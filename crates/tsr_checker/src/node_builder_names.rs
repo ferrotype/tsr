@@ -45,6 +45,7 @@ pub(super) struct NameAccess {
     extended: Map<SymbolId, Vec<SymbolId>>,
     extended_by_file: Map<(SymbolId, NodeId), Vec<SymbolId>>,
 }
+// port: tsc/internal/checker/symbolaccessibility.go:getQualifiedLeftMeaning
 fn left_meaning(meaning: u32) -> u32 {
     if meaning == sf::VALUE {
         sf::VALUE
@@ -168,6 +169,21 @@ impl NodeBuilder<'_> {
             external_only: false,
         })
     }
+    /// `getAccessibleSymbolChain`: a chain search with its own visited tables.
+    pub(crate) fn accessible_symbol_chain(
+        &mut self,
+        symbol: SymbolId,
+        enclosing: Option<NodeId>,
+        meaning: u32,
+        external_only: bool,
+    ) -> Result<Vec<SymbolId>, Error> {
+        self.accessible_name_chain(NameQuery {
+            symbol,
+            enclosing,
+            meaning,
+            external_only,
+        })
+    }
     pub(super) fn accessibility_containers(
         &mut self,
         symbol: SymbolId,
@@ -216,22 +232,49 @@ impl NodeBuilder<'_> {
     }
     pub(super) fn name_external_module(&self, symbol: SymbolId) -> Result<bool, Error> {
         for node in self.checker.symbol_declarations(symbol)?.iter().flatten() {
-            let view = self.checker.ast(node)?;
-            let read = view.node(node)?;
-            if read.kind() == K::SourceFile
-                && tsr_ast::utilities::is_external_or_common_js_module(&view.source_file(node)?)
-            {
+            if self.has_non_global_augmentation_external_module_symbol(node)? {
                 return Ok(true);
-            }
-            if read.kind() == K::ModuleDeclaration {
-                if let Some(name) = read.name() {
-                    if view.node(name)?.kind() == K::StringLiteral {
-                        return Ok(true);
-                    }
-                }
             }
         }
         Ok(false)
+    }
+
+    // port: tsc/internal/checker/symbolaccessibility.go:hasNonGlobalAugmentationExternalModuleSymbol
+    fn has_non_global_augmentation_external_module_symbol(
+        &self,
+        declaration: NodeId,
+    ) -> Result<bool, Error> {
+        let view = self.checker.ast(declaration)?;
+        let read = view.node(declaration)?;
+        if read.kind() == K::ModuleDeclaration {
+            if let Some(name) = read.name() {
+                if view.node(name)?.kind() == K::StringLiteral {
+                    return Ok(true);
+                }
+            }
+        }
+        Ok(read.kind() == K::SourceFile
+            && tsr_ast::utilities::is_external_or_common_js_module(&view.source_file(declaration)?))
+    }
+
+    // port: tsc/internal/checker/symbolaccessibility.go:isUMDExportSymbol
+    fn is_umd_export_symbol(&self, symbol: SymbolId) -> Result<bool, Error> {
+        match self.checker.symbol_declarations(symbol)?.first().flatten() {
+            Some(first) => Ok(self.checker.node(first)?.kind() == K::NamespaceExportDeclaration),
+            None => Ok(false),
+        }
+    }
+
+    // port: tsc/internal/checker/symbolaccessibility.go:isNamespaceReexportDeclaration
+    fn is_namespace_reexport_declaration(&self, node: NodeId) -> Result<bool, Error> {
+        let read = self.checker.node(node)?;
+        if read.kind() != K::NamespaceExport {
+            return Ok(false);
+        }
+        let parent = read
+            .parent()
+            .ok_or(Error::MissingLink("namespace export parent"))?;
+        Ok(self.checker.module_specifier(parent)?.is_some())
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getSpecifierForModuleSymbol
@@ -607,7 +650,7 @@ impl NodeBuilder<'_> {
             ) {
                 continue;
             }
-            if self.name_has_declaration_kind(alias, K::NamespaceExportDeclaration)? {
+            if self.is_umd_export_symbol(alias)? {
                 if let Some(enclosing) = query.enclosing {
                     let file = tsr_ast::utilities::get_source_file_of_node(
                         self.checker.ast(enclosing)?,
@@ -676,14 +719,8 @@ impl NodeBuilder<'_> {
     }
     fn name_has_namespace_reexport(&self, symbol: SymbolId) -> Result<bool, Error> {
         for node in self.checker.symbol_declarations(symbol)?.iter().flatten() {
-            let read = self.checker.node(node)?;
-            if read.kind() == K::NamespaceExport {
-                let parent = read
-                    .parent()
-                    .ok_or(Error::MissingLink("namespace export parent"))?;
-                if self.checker.module_specifier(parent)?.is_some() {
-                    return Ok(true);
-                }
+            if self.is_namespace_reexport_declaration(node)? {
+                return Ok(true);
             }
         }
         Ok(false)

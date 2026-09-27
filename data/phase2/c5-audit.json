@@ -1022,95 +1022,59 @@
    "item": "C5.5",
    "reason": "Not yet ported; the item that closes it is named."
   },
-  "tsc/internal/checker/symbolaccessibility.go:Checker.GetAccessibleSymbolChain": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/symbolaccessibility.go:Checker.IsSymbolAccessible": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/symbolaccessibility.go:Checker.IsSymbolAccessibleByFlags": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/symbolaccessibility.go:Checker.getAccessibleSymbolChain": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
   "tsc/internal/checker/symbolaccessibility.go:Checker.getClassExpressionNameTable": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/symbolaccessibility.go:Checker.getExternalModuleContainer": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "The class-expression name is offered as a singleton name table keyed NameTableId::Locals(class expression), the id the pin's symbolTableIDFromLocals gives the cached table; the singleton needs no cache because its identity is the key.",
+   "reviewed_from": "pinned body and its callers; C5.3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_scope.rs:81"
   },
   "tsc/internal/checker/symbolaccessibility.go:Checker.getFileSymbolIfFileSymbolExportEqualsContainer": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/symbolaccessibility.go:getQualifiedLeftMeaning": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined in getWithAlternativeContainers' port: the external module container of each declaration whose export= export is the same reference as the container.",
+   "reviewed_from": "pinned body and its callers; C5.3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_containers.rs:94"
   },
   "tsc/internal/checker/symbolaccessibility.go:hasExternalModuleSymbol": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/symbolaccessibility.go:hasNonGlobalAugmentationExternalModuleSymbol": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/symbolaccessibility.go:isNamespaceReexportDeclaration": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "The ancestor test of getExternalModuleContainer's port: an ambient module, or a source file that is an external or CommonJS module.",
+   "reviewed_from": "pinned body and its callers; C5.3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_containers.rs:67"
   },
   "tsc/internal/checker/symbolaccessibility.go:isPropertyOrMethodDeclarationSymbol": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/symbolaccessibility.go:isUMDExportSymbol": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined at the head of getAccessibleSymbolChainEx's port: a symbol whose declarations are all property, method or accessor declarations has no chain.",
+   "reviewed_from": "pinned body and its callers; C5.3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:517"
   },
   "tsc/internal/checker/symbolaccessibility.go:symbolTableIDFromExports": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "The symbol-table id is the NameTableId variant for the table's kind with its node or symbol; the visited set keys on (queried symbol, NameTableId), as the pin keys visitedSymbolTablesMap.",
+   "reviewed_from": "pinned body and its callers; C5.3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:21"
   },
   "tsc/internal/checker/symbolaccessibility.go:symbolTableIDFromGlobals": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "The symbol-table id is the NameTableId variant for the table's kind with its node or symbol; the visited set keys on (queried symbol, NameTableId), as the pin keys visitedSymbolTablesMap.",
+   "reviewed_from": "pinned body and its callers; C5.3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:21"
   },
   "tsc/internal/checker/symbolaccessibility.go:symbolTableIDFromLocals": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "The symbol-table id is the NameTableId variant for the table's kind with its node or symbol; the visited set keys on (queried symbol, NameTableId), as the pin keys visitedSymbolTablesMap.",
+   "reviewed_from": "pinned body and its callers; C5.3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:21"
   },
   "tsc/internal/checker/symbolaccessibility.go:symbolTableIDFromMembers": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "The symbol-table id is the NameTableId variant for the table's kind with its node or symbol; the visited set keys on (queried symbol, NameTableId), as the pin keys visitedSymbolTablesMap.",
+   "reviewed_from": "pinned body and its callers; C5.3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:21"
   },
   "tsc/internal/checker/symbolaccessibility.go:symbolTableIDFromResolvedExports": {
-   "disposition": "gap",
-   "item": "C5.3",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "The symbol-table id is the NameTableId variant for the table's kind with its node or symbol; the visited set keys on (queried symbol, NameTableId), as the pin keys visitedSymbolTablesMap.",
+   "reviewed_from": "pinned body and its callers; C5.3 source audit",
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:21"
   },
   "tsc/internal/checker/symboltracker.go:NewSymbolTrackerImpl": {
    "disposition": "gap",
