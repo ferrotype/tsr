@@ -493,11 +493,7 @@ impl CheckerState {
         let setting = self.program()?.host.options().allow_unused_labels;
         if self.node(label)?.flags() & nf::UNREACHABLE != 0 && setting != Tristate::TRUE {
             let diagnostic = self.diagnostic_for_node(Some(label), d::Unused_label, vec![])?;
-            if setting == Tristate::FALSE {
-                self.add_diagnostic(diagnostic)?;
-            } else {
-                self.add_suggestion_diagnostic(diagnostic)?;
-            }
+            self.variable_error_or_suggestion(setting == Tristate::FALSE, diagnostic)?;
         }
         self.check_source_element(statement)
     }

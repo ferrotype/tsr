@@ -151,8 +151,8 @@ impl CheckerState {
                             if member { args.push(JsString::from_bytes(b"any".as_slice())); }
                             let diagnostic = self.diagnostic_for_node(Some(declaration), diagnostic, args)?;
                             let options = self.program()?.host.options();
-                            if options.strict_option_value(options.no_implicit_any) { self.add_diagnostic(diagnostic)?; }
-                            else { self.add_suggestion_diagnostic(diagnostic)?; }
+                            let error = options.strict_option_value(options.no_implicit_any);
+                            self.variable_error_or_suggestion(error, diagnostic)?;
                             break;
                         }
                     }

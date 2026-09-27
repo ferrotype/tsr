@@ -674,6 +674,29 @@ impl CheckerState {
                 ));
             }
             if let Some(symbol) = self.constituent_property(object, name.as_bytes(), false)? {
+                if let Some(access) = node.filter(|_| flags & af::REPORT_DEPRECATED != 0) {
+                    let declarations = self.symbol_declarations(symbol)?.to_vec();
+                    if !declarations.is_empty()
+                        && self.is_deprecated_symbol(symbol)?
+                        && self.is_uncalled_function_reference(access, symbol)?
+                    {
+                        let read = self.node(access)?;
+                        let deprecated = if expression.is_some() {
+                            read.data_source()
+                                .as_element_access_expression()
+                                .and_then(|data| data.argument_expression())
+                                .ok_or(Error::MissingLink("element access argument"))?
+                        } else if read.kind() == K::IndexedAccessType {
+                            read.data_source()
+                                .as_indexed_access_type_node()
+                                .and_then(|data| data.index_type())
+                                .ok_or(Error::MissingLink("indexed access index type"))?
+                        } else {
+                            access
+                        };
+                        self.add_deprecated_suggestion(deprecated, &declarations, name.clone())?;
+                    }
+                }
                 if let Some(expression) = expression {
                     let left = self
                         .ast(expression)?

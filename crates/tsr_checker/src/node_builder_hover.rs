@@ -66,7 +66,7 @@ impl NodeBuilder<'_> {
                 Some(self.ast.new_modifier(kind))
             })
             .unwrap_or_default();
-        self.list(nodes.into_iter().flatten().collect())
+        self.modifiers_list(nodes.into_iter().flatten().collect())
     }
 
     fn builder_modifier_flags(&self, node: NodeId) -> Result<u32, Error> {
@@ -730,7 +730,7 @@ impl NodeBuilder<'_> {
         let old_flags = self.flags;
         self.flags |= tsr_nodebuilder::flags::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME
             | tsr_nodebuilder::Flags::from(crate::symbol_format_flags::USE_ONLY_EXTERNAL_ALIASING);
-        let local_name = self.symbol_display_node(symbol, sf::ALL, false);
+        let local_name = self.symbol_display_node(symbol, sf::ALL, true);
         self.flags = old_flags;
         let local_name = local_name?;
         let result = self.expand_module_body(symbol, local_name, &members);
@@ -1175,6 +1175,10 @@ impl CheckerState {
                 .expand_symbol_for_hover_request(symbol, meaning)?
                 .unwrap_or_default();
             signals = builder.verbosity.take();
+            // The printer reads the source file through the builder's view.
+            if let Some(source) = source {
+                builder.retain_source_node(source)?;
+            }
             let printer = tsr_printer::Printer::new(
                 tsr_printer::PrinterOptions {
                     remove_comments: true,

@@ -41,12 +41,34 @@ impl CheckerState {
         Ok(self.builtins.any_type)
     }
 
+    /// `reportImplicitAny` reports nothing in a JavaScript file unless checkJs
+    /// is on for it; the sites that inline its branches ask this first.
+    pub(crate) fn implicit_any_is_silent(&self, declaration: NodeId) -> Result<bool, Error> {
+        if !tsr_ast::utilities::is_in_js_file(Some(&self.node(declaration)?)) {
+            return Ok(false);
+        }
+        let Some(file) =
+            tsr_ast::utilities::get_source_file_of_node(self.ast(declaration)?, Some(declaration))?
+        else {
+            return Ok(false);
+        };
+        let source = self.source_file_read(file)?;
+        Ok(!tsr_ast::utilities::is_check_js_enabled_for_file(
+            &source,
+            self.program()?.host.options(),
+        ))
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.reportImplicitAny
     pub(crate) fn report_implicit_any(
         &mut self,
         declaration: NodeId,
         ty: TypeId,
     ) -> Result<(), Error> {
+        if self.implicit_any_is_silent(declaration)? {
+            // Only report implicit any errors/suggestions in TS and ts-check JS files.
+            return Ok(());
+        }
         let no_implicit = self
             .program()?
             .host
@@ -139,17 +161,62 @@ impl CheckerState {
                 }
                 d::Binding_element_0_implicitly_has_an_1_type
             }
-            Some(K::VariableDeclaration) => {
+            Some(
+                K::FunctionDeclaration
+                | K::MethodDeclaration
+                | K::MethodSignature
+                | K::GetAccessor
+                | K::SetAccessor
+                | K::FunctionExpression
+                | K::ArrowFunction,
+            ) => {
+                // The normal widening kind; generator yields report through
+                // `report_function_widening`.
+                if no_implicit && name.is_none() {
+                    self.error_at(
+                        Some(declaration),
+                        d::Function_expression_which_lacks_return_type_annotation_implicitly_has_an_0_return_type,
+                        vec![display],
+                    )?;
+                    return Ok(());
+                }
+                if !no_implicit {
+                    d::X_0_implicitly_has_an_1_return_type_but_a_better_type_may_be_inferred_from_usage
+                } else if read.flags() & tsr_ast::node_flags::REPARSED != 0 {
+                    if spelling.as_bytes().is_empty() {
+                        self.error_at(
+                            Some(declaration),
+                            d::This_overload_implicitly_returns_the_type_0_because_it_lacks_a_return_type_annotation,
+                            vec![display],
+                        )?;
+                    } else {
+                        self.error_at(
+                            Some(declaration),
+                            d::X_0_which_lacks_return_type_annotation_implicitly_has_an_1_return_type,
+                            vec![spelling, display],
+                        )?;
+                    }
+                    return Ok(());
+                } else {
+                    d::X_0_which_lacks_return_type_annotation_implicitly_has_an_1_return_type
+                }
+            }
+            Some(K::MappedType) => {
+                if no_implicit {
+                    self.error_at(
+                        Some(declaration),
+                        d::Mapped_object_type_implicitly_has_an_any_template_type,
+                        vec![],
+                    )?;
+                }
+                return Ok(());
+            }
+            _ => {
                 if no_implicit {
                     d::Variable_0_implicitly_has_an_1_type
                 } else {
                     d::Variable_0_implicitly_has_an_1_type_but_a_better_type_may_be_inferred_from_usage
                 }
-            }
-            _ => {
-                return Err(Error::Unsupported(
-                    "reportImplicitAny: non-variable widening kind",
-                ))
             }
         };
         let diagnostic =

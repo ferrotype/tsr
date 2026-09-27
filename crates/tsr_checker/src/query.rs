@@ -98,6 +98,34 @@ impl CheckerState {
         Ok(Some(self.get_merged_symbol(symbol)))
     }
 
+    /// The parameter a JSDoc `@param` name documents: the one of that name in
+    /// the function-like node at the name's position, which the JSDoc comment
+    /// precedes (the `IsJSDocParameterTag` branch of `getSymbolAtLocation`).
+    fn jsdoc_parameter_tag_symbol(&mut self, name: NodeId) -> Result<Option<SymbolId>, Error> {
+        let view = self.ast(name)?;
+        let Some(file) = tsr_ast::utilities::get_source_file_of_node(view, Some(name))? else {
+            return Ok(None);
+        };
+        let pos = view.node(name)?.pos();
+        let function =
+            tsr_ast::utilities_positions::get_node_at_position(self.ast(file)?, file, pos)?;
+        if !tsr_ast::utilities::is_function_like(Some(&self.node(function)?)) {
+            return Ok(None);
+        }
+        let text = self.node_text(name)?.into_js_string();
+        for parameter in self.source_list(function, self.node(function)?.parameter_list())? {
+            let Some(parameter_name) = self.node(parameter)?.name() else {
+                continue;
+            };
+            if self.node(parameter_name)?.kind() == K::Identifier
+                && self.node_text(parameter_name)?.as_bytes() == text.as_bytes()
+            {
+                return self.get_symbol_of_declaration(parameter);
+            }
+        }
+        Ok(None)
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.getSymbolAtLocation
     pub(crate) fn get_symbol_at_location(
         &mut self,
@@ -162,6 +190,7 @@ impl CheckerState {
             }
         }
         let read = self.node(node)?;
+        let mut jsdoc_parameter_name = false;
         if read.kind() == K::Identifier {
             if let Some(parent) = read.parent() {
                 let parent_read = self.node(parent)?;
@@ -182,8 +211,16 @@ impl CheckerState {
                     }
                     return Ok(None);
                 }
+                jsdoc_parameter_name =
+                    parent_read.kind() == K::JSDocParameterTag && parent_read.name() == Some(node);
             }
         }
+        if jsdoc_parameter_name {
+            if let Some(symbol) = self.jsdoc_parameter_tag_symbol(node)? {
+                return Ok(Some(symbol));
+            }
+        }
+        let read = self.node(node)?;
         let this_in_type_query = is_this_in_type_query(self.ast(node)?, node)?;
         if !this_in_type_query
             && matches!(
@@ -254,8 +291,9 @@ impl CheckerState {
             },
             Some(K::ImportKeyword | K::NewKeyword) => {
                 // Parsed meta-properties store their keyword as a kind field,
-                // not a child node. Native checkMetaPropertyKeyword is a stub;
-                // this arm cannot be reached by the parsed baseline walker.
+                // not a child node; the language service reaches this arm with
+                // the keyword token it creates. checkMetaPropertyKeyword is the
+                // pin's stub: the error type, which has no symbol.
                 let Some(parent) = read.parent() else {
                     return Ok(None);
                 };
@@ -270,8 +308,7 @@ impl CheckerState {
                         }
                     }
                 }
-                let ty = self.check_meta_property(parent)?;
-                Ok(self.types.get(ty)?.symbol)
+                Ok(self.types.get(self.builtins.error_type)?.symbol)
             }
             Some(K::InstanceOfKeyword) => {
                 let Some(parent) = read.parent() else {
@@ -620,9 +657,28 @@ impl CheckerState {
                 }
             }
             Some(K::TypeReference | K::ExpressionWithTypeArguments) => {
-                match self.intended_jsdoc_type(node)? {
-                    Some(ty) => ty,
-                    None => self.source_type_reference(node)?,
+                // The language service's queries on the `const` in `x as
+                // const` resolve to the type of `x`.
+                let assertion = match read.parent() {
+                    Some(parent)
+                        if tsr_ast::utilities_middle::is_const_type_reference(
+                            self.ast(node)?,
+                            &read,
+                        )? && tsr_ast::utilities::is_assertion_expression(
+                            &self.node(parent)?,
+                        ) =>
+                    {
+                        self.node(parent)?.expression()
+                    }
+                    _ => None,
+                };
+                if let Some(expression) = assertion {
+                    self.check_expression_cached(expression)?
+                } else {
+                    match self.intended_jsdoc_type(node)? {
+                        Some(ty) => ty,
+                        None => self.source_type_reference(node)?,
+                    }
                 }
             }
             Some(K::MappedType) => self.source_mapped_type(node)?,
@@ -852,8 +908,14 @@ impl CheckerState {
         let read = self.node(node)?;
         let ty = match read.kind().known() {
             Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral) => {
-                let text = self.node_text(node)?;
-                self.get_string_literal_type(JsString::from_bytes(text.as_bytes()))?
+                // The string the language service is editing, while inference
+                // from it is blocked (`isSkipDirectInferenceNode`).
+                if self.calls.skip_direct_inference_nodes.contains(&node) {
+                    self.builtins.blocked_string_type
+                } else {
+                    let text = self.node_text(node)?;
+                    self.get_string_literal_type(JsString::from_bytes(text.as_bytes()))?
+                }
             }
             Some(K::NumericLiteral) => {
                 self.check_grammar_numeric_literal(node)?;
@@ -975,7 +1037,7 @@ impl CheckerState {
             return Ok(());
         }
         let diagnostic = self.diagnostic_for_node(Some(node), tsr_diagnostics::Numeric_literals_with_absolute_values_equal_to_2_53_or_greater_are_too_large_to_be_represented_accurately_as_integers, Vec::new())?;
-        self.add_suggestion_diagnostic(diagnostic)?;
+        self.variable_error_or_suggestion(false, diagnostic)?;
         Ok(())
     }
 

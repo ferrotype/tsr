@@ -602,6 +602,14 @@ impl CheckerState {
         if self.program()?.host.options().isolated_modules() && !type_only && !ambient {
             self.check_isolated_alias(node, symbol, target, target_flags)?;
         }
+        if self.node(node)?.kind() == K::ImportSpecifier {
+            let target = self.resolve_alias_with_deprecation_check(symbol, node)?;
+            let declarations = self.symbol_declarations(target)?.to_vec();
+            if self.is_deprecated_symbol(target)? && !declarations.is_empty() {
+                let name = self.symbol(target)?.name_to_owned();
+                self.add_deprecated_suggestion(node, &declarations, name)?;
+            }
+        }
         Ok(())
     }
     // port: tsc/internal/checker/checker.go:Checker.checkTypeNameIsReserved

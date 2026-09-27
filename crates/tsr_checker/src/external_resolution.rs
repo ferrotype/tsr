@@ -536,12 +536,8 @@ impl CheckerState {
                 args,
             )?
         };
-        if is_error {
-            self.add_diagnostic(diagnostic)?;
-        } else {
-            self.add_suggestion_diagnostic(diagnostic)?;
-        }
-        Ok(())
+        // `addErrorOrSuggestion`: a suggestion carries the suggestion category.
+        self.variable_error_or_suggestion(is_error, diagnostic)
     }
     // port: tsc/internal/checker/checker.go:Checker.getSuggestedImportExtension
     fn suggested_import_extension(&self, path: &[u8]) -> Result<Option<&'static [u8]>, Error> {

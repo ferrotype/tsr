@@ -1,9 +1,8 @@
 {
  "dispositions": {
   "tsc/internal/checker/checker.go:Checker.GetAliasedSymbol": {
-   "disposition": "equivalent",
-   "reason": "the public wrapper of resolve_alias",
-   "rust": "crates/tsr_checker/src/module_aliases.rs:255"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.5 (exports.rs), a public entry point the recorded fourslash calls replay."
   },
   "tsc/internal/checker/checker.go:Checker.GetSymbolAtLocation": {
    "disposition": "equivalent",
@@ -11,9 +10,8 @@
    "rust": "crates/tsr_checker/src/query.rs:102"
   },
   "tsc/internal/checker/checker.go:Checker.ResolveAlias": {
-   "disposition": "equivalent",
-   "reason": "the public wrapper of resolve_alias with the unknown-symbol test at the call site",
-   "rust": "crates/tsr_checker/src/module_aliases.rs:255"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.5 (exports.rs), a public entry point the recorded fourslash calls replay."
   },
   "tsc/internal/checker/checker.go:Checker.addInheritedMembers": {
    "disposition": "equivalent",
@@ -342,9 +340,8 @@
    "rust": "crates/tsr_checker/src/merge.rs:90"
   },
   "tsc/internal/checker/checker.go:Checker.resolveAliasWithDeprecationCheck": {
-   "disposition": "equivalent",
-   "reason": "check_value_identifier resolves the alias; the deprecation walk adds suggestion diagnostics only, which the harness never captures (CaptureSuggestions is false)",
-   "rust": "crates/tsr_checker/src/value_references.rs:35"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.5 (signature_jsdoc.rs): the services replay observes the deprecation suggestions it reports."
   },
   "tsc/internal/checker/checker.go:Checker.resolveClassOrInterfaceMembers": {
    "disposition": "equivalent",

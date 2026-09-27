@@ -75,9 +75,22 @@ impl CheckerState {
         };
         for target_property in properties {
             let name = self.symbol(target_property)?.name_to_owned();
-            if let Some(source_property) =
-                self.constituent_property(source, name.as_bytes(), false)?
-            {
+            let source_property = self.constituent_property(source, name.as_bytes(), false)?;
+            // A property the language service is editing is not an inference
+            // source (`isSkipDirectInferenceNode` on its declarations).
+            let blocked = match source_property {
+                Some(property) if !self.calls.skip_direct_inference_nodes.is_empty() => self
+                    .symbol_declarations(property)?
+                    .iter()
+                    .flatten()
+                    .any(|declaration| {
+                        self.calls
+                            .skip_direct_inference_nodes
+                            .contains(&declaration)
+                    }),
+                _ => false,
+            };
+            if let Some(source_property) = source_property.filter(|_| !blocked) {
                 let s = self.get_type_of_symbol(source_property)?;
                 let s = self.remove_missing_type(
                     s,

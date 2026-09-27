@@ -84,7 +84,7 @@ impl NodeBuilder<'_> {
                             let modifiers = if modifiers.is_empty() {
                                 None
                             } else {
-                                Some(self.list(modifiers)?)
+                                Some(self.modifiers_list(modifiers)?)
                             };
                             self.retain_source_node(name)?;
                             let symbol = self
@@ -124,7 +124,7 @@ impl NodeBuilder<'_> {
                                 .flatten(),
                         );
                     }
-                    let modifiers = self.list(modifiers)?;
+                    let modifiers = self.modifiers_list(modifiers)?;
                     node = self.ast.update_index_signature_declaration(
                         node,
                         Some(modifiers),

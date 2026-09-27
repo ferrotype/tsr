@@ -90,7 +90,7 @@ impl NodeBuilder<'_> {
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createAccessExpression
-    fn create_access_expression(&mut self, node: NodeId) -> Result<NodeId, Error> {
+    pub(super) fn create_access_expression(&mut self, node: NodeId) -> Result<NodeId, Error> {
         let mut node = node;
         let mut names = Vec::new();
         while self.ast.view().node(node)?.kind() == K::QualifiedName {

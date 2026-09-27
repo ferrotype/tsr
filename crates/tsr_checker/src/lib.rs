@@ -214,6 +214,8 @@ mod relater_variance;
 mod relation_error_target;
 mod relation_errors;
 mod relation_helpers;
+#[cfg(feature = "services-replay")]
+mod replay_view;
 mod resolution;
 mod return_inference;
 mod services;
@@ -245,6 +247,8 @@ mod variables;
 mod variance;
 mod widening;
 pub use relater::RelationKind;
+#[cfg(feature = "services-replay")]
+pub use replay_view::{LiteralView, SignatureView, TypeView, TypeViewData};
 mod type_display;
 mod type_parameters;
 mod types;

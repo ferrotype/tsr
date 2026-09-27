@@ -908,6 +908,59 @@ impl Operation<'_> {
             != 0)
     }
 
+    /// `Checker.GetNonNullableType`, ported as `non_nullable_type`.
+    pub fn get_non_nullable_type(&mut self, ty: TypeRef) -> Result<TypeRef, Error> {
+        let ty = self.check_type(ty)?;
+        let result = self.state_mut().non_nullable_type(ty)?;
+        Ok(self.type_ref(result))
+    }
+
+    /// `Checker.IsEmptyAnonymousObjectType`.
+    pub fn is_empty_anonymous_object_type(&mut self, ty: TypeRef) -> Result<bool, Error> {
+        let ty = self.check_type(ty)?;
+        self.state_mut().is_empty_anonymous_object_type(ty)
+    }
+
+    /// `Checker.GetPromisedTypeOfPromise`.
+    pub fn get_promised_type_of_promise(&mut self, ty: TypeRef) -> Result<Option<TypeRef>, Error> {
+        let ty = self.check_type(ty)?;
+        let result = self.state_mut().get_promised_type_of_promise(ty)?;
+        Ok(result.map(|ty| self.type_ref(ty)))
+    }
+
+    /// `Checker.IsLibTypeForHoverVerbosity`.
+    pub fn is_lib_type_for_hover_verbosity(&self, ty: TypeRef) -> Result<bool, Error> {
+        let ty = self.check_type(ty)?;
+        self.state().is_lib_type_for_hover_verbosity(ty)
+    }
+
+    /// `Checker.IsLibSymbolForHoverVerbosity`.
+    pub fn is_lib_symbol_for_hover_verbosity(
+        &self,
+        symbol: Option<SymbolRef>,
+    ) -> Result<bool, Error> {
+        let symbol = symbol.map(|s| self.check_symbol_ref(s)).transpose()?;
+        self.state().is_lib_symbol_for_hover_verbosity(symbol)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.ResolveAlias
+    /// The alias target, and whether it resolved to something other than the
+    /// unknown symbol.
+    pub fn resolve_alias(&mut self, symbol: SymbolRef) -> Result<(SymbolRef, bool), Error> {
+        let symbol = self.check_symbol_ref(symbol)?;
+        let state = self.state_mut();
+        let resolved = state.resolve_alias(symbol)?;
+        let unknown = state.builtins.unknown_symbol;
+        Ok((self.symbol_ref(resolved)?, resolved != unknown))
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.GetAliasedSymbol
+    pub fn get_aliased_symbol(&mut self, symbol: SymbolRef) -> Result<SymbolRef, Error> {
+        let symbol = self.check_symbol_ref(symbol)?;
+        let resolved = self.state_mut().resolve_alias(symbol)?;
+        self.symbol_ref(resolved)
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.TryGetThisTypeAtEx
     /// The `this` type at `node`; `None` for a JSDoc node the binder never saw.
     pub fn try_get_this_type_at_ex(

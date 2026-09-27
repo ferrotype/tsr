@@ -274,7 +274,17 @@ impl<'a> NodeBuilder<'a> {
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getNameOfSymbolAsWritten
-    fn symbol_name(&self, symbol: SymbolId) -> Result<JsString, Error> {
+    fn symbol_name(&mut self, symbol: SymbolId) -> Result<JsString, Error> {
+        let (name, anonymous) = self.symbol_name_as_written(symbol)?;
+        // A class or function expression cannot be named.
+        if anonymous && !self.encountered_error && self.flags & nf::ALLOW_ANONYMOUS_IDENTIFIER == 0
+        {
+            self.encountered_error = true;
+        }
+        Ok(name)
+    }
+
+    fn symbol_name_as_written(&self, symbol: SymbolId) -> Result<(JsString, bool), Error> {
         // The pin looks the symbol up in remappedSymbolReferences by symbol id
         // first, which assigns the id of every symbol whose name is written.
         self.checker.symbol_runtime_id(symbol)?;
@@ -293,7 +303,7 @@ impl<'a> NodeBuilder<'a> {
                     false
                 };
             if external {
-                return Ok(JsString::from_bytes(b"default".as_slice()));
+                return Ok((JsString::from_bytes(b"default".as_slice()), false));
             }
         }
         for declaration in declarations.iter().flatten() {
@@ -313,12 +323,15 @@ impl<'a> NodeBuilder<'a> {
                             != 0
                         {
                             if let Some(name) = self.symbol_name_from_name_type(symbol)? {
-                                return Ok(name);
+                                return Ok((name, false));
                             }
                         }
                     }
                 }
-                return Ok(tsr_scanner::declaration_name_to_string(view, Some(name))?);
+                return Ok((
+                    tsr_scanner::declaration_name_to_string(view, Some(name))?,
+                    false,
+                ));
             }
         }
         if let Some(declaration) = declarations.first().flatten() {
@@ -326,27 +339,33 @@ impl<'a> NodeBuilder<'a> {
             let node = view.node(declaration)?;
             if let Some(parent) = node.parent() {
                 if view.node(parent)?.kind() == K::VariableDeclaration {
-                    return Ok(tsr_scanner::declaration_name_to_string(
-                        view,
-                        view.node(parent)?.name(),
-                    )?);
+                    return Ok((
+                        tsr_scanner::declaration_name_to_string(view, view.node(parent)?.name())?,
+                        false,
+                    ));
                 }
             }
             match node.kind().known() {
                 Some(K::ClassExpression) => {
-                    return Ok(JsString::from_bytes(b"(Anonymous class)".as_slice()))
+                    return Ok((JsString::from_bytes(b"(Anonymous class)".as_slice()), true))
                 }
                 Some(K::FunctionExpression | K::ArrowFunction) => {
-                    return Ok(JsString::from_bytes(b"(Anonymous function)".as_slice()))
+                    return Ok((
+                        JsString::from_bytes(b"(Anonymous function)".as_slice()),
+                        true,
+                    ))
                 }
                 _ => {}
             }
         }
         if let Some(name) = self.symbol_name_from_name_type(symbol)? {
-            return Ok(name);
+            return Ok((name, false));
         }
-        Ok(JsString::from_bytes(
-            tsr_ast::escape_internal_symbol_name(read.name_bytes()).into_owned(),
+        Ok((
+            JsString::from_bytes(
+                tsr_ast::escape_internal_symbol_name(read.name_bytes()).into_owned(),
+            ),
+            false,
         ))
     }
 
@@ -405,7 +424,7 @@ impl<'a> NodeBuilder<'a> {
                 .get(name_type)?
                 .symbol
                 .ok_or(Error::MissingLink("symbol name unique symbol"))?;
-            let name = self.symbol_name(target)?;
+            let name = self.symbol_name_as_written(target)?.0;
             let mut text = vec![b'['];
             text.extend_from_slice(name.as_bytes());
             text.push(b']');
@@ -428,6 +447,16 @@ impl<'a> NodeBuilder<'a> {
     fn list(&mut self, nodes: Vec<NodeId>) -> Result<NodeListId, Error> {
         let nodes = self.ast.node_slice(nodes.into_iter().map(Some).collect())?;
         Ok(self.ast.new_list(TextRange::new(-1, -1), nodes)?)
+    }
+
+    /// `NewModifierList`: a list that carries its modifier flags, which
+    /// `ModifierFlags` and `HasSyntacticModifier` read.
+    fn modifiers_list(&mut self, nodes: Vec<NodeId>) -> Result<NodeListId, Error> {
+        let nodes = self.ast.node_slice(nodes.into_iter().map(Some).collect())?;
+        Ok(tsr_ast::RuntimeFactory::new_modifier_list(
+            &mut self.ast,
+            nodes,
+        ))
     }
 
     fn optional_node_list(&mut self, nodes: Vec<Option<NodeId>>) -> Result<NodeListId, Error> {
@@ -1258,7 +1287,7 @@ impl<'a> NodeBuilder<'a> {
         let modifiers = if readonly {
             self.approximate_length += 9;
             let modifier = self.ast.new_modifier(K::ReadonlyKeyword.into());
-            Some(self.list(vec![modifier])?)
+            Some(self.modifiers_list(vec![modifier])?)
         } else {
             None
         };

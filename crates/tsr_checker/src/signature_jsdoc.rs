@@ -166,11 +166,7 @@ impl CheckerState {
                     d::JSDoc_param_tag_has_name_0_but_there_is_no_parameter_with_that_name,
                     vec![text],
                 )?;
-                if js {
-                    self.add_diagnostic(diagnostic)?;
-                } else {
-                    self.add_suggestion_diagnostic(diagnostic)?;
-                }
+                self.variable_error_or_suggestion(js, diagnostic)?;
             }
         }
         Ok(())
@@ -598,6 +594,91 @@ impl CheckerState {
         }
         for declaration in declarations.iter().flatten() {
             if !self.is_deprecated_declaration(*declaration)? {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.resolveAliasWithDeprecationCheck
+    /// The alias target of `symbol`, reporting the first deprecated alias on
+    /// the way; a deprecated alias itself resolves to itself.
+    pub(crate) fn resolve_alias_with_deprecation_check(
+        &mut self,
+        symbol: SymbolId,
+        location: NodeId,
+    ) -> Result<SymbolId, Error> {
+        if self.symbol(symbol)?.flags() & sf::ALIAS == 0
+            || self.is_deprecated_symbol(symbol)?
+            || self.alias_declaration_or_none(symbol)?.is_none()
+        {
+            return Ok(symbol);
+        }
+        let target_symbol = self.resolve_alias(symbol)?;
+        if target_symbol == self.builtins.unknown_symbol {
+            return Ok(target_symbol);
+        }
+        let mut symbol = symbol;
+        while self.symbol(symbol)?.flags() & sf::ALIAS != 0 {
+            let Some(target) = self.immediate_aliased_symbol(symbol)? else {
+                break;
+            };
+            if target == target_symbol {
+                break;
+            }
+            let declarations = self.symbol_declarations(target)?.to_vec();
+            if declarations.is_empty() {
+                // The pin loops on the same symbol here; no recorded program
+                // reaches it, and the walk cannot advance, so it stops.
+                break;
+            }
+            if self.is_deprecated_symbol(target)? {
+                let name = self.symbol(target)?.name_to_owned();
+                self.add_deprecated_suggestion(location, &declarations, name)?;
+                break;
+            }
+            if symbol == target_symbol {
+                break;
+            }
+            symbol = target;
+        }
+        Ok(target_symbol)
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.isUncalledFunctionReference
+    pub(crate) fn is_uncalled_function_reference(
+        &mut self,
+        node: NodeId,
+        symbol: SymbolId,
+    ) -> Result<bool, Error> {
+        if self.symbol(symbol)?.flags() & (sf::FUNCTION | sf::METHOD) == 0 {
+            return Ok(true);
+        }
+        let first = self.node(node)?.parent();
+        let mut parent = first;
+        while let Some(current) = parent {
+            if !tsr_ast::utilities::is_access_expression(&self.node(current)?) {
+                break;
+            }
+            parent = self.node(current)?.parent();
+        }
+        let parent = parent
+            .or(first)
+            .expect("runtime error: invalid memory address or nil pointer dereference");
+        let read = self.node(parent)?;
+        if tsr_ast::utilities_middle::is_call_like_expression(self.ast(parent)?, &read)? {
+            return Ok(matches!(
+                read.kind().known(),
+                Some(K::CallExpression | K::NewExpression)
+            ) && self.node(node)?.kind() == K::Identifier
+                && self.flow_has_matching_argument(parent, node)?);
+        }
+        let declarations: Vec<NodeId> =
+            self.symbol_declarations(symbol)?.iter().flatten().collect();
+        for declaration in declarations {
+            if tsr_ast::utilities::is_function_like(Some(&self.node(declaration)?))
+                && !self.is_deprecated_declaration(declaration)?
+            {
                 return Ok(false);
             }
         }

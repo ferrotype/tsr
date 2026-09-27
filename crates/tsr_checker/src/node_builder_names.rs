@@ -1260,9 +1260,17 @@ impl NodeBuilder<'_> {
                     .new_type_reference_node(Some(entity_name), type_arguments)
             });
         }
-        Err(Error::Unsupported(
-            "symbolToTypeNode: expression with type arguments",
-        ))
+        if is_type_of && kind == K::ExpressionWithTypeArguments {
+            let (expression, arguments) = {
+                let read = self.ast.view().node(entity_name)?;
+                (read.expression(), read.type_argument_list())
+            };
+            let expression = expression.ok_or(Error::MissingLink("instantiation expression"))?;
+            let expression = tsr_ast::deep_clone_node(&mut self.ast, Some(expression))
+                .ok_or(Error::MissingLink("instantiation expression clone"))?;
+            return Ok(self.ast.new_type_query_node(Some(expression), arguments));
+        }
+        Ok(entity_name)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToTypeNode
@@ -1637,9 +1645,12 @@ impl NodeBuilder<'_> {
             {
                 return Ok(self.ast.new_qualified_name(Some(lhs), Some(identifier)));
             }
-            return Err(Error::Unsupported(
-                "createAccessFromSymbolChain: instantiation expression access",
-            ));
+            use tsr_ast::FactoryMethods;
+            let access = self.create_access_expression(lhs)?;
+            let property =
+                self.ast
+                    .new_property_access_expression(Some(access), None, Some(identifier), 0);
+            return Ok(self.expression_with_type_arguments(property, type_parameter_nodes));
         }
         Ok(identifier)
     }

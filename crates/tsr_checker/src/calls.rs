@@ -630,11 +630,32 @@ impl CheckerState {
                 self.check_expression(attributes)?;
                 return Ok(self.builtins.any_signature);
             }
-            Some(K::JsxOpeningFragment) => return Ok(self.builtins.any_signature),
+            Some(K::TaggedTemplateExpression) => {
+                let template = self
+                    .node(node)?
+                    .data_source()
+                    .as_tagged_template_expression()
+                    .and_then(|data| data.template())
+                    .ok_or(Error::MissingLink("tagged template"))?;
+                self.check_expression(template)?;
+            }
+            Some(K::BinaryExpression) => {
+                let left = self
+                    .node(node)?
+                    .data_source()
+                    .as_binary_expression()
+                    .and_then(|data| data.left())
+                    .ok_or(Error::MissingLink("binary left"))?;
+                self.check_expression(left)?;
+            }
+            Some(K::CallExpression | K::NewExpression) => {
+                let arguments = self.node(node)?.argument_list();
+                for argument in self.source_list(node, arguments)? {
+                    self.check_expression(argument)?;
+                }
+            }
+            // A decorator's and a fragment's arguments are not checked here.
             _ => {}
-        }
-        for argument in self.effective_call_arguments(node)? {
-            self.check_expression(argument)?;
         }
         Ok(self.builtins.any_signature)
     }

@@ -78,12 +78,6 @@
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
    "rust": "crates/tsr_checker/src/node_builder_names.rs:906"
   },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.tryGetThisParameterDeclaration": {
-   "disposition": "equivalent",
-   "reason": "Inlined in signatureToSignatureDeclarationHelper's port: the signature's this parameter as a parameter declaration; the pin's JSDoc this-tag branch is commented out.",
-   "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_extra.rs:492"
-  },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeNodeIsEquivalentToType": {
    "disposition": "equivalent",
    "reason": "Inlined in tryReuseExistingNonParameterTypeNode's port: the annotation's type is the type, or the host has a question token and the type without undefined is it.",
@@ -107,12 +101,6 @@
    "reason": "Inlined in mapToTypeNodes' port, its only caller: every seen name of a group compared with the first.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
    "rust": "crates/tsr_checker/src/node_builder.rs:597"
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:getEffectiveParameterDeclaration": {
-   "disposition": "equivalent",
-   "reason": "Inlined in symbolToParameterDeclaration's port: the parameter's value declaration, a parameter or its JSDoc parameter tag.",
-   "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_extra.rs:416"
   },
   "tsc/internal/checker/nodebuilderimpl.go:getTopmostIndexedAccessType": {
    "disposition": "equivalent",

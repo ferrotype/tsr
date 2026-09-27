@@ -391,6 +391,15 @@ impl CheckerState {
             self.constituent_property_ex(apparent, name.as_bytes(), skip_augment, qualified)?
         };
         let ty = if let Some(property) = property {
+            let target = self.resolve_alias_with_deprecation_check(property, right)?;
+            if self.is_deprecated_symbol(target)?
+                && self.is_uncalled_function_reference(node, target)?
+            {
+                let declarations = self.symbol_declarations(target)?.to_vec();
+                if !declarations.is_empty() {
+                    self.add_deprecated_suggestion(right, &declarations, name.clone())?;
+                }
+            }
             self.check_property_use_before_declaration(property, node, right)?;
             let parent = self.query.resolved_symbols.try_get(left).copied().flatten();
             self.mark_access_property_referenced(property, node, left, parent)?;
@@ -509,8 +518,13 @@ impl CheckerState {
                 self.error_at(
                     Some(right),
                     d::Property_0_comes_from_an_index_signature_so_it_must_be_accessed_with_0,
-                    vec![name],
+                    vec![name.clone()],
                 )?;
+            }
+            if let Some(declaration) = index.declaration {
+                if self.is_deprecated_declaration(declaration)? {
+                    self.add_deprecated_suggestion(right, &[Some(declaration)], name)?;
+                }
             }
             ty
         };

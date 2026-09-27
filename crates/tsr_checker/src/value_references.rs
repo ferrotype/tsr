@@ -31,8 +31,14 @@ impl CheckerState {
         self.mark_value_identifier_alias(node, local)?;
         let symbol = self.get_export_symbol_of_value_symbol_if_exported(local)?;
         let flags = self.symbol(symbol)?.flags();
-        if flags & sf::ALIAS != 0 {
-            self.resolve_alias(symbol)?;
+        let target = self.resolve_alias_with_deprecation_check(symbol, node)?;
+        let declarations = self.symbol_declarations(target)?.to_vec();
+        if !declarations.is_empty()
+            && self.is_deprecated_symbol(target)?
+            && self.is_uncalled_function_reference(node, target)?
+        {
+            let text = self.node_text(node)?.into_js_string();
+            self.add_deprecated_suggestion(node, &declarations, text)?;
         }
         let immediate = self.symbol(symbol)?.value_declaration();
         if let Some(declaration) = immediate {

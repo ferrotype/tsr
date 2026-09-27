@@ -328,7 +328,7 @@ impl CheckerState {
                 return Ok(());
             }
         }
-        if self.report_widening_errors_in_type(ty)? {
+        if self.report_widening_errors_in_type(ty)? || self.implicit_any_is_silent(function)? {
             return Ok(());
         }
         let widened = self.widened_type(ty)?;

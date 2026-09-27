@@ -426,6 +426,7 @@ impl NodeBuilder<'_> {
             self.clone_binding_name_native(name)
         }
     }
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.cloneBindingName
     pub(super) fn clone_binding_name_native(&mut self, node: NodeId) -> Result<NodeId, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
             self.clone_binding_name_native_worker(node)

@@ -521,10 +521,8 @@
    "rust": "crates/tsr_checker/src/access_symbols.rs:153"
   },
   "tsc/internal/checker/checker.go:Checker.isUncalledFunctionReference": {
-   "disposition": "equivalent",
-   "reason": "The pin uses the uncalled-reference test to decide whether a deprecated function reference is reported; Rust folds that test into the deprecation check at its identifier and property-access callers.",
-   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/signature_jsdoc.rs:290"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.5 (signature_jsdoc.rs): the services replay observes the deprecation suggestions it gates."
   },
   "tsc/internal/checker/checker.go:Checker.isUnwrappedReturnTypeUndefinedVoidOrAny": {
    "disposition": "equivalent",

@@ -16,6 +16,8 @@ include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/lice
 relation-probe = ["tsr_checker/relation-probe"]
 recursion-probe = ["relation-probe", "tsr_checker/recursion-probe"]
 creation-trace = ["relation-probe", "tsr_checker/creation-trace"]
+# Phase 2 C5.5: the recorded fourslash services replay.
+services-replay = ["tsr_checker/services-replay"]
 # S08 P7 measurement executables (`data/s08/checker-workload.json`): the normal
 # timing binary has neither; phase timing adds nested exclusive clocks;
 # allocation adds the counting allocator wrapper.
@@ -47,6 +49,10 @@ name = "p7_relater"
 required-features = ["relation-probe"]
 
 [[example]]
+name = "phase2_services"
+required-features = ["services-replay"]
+
+[[example]]
 name = "p7_census"
 required-features = ["s08-allocation"]
 
@@ -76,6 +82,7 @@ workspace = true
 [dev-dependencies]
 serde = { version = "1", features = ["derive"] }
 tsr_nodebuilder = { version = "0.1.0", path = "../tsr_nodebuilder" }
+tsr_astnav = { version = "0.1.0", path = "../tsr_astnav" }
 serde_json = "1"
 sha2 = "0.10"
 mimalloc = "=0.1.48"
