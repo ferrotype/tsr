@@ -8,9 +8,12 @@ and `blocked` row and each `incoming` entry of that checkpoint's claims file
 against the capture in DIR: it recomputes the request and raw-observation
 digests from the authenticated capture, checks that the row's currently unmet
 domains are still covered by the handoff's domains and that the trace artifact
-still has its recorded digest, and rewrites the capture bindings. A handoff
-that no longer holds is reported and left unchanged, so its row counts as open
-for its owner. The claims file's own bindings (`rust_capture_sha256`,
+still has its recorded digest, and rewrites the capture binding. A handoff
+attributes one observation: only an entry whose request and raw-observation
+digests are unchanged is rebound. A row whose observation changed (`changed`)
+needs fresh attribution, and a handoff that no longer covers its row (`stale`)
+is reported; both are left unchanged, so their rows count as open for their
+owner. The claims file's own bindings (`rust_capture_sha256`,
 `baseline_sha256`, `inventory_sha256`) name the checkpoint's start capture and
 do not move: the producer checks them against the baseline, and only the
 handoffs follow the fresh capture.
@@ -45,7 +48,7 @@ def rebind(claims, comparison, capture_sha256, digests, *, root=ROOT):
     rows = {row["id"]: row for row in comparison["rows"] if "outcomes" in row}
     if comparison["rust_capture_sha256"] != capture_sha256:
         raise ValueError("the comparison was made against another capture")
-    stale = []
+    stale, changed = [], []
     for entry in claims.get("rows", []):
         vid = entry["id"]
         for key in ("handoff", "incoming"):
@@ -63,10 +66,14 @@ def rebind(claims, comparison, capture_sha256, digests, *, root=ROOT):
             if not holds:
                 stale.append(vid)
                 continue
+            # A changed request or observation may carry a new defect under the
+            # old cause: it is reported for fresh attribution, never rebound.
+            if (current["request_sha256"] != handoff.get("request_sha256")
+                    or current["raw_observation_sha256"] != handoff.get("raw_observation_sha256")):
+                changed.append(vid)
+                continue
             handoff["capture_sha256"] = capture_sha256
-            handoff["request_sha256"] = current["request_sha256"]
-            handoff["raw_observation_sha256"] = current["raw_observation_sha256"]
-    return sorted(set(stale))
+    return {"stale": sorted(set(stale)), "changed": sorted(set(changed))}
 
 
 def main():
@@ -81,13 +88,14 @@ def main():
     claims = json.loads(claims_path.read_bytes())
     comparison = phase2_compare.report(args.native, args.rust, write=False)
     capture_sha256, digests = capture_digests(args.rust)
-    stale = rebind(claims, comparison, capture_sha256, digests)
+    result = rebind(claims, comparison, capture_sha256, digests)
     claims_path.write_text(json.dumps(claims, indent=1, sort_keys=True) + "\n")
+    held = len(result["stale"]) + len(result["changed"])
     print(json.dumps({"checkpoint": args.checkpoint, "capture_sha256": capture_sha256,
                       "rebound": sum(1 for e in claims["rows"] if e.get("status") in ("handed", "blocked")
-                                     or "incoming" in e) - len(stale),
-                      "stale": stale}, indent=1))
-    if stale:
+                                     or "incoming" in e) - held,
+                      "stale": result["stale"], "changed": result["changed"]}, indent=1))
+    if held:
         raise SystemExit(1)
 
 

@@ -1,0 +1,9 @@
+[
+ {
+  "id": "malformed",
+  "root": "/main.ts",
+  "files": {
+   "/main.ts": "let x: = 5;\nfunction broken( {\n  return x;\n}\nconst y: number = \"text\";\nclass C {\n  method( { }\n}\nexport {};\n"
+  }
+ }
+]

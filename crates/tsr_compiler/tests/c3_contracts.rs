@@ -7,11 +7,14 @@ mod changes;
 mod native;
 #[path = "support/c2_contract_program.rs"]
 mod support;
-use serde_json::json;
+use serde_json::{json, Value};
+use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::ops::ControlFlow;
+use std::sync::Arc;
 use tsr_arena::NodeId;
 use tsr_ast::{AstView, ChildVisitor, SyntaxKind as K};
+use tsr_checker::CheckerOwner;
 use tsr_compiler::Program;
 
 const NARROWING: &str = r#"
@@ -140,32 +143,68 @@ fn alias_links_record_referenced_and_type_only_state() {
 }
 
 /// Contract 8: a file with parse errors is checked to completion. The pinned
-/// command line reports only the syntactic diagnostics of such a file, so the
-/// fixture binds those; the semantic pass must still complete without a
-/// harness error, and the checker answers later queries and repeats itself.
+/// command line stops at the syntax errors, so the checker's own diagnostics
+/// come from a pinned Go oracle (`fixtures/c3/malformed/`): the parser's, the
+/// binder's, the checker's and the global sets each match natively, the same
+/// checker answers a later query, and the sets repeat unchanged.
 #[test]
 fn malformed_input_checks_to_completion_and_keeps_answering() {
-    let fixture = native::load(
-        "malformed.ts",
-        include_str!("fixtures/c3/malformed.ts"),
-        include_str!("fixtures/c3/malformed.ts.native.json"),
+    let requests: Value =
+        serde_json::from_str(include_str!("fixtures/c3/malformed/requests.json")).unwrap();
+    let native: Value =
+        serde_json::from_str(include_str!("fixtures/c3/malformed/native.json")).unwrap();
+    let provenance: Value =
+        serde_json::from_str(include_str!("fixtures/c3/malformed/provenance.json")).unwrap();
+    let pin: Value = serde_json::from_str(include_str!("../../../data/upstream.json")).unwrap();
+    let digest = |bytes: &[u8]| json!(format!("{:x}", Sha256::digest(bytes)));
+    assert_eq!(provenance["pin"], pin["pin"]);
+    assert_eq!(native["request_sha256"], provenance["request_sha256"]);
+    assert_eq!(
+        provenance["request_sha256"],
+        digest(include_bytes!("fixtures/c3/malformed/requests.json"))
     );
-    let first = native::observed(&fixture);
-    let syntactic = fixture.native["diagnostics"].as_array().unwrap();
-    assert_eq!(&first[..syntactic.len()], syntactic.as_slice());
-    assert!(
-        first.len() > syntactic.len(),
-        "the semantic pass reported nothing"
+    assert_eq!(
+        provenance["source_sha256"],
+        digest(include_bytes!("fixtures/c3/malformed.ts"))
     );
-    let op = fixture.owner.operation().unwrap();
+    let source = requests[0]["files"]["/main.ts"].as_str().unwrap();
+    assert_eq!(source, include_str!("fixtures/c3/malformed.ts"));
+    let program = support::program(&[("/main.ts", source)]);
+    let (_, _, owner) = support::checker(&program);
+    let file = program.file(b"/main.ts").unwrap();
+    let render = |diagnostics: &[tsr_ast::Diagnostic]| {
+        diagnostics
+            .iter()
+            .map(|d| native::diagnostic_json(&program, d))
+            .collect::<Vec<_>>()
+    };
+    let observe = |owner: &Arc<CheckerOwner>| {
+        let mut op = owner.operation().unwrap();
+        json!({
+            "syntactic": render(&program.syntactic_diagnostics(Some(file)).unwrap()),
+            "bind": render(&program.bind_diagnostics(Some(file.source())).unwrap()),
+            "checker": render(&op.semantic_diagnostics(file.source()).unwrap()),
+            "global": render(&op.global_diagnostics().unwrap()),
+        })
+    };
+    let row = &native["rows"][0];
+    let expected = json!({
+        "syntactic": row["syntactic"], "bind": row["bind"], "checker": row["checker"], "global": row["global"],
+    });
+    assert!(!row["syntactic"].as_array().unwrap().is_empty());
+    assert!(!row["checker"].as_array().unwrap().is_empty());
+    assert_eq!(observe(&owner), expected);
+    let op = owner.operation().unwrap();
     assert!(op.builtin_type("stringType").is_some());
     drop(op);
-    assert_eq!(native::observed(&fixture), first);
+    assert_eq!(observe(&owner), expected);
 }
 
-/// Contract 9: a deep flow graph (the corpus row binderBinaryExpressionStress)
-/// checks on the E2 small stack with the recursion observer engaged and gives
-/// the same diagnostics as an ordinary stack.
+/// Contract 9: a deep expression chain (the corpus row
+/// binderBinaryExpressionStress, thousands of left-nested operators) checks on
+/// the E2 small stack and gives the same diagnostics as an ordinary stack. The
+/// observer on the expression path shows the recursion reaching one level per
+/// operator and running on a grown stack segment larger than the thread's.
 #[test]
 fn deep_flow_graph_checks_on_a_small_stack() {
     const STACK: usize = 256 * 1024;
@@ -198,9 +237,25 @@ fn deep_flow_graph_checks_on_a_small_stack() {
         .join()
         .unwrap();
     assert_eq!(observed.0, reference);
+    let operators = SOURCE
+        .lines()
+        .map(|line| line.matches(" + ").count())
+        .max()
+        .unwrap();
     assert!(
-        observed.1["maximum_depth"].as_u64().is_some(),
-        "{}",
+        operators > 1000,
+        "{operators} operators on the longest line"
+    );
+    let depth = observed.1["maximum_expression_depth"].as_u64().unwrap();
+    assert!(
+        depth >= operators as u64,
+        "expression depth {depth} for {operators} operators: {}",
+        observed.1
+    );
+    let remaining = observed.1["maximum_remaining_stack"].as_u64().unwrap();
+    assert!(
+        remaining > STACK as u64,
+        "no stack segment beyond the {STACK}-byte thread stack: {}",
         observed.1
     );
 }

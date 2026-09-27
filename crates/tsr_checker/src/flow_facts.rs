@@ -300,12 +300,9 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.getGlobalNonNullableTypeInstantiation
     fn global_non_nullable_type(&mut self, ty: TypeId) -> Result<TypeId, Error> {
-        if let Some(symbol) = self.lookup_symbol_resolving(
-            self.builtins.globals,
-            b"NonNullable",
-            tsr_ast::symbol_flags::TYPE_ALIAS,
-        )? {
-            // getGlobalTypeAliasResolver only accepts aliases with the expected arity.
+        // getGlobalNonNullableTypeAliasOrNil: the memoized global alias
+        // lookup, silent about a differing arity.
+        if let Some(symbol) = self.global_type_alias_symbol("NonNullable", 1, false)? {
             let declared = self.get_declared_type_of_symbol(symbol)?;
             let parameters = self
                 .query
@@ -313,9 +310,7 @@ impl CheckerState {
                 .try_get(symbol)
                 .and_then(|links| links.parameters.clone())
                 .unwrap_or_default();
-            if parameters.len() == 1 {
-                return self.type_alias_instantiation(symbol, declared, &parameters, &[ty], None);
-            }
+            return self.type_alias_instantiation(symbol, declared, &parameters, &[ty], None);
         }
         self.get_intersection_type(&[ty, self.builtins.empty_object_type])
     }

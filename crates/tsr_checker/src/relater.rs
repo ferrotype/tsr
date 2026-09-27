@@ -52,6 +52,10 @@ pub(crate) struct Relations {
 pub(crate) struct RecursionProbe {
     pub calls: usize,
     pub maximum_depth: usize,
+    /// Nesting of `checkExpressionEx`, the deep path of left-nested binary
+    /// chains; the relation depth above does not see it.
+    pub expression_depth: usize,
+    pub maximum_expression_depth: usize,
     pub maximum_remaining_stack: usize,
     pub depth_limit_hits: usize,
     pub panic_at_depth: Option<usize>,

@@ -267,3 +267,57 @@ again with the refreshed receipt. For C2 it reports the accounting
 this checker run makes `P2B-C2` read as pending in `sprints/P2B.toml` while
 `P2B-C1` and `P2B-C3` read as done; that is the plan's known tracker gap, not
 a C2 regression. The recording, `cargo xtask run checker`, is the owner's.
+
+## Review follow-up (2026-09-27)
+
+The review of `e286c3c` made five findings. Each is closed on the branch:
+
+1. **Rebinding could hide a new defect under an old handoff.** The rebind
+   only checked that the unmet domains stayed covered and the trace existed,
+   then replaced the observation digests. It now rebinds only an entry whose
+   request and raw-observation digests are unchanged; a row whose observation
+   changed is reported as `changed` for fresh attribution and left as it was,
+   so it counts as open. The C2 and C3 handoffs at the exit capture are all
+   unchanged, so the recorded claims did not move; the test covers the three
+   outcomes.
+2. **Native fixture failures could become empty expectations.** The recorder
+   refuses an unclean run: anything on stderr, an unparsed output line, or an
+   exit code that disagrees with the diagnostics (0 without, 2 with) stops it
+   before writing. It retains stderr in the record and parses location-less
+   global diagnostics. The loader refuses a record whose exit code disagrees
+   with its diagnostics or that carries stderr. Every fixture was re-recorded.
+3. **The malformed contract compared only the syntactic prefix.** The command
+   line stops at a file's syntax errors, so the checker's own diagnostics now
+   come from a pinned Go oracle (`fixtures/c3/malformed/`, a `go test` overlay
+   in the pinned checkout, with provenance): the parser's eight, the binder's
+   none, the checker's seven and the empty global set must each match, the
+   same checker answers a later query, and the sets repeat unchanged.
+4. **The deep-chain contract did not prove growth.** The recursion probe now
+   observes the expression path (`checkExpressionEx` nesting, and the
+   remaining stack read inside the possibly grown segment). The contract
+   asserts one level per operator of the fixture's longest line (1,499) and a
+   remaining stack larger than the 256 KiB thread stack, which only a grown
+   segment gives. The contract is renamed for what it observes: a deep
+   expression chain, not a deep flow graph.
+5. **The alias fixture did not reach its lookups.** It is rewritten under
+   `--noLib`: the uses come first in source order, the `import =` aliases
+   that give `Record`, `Extract`, `NonNullable`, `Symbol` and `NaN` their
+   global meaning come last, and the required global types are declared. The
+   `in` narrowing uses an unknown property, the `for..of` iterates a plain
+   object, the `for..in` and truthiness narrowing are generic. Recording it
+   exposed a fidelity gap: the three type-alias sites bypassed
+   `getGlobalTypeAliasSymbol`, whose arity check reports a global `TS2317`
+   for an alias, so Rust lacked the two global errors the pin prints. They
+   now go through the memoized resolver, and the fixture renderer composes
+   the diagnostics as the command line does (syntactic alone, else global
+   alone, else bind, checker and global, sorted and deduplicated). Mutation
+   checks: the resolver on a raw lookup and the `Symbol` site on a raw lookup
+   each fail the fixture with the alias-resolution refusal; the `NaN` site
+   does not, because resolving the identifier resolves the alias first; the
+   JSDoc site cannot meet an alias, since a class's exports hold none. Those
+   two stay fidelity changes without a discriminating case.
+
+After the follow-up the raw-lookup audit reads: the `Record`, `Extract` and
+`NonNullable` sites resolve through `global_type_alias_symbol`, the `Symbol`,
+`NaN` and JSDoc-export sites through `lookup_symbol_resolving`, and the two
+raw callers remain the resolve-name worker and the wrapper.

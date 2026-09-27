@@ -335,6 +335,7 @@ impl Operation<'_> {
         Ok(serde_json::json!({
             "calls": probe.calls,
             "maximum_depth": probe.maximum_depth,
+            "maximum_expression_depth": probe.maximum_expression_depth,
             "maximum_remaining_stack": probe.maximum_remaining_stack,
             "depth_limit_hits": probe.depth_limit_hits,
         }))
