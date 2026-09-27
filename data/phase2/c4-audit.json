@@ -1,109 +1,9 @@
 {
  "checkpoint": "C4",
  "dispositions": {
-  "tsc/internal/checker/checker.go:Checker.checkDecorator": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.checkDecorators": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.getClassElementPropertyKeyType": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.getClassMemberDecoratorContextOverrideType": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.getContextualTypeForDecorator": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.getDecoratorArgumentCount": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.getDecoratorCallSignature": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.getDiagnosticHeadMessageForDecoratorResolution": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.getESDecoratorCallSignature": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.getEffectiveDecoratorArguments": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.getEntityNameForDecoratorMetadata": {
-   "disposition": "gap",
-   "item": "C4.7",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.getEntityNameForDecoratorMetadataFromTypeList": {
-   "disposition": "gap",
-   "item": "C4.7",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.getLegacyDecoratorArgumentCount": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.getLegacyDecoratorCallSignature": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.getParameterTypeNodeForDecoratorCheck": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.getParentTypeOfClassElement": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
   "tsc/internal/checker/checker.go:Checker.isArrayOrTupleLikeType": {
    "disposition": "gap",
    "item": "C4.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.isPotentiallyUncalledDecorator": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.markDecoratorAliasReferenced": {
-   "disposition": "gap",
-   "item": "C4.7",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.markDecoratorMedataDataTypeNodeAsReferenced": {
-   "disposition": "gap",
-   "item": "C4.7",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.markEntityNameOrEntityExpressionAsReference": {
-   "disposition": "gap",
-   "item": "C4.7",
    "reason": "Not yet ported; the item that closes it is named."
   },
   "tsc/internal/checker/checker.go:Checker.markJsxAliasReferenced": {
@@ -112,104 +12,16 @@
    "reason": "Not yet ported; the item that closes it is named."
   },
   "tsc/internal/checker/checker.go:Checker.markTypeNodeAsReferenced": {
-   "disposition": "gap",
-   "item": "C4.7",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newClassAccessorDecoratorContextType": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newClassAccessorDecoratorResultType": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newClassAccessorDecoratorTargetType": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newClassDecoratorContextType": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newClassFieldDecoratorContextType": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newClassFieldDecoratorInitializerMutatorType": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newClassGetterDecoratorContextType": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newClassMemberDecoratorContextTypeForNode": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newClassMethodDecoratorContextType": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newClassSetterDecoratorContextType": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newESDecoratorCallSignature": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newFunctionType": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newGetterFunctionType": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newParameter": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newProperty": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newSetterFunctionType": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.newTypedPropertyDescriptorType": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/checker.go:Checker.resolveDecorator": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "No caller at the pin; the operation it composes, markEntityNameOrEntityExpressionAsReference(getEntityNameFromTypeNode(node), false), is ported at the Rust site.",
+   "reviewed_from": "pinned body and the pinned caller's port; C4 source audit",
+   "rust": "crates/tsr_checker/src/decorators.rs:1298"
   },
   "tsc/internal/checker/checker.go:getEntityNameFromTypeNode": {
-   "disposition": "gap",
-   "item": "C4.7",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Serves only markTypeNodeAsReferenced, which has no caller at the pin; the metadata path reads entity names through getEntityNameForDecoratorMetadata, ported beside the Rust site.",
+   "reviewed_from": "pinned body and the pinned caller's port; C4 source audit",
+   "rust": "crates/tsr_checker/src/decorators.rs:1298"
   },
   "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFactoryEntity": {
    "disposition": "later",
@@ -236,11 +48,6 @@
    "owner": "C5",
    "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
   },
-  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarDecorator": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarJsxElement": {
    "disposition": "gap",
    "item": "C4.2",
@@ -257,14 +64,16 @@
    "reason": "Not yet ported; the item that closes it is named."
   },
   "tsc/internal/checker/grammarchecks.go:Checker.findFirstIllegalDecorator": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined with reportObviousDecoratorErrors: CanHaveIllegalDecorators on the node kind, then the first Decorator modifier.",
+   "reviewed_from": "pinned body and the pinned caller's port; C4 source audit",
+   "rust": "crates/tsr_checker/src/grammar_modifiers.rs:259"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.reportObviousDecoratorErrors": {
-   "disposition": "gap",
-   "item": "C4.6",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "Inlined at the port of its only caller, checkGrammarModifiers: the first decorator of a node that can have illegal decorators gets TS1206 on its first token, then the modifier checks stop.",
+   "reviewed_from": "pinned body and the pinned caller's port; C4 source audit",
+   "rust": "crates/tsr_checker/src/grammar_modifiers.rs:259"
   },
   "tsc/internal/checker/jsx.go:Checker.checkApplicableSignatureForJsxCallLikeElement": {
    "disposition": "gap",

@@ -86,6 +86,9 @@ impl CheckerState {
         if read.kind() == K::TaggedTemplateExpression {
             return self.tagged_template_arguments(node);
         }
+        if read.kind() == K::Decorator {
+            return self.effective_decorator_arguments(node);
+        }
         if read.kind() == K::BinaryExpression {
             return Ok(vec![read
                 .data_source()

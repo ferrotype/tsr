@@ -145,6 +145,7 @@ impl CheckerState {
         ) {
             self.check_source_method_grammar(function)?;
         }
+        self.check_decorators(function)?;
         self.check_signature_syntax(function)?;
         let read = self.node(function)?;
         let body = read.body();

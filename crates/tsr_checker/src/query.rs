@@ -17,6 +17,8 @@ pub(crate) struct QueryState {
     pub declared_types: LinkStore<SymbolId, Option<TypeId>>,
     pub type_nodes: LinkStore<NodeId, Option<TypeId>>,
     pub global_types: crate::types::Map<&'static str, TypeId>,
+    /// `CachedTypeKindDecoratorContext*` override object types, per flags and name type.
+    pub decorator_context_overrides: crate::types::Map<(u8, TypeId), TypeId>,
     /// `symbolTableAliasCache`: alias symbols of the globals and exports tables,
     /// shared by every display query of this checker.
     pub symbol_table_aliases:

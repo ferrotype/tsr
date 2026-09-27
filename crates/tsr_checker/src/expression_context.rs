@@ -246,16 +246,14 @@ impl CheckerState {
                 self.contextual_type_for_yield_operand(parent, context_flags)
             }
             Some(K::ImportAttribute) => self.contextual_import_attribute_type(parent),
+            Some(K::Decorator) => self.contextual_type_for_decorator(parent),
             Some(
-                K::Decorator
-                | K::JsxExpression
+                K::JsxExpression
                 | K::JsxAttribute
                 | K::JsxSpreadAttribute
                 | K::JsxOpeningElement
                 | K::JsxSelfClosingElement,
-            ) => Err(Error::Unsupported(
-                "getContextualType: decorator/JSX context",
-            )),
+            ) => Err(Error::Unsupported("getContextualType: JSX context")),
             _ => Ok(None),
         }
     }

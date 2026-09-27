@@ -379,6 +379,8 @@ impl CheckerState {
         if !grammar_error && !self.check_class_property_grammar(node)? {
             self.check_grammar_computed_property_name(name)?;
         }
+        // checkVariableLikeDeclaration begins with checkDecorators.
+        self.check_decorators(node)?;
         self.check_variable_initializer(node)?;
         if self.node(name)?.kind() == K::PrivateIdentifier {
             self.set_node_links_for_private_identifier_scope(node)?;
@@ -615,6 +617,7 @@ impl CheckerState {
                 )?;
             }
         }
+        self.check_decorators(node)?;
         self.check_signature_syntax(node)?;
         if getter_kind
             && flags & nf::AMBIENT == 0

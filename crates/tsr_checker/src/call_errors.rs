@@ -44,6 +44,18 @@ impl CheckerState {
         ty: TypeId,
         construct: bool,
     ) -> Result<(), Error> {
+        self.call_invocation_error_ex(node, ty, construct, None)
+    }
+
+    /// The invocation error, chained under `head` when a caller supplies one
+    /// (a decorator's resolution head message).
+    pub(crate) fn call_invocation_error_ex(
+        &mut self,
+        node: NodeId,
+        ty: TypeId,
+        construct: bool,
+        outer_head: Option<&'static tsr_diagnostics::Message>,
+    ) -> Result<(), Error> {
         let expression = tsr_ast::utilities_middle::get_invoked_expression(self.ast(node)?, node)?
             .ok_or(Error::MissingLink("invocation expression"))?;
         let awaited = self.awaited_type(ty)?;
@@ -195,6 +207,13 @@ impl CheckerState {
                     )?,
                 ));
             }
+        }
+        if let Some(outer_head) = outer_head {
+            diagnostic = tsr_ast::Diagnostic::chain(
+                Some(std::sync::Arc::new(diagnostic)),
+                outer_head,
+                vec![],
+            );
         }
         self.add_diagnostic(diagnostic)?;
         Ok(())
