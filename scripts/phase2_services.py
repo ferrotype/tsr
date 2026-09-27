@@ -270,12 +270,35 @@ def write_record(output, raw, keep):
     return compressed, record_sha256, operations
 
 
+def overlay_fingerprint(directory):
+    """The overlay fingerprint of an earlier build in `directory`, as `build`
+    computes it from the overlay sources it writes there."""
+    root = directory / "overlay"
+    return {path.relative_to(root).as_posix(): digest(path.read_bytes())
+            for path in sorted(root.rglob("*")) if path.is_file()}
+
+
+def pooled_runs(pools, fingerprint):
+    """The outcomes and test digests of earlier `verify` runs of the same
+    overlay. The language server's timing can settle on one result for a whole
+    session, so a test the pin records differently at another time is as
+    timing-dependent as one the record's own runs disagree on."""
+    outcomes_, digests = [], []
+    for pool in pools:
+        if overlay_fingerprint(pool) != fingerprint:
+            raise ValueError(f"{pool} was recorded with another overlay")
+        for which in RUNS[:2]:
+            outcomes_.append(outcomes((pool / f"{which}.stdout").read_text(errors="replace")))
+            digests.append(test_digests(pool / f"{which}.ndjson"))
+    return outcomes_, digests
+
+
 def stable_tests(digests):
     """The tests every recorded run recorded identically."""
     return {name for name, value in digests[0].items() if all(run.get(name) == value for run in digests[1:])}
 
 
-def manifest_of(oracle, runs, digests, pin, go_version, operations, record_sha256, record_xz_sha256):
+def manifest_of(oracle, runs, digests, pin, go_version, operations, record_sha256, record_xz_sha256, pooled=0):
     plain, first = runs[0], runs[1]
     first_digests = digests[0]
     stable = stable_tests(digests)
@@ -290,6 +313,7 @@ def manifest_of(oracle, runs, digests, pin, go_version, operations, record_sha25
         "entry_points": oracle["entry_points"],
         "neutral": all(outcome == plain for outcome in runs[1:]),
         "recorded_runs": len(digests),
+        "pooled_runs": pooled,
         "outcomes": dict(sorted(Counter(first.values()).items())),
         "skipped": sorted(name for name, outcome in first.items() if outcome == "SKIP"),
         "failed": sorted(name for name, outcome in first.items() if outcome == "FAIL"),
@@ -321,7 +345,7 @@ def reused_runs(output):
     return oracle, tuple(runs), digests
 
 
-def record(output, run=None, reuse=False):
+def record(output, run=None, reuse=False, pools=()):
     upstream = verified_upstream()
     env = go_environment()
     output.mkdir(parents=True, exist_ok=True)
@@ -329,6 +353,11 @@ def record(output, run=None, reuse=False):
         oracle, runs, digests = reused_runs(output)
     else:
         oracle, runs, digests = record_runs(output, upstream, env, run=run)
+    if pools:
+        if overlay_fingerprint(output) != oracle["overlay_sha256"]:
+            raise ValueError("the record's overlay sources are not its fingerprint")
+        pooled_outcomes, pooled_digests = pooled_runs(pools, oracle["overlay_sha256"])
+        runs, digests = (*runs, *pooled_outcomes), [*digests, *pooled_digests]
     plain = runs[0]
     if not all(outcome == plain for outcome in runs[1:]):
         changed = sorted(name for name in set().union(*runs) if len({outcome.get(name) for outcome in runs}) != 1)
@@ -336,7 +365,7 @@ def record(output, run=None, reuse=False):
     keep = stable_tests(digests)
     compressed, record_sha256, operations = write_record(output, output / "first.ndjson", keep)
     manifest = manifest_of(oracle, runs, digests, pin(), go_version(env), operations, record_sha256,
-                           digest(compressed.read_bytes()))
+                           digest(compressed.read_bytes()), pooled=2 * len(pools))
     (output / "manifest.json").write_bytes(json.dumps(manifest, indent=1, sort_keys=True).encode() + b"\n")
     if run is None:
         shutil.copyfile(compressed, RECORD)
@@ -607,6 +636,9 @@ def main():
             sub.add_argument("--run", help="a -test.run pattern (development only; never committed)")
             sub.add_argument("--reuse", action="store_true",
                              help="re-derive the record from this output's earlier runs (no Go runs)")
+            sub.add_argument("--pool", type=Path, action="append", default=[],
+                             help="an earlier `verify` output of the same overlay whose two runs also decide "
+                                  "which tests are stable")
         if name == "replay":
             sub.add_argument("--test", action="append", help="replay only this test (development only)")
             sub.add_argument("--jobs", type=int)
@@ -616,7 +648,7 @@ def main():
     if args.command == "fixture":
         fixture()
     elif args.command == "record":
-        record(args.output, run=args.run, reuse=args.reuse)
+        record(args.output, run=args.run, reuse=args.reuse, pools=[pool.resolve() for pool in args.pool])
     elif args.command == "verify":
         sys.exit(0 if verify(args.output) else 1)
     elif args.command == "replay":

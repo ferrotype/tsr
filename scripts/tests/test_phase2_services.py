@@ -73,6 +73,28 @@ class Record(unittest.TestCase):
                                        digests, "pin", "go1", Counter(), "r", "x")
         self.assertFalse(changed["neutral"])
 
+    def test_pooled_verify_runs_of_the_same_overlay_also_decide_stability(self):
+        with tempfile.TemporaryDirectory() as directory:
+            pool = Path(directory) / "verify"
+            (pool / "overlay/checker").mkdir(parents=True)
+            (pool / "overlay/checker/checker.go").write_text("package checker\n")
+            fingerprint = {"checker/checker.go": services.digest(b"package checker\n")}
+            self.assertEqual(services.overlay_fingerprint(pool), fingerprint)
+            (pool / "first.stdout").write_text("--- PASS: TestA (0.00s)\n")
+            (pool / "second.stdout").write_text("--- PASS: TestA (0.00s)\n")
+            for which in ("first", "second"):
+                (pool / f"{which}.ndjson").touch()
+            # Both verify runs agree with each other on TestB but not with the record.
+            digests = {"first": {"TestA": "1", "TestB": "9"}, "second": {"TestA": "1", "TestB": "9"}}
+            with patch.object(services, "test_digests", side_effect=lambda path: digests[path.stem]):
+                outcomes, pooled = services.pooled_runs([pool], fingerprint)
+                with self.assertRaisesRegex(ValueError, "another overlay"):
+                    services.pooled_runs([pool], {"checker/checker.go": "0" * 64})
+        recorded = [{"TestA": "1", "TestB": "2"}] * 3
+        self.assertEqual(services.stable_tests(recorded), {"TestA", "TestB"})
+        self.assertEqual(services.stable_tests([*recorded, *pooled]), {"TestA"})
+        self.assertEqual(len(outcomes), 2)
+
 
 class Verification(unittest.TestCase):
     def test_a_test_pattern_selects_exactly_one_test_or_subtest(self):
