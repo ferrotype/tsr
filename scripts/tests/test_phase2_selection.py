@@ -91,7 +91,10 @@ class Reports(unittest.TestCase):
         expected = self.build(selected)
         with patch.object(inventory, 'read', return_value={'rows': self.inventory}), patch.object(
                 corpus, 'loading_requests', return_value={vid: record['request']['loading'] for vid, record in self.records.items()}):
-            _, requests, observations = corpus.requests(self.directory, **selected)
+            # The fixture rows predate the C5.7 post-emit schedule.
+            _, requests, observations = corpus.requests(self.directory, emit_schedule=False, **selected)
+            _, scheduled, _ = corpus.requests(self.directory, **selected)
+        self.assertEqual(scheduled, [dict(request, emit_schedule=True) for request in requests])
         self.assertEqual([row['id'] for row in requests], [row['id'] for row in expected])
         self.assertEqual([row['id'] for row in observations], [row['id'] for row in expected])
         for request in requests:
@@ -122,8 +125,8 @@ class Reports(unittest.TestCase):
               patch.object(corpus.p4, 'build', side_effect=build) as compiled,
               patch.object(corpus.p4, 'execute_case', side_effect=execute) as executed,
               contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO())):
-            result = corpus.run(self.directory, output, 1, 60, **selected)
-            again = corpus.run(self.directory, output, 1, 60, resume=True, **selected)
+            result = corpus.run(self.directory, output, 1, 60, emit_schedule=False, **selected)
+            again = corpus.run(self.directory, output, 1, 60, resume=True, emit_schedule=False, **selected)
         self.assertEqual(compiled.call_count, 1)
         self.assertEqual(executed.call_count, 2)  # no resumed row was re-executed
         self.assertEqual(result, again)

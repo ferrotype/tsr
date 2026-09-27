@@ -12,8 +12,10 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import phase2_audit as audit  # noqa: E402
 import phase2_blockers as blockers  # noqa: E402
 import phase2_compare as compare  # noqa: E402
+import phase2_corpus as corpus  # noqa: E402
 import phase2_producers as producers  # noqa: E402
 from test_phase2_c1 import row, comparison  # noqa: E402
+from test_phase2_compare import native, rust  # noqa: E402
 
 
 class MetricsFixture:
@@ -98,6 +100,105 @@ class RecordedCompletion(unittest.TestCase):
 
     def test_a_missing_manifest_is_not_a_current_replay(self):
         self.assertFalse(producers.services_current(ROOT / "data/phase2/no-such-manifest.json", {}))
+
+
+def schedule(**overrides):
+    calls = dict.fromkeys(corpus.EMIT_CALLS, 0) | {"mark_linked_references_recursively": 1, "constant_value": 2}
+    value = {"state": "executed", "program": "fresh", "reason": None, "transforms": corpus.EMIT_TRANSFORMS,
+             "not_executed": corpus.EMIT_NOT_EXECUTED, "no_emit_on_error": None,
+             "files": [{"file_hex": b"/.src/a.ts".hex(), "import_elision": True, "const_enum_inlining": True,
+                        "calls": calls}]}
+    value.update(overrides)
+    return value
+
+
+def request(**options):
+    return {"emit_schedule": True, "loading": {"options": options}}
+
+
+class PostEmitComparison(unittest.TestCase):
+    """C5.7: an executed emit schedule compares both sets; an unexecuted one keeps the refusal."""
+
+    def setUp(self):
+        pre = {"code": 2313, "pos": 1, "end": 2}
+        post = dict(pre, pos=5)
+        self.native = native(error_pre_diagnostics=[pre], error_post_diagnostics=[post], error_diagnostics=[post])
+        self.pre, self.post = [pre], [post]
+
+    def errors(self, **fields):
+        base = {"state": "executed", "diagnostics": self.post, "baseline": {"state": "no_content"},
+                "emit": schedule(), "pre_diagnostics": self.pre, "pretty": False, "inputs": []}
+        return rust(error_baseline=base | fields)
+
+    def test_matching_post_and_pre_sets_match_when_emit_executed(self):
+        result = compare.compare_row(self.native, self.errors(), None)
+        self.assertEqual(result["errors"]["category"], "match")
+
+    def test_unexecuted_emit_keeps_the_native_pre_post_refusal(self):
+        observed = self.errors(emit="not_executed")
+        result = compare.compare_row(self.native, observed, None)
+        self.assertEqual(result["errors"]["differences"], ["native_pre_post"])
+        self.assertEqual(compare.area(result, observed), "emit order: native pre/post-emit sets differ")
+
+    def test_a_differing_pre_emit_set_is_still_a_difference(self):
+        observed = self.errors(pre_diagnostics=self.post)
+        result = compare.compare_row(self.native, observed, None)
+        self.assertEqual(result["errors"]["differences"], ["pre_diagnostics"])
+        self.assertEqual(result["errors"]["first_code"], 2313)
+
+    def test_a_post_set_equal_to_the_pre_set_differs_from_the_native_post_set(self):
+        result = compare.compare_row(self.native, self.errors(diagnostics=self.pre), None)
+        self.assertIn("post_diagnostics", result["errors"]["differences"])
+
+
+class EmitSchedule(unittest.TestCase):
+    def test_a_valid_schedule_is_seen_by_the_p5_contract_as_pre_emit(self):
+        row = {"error_baseline": {"state": "executed", "diagnostics": [], "emit": schedule(), "pre_diagnostics": []}}
+        view = corpus.pre_emit_view(request(), row)
+        self.assertEqual(view["error_baseline"]["emit"], "not_executed")
+        self.assertNotIn("pre_diagnostics", view["error_baseline"])
+
+    def test_a_dropped_schedule_or_pre_set_is_refused(self):
+        with self.assertRaises(ValueError):
+            corpus.pre_emit_view(request(), {"error_baseline": {"state": "executed", "emit": "not_executed"}})
+        with self.assertRaises(ValueError):
+            corpus.pre_emit_view(request(), {"error_baseline": {"state": "executed", "emit": schedule()}})
+
+    def invalid(self, value, **options):
+        with self.assertRaises(ValueError):
+            corpus.validate_emit(request(**options), value)
+
+    def test_guards_follow_the_emitter(self):
+        corpus.validate_emit(request(), schedule())
+        verbatim = schedule()
+        self.invalid(verbatim, verbatimModuleSyntax=True)
+        self.invalid(schedule(), isolatedModules=True)
+        javascript = schedule()
+        javascript["files"][0]["file_hex"] = b"/.src/a.js".hex()
+        self.invalid(javascript)
+        for name in (b"/.src/a.js", b"/.src/data.json"):
+            value = schedule()
+            value["files"][0].update(file_hex=name.hex(), import_elision=False)
+            value["files"][0]["calls"]["mark_linked_references_recursively"] = 0
+            corpus.validate_emit(request(), value)
+
+    def test_every_transformed_file_marks_its_references_once(self):
+        value = schedule()
+        value["files"][0]["calls"]["mark_linked_references_recursively"] = 0
+        self.invalid(value)
+
+    def test_no_emit_reuses_the_pre_emit_program_without_files(self):
+        reused = schedule(program="pre", reason="noEmit", files=[])
+        corpus.validate_emit(request(noEmit=True), reused)
+        self.invalid(schedule(), noEmit=True)
+        self.invalid(schedule(program="pre", reason="no JavaScript output", files=[]), noEmitOnError=True)
+
+    def test_no_emit_on_error_gate_skips_every_transform(self):
+        corpus.validate_emit(request(noEmitOnError=True),
+                             schedule(no_emit_on_error={"diagnostics": 2, "emit_skipped": True}, files=[]))
+        self.invalid(schedule(no_emit_on_error={"diagnostics": 2, "emit_skipped": True}), noEmitOnError=True)
+        self.invalid(schedule(), noEmitOnError=True)
+        self.invalid(schedule(no_emit_on_error={"diagnostics": 0, "emit_skipped": False}))
 
 
 class Wiring(unittest.TestCase):

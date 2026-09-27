@@ -41,6 +41,14 @@ EXAMPLE = "phase2_checker"
 SOURCE_OBSERVATIONS = ROOT / "target/s07-subset/source-observations.ndjson"
 PHASES = ("config", "program", "syntactic", "semantic", "global")
 SUBTESTS = ("trace", "union_ordering", "parent_pointers")
+# The post-emit schedule the Rust driver runs before the error baseline's
+# diagnostics (C5.7), and the emit work it leaves unexecuted.
+EMIT_TRANSFORMS = ["import_elision", "runtime_syntax_enum_members", "const_enum_inlining"]
+EMIT_NOT_EXECUTED = ["declaration_emit", "other_script_transforms"]
+EMIT_CALLS = ("mark_linked_references_recursively", "is_referenced_alias_declaration", "is_value_alias_declaration",
+              "is_top_level_value_import_equals_with_entity_name", "enum_member_value", "constant_value")
+# The parser flags JSON files as JavaScript, so the emitter elides no imports there.
+JS_EXTENSIONS = (".js", ".jsx", ".mjs", ".cjs", ".json")
 # What decides a Rust row: the production crates and the S08 adapters
 # (p4.sources), the P5 adapter and the Phase 2 sub-tests. Requests and the
 # native capture are bound by digest in capture.json, and validation reruns
@@ -108,7 +116,10 @@ def select_rows(rows, *, sample=False, cases=(), limit=None):
     return rows
 
 
-def requests(native_dir, limit=None, *, sample=False, cases=()):
+def requests(native_dir, limit=None, *, sample=False, cases=(), emit_schedule=True):
+    """The Rust requests of the selected rows. `emit_schedule` asks the driver
+    for the harness's post-emit program (C5.7); only replays of rows recorded
+    before it turn it off."""
     directory, report, observed = phase2_native.load_capture(native_dir)
     phase2_native.current(report)
     if not (directory / "verified.json").exists():
@@ -135,6 +146,8 @@ def requests(native_dir, limit=None, *, sample=False, cases=()):
         entry = {"id": row["id"], "acceptance_tier": "executed", "diagnostic_phases": phases,
                  "type_baseline_requested": types, "loading": request, "error_baseline_requested": True,
                  "public_type_strings": True}
+        if emit_schedule:
+            entry["emit_schedule"] = True
         if native["state"] == "executed":
             entry["error_inputs"] = native["error_inputs"]
             if types:
@@ -151,7 +164,7 @@ def validate_row(request, row):
         raise ValueError("observation is not an object")
     extra = {key: row[key] for key in ("phase2", "panic_location") if key in row}
     base = {key: value for key, value in row.items() if key not in extra}
-    p5.validate_row(request, base)
+    p5.validate_row(request, pre_emit_view(request, base))
     if "fatal" in base:
         # Only the example's own panic handler records a location; the runner's
         # deadline, exit and protocol rows (s08_p4.fatal) never do.
@@ -214,6 +227,83 @@ def validate_row(request, row):
     return row
 
 
+def pre_emit_view(request, row):
+    """Validate a row's post-emit schedule; return the row as the S08 P5
+    contract sees it, with the pre-emit error baseline only."""
+    errors = row.get("error_baseline")
+    if request.get("emit_schedule") is not True or not isinstance(errors, dict) or "emit" not in errors:
+        return row
+    emit = errors["emit"]
+    if emit == "not_executed":
+        if errors["state"] == "executed":
+            raise ValueError("requested emit schedule silently dropped")
+        return row
+    if not isinstance(emit, dict) or emit.get("state") not in ("executed", "failed"):
+        raise ValueError("unclassified emit schedule")
+    if emit["state"] == "failed":
+        if set(emit) != {"state"} or errors["state"] != "failed":
+            raise ValueError("a failed emit schedule completed the error baseline")
+    else:
+        validate_emit(request, emit)
+        if "pre_diagnostics" not in errors:
+            raise ValueError("post-emit error baseline lacks the pre-emit set")
+        p5.diagnostics(errors["pre_diagnostics"])
+        if errors["state"] == "failed" and "counts" in errors:
+            counts = errors["counts"]
+            if (errors.get("class") != "unsupported" or type(counts) is not list or len(counts) != 2
+                    or counts[0] == counts[1]):
+                raise ValueError("malformed pre/post-emit count failure")
+    view = {key: value for key, value in errors.items() if key not in ("pre_diagnostics", "counts")}
+    return dict(row, error_baseline=dict(view, emit="not_executed"))
+
+
+def validate_emit(request, emit):
+    """The schedule identity agrees with the request's emit options."""
+    options = request["loading"]["options"]
+    if set(emit) != {"state", "program", "reason", "transforms", "not_executed", "no_emit_on_error", "files"}:
+        raise ValueError("incomplete emit schedule")
+    if emit["transforms"] != EMIT_TRANSFORMS or emit["not_executed"] != EMIT_NOT_EXECUTED:
+        raise ValueError("emit schedule identity changed")
+    files = emit["files"]
+    if not isinstance(files, list):
+        raise ValueError("emit schedule lacks its files")
+    if options.get("noEmit") is True:
+        if (emit["program"], emit["reason"], files) != ("pre", "noEmit", []):
+            raise ValueError("noEmit transformed files")
+    elif emit["program"] == "pre":
+        if emit["reason"] != "no JavaScript output" or files or options.get("noEmitOnError") is True:
+            raise ValueError("pre-emit program reused where emit transforms files")
+    elif emit["program"] != "fresh" or emit["reason"] is not None:
+        raise ValueError("unknown post-emit program")
+    gate = emit["no_emit_on_error"]
+    if (gate is not None) != (emit["program"] == "fresh" and options.get("noEmitOnError") is True):
+        raise ValueError("noEmitOnError gate observed without the option, or missing")
+    if gate is not None:
+        if set(gate) != {"diagnostics", "emit_skipped"} or type(gate["diagnostics"]) is not int:
+            raise ValueError("malformed noEmitOnError gate")
+        if gate["emit_skipped"] != (gate["diagnostics"] > 0) or gate["emit_skipped"] and files:
+            raise ValueError("noEmitOnError gate disagrees with its transforms")
+    verbatim = options.get("verbatimModuleSyntax") is True
+    isolated = verbatim or options.get("isolatedModules") is True
+    for entry in files:
+        if not isinstance(entry, dict) or set(entry) != {"file_hex", "import_elision", "const_enum_inlining", "calls"}:
+            raise ValueError("malformed emitted-file schedule")
+        name = bytes.fromhex(entry["file_hex"]).decode("utf-8", "surrogateescape")
+        if entry["import_elision"] != (not verbatim and not name.endswith(JS_EXTENSIONS)):
+            raise ValueError("import elision guard differs from the emitter's")
+        if entry["const_enum_inlining"] != (not isolated):
+            raise ValueError("constant-enum inlining guard differs from the emitter's")
+        calls = entry["calls"]
+        if set(calls) != set(EMIT_CALLS) or any(type(v) is not int or v < 0 for v in calls.values()):
+            raise ValueError("malformed resolver call counts")
+        if calls["mark_linked_references_recursively"] != int(entry["import_elision"]):
+            raise ValueError("import elision did not mark the file's linked references once")
+        if not entry["import_elision"] and any(calls[k] for k in EMIT_CALLS[1:4]):
+            raise ValueError("alias queries without import elision")
+        if not entry["const_enum_inlining"] and calls["constant_value"]:
+            raise ValueError("constant queries without constant-enum inlining")
+
+
 def adapter_panic(row):
     location = row.get("panic_location") or ""
     return location.startswith(("tools/", "crates/tsr_compiler/examples/")) or "/tools/" in location
@@ -271,10 +361,10 @@ def attribute(row, stderr):
     return "harness", f"unattributed {fatal['class']}: {fatal['reason']}"
 
 
-def run(native_dir, output, jobs, timeout, resume=False, limit=None, *, sample=False, cases=()):
+def run(native_dir, output, jobs, timeout, resume=False, limit=None, *, sample=False, cases=(), emit_schedule=True):
     output = Path(output).resolve()
     selected = selection(sample, cases, limit)
-    report, request_rows, _ = requests(native_dir, limit, sample=sample, cases=cases)
+    report, request_rows, _ = requests(native_dir, limit, sample=sample, cases=cases, emit_schedule=emit_schedule)
     native_meta = {"directory": str(Path(native_dir).resolve()), "report_sha256":
                    digest((Path(native_dir) / "report.json").read_bytes()),
                    "observation_sha256": report["observation_sha256"]}

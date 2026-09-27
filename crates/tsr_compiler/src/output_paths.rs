@@ -222,3 +222,40 @@ pub(crate) fn module_specifier_output_name(
     ]
     .concat()
 }
+
+impl Program {
+    /// The files whose JavaScript `Program.Emit` transforms, in program order:
+    /// the emitted files with a JavaScript output path that `noEmit` and the
+    /// blocked outputs leave in place, as `emitter.emitJSFile` selects them.
+    /// `noEmitOnError` needs the program's diagnostics and stays the caller's.
+    pub fn javascript_emit_files(&self) -> Result<Vec<&std::sync::Arc<ProgramFile>>, Error> {
+        if self.options().no_emit.is_true() {
+            return Ok(Vec::new());
+        }
+        let mut emitted = Vec::new();
+        for file in self.files() {
+            if may_emit(file, self)? {
+                emitted.push(file);
+            }
+        }
+        let names = emitted
+            .iter()
+            .map(|file| {
+                file.bound()
+                    .view()
+                    .source_file()
+                    .map(|source| source.parse_options().file_name.clone())
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let common = common_directory(self, &names);
+        let blocked = &self.option_verification().blocked_output_paths;
+        let mut result = Vec::new();
+        for file in emitted {
+            let [javascript, ..] = output_names(file, self, &common)?;
+            if !javascript.is_empty() && !blocked.contains(&self.to_path(&javascript)) {
+                result.push(file);
+            }
+        }
+        Ok(result)
+    }
+}

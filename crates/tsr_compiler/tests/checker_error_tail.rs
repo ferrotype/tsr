@@ -21,7 +21,7 @@ fn remaining_error_tail_matches_native_diagnostics() {
             request,
             &mut tsr_compiler::FileCache::new(),
             &mut executor::NoHooks,
-            |program, _, _, diagnostics, _| {
+            |program, _, _, diagnostics, _, _| {
                 let sorted = program
                     .sort_and_deduplicate_diagnostics(diagnostics.unwrap())
                     .unwrap();

@@ -17,15 +17,14 @@ impl Program {
         operation: &mut Operation<'_>,
         file: Option<&ProgramFile>,
     ) -> Result<Vec<Diagnostic>, Error> {
-        let diagnostics = match file {
-            Some(file) => self.declaration_diagnostics_with_checker(operation, file)?,
-            None => {
-                let mut diagnostics = Vec::new();
-                for file in self.files() {
-                    diagnostics.extend(self.declaration_diagnostics_with_checker(operation, file)?);
-                }
-                diagnostics
+        let diagnostics = if let Some(file) = file {
+            self.declaration_diagnostics_with_checker(operation, file)?
+        } else {
+            let mut diagnostics = Vec::new();
+            for file in self.files() {
+                diagnostics.extend(self.declaration_diagnostics_with_checker(operation, file)?);
             }
+            diagnostics
         };
         self.filter_and_sort_diagnostics(&diagnostics)
     }

@@ -17,7 +17,7 @@ fn original_config_diagnostics_reach_the_baseline_executor() {
             request,
             &mut tsr_compiler::FileCache::new(),
             &mut executor::NoHooks,
-            |_, _, _, _, _| panic!("diagnostic-only request must not run a baseline walker"),
+            |_, _, _, _, _, _| panic!("diagnostic-only request must not run a baseline walker"),
         );
         assert_eq!(
             actual["load"]["state"], "executed",
@@ -55,7 +55,7 @@ fn inherited_config_diagnostics_keep_their_source_during_formatting() {
         &request,
         &mut tsr_compiler::FileCache::new(),
         &mut executor::NoHooks,
-        |program, _, _, diagnostics, _| {
+        |program, _, _, diagnostics, _, _| {
             let sorted = program
                 .sort_and_deduplicate_diagnostics(diagnostics.unwrap())
                 .unwrap();
@@ -97,7 +97,7 @@ fn config_include_specs_reach_program_diagnostics() {
         &request,
         &mut tsr_compiler::FileCache::new(),
         &mut executor::NoHooks,
-        |program, _, _, diagnostics, _| {
+        |program, _, _, diagnostics, _, _| {
             let sorted = program
                 .sort_and_deduplicate_diagnostics(diagnostics.unwrap())
                 .unwrap();
@@ -124,7 +124,7 @@ fn original_config_text_is_not_decoded_as_a_filesystem_read() {
         &request,
         &mut tsr_compiler::FileCache::new(),
         &mut executor::NoHooks,
-        |program, _, _, _, _| {
+        |program, _, _, _, _, _| {
             let config = program.config().config_file.as_ref().unwrap();
             assert_eq!(
                 config
@@ -157,7 +157,7 @@ fn missing_original_config_is_an_explicit_capture_failure() {
         &request,
         &mut tsr_compiler::FileCache::new(),
         &mut executor::NoHooks,
-        |_, _, _, _, _| panic!("config failure must stop loading"),
+        |_, _, _, _, _, _| panic!("config failure must stop loading"),
     );
     assert_eq!(result["load"]["state"], "failed");
     assert_eq!(result["load"]["class"], "config_parse");
