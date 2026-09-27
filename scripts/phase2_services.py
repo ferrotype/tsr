@@ -13,6 +13,7 @@ checker's entry points and compares the results per operation.
     record  [--output DIR] [--run REGEX]   # neutrality, two recorded runs, the record and manifest
     verify  [--output DIR]                 # re-record; the committed manifest must reproduce
     replay  [--output DIR] [--test NAME]   # replay the record against Rust; writes the receipt
+    fixture                                # the C5.8 contract subset of the record
 
 `record` builds the suite twice (with and without the overlay), runs it three
 times (once plain, twice recorded) and requires the same fourslash outcome for
@@ -379,6 +380,38 @@ def aggregate(shards):
     return operations, unsupported, exclusions, programs, examples
 
 
+def classify(recorded, operations, unsupported, exclusions, approved, *, whole=True):
+    """Each operation's state, each exclusion's approval, and completeness.
+
+    An operation is `replayed` when every call matched or was excluded,
+    `approved` when the owner approved it or every other call is unsupported
+    for an approved reason, `incomplete` when a whole replay saw fewer calls
+    than the record holds, and `open` otherwise. The replay is complete only
+    over the whole record, with every operation replayed or approved and every
+    exclusion approved."""
+    states = {}
+    for op in sorted(set(recorded) | set(operations)):
+        counts = operations.get(op, Counter())
+        other = sum(count for outcome, count in counts.items() if outcome not in MATCHED)
+        covered = sum(count for reason, count in unsupported.get(op, {}).items() if reason in approved["unsupported"])
+        if whole and sum(counts.values()) != recorded.get(op, 0):
+            state = "incomplete"
+        elif other == 0:
+            state = "replayed"
+        elif op in approved["operations"] or other == covered:
+            state = "approved"
+        else:
+            state = "open"
+        states[op] = {"state": state, "counts": dict(sorted(counts.items()))}
+        if unsupported.get(op):
+            states[op]["unsupported"] = dict(sorted(unsupported[op].items()))
+    excluded = {reason: {**dict(counts), "approved": reason in approved["exclusions"]}
+                for reason, counts in sorted(exclusions.items())}
+    complete = (whole and all(entry["state"] in ("replayed", "approved") for entry in states.values())
+                and all(entry["approved"] for entry in excluded.values()))
+    return states, excluded, complete
+
+
 def replay(output, tests=None, jobs=None):
     manifest_bytes = MANIFEST.read_bytes()
     manifest = json.loads(manifest_bytes)
@@ -404,26 +437,8 @@ def replay(output, tests=None, jobs=None):
         raise ValueError("a replay shard failed; see " + str(output))
     operations, unsupported, exclusions, programs, examples = aggregate(shards)
     approved, approvals_sha256 = approvals()
-    states = {}
-    for op in sorted(set(manifest["operations"]) | set(operations)):
-        counts = operations.get(op, Counter())
-        other = sum(count for outcome, count in counts.items() if outcome not in MATCHED)
-        covered = sum(count for reason, count in unsupported.get(op, {}).items() if reason in approved["unsupported"])
-        if tests is None and sum(counts.values()) != manifest["operations"].get(op, 0):
-            state = "incomplete"
-        elif other == 0:
-            state = "replayed"
-        elif op in approved["operations"] or other == covered:
-            state = "approved"
-        else:
-            state = "open"
-        states[op] = {"state": state, "counts": dict(sorted(counts.items()))}
-        if unsupported.get(op):
-            states[op]["unsupported"] = dict(sorted(unsupported[op].items()))
-    excluded = {reason: {**dict(counts), "approved": reason in approved["exclusions"]}
-                for reason, counts in sorted(exclusions.items())}
-    complete = (tests is None and all(entry["state"] in ("replayed", "approved") for entry in states.values())
-                and all(entry["approved"] for entry in excluded.values()))
+    states, excluded, complete = classify(manifest["operations"], operations, unsupported, exclusions, approved,
+                                          whole=tests is None)
     totals = Counter()
     for counts in operations.values():
         totals.update(counts)
@@ -447,6 +462,45 @@ def replay(output, tests=None, jobs=None):
     print(json.dumps({key: receipt[key] for key in ("complete", "calls", "programs", "replayed", "approved", "open")},
                      indent=1))
     return receipt
+
+
+# The recorded tests the C5.8 contracts replay (crates/tsr_compiler/tests/
+# c5_contracts.rs): hover expansion of each declaration kind, accessibility
+# chains, declaration serialization and its resolver marks, signature help,
+# string-literal completions with blocked inference, deprecation and
+# implicit-any suggestions, and JSDoc parameter references.
+CONTRACT_TESTS = [
+    "TestQuickinfoVerbosityClassWithMixinBase", "TestQuickinfoVerbosityInterfaceMemberOrdering",
+    "TestQuickinfoVerbosityConstEnum", "TestQuickinfoVerbosityNestedNamespace",
+    "TestQuickinfoVerbosityNamespaceTypeAliases", "TestQuickinfoVerbosityConditionalType",
+    "TestCompletionForComputedStringProperties", "TestQualifyModuleTypeNames",
+    "TestCodeFixMissingTypeAnnotationOnExports11", "TestCodeFixMissingTypeAnnotationOnExports44_default_export",
+    "TestCodeFixMissingTypeAnnotationOnExports55_generator_return", "TestCodeFixClassImplementInterfaceWithAmbientSignatures2",
+    "TestQuickinfoVerbosityToplevelTruncation1", "TestReferences01", "TestSignatureHelp01",
+    "TestCompletionForStringLiteral12", "TestCompletionsLiteralOverload", "TestJsdocDeprecated_suggestion1",
+    "TestGetJavaScriptSyntacticDiagnostics16", "TestRenameJsDocTypeLiteral",
+]
+CONTRACT_FIXTURE = ROOT / "crates/tsr_compiler/tests/fixtures/c5/services-subset.ndjson"
+
+
+def fixture():
+    """The contract subset of the committed record, test by test in record order."""
+    wanted = set(CONTRACT_TESTS)
+    found = []
+    with lzma.open(RECORD) as source, CONTRACT_FIXTURE.open("wb") as target:
+        keep = False
+        for line in source:
+            if line.startswith(b'{"e":"test"'):
+                name = json.loads(line)["name"]
+                keep = name in wanted
+                if keep:
+                    found.append(name)
+            if keep:
+                target.write(line)
+    missing = sorted(wanted - set(found))
+    if missing:
+        raise ValueError("contract tests not in the record: " + ", ".join(missing))
+    print(json.dumps({"tests": len(found), "bytes": CONTRACT_FIXTURE.stat().st_size}))
 
 
 def current(manifest, comparison=None, *, context=None):
@@ -476,6 +530,7 @@ def current(manifest, comparison=None, *, context=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
+    commands.add_parser("fixture", help="write the C5.8 contract subset of the record")
     for name in ("record", "verify", "replay"):
         sub = commands.add_parser(name)
         sub.add_argument("--output", type=Path, default=OUTPUT / name)
@@ -485,7 +540,9 @@ def main():
             sub.add_argument("--test", action="append", help="replay only this test (development only)")
             sub.add_argument("--jobs", type=int)
     args = parser.parse_args()
-    if args.command == "record":
+    if args.command == "fixture":
+        fixture()
+    elif args.command == "record":
         record(args.output, run=args.run)
     elif args.command == "verify":
         sys.exit(0 if verify(args.output) else 1)

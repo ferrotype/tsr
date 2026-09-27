@@ -37,6 +37,7 @@ struct Options {
     tests: Vec<String>,
 }
 
+#[allow(dead_code, reason = "the example's argument parser")]
 fn options() -> Result<Options, Error> {
     let mut options = Options {
         input: String::new(),
@@ -466,8 +467,31 @@ impl Driver {
     }
 }
 
+#[allow(
+    dead_code,
+    reason = "the example's entry point; the contract test calls `run`"
+)]
 pub fn main() -> Result<(), Error> {
-    let options = options()?;
+    run(&options()?)
+}
+
+/// Replays the tests of `input` (this shard's, or the named ones) and writes
+/// one report line per test to `output`.
+#[allow(
+    dead_code,
+    reason = "the contract test's entry point; the example calls `main`"
+)]
+pub fn replay_file(input: &str, output: &str, tests: &[String]) -> Result<(), Error> {
+    run(&Options {
+        input: input.to_string(),
+        output: output.to_string(),
+        shard: 0,
+        shards: 1,
+        tests: tests.to_vec(),
+    })
+}
+
+fn run(options: &Options) -> Result<(), Error> {
     let input = BufReader::with_capacity(1 << 20, std::fs::File::open(&options.input)?);
     let mut out = BufWriter::new(std::fs::File::create(&options.output)?);
     let mut driver = Driver {

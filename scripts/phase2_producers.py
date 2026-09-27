@@ -144,11 +144,14 @@ WITNESSES["c3-contracts"] = {
                 "upstream/tsc/testdata/tests/cases/compiler/binderBinaryExpressionStress.ts"],
 }
 WITNESSES["c5-contracts"] = {
-    "commands": [["cargo", "test", "-p", "tsr_compiler", "--features", "recursion-probe",
+    # The services replay contract compiles the replay driver, which reads the
+    # checker through the services-replay feature's views.
+    "commands": [["cargo", "test", "-p", "tsr_compiler", "--features", "recursion-probe,services-replay",
                   "--test", "c5_contracts", "--locked", *release] for release in ([], ["--release"])],
     "test_source": "crates/tsr_compiler/tests/c5_contracts.rs", "minimum_tests": 9,
     "test_modules": {},
-    "sources": [*WITNESSES["c1-contracts"]["sources"], "crates/tsr_compiler/tests/fixtures/c5"],
+    "sources": [*WITNESSES["c1-contracts"]["sources"], "crates/tsr_compiler/tests/fixtures/c5",
+                "tools/phase2/services/replay"],
 }
 WITNESSES["c4-contracts"] = {
     "commands": [["cargo", "test", "-p", "tsr_compiler", "--features", "recursion-probe",
