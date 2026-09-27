@@ -26,11 +26,11 @@ pub(super) struct RecoveryBoundary {
     approximate_length: usize,
     encountered_error: bool,
 }
+// Source: tsc/internal/checker/nodecopy.go:originalRecoveryScopeState
 #[derive(Clone, Copy)]
 struct RecoveryScope {
     had_error: bool,
     reports: usize,
-    symbols: usize,
 }
 
 impl NodeBuilder<'_> {
@@ -67,6 +67,7 @@ impl NodeBuilder<'_> {
             false
         }
     }
+    // port: tsc/internal/checker/nodecopy.go:recoveryBoundary.markError
     fn reuse_mark_error(&mut self) -> Result<(), Error> {
         self.reuse_boundaries
             .last_mut()
@@ -77,6 +78,7 @@ impl NodeBuilder<'_> {
     fn reuse_had_error(&self) -> bool {
         self.reuse_boundaries.last().is_some_and(|b| b.had_error)
     }
+    // port: tsc/internal/checker/nodecopy.go:recoveryBoundary.startRecoveryScope
     fn reuse_start_scope(&self) -> Result<RecoveryScope, Error> {
         let b = self
             .reuse_boundaries
@@ -85,9 +87,13 @@ impl NodeBuilder<'_> {
         Ok(RecoveryScope {
             had_error: b.had_error,
             reports: b.reports.len(),
-            symbols: b.symbols.len(),
         })
     }
+    // port: tsc/internal/checker/nodecopy.go:recoveryBoundary.endRecoveryScope
+    /// Restores the error state and drops the deferred reports. The pin
+    /// truncates only the context's tracked symbols, which a boundary discards
+    /// anyway; the symbols the wrapping tracker deferred stay and are tracked
+    /// when the boundary finalizes.
     fn reuse_end_scope(&mut self, state: RecoveryScope) -> Result<(), Error> {
         let b = self
             .reuse_boundaries
@@ -95,7 +101,6 @@ impl NodeBuilder<'_> {
             .ok_or(Error::MissingLink("annotation recovery boundary"))?;
         b.had_error = state.had_error;
         b.reports.truncate(state.reports);
-        b.symbols.truncate(state.symbols);
         Ok(())
     }
     fn reuse_retain(&mut self, node: NodeId) -> Result<(), Error> {
@@ -104,7 +109,9 @@ impl NodeBuilder<'_> {
         }
         Ok(())
     }
+    // port: tsc/internal/checker/nodecopy.go:NodeBuilderImpl.reuseNode
     // port: tsc/internal/checker/nodecopy.go:NodeBuilderImpl.tryReuseExistingNodeHelper
+    // port: tsc/internal/checker/nodecopy.go:NodeBuilderImpl.finalizeBoundary
     pub(super) fn reuse_node(&mut self, node: NodeId) -> Result<Option<NodeId>, Error> {
         self.reuse_retain(node)?;
         self.reuse_boundaries.push(RecoveryBoundary {
@@ -1549,6 +1556,7 @@ impl NodeBuilder<'_> {
         };
         Ok(view.node(literal)?.kind() == K::StringLiteral)
     }
+    // port: tsc/internal/checker/nodecopy.go:NodeBuilderImpl.getModuleSpecifierOverride
     fn reuse_module_specifier_override(
         &mut self,
         parent: NodeId,
