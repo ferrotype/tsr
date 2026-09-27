@@ -5,13 +5,13 @@
    "disposition": "equivalent",
    "reason": "No caller at the pin; the operation it composes, markEntityNameOrEntityExpressionAsReference(getEntityNameFromTypeNode(node), false), is ported at the Rust site.",
    "reviewed_from": "pinned body and the pinned caller's port; C4 source audit",
-   "rust": "crates/tsr_checker/src/decorators.rs:1302"
+   "rust": "crates/tsr_checker/src/decorators.rs:1280"
   },
   "tsc/internal/checker/checker.go:getEntityNameFromTypeNode": {
    "disposition": "equivalent",
    "reason": "Serves only markTypeNodeAsReferenced, which has no caller at the pin; the metadata path reads entity names through getEntityNameForDecoratorMetadata, ported beside the Rust site.",
    "reviewed_from": "pinned body and the pinned caller's port; C4 source audit",
-   "rust": "crates/tsr_checker/src/decorators.rs:1302"
+   "rust": "crates/tsr_checker/src/decorators.rs:1280"
   },
   "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFactoryEntity": {
    "disposition": "mapped",

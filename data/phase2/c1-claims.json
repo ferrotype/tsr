@@ -818,24 +818,22 @@
    "status": "claimed"
   },
   {
-   "blocker": "B09",
    "bucket": "emit order: native pre/post-emit sets differ",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; after the TS2751 fix (341f3a3) the structured set equals the native pre-emit set and the baseline is the post-emit set, which B09 withholds",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; after the TS2751 fix (341f3a3) the structured set equals the native pre-emit set and the baseline is the post-emit set, which B09 withholds; C5 exit (target/phase2/rust-c5, 2026-09-27): the post-emit schedule (8f825b5) executes and the row matches every enabled domain, so the post-emit order entry no longer lists it",
    "go": "tsc/internal/checker/checker.go:Checker.getResolvedBaseConstraint",
    "id": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
    "item": "C1.5",
    "mechanism": "the related information 'Circularity originates in type at this location' (TS2751) on 'Type parameter has a circular constraint' is never attached; constraints.rs reports the error without the currentNode-relative related entry",
-   "status": "blocked"
+   "status": "claimed"
   },
   {
-   "blocker": "B09",
    "bucket": "emit order: native pre/post-emit sets differ",
-   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; after the TS2751 fix (341f3a3) the structured set equals the native pre-emit set and the baseline is the post-emit set, which B09 withholds",
+   "evidence": "C1.0 run target/phase2/c1-base, native vs Rust structured diagnostics (scratch diffrow), 2026-09-25; after the TS2751 fix (341f3a3) the structured set equals the native pre-emit set and the baseline is the post-emit set, which B09 withholds; C5 exit (target/phase2/rust-c5, 2026-09-27): the post-emit schedule (8f825b5) executes and the row matches every enabled domain, so the post-emit order entry no longer lists it",
    "go": "tsc/internal/checker/checker.go:Checker.getResolvedBaseConstraint",
    "id": "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0",
    "item": "C1.5",
    "mechanism": "the related information 'Circularity originates in type at this location' (TS2751) on 'Type parameter has a circular constraint' is never attached; constraints.rs reports the error without the currentNode-relative related entry",
-   "status": "blocked"
+   "status": "claimed"
   },
   {
    "bucket": "diagnostics: TS2314",

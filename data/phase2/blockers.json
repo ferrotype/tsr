@@ -1,17 +1,10 @@
 {
  "comparison": {
   "native_observation_sha256": "1b5356b425ad95a3e5e2a0bb29d42534e8d9d4a6159649f063f3317084a0e276",
-  "rust_capture_sha256": "928ef3dcbfbe5185cbba3ac022d9d4ee742b16337671db5a0d3ff52961688d98"
+  "rust_capture_sha256": "8217ae9b14bc914cbed20d19a3aff3780e1cb7bc48920935375dc7926f6a4383"
  },
  "declaration_audit": {
   "examples": {
-   "different": [
-    "compiler/declarationEmitExpressionWithNonlocalPrivateUniqueSymbol.ts#configuration=0",
-    "compiler/isolatedDeclarationErrors.ts#configuration=0",
-    "compiler/isolatedDeclarationErrorsExpandoFunctions.ts#configuration=0",
-    "compiler/isolatedDeclarationErrorsObjects.ts#configuration=0",
-    "compiler/isolatedDeclarationLazySymbols.ts#configuration=0"
-   ],
    "not loaded: unsupported": [
     "compiler/contentMapperDeclarationEmit.ts#configuration=0",
     "compiler/contentMapperDeclarationEmitFailure.ts#configuration=0",
@@ -20,9 +13,8 @@
   },
   "native_requests": 1754,
   "outcomes": {
-   "different": 5,
    "not loaded: unsupported": 3,
-   "working": 1746
+   "working": 1751
   },
   "rule": "working paths keep their results; only a missing transform or emit-resolver operation becomes a blocker, under its Phase 3 or Phase 2 owner"
  },
@@ -539,58 +531,6 @@
     "compiler/contentMapperSymlink.ts#configuration=0",
     "compiler/contentMapperSynthesizedUnusedDiagnostics.ts#configuration=0",
     "compiler/contentMapperTransform.ts#configuration=0"
-   ]
-  },
-  {
-   "checkpoints": {
-    "C2": 3
-   },
-   "domains": {
-    "errors": 3
-   },
-   "evidence": [
-    {
-     "observation": "native pre-emit and post-emit structured diagnostic sets differ; the baseline is the post-emit set",
-     "variant": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0"
-    },
-    {
-     "observation": "native pre-emit and post-emit structured diagnostic sets differ; the baseline is the post-emit set",
-     "variant": "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0"
-    },
-    {
-     "observation": "native pre-emit and post-emit structured diagnostic sets differ; the baseline is the post-emit set",
-     "variant": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0"
-    }
-   ],
-   "id": "B02",
-   "kind": "emit_order",
-   "missing_operation": "checking in the post-emit program order: the native harness emits before collecting diagnostics, and these variants' diagnostics depend on that order",
-   "operation": "post-emit diagnostic order",
-   "owner": "C5 emit resolver, with Phase 3 emit (joint)",
-   "ownership": [
-    {
-     "domain": "errors",
-     "effective_owner": "C5",
-     "inventory_owner": "C2",
-     "variant": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0"
-    },
-    {
-     "domain": "errors",
-     "effective_owner": "C5",
-     "inventory_owner": "C2",
-     "variant": "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0"
-    },
-    {
-     "domain": "errors",
-     "effective_owner": "C5",
-     "inventory_owner": "C2",
-     "variant": "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0"
-    }
-   ],
-   "variants": [
-    "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
-    "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0",
-    "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0"
    ]
   }
  ],

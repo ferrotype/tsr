@@ -21,7 +21,7 @@
       "disposition": "equivalent",
       "reason": "When a context-sensitive body has no contextual signature, initializes its this parameter first, then each ordinary parameter with no contextual type.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/check_bodies.rs:435"
+      "rust": "crates/tsr_checker/src/check_bodies.rs:426"
     },
     "tsc/internal/checker/checker.go:Checker.checkCollisionWithGlobalPromiseInGeneratedCode": {
       "disposition": "equivalent",
@@ -32,23 +32,23 @@
     "tsc/internal/checker/checker.go:Checker.checkConditionalType": {
       "disposition": "equivalent",
       "reason": "The ConditionalType source-element arm visits every source child with check_source_element, matching ForEachChild(checkSourceElement).",
-      "rust": "crates/tsr_checker/src/check.rs:264"
+      "rust": "crates/tsr_checker/src/check.rs:265"
     },
     "tsc/internal/checker/checker.go:Checker.checkIndexConstraintForIndexSignature": {
       "disposition": "equivalent",
       "reason": "check_index_constraints compares each distinct applicable index pair, selects the local declaration or inherited interface error node, checks source value assignability and reports the four type arguments. inherited_index_error_node at 226 suppresses duplicate errors when a base has both key signatures.",
-      "rust": "crates/tsr_checker/src/check_indexes.rs:82"
+      "rust": "crates/tsr_checker/src/check_indexes.rs:85"
     },
     "tsc/internal/checker/checker.go:Checker.checkNoTypeArguments": {
       "disposition": "equivalent",
       "reason": "The non-generic reference branch reports Type_0_is_not_generic at the reference with symbol_to_string and returns errorType; the symbol-less JSDoc path at jsdoc_types.rs:46 uses declaration_name_to_string and preserves its intended primitive result, as the native callers do.",
-      "rust": "crates/tsr_checker/src/references.rs:359"
+      "rust": "crates/tsr_checker/src/references.rs:367"
     },
     "tsc/internal/checker/checker.go:Checker.createCombinedSymbolForOverloadFailure": {
       "disposition": "equivalent",
       "reason": "After constructing the parameter-type union, create_symbol_with_type uses only the first source. The rest-parameter path likewise uses the first rest symbol, matching the native intentionally first-source choice.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/call_failure.rs:189"
+      "rust": "crates/tsr_checker/src/call_failure.rs:195"
     },
     "tsc/internal/checker/checker.go:Checker.createInstantiatedSymbolTable": {
       "disposition": "equivalent",
@@ -67,7 +67,7 @@
     "tsc/internal/checker/checker.go:Checker.getApplicableIndexInfo": {
       "disposition": "equivalent",
       "reason": "applicable_index_info obtains all index infos for the supplied object and implements findApplicableIndexInfo including non-string priority, compound applicable infos and string fallback.",
-      "rust": "crates/tsr_checker/src/indexes.rs:585"
+      "rust": "crates/tsr_checker/src/indexes.rs:591"
     },
     "tsc/internal/checker/checker.go:Checker.getApplicableIndexInfoForName": {
       "disposition": "equivalent",
@@ -82,7 +82,7 @@
       "disposition": "equivalent",
       "reason": "The only pinned caller getAwaitedTypeOfPromise supplies nil node/message/args. awaited_type_of_promise first resolves the promised type, then awaited_type; absent promised types remain absent. Diagnostic-bearing awaited operations elsewhere use awaited_type_ex directly.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/promises.rs:468"
+      "rust": "crates/tsr_checker/src/promises.rs:469"
     },
     "tsc/internal/checker/checker.go:Checker.getConstraintFromIndexedAccess": {
       "disposition": "equivalent",
@@ -103,7 +103,7 @@
       "disposition": "equivalent",
       "reason": "Filters to function expressions, arrows, and methods whose parent is an object literal before resolving the contextual signature.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/return_inference.rs:519"
+      "rust": "crates/tsr_checker/src/return_inference.rs:515"
     },
     "tsc/internal/checker/checker.go:Checker.getContextualTypeForArgument": {
       "disposition": "mapped"
@@ -116,19 +116,19 @@
       "disposition": "equivalent",
       "reason": "Parent contextual type is unwrapped with getAwaitedTypeNoAlias; when available, operand context is its union with PromiseLike of the same type.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/expression_context.rs:230"
+      "rust": "crates/tsr_checker/src/expression_context.rs:229"
     },
     "tsc/internal/checker/checker.go:Checker.getContextualTypeForBinaryOperand": {
       "disposition": "equivalent",
       "reason": "Handles explicit annotation, assignment declarations, short-circuit and comma operands. For ||/?? RHS, a binding-pattern-derived context now selects the left expression type as native does; source regression and controls are in contextual_audit.json.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/expression_context.rs:184"
+      "rust": "crates/tsr_checker/src/expression_context.rs:183"
     },
     "tsc/internal/checker/checker.go:Checker.getContextualTypeForConditionalOperand": {
       "disposition": "equivalent",
       "reason": "Only true/false branches inherit the conditional expression context; the condition has no inherited context.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/expression_context.rs:160"
+      "rust": "crates/tsr_checker/src/expression_context.rs:159"
     },
     "tsc/internal/checker/checker.go:Checker.getContextualTypeForDecorator": {
       "disposition": "mapped",
@@ -138,31 +138,31 @@
       "disposition": "equivalent",
       "reason": "The variable-like parent arm verifies initializer identity, checks annotation/parameter/binding/static context, then creates a nonempty binding-pattern context unless SkipBindingPatterns is set.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/expression_context.rs:68"
+      "rust": "crates/tsr_checker/src/expression_context.rs:67"
     },
     "tsc/internal/checker/checker.go:Checker.getContextualTypeForObjectLiteralMethod": {
       "disposition": "equivalent",
       "reason": "Object-method contexts route through contextual_expression_type_ex, whose IN_WITH_STATEMENT guard precedes parent property context resolution; non-object methods cannot be contextually typed.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/return_inference.rs:519"
+      "rust": "crates/tsr_checker/src/return_inference.rs:515"
     },
     "tsc/internal/checker/checker.go:Checker.getContextualTypeForStaticPropertyDeclaration": {
       "disposition": "equivalent",
       "reason": "Only static property initializers in a class expression inherit contextual property type from that class expression; symbol name and context flags are retained.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/expression_context.rs:86"
+      "rust": "crates/tsr_checker/src/expression_context.rs:85"
     },
     "tsc/internal/checker/checker.go:Checker.getContextualTypeForSubstitutionExpression": {
       "disposition": "equivalent",
       "reason": "A tagged parent supplies effective-call-argument contextual typing for the substitution expression; untagged template spans produce no contextual type.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/expression_context.rs:172"
+      "rust": "crates/tsr_checker/src/expression_context.rs:171"
     },
     "tsc/internal/checker/checker.go:Checker.getContextualTypeForVariableLikeDeclaration": {
       "disposition": "equivalent",
       "reason": "Initializer parent handling prioritizes annotations, then contextual parameter/binding-element types, then static class-expression property context; absent context falls through to binding-pattern inference at the native caller.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/expression_context.rs:71"
+      "rust": "crates/tsr_checker/src/expression_context.rs:70"
     },
     "tsc/internal/checker/checker.go:Checker.getDefaultFromTypeParameter": {
       "disposition": "mapped",
@@ -171,7 +171,7 @@
     "tsc/internal/checker/checker.go:Checker.getDefaultTypeArgumentType": {
       "disposition": "equivalent",
       "reason": "fill_missing_type_arguments selects any for JavaScript implicit defaults and unknown otherwise, after excluding no-constraint/circular defaults.",
-      "rust": "crates/tsr_checker/src/type_parameters.rs:316"
+      "rust": "crates/tsr_checker/src/type_parameters.rs:333"
     },
     "tsc/internal/checker/checker.go:Checker.getEffectiveTypeArgumentAtIndex": {
       "disposition": "equivalent",
@@ -181,7 +181,7 @@
     "tsc/internal/checker/checker.go:Checker.getEffectiveTypeArguments": {
       "disposition": "equivalent",
       "reason": "Resolves source argument nodes in order and calls fill_missing_type_arguments with the declaration JavaScript flag. The Rust filling routine implements the native default/error placeholder algorithm; the native minimum-count argument is unused in that routine.",
-      "rust": "crates/tsr_checker/src/references.rs:451"
+      "rust": "crates/tsr_checker/src/references.rs:459"
     },
     "tsc/internal/checker/checker.go:Checker.getFalseTypeFromConditionalType": {
       "disposition": "equivalent",
@@ -191,7 +191,7 @@
     "tsc/internal/checker/checker.go:Checker.getIndexType": {
       "disposition": "equivalent",
       "reason": "Rust get_index_type accepts the explicit index flags of native getIndexTypeEx; native getIndexType consumers pass 0, e.g. relater_structure.rs:276, preserving the wrapper default.",
-      "rust": "crates/tsr_checker/src/indexes.rs:103"
+      "rust": "crates/tsr_checker/src/indexes.rs:104"
     },
     "tsc/internal/checker/checker.go:Checker.getIndexTypeOfType": {
       "disposition": "equivalent",
@@ -206,7 +206,7 @@
     "tsc/internal/checker/checker.go:Checker.getIndexedAccessType": {
       "disposition": "equivalent",
       "reason": "get_indexed_access_type is the full native Ex operation; no-context wrapper consumers supply access_flags=0, access_node=None and alias=None, e.g. normalize.rs:198.",
-      "rust": "crates/tsr_checker/src/indexes.rs:324"
+      "rust": "crates/tsr_checker/src/indexes.rs:329"
     },
     "tsc/internal/checker/checker.go:Checker.getInferredTrueTypeFromConditionalType": {
       "disposition": "equivalent",
@@ -217,7 +217,7 @@
       "disposition": "equivalent",
       "reason": "Ordered candidate scan returns the first effective-rest or sufficiently long signature; otherwise chooses the first longest parameter list.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/call_failure.rs:31"
+      "rust": "crates/tsr_checker/src/call_failure.rs:33"
     },
     "tsc/internal/checker/checker.go:Checker.getOuterTypeParametersOfClassOrInterface": {
       "disposition": "equivalent",
@@ -228,13 +228,13 @@
       "disposition": "equivalent",
       "reason": "Quick call/construct path permits object members but requires exactly one signature of the requested kind, none of the opposite kind and no type parameters, then resolves its return type.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/expressions.rs:113"
+      "rust": "crates/tsr_checker/src/expressions.rs:112"
     },
     "tsc/internal/checker/checker.go:Checker.getReturnTypeOfSingleNonGenericSignatureOfCallChain": {
       "disposition": "equivalent",
       "reason": "Optional-chain quick path computes nonoptional expression type for the propagation flag, deliberately queries the original function type as the pin does, then propagates the optional marker on the returned type.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/expressions.rs:103"
+      "rust": "crates/tsr_checker/src/expressions.rs:102"
     },
     "tsc/internal/checker/checker.go:Checker.getSignatureInstantiationWithoutFillingInTypeArguments": {
       "disposition": "equivalent",
@@ -250,7 +250,7 @@
     "tsc/internal/checker/checker.go:Checker.getSuggestedImportSource": {
       "disposition": "equivalent",
       "reason": "check_resolved_ts_extension strips the recognized TS/declaration extension and, for non-Node ESM or ESNext usage, appends mts/mjs, cts/cjs, or ts/js according to allow_importing_ts_extensions; non-ESM leaves the extension stripped.",
-      "rust": "crates/tsr_checker/src/external_resolution.rs:528"
+      "rust": "crates/tsr_checker/src/external_resolution.rs:582"
     },
     "tsc/internal/checker/checker.go:Checker.getSymbolOfPartOfRightHandSideOfImportEquals": {
       "disposition": "equivalent",
@@ -270,22 +270,22 @@
     "tsc/internal/checker/checker.go:Checker.getTypeArgumentsForAliasSymbol": {
       "disposition": "equivalent",
       "reason": "alias_for_type_node rejects a missing alias symbol and otherwise stores get_local_type_parameters(symbol) as the alias arguments, matching the native optional-symbol wrapper.",
-      "rust": "crates/tsr_checker/src/query.rs:697"
+      "rust": "crates/tsr_checker/src/query.rs:756"
     },
     "tsc/internal/checker/checker.go:Checker.getTypeArgumentsFromNode": {
       "disposition": "equivalent",
       "reason": "effective_type_arguments maps every type_argument_list node through get_type_from_type_node in source order before filling defaults; type_reference_from_symbol performs the same raw mapping before alias instantiation.",
-      "rust": "crates/tsr_checker/src/references.rs:459"
+      "rust": "crates/tsr_checker/src/references.rs:467"
     },
     "tsc/internal/checker/checker.go:Checker.getTypeArgumentsFromNodes": {
       "disposition": "equivalent",
       "reason": "The failed-overload fallback truncates supplied nodes to parameter count, resolves them in order, then appends each missing default, constraint, or unknown in that precedence without instantiating those defaults, matching the native error-recovery helper.",
-      "rust": "crates/tsr_checker/src/call_failure.rs:57"
+      "rust": "crates/tsr_checker/src/call_failure.rs:63"
     },
     "tsc/internal/checker/checker.go:Checker.getTypeOfModuleDeclarationImportAttributes": {
       "disposition": "equivalent",
       "reason": "module_import_attributes_type initializes empty_object_type, selects the native first string-named module declaration, and replaces it with get_type_from_type_node(attributes) only when attributes exist.",
-      "rust": "crates/tsr_checker/src/import_attributes.rs:277"
+      "rust": "crates/tsr_checker/src/import_attributes.rs:280"
     },
     "tsc/internal/checker/checker.go:Checker.getTypeParametersForTypeAndSymbol": {
       "disposition": "mapped",
@@ -304,13 +304,13 @@
       "disposition": "equivalent",
       "reason": "Only unit return types widen against contextual return type, unwrapping promised types for async functions, then literal/unique-symbol widening and regularization in the native order.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/return_inference.rs:78"
+      "rust": "crates/tsr_checker/src/return_inference.rs:70"
     },
     "tsc/internal/checker/checker.go:Checker.getWidenedLiteralLikeTypeForContextualType": {
       "disposition": "equivalent",
       "reason": "Return and generator iteration paths preserve context-compatible literals, otherwise widen literal then unique-symbol types, and always return the regular literal type. Call argument checks share literal_of_context for the same compatibility predicate.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/return_inference.rs:99"
+      "rust": "crates/tsr_checker/src/return_inference.rs:91"
     },
     "tsc/internal/checker/checker.go:Checker.getWidenedProperty": {
       "disposition": "equivalent",
@@ -327,28 +327,28 @@
       "disposition": "equivalent",
       "reason": "Instantiated accessor branch returns cached writeType or recursively resolves target write type, instantiates it with the stored mapper and caches the result. This is the sole native getWriteTypeOfSymbol caller branch.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/property_symbols.rs:185"
+      "rust": "crates/tsr_checker/src/property_symbols.rs:187"
     },
     "tsc/internal/checker/checker.go:Checker.hasArrayOrTypeTypeConstraint": {
       "disposition": "equivalent",
       "reason": "The homomorphic any-array path obtains the type parameter constraint and requires every distributed constituent to be an array or tuple; missing constraint fails. This matches the native array-or-tuple constraint predicate (including its pinned spelling).",
-      "rust": "crates/tsr_checker/src/mapped.rs:462"
+      "rust": "crates/tsr_checker/src/mapped.rs:465"
     },
     "tsc/internal/checker/checker.go:Checker.hasCorrectTypeArgumentArity": {
       "disposition": "equivalent",
       "reason": "Overload candidate selection admits an absent type-argument list or a count between min_type_argument_count and the signature parameter count, exactly the native predicate.",
-      "rust": "crates/tsr_checker/src/calls.rs:820"
+      "rust": "crates/tsr_checker/src/calls.rs:865"
     },
     "tsc/internal/checker/checker.go:Checker.inferSignatureInstantiationForOverloadFailure": {
       "disposition": "equivalent",
       "reason": "Creates a new inference context with JS AnyDefault when appropriate, infers with SkipContextSensitive|SkipGenericFunctions, and its overload_failure_candidate caller creates the selected signature instantiation.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:338"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:346"
     },
     "tsc/internal/checker/checker.go:Checker.instantiateMappedArrayType": {
       "disposition": "equivalent",
       "reason": "The mapped array branch instantiates the number-indexed template with optional=true, propagates error_type, computes source readonly plus mapped readonly modifiers and creates the resulting array.",
-      "rust": "crates/tsr_checker/src/mapped.rs:477"
+      "rust": "crates/tsr_checker/src/mapped.rs:480"
     },
     "tsc/internal/checker/checker.go:Checker.instantiateSignatures": {
       "disposition": "equivalent",
@@ -378,7 +378,7 @@
       "disposition": "equivalent",
       "reason": "The skip-generic path checks nonempty type parameters and an OBJECT return with at least one call signature, exactly the native isFunctionType predicate, before marking a skipped inference pass.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/calls.rs:455"
+      "rust": "crates/tsr_checker/src/calls.rs:465"
     },
     "tsc/internal/checker/checker.go:Checker.isGenericObjectType": {
       "disposition": "equivalent",
@@ -393,12 +393,12 @@
     "tsc/internal/checker/checker.go:Checker.isGenericTypeWithUndefinedConstraint": {
       "disposition": "equivalent",
       "reason": "The binding helper tests an instantiable constituent, obtains its base constraint, and applies maybe_type_of_kind(undefined); missing constraints fail, matching the native predicate.",
-      "rust": "crates/tsr_checker/src/bindings.rs:488"
+      "rust": "crates/tsr_checker/src/bindings.rs:491"
     },
     "tsc/internal/checker/checker.go:Checker.isMappedTypeWithKeyofConstraintDeclaration": {
       "disposition": "equivalent",
       "reason": "mapped_keyof_constraint reads the mapped parameter constraint AST and accepts only a TypeOperator whose operator is KeyOfKeyword, without resolving a type.",
-      "rust": "crates/tsr_checker/src/mapped.rs:267"
+      "rust": "crates/tsr_checker/src/mapped.rs:270"
     },
     "tsc/internal/checker/checker.go:Checker.isNonGenericObjectType": {
       "disposition": "equivalent",
@@ -434,7 +434,7 @@
       "disposition": "equivalent",
       "reason": "Deferred indexed access allocates IndexedAccess with object, index and persistent access flags; alias is assigned after construction as at the native caller.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/indexes.rs:385"
+      "rust": "crates/tsr_checker/src/indexes.rs:390"
     },
     "tsc/internal/checker/checker.go:Checker.newStringMappingType": {
       "disposition": "equivalent",
@@ -452,19 +452,19 @@
       "disposition": "equivalent",
       "reason": "Uses the first longest eligible signature, explicit type argument nodes up to parameter count with default/constraint/unknown fill, otherwise failure-specific inference, and replaces that candidate. The services-only apparentArgumentCount override is not supplied by the corpus/public checker path.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/call_failure.rs:30"
+      "rust": "crates/tsr_checker/src/call_failure.rs:32"
     },
     "tsc/internal/checker/checker.go:Checker.popContextualType": {
       "disposition": "equivalent",
       "reason": "The contextual argument closure saves its result before popping the Vec entry, so both Ok and Err paths remove the top context; cached object/array contexts use the same push/run/pop discipline.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:238"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:246"
     },
     "tsc/internal/checker/checker.go:Checker.popInferenceContext": {
       "disposition": "equivalent",
       "reason": "Inference contexts are a separate LIFO Vec; the result is captured before pop on both successful and failed expression checks.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:237"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:245"
     },
     "tsc/internal/checker/checker.go:Checker.pushCachedContextualType": {
       "disposition": "mapped"
@@ -473,18 +473,18 @@
       "disposition": "equivalent",
       "reason": "Explicit argument contexts store node, optional type, is_cache=false and inference identity. Cached contexts use the same record with is_cache=true, preserving cached-absent vs absent-entry semantics.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:212"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:220"
     },
     "tsc/internal/checker/checker.go:Checker.pushInferenceContext": {
       "disposition": "equivalent",
       "reason": "Pushes the node and optional inference context as a separate scope before expression evaluation; getInferenceContext scans these scopes from inner to outer.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:220"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:228"
     },
     "tsc/internal/checker/checker.go:Checker.reportInvalidImportEqualsExportMember": {
       "disposition": "equivalent",
       "reason": "The invalid export-equals member path selects the ES2015+ default-import message, JavaScript require-call/default message, or import=require/default message with the same declaration and module-name argument ordering.",
-      "rust": "crates/tsr_checker/src/external_aliases.rs:660"
+      "rust": "crates/tsr_checker/src/external_aliases.rs:668"
     },
     "tsc/internal/checker/checker.go:Checker.shouldReportErrorsFromWideningWithContextualSignature": {
       "disposition": "equivalent",
@@ -502,7 +502,7 @@
       "disposition": "equivalent",
       "reason": "Inside create_awaited_type_if_needed, an available global Awaited alias is instantiated with unwrap_awaited_type; absence yields the original type as the sole native caller does after the helper returns nil.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/promises.rs:427"
+      "rust": "crates/tsr_checker/src/promises.rs:428"
     },
     "tsc/internal/checker/checker.go:getConditionalTypeKey": {
       "disposition": "equivalent",
@@ -514,19 +514,19 @@
       "disposition": "equivalent",
       "reason": "Key writes object, index, full incoming access flags and alias. Native stores only persistent flags in the payload but keys on full flags; Rust preserves that distinction.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/indexes.rs:374"
+      "rust": "crates/tsr_checker/src/indexes.rs:379"
     },
     "tsc/internal/checker/checker.go:getTypeAliasInstantiationKey": {
       "disposition": "equivalent",
       "reason": "The alias caller uses object_instantiation_key with single_signature=false, retaining the raw explicit argument list separately from arguments filled for evaluation.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/instantiate.rs:698"
+      "rust": "crates/tsr_checker/src/instantiate.rs:704"
     },
     "tsc/internal/checker/checker.go:getTypeInstantiationKey": {
       "disposition": "equivalent",
       "reason": "Key writes argument list and alias, then the single-signature discriminator, preserving the native partition of object instantiations.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/instantiate.rs:698"
+      "rust": "crates/tsr_checker/src/instantiate.rs:704"
     },
     "tsc/internal/checker/checker.go:getUniqueTypeParameterName": {
       "disposition": "equivalent",
@@ -570,19 +570,19 @@
     "tsc/internal/checker/checker.go:isThislessTypeParameter": {
       "disposition": "equivalent",
       "reason": "The method-signature thisless check walks declared type parameters and rejects only a present constraint whose type syntax is not thisless; an absent constraint succeeds, matching the native declaration predicate.",
-      "rust": "crates/tsr_checker/src/instantiate.rs:440"
+      "rust": "crates/tsr_checker/src/instantiate.rs:446"
     },
     "tsc/internal/checker/checker.go:isTypeReferenceWithGenericArguments": {
       "disposition": "equivalent",
       "reason": "Rejects non-reference and deferred-node references; recursively recognizes a parameter or generic reference among resolved type arguments, matching the native relation-key predicate.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/relater.rs:523"
+      "rust": "crates/tsr_checker/src/relater.rs:527"
     },
     "tsc/internal/checker/checker.go:keyBuilder.writeGenericTypeReferences": {
       "disposition": "equivalent",
       "reason": "Shared source/target parameter ordinal table, constraint-sensitive parameter identity, recursive generic reference keys through depth four, and ordered delimiters match native. Each recursive result propagates the constrained flag.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/relater.rs:539"
+      "rust": "crates/tsr_checker/src/relater.rs:543"
     },
     "tsc/internal/checker/inference.go:Checker.findLeftmostType": {
       "disposition": "equivalent",
@@ -612,12 +612,12 @@
     "tsc/internal/checker/inference.go:Checker.getInferredTypes": {
       "disposition": "equivalent",
       "reason": "The call inference result loops through context parameter indices in order, calling inferred_type for every element. Contextual signature instantiation repeats the same ordered collection; no candidate is skipped.",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:508"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:516"
     },
     "tsc/internal/checker/inference.go:Checker.getMapperFromContext": {
       "disposition": "equivalent",
       "reason": "Option mapping returns the context fixing mapper when present and None for an absent context; both return-inference paths use this same conditional extraction.",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:409"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:417"
     },
     "tsc/internal/checker/inference.go:Checker.getSingleCommonSupertype": {
       "disposition": "equivalent",
@@ -637,7 +637,7 @@
     "tsc/internal/checker/inference.go:Checker.inferFromContravariantTypes": {
       "disposition": "equivalent",
       "reason": "Flips the traversal contravariance before infer_from_types and restores it afterward, including Result error return.",
-      "rust": "crates/tsr_checker/src/infer_types.rs:365"
+      "rust": "crates/tsr_checker/src/infer_types.rs:367"
     },
     "tsc/internal/checker/inference.go:Checker.inferFromContravariantTypesIfStrictFunctionTypes": {
       "disposition": "equivalent",
@@ -647,7 +647,7 @@
     "tsc/internal/checker/inference.go:Checker.inferFromContravariantTypesWithPriority": {
       "disposition": "equivalent",
       "reason": "The sole literal-keyof caller saves priority, adds LiteralKeyof, calls the restoring contravariant helper, then restores priority before propagating the result.",
-      "rust": "crates/tsr_checker/src/infer_types.rs:274"
+      "rust": "crates/tsr_checker/src/infer_types.rs:276"
     },
     "tsc/internal/checker/inference.go:Checker.inferFromProperties": {
       "disposition": "equivalent",
@@ -657,7 +657,7 @@
     "tsc/internal/checker/inference.go:Checker.inferFromTypeArguments": {
       "disposition": "equivalent",
       "reason": "Zips source and target arguments to their minimum length and flips inference only for an explicitly contravariant masked variance; absent variance entries follow ordinary inference.",
-      "rust": "crates/tsr_checker/src/infer_types.rs:333"
+      "rust": "crates/tsr_checker/src/infer_types.rs:335"
     },
     "tsc/internal/checker/inference.go:Checker.inferReverseMappedTypeWorker": {
       "disposition": "equivalent",
@@ -672,7 +672,7 @@
     "tsc/internal/checker/inference.go:Checker.inferWithPriority": {
       "disposition": "equivalent",
       "reason": "Saves traversal priority, ORs the requested mask, runs inference, restores the saved priority and then returns the original result.",
-      "rust": "crates/tsr_checker/src/infer_types.rs:352"
+      "rust": "crates/tsr_checker/src/infer_types.rs:354"
     },
     "tsc/internal/checker/inference.go:Checker.isFromInferenceBlockedSource": {
       "disposition": "mapped",
@@ -710,7 +710,7 @@
     "tsc/internal/checker/inference.go:Checker.replaceIndexedAccess": {
       "disposition": "equivalent",
       "reason": "The only caller rewrites indexed access X[K] when both operands are type parameters by mapping K to literal zero and X to the one-element tuple [X], then instantiates the mapped type and uses keyof X as constraint.",
-      "rust": "crates/tsr_checker/src/infer_reverse.rs:269"
+      "rust": "crates/tsr_checker/src/infer_reverse.rs:279"
     },
     "tsc/internal/checker/inference.go:Checker.unionObjectAndArrayLiteralCandidates": {
       "disposition": "equivalent",
@@ -750,7 +750,7 @@
     "tsc/internal/checker/inference.go:hasInferenceCandidatesOrDefault": {
       "disposition": "equivalent",
       "reason": "The signature-context predicate combines either candidate list with syntactic default presence. It no longer resolves a default or fills the lazy default cache; the native fixture checks absent, unknown and circular defaults.",
-      "rust": "crates/tsr_checker/src/call_arguments.rs:277"
+      "rust": "crates/tsr_checker/src/call_arguments.rs:285"
     },
     "tsc/internal/checker/inference.go:hasOverlappingInferences": {
       "disposition": "equivalent",
@@ -765,7 +765,7 @@
     "tsc/internal/checker/inference.go:tupleTypesDefinitelyUnrelated": {
       "disposition": "equivalent",
       "reason": "The initial tuple/tuple branch compares target minimum length with source arity unless source has a rest element and compares target fixed arity with source minimum length unless target has a rest element, before the separate object-property predicate.",
-      "rust": "crates/tsr_checker/src/infer_objects.rs:100"
+      "rust": "crates/tsr_checker/src/infer_objects.rs:113"
     },
     "tsc/internal/checker/mapper.go:ArrayToSingleTypeMapper.Map": {
       "disposition": "equivalent",
@@ -790,7 +790,7 @@
     "tsc/internal/checker/mapper.go:Checker.mapTypeWithCompositeMapper": {
       "disposition": "equivalent",
       "reason": "The object-instantiation loop applies the optional first mapper, invokes the second directly when unchanged (including absent first), and otherwise instantiates the changed first result with the second mapper.",
-      "rust": "crates/tsr_checker/src/instantiate.rs:600"
+      "rust": "crates/tsr_checker/src/instantiate.rs:606"
     },
     "tsc/internal/checker/mapper.go:Checker.newBackreferenceMapper": {
       "disposition": "equivalent",
@@ -880,7 +880,7 @@
     "tsc/internal/checker/mapper.go:newDeferredTypeMapper": {
       "disposition": "equivalent",
       "reason": "The sole native use creates per-index lazy effective-argument closures. Rust stores the original node and source list instead, resolves the same effective argument on a matching Map, and retains the node in its owner graph.",
-      "rust": "crates/tsr_checker/src/infer_constraints.rs:72"
+      "rust": "crates/tsr_checker/src/infer_constraints.rs:58"
     },
     "tsc/internal/checker/mapper.go:newFunctionTypeMapper": {
       "disposition": "equivalent",

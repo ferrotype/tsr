@@ -1,45 +1,996 @@
 {
- "runs": [
-  {
-   "command": [
-    "cargo",
-    "test",
-    "-p",
-    "tsr_compiler",
-    "--features",
-    "recursion-probe",
-    "--test",
-    "c4_contracts",
-    "--locked"
-   ],
-   "exit_code": 0,
-   "stderr_sha256": "8098e59d9575e810db9648fdc2267e77f11406af74a701ddbefb6bffccaff00b",
-   "stderr_tail": "   Compiling tsr_checker v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_checker)\n   Compiling tsr_compiler v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_compiler)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.98s\n     Running tests/c4_contracts.rs (target/debug/deps/c4_contracts-70a1fcf1d0eaac28)\n",
-   "stdout": "\nrunning 9 tests\ntest jsx_in_javascript_matches_native ... ok\ntest generic_components_match_native ... ok\ntest jsx_and_decorator_errors_leave_checkers_reusable ... ok\ntest decorator_context_types_match_native ... ok\ntest element_kinds_match_native ... ok\ntest checking_produces_no_transformed_syntax ... ok\ntest metadata_marking_follows_the_pin ... ok\ntest decorator_positions_match_native ... ok\ntest jsx_mode_matrix_matches_native ... ok\n\ntest result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.25s\n\n",
-   "stdout_sha256": "0d5f70d5a487442f0e5d9e4388fd14debad6587b908ee748173309a3c2543235",
-   "stdout_tail": "\nrunning 9 tests\ntest jsx_in_javascript_matches_native ... ok\ntest generic_components_match_native ... ok\ntest jsx_and_decorator_errors_leave_checkers_reusable ... ok\ntest decorator_context_types_match_native ... ok\ntest element_kinds_match_native ... ok\ntest checking_produces_no_transformed_syntax ... ok\ntest metadata_marking_follows_the_pin ... ok\ntest decorator_positions_match_native ... ok\ntest jsx_mode_matrix_matches_native ... ok\n\ntest result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.25s\n\n"
+ "approvals_sha256": "1c8e7ba36e080731135d91ae1b79bbda7e942f21ecc5defa527342836876cd42",
+ "approved": 0,
+ "calls": {
+  "excluded": 285127,
+  "match": 7951761,
+  "unsupported": 113
+ },
+ "complete": false,
+ "exclusions": {
+  "Phase 5: a *autoimport.aliasResolver program": {
+   "approved": false,
+   "calls": 137,
+   "programs": 18
   },
-  {
-   "command": [
-    "cargo",
-    "test",
-    "-p",
-    "tsr_compiler",
-    "--features",
-    "recursion-probe",
-    "--test",
-    "c4_contracts",
-    "--locked",
-    "--release"
-   ],
-   "exit_code": 0,
-   "stderr_sha256": "dbf41a3ee255e2f71dcca056f3c80f127d9e80194b097015e5fb08281b3b749d",
-   "stderr_tail": "   Compiling tsr_checker v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_checker)\n   Compiling tsr_compiler v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_compiler)\n    Finished `release` profile [optimized] target(s) in 2m 01s\n     Running tests/c4_contracts.rs (target/release/deps/c4_contracts-484d26f66bfa8789)\n",
-   "stdout": "\nrunning 9 tests\ntest element_kinds_match_native ... ok\ntest jsx_in_javascript_matches_native ... ok\ntest decorator_context_types_match_native ... ok\ntest jsx_and_decorator_errors_leave_checkers_reusable ... ok\ntest generic_components_match_native ... ok\ntest checking_produces_no_transformed_syntax ... ok\ntest metadata_marking_follows_the_pin ... ok\ntest decorator_positions_match_native ... ok\ntest jsx_mode_matrix_matches_native ... ok\n\ntest result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.55s\n\n",
-   "stdout_sha256": "d767022381a08af261f2f46a1058d76e7e846b59f8109310bc1685b302951f5c",
-   "stdout_tail": "\nrunning 9 tests\ntest element_kinds_match_native ... ok\ntest jsx_in_javascript_matches_native ... ok\ntest decorator_context_types_match_native ... ok\ntest jsx_and_decorator_errors_leave_checkers_reusable ... ok\ntest generic_components_match_native ... ok\ntest checking_produces_no_transformed_syntax ... ok\ntest metadata_marking_follows_the_pin ... ok\ntest decorator_positions_match_native ... ok\ntest jsx_mode_matrix_matches_native ... ok\n\ntest result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.55s\n\n"
+  "Phase 5: content mappers": {
+   "approved": false,
+   "calls": 230616,
+   "programs": 41
+  },
+  "Phase 5: the editor's project-reference source redirection": {
+   "approved": false,
+   "calls": 54374,
+   "programs": 33
   }
+ },
+ "manifest_sha256": "0705d494a1aa90d2c002d48a2329e45b2acacc9269a7139d7c475724fb913bc8",
+ "open": [
+  "Checker.GetMemberOverrideModifierStatus",
+  "Checker.GetSymbolAtLocation",
+  "Checker.IsSymbolAccessible",
+  "EmitResolver.CreateTypeOfDeclaration"
  ],
+ "operations": {
+  "Checker.ExpandSymbolForHover": {
+   "counts": {
+    "match": 68
+   },
+   "state": "replayed"
+  },
+  "Checker.FillMissingTypeArguments": {
+   "counts": {
+    "match": 15
+   },
+   "state": "replayed"
+  },
+  "Checker.GetAccessibleSymbolChain": {
+   "counts": {
+    "match": 100
+   },
+   "state": "replayed"
+  },
+  "Checker.GetAliasedSymbol": {
+   "counts": {
+    "excluded": 24,
+    "match": 219
+   },
+   "state": "replayed"
+  },
+  "Checker.GetAllPossiblePropertiesOfTypes": {
+   "counts": {
+    "match": 60
+   },
+   "state": "replayed"
+  },
+  "Checker.GetAmbientModules": {
+   "counts": {
+    "excluded": 4,
+    "match": 557
+   },
+   "state": "replayed"
+  },
+  "Checker.GetApparentProperties": {
+   "counts": {
+    "excluded": 7,
+    "match": 754
+   },
+   "state": "replayed"
+  },
+  "Checker.GetApparentType": {
+   "counts": {
+    "match": 122
+   },
+   "state": "replayed"
+  },
+  "Checker.GetBaseConstructorTypeOfClass": {
+   "counts": {
+    "match": 122
+   },
+   "state": "replayed"
+  },
+  "Checker.GetBaseTypes": {
+   "counts": {
+    "match": 541
+   },
+   "state": "replayed"
+  },
+  "Checker.GetCallSignatures": {
+   "counts": {
+    "match": 2097
+   },
+   "state": "replayed"
+  },
+  "Checker.GetCandidateSignaturesForStringLiteralCompletions": {
+   "counts": {
+    "match": 45
+   },
+   "state": "replayed"
+  },
+  "Checker.GetConstantValue": {
+   "counts": {
+    "match": 77
+   },
+   "state": "replayed"
+  },
+  "Checker.GetConstraintOfTypeParameter": {
+   "counts": {
+    "match": 151
+   },
+   "state": "replayed"
+  },
+  "Checker.GetContextualType": {
+   "counts": {
+    "excluded": 39,
+    "match": 3994
+   },
+   "state": "replayed"
+  },
+  "Checker.GetContextualTypeForArgumentAtIndex": {
+   "counts": {
+    "match": 20
+   },
+   "state": "replayed"
+  },
+  "Checker.GetContextualTypeForArrayLiteralAtPosition": {
+   "counts": {
+    "match": 5
+   },
+   "state": "replayed"
+  },
+  "Checker.GetContextualTypeForObjectLiteralElement": {
+   "counts": {
+    "match": 4
+   },
+   "state": "replayed"
+  },
+  "Checker.GetDeclaredTypeOfSymbol": {
+   "counts": {
+    "match": 1074
+   },
+   "state": "replayed"
+  },
+  "Checker.GetDefaultFromTypeParameter": {
+   "counts": {
+    "match": 66
+   },
+   "state": "replayed"
+  },
+  "Checker.GetDiagnostics": {
+   "counts": {
+    "excluded": 24,
+    "match": 1201
+   },
+   "state": "replayed"
+  },
+  "Checker.GetElementTypeOfArrayType": {
+   "counts": {
+    "match": 5
+   },
+   "state": "replayed"
+  },
+  "Checker.GetEmitResolver": {
+   "counts": {
+    "excluded": 49,
+    "match": 3169
+   },
+   "state": "replayed"
+  },
+  "Checker.GetExpandedParameters": {
+   "counts": {
+    "excluded": 5,
+    "match": 644
+   },
+   "state": "replayed"
+  },
+  "Checker.GetExportSpecifierLocalTargetSymbol": {
+   "counts": {
+    "match": 222
+   },
+   "state": "replayed"
+  },
+  "Checker.GetExportSymbolOfSymbol": {
+   "counts": {
+    "excluded": 5,
+    "match": 69
+   },
+   "state": "replayed"
+  },
+  "Checker.GetExportsAndPropertiesOfModule": {
+   "counts": {
+    "match": 26
+   },
+   "state": "replayed"
+  },
+  "Checker.GetExportsOfModule": {
+   "counts": {
+    "excluded": 12,
+    "match": 1092
+   },
+   "state": "replayed"
+  },
+  "Checker.GetFirstTypeArgumentFromKnownType": {
+   "counts": {
+    "excluded": 5,
+    "match": 56
+   },
+   "state": "replayed"
+  },
+  "Checker.GetGlobalDiagnostics": {
+   "counts": {
+    "excluded": 270,
+    "match": 16811
+   },
+   "state": "replayed"
+  },
+  "Checker.GetGlobalSymbol": {
+   "counts": {
+    "excluded": 9,
+    "match": 234
+   },
+   "state": "replayed"
+  },
+  "Checker.GetImmediateAliasedSymbol": {
+   "counts": {
+    "excluded": 10,
+    "match": 213
+   },
+   "state": "replayed"
+  },
+  "Checker.GetIndexInfoOfType": {
+   "counts": {
+    "match": 230
+   },
+   "state": "replayed"
+  },
+  "Checker.GetIndexSignaturesAtLocation": {
+   "counts": {
+    "match": 76
+   },
+   "state": "replayed"
+  },
+  "Checker.GetJsxIntrinsicTagNamesAt": {
+   "counts": {
+    "match": 53
+   },
+   "state": "replayed"
+  },
+  "Checker.GetJsxNamespace": {
+   "counts": {
+    "match": 25
+   },
+   "state": "replayed"
+  },
+  "Checker.GetLocalTypeParametersOfClassOrInterfaceOrTypeAlias": {
+   "counts": {
+    "match": 7
+   },
+   "state": "replayed"
+  },
+  "Checker.GetMemberOverrideModifierStatus": {
+   "counts": {
+    "unsupported": 84
+   },
+   "state": "open",
+   "unsupported": {
+    "synthetic node argument": 84
+   }
+  },
+  "Checker.GetMergedSymbol": {
+   "counts": {
+    "excluded": 56,
+    "match": 611
+   },
+   "state": "replayed"
+  },
+  "Checker.GetNameTypeOfSymbol": {
+   "counts": {
+    "match": 5
+   },
+   "state": "replayed"
+  },
+  "Checker.GetNonNullableType": {
+   "counts": {
+    "match": 1927
+   },
+   "state": "replayed"
+  },
+  "Checker.GetNonOptionalType": {
+   "counts": {
+    "excluded": 4,
+    "match": 344
+   },
+   "state": "replayed"
+  },
+  "Checker.GetNumberIndexType": {
+   "counts": {
+    "match": 298
+   },
+   "state": "replayed"
+  },
+  "Checker.GetNumberType": {
+   "counts": {
+    "match": 115
+   },
+   "state": "replayed"
+  },
+  "Checker.GetPromisedTypeOfPromise": {
+   "counts": {
+    "match": 367
+   },
+   "state": "replayed"
+  },
+  "Checker.GetPropertiesOfType": {
+   "counts": {
+    "match": 394
+   },
+   "state": "replayed"
+  },
+  "Checker.GetPropertyOfType": {
+   "counts": {
+    "excluded": 195,
+    "match": 27952
+   },
+   "state": "replayed"
+  },
+  "Checker.GetPropertySymbolOfDestructuringAssignment": {
+   "counts": {
+    "excluded": 10,
+    "match": 370
+   },
+   "state": "replayed"
+  },
+  "Checker.GetPropertySymbolsFromContextualType": {
+   "counts": {
+    "excluded": 1,
+    "match": 736
+   },
+   "state": "replayed"
+  },
+  "Checker.GetResolvedSignature": {
+   "counts": {
+    "excluded": 2,
+    "match": 619
+   },
+   "state": "replayed"
+  },
+  "Checker.GetResolvedSymbol": {
+   "counts": {
+    "match": 9
+   },
+   "state": "replayed"
+  },
+  "Checker.GetReturnTypeOfSignature": {
+   "counts": {
+    "excluded": 5,
+    "match": 800
+   },
+   "state": "replayed"
+  },
+  "Checker.GetRootSymbols": {
+   "counts": {
+    "excluded": 22474,
+    "match": 728411
+   },
+   "state": "replayed"
+  },
+  "Checker.GetShorthandAssignmentValueSymbol": {
+   "counts": {
+    "excluded": 431,
+    "match": 30493
+   },
+   "state": "replayed"
+  },
+  "Checker.GetSignatureFromDeclaration": {
+   "counts": {
+    "match": 348
+   },
+   "state": "replayed"
+  },
+  "Checker.GetSignaturesOfType": {
+   "counts": {
+    "excluded": 1,
+    "match": 763
+   },
+   "state": "replayed"
+  },
+  "Checker.GetStringIndexType": {
+   "counts": {
+    "excluded": 4,
+    "match": 643
+   },
+   "state": "replayed"
+  },
+  "Checker.GetStringType": {
+   "counts": {
+    "match": 323
+   },
+   "state": "replayed"
+  },
+  "Checker.GetSuggestionDiagnostics": {
+   "counts": {
+    "excluded": 24,
+    "match": 1174
+   },
+   "state": "replayed"
+  },
+  "Checker.GetSymbolAtLocation": {
+   "counts": {
+    "excluded": 754,
+    "match": 60336,
+    "unsupported": 8
+   },
+   "state": "open",
+   "unsupported": {
+    "synthesized import specifier argument": 8
+   }
+  },
+  "Checker.GetSymbolFlags": {
+   "counts": {
+    "excluded": 19,
+    "match": 98
+   },
+   "state": "replayed"
+  },
+  "Checker.GetSymbolsInScope": {
+   "counts": {
+    "excluded": 38,
+    "match": 1063
+   },
+   "state": "replayed"
+  },
+  "Checker.GetSymbolsOfParameterPropertyDeclaration": {
+   "counts": {
+    "match": 75
+   },
+   "state": "replayed"
+  },
+  "Checker.GetTypeAliasTypeParameters": {
+   "counts": {
+    "match": 87
+   },
+   "state": "replayed"
+  },
+  "Checker.GetTypeArgumentConstraint": {
+   "counts": {
+    "match": 278
+   },
+   "state": "replayed"
+  },
+  "Checker.GetTypeArguments": {
+   "counts": {
+    "match": 34
+   },
+   "state": "replayed"
+  },
+  "Checker.GetTypeAtLocation": {
+   "counts": {
+    "excluded": 200,
+    "match": 29712
+   },
+   "state": "replayed"
+  },
+  "Checker.GetTypeFromTypeNode": {
+   "counts": {
+    "match": 44
+   },
+   "state": "replayed"
+  },
+  "Checker.GetTypeOfPropertyOfContextualType": {
+   "counts": {
+    "match": 32
+   },
+   "state": "replayed"
+  },
+  "Checker.GetTypeOfPropertyOfType": {
+   "counts": {
+    "match": 5
+   },
+   "state": "replayed"
+  },
+  "Checker.GetTypeOfSymbol": {
+   "counts": {
+    "excluded": 1,
+    "match": 336
+   },
+   "state": "replayed"
+  },
+  "Checker.GetTypeOfSymbolAtLocation": {
+   "counts": {
+    "excluded": 23,
+    "match": 4077
+   },
+   "state": "replayed"
+  },
+  "Checker.GetTypeOnlyAliasDeclaration": {
+   "counts": {
+    "excluded": 11,
+    "match": 85
+   },
+   "state": "replayed"
+  },
+  "Checker.GetTypeParameterAtPosition": {
+   "counts": {
+    "match": 91
+   },
+   "state": "replayed"
+  },
+  "Checker.GetTypePredicateOfSignature": {
+   "counts": {
+    "excluded": 5,
+    "match": 767
+   },
+   "state": "replayed"
+  },
+  "Checker.GetUnionType": {
+   "counts": {
+    "match": 324
+   },
+   "state": "replayed"
+  },
+  "Checker.GetUnionTypeEx": {
+   "counts": {
+    "match": 5
+   },
+   "state": "replayed"
+  },
+  "Checker.GetUnknownSymbol": {
+   "counts": {
+    "excluded": 5,
+    "match": 74
+   },
+   "state": "replayed"
+  },
+  "Checker.GetWidenedLiteralType": {
+   "counts": {
+    "match": 161
+   },
+   "state": "replayed"
+  },
+  "Checker.GetWidenedType": {
+   "counts": {
+    "match": 302
+   },
+   "state": "replayed"
+  },
+  "Checker.HasEffectiveRestParameter": {
+   "counts": {
+    "excluded": 5,
+    "match": 700
+   },
+   "state": "replayed"
+  },
+  "Checker.IsArgumentsSymbol": {
+   "counts": {
+    "excluded": 106413,
+    "match": 2592928
+   },
+   "state": "replayed"
+  },
+  "Checker.IsArrayLikeType": {
+   "counts": {
+    "match": 108
+   },
+   "state": "replayed"
+  },
+  "Checker.IsDeclarationUsed": {
+   "counts": {
+    "match": 316
+   },
+   "state": "replayed"
+  },
+  "Checker.IsDeprecatedDeclaration": {
+   "counts": {
+    "excluded": 60906,
+    "match": 1777033
+   },
+   "state": "replayed"
+  },
+  "Checker.IsEmptyAnonymousObjectType": {
+   "counts": {
+    "match": 999
+   },
+   "state": "replayed"
+  },
+  "Checker.IsLibTypeForHoverVerbosity": {
+   "counts": {
+    "match": 290
+   },
+   "state": "replayed"
+  },
+  "Checker.IsNullableType": {
+   "counts": {
+    "excluded": 4,
+    "match": 340
+   },
+   "state": "replayed"
+  },
+  "Checker.IsPropertyAccessible": {
+   "counts": {
+    "match": 63
+   },
+   "state": "replayed"
+  },
+  "Checker.IsSymbolAccessible": {
+   "counts": {
+    "match": 15,
+    "unsupported": 12
+   },
+   "state": "open",
+   "unsupported": {
+    "synthetic node argument": 12
+   }
+  },
+  "Checker.IsTypeAssignableTo": {
+   "counts": {
+    "match": 161
+   },
+   "state": "replayed"
+  },
+  "Checker.IsTypeInvalidDueToUnionDiscriminant": {
+   "counts": {
+    "match": 104
+   },
+   "state": "replayed"
+  },
+  "Checker.IsUndefinedSymbol": {
+   "counts": {
+    "excluded": 21845,
+    "match": 670896
+   },
+   "state": "replayed"
+  },
+  "Checker.IsUnknownSymbol": {
+   "counts": {
+    "excluded": 11,
+    "match": 41653
+   },
+   "state": "replayed"
+  },
+  "Checker.IsValidPropertyAccess": {
+   "counts": {
+    "match": 123
+   },
+   "state": "replayed"
+  },
+  "Checker.IsValidPropertyAccessForCompletions": {
+   "counts": {
+    "excluded": 8,
+    "match": 3728
+   },
+   "state": "replayed"
+  },
+  "Checker.RemoveMissingOrUndefinedType": {
+   "counts": {
+    "excluded": 1,
+    "match": 242
+   },
+   "state": "replayed"
+  },
+  "Checker.RequiresAddingImplicitUndefined": {
+   "counts": {
+    "match": 12
+   },
+   "state": "replayed"
+  },
+  "Checker.ResolveAlias": {
+   "counts": {
+    "excluded": 5,
+    "match": 134
+   },
+   "state": "replayed"
+  },
+  "Checker.ResolveExternalModuleName": {
+   "counts": {
+    "match": 7
+   },
+   "state": "replayed"
+  },
+  "Checker.ResolveName": {
+   "counts": {
+    "excluded": 10,
+    "match": 394
+   },
+   "state": "replayed"
+  },
+  "Checker.SignatureToStringEx": {
+   "counts": {
+    "excluded": 1,
+    "match": 427
+   },
+   "state": "replayed"
+  },
+  "Checker.SkipAlias": {
+   "counts": {
+    "match": 52
+   },
+   "state": "replayed"
+  },
+  "Checker.SymbolToString": {
+   "counts": {
+    "excluded": 18,
+    "match": 1594
+   },
+   "state": "replayed"
+  },
+  "Checker.SymbolToStringEx": {
+   "counts": {
+    "excluded": 13,
+    "match": 2252
+   },
+   "state": "replayed"
+  },
+  "Checker.TryFindAmbientModule": {
+   "counts": {
+    "match": 203
+   },
+   "state": "replayed"
+  },
+  "Checker.TryGetMemberInModuleExportsAndProperties": {
+   "counts": {
+    "match": 11
+   },
+   "state": "replayed"
+  },
+  "Checker.TryGetThisTypeAtEx": {
+   "counts": {
+    "excluded": 18,
+    "match": 953
+   },
+   "state": "replayed"
+  },
+  "Checker.TypeHasCallOrConstructSignatures": {
+   "counts": {
+    "match": 103
+   },
+   "state": "replayed"
+  },
+  "Checker.TypeParameterToStringEx": {
+   "counts": {
+    "match": 2
+   },
+   "state": "replayed"
+  },
+  "Checker.TypePredicateToString": {
+   "counts": {
+    "match": 3
+   },
+   "state": "replayed"
+  },
+  "Checker.TypePredicateToTypePredicateNode": {
+   "counts": {
+    "match": 4
+   },
+   "state": "replayed"
+  },
+  "Checker.TypeToString": {
+   "counts": {
+    "match": 6
+   },
+   "state": "replayed"
+  },
+  "Checker.TypeToStringEx": {
+   "counts": {
+    "excluded": 12,
+    "match": 1515
+   },
+   "state": "replayed"
+  },
+  "Checker.TypeToTypeNode": {
+   "counts": {
+    "excluded": 5,
+    "match": 803
+   },
+   "state": "replayed"
+  },
+  "Checker.TypeToTypeNodeEx": {
+   "counts": {
+    "match": 233
+   },
+   "state": "replayed"
+  },
+  "Checker.WasCanceled": {
+   "counts": {
+    "excluded": 270,
+    "match": 16811
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.CreateLateBoundIndexSignatures": {
+   "counts": {
+    "match": 12
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.CreateLiteralConstValue": {
+   "counts": {
+    "match": 1
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.CreateReturnTypeOfSignatureDeclaration": {
+   "counts": {
+    "match": 26
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.CreateTypeOfDeclaration": {
+   "counts": {
+    "match": 63,
+    "unsupported": 9
+   },
+   "state": "open",
+   "unsupported": {
+    "synthetic node argument": 9
+   }
+  },
+  "EmitResolver.CreateTypeOfExpression": {
+   "counts": {
+    "match": 2
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.GetEffectiveDeclarationFlags": {
+   "counts": {
+    "match": 212
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.GetElementAccessExpressionName": {
+   "counts": {
+    "match": 3
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.GetEnumMemberValue": {
+   "counts": {
+    "match": 1
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.GetPropertiesOfContainerFunction": {
+   "counts": {
+    "match": 6
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.GetReferencedValueDeclaration": {
+   "counts": {
+    "match": 10
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.IsDeclarationVisible": {
+   "counts": {
+    "excluded": 49,
+    "match": 2536
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.IsEntityNameVisible": {
+   "counts": {
+    "match": 9
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.IsExpandoFunctionDeclaration": {
+   "counts": {
+    "match": 17
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.IsExpandoFunctionDeclarationUnsafe": {
+   "counts": {
+    "match": 2
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.IsImplementationOfOverload": {
+   "counts": {
+    "match": 33
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.IsImportRequiredByAugmentation": {
+   "counts": {
+    "match": 4
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.IsLiteralConstDeclaration": {
+   "counts": {
+    "match": 110
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.IsNameResolvable": {
+   "counts": {
+    "match": 9
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.IsOptionalParameter": {
+   "counts": {
+    "match": 11
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.PrecalculateDeclarationEmitVisibility": {
+   "counts": {
+    "match": 75
+   },
+   "state": "replayed"
+  },
+  "EmitResolver.RequiresAddingImplicitUndefined": {
+   "counts": {
+    "match": 8
+   },
+   "state": "replayed"
+  },
+  "GetResolvedSignatureForSignatureHelp": {
+   "counts": {
+    "excluded": 5,
+    "match": 516
+   },
+   "state": "replayed"
+  },
+  "NewNodeBuilder": {
+   "counts": {
+    "excluded": 8,
+    "match": 1474
+   },
+   "state": "replayed"
+  },
+  "NewNodeBuilderEx": {
+   "counts": {
+    "match": 396
+   },
+   "state": "replayed"
+  },
+  "NodeBuilder.IndexInfoToIndexSignatureDeclaration": {
+   "counts": {
+    "match": 4
+   },
+   "state": "replayed"
+  },
+  "NodeBuilder.SignatureToSignatureDeclaration": {
+   "counts": {
+    "match": 191
+   },
+   "state": "replayed"
+  },
+  "NodeBuilder.SymbolToNode": {
+   "counts": {
+    "match": 18
+   },
+   "state": "replayed"
+  },
+  "NodeBuilder.TypeParameterToDeclaration": {
+   "counts": {
+    "match": 131
+   },
+   "state": "replayed"
+  },
+  "NodeBuilder.TypeToTypeNode": {
+   "counts": {
+    "match": 189
+   },
+   "state": "replayed"
+  },
+  "SkipAlias": {
+   "counts": {
+    "excluded": 70794,
+    "match": 1901562
+   },
+   "state": "replayed"
+  }
+ },
+ "programs": {
+  "excluded": 92,
+  "same_files": 3966
+ },
+ "record_sha256": "d003bf5a85773537a4ab9821c10f87330c87c04c07c89fa6f9a6d2ce44838dd4",
+ "replayed": 143,
  "source_inputs": {
   ".cargo/config.toml": "716b49c90c25aeeebc4b0359b111a62927d166a1d7f02c4fe83b89d55fb74887",
   "Cargo.lock": "dfcf343fbf2b6000be578ea1074bb5d4fb24a61cfb3fced56d7254b5041ca320",
@@ -1462,7 +2413,7 @@
   "crates/tsr_wasm/src/lib.rs": "c5a1cb09e3c4f504bd9189e88826f2d3b374d839d0912c65ac23860d895df9c7",
   "rust-toolchain.toml": "cdc04b5e11c4baaf96bac0569ea6680c4a598a5f4025338d7216d57187a60e7e",
   "scripts/generate_locale_tables.py": "02ffa2ab9f6b8907adebe5e69c02f4078ed26dfc5c8bc402d270288fa19ee67c",
-  "scripts/phase2_producers.py": "5b56624d22d8eb4f6fb0a76f87542160f9c649ae0b0ca70ebe2632ed3a158954",
+  "scripts/phase2_services.py": "3ed58d6cdec6a3b81179da7ac31b1bc07e92a534f526845f43be80bc3d396d1c",
   "tools/phase1/config/Cargo.toml": "c92f9e435f68b429f912c527615105b713fc865361d730ef186929bdff12c3fa",
   "tools/phase1/filesystem/Cargo.toml": "f807926b2ce6001ebac514fdf3aa2f1594a44ece4f86bef07788f87e916b7837",
   "tools/phase1/harness/Cargo.toml": "d43b834c5000fef98d26876dffd2ce3b5c6857faecbbdf71944aba1b15cbbbec",
@@ -1471,6 +2422,9 @@
   "tools/phase1/mutation/splicer/Cargo.toml": "0c81fa5c278d6f7a1bce79aa42eed097786dd15600fbd15214da33ce4e900cbe",
   "tools/phase1/mutation/switch/Cargo.toml": "8df71e511b9b67fb890fdcb7cb1a08374c59cc70af851ac3084c5a3c8e3f023c",
   "tools/phase1/syntax/Cargo.toml": "7820fada3cfdf2dbe8e36bb1d83b77307b58074c31b3a41b2ff5dc61d8db5785",
+  "tools/phase2/services/replay/mod.rs": "19752af9bf1f8384ab9ed546eeee580afaecb25bed4f0cdbfe1f562872f300c9",
+  "tools/phase2/services/replay/ops.rs": "4f74311669df7423bc6c69c452e17953e950a46c2627517434b631952246a5be",
+  "tools/phase2/services/replay/values.rs": "c1d3c76f2a98f07644b7caf77bde0a3361a808ed60079eab75abb671f8deda69",
   "tools/s03/ast-export.mts": "f55a3b3a9153274f9e9da77184e03255d3ab163e53137f68bb5db759c4054c1f",
   "tools/s03/diagnostics-export_test.go": "8dd5e4a9e635a5ac3493a3269dd6519317382cd94c73b61d8ecabb8404edb70f",
   "tools/s03/encoder-constants.go": "cff51f44ddfc7d8f253af044f902a2224d1e2dbee2146d99ed1a5d6c4bfb58a5",
@@ -1533,17 +2487,5 @@
   "xtask/src/worklist_tests.rs": "d4336424885bd5fda44d671e6994a0f74401e2c454cade660a969aa899313948"
  },
  "state": "observed",
- "tests": [
-  "checking_produces_no_transformed_syntax",
-  "decorator_context_types_match_native",
-  "decorator_positions_match_native",
-  "element_kinds_match_native",
-  "generic_components_match_native",
-  "jsx_and_decorator_errors_leave_checkers_reusable",
-  "jsx_in_javascript_matches_native",
-  "jsx_mode_matrix_matches_native",
-  "metadata_marking_follows_the_pin"
- ],
- "version": 2,
- "witness": "c4-contracts"
+ "version": 1
 }

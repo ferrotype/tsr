@@ -118,6 +118,16 @@ def load_handoffs(checkpoint, claims_path, audit_path, comparison, authenticated
     return claims, audit, outgoing, incoming
 
 
+def emit_order_open(native_row, row):
+    """Whether a row belongs to the post-emit order entry: the pin's pre- and
+    post-emit sets differ and Rust has not executed the post-emit schedule.
+    Only an observed missing emit is a blocker; once Rust's emit executes the
+    comparison drops `native_pre_post`, and a row that still differs is its
+    owner's defect (C5.7)."""
+    return (native_row["error_pre_diagnostics"] != native_row["error_post_diagnostics"]
+            and bool(cause_domains(row, "emit_order", EMIT_OPERATION)))
+
+
 def cause_domains(row, kind, operation):
     if kind == "emit_order" and operation == EMIT_OPERATION:
         detail = row.get("details", {}).get("errors", {})
@@ -301,7 +311,7 @@ def build(native_dir, rust_dir, record=False, *, handoffs=None, incoming=None, c
             if len(group["evidence"]) < 5:
                 group["evidence"].append({"variant": row["id"], "case": case_dir[row["id"]],
                                           "observation": f"unsupported: {operation}"})
-        if native[row["id"]]["error_pre_diagnostics"] != native[row["id"]]["error_post_diagnostics"]:
+        if emit_order_open(native[row["id"]], row):
             group = groups[("emit_order", EMIT_OPERATION)]
             group["variants"].append(row["id"])
             group["domains"].update(["errors"])

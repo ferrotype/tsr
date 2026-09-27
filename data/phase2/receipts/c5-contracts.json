@@ -7,17 +7,17 @@
     "-p",
     "tsr_compiler",
     "--features",
-    "recursion-probe",
+    "recursion-probe,services-replay",
     "--test",
-    "c4_contracts",
+    "c5_contracts",
     "--locked"
    ],
    "exit_code": 0,
-   "stderr_sha256": "8098e59d9575e810db9648fdc2267e77f11406af74a701ddbefb6bffccaff00b",
-   "stderr_tail": "   Compiling tsr_checker v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_checker)\n   Compiling tsr_compiler v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_compiler)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.98s\n     Running tests/c4_contracts.rs (target/debug/deps/c4_contracts-70a1fcf1d0eaac28)\n",
-   "stdout": "\nrunning 9 tests\ntest jsx_in_javascript_matches_native ... ok\ntest generic_components_match_native ... ok\ntest jsx_and_decorator_errors_leave_checkers_reusable ... ok\ntest decorator_context_types_match_native ... ok\ntest element_kinds_match_native ... ok\ntest checking_produces_no_transformed_syntax ... ok\ntest metadata_marking_follows_the_pin ... ok\ntest decorator_positions_match_native ... ok\ntest jsx_mode_matrix_matches_native ... ok\n\ntest result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.25s\n\n",
-   "stdout_sha256": "0d5f70d5a487442f0e5d9e4388fd14debad6587b908ee748173309a3c2543235",
-   "stdout_tail": "\nrunning 9 tests\ntest jsx_in_javascript_matches_native ... ok\ntest generic_components_match_native ... ok\ntest jsx_and_decorator_errors_leave_checkers_reusable ... ok\ntest decorator_context_types_match_native ... ok\ntest element_kinds_match_native ... ok\ntest checking_produces_no_transformed_syntax ... ok\ntest metadata_marking_follows_the_pin ... ok\ntest decorator_positions_match_native ... ok\ntest jsx_mode_matrix_matches_native ... ok\n\ntest result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.25s\n\n"
+   "stderr_sha256": "97e0d23c25bd2b8d88959807ee122021e134caf72faedad6ac40fcb8ebb042e2",
+   "stderr_tail": "   Compiling tsr_ast v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_ast)\n   Compiling tsr_scanner v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_scanner)\n   Compiling tsr_nodebuilder v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_nodebuilder)\n   Compiling tsr_pseudochecker v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_pseudochecker)\n   Compiling tsr_parser v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_parser)\n   Compiling tsr_printer v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_printer)\n   Compiling tsr_astnav v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_astnav)\n   Compiling tsr_transformers v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_transformers)\n   Compiling tsr_tsoptions v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_tsoptions)\n   Compiling tsr_binder v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_binder)\n   Compiling s08_relater_prototype v0.1.0 (/Users/cristian/git/ts-rust/tools/s08/relater-prototype)\n   Compiling tsr_module v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_module)\n   Compiling tsr_checker v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_checker)\n   Compiling tsr_compiler v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_compiler)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.46s\n     Running tests/c5_contracts.rs (target/debug/deps/c5_contracts-56fc665511953cb9)\n",
+   "stdout": "\nrunning 9 tests\ntest accessibility_chains_replay_as_the_pin_answered ... ok\ntest the_public_query_surface_answers_and_answers_again ... ok\ntest two_checkers_are_independent_and_a_builder_panic_retires_one ... ok\ntest owner_retention_follows_three_lifetimes ... ok\ntest hover_expansion_replays_as_the_pin_recorded ... ok\ntest declaration_diagnostics_come_from_each_files_view ... ok\ntest resolver_queries_read_the_marking_state ... ok\ntest serialization_reuse_and_truncation_follow_the_pin ... ok\ntest the_services_replay_detects_a_changed_result ... ok\n\ntest result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.17s\n\n",
+   "stdout_sha256": "1a3eabc5a59be394c56bd8490200d1d2748f0a908776bab05033e3f4d9d668e3",
+   "stdout_tail": "\nrunning 9 tests\ntest accessibility_chains_replay_as_the_pin_answered ... ok\ntest the_public_query_surface_answers_and_answers_again ... ok\ntest two_checkers_are_independent_and_a_builder_panic_retires_one ... ok\ntest owner_retention_follows_three_lifetimes ... ok\ntest hover_expansion_replays_as_the_pin_recorded ... ok\ntest declaration_diagnostics_come_from_each_files_view ... ok\ntest resolver_queries_read_the_marking_state ... ok\ntest serialization_reuse_and_truncation_follow_the_pin ... ok\ntest the_services_replay_detects_a_changed_result ... ok\n\ntest result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.17s\n\n"
   },
   {
    "command": [
@@ -26,18 +26,18 @@
     "-p",
     "tsr_compiler",
     "--features",
-    "recursion-probe",
+    "recursion-probe,services-replay",
     "--test",
-    "c4_contracts",
+    "c5_contracts",
     "--locked",
     "--release"
    ],
    "exit_code": 0,
-   "stderr_sha256": "dbf41a3ee255e2f71dcca056f3c80f127d9e80194b097015e5fb08281b3b749d",
-   "stderr_tail": "   Compiling tsr_checker v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_checker)\n   Compiling tsr_compiler v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_compiler)\n    Finished `release` profile [optimized] target(s) in 2m 01s\n     Running tests/c4_contracts.rs (target/release/deps/c4_contracts-484d26f66bfa8789)\n",
-   "stdout": "\nrunning 9 tests\ntest element_kinds_match_native ... ok\ntest jsx_in_javascript_matches_native ... ok\ntest decorator_context_types_match_native ... ok\ntest jsx_and_decorator_errors_leave_checkers_reusable ... ok\ntest generic_components_match_native ... ok\ntest checking_produces_no_transformed_syntax ... ok\ntest metadata_marking_follows_the_pin ... ok\ntest decorator_positions_match_native ... ok\ntest jsx_mode_matrix_matches_native ... ok\n\ntest result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.55s\n\n",
-   "stdout_sha256": "d767022381a08af261f2f46a1058d76e7e846b59f8109310bc1685b302951f5c",
-   "stdout_tail": "\nrunning 9 tests\ntest element_kinds_match_native ... ok\ntest jsx_in_javascript_matches_native ... ok\ntest decorator_context_types_match_native ... ok\ntest jsx_and_decorator_errors_leave_checkers_reusable ... ok\ntest generic_components_match_native ... ok\ntest checking_produces_no_transformed_syntax ... ok\ntest metadata_marking_follows_the_pin ... ok\ntest decorator_positions_match_native ... ok\ntest jsx_mode_matrix_matches_native ... ok\n\ntest result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.55s\n\n"
+   "stderr_sha256": "15d0eefa120187d65fa235b19d216f48a1c8099acdd9f9fca3a67e04fa5b554e",
+   "stderr_tail": "   Compiling tsr_ast v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_ast)\n   Compiling tsr_scanner v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_scanner)\n   Compiling tsr_nodebuilder v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_nodebuilder)\n   Compiling tsr_pseudochecker v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_pseudochecker)\n   Compiling tsr_parser v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_parser)\n   Compiling tsr_printer v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_printer)\n   Compiling tsr_astnav v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_astnav)\n   Compiling tsr_transformers v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_transformers)\n   Compiling tsr_tsoptions v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_tsoptions)\n   Compiling tsr_binder v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_binder)\n   Compiling s08_relater_prototype v0.1.0 (/Users/cristian/git/ts-rust/tools/s08/relater-prototype)\n   Compiling tsr_module v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_module)\n   Compiling tsr_checker v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_checker)\n   Compiling tsr_compiler v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_compiler)\n    Finished `release` profile [optimized] target(s) in 2m 22s\n     Running tests/c5_contracts.rs (target/release/deps/c5_contracts-83391a1c118ac1d9)\n",
+   "stdout": "\nrunning 9 tests\ntest owner_retention_follows_three_lifetimes ... ok\ntest accessibility_chains_replay_as_the_pin_answered ... ok\ntest two_checkers_are_independent_and_a_builder_panic_retires_one ... ok\ntest the_public_query_surface_answers_and_answers_again ... ok\ntest hover_expansion_replays_as_the_pin_recorded ... ok\ntest declaration_diagnostics_come_from_each_files_view ... ok\ntest resolver_queries_read_the_marking_state ... ok\ntest serialization_reuse_and_truncation_follow_the_pin ... ok\ntest the_services_replay_detects_a_changed_result ... ok\n\ntest result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s\n\n",
+   "stdout_sha256": "82be117a9d441d183ade9de204a1a2013d246b8932961f5cbb9930d0cefb4787",
+   "stdout_tail": "\nrunning 9 tests\ntest owner_retention_follows_three_lifetimes ... ok\ntest accessibility_chains_replay_as_the_pin_answered ... ok\ntest two_checkers_are_independent_and_a_builder_panic_retires_one ... ok\ntest the_public_query_surface_answers_and_answers_again ... ok\ntest hover_expansion_replays_as_the_pin_recorded ... ok\ntest declaration_diagnostics_come_from_each_files_view ... ok\ntest resolver_queries_read_the_marking_state ... ok\ntest serialization_reuse_and_truncation_follow_the_pin ... ok\ntest the_services_replay_detects_a_changed_result ... ok\n\ntest result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s\n\n"
   }
  ],
  "source_inputs": {
@@ -1471,6 +1471,9 @@
   "tools/phase1/mutation/splicer/Cargo.toml": "0c81fa5c278d6f7a1bce79aa42eed097786dd15600fbd15214da33ce4e900cbe",
   "tools/phase1/mutation/switch/Cargo.toml": "8df71e511b9b67fb890fdcb7cb1a08374c59cc70af851ac3084c5a3c8e3f023c",
   "tools/phase1/syntax/Cargo.toml": "7820fada3cfdf2dbe8e36bb1d83b77307b58074c31b3a41b2ff5dc61d8db5785",
+  "tools/phase2/services/replay/mod.rs": "19752af9bf1f8384ab9ed546eeee580afaecb25bed4f0cdbfe1f562872f300c9",
+  "tools/phase2/services/replay/ops.rs": "4f74311669df7423bc6c69c452e17953e950a46c2627517434b631952246a5be",
+  "tools/phase2/services/replay/values.rs": "c1d3c76f2a98f07644b7caf77bde0a3361a808ed60079eab75abb671f8deda69",
   "tools/s03/ast-export.mts": "f55a3b3a9153274f9e9da77184e03255d3ab163e53137f68bb5db759c4054c1f",
   "tools/s03/diagnostics-export_test.go": "8dd5e4a9e635a5ac3493a3269dd6519317382cd94c73b61d8ecabb8404edb70f",
   "tools/s03/encoder-constants.go": "cff51f44ddfc7d8f253af044f902a2224d1e2dbee2146d99ed1a5d6c4bfb58a5",
@@ -1534,16 +1537,16 @@
  },
  "state": "observed",
  "tests": [
-  "checking_produces_no_transformed_syntax",
-  "decorator_context_types_match_native",
-  "decorator_positions_match_native",
-  "element_kinds_match_native",
-  "generic_components_match_native",
-  "jsx_and_decorator_errors_leave_checkers_reusable",
-  "jsx_in_javascript_matches_native",
-  "jsx_mode_matrix_matches_native",
-  "metadata_marking_follows_the_pin"
+  "accessibility_chains_replay_as_the_pin_answered",
+  "declaration_diagnostics_come_from_each_files_view",
+  "hover_expansion_replays_as_the_pin_recorded",
+  "owner_retention_follows_three_lifetimes",
+  "resolver_queries_read_the_marking_state",
+  "serialization_reuse_and_truncation_follow_the_pin",
+  "the_public_query_surface_answers_and_answers_again",
+  "the_services_replay_detects_a_changed_result",
+  "two_checkers_are_independent_and_a_builder_panic_retires_one"
  ],
  "version": 2,
- "witness": "c4-contracts"
+ "witness": "c5-contracts"
 }

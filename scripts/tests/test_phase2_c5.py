@@ -150,6 +150,16 @@ class PostEmitComparison(unittest.TestCase):
         result = compare.compare_row(self.native, self.errors(diagnostics=self.pre), None)
         self.assertIn("post_diagnostics", result["errors"]["differences"])
 
+    def test_only_an_unexecuted_emit_stays_in_the_emit_order_register_entry(self):
+        def register_row(observed):
+            return {"details": compare.compare_row(self.native, observed, None)}
+        self.assertTrue(blockers.emit_order_open(self.native, register_row(self.errors(emit="not_executed"))))
+        self.assertFalse(blockers.emit_order_open(self.native, register_row(self.errors())))
+        # An executed emit that still differs is the owner's defect, not the entry's.
+        self.assertFalse(blockers.emit_order_open(self.native, register_row(self.errors(diagnostics=self.pre))))
+        same = native(error_pre_diagnostics=self.post, error_post_diagnostics=self.post, error_diagnostics=self.post)
+        self.assertFalse(blockers.emit_order_open(same, register_row(self.errors(emit="not_executed"))))
+
 
 class EmitSchedule(unittest.TestCase):
     def test_a_valid_schedule_is_seen_by_the_p5_contract_as_pre_emit(self):

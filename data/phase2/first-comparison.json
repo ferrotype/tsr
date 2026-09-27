@@ -1,23 +1,16 @@
 {
- "all_domains_match": 13414,
+ "all_domains_match": 13417,
  "buckets": [
   {
    "bucket": "unsupported: content-mapper execution",
    "owner": "Phase 5 (content mapper)",
    "representative": "compiler/contentMapperInvalidExtension.ts#configuration=0",
    "variants": 15
-  },
-  {
-   "bucket": "emit order: native pre/post-emit sets differ",
-   "owner": "C5 / Phase 3 (emit order)",
-   "representative": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
-   "variants": 3
   }
  ],
  "by_checkpoint": {
   "C2": {
-   "match": 2951,
-   "open": 3
+   "match": 2954
   },
   "C3": {
    "match": 170,
@@ -37,8 +30,7 @@
    "unsupported": 10
   },
   "errors": {
-   "different": 3,
-   "match": 13414,
+   "match": 13417,
    "unsupported": 15
   },
   "parent_pointers": {
@@ -67,37 +59,27 @@
  "changed_observations": [],
  "dimensions": {
   "area": {
-   "emit order: native pre/post-emit sets differ": 3,
    "unsupported: content-mapper execution": 15
   },
   "family": {
-   "conditional_types": 1,
-   "content_mapper_execution": 15,
-   "explicit_type_parameters": 3,
-   "indexed_access_types": 1,
-   "infer_types": 1,
-   "mapped_types": 2,
-   "nonempty_type_arguments": 1
+   "content_mapper_execution": 15
   },
   "first_code": {
-   "(none)": 15,
-   "2313": 2,
-   "2615": 1
+   "(none)": 15
   },
   "jsx": {
    "preserve": 1,
-   "unset": 17
+   "unset": 14
   },
   "module": {
    "esnext": 11,
-   "unset": 7
+   "unset": 4
   },
   "strict": {
-   "False": 6,
+   "False": 3,
    "True": 12
   },
   "target": {
-   "es2015": 3,
    "es2020": 11,
    "unset": 4
   }
@@ -108,7 +90,7 @@
  "native_observation_sha256": "1b5356b425ad95a3e5e2a0bb29d42534e8d9d4a6159649f063f3317084a0e276",
  "partial": false,
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
- "previous": "00e382a114fdf564602fa42b30a2d07395b5395daacc06f603d1e77952eea3b0",
+ "previous": "c0cd699fda412e7f54aa06c6f85872a3c0e93b68e2f859c2daf1ac362287cb0b",
  "regression_subset": {
   "all_domains_match": 9367,
   "by_domain": {
@@ -141,7 +123,7 @@
   "rows": 9367
  },
  "regressions": [],
- "rust_capture_sha256": "928ef3dcbfbe5185cbba3ac022d9d4ee742b16337671db5a0d3ff52961688d98",
+ "rust_capture_sha256": "8217ae9b14bc914cbed20d19a3aff3780e1cb7bc48920935375dc7926f6a4383",
  "rust_source_stable": true,
  "selection": {
   "cases": [],

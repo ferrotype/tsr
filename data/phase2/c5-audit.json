@@ -16,19 +16,19 @@
    "disposition": "equivalent",
    "reason": "There is no context stack: each public request prepares the builder's whole per-request state (prepare_context), so restoring the previous context has nothing to restore.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:91"
+   "rust": "crates/tsr_checker/src/node_builder.rs:93"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getTypeParametersOfClassOrInterface": {
    "disposition": "equivalent",
    "reason": "Inlined in lookupInstantiatedTypeArgumentNodes' port, its only caller: the outer type parameters of the class-or-interface declaration, then its local ones.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_names.rs:1394"
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:1402"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isMappedTypeHomomorphic": {
    "disposition": "equivalent",
    "reason": "Inlined at its only caller, isHomomorphicMappedTypeWithNonHomomorphicInstantiation's port: a mapped type is homomorphic when it has a homomorphic type variable.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_extra.rs:982"
+   "rust": "crates/tsr_checker/src/node_builder_extra.rs:1123"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.lookupSymbolChain": {
    "disposition": "equivalent",
@@ -94,19 +94,19 @@
    "disposition": "equivalent",
    "reason": "Inlined at its only caller, the any-with-alias case of typeToTypeNode: the alias symbol's raw entity name with its type arguments.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:666"
+   "rust": "crates/tsr_checker/src/node_builder.rs:697"
   },
   "tsc/internal/checker/nodebuilderimpl.go:arrayIsHomogeneous": {
    "disposition": "equivalent",
    "reason": "Inlined in mapToTypeNodes' port, its only caller: every seen name of a group compared with the first.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:597"
+   "rust": "crates/tsr_checker/src/node_builder.rs:628"
   },
   "tsc/internal/checker/nodebuilderimpl.go:getTopmostIndexedAccessType": {
    "disposition": "equivalent",
    "reason": "Inlined in createAccessFromSymbolChain's port: the object side is followed to the outermost indexed access.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_names.rs:1281"
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:1289"
   },
   "tsc/internal/checker/nodebuilderimpl.go:hasTypeAnnotation": {
    "disposition": "equivalent",
@@ -118,7 +118,7 @@
    "disposition": "equivalent",
    "reason": "Inlined in mapToTypeNodes' port: a type reference whose type name is an identifier records a seen name.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:554"
+   "rust": "crates/tsr_checker/src/node_builder.rs:585"
   },
   "tsc/internal/checker/nodebuilderimpl.go:tryGetModuleSpecifierFromDeclarationWorker": {
    "disposition": "equivalent",
@@ -148,19 +148,19 @@
    "disposition": "equivalent",
    "reason": "Inlined at its only caller, the unique-symbol reuse test: the enclosing declaration walks out of synthetic signature scopes (the fake-scope link of the pin).",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1259"
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1268"
   },
   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.rewriteModuleSpecifier": {
    "disposition": "equivalent",
    "reason": "Inlined in the literal import type's reuse: an overridden specifier becomes a new string literal whose original is the source literal; otherwise the literal is visited.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1672"
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1681"
   },
   "tsc/internal/checker/nodecopy.go:getExistingNodeTreeVisitor": {
    "disposition": "equivalent",
    "reason": "The visitor is the reuse_visit family: reuse_visit_scoped is its per-node closure (recovery scope, new scopes for function-like and mapped nodes, cloning, fallback), reuse_visit_worker the symbol-aware worker.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1098"
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1107"
   },
   "tsc/internal/checker/nodecopy.go:newWrappingTracker": {
    "disposition": "equivalent",
@@ -370,85 +370,85 @@
    "disposition": "equivalent",
    "reason": "The builder holds the caller's tracker directly; there is no wrapper chain to unwrap, and report and track_symbol are the wrapper's behavior.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:164"
+   "rust": "crates/tsr_checker/src/node_builder.rs:199"
   },
   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.PopErrorFallbackNode": {
    "disposition": "equivalent",
    "reason": "report forwards this event without marking a reported diagnostic, as the wrapper does.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:182"
+   "rust": "crates/tsr_checker/src/node_builder.rs:223"
   },
   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.PushErrorFallbackNode": {
    "disposition": "equivalent",
    "reason": "report forwards this event without marking a reported diagnostic, as the wrapper does.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:182"
+   "rust": "crates/tsr_checker/src/node_builder.rs:223"
   },
   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportCyclicStructureError": {
    "disposition": "equivalent",
    "reason": "report marks the reported diagnostic and forwards the event to the tracker when there is one, as the wrapper does for every report method.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:182"
+   "rust": "crates/tsr_checker/src/node_builder.rs:223"
   },
   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportInaccessibleThisError": {
    "disposition": "equivalent",
    "reason": "report marks the reported diagnostic and forwards the event to the tracker when there is one, as the wrapper does for every report method.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:182"
+   "rust": "crates/tsr_checker/src/node_builder.rs:223"
   },
   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportInaccessibleUniqueSymbolError": {
    "disposition": "equivalent",
    "reason": "report marks the reported diagnostic and forwards the event to the tracker when there is one, as the wrapper does for every report method.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:182"
+   "rust": "crates/tsr_checker/src/node_builder.rs:223"
   },
   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportInferenceFallback": {
    "disposition": "equivalent",
    "reason": "report forwards this event without marking a reported diagnostic, as the wrapper does.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:182"
+   "rust": "crates/tsr_checker/src/node_builder.rs:223"
   },
   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportLikelyUnsafeImportRequiredError": {
    "disposition": "equivalent",
    "reason": "report marks the reported diagnostic and forwards the event to the tracker when there is one, as the wrapper does for every report method.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:182"
+   "rust": "crates/tsr_checker/src/node_builder.rs:223"
   },
   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportNonSerializableProperty": {
    "disposition": "equivalent",
    "reason": "report marks the reported diagnostic and forwards the event to the tracker when there is one, as the wrapper does for every report method.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:182"
+   "rust": "crates/tsr_checker/src/node_builder.rs:223"
   },
   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportNonlocalAugmentation": {
    "disposition": "equivalent",
    "reason": "report marks the reported diagnostic and forwards the event to the tracker when there is one, as the wrapper does for every report method.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:182"
+   "rust": "crates/tsr_checker/src/node_builder.rs:223"
   },
   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportPrivateInBaseOfClassExpression": {
    "disposition": "equivalent",
    "reason": "report marks the reported diagnostic and forwards the event to the tracker when there is one, as the wrapper does for every report method.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:182"
+   "rust": "crates/tsr_checker/src/node_builder.rs:223"
   },
   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.ReportTruncationError": {
    "disposition": "equivalent",
    "reason": "report marks the reported diagnostic and forwards the event to the tracker when there is one, as the wrapper does for every report method.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:182"
+   "rust": "crates/tsr_checker/src/node_builder.rs:223"
   },
   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.TrackSymbol": {
    "disposition": "equivalent",
    "reason": "track_symbol asks the tracker; a report marks the builder's reported diagnostic, otherwise a non-type-parameter symbol is appended to the tracked symbols, as SymbolTrackerImpl.TrackSymbol does.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:200"
+   "rust": "crates/tsr_checker/src/node_builder.rs:241"
   },
   "tsc/internal/checker/symboltracker.go:SymbolTrackerImpl.onDiagnosticReported": {
    "disposition": "equivalent",
    "reason": "report sets reported_diagnostic, the context's reportedDiagnostic.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:182"
+   "rust": "crates/tsr_checker/src/node_builder.rs:223"
   }
  },
  "groups": {
