@@ -868,10 +868,6 @@ impl CheckerState {
             Some(K::TrueKeyword) => return Ok(self.builtins.true_type),
             Some(K::FalseKeyword) => return Ok(self.builtins.false_type),
             Some(K::NullKeyword) => return Ok(self.builtins.null_widening_type),
-            // A malformed import<T> has already reported its grammar error.
-            // The pin's checkExpressionWorker falls through to errorType for
-            // its bare import keyword; preserve checks of the type arguments.
-            Some(K::ImportKeyword) => return Ok(self.builtins.error_type),
             Some(K::ParenthesizedExpression) => {
                 return self.check_expression_ex(
                     required(read.expression(), "parenthesized expression")?,
@@ -947,8 +943,10 @@ impl CheckerState {
                     "Should never directly check a JsxOpeningElement",
                 ))
             }
-            // Every other kind, such as the MissingDeclaration a decorator
-            // outside a class parses to, is an error type upstream.
+            // Every other kind is an error type upstream: the bare import
+            // keyword of a malformed import<T>, which has already reported its
+            // grammar error, or the MissingDeclaration a decorator outside a
+            // class parses to.
             _ => return Ok(self.builtins.error_type),
         };
         self.get_fresh_type_of_literal_type(ty)

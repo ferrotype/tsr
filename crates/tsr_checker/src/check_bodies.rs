@@ -606,11 +606,15 @@ impl CheckerState {
                 }
                 Ok(false)
             }
-            Some(K::ParenthesizedExpression | K::YieldExpression) => match read.expression() {
-                Some(expression) => self.expression_is_context_sensitive(expression),
-                None => Ok(false),
-            },
-            Some(K::PropertyAssignment) => match read.initializer() {
+            // It is possible to that a JSX expression's expression is undefined (e.g <div x={} />)
+            Some(K::ParenthesizedExpression | K::YieldExpression | K::JsxExpression) => {
+                match read.expression() {
+                    Some(expression) => self.expression_is_context_sensitive(expression),
+                    None => Ok(false),
+                }
+            }
+            // If there is no initializer, JSX attribute has a boolean value of true which is not context sensitive.
+            Some(K::PropertyAssignment | K::JsxAttribute) => match read.initializer() {
                 Some(expression) => self.expression_is_context_sensitive(expression),
                 None => Ok(false),
             },
@@ -668,16 +672,6 @@ impl CheckerState {
                 }
                 Ok(false)
             }
-            // If there is no initializer, JSX attribute has a boolean value of true which is not context sensitive.
-            Some(K::JsxAttribute) => match read.initializer() {
-                Some(initializer) => self.expression_is_context_sensitive(initializer),
-                None => Ok(false),
-            },
-            // It is possible to that node.expression is undefined (e.g <div x={} />)
-            Some(K::JsxExpression) => match read.expression() {
-                Some(expression) => self.expression_is_context_sensitive(expression),
-                None => Ok(false),
-            },
             _ => Ok(false),
         }
     }

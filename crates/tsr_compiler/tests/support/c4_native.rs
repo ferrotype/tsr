@@ -165,7 +165,7 @@ pub fn checker(program: &Arc<Program>) -> (Generation, Arc<CheckerOwner>) {
 
 fn position(text: &[u8], offset: usize) -> (usize, usize) {
     let prefix = &text[..offset];
-    let line = prefix.iter().filter(|&&byte| byte == b'\n').count() + 1;
+    let line = prefix.split(|&byte| byte == b'\n').count();
     let start = prefix
         .iter()
         .rposition(|&byte| byte == b'\n')
@@ -189,14 +189,14 @@ type SortKey = (String, i64, i64, i32, i32, String);
 pub fn observed_with(case: &Case, owner: &Arc<CheckerOwner>) -> Vec<Value> {
     let files = case.program.files();
     let mut diagnostics = Vec::new();
-    for file in files.iter() {
+    for file in files {
         diagnostics.extend(case.program.syntactic_diagnostics(Some(file)).unwrap());
     }
     if diagnostics.is_empty() {
         let mut op = owner.operation().unwrap();
         diagnostics = op.global_diagnostics().unwrap();
         if diagnostics.is_empty() {
-            for file in files.iter() {
+            for file in files {
                 if file
                     .bound()
                     .view()

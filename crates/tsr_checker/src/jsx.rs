@@ -686,21 +686,21 @@ impl CheckerState {
         }
         let more_than_one = valid.len() > 1;
         let iterable = self.iteration_global("Iterable", 3)?;
-        let (array_like, non_array_like) = if iterable != self.builtins.empty_generic_type {
+        let (array_like, non_array_like) = if iterable == self.builtins.empty_generic_type {
+            let array_like = self.filter_type(children_target, &mut |checker, part| {
+                checker.is_array_or_tuple_like_type(part)
+            })?;
+            let non_array_like = self.filter_type(children_target, &mut |checker, part| {
+                Ok(!checker.is_array_or_tuple_like_type(part)?)
+            })?;
+            (array_like, non_array_like)
+        } else {
             let any_iterable = self.create_iterable_type(self.builtins.any_type)?;
             let array_like = self.filter_type(children_target, &mut |checker, part| {
                 checker.is_type_related_to(part, any_iterable, RelationKind::Assignable)
             })?;
             let non_array_like = self.filter_type(children_target, &mut |checker, part| {
                 Ok(!checker.is_type_related_to(part, any_iterable, RelationKind::Assignable)?)
-            })?;
-            (array_like, non_array_like)
-        } else {
-            let array_like = self.filter_type(children_target, &mut |checker, part| {
-                checker.is_array_or_tuple_like_type(part)
-            })?;
-            let non_array_like = self.filter_type(children_target, &mut |checker, part| {
-                Ok(!checker.is_array_or_tuple_like_type(part)?)
             })?;
             (array_like, non_array_like)
         };
@@ -720,18 +720,7 @@ impl CheckerState {
             self.jsx_tag_name(required(opening, "JSX opening element")?)?
         };
         if more_than_one {
-            if array_like != self.builtins.never_type {
-                let types = self.check_jsx_children(containing, 0)?;
-                let real_source = self.create_tuple_type(&types)?;
-                reported = self.elaborate_jsx_children_elementwise(
-                    &children,
-                    real_source,
-                    array_like,
-                    relation,
-                    &mut text,
-                    output,
-                )? || reported;
-            } else {
+            if array_like == self.builtins.never_type {
                 let source_children =
                     self.get_indexed_access_type(source, children_name_type, 0, None, None)?;
                 if !self.is_type_related_to(source_children, children_target, relation)? {
@@ -747,6 +736,17 @@ impl CheckerState {
                     output.push(diagnostic);
                     reported = true;
                 }
+            } else {
+                let types = self.check_jsx_children(containing, 0)?;
+                let real_source = self.create_tuple_type(&types)?;
+                reported = self.elaborate_jsx_children_elementwise(
+                    &children,
+                    real_source,
+                    array_like,
+                    relation,
+                    &mut text,
+                    output,
+                )? || reported;
             }
         } else if non_array_like != self.builtins.never_type {
             let child = valid[0];
@@ -874,15 +874,16 @@ impl CheckerState {
             None
         };
         let mut reported = false;
-        let mut offset = 0;
-        for (index, &child) in children.iter().enumerate() {
-            #[allow(clippy::cast_precision_loss, reason = "child indexes are small")]
+        // The index of a child among the children that are elements: whitespace
+        // text does not count (`memberOffset` upstream).
+        let mut position = 0_u32;
+        for &child in children {
             let name_type =
-                self.get_number_literal_type(tsr_jsnum::Number::new((index - offset) as f64))?;
+                self.get_number_literal_type(tsr_jsnum::Number::new(f64::from(position)))?;
             let Some(element) = self.jsx_child_elaboration_element(child, name_type)? else {
-                offset += 1;
                 continue;
             };
+            position += 1;
             let property = element.error_node;
             let next = element.inner_expression;
             let mut target_type = iteration_type;
@@ -1633,10 +1634,8 @@ impl CheckerState {
                 if !tsr_ast::utilities_middle::is_whitespace_only_jsx_text(&read) {
                     types.push(self.builtins.string_type);
                 }
-            } else if read.kind() == K::JsxExpression && read.expression().is_none() {
+            } else if read.kind() != K::JsxExpression || read.expression().is_some() {
                 // empty jsx expressions don't *really* count as present children
-                continue;
-            } else {
                 types.push(self.check_object_mutable_location_ex(child, mode)?);
             }
         }
@@ -2478,13 +2477,12 @@ impl CheckerState {
         if let Some(&container) = self.jsx.implicit_imports.get(&file) {
             return Ok((container != unknown).then_some(container));
         }
-        let tag = match self.jsx.first_tags.get(&file) {
-            Some(&tag) => tag,
-            None => {
-                let tag = self.first_jsx_tag_in_file(file)?;
-                self.jsx.first_tags.insert(file, tag);
-                tag
-            }
+        let tag = if let Some(&tag) = self.jsx.first_tags.get(&file) {
+            tag
+        } else {
+            let tag = self.first_jsx_tag_in_file(file)?;
+            self.jsx.first_tags.insert(file, tag);
+            tag
         };
         let reference = self.jsx_runtime_import_specifier(file)?;
         if reference.is_empty() {
