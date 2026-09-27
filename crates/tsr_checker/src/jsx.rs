@@ -74,6 +74,11 @@ pub(crate) struct JsxTextChildMessage {
     args: Option<Vec<JsString>>,
 }
 
+// port: tsc/internal/checker/relater.go:isHyphenatedJsxName
+pub(crate) fn is_hyphenated_jsx_name(name: &[u8]) -> bool {
+    name.contains(&b'-')
+}
+
 /// `JsxElaborationElement`.
 struct JsxElaborationElement {
     error_node: NodeId,
@@ -83,6 +88,18 @@ struct JsxElaborationElement {
 }
 
 impl CheckerState {
+    // port: tsc/internal/checker/relater.go:isIgnoredJsxProperty
+    pub(crate) fn is_ignored_jsx_property(
+        &self,
+        source: TypeId,
+        property: SymbolId,
+    ) -> Result<bool, Error> {
+        Ok(
+            self.types.get(source)?.object_flags & of::JSX_ATTRIBUTES != 0
+                && is_hyphenated_jsx_name(self.symbol(property)?.name_bytes()),
+        )
+    }
+
     // port: tsc/internal/checker/utilities.go:isJsxIntrinsicTagName
     pub(crate) fn is_jsx_intrinsic_tag_name(&self, tag: NodeId) -> Result<bool, Error> {
         let read = self.node(tag)?;
@@ -627,7 +644,7 @@ impl CheckerState {
             let name = required(read.name(), "elaborated JSX attribute name")?;
             let initializer = read.initializer();
             let text = self.jsx_name_text(name)?;
-            if text.as_bytes().contains(&b'-') {
+            if is_hyphenated_jsx_name(text.as_bytes()) {
                 continue;
             }
             let name_type = self.get_string_literal_type(text)?;
@@ -1906,8 +1923,9 @@ impl CheckerState {
         Ok(None)
     }
 
-    /// `getJsxLibraryManagedAttributes` and `getJsxElementTypeSymbol`: a type
-    /// declared directly in the namespace's own exports.
+    /// A type declared directly in the namespace's own exports.
+    // port: tsc/internal/checker/jsx.go:Checker.getJsxLibraryManagedAttributes
+    // port: tsc/internal/checker/jsx.go:Checker.getJsxElementTypeSymbol
     fn jsx_namespace_type_symbol(
         &mut self,
         namespace: Option<SymbolId>,
@@ -2468,13 +2486,7 @@ impl CheckerState {
                 tag
             }
         };
-        let file_name = self
-            .source_file_read(file)?
-            .parse_options()
-            .file_name
-            .clone();
-        let host = self.program()?.host.clone();
-        let reference = host.get_jsx_runtime_import_specifier(file_name.as_bytes())?;
+        let reference = self.jsx_runtime_import_specifier(file)?;
         if reference.is_empty() {
             return Ok(None);
         }
@@ -2493,6 +2505,18 @@ impl CheckerState {
             .implicit_imports
             .insert(file, result.unwrap_or(unknown));
         Ok(result)
+    }
+
+    // port: tsc/internal/checker/jsx.go:Checker.getJSXRuntimeImportSpecifier
+    fn jsx_runtime_import_specifier(&self, file: NodeId) -> Result<JsString, Error> {
+        let file_name = self
+            .source_file_read(file)?
+            .parse_options()
+            .file_name
+            .clone();
+        self.program()?
+            .host
+            .get_jsx_runtime_import_specifier(file_name.as_bytes())
     }
 
     /// The first JSX element, self-closing element or fragment's opening
@@ -2672,5 +2696,67 @@ impl CheckerState {
             }
         }
         Ok(false)
+    }
+}
+
+#[cfg(feature = "relation-probe")]
+impl CheckerState {
+    /// The JSX state the emit resolver reads at an opening element or
+    /// fragment: the factory and fragment factory entities, the file that
+    /// declares the `JSX` namespace, and the file of the implicit runtime
+    /// import (C4 contracts 1, 8 and 9).
+    pub(crate) fn jsx_link_state(&mut self, node: NodeId) -> Result<serde_json::Value, Error> {
+        let factory = self.jsx_factory_entity(Some(node))?;
+        let fragment = self.jsx_fragment_factory_entity(Some(node))?;
+        let namespace = self.jsx_namespace_at(node)?;
+        let container = self.jsx_namespace_container_for_implicit_import(node)?;
+        let entity = |state: &Self, entity: Option<NodeId>| -> Result<serde_json::Value, Error> {
+            Ok(match entity {
+                Some(entity) => serde_json::Value::String(
+                    String::from_utf8_lossy(state.jsx_entity_name_text(entity)?.as_bytes())
+                        .into_owned(),
+                ),
+                None => serde_json::Value::Null,
+            })
+        };
+        let declared_in =
+            |state: &Self, symbol: Option<SymbolId>| -> Result<serde_json::Value, Error> {
+                let Some(symbol) = symbol else {
+                    return Ok(serde_json::Value::Null);
+                };
+                let Some(declaration) = state.symbol_declarations(symbol)?.first().flatten() else {
+                    return Ok(serde_json::Value::Null);
+                };
+                let file = state.jsx_source_file(declaration)?;
+                let name = state
+                    .source_file_read(file)?
+                    .parse_options()
+                    .file_name
+                    .clone();
+                Ok(serde_json::Value::String(
+                    String::from_utf8_lossy(name.as_bytes()).into_owned(),
+                ))
+            };
+        Ok(serde_json::json!({
+            "factory": entity(self, factory)?,
+            "fragment_factory": entity(self, fragment)?,
+            "namespace": declared_in(self, namespace)?,
+            "implicit_import": declared_in(self, container)?,
+        }))
+    }
+
+    /// Every syntax kind the checker's own factory has built (C4 contract 9).
+    pub(crate) fn synthetic_syntax_kinds(&self) -> Result<Vec<String>, Error> {
+        let view = self.factory.view();
+        let arena = self.factory.id().arena();
+        let count = u32::try_from(self.factory.node_count()).unwrap_or(0);
+        let mut kinds = std::collections::BTreeSet::new();
+        for slot in 1..=count {
+            let id = NodeId::from_parts(arena, slot)?;
+            if let Ok(read) = view.node(id) {
+                kinds.insert(read.kind_string());
+            }
+        }
+        Ok(kinds.into_iter().collect())
     }
 }

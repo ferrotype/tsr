@@ -562,11 +562,9 @@ impl Relater<'_> {
     ) -> Result<Ternary, Error> {
         let info = self.checker.signatures.index_info(target)?.clone();
         let mut result = tr::TRUE;
-        let jsx =
-            self.checker.types.get(source)?.object_flags & crate::object_flags::JSX_ATTRIBUTES != 0;
         for property in self.checker.get_properties_of_type(source)? {
             // Skip over ignored JSX and symbol-named members
-            if jsx && self.checker.symbol(property)?.name_bytes().contains(&b'-') {
+            if self.checker.is_ignored_jsx_property(source, property)? {
                 continue;
             }
             let key = self.checker.literal_type_from_property(

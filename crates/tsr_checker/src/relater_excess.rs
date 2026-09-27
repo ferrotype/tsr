@@ -55,7 +55,7 @@ impl CheckerState {
                     && self
                         .index_info_of_type(ty, self.builtins.string_type)?
                         .is_some()
-                || jsx && name.contains(&b'-')
+                || jsx && crate::jsx::is_hyphenated_jsx_name(name)
             {
                 return Ok(true);
             }
@@ -176,7 +176,7 @@ impl Relater<'_> {
             let container_declaration = self.checker.symbol(container)?.value_declaration();
             if container_declaration.is_none()
                 || self.checker.node(declaration)?.parent() != container_declaration
-                || jsx && name.as_bytes().contains(&b'-')
+                || self.checker.is_ignored_jsx_property(source, property)?
             {
                 continue;
             }

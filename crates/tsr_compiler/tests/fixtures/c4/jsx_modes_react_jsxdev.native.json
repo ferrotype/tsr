@@ -1,0 +1,50 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources_sha256": {
+    "jsx_modes.tsx": "36619281be29d06dd031d2aa3abde13942565675e3abcd7bb48766ad45cbeb06",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+  },
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--skipLibCheck",
+    "--jsx",
+    "react-jsxdev",
+    "--strict",
+    "jsx_modes.tsx"
+  ],
+  "native_output_sha256": "b03a8c23478e9788943d42cee46087fcdd9a250ef1092e43db8bad442748446d",
+  "exit_code": 2,
+  "native_stderr": "",
+  "diagnostics": [
+    {
+      "file": "jsx_modes.tsx",
+      "line": 2,
+      "column": 65,
+      "code": 2875,
+      "message": "This JSX tag requires the module path 'react/jsx-dev-runtime' to exist, but none could be found. Make sure you have types for the appropriate package installed."
+    },
+    {
+      "file": "jsx_modes.tsx",
+      "line": 5,
+      "column": 25,
+      "code": 2322,
+      "message": "Type 'number' is not assignable to type 'string'."
+    },
+    {
+      "file": "jsx_modes.tsx",
+      "line": 6,
+      "column": 14,
+      "code": 2322,
+      "message": "Type 'Element' is not assignable to type 'number'."
+    }
+  ]
+}

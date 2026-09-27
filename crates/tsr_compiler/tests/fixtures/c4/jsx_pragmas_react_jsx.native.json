@@ -1,0 +1,43 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources_sha256": {
+    "jsx_pragmas.tsx": "d6777a2316c132c4f316a4f7dcf3a9175a3f9232c8ea5e4d30c5e653257f020b",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+  },
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--skipLibCheck",
+    "--jsx",
+    "react-jsx",
+    "--strict",
+    "jsx_pragmas.tsx"
+  ],
+  "native_output_sha256": "09ce4c1bbf5d1ce25272de68eb3e7c5aab999b1a9b48613f58a2dcbddb5309ca",
+  "exit_code": 2,
+  "native_stderr": "",
+  "diagnostics": [
+    {
+      "file": "jsx_pragmas.tsx",
+      "line": 11,
+      "column": 18,
+      "code": 2339,
+      "message": "Property 'p' does not exist on type 'JSX.IntrinsicElements'."
+    },
+    {
+      "file": "jsx_pragmas.tsx",
+      "line": 12,
+      "column": 20,
+      "code": 2339,
+      "message": "Property 'p' does not exist on type 'JSX.IntrinsicElements'."
+    }
+  ]
+}

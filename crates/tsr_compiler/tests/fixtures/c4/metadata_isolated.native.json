@@ -1,0 +1,35 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources_sha256": {
+    "metadata_marking.ts": "bc7b9fa24d55dd4990e55f95be4ebf1b0d110b39cc0560e21dba325746466f01",
+    "metadata_types.ts": "1f53140b3633eb8f9601a3f55b76fdde9d7bcebd8f5d95ba9fa8da1d62083d22"
+  },
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--skipLibCheck",
+    "--strict",
+    "--experimentalDecorators",
+    "--emitDecoratorMetadata",
+    "--isolatedModules",
+    "metadata_marking.ts"
+  ],
+  "native_output_sha256": "51f98eb3bae986ed7b068c7e2712afc18b513ed07fdc9a2e7e464339905b6137",
+  "exit_code": 2,
+  "native_stderr": "",
+  "diagnostics": [
+    {
+      "file": "metadata_marking.ts",
+      "line": 6,
+      "column": 57,
+      "code": 1272,
+      "message": "A type referenced in a decorated signature must be imported with 'import type' or a namespace import when 'isolatedModules' and 'emitDecoratorMetadata' are enabled."
+    }
+  ]
+}

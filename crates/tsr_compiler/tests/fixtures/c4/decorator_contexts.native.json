@@ -1,0 +1,66 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources_sha256": {
+    "decorator_contexts.ts": "db2a4bbd9eb3e0a5abc651f498231096243966cc9198dee3cd92cf7c5fc8849b"
+  },
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--skipLibCheck",
+    "--strict",
+    "decorator_contexts.ts"
+  ],
+  "native_output_sha256": "d49756773e158f399fc60cf939086fa2d0dcec0715186c7142aa5e742732a57f",
+  "exit_code": 2,
+  "native_stderr": "",
+  "diagnostics": [
+    {
+      "file": "decorator_contexts.ts",
+      "line": 3,
+      "column": 4,
+      "code": 1241,
+      "message": "Unable to resolve signature of method decorator when called as an expression.\n  Argument of type 'ClassMethodDecoratorContext<typeof C, () => void> & { name: \"m\"; private: false; static: true; }' is not assignable to parameter of type 'number'."
+    },
+    {
+      "file": "decorator_contexts.ts",
+      "line": 4,
+      "column": 4,
+      "code": 1240,
+      "message": "Unable to resolve signature of property decorator when called as an expression.\n  Argument of type 'ClassFieldDecoratorContext<C, number> & { name: \"#p\"; private: true; static: false; }' is not assignable to parameter of type 'number'."
+    },
+    {
+      "file": "decorator_contexts.ts",
+      "line": 5,
+      "column": 4,
+      "code": 1241,
+      "message": "Unable to resolve signature of method decorator when called as an expression.\n  Argument of type 'ClassGetterDecoratorContext<C, number> & { name: \"g\"; private: false; static: false; }' is not assignable to parameter of type 'number'."
+    },
+    {
+      "file": "decorator_contexts.ts",
+      "line": 6,
+      "column": 4,
+      "code": 1240,
+      "message": "Unable to resolve signature of property decorator when called as an expression.\n  Argument of type 'ClassAccessorDecoratorContext<C, string> & { name: \"a\"; private: false; static: false; }' is not assignable to parameter of type 'number'."
+    },
+    {
+      "file": "decorator_contexts.ts",
+      "line": 8,
+      "column": 2,
+      "code": 1238,
+      "message": "Unable to resolve signature of class decorator when called as an expression.\n  Argument of type 'ClassDecoratorContext<typeof D>' is not assignable to parameter of type 'number'."
+    },
+    {
+      "file": "decorator_contexts.ts",
+      "line": 15,
+      "column": 7,
+      "code": 2322,
+      "message": "Type 'DecoratorMetadataObject | null' is not assignable to type 'number'.\n  Type 'null' is not assignable to type 'number'."
+    }
+  ]
+}

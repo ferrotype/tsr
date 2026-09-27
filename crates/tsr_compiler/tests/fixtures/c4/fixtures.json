@@ -1,0 +1,225 @@
+{
+  "jsx_modes_preserve": {
+    "root": "jsx_modes.tsx",
+    "files": [
+      "node_modules/react/package.json",
+      "node_modules/react/index.d.ts",
+      "node_modules/react/jsx-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "preserve",
+      "--strict"
+    ]
+  },
+  "jsx_pragmas_preserve": {
+    "root": "jsx_pragmas.tsx",
+    "files": [
+      "node_modules/react/package.json",
+      "node_modules/react/index.d.ts",
+      "node_modules/react/jsx-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "preserve",
+      "--strict"
+    ]
+  },
+  "jsx_modes_react_native": {
+    "root": "jsx_modes.tsx",
+    "files": [
+      "node_modules/react/package.json",
+      "node_modules/react/index.d.ts",
+      "node_modules/react/jsx-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-native",
+      "--strict"
+    ]
+  },
+  "jsx_pragmas_react_native": {
+    "root": "jsx_pragmas.tsx",
+    "files": [
+      "node_modules/react/package.json",
+      "node_modules/react/index.d.ts",
+      "node_modules/react/jsx-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-native",
+      "--strict"
+    ]
+  },
+  "jsx_modes_react": {
+    "root": "jsx_modes.tsx",
+    "files": [
+      "node_modules/react/package.json",
+      "node_modules/react/index.d.ts",
+      "node_modules/react/jsx-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react",
+      "--strict"
+    ]
+  },
+  "jsx_pragmas_react": {
+    "root": "jsx_pragmas.tsx",
+    "files": [
+      "node_modules/react/package.json",
+      "node_modules/react/index.d.ts",
+      "node_modules/react/jsx-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react",
+      "--strict"
+    ]
+  },
+  "jsx_modes_react_jsx": {
+    "root": "jsx_modes.tsx",
+    "files": [
+      "node_modules/react/package.json",
+      "node_modules/react/index.d.ts",
+      "node_modules/react/jsx-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-jsx",
+      "--strict"
+    ]
+  },
+  "jsx_pragmas_react_jsx": {
+    "root": "jsx_pragmas.tsx",
+    "files": [
+      "node_modules/react/package.json",
+      "node_modules/react/index.d.ts",
+      "node_modules/react/jsx-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-jsx",
+      "--strict"
+    ]
+  },
+  "jsx_modes_react_jsxdev": {
+    "root": "jsx_modes.tsx",
+    "files": [
+      "node_modules/react/package.json",
+      "node_modules/react/index.d.ts",
+      "node_modules/react/jsx-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-jsxdev",
+      "--strict"
+    ]
+  },
+  "jsx_pragmas_react_jsxdev": {
+    "root": "jsx_pragmas.tsx",
+    "files": [
+      "node_modules/react/package.json",
+      "node_modules/react/index.d.ts",
+      "node_modules/react/jsx-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-jsxdev",
+      "--strict"
+    ]
+  },
+  "jsx_elements": {
+    "root": "jsx_elements.tsx",
+    "flags": [
+      "--jsx",
+      "react",
+      "--strict"
+    ]
+  },
+  "jsx_generics": {
+    "root": "jsx_generics.tsx",
+    "flags": [
+      "--jsx",
+      "react",
+      "--strict"
+    ]
+  },
+  "jsx_in_js": {
+    "root": "jsx_in_js.jsx",
+    "flags": [
+      "--jsx",
+      "preserve",
+      "--allowJs",
+      "--checkJs"
+    ]
+  },
+  "decorator_positions_es": {
+    "root": "decorator_positions.ts",
+    "flags": [
+      "--strict"
+    ]
+  },
+  "decorator_positions_legacy": {
+    "root": "decorator_positions.ts",
+    "flags": [
+      "--strict",
+      "--experimentalDecorators"
+    ]
+  },
+  "decorator_static_block_es": {
+    "root": "decorator_static_block.ts",
+    "flags": [
+      "--strict"
+    ]
+  },
+  "decorator_static_block_legacy": {
+    "root": "decorator_static_block.ts",
+    "flags": [
+      "--strict",
+      "--experimentalDecorators"
+    ]
+  },
+  "decorator_contexts": {
+    "root": "decorator_contexts.ts",
+    "flags": [
+      "--strict"
+    ]
+  },
+  "metadata_marking": {
+    "root": "metadata_marking.ts",
+    "files": [
+      "metadata_types.ts"
+    ],
+    "flags": [
+      "--strict",
+      "--experimentalDecorators",
+      "--emitDecoratorMetadata"
+    ]
+  },
+  "metadata_isolated": {
+    "root": "metadata_marking.ts",
+    "files": [
+      "metadata_types.ts"
+    ],
+    "flags": [
+      "--strict",
+      "--experimentalDecorators",
+      "--emitDecoratorMetadata",
+      "--isolatedModules"
+    ]
+  },
+  "lifecycle": {
+    "root": "lifecycle.tsx",
+    "files": [
+      "node_modules/react/package.json",
+      "node_modules/react/index.d.ts",
+      "node_modules/react/jsx-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-jsx",
+      "--strict"
+    ]
+  }
+}
