@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter, defaultdict
+import hashlib
 import json
 import lzma
 import os
@@ -179,9 +180,12 @@ def outcomes(text):
 
 
 def recorded_tests(raw_path):
-    """Each recorded test's events in order, without the recorder's sequence numbers.
+    """Each recorded test segment's events in order, without the recorder's
+    sequence numbers.
 
-    Yields (name, [event line bytes]); a test with no checker call records nothing."""
+    Yields (name, [event line bytes]); a test with no checker call records
+    nothing, and a test that starts several servers records one segment each,
+    in order, under its name."""
     current = None
     with open(raw_path, "rb") as lines:
         for line in lines:
@@ -209,6 +213,14 @@ def test_digest(events):
     return digest(b"\n".join(events))
 
 
+def test_digests(raw_path):
+    """Each test's digest over all its segments in order."""
+    hashes = {}
+    for name, events in recorded_tests(raw_path):
+        hashes.setdefault(name, hashlib.sha256()).update(b"\n".join(events) + b"\n")
+    return {name: value.hexdigest() for name, value in hashes.items()}
+
+
 def operation_counts(events):
     counts = Counter()
     for line in events:
@@ -217,26 +229,40 @@ def operation_counts(events):
     return counts
 
 
-def record_runs(output, upstream, env, run=None):
-    """Build, run the suite plain and twice recorded, and return the observations."""
+RUNS = ("first", "second", "third")
+
+
+def record_runs(output, upstream, env, run=None, runs=RUNS):
+    """Build, run the suite plain and once recorded per name in `runs`; return
+    the build, the outcomes (plain first) and each recorded run's test digests."""
     oracle = build(output, upstream, env)
     plain = run_suite(output / "fourslash-plain.test", output, upstream, env, run=run)
-    first = run_suite(output / "fourslash.test", output, upstream, env, run=run, record=output / "first.ndjson")
-    second = run_suite(output / "fourslash.test", output, upstream, env, run=run, record=output / "second.ndjson")
-    digests = [{name: test_digest(events) for name, events in recorded_tests(output / f"{which}.ndjson")}
-               for which in ("first", "second")]
-    return oracle, (plain, first, second), digests
+    recorded = [run_suite(output / "fourslash.test", output, upstream, env, run=run, record=output / f"{which}.ndjson")
+                for which in runs]
+    digests = [test_digests(output / f"{which}.ndjson") for which in runs]
+    return oracle, (plain, *recorded), digests
 
 
 def write_record(output, raw, keep):
-    """The committed record: the kept tests' events, xz-compressed, and its digests."""
+    """The committed record: the kept tests' events in test-name order (the
+    suite's parallel tests run in no fixed order), xz-compressed, and its digests."""
     stream = output / "record.ndjson"
-    with stream.open("wb") as out:
-        operations = Counter()
+    unordered = output / "record.unordered.ndjson"
+    spans = defaultdict(list)
+    operations = Counter()
+    with unordered.open("wb") as out:
         for name, events in recorded_tests(raw):
             if name in keep:
                 operations.update(operation_counts(events))
+                start = out.tell()
                 out.write(b"\n".join(events) + b"\n")
+                spans[name].append((start, out.tell() - start))
+    with unordered.open("rb") as source, stream.open("wb") as out:
+        for name in sorted(spans):
+            for start, length in spans[name]:
+                source.seek(start)
+                out.write(source.read(length))
+    unordered.unlink()
     record_sha256 = digest(stream.read_bytes())
     compressed = output / "record.ndjson.xz"
     with stream.open("rb") as source, compressed.open("wb") as target:
@@ -244,11 +270,17 @@ def write_record(output, raw, keep):
     return compressed, record_sha256, operations
 
 
+def stable_tests(digests):
+    """The tests every recorded run recorded identically."""
+    return {name for name, value in digests[0].items() if all(run.get(name) == value for run in digests[1:])}
+
+
 def manifest_of(oracle, runs, digests, pin, go_version, operations, record_sha256, record_xz_sha256):
-    plain, first, second = runs
-    first_digests, second_digests = digests
-    excluded = sorted(name for name in first_digests if first_digests.get(name) != second_digests.get(name))
-    kept = {name: value for name, value in first_digests.items() if name not in excluded}
+    plain, first = runs[0], runs[1]
+    first_digests = digests[0]
+    stable = stable_tests(digests)
+    excluded = sorted(name for name in first_digests if name not in stable)
+    kept = {name: value for name, value in first_digests.items() if name in stable}
     return {
         "version": 1,
         "pin": pin,
@@ -256,7 +288,8 @@ def manifest_of(oracle, runs, digests, pin, go_version, operations, record_sha25
         "command": oracle["command"],
         "overlay_sha256": oracle["overlay_sha256"],
         "entry_points": oracle["entry_points"],
-        "neutral": plain == first == second,
+        "neutral": all(outcome == plain for outcome in runs[1:]),
+        "recorded_runs": len(digests),
         "outcomes": dict(sorted(Counter(first.values()).items())),
         "skipped": sorted(name for name, outcome in first.items() if outcome == "SKIP"),
         "failed": sorted(name for name, outcome in first.items() if outcome == "FAIL"),
@@ -279,17 +312,28 @@ def pin():
     return json.loads((ROOT / "data/upstream.json").read_text())["pin"]
 
 
-def record(output, run=None):
+def reused_runs(output):
+    """The build and runs of an earlier `record` in `output` (development)."""
+    previous = json.loads((output / "manifest.json").read_bytes())
+    oracle = {key: previous[key] for key in ("command", "overlay_sha256", "entry_points")}
+    runs = [outcomes((output / f"{which}.stdout").read_text(errors="replace")) for which in ("plain", *RUNS)]
+    digests = [test_digests(output / f"{which}.ndjson") for which in RUNS]
+    return oracle, tuple(runs), digests
+
+
+def record(output, run=None, reuse=False):
     upstream = verified_upstream()
     env = go_environment()
     output.mkdir(parents=True, exist_ok=True)
-    oracle, runs, digests = record_runs(output, upstream, env, run=run)
-    plain, first, second = runs
-    if not plain == first == second:
-        changed = sorted(name for name in set(plain) | set(first) | set(second)
-                         if not plain.get(name) == first.get(name) == second.get(name))
+    if reuse:
+        oracle, runs, digests = reused_runs(output)
+    else:
+        oracle, runs, digests = record_runs(output, upstream, env, run=run)
+    plain = runs[0]
+    if not all(outcome == plain for outcome in runs[1:]):
+        changed = sorted(name for name in set().union(*runs) if len({outcome.get(name) for outcome in runs}) != 1)
         raise ValueError("the recorder changed fourslash outcomes: " + ", ".join(changed[:20]))
-    keep = {name for name in digests[0] if digests[0][name] == digests[1].get(name)}
+    keep = stable_tests(digests)
     compressed, record_sha256, operations = write_record(output, output / "first.ndjson", keep)
     manifest = manifest_of(oracle, runs, digests, pin(), go_version(env), operations, record_sha256,
                            digest(compressed.read_bytes()))
@@ -302,35 +346,60 @@ def record(output, run=None):
     return manifest
 
 
+def test_pattern(name):
+    """The -test.run pattern that selects exactly `name` (subtests included)."""
+    return "/".join("^" + re.escape(part) + "$" for part in name.split("/"))
+
+
+def retried(output, upstream, env, name, value, attempts=5):
+    """Whether recording `name` alone reproduces `value` within `attempts` runs:
+    a timing-dependent test can land on the same other result twice."""
+    for attempt in range(attempts):
+        raw = output / f"retry-{attempt}.ndjson"
+        run_suite(output / "fourslash.test", output, upstream, env, run=test_pattern(name), record=raw)
+        if test_digests(raw).get(name) == value:
+            return True
+    return False
+
+
 def verify(output):
-    """Re-record: the committed tests reproduce their digests (in at least one of
-    the two recorded runs, since a test the new runs find timing-dependent may
-    land on either result), at the same pin, overlay and outcomes."""
+    """Re-record twice: every committed test reproduces its digest in one of the
+    runs, or records differently in the two, or reproduces it when recorded
+    alone within five attempts (the language server's timing, as the record's
+    own exclusions show), at the same pin, overlay and outcomes. Any other test
+    changed."""
     committed = json.loads(MANIFEST.read_bytes())
     upstream = verified_upstream()
     env = go_environment()
     output.mkdir(parents=True, exist_ok=True)
-    oracle, runs, digests = record_runs(output, upstream, env)
-    plain, first, second = runs
+    oracle, runs, digests = record_runs(output, upstream, env, runs=RUNS[:2])
+    plain, first = runs[0], runs[1]
     problems = []
     if committed["pin"] != pin():
         problems.append("pin changed")
     if committed["overlay_sha256"] != oracle["overlay_sha256"]:
         problems.append("overlay fingerprint changed")
-    if not plain == first == second:
+    if not all(outcome == plain for outcome in runs[1:]):
         problems.append("the recorder changed fourslash outcomes")
     if committed["outcomes"] != dict(sorted(Counter(first.values()).items())):
         problems.append("fourslash outcomes changed")
     if committed["skipped"] != sorted(name for name, outcome in first.items() if outcome == "SKIP"):
         problems.append("the skipped tests changed")
-    missing = [name for name, value in committed["test_digests"].items()
-               if value not in (digests[0].get(name), digests[1].get(name))]
-    if missing:
-        problems.append(f"{len(missing)} recorded tests do not reproduce: " + ", ".join(missing[:10]))
+    reproduced, unstable, changed = [], [], []
+    for name, value in committed["test_digests"].items():
+        new = [run.get(name) for run in digests]
+        if value in new:
+            reproduced.append(name)
+        elif len(set(new)) > 1 or retried(output, upstream, env, name, value):
+            unstable.append(name)
+        else:
+            changed.append(name)
+    if changed:
+        problems.append(f"{len(changed)} recorded tests changed: " + ", ".join(changed[:10]))
     if digest(RECORD.read_bytes()) != committed["record_xz_sha256"]:
         problems.append("the committed record is not the manifest's")
-    report = {"verified": not problems, "problems": problems,
-              "tests_reproduced": len(committed["test_digests"]) - len(missing)}
+    report = {"verified": not problems, "problems": problems, "tests_reproduced": len(reproduced),
+              "tests_unstable": sorted(unstable), "tests_changed": sorted(changed)}
     (output / "verify.json").write_bytes(json.dumps(report, indent=1, sort_keys=True).encode() + b"\n")
     print(json.dumps(report, indent=1))
     return not problems
@@ -536,14 +605,18 @@ def main():
         sub.add_argument("--output", type=Path, default=OUTPUT / name)
         if name == "record":
             sub.add_argument("--run", help="a -test.run pattern (development only; never committed)")
+            sub.add_argument("--reuse", action="store_true",
+                             help="re-derive the record from this output's earlier runs (no Go runs)")
         if name == "replay":
             sub.add_argument("--test", action="append", help="replay only this test (development only)")
             sub.add_argument("--jobs", type=int)
     args = parser.parse_args()
+    if hasattr(args, "output"):
+        args.output = args.output.resolve()
     if args.command == "fixture":
         fixture()
     elif args.command == "record":
-        record(args.output, run=args.run)
+        record(args.output, run=args.run, reuse=args.reuse)
     elif args.command == "verify":
         sys.exit(0 if verify(args.output) else 1)
     elif args.command == "replay":

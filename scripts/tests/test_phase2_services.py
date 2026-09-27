@@ -37,19 +37,47 @@ class Record(unittest.TestCase):
         self.assertEqual(services.operation_counts(events), Counter({"Checker.WasCanceled": 1}))
         self.assertEqual(services.test_digest(events), services.test_digest(list(events)))
 
+    def test_a_test_with_several_servers_digests_every_segment_in_order(self):
+        with tempfile.TemporaryDirectory() as directory:
+            raw = Path(directory) / "raw.ndjson"
+            call = {"args": [], "checker": "c1", "e": "call", "op": "Checker.WasCanceled", "results": [False]}
+            raw.write_text("\n".join(json.dumps(event) for event in [
+                {"e": "test", "name": "TestA", "files": {}, "symlinks": {}}, call, {"e": "end"},
+                {"e": "test", "name": "TestA", "files": {"/b.ts": ""}, "symlinks": {}}, call, {"e": "end"},
+            ]) + "\n")
+            segments = list(services.recorded_tests(raw))
+            digests = services.test_digests(raw)
+            output = Path(directory) / "out"
+            output.mkdir()
+            with patch.object(services.subprocess, "run"):
+                _, _, operations = services.write_record(output, raw, {"TestA"})
+            written = (output / "record.ndjson").read_bytes()
+        self.assertEqual(len(segments), 2)
+        self.assertEqual(list(digests), ["TestA"])
+        self.assertNotEqual(digests["TestA"], services.test_digest(segments[1][1]))
+        self.assertEqual(operations, Counter({"Checker.WasCanceled": 2}))
+        self.assertEqual(written.count(b'"e":"test"'), 2)
+
     def test_the_manifest_keeps_only_reproduced_tests_and_names_the_rest(self):
         oracle = {"command": ["go"], "overlay_sha256": {"a": "b"}, "entry_points": 3}
         outcomes = {"TestA": "PASS", "TestB": "PASS", "TestC": "SKIP"}
-        runs = (outcomes, outcomes, dict(outcomes))
-        digests = ({"TestA": "1", "TestB": "2"}, {"TestA": "1", "TestB": "3"})
+        runs = (outcomes, outcomes, dict(outcomes), dict(outcomes))
+        digests = ({"TestA": "1", "TestB": "2"}, {"TestA": "1", "TestB": "2"}, {"TestA": "1", "TestB": "3"})
         manifest = services.manifest_of(oracle, runs, digests, "pin", "go1", Counter({"op": 2}), "r", "x")
         self.assertTrue(manifest["neutral"])
         self.assertEqual(manifest["excluded_nondeterministic"], ["TestB"])
         self.assertEqual(manifest["test_digests"], {"TestA": "1"})
         self.assertEqual(manifest["skipped"], ["TestC"])
-        changed = services.manifest_of(oracle, (outcomes, {**outcomes, "TestA": "FAIL"}, outcomes), digests,
-                                       "pin", "go1", Counter(), "r", "x")
+        self.assertEqual(manifest["recorded_runs"], 3)
+        changed = services.manifest_of(oracle, (outcomes, outcomes, {**outcomes, "TestA": "FAIL"}, outcomes),
+                                       digests, "pin", "go1", Counter(), "r", "x")
         self.assertFalse(changed["neutral"])
+
+
+class Verification(unittest.TestCase):
+    def test_a_test_pattern_selects_exactly_one_test_or_subtest(self):
+        self.assertEqual(services.test_pattern("TestA"), "^TestA$")
+        self.assertEqual(services.test_pattern("TestA/TestA_b.c"), "^TestA$/^TestA_b\\.c$")
 
 
 class Classification(unittest.TestCase):
