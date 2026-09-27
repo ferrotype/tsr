@@ -16,8 +16,8 @@ use tsr_diagnostics::Message;
 /// An index signature of one checker's type.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct IndexInfoRef {
-    owner: ArenaId,
-    id: IndexInfoId,
+    pub(crate) owner: ArenaId,
+    pub(crate) id: IndexInfoId,
 }
 
 /// The parts of an index signature, read through its operation.
@@ -32,8 +32,8 @@ pub struct IndexInfoParts {
 /// A type predicate of one checker's signature.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct TypePredicateRef {
-    owner: ArenaId,
-    id: TypePredicateId,
+    pub(crate) owner: ArenaId,
+    pub(crate) id: TypePredicateId,
 }
 
 /// The parts of a type predicate, read through its operation.

@@ -160,6 +160,10 @@ impl NodeBuilder<'_> {
     // port: tsc/internal/checker/nodecopy.go:NodeBuilderImpl.reuseTypeNode
     pub(super) fn reuse_type_node(&mut self, node: NodeId) -> Result<NodeId, Error> {
         if let Some(result) = self.reuse_node(node)? {
+            // A reused annotation never reached should_expand_type, so probe it.
+            if self.max_expansion_depth >= 0 && !self.can_increase_expansion_depth {
+                self.walk_node_for_expandability(node)?;
+            }
             return Ok(result);
         }
         self.report(Event::InferenceFallback(node));
@@ -235,10 +239,10 @@ impl NodeBuilder<'_> {
         ty: TypeId,
         annotation: Option<NodeId>,
     ) -> Result<NodeId, Error> {
-        // Declaration and display contexts have no active hover expansion.
-        if let Some(annotation) = annotation {
+        if let Some(annotation) = annotation.filter(|_| !self.is_actively_expanding()) {
             if self.reuse_type_from_node(annotation, false)? == Some(ty) {
                 if let Some(node) = self.reuse_node(annotation)? {
+                    self.check_type_expandability(Some(ty))?;
                     return Ok(node);
                 }
             }

@@ -12,122 +12,12 @@
    "reason": "The no-op alias adder of isEntityNameVisible without alias computation is hasVisibleDeclarations run with compute_aliases false, which records no alias.",
    "rust": "crates/tsr_checker/src/emit_visibility.rs:317"
   },
-  "tsc/internal/checker/nodebuilder.go:Checker.getNodeBuilderEx": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NewNodeBuilder": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NewNodeBuilderEx": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.EmitContext": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
   "tsc/internal/checker/nodebuilder.go:NodeBuilder.ExpandSymbolForHover": {
    "disposition": "gap",
    "item": "C5.4",
    "reason": "Not yet ported; the item that closes it is named."
   },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.IndexInfoToIndexSignatureDeclaration": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeReturnTypeForSignature": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeTypeForDeclaration": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeTypeForExpression": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeTypeParametersForSignature": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SignatureToSignatureDeclaration": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToEntityName": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToExpression": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToNode": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToParameterDeclaration": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToTypeParameterDeclarations": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.TryJSTypeNodeToTypeNode": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.TypeParameterToDeclaration": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.TypePredicateToTypePredicateNode": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.exitContext": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.exitContextCheck": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.exitContextSlice": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
   "tsc/internal/checker/nodebuilder.go:NodeBuilder.popContext": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilder.go:NodeBuilder.propagateVerbosityOut": {
    "disposition": "gap",
    "item": "C5.4",
    "reason": "Not yet ported; the item that closes it is named."
@@ -232,21 +122,6 @@
    "item": "C5.5",
    "reason": "Not yet ported; the item that closes it is named."
   },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.checkTruncationLengthIfExpanding": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.checkTypeExpandability": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createAnonymousTypeNode": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createExpressionWithTypeArguments": {
    "disposition": "gap",
    "item": "C5.4",
@@ -277,22 +152,7 @@
    "item": "C5.4",
    "reason": "Not yet ported; the item that closes it is named."
   },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isActivelyExpanding": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isExpandableType": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isMappedTypeHomomorphic": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.isTypeOnStack": {
    "disposition": "gap",
    "item": "C5.4",
    "reason": "Not yet ported; the item that closes it is named."
@@ -348,11 +208,6 @@
    "reason": "Not yet ported; the item that closes it is named."
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.setCommentRange": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.shouldExpandType": {
    "disposition": "gap",
    "item": "C5.4",
    "reason": "Not yet ported; the item that closes it is named."
@@ -490,11 +345,6 @@
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
    "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1672"
   },
-  "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.walkNodeForExpandability": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
   "tsc/internal/checker/nodecopy.go:getExistingNodeTreeVisitor": {
    "disposition": "equivalent",
    "reason": "The visitor is the reuse_visit family: reuse_visit_scoped is its per-node closure (recovery scope, new scopes for function-like and mapped nodes, cloning, fallback), reuse_visit_worker the symbol-aware worker.",
@@ -589,37 +439,7 @@
    "item": "C5.4",
    "reason": "Not yet ported; the item that closes it is named."
   },
-  "tsc/internal/checker/printer.go:Checker.SignatureToStringEx": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/printer.go:Checker.SymbolToString": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/printer.go:Checker.SymbolToStringEx": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/printer.go:Checker.TypeParameterToStringEx": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
   "tsc/internal/checker/printer.go:Checker.TypePredicateToTypePredicateNode": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/printer.go:Checker.TypeToString": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/printer.go:Checker.TypeToStringEx": {
    "disposition": "gap",
    "item": "C5.4",
    "reason": "Not yet ported; the item that closes it is named."
@@ -630,16 +450,6 @@
    "reason": "Not yet ported; the item that closes it is named."
   },
   "tsc/internal/checker/printer.go:Checker.TypeToTypeNodeEx": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/printer.go:Checker.signatureToString": {
-   "disposition": "gap",
-   "item": "C5.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/printer.go:Checker.typePredicateToStringEx": {
    "disposition": "gap",
    "item": "C5.4",
    "reason": "Not yet ported; the item that closes it is named."
@@ -845,16 +655,6 @@
    "reason": "Not yet ported; the item that closes it is named."
   },
   "tsc/internal/checker/services.go:Checker.IsDeclarationUsed": {
-   "disposition": "gap",
-   "item": "C5.5",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/services.go:Checker.IsLibSymbolForHoverVerbosity": {
-   "disposition": "gap",
-   "item": "C5.5",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/services.go:Checker.IsLibTypeForHoverVerbosity": {
    "disposition": "gap",
    "item": "C5.5",
    "reason": "Not yet ported; the item that closes it is named."

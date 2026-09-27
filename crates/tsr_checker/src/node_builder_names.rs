@@ -106,7 +106,7 @@ impl NodeBuilder<'_> {
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToName
-    pub(super) fn symbol_name_node(
+    pub(crate) fn symbol_name_node(
         &mut self,
         symbol: SymbolId,
         meaning: u32,

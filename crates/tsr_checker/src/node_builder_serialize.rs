@@ -148,7 +148,7 @@ impl NodeBuilder<'_> {
                 None => false,
             };
             let mut reported_fallback = false;
-            if try_reuse && self.enclosing.is_some() && eligible {
+            if !self.is_actively_expanding() && try_reuse && self.enclosing.is_some() && eligible {
                 let decl = declaration.expect("eligible declaration");
                 if let Some(s) = symbol {
                     // addSymbolTypeToContext keys by symbol id.
@@ -316,7 +316,8 @@ impl NodeBuilder<'_> {
             if suppress_any && self.checker.types.flags(ty)? & tf::ANY != 0 {
                 return Ok(None);
             }
-            if let Some(decl) = original.filter(|_| try_reuse && self.enclosing.is_some()) {
+            let reuse = !self.is_actively_expanding() && try_reuse && self.enclosing.is_some();
+            if let Some(decl) = original.filter(|_| reuse) {
                 let symbol = self.checker.get_symbol_of_declaration(decl)?;
                 if let Some(s) = symbol {
                     // addSymbolTypeToContext keys by symbol id.

@@ -164,7 +164,7 @@ impl NodeBuilder<'_> {
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParametersToTypeParameterDeclarations
-    pub(super) fn symbol_type_parameter_declarations(
+    pub(crate) fn symbol_type_parameter_declarations(
         &mut self,
         symbol: SymbolId,
     ) -> Result<Vec<NodeId>, Error> {

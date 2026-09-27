@@ -23,7 +23,7 @@ use tsr_jsnum::{Number, PseudoBigInt};
 
 #[path = "handles_display.rs"]
 mod display;
-pub use display::TypeNodeBuilder;
+pub use display::{BuilderRequest, TypeNodeBuilder};
 
 #[cfg(feature = "recursion-probe")]
 #[path = "handles_c2_probe.rs"]

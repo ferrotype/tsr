@@ -262,6 +262,7 @@ pub mod storage_pilot;
 pub use emit_resolver_js::TypeReferenceSerializationKind;
 pub use exports::{IndexInfoParts, IndexInfoRef, TypePredicateParts, TypePredicateRef};
 pub use flags::*;
+pub use handles::BuilderRequest;
 #[cfg(feature = "relation-probe")]
 pub use handles::{LiteralShape, SignatureShape};
 pub use handles::{
@@ -277,6 +278,7 @@ pub(crate) use init::Builtins;
 pub use init::BUILTIN_TYPE_NAMES;
 pub(crate) use key::CacheKey;
 pub use links::{LinkKey, LinkStore};
+pub use node_builder::VerbosityContext;
 pub use owner::{CheckerOwner, Operation};
 #[cfg(test)]
 use resolution::TypeResolution;

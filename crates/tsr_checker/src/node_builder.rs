@@ -25,6 +25,9 @@ mod declaration_emit;
 #[cfg(test)]
 #[path = "node_builder_elision_tests.rs"]
 mod elision_tests;
+#[path = "node_builder_expansion.rs"]
+mod expansion;
+pub use expansion::VerbosityContext;
 #[path = "node_builder_extra.rs"]
 mod extra;
 #[path = "node_builder_names.rs"]
@@ -67,6 +70,15 @@ pub(crate) struct NodeBuilder<'a> {
     tracked_symbols: Vec<cache::TrackedSymbol>,
     reported_diagnostic: bool,
     cached: bool,
+    /// The verbosity of the next request (`NodeBuilder.verbosity`); `None`
+    /// for callers that never expand.
+    pub(crate) verbosity: Option<expansion::VerbosityContext>,
+    max_expansion_depth: i32,
+    max_truncation_length: usize,
+    depth: i32,
+    type_stack: Vec<Option<TypeId>>,
+    can_increase_expansion_depth: bool,
+    expansion_truncated: bool,
 }
 
 impl<'a> NodeBuilder<'a> {
@@ -100,6 +112,14 @@ impl<'a> NodeBuilder<'a> {
         self.name_access = names::NameAccess::default();
         self.tracked_symbols.clear();
         self.reported_diagnostic = false;
+        self.max_expansion_depth = self.verbosity.map_or(-1, |verbosity| verbosity.level);
+        self.max_truncation_length = self
+            .verbosity
+            .map_or(0, |verbosity| verbosity.max_truncation_length);
+        self.depth = 0;
+        self.type_stack.clear();
+        self.can_increase_expansion_depth = false;
+        self.expansion_truncated = false;
         Ok(())
     }
 
@@ -144,6 +164,13 @@ impl<'a> NodeBuilder<'a> {
             tracked_symbols: Vec::new(),
             reported_diagnostic: false,
             cached: false,
+            verbosity: None,
+            max_expansion_depth: -1,
+            max_truncation_length: 0,
+            depth: 0,
+            type_stack: Vec::new(),
+            can_increase_expansion_depth: false,
+            expansion_truncated: false,
         }
     }
 
@@ -171,9 +198,7 @@ impl<'a> NodeBuilder<'a> {
         builder.internal_flags = internal_flags;
         builder.tracker = Some(tracker);
         let result = action(&mut builder);
-        if builder.truncating && builder.flags & nf::NO_TRUNCATION != 0 {
-            builder.report(tsr_printer::emit_resolver::DeclarationTrackerEvent::Truncation);
-        }
+        builder.exit_context_check();
         std::mem::swap(&mut builder.ast, output);
         std::mem::swap(&mut builder.emit, emit);
         result
@@ -422,6 +447,8 @@ impl<'a> NodeBuilder<'a> {
     fn check_truncation(&mut self) -> bool {
         let limit = if self.flags & nf::NO_TRUNCATION != 0 {
             crate::NO_TRUNCATION_MAXIMUM_TRUNCATION_LENGTH
+        } else if self.max_truncation_length > 0 {
+            self.max_truncation_length
         } else {
             crate::DEFAULT_MAXIMUM_TRUNCATION_LENGTH
         };
@@ -565,7 +592,16 @@ impl<'a> NodeBuilder<'a> {
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeToTypeNode
     pub(crate) fn type_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
-        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || self.type_node_worker(ty))
+        // The type stack tracks expansion; it is kept only while expanding.
+        let expanding = self.max_expansion_depth >= 0;
+        if expanding {
+            self.type_stack.push(Some(ty));
+        }
+        let result = stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || self.type_node_worker(ty));
+        if expanding {
+            self.type_stack.pop();
+        }
+        result
     }
 
     fn type_node_worker(&mut self, ty: TypeId) -> Result<NodeId, Error> {
@@ -620,10 +656,14 @@ impl<'a> NodeBuilder<'a> {
         if record.flags & tf::BOOLEAN != 0 && record.alias.is_none() {
             return Ok(self.keyword(K::BooleanKeyword, 7));
         }
+        let mut expanding_enum = false;
         if record.flags & tf::ENUM_LIKE != 0 {
-            return self
-                .enum_type_node(ty, false)?
-                .ok_or(Error::MissingLink("enum display"));
+            // An enum member is not a union, so it never asks for expansion.
+            let expanding = record.flags & tf::UNION != 0 && self.should_expand_type(ty, false)?;
+            match self.enum_type_node(ty, expanding)? {
+                Some(node) => return Ok(node),
+                None => expanding_enum = true,
+            }
         }
         if record.flags & tf::LITERAL != 0 {
             let value = self.checker.types.literal(ty)?.value.clone();
@@ -727,14 +767,39 @@ impl<'a> NodeBuilder<'a> {
                         .checker
                         .type_symbol_accessible(symbol, self.enclosing)?
                 {
-                    return self.type_reference(
-                        symbol,
-                        crate::type_display::alias_type_arguments(alias.as_ref()),
-                    );
+                    if !self.should_expand_type(ty, true)? {
+                        return self.type_reference(
+                            symbol,
+                            crate::type_display::alias_type_arguments(alias.as_ref()),
+                        );
+                    }
+                    // Expanding the alias serializes the underlying type one level deeper.
+                    self.depth += 1;
+                    let result = self.structured_type_node(ty, record, expanding_enum);
+                    self.depth -= 1;
+                    return result;
                 }
             }
         }
+        self.structured_type_node(ty, record, expanding_enum)
+    }
+
+    /// The object, parameter, union and other structured families of
+    /// `typeToTypeNode`, after the alias decision.
+    fn structured_type_node(
+        &mut self,
+        ty: TypeId,
+        record: crate::types::TypeRecord,
+        expanding_enum: bool,
+    ) -> Result<NodeId, Error> {
         if record.object_flags & of::REFERENCE != 0 {
+            // Expanding a reference serializes its structural form.
+            if self.should_expand_type(ty, false)? {
+                self.depth += 1;
+                let result = self.anonymous_type_node_ex(ty, true, true);
+                self.depth -= 1;
+                return result;
+            }
             return if self.checker.types.type_reference(ty)?.node.is_some() {
                 self.visit_transform_type(ty, Self::reference_type_node)
             } else {
@@ -767,6 +832,14 @@ impl<'a> NodeBuilder<'a> {
         if record.object_flags & of::CLASS_OR_INTERFACE != 0
             || record.flags & tf::TYPE_PARAMETER != 0
         {
+            if record.object_flags & of::CLASS_OR_INTERFACE != 0
+                && self.should_expand_type(ty, false)?
+            {
+                self.depth += 1;
+                let result = self.anonymous_type_node_ex(ty, true, true);
+                self.depth -= 1;
+                return result;
+            }
             if record.flags & tf::TYPE_PARAMETER != 0
                 && self.flags & nf::GENERATE_NAMES_FOR_SHADOWED_TYPE_PARAMS != 0
             {
@@ -815,7 +888,7 @@ impl<'a> NodeBuilder<'a> {
             let is_union = record.flags & tf::UNION != 0;
             let constituents = self.checker.types.compound_types(ty)?.clone();
             let types = if is_union {
-                self.format_union(&constituents)?
+                self.format_union_with_enums(&constituents, expanding_enum)?
             } else {
                 constituents.to_vec()
             };
@@ -912,11 +985,6 @@ impl<'a> NodeBuilder<'a> {
         Err(Error::Unsupported(
             "typeToTypeNode: unsupported type family",
         ))
-    }
-
-    // port: tsc/internal/checker/printer.go:Checker.formatUnionTypes
-    fn format_union(&mut self, types: &[TypeId]) -> Result<Vec<TypeId>, Error> {
-        self.format_union_with_enums(types, false)
     }
 
     fn object_type(&mut self, ty: TypeId) -> Result<NodeId, Error> {

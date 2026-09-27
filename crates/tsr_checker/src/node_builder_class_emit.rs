@@ -167,14 +167,22 @@ impl NodeBuilder<'_> {
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.shouldEmitTypeOfSymbol
     fn should_emit_type_of_symbol(
         &mut self,
+        force_expansion: bool,
+        force_class_expansion: bool,
         ty: TypeId,
         symbol: SymbolId,
         meaning: u32,
     ) -> Result<(bool, SymbolId), Error> {
+        if force_expansion {
+            return Ok((false, symbol));
+        }
         let read = self.checker.symbol(symbol)?;
         let flags = read.flags();
         let value = read.value_declaration();
-        if flags & sf::CLASS != 0 && self.checker.class_base_type_variable(symbol)?.is_none() {
+        if flags & sf::CLASS != 0
+            && !force_class_expansion
+            && self.checker.class_base_type_variable(symbol)?.is_none()
+        {
             let expand = if self.flags & nf::WRITE_CLASS_EXPRESSION_AS_TYPE_LITERAL != 0 {
                 match value {
                     Some(value)
@@ -237,8 +245,20 @@ impl NodeBuilder<'_> {
         Ok(None)
     }
 
-    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createAnonymousTypeNodeEx
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createAnonymousTypeNode
     pub(super) fn anonymous_type_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
+        self.anonymous_type_node_ex(ty, false, false)
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createAnonymousTypeNodeEx
+    /// Expansion forces the structural form: `force_expansion` never writes
+    /// `typeof`, `force_class_expansion` expands a class's constructor side.
+    pub(super) fn anonymous_type_node_ex(
+        &mut self,
+        ty: TypeId,
+        force_class_expansion: bool,
+        force_expansion: bool,
+    ) -> Result<NodeId, Error> {
         let record = *self.checker.types.get(ty)?;
         let Some(symbol) = record.symbol else {
             return self.object_type_members_node(ty);
@@ -269,9 +289,20 @@ impl NodeBuilder<'_> {
         } else {
             sf::VALUE
         };
-        let (write_symbol, symbol) = self.should_emit_type_of_symbol(ty, symbol, meaning)?;
+        // The written symbol can be a variable's; later steps keep the type's own.
+        let (write_symbol, written) = self.should_emit_type_of_symbol(
+            force_expansion,
+            force_class_expansion,
+            ty,
+            symbol,
+            meaning,
+        )?;
         if write_symbol {
-            return self.symbol_type_node_with_meaning(symbol, meaning);
+            if !self.should_expand_type(ty, false)? {
+                return self.symbol_type_node_with_meaning(written, meaning);
+            }
+            // The pin leaves this depth raised for the rest of the request.
+            self.depth += 1;
         }
         if self.visited.contains(&ty) {
             if let Some(alias) = self.alias_for_recursive_literal(symbol)? {

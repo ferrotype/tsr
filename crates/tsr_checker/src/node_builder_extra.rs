@@ -355,7 +355,7 @@ impl NodeBuilder<'_> {
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParameterToDeclaration
-    pub(super) fn type_parameter_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
+    pub(crate) fn type_parameter_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
         let constraint = if let Some(constraint) = self.checker.constraint_of_type_parameter(ty)? {
             let annotation = self.checker.constraint_declaration(ty)?;
             Some(self.type_node_with_reusable_annotation(constraint, annotation)?)
@@ -403,7 +403,7 @@ impl NodeBuilder<'_> {
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToParameterDeclaration
-    fn parameter_node(&mut self, symbol: SymbolId) -> Result<NodeId, Error> {
+    pub(crate) fn parameter_node(&mut self, symbol: SymbolId) -> Result<NodeId, Error> {
         let value = self.checker.symbol(symbol)?;
         let text = value.name_to_owned();
         let mut source_name = None;
@@ -694,7 +694,7 @@ impl NodeBuilder<'_> {
         Ok(vec![self.index_signature_node_with_type(index, value_node)?])
     }
 
-    pub(super) fn index_signature_node(&mut self, index: IndexInfoId) -> Result<NodeId, Error> {
+    pub(crate) fn index_signature_node(&mut self, index: IndexInfoId) -> Result<NodeId, Error> {
         self.index_signature_node_with_type(index, None)
     }
 
