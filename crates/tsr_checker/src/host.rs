@@ -73,6 +73,10 @@ pub trait CheckerHost: Send + Sync {
         &self,
         file_name: &[u8],
     ) -> Result<ResolutionMode, Error>;
+    /// `GetJSXRuntimeImportSpecifier(path)`: the module reference of the
+    /// compiler's synthetic JSX runtime import, empty when the file has none.
+    /// The import resolves in the same mode as the synthetic `tslib` import.
+    fn get_jsx_runtime_import_specifier(&self, file_name: &[u8]) -> Result<JsString, Error>;
     fn get_implied_node_format_for_emit(&self, file_name: &[u8]) -> Result<ModuleKind, Error>;
     fn get_resolved_module(
         &self,

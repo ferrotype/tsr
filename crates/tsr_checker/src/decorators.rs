@@ -242,7 +242,7 @@ impl CheckerState {
     }
 
     /// `resolveErrorCall`: check the arguments untyped, then the unknown signature.
-    fn resolve_error_call(&mut self, node: NodeId) -> Result<SignatureId, Error> {
+    pub(crate) fn resolve_error_call(&mut self, node: NodeId) -> Result<SignatureId, Error> {
         self.resolve_untyped_call(node)?;
         Ok(self.builtins.unknown_signature)
     }

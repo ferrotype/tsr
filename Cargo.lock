@@ -934,6 +934,7 @@ dependencies = [
  "tsr_jsstring",
  "tsr_module",
  "tsr_nodebuilder",
+ "tsr_parser",
  "tsr_printer",
  "tsr_pseudochecker",
  "tsr_scanner",

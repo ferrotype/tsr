@@ -154,6 +154,7 @@ mod iteration;
 mod iteration_protocol;
 mod jsdoc_checks;
 mod jsdoc_types;
+mod jsx;
 mod key;
 mod late_indexes;
 mod late_members;

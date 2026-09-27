@@ -358,8 +358,14 @@ impl CheckerState {
         if read.kind() == K::Decorator {
             return self.resolve_decorator(node);
         }
+        if matches!(
+            read.kind().known(),
+            Some(K::JsxOpeningElement | K::JsxSelfClosingElement | K::JsxOpeningFragment)
+        ) {
+            return self.resolve_jsx_opening_like_element(node);
+        }
         if read.kind() != K::CallExpression {
-            return Err(Error::Unsupported("resolveSignature: JSX"));
+            return Err(Error::Unsupported("resolveSignature"));
         }
         let expression = read.expression().ok_or(Error::MissingLink("call target"))?;
         if self.node(expression)?.kind() == K::SuperKeyword {
@@ -595,14 +601,27 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.resolveUntypedCall
     pub(crate) fn resolve_untyped_call(&mut self, node: NodeId) -> Result<SignatureId, Error> {
+        let kind = self.node(node)?.kind();
         // callLikeExpressionMayHaveTypeArguments
         if !matches!(
-            self.node(node)?.kind().known(),
-            Some(K::BinaryExpression | K::Decorator)
+            kind.known(),
+            Some(K::BinaryExpression | K::Decorator | K::JsxOpeningFragment)
         ) {
             for argument in self.source_list(node, self.node(node)?.type_argument_list())? {
                 self.check_source_element(argument)?;
             }
+        }
+        match kind.known() {
+            Some(K::JsxOpeningElement | K::JsxSelfClosingElement) => {
+                let attributes = self
+                    .node(node)?
+                    .attributes()
+                    .ok_or(Error::MissingLink("JSX attributes"))?;
+                self.check_expression(attributes)?;
+                return Ok(self.builtins.any_signature);
+            }
+            Some(K::JsxOpeningFragment) => return Ok(self.builtins.any_signature),
+            _ => {}
         }
         for argument in self.effective_call_arguments(node)? {
             self.check_expression(argument)?;
@@ -701,7 +720,7 @@ impl CheckerState {
         let type_arguments =
             if matches!(
                 read.kind().known(),
-                Some(K::BinaryExpression | K::Decorator)
+                Some(K::BinaryExpression | K::Decorator | K::JsxOpeningFragment)
             ) || tsr_ast::utilities_middle::is_super_call(self.ast(node)?, &read)?
             {
                 Vec::new()

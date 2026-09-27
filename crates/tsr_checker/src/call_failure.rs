@@ -287,7 +287,7 @@ impl CheckerState {
             self.report_call_arity(state.node, &state.args, arity)?;
         } else if let Some(constraint) = state.constraint_error {
             self.call_type_arguments(constraint, &state.type_arguments, true)?;
-        } else {
+        } else if self.node(state.node)?.kind() != K::JsxOpeningFragment {
             let mut correct = Vec::new();
             for &signature in signatures {
                 let parameters = self

@@ -171,7 +171,10 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getUnionSignatures
-    fn union_signatures(&mut self, lists: &[Vec<SignatureId>]) -> Result<Vec<SignatureId>, Error> {
+    pub(crate) fn union_signatures(
+        &mut self,
+        lists: &[Vec<SignatureId>],
+    ) -> Result<Vec<SignatureId>, Error> {
         let mut result = Vec::new();
         let mut over_one = 0;
         let mut master = 0;

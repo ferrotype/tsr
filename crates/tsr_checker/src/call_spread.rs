@@ -89,6 +89,32 @@ impl CheckerState {
         if read.kind() == K::Decorator {
             return self.effective_decorator_arguments(node);
         }
+        if read.kind() == K::JsxOpeningFragment {
+            // This attributes Type does not include a children property yet, the same way a fragment created with <React.Fragment> does not at this stage
+            let ty = self.builtins.empty_fresh_jsx_object_type;
+            return Ok(vec![self.synthetic_call_argument(node, ty, false, None)?]);
+        }
+        if tsr_ast::utilities_middle::is_jsx_opening_like_element(&read) {
+            let attributes = read
+                .attributes()
+                .ok_or(Error::MissingLink("JSX attributes"))?;
+            let has_properties = !self
+                .source_list(attributes, self.node(attributes)?.property_list())?
+                .is_empty();
+            let has_children = read.kind() == K::JsxOpeningElement && {
+                let element = read
+                    .parent()
+                    .ok_or(Error::MissingLink("JSX opening element parent"))?;
+                !self
+                    .source_list(element, self.node(element)?.children_list())?
+                    .is_empty()
+            };
+            return Ok(if has_properties || has_children {
+                vec![attributes]
+            } else {
+                Vec::new()
+            });
+        }
         if read.kind() == K::BinaryExpression {
             return Ok(vec![read
                 .data_source()

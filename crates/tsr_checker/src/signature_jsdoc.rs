@@ -378,6 +378,11 @@ impl CheckerState {
                         .and_then(|data| data.tag())
                         .ok_or(Error::MissingLink("deprecated template tag"))?;
                 }
+                Some(K::JsxOpeningElement | K::JsxSelfClosingElement) => {
+                    node = read
+                        .tag_name()
+                        .ok_or(Error::MissingLink("deprecated JSX tag name"))?;
+                }
                 Some(K::TypeReference) => {
                     let name = read
                         .data_source()

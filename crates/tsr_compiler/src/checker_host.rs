@@ -176,6 +176,31 @@ impl CheckerHost for ProgramCheckerHost {
         ))
     }
 
+    // port: tsc/internal/compiler/program.go:Program.GetJSXRuntimeImportSpecifier
+    // port: tsc/internal/compiler/program.go:Program.jsxRuntimeImportSpecifier
+    fn get_jsx_runtime_import_specifier(
+        &self,
+        file_name: &[u8],
+    ) -> Result<tsr_jsstring::JsString, Error> {
+        let file = self.required_file(file_name)?;
+        let view = file.bound().view();
+        let source = view.source_file()?;
+        if !matches!(
+            source.script_kind,
+            tsr_core::ScriptKind::JS | tsr_core::ScriptKind::JSX | tsr_core::ScriptKind::TSX
+        ) {
+            return Ok(tsr_jsstring::JsString::default());
+        }
+        let options = self.file_options(file)?;
+        let base = metadata::jsx_implicit_import_base(view.ast(), file.source(), options).map_err(
+            |error| match error {
+                crate::Error::Ast(error) => error.into(),
+                _ => Error::Unsupported("GetJSXRuntimeImportSpecifier: compiler metadata failure"),
+            },
+        )?;
+        Ok(metadata::jsx_runtime_import(base.as_bytes(), options))
+    }
+
     fn get_default_resolution_mode_for_file(
         &self,
         file_name: &[u8],

@@ -355,21 +355,36 @@ impl CheckerState {
             None
         };
         let result = if let Some(distribution) = distribution.filter(|t| *t != root.check_type) {
-            if self.types.flags(distribution)? & (tf::UNION | tf::NEVER) != 0 {
+            let flags = self.types.flags(distribution)?;
+            // port: tsc/internal/checker/checker.go:Checker.mapTypeWithAlias
+            if flags & tf::UNION != 0 && alias.is_some() {
                 let mut mapped = Vec::new();
-                if self.types.flags(distribution)? & tf::NEVER == 0 {
-                    for part in self.types.types_of(distribution)?.to_vec() {
-                        let mapper =
-                            self.prepend_type_mapping(root.check_type, part, Some(mapper))?;
-                        mapped.push(self.get_conditional_type(
-                            id,
-                            Some(mapper),
-                            for_constraint,
-                            None,
-                        )?);
-                    }
+                for part in self.types.types_of(distribution)?.to_vec() {
+                    let mapper = self.prepend_type_mapping(root.check_type, part, Some(mapper))?;
+                    mapped.push(self.get_conditional_type(
+                        id,
+                        Some(mapper),
+                        for_constraint,
+                        None,
+                    )?);
                 }
                 self.get_union_type_ex(&mapped, crate::UnionReduction::Literal, alias, None)?
+            } else if flags & (tf::UNION | tf::NEVER) != 0 {
+                // Without an alias the distribution maps the union itself, which keeps
+                // an unchanged union, and its origin, as it is.
+                let check_type = root.check_type;
+                self.map_type_ex(
+                    distribution,
+                    &mut |checker, part| {
+                        let mapper =
+                            checker.prepend_type_mapping(check_type, part, Some(mapper))?;
+                        checker
+                            .get_conditional_type(id, Some(mapper), for_constraint, None)
+                            .map(Some)
+                    },
+                    false,
+                )?
+                .ok_or(Error::MissingLink("distributed conditional type"))?
             } else {
                 self.get_conditional_type(id, Some(mapper), for_constraint, alias)?
             }

@@ -65,7 +65,7 @@ impl CheckerState {
                 (None, None)
             };
             reported = self.elaborate_element_error(
-                source, target, relation, name, next, name_type, message, output,
+                source, target, relation, name, next, name_type, message, None, output,
             )? || reported;
         }
         Ok(reported)
@@ -122,6 +122,7 @@ impl CheckerState {
                 Some(check),
                 name,
                 None,
+                None,
                 output,
             )? || reported;
         }
@@ -141,7 +142,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/relater.go:Checker.getBestMatchIndexedAccessTypeOrUndefined
-    fn best_match_indexed_access(
+    pub(crate) fn best_match_indexed_access(
         &mut self,
         source: TypeId,
         target: TypeId,
@@ -159,7 +160,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/relater.go:Checker.checkExpressionForMutableLocationWithContextualType
-    fn elaborate_mutable_expression(
+    pub(crate) fn elaborate_mutable_expression(
         &mut self,
         node: NodeId,
         context: TypeId,
@@ -181,7 +182,7 @@ impl CheckerState {
         reason = "Pinned elaborateElement keeps the relation, property, nested expression and diagnostic head independent"
     )]
     // port: tsc/internal/checker/relater.go:Checker.elaborateElement
-    fn elaborate_element_error(
+    pub(crate) fn elaborate_element_error(
         &mut self,
         source: TypeId,
         target: TypeId,
@@ -190,6 +191,7 @@ impl CheckerState {
         next: Option<NodeId>,
         name: TypeId,
         message: Option<&'static d::Message>,
+        text: Option<&mut crate::jsx::JsxTextChildMessage>,
         output: &mut Vec<Diagnostic>,
     ) -> Result<bool, Error> {
         let Some(mut target_type) = self.best_match_indexed_access(source, target, name)? else {
@@ -220,7 +222,10 @@ impl CheckerState {
             Some(name) => self.constituent_property(target, name.as_bytes(), false)?,
             None => None,
         };
-        let mut diagnostic = if self.options.exact_optional_property_types
+        let mut diagnostic = if let Some(text) = text {
+            // Use the custom diagnostic factory if provided (e.g., for JSX text children with dynamic error messages)
+            Some(self.jsx_text_child_diagnostic(text, property)?)
+        } else if self.options.exact_optional_property_types
             && self.maybe_type_of_kind(specific, tf::UNDEFINED)?
             && self.type_contains_missing(target_type)?
         {

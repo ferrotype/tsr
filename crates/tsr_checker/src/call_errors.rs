@@ -368,6 +368,9 @@ impl CheckerState {
             Some(K::ArrayLiteralExpression) => {
                 self.elaborate_array_error(node, source, target, relation, output)
             }
+            Some(K::JsxAttributes) => {
+                self.elaborate_jsx_components(node, source, target, relation, output)
+            }
             _ => Ok(false),
         }
     }
