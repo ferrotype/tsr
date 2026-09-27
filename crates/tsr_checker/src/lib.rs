@@ -95,6 +95,7 @@ mod element_errors;
 mod emit_checks;
 mod emit_reference;
 mod emit_resolver;
+mod emit_resolver_js;
 mod emit_scopes;
 mod emit_visibility;
 mod enum_eval;
@@ -158,6 +159,7 @@ mod jsx;
 mod key;
 mod late_indexes;
 mod late_members;
+mod linked_references;
 mod links;
 mod mapped;
 mod mapper;
@@ -256,6 +258,7 @@ pub mod storage_families;
 #[cfg(feature = "storage-pilot")]
 pub mod storage_pilot;
 
+pub use emit_resolver_js::TypeReferenceSerializationKind;
 pub use flags::*;
 #[cfg(feature = "relation-probe")]
 pub use handles::{LiteralShape, SignatureShape};

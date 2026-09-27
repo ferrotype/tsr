@@ -643,7 +643,7 @@ impl CheckerState {
         )
     }
     // port: tsc/internal/checker/checker.go:Checker.markExportAsReferenced
-    fn mark_module_export_referenced(&mut self, node: NodeId) -> Result<(), Error> {
+    pub(crate) fn mark_module_export_referenced(&mut self, node: NodeId) -> Result<(), Error> {
         if self
             .program()?
             .host

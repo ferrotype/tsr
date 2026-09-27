@@ -161,9 +161,8 @@
    "rust": "crates/tsr_checker/src/indexes.rs:495"
   },
   "tsc/internal/checker/checker.go:Checker.getReferencedValueOrAliasSymbol": {
-   "disposition": "equivalent",
-   "reason": "the resolved-symbol link with the resolve fallback, inline in the emit reference path",
-   "rust": "crates/tsr_checker/src/emit_reference.rs:156"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/emit_reference.rs:156: the resolved-symbol link with the resolve fallback, inline in the emit reference path"
   },
   "tsc/internal/checker/checker.go:Checker.getResolvedSymbolOrNil": {
    "disposition": "equivalent",

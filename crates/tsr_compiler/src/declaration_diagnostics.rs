@@ -9,6 +9,27 @@ use tsr_printer::EmitContext;
 use tsr_transformers::declarations::{transform_declarations, DeclarationOptions};
 
 impl Program {
+    /// The declaration diagnostics of one file, or of every file, sorted and
+    /// deduplicated as the pin's program collects them.
+    // port: tsc/internal/compiler/program.go:Program.GetDeclarationDiagnostics
+    pub fn declaration_diagnostics(
+        &self,
+        operation: &mut Operation<'_>,
+        file: Option<&ProgramFile>,
+    ) -> Result<Vec<Diagnostic>, Error> {
+        let diagnostics = match file {
+            Some(file) => self.declaration_diagnostics_with_checker(operation, file)?,
+            None => {
+                let mut diagnostics = Vec::new();
+                for file in self.files() {
+                    diagnostics.extend(self.declaration_diagnostics_with_checker(operation, file)?);
+                }
+                diagnostics
+            }
+        };
+        self.filter_and_sort_diagnostics(&diagnostics)
+    }
+
     // port: tsc/internal/compiler/program.go:Program.getDeclarationDiagnosticsForFile
     // port: tsc/internal/compiler/emitter.go:getDeclarationDiagnostics
     pub fn declaration_diagnostics_with_checker(

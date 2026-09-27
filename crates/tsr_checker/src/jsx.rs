@@ -2371,7 +2371,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/jsx.go:Checker.getJsxFragmentFactoryEntity
-    fn jsx_fragment_factory_entity(
+    pub(crate) fn jsx_fragment_factory_entity(
         &mut self,
         location: Option<NodeId>,
     ) -> Result<Option<NodeId>, Error> {
@@ -2544,7 +2544,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.markJsxAliasReferenced
-    fn mark_jsx_alias_referenced(&mut self, node: NodeId) -> Result<(), Error> {
+    pub(crate) fn mark_jsx_alias_referenced(&mut self, node: NodeId) -> Result<(), Error> {
         if self
             .jsx_namespace_container_for_implicit_import(node)?
             .is_some()

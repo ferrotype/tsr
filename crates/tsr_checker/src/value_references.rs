@@ -451,9 +451,16 @@ impl CheckerState {
         let target = self.get_export_symbol_of_value_symbol_if_exported(target)?;
         let flags = self.symbol(target)?.flags();
         let options = self.program()?.host.options();
-        if options.isolated_modules()
-            || flags & sf::CONST_ENUM == 0
-                && !(flags & sf::VALUE_MODULE != 0 && flags & sf::CONST_ENUM_ONLY_MODULE != 0)
+        let (isolated, preserve) = (
+            options.isolated_modules(),
+            options.should_preserve_const_enums(),
+        );
+        // An alias resolving to a const enum cannot be elided if (1) 'isolatedModules' is enabled
+        // (because the const enum value will not be inlined), or if (2) the alias is an export
+        // of a const enum declaration that will be preserved.
+        if isolated
+            || preserve && self.is_export_or_export_expression(node)?
+            || !crate::linked_references::is_const_enum_or_const_enum_only_module(flags)
         {
             self.mark_module_alias_referenced(symbol)?;
         }

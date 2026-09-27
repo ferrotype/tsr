@@ -18,7 +18,7 @@ const CONTEXT_PRIVATE: u8 = 1;
 const CONTEXT_STATIC: u8 = 2;
 
 /// Inline `ast.CanHaveDecorators`.
-fn can_have_decorators(kind: tsr_ast::NodeKind) -> bool {
+pub(crate) fn can_have_decorators(kind: tsr_ast::NodeKind) -> bool {
     matches!(
         kind.known(),
         Some(
@@ -135,7 +135,12 @@ impl CheckerState {
                 }
             }
         }
-        self.mark_linked_decorator_references(node)?;
+        self.mark_linked_references(
+            node,
+            crate::linked_references::ReferenceHint::Decorator,
+            None,
+            None,
+        )?;
         for modifier in self.source_list(node, self.node(node)?.modifiers())? {
             if self.node(modifier)?.kind() == K::Decorator {
                 self.check_decorator(modifier)?;
@@ -1054,35 +1059,8 @@ impl CheckerState {
         Ok(false)
     }
 
-    /// `markLinkedReferences(node, ReferenceHintDecorator)`: the guard of the
-    /// dispatch, then the decorator case.
-    fn mark_linked_decorator_references(&mut self, node: NodeId) -> Result<(), Error> {
-        // canCollectSymbolAliasAccessibilityData
-        if self
-            .program()?
-            .host
-            .options()
-            .verbatim_module_syntax
-            .is_true()
-        {
-            return Ok(());
-        }
-        let read = self.node(node)?;
-        // References within types and declaration files never retain a JS
-        // import, except for properties (which can be decorated).
-        if read.flags() & tsr_ast::node_flags::AMBIENT != 0
-            && !matches!(
-                read.kind().known(),
-                Some(K::PropertySignature | K::PropertyDeclaration)
-            )
-        {
-            return Ok(());
-        }
-        self.mark_decorator_alias_referenced(node)
-    }
-
     // port: tsc/internal/checker/checker.go:Checker.markDecoratorAliasReferenced
-    fn mark_decorator_alias_referenced(&mut self, node: NodeId) -> Result<(), Error> {
+    pub(crate) fn mark_decorator_alias_referenced(&mut self, node: NodeId) -> Result<(), Error> {
         if !self
             .program()?
             .host

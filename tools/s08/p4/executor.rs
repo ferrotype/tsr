@@ -237,7 +237,8 @@ pub fn observe(
             hooks.pause();
             let name = diagnostics::hex(source.parse_options().file_name.as_bytes());
             hooks.resume();
-            let values = program.declaration_diagnostics_with_checker(&mut op, file);
+            // Program.GetDeclarationDiagnostics(ctx, file): sorted and deduplicated.
+            let values = program.declaration_diagnostics(&mut op, Some(file));
             hooks.pause();
             let result = match values {
                 Ok(values) => {

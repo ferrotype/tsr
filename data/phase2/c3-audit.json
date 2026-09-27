@@ -548,28 +548,20 @@
    "reason": "Ported at C4 (C4.7), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/checker.go:Checker.markExportAssignmentAliasReferenced": {
-   "disposition": "equivalent",
-   "reason": "The export-assignment case of the pin's marker is performed inside the export-assignment check.",
-   "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/source_module_aliases.rs:146"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/source_module_aliases.rs:146: The export-assignment case of the pin's marker is performed inside the export-assignment check."
   },
   "tsc/internal/checker/checker.go:Checker.markExportSpecifierAliasReferenced": {
-   "disposition": "equivalent",
-   "reason": "The export-specifier case of the pin's marker is performed inside the export-specifier check, which marks the export and its alias unless type-only.",
-   "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/source_module_aliases.rs:300"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/source_module_aliases.rs:300: The export-specifier case of the pin's marker is performed inside the export-specifier check, which marks the export and its alias unless type-only."
   },
   "tsc/internal/checker/checker.go:Checker.markLinkedReferences": {
-   "disposition": "equivalent",
-   "reason": "The pin dispatches alias marking over the node kind in one function; Rust calls the same markers directly at each checking site: identifiers here, property accesses in access_expressions.rs, export specifiers and assignments and import-equals declarations in source_module_aliases.rs.",
-   "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/value_references.rs:31"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/value_references.rs:31: The pin dispatches alias marking over the node kind in one function; Rust calls the same markers directly at each checking site: identifiers here, property accesses in access_expressions.rs, export specifiers and assignments and import-equals declarations in source_module_aliases.rs."
   },
   "tsc/internal/checker/checker.go:Checker.markPropertyAliasReferenced": {
-   "disposition": "equivalent",
-   "reason": "The property-access case of the pin's marker: the left-hand identifier's alias is marked unless the access is part of an import-equals reference, as this site does.",
-   "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/access_expressions.rs:379"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/access_expressions.rs:379: The property-access case of the pin's marker: the left-hand identifier's alias is marked unless the access is part of an import-equals reference, as this site does."
   },
   "tsc/internal/checker/checker.go:Checker.markSymbolOfAliasDeclarationIfTypeOnly": {
    "disposition": "equivalent",
@@ -728,10 +720,8 @@
    "rust": "crates/tsr_checker/src/name_errors.rs:21"
   },
   "tsc/internal/checker/checker.go:isExportOrExportExpression": {
-   "disposition": "equivalent",
-   "reason": "The pin's ancestor test for export or import-equals references is the ancestor walk at this site and the export-specifier tests of the identifier marker.",
-   "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/access_expressions.rs:365"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/access_expressions.rs:365: The pin's ancestor test for export or import-equals references is the ancestor walk at this site and the export-specifier tests of the identifier marker."
   },
   "tsc/internal/checker/checker.go:isImmediatelyUsedInInitializerOfBlockScopedVariable": {
    "disposition": "equivalent",
@@ -788,10 +778,8 @@
    "rust": "crates/tsr_checker/src/instantiate.rs:365"
   },
   "tsc/internal/checker/checker.go:shouldMarkIdentifierAliasReferenced": {
-   "disposition": "equivalent",
-   "reason": "The pin's guard (a value identifier that is not a type-only export or a property-access receiver) is the head of the Rust identifier marker.",
-   "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/value_references.rs:399"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/value_references.rs:399: The pin's guard (a value identifier that is not a type-only export or a property-access receiver) is the head of the Rust identifier marker."
   },
   "tsc/internal/checker/checker.go:superCallIsRootLevelInConstructor": {
    "disposition": "equivalent",

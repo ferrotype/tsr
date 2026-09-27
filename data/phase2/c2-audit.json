@@ -424,9 +424,8 @@
       "rust": "crates/tsr_checker/src/union_reduction.rs:22"
     },
     "tsc/internal/checker/checker.go:Checker.markImportEqualsAliasReferenced": {
-      "disposition": "equivalent",
-      "reason": "Both external and internal import-equals branches test modifier EXPORT before mark_module_export_referenced, the native markExportAsReferenced operation; non-exported declarations do not call it.",
-      "rust": "crates/tsr_checker/src/source_module_aliases.rs:490"
+      "disposition": "mapped",
+      "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/source_module_aliases.rs:490: Both external and internal import-equals branches test modifier EXPORT before mark_module_export_referenced, the native markExportAsReferenced operation; non-exported declarations do not call it."
     },
     "tsc/internal/checker/checker.go:Checker.newConditionalType": {
       "disposition": "equivalent",
@@ -553,9 +552,8 @@
       "rust": "crates/tsr_checker/src/template.rs:289"
     },
     "tsc/internal/checker/checker.go:isInternalModuleImportEqualsDeclaration": {
-      "disposition": "equivalent",
-      "reason": "The isolated alias check requires ImportEqualsDeclaration and a module_reference whose kind differs from ExternalModuleReference; other import kinds yield false.",
-      "rust": "crates/tsr_checker/src/source_alias_checks.rs:150"
+      "disposition": "mapped",
+      "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/source_alias_checks.rs:150: The isolated alias check requires ImportEqualsDeclaration and a module_reference whose kind differs from ExternalModuleReference; other import kinds yield false."
     },
     "tsc/internal/checker/checker.go:isNotOverload": {
       "disposition": "equivalent",
@@ -564,9 +562,8 @@
       "rust": "crates/tsr_checker/src/source_modules.rs:452"
     },
     "tsc/internal/checker/checker.go:isPartOfImportEqualsModuleReference": {
-      "disposition": "equivalent",
-      "reason": "The property-alias marking guard climbs only identifier/qualified/property-access RHS syntax to its enclosing ImportEqualsDeclaration and suppresses reference marking. For the valid property/qualified location inputs of the native sole caller, this is equivalent to finding the module-reference ancestor by identity.",
-      "rust": "crates/tsr_checker/src/access_expressions.rs:361"
+      "disposition": "mapped",
+      "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/access_expressions.rs:361: The property-alias marking guard climbs only identifier/qualified/property-access RHS syntax to its enclosing ImportEqualsDeclaration and suppresses reference marking. For the valid property/qualified location inputs of the native sole caller, this is equivalent to finding the module-reference ancestor by identity."
     },
     "tsc/internal/checker/checker.go:isPartialMappedType": {
       "disposition": "equivalent",

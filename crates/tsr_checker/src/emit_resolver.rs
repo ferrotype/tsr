@@ -8,6 +8,7 @@ use tsr_ast::{
 };
 use tsr_printer::emit_resolver::{ConstantValue, DeclarationEmitResolver, EnumMemberValue};
 
+// port: tsc/internal/checker/emitresolver.go:newEmitResolver
 impl DeclarationEmitResolver for Operation<'_> {
     fn create_expando_namespace_scope(
         &mut self,
@@ -115,21 +116,27 @@ impl DeclarationEmitResolver for Operation<'_> {
     fn precalculate_declaration_emit_visibility(&mut self, source: NodeId) -> Result<(), Error> {
         self.state_mut().emit_precalculate_visibility(source)
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.IsDeclarationVisible
     fn is_declaration_visible(&mut self, node: NodeId) -> Result<bool, Error> {
         self.state_mut().emit_declaration_visible(Some(node))
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.GetEffectiveDeclarationFlags
     fn effective_declaration_flags(&mut self, node: NodeId, flags: u32) -> Result<u32, Error> {
         self.state().effective_declaration_flags(node, flags)
     }
     fn implementation_of_overload(&mut self, node: NodeId) -> Result<bool, Error> {
         self.state_mut().emit_implementation_of_overload(node)
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.IsOptionalParameter
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.isOptionalParameter
     fn optional_parameter(&mut self, node: NodeId) -> Result<bool, Error> {
         self.state_mut().is_optional_parameter(node)
     }
     fn literal_const_declaration(&mut self, node: NodeId) -> Result<bool, Error> {
         self.state_mut().emit_literal_const_declaration(node)
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.IsSymbolAccessible
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.isSymbolAccessible
     fn symbol_accessible(
         &mut self,
         symbol: Option<SymbolId>,
@@ -140,6 +147,7 @@ impl DeclarationEmitResolver for Operation<'_> {
         self.state_mut()
             .emit_symbol_accessible(symbol, enclosing, meaning, compute_aliases, true)
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.IsEntityNameVisible
     fn entity_name_visible(
         &mut self,
         node: NodeId,
@@ -147,6 +155,7 @@ impl DeclarationEmitResolver for Operation<'_> {
     ) -> Result<tsr_printer::emit_resolver::SymbolAccessibilityResult, Error> {
         self.state_mut().emit_entity_visible(node, enclosing)
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.IsLateBound
     fn late_bound(&mut self, node: NodeId) -> Result<bool, Error> {
         let state = self.state_mut();
         if !state.emit_parse_node(node)? {
@@ -157,6 +166,7 @@ impl DeclarationEmitResolver for Operation<'_> {
             None => false,
         })
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.GetEnumMemberValue
     fn enum_member_value(&mut self, node: NodeId) -> Result<EnumMemberValue, Error> {
         let state = self.state_mut();
         if !state.emit_parse_node(node)? {
@@ -179,6 +189,7 @@ impl DeclarationEmitResolver for Operation<'_> {
             has_external_references: value.has_external_references,
         })
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.RequiresAddingImplicitUndefined
     fn requires_adding_implicit_undefined(
         &mut self,
         node: NodeId,
@@ -188,6 +199,7 @@ impl DeclarationEmitResolver for Operation<'_> {
         self.state_mut()
             .emit_requires_undefined(node, symbol, enclosing)
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.RequiresAddingImplicitUndefinedUnsafe
     fn requires_adding_implicit_undefined_unsafe(
         &mut self,
         node: NodeId,
@@ -200,6 +212,7 @@ impl DeclarationEmitResolver for Operation<'_> {
     fn properties_of_container_function(&mut self, node: NodeId) -> Result<Vec<SymbolId>, Error> {
         self.state_mut().emit_container_function_properties(node)
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.IsExpandoFunctionDeclaration
     fn expando_function_declaration(&mut self, node: NodeId) -> Result<bool, Error> {
         self.state_mut().emit_expando_function(node)
     }
@@ -227,6 +240,7 @@ impl DeclarationEmitResolver for Operation<'_> {
             |builder| builder.declaration_late_indexes(node),
         )
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.IsNameResolvable
     fn name_resolvable(&mut self, node: NodeId, name: &[u8]) -> Result<bool, Error> {
         Ok(self
             .state_mut()
@@ -239,6 +253,7 @@ impl DeclarationEmitResolver for Operation<'_> {
             )?
             .is_some())
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.CreateTypeOfDeclaration
     fn create_type_of_declaration(
         &mut self,
         output: &mut AstBuilder,
@@ -268,6 +283,7 @@ impl DeclarationEmitResolver for Operation<'_> {
             },
         )
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.CreateReturnTypeOfSignatureDeclaration
     fn create_return_type_of_signature(
         &mut self,
         output: &mut AstBuilder,
@@ -303,6 +319,7 @@ impl DeclarationEmitResolver for Operation<'_> {
             },
         )
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.CreateTypeOfExpression
     fn create_type_of_expression(
         &mut self,
         output: &mut AstBuilder,
@@ -331,6 +348,7 @@ impl DeclarationEmitResolver for Operation<'_> {
             },
         )
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.CreateTypeParametersOfSignatureDeclaration
     fn create_type_parameters_of_signature(
         &mut self,
         output: &mut AstBuilder,
@@ -382,6 +400,7 @@ impl DeclarationEmitResolver for Operation<'_> {
             |builder| builder.declaration_literal_value(node),
         )
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.TryJSTypeNodeToTypeNode
     fn try_js_type_node_to_type_node(
         &mut self,
         output: &mut AstBuilder,
@@ -414,6 +433,7 @@ impl DeclarationEmitResolver for Operation<'_> {
             },
         )
     }
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.GetExternalModuleFileFromDeclaration
     fn external_module_file_from_declaration(
         &mut self,
         node: NodeId,
@@ -529,43 +549,85 @@ impl CheckerState {
                     && candidate != self.builtins.missing_type)
             }
             Some(K::Parameter | K::JSDocParameterTag) => {
-                let initialized = read.initializer().is_some();
-                let annotation = read.type_node();
-                if !self.options.strict_null_checks {
-                    return Ok(false);
-                }
-                let optional = self.is_optional_parameter(node)?;
-                let property = tsr_ast::utilities::has_syntactic_modifier(
-                    self.ast(node)?,
-                    node,
-                    mf::PARAMETER_PROPERTY_MODIFIER,
-                )?;
-                let enclosing_function = match enclosing {
-                    Some(n) => {
-                        tsr_ast::utilities::is_function_like_declaration(Some(&self.node(n)?))
-                    }
-                    None => false,
-                };
-                let requires = (!optional && initialized && (!property || enclosing_function))
-                    || optional && !initialized && property;
-                if !requires {
-                    return Ok(false);
-                }
-                if let Some(annotation) = annotation {
-                    let ty = self.get_type_from_type_node(annotation)?;
-                    let first = if self.types.flags(ty)? & tf::UNION != 0 {
-                        self.types.union(ty)?.types[0]
-                    } else {
-                        ty
-                    };
-                    if self.is_error_type(ty)? || self.types.flags(first)? & tf::UNDEFINED != 0 {
-                        return Ok(false);
-                    }
-                }
-                Ok(true)
+                self.emit_requires_undefined_worker(node, enclosing)
             }
             _ => Err(Error::MissingLink("implicit undefined declaration kind")),
         }
+    }
+
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.requiresAddingImplicitUndefinedWorker
+    fn emit_requires_undefined_worker(
+        &mut self,
+        parameter: NodeId,
+        enclosing: Option<NodeId>,
+    ) -> Result<bool, Error> {
+        Ok(
+            (self.emit_required_initialized_parameter(parameter, enclosing)?
+                || self.emit_optional_uninitialized_parameter_property(parameter)?)
+                && !self.emit_declared_parameter_type_contains_undefined(parameter)?,
+        )
+    }
+
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.declaredParameterTypeContainsUndefined
+    fn emit_declared_parameter_type_contains_undefined(
+        &mut self,
+        parameter: NodeId,
+    ) -> Result<bool, Error> {
+        let Some(annotation) = self.node(parameter)?.type_node() else {
+            return Ok(false);
+        };
+        let ty = self.get_type_from_type_node(annotation)?;
+        // allow error type here to avoid confusing errors that the annotation has to contain undefined when it does in cases like this:
+        //
+        // export function fn(x?: Unresolved | undefined): void {}
+        let first = if self.types.flags(ty)? & tf::UNION != 0 {
+            self.types.union(ty)?.types[0]
+        } else {
+            ty
+        };
+        Ok(self.is_error_type(ty)? || self.types.flags(first)? & tf::UNDEFINED != 0)
+    }
+
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.isOptionalUninitializedParameterProperty
+    fn emit_optional_uninitialized_parameter_property(
+        &mut self,
+        parameter: NodeId,
+    ) -> Result<bool, Error> {
+        Ok(self.options.strict_null_checks
+            && self.is_optional_parameter(parameter)?
+            && self.node(parameter)?.initializer().is_none()
+            && tsr_ast::utilities::has_syntactic_modifier(
+                self.ast(parameter)?,
+                parameter,
+                mf::PARAMETER_PROPERTY_MODIFIER,
+            )?)
+    }
+
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.isRequiredInitializedParameter
+    fn emit_required_initialized_parameter(
+        &mut self,
+        parameter: NodeId,
+        enclosing: Option<NodeId>,
+    ) -> Result<bool, Error> {
+        if !self.options.strict_null_checks
+            || self.is_optional_parameter(parameter)?
+            || self.node(parameter)?.initializer().is_none()
+        {
+            return Ok(false);
+        }
+        if tsr_ast::utilities::has_syntactic_modifier(
+            self.ast(parameter)?,
+            parameter,
+            mf::PARAMETER_PROPERTY_MODIFIER,
+        )? {
+            return Ok(match enclosing {
+                Some(enclosing) => {
+                    tsr_ast::utilities::is_function_like_declaration(Some(&self.node(enclosing)?))
+                }
+                None => false,
+            });
+        }
+        Ok(true)
     }
 
     // port: tsc/internal/checker/emitresolver.go:EmitResolver.GetPropertiesOfContainerFunction

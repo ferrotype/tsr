@@ -14,19 +14,16 @@
    "rust": "crates/tsr_checker/src/decorators.rs:1302"
   },
   "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFactoryEntity": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFragmentFactoryEntity": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/emitresolver.go:EmitResolver.GetTypeReferenceSerializationKind": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/exports.go:Checker.GetJsxFragmentFactory": {
    "disposition": "later",

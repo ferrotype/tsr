@@ -58,7 +58,7 @@ impl ResolverHost for ReferenceHost<'_> {
 }
 
 struct NameAnswer {
-    node: NodeId,
+    location: NodeId,
     name: JsString,
     symbol: Option<SymbolId>,
 }
@@ -83,7 +83,7 @@ impl ReferenceResolverHooks for ReferenceHooks<'_> {
                 .name
                 .as_ref()
                 .ok_or(Error::MissingLink("prepared reference name callback"))?;
-            if location != Some(answer.node)
+            if location != Some(answer.location)
                 || name != answer.name.as_bytes()
                 || meaning != sf::VALUE | sf::EXPORT_VALUE | sf::ALIAS
                 || message.is_some()
@@ -126,7 +126,43 @@ impl ReferenceResolverHooks for ReferenceHooks<'_> {
     }
 }
 
+/// A query of the binder's reference resolver (`binder.ReferenceResolver`).
+#[derive(Clone, Copy)]
+pub(crate) enum ReferenceQuery {
+    Value,
+    Member,
+    ExportContainer { prefix_locals: bool },
+    ValueDeclarations,
+}
+
+pub(crate) enum ReferenceAnswer {
+    Node(Option<NodeId>),
+    Nodes(Option<Vec<NodeId>>),
+}
+
 impl CheckerState {
+    /// Where `getReferencedValueSymbol` resolves the name of a module or enum
+    /// declaration for `GetReferencedExportContainer`: at the declaration's
+    /// container, so an exported member of the same name is not found.
+    fn reference_lookup_location(&self, node: NodeId) -> Result<NodeId, Error> {
+        let Some(parent) = self.node(node)?.parent() else {
+            return Ok(node);
+        };
+        let read = self.node(parent)?;
+        if matches!(
+            read.kind().known(),
+            Some(K::ModuleDeclaration | K::EnumDeclaration)
+        ) && read.name() == Some(node)
+            && tsr_ast::is_declaration(&read)
+        {
+            if let Some(container) = tsr_ast::get_declaration_container(self.ast(parent)?, parent)?
+            {
+                return Ok(container);
+            }
+        }
+        Ok(node)
+    }
+
     // port: tsc/internal/checker/emitresolver.go:EmitResolver.getReferenceResolver
     // port: tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedValueDeclarationUnsafe
     pub(crate) fn emit_referenced_value_declaration(
@@ -150,21 +186,46 @@ impl CheckerState {
         node: NodeId,
         member: bool,
     ) -> Result<Option<NodeId>, Error> {
+        let query = if member {
+            ReferenceQuery::Member
+        } else {
+            ReferenceQuery::Value
+        };
+        match self.emit_reference_query(node, query)? {
+            ReferenceAnswer::Node(node) => Ok(node),
+            ReferenceAnswer::Nodes(_) => Err(Error::MissingLink("reference query answer")),
+        }
+    }
+
+    /// One query of the binder's reference resolver with the checker's hooks.
+    pub(crate) fn emit_reference_query(
+        &mut self,
+        node: NodeId,
+        query: ReferenceQuery,
+    ) -> Result<ReferenceAnswer, Error> {
         // getResolvedSymbolOrNil creates the native symbol-node link even when
         // the cached value is nil. Preserve that before sharing the host read.
         self.node(node)?;
         let cached = *self.query.resolved_symbols.get_or_default(node);
-        let name = if !member && cached.is_none() {
+        let name = if !matches!(query, ReferenceQuery::Member) && cached.is_none() {
             let name = self.node_text(node)?.into_js_string();
+            let location = match query {
+                ReferenceQuery::ExportContainer { .. } => self.reference_lookup_location(node)?,
+                _ => node,
+            };
             let symbol = self.resolve_name_ex(
-                Some(node),
+                Some(location),
                 name.as_bytes(),
                 sf::VALUE | sf::EXPORT_VALUE | sf::ALIAS,
                 None,
                 false,
                 false,
             )?;
-            Some(NameAnswer { node, name, symbol })
+            Some(NameAnswer {
+                location,
+                name,
+                symbol,
+            })
         } else {
             None
         };
@@ -189,10 +250,19 @@ impl CheckerState {
             cached,
             name,
         };
-        let result = if member {
-            resolver.get_referenced_member_value_declaration(&host, &mut hooks, node)
-        } else {
-            resolver.get_referenced_value_declaration(&mut host, &mut hooks, node)
+        let result = match query {
+            ReferenceQuery::Member => resolver
+                .get_referenced_member_value_declaration(&host, &mut hooks, node)
+                .map(ReferenceAnswer::Node),
+            ReferenceQuery::Value => resolver
+                .get_referenced_value_declaration(&mut host, &mut hooks, node)
+                .map(ReferenceAnswer::Node),
+            ReferenceQuery::ExportContainer { prefix_locals } => resolver
+                .get_referenced_export_container(&mut host, &mut hooks, node, prefix_locals)
+                .map(ReferenceAnswer::Node),
+            ReferenceQuery::ValueDeclarations => resolver
+                .get_referenced_value_declarations(&mut host, &mut hooks, node)
+                .map(ReferenceAnswer::Nodes),
         };
         match failure.take() {
             Some(error) => Err(error),
