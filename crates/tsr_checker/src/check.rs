@@ -116,6 +116,7 @@ impl CheckerState {
         Ok(())
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.checkSourceElement
     // port: tsc/internal/checker/checker.go:Checker.checkSourceElementWorker
     pub(crate) fn check_source_element(&mut self, node: NodeId) -> Result<(), Error> {
         let previous = self.current_node.replace(node);

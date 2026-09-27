@@ -1,0 +1,1 @@
+changes_strict_false_omission.js(5,1): error TS2554: Expected 1 arguments, but got 0.

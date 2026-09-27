@@ -1,0 +1,1 @@
+options_verbatim_module_syntax.ts(2,10): error TS1205: Re-exporting a type when 'verbatimModuleSyntax' is enabled requires using 'export type'.

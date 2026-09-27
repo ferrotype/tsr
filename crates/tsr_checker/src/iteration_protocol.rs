@@ -81,6 +81,7 @@ impl CheckerState {
                 let arguments = self.get_type_arguments(ty)?;
                 let yield_type = *arguments.first().ok_or(tsr_arena::Error::InvalidGraph)?;
                 let options = self.program()?.host.options();
+                // port: tsc/internal/checker/checker.go:Checker.getBuiltinIteratorReturnType
                 let return_type =
                     if options.strict_option_value(options.strict_builtin_iterator_return) {
                         self.builtins.undefined_type
@@ -156,6 +157,7 @@ impl CheckerState {
         }
         Ok(IterationTypes::default())
     }
+    // port: tsc/internal/checker/checker.go:Checker.getIterationTypesOfIterator
     // port: tsc/internal/checker/checker.go:Checker.getIterationTypesOfIteratorWorker
     pub(crate) fn iteration_types_of_iterator(
         &mut self,
@@ -171,6 +173,7 @@ impl CheckerState {
         if fast.has_types() {
             return Ok(fast);
         }
+        // port: tsc/internal/checker/checker.go:Checker.getIterationTypesOfIteratorSlow
         let next =
             self.iteration_types_of_method(ty, b"next", error_node, diagnostics, asynchronous)?;
         let return_ =
@@ -383,6 +386,8 @@ impl CheckerState {
         })
     }
     // port: tsc/internal/checker/checker.go:Checker.isIteratorResult
+    // port: tsc/internal/checker/checker.go:Checker.isYieldIteratorResult
+    // port: tsc/internal/checker/checker.go:Checker.isReturnIteratorResult
     fn is_iteration_result(&mut self, ty: TypeId, yield_: bool) -> Result<bool, Error> {
         let done = self
             .property_type(ty, b"done")?

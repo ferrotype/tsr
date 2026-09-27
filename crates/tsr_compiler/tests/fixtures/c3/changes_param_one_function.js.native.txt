@@ -1,0 +1,1 @@
+changes_param_one_function.js(3,8): error TS7006: Parameter 'x' implicitly has an 'any' type.

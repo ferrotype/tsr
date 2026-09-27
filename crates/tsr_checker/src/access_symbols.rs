@@ -101,6 +101,8 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkPropertyAccessibilityAtLocation
+    // port: tsc/internal/checker/checker.go:Checker.checkPropertyAccessibility
+    // port: tsc/internal/checker/checker.go:Checker.checkPropertyAccessibilityEx
     pub(crate) fn check_access_property_accessibility(
         &mut self,
         node: NodeId,

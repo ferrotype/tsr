@@ -234,6 +234,9 @@ impl<'a> NodeBuilder<'a> {
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getNameOfSymbolAsWritten
     fn symbol_name(&self, symbol: SymbolId) -> Result<JsString, Error> {
+        // The pin looks the symbol up in remappedSymbolReferences by symbol id
+        // first, which assigns the id of every symbol whose name is written.
+        self.checker.symbol_runtime_id(symbol)?;
         let read = self.checker.symbol(symbol)?;
         let declarations = self.checker.symbol_declarations(symbol)?;
         if read.name_bytes() == tsr_ast::internal_symbol_names::DEFAULT

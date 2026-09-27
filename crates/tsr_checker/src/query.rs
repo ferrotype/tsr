@@ -55,7 +55,6 @@ pub(crate) struct QueryState {
     pub unresolved_symbols: crate::types::Map<JsString, SymbolId>,
     pub error_types: crate::types::Map<crate::CacheKey, TypeId>,
     pub undefined_properties: crate::types::Map<JsString, SymbolId>,
-    pub function_symbols_checked: crate::types::Set<SymbolId>,
 }
 
 fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
@@ -794,6 +793,7 @@ impl CheckerState {
         Ok(ty)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.checkExpression
     // port: tsc/internal/checker/checker.go:Checker.checkExpressionWorker
     pub(crate) fn check_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
         self.check_expression_ex(node, 0)
@@ -804,7 +804,21 @@ impl CheckerState {
         let previous_mode = std::mem::replace(&mut self.expression_mode, mode);
         let previous = self.current_node.replace(node);
         self.instantiation.count = 0;
+        #[cfg(feature = "recursion-probe")]
+        if let Some(probe) = &mut self.relations.recursion_probe {
+            probe.expression_depth += 1;
+            probe.maximum_expression_depth =
+                probe.maximum_expression_depth.max(probe.expression_depth);
+        }
         let result = stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            #[cfg(feature = "recursion-probe")]
+            if let Some(probe) = &mut self.relations.recursion_probe {
+                // Observed inside the possibly grown segment: on a small thread
+                // stack a value above the thread's size proves the growth.
+                probe.maximum_remaining_stack = probe
+                    .maximum_remaining_stack
+                    .max(stacker::remaining_stack().expect("expression contract stack bounds"));
+            }
             let ty = self.check_expression_worker(node)?;
             let ty = self.instantiate_single_generic_function(node, ty, mode)?;
             if self.const_enum_object_type(ty)? {
@@ -812,6 +826,10 @@ impl CheckerState {
             }
             Ok(ty)
         });
+        #[cfg(feature = "recursion-probe")]
+        if let Some(probe) = &mut self.relations.recursion_probe {
+            probe.expression_depth -= 1;
+        }
         self.current_node = previous;
         self.expression_mode = previous_mode;
         result

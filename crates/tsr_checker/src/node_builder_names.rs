@@ -517,6 +517,8 @@ impl NodeBuilder<'_> {
         ignore_qualification: bool,
         local: bool,
     ) -> Result<Vec<SymbolId>, Error> {
+        // The pin keys visitedSymbolTablesMap by the queried symbol's id.
+        self.checker.symbol_runtime_id(query.symbol)?;
         let key = (query.symbol, table.id);
         if !self.name_access.visited.insert(key) {
             return Ok(vec![]);
@@ -716,6 +718,8 @@ impl NodeBuilder<'_> {
         let Some(table) = self.checker.module_exports_of_symbol(resolved)? else {
             return Ok(vec![]);
         };
+        // symbolTableIDFromResolvedExports assigns the resolved symbol's id.
+        self.checker.symbol_runtime_id(resolved)?;
         let table = NameTable {
             id: NameTableId::ResolvedExports(resolved),
             table: Some(table),
@@ -986,17 +990,22 @@ impl NodeBuilder<'_> {
         if self.flags & tsr_nodebuilder::flags::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME != 0
             && index + 1 < chain.len()
         {
-            for declaration in self.checker.symbol_declarations(symbol)?.iter().flatten() {
-                if self
-                    .checker
-                    .ast(declaration)?
-                    .node(declaration)?
-                    .type_parameter_list()
-                    .is_some()
-                {
-                    return Err(Error::Unsupported(
-                        "lookupExpressionChainTypeArgumentNodes: generic qualified value",
-                    ));
+            // lookupExpressionChainTypeArgumentNodes keys its visited list by
+            // symbol id; a symbol already listed gets no type arguments.
+            self.checker.symbol_runtime_id(symbol)?;
+            if self.type_parameter_names.symbols.insert(symbol) {
+                for declaration in self.checker.symbol_declarations(symbol)?.iter().flatten() {
+                    if self
+                        .checker
+                        .ast(declaration)?
+                        .node(declaration)?
+                        .type_parameter_list()
+                        .is_some()
+                    {
+                        return Err(Error::Unsupported(
+                            "lookupExpressionChainTypeArgumentNodes: generic qualified value",
+                        ));
+                    }
                 }
             }
         }

@@ -1,0 +1,2 @@
+changes_arguments_no_rest.js(4,3): error TS2554: Expected 0 arguments, but got 1.
+changes_arguments_no_rest.js(5,12): error TS7019: Rest parameter 'args' implicitly has an 'any[]' type.

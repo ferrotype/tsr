@@ -212,9 +212,9 @@ impl CheckerState {
         &mut self,
         key: crate::TypeId,
     ) -> Result<crate::TypeId, Error> {
-        if let Some(symbol) =
-            self.lookup_symbol(self.builtins.globals, b"Extract", sf::TYPE_ALIAS)?
-        {
+        // getGlobalExtractSymbol: the memoized global alias lookup, which
+        // checks the arity and reports a global error when it differs.
+        if let Some(symbol) = self.global_type_alias_symbol("Extract", 2, true)? {
             let declared = self.get_declared_type_of_symbol(symbol)?;
             let parameters = self
                 .query
@@ -222,15 +222,13 @@ impl CheckerState {
                 .try_get(symbol)
                 .and_then(|links| links.parameters.clone())
                 .unwrap_or_default();
-            if parameters.len() == 2 {
-                return self.type_alias_instantiation(
-                    symbol,
-                    declared,
-                    &parameters,
-                    &[key, self.builtins.string_type],
-                    None,
-                );
-            }
+            return self.type_alias_instantiation(
+                symbol,
+                declared,
+                &parameters,
+                &[key, self.builtins.string_type],
+                None,
+            );
         }
         Ok(self.builtins.string_type)
     }

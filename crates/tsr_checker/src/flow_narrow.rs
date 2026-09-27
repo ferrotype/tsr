@@ -51,6 +51,7 @@ impl CheckerState {
         } else {
             false
         };
+        // port: tsc/internal/checker/flow.go:Checker.narrowTypeByOptionality
         if optionality {
             let facts = if assume {
                 f::NE_UNDEFINED_OR_NULL
@@ -128,6 +129,7 @@ impl CheckerState {
                     );
                 }
             }
+            // port: tsc/internal/checker/flow.go:Checker.narrowTypeByBinaryExpression
             Some(K::BinaryExpression) => {
                 let data = read
                     .data_source()
@@ -150,6 +152,7 @@ impl CheckerState {
                             let candidate = self.reference_candidate(candidate)?;
                             let value = self.reference_candidate(value)?;
                             let read = self.node(candidate)?;
+                            // port: tsc/internal/checker/flow.go:Checker.narrowTypeByTypeof
                             if read.kind() == K::TypeOfExpression
                                 && matches!(
                                     self.node(value)?.kind().known(),
@@ -221,6 +224,7 @@ impl CheckerState {
                         for (expr, value) in [(left, right), (right, left)] {
                             if matches!(
                                 self.node(value)?.kind().known(),
+                                // port: tsc/internal/checker/flow.go:Checker.narrowTypeByBooleanComparison
                                 Some(K::TrueKeyword | K::FalseKeyword)
                             ) && !matches!(
                                 self.node(expr)?.kind().known(),
@@ -419,11 +423,9 @@ impl CheckerState {
             });
         }
         if assume {
-            if let Some(symbol) = self.lookup_symbol(
-                self.builtins.globals,
-                b"Record",
-                tsr_ast::symbol_flags::TYPE_ALIAS,
-            )? {
+            // getGlobalRecordSymbol: the memoized global alias lookup, which
+            // checks the arity and reports a global error when it differs.
+            if let Some(symbol) = self.global_type_alias_symbol("Record", 2, true)? {
                 let declared = self.get_declared_type_of_symbol(symbol)?;
                 let parameters = self
                     .query
@@ -431,16 +433,14 @@ impl CheckerState {
                     .try_get(symbol)
                     .and_then(|links| links.parameters.clone())
                     .unwrap_or_default();
-                if parameters.len() == 2 {
-                    let record = self.type_alias_instantiation(
-                        symbol,
-                        declared,
-                        &parameters,
-                        &[key, self.builtins.unknown_type],
-                        None,
-                    )?;
-                    return self.get_intersection_type(&[ty, record]);
-                }
+                let record = self.type_alias_instantiation(
+                    symbol,
+                    declared,
+                    &parameters,
+                    &[key, self.builtins.unknown_type],
+                    None,
+                )?;
+                return self.get_intersection_type(&[ty, record]);
             }
         }
         Ok(ty)
@@ -509,6 +509,7 @@ impl CheckerState {
         assume: bool,
     ) -> Result<TypeId, Error> {
         let (implied, eq, ne) = match name {
+            // port: tsc/internal/checker/flow.go:Checker.narrowTypeByTypeName
             b"string" => (
                 self.builtins.string_type,
                 f::TYPEOF_EQ_STRING,

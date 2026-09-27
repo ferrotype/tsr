@@ -1,0 +1,1 @@
+options_unknown_catch.ts(3,5): error TS2339: Property 'message' does not exist on type 'unknown'.

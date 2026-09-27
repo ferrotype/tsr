@@ -318,6 +318,7 @@ impl CheckerState {
         self.get_union_type_ex(&[a, b], crate::UnionReduction::Subtype, None, None)
     }
 
+    // port: tsc/internal/checker/checker.go:Checker.checkBinaryExpression
     // port: tsc/internal/checker/checker.go:Checker.checkBinaryLikeExpression
     pub(crate) fn check_binary_expression(&mut self, node: NodeId) -> Result<TypeId, Error> {
         let read = self.node(node)?;

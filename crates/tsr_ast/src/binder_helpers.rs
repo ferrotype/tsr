@@ -680,6 +680,7 @@ pub fn is_part_of_type_query(view: AstView<'_>, mut id: NodeId) -> Result<bool, 
     }
     Ok(view.node(id)?.kind() == K::TypeQuery)
 }
+// port: tsc/internal/checker/checker.go:Checker.getThisContainer
 /// port: tsc/internal/ast/utilities.go:GetThisContainer
 pub fn get_this_container(
     view: AstView<'_>,

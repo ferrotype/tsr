@@ -4,7 +4,7 @@
 use crate::{metadata, output_paths, Program, ProgramFile};
 use std::sync::{Arc, OnceLock};
 use tsr_ast::{CompletedFile, NodeId, SourceFileMetaData};
-use tsr_checker::{CheckerHost, Error};
+use tsr_checker::{CheckerHost, Error, ProjectReferenceSource};
 use tsr_core::{CompilerOptions, ModuleKind, ResolutionMode};
 use tsr_module::ResolvedModule;
 use tsr_tsoptions::ParsedCommandLine;
@@ -299,10 +299,14 @@ impl CheckerHost for ProgramCheckerHost {
     fn get_project_reference_from_source(
         &self,
         path: &[u8],
-    ) -> Result<Option<&ParsedCommandLine>, Error> {
+    ) -> Result<Option<ProjectReferenceSource<'_>>, Error> {
         Ok(self
             .program
-            .project_reference_from_source(self.program.to_path(path).as_bytes()))
+            .project_reference_from_source(self.program.to_path(path).as_bytes())
+            .map(|(output_dts, resolved)| ProjectReferenceSource {
+                output_dts,
+                resolved,
+            }))
     }
 
     fn get_module_specifier_paths(

@@ -40,6 +40,7 @@ impl CheckerState {
         Ok(private_name || read.modifier_flags(self.ast(node)?)? & mf::PRIVATE != 0)
     }
 
+    // port: tsc/internal/checker/utilities.go:GetSetAccessorValueParameter
     pub(crate) fn set_accessor_value_parameter(
         &self,
         node: NodeId,

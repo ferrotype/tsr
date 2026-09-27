@@ -38,6 +38,14 @@ pub struct ModuleSpecifierPath {
     pub is_redirect: bool,
 }
 
+/// A referenced project's source with the declaration output that stands in
+/// for it (the pin's SourceOutputAndProjectReference).
+#[derive(Clone, Copy, Debug)]
+pub struct ProjectReferenceSource<'a> {
+    pub output_dts: &'a JsString,
+    pub resolved: &'a ParsedCommandLine,
+}
+
 /// File names and directories are bytes, as everywhere in this port.
 pub trait CheckerHost: Send + Sync {
     fn options(&self) -> &CompilerOptions;
@@ -103,7 +111,7 @@ pub trait CheckerHost: Send + Sync {
     fn get_project_reference_from_source(
         &self,
         path: &[u8],
-    ) -> Result<Option<&ParsedCommandLine>, Error>;
+    ) -> Result<Option<ProjectReferenceSource<'_>>, Error>;
     fn get_module_specifier_paths(
         &self,
         importer: &[u8],

@@ -187,7 +187,6 @@ impl CheckerState {
             &self.bindings.contextual_patterns,
             self.bindings.contextual_patterns.capacity(),
         );
-        census.set("query_links", &query.function_symbols_checked);
         census.set("query_links", &query.reported_unreachable);
         census.map("query_links", &self.merged_symbols);
         census.map("query_links", &self.source_checks);

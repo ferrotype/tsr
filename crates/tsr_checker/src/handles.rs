@@ -335,12 +335,37 @@ impl Operation<'_> {
         Ok(serde_json::json!({
             "calls": probe.calls,
             "maximum_depth": probe.maximum_depth,
+            "maximum_expression_depth": probe.maximum_expression_depth,
             "maximum_remaining_stack": probe.maximum_remaining_stack,
             "depth_limit_hits": probe.depth_limit_hits,
         }))
     }
 
     /// Owned counter/cache snapshot. It cannot warm a type or relation cache.
+    /// C3 contract 6: the alias links the resolver reads, for the symbol of
+    /// `declaration` (an import or export specifier, clause or equals declaration).
+    #[cfg(feature = "relation-probe")]
+    pub fn alias_link_state(&mut self, declaration: NodeId) -> Result<serde_json::Value, Error> {
+        let state = self.state_mut();
+        let Some(symbol) = state.get_symbol_of_declaration(declaration)? else {
+            return Ok(serde_json::Value::Null);
+        };
+        Ok(serde_json::json!({
+            "referenced": state.module_aliases.referenced.contains(&symbol),
+            "type_only": state.module_aliases.type_only.contains_key(&symbol),
+        }))
+    }
+
+    /// The symbol's lazily assigned runtime id (`ast.GetSymbolId`), or 0 when
+    /// nothing has observed the symbol yet. A read only; it assigns nothing.
+    #[cfg(feature = "relation-probe")]
+    pub fn existing_symbol_runtime_id(&self, symbol: SymbolRef) -> Result<u64, Error> {
+        let id = self.check_symbol_ref(symbol)?;
+        Ok(tsr_ast::existing_runtime_symbol_id(
+            &self.state().symbol(id)?,
+        ))
+    }
+
     #[cfg(feature = "relation-probe")]
     pub fn relation_state(&self) -> serde_json::Value {
         let state = self.state();

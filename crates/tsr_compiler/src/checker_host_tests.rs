@@ -433,6 +433,7 @@ fn checker_host_reads_project_references_and_their_options() {
         name(
             host.get_project_reference_from_source(b"/src/lib/a.ts")
                 .unwrap()
+                .map(|reference| reference.resolved)
         ),
         lib
     );

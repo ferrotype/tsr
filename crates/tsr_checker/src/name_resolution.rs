@@ -229,6 +229,7 @@ impl NameResolverHooks for Hooks<'_> {
         self.effects.push(Effect::Referenced(symbol, meaning));
         Ok(())
     }
+    // port: tsc/internal/checker/checker.go:Checker.getRequiresScopeChangeCache
     fn get_requires_scope_change_cache(
         &mut self,
         node: NodeId,
@@ -248,6 +249,7 @@ impl NameResolverHooks for Hooks<'_> {
             .copied()
             .unwrap_or(Tristate::UNKNOWN))
     }
+    // port: tsc/internal/checker/checker.go:Checker.setRequiresScopeChangeCache
     fn set_requires_scope_change_cache(
         &mut self,
         node: NodeId,

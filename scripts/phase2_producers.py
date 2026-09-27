@@ -90,6 +90,9 @@ CHECKPOINT_AUTHORITIES = {
     "C1": {"claims": CLAIMS, "audit": AUDIT, "baseline": BASELINE},
     "C2": {name: ROOT / f"data/phase2/c2-{name}{'.json.gz' if name == 'baseline' else '.json'}"
            for name in ("claims", "audit", "baseline", "measurement")},
+    # C3 has no measurement obligation (docs/PHASE2-C3-plan.md section 1).
+    "C3": {name: ROOT / f"data/phase2/c3-{name}{'.json.gz' if name == 'baseline' else '.json'}"
+           for name in ("claims", "audit", "baseline")},
 }
 WITNESSES = {
     "c1-contracts": {
@@ -122,6 +125,15 @@ WITNESSES["c2-contracts"] = {
                 "scripts/phase2_order_trace.py", "data/upstream.json", "data/s04/toolchains.toml",
                 "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py",
                 "scripts/tracking-bootstrap.py", "scripts/s08_oracle.py"],
+}
+WITNESSES["c3-contracts"] = {
+    "commands": [["cargo", "test", "-p", "tsr_compiler", "--features", "recursion-probe",
+                  "--test", "c3_contracts", "--locked", *release] for release in ([], ["--release"])],
+    "test_source": "crates/tsr_compiler/tests/c3_contracts.rs", "minimum_tests": 34,
+    "test_modules": {"changes": "support/c3_changes.rs", "native": "support/c3_native_diagnostics.rs"},
+    # The fixtures and their pinned native observations are contract inputs.
+    "sources": [*WITNESSES["c1-contracts"]["sources"], "crates/tsr_compiler/tests/fixtures/c3",
+                "upstream/tsc/testdata/tests/cases/compiler/binderBinaryExpressionStress.ts"],
 }
 PRODUCTION_PATTERNS = tuple(path for path in WITNESSES["c1-contracts"]["sources"]
                             if path != "scripts/phase2_producers.py")
@@ -285,6 +297,23 @@ def _c1_claim_metrics(comparison, claims, blockers=None):
     return metrics
 
 
+CHECKPOINTS = ("C2", "C3")
+
+
+def newest_checkpoint(loaded):
+    """The one checkpoint whose completion this run may compute: the latest with authorities."""
+    return max(loaded, key=CHECKPOINTS.index) if loaded else None
+
+
+def drop_historical_completion(metrics, checkpoint):
+    """A checkpoint's completion is a recorded historical fact (C3 plan, section 3):
+    `P2B-Cn` closes on the checker run recorded at that checkpoint's exit, and a later
+    run reports the checkpoint's accounting but never recomputes `_measured` or
+    `_complete` on its own capture."""
+    for suffix in ("_measured", "_complete"):
+        metrics.pop(checkpoint.lower() + suffix, None)
+
+
 def checkpoint_metrics(checkpoint, comparison, claims, audit_ok, baseline, contracts_ok, regression_parity,
                        blockers=None, *, handoffs=None, measured_ok=None, baseline_sha256=None,
                        prerequisites=None, inventory=None, incoming=None):
@@ -353,8 +382,11 @@ def checkpoint_metrics(checkpoint, comparison, claims, audit_ok, baseline, contr
     counters = ["open", "regressions", "failures"]
     booleans = ["audit_complete", "contracts"]
     if checkpoint != "C1":
-        metrics[prefix + "_measured"] = measured_ok is True
         counters.append("blockers_open")
+    # Only a checkpoint whose authorities include a measurement record (C2)
+    # binds its completion to one; C3 records none (its plan, section 1).
+    if "measurement" in CHECKPOINT_AUTHORITIES.get(checkpoint, {}):
+        metrics[prefix + "_measured"] = measured_ok is True
         booleans.append("measured")
     evidence_ok = checkpoint == "C1" or (prerequisites is not None and all(
         prerequisites.get(name) is True for name in ("inventory_frozen", "native_verified", "harness_valid",
@@ -451,7 +483,8 @@ def ratio(rows, domain, *, exclude_disabled=False):
 
 def checker(native=NATIVE, rust=RUST):
     metrics = {"inventory_frozen": False, "native_verified": False, "harness_valid": False,
-               "result_recorded": False, "blockers_named": False, "c1_complete": False, "c2_complete": False}
+               "result_recorded": False, "blockers_named": False, "c1_complete": False, "c2_complete": False,
+               "c3_complete": False}
     try:
         document = phase2_inventory.read()
         metrics["inventory_frozen"] = (phase2_inventory.INVENTORY.read_bytes()
@@ -521,31 +554,51 @@ def checker(native=NATIVE, rust=RUST):
         print("C1 metrics unavailable: " + str(error), file=sys.stderr)
         metrics["c1_complete"] = False
     register = None
-    authorities = CHECKPOINT_AUTHORITIES["C2"]
-    c2_claims, c2_audit, transfers, incoming = None, None, None, None
+    loaded, all_transfers, all_incoming = {}, {}, {}
+    for checkpoint in CHECKPOINTS:
+        authorities = CHECKPOINT_AUTHORITIES[checkpoint]
+        try:
+            claims, audit, transfers, incoming = phase2_blockers.load_handoffs(
+                checkpoint, authorities["claims"], authorities["audit"], comparison, context)
+            for vid in set(transfers) & set(all_transfers):
+                raise ValueError(f"variant {vid} is handed off by two checkpoints")
+            loaded[checkpoint] = (claims, audit, transfers, incoming)
+            all_transfers.update(transfers)
+            all_incoming.update(incoming)
+        except (OSError, ValueError, KeyError, TypeError) as error:
+            print(f"{checkpoint} handoff authorities unavailable: " + str(error), file=sys.stderr)
     try:
-        c2_claims, c2_audit, transfers, incoming = phase2_blockers.load_handoffs(
-            "C2", authorities["claims"], authorities["audit"], comparison, context)
+        if len(loaded) != 2:
+            raise ValueError("every checkpoint's handoff authorities must validate before the register is built")
         register = quietly(phase2_blockers.build, native, rust, context=context, comparison=comparison,
-                           handoffs=transfers, incoming=incoming)
+                           handoffs=all_transfers, incoming=all_incoming)
         committed = json.loads(phase2_blockers.REGISTER.read_bytes()) if phase2_blockers.REGISTER.exists() else None
         metrics["blockers_named"] = register == committed and phase2_blockers.complete(register, comparison)
     except (OSError, ValueError, KeyError, TypeError) as error:
         print("blocker register unavailable: " + str(error), file=sys.stderr)
-    try:
-        if transfers is None:
-            raise ValueError("C2 handoff authority validation did not complete")
-        audit_ok = phase2_audit.complete(c2_audit) if c2_audit is not None else None
-        baseline = phase2_compare.load_baseline(authorities["baseline"]) if authorities["baseline"].is_file() else None
-        measured = measurement_current(comparison, rust, context=context)
-        metrics.update(checkpoint_metrics(
-            "C2", comparison, c2_claims, audit_ok, baseline, receipt_current("c2-contracts"),
-            metrics["regression_parity"], register, handoffs=transfers, measured_ok=measured,
-            baseline_sha256=digest(authorities["baseline"].read_bytes()) if baseline is not None else None,
-            prerequisites=metrics, incoming=incoming))
-    except (OSError, ValueError, KeyError, TypeError) as error:
-        print("C2 metrics unavailable: " + str(error), file=sys.stderr)
-        metrics["c2_complete"] = False
+    current = newest_checkpoint(loaded)
+    for checkpoint in CHECKPOINTS:
+        authorities = CHECKPOINT_AUTHORITIES[checkpoint]
+        prefix = checkpoint.lower()
+        try:
+            if checkpoint not in loaded:
+                raise ValueError(f"{checkpoint} handoff authority validation did not complete")
+            claims, audit, transfers, incoming = loaded[checkpoint]
+            audit_ok = phase2_audit.complete(audit) if audit is not None else None
+            baseline = (phase2_compare.load_baseline(authorities["baseline"])
+                        if authorities["baseline"].is_file() else None)
+            measured = (measurement_current(comparison, rust, context=context)
+                        if "measurement" in authorities and checkpoint == current else None)
+            metrics.update(checkpoint_metrics(
+                checkpoint, comparison, claims, audit_ok, baseline, receipt_current(prefix + "-contracts"),
+                metrics["regression_parity"], register, handoffs=transfers, measured_ok=measured,
+                baseline_sha256=digest(authorities["baseline"].read_bytes()) if baseline is not None else None,
+                prerequisites=metrics, incoming=incoming))
+        except (OSError, ValueError, KeyError, TypeError) as error:
+            print(f"{checkpoint} metrics unavailable: " + str(error), file=sys.stderr)
+            metrics[prefix + "_complete"] = False
+        if checkpoint != current:
+            drop_historical_completion(metrics, checkpoint)
     print("checker evidence: " + canonical({"native": report["observation_sha256"],
                                              "rust": comparison["rust_capture_sha256"]}).decode(), file=sys.stderr)
     return {"metrics": {k: v for k, v in metrics.items() if v is not None}}

@@ -57,6 +57,8 @@ impl NodeBuilder<'_> {
                     _ => self.checker.builtins.error_type,
                 },
                 Some(symbol) => {
+                    // enclosingSymbolTypes is keyed by symbol id.
+                    self.checker.symbol_runtime_id(symbol)?;
                     if let Some(&ty) = self.enclosing_symbol_types.get(&symbol) {
                         ty
                     } else {
@@ -148,6 +150,10 @@ impl NodeBuilder<'_> {
             let mut reported_fallback = false;
             if try_reuse && self.enclosing.is_some() && eligible {
                 let decl = declaration.expect("eligible declaration");
+                if let Some(s) = symbol {
+                    // addSymbolTypeToContext keys by symbol id.
+                    self.checker.symbol_runtime_id(s)?;
+                }
                 let previous = symbol.and_then(|s| self.enclosing_symbol_types.insert(s, ty));
                 let attempt = (|| {
                     let accessor = matches!(
@@ -291,6 +297,10 @@ impl NodeBuilder<'_> {
             };
             let ty = if let Some(decl) = original {
                 let symbol = self.checker.get_symbol_of_declaration(decl)?;
+                if let Some(s) = symbol {
+                    // enclosingSymbolTypes is keyed by symbol id.
+                    self.checker.symbol_runtime_id(s)?;
+                }
                 if let Some(ty) = symbol
                     .and_then(|s| self.enclosing_symbol_types.get(&s))
                     .copied()
@@ -308,6 +318,10 @@ impl NodeBuilder<'_> {
             }
             if let Some(decl) = original.filter(|_| try_reuse && self.enclosing.is_some()) {
                 let symbol = self.checker.get_symbol_of_declaration(decl)?;
+                if let Some(s) = symbol {
+                    // addSymbolTypeToContext keys by symbol id.
+                    self.checker.symbol_runtime_id(s)?;
+                }
                 let previous = symbol.and_then(|s| self.enclosing_symbol_types.insert(s, ty));
                 let attempt = (|| {
                     let pseudo = self

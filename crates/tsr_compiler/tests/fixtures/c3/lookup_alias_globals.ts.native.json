@@ -1,0 +1,52 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "source_sha256": "bf021d4a866ec2bbc4c6565b800a5d0e5a3375a0f82b640bf22db0881caa6d7e",
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--strict",
+    "--noLib",
+    "lookup_alias_globals.ts"
+  ],
+  "native_output_sha256": "350230e971ca4156dde84cc4e6fd054bb7de9b43c50b37ef7c48c9410febf84e",
+  "exit_code": 2,
+  "native_stderr": "",
+  "diagnostics": [
+    {
+      "line": null,
+      "column": null,
+      "code": 2317,
+      "message": "Global type 'Extract' must have 2 type parameter(s)."
+    },
+    {
+      "line": null,
+      "column": null,
+      "code": 2317,
+      "message": "Global type 'Record' must have 2 type parameter(s)."
+    },
+    {
+      "line": 9,
+      "column": 14,
+      "code": 2339,
+      "message": "Property 'c' does not exist on type 'object'."
+    },
+    {
+      "line": 16,
+      "column": 19,
+      "code": 2495,
+      "message": "Type '{ size: number; }' is not an array type or a string type."
+    },
+    {
+      "line": 35,
+      "column": 10,
+      "code": 2845,
+      "message": "This condition will always return 'false'."
+    }
+  ]
+}

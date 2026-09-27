@@ -1,0 +1,5 @@
+flow_narrowing.ts(16,14): error TS18048: 'shape' is possibly 'undefined'.
+flow_narrowing.ts(21,32): error TS18047: 'v' is possibly 'null'.
+flow_narrowing.ts(22,39): error TS18047: 'v' is possibly 'null'.
+flow_narrowing.ts(22,41): error TS2339: Property 'toFixed' does not exist on type 'number | (() => void)'.
+  Property 'toFixed' does not exist on type '() => void'.

@@ -64,8 +64,11 @@ impl CheckerState {
         let mut spreadable = Vec::new();
         let mut omitted = Vec::new();
         for property in self.get_properties_of_type(source)? {
-            let literal =
-                self.literal_type_from_property(property, tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE)?;
+            let literal = self.literal_type_from_property(
+                property,
+                tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE,
+                false,
+            )?;
             if !self.is_type_related_to(literal, omit, RelationKind::Assignable)?
                 && self.rest_declaration_modifiers(property)?
                     & mf::NON_PUBLIC_ACCESSIBILITY_MODIFIER

@@ -261,6 +261,7 @@ impl CheckerState {
                     let read = self.node(declaration)?;
                     let explicit = if matches!(
                         read.kind().known(),
+                        // port: tsc/internal/checker/flow.go:Checker.isDeclarationWithExplicitTypeAnnotation
                         Some(
                             K::VariableDeclaration
                                 | K::PropertyDeclaration
@@ -270,6 +271,7 @@ impl CheckerState {
                     ) {
                         read.type_node().is_some()
                     } else if let Some(binary) = read.data_source().as_binary_expression() {
+                        // port: tsc/internal/checker/flow.go:Checker.isExpandoPropertyFunctionWithReturnTypeAnnotation
                         let right = required(binary.right(), "expando function")?;
                         let right = self.node(right)?;
                         tsr_ast::utilities::is_function_like(Some(&right))

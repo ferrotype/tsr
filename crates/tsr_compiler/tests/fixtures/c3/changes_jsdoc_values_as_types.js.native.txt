@@ -1,0 +1,3 @@
+changes_jsdoc_values_as_types.js(1,15): error TS2749: 'FORWARD' refers to a value, but is being used as a type here. Did you mean 'typeof FORWARD'?
+changes_jsdoc_values_as_types.js(1,25): error TS2749: 'BACKWARD' refers to a value, but is being used as a type here. Did you mean 'typeof BACKWARD'?
+changes_jsdoc_values_as_types.js(8,7): error TS2322: Type '3' is not assignable to type 'Direction2'.

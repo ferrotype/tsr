@@ -1,0 +1,1 @@
+changes_type_assertion_no_narrowing.js(5,5): error TS18048: 'cu' is possibly 'undefined'.

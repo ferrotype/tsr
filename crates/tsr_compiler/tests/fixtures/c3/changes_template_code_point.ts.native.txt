@@ -1,0 +1,2 @@
+changes_template_code_point.ts(5,7): error TS2322: Type '"x"' is not assignable to type '"😀"'.
+changes_template_code_point.ts(6,7): error TS2322: Type '"x"' is not assignable to type '"abc"'.

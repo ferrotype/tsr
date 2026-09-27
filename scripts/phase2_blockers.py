@@ -33,6 +33,9 @@ import phase2_audit  # noqa: E402
 REGISTER = ROOT / "data/phase2/blockers.json"
 CLAIMS = ROOT / "data/phase2/c2-claims.json"
 AUDIT = ROOT / "data/phase2/c2-audit.json"
+# Every checkpoint whose claims can carry handoffs; the register merges them.
+CHECKPOINT_CLAIMS = {"C2": (CLAIMS, AUDIT),
+                     "C3": (ROOT / "data/phase2/c3-claims.json", ROOT / "data/phase2/c3-audit.json")}
 TARGETS = {*(f"C{i}" for i in range(1, 8)), "Phase 3", "Phase 4", "Phase 5"}
 EMIT_OPERATION = "post-emit diagnostic order"
 OWNERS = (
@@ -82,6 +85,18 @@ def capture_context(directory, comparison, *, authenticated=None):
         # comparator's fatal-domain digest (which deliberately omits location).
         "raw_observation_sha256": digest(canonical(row)),
     } for request, row in zip(requests, rows, strict=True)}
+
+
+def load_all_handoffs(comparison, authenticated, checkpoints=None):
+    """Merge every checkpoint's validated transfers; a variant transfers once."""
+    handoffs, incoming = {}, {}
+    for checkpoint, (claims_path, audit_path) in (checkpoints or CHECKPOINT_CLAIMS).items():
+        _, _, outgoing, arriving = load_handoffs(checkpoint, claims_path, audit_path, comparison, authenticated)
+        for vid in set(outgoing) & set(handoffs):
+            raise ValueError(f"variant {vid} is handed off by two checkpoints")
+        handoffs.update(outgoing)
+        incoming.update(arriving)
+    return handoffs, incoming
 
 
 def load_handoffs(checkpoint, claims_path, audit_path, comparison, authenticated):
@@ -265,7 +280,7 @@ def build(native_dir, rust_dir, record=False, *, handoffs=None, incoming=None, c
     case_dir = {request["id"]: f"cases/{index:05d}" for index, request in enumerate(rust_requests)}
     rust = {request["id"]: row for request, row in zip(rust_requests, context.rust_rows, strict=True)}
     if handoffs is None:
-        _, _, handoffs, incoming = load_handoffs("C2", CLAIMS, AUDIT, comparison, context)
+        handoffs, incoming = load_all_handoffs(comparison, context)
     groups = defaultdict(lambda: {"variants": [], "domains": Counter(), "evidence": [], "ownership": []})
     for row in comparison["rows"]:
         if "outcomes" not in row:

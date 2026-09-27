@@ -89,6 +89,7 @@ impl CheckerState {
         let expression = required(read.expression(), "call expression")?;
         let args = self.source_list(call, read.argument_list())?;
         for arg in args {
+            // port: tsc/internal/checker/flow.go:Checker.isOrContainsMatchingReference
             if self.matching_reference(reference, arg)?
                 || self.contains_flow_reference(reference, arg)?
                 || self.optional_chain_contains_reference(arg, reference)?

@@ -34,6 +34,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getModuleSpecifierForImportOrExport
+    // port: tsc/internal/checker/checker.go:getModuleSpecifierFromNode
     pub(crate) fn module_specifier(&self, mut node: NodeId) -> Result<Option<NodeId>, Error> {
         loop {
             let read = self.node(node)?;
@@ -347,14 +348,21 @@ impl CheckerState {
             }
         }
         if let Some(message) = message {
+            // See if this was possibly a projectReference redirect: the source
+            // resolved but the declaration output standing in for it is not
+            // in the program, so it has not been built.
             if let Some(resolved) = resolved.filter(|resolved| resolved.is_resolved()) {
-                if host
+                let output_dts = host
                     .get_project_reference_from_source(resolved.resolved_file_name.as_bytes())?
-                    .is_some()
-                {
-                    return Err(Error::Unsupported(
-                        "resolveExternalModule: project reference output",
-                    ));
+                    .map(|reference| reference.output_dts.clone())
+                    .filter(|output_dts| !output_dts.is_empty());
+                if let Some(output_dts) = output_dts {
+                    self.error_at(
+                        Some(error),
+                        d::Output_file_0_has_not_been_built_from_source_file_1,
+                        vec![output_dts, resolved.resolved_file_name.clone()],
+                    )?;
+                    return Ok(None);
                 }
             }
             if let Some(diagnostic) = diagnostic {
@@ -584,21 +592,45 @@ impl CheckerState {
                     vec![JsString::from_bytes(any_extension(name.as_bytes()))],
                 )?;
             } else if resolved.resolved_using_ts_extension && should_rewrite {
-                // Loading rejects project references, so the redirect comparison
-                // upstream performs here has nothing to compare.
+                // A rewritten import into another project is safe only when the
+                // projects' output directories keep the input directories'
+                // relative layout.
                 let target_name = target
                     .view()
                     .source_file()?
                     .parse_options()
                     .file_name
                     .clone();
-                if host
+                let redirect = host
                     .get_redirect_for_resolution(target_name.as_bytes())?
-                    .is_some()
-                {
-                    return Err(Error::Unsupported(
-                        "resolveExternalModule: rewrite across project references",
-                    ));
+                    .cloned();
+                if let Some(mut redirect) = redirect {
+                    let cwd = host.get_current_directory();
+                    let case_sensitive = host.use_case_sensitive_file_names();
+                    let own_root = host.common_source_directory()?.to_vec();
+                    let other_root = redirect.common_source_directory().to_vec();
+                    let root_dir_path =
+                        path::relative_from_directory(&own_root, &other_root, cwd, case_sensitive);
+                    let own_out = host.options().out_dir.clone();
+                    let own_out = if own_out.is_empty() {
+                        own_root.clone()
+                    } else {
+                        path::absolute(own_out.as_bytes(), cwd)
+                    };
+                    let other_out = if redirect.options.out_dir.is_empty() {
+                        other_root.clone()
+                    } else {
+                        path::absolute(redirect.options.out_dir.as_bytes(), cwd)
+                    };
+                    let out_dir_path =
+                        path::relative_from_directory(&own_out, &other_out, cwd, case_sensitive);
+                    if root_dir_path != out_dir_path {
+                        self.error_at(
+                            Some(error),
+                            d::This_import_path_is_unsafe_to_rewrite_because_it_resolves_to_another_project_and_the_relative_path_between_the_projects_output_files_is_not_the_same_as_the_relative_path_between_its_input_files,
+                            vec![],
+                        )?;
+                    }
                 }
             }
         }
@@ -686,6 +718,7 @@ fn ts_extension(name: &[u8]) -> Option<&'static [u8]> {
         .copied()
         .find(|extension| name.ends_with(extension))
 }
+// port: tsc/internal/checker/checker.go:resolutionExtensionIsTSOrJson
 fn ts_or_json_extension(extension: &[u8]) -> bool {
     TS_EXTENSIONS.contains(&extension) || extension == b".json"
 }

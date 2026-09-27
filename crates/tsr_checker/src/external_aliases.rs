@@ -243,6 +243,8 @@ impl CheckerState {
                 if mode == ModuleKind::ESNEXT && target_mode == ModuleKind::ESNEXT {
                     return Ok(false);
                 }
+                // A declaration file mapped to a project reference takes its
+                // module format from the referenced project's options.
                 if target_mode == ModuleKind::NONE
                     && self.source_file_read(file)?.is_declaration_file
                     && (self
@@ -256,9 +258,15 @@ impl CheckerState {
                             .get_project_reference_from_output_dts(file_name.as_bytes())?
                             .is_some())
                 {
-                    return Err(Error::Unsupported(
-                        "canHaveSyntheticDefault: project reference module format",
-                    ));
+                    let target_module_kind = self
+                        .program()?
+                        .host
+                        .get_emit_module_format_of_file(file_name.as_bytes())?;
+                    if mode == ModuleKind::ESNEXT
+                        && (ModuleKind::ES2015..=ModuleKind::ESNEXT).contains(&target_module_kind)
+                    {
+                        return Ok(false);
+                    }
                 }
             }
         }

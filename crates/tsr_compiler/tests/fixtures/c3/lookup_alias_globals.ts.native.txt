@@ -1,0 +1,5 @@
+error TS2317: Global type 'Extract' must have 2 type parameter(s).
+error TS2317: Global type 'Record' must have 2 type parameter(s).
+lookup_alias_globals.ts(9,14): error TS2339: Property 'c' does not exist on type 'object'.
+lookup_alias_globals.ts(16,19): error TS2495: Type '{ size: number; }' is not an array type or a string type.
+lookup_alias_globals.ts(35,10): error TS2845: This condition will always return 'false'.
