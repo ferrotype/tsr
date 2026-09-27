@@ -1,0 +1,723 @@
+{
+ "checkpoint": "C4",
+ "dispositions": {
+  "tsc/internal/checker/checker.go:Checker.checkDecorator": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.checkDecorators": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.getClassElementPropertyKeyType": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.getClassMemberDecoratorContextOverrideType": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.getContextualTypeForDecorator": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.getDecoratorArgumentCount": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.getDecoratorCallSignature": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.getDiagnosticHeadMessageForDecoratorResolution": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.getESDecoratorCallSignature": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.getEffectiveDecoratorArguments": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.getEntityNameForDecoratorMetadata": {
+   "disposition": "gap",
+   "item": "C4.7",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.getEntityNameForDecoratorMetadataFromTypeList": {
+   "disposition": "gap",
+   "item": "C4.7",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.getLegacyDecoratorArgumentCount": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.getLegacyDecoratorCallSignature": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.getParameterTypeNodeForDecoratorCheck": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.getParentTypeOfClassElement": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.isArrayOrTupleLikeType": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.isPotentiallyUncalledDecorator": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.markDecoratorAliasReferenced": {
+   "disposition": "gap",
+   "item": "C4.7",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.markDecoratorMedataDataTypeNodeAsReferenced": {
+   "disposition": "gap",
+   "item": "C4.7",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.markEntityNameOrEntityExpressionAsReference": {
+   "disposition": "gap",
+   "item": "C4.7",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.markJsxAliasReferenced": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.markTypeNodeAsReferenced": {
+   "disposition": "gap",
+   "item": "C4.7",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newClassAccessorDecoratorContextType": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newClassAccessorDecoratorResultType": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newClassAccessorDecoratorTargetType": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newClassDecoratorContextType": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newClassFieldDecoratorContextType": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newClassFieldDecoratorInitializerMutatorType": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newClassGetterDecoratorContextType": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newClassMemberDecoratorContextTypeForNode": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newClassMethodDecoratorContextType": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newClassSetterDecoratorContextType": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newESDecoratorCallSignature": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newFunctionType": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newGetterFunctionType": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newParameter": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newProperty": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newSetterFunctionType": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.newTypedPropertyDescriptorType": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:Checker.resolveDecorator": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/checker.go:getEntityNameFromTypeNode": {
+   "disposition": "gap",
+   "item": "C4.7",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFactoryEntity": {
+   "disposition": "later",
+   "owner": "C5",
+   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFragmentFactoryEntity": {
+   "disposition": "later",
+   "owner": "C5",
+   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+  },
+  "tsc/internal/checker/emitresolver.go:EmitResolver.GetTypeReferenceSerializationKind": {
+   "disposition": "later",
+   "owner": "C5",
+   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetJsxFragmentFactory": {
+   "disposition": "later",
+   "owner": "C5",
+   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+  },
+  "tsc/internal/checker/exports.go:Checker.GetJsxNamespace": {
+   "disposition": "later",
+   "owner": "C5",
+   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarDecorator": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarJsxElement": {
+   "disposition": "gap",
+   "item": "C4.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarJsxExpression": {
+   "disposition": "gap",
+   "item": "C4.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarJsxName": {
+   "disposition": "gap",
+   "item": "C4.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.findFirstIllegalDecorator": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/grammarchecks.go:Checker.reportObviousDecoratorErrors": {
+   "disposition": "gap",
+   "item": "C4.6",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.checkApplicableSignatureForJsxCallLikeElement": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.checkJsxAttribute": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.checkJsxAttributes": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.checkJsxChildren": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.checkJsxElement": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.checkJsxElementDeferred": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.checkJsxExpression": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.checkJsxFragment": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.checkJsxOpeningLikeElementOrOpeningFragment": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.checkJsxPreconditions": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.checkJsxReturnAssignableToAppropriateBound": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.checkJsxSelfClosingElement": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.checkJsxSelfClosingElementDeferred": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.createJsxAttributesTypeFromAttributesProperty": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.createSignatureForJSXIntrinsic": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.discriminateContextualTypeByJSXAttributes": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.elaborateIterableOrArrayLikeTargetElementwise": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.elaborateJsxComponents": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.generateJsxChildren": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getContextualJsxElementAttributesType": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getContextualTypeForChildJsxExpression": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getContextualTypeForJsxAttribute": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getContextualTypeForJsxExpression": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getEffectiveFirstArgumentForJsxSignature": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getElaborationElementForJsxChild": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getIntrinsicAttributesTypeFromJsxOpeningLikeElement": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getIntrinsicAttributesTypeFromStringLiteralType": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getIntrinsicTagSymbol": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJSXFragmentType": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJSXRuntimeImportSpecifier": {
+   "disposition": "gap",
+   "item": "C4.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxElementChildrenPropertyName": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxElementClassTypeAt": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxElementPropertiesName": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxElementTypeAt": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxElementTypeSymbol": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxElementTypeTypeAt": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxFactoryEntity": {
+   "disposition": "gap",
+   "item": "C4.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxFragmentFactoryEntity": {
+   "disposition": "gap",
+   "item": "C4.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxLibraryManagedAttributes": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxManagedAttributesFromLocatedAttributes": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxNamespace": {
+   "disposition": "gap",
+   "item": "C4.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxNamespaceAt": {
+   "disposition": "gap",
+   "item": "C4.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxNamespaceContainerForImplicitImport": {
+   "disposition": "gap",
+   "item": "C4.5",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxPropsTypeForSignatureFromMember": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxPropsTypeFromCallSignature": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxPropsTypeFromClassType": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxReferenceKind": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxStatelessElementTypeAt": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getJsxType": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getLocalJsxNamespace": {
+   "disposition": "gap",
+   "item": "C4.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getNameFromJsxElementAttributesContainer": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getStaticTypeOfReferencedJsxConstructor": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getSuggestedSymbolForNonexistentJSXAttribute": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.getUninstantiatedJsxSignaturesOfType": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.inferJsxTypeArguments": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.instantiateAliasOrInterfaceWithDefaults": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.parseIsolatedEntityName": {
+   "disposition": "gap",
+   "item": "C4.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:Checker.resolveJsxOpeningLikeElement": {
+   "disposition": "gap",
+   "item": "C4.4",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/jsx.go:markAsSynthetic": {
+   "disposition": "gap",
+   "item": "C4.2",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/relater.go:isHyphenatedJsxName": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/relater.go:isIgnoredJsxProperty": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  },
+  "tsc/internal/checker/services.go:Checker.GetContextualTypeForJsxAttribute": {
+   "disposition": "later",
+   "owner": "C5",
+   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+  },
+  "tsc/internal/checker/services.go:Checker.GetJsxIntrinsicTagNamesAt": {
+   "disposition": "later",
+   "owner": "C5",
+   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+  },
+  "tsc/internal/checker/utilities.go:isJsxIntrinsicTagName": {
+   "disposition": "gap",
+   "item": "C4.3",
+   "reason": "Not yet ported; the item that closes it is named."
+  }
+ },
+ "groups": {
+  "C4 JSX seams (checker, grammar, relater, utilities; C5 wrappers)": [
+   "tsc/internal/checker/checker.go:Checker.isArrayOrTupleLikeType",
+   "tsc/internal/checker/checker.go:Checker.markJsxAliasReferenced",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFactoryEntity",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFragmentFactoryEntity",
+   "tsc/internal/checker/exports.go:Checker.GetJsxFragmentFactory",
+   "tsc/internal/checker/exports.go:Checker.GetJsxNamespace",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarJsxElement",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarJsxExpression",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarJsxName",
+   "tsc/internal/checker/relater.go:isHyphenatedJsxName",
+   "tsc/internal/checker/relater.go:isIgnoredJsxProperty",
+   "tsc/internal/checker/services.go:Checker.GetContextualTypeForJsxAttribute",
+   "tsc/internal/checker/services.go:Checker.GetJsxIntrinsicTagNamesAt",
+   "tsc/internal/checker/utilities.go:isJsxIntrinsicTagName"
+  ],
+  "C4.2-C4.5 JSX (jsx.go)": [
+   "tsc/internal/checker/jsx.go:Checker.checkApplicableSignatureForJsxCallLikeElement",
+   "tsc/internal/checker/jsx.go:Checker.checkJsxAttribute",
+   "tsc/internal/checker/jsx.go:Checker.checkJsxAttributes",
+   "tsc/internal/checker/jsx.go:Checker.checkJsxChildren",
+   "tsc/internal/checker/jsx.go:Checker.checkJsxElement",
+   "tsc/internal/checker/jsx.go:Checker.checkJsxElementDeferred",
+   "tsc/internal/checker/jsx.go:Checker.checkJsxExpression",
+   "tsc/internal/checker/jsx.go:Checker.checkJsxFragment",
+   "tsc/internal/checker/jsx.go:Checker.checkJsxOpeningLikeElementOrOpeningFragment",
+   "tsc/internal/checker/jsx.go:Checker.checkJsxPreconditions",
+   "tsc/internal/checker/jsx.go:Checker.checkJsxReturnAssignableToAppropriateBound",
+   "tsc/internal/checker/jsx.go:Checker.checkJsxSelfClosingElement",
+   "tsc/internal/checker/jsx.go:Checker.checkJsxSelfClosingElementDeferred",
+   "tsc/internal/checker/jsx.go:Checker.createJsxAttributesTypeFromAttributesProperty",
+   "tsc/internal/checker/jsx.go:Checker.createSignatureForJSXIntrinsic",
+   "tsc/internal/checker/jsx.go:Checker.discriminateContextualTypeByJSXAttributes",
+   "tsc/internal/checker/jsx.go:Checker.elaborateIterableOrArrayLikeTargetElementwise",
+   "tsc/internal/checker/jsx.go:Checker.elaborateJsxComponents",
+   "tsc/internal/checker/jsx.go:Checker.generateJsxChildren",
+   "tsc/internal/checker/jsx.go:Checker.getContextualJsxElementAttributesType",
+   "tsc/internal/checker/jsx.go:Checker.getContextualTypeForChildJsxExpression",
+   "tsc/internal/checker/jsx.go:Checker.getContextualTypeForJsxAttribute",
+   "tsc/internal/checker/jsx.go:Checker.getContextualTypeForJsxExpression",
+   "tsc/internal/checker/jsx.go:Checker.getEffectiveFirstArgumentForJsxSignature",
+   "tsc/internal/checker/jsx.go:Checker.getElaborationElementForJsxChild",
+   "tsc/internal/checker/jsx.go:Checker.getIntrinsicAttributesTypeFromJsxOpeningLikeElement",
+   "tsc/internal/checker/jsx.go:Checker.getIntrinsicAttributesTypeFromStringLiteralType",
+   "tsc/internal/checker/jsx.go:Checker.getIntrinsicTagSymbol",
+   "tsc/internal/checker/jsx.go:Checker.getJSXFragmentType",
+   "tsc/internal/checker/jsx.go:Checker.getJSXRuntimeImportSpecifier",
+   "tsc/internal/checker/jsx.go:Checker.getJsxElementChildrenPropertyName",
+   "tsc/internal/checker/jsx.go:Checker.getJsxElementClassTypeAt",
+   "tsc/internal/checker/jsx.go:Checker.getJsxElementPropertiesName",
+   "tsc/internal/checker/jsx.go:Checker.getJsxElementTypeAt",
+   "tsc/internal/checker/jsx.go:Checker.getJsxElementTypeSymbol",
+   "tsc/internal/checker/jsx.go:Checker.getJsxElementTypeTypeAt",
+   "tsc/internal/checker/jsx.go:Checker.getJsxFactoryEntity",
+   "tsc/internal/checker/jsx.go:Checker.getJsxFragmentFactoryEntity",
+   "tsc/internal/checker/jsx.go:Checker.getJsxLibraryManagedAttributes",
+   "tsc/internal/checker/jsx.go:Checker.getJsxManagedAttributesFromLocatedAttributes",
+   "tsc/internal/checker/jsx.go:Checker.getJsxNamespace",
+   "tsc/internal/checker/jsx.go:Checker.getJsxNamespaceAt",
+   "tsc/internal/checker/jsx.go:Checker.getJsxNamespaceContainerForImplicitImport",
+   "tsc/internal/checker/jsx.go:Checker.getJsxPropsTypeForSignatureFromMember",
+   "tsc/internal/checker/jsx.go:Checker.getJsxPropsTypeFromCallSignature",
+   "tsc/internal/checker/jsx.go:Checker.getJsxPropsTypeFromClassType",
+   "tsc/internal/checker/jsx.go:Checker.getJsxReferenceKind",
+   "tsc/internal/checker/jsx.go:Checker.getJsxStatelessElementTypeAt",
+   "tsc/internal/checker/jsx.go:Checker.getJsxType",
+   "tsc/internal/checker/jsx.go:Checker.getLocalJsxNamespace",
+   "tsc/internal/checker/jsx.go:Checker.getNameFromJsxElementAttributesContainer",
+   "tsc/internal/checker/jsx.go:Checker.getStaticTypeOfReferencedJsxConstructor",
+   "tsc/internal/checker/jsx.go:Checker.getSuggestedSymbolForNonexistentJSXAttribute",
+   "tsc/internal/checker/jsx.go:Checker.getUninstantiatedJsxSignaturesOfType",
+   "tsc/internal/checker/jsx.go:Checker.inferJsxTypeArguments",
+   "tsc/internal/checker/jsx.go:Checker.instantiateAliasOrInterfaceWithDefaults",
+   "tsc/internal/checker/jsx.go:Checker.parseIsolatedEntityName",
+   "tsc/internal/checker/jsx.go:Checker.resolveJsxOpeningLikeElement",
+   "tsc/internal/checker/jsx.go:markAsSynthetic"
+  ],
+  "C4.6-C4.7 decorators and metadata": [
+   "tsc/internal/checker/checker.go:Checker.checkDecorator",
+   "tsc/internal/checker/checker.go:Checker.checkDecorators",
+   "tsc/internal/checker/checker.go:Checker.checkThisInStaticClassFieldInitializerInDecoratedClass",
+   "tsc/internal/checker/checker.go:Checker.getAnnotatedAccessorTypeNode",
+   "tsc/internal/checker/checker.go:Checker.getClassElementPropertyKeyType",
+   "tsc/internal/checker/checker.go:Checker.getClassMemberDecoratorContextOverrideType",
+   "tsc/internal/checker/checker.go:Checker.getContextualTypeForDecorator",
+   "tsc/internal/checker/checker.go:Checker.getDecoratorArgumentCount",
+   "tsc/internal/checker/checker.go:Checker.getDecoratorCallSignature",
+   "tsc/internal/checker/checker.go:Checker.getDiagnosticHeadMessageForDecoratorResolution",
+   "tsc/internal/checker/checker.go:Checker.getESDecoratorCallSignature",
+   "tsc/internal/checker/checker.go:Checker.getEffectiveDecoratorArguments",
+   "tsc/internal/checker/checker.go:Checker.getEntityNameForDecoratorMetadata",
+   "tsc/internal/checker/checker.go:Checker.getEntityNameForDecoratorMetadataFromTypeList",
+   "tsc/internal/checker/checker.go:Checker.getLegacyDecoratorArgumentCount",
+   "tsc/internal/checker/checker.go:Checker.getLegacyDecoratorCallSignature",
+   "tsc/internal/checker/checker.go:Checker.getParameterTypeNodeForDecoratorCheck",
+   "tsc/internal/checker/checker.go:Checker.getParentTypeOfClassElement",
+   "tsc/internal/checker/checker.go:Checker.isPotentiallyUncalledDecorator",
+   "tsc/internal/checker/checker.go:Checker.markDecoratorAliasReferenced",
+   "tsc/internal/checker/checker.go:Checker.markDecoratorMedataDataTypeNodeAsReferenced",
+   "tsc/internal/checker/checker.go:Checker.markEntityNameOrEntityExpressionAsReference",
+   "tsc/internal/checker/checker.go:Checker.markTypeNodeAsReferenced",
+   "tsc/internal/checker/checker.go:Checker.newClassAccessorDecoratorContextType",
+   "tsc/internal/checker/checker.go:Checker.newClassAccessorDecoratorResultType",
+   "tsc/internal/checker/checker.go:Checker.newClassAccessorDecoratorTargetType",
+   "tsc/internal/checker/checker.go:Checker.newClassDecoratorContextType",
+   "tsc/internal/checker/checker.go:Checker.newClassFieldDecoratorContextType",
+   "tsc/internal/checker/checker.go:Checker.newClassFieldDecoratorInitializerMutatorType",
+   "tsc/internal/checker/checker.go:Checker.newClassGetterDecoratorContextType",
+   "tsc/internal/checker/checker.go:Checker.newClassMemberDecoratorContextTypeForNode",
+   "tsc/internal/checker/checker.go:Checker.newClassMethodDecoratorContextType",
+   "tsc/internal/checker/checker.go:Checker.newClassSetterDecoratorContextType",
+   "tsc/internal/checker/checker.go:Checker.newESDecoratorCallSignature",
+   "tsc/internal/checker/checker.go:Checker.newFunctionType",
+   "tsc/internal/checker/checker.go:Checker.newGetterFunctionType",
+   "tsc/internal/checker/checker.go:Checker.newParameter",
+   "tsc/internal/checker/checker.go:Checker.newProperty",
+   "tsc/internal/checker/checker.go:Checker.newSetterFunctionType",
+   "tsc/internal/checker/checker.go:Checker.newTypedPropertyDescriptorType",
+   "tsc/internal/checker/checker.go:Checker.resolveDecorator",
+   "tsc/internal/checker/checker.go:getEntityNameFromTypeNode",
+   "tsc/internal/checker/emitresolver.go:EmitResolver.GetTypeReferenceSerializationKind",
+   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarDecorator",
+   "tsc/internal/checker/grammarchecks.go:Checker.findFirstIllegalDecorator",
+   "tsc/internal/checker/grammarchecks.go:Checker.reportObviousDecoratorErrors",
+   "tsc/internal/checker/utilities.go:getContainingClassExcludingClassDecorators"
+  ]
+ },
+ "handoffs": [],
+ "open_issues": [],
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "scope": "C4 audit over the complete jsx.go inventory, the JSX seams outside it and the decorator and metadata functions (docs/PHASE2-C4-plan.md, C4.1). Open gaps name the item that closes them.",
+ "version": 1
+}

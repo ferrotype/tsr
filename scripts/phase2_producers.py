@@ -93,6 +93,9 @@ CHECKPOINT_AUTHORITIES = {
     # C3 has no measurement obligation (docs/PHASE2-C3-plan.md section 1).
     "C3": {name: ROOT / f"data/phase2/c3-{name}{'.json.gz' if name == 'baseline' else '.json'}"
            for name in ("claims", "audit", "baseline")},
+    # C4 has no measurement obligation (docs/PHASE2-C4-plan.md section 1).
+    "C4": {name: ROOT / f"data/phase2/c4-{name}{'.json.gz' if name == 'baseline' else '.json'}"
+           for name in ("claims", "audit", "baseline")},
 }
 WITNESSES = {
     "c1-contracts": {
@@ -134,6 +137,14 @@ WITNESSES["c3-contracts"] = {
     # The fixtures and their pinned native observations are contract inputs.
     "sources": [*WITNESSES["c1-contracts"]["sources"], "crates/tsr_compiler/tests/fixtures/c3",
                 "upstream/tsc/testdata/tests/cases/compiler/binderBinaryExpressionStress.ts"],
+}
+WITNESSES["c4-contracts"] = {
+    "commands": [["cargo", "test", "-p", "tsr_compiler", "--features", "recursion-probe",
+                  "--test", "c4_contracts", "--locked", *release] for release in ([], ["--release"])],
+    "test_source": "crates/tsr_compiler/tests/c4_contracts.rs", "minimum_tests": 9,
+    "test_modules": {},
+    # The fixtures and their pinned native observations are contract inputs.
+    "sources": [*WITNESSES["c1-contracts"]["sources"], "crates/tsr_compiler/tests/fixtures/c4"],
 }
 PRODUCTION_PATTERNS = tuple(path for path in WITNESSES["c1-contracts"]["sources"]
                             if path != "scripts/phase2_producers.py")
@@ -297,7 +308,7 @@ def _c1_claim_metrics(comparison, claims, blockers=None):
     return metrics
 
 
-CHECKPOINTS = ("C2", "C3")
+CHECKPOINTS = ("C2", "C3", "C4")
 
 
 def newest_checkpoint(loaded):
@@ -484,7 +495,7 @@ def ratio(rows, domain, *, exclude_disabled=False):
 def checker(native=NATIVE, rust=RUST):
     metrics = {"inventory_frozen": False, "native_verified": False, "harness_valid": False,
                "result_recorded": False, "blockers_named": False, "c1_complete": False, "c2_complete": False,
-               "c3_complete": False}
+               "c3_complete": False, "c4_complete": False}
     try:
         document = phase2_inventory.read()
         metrics["inventory_frozen"] = (phase2_inventory.INVENTORY.read_bytes()
@@ -568,7 +579,7 @@ def checker(native=NATIVE, rust=RUST):
         except (OSError, ValueError, KeyError, TypeError) as error:
             print(f"{checkpoint} handoff authorities unavailable: " + str(error), file=sys.stderr)
     try:
-        if len(loaded) != 2:
+        if len(loaded) != len(CHECKPOINTS):
             raise ValueError("every checkpoint's handoff authorities must validate before the register is built")
         register = quietly(phase2_blockers.build, native, rust, context=context, comparison=comparison,
                            handoffs=all_transfers, incoming=all_incoming)
