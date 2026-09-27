@@ -6,7 +6,10 @@
 //! syntax transform's enum member values and constant-enum inlining — with the
 //! emitter's option guards, over the files `emitter.emitJSFile` transforms.
 //! Declaration emit and the other transforms' resolver calls are not executed,
-//! and the schedule says so.
+//! and the schedule says so. One effect of the downleveler that runs between
+//! them is modeled because it decides which nodes constant-enum inlining asks
+//! about: below ES2022 the class-fields transform replaces an access to a
+//! private name an enclosing class declares with a helper call.
 use crate::executor;
 use serde_json::{json, Value};
 use std::ops::ControlFlow;
@@ -120,6 +123,7 @@ struct Schedule<'a, 'op> {
     preserve_const_enums: bool,
     experimental_decorators: bool,
     external_module: bool,
+    lowers_private_names: bool,
     calls: Calls,
 }
 
@@ -141,6 +145,8 @@ fn schedule_file(program: &Program, op: &mut Operation<'_>, file: &ProgramFile) 
         preserve_const_enums: options.should_preserve_const_enums(),
         experimental_decorators: options.experimental_decorators.is_true(),
         external_module: tsr_ast::utilities::is_external_module(&source),
+        // classfields.go:newClassFieldsTransformer
+        lowers_private_names: options.emit_script_target() < tsr_core::ScriptTarget::ES2022,
         calls: Calls::default(),
     };
     if import_elision {
@@ -276,6 +282,46 @@ impl Schedule<'_, '_> {
             }
         }
         Ok(Some(kept))
+    }
+
+    /// Whether the class-fields transform replaces the access `node` with a
+    /// private-field helper call before constant-enum inlining sees it: its
+    /// name is a private name that an enclosing class declares, and private
+    /// elements are lowered (`classfields.go:visitPropertyAccessExpression`,
+    /// `accessPrivateIdentifier`). The inliner then visits only the receiver.
+    fn private_access_lowered(&self, node: NodeId) -> Result<bool> {
+        if !self.lowers_private_names {
+            return Ok(false);
+        }
+        let read = self.view.node(node).map_err(arena)?;
+        let Some(name) = read.name() else {
+            return Ok(false);
+        };
+        if read.kind() != K::PropertyAccessExpression
+            || self.view.node(name).map_err(arena)?.kind() != K::PrivateIdentifier
+        {
+            return Ok(false);
+        }
+        let text = self.view.node_text(name).map_err(arena)?;
+        let mut ancestor = read.parent();
+        while let Some(current) = ancestor {
+            let current_read = self.view.node(current).map_err(arena)?;
+            if tsr_ast::utilities::is_class_like(&current_read) {
+                for member in self.list(current_read.member_list())? {
+                    let Some(member_name) = self.view.node(member).map_err(arena)?.name() else {
+                        continue;
+                    };
+                    if self.view.node(member_name).map_err(arena)?.kind() == K::PrivateIdentifier
+                        && self.view.node_text(member_name).map_err(arena)?.as_bytes()
+                            == text.as_bytes()
+                    {
+                        return Ok(true);
+                    }
+                }
+            }
+            ancestor = current_read.parent();
+        }
+        Ok(false)
     }
 
     /// Whether the type eraser, or the runtime syntax transform for a constant
@@ -539,7 +585,8 @@ impl Schedule<'_, '_> {
             if matches!(
                 kind.known(),
                 Some(K::PropertyAccessExpression | K::ElementAccessExpression)
-            ) {
+            ) && !self.private_access_lowered(node)?
+            {
                 self.calls.constant_value += 1;
                 if self.op.constant_value(node).map_err(checker)?.is_some() {
                     continue;

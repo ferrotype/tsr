@@ -272,8 +272,16 @@ impl CheckerState {
             self.query.error_types.insert(key, ty);
             return Ok(ty);
         }
-        let ty = self.get_declared_type_of_symbol(symbol)?;
         let flags = self.symbol(symbol)?.flags();
+        // getTypeFromClassOrInterfaceReference takes the declared type of the
+        // merged symbol: an import can name the unmerged declaration of an
+        // interface a module augmentation merged through `export *`.
+        let ty = if flags & (sf::CLASS | sf::INTERFACE) != 0 {
+            let merged = self.get_merged_symbol(symbol);
+            self.get_declared_type_of_symbol(merged)?
+        } else {
+            self.get_declared_type_of_symbol(symbol)?
+        };
         let argument_nodes = self.source_list(node, self.node(node)?.type_argument_list())?;
         if flags & (sf::CLASS | sf::INTERFACE) != 0 {
             let interface = self.types.interface(ty)?;

@@ -770,7 +770,7 @@ pub fn try_get_property_name_of_binding_or_assignment_element(
 /// descending into JSDoc: the pin's `includeJSDoc` false, the only form the
 /// checker uses. Tokens are not nodes here (`Kind >= KindFirstNode`), and a
 /// meta property is not descended into.
-/// port: tsc/internal/ast/utilities.go:GetNodeAtPosition
+/// Over a finished tree; the port of `GetNodeAtPosition` is the parser's (`tsr_parser::references`).
 pub fn get_node_at_position(
     view: AstView<'_>,
     file: NodeId,
@@ -792,7 +792,7 @@ pub fn get_node_at_position(
     }
 }
 
-// port: tsc/internal/ast/utilities.go:nodeContainsPosition
+// Over a finished tree; the port of `nodeContainsPosition` is the parser's (`tsr_parser::references`).
 fn node_contains_position(view: AstView<'_>, node: NodeId, position: i32) -> Result<bool, Error> {
     let read = view.node(node)?;
     let kind = read.kind();
