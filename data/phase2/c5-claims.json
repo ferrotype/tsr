@@ -25,7 +25,7 @@
      "kind": "emit_order",
      "operation": "post-emit diagnostic order"
     },
-    "capture_sha256": "8217ae9b14bc914cbed20d19a3aff3780e1cb7bc48920935375dc7926f6a4383",
+    "capture_sha256": "977fa62a40ab9aaa2c83dc4362ba22518f62a0c89ed7b0ee31778663321817ae",
     "cause": "JavaScript constant-enum inlining asks GetConstantValue about v[k] before semantic checking, first resolving the circular constraints at v and attaching TS2751.",
     "domains": [
      "errors"
@@ -86,7 +86,7 @@
      "kind": "emit_order",
      "operation": "post-emit diagnostic order"
     },
-    "capture_sha256": "8217ae9b14bc914cbed20d19a3aff3780e1cb7bc48920935375dc7926f6a4383",
+    "capture_sha256": "977fa62a40ab9aaa2c83dc4362ba22518f62a0c89ed7b0ee31778663321817ae",
     "cause": "JavaScript import elision marks linked references, checking the property receiver before semantic checking; this changes the first circular-constraint or mapped-property diagnostic location.",
     "domains": [
      "errors"
@@ -147,7 +147,7 @@
      "kind": "emit_order",
      "operation": "post-emit diagnostic order"
     },
-    "capture_sha256": "8217ae9b14bc914cbed20d19a3aff3780e1cb7bc48920935375dc7926f6a4383",
+    "capture_sha256": "977fa62a40ab9aaa2c83dc4362ba22518f62a0c89ed7b0ee31778663321817ae",
     "cause": "JavaScript import elision marks linked references, checking the property receiver before semantic checking; this changes the first circular-constraint or mapped-property diagnostic location.",
     "domains": [
      "errors"

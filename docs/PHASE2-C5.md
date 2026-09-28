@@ -212,11 +212,12 @@ member a code fix synthesized. The replay takes about ten seconds; its report
 is `target/phase2/services/replay/report.json` and its receipt
 `data/phase2/receipts/c5-services.json`.
 
-### Left to Phase 5, awaiting the owner
+### Left to Phase 5, approved by the owner
 
-`data/phase2/services-approvals.json` proposes, with `approved_by` empty,
-what the replay leaves to Phase 5; `c5_services` stays false until the owner
-approves or rejects each entry:
+`data/phase2/services-approvals.json` names what the replay leaves to Phase 5.
+The owner approved every entry on 2026-09-28 (`e2f0876`), and the replay run
+again over the approvals classifies complete with no open operation: 143
+operations replayed and 4 approved.
 
 - three program kinds the replay excludes: the auto-import registry's
   alias-resolver programs (the registry is Phase 5's), content-mapped sources
@@ -329,7 +330,7 @@ All nine C5 contracts pass in debug and release; the receipt is
 `data/phase2/receipts/c5-contracts.json`, and the C1 to C4 receipts were
 refreshed on the same sources. The services receipt
 `data/phase2/receipts/c5-services.json` is current (every call matches or
-falls under a proposed entry; `complete` false until the approvals). Relater
+falls under an approved entry; `complete` true since the approvals). Relater
 parity is 105 of 105 groups for both implementations with `all_cases_match`
 true (`target/s08/relater-c5`). Workspace formatting and clippy with warnings
 denied pass, `cargo xtask validate` passes, and the Python suite passes 1,426
@@ -344,12 +345,29 @@ The checker producer reports `c5_open = 0`, `c5_regressions = 0`,
 `c5_failures = 0`, `c5_blockers_open = 0`, `c5_handoffs = 0`,
 `c5_audit_complete = true` and `c5_contracts = true`, with
 `regression_parity = 1` and `trace_parity = 1`, and every prerequisite true;
-`c5_services` is false, so `c5_complete` is false, until the owner approves
-or rejects the entries of `data/phase2/services-approvals.json`. With every
-proposal approved the replay classifies complete with no open operation; the
-receipt binds the approvals file's digest, so `python3
-scripts/phase2_services.py replay` must be run again after the approval. C1
-stays complete. For C2, C3 and C4 the producer reports the accounting (open
+`c5_services` was false at the exit, so `c5_complete` was false, until the owner
+approved the entries of `data/phase2/services-approvals.json`, and the
+replay then ran again to bind the approvals. C1 stays complete. For C2, C3 and C4 the producer reports the accounting (open
 0, regressions 0, failures 0, open blockers 0, audits complete, contracts
 true; `c2_handoffs = 3`) and no completion metric. The recording, `cargo
 xtask run checker`, is the owner's.
+
+## After the exit
+
+The owner approved the five services entries, and the replay receipt was
+refreshed over them (`e2f0876`).
+
+The #68 review follow-up (`c4f2dc5`, recorded in `docs/PHASE2-C4.md`) changed
+production sources after the exit capture. So `target/phase2/rust-c5` was
+captured again on the new head. The comparison, the handoffs and the register
+followed it, and so did the C1 contract receipt; the C2 to C5 contract
+receipts still need refreshing on these sources. The
+capture completed all 13,432 variants with no harness error, and 13,417
+match every enabled domain, as before. All 9,367 regression variants match,
+and no outcome changed. Two raw observations changed, and only in type ids:
+`isolatedDeclarationErrorsClasses` and `overloadsWithComputedNames` swap two
+pairs of ids from run to run of the same binary. That traces to the random
+iteration order of the std map from which the checker builds its symbol
+tables; it is not an effect of the follow-up. All 21 handoffs rebound
+without a change, and the register is unchanged (B01, content-mapper
+execution, Phase 5).
