@@ -363,3 +363,16 @@ Not changed here:
 - The tracker gap (review 1, finding 1) stays the plans' C7.7 item.
 - These fixes change production sources, so the recorded `rust-c5` capture and
   the C1 to C5 contract receipts need their end-of-phase refresh.
+
+## Claims closed (after the C5 merge)
+
+The 767 claims of `data/phase2/c4-claims.json` are `closed`, each with the
+first C4 commit at which it matches and a closure bound to the recorded C4
+exit capture (`target/phase2/rust-c4`: its outcomes, request and
+raw-observation digests), as C2's closed rows are. The commits come from two
+bisect captures of the 767 rows, run at each commit with that commit's own
+driver and comparator: at `051e814` (decorators) 328 rows match (every
+decorator refusal and diagnostic bucket), and at `003c31a` (JSX) the other 439,
+all `checkExpressionWorker` refusals. The C2 to C5 contract receipts were
+refreshed on the merged sources (the `rust-c5` capture had been retaken in
+`b02bc48`), and the checker producer reports `c5_complete = true`.
