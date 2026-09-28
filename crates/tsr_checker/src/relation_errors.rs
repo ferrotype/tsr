@@ -197,8 +197,26 @@ impl Relater<'_> {
                 messages::The_Object_type_is_assignable_to_very_few_other_types_Did_you_mean_to_use_the_any_type_instead,
                 vec![],
             );
-        }
-        if self.checker.types.flags(original_target)? & tf::INTERSECTION != 0
+        } else if self.checker.types.get(source)?.object_flags & crate::object_flags::JSX_ATTRIBUTES
+            != 0
+            && target_flags & tf::INTERSECTION != 0
+        {
+            let error_node = self
+                .errors
+                .error_node
+                .ok_or(Error::MissingLink("JSX relation error node"))?;
+            let parts = self.checker.types.compound_types(target)?.to_vec();
+            let intrinsic = self.checker.jsx_type(b"IntrinsicAttributes", error_node)?;
+            let intrinsic_class = self
+                .checker
+                .jsx_type(b"IntrinsicClassAttributes", error_node)?;
+            if !self.checker.is_error_type(intrinsic)?
+                && !self.checker.is_error_type(intrinsic_class)?
+                && (parts.contains(&intrinsic) || parts.contains(&intrinsic_class))
+            {
+                return Ok(());
+            }
+        } else if self.checker.types.flags(original_target)? & tf::INTERSECTION != 0
             && self.checker.types.object_flags(original_target)?
                 & crate::object_flags::IS_NEVER_INTERSECTION
                 != 0
@@ -244,7 +262,7 @@ impl Relater<'_> {
     }
 
     // port: tsc/internal/checker/relater.go:Relater.reportRelationError
-    fn report_relation_error(
+    pub(crate) fn report_relation_error(
         &mut self,
         source: TypeId,
         target: TypeId,

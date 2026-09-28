@@ -200,7 +200,16 @@ impl CheckerState {
         if read.kind() != K::Identifier || self.node_text(node)?.as_bytes() != name {
             return Ok(false);
         }
-        if let Some(parent) = read.parent() {
+        // isTypeReferenceIdentifier: the identifier names a type reference,
+        // possibly as the left of a qualified name.
+        let mut name_node = node;
+        while let Some(parent) = self.node(name_node)?.parent() {
+            if self.node(parent)?.kind() != K::QualifiedName {
+                break;
+            }
+            name_node = parent;
+        }
+        if let Some(parent) = self.node(name_node)?.parent() {
             if self.node(parent)?.kind() == K::TypeReference {
                 return Ok(false);
             }

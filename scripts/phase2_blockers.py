@@ -35,7 +35,8 @@ CLAIMS = ROOT / "data/phase2/c2-claims.json"
 AUDIT = ROOT / "data/phase2/c2-audit.json"
 # Every checkpoint whose claims can carry handoffs; the register merges them.
 CHECKPOINT_CLAIMS = {"C2": (CLAIMS, AUDIT),
-                     "C3": (ROOT / "data/phase2/c3-claims.json", ROOT / "data/phase2/c3-audit.json")}
+                     "C3": (ROOT / "data/phase2/c3-claims.json", ROOT / "data/phase2/c3-audit.json"),
+                     "C4": (ROOT / "data/phase2/c4-claims.json", ROOT / "data/phase2/c4-audit.json")}
 TARGETS = {*(f"C{i}" for i in range(1, 8)), "Phase 3", "Phase 4", "Phase 5"}
 EMIT_OPERATION = "post-emit diagnostic order"
 OWNERS = (

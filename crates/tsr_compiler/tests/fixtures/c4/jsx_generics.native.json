@@ -1,0 +1,47 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources_sha256": {
+    "jsx_generics.tsx": "8217d7630c6b2276450a3d220bdf921d92c4a981bb160ac7ca869e7b57a72504"
+  },
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--skipLibCheck",
+    "--jsx",
+    "react",
+    "--strict",
+    "jsx_generics.tsx"
+  ],
+  "native_output_sha256": "2127f6009e74c9aa1ddbf6a7cc078d4fef4715c6777a0f170daf13a25f4a39ed",
+  "exit_code": 2,
+  "native_stderr": "",
+  "diagnostics": [
+    {
+      "file": "jsx_generics.tsx",
+      "line": 15,
+      "column": 43,
+      "code": 2322,
+      "message": "Type 'number' is not assignable to type 'string'."
+    },
+    {
+      "file": "jsx_generics.tsx",
+      "line": 17,
+      "column": 34,
+      "code": 2769,
+      "message": "No overload matches this call.\n  The last overload gave the following error.\n    Type 'number' is not assignable to type 'string'."
+    },
+    {
+      "file": "jsx_generics.tsx",
+      "line": 19,
+      "column": 51,
+      "code": 2339,
+      "message": "Property 'length' does not exist on type 'number'."
+    }
+  ]
+}

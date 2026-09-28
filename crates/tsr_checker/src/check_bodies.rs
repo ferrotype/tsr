@@ -145,6 +145,7 @@ impl CheckerState {
         ) {
             self.check_source_method_grammar(function)?;
         }
+        self.check_decorators(function)?;
         self.check_signature_syntax(function)?;
         let read = self.node(function)?;
         let body = read.body();
@@ -605,11 +606,15 @@ impl CheckerState {
                 }
                 Ok(false)
             }
-            Some(K::ParenthesizedExpression | K::YieldExpression) => match read.expression() {
-                Some(expression) => self.expression_is_context_sensitive(expression),
-                None => Ok(false),
-            },
-            Some(K::PropertyAssignment) => match read.initializer() {
+            // It is possible to that a JSX expression's expression is undefined (e.g <div x={} />)
+            Some(K::ParenthesizedExpression | K::YieldExpression | K::JsxExpression) => {
+                match read.expression() {
+                    Some(expression) => self.expression_is_context_sensitive(expression),
+                    None => Ok(false),
+                }
+            }
+            // If there is no initializer, JSX attribute has a boolean value of true which is not context sensitive.
+            Some(K::PropertyAssignment | K::JsxAttribute) => match read.initializer() {
                 Some(expression) => self.expression_is_context_sensitive(expression),
                 None => Ok(false),
             },
@@ -645,8 +650,27 @@ impl CheckerState {
                 }
                 Ok(false)
             }
-            Some(K::JsxAttributes | K::JsxAttribute | K::JsxExpression) => {
-                Err(Error::Unsupported("isContextSensitive: JSX"))
+            Some(K::JsxAttributes) => {
+                for property in self.source_list(node, read.property_list())? {
+                    if self.expression_is_context_sensitive(property)? {
+                        return Ok(true);
+                    }
+                }
+                let parent = read
+                    .parent()
+                    .ok_or(Error::MissingLink("JSX attributes parent"))?;
+                if self.node(parent)?.kind() == K::JsxOpeningElement {
+                    let element = self
+                        .node(parent)?
+                        .parent()
+                        .ok_or(Error::MissingLink("JSX opening element parent"))?;
+                    for child in self.source_list(element, self.node(element)?.children_list())? {
+                        if self.expression_is_context_sensitive(child)? {
+                            return Ok(true);
+                        }
+                    }
+                }
+                Ok(false)
             }
             _ => Ok(false),
         }
@@ -824,12 +848,27 @@ impl CheckerState {
             let Some(node) = node else { break };
             let saved = self.current_node.replace(node);
             self.instantiation.count = 0;
+            let kind = self.node(node)?.kind();
             let result = if matches!(
-                self.node(node)?.kind().known(),
-                Some(K::CallExpression | K::NewExpression | K::BinaryExpression)
+                kind.known(),
+                Some(
+                    K::CallExpression
+                        | K::NewExpression
+                        | K::TaggedTemplateExpression
+                        | K::Decorator
+                        | K::JsxOpeningElement
+                        | K::BinaryExpression
+                )
             ) {
                 self.resolve_untyped_call(node).map(|_| ())
-            } else if self.node(node)?.kind() == K::ObjectLiteralExpression {
+            } else if kind == K::JsxSelfClosingElement {
+                self.check_jsx_self_closing_element_deferred(node)
+            } else if kind == K::JsxElement {
+                self.check_jsx_element_deferred(node)
+            } else if matches!(
+                kind.known(),
+                Some(K::ObjectLiteralExpression | K::JsxAttributes)
+            ) {
                 self.check_object_contextual_deprecations(node)
             } else if matches!(
                 self.node(node)?.kind().known(),

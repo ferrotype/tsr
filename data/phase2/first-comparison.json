@@ -1,24 +1,6 @@
 {
- "all_domains_match": 12647,
+ "all_domains_match": 13414,
  "buckets": [
-  {
-   "bucket": "unsupported: checkExpressionWorker",
-   "owner": "C4",
-   "representative": "compiler/conflictMarkerTrivia3.tsx#configuration=0",
-   "variants": 439
-  },
-  {
-   "bucket": "unsupported: checkClassLikeDeclaration: decorators",
-   "owner": "C4",
-   "representative": "compiler/classExpressionWithDecorator1.ts#configuration=0",
-   "variants": 284
-  },
-  {
-   "bucket": "unsupported: checkDecorators: parameter or binding",
-   "owner": "C4",
-   "representative": "conformance/decorators/invalid/decoratorOnFunctionParameter.ts#configuration=0",
-   "variants": 25
-  },
   {
    "bucket": "unsupported: content-mapper execution",
    "owner": "Phase 5 (content mapper)",
@@ -26,76 +8,10 @@
    "variants": 15
   },
   {
-   "bucket": "diagnostics: TS2304",
-   "owner": "C4",
-   "representative": "compiler/anonymousClassDecoratorEs2022.ts#configuration=0",
-   "variants": 5
-  },
-  {
    "bucket": "emit order: native pre/post-emit sets differ",
    "owner": "C5 / Phase 3 (emit order)",
    "representative": "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0",
    "variants": 3
-  },
-  {
-   "bucket": "diagnostics: TS1240",
-   "owner": "C4",
-   "representative": "conformance/decorators/class/property/decoratorOnClassProperty6.ts#configuration=0",
-   "variants": 2
-  },
-  {
-   "bucket": "diagnostics: TS1241",
-   "owner": "C4",
-   "representative": "conformance/decorators/class/method/decoratorOnClassMethod8.ts#configuration=0",
-   "variants": 2
-  },
-  {
-   "bucket": "diagnostics: TS1329",
-   "owner": "C4",
-   "representative": "conformance/decorators/class/property/decoratorOnClassProperty11.ts#configuration=0",
-   "variants": 2
-  },
-  {
-   "bucket": "unsupported: getContextualType: decorator/JSX context",
-   "owner": "C4",
-   "representative": "conformance/decorators/class/decoratorChecksFunctionBodies.ts#configuration=0",
-   "variants": 2
-  },
-  {
-   "bucket": "diagnostics: TS1272",
-   "owner": "C4",
-   "representative": "compiler/emitDecoratorMetadata_isolatedModules.ts#configuration=1",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS2318",
-   "owner": "C4",
-   "representative": "conformance/decorators/missingDecoratorType.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS2331",
-   "owner": "C4",
-   "representative": "conformance/decorators/class/method/decoratorOnClassMethod11.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS2593",
-   "owner": "C4",
-   "representative": "compiler/metadataImportType.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "diagnostics: TS2660",
-   "owner": "C4",
-   "representative": "conformance/decorators/class/method/decoratorOnClassMethod12.ts#configuration=0",
-   "variants": 1
-  },
-  {
-   "bucket": "unsupported: checkSourceElementWorker: statement/type family",
-   "owner": "C4",
-   "representative": "conformance/classes/classStaticBlock/classStaticBlock19.ts#configuration=0",
-   "variants": 1
   }
  ],
  "by_checkpoint": {
@@ -108,8 +24,7 @@
    "open": 15
   },
   "C4": {
-   "match": 159,
-   "open": 767
+   "match": 926
   },
   "regression": {
    "match": 9367
@@ -118,13 +33,13 @@
  "categories": {
   "display": {
    "disabled": 679,
-   "match": 12196,
-   "unsupported": 557
+   "match": 12743,
+   "unsupported": 10
   },
   "errors": {
-   "different": 20,
-   "match": 12648,
-   "unsupported": 764
+   "different": 3,
+   "match": 13414,
+   "unsupported": 15
   },
   "parent_pointers": {
    "match": 13417,
@@ -132,18 +47,17 @@
   },
   "symbols": {
    "disabled": 679,
-   "match": 12196,
-   "unsupported": 557
+   "match": 12743,
+   "unsupported": 10
   },
   "trace": {
    "disabled": 13278,
    "match": 154
   },
   "types": {
-   "different": 8,
    "disabled": 679,
-   "match": 12188,
-   "unsupported": 557
+   "match": 12743,
+   "unsupported": 10
   },
   "union_ordering": {
    "match": 13417,
@@ -153,86 +67,39 @@
  "changed_observations": [],
  "dimensions": {
   "area": {
-   "diagnostics: TS1240": 2,
-   "diagnostics: TS1241": 2,
-   "diagnostics: TS1272": 1,
-   "diagnostics: TS1329": 2,
-   "diagnostics: TS2304": 5,
-   "diagnostics: TS2318": 1,
-   "diagnostics: TS2331": 1,
-   "diagnostics: TS2593": 1,
-   "diagnostics: TS2660": 1,
    "emit order: native pre/post-emit sets differ": 3,
-   "unsupported: checkClassLikeDeclaration: decorators": 284,
-   "unsupported: checkDecorators: parameter or binding": 25,
-   "unsupported: checkExpressionWorker": 439,
-   "unsupported: checkSourceElementWorker: statement/type family": 1,
-   "unsupported: content-mapper execution": 15,
-   "unsupported: getContextualType: decorator/JSX context": 2
+   "unsupported: content-mapper execution": 15
   },
   "family": {
-   "conditional_types": 15,
+   "conditional_types": 1,
    "content_mapper_execution": 15,
-   "decorators": 331,
-   "emitted_output_only": 182,
-   "explicit_type_parameters": 122,
-   "import_types": 1,
-   "indexed_access_types": 13,
-   "infer_types": 7,
-   "jsx": 436,
-   "mapped_types": 9,
-   "nonempty_type_arguments": 138,
-   "template_literal_types": 2
+   "explicit_type_parameters": 3,
+   "indexed_access_types": 1,
+   "infer_types": 1,
+   "mapped_types": 2,
+   "nonempty_type_arguments": 1
   },
   "first_code": {
-   "(none)": 765,
-   "1240": 2,
-   "1241": 2,
-   "1272": 1,
-   "1329": 2,
-   "2304": 5,
+   "(none)": 15,
    "2313": 2,
-   "2318": 1,
-   "2331": 1,
-   "2345": 1,
-   "2593": 1,
-   "2615": 1,
-   "2660": 1
+   "2615": 1
   },
   "jsx": {
-   "preserve": 210,
-   "react": 158,
-   "react-jsx": 38,
-   "react-jsxdev": 19,
-   "react-native": 2,
-   "unset": 358
+   "preserve": 1,
+   "unset": 17
   },
   "module": {
-   "commonjs": 272,
-   "es2015": 9,
-   "es2020": 1,
-   "es2022": 4,
-   "esnext": 93,
-   "node16": 1,
-   "node18": 1,
-   "node20": 1,
-   "nodenext": 5,
-   "preserve": 6,
-   "unset": 392
+   "esnext": 11,
+   "unset": 7
   },
   "strict": {
-   "False": 673,
-   "True": 112
+   "False": 6,
+   "True": 12
   },
   "target": {
-   "es2015": 580,
-   "es2017": 16,
-   "es2018": 4,
-   "es2020": 15,
-   "es2021": 1,
-   "es2022": 51,
-   "esnext": 103,
-   "unset": 15
+   "es2015": 3,
+   "es2020": 11,
+   "unset": 4
   }
  },
  "executed": 13432,
@@ -241,7 +108,7 @@
  "native_observation_sha256": "1b5356b425ad95a3e5e2a0bb29d42534e8d9d4a6159649f063f3317084a0e276",
  "partial": false,
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
- "previous": "d7e484b708e2a732af56868ddefe68f095299f620c3169c25de623574f411e86",
+ "previous": "449d9aec60a8dca1b3a9a39ae652007aa273a9eeaaee0d1d9236cb289e2c20bb",
  "regression_subset": {
   "all_domains_match": 9367,
   "by_domain": {
@@ -274,7 +141,7 @@
   "rows": 9367
  },
  "regressions": [],
- "rust_capture_sha256": "9114fae8eae7c5d769c5d7b8c990511dc897ca2161ee3e38ce9d25ff18494ecc",
+ "rust_capture_sha256": "116dcbe7dc29e434e59c3de78d1d8e6ed285ce174eef8d0327036a5d0b8cd2a1",
  "rust_source_stable": true,
  "selection": {
   "cases": [],
@@ -282,12 +149,7 @@
   "sample": false
  },
  "unsupported_operations": {
-  "checkClassLikeDeclaration: decorators": 569,
-  "checkDecorators: parameter or binding": 82,
-  "checkExpressionWorker": 1729,
-  "checkSourceElementWorker: statement/type family": 4,
-  "content-mapper execution": 75,
-  "getContextualType: decorator/JSX context": 6
+  "content-mapper execution": 75
  },
  "version": 1
 }

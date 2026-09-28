@@ -794,6 +794,15 @@ impl Relater<'_> {
             }
             if intersection & TARGET == 0 {
                 if self.excess_properties(source, target, self.report_errors)? {
+                    if self.report_errors {
+                        let display = if self.checker.types.get(original_target)?.alias.is_some() {
+                            original_target
+                        } else {
+                            target
+                        };
+                        self.report_relation_error(source, display, head)?;
+                    }
+                    report_results = false;
                     return Ok(tr::FALSE);
                 }
                 if self.no_common_properties(source, target)? {

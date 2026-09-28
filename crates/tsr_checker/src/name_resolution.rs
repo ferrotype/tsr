@@ -342,7 +342,8 @@ impl CheckerState {
     ) -> Result<Option<SymbolId>, Error> {
         use tsr_ast::{internal_symbol_names as names, SyntaxKind as K};
         let read = self.node(name)?;
-        if read.pos() == read.end() {
+        // NodeIsMissing: a synthesized name has no position and is not missing.
+        if read.pos() == read.end() && read.pos() >= 0 {
             return Ok(None);
         }
         let symbol = if read.kind() == K::Identifier {
@@ -418,7 +419,7 @@ impl CheckerState {
             if namespace == self.builtins.unknown_symbol {
                 return Ok(Some(namespace));
             }
-            if self.node(right)?.pos() == self.node(right)?.end() {
+            if self.node(right)?.pos() == self.node(right)?.end() && self.node(right)?.pos() >= 0 {
                 return Ok(None);
             }
             let namespace = self.resolve_common_js_namespace(namespace)?;

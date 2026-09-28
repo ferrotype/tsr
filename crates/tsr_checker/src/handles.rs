@@ -356,6 +356,19 @@ impl Operation<'_> {
         }))
     }
 
+    /// C4 contracts 1, 8 and 9: the JSX entities the resolver reads at an
+    /// opening element or fragment.
+    #[cfg(feature = "relation-probe")]
+    pub fn jsx_link_state(&mut self, node: NodeId) -> Result<serde_json::Value, Error> {
+        self.state_mut().jsx_link_state(node)
+    }
+
+    /// C4 contract 9: the syntax kinds the checker's factory has built.
+    #[cfg(feature = "relation-probe")]
+    pub fn synthetic_syntax_kinds(&self) -> Result<Vec<String>, Error> {
+        self.state().synthetic_syntax_kinds()
+    }
+
     /// The symbol's lazily assigned runtime id (`ast.GetSymbolId`), or 0 when
     /// nothing has observed the symbol yet. A read only; it assigns nothing.
     #[cfg(feature = "relation-probe")]

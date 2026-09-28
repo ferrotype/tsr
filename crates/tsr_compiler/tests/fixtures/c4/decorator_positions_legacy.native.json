@@ -1,0 +1,67 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources_sha256": {
+    "decorator_positions.ts": "5912f3c184daee8bcbfec2188d0d63cf502f4fb633a2ebed0b5cb3a72cc69dca"
+  },
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--skipLibCheck",
+    "--strict",
+    "--experimentalDecorators",
+    "decorator_positions.ts"
+  ],
+  "native_output_sha256": "bd6697b6fe3f4c7a7baeb2d2eec39340a45b23dd65e4f947e17939dccda2d4d1",
+  "exit_code": 2,
+  "native_stderr": "",
+  "diagnostics": [
+    {
+      "file": "decorator_positions.ts",
+      "line": 8,
+      "column": 1,
+      "code": 1238,
+      "message": "Unable to resolve signature of class decorator when called as an expression.\n  The runtime will invoke the decorator with 1 arguments, but the decorator expects 2."
+    },
+    {
+      "file": "decorator_positions.ts",
+      "line": 10,
+      "column": 4,
+      "code": 1241,
+      "message": "Unable to resolve signature of method decorator when called as an expression.\n  Argument of type 'C' is not assignable to parameter of type '(this: C) => number'.\n    Type 'C' provides no match for the signature '(this: C): number'."
+    },
+    {
+      "file": "decorator_positions.ts",
+      "line": 11,
+      "column": 4,
+      "code": 1241,
+      "message": "Unable to resolve signature of method decorator when called as an expression.\n  Argument of type 'C' is not assignable to parameter of type '(this: C) => number'.\n    Type 'C' provides no match for the signature '(this: C): number'."
+    },
+    {
+      "file": "decorator_positions.ts",
+      "line": 12,
+      "column": 4,
+      "code": 1241,
+      "message": "Unable to resolve signature of method decorator when called as an expression.\n  Argument of type 'C' is not assignable to parameter of type '(this: C, value: number) => void'.\n    Type 'C' provides no match for the signature '(this: C, value: number): void'."
+    },
+    {
+      "file": "decorator_positions.ts",
+      "line": 13,
+      "column": 4,
+      "code": 1240,
+      "message": "Unable to resolve signature of property decorator when called as an expression.\n  The runtime will invoke the decorator with 3 arguments, but the decorator expects 2."
+    },
+    {
+      "file": "decorator_positions.ts",
+      "line": 14,
+      "column": 4,
+      "code": 1240,
+      "message": "Unable to resolve signature of property decorator when called as an expression.\n  Argument of type 'C' is not assignable to parameter of type 'undefined'."
+    }
+  ]
+}

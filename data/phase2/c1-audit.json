@@ -8,7 +8,7 @@
   "tsc/internal/checker/checker.go:Checker.GetSymbolAtLocation": {
    "disposition": "equivalent",
    "reason": "the public wrapper of get_symbol_at_location with ignoreErrors",
-   "rust": "crates/tsr_checker/src/query.rs:100"
+   "rust": "crates/tsr_checker/src/query.rs:102"
   },
   "tsc/internal/checker/checker.go:Checker.ResolveAlias": {
    "disposition": "equivalent",
@@ -48,7 +48,7 @@
   "tsc/internal/checker/checker.go:Checker.getAliasSymbolForTypeNode": {
    "disposition": "equivalent",
    "reason": "alias_for_type_node returns the alias with its symbol",
-   "rust": "crates/tsr_checker/src/query.rs:687"
+   "rust": "crates/tsr_checker/src/query.rs:697"
   },
   "tsc/internal/checker/checker.go:Checker.getApplicableIndexInfo": {
    "disposition": "equivalent",
@@ -78,7 +78,7 @@
   "tsc/internal/checker/checker.go:Checker.getClassOrInterfaceDeclarationsOfSymbol": {
    "disposition": "equivalent",
    "reason": "the declaration filter is inline where the pin calls it",
-   "rust": "crates/tsr_checker/src/class_check.rs:497"
+   "rust": "crates/tsr_checker/src/class_check.rs:493"
   },
   "tsc/internal/checker/checker.go:Checker.getConstraintFromIndexedAccess": {
    "disposition": "equivalent",
@@ -98,7 +98,7 @@
   "tsc/internal/checker/checker.go:Checker.getDeclaredTypeOfAlias": {
    "disposition": "equivalent",
    "reason": "inlined in get_declared_type_of_symbol: the alias resolves and recurses; the target declared-type cache stands in for the alias link",
-   "rust": "crates/tsr_checker/src/query.rs:346"
+   "rust": "crates/tsr_checker/src/query.rs:356"
   },
   "tsc/internal/checker/checker.go:Checker.getGlobalSymbol": {
    "disposition": "equivalent",
@@ -203,7 +203,7 @@
   "tsc/internal/checker/checker.go:Checker.getSymbolOfNode": {
    "disposition": "equivalent",
    "reason": "get_symbol_of_declaration returns the merged late-bound symbol of a declaration",
-   "rust": "crates/tsr_checker/src/query.rs:88"
+   "rust": "crates/tsr_checker/src/query.rs:90"
   },
   "tsc/internal/checker/checker.go:Checker.getTargetOfExportAssignment": {
    "disposition": "equivalent",
@@ -223,12 +223,12 @@
   "tsc/internal/checker/checker.go:Checker.getTypeArgumentsForAliasSymbol": {
    "disposition": "equivalent",
    "reason": "alias_for_type_node also carries the local type parameters as the alias arguments",
-   "rust": "crates/tsr_checker/src/query.rs:687"
+   "rust": "crates/tsr_checker/src/query.rs:697"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeFromLiteralTypeNode": {
    "disposition": "equivalent",
    "reason": "inlined in the LiteralType arm of the type node worker: the null keyword, else the regular literal type of the checked literal",
-   "rust": "crates/tsr_checker/src/query.rs:577"
+   "rust": "crates/tsr_checker/src/query.rs:587"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeFromTypeAliasReference": {
    "disposition": "equivalent",
@@ -285,9 +285,8 @@
    "rust": "crates/tsr_checker/src/instantiate.rs:339"
   },
   "tsc/internal/checker/checker.go:Checker.isArrayOrTupleLikeType": {
-   "disposition": "later",
-   "owner": "C4",
-   "reason": "reached only from elaborateJsxComponents (jsx.go), whose port is C4 work"
+   "disposition": "mapped",
+   "reason": "Ported at C4 (C4.3), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/checker.go:Checker.isArrayOrTupleOrIntersection": {
    "disposition": "equivalent",
@@ -307,7 +306,7 @@
   "tsc/internal/checker/checker.go:Checker.isGlobalSymbolConstructor": {
    "disposition": "equivalent",
    "reason": "the global SymbolConstructor symbol is compared at the call site",
-   "rust": "crates/tsr_checker/src/name_resolution.rs:820"
+   "rust": "crates/tsr_checker/src/name_resolution.rs:821"
   },
   "tsc/internal/checker/checker.go:Checker.isLateBindableIndexSignature": {
    "disposition": "equivalent",
@@ -322,7 +321,7 @@
   "tsc/internal/checker/checker.go:Checker.isSimpleTupleType": {
    "disposition": "equivalent",
    "reason": "simple_tuple_arity returns the arity of a simple tuple node, None otherwise",
-   "rust": "crates/tsr_checker/src/conditional.rs:438"
+   "rust": "crates/tsr_checker/src/conditional.rs:453"
   },
   "tsc/internal/checker/checker.go:Checker.isTypeUsableAsIndexSignatureDeclaration": {
    "disposition": "equivalent",
@@ -372,7 +371,7 @@
   "tsc/internal/checker/checker.go:Checker.tryGetDeclaredTypeOfSymbol": {
    "disposition": "equivalent",
    "reason": "inlined in get_declared_type_of_symbol as the flag dispatch; no matching flag yields the error type, and type_reference_from_symbol reports Type_0_is_not_generic before reaching it",
-   "rust": "crates/tsr_checker/src/query.rs:330"
+   "rust": "crates/tsr_checker/src/query.rs:340"
   },
   "tsc/internal/checker/checker.go:Checker.typeHasCallOrConstructSignatures": {
    "disposition": "equivalent",
@@ -452,7 +451,7 @@
   "tsc/internal/checker/relater.go:Checker.checkTypeAssignableToAndOptionallyElaborate": {
    "disposition": "equivalent",
    "reason": "callers pass RelationKind::Assignable to the port of checkTypeRelatedToAndOptionallyElaborate",
-   "rust": "crates/tsr_checker/src/call_errors.rs:203"
+   "rust": "crates/tsr_checker/src/call_errors.rs:222"
   },
   "tsc/internal/checker/relater.go:Checker.checkTypeAssignableToEx": {
    "disposition": "equivalent",
@@ -497,7 +496,7 @@
   "tsc/internal/checker/relater.go:Checker.elaborateDidYouMeanToCallOrConstruct": {
    "disposition": "equivalent",
    "reason": "inlined in elaborate_call_error for the construct then the call signature kind",
-   "rust": "crates/tsr_checker/src/call_errors.rs:292"
+   "rust": "crates/tsr_checker/src/call_errors.rs:311"
   },
   "tsc/internal/checker/relater.go:Checker.filterPrimitivesIfContainsNonPrimitive": {
    "disposition": "equivalent",
@@ -562,12 +561,12 @@
   "tsc/internal/checker/relater.go:Checker.getUnmatchedProperties": {
    "disposition": "equivalent",
    "reason": "report_unmatched_property walks the unmatched properties inline; the iterator is not materialized",
-   "rust": "crates/tsr_checker/src/relation_errors.rs:620"
+   "rust": "crates/tsr_checker/src/relation_errors.rs:638"
   },
   "tsc/internal/checker/relater.go:Checker.getUnmatchedProperty": {
    "disposition": "equivalent",
    "reason": "the first unmatched property is the first iteration of that walk",
-   "rust": "crates/tsr_checker/src/relation_errors.rs:620"
+   "rust": "crates/tsr_checker/src/relation_errors.rs:638"
   },
   "tsc/internal/checker/relater.go:Checker.getVarianceStackIndex": {
    "disposition": "equivalent",
@@ -642,7 +641,7 @@
   "tsc/internal/checker/relater.go:Checker.shouldReportUnmatchedPropertyError": {
    "disposition": "equivalent",
    "reason": "inlined in report_unmatched_property: a source with only signatures reports only when the target has signatures of the same kind",
-   "rust": "crates/tsr_checker/src/relation_errors.rs:604"
+   "rust": "crates/tsr_checker/src/relation_errors.rs:622"
   },
   "tsc/internal/checker/relater.go:Checker.templateLiteralTypesDefinitelyUnrelated": {
    "disposition": "equivalent",
@@ -657,7 +656,7 @@
   "tsc/internal/checker/relater.go:Relater.chainArgsMatch": {
    "disposition": "equivalent",
    "reason": "inlined in report_relation_error: the head chain entry args are compared positionally for each suppressed message",
-   "rust": "crates/tsr_checker/src/relation_errors.rs:355"
+   "rust": "crates/tsr_checker/src/relation_errors.rs:373"
   },
   "tsc/internal/checker/relater.go:Relater.getErrorState": {
    "disposition": "equivalent",
@@ -750,14 +749,12 @@
    "rust": "crates/tsr_checker/src/relater_structure.rs:380"
   },
   "tsc/internal/checker/relater.go:isHyphenatedJsxName": {
-   "disposition": "later",
-   "owner": "C4",
-   "reason": "JSX attribute relation"
+   "disposition": "mapped",
+   "reason": "Ported at C4 (C4.3), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/relater.go:isIgnoredJsxProperty": {
-   "disposition": "later",
-   "owner": "C4",
-   "reason": "JSX attribute relation"
+   "disposition": "mapped",
+   "reason": "Ported at C4 (C4.3), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/relater.go:isNonPrimitiveType": {
    "disposition": "equivalent",

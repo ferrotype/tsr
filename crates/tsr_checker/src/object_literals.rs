@@ -434,7 +434,7 @@ impl CheckerState {
             _ => Ok(false),
         }
     }
-    fn check_object_mutable_location_ex(
+    pub(crate) fn check_object_mutable_location_ex(
         &mut self,
         node: NodeId,
         mode: u32,
@@ -521,7 +521,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkSpreadPropOverrides
-    fn check_spread_property_overrides(
+    pub(crate) fn check_spread_property_overrides(
         &mut self,
         ty: TypeId,
         properties: &SymbolTable,

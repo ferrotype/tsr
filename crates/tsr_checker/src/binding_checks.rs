@@ -63,11 +63,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkVariableLikeDeclaration
     pub(crate) fn check_binding_variable(&mut self, node: NodeId) -> Result<(), Error> {
-        for modifier in self.source_list(node, self.node(node)?.modifiers())? {
-            if self.node(modifier)?.kind() == K::Decorator {
-                return Err(Error::Unsupported("checkDecorators: parameter or binding"));
-            }
-        }
+        self.check_decorators(node)?;
         let read = self.node(node)?;
         let Some(name) = read.name() else {
             return Ok(());

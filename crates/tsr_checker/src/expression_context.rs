@@ -246,16 +246,16 @@ impl CheckerState {
                 self.contextual_type_for_yield_operand(parent, context_flags)
             }
             Some(K::ImportAttribute) => self.contextual_import_attribute_type(parent),
-            Some(
-                K::Decorator
-                | K::JsxExpression
-                | K::JsxAttribute
-                | K::JsxSpreadAttribute
-                | K::JsxOpeningElement
-                | K::JsxSelfClosingElement,
-            ) => Err(Error::Unsupported(
-                "getContextualType: decorator/JSX context",
-            )),
+            Some(K::Decorator) => self.contextual_type_for_decorator(parent),
+            Some(K::JsxExpression) => {
+                self.contextual_type_for_jsx_expression(parent, context_flags)
+            }
+            Some(K::JsxAttribute | K::JsxSpreadAttribute) => {
+                self.contextual_type_for_jsx_attribute(parent, context_flags)
+            }
+            Some(K::JsxOpeningElement | K::JsxSelfClosingElement) => {
+                self.contextual_jsx_element_attributes_type(parent, context_flags)
+            }
             _ => Ok(None),
         }
     }
@@ -274,7 +274,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getContextualTypeForArgumentAtIndex
-    fn contextual_call_argument_at(
+    pub(crate) fn contextual_call_argument_at(
         &mut self,
         call: NodeId,
         index: usize,
@@ -290,6 +290,11 @@ impl CheckerState {
             Some(signature) if signature == self.builtins.resolving_signature => signature,
             _ => self.resolved_call_signature(call)?,
         };
+        if index == 0 && tsr_ast::utilities_middle::is_jsx_opening_like_element(&self.node(call)?) {
+            return self
+                .effective_first_argument_for_jsx_signature(signature, call)
+                .map(Some);
+        }
         let data = self.signatures.get(signature)?;
         let parameters = data.parameters.clone().unwrap_or_else(|| [].into());
         if data.flags & crate::signature_flags::HAS_REST_PARAMETER != 0
@@ -362,10 +367,16 @@ impl CheckerState {
                 true,
             )?
             .ok_or(Error::MissingLink("apparent contextual type"))?;
-        if self.types.flags(ty)? & tf::UNION != 0
-            && self.node(node)?.kind() == K::ObjectLiteralExpression
-        {
-            return self.discriminate_object_context(node, ty).map(Some);
+        if self.types.flags(ty)? & tf::UNION != 0 {
+            match self.node(node)?.kind().known() {
+                Some(K::ObjectLiteralExpression) => {
+                    return self.discriminate_object_context(node, ty).map(Some);
+                }
+                Some(K::JsxAttributes) => {
+                    return self.discriminate_jsx_attributes_context(node, ty).map(Some);
+                }
+                _ => {}
+            }
         }
         Ok(Some(ty))
     }

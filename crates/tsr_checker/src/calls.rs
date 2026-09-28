@@ -50,6 +50,9 @@ pub(crate) struct CallState {
     /// Native inference scopes are separate from cached contextual types: a
     /// cache must not hide an enclosing call's inference context.
     pub inference_contexts: Vec<(NodeId, Option<InferenceId>)>,
+    /// `signatureLinks.decoratorSignature` per decorated node; the any
+    /// signature marks a node without one.
+    pub decorator_signatures: Map<NodeId, SignatureId>,
 }
 
 #[cfg(any(test, feature = "storage-pilot"))]
@@ -352,8 +355,17 @@ impl CheckerState {
         if read.kind() == K::TaggedTemplateExpression {
             return self.resolve_tagged_template_expression(node);
         }
+        if read.kind() == K::Decorator {
+            return self.resolve_decorator(node);
+        }
+        if matches!(
+            read.kind().known(),
+            Some(K::JsxOpeningElement | K::JsxSelfClosingElement | K::JsxOpeningFragment)
+        ) {
+            return self.resolve_jsx_opening_like_element(node);
+        }
         if read.kind() != K::CallExpression {
-            return Err(Error::Unsupported("resolveSignature: decorator/JSX"));
+            return Err(Error::Unsupported("resolveSignature"));
         }
         let expression = read.expression().ok_or(Error::MissingLink("call target"))?;
         if self.node(expression)?.kind() == K::SuperKeyword {
@@ -589,10 +601,27 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.resolveUntypedCall
     pub(crate) fn resolve_untyped_call(&mut self, node: NodeId) -> Result<SignatureId, Error> {
-        if self.node(node)?.kind() != K::BinaryExpression {
+        let kind = self.node(node)?.kind();
+        // callLikeExpressionMayHaveTypeArguments
+        if !matches!(
+            kind.known(),
+            Some(K::BinaryExpression | K::Decorator | K::JsxOpeningFragment)
+        ) {
             for argument in self.source_list(node, self.node(node)?.type_argument_list())? {
                 self.check_source_element(argument)?;
             }
+        }
+        match kind.known() {
+            Some(K::JsxOpeningElement | K::JsxSelfClosingElement) => {
+                let attributes = self
+                    .node(node)?
+                    .attributes()
+                    .ok_or(Error::MissingLink("JSX attributes"))?;
+                self.check_expression(attributes)?;
+                return Ok(self.builtins.any_signature);
+            }
+            Some(K::JsxOpeningFragment) => return Ok(self.builtins.any_signature),
+            _ => {}
         }
         for argument in self.effective_call_arguments(node)? {
             self.check_expression(argument)?;
@@ -688,13 +717,16 @@ impl CheckerState {
         call_chain_flags: u32,
     ) -> Result<SignatureId, Error> {
         let read = self.node(node)?;
-        let type_arguments = if read.kind() == K::BinaryExpression
-            || tsr_ast::utilities_middle::is_super_call(self.ast(node)?, &read)?
-        {
-            Vec::new()
-        } else {
-            self.source_list(node, read.type_argument_list())?
-        };
+        let type_arguments =
+            if matches!(
+                read.kind().known(),
+                Some(K::BinaryExpression | K::Decorator | K::JsxOpeningFragment)
+            ) || tsr_ast::utilities_middle::is_super_call(self.ast(node)?, &read)?
+            {
+                Vec::new()
+            } else {
+                self.source_list(node, read.type_argument_list())?
+            };
         for &argument in &type_arguments {
             self.check_source_element(argument)?;
         }
@@ -713,7 +745,7 @@ impl CheckerState {
                 .as_ref()
                 .is_none_or(|types| types.is_empty());
         let mut argument_mode = 0;
-        if !single_non_generic {
+        if !single_non_generic && self.node(node)?.kind() != K::Decorator {
             for &argument in &args {
                 if self.expression_is_context_sensitive(argument)? {
                     argument_mode = 4;

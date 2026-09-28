@@ -563,6 +563,10 @@ impl Relater<'_> {
         let info = self.checker.signatures.index_info(target)?.clone();
         let mut result = tr::TRUE;
         for property in self.checker.get_properties_of_type(source)? {
+            // Skip over ignored JSX and symbol-named members
+            if self.checker.is_ignored_jsx_property(source, property)? {
+                continue;
+            }
             let key = self.checker.literal_type_from_property(
                 property,
                 tf::STRING_OR_NUMBER_LITERAL_OR_UNIQUE,

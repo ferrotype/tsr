@@ -53,8 +53,42 @@ impl CheckerState {
         args: &[NodeId],
         signature: SignatureId,
     ) -> Result<bool, Error> {
+        if self.node(node)?.kind() == K::JsxOpeningFragment {
+            return Ok(true);
+        }
         let parameter_count = self.parameter_count(signature)?;
         let minimum = self.min_argument_count(signature)?;
+        if tsr_ast::utilities_middle::is_jsx_opening_like_element(&self.node(node)?) {
+            let read = self.node(node)?;
+            let attributes = read
+                .attributes()
+                .ok_or(Error::MissingLink("JSX attributes"))?;
+            if self.node(attributes)?.end() == read.end() {
+                return Ok(true);
+            }
+            let count = if minimum == 0 { args.len() } else { 1 };
+            // class may have argumentless ctor functions - still resolve ctor and compare vs props member type
+            let parameter_count = if args.is_empty() { parameter_count } else { 1 };
+            // sfc may specify context argument - handled by framework and not typechecked
+            let minimum = minimum.min(1);
+            if !self.effective_rest_parameter(signature)? && count > parameter_count {
+                return Ok(false);
+            }
+            if count >= minimum {
+                return Ok(true);
+            }
+            return self.missing_arguments_accept_void(signature, count, minimum);
+        }
+        if self.node(node)?.kind() == K::Decorator {
+            let count = self.decorator_argument_count(node, signature)?;
+            if !self.effective_rest_parameter(signature)? && count > parameter_count {
+                return Ok(false);
+            }
+            if count >= minimum {
+                return Ok(true);
+            }
+            return self.missing_arguments_accept_void(signature, count, minimum);
+        }
         let view = self.ast(node)?;
         let read = view.node(node)?;
         let incomplete = if read.kind() == K::BinaryExpression {
@@ -80,7 +114,18 @@ impl CheckerState {
         if incomplete || args.len() >= minimum {
             return Ok(true);
         }
-        for index in args.len()..minimum {
+        self.missing_arguments_accept_void(signature, args.len(), minimum)
+    }
+
+    /// The lower-bound tail of `hasCorrectArity`: every missing parameter must
+    /// accept `void`.
+    fn missing_arguments_accept_void(
+        &mut self,
+        signature: SignatureId,
+        count: usize,
+        minimum: usize,
+    ) -> Result<bool, Error> {
+        for index in count..minimum {
             let ty = self
                 .parameter_type_at(signature, index)?
                 .unwrap_or(self.builtins.any_type);
@@ -163,12 +208,15 @@ impl CheckerState {
         inference: Option<InferenceId>,
         mode: u32,
     ) -> Result<TypeId, Error> {
+        let context_node = self.contextual_node_of(node)?;
         self.calls.contexts.push(crate::calls::ArgumentContext {
-            node,
+            node: context_node,
             ty: Some(contextual),
             is_cache: false,
         });
-        self.calls.inference_contexts.push((node, inference));
+        self.calls
+            .inference_contexts
+            .push((context_node, inference));
         let result = (|| {
             let mode = mode | 1 | if inference.is_some() { 2 } else { 0 };
             let mut ty = self.check_expression_ex(node, mode)?;
@@ -188,6 +236,26 @@ impl CheckerState {
         self.calls.inference_contexts.pop();
         self.calls.contexts.pop();
         result
+    }
+
+    /// Attributes of an element with children push their context on the
+    /// element, so that it encompasses the attributes _and_ the children
+    /// (which are essentially part of the attributes).
+    // port: tsc/internal/checker/checker.go:Checker.getContextNode
+    fn contextual_node_of(&self, node: NodeId) -> Result<NodeId, Error> {
+        let read = self.node(node)?;
+        if read.kind() == K::JsxAttributes {
+            let parent = read
+                .parent()
+                .ok_or(Error::MissingLink("JSX attributes parent"))?;
+            if self.node(parent)?.kind() != K::JsxSelfClosingElement {
+                return self
+                    .node(parent)?
+                    .parent()
+                    .ok_or(Error::MissingLink("JSX opening element parent"));
+            }
+        }
+        Ok(node)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.instantiateContextualType
@@ -295,6 +363,9 @@ impl CheckerState {
         mode: u32,
         context: InferenceId,
     ) -> Result<Vec<TypeId>, Error> {
+        if tsr_ast::utilities_middle::is_jsx_opening_like_element(&self.node(node)?) {
+            return self.infer_jsx_type_arguments(node, signature, mode, context);
+        }
         let parameters = self
             .signatures
             .get(signature)?
@@ -481,6 +552,11 @@ impl CheckerState {
         output: &mut Vec<Diagnostic>,
     ) -> Result<bool, Error> {
         let read = self.node(node)?;
+        if tsr_ast::utilities_middle::is_jsx_call_like(&read) {
+            return self.check_applicable_signature_for_jsx_call_like_element(
+                node, signature, relation, mode, report, output,
+            );
+        }
         let skip_this = read.kind() == K::NewExpression
             || read.kind() == K::CallExpression
                 && match read.expression() {
@@ -623,10 +699,13 @@ impl CheckerState {
                 .ok_or(Error::MissingLink("instanceof right operand"))?;
             return Ok(Some(right));
         }
-        if !matches!(
-            self.node(node)?.kind().known(),
-            Some(K::CallExpression | K::TaggedTemplateExpression)
-        ) {
+        let es_decorator = self.node(node)?.kind() == K::Decorator && !self.legacy_decorators()?;
+        if !es_decorator
+            && !matches!(
+                self.node(node)?.kind().known(),
+                Some(K::CallExpression | K::TaggedTemplateExpression)
+            )
+        {
             return Ok(None);
         }
         let mut expression =
@@ -720,8 +799,13 @@ impl CheckerState {
             && count == "1"
             && args.is_empty()
             && self.is_promise_resolve_arity_error(node)?;
+        let decorator = self.node(node)?.kind() == K::Decorator;
         let message = if between {
             messages::No_overload_expects_0_arguments_but_overloads_do_exist_that_expect_either_1_or_2_arguments
+        } else if decorator && rest {
+            messages::The_runtime_will_invoke_the_decorator_with_1_arguments_but_the_decorator_expects_at_least_0
+        } else if decorator {
+            messages::The_runtime_will_invoke_the_decorator_with_1_arguments_but_the_decorator_expects_0
         } else if rest {
             messages::Expected_at_least_0_arguments_but_got_1
         } else if void_promise_error {
@@ -799,8 +883,8 @@ impl CheckerState {
                 diagnostic_args,
             )
         };
-        if self.node(node)?.kind() == K::BinaryExpression {
-            diagnostic = Diagnostic::chain(Some(std::sync::Arc::new(diagnostic)), messages::The_left_hand_side_of_an_instanceof_expression_must_be_assignable_to_the_first_argument_of_the_right_hand_side_s_Symbol_hasInstance_method, vec![]);
+        if let Some(head) = self.call_head_message(node)? {
+            diagnostic = Diagnostic::chain(Some(std::sync::Arc::new(diagnostic)), head, vec![]);
         }
         if args.len() < minimum {
             if let Some(declaration) = self.signatures.get(signature)?.declaration {

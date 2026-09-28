@@ -4,6 +4,16 @@ use crate::{type_flags as tf, CheckerState, Error, TypeId, UnionReduction};
 use tsr_arena::NodeId;
 use tsr_ast::{symbol_flags as sf, JsString, SyntaxKind as K};
 
+/// The value `ObjectLiteralDiscriminator.matches` tests: an initializer's
+/// context-free type, `undefined` for an absent optional member, or `true`
+/// for a JSX attribute without an initializer.
+#[derive(Clone, Copy)]
+pub(crate) enum Discriminant {
+    Expression(NodeId),
+    Undefined,
+    True,
+}
+
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.discriminateContextualTypeByObjectMembers
     pub(crate) fn discriminate_object_context(
@@ -41,7 +51,7 @@ impl CheckerState {
                     continue;
                 };
                 if self.discriminant_property(context, name.as_bytes())? {
-                    discriminants.push((name, Some(expression)));
+                    discriminants.push((name, Discriminant::Expression(expression)));
                 }
             }
             let symbol = self
@@ -55,7 +65,7 @@ impl CheckerState {
                     && self.member_symbol(members, name.as_bytes())?.is_none()
                     && self.discriminant_property(context, name.as_bytes())?
                 {
-                    discriminants.push((name, None));
+                    discriminants.push((name, Discriminant::Undefined));
                 }
             }
             self.discriminate_object_items(context, &discriminants)?
@@ -114,7 +124,7 @@ impl CheckerState {
         Ok(None)
     }
     // port: tsc/internal/checker/checker.go:Checker.isPossiblyDiscriminantValue
-    fn possible_object_discriminant(&self, node: NodeId) -> Result<bool, Error> {
+    pub(crate) fn possible_object_discriminant(&self, node: NodeId) -> Result<bool, Error> {
         let read = self.node(node)?;
         match read.kind().known() {
             Some(
@@ -143,10 +153,10 @@ impl CheckerState {
         }
     }
     // port: tsc/internal/checker/relater.go:Checker.discriminateTypeByDiscriminableItems
-    fn discriminate_object_items(
+    pub(crate) fn discriminate_object_items(
         &mut self,
         context: TypeId,
-        items: &[(JsString, Option<NodeId>)],
+        items: &[(JsString, Discriminant)],
     ) -> Result<TypeId, Error> {
         let types = self.types.compound_types(context)?.clone();
         let mut include = Vec::with_capacity(types.len());
@@ -165,8 +175,11 @@ impl CheckerState {
                 }
                 if let Some(target) = self.property_or_index_type(ty, name.as_bytes())? {
                     let source = match expression {
-                        Some(node) => self.get_context_free_type_of_expression(*node)?,
-                        None => self.builtins.undefined_type,
+                        Discriminant::Expression(node) => {
+                            self.get_context_free_type_of_expression(*node)?
+                        }
+                        Discriminant::Undefined => self.builtins.undefined_type,
+                        Discriminant::True => self.builtins.true_type,
                     };
                     let mut current = false;
                     for part in self.distributed_types(source)? {

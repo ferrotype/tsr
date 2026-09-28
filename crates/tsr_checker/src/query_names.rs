@@ -130,6 +130,13 @@ impl CheckerState {
                 tsr_ast::utilities_tail::is_js_doc_name_reference_context(self.ast(name)?, name)?;
             match read.kind().known() {
                 Some(K::Identifier) => {
+                    if tsr_ast::utilities_targets::is_jsx_tag_name(self.ast(name)?, name)?
+                        && self.is_jsx_intrinsic_tag_name(name)?
+                    {
+                        let parent = required(self.node(name)?.parent(), "JSX tag parent")?;
+                        let symbol = self.intrinsic_tag_symbol(parent)?;
+                        return Ok(symbol.filter(|&symbol| symbol != self.builtins.unknown_symbol));
+                    }
                     if jsdoc {
                         self.jsdoc_identifier_symbol(name)
                     } else {
@@ -217,7 +224,7 @@ impl CheckerState {
         }
     }
     // port: tsc/internal/checker/checker.go:Checker.getApplicableIndexSymbol
-    fn applicable_index_symbol(
+    pub(crate) fn applicable_index_symbol(
         &mut self,
         ty: TypeId,
         key: TypeId,

@@ -27,11 +27,7 @@ impl CheckerState {
         if !self.check_class_heritage_grammar(node)? {
             self.check_grammar_type_parameter_list(node)?;
         }
-        for modifier in self.source_list(node, self.node(node)?.modifiers())? {
-            if self.node(modifier)?.kind() == K::Decorator {
-                return Err(Error::Unsupported("checkClassLikeDeclaration: decorators"));
-            }
-        }
+        self.check_decorators(node)?;
         self.check_collisions_for_declaration_name(node)?;
         self.check_type_parameters(node)?;
         self.check_exports_on_merged_declarations(node)?;

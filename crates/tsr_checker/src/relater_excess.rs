@@ -55,7 +55,7 @@ impl CheckerState {
                     && self
                         .index_info_of_type(ty, self.builtins.string_type)?
                         .is_some()
-                || jsx && name.contains(&b'-')
+                || jsx && crate::jsx::is_hyphenated_jsx_name(name)
             {
                 return Ok(true);
             }
@@ -164,25 +164,25 @@ impl Relater<'_> {
                 }
             }
         }
-        let container = record
-            .symbol
-            .ok_or(Error::MissingLink("fresh literal symbol"))?;
-        let container_declaration = self.checker.symbol(container)?.value_declaration();
         for property in self.checker.get_properties_of_type(source)? {
             let read = self.checker.symbol(property)?;
             let name = read.name_to_owned();
             let Some(declaration) = read.value_declaration() else {
                 continue;
             };
+            let container = record
+                .symbol
+                .ok_or(Error::MissingLink("fresh literal symbol"))?;
+            let container_declaration = self.checker.symbol(container)?.value_declaration();
             if container_declaration.is_none()
                 || self.checker.node(declaration)?.parent() != container_declaration
-                || jsx && name.as_bytes().contains(&b'-')
+                || self.checker.is_ignored_jsx_property(source, property)?
             {
                 continue;
             }
             if !self.checker.known_property(reduced, name.as_bytes(), jsx)? {
                 if report {
-                    self.report_excess_property(property, declaration, container, reduced, jsx)?;
+                    self.report_excess_property(property, declaration, container, reduced)?;
                 }
                 return Ok(true);
             }
@@ -235,7 +235,6 @@ impl Relater<'_> {
         declaration: NodeId,
         container: SymbolId,
         reduced: TypeId,
-        jsx: bool,
     ) -> Result<(), Error> {
         // Report error in terms of object types in the target as those are the only ones
         // we check in isKnownProperty.
@@ -247,8 +246,7 @@ impl Relater<'_> {
             .error_node
             .ok_or(Error::MissingLink("No errorNode in hasExcessProperties"))?;
         let error_read = self.checker.node(error_node)?;
-        let jsx_error = jsx
-            || tsr_ast::is_jsx_attributes(&error_read)
+        let jsx_error = tsr_ast::is_jsx_attributes(&error_read)
             || tsr_ast::utilities_middle::is_jsx_opening_like_element(&error_read)
             || error_read
                 .parent()
@@ -260,7 +258,50 @@ impl Relater<'_> {
                 .transpose()?
                 .unwrap_or(false);
         if jsx_error {
-            return Err(Error::Unsupported("hasExcessProperties: JSX attributes"));
+            // JsxAttributes has an object-literal flag and undergo same type-assignablity check as normal object-literal.
+            // However, using an object-literal error message will be very confusing to the users so we give different a message.
+            let declaration_read = self.checker.node(declaration)?;
+            if declaration_read.kind() == K::JsxAttribute {
+                let name = declaration_read
+                    .name()
+                    .ok_or(Error::MissingLink("JSX attribute name"))?;
+                let error_file = tsr_ast::utilities::get_source_file_of_node(
+                    self.checker.ast(error_node)?,
+                    Some(error_node),
+                )?;
+                let name_file = tsr_ast::utilities::get_source_file_of_node(
+                    self.checker.ast(name)?,
+                    Some(name),
+                )?;
+                if error_file == name_file {
+                    // Note that extraneous children (as in `<NoChild>extra</NoChild>`) don't pass this check,
+                    // since `children` is a Kind.PropertySignature instead of a Kind.JsxAttribute.
+                    self.errors.error_node = Some(name);
+                }
+            }
+            let property_name = self.checker.symbol_to_string(property)?;
+            let suggestion = self
+                .checker
+                .suggested_symbol_for_nonexistent_jsx_attribute(
+                    property_name.as_bytes(),
+                    error_target,
+                )?;
+            let target_name = self
+                .checker
+                .type_to_string(error_target, crate::type_display::DEFAULT_FLAGS)?;
+            if let Some(suggestion) = suggestion {
+                let suggestion = self.checker.symbol_to_string(suggestion)?;
+                self.report_error(
+                    d::Property_0_does_not_exist_on_type_1_Did_you_mean_2,
+                    vec![property_name, target_name, suggestion],
+                );
+            } else {
+                self.report_error(
+                    d::Property_0_does_not_exist_on_type_1,
+                    vec![property_name, target_name],
+                );
+            }
+            return Ok(());
         }
         // use the property's value declaration if the property is assigned inside the literal itself
         let object_literal_declaration = self

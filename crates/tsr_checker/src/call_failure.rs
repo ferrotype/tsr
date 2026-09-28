@@ -266,8 +266,8 @@ impl CheckerState {
                         vec![],
                     );
                 }
-                if self.node(state.node)?.kind() == K::BinaryExpression {
-                    diagnostic=Diagnostic::chain(Some(Arc::new(diagnostic)),messages::The_left_hand_side_of_an_instanceof_expression_must_be_assignable_to_the_first_argument_of_the_right_hand_side_s_Symbol_hasInstance_method,vec![]);
+                if let Some(head) = self.call_head_message(state.node)? {
+                    diagnostic = Diagnostic::chain(Some(Arc::new(diagnostic)), head, vec![]);
                 }
                 if state.argument_errors.len() > 1 {
                     if let Some(declaration) = self.signatures.get(last)?.declaration {
@@ -287,7 +287,7 @@ impl CheckerState {
             self.report_call_arity(state.node, &state.args, arity)?;
         } else if let Some(constraint) = state.constraint_error {
             self.call_type_arguments(constraint, &state.type_arguments, true)?;
-        } else {
+        } else if self.node(state.node)?.kind() != K::JsxOpeningFragment {
             let mut correct = Vec::new();
             for &signature in signatures {
                 let parameters = self
@@ -314,6 +314,19 @@ impl CheckerState {
             }
         }
         Ok(())
+    }
+
+    /// The head message `resolveCall` receives: a decorator's resolution head
+    /// message, or the `instanceof` message `resolveCall` supplies itself.
+    pub(crate) fn call_head_message(
+        &self,
+        node: NodeId,
+    ) -> Result<Option<&'static tsr_diagnostics::Message>, Error> {
+        Ok(match self.node(node)?.kind().known() {
+            Some(K::Decorator) => Some(self.decorator_resolution_head_message(node)?),
+            Some(K::BinaryExpression) => Some(messages::The_left_hand_side_of_an_instanceof_expression_must_be_assignable_to_the_first_argument_of_the_right_hand_side_s_Symbol_hasInstance_method),
+            _ => None,
+        })
     }
 
     // port: tsc/internal/checker/checker.go:Checker.addImplementationSuccessElaboration

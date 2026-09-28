@@ -191,6 +191,32 @@ impl CheckerState {
         })
     }
 
+    /// The compiler's synthetic JSX runtime import resolves like its `tslib`
+    /// import: from the file, in the helpers' mode; its errors land on the
+    /// file's first JSX tag.
+    // port: tsc/internal/checker/jsx.go:Checker.getJsxNamespaceContainerForImplicitImport
+    pub(crate) fn resolve_jsx_runtime_module(
+        &mut self,
+        source: NodeId,
+        module_reference: JsString,
+        error_node: Option<NodeId>,
+    ) -> Result<Option<SymbolId>, Error> {
+        let (_, file_name) = self.module_source(source)?;
+        let mode = self
+            .program()?
+            .host
+            .get_import_helpers_resolution_mode(file_name.as_bytes())?;
+        self.resolve_external_module_reference(ExternalModuleReference {
+            location: source,
+            module_reference,
+            error_node,
+            message: Some(d::This_JSX_tag_requires_the_module_path_0_to_exist_but_none_could_be_found_Make_sure_you_have_types_for_the_appropriate_package_installed),
+            augmentation: false,
+            mode,
+            attributes: None,
+        })
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.resolveExternalModule
     fn resolve_external_module_reference(
         &mut self,

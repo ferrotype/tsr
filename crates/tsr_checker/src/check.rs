@@ -324,7 +324,8 @@ impl CheckerState {
             Some(K::NamespaceExportDeclaration | K::SemicolonClassElement) => Ok(()),
             // Upstream visits modifier keywords through forEachChild and its
             // switch has no case for them.
-            _ if tsr_ast::is_modifier_kind(read.kind()) && read.kind() != K::Decorator => Ok(()),
+            // Nor for decorators, which the declaration's own check visits.
+            _ if tsr_ast::is_modifier_kind(read.kind()) || read.kind() == K::Decorator => Ok(()),
             _ => Err(Error::Unsupported(
                 "checkSourceElementWorker: statement/type family",
             )),

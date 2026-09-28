@@ -17,6 +17,8 @@ pub(crate) struct QueryState {
     pub declared_types: LinkStore<SymbolId, Option<TypeId>>,
     pub type_nodes: LinkStore<NodeId, Option<TypeId>>,
     pub global_types: crate::types::Map<&'static str, TypeId>,
+    /// `CachedTypeKindDecoratorContext*` override object types, per flags and name type.
+    pub decorator_context_overrides: crate::types::Map<(u8, TypeId), TypeId>,
     /// `symbolTableAliasCache`: alias symbols of the globals and exports tables,
     /// shared by every display query of this checker.
     pub symbol_table_aliases:
@@ -313,9 +315,17 @@ impl CheckerState {
                     _ => Ok(None),
                 }
             }
-            Some(K::JsxNamespacedName) => Err(Error::Unsupported(
-                "getSymbolAtLocation: JSX namespaced name",
-            )),
+            Some(K::JsxNamespacedName) => {
+                let view = self.ast(node)?;
+                if tsr_ast::utilities_targets::is_jsx_tag_name(view, node)?
+                    && self.is_jsx_intrinsic_tag_name(node)?
+                {
+                    let parent = required(read.parent(), "JSX tag parent")?;
+                    let symbol = self.intrinsic_tag_symbol(parent)?;
+                    return Ok(symbol.filter(|&symbol| symbol != self.builtins.unknown_symbol));
+                }
+                Ok(None)
+            }
             _ => Ok(None),
         }
     }
@@ -858,10 +868,6 @@ impl CheckerState {
             Some(K::TrueKeyword) => return Ok(self.builtins.true_type),
             Some(K::FalseKeyword) => return Ok(self.builtins.false_type),
             Some(K::NullKeyword) => return Ok(self.builtins.null_widening_type),
-            // A malformed import<T> has already reported its grammar error.
-            // The pin's checkExpressionWorker falls through to errorType for
-            // its bare import keyword; preserve checks of the type arguments.
-            Some(K::ImportKeyword) => return Ok(self.builtins.error_type),
             Some(K::ParenthesizedExpression) => {
                 return self.check_expression_ex(
                     required(read.expression(), "parenthesized expression")?,
@@ -927,9 +933,21 @@ impl CheckerState {
             }
             Some(K::DeleteExpression) => return self.check_delete_expression(node),
             Some(K::MetaProperty) => return self.check_meta_property(node),
-            // JSX expressions are outside the frozen denominator; every other
-            // kind upstream accepts is ported above.
-            _ => return Err(Error::Unsupported("checkExpressionWorker")),
+            Some(K::JsxExpression) => return self.check_jsx_expression(node),
+            Some(K::JsxElement) => return self.check_jsx_element(node),
+            Some(K::JsxSelfClosingElement) => return self.check_jsx_self_closing_element(node),
+            Some(K::JsxFragment) => return self.check_jsx_fragment(node),
+            Some(K::JsxAttributes) => return self.check_jsx_attributes(node),
+            Some(K::JsxOpeningElement) => {
+                return Err(Error::Unsupported(
+                    "Should never directly check a JsxOpeningElement",
+                ))
+            }
+            // Every other kind is an error type upstream: the bare import
+            // keyword of a malformed import<T>, which has already reported its
+            // grammar error, or the MissingDeclaration a decorator outside a
+            // class parses to.
+            _ => return Ok(self.builtins.error_type),
         };
         self.get_fresh_type_of_literal_type(ty)
     }
@@ -1161,6 +1179,8 @@ impl CheckerState {
                 self.check_shorthand_property_assignment(declaration, true, 0)
             } else if self.node(declaration)?.kind() == K::MethodDeclaration {
                 self.check_object_literal_method(declaration)
+            } else if self.node(declaration)?.kind() == K::JsxAttribute {
+                self.check_jsx_attribute(declaration, 0)
             } else if matches!(
                 self.node(declaration)?.kind().known(),
                 Some(K::BinaryExpression | K::CallExpression)

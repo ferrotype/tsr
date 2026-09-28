@@ -1,0 +1,31 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources_sha256": {
+    "decorator_positions.ts": "5912f3c184daee8bcbfec2188d0d63cf502f4fb633a2ebed0b5cb3a72cc69dca"
+  },
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--skipLibCheck",
+    "--strict",
+    "decorator_positions.ts"
+  ],
+  "native_output_sha256": "d4ddc1fc479ad8be5855168f02c43314770c2facdb8c188bc86404148301dd8d",
+  "exit_code": 2,
+  "native_stderr": "",
+  "diagnostics": [
+    {
+      "file": "decorator_positions.ts",
+      "line": 15,
+      "column": 15,
+      "code": 1206,
+      "message": "Decorators are not valid here."
+    }
+  ]
+}

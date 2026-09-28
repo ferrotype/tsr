@@ -99,9 +99,16 @@ C3_REVIEWED_GROUPS = {
     "C3.8 utilities (utilities.go share)": (143, "56cda335a5295c55602fbc240e65793810f50c688d5dc299cd223f0c04bcb3a9"),
 }
 C3_COMPLETE_FILES = {"C3.2 narrowing and flow (flow.go)": "tsc/internal/checker/flow.go:"}
+C4_REVIEWED_GROUPS = {
+    "C4.2-C4.5 JSX (jsx.go)": (59, "178da8f43e12d0920e98a9e8a2359f8f6dbc47e35bf2834bdb963088022f0ff2"),
+    "C4 JSX seams (checker, grammar, relater, utilities; C5 wrappers)": (14, "c9202b9c9fc202e1d3514c6d2cc1768a02b049954187e1078f8c8c19d3adecea"),
+    "C4.6-C4.7 decorators and metadata": (47, "8c3d1ce5c8ae1acd5483a5603b8b83e35afa14d6d6c5d683998789e86a0428d7"),
+}
+C4_COMPLETE_FILES = {"C4.2-C4.5 JSX (jsx.go)": "tsc/internal/checker/jsx.go:"}
 SCOPES = {"C1": (REVIEWED_GROUPS, COMPLETE_FILES, REQUIRED_HANDOFFS),
           "C2": (C2_REVIEWED_GROUPS, C2_COMPLETE_FILES, {}),
-          "C3": (C3_REVIEWED_GROUPS, C3_COMPLETE_FILES, {})}
+          "C3": (C3_REVIEWED_GROUPS, C3_COMPLETE_FILES, {}),
+          "C4": (C4_REVIEWED_GROUPS, C4_COMPLETE_FILES, {})}
 
 
 def inventory():
