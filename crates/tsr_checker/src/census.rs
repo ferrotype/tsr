@@ -407,11 +407,13 @@ impl CheckerState {
         self.census_enums(&mut census);
         self.body_checks.census(&mut census);
         self.calls.census(&mut census);
+        self.jsx.census(&mut census);
         self.iteration.census(&mut census);
         self.module_aliases.census(&mut census);
         self.synthetic_scopes.census(&mut census);
         census.links("query_links", &self.emit.visible);
         census.links("query_links", &self.emit.aliases_marked);
+        census.map("query_links", &self.emit.import_refs);
         census.links("query_links", &self.emit_checks.node_flags);
         census.links("query_links", &self.emit_checks.requested_helpers);
         census.links("query_links", &self.emit_checks.helpers_module);

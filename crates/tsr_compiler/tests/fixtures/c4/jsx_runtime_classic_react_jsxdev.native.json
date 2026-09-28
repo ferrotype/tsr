@@ -1,0 +1,36 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources_sha256": {
+    "jsx_runtime_classic.tsx": "4a24940a6d336dc21bea4329ddc81fb3c1db71f81f6ca6b93b6c4599fb307eff",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+  },
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--skipLibCheck",
+    "--jsx",
+    "react-jsxdev",
+    "--strict",
+    "jsx_runtime_classic.tsx"
+  ],
+  "native_output_sha256": "25f5ac125c4c374df0d9eab22f5fbe00ddeffb387c727c6d92aa32df6438df8f",
+  "exit_code": 2,
+  "native_stderr": "",
+  "diagnostics": [
+    {
+      "file": "jsx_runtime_classic.tsx",
+      "line": 4,
+      "column": 14,
+      "code": 2322,
+      "message": "Type 'Element' is not assignable to type 'number'."
+    }
+  ]
+}

@@ -338,7 +338,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (getSuggestedSymbolForNonexistentProperty).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/deferred_checks.rs:158"
+   "rust": "crates/tsr_checker/src/deferred_checks.rs:180"
   },
   "tsc/internal/checker/checker.go:Checker.getSuggestedSymbolForNonexistentSymbol": {
    "disposition": "equivalent",
@@ -446,7 +446,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (invocationError).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/calls.rs:448"
+   "rust": "crates/tsr_checker/src/calls.rs:457"
   },
   "tsc/internal/checker/checker.go:Checker.isAritySmaller": {
    "disposition": "equivalent",
@@ -476,7 +476,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (isPropertyAbstractOrInterface).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/class_overrides.rs:125"
+   "rust": "crates/tsr_checker/src/class_overrides.rs:299"
   },
   "tsc/internal/checker/checker.go:Checker.isPropertyDeclaredInAncestorClass": {
    "disposition": "equivalent",
@@ -619,7 +619,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (resolveErrorCall).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/calls.rs:427"
+   "rust": "crates/tsr_checker/src/calls.rs:436"
   },
   "tsc/internal/checker/checker.go:Checker.shouldCheckErasableSyntax": {
    "disposition": "equivalent",
@@ -696,7 +696,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (getVerbatimModuleSyntaxErrorMessage).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/source_alias_checks.rs:163"
+   "rust": "crates/tsr_checker/src/source_module_aliases.rs:263"
   },
   "tsc/internal/checker/checker.go:hasCommonDomTypeName": {
    "disposition": "equivalent",
@@ -920,7 +920,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (callLikeExpressionMayHaveTypeArguments).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/calls.rs:612"
+   "rust": "crates/tsr_checker/src/calls.rs:621"
   },
   "tsc/internal/checker/utilities.go:Checker.checkNotCanceled": {
    "disposition": "later",

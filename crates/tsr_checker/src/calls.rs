@@ -78,6 +78,13 @@ impl CallState {
             &self.inference_contexts,
             self.inference_contexts.capacity(),
         );
+        census.map("call_resolution", &self.decorator_signatures);
+        census.vec_capacity(
+            "call_resolution",
+            &self.candidates_out,
+            self.candidates_out.capacity(),
+        );
+        census.set("call_resolution", &self.skip_direct_inference_nodes);
     }
     pub(crate) fn census_signatures(&self) -> impl Iterator<Item = SignatureId> + '_ {
         self.resolved
@@ -91,6 +98,8 @@ impl CallState {
                     .iter()
                     .flat_map(|(&(source, _), &result)| [source, result]),
             )
+            .chain(self.decorator_signatures.values().copied())
+            .chain(self.candidates_out.iter().copied())
     }
     pub(crate) fn census_types(&self) -> impl Iterator<Item = TypeId> + '_ {
         self.contexts.iter().filter_map(|context| context.ty).chain(

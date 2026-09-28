@@ -337,7 +337,7 @@
     "tsc/internal/checker/checker.go:Checker.hasCorrectTypeArgumentArity": {
       "disposition": "equivalent",
       "reason": "Overload candidate selection admits an absent type-argument list or a count between min_type_argument_count and the signature parameter count, exactly the native predicate.",
-      "rust": "crates/tsr_checker/src/calls.rs:865"
+      "rust": "crates/tsr_checker/src/calls.rs:874"
     },
     "tsc/internal/checker/checker.go:Checker.inferSignatureInstantiationForOverloadFailure": {
       "disposition": "equivalent",
@@ -378,7 +378,7 @@
       "disposition": "equivalent",
       "reason": "The skip-generic path checks nonempty type parameters and an OBJECT return with at least one call signature, exactly the native isFunctionType predicate, before marking a skipped inference pass.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/calls.rs:465"
+      "rust": "crates/tsr_checker/src/calls.rs:474"
     },
     "tsc/internal/checker/checker.go:Checker.isGenericObjectType": {
       "disposition": "equivalent",

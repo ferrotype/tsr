@@ -1,0 +1,47 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources_sha256": {
+    "jsx_pragma_without_frag.tsx": "64417da317309b8eaf039b3fcee28bd62f937c98f273a570068201b7dd6417c8"
+  },
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--skipLibCheck",
+    "--jsx",
+    "react",
+    "--strict",
+    "jsx_pragma_without_frag.tsx"
+  ],
+  "native_output_sha256": "92af848b1c719cd057b2c6684ec1bdbb96164b33b630d960fb63e2477f2d501a",
+  "exit_code": 2,
+  "native_stderr": "",
+  "diagnostics": [
+    {
+      "file": "jsx_pragma_without_frag.tsx",
+      "line": 10,
+      "column": 18,
+      "code": 2874,
+      "message": "This JSX tag requires 'React' to be in scope, but it could not be found."
+    },
+    {
+      "file": "jsx_pragma_without_frag.tsx",
+      "line": 10,
+      "column": 18,
+      "code": 2879,
+      "message": "Using JSX fragments requires fragment factory 'React' to be in scope, but it could not be found."
+    },
+    {
+      "file": "jsx_pragma_without_frag.tsx",
+      "line": 10,
+      "column": 18,
+      "code": 17017,
+      "message": "An @jsxFrag pragma is required when using an @jsx pragma with JSX fragments."
+    }
+  ]
+}

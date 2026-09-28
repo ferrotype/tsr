@@ -31,11 +31,20 @@ pub const REACT: &[(&str, &str)] = &[
 ];
 
 pub struct Case {
+    pub name: String,
     pub program: Arc<Program>,
     pub owner: Arc<CheckerOwner>,
     pub generation: Generation,
     pub root: String,
     pub native: Value,
+}
+
+fn string_value(flag: &str, value: Option<&str>) -> JsString {
+    JsString::from_bytes(
+        value
+            .unwrap_or_else(|| panic!("{flag} needs a value"))
+            .as_bytes(),
+    )
 }
 
 fn options_from_command(command: &[Value]) -> CompilerOptions {
@@ -71,8 +80,12 @@ fn options_from_command(command: &[Value]) -> CompilerOptions {
                     other => panic!("unsupported native jsx mode {other:?}"),
                 }
             }
+            "--jsxFactory" => options.jsx_factory = string_value(flag, value),
+            "--jsxFragmentFactory" => options.jsx_fragment_factory = string_value(flag, value),
+            "--jsxImportSource" => options.jsx_import_source = string_value(flag, value),
             "--target" => assert_eq!(value, Some("esnext")),
-            "--noEmit" | "--ignoreConfig" | "--pretty" => {}
+            "--noEmit" => options.no_emit = tristate,
+            "--ignoreConfig" | "--pretty" => {}
             other => panic!("unsupported native flag {other}"),
         }
         i += 1 + usize::from(value.is_some());
@@ -140,6 +153,7 @@ pub fn load(case: &str, native_json: &str, files: &[(&str, &str)]) -> Case {
     );
     let (generation, owner) = checker(&program);
     Case {
+        name: case.to_string(),
         program,
         owner,
         generation,
@@ -274,6 +288,10 @@ pub fn assert_case(case: &str, native_json: &str, files: &[(&str, &str)]) -> Cas
 /// The first JSX opening element, self-closing element or opening fragment
 /// in the root file, in source order.
 pub fn first_jsx_tag(case: &Case) -> NodeId {
+    find_first_jsx_tag(case).expect("a JSX tag in the root file")
+}
+
+fn find_first_jsx_tag(case: &Case) -> Option<NodeId> {
     use std::ops::ControlFlow;
     use tsr_ast::{AstView, ChildVisitor, SyntaxKind as K};
     struct Walk<'a> {
@@ -311,5 +329,308 @@ pub fn first_jsx_tag(case: &Case) -> NodeId {
         found: None,
     };
     let _ = walk.visit_node(file.source());
-    walk.found.expect("a JSX tag in the root file")
+    walk.found
+}
+
+macro_rules! fixture_files {
+    ($($name:literal),* $(,)?) => {
+        &[$(($name, include_str!(concat!("../fixtures/c4/", $name)))),*]
+    };
+}
+
+macro_rules! case_records {
+    ($($name:literal),* $(,)?) => {
+        &[$(($name, include_str!(concat!("../fixtures/c4/", $name, ".native.json")))),*]
+    };
+}
+
+/// Every file a case of `fixtures/c4/fixtures.json` names.
+pub const FILES: &[(&str, &str)] = fixture_files![
+    "jsx_modes.tsx",
+    "node_modules/react/package.json",
+    "node_modules/react/index.d.ts",
+    "node_modules/react/jsx-runtime.d.ts",
+    "jsx_pragmas.tsx",
+    "jsx_elements.tsx",
+    "jsx_generics.tsx",
+    "jsx_in_js.jsx",
+    "decorator_positions.ts",
+    "decorator_static_block.ts",
+    "decorator_contexts.ts",
+    "metadata_marking.ts",
+    "metadata_types.ts",
+    "lifecycle.tsx",
+    "jsx_deep_pragma.tsx",
+    "jsx_import_source.tsx",
+    "node_modules/preact/package.json",
+    "node_modules/preact/index.d.ts",
+    "node_modules/preact/jsx-runtime.d.ts",
+    "node_modules/preact/jsx-dev-runtime.d.ts",
+    "jsx_import_source_absent.tsx",
+    "node_modules/bare/package.json",
+    "node_modules/bare/index.d.ts",
+    "jsx_import_source_option.tsx",
+    "jsx_factory_options.tsx",
+    "jsx_pragma_without_frag.tsx",
+    "jsx_no_namespace.tsx",
+    "jsx_runtime_classic.tsx",
+    "jsx_runtime_automatic.tsx",
+    "conditional_distribution.ts",
+    "relation_excess.ts",
+];
+
+/// Every case's native diagnostics record.
+pub const RECORDS: &[(&str, &str)] = case_records![
+    "jsx_modes_preserve",
+    "jsx_pragmas_preserve",
+    "jsx_modes_react_native",
+    "jsx_pragmas_react_native",
+    "jsx_modes_react",
+    "jsx_pragmas_react",
+    "jsx_modes_react_jsx",
+    "jsx_pragmas_react_jsx",
+    "jsx_modes_react_jsxdev",
+    "jsx_pragmas_react_jsxdev",
+    "jsx_elements",
+    "jsx_generics",
+    "jsx_in_js",
+    "decorator_positions_es",
+    "decorator_positions_legacy",
+    "decorator_static_block_es",
+    "decorator_static_block_legacy",
+    "decorator_contexts",
+    "metadata_marking",
+    "metadata_isolated",
+    "lifecycle",
+    "jsx_deep_pragma",
+    "jsx_import_source_preserve",
+    "jsx_import_source_absent_preserve",
+    "jsx_import_source_react_native",
+    "jsx_import_source_absent_react_native",
+    "jsx_import_source_react",
+    "jsx_import_source_absent_react",
+    "jsx_import_source_react_jsx",
+    "jsx_import_source_absent_react_jsx",
+    "jsx_import_source_react_jsxdev",
+    "jsx_import_source_absent_react_jsxdev",
+    "jsx_import_source_option_react_jsx",
+    "jsx_import_source_option_react_jsxdev",
+    "jsx_factory_option",
+    "jsx_factory_options",
+    "jsx_pragmas_over_options",
+    "jsx_pragma_without_frag",
+    "jsx_no_flag",
+    "jsx_react_missing",
+    "jsx_runtime_classic_react_jsx",
+    "jsx_runtime_classic_react_jsxdev",
+    "jsx_runtime_automatic_react",
+    "jsx_runtime_automatic_preserve",
+    "metadata_plain",
+    "conditional_distribution",
+    "relation_excess",
+];
+
+pub const MANIFEST: &str = include_str!("../fixtures/c4/fixtures.json");
+
+/// The case's root and bound files, root first, as the manifest lists them.
+pub fn case_files(case: &str) -> Vec<(&'static str, &'static str)> {
+    let manifest: Value = serde_json::from_str(MANIFEST).unwrap();
+    let spec = &manifest[case];
+    let root = spec["root"]
+        .as_str()
+        .unwrap_or_else(|| panic!("{case} is not in the manifest"));
+    let mut names = vec![root.to_string()];
+    for name in spec["files"].as_array().into_iter().flatten() {
+        names.push(name.as_str().unwrap().to_string());
+    }
+    names
+        .iter()
+        .map(|name| {
+            *FILES
+                .iter()
+                .find(|(file, _)| file == name)
+                .unwrap_or_else(|| panic!("{case}: {name} is not in the fixture table"))
+        })
+        .collect()
+}
+
+/// Loads a manifest case by name.
+pub fn named(case: &str) -> Case {
+    let record = RECORDS
+        .iter()
+        .find(|(name, _)| *name == case)
+        .unwrap_or_else(|| panic!("{case} has no native record in the table"))
+        .1;
+    load(case, record, &case_files(case))
+}
+
+/// Loads a manifest case by name and asserts its diagnostics equal the record.
+pub fn assert_named(case: &str) -> Case {
+    let loaded = named(case);
+    assert_eq!(
+        json!(observed(&loaded)),
+        loaded.native["diagnostics"],
+        "{case}: diagnostics differ from the pinned native observation"
+    );
+    loaded
+}
+
+/// The pinned checker's state for `case` (`fixtures/c4/state`, recorded by
+/// its `regenerate.py` through a Go overlay of the pinned checker), after
+/// checking the bound flags and sources the case loads.
+pub fn recorded_state(case: &Case) -> Value {
+    let record: Value =
+        serde_json::from_str(include_str!("../fixtures/c4/state/native.json")).unwrap();
+    let provenance: Value =
+        serde_json::from_str(include_str!("../fixtures/c4/state/provenance.json")).unwrap();
+    assert_eq!(provenance["pin"], case.native["pin"], "state record pin");
+    assert_eq!(
+        provenance["output_sha256"],
+        json!(format!(
+            "{:x}",
+            Sha256::digest(include_bytes!("../fixtures/c4/state/native.json"))
+        )),
+        "state record digest"
+    );
+    let row = record["rows"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["id"] == json!(case.name))
+        .unwrap_or_else(|| panic!("{}: no recorded state", case.name))
+        .clone();
+    let command: Vec<&Value> = case.native["native_command"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .collect();
+    let manifest: Value = serde_json::from_str(MANIFEST).unwrap();
+    assert_eq!(
+        row["flags"], manifest[&case.name]["flags"],
+        "{}: state flags",
+        case.name
+    );
+    for flag in row["flags"].as_array().unwrap() {
+        assert!(
+            command.contains(&flag),
+            "{}: {flag} is not in the native command",
+            case.name
+        );
+    }
+    assert_eq!(
+        row["sources_sha256"], case.native["sources_sha256"],
+        "{}: state sources",
+        case.name
+    );
+    row
+}
+
+/// The JSX entities `owner` reads at the case's first JSX tag, in the form
+/// the state record keeps them: a name longer than 200 bytes by its length
+/// and digest.
+pub fn jsx_state(case: &Case, owner: &Arc<CheckerOwner>) -> Value {
+    let tag = first_jsx_tag(case);
+    let mut state = owner.operation().unwrap().jsx_link_state(tag).unwrap();
+    for key in ["factory", "fragment_factory"] {
+        if let Some(text) = state[key].as_str().filter(|text| text.len() > 200) {
+            state[key] = json!({"bytes": text.len(), "sha256": format!("{:x}", Sha256::digest(text.as_bytes()))});
+        }
+    }
+    state
+}
+
+/// The case's checker state equals the pinned checker's after the same
+/// checks: the JSX entities at the first JSX tag and the referenced state of
+/// the root's import specifiers.
+pub fn assert_state(case: &Case) {
+    let row = recorded_state(case);
+    let expected = &row["checked"];
+    if expected["jsx"].is_null() {
+        assert_eq!(
+            find_first_jsx_tag(case),
+            None,
+            "{}: the pin found no JSX tag",
+            case.name
+        );
+    } else {
+        assert_eq!(
+            jsx_state(case, &case.owner),
+            expected["jsx"],
+            "{}: JSX state",
+            case.name
+        );
+    }
+    for (name, referenced) in expected["aliases"].as_object().unwrap() {
+        let specifier = import_specifier(case, name);
+        let mut op = case.owner.operation().unwrap();
+        assert_eq!(
+            op.alias_link_state(specifier).unwrap()["referenced"],
+            *referenced,
+            "{}: {name} referenced",
+            case.name
+        );
+    }
+}
+
+/// A fresh checker over the case's program, asked before anything is
+/// checked, reads the pinned checker's unchecked JSX state.
+pub fn assert_unchecked_state(case: &Case) {
+    let row = recorded_state(case);
+    let (_generation, fresh) = checker(&case.program);
+    if !row["unchecked"]["jsx"].is_null() {
+        assert_eq!(
+            jsx_state(case, &fresh),
+            row["unchecked"]["jsx"],
+            "{}: unchecked JSX state",
+            case.name
+        );
+    }
+}
+
+/// The import specifier of the root file that imports `name`.
+pub fn import_specifier(case: &Case, name: &str) -> NodeId {
+    use std::ops::ControlFlow;
+    use tsr_ast::{AstView, ChildVisitor, SyntaxKind as K};
+    struct Walk<'a> {
+        view: AstView<'a>,
+        name: &'a str,
+        found: Option<NodeId>,
+    }
+    impl ChildVisitor for Walk<'_> {
+        fn visit_node(&mut self, node: NodeId) -> ControlFlow<()> {
+            let read = self.view.node(node).unwrap();
+            if read.kind() == K::ImportSpecifier
+                && self
+                    .view
+                    .node_text(read.name().unwrap())
+                    .unwrap()
+                    .as_bytes()
+                    == self.name.as_bytes()
+            {
+                self.found = Some(node);
+                return ControlFlow::Break(());
+            }
+            read.for_each_child(self)
+        }
+        fn visit_list(&mut self, list: tsr_ast::NodeListId) -> ControlFlow<()> {
+            self.visit_node_slice(self.view.list(list).unwrap().nodes())
+        }
+        fn visit_node_slice(&mut self, slice: tsr_ast::NodeSlice) -> ControlFlow<()> {
+            for node in self.view.node_slice(slice).unwrap().iter().flatten() {
+                self.visit_node(node)?;
+            }
+            ControlFlow::Continue(())
+        }
+    }
+    let file = case
+        .program
+        .file(format!("/{}", case.root).as_bytes())
+        .unwrap();
+    let mut walk = Walk {
+        view: file.bound().view().ast(),
+        name,
+        found: None,
+    };
+    let _ = walk.visit_node(file.source());
+    walk.found.expect("import specifier")
 }

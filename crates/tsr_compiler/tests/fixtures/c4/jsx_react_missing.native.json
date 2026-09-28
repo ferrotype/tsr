@@ -1,0 +1,54 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources_sha256": {
+    "jsx_no_namespace.tsx": "24eee2f30b6b8519e3ed8caca5916f9e1304c1e351ec34f9ea915b894bc3db1f"
+  },
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--skipLibCheck",
+    "--jsx",
+    "react",
+    "--strict",
+    "jsx_no_namespace.tsx"
+  ],
+  "native_output_sha256": "5925b0fd70e4d530e16e5100def14dffd0b1ae25491a11ad684468b8df44f32a",
+  "exit_code": 2,
+  "native_stderr": "",
+  "diagnostics": [
+    {
+      "file": "jsx_no_namespace.tsx",
+      "line": 1,
+      "column": 18,
+      "code": 7026,
+      "message": "JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists."
+    },
+    {
+      "file": "jsx_no_namespace.tsx",
+      "line": 1,
+      "column": 19,
+      "code": 2874,
+      "message": "This JSX tag requires 'React' to be in scope, but it could not be found."
+    },
+    {
+      "file": "jsx_no_namespace.tsx",
+      "line": 2,
+      "column": 18,
+      "code": 2874,
+      "message": "This JSX tag requires 'React' to be in scope, but it could not be found."
+    },
+    {
+      "file": "jsx_no_namespace.tsx",
+      "line": 2,
+      "column": 18,
+      "code": 2879,
+      "message": "Using JSX fragments requires fragment factory 'React' to be in scope, but it could not be found."
+    }
+  ]
+}

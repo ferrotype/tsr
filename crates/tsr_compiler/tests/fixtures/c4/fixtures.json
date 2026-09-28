@@ -221,5 +221,305 @@
       "react-jsx",
       "--strict"
     ]
+  },
+  "jsx_deep_pragma": {
+    "root": "jsx_deep_pragma.tsx",
+    "flags": [
+      "--jsx",
+      "react",
+      "--strict"
+    ]
+  },
+  "jsx_import_source_preserve": {
+    "root": "jsx_import_source.tsx",
+    "files": [
+      "node_modules/preact/package.json",
+      "node_modules/preact/index.d.ts",
+      "node_modules/preact/jsx-runtime.d.ts",
+      "node_modules/preact/jsx-dev-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "preserve",
+      "--strict"
+    ]
+  },
+  "jsx_import_source_absent_preserve": {
+    "root": "jsx_import_source_absent.tsx",
+    "files": [
+      "node_modules/bare/package.json",
+      "node_modules/bare/index.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "preserve",
+      "--strict"
+    ]
+  },
+  "jsx_import_source_react_native": {
+    "root": "jsx_import_source.tsx",
+    "files": [
+      "node_modules/preact/package.json",
+      "node_modules/preact/index.d.ts",
+      "node_modules/preact/jsx-runtime.d.ts",
+      "node_modules/preact/jsx-dev-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-native",
+      "--strict"
+    ]
+  },
+  "jsx_import_source_absent_react_native": {
+    "root": "jsx_import_source_absent.tsx",
+    "files": [
+      "node_modules/bare/package.json",
+      "node_modules/bare/index.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-native",
+      "--strict"
+    ]
+  },
+  "jsx_import_source_react": {
+    "root": "jsx_import_source.tsx",
+    "files": [
+      "node_modules/preact/package.json",
+      "node_modules/preact/index.d.ts",
+      "node_modules/preact/jsx-runtime.d.ts",
+      "node_modules/preact/jsx-dev-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react",
+      "--strict"
+    ]
+  },
+  "jsx_import_source_absent_react": {
+    "root": "jsx_import_source_absent.tsx",
+    "files": [
+      "node_modules/bare/package.json",
+      "node_modules/bare/index.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react",
+      "--strict"
+    ]
+  },
+  "jsx_import_source_react_jsx": {
+    "root": "jsx_import_source.tsx",
+    "files": [
+      "node_modules/preact/package.json",
+      "node_modules/preact/index.d.ts",
+      "node_modules/preact/jsx-runtime.d.ts",
+      "node_modules/preact/jsx-dev-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-jsx",
+      "--strict"
+    ]
+  },
+  "jsx_import_source_absent_react_jsx": {
+    "root": "jsx_import_source_absent.tsx",
+    "files": [
+      "node_modules/bare/package.json",
+      "node_modules/bare/index.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-jsx",
+      "--strict"
+    ]
+  },
+  "jsx_import_source_react_jsxdev": {
+    "root": "jsx_import_source.tsx",
+    "files": [
+      "node_modules/preact/package.json",
+      "node_modules/preact/index.d.ts",
+      "node_modules/preact/jsx-runtime.d.ts",
+      "node_modules/preact/jsx-dev-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-jsxdev",
+      "--strict"
+    ]
+  },
+  "jsx_import_source_absent_react_jsxdev": {
+    "root": "jsx_import_source_absent.tsx",
+    "files": [
+      "node_modules/bare/package.json",
+      "node_modules/bare/index.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-jsxdev",
+      "--strict"
+    ]
+  },
+  "jsx_import_source_option_react_jsx": {
+    "root": "jsx_import_source_option.tsx",
+    "files": [
+      "node_modules/preact/package.json",
+      "node_modules/preact/index.d.ts",
+      "node_modules/preact/jsx-runtime.d.ts",
+      "node_modules/preact/jsx-dev-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-jsx",
+      "--jsxImportSource",
+      "preact",
+      "--strict"
+    ]
+  },
+  "jsx_import_source_option_react_jsxdev": {
+    "root": "jsx_import_source_option.tsx",
+    "files": [
+      "node_modules/preact/package.json",
+      "node_modules/preact/index.d.ts",
+      "node_modules/preact/jsx-runtime.d.ts",
+      "node_modules/preact/jsx-dev-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-jsxdev",
+      "--jsxImportSource",
+      "preact",
+      "--strict"
+    ]
+  },
+  "jsx_factory_option": {
+    "root": "jsx_factory_options.tsx",
+    "flags": [
+      "--jsx",
+      "react",
+      "--jsxFactory",
+      "h",
+      "--strict"
+    ]
+  },
+  "jsx_factory_options": {
+    "root": "jsx_factory_options.tsx",
+    "flags": [
+      "--jsx",
+      "react",
+      "--jsxFactory",
+      "h",
+      "--jsxFragmentFactory",
+      "Frag",
+      "--strict"
+    ]
+  },
+  "jsx_pragmas_over_options": {
+    "root": "jsx_pragmas.tsx",
+    "flags": [
+      "--jsx",
+      "react",
+      "--jsxFactory",
+      "Other.make",
+      "--jsxFragmentFactory",
+      "OtherFrag",
+      "--strict"
+    ]
+  },
+  "jsx_pragma_without_frag": {
+    "root": "jsx_pragma_without_frag.tsx",
+    "flags": [
+      "--jsx",
+      "react",
+      "--strict"
+    ]
+  },
+  "jsx_no_flag": {
+    "root": "jsx_no_namespace.tsx",
+    "flags": [
+      "--strict"
+    ]
+  },
+  "jsx_react_missing": {
+    "root": "jsx_no_namespace.tsx",
+    "flags": [
+      "--jsx",
+      "react",
+      "--strict"
+    ]
+  },
+  "jsx_runtime_classic_react_jsx": {
+    "root": "jsx_runtime_classic.tsx",
+    "files": [
+      "node_modules/react/package.json",
+      "node_modules/react/index.d.ts",
+      "node_modules/react/jsx-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-jsx",
+      "--strict"
+    ]
+  },
+  "jsx_runtime_classic_react_jsxdev": {
+    "root": "jsx_runtime_classic.tsx",
+    "files": [
+      "node_modules/react/package.json",
+      "node_modules/react/index.d.ts",
+      "node_modules/react/jsx-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react-jsxdev",
+      "--strict"
+    ]
+  },
+  "jsx_runtime_automatic_react": {
+    "root": "jsx_runtime_automatic.tsx",
+    "files": [
+      "node_modules/react/package.json",
+      "node_modules/react/index.d.ts",
+      "node_modules/react/jsx-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "react",
+      "--strict"
+    ]
+  },
+  "jsx_runtime_automatic_preserve": {
+    "root": "jsx_runtime_automatic.tsx",
+    "files": [
+      "node_modules/react/package.json",
+      "node_modules/react/index.d.ts",
+      "node_modules/react/jsx-runtime.d.ts"
+    ],
+    "flags": [
+      "--jsx",
+      "preserve",
+      "--strict"
+    ]
+  },
+  "metadata_plain": {
+    "root": "metadata_marking.ts",
+    "files": [
+      "metadata_types.ts"
+    ],
+    "flags": [
+      "--strict",
+      "--experimentalDecorators"
+    ]
+  },
+  "conditional_distribution": {
+    "root": "conditional_distribution.ts",
+    "flags": [
+      "--strict"
+    ]
+  },
+  "relation_excess": {
+    "root": "relation_excess.ts",
+    "flags": [
+      "--strict"
+    ]
   }
 }

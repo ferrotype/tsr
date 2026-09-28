@@ -131,6 +131,7 @@ impl CheckerState {
         census.links("query_links", &query.resolved_symbols);
         census.map("query_links", &query.global_types);
         census.map("query_links", &query.global_type_aliases);
+        census.map("type_caches", &query.decorator_context_overrides);
         census.map("query_links", &query.this_assignments);
         census.links("query_links", &query.references);
         census.links("query_links", &query.scope_changes);

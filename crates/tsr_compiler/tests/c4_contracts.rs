@@ -1,15 +1,16 @@
 //! Phase 2 C4 direct contracts (docs/PHASE2-C4-plan.md, C4.8), over production
 //! entry points. Each case's diagnostics were recorded from the pinned `tsgo`
-//! by `fixtures/c4/regenerate.py`; the JSX entities and alias state the
-//! resolver reads are observed through the checker's links until C5.6 gives
-//! the resolver its entry points (the plan's decision 3).
+//! by `fixtures/c4/regenerate.py`. The JSX entities and alias state the
+//! resolver reads are compared with the pinned checker's own state, recorded
+//! through a Go overlay by `fixtures/c4/state/regenerate.py`: nothing here is
+//! a hand-written expectation of checker state.
 #[path = "support/c4_native.rs"]
 mod native;
 use native::REACT;
 use serde_json::{json, Value};
 use std::ops::ControlFlow;
 use tsr_arena::NodeId;
-use tsr_ast::{AstView, ChildVisitor, SyntaxKind as K};
+use tsr_ast::{AstView, ChildVisitor};
 
 const MODES: &[&str] = &[
     "preserve",
@@ -47,36 +48,24 @@ fn jsx_pragmas_record(mode: &str) -> &'static str {
     }
 }
 
-fn link_state(case: &native::Case) -> Value {
-    let tag = native::first_jsx_tag(case);
-    let mut op = case.owner.operation().unwrap();
-    op.jsx_link_state(tag).unwrap()
-}
-
 /// Contract 1: one program under each of the five `jsx` modes, without and
 /// with `@jsx`/`@jsxFrag` pragmas. Diagnostics equal the native observations;
-/// the factory, the `JSX` namespace and the implicit runtime import are those
-/// of `getJsxFactoryEntity`, `getJsxNamespaceAt` and
-/// `getJsxNamespaceContainerForImplicitImport`: only `react-jsx` finds its
-/// runtime (the package has no development runtime, so `react-jsxdev` reports
-/// TS2875 and falls back to the classic namespace).
+/// the factory, the `JSX` namespace and the implicit runtime import equal the
+/// pinned `getJsxFactoryEntity`, `getJsxFragmentFactoryEntity`,
+/// `getJsxNamespaceAt` and `getJsxNamespaceContainerForImplicitImport`, after
+/// checking and on a fresh checker that reads the pragmas itself (the
+/// resolver may ask before anything is checked). Only `react-jsx` finds the
+/// `react` runtime; the package has no development runtime.
 #[test]
 fn jsx_mode_matrix_matches_native() {
-    const CLASSIC: &str = "/node_modules/react/index.d.ts";
-    const RUNTIME: &str = "/node_modules/react/jsx-runtime.d.ts";
     for &mode in MODES {
         let case = native::assert_case(
             &format!("jsx_modes_{mode}"),
             jsx_modes_record(mode),
             &with_react(("jsx_modes.tsx", include_str!("fixtures/c4/jsx_modes.tsx"))),
         );
-        let runtime = (mode == "react_jsx").then_some(RUNTIME);
-        assert_eq!(
-            link_state(&case),
-            json!({"factory": "React.createElement", "fragment_factory": null,
-                   "namespace": runtime.unwrap_or(CLASSIC), "implicit_import": runtime}),
-            "jsx_modes_{mode}"
-        );
+        native::assert_state(&case);
+        native::assert_unchecked_state(&case);
         let case = native::assert_case(
             &format!("jsx_pragmas_{mode}"),
             jsx_pragmas_record(mode),
@@ -85,18 +74,116 @@ fn jsx_mode_matrix_matches_native() {
                 include_str!("fixtures/c4/jsx_pragmas.tsx"),
             )),
         );
-        let expected = json!({"factory": "h", "fragment_factory": "Frag",
-               "namespace": runtime.unwrap_or("/jsx_pragmas.tsx"), "implicit_import": runtime});
-        assert_eq!(link_state(&case), expected, "jsx_pragmas_{mode}");
-        // The resolver may ask before anything is checked: a fresh checker
-        // reads the pragmas itself (`getJsxFragmentFactoryEntity`).
-        let (_generation, fresh) = native::checker(&case.program);
-        let tag = native::first_jsx_tag(&case);
-        assert_eq!(
-            fresh.operation().unwrap().jsx_link_state(tag).unwrap(),
-            expected,
-            "jsx_pragmas_{mode}, unchecked"
-        );
+        native::assert_state(&case);
+        native::assert_unchecked_state(&case);
+    }
+}
+
+/// A `@jsx` pragma of 30,000 components completes with the pin's diagnostics
+/// on a bounded stack: the isolated entity name is flattened in a loop, and
+/// the factory entity keeps every component (the recorded state binds its
+/// length and digest).
+#[test]
+fn deep_jsx_pragma_completes_on_a_bounded_stack() {
+    std::thread::Builder::new()
+        .stack_size(512 * 1024)
+        .spawn(|| {
+            let case = native::assert_named("jsx_deep_pragma");
+            native::assert_state(&case);
+        })
+        .unwrap()
+        .join()
+        .unwrap();
+}
+
+/// The C4.2 exit: a direct case per pragma and option combination. The
+/// `jsxFactory` option alone (TS17016 at a fragment) and with
+/// `jsxFragmentFactory`; `@jsx`/`@jsxFrag` pragmas over both options;
+/// `@jsx` without `@jsxFrag` (TS17017); no `jsx` option (TS17004); `react`
+/// without `React` in scope (TS2874); `@jsxRuntime classic` under both
+/// automatic modes and `@jsxRuntime automatic` under two classic ones.
+#[test]
+fn jsx_pragma_and_option_combinations_match_native() {
+    for case in [
+        "jsx_factory_option",
+        "jsx_factory_options",
+        "jsx_pragmas_over_options",
+        "jsx_pragma_without_frag",
+        "jsx_no_flag",
+        "jsx_react_missing",
+        "jsx_runtime_classic_react_jsx",
+        "jsx_runtime_classic_react_jsxdev",
+        "jsx_runtime_automatic_react",
+        "jsx_runtime_automatic_preserve",
+    ] {
+        let case = native::assert_named(case);
+        native::assert_state(&case);
+        native::assert_unchecked_state(&case);
+    }
+}
+
+/// The C4.5 exit: under each `jsx` mode, an `@jsxImportSource` package that
+/// has both runtime modules and one that has neither (TS2875 where the mode
+/// needs one), and the `jsxImportSource` option under both automatic modes;
+/// the implicit import and the namespace are the pin's.
+#[test]
+fn jsx_runtime_per_mode_matches_native() {
+    for &mode in MODES {
+        for case in [
+            format!("jsx_import_source_{mode}"),
+            format!("jsx_import_source_absent_{mode}"),
+        ] {
+            let case = native::assert_named(&case);
+            native::assert_state(&case);
+            native::assert_unchecked_state(&case);
+        }
+    }
+    for case in [
+        "jsx_import_source_option_react_jsx",
+        "jsx_import_source_option_react_jsxdev",
+    ] {
+        let case = native::assert_named(case);
+        native::assert_state(&case);
+        native::assert_unchecked_state(&case);
+    }
+}
+
+/// The two shared corrections C4 made outside JSX, witnessed without JSX. A
+/// distributive conditional instantiated without an alias maps its
+/// distribution union (`mapTypeWithAlias`), so an unchanged `keyof Props`
+/// keeps its origin (`Pick<Props, keyof Props>`), while an aliased one is
+/// rebuilt under its alias; and an excess property of a fresh object literal
+/// reports the relation error `isRelatedTo` reports, in declarations, nested
+/// literals, union, intersection and array targets, and an argument.
+#[test]
+fn shared_fixes_hold_outside_jsx() {
+    native::assert_named("conditional_distribution");
+    native::assert_named("relation_excess");
+}
+
+/// Every case of the manifest has a native record and matches it, and every
+/// recorded state matches, so no fixture is recorded without a contract.
+#[test]
+fn every_recorded_case_matches_native() {
+    let manifest: Value = serde_json::from_str(native::MANIFEST).unwrap();
+    let cases = manifest.as_object().unwrap();
+    assert_eq!(cases.len(), native::RECORDS.len(), "one record per case");
+    let state: Value = serde_json::from_str(include_str!("fixtures/c4/state/native.json")).unwrap();
+    let recorded: Vec<&str> = state["rows"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|row| row["id"].as_str().unwrap())
+        .collect();
+    for name in cases.keys() {
+        if name == "jsx_deep_pragma" {
+            continue; // on its bounded stack above
+        }
+        let case = native::assert_named(name);
+        if recorded.contains(&name.as_str()) {
+            native::assert_state(&case);
+            native::assert_unchecked_state(&case);
+        }
     }
 }
 
@@ -115,7 +202,7 @@ fn element_kinds_match_native() {
             include_str!("fixtures/c4/jsx_elements.tsx"),
         )],
     );
-    assert_eq!(link_state(&case)["namespace"], json!("/jsx_elements.tsx"));
+    native::assert_state(&case);
 }
 
 /// Contract 3: generic components over a bundled-lib-only program: inferred
@@ -213,56 +300,13 @@ fn decorator_context_types_match_native() {
     }
 }
 
-fn import_specifier(case: &native::Case, name: &str) -> NodeId {
-    struct Walk<'a> {
-        view: AstView<'a>,
-        name: &'a str,
-        found: Option<NodeId>,
-    }
-    impl ChildVisitor for Walk<'_> {
-        fn visit_node(&mut self, node: NodeId) -> ControlFlow<()> {
-            let read = self.view.node(node).unwrap();
-            if read.kind() == K::ImportSpecifier
-                && self
-                    .view
-                    .node_text(read.name().unwrap())
-                    .unwrap()
-                    .as_bytes()
-                    == self.name.as_bytes()
-            {
-                self.found = Some(node);
-                return ControlFlow::Break(());
-            }
-            read.for_each_child(self)
-        }
-        fn visit_list(&mut self, list: tsr_ast::NodeListId) -> ControlFlow<()> {
-            self.visit_node_slice(self.view.list(list).unwrap().nodes())
-        }
-        fn visit_node_slice(&mut self, slice: tsr_ast::NodeSlice) -> ControlFlow<()> {
-            for node in self.view.node_slice(slice).unwrap().iter().flatten() {
-                self.visit_node(node)?;
-            }
-            ControlFlow::Continue(())
-        }
-    }
-    let file = case
-        .program
-        .file(format!("/{}", case.root).as_bytes())
-        .unwrap();
-    let mut walk = Walk {
-        view: file.bound().view().ast(),
-        name,
-        found: None,
-    };
-    let _ = walk.visit_node(file.source());
-    walk.found.expect("import specifier")
-}
-
 /// Contract 7: under `emitDecoratorMetadata` the class a decorated
 /// constructor parameter names is marked referenced and the interface is not
 /// (`markDecoratorAliasReferenced`, `markDecoratorMedataDataTypeNodeAsReferenced`);
 /// without the option nothing is marked; under `isolatedModules` the interface
 /// imported as a value reports TS1272 (`markEntityNameOrEntityExpressionAsReference`).
+/// Each command is its own native case, and the referenced state is the
+/// pinned checker's (`aliasSymbolLinks.referenced`).
 #[test]
 fn metadata_marking_follows_the_pin() {
     let files = [
@@ -275,33 +319,23 @@ fn metadata_marking_follows_the_pin() {
             include_str!("fixtures/c4/metadata_types.ts"),
         ),
     ];
-    let case = native::assert_case(
-        "metadata_marking",
-        include_str!("fixtures/c4/metadata_marking.native.json"),
-        &files,
-    );
-    let state = |case: &native::Case, name: &str| {
-        let specifier = import_specifier(case, name);
-        let mut op = case.owner.operation().unwrap();
-        op.alias_link_state(specifier).unwrap()["referenced"].clone()
-    };
-    assert_eq!(state(&case, "Service"), json!(true));
-    assert_eq!(state(&case, "Config"), json!(false));
-    native::assert_case(
-        "metadata_isolated",
-        include_str!("fixtures/c4/metadata_isolated.native.json"),
-        &files,
-    );
-    // The same program checked without emitDecoratorMetadata marks nothing:
-    // the positions case has decorators and no metadata option.
-    let mut record: Value =
-        serde_json::from_str(include_str!("fixtures/c4/metadata_marking.native.json")).unwrap();
-    let command = record["native_command"].as_array_mut().unwrap();
-    command.retain(|flag| flag != "--emitDecoratorMetadata");
-    record["diagnostics"] = json!([]);
-    let plain = native::load("metadata_plain", &record.to_string(), &files);
-    assert_eq!(json!(native::observed(&plain)), json!([]));
-    assert_eq!(state(&plain, "Service"), json!(false));
+    for (case, record) in [
+        (
+            "metadata_marking",
+            include_str!("fixtures/c4/metadata_marking.native.json"),
+        ),
+        (
+            "metadata_isolated",
+            include_str!("fixtures/c4/metadata_isolated.native.json"),
+        ),
+        (
+            "metadata_plain",
+            include_str!("fixtures/c4/metadata_plain.native.json"),
+        ),
+    ] {
+        let case = native::assert_case(case, record, &files);
+        native::assert_state(&case);
+    }
 }
 
 /// Contract 8: a JSX error and a decorator error leave the checker reusable:
@@ -317,15 +351,14 @@ fn jsx_and_decorator_errors_leave_checkers_reusable() {
     );
     let expected = case.native["diagnostics"].clone();
     assert_eq!(json!(native::observed(&case)), expected);
+    let recorded = native::recorded_state(&case);
     let (_generation, second) = native::checker(&case.program);
-    let tag = native::first_jsx_tag(&case);
-    let runtime = json!("/node_modules/react/jsx-runtime.d.ts");
     assert_eq!(
-        second.operation().unwrap().jsx_link_state(tag).unwrap()["implicit_import"],
-        runtime
+        native::jsx_state(&case, &second),
+        recorded["unchecked"]["jsx"]
     );
     assert_eq!(json!(native::observed_with(&case, &second)), expected);
-    assert_eq!(link_state(&case)["implicit_import"], runtime);
+    native::assert_state(&case);
     case.generation.retire();
     assert!(
         case.owner.operation().is_err(),
@@ -410,5 +443,5 @@ fn checking_produces_no_transformed_syntax() {
         // The one JSX entity the checker builds is the recorded factory name.
         assert_eq!(kinds.contains(&"QualifiedName"), recorded, "{kinds:?}");
     }
-    assert_eq!(link_state(&case)["factory"], json!("React.createElement"));
+    native::assert_state(&case);
 }

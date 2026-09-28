@@ -1,0 +1,39 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources_sha256": {
+    "jsx_import_source_option.tsx": "ba0f512c373d3d9d5d69aa14ffb96c4117ff6f19bedc0f6fd24e6c7fe4a06ccf",
+    "node_modules/preact/package.json": "92fe6ed6e4690f552691a4c7ac82170b13b9d9d08cda4dd7ea0a2b826ae51a75",
+    "node_modules/preact/index.d.ts": "8a60ed93d81f472e270e213c5da23bdfc2a87b6616031f4d397aced25f727217",
+    "node_modules/preact/jsx-runtime.d.ts": "99ae6137ee1c49bc5c0063356c0e5615aeda0e23277af74b20081d873909ba8a",
+    "node_modules/preact/jsx-dev-runtime.d.ts": "536250efc6485898a362cb28704dc5b73cd30134b8e55cc08922645e5c7f4e70"
+  },
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--skipLibCheck",
+    "--jsx",
+    "react-jsxdev",
+    "--jsxImportSource",
+    "preact",
+    "--strict",
+    "jsx_import_source_option.tsx"
+  ],
+  "native_output_sha256": "1f916d39b47498aed3c1aea4e9fca7273a6a1c2f276f9c7a52450285bcf704c5",
+  "exit_code": 2,
+  "native_stderr": "",
+  "diagnostics": [
+    {
+      "file": "jsx_import_source_option.tsx",
+      "line": 3,
+      "column": 14,
+      "code": 2322,
+      "message": "Type 'Element' is not assignable to type 'number'."
+    }
+  ]
+}

@@ -65,6 +65,40 @@ pub(crate) struct JsxState {
     factory_entity: Option<NodeId>,
 }
 
+#[cfg(any(test, feature = "storage-pilot"))]
+impl JsxState {
+    /// The links' backing allocations and retained names; the namespace and
+    /// implicit-import symbols are symbol storage, charged with the symbols.
+    pub(crate) fn census(&self, census: &mut crate::census::Census) {
+        census.map("query_links", &self.flags);
+        census.map("query_links", &self.attributes_types);
+        census.map("query_links", &self.namespaces);
+        census.map("query_links", &self.implicit_imports);
+        census.map("query_links", &self.first_tags);
+        census.map("query_links", &self.intrinsic_tag_symbols);
+        census.map("query_links", &self.files);
+        for links in self.files.values() {
+            for name in [&links.local_namespace, &links.local_fragment_namespace]
+                .into_iter()
+                .flatten()
+            {
+                census.text("query_links", name);
+            }
+        }
+        if let Some(name) = &self.namespace {
+            census.text("query_links", name);
+        }
+    }
+
+    /// The attributes types and file fragment types the links retain.
+    pub(crate) fn census_types(&self) -> impl Iterator<Item = TypeId> + '_ {
+        self.attributes_types
+            .values()
+            .copied()
+            .chain(self.files.values().filter_map(|links| links.fragment_type))
+    }
+}
+
 /// `getInvalidTextualChildDiagnostic`: the text-child message is built on
 /// first use and shared by every text child of one element.
 pub(crate) struct JsxTextChildMessage {
@@ -2426,30 +2460,29 @@ impl CheckerState {
         ) else {
             return Ok(None);
         };
-        fn collect(
-            view: tsr_ast::AstView<'_>,
-            node: NodeId,
-            parts: &mut Vec<JsString>,
-        ) -> Result<(), Error> {
-            let read = view.node(node)?;
-            match read.kind().known() {
-                Some(K::Identifier) => parts.push(view.node_text(node)?.into_js_string()),
-                Some(K::QualifiedName) => {
-                    let data = read
-                        .data_source()
-                        .as_qualified_name()
-                        .ok_or(Error::MissingLink("isolated qualified name"))?;
-                    let left = required(data.left(), "isolated qualified name left")?;
-                    let right = required(data.right(), "isolated qualified name right")?;
-                    collect(view, left, parts)?;
-                    collect(view, right, parts)?;
-                }
-                _ => return Err(Error::Unsupported("parseIsolatedEntityName: entity syntax")),
+        // A pragma name can have any number of components, so the left spine
+        // is walked in a loop: the right of a qualified name is an identifier.
+        let view = parsed.view();
+        let identifier_text = |node: NodeId| -> Result<JsString, Error> {
+            if view.node(node)?.kind() != K::Identifier {
+                return Err(Error::Unsupported("parseIsolatedEntityName: entity syntax"));
             }
-            Ok(())
-        }
+            Ok(view.node_text(node)?.into_js_string())
+        };
         let mut parts = Vec::new();
-        collect(parsed.view(), parsed.root(), &mut parts)?;
+        let mut node = parsed.root();
+        while view.node(node)?.kind() == K::QualifiedName {
+            let read = view.node(node)?;
+            let data = read
+                .data_source()
+                .as_qualified_name()
+                .ok_or(Error::MissingLink("isolated qualified name"))?;
+            let right = required(data.right(), "isolated qualified name right")?;
+            parts.push(identifier_text(right)?);
+            node = required(data.left(), "isolated qualified name left")?;
+        }
+        parts.push(identifier_text(node)?);
+        parts.reverse();
         let synthetic = tsr_core::TextRange::new(-1, -1);
         let mut parts = parts.into_iter();
         let first = required(parts.next(), "isolated entity name")?;
@@ -2756,5 +2789,63 @@ impl CheckerState {
             }
         }
         Ok(kinds.into_iter().collect())
+    }
+}
+
+#[cfg(test)]
+mod census_tests {
+    use super::JsxFileLinks;
+    use tsr_ast::FactoryMethods;
+    use tsr_jsstring::JsString;
+
+    /// The JSX links, the decorator signatures and the decorator context
+    /// overrides are charged to their families and root what they retain.
+    #[test]
+    fn jsx_and_decorator_caches_are_charged_and_rooted() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let before = state.census(&[]).unwrap();
+        let reachable = state.reachable_types(&[]).unwrap();
+        let node = state
+            .factory
+            .new_identifier(JsString::from_bytes(b"x".as_slice()));
+        let attributes = state.new_anonymous_type(None, None, &[], &[], &[]).unwrap();
+        let fragment = state.new_anonymous_type(None, None, &[], &[], &[]).unwrap();
+        let name = state.new_type_parameter(None).unwrap();
+        let context = state.new_anonymous_type(None, None, &[], &[], &[]).unwrap();
+        let returned = state.new_type_parameter(None).unwrap();
+        let signature = state
+            .signatures
+            .new_signature(0, None, None, None, None, Some(returned), None, 0)
+            .unwrap();
+        state.jsx.attributes_types.insert(node, attributes);
+        state.jsx.files.insert(
+            node,
+            JsxFileLinks {
+                fragment_type: Some(fragment),
+                local_namespace: Some(JsString::from_bytes(b"LocalJsx".as_slice())),
+                ..JsxFileLinks::default()
+            },
+        );
+        state.jsx.namespace = Some(JsString::from_bytes(b"GlobalJsx".as_slice()));
+        state.calls.decorator_signatures.insert(node, signature);
+        state
+            .query
+            .decorator_context_overrides
+            .insert((0, name), context);
+        let after = state.census(&[]).unwrap();
+        assert_eq!(
+            after["types"]["reachable"].as_u64(),
+            Some(reachable as u64 + 5),
+            "the five cached types are reachable"
+        );
+        for family in ["query_links", "call_resolution", "type_caches"] {
+            let bytes = |report: &serde_json::Value| report["families"][family]["bytes"].as_u64();
+            assert!(
+                bytes(&after) > bytes(&before),
+                "{family} charges the new caches"
+            );
+        }
     }
 }
