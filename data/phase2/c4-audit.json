@@ -5,38 +5,33 @@
    "disposition": "equivalent",
    "reason": "No caller at the pin; the operation it composes, markEntityNameOrEntityExpressionAsReference(getEntityNameFromTypeNode(node), false), is ported at the Rust site.",
    "reviewed_from": "pinned body and the pinned caller's port; C4 source audit",
-   "rust": "crates/tsr_checker/src/decorators.rs:1302"
+   "rust": "crates/tsr_checker/src/decorators.rs:1280"
   },
   "tsc/internal/checker/checker.go:getEntityNameFromTypeNode": {
    "disposition": "equivalent",
    "reason": "Serves only markTypeNodeAsReferenced, which has no caller at the pin; the metadata path reads entity names through getEntityNameForDecoratorMetadata, ported beside the Rust site.",
    "reviewed_from": "pinned body and the pinned caller's port; C4 source audit",
-   "rust": "crates/tsr_checker/src/decorators.rs:1302"
+   "rust": "crates/tsr_checker/src/decorators.rs:1280"
   },
   "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFactoryEntity": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFragmentFactoryEntity": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/emitresolver.go:EmitResolver.GetTypeReferenceSerializationKind": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/exports.go:Checker.GetJsxFragmentFactory": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.2 (exports.rs)."
   },
   "tsc/internal/checker/exports.go:Checker.GetJsxNamespace": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.2 (exports.rs)."
   },
   "tsc/internal/checker/grammarchecks.go:Checker.findFirstIllegalDecorator": {
    "disposition": "equivalent",
@@ -51,14 +46,12 @@
    "rust": "crates/tsr_checker/src/grammar_modifiers.rs:259"
   },
   "tsc/internal/checker/services.go:Checker.GetContextualTypeForJsxAttribute": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.5), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/services.go:Checker.GetJsxIntrinsicTagNamesAt": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "Resolver or services surface over the C4 function it wraps (docs/PHASE2-C4-plan.md, C4.1)."
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.5), the later owner this audit named; the port marker names it."
   }
  },
  "groups": {

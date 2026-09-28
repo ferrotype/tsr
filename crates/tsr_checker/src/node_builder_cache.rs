@@ -323,8 +323,13 @@ impl<'a> NodeBuilder<'a> {
             flags: self.flags,
             internal_flags: self.internal_flags,
         };
-        if let Some(node) = self.cached_type_node(key)? {
-            return Ok(node);
+        // An expanding request computes can_increase_expansion_depth, so it
+        // neither reads nor fills the cache.
+        let can_use_cache = self.max_expansion_depth < 0;
+        if can_use_cache {
+            if let Some(node) = self.cached_type_node(key)? {
+                return Ok(node);
+            }
         }
         if let Some(identity) = identity {
             if self
@@ -344,7 +349,7 @@ impl<'a> NodeBuilder<'a> {
         let result = action(self, ty);
         let symbols = std::mem::replace(&mut self.tracked_symbols, tracked);
         if let Ok(node) = result {
-            if !self.reported_diagnostic && !self.encountered_error {
+            if can_use_cache && !self.reported_diagnostic && !self.encountered_error {
                 self.serialized.insert(
                     key,
                     SerializedType {

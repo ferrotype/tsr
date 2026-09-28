@@ -198,18 +198,9 @@ impl CheckerState {
             Some(body) => tsr_ast::node_is_missing(Some(&self.node(body)?)),
         };
         if annotation.is_none() && body_missing {
-            let read = self.node(function)?;
             let private_ambient = self.binding_private_ambient(function)?;
-            if !private_ambient
-                && self
-                    .program()?
-                    .host
-                    .options()
-                    .strict_option_value(self.program()?.host.options().no_implicit_any)
-            {
-                let name =
-                    tsr_scanner::declaration_name_to_string(self.ast(function)?, read.name())?;
-                self.error_at(Some(function), messages::X_0_which_lacks_return_type_annotation_implicitly_has_an_1_return_type, vec![name, tsr_ast::JsString::from_bytes(b"any".as_slice())])?;
+            if !private_ambient {
+                self.report_implicit_any(function, self.builtins.any_type)?;
             }
         }
         if annotation.is_none() && !body_missing && self.body_function_flags(function)?.1 {

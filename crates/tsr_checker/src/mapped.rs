@@ -1040,7 +1040,9 @@ impl CheckerState {
         }
         if annotation.is_none() {
             let options = self.program()?.host.options();
-            if options.strict_option_value(options.no_implicit_any) {
+            if options.strict_option_value(options.no_implicit_any)
+                && !self.implicit_any_is_silent(node)?
+            {
                 self.error_at(
                     Some(node),
                     tsr_diagnostics::Mapped_object_type_implicitly_has_an_any_template_type,

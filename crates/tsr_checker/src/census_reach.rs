@@ -71,6 +71,7 @@ impl CheckerState {
         work.signatures(self.flow.signature_roots());
         work.types(self.calls.census_types());
         work.signatures(self.calls.census_signatures());
+        work.types(self.jsx.census_types());
         for (_, inference) in &self.calls.inference_contexts {
             work.pending.extend(inference.map(Edge::Inference));
         }
@@ -139,6 +140,9 @@ impl CheckerState {
                 .flatten(),
         );
         work.types(self.query.global_types.values().copied());
+        for (&(_, name), &ty) in &self.query.decorator_context_overrides {
+            work.types([name, ty]);
+        }
         work.types(self.query.context_free_types.values().copied());
         work.types(self.query.array_literal_types.keys().copied());
         work.types(self.query.array_literal_types.values().copied());

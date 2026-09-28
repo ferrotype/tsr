@@ -84,7 +84,7 @@ impl NodeBuilder<'_> {
                             let modifiers = if modifiers.is_empty() {
                                 None
                             } else {
-                                Some(self.list(modifiers)?)
+                                Some(self.modifiers_list(modifiers)?)
                             };
                             self.retain_source_node(name)?;
                             let symbol = self
@@ -124,7 +124,7 @@ impl NodeBuilder<'_> {
                                 .flatten(),
                         );
                     }
-                    let modifiers = self.list(modifiers)?;
+                    let modifiers = self.modifiers_list(modifiers)?;
                     node = self.ast.update_index_signature_declaration(
                         node,
                         Some(modifiers),
@@ -164,7 +164,8 @@ impl NodeBuilder<'_> {
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParametersToTypeParameterDeclarations
-    pub(super) fn symbol_type_parameter_declarations(
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToTypeParameterDeclarations
+    pub(crate) fn symbol_type_parameter_declarations(
         &mut self,
         symbol: SymbolId,
     ) -> Result<Vec<NodeId>, Error> {

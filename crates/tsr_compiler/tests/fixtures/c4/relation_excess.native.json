@@ -1,0 +1,73 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources_sha256": {
+    "relation_excess.ts": "2212bb4947015dad29a7650f1199c2c5c6bcd106d3e060947fb1855cb3f4889b"
+  },
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--skipLibCheck",
+    "--strict",
+    "relation_excess.ts"
+  ],
+  "native_output_sha256": "e2875e4931d254db90f62d6552fa403b5a7d3ad7e315fc01805cec1cf6eeac4a",
+  "exit_code": 2,
+  "native_stderr": "",
+  "diagnostics": [
+    {
+      "file": "relation_excess.ts",
+      "line": 4,
+      "column": 43,
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'b' does not exist in type '{ a: number; }'."
+    },
+    {
+      "file": "relation_excess.ts",
+      "line": 5,
+      "column": 66,
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'extra' does not exist in type '{ a: number; }'."
+    },
+    {
+      "file": "relation_excess.ts",
+      "line": 6,
+      "column": 48,
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'y' does not exist in type 'A'."
+    },
+    {
+      "file": "relation_excess.ts",
+      "line": 7,
+      "column": 67,
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'c' does not exist in type '{ a: number; } & { b: string; }'."
+    },
+    {
+      "file": "relation_excess.ts",
+      "line": 8,
+      "column": 47,
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'q' does not exist in type '{ a: number; }'."
+    },
+    {
+      "file": "relation_excess.ts",
+      "line": 9,
+      "column": 39,
+      "code": 2322,
+      "message": "Type 'string' is not assignable to type 'number'."
+    },
+    {
+      "file": "relation_excess.ts",
+      "line": 10,
+      "column": 14,
+      "code": 2353,
+      "message": "Object literal may only specify known properties, and 'z' does not exist in type '{ a: number; }'."
+    }
+  ]
+}

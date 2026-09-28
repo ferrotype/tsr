@@ -378,6 +378,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "tsr_astnav"
+version = "0.1.0"
+dependencies = [
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_scanner",
+]
+
+[[package]]
 name = "tsr_binder"
 version = "0.1.0"
 dependencies = [
@@ -407,6 +416,7 @@ dependencies = [
  "stacker",
  "tsr_arena",
  "tsr_ast",
+ "tsr_astnav",
  "tsr_binder",
  "tsr_core",
  "tsr_diagnostics",
@@ -414,6 +424,7 @@ dependencies = [
  "tsr_jsstring",
  "tsr_module",
  "tsr_nodebuilder",
+ "tsr_parser",
  "tsr_printer",
  "tsr_pseudochecker",
  "tsr_scanner",

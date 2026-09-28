@@ -56,6 +56,7 @@ impl NodeBuilder<'_> {
         Ok(candidates.first().copied())
     }
 
+    // port: tsc/internal/checker/symbolaccessibility.go:Checker.getExternalModuleContainer
     pub(super) fn external_name_container(
         &mut self,
         declaration: NodeId,

@@ -1,19 +1,17 @@
 {
  "dispositions": {
   "tsc/internal/checker/checker.go:Checker.GetAliasedSymbol": {
-   "disposition": "equivalent",
-   "reason": "the public wrapper of resolve_alias",
-   "rust": "crates/tsr_checker/src/module_aliases.rs:255"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.5 (exports.rs), a public entry point the recorded fourslash calls replay."
   },
   "tsc/internal/checker/checker.go:Checker.GetSymbolAtLocation": {
    "disposition": "equivalent",
    "reason": "the public wrapper of get_symbol_at_location with ignoreErrors",
-   "rust": "crates/tsr_checker/src/query.rs:102"
+   "rust": "crates/tsr_checker/src/query.rs:130"
   },
   "tsc/internal/checker/checker.go:Checker.ResolveAlias": {
-   "disposition": "equivalent",
-   "reason": "the public wrapper of resolve_alias with the unknown-symbol test at the call site",
-   "rust": "crates/tsr_checker/src/module_aliases.rs:255"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.5 (exports.rs), a public entry point the recorded fourslash calls replay."
   },
   "tsc/internal/checker/checker.go:Checker.addInheritedMembers": {
    "disposition": "equivalent",
@@ -38,7 +36,7 @@
   "tsc/internal/checker/checker.go:Checker.expandSignatureParametersWithTupleMembers": {
    "disposition": "equivalent",
    "reason": "expanded_signature_parameters expands the rest tuple as the pin does",
-   "rust": "crates/tsr_checker/src/signature_parameters.rs:628"
+   "rust": "crates/tsr_checker/src/signature_parameters.rs:675"
   },
   "tsc/internal/checker/checker.go:Checker.findIndexInfo": {
    "disposition": "equivalent",
@@ -48,22 +46,21 @@
   "tsc/internal/checker/checker.go:Checker.getAliasSymbolForTypeNode": {
    "disposition": "equivalent",
    "reason": "alias_for_type_node returns the alias with its symbol",
-   "rust": "crates/tsr_checker/src/query.rs:697"
+   "rust": "crates/tsr_checker/src/query.rs:756"
   },
   "tsc/internal/checker/checker.go:Checker.getApplicableIndexInfo": {
    "disposition": "equivalent",
    "reason": "applicable_index_info over index_infos_of_type",
-   "rust": "crates/tsr_checker/src/indexes.rs:585"
+   "rust": "crates/tsr_checker/src/indexes.rs:591"
   },
   "tsc/internal/checker/checker.go:Checker.getApplicableIndexInfoForName": {
    "disposition": "equivalent",
    "reason": "callers pass the string literal or es-symbol key to applicable_index_info",
-   "rust": "crates/tsr_checker/src/indexes.rs:585"
+   "rust": "crates/tsr_checker/src/indexes.rs:591"
   },
   "tsc/internal/checker/checker.go:Checker.getApplicableIndexInfos": {
-   "disposition": "equivalent",
-   "reason": "callers filter index infos with applicable_index_type",
-   "rust": "crates/tsr_checker/src/indexes.rs:563"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.2 (exports.rs) for GetIndexSignaturesAtLocation."
   },
   "tsc/internal/checker/checker.go:Checker.getArrayOrTupleTargetType": {
    "disposition": "equivalent",
@@ -73,7 +70,7 @@
   "tsc/internal/checker/checker.go:Checker.getBaseTypeOfLiteralTypeUnion": {
    "disposition": "equivalent",
    "reason": "inlined in base_literal_type under the literal_union_bases cache",
-   "rust": "crates/tsr_checker/src/infer_candidates.rs:289"
+   "rust": "crates/tsr_checker/src/infer_candidates.rs:294"
   },
   "tsc/internal/checker/checker.go:Checker.getClassOrInterfaceDeclarationsOfSymbol": {
    "disposition": "equivalent",
@@ -93,37 +90,37 @@
   "tsc/internal/checker/checker.go:Checker.getDeclarationNodeFlagsFromSymbol": {
    "disposition": "equivalent",
    "reason": "get_combined_node_flags over the value declaration at the call sites",
-   "rust": "crates/tsr_checker/src/check.rs:210"
+   "rust": "crates/tsr_checker/src/check.rs:211"
   },
   "tsc/internal/checker/checker.go:Checker.getDeclaredTypeOfAlias": {
    "disposition": "equivalent",
    "reason": "inlined in get_declared_type_of_symbol: the alias resolves and recurses; the target declared-type cache stands in for the alias link",
-   "rust": "crates/tsr_checker/src/query.rs:356"
+   "rust": "crates/tsr_checker/src/query.rs:393"
   },
   "tsc/internal/checker/checker.go:Checker.getGlobalSymbol": {
    "disposition": "equivalent",
    "reason": "resolve_name with no location, the diagnostic and no use, as get_global_type does",
-   "rust": "crates/tsr_checker/src/program_init.rs:223"
+   "rust": "crates/tsr_checker/src/program_init.rs:229"
   },
   "tsc/internal/checker/checker.go:Checker.getGlobalTypeSymbolResolver": {
    "disposition": "equivalent",
    "reason": "the memoized resolvers are the global-type cache of the query state",
-   "rust": "crates/tsr_checker/src/program_init.rs:223"
+   "rust": "crates/tsr_checker/src/program_init.rs:229"
   },
   "tsc/internal/checker/checker.go:Checker.getGlobalTypesResolver": {
    "disposition": "equivalent",
    "reason": "the memoized resolvers are the global-type cache of the query state",
-   "rust": "crates/tsr_checker/src/program_init.rs:223"
+   "rust": "crates/tsr_checker/src/program_init.rs:229"
   },
   "tsc/internal/checker/checker.go:Checker.getIndexInfoWithReadonly": {
    "disposition": "equivalent",
    "reason": "inlined in the spread index loop: an index info with a different readonly flag is re-minted",
-   "rust": "crates/tsr_checker/src/object_spread.rs:166"
+   "rust": "crates/tsr_checker/src/object_spread.rs:167"
   },
   "tsc/internal/checker/checker.go:Checker.getIndexInfosOfStructuredType": {
    "disposition": "equivalent",
    "reason": "index_infos_of_type reads the resolved members' index infos",
-   "rust": "crates/tsr_checker/src/indexes.rs:283"
+   "rust": "crates/tsr_checker/src/indexes.rs:288"
   },
   "tsc/internal/checker/checker.go:Checker.getIndexInfosOfSymbol": {
    "disposition": "equivalent",
@@ -148,7 +145,7 @@
   "tsc/internal/checker/checker.go:Checker.getIntersectedSignatures": {
    "disposition": "equivalent",
    "reason": "inlined in contextual_signature_for_type: under noImplicitAny the applicable signatures combine when their type parameters are identical",
-   "rust": "crates/tsr_checker/src/return_inference.rs:648"
+   "rust": "crates/tsr_checker/src/return_inference.rs:644"
   },
   "tsc/internal/checker/checker.go:Checker.getNormalizedTupleType": {
    "disposition": "equivalent",
@@ -158,17 +155,16 @@
   "tsc/internal/checker/checker.go:Checker.getPropertyNameFromIndex": {
    "disposition": "equivalent",
    "reason": "index_property_name",
-   "rust": "crates/tsr_checker/src/indexes.rs:495"
+   "rust": "crates/tsr_checker/src/indexes.rs:500"
   },
   "tsc/internal/checker/checker.go:Checker.getReferencedValueOrAliasSymbol": {
-   "disposition": "equivalent",
-   "reason": "the resolved-symbol link with the resolve fallback, inline in the emit reference path",
-   "rust": "crates/tsr_checker/src/emit_reference.rs:156"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/emit_reference.rs:156: the resolved-symbol link with the resolve fallback, inline in the emit reference path"
   },
   "tsc/internal/checker/checker.go:Checker.getResolvedSymbolOrNil": {
    "disposition": "equivalent",
    "reason": "the resolved-symbol link read at the call sites",
-   "rust": "crates/tsr_checker/src/access_expressions.rs:397"
+   "rust": "crates/tsr_checker/src/access_expressions.rs:406"
   },
   "tsc/internal/checker/checker.go:Checker.getRestTypeOfSignature": {
    "disposition": "equivalent",
@@ -183,7 +179,7 @@
   "tsc/internal/checker/checker.go:Checker.getReturnTypeOfFullSignature": {
    "disposition": "equivalent",
    "reason": "signature_of_full_signature followed by return_type_of_signature",
-   "rust": "crates/tsr_checker/src/source_signatures.rs:651"
+   "rust": "crates/tsr_checker/src/source_signatures.rs:661"
   },
   "tsc/internal/checker/checker.go:Checker.getReturnTypeOfSingleNonGenericSignature": {
    "disposition": "equivalent",
@@ -223,22 +219,22 @@
   "tsc/internal/checker/checker.go:Checker.getTypeArgumentsForAliasSymbol": {
    "disposition": "equivalent",
    "reason": "alias_for_type_node also carries the local type parameters as the alias arguments",
-   "rust": "crates/tsr_checker/src/query.rs:697"
+   "rust": "crates/tsr_checker/src/query.rs:756"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeFromLiteralTypeNode": {
    "disposition": "equivalent",
    "reason": "inlined in the LiteralType arm of the type node worker: the null keyword, else the regular literal type of the checked literal",
-   "rust": "crates/tsr_checker/src/query.rs:587"
+   "rust": "crates/tsr_checker/src/query.rs:627"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeFromTypeAliasReference": {
    "disposition": "equivalent",
    "reason": "the alias branch of get_type_reference_type, including the arity check",
-   "rust": "crates/tsr_checker/src/references.rs:223"
+   "rust": "crates/tsr_checker/src/references.rs:240"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeOfFuncClassEnumModule": {
    "disposition": "equivalent",
    "reason": "the worker is ported; its value-links cache is the query state's",
-   "rust": "crates/tsr_checker/src/enums.rs:255"
+   "rust": "crates/tsr_checker/src/enums.rs:257"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeParametersForTypeAndSymbol": {
    "disposition": "mapped",
@@ -247,12 +243,12 @@
   "tsc/internal/checker/checker.go:Checker.getUniqAssociatedNamesFromTupleType": {
    "disposition": "equivalent",
    "reason": "reached only through getExpandedParameters (exports.go, nodebuilderscopes.go, pseudotypenodebuilder.go), never from tsc diagnostics; the node builder expansion that error display uses is ported here and reproduces the pin `(a, a_2, a_3, a_1)` naming",
-   "rust": "crates/tsr_checker/src/signature_parameters.rs:708"
+   "rust": "crates/tsr_checker/src/signature_parameters.rs:754"
   },
   "tsc/internal/checker/checker.go:Checker.getUniqueLiteralTypeForTypeParameter": {
    "disposition": "equivalent",
    "reason": "the UniqueLiteral mapper arm maps type parameters to the unique literal type",
-   "rust": "crates/tsr_checker/src/mapper.rs:293"
+   "rust": "crates/tsr_checker/src/mapper.rs:316"
   },
   "tsc/internal/checker/checker.go:Checker.hasLateBindableIndexSignature": {
    "disposition": "equivalent",
@@ -282,7 +278,7 @@
   "tsc/internal/checker/checker.go:Checker.instantiateSymbols": {
    "disposition": "equivalent",
    "reason": "instantiate_symbol applied per element at the call sites",
-   "rust": "crates/tsr_checker/src/instantiate.rs:339"
+   "rust": "crates/tsr_checker/src/instantiate.rs:353"
   },
   "tsc/internal/checker/checker.go:Checker.isArrayOrTupleLikeType": {
    "disposition": "mapped",
@@ -291,7 +287,7 @@
   "tsc/internal/checker/checker.go:Checker.isArrayOrTupleOrIntersection": {
    "disposition": "equivalent",
    "reason": "array_tuple_intersection folds isArrayOrTupleType with the every-constituent intersection test, which is how both pin sites use it",
-   "rust": "crates/tsr_checker/src/mapped.rs:507"
+   "rust": "crates/tsr_checker/src/mapped.rs:510"
   },
   "tsc/internal/checker/checker.go:Checker.isArrayOrTupleSymbol": {
    "disposition": "equivalent",
@@ -331,7 +327,7 @@
   "tsc/internal/checker/checker.go:Checker.newUniqueESSymbolType": {
    "disposition": "equivalent",
    "reason": "inlined in es_symbol_like_type_for_node: a UniqueEsSymbol type with the symbol and the escaped name",
-   "rust": "crates/tsr_checker/src/late_members.rs:575"
+   "rust": "crates/tsr_checker/src/late_members.rs:577"
   },
   "tsc/internal/checker/checker.go:Checker.parseBigIntLiteralType": {
    "disposition": "equivalent",
@@ -344,9 +340,8 @@
    "rust": "crates/tsr_checker/src/merge.rs:90"
   },
   "tsc/internal/checker/checker.go:Checker.resolveAliasWithDeprecationCheck": {
-   "disposition": "equivalent",
-   "reason": "check_value_identifier resolves the alias; the deprecation walk adds suggestion diagnostics only, which the harness never captures (CaptureSuggestions is false)",
-   "rust": "crates/tsr_checker/src/value_references.rs:35"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.5 (signature_jsdoc.rs): the services replay observes the deprecation suggestions it reports."
   },
   "tsc/internal/checker/checker.go:Checker.resolveClassOrInterfaceMembers": {
    "disposition": "equivalent",
@@ -366,17 +361,16 @@
   "tsc/internal/checker/checker.go:Checker.transformTypeOfMembers": {
    "disposition": "equivalent",
    "reason": "inlined in regular_object_literal_type: a property whose regularized type changes is re-created with the new type",
-   "rust": "crates/tsr_checker/src/relation_helpers.rs:147"
+   "rust": "crates/tsr_checker/src/relation_helpers.rs:148"
   },
   "tsc/internal/checker/checker.go:Checker.tryGetDeclaredTypeOfSymbol": {
    "disposition": "equivalent",
    "reason": "inlined in get_declared_type_of_symbol as the flag dispatch; no matching flag yields the error type, and type_reference_from_symbol reports Type_0_is_not_generic before reaching it",
-   "rust": "crates/tsr_checker/src/query.rs:340"
+   "rust": "crates/tsr_checker/src/query.rs:377"
   },
   "tsc/internal/checker/checker.go:Checker.typeHasCallOrConstructSignatures": {
-   "disposition": "equivalent",
-   "reason": "resolve_type_members' signatures non-empty at the call sites",
-   "rust": "crates/tsr_checker/src/object_members.rs:15"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.2 (exports.rs), the public TypeHasCallOrConstructSignatures."
   },
   "tsc/internal/checker/checker.go:findIndexInfo": {
    "disposition": "equivalent",
@@ -394,9 +388,8 @@
    "rust": "crates/tsr_checker/src/types.rs:167"
   },
   "tsc/internal/checker/checker.go:getNameFromIndexInfo": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "index parameter names are node-builder output"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.2 (exports.rs); the builder site keeps its inline copy until C5.4."
   },
   "tsc/internal/checker/checker.go:getNumberLiteralValue": {
    "disposition": "equivalent",
@@ -411,17 +404,17 @@
   "tsc/internal/checker/checker.go:getTypeAliasInstantiationKey": {
    "disposition": "equivalent",
    "reason": "object_instantiation_key builds the same key",
-   "rust": "crates/tsr_checker/src/instantiate.rs:593"
+   "rust": "crates/tsr_checker/src/instantiate.rs:623"
   },
   "tsc/internal/checker/checker.go:isConstEnumSymbol": {
    "disposition": "equivalent",
    "reason": "const_enum_object_type tests the symbol's const-enum flag inline",
-   "rust": "crates/tsr_checker/src/enums.rs:725"
+   "rust": "crates/tsr_checker/src/enums.rs:732"
   },
   "tsc/internal/checker/checker.go:isGenericTupleType": {
    "disposition": "equivalent",
    "reason": "is_generic_tuple_type is marked as the Checker method of the same name; the package-level function has the same body",
-   "rust": "crates/tsr_checker/src/template.rs:285"
+   "rust": "crates/tsr_checker/src/template.rs:289"
   },
   "tsc/internal/checker/checker.go:isMutableTupleType": {
    "disposition": "equivalent",
@@ -456,42 +449,42 @@
   "tsc/internal/checker/relater.go:Checker.checkTypeAssignableToEx": {
    "disposition": "equivalent",
    "reason": "check_type_related_ex takes the relation kind, error node and head message of these wrappers",
-   "rust": "crates/tsr_checker/src/relater.rs:245"
+   "rust": "crates/tsr_checker/src/relater.rs:261"
   },
   "tsc/internal/checker/relater.go:Checker.checkTypeComparableTo": {
    "disposition": "equivalent",
    "reason": "check_type_related_ex takes the relation kind, error node and head message of these wrappers",
-   "rust": "crates/tsr_checker/src/relater.rs:245"
+   "rust": "crates/tsr_checker/src/relater.rs:261"
   },
   "tsc/internal/checker/relater.go:Checker.checkTypeRelatedTo": {
    "disposition": "equivalent",
    "reason": "check_type_related_ex takes the relation kind, error node and head message of these wrappers",
-   "rust": "crates/tsr_checker/src/relater.rs:245"
+   "rust": "crates/tsr_checker/src/relater.rs:261"
   },
   "tsc/internal/checker/relater.go:Checker.compareTypePredicatesIdentical": {
    "disposition": "equivalent",
    "reason": "inlined in compare_signatures_identical: one missing predicate is FALSE, kinds must match, then the predicate types compare",
-   "rust": "crates/tsr_checker/src/signature_identity.rs:96"
+   "rust": "crates/tsr_checker/src/signature_identity.rs:92"
   },
   "tsc/internal/checker/relater.go:Checker.compareTypesAssignableSimple": {
    "disposition": "equivalent",
    "reason": "the comparator callbacks are is_type_related_to with the relation kind; callers pass the kind instead of a function value",
-   "rust": "crates/tsr_checker/src/relater.rs:158"
+   "rust": "crates/tsr_checker/src/relater.rs:174"
   },
   "tsc/internal/checker/relater.go:Checker.compareTypesAssignableWorker": {
    "disposition": "equivalent",
    "reason": "the comparator callbacks are is_type_related_to with the relation kind; callers pass the kind instead of a function value",
-   "rust": "crates/tsr_checker/src/relater.rs:158"
+   "rust": "crates/tsr_checker/src/relater.rs:174"
   },
   "tsc/internal/checker/relater.go:Checker.compareTypesIdentical": {
    "disposition": "equivalent",
    "reason": "the comparator callbacks are is_type_related_to with the relation kind; callers pass the kind instead of a function value",
-   "rust": "crates/tsr_checker/src/relater.rs:158"
+   "rust": "crates/tsr_checker/src/relater.rs:174"
   },
   "tsc/internal/checker/relater.go:Checker.compareTypesSubtypeOf": {
    "disposition": "equivalent",
    "reason": "the comparator callbacks are is_type_related_to with the relation kind; callers pass the kind instead of a function value",
-   "rust": "crates/tsr_checker/src/relater.rs:158"
+   "rust": "crates/tsr_checker/src/relater.rs:174"
   },
   "tsc/internal/checker/relater.go:Checker.elaborateDidYouMeanToCallOrConstruct": {
    "disposition": "equivalent",
@@ -521,12 +514,12 @@
   "tsc/internal/checker/relater.go:Checker.getKeyPropertyCandidateName": {
    "disposition": "equivalent",
    "reason": "compute_key_property_name computes the candidate name inline",
-   "rust": "crates/tsr_checker/src/relation_helpers.rs:205"
+   "rust": "crates/tsr_checker/src/relation_helpers.rs:206"
   },
   "tsc/internal/checker/relater.go:Checker.getRelater": {
    "disposition": "equivalent",
    "reason": "new_relation_frame reuses relater stacks the way the pin's pool hands out a Relater",
-   "rust": "crates/tsr_checker/src/relater.rs:99"
+   "rust": "crates/tsr_checker/src/relater.rs:115"
   },
   "tsc/internal/checker/relater.go:Checker.getRestArrayTypeOfTupleType": {
    "disposition": "equivalent",
@@ -541,22 +534,22 @@
   "tsc/internal/checker/relater.go:Checker.getThisTypeOfSignature": {
    "disposition": "equivalent",
    "reason": "every site reads this_parameter and calls get_type_of_symbol; compare_signatures_identical is one",
-   "rust": "crates/tsr_checker/src/signature_identity.rs:72"
+   "rust": "crates/tsr_checker/src/signature_identity.rs:68"
   },
   "tsc/internal/checker/relater.go:Checker.getTypeAtPosition": {
    "disposition": "equivalent",
    "reason": "parameter_type_at is the same lookup",
-   "rust": "crates/tsr_checker/src/signature_parameters.rs:234"
+   "rust": "crates/tsr_checker/src/signature_parameters.rs:237"
   },
   "tsc/internal/checker/relater.go:Checker.getTypeOfPropertyInType": {
    "disposition": "equivalent",
    "reason": "inlined in excess_properties: the constituent property type, else the applicable index value type, else undefined",
-   "rust": "crates/tsr_checker/src/relater_excess.rs:212"
+   "rust": "crates/tsr_checker/src/relater_excess.rs:208"
   },
   "tsc/internal/checker/relater.go:Checker.getTypeOfPropertyInTypes": {
    "disposition": "equivalent",
    "reason": "inlined in excess_properties as the union of the per-constituent property types",
-   "rust": "crates/tsr_checker/src/relater_excess.rs:217"
+   "rust": "crates/tsr_checker/src/relater_excess.rs:213"
   },
   "tsc/internal/checker/relater.go:Checker.getUnmatchedProperties": {
    "disposition": "equivalent",
@@ -571,7 +564,7 @@
   "tsc/internal/checker/relater.go:Checker.getVarianceStackIndex": {
    "disposition": "equivalent",
    "reason": "inlined in variances_worker as a position search over the variance stack",
-   "rust": "crates/tsr_checker/src/variance.rs:62"
+   "rust": "crates/tsr_checker/src/variance.rs:64"
   },
   "tsc/internal/checker/relater.go:Checker.hasCommonProperties": {
    "disposition": "equivalent",
@@ -601,37 +594,37 @@
   "tsc/internal/checker/relater.go:Checker.isTypeAssignableTo": {
    "disposition": "equivalent",
    "reason": "is_type_related_to takes the RelationKind that names this wrapper's relation",
-   "rust": "crates/tsr_checker/src/relater.rs:158"
+   "rust": "crates/tsr_checker/src/relater.rs:174"
   },
   "tsc/internal/checker/relater.go:Checker.isTypeComparableTo": {
    "disposition": "equivalent",
    "reason": "is_type_related_to takes the RelationKind that names this wrapper's relation",
-   "rust": "crates/tsr_checker/src/relater.rs:158"
+   "rust": "crates/tsr_checker/src/relater.rs:174"
   },
   "tsc/internal/checker/relater.go:Checker.isTypeIdenticalTo": {
    "disposition": "equivalent",
    "reason": "is_type_related_to takes the RelationKind that names this wrapper's relation",
-   "rust": "crates/tsr_checker/src/relater.rs:158"
+   "rust": "crates/tsr_checker/src/relater.rs:174"
   },
   "tsc/internal/checker/relater.go:Checker.isTypeStrictSubtypeOf": {
    "disposition": "equivalent",
    "reason": "is_type_related_to takes the RelationKind that names this wrapper's relation",
-   "rust": "crates/tsr_checker/src/relater.rs:158"
+   "rust": "crates/tsr_checker/src/relater.rs:174"
   },
   "tsc/internal/checker/relater.go:Checker.isTypeSubtypeOf": {
    "disposition": "equivalent",
    "reason": "is_type_related_to takes the RelationKind that names this wrapper's relation",
-   "rust": "crates/tsr_checker/src/relater.rs:158"
+   "rust": "crates/tsr_checker/src/relater.rs:174"
   },
   "tsc/internal/checker/relater.go:Checker.isValidDeclarationForTupleLabel": {
    "disposition": "equivalent",
    "reason": "inlined in parameter_label_at: a named tuple member or a parameter with an identifier name",
-   "rust": "crates/tsr_checker/src/signature_parameters.rs:387"
+   "rust": "crates/tsr_checker/src/signature_parameters.rs:390"
   },
   "tsc/internal/checker/relater.go:Checker.putRelater": {
    "disposition": "equivalent",
    "reason": "retain_relation_frame returns the stacks to the pool",
-   "rust": "crates/tsr_checker/src/relater.rs:120"
+   "rust": "crates/tsr_checker/src/relater.rs:136"
   },
   "tsc/internal/checker/relater.go:Checker.reportDiagnostic": {
    "disposition": "equivalent",
@@ -651,7 +644,7 @@
   "tsc/internal/checker/relater.go:Checker.typePredicateKindsMatch": {
    "disposition": "equivalent",
    "reason": "inlined in compare_signatures_identical as the kind and parameter-index test",
-   "rust": "crates/tsr_checker/src/signature_identity.rs:102"
+   "rust": "crates/tsr_checker/src/signature_identity.rs:98"
   },
   "tsc/internal/checker/relater.go:Relater.chainArgsMatch": {
    "disposition": "equivalent",
@@ -671,12 +664,12 @@
   "tsc/internal/checker/relater.go:Relater.indexSignaturesIdenticalTo": {
    "disposition": "equivalent",
    "reason": "inlined in indexes_related under the identity relation: equal counts, a per-key lookup, readonly and value-type identity",
-   "rust": "crates/tsr_checker/src/relater_properties.rs:483"
+   "rust": "crates/tsr_checker/src/relater_properties.rs:488"
   },
   "tsc/internal/checker/relater.go:Relater.isPropertySymbolTypeRelated": {
    "disposition": "equivalent",
    "reason": "inlined in property_related_as: partial-target optionality, the any/unknown short-circuit by relation, then the source property type",
-   "rust": "crates/tsr_checker/src/relater_properties.rs:389"
+   "rust": "crates/tsr_checker/src/relater_properties.rs:394"
   },
   "tsc/internal/checker/relater.go:Relater.isSourceIntersectionNeedingExtraCheck": {
    "disposition": "equivalent",
@@ -706,22 +699,22 @@
   "tsc/internal/checker/relater.go:Relater.typeRelatedToIndexInfo": {
    "disposition": "equivalent",
    "reason": "inlined in indexes_related: the applicable index info, the inferable-index members, then the missing index signature error",
-   "rust": "crates/tsr_checker/src/relater_properties.rs:537"
+   "rust": "crates/tsr_checker/src/relater_properties.rs:542"
   },
   "tsc/internal/checker/relater.go:Relation.get": {
    "disposition": "equivalent",
    "reason": "the relation cache is a per-kind map read inside compare_in_relation_frame",
-   "rust": "crates/tsr_checker/src/relater.rs:135"
+   "rust": "crates/tsr_checker/src/relater.rs:151"
   },
   "tsc/internal/checker/relater.go:Relation.set": {
    "disposition": "equivalent",
    "reason": "the relation cache is written by the same frame helper",
-   "rust": "crates/tsr_checker/src/relater.rs:135"
+   "rust": "crates/tsr_checker/src/relater.rs:151"
   },
   "tsc/internal/checker/relater.go:Relation.size": {
    "disposition": "equivalent",
    "reason": "the cache length is the map's length",
-   "rust": "crates/tsr_checker/src/relater.rs:135"
+   "rust": "crates/tsr_checker/src/relater.rs:151"
   },
   "tsc/internal/checker/relater.go:TypeDiscriminator.len": {
    "disposition": "equivalent",
@@ -741,7 +734,7 @@
   "tsc/internal/checker/relater.go:asRecursionId": {
    "disposition": "equivalent",
    "reason": "RecursionIdentity is an enum over node, symbol and type identities instead of an interface conversion",
-   "rust": "crates/tsr_checker/src/constraints.rs:79"
+   "rust": "crates/tsr_checker/src/constraints.rs:103"
   },
   "tsc/internal/checker/relater.go:chainDepth": {
    "disposition": "equivalent",
@@ -759,17 +752,17 @@
   "tsc/internal/checker/relater.go:isNonPrimitiveType": {
    "disposition": "equivalent",
    "reason": "a flags test on NON_PRIMITIVE at the call sites",
-   "rust": "crates/tsr_checker/src/relater.rs:382"
+   "rust": "crates/tsr_checker/src/relater.rs:398"
   },
   "tsc/internal/checker/relater.go:isObjectOrInstantiableNonPrimitive": {
    "disposition": "equivalent",
    "reason": "inlined in the key-property map computation as the object-or-instantiable-non-primitive flag test",
-   "rust": "crates/tsr_checker/src/relation_helpers.rs:211"
+   "rust": "crates/tsr_checker/src/relation_helpers.rs:212"
   },
   "tsc/internal/checker/relater.go:shouldCheckAsExcessProperty": {
    "disposition": "equivalent",
    "reason": "inlined in excess_properties: the property value declaration must be a direct child of the container value declaration",
-   "rust": "crates/tsr_checker/src/relater_excess.rs:182"
+   "rust": "crates/tsr_checker/src/relater_excess.rs:178"
   },
   "tsc/internal/checker/relater.go:visibilityToString": {
    "disposition": "equivalent",
@@ -789,27 +782,27 @@
   "tsc/internal/checker/types.go:ConstrainedType.AsConstrainedType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:IndexInfo.Declaration": {
    "disposition": "equivalent",
    "reason": "IndexInfo.declaration",
-   "rust": "crates/tsr_checker/src/signatures.rs:54"
+   "rust": "crates/tsr_checker/src/signatures.rs:55"
   },
   "tsc/internal/checker/types.go:IndexInfo.IsReadonly": {
    "disposition": "equivalent",
    "reason": "IndexInfo.is_readonly",
-   "rust": "crates/tsr_checker/src/signatures.rs:52"
+   "rust": "crates/tsr_checker/src/signatures.rs:53"
   },
   "tsc/internal/checker/types.go:IndexInfo.KeyType": {
    "disposition": "equivalent",
    "reason": "IndexInfo.key_type",
-   "rust": "crates/tsr_checker/src/signatures.rs:50"
+   "rust": "crates/tsr_checker/src/signatures.rs:51"
   },
   "tsc/internal/checker/types.go:IndexInfo.ValueType": {
    "disposition": "equivalent",
    "reason": "IndexInfo.value_type",
-   "rust": "crates/tsr_checker/src/signatures.rs:51"
+   "rust": "crates/tsr_checker/src/signatures.rs:52"
   },
   "tsc/internal/checker/types.go:IndexType.Target": {
    "disposition": "equivalent",
@@ -829,7 +822,7 @@
   "tsc/internal/checker/types.go:InterfaceType.AsInterfaceType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:InterfaceType.LocalTypeParameters": {
    "disposition": "equivalent",
@@ -869,7 +862,7 @@
   "tsc/internal/checker/types.go:ObjectType.AsObjectType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Signature.Declaration": {
    "disposition": "equivalent",
@@ -889,7 +882,7 @@
   "tsc/internal/checker/types.go:Signature.Id": {
    "disposition": "equivalent",
    "reason": "the SignatureId newtype is the identity; signatures are numbered from 1 as the pin's are",
-   "rust": "crates/tsr_checker/src/signatures.rs:163"
+   "rust": "crates/tsr_checker/src/signatures.rs:165"
   },
   "tsc/internal/checker/types.go:Signature.MinArgumentCount": {
    "disposition": "equivalent",
@@ -924,7 +917,7 @@
   "tsc/internal/checker/types.go:StructuredType.AsStructuredType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:StructuredType.CallSignatures": {
    "disposition": "equivalent",
@@ -994,132 +987,132 @@
   "tsc/internal/checker/types.go:Type.Alias": {
    "disposition": "equivalent",
    "reason": "alias_of(id) returns the alias record",
-   "rust": "crates/tsr_checker/src/types.rs:733"
+   "rust": "crates/tsr_checker/src/types.rs:743"
   },
   "tsc/internal/checker/types.go:Type.AsConditionalType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsConstrainedType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsEvolvingArrayType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsIndexType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsIndexedAccessType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsInstantiationExpressionType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsInterfaceType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsIntersectionType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsIntrinsicType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsLiteralType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsMappedType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsObjectType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsReverseMappedType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsStringMappingType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsStructuredType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsSubstitutionType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsTemplateLiteralType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsTupleType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsTypeParameter": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsTypeReference": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsUnionOrIntersectionType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsUnionType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.AsUniqueESSymbolType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:Type.Distributed": {
    "disposition": "equivalent",
    "reason": "types_of(id) yields the union's constituents, or the type itself where the pin returns a singleton",
-   "rust": "crates/tsr_checker/src/types.rs:983"
+   "rust": "crates/tsr_checker/src/types.rs:993"
   },
   "tsc/internal/checker/types.go:Type.Flags": {
    "disposition": "equivalent",
    "reason": "flags(id) reads the record's flags",
-   "rust": "crates/tsr_checker/src/types.rs:623"
+   "rust": "crates/tsr_checker/src/types.rs:625"
   },
   "tsc/internal/checker/types.go:Type.Id": {
    "disposition": "equivalent",
@@ -1129,127 +1122,127 @@
   "tsc/internal/checker/types.go:Type.IsBigIntLiteral": {
    "disposition": "equivalent",
    "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
-   "rust": "crates/tsr_checker/src/types.rs:623"
+   "rust": "crates/tsr_checker/src/types.rs:625"
   },
   "tsc/internal/checker/types.go:Type.IsBooleanLike": {
    "disposition": "equivalent",
    "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
-   "rust": "crates/tsr_checker/src/types.rs:623"
+   "rust": "crates/tsr_checker/src/types.rs:625"
   },
   "tsc/internal/checker/types.go:Type.IsClass": {
    "disposition": "equivalent",
    "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
-   "rust": "crates/tsr_checker/src/types.rs:623"
+   "rust": "crates/tsr_checker/src/types.rs:625"
   },
   "tsc/internal/checker/types.go:Type.IsEnumLiteral": {
    "disposition": "equivalent",
    "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
-   "rust": "crates/tsr_checker/src/types.rs:623"
+   "rust": "crates/tsr_checker/src/types.rs:625"
   },
   "tsc/internal/checker/types.go:Type.IsIndex": {
    "disposition": "equivalent",
    "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
-   "rust": "crates/tsr_checker/src/types.rs:623"
+   "rust": "crates/tsr_checker/src/types.rs:625"
   },
   "tsc/internal/checker/types.go:Type.IsIntersection": {
    "disposition": "equivalent",
    "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
-   "rust": "crates/tsr_checker/src/types.rs:623"
+   "rust": "crates/tsr_checker/src/types.rs:625"
   },
   "tsc/internal/checker/types.go:Type.IsNumberLiteral": {
    "disposition": "equivalent",
    "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
-   "rust": "crates/tsr_checker/src/types.rs:623"
+   "rust": "crates/tsr_checker/src/types.rs:625"
   },
   "tsc/internal/checker/types.go:Type.IsString": {
    "disposition": "equivalent",
    "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
-   "rust": "crates/tsr_checker/src/types.rs:623"
+   "rust": "crates/tsr_checker/src/types.rs:625"
   },
   "tsc/internal/checker/types.go:Type.IsStringLike": {
    "disposition": "equivalent",
    "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
-   "rust": "crates/tsr_checker/src/types.rs:623"
+   "rust": "crates/tsr_checker/src/types.rs:625"
   },
   "tsc/internal/checker/types.go:Type.IsStringLiteral": {
    "disposition": "equivalent",
    "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
-   "rust": "crates/tsr_checker/src/types.rs:623"
+   "rust": "crates/tsr_checker/src/types.rs:625"
   },
   "tsc/internal/checker/types.go:Type.IsTupleType": {
    "disposition": "equivalent",
    "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
-   "rust": "crates/tsr_checker/src/types.rs:623"
+   "rust": "crates/tsr_checker/src/types.rs:625"
   },
   "tsc/internal/checker/types.go:Type.IsTypeParameter": {
    "disposition": "equivalent",
    "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
-   "rust": "crates/tsr_checker/src/types.rs:623"
+   "rust": "crates/tsr_checker/src/types.rs:625"
   },
   "tsc/internal/checker/types.go:Type.IsUnion": {
    "disposition": "equivalent",
    "reason": "a flags (or object flags, or target object flags for tuples) test at the call sites; the store exposes flags(id) and object_flags(id)",
-   "rust": "crates/tsr_checker/src/types.rs:623"
+   "rust": "crates/tsr_checker/src/types.rs:625"
   },
   "tsc/internal/checker/types.go:Type.Mapper": {
    "disposition": "equivalent",
    "reason": "the object payload's mapper field, read per payload kind at the call sites",
-   "rust": "crates/tsr_checker/src/types.rs:806"
+   "rust": "crates/tsr_checker/src/types.rs:816"
   },
   "tsc/internal/checker/types.go:Type.ObjectFlags": {
    "disposition": "equivalent",
    "reason": "object_flags(id) reads the record's object flags",
-   "rust": "crates/tsr_checker/src/types.rs:627"
+   "rust": "crates/tsr_checker/src/types.rs:629"
   },
   "tsc/internal/checker/types.go:Type.Symbol": {
    "disposition": "equivalent",
    "reason": "the record's symbol field",
-   "rust": "crates/tsr_checker/src/types.rs:611"
+   "rust": "crates/tsr_checker/src/types.rs:613"
   },
   "tsc/internal/checker/types.go:Type.TargetInterfaceType": {
    "disposition": "equivalent",
    "reason": "interface(target(id)) is the target's interface payload",
-   "rust": "crates/tsr_checker/src/types.rs:917"
+   "rust": "crates/tsr_checker/src/types.rs:927"
   },
   "tsc/internal/checker/types.go:Type.TargetTupleType": {
    "disposition": "equivalent",
    "reason": "tuple(target(id)) is the target's tuple payload",
-   "rust": "crates/tsr_checker/src/types.rs:996"
+   "rust": "crates/tsr_checker/src/types.rs:1006"
   },
   "tsc/internal/checker/types.go:TypeBase.AsConstrainedType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:TypeBase.AsInterfaceType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:TypeBase.AsObjectType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:TypeBase.AsStructuredType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:TypeBase.AsType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:TypeBase.AsTypeReference": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:TypeBase.AsUnionOrIntersectionType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:TypeParameter.IsThisType": {
    "disposition": "equivalent",
@@ -1279,17 +1272,17 @@
   "tsc/internal/checker/types.go:TypeReference.AsTypeReference": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:UnionOrIntersectionType.AsUnionOrIntersectionType": {
    "disposition": "equivalent",
    "reason": "payload conversions are the typed accessors the payload_accessors macro defines on the type store; a wrong payload kind is an UnexpectedType error instead of a nil interface",
-   "rust": "crates/tsr_checker/src/types.rs:546"
+   "rust": "crates/tsr_checker/src/types.rs:548"
   },
   "tsc/internal/checker/types.go:UnionOrIntersectionType.Types": {
    "disposition": "equivalent",
    "reason": "types_of(id)",
-   "rust": "crates/tsr_checker/src/types.rs:983"
+   "rust": "crates/tsr_checker/src/types.rs:993"
   }
  },
  "groups": {

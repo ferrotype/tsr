@@ -65,13 +65,13 @@ impl Hooks for NoHooks {}
 pub fn failure(reason: impl std::fmt::Display, class: &str) -> Value {
     json!({"state":"failed","class":class,"reason":reason.to_string()})
 }
-fn checker_failure(error: Error) -> Value {
+pub fn checker_failure(error: Error) -> Value {
     match error {
         Error::Unsupported(reason) => failure(reason, "unsupported"),
         _ => failure(error, "checker_error"),
     }
 }
-fn compiler_failure(error: ts_compiler_error::Error) -> Value {
+pub fn compiler_failure(error: ts_compiler_error::Error) -> Value {
     match error {
         ts_compiler_error::Error::Checker(error) => checker_failure(error),
         ts_compiler_error::Error::Unsupported(reason) => failure(reason, "unsupported"),
@@ -96,6 +96,7 @@ pub fn observe(
         &Value,
         Option<&[tsr_ast::Diagnostic]>,
         &mut dyn Hooks,
+        &mut FileCache,
     ) -> BaselineResults,
 ) -> Value {
     let counters = tsr_arena::Counters::new();
@@ -237,7 +238,8 @@ pub fn observe(
             hooks.pause();
             let name = diagnostics::hex(source.parse_options().file_name.as_bytes());
             hooks.resume();
-            let values = program.declaration_diagnostics_with_checker(&mut op, file);
+            // Program.GetDeclarationDiagnostics(ctx, file): sorted and deduplicated.
+            let values = program.declaration_diagnostics(&mut op, Some(file));
             hooks.pause();
             let result = match values {
                 Ok(values) => {
@@ -281,6 +283,7 @@ pub fn observe(
             &row["phases"],
             diagnostic_values.as_deref(),
             hooks,
+            cache,
         );
         hooks.pause();
         row["type_symbol_baselines"] = results.type_symbols;
@@ -291,4 +294,126 @@ pub fn observe(
     }
     hooks.checkpoint(&mut op);
     row
+}
+
+#[allow(dead_code)]
+/// The configuration's program and checker loaded again, as the pin's harness
+/// loads its post-emit program: a fresh load outside any measurement hooks.
+pub struct Fresh {
+    pub program: Arc<Program>,
+    pub owner: Arc<CheckerOwner>,
+    _counters: tsr_arena::Counters,
+}
+
+#[allow(dead_code)]
+pub fn load_fresh(request: &Value, cache: &mut FileCache) -> Result<Fresh, Value> {
+    let counters = tsr_arena::Counters::new();
+    let parsed = config::parse(request).map_err(|error| failure(error, "config_parse"))?;
+    let mut hooks = NoHooks;
+    let program = hooks
+        .load_program(
+            observation::program_options(&request["loading"], parsed),
+            cache,
+            &counters,
+        )
+        .map_err(compiler_failure)?;
+    let owner = hooks
+        .create_checker(program.clone(), &counters)
+        .map_err(checker_failure)?;
+    Ok(Fresh {
+        program,
+        owner,
+        _counters: counters,
+    })
+}
+
+#[allow(dead_code)]
+/// A program's diagnostics in the pin's harness collection order: config,
+/// program, syntactic, semantic, global, then the requested declaration and
+/// suggestion phases (`harnessutil.compileFilesWithHost`), unsorted.
+pub fn harness_diagnostics(
+    program: &Program,
+    op: &mut tsr_checker::Operation<'_>,
+    phases: &Value,
+) -> Result<Vec<tsr_ast::Diagnostic>, Value> {
+    let requested = |name: &str| {
+        phases
+            .as_array()
+            .is_some_and(|phases| phases.iter().any(|phase| phase == name))
+    };
+    let mut values = program.config().config_file_parsing_diagnostics();
+    values.extend_from_slice(program.program_diagnostics().map_err(compiler_failure)?);
+    values.extend(
+        program
+            .syntactic_diagnostics(None)
+            .map_err(compiler_failure)?,
+    );
+    for file in program.files() {
+        values.extend(
+            program
+                .semantic_diagnostics_with_checker(op, file)
+                .map_err(compiler_failure)?,
+        );
+    }
+    values.extend(op.global_diagnostics().map_err(checker_failure)?);
+    if requested("declaration") {
+        for file in program.files() {
+            values.extend(
+                program
+                    .declaration_diagnostics(op, Some(file))
+                    .map_err(compiler_failure)?,
+            );
+        }
+    }
+    if requested("suggestion") {
+        for file in program.files() {
+            values.extend(
+                program
+                    .suggestion_diagnostics_with_checker(op, file)
+                    .map_err(compiler_failure)?,
+            );
+        }
+    }
+    Ok(values)
+}
+
+#[allow(dead_code)]
+/// The diagnostics `noEmitOnError` asks for before emit, in the pin's
+/// `GetDiagnosticsOfAnyProgram` order: each later phase runs only while the
+/// earlier ones found nothing.
+pub fn any_program_diagnostics(
+    program: &Program,
+    op: &mut tsr_checker::Operation<'_>,
+) -> Result<Vec<tsr_ast::Diagnostic>, Value> {
+    let mut values = program.config().config_file_parsing_diagnostics();
+    let config = values.len();
+    values.extend(
+        program
+            .syntactic_diagnostics(None)
+            .map_err(compiler_failure)?,
+    );
+    if values.len() == config {
+        values.extend_from_slice(program.program_diagnostics().map_err(compiler_failure)?);
+        if !program.options().list_files_only.is_true() {
+            values.extend(op.global_diagnostics().map_err(checker_failure)?);
+            if values.len() == config {
+                for file in program.files() {
+                    values.extend(
+                        program
+                            .semantic_diagnostics_with_checker(op, file)
+                            .map_err(compiler_failure)?,
+                    );
+                }
+                values.extend(op.global_diagnostics().map_err(checker_failure)?);
+            }
+            if program.options().emit_declarations() && values.len() == config {
+                values.extend(
+                    program
+                        .declaration_diagnostics(op, None)
+                        .map_err(compiler_failure)?,
+                );
+            }
+        }
+    }
+    Ok(values)
 }

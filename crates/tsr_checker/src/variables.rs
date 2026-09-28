@@ -169,6 +169,11 @@ impl CheckerState {
             }
         }
         if kind == K::Parameter {
+            // Parameters of function types defined in JSDoc in TS files don't
+            // have symbols.
+            if self.raw_declaration_symbol(declaration)?.is_none() {
+                return Ok(None);
+            }
             if self.node(parent)?.kind() == K::SetAccessor {
                 if let Some(symbol) = self.get_symbol_of_declaration(parent)? {
                     if let Some(getter) = self.declaration_of_kind(symbol, K::GetAccessor)? {

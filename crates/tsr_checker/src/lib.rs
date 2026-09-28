@@ -95,10 +95,12 @@ mod element_errors;
 mod emit_checks;
 mod emit_reference;
 mod emit_resolver;
+mod emit_resolver_js;
 mod emit_scopes;
 mod emit_visibility;
 mod enum_eval;
 mod enums;
+mod exports;
 mod expression_context;
 mod expression_errors;
 mod expressions;
@@ -158,6 +160,7 @@ mod jsx;
 mod key;
 mod late_indexes;
 mod late_members;
+mod linked_references;
 mod links;
 mod mapped;
 mod mapper;
@@ -211,8 +214,11 @@ mod relater_variance;
 mod relation_error_target;
 mod relation_errors;
 mod relation_helpers;
+#[cfg(feature = "services-replay")]
+mod replay_view;
 mod resolution;
 mod return_inference;
+mod services;
 mod signature_identity;
 mod signature_jsdoc;
 mod signature_parameters;
@@ -241,6 +247,8 @@ mod variables;
 mod variance;
 mod widening;
 pub use relater::RelationKind;
+#[cfg(feature = "services-replay")]
+pub use replay_view::{LiteralView, SignatureView, TypeView, TypeViewData};
 mod type_display;
 mod type_parameters;
 mod types;
@@ -256,7 +264,10 @@ pub mod storage_families;
 #[cfg(feature = "storage-pilot")]
 pub mod storage_pilot;
 
+pub use emit_resolver_js::TypeReferenceSerializationKind;
+pub use exports::{IndexInfoParts, IndexInfoRef, TypePredicateParts, TypePredicateRef};
 pub use flags::*;
+pub use handles::BuilderRequest;
 #[cfg(feature = "relation-probe")]
 pub use handles::{LiteralShape, SignatureShape};
 pub use handles::{
@@ -272,6 +283,7 @@ pub(crate) use init::Builtins;
 pub use init::BUILTIN_TYPE_NAMES;
 pub(crate) use key::CacheKey;
 pub use links::{LinkKey, LinkStore};
+pub use node_builder::VerbosityContext;
 pub use owner::{CheckerOwner, Operation};
 #[cfg(test)]
 use resolution::TypeResolution;

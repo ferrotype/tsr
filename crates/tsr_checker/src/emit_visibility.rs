@@ -9,6 +9,8 @@ use tsr_printer::emit_resolver::SymbolAccessibilityResult;
 pub(crate) struct EmitState {
     pub(crate) visible: LinkStore<NodeId, Option<bool>>,
     pub(crate) aliases_marked: LinkStore<NodeId, bool>,
+    /// `jsxLinks.importRef`: the import a transformed JSX reference points at.
+    pub(crate) import_refs: crate::types::Map<NodeId, NodeId>,
 }
 
 impl CheckerState {
@@ -185,6 +187,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/emitresolver.go:EmitResolver.PrecalculateDeclarationEmitVisibility
+    // port: tsc/internal/checker/emitresolver.go:EmitResolver.aliasMarkingVisitorWorker
     pub(crate) fn emit_precalculate_visibility(&mut self, source: NodeId) -> Result<(), Error> {
         if self
             .emit

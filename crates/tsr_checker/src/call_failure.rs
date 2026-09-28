@@ -26,12 +26,18 @@ impl CheckerState {
                 .as_ref()
                 .is_some_and(|p| !p.is_empty());
         }
-        if state.candidates.len() == 1 || has_type_parameters {
+        // A services request wants one of the overloads, never their union.
+        let requested = self.calls.candidates_request == Some(state.node);
+        if requested || state.candidates.len() == 1 || has_type_parameters {
             let mut best = None;
             let mut longest = 0;
+            let argument_count = self
+                .calls
+                .apparent_argument_count
+                .unwrap_or(state.args.len());
             for (index, &candidate) in state.candidates.iter().enumerate() {
                 let count = self.parameter_count(candidate)?;
-                if self.effective_rest_parameter(candidate)? || count >= state.args.len() {
+                if self.effective_rest_parameter(candidate)? || count >= argument_count {
                     best = Some(index);
                     break;
                 }

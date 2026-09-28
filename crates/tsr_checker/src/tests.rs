@@ -17,7 +17,7 @@ fn symbol(arena: &SymbolArena<u32>, slot: u32) -> SymbolId {
     SymbolId::from_parts(arena.id(), slot).unwrap()
 }
 
-fn owner() -> (
+pub(crate) fn owner() -> (
     Counters,
     Generation,
     Arc<CheckerIdentity>,

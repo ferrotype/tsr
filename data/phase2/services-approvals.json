@@ -1,0 +1,29 @@
+{
+ "version": 1,
+ "note": "What the C5.5 services replay leaves to Phase 5. An entry counts only once the owner sets approved_by; until then it is a proposal and c5_services stays false. Reasons are the replay's own (scripts/phase2_services.py replay, report.json).",
+ "exclusions": {
+  "Phase 5: a *autoimport.aliasResolver program": {
+   "approved_by": "Cristian Ianto (in chat, 2026-09-28)",
+   "why": "The auto-import registry builds checkers over its own alias-resolver program (no default library, noCheck, its own module resolution). That program belongs to the registry, which Phase 5 ports with the language service; the compiler program the replay rebuilds is a different program."
+  },
+  "Phase 5: content mappers": {
+   "approved_by": "Cristian Ianto (in chat, 2026-09-28)",
+   "why": "Content-mapped sources (.vue, .astro, .svelte and the test mappers) are not loaded by the Rust program loader; content mappers are withheld under B06 and are Phase 5's."
+  },
+  "Phase 5: the editor's project-reference source redirection": {
+   "approved_by": "Cristian Ianto (in chat, 2026-09-28)",
+   "why": "The editor loads a referenced project's sources in place of its outputs (newProjectReferenceDtsFakingHost). Program::load_with_source_of_project_reference refuses that mode when the outputs exist; the project system is Phase 5's."
+  }
+ },
+ "unsupported": {
+  "synthetic node argument": {
+   "approved_by": "Cristian Ianto (in chat, 2026-09-28)",
+   "why": "Code fixes pass syntax they synthesized (a member declaration, a block, a module declaration) to GetMemberOverrideModifierStatus, IsSymbolAccessible and EmitResolver.CreateTypeOfDeclaration. Rust checker queries take program nodes; accepting synthesized syntax is an API decision for the Phase 5 language service."
+  },
+  "synthesized import specifier argument": {
+   "approved_by": "Cristian Ianto (in chat, 2026-09-28)",
+   "why": "The find-all-references import tracker asks GetSymbolAtLocation for the program's synthesized tslib and JSX runtime import specifiers (GetImportHelpersImportSpecifier, GetJSXRuntimeImportSpecifier). The Rust program exposes those specifiers as text, not as nodes."
+  }
+ },
+ "operations": {}
+}

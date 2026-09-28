@@ -36,7 +36,8 @@ AUDIT = ROOT / "data/phase2/c2-audit.json"
 # Every checkpoint whose claims can carry handoffs; the register merges them.
 CHECKPOINT_CLAIMS = {"C2": (CLAIMS, AUDIT),
                      "C3": (ROOT / "data/phase2/c3-claims.json", ROOT / "data/phase2/c3-audit.json"),
-                     "C4": (ROOT / "data/phase2/c4-claims.json", ROOT / "data/phase2/c4-audit.json")}
+                     "C4": (ROOT / "data/phase2/c4-claims.json", ROOT / "data/phase2/c4-audit.json"),
+                     "C5": (ROOT / "data/phase2/c5-claims.json", ROOT / "data/phase2/c5-audit.json")}
 TARGETS = {*(f"C{i}" for i in range(1, 8)), "Phase 3", "Phase 4", "Phase 5"}
 EMIT_OPERATION = "post-emit diagnostic order"
 OWNERS = (
@@ -115,6 +116,16 @@ def load_handoffs(checkpoint, claims_path, audit_path, comparison, authenticated
         outgoing = validated_handoffs(checkpoint, claims, comparison, context, owned_functions=owned)
         incoming = validated_handoffs(checkpoint, claims, comparison, context, owned_functions=owned, incoming=True)
     return claims, audit, outgoing, incoming
+
+
+def emit_order_open(native_row, row):
+    """Whether a row belongs to the post-emit order entry: the pin's pre- and
+    post-emit sets differ and Rust has not executed the post-emit schedule.
+    Only an observed missing emit is a blocker; once Rust's emit executes the
+    comparison drops `native_pre_post`, and a row that still differs is its
+    owner's defect (C5.7)."""
+    return (native_row["error_pre_diagnostics"] != native_row["error_post_diagnostics"]
+            and bool(cause_domains(row, "emit_order", EMIT_OPERATION)))
 
 
 def cause_domains(row, kind, operation):
@@ -300,7 +311,7 @@ def build(native_dir, rust_dir, record=False, *, handoffs=None, incoming=None, c
             if len(group["evidence"]) < 5:
                 group["evidence"].append({"variant": row["id"], "case": case_dir[row["id"]],
                                           "observation": f"unsupported: {operation}"})
-        if native[row["id"]]["error_pre_diagnostics"] != native[row["id"]]["error_post_diagnostics"]:
+        if emit_order_open(native[row["id"]], row):
             group = groups[("emit_order", EMIT_OPERATION)]
             group["variants"].append(row["id"])
             group["domains"].update(["errors"])

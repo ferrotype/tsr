@@ -270,6 +270,17 @@ impl CheckerState {
         for &node in &nodes {
             self.check_source_element(node)?;
         }
+        let read = self.node(node)?;
+        let const_assertion =
+            tsr_ast::utilities_middle::is_const_type_reference(self.ast(node)?, &read)?
+                && read
+                    .parent()
+                    .map(|parent| self.node(parent))
+                    .transpose()?
+                    .is_some_and(|parent| tsr_ast::utilities::is_assertion_expression(&parent));
+        if const_assertion {
+            return Ok(());
+        }
         self.check_type_reference_or_import(node)
     }
 

@@ -45,6 +45,7 @@ pub(super) struct NameAccess {
     extended: Map<SymbolId, Vec<SymbolId>>,
     extended_by_file: Map<(SymbolId, NodeId), Vec<SymbolId>>,
 }
+// port: tsc/internal/checker/symbolaccessibility.go:getQualifiedLeftMeaning
 fn left_meaning(meaning: u32) -> u32 {
     if meaning == sf::VALUE {
         sf::VALUE
@@ -105,7 +106,7 @@ impl NodeBuilder<'_> {
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToName
-    pub(super) fn symbol_name_node(
+    pub(crate) fn symbol_name_node(
         &mut self,
         symbol: SymbolId,
         meaning: u32,
@@ -168,6 +169,21 @@ impl NodeBuilder<'_> {
             external_only: false,
         })
     }
+    /// `getAccessibleSymbolChain`: a chain search with its own visited tables.
+    pub(crate) fn accessible_symbol_chain(
+        &mut self,
+        symbol: SymbolId,
+        enclosing: Option<NodeId>,
+        meaning: u32,
+        external_only: bool,
+    ) -> Result<Vec<SymbolId>, Error> {
+        self.accessible_name_chain(NameQuery {
+            symbol,
+            enclosing,
+            meaning,
+            external_only,
+        })
+    }
     pub(super) fn accessibility_containers(
         &mut self,
         symbol: SymbolId,
@@ -216,22 +232,49 @@ impl NodeBuilder<'_> {
     }
     pub(super) fn name_external_module(&self, symbol: SymbolId) -> Result<bool, Error> {
         for node in self.checker.symbol_declarations(symbol)?.iter().flatten() {
-            let view = self.checker.ast(node)?;
-            let read = view.node(node)?;
-            if read.kind() == K::SourceFile
-                && tsr_ast::utilities::is_external_or_common_js_module(&view.source_file(node)?)
-            {
+            if self.has_non_global_augmentation_external_module_symbol(node)? {
                 return Ok(true);
-            }
-            if read.kind() == K::ModuleDeclaration {
-                if let Some(name) = read.name() {
-                    if view.node(name)?.kind() == K::StringLiteral {
-                        return Ok(true);
-                    }
-                }
             }
         }
         Ok(false)
+    }
+
+    // port: tsc/internal/checker/symbolaccessibility.go:hasNonGlobalAugmentationExternalModuleSymbol
+    fn has_non_global_augmentation_external_module_symbol(
+        &self,
+        declaration: NodeId,
+    ) -> Result<bool, Error> {
+        let view = self.checker.ast(declaration)?;
+        let read = view.node(declaration)?;
+        if read.kind() == K::ModuleDeclaration {
+            if let Some(name) = read.name() {
+                if view.node(name)?.kind() == K::StringLiteral {
+                    return Ok(true);
+                }
+            }
+        }
+        Ok(read.kind() == K::SourceFile
+            && tsr_ast::utilities::is_external_or_common_js_module(&view.source_file(declaration)?))
+    }
+
+    // port: tsc/internal/checker/symbolaccessibility.go:isUMDExportSymbol
+    fn is_umd_export_symbol(&self, symbol: SymbolId) -> Result<bool, Error> {
+        match self.checker.symbol_declarations(symbol)?.first().flatten() {
+            Some(first) => Ok(self.checker.node(first)?.kind() == K::NamespaceExportDeclaration),
+            None => Ok(false),
+        }
+    }
+
+    // port: tsc/internal/checker/symbolaccessibility.go:isNamespaceReexportDeclaration
+    fn is_namespace_reexport_declaration(&self, node: NodeId) -> Result<bool, Error> {
+        let read = self.checker.node(node)?;
+        if read.kind() != K::NamespaceExport {
+            return Ok(false);
+        }
+        let parent = read
+            .parent()
+            .ok_or(Error::MissingLink("namespace export parent"))?;
+        Ok(self.checker.module_specifier(parent)?.is_some())
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.getSpecifierForModuleSymbol
@@ -607,7 +650,7 @@ impl NodeBuilder<'_> {
             ) {
                 continue;
             }
-            if self.name_has_declaration_kind(alias, K::NamespaceExportDeclaration)? {
+            if self.is_umd_export_symbol(alias)? {
                 if let Some(enclosing) = query.enclosing {
                     let file = tsr_ast::utilities::get_source_file_of_node(
                         self.checker.ast(enclosing)?,
@@ -676,14 +719,8 @@ impl NodeBuilder<'_> {
     }
     fn name_has_namespace_reexport(&self, symbol: SymbolId) -> Result<bool, Error> {
         for node in self.checker.symbol_declarations(symbol)?.iter().flatten() {
-            let read = self.checker.node(node)?;
-            if read.kind() == K::NamespaceExport {
-                let parent = read
-                    .parent()
-                    .ok_or(Error::MissingLink("namespace export parent"))?;
-                if self.checker.module_specifier(parent)?.is_some() {
-                    return Ok(true);
-                }
+            if self.is_namespace_reexport_declaration(node)? {
+                return Ok(true);
             }
         }
         Ok(false)
@@ -986,29 +1023,8 @@ impl NodeBuilder<'_> {
         index: usize,
     ) -> Result<NodeId, Error> {
         use tsr_ast::FactoryMethods;
+        let arguments = self.expression_chain_type_argument_nodes(chain, index)?;
         let symbol = chain[index];
-        if self.flags & tsr_nodebuilder::flags::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME != 0
-            && index + 1 < chain.len()
-        {
-            // lookupExpressionChainTypeArgumentNodes keys its visited list by
-            // symbol id; a symbol already listed gets no type arguments.
-            self.checker.symbol_runtime_id(symbol)?;
-            if self.type_parameter_names.symbols.insert(symbol) {
-                for declaration in self.checker.symbol_declarations(symbol)?.iter().flatten() {
-                    if self
-                        .checker
-                        .ast(declaration)?
-                        .node(declaration)?
-                        .type_parameter_list()
-                        .is_some()
-                    {
-                        return Err(Error::Unsupported(
-                            "lookupExpressionChainTypeArgumentNodes: generic qualified value",
-                        ));
-                    }
-                }
-            }
-        }
         if index == 0 {
             self.flags |= tsr_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
         }
@@ -1017,26 +1033,14 @@ impl NodeBuilder<'_> {
             self.flags ^= tsr_nodebuilder::flags::IN_INITIAL_ENTITY_NAME;
         }
         let mut name = name?;
-        if name
-            .as_bytes()
-            .first()
-            .is_some_and(|b| matches!(b, b'\'' | b'"'))
+        if starts_with_single_or_double_quote(name.as_bytes())
             && self.name_external_module(symbol)?
         {
             let specifier = self.module_specifier_with_context(symbol, self.enclosing)?;
             self.approximate_length += specifier.len() + 2;
             return Ok(self.string_literal(specifier));
         }
-        let can_access = if name.as_bytes().starts_with(b"#") {
-            name.len() > 1
-                && tsr_scanner::is_identifier_text(
-                    &name.as_bytes()[1..],
-                    tsr_core::LanguageVariant::STANDARD,
-                )
-        } else {
-            tsr_scanner::is_identifier_text(name.as_bytes(), tsr_core::LanguageVariant::STANDARD)
-        };
-        if index == 0 || can_access {
+        if index == 0 || can_use_property_access(name.as_bytes()) {
             let identifier = self.ast.new_identifier(name.clone());
             self.emit
                 .add_emit_flags(identifier, tsr_printer::emit_flags::NO_ASCII_ESCAPING);
@@ -1048,17 +1052,14 @@ impl NodeBuilder<'_> {
                         .new_property_access_expression(Some(left), None, Some(identifier), 0);
                 self.emit
                     .add_emit_flags(node, tsr_printer::emit_flags::NO_INDENTATION);
-                return Ok(node);
+                return Ok(self.expression_with_type_arguments(node, arguments));
             }
-            return Ok(identifier);
+            return Ok(self.expression_with_type_arguments(identifier, arguments));
         }
-        if name.as_bytes().starts_with(b"[") {
+        if starts_with_square_bracket(name.as_bytes()) {
             name = JsString::from_bytes(&name.as_bytes()[1..name.len() - 1]);
         }
-        let expression = if name
-            .as_bytes()
-            .first()
-            .is_some_and(|b| matches!(b, b'\'' | b'"'))
+        let expression = if starts_with_single_or_double_quote(name.as_bytes())
             && self.checker.symbol(symbol)?.flags() & sf::ENUM_MEMBER == 0
         {
             let single = name.as_bytes()[0] == b'\'';
@@ -1088,10 +1089,95 @@ impl NodeBuilder<'_> {
         };
         self.approximate_length += 2;
         let left = self.expression_from_name_chain(chain, index - 1)?;
-        Ok(self
+        let access = self
             .ast
-            .new_element_access_expression(Some(left), None, Some(expression), 0))
+            .new_element_access_expression(Some(left), None, Some(expression), 0);
+        Ok(self.expression_with_type_arguments(access, arguments))
     }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.lookupExpressionChainTypeArgumentNodes
+    /// The type arguments a non-final value chain component writes, once per
+    /// symbol, as `lookupTypeParameterNodes` does for type chains.
+    fn expression_chain_type_argument_nodes(
+        &mut self,
+        chain: &[SymbolId],
+        index: usize,
+    ) -> Result<Option<tsr_ast::NodeListId>, Error> {
+        if !self.should_write_type_parameters_in_qualified_name(chain, index) {
+            return Ok(None);
+        }
+        let symbol = chain[index];
+        // typeParameterSymbolList keys by symbol id.
+        self.checker.symbol_runtime_id(symbol)?;
+        if !self.type_parameter_names.symbols.insert(symbol) {
+            return Ok(None);
+        }
+        if let Some(arguments) = self.instantiated_qualified_type_argument_nodes(chain, index)? {
+            return Ok(Some(arguments));
+        }
+        let parameters = self.symbol_type_parameter_declarations(symbol)?;
+        if parameters.is_empty() {
+            Ok(None)
+        } else {
+            self.list(parameters).map(Some)
+        }
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.shouldWriteTypeParametersInQualifiedName
+    fn should_write_type_parameters_in_qualified_name(
+        &self,
+        chain: &[SymbolId],
+        index: usize,
+    ) -> bool {
+        self.flags & tsr_nodebuilder::flags::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME != 0
+            && index + 1 < chain.len()
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createExpressionWithTypeArguments
+    fn expression_with_type_arguments(
+        &mut self,
+        expression: NodeId,
+        arguments: Option<tsr_ast::NodeListId>,
+    ) -> NodeId {
+        use tsr_ast::FactoryMethods;
+        match arguments {
+            Some(list)
+                if self
+                    .ast
+                    .view()
+                    .list(list)
+                    .is_ok_and(|list| !list.nodes().is_empty()) =>
+            {
+                self.ast
+                    .new_expression_with_type_arguments(Some(expression), Some(list))
+            }
+            _ => expression,
+        }
+    }
+}
+
+// port: tsc/internal/checker/nodebuilderimpl.go:canUsePropertyAccess
+fn can_use_property_access(name: &[u8]) -> bool {
+    match name.strip_prefix(b"#") {
+        Some(rest) => {
+            !rest.is_empty()
+                && tsr_scanner::is_identifier_text(rest, tsr_core::LanguageVariant::STANDARD)
+        }
+        None => {
+            !name.is_empty()
+                && tsr_scanner::is_identifier_text(name, tsr_core::LanguageVariant::STANDARD)
+        }
+    }
+}
+
+// port: tsc/internal/checker/nodebuilderimpl.go:startsWithSingleOrDoubleQuote
+fn starts_with_single_or_double_quote(name: &[u8]) -> bool {
+    matches!(name.first(), Some(b'\'' | b'"'))
+}
+
+// port: tsc/internal/checker/nodebuilderimpl.go:startsWithSquareBracket
+fn starts_with_square_bracket(name: &[u8]) -> bool {
+    name.first() == Some(&b'[')
 }
 
 // port: tsc/internal/stringutil/util.go:UnquoteString
@@ -1174,9 +1260,17 @@ impl NodeBuilder<'_> {
                     .new_type_reference_node(Some(entity_name), type_arguments)
             });
         }
-        Err(Error::Unsupported(
-            "symbolToTypeNode: expression with type arguments",
-        ))
+        if is_type_of && kind == K::ExpressionWithTypeArguments {
+            let (expression, arguments) = {
+                let read = self.ast.view().node(entity_name)?;
+                (read.expression(), read.type_argument_list())
+            };
+            let expression = expression.ok_or(Error::MissingLink("instantiation expression"))?;
+            let expression = tsr_ast::deep_clone_node(&mut self.ast, Some(expression))
+                .ok_or(Error::MissingLink("instantiation expression clone"))?;
+            return Ok(self.ast.new_type_query_node(Some(expression), arguments));
+        }
+        Ok(entity_name)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToTypeNode
@@ -1551,9 +1645,12 @@ impl NodeBuilder<'_> {
             {
                 return Ok(self.ast.new_qualified_name(Some(lhs), Some(identifier)));
             }
-            return Err(Error::Unsupported(
-                "createAccessFromSymbolChain: instantiation expression access",
-            ));
+            use tsr_ast::FactoryMethods;
+            let access = self.create_access_expression(lhs)?;
+            let property =
+                self.ast
+                    .new_property_access_expression(Some(access), None, Some(identifier), 0);
+            return Ok(self.expression_with_type_arguments(property, type_parameter_nodes));
         }
         Ok(identifier)
     }

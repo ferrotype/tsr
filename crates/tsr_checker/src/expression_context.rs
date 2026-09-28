@@ -39,14 +39,13 @@ impl CheckerState {
         if let Some(context) = self.contextual_call_argument_ex(node, context_flags == 0) {
             return Ok(context.ty);
         }
+        // A declaration's JSDoc `@type` is its full signature, never a
+        // contextual type: the pin reads it in getSignaturesOfSymbol and for
+        // parameter and return types, and getContextualType of a declaration
+        // is its parent's (a statement's: none).
         if matches!(
             read.kind().known(),
-            Some(
-                K::FunctionDeclaration
-                    | K::FunctionExpression
-                    | K::ArrowFunction
-                    | K::MethodDeclaration
-            )
+            Some(K::FunctionExpression | K::ArrowFunction)
         ) {
             if let Some(annotation) = self.full_signature_type_node(node)? {
                 return self.get_type_from_type_node(annotation).map(Some);

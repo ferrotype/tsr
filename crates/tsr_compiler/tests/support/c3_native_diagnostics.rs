@@ -54,7 +54,8 @@ fn options_from_command(command: &[Value]) -> CompilerOptions {
                 }
             }
             "--target" => assert_eq!(value, Some("esnext")),
-            "--noEmit" | "--ignoreConfig" | "--pretty" => {}
+            "--noEmit" => options.no_emit = tristate,
+            "--ignoreConfig" | "--pretty" => {}
             other => panic!("unsupported native flag {other}"),
         }
         i += 1 + usize::from(value.is_some());

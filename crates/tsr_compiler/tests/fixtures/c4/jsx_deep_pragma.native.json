@@ -1,0 +1,33 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources_sha256": {
+    "jsx_deep_pragma.tsx": "4c14c1bb49bce2e39545b8c363496bfb6d652b32c85c218500788eef4d6b7792"
+  },
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--skipLibCheck",
+    "--jsx",
+    "react",
+    "--strict",
+    "jsx_deep_pragma.tsx"
+  ],
+  "native_output_sha256": "07ca2cbdc69dcbcc90cf87069b242bcbaab58c6695d127c03fe11fbf381ad48e",
+  "exit_code": 2,
+  "native_stderr": "",
+  "diagnostics": [
+    {
+      "file": "jsx_deep_pragma.tsx",
+      "line": 3,
+      "column": 11,
+      "code": 7026,
+      "message": "JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists."
+    }
+  ]
+}

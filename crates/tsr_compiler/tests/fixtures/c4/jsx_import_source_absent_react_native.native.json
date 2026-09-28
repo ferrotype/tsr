@@ -1,0 +1,70 @@
+{
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "sources_sha256": {
+    "jsx_import_source_absent.tsx": "c627f5c9b0ee4d3ee3cdc6fa7e0a727d9f4f5657baff19e4030005be99777019",
+    "node_modules/bare/package.json": "ae9a194fc5940e11a16a668bc20df5f03d51fefd20d3bd6d752afc5678455ea9",
+    "node_modules/bare/index.d.ts": "8a60ed93d81f472e270e213c5da23bdfc2a87b6616031f4d397aced25f727217"
+  },
+  "native_executable_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+  "native_command": [
+    "tsc",
+    "--noEmit",
+    "--target",
+    "esnext",
+    "--ignoreConfig",
+    "--pretty",
+    "false",
+    "--skipLibCheck",
+    "--jsx",
+    "react-native",
+    "--strict",
+    "jsx_import_source_absent.tsx"
+  ],
+  "native_output_sha256": "e3f6c0b6f66ded2dfc65452925f97359b846cd242dc15d41abb25b79c811fa06",
+  "exit_code": 2,
+  "native_stderr": "",
+  "diagnostics": [
+    {
+      "file": "jsx_import_source_absent.tsx",
+      "line": 2,
+      "column": 18,
+      "code": 7026,
+      "message": "JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists."
+    },
+    {
+      "file": "jsx_import_source_absent.tsx",
+      "line": 2,
+      "column": 18,
+      "code": 2875,
+      "message": "This JSX tag requires the module path 'bare/jsx-runtime' to exist, but none could be found. Make sure you have types for the appropriate package installed."
+    },
+    {
+      "file": "jsx_import_source_absent.tsx",
+      "line": 2,
+      "column": 33,
+      "code": 7026,
+      "message": "JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists."
+    },
+    {
+      "file": "jsx_import_source_absent.tsx",
+      "line": 2,
+      "column": 41,
+      "code": 7026,
+      "message": "JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists."
+    },
+    {
+      "file": "jsx_import_source_absent.tsx",
+      "line": 3,
+      "column": 20,
+      "code": 7026,
+      "message": "JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists."
+    },
+    {
+      "file": "jsx_import_source_absent.tsx",
+      "line": 4,
+      "column": 26,
+      "code": 7026,
+      "message": "JSX element implicitly has type 'any' because no interface 'JSX.IntrinsicElements' exists."
+    }
+  ]
+}

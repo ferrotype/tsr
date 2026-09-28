@@ -237,7 +237,7 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.createUnionOrIntersectionProperty
-    fn create_compound_property(
+    pub(crate) fn create_compound_property(
         &mut self,
         containing: TypeId,
         name: &JsString,

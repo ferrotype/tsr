@@ -765,3 +765,38 @@ pub fn try_get_property_name_of_binding_or_assignment_element(
     }
     Ok(None)
 }
+
+/// The deepest node of `file` whose range contains `position`, never
+/// descending into JSDoc: the pin's `includeJSDoc` false, the only form the
+/// checker uses. Tokens are not nodes here (`Kind >= KindFirstNode`), and a
+/// meta property is not descended into.
+/// Over a finished tree; the port of `GetNodeAtPosition` is the parser's (`tsr_parser::references`).
+pub fn get_node_at_position(
+    view: AstView<'_>,
+    file: NodeId,
+    position: i32,
+) -> Result<NodeId, Error> {
+    let mut current = file;
+    loop {
+        let mut next = None;
+        for child in crate::source_file_tables::children(view, current)? {
+            if node_contains_position(view, child, position)? {
+                next = Some(child);
+                break;
+            }
+        }
+        match next {
+            Some(child) if kind(view, child)? != K::MetaProperty => current = child,
+            _ => return Ok(current),
+        }
+    }
+}
+
+// Over a finished tree; the port of `nodeContainsPosition` is the parser's (`tsr_parser::references`).
+fn node_contains_position(view: AstView<'_>, node: NodeId, position: i32) -> Result<bool, Error> {
+    let read = view.node(node)?;
+    let kind = read.kind();
+    Ok(kind.raw() >= K::FirstNode as i16
+        && read.pos() <= position
+        && (position < read.end() || position == read.end() && kind == K::EndOfFile))
+}

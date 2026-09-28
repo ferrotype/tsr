@@ -11,7 +11,7 @@ use tsr_ast::{node_flags as nf, symbol_flags as sf, SyntaxKind as K};
 use tsr_diagnostics as messages;
 
 #[derive(Clone)]
-enum Resolution {
+pub(crate) enum Resolution {
     Signature(SignatureId),
     Failed(Error),
 }
@@ -38,7 +38,7 @@ pub(crate) struct TypedCall {
 
 #[derive(Default)]
 pub(crate) struct CallState {
-    resolved: Map<NodeId, Resolution>,
+    pub(crate) resolved: Map<NodeId, Resolution>,
     optional_signatures: Map<(SignatureId, u32), SignatureId>,
     #[allow(
         clippy::option_option,
@@ -53,6 +53,16 @@ pub(crate) struct CallState {
     /// `signatureLinks.decoratorSignature` per decorated node; the any
     /// signature marks a node without one.
     pub decorator_signatures: Map<NodeId, SignatureId>,
+    /// Services: the call whose candidates are requested (`candidatesOutArray`),
+    /// and the candidates its resolution chose among, instantiated in place.
+    pub candidates_request: Option<NodeId>,
+    pub candidates_out: Vec<SignatureId>,
+    /// `apparentArgumentCount`: signature help's count for the longest candidate.
+    pub apparent_argument_count: Option<usize>,
+    /// `isInferencePartiallyBlocked`: no call reports its errors.
+    pub inference_partially_blocked: bool,
+    /// `skipDirectInferenceNodes`: sources declared here make no inferences.
+    pub skip_direct_inference_nodes: crate::types::Set<NodeId>,
 }
 
 #[cfg(any(test, feature = "storage-pilot"))]
@@ -68,6 +78,13 @@ impl CallState {
             &self.inference_contexts,
             self.inference_contexts.capacity(),
         );
+        census.map("call_resolution", &self.decorator_signatures);
+        census.vec_capacity(
+            "call_resolution",
+            &self.candidates_out,
+            self.candidates_out.capacity(),
+        );
+        census.set("call_resolution", &self.skip_direct_inference_nodes);
     }
     pub(crate) fn census_signatures(&self) -> impl Iterator<Item = SignatureId> + '_ {
         self.resolved
@@ -81,6 +98,8 @@ impl CallState {
                     .iter()
                     .flat_map(|(&(source, _), &result)| [source, result]),
             )
+            .chain(self.decorator_signatures.values().copied())
+            .chain(self.candidates_out.iter().copied())
     }
     pub(crate) fn census_types(&self) -> impl Iterator<Item = TypeId> + '_ {
         self.contexts.iter().filter_map(|context| context.ty).chain(
@@ -620,11 +639,32 @@ impl CheckerState {
                 self.check_expression(attributes)?;
                 return Ok(self.builtins.any_signature);
             }
-            Some(K::JsxOpeningFragment) => return Ok(self.builtins.any_signature),
+            Some(K::TaggedTemplateExpression) => {
+                let template = self
+                    .node(node)?
+                    .data_source()
+                    .as_tagged_template_expression()
+                    .and_then(|data| data.template())
+                    .ok_or(Error::MissingLink("tagged template"))?;
+                self.check_expression(template)?;
+            }
+            Some(K::BinaryExpression) => {
+                let left = self
+                    .node(node)?
+                    .data_source()
+                    .as_binary_expression()
+                    .and_then(|data| data.left())
+                    .ok_or(Error::MissingLink("binary left"))?;
+                self.check_expression(left)?;
+            }
+            Some(K::CallExpression | K::NewExpression) => {
+                let arguments = self.node(node)?.argument_list();
+                for argument in self.source_list(node, arguments)? {
+                    self.check_expression(argument)?;
+                }
+            }
+            // A decorator's and a fragment's arguments are not checked here.
             _ => {}
-        }
-        for argument in self.effective_call_arguments(node)? {
-            self.check_expression(argument)?;
         }
         Ok(self.builtins.any_signature)
     }
@@ -731,7 +771,11 @@ impl CheckerState {
             self.check_source_element(argument)?;
         }
         let candidates = self.reorder_call_candidates(signatures, call_chain_flags)?;
+        let requested = self.calls.candidates_request == Some(node);
         if candidates.is_empty() {
+            if requested {
+                self.calls.candidates_out.clear();
+            }
             // The pin returns the unknown signature here: every known program
             // that reaches this point already has another error on this path.
             return Ok(self.builtins.unknown_signature);
@@ -764,20 +808,30 @@ impl CheckerState {
             arity_error: None,
             constraint_error: None,
         };
+        let mut chosen = None;
         if state.candidates.len() > 1 {
-            if let Some(result) = self.choose_typed_call(&mut state, RelationKind::Subtype)? {
-                return Ok(result);
+            chosen = self.choose_typed_call(&mut state, RelationKind::Subtype)?;
+        }
+        if chosen.is_none() {
+            chosen = self.choose_typed_call(&mut state, RelationKind::Assignable)?;
+        }
+        let result = if let Some(result) = chosen {
+            result
+        } else {
+            let candidate = self.overload_failure_candidate(&mut state)?;
+            self.calls
+                .resolved
+                .insert(node, Resolution::Signature(candidate));
+            // A services request and blocked inference resolve without errors.
+            if !self.calls.inference_partially_blocked && !requested {
+                self.report_typed_call_failure(&state, signatures)?;
             }
+            candidate
+        };
+        if requested {
+            self.calls.candidates_out = state.candidates.clone();
         }
-        if let Some(result) = self.choose_typed_call(&mut state, RelationKind::Assignable)? {
-            return Ok(result);
-        }
-        let candidate = self.overload_failure_candidate(&mut state)?;
-        self.calls
-            .resolved
-            .insert(node, Resolution::Signature(candidate));
-        self.report_typed_call_failure(&state, signatures)?;
-        Ok(candidate)
+        Ok(result)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.chooseOverload

@@ -26,11 +26,11 @@ pub(super) struct RecoveryBoundary {
     approximate_length: usize,
     encountered_error: bool,
 }
+// Source: tsc/internal/checker/nodecopy.go:originalRecoveryScopeState
 #[derive(Clone, Copy)]
 struct RecoveryScope {
     had_error: bool,
     reports: usize,
-    symbols: usize,
 }
 
 impl NodeBuilder<'_> {
@@ -67,6 +67,7 @@ impl NodeBuilder<'_> {
             false
         }
     }
+    // port: tsc/internal/checker/nodecopy.go:recoveryBoundary.markError
     fn reuse_mark_error(&mut self) -> Result<(), Error> {
         self.reuse_boundaries
             .last_mut()
@@ -77,6 +78,7 @@ impl NodeBuilder<'_> {
     fn reuse_had_error(&self) -> bool {
         self.reuse_boundaries.last().is_some_and(|b| b.had_error)
     }
+    // port: tsc/internal/checker/nodecopy.go:recoveryBoundary.startRecoveryScope
     fn reuse_start_scope(&self) -> Result<RecoveryScope, Error> {
         let b = self
             .reuse_boundaries
@@ -85,9 +87,13 @@ impl NodeBuilder<'_> {
         Ok(RecoveryScope {
             had_error: b.had_error,
             reports: b.reports.len(),
-            symbols: b.symbols.len(),
         })
     }
+    // port: tsc/internal/checker/nodecopy.go:recoveryBoundary.endRecoveryScope
+    /// Restores the error state and drops the deferred reports. The pin
+    /// truncates only the context's tracked symbols, which a boundary discards
+    /// anyway; the symbols the wrapping tracker deferred stay and are tracked
+    /// when the boundary finalizes.
     fn reuse_end_scope(&mut self, state: RecoveryScope) -> Result<(), Error> {
         let b = self
             .reuse_boundaries
@@ -95,7 +101,6 @@ impl NodeBuilder<'_> {
             .ok_or(Error::MissingLink("annotation recovery boundary"))?;
         b.had_error = state.had_error;
         b.reports.truncate(state.reports);
-        b.symbols.truncate(state.symbols);
         Ok(())
     }
     fn reuse_retain(&mut self, node: NodeId) -> Result<(), Error> {
@@ -104,7 +109,9 @@ impl NodeBuilder<'_> {
         }
         Ok(())
     }
+    // port: tsc/internal/checker/nodecopy.go:NodeBuilderImpl.reuseNode
     // port: tsc/internal/checker/nodecopy.go:NodeBuilderImpl.tryReuseExistingNodeHelper
+    // port: tsc/internal/checker/nodecopy.go:NodeBuilderImpl.finalizeBoundary
     pub(super) fn reuse_node(&mut self, node: NodeId) -> Result<Option<NodeId>, Error> {
         self.reuse_retain(node)?;
         self.reuse_boundaries.push(RecoveryBoundary {
@@ -153,6 +160,10 @@ impl NodeBuilder<'_> {
     // port: tsc/internal/checker/nodecopy.go:NodeBuilderImpl.reuseTypeNode
     pub(super) fn reuse_type_node(&mut self, node: NodeId) -> Result<NodeId, Error> {
         if let Some(result) = self.reuse_node(node)? {
+            // A reused annotation never reached should_expand_type, so probe it.
+            if self.max_expansion_depth >= 0 && !self.can_increase_expansion_depth {
+                self.walk_node_for_expandability(node)?;
+            }
             return Ok(result);
         }
         self.report(Event::InferenceFallback(node));
@@ -174,6 +185,7 @@ impl NodeBuilder<'_> {
         let ty = self.checker.instantiate_type(original, self.mapper)?;
         Ok((!no_mapped_types || original == ty).then_some(ty))
     }
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.tryGetResolvedSymbolFromTypeNode
     fn reused_symbol_from_type_node(&mut self, node: NodeId) -> Result<Option<SymbolId>, Error> {
         if self.checker.node(node)?.parent().is_none() {
             return Ok(None);
@@ -188,6 +200,7 @@ impl NodeBuilder<'_> {
             .flatten())
     }
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.canReuseExistingJSTypeNode
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.existingTypeNodeIsNotReferenceOrIsReferenceWithCompatibleTypeArgumentCount
     pub(super) fn can_reuse_existing_js_type_node(
         &mut self,
         node: NodeId,
@@ -228,10 +241,10 @@ impl NodeBuilder<'_> {
         ty: TypeId,
         annotation: Option<NodeId>,
     ) -> Result<NodeId, Error> {
-        // Declaration and display contexts have no active hover expansion.
-        if let Some(annotation) = annotation {
+        if let Some(annotation) = annotation.filter(|_| !self.is_actively_expanding()) {
             if self.reuse_type_from_node(annotation, false)? == Some(ty) {
                 if let Some(node) = self.reuse_node(annotation)? {
+                    self.check_type_expandability(Some(ty))?;
                     return Ok(node);
                 }
             }
@@ -413,6 +426,7 @@ impl NodeBuilder<'_> {
             self.clone_binding_name_native(name)
         }
     }
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.cloneBindingName
     pub(super) fn clone_binding_name_native(&mut self, node: NodeId) -> Result<NodeId, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
             self.clone_binding_name_native_worker(node)
@@ -686,6 +700,7 @@ impl NodeBuilder<'_> {
             && tsr_ast::is_declaration(&view.node(parent)?)
             && view.node(parent)?.name() == Some(node))
     }
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.trackComputedName
     pub(super) fn reuse_track_computed_name(&mut self, node: NodeId) -> Result<(), Error> {
         let first = tsr_ast::utilities_middle::get_first_identifier(self.checker.ast(node)?, node)?;
         let text = self.checker.node_text(first)?.into_js_string();
@@ -913,6 +928,7 @@ impl NodeBuilder<'_> {
 }
 
 impl NodeBuilder<'_> {
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.serializeTypeName
     fn reuse_serialize_type_name(
         &mut self,
         name: NodeId,
@@ -1549,6 +1565,7 @@ impl NodeBuilder<'_> {
         };
         Ok(view.node(literal)?.kind() == K::StringLiteral)
     }
+    // port: tsc/internal/checker/nodecopy.go:NodeBuilderImpl.getModuleSpecifierOverride
     fn reuse_module_specifier_override(
         &mut self,
         parent: NodeId,

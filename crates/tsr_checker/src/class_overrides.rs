@@ -1,6 +1,6 @@
 //! Inheritance diagnostics distinguish redeclarations, abstract requirements and
 //! the syntactic override contract; assignability is checked by the caller.
-use crate::{type_flags as tf, CheckerState, Error, TypeId};
+use crate::{type_flags as tf, CheckerState, Error, MemberOverrideStatus, TypeId};
 use tsr_arena::{NodeId, SymbolId};
 use tsr_ast::{
     check_flags as cf, modifier_flags as mf, node_flags as nf, symbol_flags as sf, JsString,
@@ -109,15 +109,25 @@ impl CheckerState {
             };
             for member in members {
                 if let Some(symbol) = self.get_symbol_of_declaration(member)? {
-                    self.check_class_override_modifier(
+                    let view = self.ast(member)?;
+                    let modifiers = view.node(member)?.modifier_flags(view)?;
+                    self.override_modifier_status(
                         node,
-                        ty,
-                        with_this,
-                        static_type,
-                        static_base,
-                        base_with_this,
-                        symbol,
-                        member,
+                        OverrideTypes {
+                            ty,
+                            with_this,
+                            static_type,
+                            static_base,
+                            base: base_with_this,
+                        },
+                        OverrideMember {
+                            has_override: modifiers & mf::OVERRIDE != 0,
+                            is_abstract: modifiers & mf::ABSTRACT != 0,
+                            is_static: modifiers & mf::STATIC != 0,
+                            is_parameter_property: view.node(member)?.kind() == K::Parameter,
+                            symbol,
+                        },
+                        Some(member),
                     )?;
                 }
             }
@@ -126,24 +136,29 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkMemberForOverrideModifierWorker
-    #[allow(clippy::too_many_arguments)]
-    fn check_class_override_modifier(
+    /// The member's override status; errors are reported at `error_node`, and
+    /// only when there is one.
+    pub(crate) fn override_modifier_status(
         &mut self,
         node: NodeId,
-        ty: TypeId,
-        with_this: TypeId,
-        static_type: TypeId,
-        static_base: TypeId,
-        base: Option<TypeId>,
-        symbol: SymbolId,
-        member: NodeId,
-    ) -> Result<(), Error> {
-        let view = self.ast(member)?;
-        let modifiers = view.node(member)?.modifier_flags(view)?;
-        let has_override = modifiers & mf::OVERRIDE != 0;
-        let is_abstract = modifiers & mf::ABSTRACT != 0;
-        let is_static = modifiers & mf::STATIC != 0;
-        let parameter = view.node(member)?.kind() == K::Parameter;
+        types: OverrideTypes,
+        member: OverrideMember,
+        error_node: Option<NodeId>,
+    ) -> Result<MemberOverrideStatus, Error> {
+        let OverrideTypes {
+            ty,
+            with_this,
+            static_type,
+            static_base,
+            base,
+        } = types;
+        let OverrideMember {
+            has_override,
+            is_abstract,
+            is_static,
+            is_parameter_property: parameter,
+            symbol,
+        } = member;
         let javascript = self.node(node)?.flags() & nf::JAVA_SCRIPT_FILE != 0;
         if has_override {
             if let Some(declaration) = self.symbol(symbol)?.value_declaration() {
@@ -151,8 +166,10 @@ impl CheckerState {
                 if tsr_ast::utilities::is_class_element(&read) {
                     if let Some(name) = read.name() {
                         if self.non_bindable_dynamic_name(name)? {
-                            self.error_at(Some(member), if javascript {d::This_member_cannot_have_a_JSDoc_comment_with_an_override_tag_because_its_name_is_dynamic} else {d::This_member_cannot_have_an_override_modifier_because_its_name_is_dynamic},vec![])?;
-                            return Ok(());
+                            if error_node.is_some() {
+                                self.error_at(error_node, if javascript {d::This_member_cannot_have_a_JSDoc_comment_with_an_override_tag_because_its_name_is_dynamic} else {d::This_member_cannot_have_an_override_modifier_because_its_name_is_dynamic},vec![])?;
+                            }
+                            return Ok(MemberOverrideStatus::HasInvalidOverride);
                         }
                     }
                 }
@@ -177,32 +194,34 @@ impl CheckerState {
                 false,
             )?;
             if own.is_some() && original.is_none() && has_override {
-                let suggestion = self.suggested_override_member(
-                    name.as_bytes(),
-                    if is_static { static_base } else { base },
-                )?;
-                let display = self.type_to_string(base, crate::type_display::DEFAULT_FLAGS)?;
-                let (message, args) = if let Some(suggestion) = suggestion {
-                    (
-                        if javascript {
-                            d::This_member_cannot_have_a_JSDoc_comment_with_an_override_tag_because_it_is_not_declared_in_the_base_class_0_Did_you_mean_1
-                        } else {
-                            d::This_member_cannot_have_an_override_modifier_because_it_is_not_declared_in_the_base_class_0_Did_you_mean_1
-                        },
-                        vec![display, self.symbol_to_string(suggestion)?],
-                    )
-                } else {
-                    (
-                        if javascript {
-                            d::This_member_cannot_have_a_JSDoc_comment_with_an_override_tag_because_it_is_not_declared_in_the_base_class_0
-                        } else {
-                            d::This_member_cannot_have_an_override_modifier_because_it_is_not_declared_in_the_base_class_0
-                        },
-                        vec![display],
-                    )
-                };
-                self.error_at(Some(member), message, args)?;
-                return Ok(());
+                if error_node.is_some() {
+                    let suggestion = self.suggested_override_member(
+                        name.as_bytes(),
+                        if is_static { static_base } else { base },
+                    )?;
+                    let display = self.type_to_string(base, crate::type_display::DEFAULT_FLAGS)?;
+                    let (message, args) = if let Some(suggestion) = suggestion {
+                        (
+                            if javascript {
+                                d::This_member_cannot_have_a_JSDoc_comment_with_an_override_tag_because_it_is_not_declared_in_the_base_class_0_Did_you_mean_1
+                            } else {
+                                d::This_member_cannot_have_an_override_modifier_because_it_is_not_declared_in_the_base_class_0_Did_you_mean_1
+                            },
+                            vec![display, self.symbol_to_string(suggestion)?],
+                        )
+                    } else {
+                        (
+                            if javascript {
+                                d::This_member_cannot_have_a_JSDoc_comment_with_an_override_tag_because_it_is_not_declared_in_the_base_class_0
+                            } else {
+                                d::This_member_cannot_have_an_override_modifier_because_it_is_not_declared_in_the_base_class_0
+                            },
+                            vec![display],
+                        )
+                    };
+                    self.error_at(error_node, message, args)?;
+                }
+                return Ok(MemberOverrideStatus::HasInvalidOverride);
             }
             let ambient = self.node(node)?.flags() & nf::AMBIENT != 0;
             if let Some(original) = original.filter(|_| own.is_some() && implicit && !ambient) {
@@ -220,7 +239,7 @@ impl CheckerState {
                         }
                     }
                     if has_override {
-                        return Ok(());
+                        return Ok(MemberOverrideStatus::None);
                     }
                     let message = if !base_abstract {
                         Some(if parameter {
@@ -240,17 +259,23 @@ impl CheckerState {
                         None
                     };
                     if let Some(message) = message {
-                        let display =
-                            self.type_to_string(base, crate::type_display::DEFAULT_FLAGS)?;
-                        self.error_at(Some(member), message, vec![display])?;
+                        if error_node.is_some() {
+                            let display =
+                                self.type_to_string(base, crate::type_display::DEFAULT_FLAGS)?;
+                            self.error_at(error_node, message, vec![display])?;
+                        }
+                        return Ok(MemberOverrideStatus::NeedsOverride);
                     }
                 }
             }
         } else if has_override {
-            let display = self.type_to_string(ty, crate::type_display::DEFAULT_FLAGS)?;
-            self.error_at(Some(member),if javascript {d::This_member_cannot_have_a_JSDoc_comment_with_an_override_tag_because_its_containing_class_0_does_not_extend_another_class} else {d::This_member_cannot_have_an_override_modifier_because_its_containing_class_0_does_not_extend_another_class},vec![display])?;
+            if error_node.is_some() {
+                let display = self.type_to_string(ty, crate::type_display::DEFAULT_FLAGS)?;
+                self.error_at(error_node,if javascript {d::This_member_cannot_have_a_JSDoc_comment_with_an_override_tag_because_its_containing_class_0_does_not_extend_another_class} else {d::This_member_cannot_have_an_override_modifier_because_its_containing_class_0_does_not_extend_another_class},vec![display])?;
+            }
+            return Ok(MemberOverrideStatus::HasInvalidOverride);
         }
-        Ok(())
+        Ok(MemberOverrideStatus::None)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.arePropertiesAbstractOrInterface
@@ -526,4 +551,24 @@ impl CheckerState {
         }
         Ok(())
     }
+}
+
+/// The class-side types an override check compares a member against.
+#[derive(Clone, Copy)]
+pub(crate) struct OverrideTypes {
+    pub ty: TypeId,
+    pub with_this: TypeId,
+    pub static_type: TypeId,
+    pub static_base: TypeId,
+    pub base: Option<TypeId>,
+}
+
+/// The member an override check reads, with its syntactic modifiers.
+#[derive(Clone, Copy)]
+pub(crate) struct OverrideMember {
+    pub has_override: bool,
+    pub is_abstract: bool,
+    pub is_static: bool,
+    pub is_parameter_property: bool,
+    pub symbol: SymbolId,
 }

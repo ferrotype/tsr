@@ -31,8 +31,14 @@ impl CheckerState {
         self.mark_value_identifier_alias(node, local)?;
         let symbol = self.get_export_symbol_of_value_symbol_if_exported(local)?;
         let flags = self.symbol(symbol)?.flags();
-        if flags & sf::ALIAS != 0 {
-            self.resolve_alias(symbol)?;
+        let target = self.resolve_alias_with_deprecation_check(symbol, node)?;
+        let declarations = self.symbol_declarations(target)?.to_vec();
+        if !declarations.is_empty()
+            && self.is_deprecated_symbol(target)?
+            && self.is_uncalled_function_reference(node, target)?
+        {
+            let text = self.node_text(node)?.into_js_string();
+            self.add_deprecated_suggestion(node, &declarations, text)?;
         }
         let immediate = self.symbol(symbol)?.value_declaration();
         if let Some(declaration) = immediate {
@@ -451,9 +457,16 @@ impl CheckerState {
         let target = self.get_export_symbol_of_value_symbol_if_exported(target)?;
         let flags = self.symbol(target)?.flags();
         let options = self.program()?.host.options();
-        if options.isolated_modules()
-            || flags & sf::CONST_ENUM == 0
-                && !(flags & sf::VALUE_MODULE != 0 && flags & sf::CONST_ENUM_ONLY_MODULE != 0)
+        let (isolated, preserve) = (
+            options.isolated_modules(),
+            options.should_preserve_const_enums(),
+        );
+        // An alias resolving to a const enum cannot be elided if (1) 'isolatedModules' is enabled
+        // (because the const enum value will not be inlined), or if (2) the alias is an export
+        // of a const enum declaration that will be preserved.
+        if isolated
+            || preserve && self.is_export_or_export_expression(node)?
+            || !crate::linked_references::is_const_enum_or_const_enum_only_module(flags)
         {
             self.mark_module_alias_referenced(symbol)?;
         }

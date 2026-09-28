@@ -1,0 +1,28 @@
+{
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "command": [
+  "go",
+  "test",
+  "-mod=readonly",
+  "-trimpath",
+  "-overlay",
+  "$ROOT/target/phase2/c4-state-native/overlay.json",
+  "./internal/checker",
+  "-run",
+  "^TestC4State$",
+  "-count=1",
+  "-timeout=5m"
+ ],
+ "request_sha256": "9aa51c0df4417e8d36c37b0e2f8d51fe42849686d93af06d016c8c8897f6f322",
+ "output_sha256": "84a4538ae0dbfa9aea740541ffc49c6a82fc87ae89b019bc12f4fa3c935806b6",
+ "observer_sources": {
+  "export_test.go": "a8b8d9ae29b252dfd0d551ea97b9d3acc180ce305201b24e410a0b45a888ae0b",
+  "oracle_test.go": "eceb0050d0a7cf182ac688d4716c8196d06c1a3875eaf9ab3afcb35d0b78d74a",
+  "regenerate.py": "06503109b9c7530a9f65a59a5f9f98f557038fc6532362f45c19429f442967ca"
+ },
+ "replacements": {
+  "internal/checker/c4_state_export_test.go": "a8b8d9ae29b252dfd0d551ea97b9d3acc180ce305201b24e410a0b45a888ae0b",
+  "internal/checker/c4_state_oracle_test.go": "eceb0050d0a7cf182ac688d4716c8196d06c1a3875eaf9ab3afcb35d0b78d74a"
+ },
+ "scope": "The pinned checker's JSX entities at each case's first JSX tag, checked and unchecked, and aliasSymbolLinks.referenced of the root's import specifiers after checking."
+}

@@ -7,7 +7,71 @@ use tsr_printer::emit_resolver::{
     SymbolAccessibility as Access, SymbolAccessibilityResult as ResultInfo,
 };
 
+impl crate::Operation<'_> {
+    // port: tsc/internal/checker/symbolaccessibility.go:Checker.IsSymbolAccessible
+    pub fn is_symbol_accessible(
+        &mut self,
+        symbol: Option<crate::SymbolRef>,
+        enclosing: Option<NodeId>,
+        meaning: u32,
+        compute_aliases: bool,
+    ) -> Result<ResultInfo, Error> {
+        let symbol = symbol.map(|s| self.check_symbol_ref(s)).transpose()?;
+        self.state_mut()
+            .emit_symbol_accessible(symbol, enclosing, meaning, compute_aliases, true)
+    }
+
+    // port: tsc/internal/checker/symbolaccessibility.go:Checker.IsSymbolAccessibleByFlags
+    pub fn is_symbol_accessible_by_flags(
+        &mut self,
+        symbol: crate::SymbolRef,
+        enclosing: Option<NodeId>,
+        flags: u32,
+    ) -> Result<bool, Error> {
+        let symbol = self.check_symbol_ref(symbol)?;
+        Ok(self
+            .state_mut()
+            .emit_symbol_accessible(Some(symbol), enclosing, flags, false, false)?
+            .accessibility
+            == Access::Accessible)
+    }
+
+    // port: tsc/internal/checker/symbolaccessibility.go:Checker.GetAccessibleSymbolChain
+    pub fn get_accessible_symbol_chain(
+        &mut self,
+        symbol: crate::SymbolRef,
+        enclosing: Option<NodeId>,
+        meaning: u32,
+        use_only_external_aliasing: bool,
+    ) -> Result<Vec<crate::SymbolRef>, Error> {
+        let symbol = self.check_symbol_ref(symbol)?;
+        let chain = self.state_mut().accessible_symbol_chain(
+            symbol,
+            enclosing,
+            meaning,
+            use_only_external_aliasing,
+        )?;
+        chain.into_iter().map(|s| self.symbol_ref(s)).collect()
+    }
+}
+
 impl CheckerState {
+    // port: tsc/internal/checker/symbolaccessibility.go:Checker.getAccessibleSymbolChain
+    pub(crate) fn accessible_symbol_chain(
+        &mut self,
+        symbol: SymbolId,
+        enclosing: Option<NodeId>,
+        meaning: u32,
+        use_only_external_aliasing: bool,
+    ) -> Result<Vec<SymbolId>, Error> {
+        NodeBuilder::new(self, tsr_nodebuilder::flags::IGNORE_ERRORS).accessible_symbol_chain(
+            symbol,
+            enclosing,
+            meaning,
+            use_only_external_aliasing,
+        )
+    }
+
     // port: tsc/internal/checker/symbolaccessibility.go:Checker.IsTypeSymbolAccessible
     pub(crate) fn type_symbol_accessible(
         &mut self,

@@ -179,8 +179,10 @@ impl CheckerState {
             target = self.actual_type_variable(target)?;
         }
         if self.types.flags(target)? & tf::TYPE_VARIABLE != 0 {
-            // SkipDirectInferenceNodes are populated by P4 expression contexts;
-            // type-only inference does not create inference-blocked AST nodes.
+            // A source the language service is editing makes no inference.
+            if self.is_from_inference_blocked_source(source)? {
+                return Ok(());
+            }
             if let Some(index) = self.inference_index(run, target)? {
                 if self.types.object_flags(source)? & of::NON_INFERRABLE_TYPE != 0
                     || source == self.builtins.non_inferrable_any_type

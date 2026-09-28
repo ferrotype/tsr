@@ -234,6 +234,7 @@ impl NodeBuilder<'_> {
                     .ok_or(Error::MissingLink("pseudo object literal"))?;
                 let is_const = self.checker.is_const_context(container)?;
                 let flags = self.flags;
+                let depth = self.depth;
                 self.flags |= nf::IN_OBJECT_TYPE_LITERAL;
                 let result = (|| {
                     let mut members = Vec::with_capacity(elements.len());
@@ -333,6 +334,7 @@ impl NodeBuilder<'_> {
                     self.list(members)
                 })();
                 self.flags = flags;
+                self.depth = depth;
                 let list = result?;
                 let node = self.ast.new_type_literal_node(Some(list));
                 if self.flags & nf::MULTILINE_OBJECT_LITERALS == 0 {

@@ -102,19 +102,27 @@ impl CheckerState {
                 None => return Err(Error::MissingLink("call argument list")),
             }
         };
+        // In signature help a trailing comma asks for one more argument.
+        let trailing_comma = self.expression_mode & 16 != 0
+            && read.kind() == K::CallExpression
+            && match read.argument_list() {
+                Some(list) => view.list_has_trailing_comma(list)?,
+                None => false,
+            };
+        let count = args.len() + usize::from(trailing_comma);
         if read.kind() != K::BinaryExpression {
             if let Some(index) = self.spread_argument_index(args)? {
                 return Ok(index >= minimum
                     && (self.effective_rest_parameter(signature)? || index < parameter_count));
             }
         }
-        if !self.effective_rest_parameter(signature)? && args.len() > parameter_count {
+        if !self.effective_rest_parameter(signature)? && count > parameter_count {
             return Ok(false);
         }
-        if incomplete || args.len() >= minimum {
+        if incomplete || count >= minimum {
             return Ok(true);
         }
-        self.missing_arguments_accept_void(signature, args.len(), minimum)
+        self.missing_arguments_accept_void(signature, count, minimum)
     }
 
     /// The lower-bound tail of `hasCorrectArity`: every missing parameter must

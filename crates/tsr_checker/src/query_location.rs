@@ -292,7 +292,8 @@ impl CheckerState {
                 .as_meta_property()
             {
                 if meta.keyword_token() == kind {
-                    return self.check_meta_property(parent);
+                    // checkMetaPropertyKeyword: the pin's stub is the error type.
+                    return Ok(self.builtins.error_type);
                 }
             }
         }

@@ -88,7 +88,10 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.tryFindAmbientModule
-    fn try_find_ambient_module(&mut self, name: &[u8]) -> Result<Option<SymbolId>, Error> {
+    pub(crate) fn try_find_ambient_module(
+        &mut self,
+        name: &[u8],
+    ) -> Result<Option<SymbolId>, Error> {
         if tsr_module::is_relative(name) {
             return Ok(None);
         }
@@ -113,6 +116,38 @@ impl CheckerState {
         specifier: NodeId,
         ignore_errors: bool,
     ) -> Result<Option<SymbolId>, Error> {
+        self.resolve_external_module_name_attributed(
+            location,
+            specifier,
+            ignore_errors,
+            Attributes::OfSpecifier,
+        )
+    }
+
+    /// `resolveExternalModuleName` with the caller's import attributes type,
+    /// as the public `ResolveExternalModuleName` passes it.
+    pub(crate) fn resolve_external_module_name_with_attributes(
+        &mut self,
+        location: NodeId,
+        specifier: NodeId,
+        ignore_errors: bool,
+        attributes: Option<crate::TypeId>,
+    ) -> Result<Option<SymbolId>, Error> {
+        self.resolve_external_module_name_attributed(
+            location,
+            specifier,
+            ignore_errors,
+            Attributes::Explicit(attributes),
+        )
+    }
+
+    fn resolve_external_module_name_attributed(
+        &mut self,
+        location: NodeId,
+        specifier: NodeId,
+        ignore_errors: bool,
+        attributes: Attributes,
+    ) -> Result<Option<SymbolId>, Error> {
         let mut message = d::Cannot_find_module_0_or_its_corresponding_type_declarations;
         if self.node(specifier)?.kind() == K::StringLiteral
             && node_core_module(self.node_text(specifier)?.as_bytes())
@@ -123,17 +158,16 @@ impl CheckerState {
                 d::Cannot_find_name_0_Do_you_need_to_install_type_definitions_for_node_Try_npm_i_save_dev_types_Slashnode_and_then_add_node_to_the_types_field_in_your_tsconfig
             };
         }
-        self.resolve_external_module_name_with_error(
+        self.resolve_external_module_name_worker(
             location,
             specifier,
             ignore_errors,
             Some(message),
             false,
+            attributes,
         )
     }
 
-    // port: tsc/internal/checker/checker.go:Checker.resolveExternalModuleNameWorker
-    // port: tsc/internal/checker/checker.go:Checker.resolveExternalModule
     pub(crate) fn resolve_external_module_name_with_error(
         &mut self,
         location: NodeId,
@@ -141,6 +175,27 @@ impl CheckerState {
         ignore_errors: bool,
         message: Option<&'static Message>,
         augmentation: bool,
+    ) -> Result<Option<SymbolId>, Error> {
+        self.resolve_external_module_name_worker(
+            location,
+            specifier,
+            ignore_errors,
+            message,
+            augmentation,
+            Attributes::OfSpecifier,
+        )
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.resolveExternalModuleNameWorker
+    // port: tsc/internal/checker/checker.go:Checker.resolveExternalModule
+    fn resolve_external_module_name_worker(
+        &mut self,
+        location: NodeId,
+        specifier: NodeId,
+        ignore_errors: bool,
+        message: Option<&'static Message>,
+        augmentation: bool,
+        attributes: Attributes,
     ) -> Result<Option<SymbolId>, Error> {
         if !matches!(
             self.node(specifier)?.kind().known(),
@@ -154,7 +209,10 @@ impl CheckerState {
         let mode = host.get_mode_for_usage_location(file_name.as_bytes(), specifier)?;
         let error_node =
             (!ignore_errors && !host.options().no_check.is_true()).then_some(specifier);
-        let attributes = self.import_attributes_type_for_specifier(specifier)?;
+        let attributes = match attributes {
+            Attributes::Explicit(attributes) => attributes,
+            Attributes::OfSpecifier => self.import_attributes_type_for_specifier(specifier)?,
+        };
         self.resolve_external_module_reference(ExternalModuleReference {
             location,
             module_reference,
@@ -478,12 +536,8 @@ impl CheckerState {
                 args,
             )?
         };
-        if is_error {
-            self.add_diagnostic(diagnostic)?;
-        } else {
-            self.add_suggestion_diagnostic(diagnostic)?;
-        }
-        Ok(())
+        // `addErrorOrSuggestion`: a suggestion carries the suggestion category.
+        self.variable_error_or_suggestion(is_error, diagnostic)
     }
     // port: tsc/internal/checker/checker.go:Checker.getSuggestedImportExtension
     fn suggested_import_extension(&self, path: &[u8]) -> Result<Option<&'static [u8]>, Error> {
@@ -1138,4 +1192,12 @@ fn has_ts_file_extension(file: &[u8]) -> bool {
 // port: tsc/internal/tspath/path.go:GetAnyExtensionFromPath
 fn any_extension(file: &[u8]) -> &[u8] {
     path::any_extension_from_path::<&[u8]>(file, &[], false)
+}
+
+/// The import attributes type a module resolution uses: the caller's, or the
+/// attributes of the specifier's own import, as the checker's callers pass them.
+#[derive(Clone, Copy)]
+enum Attributes {
+    OfSpecifier,
+    Explicit(Option<crate::TypeId>),
 }

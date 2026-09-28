@@ -103,6 +103,7 @@ impl NodeBuilder<'_> {
             }
         }
         let saved_flags = self.flags;
+        let saved_depth = self.depth;
         let result = (|| {
             if self.checker.types.flags(ty)? & tf::UNIQUE_ES_SYMBOL != 0
                 && self.checker.types.get(ty)?.symbol == symbol
@@ -148,7 +149,7 @@ impl NodeBuilder<'_> {
                 None => false,
             };
             let mut reported_fallback = false;
-            if try_reuse && self.enclosing.is_some() && eligible {
+            if !self.is_actively_expanding() && try_reuse && self.enclosing.is_some() && eligible {
                 let decl = declaration.expect("eligible declaration");
                 if let Some(s) = symbol {
                     // addSymbolTypeToContext keys by symbol id.
@@ -263,6 +264,7 @@ impl NodeBuilder<'_> {
             result
         })();
         self.flags = saved_flags;
+        self.depth = saved_depth;
         result
     }
 
@@ -284,6 +286,7 @@ impl NodeBuilder<'_> {
         try_reuse: bool,
     ) -> Result<Option<NodeId>, Error> {
         let flags = self.flags;
+        let depth = self.depth;
         let suppress_any = flags & nf::SUPPRESS_ANY_RETURN_TYPE != 0;
         if suppress_any {
             self.flags &= !nf::SUPPRESS_ANY_RETURN_TYPE;
@@ -316,7 +319,8 @@ impl NodeBuilder<'_> {
             if suppress_any && self.checker.types.flags(ty)? & tf::ANY != 0 {
                 return Ok(None);
             }
-            if let Some(decl) = original.filter(|_| try_reuse && self.enclosing.is_some()) {
+            let reuse = !self.is_actively_expanding() && try_reuse && self.enclosing.is_some();
+            if let Some(decl) = original.filter(|_| reuse) {
                 let symbol = self.checker.get_symbol_of_declaration(decl)?;
                 if let Some(s) = symbol {
                     // addSymbolTypeToContext keys by symbol id.
@@ -382,6 +386,7 @@ impl NodeBuilder<'_> {
             result.map(Some)
         })();
         self.flags = flags;
+        self.depth = depth;
         result
     }
 

@@ -1,0 +1,1213 @@
+{
+ "go": "go1.27.1",
+ "goarch": "arm64",
+ "goos": "darwin",
+ "request_sha256": "9aa51c0df4417e8d36c37b0e2f8d51fe42849686d93af06d016c8c8897f6f322",
+ "rows": [
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/node_modules/react/index.d.ts"
+    }
+   },
+   "id": "jsx_modes_preserve",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/node_modules/react/index.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "preserve",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_modes.tsx": "36619281be29d06dd031d2aa3abde13942565675e3abcd7bb48766ad45cbeb06",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": "Frag",
+     "implicit_import": null,
+     "namespace": "/jsx_pragmas.tsx"
+    }
+   },
+   "id": "jsx_pragmas_preserve",
+   "unchecked": {
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": "Frag",
+     "implicit_import": null,
+     "namespace": "/jsx_pragmas.tsx"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "preserve",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_pragmas.tsx": "d6777a2316c132c4f316a4f7dcf3a9175a3f9232c8ea5e4d30c5e653257f020b",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/node_modules/react/index.d.ts"
+    }
+   },
+   "id": "jsx_modes_react_native",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/node_modules/react/index.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-native",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_modes.tsx": "36619281be29d06dd031d2aa3abde13942565675e3abcd7bb48766ad45cbeb06",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": "Frag",
+     "implicit_import": null,
+     "namespace": "/jsx_pragmas.tsx"
+    }
+   },
+   "id": "jsx_pragmas_react_native",
+   "unchecked": {
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": "Frag",
+     "implicit_import": null,
+     "namespace": "/jsx_pragmas.tsx"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-native",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_pragmas.tsx": "d6777a2316c132c4f316a4f7dcf3a9175a3f9232c8ea5e4d30c5e653257f020b",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/node_modules/react/index.d.ts"
+    }
+   },
+   "id": "jsx_modes_react",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/node_modules/react/index.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_modes.tsx": "36619281be29d06dd031d2aa3abde13942565675e3abcd7bb48766ad45cbeb06",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": "Frag",
+     "implicit_import": null,
+     "namespace": "/jsx_pragmas.tsx"
+    }
+   },
+   "id": "jsx_pragmas_react",
+   "unchecked": {
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": "Frag",
+     "implicit_import": null,
+     "namespace": "/jsx_pragmas.tsx"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_pragmas.tsx": "d6777a2316c132c4f316a4f7dcf3a9175a3f9232c8ea5e4d30c5e653257f020b",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/react/jsx-runtime.d.ts",
+     "namespace": "/node_modules/react/jsx-runtime.d.ts"
+    }
+   },
+   "id": "jsx_modes_react_jsx",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/react/jsx-runtime.d.ts",
+     "namespace": "/node_modules/react/jsx-runtime.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-jsx",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_modes.tsx": "36619281be29d06dd031d2aa3abde13942565675e3abcd7bb48766ad45cbeb06",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": "Frag",
+     "implicit_import": "/node_modules/react/jsx-runtime.d.ts",
+     "namespace": "/node_modules/react/jsx-runtime.d.ts"
+    }
+   },
+   "id": "jsx_pragmas_react_jsx",
+   "unchecked": {
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": "Frag",
+     "implicit_import": "/node_modules/react/jsx-runtime.d.ts",
+     "namespace": "/node_modules/react/jsx-runtime.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-jsx",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_pragmas.tsx": "d6777a2316c132c4f316a4f7dcf3a9175a3f9232c8ea5e4d30c5e653257f020b",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/node_modules/react/index.d.ts"
+    }
+   },
+   "id": "jsx_modes_react_jsxdev",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/node_modules/react/index.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-jsxdev",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_modes.tsx": "36619281be29d06dd031d2aa3abde13942565675e3abcd7bb48766ad45cbeb06",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": "Frag",
+     "implicit_import": null,
+     "namespace": "/jsx_pragmas.tsx"
+    }
+   },
+   "id": "jsx_pragmas_react_jsxdev",
+   "unchecked": {
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": "Frag",
+     "implicit_import": null,
+     "namespace": "/jsx_pragmas.tsx"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-jsxdev",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_pragmas.tsx": "d6777a2316c132c4f316a4f7dcf3a9175a3f9232c8ea5e4d30c5e653257f020b",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/jsx_elements.tsx"
+    }
+   },
+   "id": "jsx_elements",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/jsx_elements.tsx"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_elements.tsx": "e2815a27f70323839dcf3b7123330f60f50d888a5ff88b75b6912bdc5a2d21c3"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/jsx_generics.tsx"
+    }
+   },
+   "id": "jsx_generics",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/jsx_generics.tsx"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_generics.tsx": "8217d7630c6b2276450a3d220bdf921d92c4a981bb160ac7ca869e7b57a72504"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "id": "jsx_in_js",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "flags": [
+    "--jsx",
+    "preserve",
+    "--allowJs",
+    "--checkJs"
+   ],
+   "sources_sha256": {
+    "jsx_in_js.jsx": "49eb38941acc6c43001b319e6fd510e91cb86e64f144db15404ba49733a86008"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {
+     "Config": false,
+     "Service": true
+    },
+    "jsx": null
+   },
+   "id": "metadata_marking",
+   "unchecked": {
+    "jsx": null
+   },
+   "flags": [
+    "--strict",
+    "--experimentalDecorators",
+    "--emitDecoratorMetadata"
+   ],
+   "sources_sha256": {
+    "metadata_marking.ts": "bc7b9fa24d55dd4990e55f95be4ebf1b0d110b39cc0560e21dba325746466f01",
+    "metadata_types.ts": "1f53140b3633eb8f9601a3f55b76fdde9d7bcebd8f5d95ba9fa8da1d62083d22"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {
+     "Config": false,
+     "Service": true
+    },
+    "jsx": null
+   },
+   "id": "metadata_isolated",
+   "unchecked": {
+    "jsx": null
+   },
+   "flags": [
+    "--strict",
+    "--experimentalDecorators",
+    "--emitDecoratorMetadata",
+    "--isolatedModules"
+   ],
+   "sources_sha256": {
+    "metadata_marking.ts": "bc7b9fa24d55dd4990e55f95be4ebf1b0d110b39cc0560e21dba325746466f01",
+    "metadata_types.ts": "1f53140b3633eb8f9601a3f55b76fdde9d7bcebd8f5d95ba9fa8da1d62083d22"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/react/jsx-runtime.d.ts",
+     "namespace": "/node_modules/react/jsx-runtime.d.ts"
+    }
+   },
+   "id": "lifecycle",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/react/jsx-runtime.d.ts",
+     "namespace": "/node_modules/react/jsx-runtime.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-jsx",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "lifecycle.tsx": "eaec6c37a00c84299ba1eb15b56fb3471d8b7efb09d907b37bca47a5d186a9ed",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": {
+      "bytes": 60001,
+      "sha256": "355249f4159a804368c896cd378eaed584cba89bf24a83510367434a8561c0c5"
+     },
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "id": "jsx_deep_pragma",
+   "unchecked": {
+    "jsx": {
+     "factory": {
+      "bytes": 60001,
+      "sha256": "355249f4159a804368c896cd378eaed584cba89bf24a83510367434a8561c0c5"
+     },
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_deep_pragma.tsx": "4c14c1bb49bce2e39545b8c363496bfb6d652b32c85c218500788eef4d6b7792"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/preact/jsx-runtime.d.ts",
+     "namespace": "/node_modules/preact/jsx-runtime.d.ts"
+    }
+   },
+   "id": "jsx_import_source_preserve",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/preact/jsx-runtime.d.ts",
+     "namespace": "/node_modules/preact/jsx-runtime.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "preserve",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_import_source.tsx": "5728e43b23bc42a8eae12094015000da90da8d2f403a1532a16375339604af58",
+    "node_modules/preact/package.json": "92fe6ed6e4690f552691a4c7ac82170b13b9d9d08cda4dd7ea0a2b826ae51a75",
+    "node_modules/preact/index.d.ts": "8a60ed93d81f472e270e213c5da23bdfc2a87b6616031f4d397aced25f727217",
+    "node_modules/preact/jsx-runtime.d.ts": "99ae6137ee1c49bc5c0063356c0e5615aeda0e23277af74b20081d873909ba8a",
+    "node_modules/preact/jsx-dev-runtime.d.ts": "536250efc6485898a362cb28704dc5b73cd30134b8e55cc08922645e5c7f4e70"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "id": "jsx_import_source_absent_preserve",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "flags": [
+    "--jsx",
+    "preserve",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_import_source_absent.tsx": "c627f5c9b0ee4d3ee3cdc6fa7e0a727d9f4f5657baff19e4030005be99777019",
+    "node_modules/bare/package.json": "ae9a194fc5940e11a16a668bc20df5f03d51fefd20d3bd6d752afc5678455ea9",
+    "node_modules/bare/index.d.ts": "8a60ed93d81f472e270e213c5da23bdfc2a87b6616031f4d397aced25f727217"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/preact/jsx-runtime.d.ts",
+     "namespace": "/node_modules/preact/jsx-runtime.d.ts"
+    }
+   },
+   "id": "jsx_import_source_react_native",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/preact/jsx-runtime.d.ts",
+     "namespace": "/node_modules/preact/jsx-runtime.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-native",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_import_source.tsx": "5728e43b23bc42a8eae12094015000da90da8d2f403a1532a16375339604af58",
+    "node_modules/preact/package.json": "92fe6ed6e4690f552691a4c7ac82170b13b9d9d08cda4dd7ea0a2b826ae51a75",
+    "node_modules/preact/index.d.ts": "8a60ed93d81f472e270e213c5da23bdfc2a87b6616031f4d397aced25f727217",
+    "node_modules/preact/jsx-runtime.d.ts": "99ae6137ee1c49bc5c0063356c0e5615aeda0e23277af74b20081d873909ba8a",
+    "node_modules/preact/jsx-dev-runtime.d.ts": "536250efc6485898a362cb28704dc5b73cd30134b8e55cc08922645e5c7f4e70"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "id": "jsx_import_source_absent_react_native",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-native",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_import_source_absent.tsx": "c627f5c9b0ee4d3ee3cdc6fa7e0a727d9f4f5657baff19e4030005be99777019",
+    "node_modules/bare/package.json": "ae9a194fc5940e11a16a668bc20df5f03d51fefd20d3bd6d752afc5678455ea9",
+    "node_modules/bare/index.d.ts": "8a60ed93d81f472e270e213c5da23bdfc2a87b6616031f4d397aced25f727217"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/preact/jsx-runtime.d.ts",
+     "namespace": "/node_modules/preact/jsx-runtime.d.ts"
+    }
+   },
+   "id": "jsx_import_source_react",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/preact/jsx-runtime.d.ts",
+     "namespace": "/node_modules/preact/jsx-runtime.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_import_source.tsx": "5728e43b23bc42a8eae12094015000da90da8d2f403a1532a16375339604af58",
+    "node_modules/preact/package.json": "92fe6ed6e4690f552691a4c7ac82170b13b9d9d08cda4dd7ea0a2b826ae51a75",
+    "node_modules/preact/index.d.ts": "8a60ed93d81f472e270e213c5da23bdfc2a87b6616031f4d397aced25f727217",
+    "node_modules/preact/jsx-runtime.d.ts": "99ae6137ee1c49bc5c0063356c0e5615aeda0e23277af74b20081d873909ba8a",
+    "node_modules/preact/jsx-dev-runtime.d.ts": "536250efc6485898a362cb28704dc5b73cd30134b8e55cc08922645e5c7f4e70"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "id": "jsx_import_source_absent_react",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_import_source_absent.tsx": "c627f5c9b0ee4d3ee3cdc6fa7e0a727d9f4f5657baff19e4030005be99777019",
+    "node_modules/bare/package.json": "ae9a194fc5940e11a16a668bc20df5f03d51fefd20d3bd6d752afc5678455ea9",
+    "node_modules/bare/index.d.ts": "8a60ed93d81f472e270e213c5da23bdfc2a87b6616031f4d397aced25f727217"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/preact/jsx-runtime.d.ts",
+     "namespace": "/node_modules/preact/jsx-runtime.d.ts"
+    }
+   },
+   "id": "jsx_import_source_react_jsx",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/preact/jsx-runtime.d.ts",
+     "namespace": "/node_modules/preact/jsx-runtime.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-jsx",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_import_source.tsx": "5728e43b23bc42a8eae12094015000da90da8d2f403a1532a16375339604af58",
+    "node_modules/preact/package.json": "92fe6ed6e4690f552691a4c7ac82170b13b9d9d08cda4dd7ea0a2b826ae51a75",
+    "node_modules/preact/index.d.ts": "8a60ed93d81f472e270e213c5da23bdfc2a87b6616031f4d397aced25f727217",
+    "node_modules/preact/jsx-runtime.d.ts": "99ae6137ee1c49bc5c0063356c0e5615aeda0e23277af74b20081d873909ba8a",
+    "node_modules/preact/jsx-dev-runtime.d.ts": "536250efc6485898a362cb28704dc5b73cd30134b8e55cc08922645e5c7f4e70"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "id": "jsx_import_source_absent_react_jsx",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-jsx",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_import_source_absent.tsx": "c627f5c9b0ee4d3ee3cdc6fa7e0a727d9f4f5657baff19e4030005be99777019",
+    "node_modules/bare/package.json": "ae9a194fc5940e11a16a668bc20df5f03d51fefd20d3bd6d752afc5678455ea9",
+    "node_modules/bare/index.d.ts": "8a60ed93d81f472e270e213c5da23bdfc2a87b6616031f4d397aced25f727217"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/preact/jsx-dev-runtime.d.ts",
+     "namespace": "/node_modules/preact/jsx-dev-runtime.d.ts"
+    }
+   },
+   "id": "jsx_import_source_react_jsxdev",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/preact/jsx-dev-runtime.d.ts",
+     "namespace": "/node_modules/preact/jsx-dev-runtime.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-jsxdev",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_import_source.tsx": "5728e43b23bc42a8eae12094015000da90da8d2f403a1532a16375339604af58",
+    "node_modules/preact/package.json": "92fe6ed6e4690f552691a4c7ac82170b13b9d9d08cda4dd7ea0a2b826ae51a75",
+    "node_modules/preact/index.d.ts": "8a60ed93d81f472e270e213c5da23bdfc2a87b6616031f4d397aced25f727217",
+    "node_modules/preact/jsx-runtime.d.ts": "99ae6137ee1c49bc5c0063356c0e5615aeda0e23277af74b20081d873909ba8a",
+    "node_modules/preact/jsx-dev-runtime.d.ts": "536250efc6485898a362cb28704dc5b73cd30134b8e55cc08922645e5c7f4e70"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "id": "jsx_import_source_absent_react_jsxdev",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-jsxdev",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_import_source_absent.tsx": "c627f5c9b0ee4d3ee3cdc6fa7e0a727d9f4f5657baff19e4030005be99777019",
+    "node_modules/bare/package.json": "ae9a194fc5940e11a16a668bc20df5f03d51fefd20d3bd6d752afc5678455ea9",
+    "node_modules/bare/index.d.ts": "8a60ed93d81f472e270e213c5da23bdfc2a87b6616031f4d397aced25f727217"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/preact/jsx-runtime.d.ts",
+     "namespace": "/node_modules/preact/jsx-runtime.d.ts"
+    }
+   },
+   "id": "jsx_import_source_option_react_jsx",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/preact/jsx-runtime.d.ts",
+     "namespace": "/node_modules/preact/jsx-runtime.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-jsx",
+    "--jsxImportSource",
+    "preact",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_import_source_option.tsx": "ba0f512c373d3d9d5d69aa14ffb96c4117ff6f19bedc0f6fd24e6c7fe4a06ccf",
+    "node_modules/preact/package.json": "92fe6ed6e4690f552691a4c7ac82170b13b9d9d08cda4dd7ea0a2b826ae51a75",
+    "node_modules/preact/index.d.ts": "8a60ed93d81f472e270e213c5da23bdfc2a87b6616031f4d397aced25f727217",
+    "node_modules/preact/jsx-runtime.d.ts": "99ae6137ee1c49bc5c0063356c0e5615aeda0e23277af74b20081d873909ba8a",
+    "node_modules/preact/jsx-dev-runtime.d.ts": "536250efc6485898a362cb28704dc5b73cd30134b8e55cc08922645e5c7f4e70"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/preact/jsx-dev-runtime.d.ts",
+     "namespace": "/node_modules/preact/jsx-dev-runtime.d.ts"
+    }
+   },
+   "id": "jsx_import_source_option_react_jsxdev",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/preact/jsx-dev-runtime.d.ts",
+     "namespace": "/node_modules/preact/jsx-dev-runtime.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-jsxdev",
+    "--jsxImportSource",
+    "preact",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_import_source_option.tsx": "ba0f512c373d3d9d5d69aa14ffb96c4117ff6f19bedc0f6fd24e6c7fe4a06ccf",
+    "node_modules/preact/package.json": "92fe6ed6e4690f552691a4c7ac82170b13b9d9d08cda4dd7ea0a2b826ae51a75",
+    "node_modules/preact/index.d.ts": "8a60ed93d81f472e270e213c5da23bdfc2a87b6616031f4d397aced25f727217",
+    "node_modules/preact/jsx-runtime.d.ts": "99ae6137ee1c49bc5c0063356c0e5615aeda0e23277af74b20081d873909ba8a",
+    "node_modules/preact/jsx-dev-runtime.d.ts": "536250efc6485898a362cb28704dc5b73cd30134b8e55cc08922645e5c7f4e70"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/jsx_factory_options.tsx"
+    }
+   },
+   "id": "jsx_factory_option",
+   "unchecked": {
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/jsx_factory_options.tsx"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react",
+    "--jsxFactory",
+    "h",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_factory_options.tsx": "abe1b582b75af1630a2538e6d93e10c6b157614bbc48f45e2a62aff85a70bbef"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": "Frag",
+     "implicit_import": null,
+     "namespace": "/jsx_factory_options.tsx"
+    }
+   },
+   "id": "jsx_factory_options",
+   "unchecked": {
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": "Frag",
+     "implicit_import": null,
+     "namespace": "/jsx_factory_options.tsx"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react",
+    "--jsxFactory",
+    "h",
+    "--jsxFragmentFactory",
+    "Frag",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_factory_options.tsx": "abe1b582b75af1630a2538e6d93e10c6b157614bbc48f45e2a62aff85a70bbef"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": "Frag",
+     "implicit_import": null,
+     "namespace": "/jsx_pragmas.tsx"
+    }
+   },
+   "id": "jsx_pragmas_over_options",
+   "unchecked": {
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": "Frag",
+     "implicit_import": null,
+     "namespace": "/jsx_pragmas.tsx"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react",
+    "--jsxFactory",
+    "Other.make",
+    "--jsxFragmentFactory",
+    "OtherFrag",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_pragmas.tsx": "d6777a2316c132c4f316a4f7dcf3a9175a3f9232c8ea5e4d30c5e653257f020b"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/jsx_pragma_without_frag.tsx"
+    }
+   },
+   "id": "jsx_pragma_without_frag",
+   "unchecked": {
+    "jsx": {
+     "factory": "h",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/jsx_pragma_without_frag.tsx"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_pragma_without_frag.tsx": "64417da317309b8eaf039b3fcee28bd62f937c98f273a570068201b7dd6417c8"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "id": "jsx_no_flag",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "flags": [
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_no_namespace.tsx": "24eee2f30b6b8519e3ed8caca5916f9e1304c1e351ec34f9ea915b894bc3db1f"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "id": "jsx_react_missing",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": null
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_no_namespace.tsx": "24eee2f30b6b8519e3ed8caca5916f9e1304c1e351ec34f9ea915b894bc3db1f"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/node_modules/react/index.d.ts"
+    }
+   },
+   "id": "jsx_runtime_classic_react_jsx",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/node_modules/react/index.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-jsx",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_runtime_classic.tsx": "4a24940a6d336dc21bea4329ddc81fb3c1db71f81f6ca6b93b6c4599fb307eff",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/node_modules/react/index.d.ts"
+    }
+   },
+   "id": "jsx_runtime_classic_react_jsxdev",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": null,
+     "namespace": "/node_modules/react/index.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react-jsxdev",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_runtime_classic.tsx": "4a24940a6d336dc21bea4329ddc81fb3c1db71f81f6ca6b93b6c4599fb307eff",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/react/jsx-runtime.d.ts",
+     "namespace": "/node_modules/react/jsx-runtime.d.ts"
+    }
+   },
+   "id": "jsx_runtime_automatic_react",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/react/jsx-runtime.d.ts",
+     "namespace": "/node_modules/react/jsx-runtime.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "react",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_runtime_automatic.tsx": "a8851add4ab477fab088a3aaeb2626279e3e4e93d7d1dd7437401a3ec3debc41",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {},
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/react/jsx-runtime.d.ts",
+     "namespace": "/node_modules/react/jsx-runtime.d.ts"
+    }
+   },
+   "id": "jsx_runtime_automatic_preserve",
+   "unchecked": {
+    "jsx": {
+     "factory": "React.createElement",
+     "fragment_factory": null,
+     "implicit_import": "/node_modules/react/jsx-runtime.d.ts",
+     "namespace": "/node_modules/react/jsx-runtime.d.ts"
+    }
+   },
+   "flags": [
+    "--jsx",
+    "preserve",
+    "--strict"
+   ],
+   "sources_sha256": {
+    "jsx_runtime_automatic.tsx": "a8851add4ab477fab088a3aaeb2626279e3e4e93d7d1dd7437401a3ec3debc41",
+    "node_modules/react/package.json": "9677f70485cdea509bcfe93a1897aea9c08b8e41f35a781f00f1d3a3de9eee99",
+    "node_modules/react/index.d.ts": "dc71e844f9098526cadcf8936274bd5ba609a1aa2bc199239d949cc6dbb13f04",
+    "node_modules/react/jsx-runtime.d.ts": "fc47708cc6f58af91540833e70da1a5fac0a16da6f5fc6f7f6592c17a5ee6dcc"
+   }
+  },
+  {
+   "checked": {
+    "aliases": {
+     "Config": false,
+     "Service": false
+    },
+    "jsx": null
+   },
+   "id": "metadata_plain",
+   "unchecked": {
+    "jsx": null
+   },
+   "flags": [
+    "--strict",
+    "--experimentalDecorators"
+   ],
+   "sources_sha256": {
+    "metadata_marking.ts": "bc7b9fa24d55dd4990e55f95be4ebf1b0d110b39cc0560e21dba325746466f01",
+    "metadata_types.ts": "1f53140b3633eb8f9601a3f55b76fdde9d7bcebd8f5d95ba9fa8da1d62083d22"
+   }
+  }
+ ],
+ "version": 1
+}

@@ -11,7 +11,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (addDeprecatedSuggestionWithSignature).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/signature_jsdoc.rs:270"
+   "rust": "crates/tsr_checker/src/signature_jsdoc.rs:266"
   },
   "tsc/internal/checker/checker.go:Checker.addDuplicateDeclarationErrorsForSymbols": {
    "disposition": "equivalent",
@@ -77,7 +77,7 @@
    "disposition": "equivalent",
    "reason": "The pin's static-block check runs the grammar check and visits the block's statements; the Rust source-element arm does the same at this site.",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check.rs:156"
+   "rust": "crates/tsr_checker/src/check.rs:157"
   },
   "tsc/internal/checker/checker.go:Checker.checkCollisionWithGlobalObjectInGeneratedCode": {
    "disposition": "equivalent",
@@ -149,7 +149,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkParenthesizedExpression).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/query.rs:858"
+   "rust": "crates/tsr_checker/src/query.rs:923"
   },
   "tsc/internal/checker/checker.go:Checker.checkPropertyAccessChain": {
    "disposition": "equivalent",
@@ -167,7 +167,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (checkThisType).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check.rs:290"
+   "rust": "crates/tsr_checker/src/check.rs:291"
   },
   "tsc/internal/checker/checker.go:Checker.checkTypeOperator": {
    "disposition": "equivalent",
@@ -191,7 +191,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkVoidExpression).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/query.rs:906"
+   "rust": "crates/tsr_checker/src/query.rs:971"
   },
   "tsc/internal/checker/checker.go:Checker.combineUnionOrIntersectionThisParam": {
    "disposition": "equivalent",
@@ -209,13 +209,13 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (errorOnImplicitAnyModule).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/external_resolution.rs:367"
+   "rust": "crates/tsr_checker/src/external_resolution.rs:425"
   },
   "tsc/internal/checker/checker.go:Checker.errorOrSuggestion": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (errorOrSuggestion).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/variable_errors.rs:119"
+   "rust": "crates/tsr_checker/src/variable_errors.rs:141"
   },
   "tsc/internal/checker/checker.go:Checker.errorSkippedOnNoEmit": {
    "disposition": "equivalent",
@@ -239,7 +239,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (getCannotResolveModuleNameErrorForSpecificModule).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/external_resolution.rs:116"
+   "rust": "crates/tsr_checker/src/external_resolution.rs:151"
   },
   "tsc/internal/checker/checker.go:Checker.getClassElementPropertyKeyType": {
    "disposition": "mapped",
@@ -249,7 +249,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (getConstituentProperty).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/indexes.rs:93"
+   "rust": "crates/tsr_checker/src/indexes.rs:94"
   },
   "tsc/internal/checker/checker.go:Checker.getContextNode": {
    "disposition": "mapped",
@@ -288,7 +288,7 @@
    "disposition": "equivalent",
    "reason": "The two strict function globals are resolved in the initialization table at this site.",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/program_init.rs:119"
+   "rust": "crates/tsr_checker/src/program_init.rs:125"
   },
   "tsc/internal/checker/checker.go:Checker.getIsolatedModulesLikeFlagName": {
    "disposition": "equivalent",
@@ -297,9 +297,8 @@
    "rust": "crates/tsr_checker/src/source_alias_checks.rs:163"
   },
   "tsc/internal/checker/checker.go:Checker.getMemberOverrideModifierStatus": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "its only caller is the public GetMemberOverrideModifierStatus of the API surface (C5.2); the override checks compute the status inline (class_overrides.rs)"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.2 (exports.rs) over the status-returning override worker."
   },
   "tsc/internal/checker/checker.go:Checker.getParentTypeOfClassElement": {
    "disposition": "mapped",
@@ -327,7 +326,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getSpreadIndices).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/expression_context.rs:153"
+   "rust": "crates/tsr_checker/src/expression_context.rs:152"
   },
   "tsc/internal/checker/checker.go:Checker.getSuggestedBooleanOperator": {
    "disposition": "equivalent",
@@ -339,7 +338,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (getSuggestedSymbolForNonexistentProperty).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/deferred_checks.rs:158"
+   "rust": "crates/tsr_checker/src/deferred_checks.rs:180"
   },
   "tsc/internal/checker/checker.go:Checker.getSuggestedSymbolForNonexistentSymbol": {
    "disposition": "equivalent",
@@ -363,31 +362,31 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (getThisArgumentOfCall).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/call_arguments.rs:184"
+   "rust": "crates/tsr_checker/src/call_arguments.rs:192"
   },
   "tsc/internal/checker/checker.go:Checker.getThisArgumentType": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (getThisArgumentType).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/call_arguments.rs:184"
+   "rust": "crates/tsr_checker/src/call_arguments.rs:192"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeFromThisTypeNode": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (getTypeFromThisTypeNode).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/query.rs:221"
+   "rust": "crates/tsr_checker/src/query.rs:258"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeFromTypeLiteralOrFunctionOrConstructorTypeNode": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (getTypeFromTypeLiteralOrFunctionOrConstructorTypeNode).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/query.rs:435"
+   "rust": "crates/tsr_checker/src/query.rs:472"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeFromTypeOperatorNode": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getTypeFromTypeOperatorNode).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/query.rs:630"
+   "rust": "crates/tsr_checker/src/query.rs:689"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeOfFirstParameterOfSignatureWithFallback": {
    "disposition": "equivalent",
@@ -423,7 +422,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (hasContextSensitiveReturnExpression).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check_bodies.rs:326"
+   "rust": "crates/tsr_checker/src/check_bodies.rs:317"
   },
   "tsc/internal/checker/checker.go:Checker.hasNumericPropertyNames": {
    "disposition": "equivalent",
@@ -447,7 +446,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (invocationError).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/calls.rs:438"
+   "rust": "crates/tsr_checker/src/calls.rs:457"
   },
   "tsc/internal/checker/checker.go:Checker.isAritySmaller": {
    "disposition": "equivalent",
@@ -459,7 +458,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (isContextSensitiveFunctionLikeDeclaration).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check_bodies.rs:326"
+   "rust": "crates/tsr_checker/src/check_bodies.rs:317"
   },
   "tsc/internal/checker/checker.go:Checker.isContextSensitiveFunctionOrObjectLiteralMethod": {
    "disposition": "equivalent",
@@ -477,7 +476,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (isPropertyAbstractOrInterface).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/class_overrides.rs:144"
+   "rust": "crates/tsr_checker/src/class_overrides.rs:299"
   },
   "tsc/internal/checker/checker.go:Checker.isPropertyDeclaredInAncestorClass": {
    "disposition": "equivalent",
@@ -522,16 +521,14 @@
    "rust": "crates/tsr_checker/src/access_symbols.rs:153"
   },
   "tsc/internal/checker/checker.go:Checker.isUncalledFunctionReference": {
-   "disposition": "equivalent",
-   "reason": "The pin uses the uncalled-reference test to decide whether a deprecated function reference is reported; Rust folds that test into the deprecation check at its identifier and property-access callers.",
-   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/signature_jsdoc.rs:290"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.5 (signature_jsdoc.rs): the services replay observes the deprecation suggestions it gates."
   },
   "tsc/internal/checker/checker.go:Checker.isUnwrappedReturnTypeUndefinedVoidOrAny": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (isUnwrappedReturnTypeUndefinedVoidOrAny).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check_bodies.rs:1002"
+   "rust": "crates/tsr_checker/src/check_bodies.rs:993"
   },
   "tsc/internal/checker/checker.go:Checker.lookupOrIssueError": {
    "disposition": "equivalent",
@@ -548,28 +545,20 @@
    "reason": "Ported at C4 (C4.7), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/checker.go:Checker.markExportAssignmentAliasReferenced": {
-   "disposition": "equivalent",
-   "reason": "The export-assignment case of the pin's marker is performed inside the export-assignment check.",
-   "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/source_module_aliases.rs:146"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/source_module_aliases.rs:146: The export-assignment case of the pin's marker is performed inside the export-assignment check."
   },
   "tsc/internal/checker/checker.go:Checker.markExportSpecifierAliasReferenced": {
-   "disposition": "equivalent",
-   "reason": "The export-specifier case of the pin's marker is performed inside the export-specifier check, which marks the export and its alias unless type-only.",
-   "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/source_module_aliases.rs:300"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/source_module_aliases.rs:300: The export-specifier case of the pin's marker is performed inside the export-specifier check, which marks the export and its alias unless type-only."
   },
   "tsc/internal/checker/checker.go:Checker.markLinkedReferences": {
-   "disposition": "equivalent",
-   "reason": "The pin dispatches alias marking over the node kind in one function; Rust calls the same markers directly at each checking site: identifiers here, property accesses in access_expressions.rs, export specifiers and assignments and import-equals declarations in source_module_aliases.rs.",
-   "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/value_references.rs:31"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/value_references.rs:31: The pin dispatches alias marking over the node kind in one function; Rust calls the same markers directly at each checking site: identifiers here, property accesses in access_expressions.rs, export specifiers and assignments and import-equals declarations in source_module_aliases.rs."
   },
   "tsc/internal/checker/checker.go:Checker.markPropertyAliasReferenced": {
-   "disposition": "equivalent",
-   "reason": "The property-access case of the pin's marker: the left-hand identifier's alias is marked unless the access is part of an import-equals reference, as this site does.",
-   "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/access_expressions.rs:379"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/access_expressions.rs:379: The property-access case of the pin's marker: the left-hand identifier's alias is marked unless the access is part of an import-equals reference, as this site does."
   },
   "tsc/internal/checker/checker.go:Checker.markSymbolOfAliasDeclarationIfTypeOnly": {
    "disposition": "equivalent",
@@ -618,7 +607,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (reportNonExportedMember).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/external_aliases.rs:693"
+   "rust": "crates/tsr_checker/src/external_aliases.rs:701"
   },
   "tsc/internal/checker/checker.go:Checker.reportOperatorErrorUnless": {
    "disposition": "equivalent",
@@ -630,7 +619,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (resolveErrorCall).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/calls.rs:417"
+   "rust": "crates/tsr_checker/src/calls.rs:436"
   },
   "tsc/internal/checker/checker.go:Checker.shouldCheckErasableSyntax": {
    "disposition": "equivalent",
@@ -648,7 +637,7 @@
    "disposition": "equivalent",
    "reason": "acceptsVoid has no caller in the pinned checker package; the void-argument acceptance Rust implements is the optional-argument test at this site, and nothing else observes the predicate.",
    "reviewed_from": "grep of the pinned internal/checker for callers (none); C3 source audit",
-   "rust": "crates/tsr_checker/src/call_arguments.rs:133"
+   "rust": "crates/tsr_checker/src/call_arguments.rs:141"
   },
   "tsc/internal/checker/checker.go:countGlobalSymbols": {
    "disposition": "equivalent",
@@ -677,7 +666,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getErrorNodeForCallNode).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/call_arguments.rs:562"
+   "rust": "crates/tsr_checker/src/call_arguments.rs:570"
   },
   "tsc/internal/checker/checker.go:getFirstDeclaration": {
    "disposition": "equivalent",
@@ -695,7 +684,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (getIndexNodeForAccessExpression).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/indexes.rs:921"
+   "rust": "crates/tsr_checker/src/indexes.rs:943"
   },
   "tsc/internal/checker/checker.go:getThisParameterFromNodeContext": {
    "disposition": "equivalent",
@@ -707,7 +696,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (getVerbatimModuleSyntaxErrorMessage).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/source_alias_checks.rs:163"
+   "rust": "crates/tsr_checker/src/source_module_aliases.rs:263"
   },
   "tsc/internal/checker/checker.go:hasCommonDomTypeName": {
    "disposition": "equivalent",
@@ -728,10 +717,8 @@
    "rust": "crates/tsr_checker/src/name_errors.rs:21"
   },
   "tsc/internal/checker/checker.go:isExportOrExportExpression": {
-   "disposition": "equivalent",
-   "reason": "The pin's ancestor test for export or import-equals references is the ancestor walk at this site and the export-specifier tests of the identifier marker.",
-   "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/access_expressions.rs:365"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/access_expressions.rs:365: The pin's ancestor test for export or import-equals references is the ancestor walk at this site and the export-specifier tests of the identifier marker."
   },
   "tsc/internal/checker/checker.go:isImmediatelyUsedInInitializerOfBlockScopedVariable": {
    "disposition": "equivalent",
@@ -761,7 +748,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (isPrototypeProperty).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/class_overrides.rs:305"
+   "rust": "crates/tsr_checker/src/class_overrides.rs:330"
   },
   "tsc/internal/checker/checker.go:isRestParameter": {
    "disposition": "equivalent",
@@ -788,10 +775,8 @@
    "rust": "crates/tsr_checker/src/instantiate.rs:365"
   },
   "tsc/internal/checker/checker.go:shouldMarkIdentifierAliasReferenced": {
-   "disposition": "equivalent",
-   "reason": "The pin's guard (a value identifier that is not a type-only export or a property-access receiver) is the head of the Rust identifier marker.",
-   "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/value_references.rs:399"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.6) for the emit resolver's reference marking, where the port marker names it; checking keeps the inline equivalent at crates/tsr_checker/src/value_references.rs:399: The pin's guard (a value identifier that is not a type-only export or a property-access receiver) is the head of the Rust identifier marker."
   },
   "tsc/internal/checker/checker.go:superCallIsRootLevelInConstructor": {
    "disposition": "equivalent",
@@ -833,13 +818,13 @@
    "disposition": "equivalent",
    "reason": "Inlined in the constructor declaration check.",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check_bodies.rs:285"
+   "rust": "crates/tsr_checker/src/check_bodies.rs:276"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarConstructorTypeParameters": {
    "disposition": "equivalent",
    "reason": "Inlined in the constructor declaration check.",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check_bodies.rs:278"
+   "rust": "crates/tsr_checker/src/check_bodies.rs:269"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarExportDeclaration": {
    "disposition": "equivalent",
@@ -935,7 +920,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (callLikeExpressionMayHaveTypeArguments).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/calls.rs:602"
+   "rust": "crates/tsr_checker/src/calls.rs:621"
   },
   "tsc/internal/checker/utilities.go:Checker.checkNotCanceled": {
    "disposition": "later",
@@ -980,19 +965,19 @@
    "disposition": "equivalent",
    "reason": "IsKnownSymbol is isLateBoundName over the symbol name; the Rust late-bound name test is this function, used by the index and node-builder callers.",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_names.rs:1106"
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:1201"
   },
   "tsc/internal/checker/utilities.go:IsPrivateIdentifierSymbol": {
    "disposition": "equivalent",
-   "reason": "The pin tests the internal `__#` prefix of a private identifier symbol; the Rust node builder tests the `#` prefix of the same symbol name at its only caller.",
+   "reason": "The pin tests the internal `__#` prefix of a private identifier symbol; the Rust node builder tests the same internal prefix of the symbol name at its only caller.",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_names.rs:1021"
+   "rust": "crates/tsr_checker/src/node_builder_class_emit.rs:364"
   },
   "tsc/internal/checker/utilities.go:IsTypeAny": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (IsTypeAny).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/promises.rs:138"
+   "rust": "crates/tsr_checker/src/promises.rs:139"
   },
   "tsc/internal/checker/utilities.go:NewDiagnosticChainForNode": {
    "disposition": "equivalent",
@@ -1027,13 +1012,13 @@
    "disposition": "equivalent",
    "reason": "findInMap is a generic map search; its only caller, reportNonExportedMember, is ported here with an iterator search over the same exports.",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/external_aliases.rs:693"
+   "rust": "crates/tsr_checker/src/external_aliases.rs:701"
   },
   "tsc/internal/checker/utilities.go:getAliasDeclarationFromName": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (getAliasDeclarationFromName).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/name_resolution.rs:312"
+   "rust": "crates/tsr_checker/src/name_resolution.rs:314"
   },
   "tsc/internal/checker/utilities.go:getBindingElementPropertyName": {
    "disposition": "equivalent",
@@ -1057,7 +1042,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (getEnclosingContainer).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/function_symbol_checks.rs:40"
+   "rust": "crates/tsr_checker/src/function_symbol_checks.rs:47"
   },
   "tsc/internal/checker/utilities.go:getIndexSymbolFromSymbolTable": {
    "disposition": "equivalent",
@@ -1099,7 +1084,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly.",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/bindings.rs:209"
+   "rust": "crates/tsr_checker/src/bindings.rs:210"
   },
   "tsc/internal/checker/utilities.go:hasExportAssignmentSymbol": {
    "disposition": "equivalent",
@@ -1117,7 +1102,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly.",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/class_overrides.rs:143"
+   "rust": "crates/tsr_checker/src/class_overrides.rs:124"
   },
   "tsc/internal/checker/utilities.go:hasReadonlyModifier": {
    "disposition": "equivalent",
@@ -1129,12 +1114,11 @@
    "disposition": "equivalent",
    "reason": "No caller in the pinned checker package; the Rust site named is where the same fact is computed for its own callers.",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1050"
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1066"
   },
   "tsc/internal/checker/utilities.go:introducesArgumentsExoticObject": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "its only caller is getSymbolsInScope (C5.5)"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.5), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/utilities.go:isAdditiveOperator": {
    "disposition": "equivalent",
@@ -1200,7 +1184,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isDeclarationReadonly).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/variables.rs:275"
+   "rust": "crates/tsr_checker/src/variables.rs:280"
   },
   "tsc/internal/checker/utilities.go:isEmptyArrayLiteral": {
    "disposition": "equivalent",
@@ -1260,13 +1244,13 @@
    "disposition": "equivalent",
    "reason": "No caller in the pinned checker package; the Rust site named is where the same fact is computed for its own callers.",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_emit.rs:233"
+   "rust": "crates/tsr_checker/src/node_builder_emit.rs:234"
   },
   "tsc/internal/checker/utilities.go:isJSDocOptionalParameter": {
    "disposition": "equivalent",
    "reason": "No caller in the pinned checker package; the Rust site named is where the same fact is computed for its own callers.",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1161"
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1177"
   },
   "tsc/internal/checker/utilities.go:isJsxIntrinsicTagName": {
    "disposition": "mapped",
@@ -1294,7 +1278,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isNodeDescendantOf).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/instantiate.rs:718"
+   "rust": "crates/tsr_checker/src/instantiate.rs:724"
   },
   "tsc/internal/checker/utilities.go:isNonNullAccess": {
    "disposition": "equivalent",
@@ -1306,7 +1290,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly.",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/indexes.rs:866"
+   "rust": "crates/tsr_checker/src/indexes.rs:890"
   },
   "tsc/internal/checker/utilities.go:isObjectOrArrayLiteralType": {
    "disposition": "equivalent",
@@ -1318,7 +1302,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isOptionalDeclaration).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/function_symbol_checks.rs:95"
+   "rust": "crates/tsr_checker/src/function_symbol_checks.rs:102"
   },
   "tsc/internal/checker/utilities.go:isRelationalOperator": {
    "disposition": "equivalent",
@@ -1333,9 +1317,8 @@
    "rust": "crates/tsr_checker/src/flow.rs:510"
   },
   "tsc/internal/checker/utilities.go:isRightSideOfAccessExpression": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "its only caller is the public GetTypeOfSymbolAtLocation (C5.2)"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.2 (exports.rs) for GetTypeOfSymbolAtLocation; the inline tests remain."
   },
   "tsc/internal/checker/utilities.go:isShiftOperator": {
    "disposition": "equivalent",
@@ -1353,19 +1336,19 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isShorthandAmbientModule).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/external_aliases.rs:315"
+   "rust": "crates/tsr_checker/src/external_aliases.rs:323"
   },
   "tsc/internal/checker/utilities.go:isShorthandAmbientModuleSymbol": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isShorthandAmbientModuleSymbol).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/external_aliases.rs:315"
+   "rust": "crates/tsr_checker/src/external_aliases.rs:323"
   },
   "tsc/internal/checker/utilities.go:isSideEffectImport": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly.",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/external_resolution.rs:238"
+   "rust": "crates/tsr_checker/src/external_resolution.rs:296"
   },
   "tsc/internal/checker/utilities.go:isSuperCall": {
    "disposition": "equivalent",
@@ -1398,10 +1381,8 @@
    "rust": "crates/tsr_checker/src/name_errors.rs:197"
   },
   "tsc/internal/checker/utilities.go:isTypeUsableAsPropertyName": {
-   "disposition": "equivalent",
-   "reason": "The pin's flag test (string, number or unique-symbol literal) is inlined at this override-check site and at the mapped-type, contextual-assignment and narrowing callers, each testing the same flag mask.",
-   "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/class_overrides.rs:30"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C5.2 (exports.rs), the public IsTypeUsableAsPropertyName; the inline tests remain."
   },
   "tsc/internal/checker/utilities.go:isValidESSymbolDeclaration": {
    "disposition": "equivalent",
@@ -1425,13 +1406,13 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (minAndMax).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/call_failure.rs:83"
+   "rust": "crates/tsr_checker/src/call_failure.rs:89"
   },
   "tsc/internal/checker/utilities.go:nodeStartsNewLexicalEnvironment": {
    "disposition": "equivalent",
    "reason": "The pin's only caller, containsArgumentsReference, stops its walk at nodes that start a new lexical environment; the Rust port stops at the same function-like and static-block nodes inside this walk.",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/signature_jsdoc.rs:180"
+   "rust": "crates/tsr_checker/src/signature_jsdoc.rs:176"
   },
   "tsc/internal/checker/utilities.go:orderedSet.add": {
    "disposition": "equivalent",
@@ -1449,12 +1430,11 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (pseudoBigIntToString).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/node_builder.rs:563"
+   "rust": "crates/tsr_checker/src/node_builder.rs:671"
   },
   "tsc/internal/checker/utilities.go:symbolsToArray": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "callers are getSymbolsInScope and the exports services (C5.5)"
+   "disposition": "mapped",
+   "reason": "Ported at C5 (C5.5), the later owner this audit named; the port marker names it."
   },
   "tsc/internal/checker/utilities.go:tokenIsIdentifierOrKeyword": {
    "disposition": "equivalent",

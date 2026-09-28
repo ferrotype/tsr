@@ -524,7 +524,7 @@ impl CheckerState {
         Ok(Some(symbol))
     }
     // port: tsc/internal/checker/checker.go:Checker.getExternalModuleMember
-    fn external_module_member(
+    pub(crate) fn external_module_member(
         &mut self,
         module: SymbolId,
         node: NodeId,

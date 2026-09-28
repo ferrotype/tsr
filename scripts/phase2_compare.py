@@ -132,9 +132,15 @@ def compare_errors(native, rust):
     if errors["state"] != "executed":
         cause = first_failure(rust) or errors
         return failure_outcome(cause if cause.get("state") in ("failed", "not_implemented") else errors)
+    # A Rust run that executed the harness's emit schedule compares both sets;
+    # without it, differing native pre- and post-emit sets refuse a match.
+    emit = errors.get("emit")
+    executed = isinstance(emit, dict) and emit.get("state") == "executed"
+    first = (("pre_diagnostics", native["error_pre_diagnostics"], errors["pre_diagnostics"]) if executed else
+             ("native_pre_post", native["error_pre_diagnostics"], native["error_post_diagnostics"]))
     differences = []
     for label, left, right in (
-        ("native_pre_post", native["error_pre_diagnostics"], native["error_post_diagnostics"]),
+        first,
         ("post_diagnostics", native["error_post_diagnostics"], errors["diagnostics"]),
         ("render_diagnostics", native["error_diagnostics"], errors["diagnostics"]),
         ("inputs", native["error_render_inputs"], errors["inputs"]),
@@ -144,6 +150,8 @@ def compare_errors(native, rust):
         if left != right:
             differences.append(label)
     code = first_code(native["error_diagnostics"], errors["diagnostics"]) if differences else None
+    if code is None and "pre_diagnostics" in differences:
+        code = first_code(native["error_pre_diagnostics"], errors["pre_diagnostics"])
     return outcome("different" if differences else "match", differences=differences, first_code=code)
 
 

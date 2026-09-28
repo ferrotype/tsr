@@ -15,7 +15,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             &request,
             &mut tsr_compiler::FileCache::new(),
             &mut executor::NoHooks,
-            |_, _, _, _, _| executor::BaselineResults {
+            |_, _, _, _, _, _| executor::BaselineResults {
                 type_symbols: json!({"state":"not_implemented","reason":"P5 native baseline walker/display schedule"}),
                 errors: json!({"state":"not_requested"}),
             },

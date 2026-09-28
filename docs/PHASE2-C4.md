@@ -283,3 +283,83 @@ this checker run makes `P2B-C2` and `P2B-C3` read as pending in
 `sprints/P2B.toml` while `P2B-C1` and `P2B-C4` read as done; that is the
 plan's known tracker gap, not a regression. The recording, `cargo xtask run
 checker`, is the owner's.
+
+## Review follow-up
+
+The two reviews of #68 were addressed on `phase2-c5`, after C5 had been built
+on the C4 branch.
+
+- **Deep factory pragma.** `parseIsolatedEntityName` flattened the parsed
+  qualified name recursively, so a `@jsx` pragma of 30,000 components
+  overflowed the stack where the pin completes. The left spine is now walked
+  in a loop. The regression is the native case `jsx_deep_pragma` (30,000
+  components under `react`, TS7026 only), checked on a 512 KiB thread; with
+  the recursive code it aborts.
+- **Census.** The JSX links (seven maps and the retained namespace names), the
+  decorator signatures and the decorator context overrides were outside the
+  census, and so were three caches C5 added (the candidate list, the
+  skip-direct-inference set and the JSX import references). Each is charged
+  to its family, and the types and signatures they hold are reachability
+  roots. A unit test populates the caches and fails when either the charge or
+  the roots are removed.
+- **External consumer lockfile.** `tools/s10/rust-consumer/Cargo.lock` lists
+  `tsr_parser` (C4) and `tsr_astnav` (C5) under `tsr_checker`. The consumer's
+  `lifetime` test passes with `--locked`.
+- **`--noEmit`.** The C3 and C4 native loaders set `no_emit` from the recorded
+  command instead of dropping it.
+- **Checker state from the pin.** `fixtures/c4/state/regenerate.py` records the
+  pinned checker's state through a Go overlay: two test files added to the
+  pinned checker package, with `upstream/` untouched. It records the four JSX
+  entities at the root's first JSX tag (`getJsxFactoryEntity`,
+  `getJsxFragmentFactoryEntity`, `getJsxNamespaceAt`,
+  `getJsxNamespaceContainerForImplicitImport`) after the loader's checks and
+  on a fresh checker, plus `aliasSymbolLinks.referenced` of the root's import
+  specifiers. It covers all 40 JSX and metadata cases, and each row binds its
+  case's flags and source digests. Contracts 1, 2 and 7 to 9 compare with
+  these records, so none of them states checker state by hand. The
+  metadata-disabled command is its own native case, `metadata_plain`. Making
+  the probe report no fragment factory fails three contracts.
+- **Direct cases the C4.2 and C4.5 exits name.** For C4.2 there are ten
+  cases:
+  - the `jsxFactory` option alone (TS17016 at a fragment) and with
+    `jsxFragmentFactory`;
+  - `@jsx`/`@jsxFrag` pragmas over both options;
+  - `@jsx` without `@jsxFrag` (TS17017);
+  - no `jsx` option (TS17004);
+  - `react` without `React` in scope (TS2874);
+  - `@jsxRuntime classic` under `react-jsx` and `react-jsxdev`;
+  - `@jsxRuntime automatic` under `react` and `preserve`.
+
+  For C4.5, each of the five modes has an `@jsxImportSource` package with
+  both runtime modules and one with neither (TS2875 where the mode needs
+  one). The `jsxImportSource` option is covered under both automatic modes.
+  All 22 cases match natively in Rust, and `every_recorded_case_matches_native`
+  loads every case of the manifest.
+- **The shared corrections outside JSX.** `conditional_distribution` witnesses
+  `mapTypeWithAlias` without JSX. `Pick<P, Extract<keyof P, keyof D>>`
+  instantiated without an alias keeps the origin of an unchanged `keyof Props`
+  (`Pick<Props, keyof Props>`); rebuilding every distribution union, the
+  pre-C4 code, fails it. `relation_excess` guards the excess-property path in
+  declarations, nested literals, union, intersection and array targets, and
+  an argument. The pre-C4 path (through `reportErrorResults`) passes it too,
+  and it cannot fail: outside JSX `reportErrorResults` ends in the same
+  relation error for a fresh object literal. Only its JSX-attributes branch
+  differs, so the correction does not change behaviour outside JSX.
+- **The C3 audit's inlined equivalents.** A sample of 14 of the 157 "inlined at
+  the port of its pinned caller" entries all had their logic at a Rust site
+  that matches the pin:
+  - five anchors name the exact line;
+  - six name the enclosing function or a call to the helper that implements
+    the function;
+  - three named unrelated code and now name the inline site
+    (`isPropertyAbstractOrInterface`, `getVerbatimModuleSyntaxErrorMessage`
+    and `getSuggestedSymbolForNonexistentProperty`).
+
+  The rest of the 157 have not been re-anchored.
+
+Not changed here:
+
+- The claims file still reads `open` for every row, pending the owner.
+- The tracker gap (review 1, finding 1) stays the plans' C7.7 item.
+- These fixes change production sources, so the recorded `rust-c5` capture and
+  the C1 to C5 contract receipts need their end-of-phase refresh.

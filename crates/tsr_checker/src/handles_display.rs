@@ -12,7 +12,64 @@ pub struct TypeNodeBuilder<'operation> {
 }
 
 impl Operation<'_> {
+    // port: tsc/internal/checker/printer.go:Checker.TypeToString
+    /// The context-free display with `TypeToString`'s default flags.
+    pub fn type_to_string_default(&mut self, ty: TypeRef) -> Result<tsr_ast::JsString, Error> {
+        let ty = self.check_type(ty)?;
+        self.state_mut()
+            .type_to_string_at(ty, None, crate::type_display::DEFAULT_FLAGS)
+    }
+
+    // port: tsc/internal/checker/printer.go:Checker.TypeToStringEx
+    /// `TypeToStringEx` with the hover verbosity; its signals are written back.
+    pub fn type_to_string_ex(
+        &mut self,
+        ty: TypeRef,
+        enclosing: Option<NodeId>,
+        flags: crate::TypeFormatFlags,
+        verbosity: Option<&mut crate::VerbosityContext>,
+    ) -> Result<tsr_ast::JsString, Error> {
+        let ty = self.check_type(ty)?;
+        self.state_mut()
+            .type_to_string_ex(ty, enclosing, flags, verbosity)
+    }
+
+    // port: tsc/internal/checker/printer.go:Checker.SymbolToString
+    pub fn symbol_to_string(
+        &mut self,
+        symbol: super::SymbolRef,
+    ) -> Result<tsr_ast::JsString, Error> {
+        let symbol = self.check_symbol_ref(symbol)?;
+        self.state_mut().symbol_to_string(symbol)
+    }
+
+    // port: tsc/internal/checker/printer.go:Checker.SignatureToStringEx
+    pub fn signature_to_string_ex(
+        &mut self,
+        signature: super::SignatureRef,
+        enclosing: Option<NodeId>,
+        flags: crate::TypeFormatFlags,
+        verbosity: Option<&mut crate::VerbosityContext>,
+    ) -> Result<tsr_ast::JsString, Error> {
+        let signature = self.check_signature(signature)?;
+        self.state_mut()
+            .signature_to_string_ex(signature, enclosing, flags, verbosity)
+    }
+
+    // port: tsc/internal/checker/printer.go:Checker.TypeParameterToStringEx
+    pub fn type_parameter_to_string_ex(
+        &mut self,
+        ty: TypeRef,
+        enclosing: Option<NodeId>,
+        verbosity: Option<&mut crate::VerbosityContext>,
+    ) -> Result<tsr_ast::JsString, Error> {
+        let ty = self.check_type(ty)?;
+        self.state_mut()
+            .type_parameter_to_string_ex(ty, enclosing, verbosity)
+    }
+
     /// `SymbolToStringEx`, including lexical qualification and computed names.
+    // port: tsc/internal/checker/printer.go:Checker.SymbolToStringEx
     pub fn symbol_to_string_at(
         &mut self,
         symbol: super::SymbolRef,
@@ -27,6 +84,10 @@ impl Operation<'_> {
 
     /// Creates the explicit builder used by callers of Go's `NewNodeBuilder`.
     /// This is separate from the checker's cached diagnostic-display builder.
+    /// Its identifier-to-symbol map is the builder's own (`id_to_symbol`).
+    // port: tsc/internal/checker/nodebuilder.go:NewNodeBuilder
+    // port: tsc/internal/checker/nodebuilder.go:NewNodeBuilderEx
+    // port: tsc/internal/checker/nodebuilder.go:Checker.getNodeBuilderEx
     pub fn node_builder(&mut self) -> TypeNodeBuilder<'_> {
         TypeNodeBuilder {
             owner: self.checker(),
@@ -48,7 +109,58 @@ impl Operation<'_> {
     }
 }
 
+/// The context of one request: the enclosing declaration and the builder flags.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct BuilderRequest {
+    pub enclosing: Option<NodeId>,
+    pub flags: tsr_nodebuilder::Flags,
+    pub internal_flags: tsr_nodebuilder::InternalFlags,
+}
+
 impl TypeNodeBuilder<'_> {
+    fn check_owner(&self, owner: ArenaId) -> Result<(), Error> {
+        if owner != self.owner {
+            return Err(tsr_arena::Error::WrongOwner.into());
+        }
+        Ok(())
+    }
+
+    fn type_id(&self, ty: TypeRef) -> Result<crate::TypeId, Error> {
+        self.check_owner(ty.owner)?;
+        self.builder.checker.types.get(ty.id)?;
+        Ok(ty.id)
+    }
+
+    fn symbol_id(&self, symbol: super::SymbolRef) -> Result<tsr_arena::SymbolId, Error> {
+        self.check_owner(symbol.owner)?;
+        self.builder.checker.symbol(symbol.id)?;
+        Ok(symbol.id)
+    }
+
+    /// Runs `action` as one request (`enterContext` .. `exitContext`); an
+    /// unsuccessful native result is absent, never replaced with `any`.
+    fn request(
+        &mut self,
+        request: BuilderRequest,
+        action: impl FnOnce(&mut crate::node_builder::NodeBuilder<'_>) -> Result<NodeId, Error>,
+    ) -> Result<Option<NodeId>, Error> {
+        self.builder
+            .prepare_context(request.enclosing, request.flags, request.internal_flags)?;
+        let node = action(&mut self.builder)?;
+        Ok(self.builder.exit_context(node))
+    }
+
+    fn request_slice(
+        &mut self,
+        request: BuilderRequest,
+        action: impl FnOnce(&mut crate::node_builder::NodeBuilder<'_>) -> Result<Vec<NodeId>, Error>,
+    ) -> Result<Option<Vec<NodeId>>, Error> {
+        self.builder
+            .prepare_context(request.enclosing, request.flags, request.internal_flags)?;
+        let nodes = action(&mut self.builder)?;
+        Ok(self.builder.exit_context_slice(nodes))
+    }
+
     /// Runs one `TypeToTypeNode` request, keeping its syntax alive for inspection
     /// or printing and subsequent requests on this builder. An unsuccessful
     /// native builder result remains absent; it is not replaced with `any`.
@@ -60,20 +172,206 @@ impl TypeNodeBuilder<'_> {
         flags: tsr_nodebuilder::Flags,
         internal_flags: tsr_nodebuilder::InternalFlags,
     ) -> Result<Option<NodeId>, Error> {
-        if ty.owner != self.owner {
-            return Err(tsr_arena::Error::WrongOwner.into());
-        }
-        self.builder.checker.types.get(ty.id)?;
+        let ty = self.type_id(ty)?;
+        let request = BuilderRequest {
+            enclosing,
+            flags,
+            internal_flags,
+        };
+        self.request(request, |b| b.type_node(ty))
+    }
+
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeTypeForDeclaration
+    pub fn serialize_type_for_declaration(
+        &mut self,
+        declaration: NodeId,
+        symbol: Option<super::SymbolRef>,
+        request: BuilderRequest,
+    ) -> Result<Option<NodeId>, Error> {
+        let symbol = symbol.map(|s| self.symbol_id(s)).transpose()?;
+        self.request(request, |b| {
+            b.serialize_declaration_type(Some(declaration), None, symbol, true)
+        })
+    }
+
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeTypeForExpression
+    pub fn serialize_type_for_expression(
+        &mut self,
+        expression: NodeId,
+        request: BuilderRequest,
+    ) -> Result<Option<NodeId>, Error> {
+        self.request(request, |b| b.serialize_expression_type(expression))
+    }
+
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeReturnTypeForSignature
+    /// The return type node of the signature `declaration` declares; `None`
+    /// also when the builder serializes no return type.
+    pub fn serialize_return_type_for_signature(
+        &mut self,
+        declaration: NodeId,
+        request: BuilderRequest,
+    ) -> Result<Option<NodeId>, Error> {
         self.builder
-            .prepare_context(enclosing, flags, internal_flags)?;
-        let node = self.builder.type_node(ty.id)?;
-        Ok((!self.builder.encountered_error).then_some(node))
+            .prepare_context(request.enclosing, request.flags, request.internal_flags)?;
+        let signature = self
+            .builder
+            .checker
+            .signature_from_declaration(declaration)?;
+        let result = self
+            .builder
+            .with_signature_scope(signature, |b| b.serialize_signature_return(signature, true))?;
+        if let Some(node) = result {
+            return Ok(self.builder.exit_context(node));
+        }
+        self.builder.exit_context_slice(Vec::new());
+        Ok(None)
+    }
+
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.SerializeTypeParametersForSignature
+    pub fn serialize_type_parameters_for_signature(
+        &mut self,
+        declaration: NodeId,
+        request: BuilderRequest,
+    ) -> Result<Option<Vec<NodeId>>, Error> {
+        self.request_slice(request, |b| b.declaration_type_parameters(declaration))
+    }
+
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.SignatureToSignatureDeclaration
+    pub fn signature_to_signature_declaration(
+        &mut self,
+        signature: super::SignatureRef,
+        kind: tsr_ast::SyntaxKind,
+        request: BuilderRequest,
+    ) -> Result<Option<NodeId>, Error> {
+        self.check_owner(signature.owner)?;
+        self.builder.checker.signatures.get(signature.id)?;
+        self.request(request, |b| {
+            b.signature_node(signature.id, kind, None, None)
+        })
+    }
+
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToParameterDeclaration
+    pub fn symbol_to_parameter_declaration(
+        &mut self,
+        symbol: super::SymbolRef,
+        request: BuilderRequest,
+    ) -> Result<Option<NodeId>, Error> {
+        let symbol = self.symbol_id(symbol)?;
+        self.request(request, |b| b.parameter_node(symbol))
+    }
+
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.TypeParameterToDeclaration
+    pub fn type_parameter_to_declaration(
+        &mut self,
+        parameter: TypeRef,
+        request: BuilderRequest,
+    ) -> Result<Option<NodeId>, Error> {
+        let parameter = self.type_id(parameter)?;
+        self.request(request, |b| b.type_parameter_node(parameter))
+    }
+
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.IndexInfoToIndexSignatureDeclaration
+    pub fn index_info_to_index_signature_declaration(
+        &mut self,
+        info: crate::IndexInfoRef,
+        request: BuilderRequest,
+    ) -> Result<Option<NodeId>, Error> {
+        self.check_owner(info.owner)?;
+        self.builder.checker.signatures.index_info(info.id)?;
+        self.request(request, |b| b.index_signature_node(info.id))
+    }
+
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToExpression
+    pub fn symbol_to_expression(
+        &mut self,
+        symbol: super::SymbolRef,
+        meaning: tsr_ast::SymbolFlags,
+        request: BuilderRequest,
+    ) -> Result<Option<NodeId>, Error> {
+        let symbol = self.symbol_id(symbol)?;
+        let enclosing = request.enclosing;
+        self.request(request, |b| {
+            b.symbol_expression_with_meaning(symbol, enclosing, meaning)
+        })
+    }
+
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToEntityName
+    pub fn symbol_to_entity_name(
+        &mut self,
+        symbol: super::SymbolRef,
+        meaning: tsr_ast::SymbolFlags,
+        request: BuilderRequest,
+    ) -> Result<Option<NodeId>, Error> {
+        let symbol = self.symbol_id(symbol)?;
+        self.request(request, |b| b.symbol_name_node(symbol, meaning, false))
+    }
+
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToNode
+    pub fn symbol_to_node(
+        &mut self,
+        symbol: super::SymbolRef,
+        meaning: tsr_ast::SymbolFlags,
+        request: BuilderRequest,
+    ) -> Result<Option<NodeId>, Error> {
+        let symbol = self.symbol_id(symbol)?;
+        self.request(request, |b| b.symbol_display_node(symbol, meaning, true))
+    }
+
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.SymbolToTypeParameterDeclarations
+    pub fn symbol_to_type_parameter_declarations(
+        &mut self,
+        symbol: super::SymbolRef,
+        request: BuilderRequest,
+    ) -> Result<Option<Vec<NodeId>>, Error> {
+        let symbol = self.symbol_id(symbol)?;
+        self.request_slice(request, |b| b.symbol_type_parameter_declarations(symbol))
+    }
+
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.TypePredicateToTypePredicateNode
+    pub fn type_predicate_to_type_predicate_node(
+        &mut self,
+        predicate: crate::TypePredicateRef,
+        request: BuilderRequest,
+    ) -> Result<Option<NodeId>, Error> {
+        self.check_owner(predicate.owner)?;
+        self.builder.checker.signatures.predicate(predicate.id)?;
+        self.request(request, |b| b.predicate_node(predicate.id))
+    }
+
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.TryJSTypeNodeToTypeNode
+    /// The reused form of a JSDoc type annotation, or `None` when it cannot be reused.
+    pub fn try_js_type_node_to_type_node(
+        &mut self,
+        node: NodeId,
+        request: BuilderRequest,
+    ) -> Result<Option<NodeId>, Error> {
+        self.builder
+            .prepare_context(request.enclosing, request.flags, request.internal_flags)?;
+        if let Some(result) = self.builder.try_js_type_node_to_type_node(node)? {
+            return Ok(self.builder.exit_context(result));
+        }
+        self.builder.exit_context_slice(Vec::new());
+        Ok(None)
+    }
+
+    /// The symbol an identifier the builder created names, if it recorded one.
+    pub fn id_to_symbol(&self, identifier: NodeId) -> Option<super::SymbolRef> {
+        self.builder
+            .id_to_symbol
+            .get(&identifier)
+            .copied()
+            .flatten()
+            .map(|id| super::SymbolRef {
+                owner: self.owner,
+                id,
+            })
     }
 
     pub fn view(&self) -> AstView<'_> {
         self.builder.ast.view()
     }
 
+    // port: tsc/internal/checker/nodebuilder.go:NodeBuilder.EmitContext
     pub fn emit_context(&self) -> &tsr_printer::EmitContext {
         &self.builder.emit
     }

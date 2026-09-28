@@ -1,5 +1,7 @@
 //! Shared P5 corpus observation, independent of its process wrapper.
 use crate::{baseline, errors, executor};
+#[path = "emit.rs"]
+mod emit;
 use serde_json::{json, Value};
 type InputBytes = (Vec<u8>, Vec<u8>);
 fn unhex(value: &Value) -> Result<Vec<u8>, &'static str> {
@@ -75,7 +77,7 @@ pub fn observe_with(
             request,
             cache,
             hooks,
-            |program, op, phases, diagnostic_values, hooks| {
+            |program, op, phases, diagnostic_values, hooks, cache| {
                 let complete = phases
                     .as_object()
                     .ok_or("missing diagnostic phases")
@@ -107,44 +109,12 @@ pub fn observe_with(
                 let errors = match &sorted {
                     Err(error) => executor::failure(error, "diagnostic_aggregation"),
                     Ok(None) => json!({"state":"not_requested"}),
+                    // The measured checker interval keeps the pre-emit schedule.
+                    Ok(Some(values)) if request["emit_schedule"] == true && !count_only => {
+                        post_emit_errors(request, cache, program, values)
+                    }
                     Ok(Some(values)) => {
-                        let diagnostics =
-                            executor::diagnostics::phase(program, values)["diagnostics"].take();
-                        let rendered = (|| -> Result<Value, Box<dyn std::error::Error>> {
-                            // Mapper execution is a named Program boundary. Do not
-                            // let oracle-selected files silently supply this filter.
-                            for file in program.files() {
-                                if !file
-                                    .bound()
-                                    .view()
-                                    .source_file()?
-                                    .content_mapper()
-                                    .is_empty()
-                                {
-                                    return Err("P5 native content-mapped error selection".into());
-                                }
-                            }
-                            let contents = input_files(request, "error_inputs")?;
-                            let inputs: Vec<_> = contents
-                                .iter()
-                                .map(|(name, content)| errors::InputFile { name, content })
-                                .collect();
-                            errors::render(
-                                program,
-                                &inputs,
-                                values,
-                                program.options().pretty.is_true(),
-                            )
-                        })();
-                        match rendered {
-                            Ok(baseline) => {
-                                json!({"state":"executed","diagnostics":diagnostics,"baseline":baseline,"emit":"not_executed",
-                                "pretty":program.options().pretty.is_true(),"inputs":request["error_inputs"]})
-                            }
-                            Err(error) => {
-                                json!({"state":"failed","class":"error_baseline","reason":error.to_string(),"diagnostics":diagnostics,"emit":"not_executed"})
-                            }
-                        }
+                        error_baseline(request, program, values, &json!("not_executed"), None)
                     }
                 };
                 let type_symbols = if request["type_baseline_requested"] == true {
@@ -193,6 +163,89 @@ pub fn observe_with(
                 .unwrap_or("non-string panic payload");
             json!({"version":1,"id":request["id"],"acceptance_tier":request["acceptance_tier"],"fatal":executor::failure(reason,"panic"),"queries":trace.queries,"active_query":trace.active})
         }
+    }
+}
+
+/// The error baseline rendered from `values`, the sorted diagnostics of `program`.
+fn error_baseline(
+    request: &Value,
+    program: &tsr_compiler::Program,
+    values: &[tsr_ast::Diagnostic],
+    emit: &Value,
+    pre: Option<Value>,
+) -> Value {
+    let diagnostics = executor::diagnostics::phase(program, values)["diagnostics"].take();
+    let rendered = (|| -> Result<Value, Box<dyn std::error::Error>> {
+        // Mapper execution is a named Program boundary. Do not
+        // let oracle-selected files silently supply this filter.
+        for file in program.files() {
+            if !file
+                .bound()
+                .view()
+                .source_file()?
+                .content_mapper()
+                .is_empty()
+            {
+                return Err("P5 native content-mapped error selection".into());
+            }
+        }
+        let contents = input_files(request, "error_inputs")?;
+        let inputs: Vec<_> = contents
+            .iter()
+            .map(|(name, content)| errors::InputFile { name, content })
+            .collect();
+        errors::render(program, &inputs, values, program.options().pretty.is_true())
+    })();
+    let mut result = match rendered {
+        Ok(baseline) => {
+            json!({"state":"executed","diagnostics":diagnostics,"baseline":baseline,"emit":emit,
+            "pretty":program.options().pretty.is_true(),"inputs":request["error_inputs"]})
+        }
+        Err(error) => {
+            json!({"state":"failed","class":"error_baseline","reason":error.to_string(),"diagnostics":diagnostics,"emit":emit})
+        }
+    };
+    if let Some(pre) = pre {
+        result["pre_diagnostics"] = pre;
+    }
+    result
+}
+
+/// The harness's error baseline: the diagnostics of a second program on which
+/// emit ran first, with the pre-emit set kept beside them.
+fn post_emit_errors(
+    request: &Value,
+    cache: &mut tsr_compiler::FileCache,
+    pre_program: &tsr_compiler::Program,
+    pre_values: &[tsr_ast::Diagnostic],
+) -> Value {
+    let pre = executor::diagnostics::phase(pre_program, pre_values)["diagnostics"].take();
+    match emit::run(request, cache, pre_program) {
+        Err(mut failure) => {
+            failure["emit"] = json!({"state":"failed"});
+            failure
+        }
+        Ok(emit::Post::Pre { schedule }) => {
+            error_baseline(request, pre_program, pre_values, &schedule, Some(pre))
+        }
+        Ok(emit::Post::Fresh {
+            program,
+            diagnostics,
+            schedule,
+            ..
+        }) if diagnostics.len() != pre_values.len() => {
+            let post = executor::diagnostics::phase(&program, &diagnostics)["diagnostics"].take();
+            json!({"state":"failed","class":"unsupported",
+                "reason":"harness pre/post-emit diagnostic count message",
+                "counts":[pre_values.len(), diagnostics.len()],"diagnostics":post,
+                "pre_diagnostics":pre,"emit":schedule})
+        }
+        Ok(emit::Post::Fresh {
+            program,
+            diagnostics,
+            schedule,
+            ..
+        }) => error_baseline(request, &program, &diagnostics, &schedule, Some(pre)),
     }
 }
 

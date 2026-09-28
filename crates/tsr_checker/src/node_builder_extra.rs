@@ -84,12 +84,14 @@ impl NodeBuilder<'_> {
             Some(self.type_list(arguments, false)?)
         };
         let flags = self.flags;
+        let depth = self.depth;
         self.flags |= nf::FORBID_INDEXED_ACCESS_SYMBOL_REFERENCES;
         let result = (|| {
             self.track_symbol(symbol, sf::TYPE)?;
             self.symbol_type_node_from_chain(symbol, sf::TYPE, arguments)
         })();
         self.flags = flags;
+        self.depth = depth;
         result
     }
 
@@ -355,7 +357,7 @@ impl NodeBuilder<'_> {
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParameterToDeclaration
-    pub(super) fn type_parameter_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
+    pub(crate) fn type_parameter_node(&mut self, ty: TypeId) -> Result<NodeId, Error> {
         let constraint = if let Some(constraint) = self.checker.constraint_of_type_parameter(ty)? {
             let annotation = self.checker.constraint_declaration(ty)?;
             Some(self.type_node_with_reusable_annotation(constraint, annotation)?)
@@ -372,6 +374,7 @@ impl NodeBuilder<'_> {
         constraint: Option<NodeId>,
     ) -> Result<NodeId, Error> {
         let flags = self.flags;
+        let depth = self.depth;
         self.flags &= !nf::WRITE_TYPE_PARAMETERS_IN_QUALIFIED_NAME;
         let result = (|| {
             let modifier_flags = self.checker.type_parameter_modifiers(ty)?;
@@ -399,50 +402,106 @@ impl NodeBuilder<'_> {
             ))
         })();
         self.flags = flags;
+        self.depth = depth;
         result
     }
 
-    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToParameterDeclaration
-    fn parameter_node(&mut self, symbol: SymbolId) -> Result<NodeId, Error> {
-        let value = self.checker.symbol(symbol)?;
-        let text = value.name_to_owned();
-        let mut source_name = None;
-        let mut rest = value.check_flags() & check_flags::REST_PARAMETER != 0;
-        let mut optional = value.check_flags() & check_flags::OPTIONAL_PARAMETER != 0;
-        let declaration = value.value_declaration();
-        if let Some(node) = value.value_declaration() {
-            let read = self.checker.node(node)?;
-            if let Some(name) = read.name() {
-                source_name = Some(name);
+    // port: tsc/internal/checker/nodebuilderimpl.go:getEffectiveParameterDeclaration
+    fn effective_parameter_declaration(&self, symbol: SymbolId) -> Result<Option<NodeId>, Error> {
+        let declarations: Vec<NodeId> = self
+            .checker
+            .symbol_declarations(symbol)?
+            .iter()
+            .flatten()
+            .collect();
+        let of_kind = |kind: K| -> Result<Option<NodeId>, Error> {
+            for &declaration in &declarations {
+                if self.checker.node(declaration)?.kind() == kind {
+                    return Ok(Some(declaration));
+                }
             }
-            if let Some(parameter) = read.data_source().as_parameter_declaration() {
-                rest |= parameter.dot_dot_dot_token().is_some();
-            }
-            optional |= self.checker.is_optional_source_parameter(node)?;
+            Ok(None)
+        };
+        if let Some(parameter) = of_kind(K::Parameter)? {
+            return Ok(Some(parameter));
         }
+        if self.checker.symbol(symbol)?.flags() & sf::TRANSIENT == 0 {
+            return of_kind(K::JSDocParameterTag);
+        }
+        Ok(None)
+    }
+
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.symbolToParameterDeclaration
+    pub(crate) fn parameter_node(&mut self, symbol: SymbolId) -> Result<NodeId, Error> {
+        self.parameter_declaration(symbol, false)
+    }
+
+    fn parameter_declaration(
+        &mut self,
+        symbol: SymbolId,
+        preserve_modifier_flags: bool,
+    ) -> Result<NodeId, Error> {
+        let declaration = self.effective_parameter_declaration(symbol)?;
         let ty = self.checker.get_type_of_symbol(symbol)?;
         let annotation =
             self.serialize_declaration_type(declaration, Some(ty), Some(symbol), true)?;
-        let name = match source_name {
-            Some(name) => self.clone_binding_name(name)?,
-            None => self.ast.new_identifier(text.clone()),
+        let mut modifiers = None;
+        if self.flags & nf::OMIT_PARAMETER_MODIFIERS == 0 && preserve_modifier_flags {
+            if let Some(declaration) = declaration {
+                let read = self.checker.node(declaration)?;
+                if tsr_ast::utilities::can_have_modifiers(&read) {
+                    let originals = self.checker.source_list(declaration, read.modifiers())?;
+                    let mut clones = Vec::new();
+                    for original in originals {
+                        let original_read = self.checker.node(original)?;
+                        if tsr_ast::utilities::is_modifier(&original_read) {
+                            clones.push(self.ast.new_modifier(original_read.kind()));
+                        }
+                    }
+                    if !clones.is_empty() {
+                        modifiers = Some(self.modifiers_list(clones)?);
+                    }
+                }
+            }
+        }
+        let (check_flags, text) = {
+            let value = self.checker.symbol(symbol)?;
+            (value.check_flags(), value.name_to_owned())
         };
+        // `isRestParameter` reads a parameter declaration's `...`.
+        let declared_rest = match declaration {
+            Some(declaration) => self
+                .checker
+                .node(declaration)?
+                .data_source()
+                .as_parameter_declaration()
+                .is_some_and(|parameter| parameter.dot_dot_dot_token().is_some()),
+            None => false,
+        };
+        let rest = declared_rest || check_flags & check_flags::REST_PARAMETER != 0;
         let rest = rest.then(|| self.ast.new_token(K::DotDotDotToken.into()));
+        let name = if let Some(declaration) = declaration {
+            self.parameter_declaration_name(Some(symbol), declaration)?
+        } else {
+            let identifier = self.ast.new_identifier(text.clone());
+            self.id_to_symbol.insert(identifier, Some(symbol));
+            identifier
+        };
+        let optional = match declaration {
+            Some(declaration) => self.checker.is_optional_source_parameter(declaration)?,
+            None => false,
+        } || check_flags & check_flags::OPTIONAL_PARAMETER != 0;
         let question = optional.then(|| self.ast.new_token(K::QuestionToken.into()));
-        self.approximate_length += text.len() + 3;
-        Ok(self.ast.new_parameter_declaration(
-            None,
+        let node = self.ast.new_parameter_declaration(
+            modifiers,
             rest,
             Some(name),
             question,
             Some(annotation),
             None,
-        ))
-    }
-
-    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.cloneBindingName
-    fn clone_binding_name(&mut self, source: NodeId) -> Result<NodeId, Error> {
-        self.clone_binding_name_native(source)
+        );
+        self.approximate_length += text.len() + 3;
+        Ok(node)
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.signatureToSignatureDeclarationHelper
@@ -469,25 +528,35 @@ impl NodeBuilder<'_> {
         let sig = self.checker.signatures.get(signature)?.clone();
         self.approximate_length += 3;
         let mut type_parameters = Vec::new();
-        for &ty in sig.type_parameters.as_deref().unwrap_or_default() {
-            type_parameters.push(self.type_parameter_node(ty)?);
-        }
-        let type_parameters = if type_parameters.is_empty() {
-            None
-        } else {
-            Some(self.list(type_parameters)?)
+        let target_parameters = match (sig.target, sig.mapper) {
+            (Some(target), Some(_)) if self.flags & nf::WRITE_TYPE_ARGUMENTS_OF_SIGNATURE != 0 => {
+                self.checker
+                    .signatures
+                    .get(target)?
+                    .type_parameters
+                    .clone()
+                    .filter(|list| !list.is_empty())
+            }
+            _ => None,
         };
+        if let Some(target_parameters) = target_parameters {
+            for &parameter in target_parameters.iter() {
+                let argument = self.checker.instantiate_type(parameter, sig.mapper)?;
+                type_parameters.push(self.type_node(argument)?);
+            }
+        } else {
+            for &ty in sig.type_parameters.as_deref().unwrap_or_default() {
+                type_parameters.push(self.type_parameter_node(ty)?);
+            }
+        }
         // Parameters do not inherit suppression of the enclosing signature's
         // top-level `any` return type.
         let flags = self.flags;
+        let depth = self.depth;
         self.flags &= !nf::SUPPRESS_ANY_RETURN_TYPE;
         let parameters = (|| {
-            let mut parameters = Vec::new();
-            if self.flags & nf::OMIT_THIS_PARAMETER == 0 {
-                if let Some(this) = sig.this_parameter {
-                    parameters.push(self.parameter_node(this)?);
-                }
-            }
+            // A variadic parameter in a non-trailing position keeps the
+            // unexpanded list.
             let mut non_trailing_rest = false;
             for &parameter in expanded {
                 if Some(&parameter) != expanded.last()
@@ -504,76 +573,154 @@ impl NodeBuilder<'_> {
             } else {
                 expanded
             };
+            let mut parameters = Vec::new();
             for &parameter in displayed {
-                parameters.push(self.parameter_node(parameter)?);
+                parameters.push(self.parameter_declaration(parameter, kind == K::Constructor)?);
             }
-            self.list(parameters)
+            // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.tryGetThisParameterDeclaration
+            if self.flags & nf::OMIT_THIS_PARAMETER == 0 {
+                if let Some(this) = sig.this_parameter {
+                    parameters.insert(0, self.parameter_declaration(this, false)?);
+                }
+            }
+            Ok::<_, Error>(parameters)
         })();
         self.flags = flags;
+        self.depth = depth;
         let parameters = parameters?;
-        let mut return_type = self.serialize_signature_return(signature, true)?;
-        if return_type.is_none() && matches!(kind, K::FunctionType | K::ConstructorType) {
-            let empty = self.ast.new_identifier(JsString::default());
-            return_type = Some(self.ast.new_type_reference_node(Some(empty), None));
-        }
+        let return_type = self.serialize_signature_return(signature, true)?;
         let modifiers = if kind == K::ConstructorType && sig.flags & sg::ABSTRACT != 0 {
             let abstract_modifier = self.ast.new_modifier(K::AbstractKeyword.into());
-            Some(self.list(vec![abstract_modifier])?)
+            Some(self.modifiers_list(vec![abstract_modifier])?)
         } else {
             None
         };
+        let parameters = Some(self.list(parameters)?);
+        let type_parameters = if type_parameters.is_empty() {
+            None
+        } else {
+            Some(self.list(type_parameters)?)
+        };
+        let name = match name {
+            Some(name) => name,
+            None => self.ast.new_identifier(JsString::default()),
+        };
+        let empty_type = |b: &mut Self| {
+            let empty = b.ast.new_identifier(JsString::default());
+            b.ast.new_type_reference_node(Some(empty), None)
+        };
         Ok(match kind {
-            K::FunctionType => {
+            K::CallSignature => {
                 self.ast
-                    .new_function_type_node(type_parameters, Some(parameters), return_type)
+                    .new_call_signature_declaration(type_parameters, parameters, return_type)
             }
-            K::ConstructorType => self.ast.new_constructor_type_node(
-                modifiers,
-                type_parameters,
-                Some(parameters),
-                return_type,
-            ),
-            K::CallSignature => self.ast.new_call_signature_declaration(
-                type_parameters,
-                Some(parameters),
-                return_type,
-            ),
             K::ConstructSignature => self.ast.new_construct_signature_declaration(
                 type_parameters,
-                Some(parameters),
+                parameters,
                 return_type,
             ),
+            K::MethodSignature => self.ast.new_method_signature_declaration(
+                modifiers,
+                Some(name),
+                question,
+                type_parameters,
+                parameters,
+                return_type,
+            ),
+            K::MethodDeclaration => self.ast.new_method_declaration(
+                modifiers,
+                None,
+                Some(name),
+                None,
+                type_parameters,
+                parameters,
+                return_type,
+                None,
+                None,
+            ),
+            K::Constructor => self
+                .ast
+                .new_constructor_declaration(modifiers, None, parameters, None, None, None),
             K::GetAccessor => self.ast.new_get_accessor_declaration(
+                modifiers,
+                Some(name),
                 None,
-                name,
-                None,
-                Some(parameters),
+                parameters,
                 return_type,
                 None,
                 None,
             ),
             K::SetAccessor => self.ast.new_set_accessor_declaration(
+                modifiers,
+                Some(name),
                 None,
-                name,
-                None,
-                Some(parameters),
+                parameters,
                 None,
                 None,
                 None,
             ),
-            K::MethodSignature => self.ast.new_method_signature_declaration(
-                None,
-                name,
-                question,
-                type_parameters,
-                Some(parameters),
-                return_type,
-            ),
-            _ => {
-                return Err(Error::Unsupported(
-                    "signatureToSignatureDeclarationHelper: syntax kind",
-                ))
+            K::IndexSignature => {
+                self.ast
+                    .new_index_signature_declaration(modifiers, parameters, return_type)
             }
+            K::FunctionType => {
+                let return_type = match return_type {
+                    Some(return_type) => return_type,
+                    None => empty_type(self),
+                };
+                self.ast
+                    .new_function_type_node(type_parameters, parameters, Some(return_type))
+            }
+            K::ConstructorType => {
+                let return_type = match return_type {
+                    Some(return_type) => return_type,
+                    None => empty_type(self),
+                };
+                self.ast.new_constructor_type_node(
+                    modifiers,
+                    type_parameters,
+                    parameters,
+                    Some(return_type),
+                )
+            }
+            K::FunctionDeclaration => self.ast.new_function_declaration(
+                modifiers,
+                None,
+                Some(name),
+                type_parameters,
+                parameters,
+                return_type,
+                None,
+                None,
+            ),
+            K::FunctionExpression => {
+                let statements = self.list(Vec::new())?;
+                let body = self.ast.new_block(Some(statements), false);
+                self.ast.new_function_expression(
+                    modifiers,
+                    None,
+                    Some(name),
+                    type_parameters,
+                    parameters,
+                    return_type,
+                    None,
+                    Some(body),
+                )
+            }
+            K::ArrowFunction => {
+                let statements = self.list(Vec::new())?;
+                let body = self.ast.new_block(Some(statements), false);
+                self.ast.new_arrow_function(
+                    modifiers,
+                    type_parameters,
+                    parameters,
+                    return_type,
+                    None,
+                    None,
+                    Some(body),
+                )
+            }
+            _ => panic!("Unhandled kind in signatureToSignatureDeclarationHelper"),
         })
     }
 
@@ -657,7 +804,7 @@ impl NodeBuilder<'_> {
                         self.reuse_track_computed_name(expression)?;
                         let modifiers = if info.is_readonly {
                             let token = self.ast.new_modifier(K::ReadonlyKeyword.into());
-                            Some(self.list(vec![token])?)
+                            Some(self.modifiers_list(vec![token])?)
                         } else {
                             None
                         };
@@ -694,10 +841,11 @@ impl NodeBuilder<'_> {
         Ok(vec![self.index_signature_node_with_type(index, value_node)?])
     }
 
-    pub(super) fn index_signature_node(&mut self, index: IndexInfoId) -> Result<NodeId, Error> {
+    pub(crate) fn index_signature_node(&mut self, index: IndexInfoId) -> Result<NodeId, Error> {
         self.index_signature_node_with_type(index, None)
     }
 
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.indexInfoToIndexSignatureDeclarationHelper
     pub(super) fn index_signature_node_with_type(
         &mut self,
         index: IndexInfoId,
@@ -732,7 +880,7 @@ impl NodeBuilder<'_> {
         let modifiers = if info.is_readonly {
             self.approximate_length += 9;
             let token = self.ast.new_modifier(K::ReadonlyKeyword.into());
-            Some(self.list(vec![token])?)
+            Some(self.modifiers_list(vec![token])?)
         } else {
             None
         };
@@ -742,6 +890,7 @@ impl NodeBuilder<'_> {
     }
 
     // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typePredicateToTypePredicateNodeHelper
+    // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typePredicateToTypePredicateNode
     pub(crate) fn predicate_node(
         &mut self,
         predicate: crate::TypePredicateId,
@@ -871,7 +1020,9 @@ impl NodeBuilder<'_> {
                                     self.checker.instantiate_signature(signature, mapper)?;
                             }
                             let name = self.property_name_node(symbol)?;
-                            nodes.push(self.signature_node(signature, kind, Some(name), None)?);
+                            let node = self.signature_node(signature, kind, Some(name), None)?;
+                            self.copy_comment_range(node, Some(declaration))?;
+                            nodes.push(node);
                         }
                     }
                     return Ok(nodes);
@@ -919,6 +1070,7 @@ impl NodeBuilder<'_> {
                     )?;
                     let name = self.property_name_node(symbol)?;
                     let getter = self.signature_node(getter, K::GetAccessor, Some(name), None)?;
+                    self.copy_comment_range(getter, property)?;
                     let name = self.property_name_node(symbol)?;
                     let setter = self.signature_node(setter, K::SetAccessor, Some(name), None)?;
                     return Ok(vec![getter, setter]);
@@ -945,12 +1097,14 @@ impl NodeBuilder<'_> {
                 let name = self.property_name_node(symbol)?;
                 let question = (flags & sf::OPTIONAL != 0)
                     .then(|| self.ast.new_token(K::QuestionToken.into()));
-                nodes.push(self.signature_node(
-                    signature,
-                    K::MethodSignature,
-                    Some(name),
-                    question,
-                )?);
+                let method =
+                    self.signature_node(signature, K::MethodSignature, Some(name), question)?;
+                let declaration = match self.checker.signatures.get(signature)?.declaration {
+                    Some(declaration) => Some(declaration),
+                    None => self.checker.symbol(symbol)?.value_declaration(),
+                };
+                self.copy_comment_range(method, declaration)?;
+                nodes.push(method);
             }
             if !nodes.is_empty() || flags & sf::OPTIONAL == 0 {
                 return Ok(nodes);
