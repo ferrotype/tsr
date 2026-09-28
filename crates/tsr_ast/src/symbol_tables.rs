@@ -17,7 +17,11 @@ use tsr_arena::{ArenaId, AuxId, Counters, Error, OwnedArena, SymbolId};
 use tsr_jsstring::JsString;
 
 /// Owned construction input. Stored tables expose borrowed byte keys instead.
-pub type SymbolTable = HashMap<JsString, Option<SymbolId>>;
+/// A stored table's order follows the order its entries were inserted in, so
+/// the input hashes with the fixed `FastState`: a std `RandomState` would seed
+/// each map differently and give the same table a different order in every
+/// checker and process.
+pub type SymbolTable = HashMap<JsString, Option<SymbolId>, FastState>;
 /// The hash every store's name pool gives `bytes`: the hasher carries no
 /// per-pool state, so a caller can hash a name once for a lookup in one table
 /// and an insert into another.

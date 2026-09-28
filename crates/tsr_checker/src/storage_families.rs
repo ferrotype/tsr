@@ -471,7 +471,10 @@ impl Started<'_> {
                 }
                 Action::Anonymous(symbol, members) => {
                     let symbol = symbol.map(|index| symbol_root(&roots, index)).transpose()?;
-                    let mut table = tsr_ast::SymbolTable::with_capacity(members.len());
+                    let mut table = tsr_ast::SymbolTable::with_capacity_and_hasher(
+                        members.len(),
+                        tsr_arena::hash::FastState::default(),
+                    );
                     for member in members {
                         let t = type_root(&roots, member.r#type)?;
                         let flags = symbol_flags::PROPERTY

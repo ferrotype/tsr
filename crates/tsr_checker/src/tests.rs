@@ -839,3 +839,64 @@ fn the_first_queries_of_a_fresh_checker_reuse_new_checker_types() {
         "subtype reduction reuses the intrinsic union"
     );
 }
+
+/// A table the checker builds from a construction map has one order in every
+/// checker: the order does not depend on the map's hasher, which a std
+/// `RandomState` would seed differently per map and per process. A tuple
+/// target of 24 elements and an anonymous type of 24 members each give the
+/// same member order in nine fresh checkers.
+#[test]
+fn checker_built_tables_have_one_order_in_every_checker() {
+    let orders = || {
+        let (_counters, _generation, _identity, owner) = owner();
+        let mut operation = owner.operation().unwrap();
+        let infos = vec![
+            crate::TupleElementInfo {
+                flags: crate::element_flags::REQUIRED,
+                labeled_declaration: None,
+            };
+            24
+        ];
+        let state = operation.state_mut();
+        let target = state.create_tuple_target_type(&infos, false).unwrap();
+        let members = state
+            .types
+            .tuple(target)
+            .unwrap()
+            .interface
+            .declared_members
+            .unwrap();
+        let names = |state: &crate::CheckerState, table| -> Vec<Vec<u8>> {
+            state
+                .table(table)
+                .unwrap()
+                .iter()
+                .map(|(name, _)| name.to_vec())
+                .collect()
+        };
+        let tuple = names(state, members);
+        let number = operation.builtin_type("numberType").unwrap();
+        let specs: Vec<(String, crate::TypeRef)> =
+            (0..24).map(|i| (format!("m{i}"), number)).collect();
+        let specs: Vec<crate::handles::MemberSpec<'_>> = specs
+            .iter()
+            .map(|(name, ty)| crate::handles::MemberSpec {
+                name: name.as_bytes(),
+                r#type: *ty,
+                optional: false,
+                readonly: false,
+            })
+            .collect();
+        let anonymous = operation.anonymous_type(None, &specs).unwrap();
+        let anonymous = operation.check_type(anonymous).unwrap();
+        let state = operation.state_mut();
+        let table = state.types.structured(anonymous).unwrap().members.unwrap();
+        (tuple, names(state, table))
+    };
+    let first = orders();
+    assert_eq!(first.0.len(), 25, "24 elements and length");
+    assert_eq!(first.1.len(), 24);
+    for _ in 0..8 {
+        assert_eq!(orders(), first);
+    }
+}

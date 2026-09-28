@@ -136,7 +136,7 @@ mod tests {
             K::Block,
             None,
             None,
-            [(name.clone(), Some(outer))].into(),
+            tsr_ast::SymbolTable::from_iter([(name.clone(), Some(outer))]),
             Some("typeParams"),
         )?;
         let child = state.create_emit_scope(
@@ -144,7 +144,7 @@ mod tests {
             K::Block,
             None,
             None,
-            [(name.clone(), Some(inner))].into(),
+            tsr_ast::SymbolTable::from_iter([(name.clone(), Some(inner))]),
             Some("params"),
         )?;
         assert_eq!(state.node(child)?.parent(), Some(scope));
@@ -172,7 +172,7 @@ mod tests {
                 K::Block,
                 None,
                 None,
-                [(name, Some(foreign_symbol))].into(),
+                tsr_ast::SymbolTable::from_iter([(name, Some(foreign_symbol))]),
                 Some("params")
             )
             .is_err());
