@@ -150,6 +150,18 @@ impl CheckerState {
                 probe.depth_limit_hits += usize::from(self.instantiation.depth == 100);
                 probe.count_limit_hits += usize::from(self.instantiation.count >= 5_000_000);
             }
+            let (depth, count) = (self.instantiation.depth, self.instantiation.count);
+            self.trace_instant(
+                crate::trace::TracePhase::CheckTypes,
+                "instantiateType_DepthLimit",
+                || {
+                    crate::trace::args([
+                        ("typeId", crate::trace::int(ty.get())),
+                        ("instantiationDepth", crate::trace::int(depth)),
+                        ("instantiationCount", crate::trace::int(count)),
+                    ])
+                },
+            );
             self.error_at(
                 self.current_node,
                 tsr_diagnostics::Type_instantiation_is_excessively_deep_and_possibly_infinite,

@@ -77,7 +77,7 @@
    "disposition": "equivalent",
    "reason": "The pin's static-block check runs the grammar check and visits the block's statements; the Rust source-element arm does the same at this site.",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check.rs:157"
+   "rust": "crates/tsr_checker/src/check.rs:173"
   },
   "tsc/internal/checker/checker.go:Checker.checkCollisionWithGlobalObjectInGeneratedCode": {
    "disposition": "equivalent",
@@ -107,7 +107,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkExpressionStatement).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check.rs:310"
+   "rust": "crates/tsr_checker/src/check.rs:329"
   },
   "tsc/internal/checker/checker.go:Checker.checkJSDocComment": {
    "disposition": "equivalent",
@@ -149,7 +149,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkParenthesizedExpression).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/query.rs:923"
+   "rust": "crates/tsr_checker/src/query.rs:924"
   },
   "tsc/internal/checker/checker.go:Checker.checkPropertyAccessChain": {
    "disposition": "equivalent",
@@ -161,37 +161,35 @@
    "disposition": "equivalent",
    "reason": "The pin's statement loop with its cancellation poll; the Rust checker iterates the source elements at this site (C6.5 adds the poll).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check.rs:104"
+   "rust": "crates/tsr_checker/src/check.rs:120"
   },
   "tsc/internal/checker/checker.go:Checker.checkThisType": {
-   "disposition": "equivalent",
-   "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (checkThisType).",
-   "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check.rs:291"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C6.2 (check.rs): checking a this type resolves it, as the pin's checkThisType does, while keyword and literal type nodes create no type."
   },
   "tsc/internal/checker/checker.go:Checker.checkTypeOperator": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkTypeOperator).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check.rs:281"
+   "rust": "crates/tsr_checker/src/check.rs:297"
   },
   "tsc/internal/checker/checker.go:Checker.checkTypeQuery": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkTypeQuery).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check.rs:189"
+   "rust": "crates/tsr_checker/src/check.rs:205"
   },
   "tsc/internal/checker/checker.go:Checker.checkVariableStatement": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkVariableStatement).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check.rs:193"
+   "rust": "crates/tsr_checker/src/check.rs:209"
   },
   "tsc/internal/checker/checker.go:Checker.checkVoidExpression": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkVoidExpression).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/query.rs:971"
+   "rust": "crates/tsr_checker/src/query.rs:972"
   },
   "tsc/internal/checker/checker.go:Checker.combineUnionOrIntersectionThisParam": {
    "disposition": "equivalent",
@@ -528,7 +526,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (isUnwrappedReturnTypeUndefinedVoidOrAny).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check_bodies.rs:993"
+   "rust": "crates/tsr_checker/src/check_bodies.rs:996"
   },
   "tsc/internal/checker/checker.go:Checker.lookupOrIssueError": {
    "disposition": "equivalent",
@@ -766,13 +764,13 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (isThisless).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/instantiate.rs:365"
+   "rust": "crates/tsr_checker/src/instantiate.rs:377"
   },
   "tsc/internal/checker/checker.go:isThislessFunctionLikeDeclaration": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (isThislessFunctionLikeDeclaration).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/instantiate.rs:365"
+   "rust": "crates/tsr_checker/src/instantiate.rs:377"
   },
   "tsc/internal/checker/checker.go:shouldMarkIdentifierAliasReferenced": {
    "disposition": "mapped",
@@ -1124,19 +1122,19 @@
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isAdditiveOperatorOrHigher": {
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isAssignmentOperatorOrHigher": {
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isBinaryOperator": {
    "disposition": "equivalent",
@@ -1148,13 +1146,13 @@
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isBitwiseOperatorOrHigher": {
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isCallChain": {
    "disposition": "equivalent",
@@ -1166,13 +1164,13 @@
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isConstTypeReference": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isConstTypeReference).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check_generics.rs:243"
+   "rust": "crates/tsr_checker/src/check_generics.rs:262"
   },
   "tsc/internal/checker/utilities.go:isConstTypeReferenceName": {
    "disposition": "equivalent",
@@ -1202,13 +1200,13 @@
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isEqualityOperatorOrHigher": {
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isExclamationToken": {
    "disposition": "equivalent",
@@ -1220,7 +1218,7 @@
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isExportAssignmentExpressionName": {
    "disposition": "equivalent",
@@ -1260,25 +1258,25 @@
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isMultiplicativeOperator": {
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isMultiplicativeOperatorOrHigher": {
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isNodeDescendantOf": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (isNodeDescendantOf).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/instantiate.rs:724"
+   "rust": "crates/tsr_checker/src/instantiate.rs:736"
   },
   "tsc/internal/checker/utilities.go:isNonNullAccess": {
    "disposition": "equivalent",
@@ -1308,13 +1306,13 @@
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isRelationalOperatorOrHigher": {
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isRightSideOfAccessExpression": {
    "disposition": "mapped",
@@ -1324,13 +1322,13 @@
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isShiftOperatorOrHigher": {
    "disposition": "equivalent",
    "reason": "The pin classifies binary operators through a chain of *OrHigher predicates whose only consumer is the compound-like assignment test; Rust answers that test from one operator classification at this site (the in-compound-like caller is ported at flow.rs).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/flow.rs:510"
+   "rust": "crates/tsr_checker/src/flow.rs:516"
   },
   "tsc/internal/checker/utilities.go:isShorthandAmbientModule": {
    "disposition": "equivalent",

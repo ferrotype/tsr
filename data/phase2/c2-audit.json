@@ -32,7 +32,7 @@
     "tsc/internal/checker/checker.go:Checker.checkConditionalType": {
       "disposition": "equivalent",
       "reason": "The ConditionalType source-element arm visits every source child with check_source_element, matching ForEachChild(checkSourceElement).",
-      "rust": "crates/tsr_checker/src/check.rs:265"
+      "rust": "crates/tsr_checker/src/check.rs:281"
     },
     "tsc/internal/checker/checker.go:Checker.checkIndexConstraintForIndexSignature": {
       "disposition": "equivalent",
@@ -372,7 +372,7 @@
       "disposition": "equivalent",
       "reason": "Instantiates members in source order and retains the existing immutable list when every TypeId is unchanged; changed lists contain all mapped entries. Rust builds a temporary vector before checking equality, an allocation choice without changed checker state.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/instantiate.rs:212"
+      "rust": "crates/tsr_checker/src/instantiate.rs:224"
     },
     "tsc/internal/checker/checker.go:Checker.isGenericFunctionReturningFunction": {
       "disposition": "equivalent",
@@ -388,7 +388,7 @@
     "tsc/internal/checker/checker.go:Checker.isGenericType": {
       "disposition": "equivalent",
       "reason": "is_generic_type tests the union of the generic-object and generic-index flag bits; get_generic_object_flags returns only those bits, so this is equivalent to native nonzero testing.",
-      "rust": "crates/tsr_checker/src/template.rs:243"
+      "rust": "crates/tsr_checker/src/template.rs:248"
     },
     "tsc/internal/checker/checker.go:Checker.isGenericTypeWithUndefinedConstraint": {
       "disposition": "equivalent",
@@ -520,13 +520,13 @@
       "disposition": "equivalent",
       "reason": "The alias caller uses object_instantiation_key with single_signature=false, retaining the raw explicit argument list separately from arguments filled for evaluation.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/instantiate.rs:704"
+      "rust": "crates/tsr_checker/src/instantiate.rs:716"
     },
     "tsc/internal/checker/checker.go:getTypeInstantiationKey": {
       "disposition": "equivalent",
       "reason": "Key writes argument list and alias, then the single-signature discriminator, preserving the native partition of object instantiations.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/instantiate.rs:704"
+      "rust": "crates/tsr_checker/src/instantiate.rs:716"
     },
     "tsc/internal/checker/checker.go:getUniqueTypeParameterName": {
       "disposition": "equivalent",
@@ -546,7 +546,7 @@
     "tsc/internal/checker/checker.go:isGenericTupleType": {
       "disposition": "equivalent",
       "reason": "is_generic_tuple_type requires a tuple reference and the target tuple combined flags to contain VARIADIC. The existing method-shaped marker is an identity-label difference; this is the pinned package-level predicate.",
-      "rust": "crates/tsr_checker/src/template.rs:289"
+      "rust": "crates/tsr_checker/src/template.rs:294"
     },
     "tsc/internal/checker/checker.go:isInternalModuleImportEqualsDeclaration": {
       "disposition": "mapped",
@@ -570,19 +570,19 @@
     "tsc/internal/checker/checker.go:isThislessTypeParameter": {
       "disposition": "equivalent",
       "reason": "The method-signature thisless check walks declared type parameters and rejects only a present constraint whose type syntax is not thisless; an absent constraint succeeds, matching the native declaration predicate.",
-      "rust": "crates/tsr_checker/src/instantiate.rs:446"
+      "rust": "crates/tsr_checker/src/instantiate.rs:458"
     },
     "tsc/internal/checker/checker.go:isTypeReferenceWithGenericArguments": {
       "disposition": "equivalent",
       "reason": "Rejects non-reference and deferred-node references; recursively recognizes a parameter or generic reference among resolved type arguments, matching the native relation-key predicate.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/relater.rs:527"
+      "rust": "crates/tsr_checker/src/relater.rs:543"
     },
     "tsc/internal/checker/checker.go:keyBuilder.writeGenericTypeReferences": {
       "disposition": "equivalent",
       "reason": "Shared source/target parameter ordinal table, constraint-sensitive parameter identity, recursive generic reference keys through depth four, and ordered delimiters match native. Each recursive result propagates the constrained flag.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/relater.rs:543"
+      "rust": "crates/tsr_checker/src/relater.rs:559"
     },
     "tsc/internal/checker/inference.go:Checker.findLeftmostType": {
       "disposition": "equivalent",
@@ -790,7 +790,7 @@
     "tsc/internal/checker/mapper.go:Checker.mapTypeWithCompositeMapper": {
       "disposition": "equivalent",
       "reason": "The object-instantiation loop applies the optional first mapper, invokes the second directly when unchanged (including absent first), and otherwise instantiates the changed first result with the second mapper.",
-      "rust": "crates/tsr_checker/src/instantiate.rs:606"
+      "rust": "crates/tsr_checker/src/instantiate.rs:618"
     },
     "tsc/internal/checker/mapper.go:Checker.newBackreferenceMapper": {
       "disposition": "equivalent",

@@ -190,6 +190,12 @@ impl CheckerState {
                     // After 100000 subtype checks we estimate the remaining amount of work by assuming the
                     // same ratio of checks per element. If the estimated number of remaining type checks is
                     // greater than 1M we deem the union type too complex to represent.
+                    let estimated = (count / (original_length - index)) * original_length;
+                    self.trace_instant(
+                        crate::trace::TracePhase::CheckTypes,
+                        "removeSubtypes_DepthLimit",
+                        || crate::trace::args([("estimatedCount", crate::trace::int(estimated))]),
+                    );
                     self.error_at(
                         self.current_node,
                         tsr_diagnostics::Expression_produces_a_union_type_that_is_too_complex_to_represent,

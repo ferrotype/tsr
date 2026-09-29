@@ -837,6 +837,8 @@ impl CheckerState {
                 .and_then(|queue| queue.nodes.get(index))
                 .copied();
             let Some(node) = node else { break };
+            // checkDeferredNode's sampled event.
+            let trace = self.trace_node_span("checkDeferredNode", node)?;
             let saved = self.current_node.replace(node);
             self.instantiation.count = 0;
             let kind = self.node(node)?.kind();
@@ -879,6 +881,7 @@ impl CheckerState {
                 self.check_function_expression_body(node)
             };
             self.current_node = saved;
+            drop(trace);
             result?;
             index += 1;
         }

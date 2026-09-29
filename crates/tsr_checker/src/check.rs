@@ -34,6 +34,8 @@ impl CheckerState {
         source: NodeId,
         check_unused: bool,
     ) -> Result<(), Error> {
+        // The pin's span covers the rest of checkSourceFile, unused checks included.
+        let mut _trace = None;
         match self.source_checks.get(&source).cloned() {
             Some(SourceCheckStatus::Complete) => {}
             Some(SourceCheckStatus::Failed(error)) => return Err(error),
@@ -41,6 +43,20 @@ impl CheckerState {
                 return Err(Error::Unsupported("recursive checkSourceFile"))
             }
             None => {
+                _trace = self.trace_span(
+                    crate::trace::TracePhase::Check,
+                    "checkSourceFile",
+                    |state| {
+                        let name = state.ast(source)?.source_file(source)?.file_name().to_vec();
+                        Ok(crate::trace::args([(
+                            "path",
+                            crate::trace::TraceValue::Str(
+                                String::from_utf8_lossy(&name).into_owned(),
+                            ),
+                        )]))
+                    },
+                    true,
+                )?;
                 self.source_checks
                     .insert(source, SourceCheckStatus::Checking);
                 let result = self.check_source_file_worker(source);
@@ -287,9 +303,15 @@ impl CheckerState {
                 | K::ConstructSignature
                 | K::IndexSignature,
             ) => self.check_signature_syntax(node),
+            // port: tsc/internal/checker/checker.go:Checker.checkThisType
+            Some(K::ThisType) => {
+                self.get_type_from_type_node(node)?;
+                Ok(())
+            }
+            // checkSourceElementWorker has no case for keyword and literal
+            // type nodes: checking one creates no type.
             Some(
-                K::ThisType
-                | K::LiteralType
+                K::LiteralType
                 | K::AnyKeyword
                 | K::UnknownKeyword
                 | K::StringKeyword
@@ -303,10 +325,7 @@ impl CheckerState {
                 | K::NeverKeyword
                 | K::ObjectKeyword
                 | K::IntrinsicKeyword,
-            ) => {
-                self.get_type_from_type_node(node)?;
-                Ok(())
-            }
+            ) => Ok(()),
             Some(K::ExpressionStatement) => {
                 let expression = required(read.expression(), "expression statement")?;
                 self.check_statement_ambient_context(node)?;
@@ -470,6 +489,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkVariableDeclaration
     fn check_variable_declaration(&mut self, node: NodeId) -> Result<(), Error> {
+        let _trace = self.trace_node_span("checkVariableDeclaration", node)?;
         self.check_grammar_variable(node)?;
         self.check_variable_like(node)
     }

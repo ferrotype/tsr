@@ -510,6 +510,8 @@ pub struct TypeCaches {
 pub struct TypeStore {
     #[cfg(feature = "creation-trace")]
     pub(crate) trace_owner: tsr_ast::creation_trace::TypeOwner,
+    /// The checker's tracer, which records every type `newType` creates.
+    pub(crate) tracer: Option<crate::trace::Tracer>,
     /// Ids start above this; only tests move it, to reach exhaustion.
     base: u32,
     records: Vec<TypeRecord>,
@@ -657,6 +659,9 @@ impl TypeStore {
                 payload,
             },
         );
+        if let Some(tracer) = &self.tracer {
+            tracer.record_type(id);
+        }
         #[cfg(feature = "creation-trace")]
         tsr_ast::creation_trace::type_birth(
             &self.trace_owner,

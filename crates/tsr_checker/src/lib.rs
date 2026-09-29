@@ -249,6 +249,7 @@ mod widening;
 pub use relater::RelationKind;
 #[cfg(feature = "services-replay")]
 pub use replay_view::{LiteralView, SignatureView, TypeView, TypeViewData};
+mod trace;
 mod type_display;
 mod type_parameters;
 mod types;
@@ -294,6 +295,10 @@ pub(crate) use signatures::{IndexInfo, Signature};
 pub(crate) use signatures::{SignatureStore, TypePredicate};
 pub use state::CheckerOptions;
 pub(crate) use state::CheckerState;
+pub use trace::{
+    write_type_records, JsonLinesTraceSink, MemoryTraceSink, TraceArgs, TraceEvent, TraceLocation,
+    TracePhase, TraceSink, TraceTypeRecord, TraceValue, Tracer,
+};
 #[cfg(test)]
 use type_display::{alias_symbol, alias_type_arguments};
 pub use type_display::{

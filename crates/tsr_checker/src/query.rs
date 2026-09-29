@@ -870,6 +870,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkExpressionEx
     pub(crate) fn check_expression_ex(&mut self, node: NodeId, mode: u32) -> Result<TypeId, Error> {
+        let _trace = self.trace_node_span("checkExpression", node)?;
         let previous_mode = std::mem::replace(&mut self.expression_mode, mode);
         let previous = self.current_node.replace(node);
         self.instantiation.count = 0;

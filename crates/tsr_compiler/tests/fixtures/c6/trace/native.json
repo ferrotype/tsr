@@ -1,0 +1,2110 @@
+{
+ "command": [
+  "tsgo",
+  "--noEmit",
+  "--ignoreConfig",
+  "--singleThreaded",
+  "--noLib",
+  "--generateTrace",
+  "out",
+  "lib.d.ts",
+  "a.ts"
+ ],
+ "events": [
+  {
+   "args": {
+    "checkerId": 0,
+    "path": "/lib.d.ts"
+   },
+   "cat": "check",
+   "name": "checkSourceFile",
+   "ph": "B"
+  },
+  {
+   "args": {
+    "checkerId": 0,
+    "path": "/lib.d.ts"
+   },
+   "cat": "check",
+   "name": "checkSourceFile",
+   "ph": "E"
+  },
+  {
+   "args": {
+    "checkerId": 0,
+    "path": "/a.ts"
+   },
+   "cat": "check",
+   "name": "checkSourceFile",
+   "ph": "B"
+  },
+  {
+   "args": {
+    "arity": 1,
+    "checkerId": 0,
+    "id": 96
+   },
+   "cat": "checkTypes",
+   "name": "getVariancesWorker",
+   "ph": "B"
+  },
+  {
+   "args": {
+    "arity": 1,
+    "checkerId": 0,
+    "id": 96,
+    "variances": [
+     "out"
+    ]
+   },
+   "cat": "checkTypes",
+   "name": "getVariancesWorker",
+   "ph": "E"
+  },
+  {
+   "args": {
+    "arity": 1,
+    "checkerId": 0,
+    "id": 83
+   },
+   "cat": "checkTypes",
+   "name": "getVariancesWorker",
+   "ph": "B"
+  },
+  {
+   "args": {
+    "arity": 1,
+    "checkerId": 0,
+    "id": 83,
+    "variances": [
+     "out"
+    ]
+   },
+   "cat": "checkTypes",
+   "name": "getVariancesWorker",
+   "ph": "E"
+  },
+  {
+   "args": {
+    "checkerId": 0,
+    "path": "/a.ts"
+   },
+   "cat": "check",
+   "name": "checkSourceFile",
+   "ph": "E"
+  }
+ ],
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "sources": {
+  "a.ts": "6eba711374bffcd939a7e4a06feb9611f1eaba582a66778d3c8e975ed21ef45b",
+  "lib.d.ts": "30ab1de85e0bb31bbe955674436769b65e1d09aeae655ccef9556ed400227a23"
+ },
+ "tsgo_sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501",
+ "types": [
+  {
+   "flags": [
+    "Any"
+   ],
+   "id": 1,
+   "intrinsicName": "any",
+   "recursionId": 0
+  },
+  {
+   "flags": [
+    "Any"
+   ],
+   "id": 2,
+   "intrinsicName": "any",
+   "recursionId": 1
+  },
+  {
+   "flags": [
+    "Any"
+   ],
+   "id": 3,
+   "intrinsicName": "any",
+   "recursionId": 2
+  },
+  {
+   "flags": [
+    "Any"
+   ],
+   "id": 4,
+   "intrinsicName": "any",
+   "recursionId": 3
+  },
+  {
+   "flags": [
+    "Any"
+   ],
+   "id": 5,
+   "intrinsicName": "error",
+   "recursionId": 4
+  },
+  {
+   "flags": [
+    "Any"
+   ],
+   "id": 6,
+   "intrinsicName": "unresolved",
+   "recursionId": 5
+  },
+  {
+   "flags": [
+    "Any"
+   ],
+   "id": 7,
+   "intrinsicName": "any",
+   "recursionId": 6
+  },
+  {
+   "flags": [
+    "Any"
+   ],
+   "id": 8,
+   "intrinsicName": "intrinsic",
+   "recursionId": 7
+  },
+  {
+   "flags": [
+    "Unknown"
+   ],
+   "id": 9,
+   "intrinsicName": "unknown",
+   "recursionId": 8
+  },
+  {
+   "flags": [
+    "Undefined"
+   ],
+   "id": 10,
+   "intrinsicName": "undefined",
+   "recursionId": 9
+  },
+  {
+   "flags": [
+    "Undefined"
+   ],
+   "id": 11,
+   "intrinsicName": "undefined",
+   "recursionId": 10
+  },
+  {
+   "flags": [
+    "Undefined"
+   ],
+   "id": 12,
+   "intrinsicName": "undefined",
+   "recursionId": 11
+  },
+  {
+   "flags": [
+    "Null"
+   ],
+   "id": 13,
+   "intrinsicName": "null",
+   "recursionId": 12
+  },
+  {
+   "flags": [
+    "String"
+   ],
+   "id": 14,
+   "intrinsicName": "string",
+   "recursionId": 13
+  },
+  {
+   "flags": [
+    "Number"
+   ],
+   "id": 15,
+   "intrinsicName": "number",
+   "recursionId": 14
+  },
+  {
+   "flags": [
+    "BigInt"
+   ],
+   "id": 16,
+   "intrinsicName": "bigint",
+   "recursionId": 15
+  },
+  {
+   "display": "false",
+   "flags": [
+    "BooleanLiteral"
+   ],
+   "id": 17,
+   "recursionId": 16
+  },
+  {
+   "display": "false",
+   "flags": [
+    "BooleanLiteral"
+   ],
+   "id": 18,
+   "recursionId": 17
+  },
+  {
+   "display": "true",
+   "flags": [
+    "BooleanLiteral"
+   ],
+   "id": 19,
+   "recursionId": 18
+  },
+  {
+   "display": "true",
+   "flags": [
+    "BooleanLiteral"
+   ],
+   "id": 20,
+   "recursionId": 19
+  },
+  {
+   "display": "boolean",
+   "flags": [
+    "Boolean",
+    "Union"
+   ],
+   "id": 21,
+   "recursionId": 20,
+   "unionTypes": [
+    17,
+    19
+   ]
+  },
+  {
+   "flags": [
+    "ESSymbol"
+   ],
+   "id": 22,
+   "intrinsicName": "symbol",
+   "recursionId": 21
+  },
+  {
+   "flags": [
+    "Void"
+   ],
+   "id": 23,
+   "intrinsicName": "void",
+   "recursionId": 22
+  },
+  {
+   "flags": [
+    "Never"
+   ],
+   "id": 24,
+   "intrinsicName": "never",
+   "recursionId": 23
+  },
+  {
+   "flags": [
+    "Never"
+   ],
+   "id": 25,
+   "intrinsicName": "never",
+   "recursionId": 24
+  },
+  {
+   "flags": [
+    "Never"
+   ],
+   "id": 26,
+   "intrinsicName": "never",
+   "recursionId": 25
+  },
+  {
+   "flags": [
+    "Never"
+   ],
+   "id": 27,
+   "intrinsicName": "never",
+   "recursionId": 26
+  },
+  {
+   "flags": [
+    "NonPrimitive"
+   ],
+   "id": 28,
+   "intrinsicName": "object",
+   "recursionId": 27
+  },
+  {
+   "display": "string | number",
+   "flags": [
+    "Union"
+   ],
+   "id": 29,
+   "recursionId": 28,
+   "unionTypes": [
+    14,
+    15
+   ]
+  },
+  {
+   "display": "string | number | symbol",
+   "flags": [
+    "Union"
+   ],
+   "id": 30,
+   "recursionId": 29,
+   "unionTypes": [
+    14,
+    15,
+    22
+   ]
+  },
+  {
+   "display": "number | bigint",
+   "flags": [
+    "Union"
+   ],
+   "id": 31,
+   "recursionId": 30,
+   "unionTypes": [
+    15,
+    16
+   ]
+  },
+  {
+   "display": "`${number}`",
+   "flags": [
+    "TemplateLiteral"
+   ],
+   "id": 32,
+   "recursionId": 31
+  },
+  {
+   "display": "string | number | bigint | boolean | null | undefined",
+   "flags": [
+    "Union"
+   ],
+   "id": 33,
+   "recursionId": 32,
+   "unionTypes": [
+    10,
+    13,
+    14,
+    15,
+    16,
+    17,
+    19
+   ]
+  },
+  {
+   "flags": [
+    "Never"
+   ],
+   "id": 34,
+   "intrinsicName": "never",
+   "recursionId": 33
+  },
+  {
+   "display": "{}",
+   "flags": [
+    "Object"
+   ],
+   "id": 35,
+   "recursionId": 34
+  },
+  {
+   "display": "{}",
+   "flags": [
+    "Object"
+   ],
+   "id": 36,
+   "recursionId": 35
+  },
+  {
+   "display": "{}",
+   "flags": [
+    "Object"
+   ],
+   "id": 37,
+   "recursionId": 36
+  },
+  {
+   "display": "{}",
+   "flags": [
+    "Object"
+   ],
+   "id": 38,
+   "recursionId": 37,
+   "symbolName": "__type"
+  },
+  {
+   "display": "{}",
+   "flags": [
+    "Object"
+   ],
+   "id": 39,
+   "recursionId": 38
+  },
+  {
+   "display": "{} | null | undefined",
+   "flags": [
+    "Union"
+   ],
+   "id": 40,
+   "recursionId": 39,
+   "unionTypes": [
+    10,
+    13,
+    39
+   ]
+  },
+  {
+   "display": "{}",
+   "flags": [
+    "Object"
+   ],
+   "id": 41,
+   "recursionId": 40
+  },
+  {
+   "display": "{}",
+   "flags": [
+    "Object"
+   ],
+   "id": 42,
+   "recursionId": 41
+  },
+  {
+   "display": "{}",
+   "flags": [
+    "Object"
+   ],
+   "id": 43,
+   "recursionId": 42
+  },
+  {
+   "display": "{}",
+   "flags": [
+    "Object"
+   ],
+   "id": 44,
+   "recursionId": 43
+  },
+  {
+   "display": "{}",
+   "flags": [
+    "Object"
+   ],
+   "id": 45,
+   "recursionId": 44
+  },
+  {
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 46,
+   "recursionId": 45
+  },
+  {
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 47,
+   "recursionId": 46
+  },
+  {
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 48,
+   "recursionId": 47
+  },
+  {
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 49,
+   "recursionId": 48
+  },
+  {
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 50,
+   "recursionId": 49
+  },
+  {
+   "display": "\"\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 51,
+   "recursionId": 50
+  },
+  {
+   "display": "0",
+   "flags": [
+    "NumberLiteral"
+   ],
+   "id": 52,
+   "recursionId": 51
+  },
+  {
+   "display": "0n",
+   "flags": [
+    "BigIntLiteral"
+   ],
+   "id": 53,
+   "recursionId": 52
+  },
+  {
+   "display": "\"bigint\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 54,
+   "recursionId": 53
+  },
+  {
+   "display": "\"boolean\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 55,
+   "recursionId": 54
+  },
+  {
+   "display": "\"function\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 56,
+   "recursionId": 55
+  },
+  {
+   "display": "\"number\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 57,
+   "recursionId": 56
+  },
+  {
+   "display": "\"object\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 58,
+   "recursionId": 57
+  },
+  {
+   "display": "\"string\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 59,
+   "recursionId": 58
+  },
+  {
+   "display": "\"symbol\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 60,
+   "recursionId": 59
+  },
+  {
+   "display": "\"undefined\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 61,
+   "recursionId": 60
+  },
+  {
+   "display": "\"bigint\" | \"boolean\" | \"function\" | \"number\" | \"object\" | \"string\" | \"symbol\" | \"undefined\"",
+   "flags": [
+    "Union"
+   ],
+   "id": 62,
+   "recursionId": 61,
+   "unionTypes": [
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 24,
+     "line": 5
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 5
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 63,
+   "recursionId": 62,
+   "symbolName": "IArguments"
+  },
+  {
+   "display": "typeof globalThis",
+   "flags": [
+    "Object"
+   ],
+   "id": 64,
+   "recursionId": 63,
+   "symbolName": "globalThis"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 83,
+     "line": 1
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 65,
+   "instantiatedType": 65,
+   "recursionId": 64,
+   "symbolName": "Array",
+   "typeArguments": [
+    66
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 18,
+     "line": 1
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 17,
+     "line": 1
+    }
+   },
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 66,
+   "recursionId": 65,
+   "symbolName": "T"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 83,
+     "line": 1
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 67,
+   "recursionId": 64,
+   "symbolName": "Array"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 20,
+     "line": 8
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 8
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 68,
+   "recursionId": 66,
+   "symbolName": "Object"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 22,
+     "line": 4
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 4
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 69,
+   "recursionId": 67,
+   "symbolName": "Function"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 30,
+     "line": 3
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 3
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 70,
+   "recursionId": 68,
+   "symbolName": "CallableFunction"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 29,
+     "line": 6
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 6
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 71,
+   "recursionId": 69,
+   "symbolName": "NewableFunction"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 20,
+     "line": 10
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 10
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 72,
+   "recursionId": 70,
+   "symbolName": "String"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 20,
+     "line": 7
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 7
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 73,
+   "recursionId": 71,
+   "symbolName": "Number"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 21,
+     "line": 2
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 2
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 74,
+   "recursionId": 72,
+   "symbolName": "Boolean"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 20,
+     "line": 9
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 9
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 75,
+   "recursionId": 73,
+   "symbolName": "RegExp"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 83,
+     "line": 1
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 76,
+   "instantiatedType": 65,
+   "recursionId": 64,
+   "symbolName": "Array",
+   "typeArguments": [
+    1
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 83,
+     "line": 1
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 77,
+   "instantiatedType": 65,
+   "recursionId": 64,
+   "symbolName": "Array",
+   "typeArguments": [
+    2
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 83,
+     "line": 1
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 78,
+   "instantiatedType": 65,
+   "recursionId": 64,
+   "symbolName": "Array",
+   "typeArguments": [
+    66,
+    67
+   ]
+  },
+  {
+   "display": "\"length\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 79,
+   "recursionId": 74
+  },
+  {
+   "display": "\"push\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 80,
+   "recursionId": 75
+  },
+  {
+   "display": "(...items: T[]) => number",
+   "firstDeclaration": {
+    "end": {
+     "character": 66,
+     "line": 1
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 38,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 81,
+   "recursionId": 76,
+   "symbolName": "push"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 20,
+     "line": 1
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 15,
+     "line": 1
+    }
+   },
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 82,
+   "recursionId": 77,
+   "symbolName": "T"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 34,
+     "line": 1
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 83,
+   "instantiatedType": 83,
+   "recursionId": 78,
+   "symbolName": "Box",
+   "typeArguments": [
+    82
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 34,
+     "line": 1
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 84,
+   "recursionId": 78,
+   "symbolName": "Box"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 34,
+     "line": 1
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 85,
+   "instantiatedType": 83,
+   "recursionId": 78,
+   "symbolName": "Box",
+   "typeArguments": [
+    82,
+    84
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 34,
+     "line": 1
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 86,
+   "instantiatedType": 83,
+   "recursionId": 79,
+   "symbolName": "Box",
+   "typeArguments": [
+    14
+   ]
+  },
+  {
+   "display": "\"x\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 87,
+   "recursionId": 80
+  },
+  {
+   "display": "\"x\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 88,
+   "recursionId": 81
+  },
+  {
+   "display": "{ value: string; }",
+   "firstDeclaration": {
+    "end": {
+     "character": 38,
+     "line": 2
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 24,
+     "line": 2
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 89,
+   "recursionId": 82,
+   "symbolName": "__object"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 13,
+     "line": 3
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 12,
+     "line": 3
+    }
+   },
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 90,
+   "recursionId": 83,
+   "symbolName": "T"
+  },
+  {
+   "display": "<T>(x: T) => T",
+   "firstDeclaration": {
+    "end": {
+     "character": 37,
+     "line": 3
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 3
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 91,
+   "recursionId": 84,
+   "symbolName": "f"
+  },
+  {
+   "display": "1",
+   "flags": [
+    "NumberLiteral"
+   ],
+   "id": 92,
+   "recursionId": 85
+  },
+  {
+   "display": "1",
+   "flags": [
+    "NumberLiteral"
+   ],
+   "id": 93,
+   "recursionId": 86
+  },
+  {
+   "display": "1 | undefined",
+   "flags": [
+    "Union"
+   ],
+   "id": 94,
+   "recursionId": 87,
+   "unionTypes": [
+    10,
+    93
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 17,
+     "line": 7
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 16,
+     "line": 7
+    }
+   },
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 95,
+   "recursionId": 88,
+   "symbolName": "T"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 42,
+     "line": 7
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 7
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 96,
+   "instantiatedType": 96,
+   "recursionId": 89,
+   "symbolName": "Pair",
+   "typeArguments": [
+    95
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 42,
+     "line": 7
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 7
+    }
+   },
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 97,
+   "recursionId": 89,
+   "symbolName": "Pair"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 42,
+     "line": 7
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 7
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 98,
+   "instantiatedType": 96,
+   "recursionId": 89,
+   "symbolName": "Pair",
+   "typeArguments": [
+    95,
+    97
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 42,
+     "line": 7
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 7
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 99,
+   "instantiatedType": 96,
+   "recursionId": 90,
+   "symbolName": "Pair",
+   "typeArguments": [
+    14
+   ]
+  },
+  {
+   "display": "\"a\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 100,
+   "recursionId": 91
+  },
+  {
+   "display": "\"a\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 101,
+   "recursionId": 92
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 42,
+     "line": 7
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 7
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 102,
+   "instantiatedType": 96,
+   "recursionId": 93,
+   "symbolName": "Pair",
+   "typeArguments": [
+    100
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 42,
+     "line": 7
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 7
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 103,
+   "instantiatedType": 96,
+   "recursionId": 89,
+   "symbolName": "Pair",
+   "typeArguments": [
+    46
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 42,
+     "line": 7
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 7
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 104,
+   "instantiatedType": 96,
+   "recursionId": 89,
+   "symbolName": "Pair",
+   "typeArguments": [
+    47
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 34,
+     "line": 1
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 105,
+   "instantiatedType": 83,
+   "recursionId": 94,
+   "symbolName": "Box",
+   "typeArguments": [
+    100
+   ]
+  },
+  {
+   "display": "2",
+   "flags": [
+    "NumberLiteral"
+   ],
+   "id": 106,
+   "recursionId": 95
+  },
+  {
+   "display": "2",
+   "flags": [
+    "NumberLiteral"
+   ],
+   "id": 107,
+   "recursionId": 96
+  },
+  {
+   "display": "{ a: 1; b: 2; }",
+   "firstDeclaration": {
+    "end": {
+     "character": 33,
+     "line": 15
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 19,
+     "line": 15
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 108,
+   "recursionId": 97,
+   "symbolName": "__type"
+  },
+  {
+   "display": "{ a: 1; b: 2; }",
+   "firstDeclaration": {
+    "end": {
+     "character": 29,
+     "line": 16
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 15,
+     "line": 16
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 109,
+   "recursionId": 98,
+   "symbolName": "__type"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 16,
+     "line": 17
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 15,
+     "line": 17
+    }
+   },
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 110,
+   "recursionId": 99,
+   "symbolName": "T"
+  },
+  {
+   "aliasTypeArguments": [
+    110
+   ],
+   "conditionalCheckType": 110,
+   "conditionalExtendsType": 14,
+   "conditionalFalseType": -1,
+   "conditionalTrueType": -1,
+   "firstDeclaration": {
+    "end": {
+     "character": 52,
+     "line": 17
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 17
+    }
+   },
+   "flags": [
+    "Conditional"
+   ],
+   "id": 111,
+   "recursionId": 100,
+   "symbolName": "IsString"
+  },
+  {
+   "display": "\"yes\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 112,
+   "recursionId": 101
+  },
+  {
+   "display": "\"yes\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 113,
+   "recursionId": 102
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 16,
+     "line": 19
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 15,
+     "line": 19
+    }
+   },
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 114,
+   "recursionId": 103,
+   "symbolName": "T"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 13,
+     "line": 20
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 12,
+     "line": 20
+    }
+   },
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 115,
+   "recursionId": 104,
+   "symbolName": "T"
+  },
+  {
+   "aliasTypeArguments": [
+    114
+   ],
+   "conditionalCheckType": 114,
+   "conditionalExtendsType": 14,
+   "conditionalFalseType": -1,
+   "conditionalTrueType": -1,
+   "firstDeclaration": {
+    "end": {
+     "character": 52,
+     "line": 19
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 19
+    }
+   },
+   "flags": [
+    "Conditional"
+   ],
+   "id": 116,
+   "recursionId": 105,
+   "symbolName": "Deferred"
+  },
+  {
+   "aliasTypeArguments": [
+    115
+   ],
+   "conditionalCheckType": 115,
+   "conditionalExtendsType": 14,
+   "conditionalFalseType": -1,
+   "conditionalTrueType": -1,
+   "firstDeclaration": {
+    "end": {
+     "character": 52,
+     "line": 19
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 19
+    }
+   },
+   "flags": [
+    "Conditional"
+   ],
+   "id": 117,
+   "recursionId": 105,
+   "symbolName": "Deferred"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 14,
+     "line": 21
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 13,
+     "line": 21
+    }
+   },
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 118,
+   "recursionId": 106,
+   "symbolName": "T"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 42,
+     "line": 21
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 30,
+     "line": 21
+    }
+   },
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 119,
+   "recursionId": 107,
+   "symbolName": "K"
+  },
+  {
+   "flags": [
+    "Index"
+   ],
+   "id": 120,
+   "keyofType": 118,
+   "recursionId": 108
+  },
+  {
+   "aliasTypeArguments": [
+    118
+   ],
+   "firstDeclaration": {
+    "end": {
+     "character": 52,
+     "line": 21
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 21
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 121,
+   "recursionId": 109,
+   "symbolName": "Mapped"
+  },
+  {
+   "flags": [
+    "IndexedAccess"
+   ],
+   "id": 122,
+   "indexedAccessIndexType": 119,
+   "indexedAccessObjectType": 118,
+   "recursionId": 106
+  },
+  {
+   "display": "{ a: 1; }",
+   "firstDeclaration": {
+    "end": {
+     "character": 26,
+     "line": 22
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 18,
+     "line": 22
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 123,
+   "recursionId": 110,
+   "symbolName": "__type"
+  },
+  {
+   "aliasTypeArguments": [
+    123
+   ],
+   "firstDeclaration": {
+    "end": {
+     "character": 52,
+     "line": 21
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 21
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 124,
+   "recursionId": 110,
+   "symbolName": "Mapped"
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 42,
+     "line": 21
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 30,
+     "line": 21
+    }
+   },
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 125,
+   "recursionId": 107,
+   "symbolName": "K"
+  },
+  {
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 126,
+   "recursionId": 111
+  },
+  {
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 127,
+   "recursionId": 112
+  },
+  {
+   "flags": [
+    "Object"
+   ],
+   "id": 128,
+   "instantiatedType": 128,
+   "isTuple": true,
+   "recursionId": 113,
+   "typeArguments": [
+    126,
+    127
+   ]
+  },
+  {
+   "flags": [
+    "TypeParameter"
+   ],
+   "id": 129,
+   "recursionId": 114
+  },
+  {
+   "flags": [
+    "Object"
+   ],
+   "id": 130,
+   "instantiatedType": 128,
+   "recursionId": 115,
+   "typeArguments": [
+    15,
+    14
+   ]
+  },
+  {
+   "flags": [
+    "Object"
+   ],
+   "id": 131,
+   "instantiatedType": 128,
+   "recursionId": 116,
+   "typeArguments": [
+    15,
+    14
+   ]
+  },
+  {
+   "display": "? | ?",
+   "flags": [
+    "Union"
+   ],
+   "id": 132,
+   "recursionId": 117,
+   "unionTypes": [
+    126,
+    127
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 83,
+     "line": 1
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 133,
+   "instantiatedType": 65,
+   "recursionId": 64,
+   "symbolName": "Array",
+   "typeArguments": [
+    132
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 83,
+     "line": 1
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 134,
+   "instantiatedType": 65,
+   "recursionId": 64,
+   "symbolName": "Array",
+   "typeArguments": [
+    29
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 83,
+     "line": 1
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 135,
+   "instantiatedType": 65,
+   "recursionId": 64,
+   "symbolName": "Array",
+   "typeArguments": [
+    29,
+    130
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 83,
+     "line": 1
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 136,
+   "instantiatedType": 65,
+   "recursionId": 64,
+   "symbolName": "Array",
+   "typeArguments": [
+    29,
+    131
+   ]
+  },
+  {
+   "display": "\"first\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 137,
+   "recursionId": 118
+  },
+  {
+   "display": "[number, string] | undefined",
+   "flags": [
+    "Union"
+   ],
+   "id": 138,
+   "recursionId": 119,
+   "unionTypes": [
+    10,
+    130
+   ]
+  },
+  {
+   "display": "\"one\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 139,
+   "recursionId": 120
+  },
+  {
+   "display": "\"two\"",
+   "flags": [
+    "StringLiteral"
+   ],
+   "id": 140,
+   "recursionId": 121
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 83,
+     "line": 1
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 141,
+   "instantiatedType": 65,
+   "recursionId": 64,
+   "symbolName": "Array",
+   "typeArguments": [
+    26
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 83,
+     "line": 1
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 142,
+   "instantiatedType": 65,
+   "recursionId": 122,
+   "symbolName": "Array",
+   "typeArguments": [
+    26
+   ]
+  },
+  {
+   "evolvingArrayElementType": 24,
+   "flags": [
+    "Object"
+   ],
+   "id": 143,
+   "recursionId": 123
+  },
+  {
+   "display": "(...items: any[]) => number",
+   "firstDeclaration": {
+    "end": {
+     "character": 66,
+     "line": 1
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 38,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 144,
+   "recursionId": 76,
+   "symbolName": "push"
+  },
+  {
+   "evolvingArrayElementType": 15,
+   "evolvingArrayFinalType": 146,
+   "flags": [
+    "Object"
+   ],
+   "id": 145,
+   "recursionId": 124
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 83,
+     "line": 1
+    },
+    "path": "/lib.d.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 146,
+   "instantiatedType": 65,
+   "recursionId": 64,
+   "symbolName": "Array",
+   "typeArguments": [
+    15
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 34,
+     "line": 1
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 147,
+   "instantiatedType": 83,
+   "recursionId": 78,
+   "symbolName": "Box",
+   "typeArguments": [
+    50
+   ]
+  },
+  {
+   "firstDeclaration": {
+    "end": {
+     "character": 34,
+     "line": 1
+    },
+    "path": "/a.ts",
+    "start": {
+     "character": 1,
+     "line": 1
+    }
+   },
+   "flags": [
+    "Object"
+   ],
+   "id": 148,
+   "instantiatedType": 83,
+   "recursionId": 78,
+   "symbolName": "Box",
+   "typeArguments": [
+    49
+   ]
+  }
+ ]
+}

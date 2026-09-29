@@ -66,6 +66,8 @@ pub(crate) struct CheckerState {
     pub(crate) body_checks: crate::check_bodies::BodyCheckState,
     pub(crate) source_checks: crate::types::Map<NodeId, crate::check::SourceCheckStatus>,
     pub(crate) types: TypeStore,
+    /// `Checker.tracer`: the optional trace session of `NewChecker`.
+    pub(crate) tracer: Option<crate::trace::Tracer>,
     pub(crate) signatures: SignatureStore,
     pub(crate) resolution: ResolutionStack,
     pub(crate) mapped_symbol_links: LinkStore<SymbolId, crate::mapped::MappedSymbolLinks>,
@@ -87,7 +89,20 @@ impl CheckerState {
         counters: &Counters,
         options: CheckerOptions,
     ) -> Result<Self, Error> {
+        Self::new_with_tracer(identity, counters, options, None)
+    }
+
+    /// `NewChecker` with its optional tracer, installed before any type is
+    /// created so that the intrinsic types are recorded too.
+    pub(crate) fn new_with_tracer(
+        identity: &CheckerIdentity,
+        counters: &Counters,
+        options: CheckerOptions,
+        tracer: Option<crate::trace::Tracer>,
+    ) -> Result<Self, Error> {
         let mut state = Self::bare(identity, counters, options)?;
+        state.types.tracer.clone_from(&tracer);
+        state.tracer = tracer;
         state.initialize()?;
         Ok(state)
     }
@@ -143,6 +158,7 @@ impl CheckerState {
             body_checks: crate::check_bodies::BodyCheckState::default(),
             source_checks: crate::types::Map::default(),
             types: TypeStore::new(),
+            tracer: None,
             signatures: SignatureStore::new(),
             resolution: ResolutionStack::new(),
             value_symbol_links: LinkStore::new(),

@@ -33,6 +33,10 @@ name = "c5_contracts"
 required-features = ["recursion-probe", "services-replay"]
 
 [[test]]
+name = "c6_contracts"
+required-features = ["recursion-probe"]
+
+[[test]]
 name = "c2_review_fixes"
 required-features = ["relation-probe"]
 

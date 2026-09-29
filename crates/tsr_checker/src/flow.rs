@@ -452,6 +452,12 @@ impl CheckerState {
     // port: tsc/internal/checker/flow.go:Checker.getTypeAtFlowNode
     fn type_at_flow(&mut self, query: &mut FlowQuery, mut flow: FlowId) -> Result<FlowType, Error> {
         if query.depth == 2000 {
+            let depth = query.depth;
+            self.trace_instant(
+                crate::trace::TracePhase::CheckTypes,
+                "getTypeAtFlowNode_DepthLimit",
+                || crate::trace::args([("depth", crate::trace::int(depth))]),
+            );
             self.flow.disabled = true;
             self.report_flow_control_error(query.reference)?;
             return Ok(FlowType {

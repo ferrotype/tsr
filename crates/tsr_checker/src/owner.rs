@@ -55,12 +55,24 @@ impl CheckerOwner {
         counters: &Counters,
         host: Arc<dyn crate::CheckerHost>,
     ) -> Result<Self, Error> {
+        Self::for_program_with_tracer(identity, counters, host, None)
+    }
+
+    /// A checker for a program with the optional tracer `NewChecker` takes: the
+    /// session receives the checker's trace events and records every type it
+    /// creates under the tracer's checker index.
+    pub fn for_program_with_tracer(
+        identity: Arc<CheckerIdentity>,
+        counters: &Counters,
+        host: Arc<dyn crate::CheckerHost>,
+        tracer: Option<crate::trace::Tracer>,
+    ) -> Result<Self, Error> {
         let options = host.options();
         let options = CheckerOptions {
             strict_null_checks: options.strict_option_value(options.strict_null_checks),
             exact_optional_property_types: options.exact_optional_property_types.is_true(),
         };
-        let mut state = CheckerState::new(&identity, counters, options)?;
+        let mut state = CheckerState::new_with_tracer(&identity, counters, options, tracer)?;
         state.program = Some(crate::program::ProgramContext::new(host));
         state.initialize_program()?;
         Ok(Self {
