@@ -1,5 +1,24 @@
 //! Phase 2 C6 direct contracts (docs/PHASE2-C6-plan.md, C6.9), each over
 //! production entry points with its pinned Go counterpart named.
+#[allow(dead_code)]
+#[path = "../../../tools/s08/p5/baseline/mod.rs"]
+mod baseline;
+#[allow(dead_code)]
+#[path = "../../../tools/s08/p5/corpus.rs"]
+mod corpus;
+#[allow(dead_code)]
+#[path = "../../../tools/s08/p5/errors.rs"]
+mod errors;
+#[allow(dead_code)]
+#[path = "../../../tools/s08/p4/executor.rs"]
+mod executor;
+#[allow(dead_code)]
+#[path = "../../../tools/s08/p5/paths.rs"]
+mod paths;
+#[allow(dead_code)]
+#[path = "../../../tools/phase2/subtests.rs"]
+mod subtests;
+
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::sync::Arc;
@@ -870,4 +889,347 @@ fn work_groups_order_tasks_as_the_pin_and_global_diagnostics_merge() {
         merged,
         program.sort_and_deduplicate_diagnostics(&single).unwrap()
     );
+}
+
+const DEEP_RELATIONS: &str = include_str!("fixtures/c1/recursion.ts");
+const DEEP_FLOW: &str = include_str!(
+    "../../../upstream/tsc/testdata/tests/cases/compiler/binderBinaryExpressionStress.ts"
+);
+
+/// The deep-relation fixture beside five small files, in the concurrent mode.
+fn deep_program(deep: &str) -> (Arc<Program>, Counters) {
+    let others: Vec<(Vec<u8>, Vec<u8>)> = (0..5)
+        .map(|i| {
+            (
+                format!("/f{i}.ts").into_bytes(),
+                format!("export const v{i}: number = \"{i}\";\n").into_bytes(),
+            )
+        })
+        .collect();
+    let mut files: Vec<(&[u8], &[u8])> = vec![(b"/deep.ts", deep.as_bytes())];
+    files.extend(
+        others
+            .iter()
+            .map(|(name, text)| (name.as_slice(), text.as_slice())),
+    );
+    program_in(&files, no_lib(), Tristate::FALSE)
+}
+
+/// Contract 6, panic retirement in a multi-checker pool (ADR 0012; the pin
+/// has no recovery, a Go panic ends the process): a panic inside one
+/// checker's recursive relation, on a pool thread, while the program's
+/// semantic diagnostics are collected (program.go `GetSemanticDiagnostics`,
+/// checkerpool.go `forEachCheckerGroupDo`) retires the pool's generation. The
+/// panic reaches the caller, the program publishes no diagnostics, and the
+/// program's pool refuses further work, while a fresh program pool checks the
+/// same program with the results of a pool that never panicked. A canceled
+/// checker, by contrast, is poisoned but leaves its pool's generation live.
+/// The per-file generation gates and the E3 scenarios over the compiler pool
+/// are `checker_pool::ownership` in the crate's own tests.
+#[test]
+fn a_panic_in_one_pool_checker_retires_the_pool_and_a_fresh_pool_succeeds() {
+    use std::panic::{catch_unwind, AssertUnwindSafe};
+    use tsr_compiler::CheckedProgram;
+
+    let (program, counters) = deep_program(DEEP_RELATIONS);
+    let reference = CheckedProgram::new(program.clone(), &counters, None)
+        .semantic_diagnostics(None)
+        .unwrap();
+    let checked = CheckedProgram::new(program.clone(), &counters, None);
+    let pool = checked.compiler_checker_pool().unwrap();
+    assert_eq!(pool.checker_count(), 4);
+    let deep = program.file(b"/deep.ts").unwrap().source();
+    pool.checker_for_file_exclusive(deep)
+        .unwrap()
+        .begin_recursion_probe(Some(8))
+        .unwrap();
+    let panic = catch_unwind(AssertUnwindSafe(|| checked.semantic_diagnostics(None)))
+        .expect_err("the relation reaches the injected panic");
+    let message = panic
+        .downcast_ref::<String>()
+        .map(String::as_str)
+        .or_else(|| panic.downcast_ref::<&str>().copied())
+        .unwrap_or("");
+    assert!(
+        message.starts_with("injected panic inside recursive relation at depth "),
+        "{message}"
+    );
+    assert_eq!(pool.generation().validate(), Err(tsr_arena::Error::Retired));
+    for owner in pool.checkers().unwrap() {
+        assert!(matches!(
+            owner.operation(),
+            Err(tsr_checker::Error::Arena(tsr_arena::Error::Retired))
+        ));
+    }
+    assert!(matches!(
+        checked.semantic_diagnostics(None),
+        Err(tsr_compiler::Error::Checker(tsr_checker::Error::Arena(
+            tsr_arena::Error::Retired
+        )))
+    ));
+    assert!(checked.global_diagnostics().is_err());
+
+    let fresh = CheckedProgram::new(program.clone(), &counters, None);
+    assert_eq!(fresh.semantic_diagnostics(None).unwrap(), reference);
+
+    let canceled = CheckedProgram::new(program.clone(), &counters, None);
+    let token = tsr_core::CancellationToken::new();
+    token.cancel();
+    let target = program.file(b"/f0.ts").unwrap().source();
+    canceled
+        .with_type_checker_for_file_exclusive(target, &mut |operation| {
+            assert_eq!(
+                operation.semantic_diagnostics_cancellable(target, &token)?,
+                vec![]
+            );
+            assert!(operation.was_canceled());
+            Ok(())
+        })
+        .unwrap();
+    let pool = canceled.compiler_checker_pool().unwrap();
+    assert!(pool.generation().validate().is_ok());
+    let plan = pool.association_plan().unwrap().clone();
+    let target_checker = plan.associations[program
+        .files()
+        .iter()
+        .position(|f| f.source() == target)
+        .unwrap()];
+    for (file, &checker) in program.files().iter().zip(&plan.associations) {
+        if checker != target_checker {
+            assert!(canceled.semantic_diagnostics(Some(file)).is_ok());
+        }
+    }
+}
+
+/// Contract 9, stacks and lifecycle (ADR 0011; checkerpool.go
+/// `createCheckers`, `forEachCheckerGroupDo`): pool checkers run on threads
+/// with the reserved stacks, so the deep C1 relation and the deep C3 flow
+/// graph complete on a pool thread with the results they have on the
+/// caller's; the pool creates its checkers once per program and releases
+/// them with it; and handles of one checker of the pool are rejected by
+/// another.
+#[test]
+fn pool_threads_carry_reserved_stacks_and_the_pool_lives_with_its_program() {
+    use std::sync::Mutex;
+    use tsr_compiler::CheckedProgram;
+
+    let (program, counters) = deep_program(DEEP_RELATIONS);
+    let checked = CheckedProgram::new(program.clone(), &counters, None);
+    let pool = checked.compiler_checker_pool().unwrap();
+    let deep = program.file(b"/deep.ts").unwrap().source();
+    let (a, b) = {
+        let view = program.file(b"/deep.ts").unwrap().bound().view().ast();
+        let statements: Vec<NodeId> = view
+            .node_slice(view.node(deep).unwrap().statements(view).unwrap())
+            .unwrap()
+            .iter()
+            .flatten()
+            .collect();
+        let name = |statement: NodeId| {
+            let list = view
+                .node(statement)
+                .unwrap()
+                .data_source()
+                .as_variable_statement()
+                .unwrap()
+                .declaration_list()
+                .unwrap();
+            let declarations = view
+                .node(list)
+                .unwrap()
+                .data_source()
+                .as_variable_declaration_list()
+                .unwrap()
+                .declarations()
+                .unwrap();
+            let declaration = view
+                .node_slice(view.list(declarations).unwrap().nodes())
+                .unwrap()
+                .get(0)
+                .unwrap()
+                .unwrap();
+            view.node(declaration).unwrap().name().unwrap()
+        };
+        (
+            name(statements[statements.len() - 4]),
+            name(statements[statements.len() - 3]),
+        )
+    };
+    let caller = std::thread::current().id();
+    let observed = Mutex::new(None);
+    pool.for_each_checker_group_do(&[deep], false, &|operation, _, _| {
+        assert_ne!(std::thread::current().id(), caller);
+        let left = operation.get_type_at_location(a).unwrap();
+        let right = operation.get_type_at_location(b).unwrap();
+        operation.begin_recursion_probe(None).unwrap();
+        let related = operation
+            .is_type_related_to(left, right, tsr_checker::RelationKind::Assignable)
+            .unwrap();
+        *observed.lock().unwrap() = Some((related, operation.take_recursion_probe().unwrap()));
+    })
+    .unwrap();
+    let (related, probe) = observed.into_inner().unwrap().unwrap();
+    assert!(
+        related,
+        "the depth limit ends the relation as on the caller's stack"
+    );
+    let remaining = probe["maximum_remaining_stack"].as_u64().unwrap();
+    assert!(
+        remaining > (tsr_core::workgroup::RESERVED_STACK / 2) as u64,
+        "a pool thread's reserved stack: {probe}"
+    );
+
+    let (flow, flow_counters) = deep_program(DEEP_FLOW);
+    let deep_flow = flow.file(b"/deep.ts").unwrap().source();
+    let reference = CheckedProgram::new(flow.clone(), &flow_counters, None)
+        .semantic_diagnostics(Some(flow.file(b"/deep.ts").unwrap()))
+        .unwrap();
+    let flow_checked = CheckedProgram::new(flow.clone(), &flow_counters, None);
+    let observed = Mutex::new(None);
+    flow_checked
+        .compiler_checker_pool()
+        .unwrap()
+        .for_each_checker_group_do(&[deep_flow], false, &|operation, _, _| {
+            assert_ne!(std::thread::current().id(), caller);
+            operation.begin_recursion_probe(None).unwrap();
+            let diagnostics = operation.semantic_diagnostics(deep_flow).unwrap();
+            *observed.lock().unwrap() =
+                Some((diagnostics, operation.take_recursion_probe().unwrap()));
+        })
+        .unwrap();
+    let (diagnostics, probe) = observed.into_inner().unwrap().unwrap();
+    assert_eq!(
+        flow.sort_and_deduplicate_diagnostics(&diagnostics).unwrap(),
+        reference
+    );
+    let operators = DEEP_FLOW
+        .lines()
+        .map(|line| line.matches(" + ").count())
+        .max()
+        .unwrap();
+    assert!(operators > 1000);
+    assert!(
+        probe["maximum_expression_depth"].as_u64().unwrap() >= operators as u64,
+        "{probe}"
+    );
+    assert!(
+        probe["maximum_remaining_stack"].as_u64().unwrap()
+            > (tsr_core::workgroup::RESERVED_STACK / 2) as u64,
+        "a pool thread's reserved stack: {probe}"
+    );
+
+    // Created once, released with the program's pool.
+    let first: Vec<_> = pool.checkers().unwrap().iter().map(Arc::as_ptr).collect();
+    checked.semantic_diagnostics(None).unwrap();
+    checked.semantic_diagnostics(None).unwrap();
+    let again: Vec<_> = pool.checkers().unwrap().iter().map(Arc::as_ptr).collect();
+    assert_eq!(first, again);
+    let weak: Vec<_> = pool
+        .checkers()
+        .unwrap()
+        .iter()
+        .map(Arc::downgrade)
+        .collect();
+
+    // A handle of one checker is rejected by another of the same pool.
+    let other = program
+        .files()
+        .iter()
+        .zip(&pool.association_plan().unwrap().associations)
+        .find(|&(_, &checker)| checker != pool.association_plan().unwrap().associations[0])
+        .map(|(file, _)| file.source())
+        .unwrap();
+    let first_file = program.files()[0].source();
+    let (retained, id) = {
+        let mut operation = pool.checker_for_file_exclusive(first_file).unwrap();
+        let literal = operation.string_literal_type(b"one checker's").unwrap();
+        (operation.retain_type(literal).unwrap(), literal)
+    };
+    {
+        let operation = pool.checker_for_file_exclusive(other).unwrap();
+        assert_eq!(
+            operation.import_type(&retained),
+            Err(tsr_checker::Error::Arena(tsr_arena::Error::WrongOwner))
+        );
+        assert_eq!(
+            operation.type_flags(id),
+            Err(tsr_checker::Error::Arena(tsr_arena::Error::WrongOwner))
+        );
+    }
+    drop(retained);
+    drop(checked);
+    assert!(
+        weak.iter().all(|owner| owner.upgrade().is_none()),
+        "released with the program's pool"
+    );
+}
+
+/// Union ordering over every checker, recorded at the pooled checkpoint.
+struct UnionOrdering(Option<Value>);
+impl executor::Hooks for UnionOrdering {
+    fn checkpoint_checkers(&mut self, checkers: &mut tsr_compiler::FileCheckers<'_, '_>) {
+        let operations: Vec<_> = checkers.iter().collect();
+        self.0 = Some(subtests::union_ordering_checkers(&operations));
+    }
+}
+
+/// Contract 8, two modes (the pin's harness with
+/// `TS_TEST_PROGRAM_SINGLE_THREADED` true and false; program.go
+/// `collectCheckerDiagnostics`, `collectDiagnosticsFromFiles`,
+/// `GetTypeCheckerForFile`; compiler_runner.go `verifyUnionOrdering`): a
+/// multi-file corpus program with cross-file types, checked through its pool
+/// with one checker single-threaded and with four checkers concurrently,
+/// equals in each mode that mode's native observation for errors, types,
+/// symbols, display and union ordering. The pin's modes differ in union
+/// ordering's counts (73 unions on one checker, 94 over four, where only the
+/// checkers of the importing files create their unions), and the Rust modes
+/// differ the same way. The fixture is `fixtures/c6/modes`, frozen from both
+/// verified native captures by its `regenerate.py`.
+#[test]
+fn both_modes_match_their_native_observations() {
+    use sha2::{Digest, Sha256};
+
+    let raw = include_str!("fixtures/c6/modes/request.json");
+    let native: Value =
+        serde_json::from_str(include_str!("fixtures/c6/modes/native.json")).unwrap();
+    let pin: Value = serde_json::from_str(include_str!("../../../data/upstream.json")).unwrap();
+    assert_eq!(native["pin"], pin["pin"]);
+    assert_eq!(
+        native["request_sha256"],
+        format!("{:x}", Sha256::digest(raw.as_bytes()))
+    );
+    let request: Value = serde_json::from_str(raw).unwrap();
+    assert_eq!(request["id"], native["id"]);
+    assert_ne!(
+        native["modes"]["single"]["union_ordering"],
+        native["modes"]["concurrent"]["union_ordering"]
+    );
+    for (mode, checkers) in [("single", 1), ("concurrent", 4)] {
+        let mut moded = request.clone();
+        moded["mode"] = json!(mode);
+        let mut hooks = UnionOrdering(None);
+        let actual = corpus::observe_with(&moded, &mut FileCache::new(), &mut hooks, false);
+        let expected = &native["modes"][mode];
+        assert_eq!(actual["mode"], json!(mode));
+        assert_eq!(actual["checker_count"], json!(checkers), "{mode}");
+        assert_eq!(
+            actual["error_baseline"]["state"], "executed",
+            "{mode}: {actual}"
+        );
+        assert_eq!(
+            actual["error_baseline"]["baseline"], expected["errors"],
+            "{mode} errors"
+        );
+        for domain in ["types", "symbols", "public_type_strings"] {
+            assert_eq!(
+                actual["type_symbol_baselines"][domain], expected[domain],
+                "{mode} {domain}"
+            );
+        }
+        assert_eq!(
+            hooks.0.unwrap(),
+            expected["union_ordering"],
+            "{mode} union ordering"
+        );
+    }
 }

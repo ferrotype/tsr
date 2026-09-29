@@ -608,7 +608,9 @@ impl CompilerCheckerPool {
 
     /// One task per checker, at once unless `single_threaded`: each holds its
     /// checker and visits, in the order given, the files associated with it,
-    /// passing each file's position in `files`.
+    /// passing each file's position in `files`. A task stops at the first file
+    /// it reaches after the pool's generation retired, and the group then
+    /// fails, so no partial result of a retired generation is returned.
     // port: tsc/internal/compiler/checkerpool.go:checkerPool.forEachCheckerGroupDo
     pub fn for_each_checker_group_do(
         &self,
@@ -628,9 +630,19 @@ impl CompilerCheckerPool {
             group.queue(move || match owner.operation() {
                 Ok(mut operation) => {
                     for (position, &file) in files.iter().enumerate() {
-                        if associated[position] == checker_index {
-                            task(&mut operation, position, file);
+                        if associated[position] != checker_index {
+                            continue;
                         }
+                        // A panic on another checker retires the pool's
+                        // generation; this task stops at its next file.
+                        if let Err(error) = self.generation.validate() {
+                            failure
+                                .lock()
+                                .unwrap_or_else(PoisonError::into_inner)
+                                .get_or_insert(error.into());
+                            break;
+                        }
+                        task(&mut operation, position, file);
                     }
                 }
                 Err(error) => {
@@ -676,3 +688,7 @@ impl Drop for RetireOnUnwind<'_> {
         }
     }
 }
+
+#[cfg(test)]
+#[path = "checker_pool_tests.rs"]
+mod ownership;

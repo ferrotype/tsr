@@ -60,7 +60,7 @@ def program_manifest():
 
 
 def checker_manifest():
-    return {"version": 4, "suites": {
+    return {"version": 5, "suites": {
         name: {"package": package, "filter": prefix, "cases": [prefix + "generation_boundary"]}
         for name, (package, prefix) in ownership.s09_ownership.SUITES.items()
     }}
@@ -154,7 +154,7 @@ class OwnershipProducerTests(unittest.TestCase):
                 self.assertFalse(report["metrics"]["release_boundaries"])
                 self.assertFalse(report["metrics"][f"checker_ownership_registry_{mode}"])
                 self.assertTrue(report["metrics"][f"checker_ownership_pool_{mode}"])
-                self.assertEqual(report["metrics"]["checker_ownership_tests"], 2)
+                self.assertEqual(report["metrics"]["checker_ownership_tests"], 3)
                 self.assertEqual(report["metrics"]["miri"], mode != "miri")
                 self.assertEqual(report["metrics"]["address_sanitizer"], mode != "address_sanitizer")
 
@@ -177,7 +177,7 @@ class OwnershipProducerTests(unittest.TestCase):
                 self.assertFalse(report["metrics"]["api_print_scratch_disposal"])
                 self.assertFalse(report["metrics"][f"api_print_scratch_disposal_{mode}"])
                 self.assertEqual(report["metrics"]["api_print_scratch_tests"], 0)
-                self.assertEqual(report["metrics"]["checker_ownership_tests"], 3)
+                self.assertEqual(report["metrics"]["checker_ownership_tests"], 4)
                 self.assertEqual(report["metrics"]["miri"], mode != "miri")
                 self.assertEqual(report["metrics"]["address_sanitizer"], mode != "address_sanitizer")
                 self.assertFalse(report["metrics"]["api_scratch_disposal"])

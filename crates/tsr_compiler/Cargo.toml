@@ -88,6 +88,8 @@ tsr_locale = { version = "0.1.0", path = "../tsr_locale" }
 workspace = true
 
 [dev-dependencies]
+# The retirement contention observer of the ownership scenarios.
+tsr_arena = { version = "0.1.0", path = "../tsr_arena", features = ["harness"] }
 serde = { version = "1", features = ["derive"] }
 tsr_nodebuilder = { version = "0.1.0", path = "../tsr_nodebuilder" }
 tsr_astnav = { version = "0.1.0", path = "../tsr_astnav" }
