@@ -287,6 +287,8 @@ pub(crate) use key::CacheKey;
 pub use links::{LinkKey, LinkStore};
 pub use node_builder::VerbosityContext;
 pub use owner::{CheckerOwner, Operation};
+mod pool;
+pub use pool::{CheckerLifetime, CheckerPool};
 #[cfg(test)]
 use resolution::TypeResolution;
 pub use resolution::TypeSystemPropertyName;

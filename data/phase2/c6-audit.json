@@ -1,95 +1,11 @@
 {
  "checkpoint": "C6",
  "dispositions": {
-  "tsc/internal/compiler/checkerpool.go:checkerPool.GetChecker": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:checkerPool.GetGlobalDiagnostics": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:checkerPool.createCheckers": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:checkerPool.forEachCheckerGroupDo": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:checkerPool.forEachCheckerParallel": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:checkerPool.getCheckerForFileExclusive": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:checkerPool.getCheckerForFileNonExclusive": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:checkerPool.getCheckerNonExclusive": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:checkerPool.getImportAdjacency": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:getCheckerAssociationBaseWeight": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:getCheckerAssociationOrder": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:getCheckerAssociationPolicy": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:getCheckerAssociationWeights": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:getCheckerAssociationsInOrder": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:newCheckerPool": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:newCheckerPoolWithTracing": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
   "tsc/internal/compiler/checkerpool.go:noop": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/checkerpool.go:shouldPrioritizeSourceFiles": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
+   "disposition": "equivalent",
+   "reason": "The release the non-exclusive acquisitions return in the pin; the Rust non-exclusive acquisitions hand out the checker owner, whose every call acquires and releases its own operation, so there is no release to return.",
+   "reviewed_from": "pinned body and its callers; C6.3 source audit",
+   "rust": "crates/tsr_compiler/src/checker_pool.rs:533"
   },
   "tsc/internal/compiler/program.go:Program.ForEachCheckerParallel": {
    "disposition": "gap",
@@ -116,11 +32,6 @@
    "item": "C6.4",
    "reason": "Not yet ported; the item that closes it is named."
   },
-  "tsc/internal/compiler/program.go:Program.SingleThreaded": {
-   "disposition": "gap",
-   "item": "C6.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
   "tsc/internal/compiler/program.go:Program.collectCheckerDiagnostics": {
    "disposition": "gap",
    "item": "C6.4",
@@ -139,36 +50,6 @@
   "tsc/internal/compiler/program.go:Program.initCheckerPool": {
    "disposition": "gap",
    "item": "C6.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/core/workgroup.go:NewWorkGroup": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/core/workgroup.go:parallelWorkGroup.Queue": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/core/workgroup.go:parallelWorkGroup.RunAndWait": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.Queue": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.RunAndWait": {
-   "disposition": "gap",
-   "item": "C6.3",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.pop": {
-   "disposition": "gap",
-   "item": "C6.3",
    "reason": "Not yet ported; the item that closes it is named."
   }
  },

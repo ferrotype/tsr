@@ -294,6 +294,7 @@ mod tests {
                 current_directory: JsString::from_bytes(b"/".as_slice()),
                 default_library_path: JsString::from_bytes(b"/missing".as_slice()),
                 skip_module_resolution: true,
+                single_threaded: tsr_core::Tristate::UNKNOWN,
             },
             &mut crate::FileCache::new(),
             &tsr_arena::Counters::new(),

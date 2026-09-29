@@ -282,6 +282,7 @@ pub fn load_with_libraries(
                 b"/no-default-lib"
             }),
             skip_module_resolution: false,
+            single_threaded: tsr_core::Tristate::UNKNOWN,
         },
         cache,
         counters,

@@ -34,6 +34,7 @@ fn program(files: &[(&str, &str)]) -> (Arc<Program>, Arc<CheckerOwner>) {
                 current_directory: JsString::from_bytes(b"/".as_slice()),
                 default_library_path: JsString::from_bytes(b"/no-default-lib".as_slice()),
                 skip_module_resolution: false,
+                single_threaded: tsr_core::Tristate::UNKNOWN,
             },
             &mut FileCache::new(),
             &counters,

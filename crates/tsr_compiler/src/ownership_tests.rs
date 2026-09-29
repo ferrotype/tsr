@@ -23,6 +23,7 @@ fn snapshot(text: &[u8], cache: &mut FileCache, counters: &Counters) -> Program 
             current_directory: JsString::from_bytes(b"/src".as_slice()),
             default_library_path: JsString::from_bytes(b"bundled:///libs".as_slice()),
             skip_module_resolution: false,
+            single_threaded: tsr_core::Tristate::UNKNOWN,
         },
         cache,
         counters,

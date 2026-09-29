@@ -243,6 +243,7 @@ fn load_program(
         current_directory: JsString::from_bytes(cwd.as_bytes()),
         default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
         skip_module_resolution: false,
+        single_threaded: tsr_core::Tristate::UNKNOWN,
     };
     match Program::load_with_source_of_project_reference(
         options(config),

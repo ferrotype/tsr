@@ -163,6 +163,7 @@ fn dynamic_import_result_types_and_diagnostics_match_native() {
                         b"/no-default-lib"
                     }),
                     skip_module_resolution: false,
+                    single_threaded: tsr_core::Tristate::UNKNOWN,
                 },
                 &mut FileCache::new(),
                 &counters,

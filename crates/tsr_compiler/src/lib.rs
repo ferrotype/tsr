@@ -5,6 +5,12 @@ mod bind_diagnostics;
 mod cache;
 mod checker_diagnostics;
 mod checker_host;
+mod checker_pool;
+pub use checker_pool::{
+    checker_association_base_weight, checker_association_order, checker_association_policy,
+    checker_association_weights, checker_associations_in_order, should_prioritize_source_files,
+    CheckerAssociationPlan, CheckerAssociationPolicy, CompilerCheckerPool,
+};
 mod checker_module_specifiers;
 mod declaration_diagnostics;
 pub mod diagnostic_writer;

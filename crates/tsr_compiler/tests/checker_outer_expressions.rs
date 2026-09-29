@@ -50,6 +50,7 @@ fn semantic(name: &[u8], text: &[u8], javascript: bool) -> Vec<(i32, i64, i64, i
                 current_directory: JsString::from_bytes(b"/".as_slice()),
                 default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
                 skip_module_resolution: false,
+                single_threaded: tsr_core::Tristate::UNKNOWN,
             },
             &mut FileCache::new(),
             &counters,

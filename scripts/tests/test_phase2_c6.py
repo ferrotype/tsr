@@ -10,6 +10,7 @@ import unittest.mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
+import phase2_assignments as assignments  # noqa: E402
 import phase2_audit as audit  # noqa: E402
 import phase2_blockers as blockers  # noqa: E402
 import phase2_native_concurrent as concurrent  # noqa: E402
@@ -66,6 +67,51 @@ class NativeModes(unittest.TestCase):
             with unittest.mock.patch.object(concurrent.native, "load_capture",
                                             return_value=(ROOT, report, [])):
                 concurrent.load_capture(ROOT)
+
+
+class Assignments(unittest.TestCase):
+    """C6.7: the recorded assignment witnesses and the arm64 fusion evidence."""
+
+    def setUp(self):
+        self.record = json.loads(assignments.RECORD.read_text())
+
+    def test_the_record_is_the_pins_on_the_capture_host_and_covers_every_feature(self):
+        pin = json.loads((ROOT / "data/upstream.json").read_text())["pin"]
+        self.assertEqual(self.record["pin"], pin)
+        self.assertEqual((self.record["goos"], self.record["goarch"], self.record["go"]),
+                         ("darwin", "arm64", "go1.27.1"))
+        self.assertEqual(self.record["mode"], "concurrent")
+        self.assertIs(self.record["step_check"]["equal"], True)
+        self.assertGreater(self.record["step_check"]["distinct_multi_checker_records"], 0)
+        decided = {(case["checker_count"], feature) for case in self.record["synthetic"] for feature in case["features"]}
+        for count in (2, 4, 8):
+            for feature in ("tie", "fallback", "slack", "source_dominated", "imports", "import_unit_clamp"):
+                self.assertIn((count, feature), decided)
+        self.assertIn((4, "fusion"), decided)
+
+    def test_the_fusion_cases_are_decided_by_fused_arithmetic(self):
+        fusion = [case for case in self.record["synthetic"] if "fusion" in case["features"]]
+        self.assertEqual(len(fusion), 2)
+        for case in fusion:
+            fused, _ = assignments._replica(case, True)
+            plain, _ = assignments._replica(case, False)
+            self.assertNotEqual(fused, plain)
+            self.assertEqual(case["native"]["associations"], fused)
+
+    def test_the_synthetic_set_is_the_generators(self):
+        generated = assignments.synthetic_cases()
+        self.assertEqual([assignments.step_input(case) for case in generated],
+                         [assignments.step_input(case) for case in self.record["synthetic"]])
+
+    def test_the_fusion_evidence_names_both_fused_sites_on_arm64_only(self):
+        text = assignments.FUSION.read_text()
+        arm64, amd64 = text.split("## arm64\n", 1)[1].split("## amd64 GOAMD64=v1\n", 1)
+        self.assertEqual(sum("FMSUBD" in line for line in arm64.splitlines()), 2)
+        self.assertIn("checkerpool.go:210) FMSUBD", arm64)
+        self.assertIn("checkerpool.go:211) FMSUBD", arm64)
+        self.assertNotIn("FMSUB", amd64)
+        self.assertNotIn("VFMADD", amd64)
+        self.assertNotIn("VFNMADD", amd64)
 
 
 if __name__ == "__main__":

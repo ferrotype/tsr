@@ -129,6 +129,7 @@ fn run(case: &Case) -> Result<Value> {
             current_directory: JsString::from_bytes(b"/".as_slice()),
             default_library_path: JsString::from_bytes(b"/missing".as_slice()),
             skip_module_resolution: true,
+            single_threaded: tsr_core::Tristate::UNKNOWN,
         },
         &mut FileCache::new(),
         &counters,

@@ -92,6 +92,7 @@ pub(super) fn program_options(
                 .map_or(tsr_bundled::LIB_PATH, str::as_bytes),
         ),
         skip_module_resolution: request["skip_module_resolution"].as_bool().unwrap_or(false),
+        single_threaded: tsr_core::Tristate::UNKNOWN,
     }
 }
 fn nullable<T>(values: Vec<T>) -> Option<Vec<T>> {

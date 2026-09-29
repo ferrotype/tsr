@@ -220,6 +220,7 @@ fn build(
             current_directory: js(&root.name),
             default_library_path: js(&root.join("lib")?),
             skip_module_resolution: false,
+            single_threaded: tsr_core::Tristate::UNKNOWN,
         },
         cache,
         &Counters::new(),
@@ -357,6 +358,7 @@ mod tests {
             current_directory: js(&root.name),
             default_library_path: js(&root.join("lib").unwrap()),
             skip_module_resolution: false,
+            single_threaded: tsr_core::Tristate::UNKNOWN,
         };
         assert!(matches!(
             Program::load(options, &mut FileCache::new(), &Counters::new()),

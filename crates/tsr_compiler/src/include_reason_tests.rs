@@ -74,6 +74,7 @@ fn load(request: &Value) -> Program {
             current_directory: JsString::from_bytes(cwd),
             default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
             skip_module_resolution: request["skip_module_resolution"].as_bool().unwrap_or(false),
+            single_threaded: tsr_core::Tristate::UNKNOWN,
         },
         &mut FileCache::new(),
         &Counters::new(),

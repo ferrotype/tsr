@@ -7,13 +7,26 @@ use tsr_arena::{CheckerIdentity, Counters, Generation, NodeId};
 use tsr_checker::{
     CheckerOwner, MemoryTraceSink, TraceLocation, TraceSink, TraceTypeRecord, TraceValue, Tracer,
 };
-use tsr_compiler::{FileCache, Program, ProgramCheckerHost, ProgramOptions};
+use tsr_compiler::{
+    CheckerAssociationPlan, CompilerCheckerPool, FileCache, Program, ProgramCheckerHost,
+    ProgramOptions,
+};
 use tsr_core::{CompilerOptions, Tristate};
 use tsr_jsstring::JsString;
 
 const TRACE: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures/c6/trace");
 
 fn program(files: &[(&[u8], &[u8])], options: CompilerOptions) -> (Arc<Program>, Counters) {
+    program_in(files, options, Tristate::UNKNOWN)
+}
+
+/// A program with its own single-threaded setting (the pin's
+/// `ProgramOptions.SingleThreaded`).
+fn program_in(
+    files: &[(&[u8], &[u8])],
+    options: CompilerOptions,
+    single_threaded: Tristate,
+) -> (Arc<Program>, Counters) {
     let counters = Counters::new();
     let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
     for &(path, text) in files {
@@ -32,6 +45,7 @@ fn program(files: &[(&[u8], &[u8])], options: CompilerOptions) -> (Arc<Program>,
             current_directory: JsString::from_bytes(b"/".as_slice()),
             default_library_path: JsString::from_bytes(b"/no-default-lib".as_slice()),
             skip_module_resolution: false,
+            single_threaded,
         },
         &mut FileCache::new(),
         &counters,
@@ -496,4 +510,364 @@ fn cancellation_in_deferred_nodes_skips_the_rest_and_keeps_retained_results() {
             b"number"
         );
     }
+}
+
+const ASSIGNMENTS: &str = concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/../../data/phase2/c6-assignments.json"
+);
+
+fn integers(value: &Value) -> Vec<i64> {
+    value
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|number| number.as_i64().unwrap())
+        .collect()
+}
+
+/// `count` script files with the given compiler options, the program's own
+/// single-threaded setting and no default library.
+fn files_program(
+    count: usize,
+    options: CompilerOptions,
+    single_threaded: Tristate,
+) -> (Arc<Program>, Counters) {
+    let names: Vec<Vec<u8>> = (0..count)
+        .map(|i| format!("/f{i}.ts").into_bytes())
+        .collect();
+    let texts: Vec<Vec<u8>> = (0..count)
+        .map(|i| {
+            // A chain of imports gives the partition an import graph.
+            let next = (i + 1) % count;
+            format!("import {{ v{next} }} from \"./f{next}\";\nexport const v{i}: number = 1;\n")
+                .into_bytes()
+        })
+        .collect();
+    let files: Vec<(&[u8], &[u8])> = names
+        .iter()
+        .zip(&texts)
+        .map(|(name, text)| (name.as_slice(), text.as_slice()))
+        .collect();
+    program_in(&files, options, single_threaded)
+}
+
+/// Contract 1, partitioning (compiler/checkerpool.go
+/// `getCheckerAssociationPolicy`, `shouldPrioritizeSourceFiles`,
+/// `getCheckerAssociationBaseWeight`, `getCheckerAssociationWeights`,
+/// `getCheckerAssociationOrder`, `getCheckerAssociationsInOrder`,
+/// `newCheckerPoolWithTracing`): over the recorded synthetic graphs at 2, 4
+/// and 8 checkers (`data/phase2/c6-assignments.json`), where score ties, the
+/// least-loaded fallback, the one-percent slack, each regime, import
+/// normalization and its clamp each decide an assignment, the regime,
+/// weights, stream order and associations equal the pin's. The two cases
+/// that arm64's fused score arithmetic decides are checked on the
+/// architecture the record was taken on, where the pin's result is theirs.
+/// The checker count is the pin's: four, one when the program is
+/// single-threaded (its own setting before the compiler option's), otherwise
+/// the `checkers` option, clamped to the file count and 256 and to at least
+/// one.
+#[test]
+fn partitioning_equals_the_pins_associations_and_count_rule() {
+    let record: Value = serde_json::from_slice(&std::fs::read(ASSIGNMENTS).unwrap()).unwrap();
+    let host = if cfg!(target_arch = "aarch64") {
+        "arm64"
+    } else if cfg!(target_arch = "x86_64") {
+        "amd64"
+    } else {
+        "other"
+    };
+    let mut decided = BTreeMap::new();
+    for case in record["synthetic"].as_array().unwrap() {
+        let features: Vec<&str> = case["features"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|feature| feature.as_str().unwrap())
+            .collect();
+        if features.contains(&"fusion") && record["goarch"] != host {
+            continue;
+        }
+        let checker_count = usize::try_from(case["checker_count"].as_u64().unwrap()).unwrap();
+        let adjacency = case["adjacency"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|adjacent| {
+                integers(adjacent)
+                    .into_iter()
+                    .map(|index| usize::try_from(index).unwrap())
+                    .collect()
+            })
+            .collect();
+        let plan = CheckerAssociationPlan::compute(
+            checker_count,
+            integers(&case["node_counts"]),
+            integers(&case["text_lengths"]),
+            integers(&case["import_counts"]),
+            case["is_declaration_file"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|flag| flag.as_bool().unwrap())
+                .collect(),
+            adjacency,
+        );
+        let policy = plan.policy.unwrap();
+        let observed = json!({
+            "policy": {
+                "prioritize_source_files": policy.prioritize_source_files,
+                "source_file_weight_multiplier": policy.source_file_weight_multiplier,
+                "balance_penalty_multiplier": policy.balance_penalty_multiplier,
+            },
+            "file_weights": plan.file_weights,
+            "order": plan.order,
+            "associations": plan.associations,
+        });
+        assert_eq!(observed, case["native"], "{}", case["id"]);
+        for feature in features {
+            *decided.entry((checker_count, feature)).or_insert(0) += 1;
+        }
+    }
+    for checker_count in [2, 4, 8] {
+        for feature in [
+            "tie",
+            "fallback",
+            "slack",
+            "source_dominated",
+            "imports",
+            "import_unit_clamp",
+        ] {
+            assert!(
+                decided.contains_key(&(checker_count, feature)),
+                "no recorded {feature} case at {checker_count} checkers"
+            );
+        }
+    }
+    assert!(decided.contains_key(&(2, "declaration_heavy_small")));
+    assert!(decided.contains_key(&(4, "declaration_heavy_strong")));
+    assert!(decided.contains_key(&(8, "declaration_heavy_strong")));
+
+    let count = |files: usize, checkers: Option<isize>, option: Tristate, own: Tristate| {
+        let options = CompilerOptions {
+            checkers,
+            single_threaded: option,
+            ..no_lib()
+        };
+        let (program, counters) = files_program(files, options, own);
+        CompilerCheckerPool::new(program, &counters).checker_count()
+    };
+    let unknown = Tristate::UNKNOWN;
+    assert_eq!(count(1, None, unknown, unknown), 1);
+    assert_eq!(count(3, None, unknown, unknown), 3);
+    assert_eq!(count(6, None, unknown, unknown), 4);
+    assert_eq!(count(6, Some(2), unknown, unknown), 2);
+    assert_eq!(count(6, Some(8), unknown, unknown), 6);
+    assert_eq!(count(6, Some(0), unknown, unknown), 1);
+    assert_eq!(count(6, Some(-3), unknown, unknown), 1);
+    assert_eq!(count(300, Some(1000), unknown, unknown), 256);
+    assert_eq!(count(6, Some(8), Tristate::TRUE, unknown), 1);
+    assert_eq!(count(6, None, Tristate::TRUE, Tristate::FALSE), 4);
+    assert_eq!(count(6, Some(3), unknown, Tristate::TRUE), 1);
+}
+
+/// Contract 2, acquisition (compiler/checkerpool.go `GetChecker`,
+/// `getCheckerForFileExclusive`, `getCheckerForFileNonExclusive`,
+/// `getCheckerNonExclusive`, `forEachCheckerGroupDo`): a file's checker is
+/// the same on every call and is the one the association plan names; an
+/// exclusive acquisition holds its checker until it is released, so another
+/// thread's acquisition of that checker, exclusive or through the lock-free
+/// hand-out's per-call operation (a resolver call), waits for the release;
+/// the interface's `GetChecker` serves the file's checker and, without a
+/// file, the first; and one task per checker, each on its own thread,
+/// visits exactly that checker's files, in program order.
+#[test]
+fn acquisition_is_exclusive_per_checker_and_affinity_is_stable() {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::sync::{mpsc, Mutex};
+    use tsr_checker::{CheckerLifetime, CheckerPool};
+
+    let (program, counters) = files_program(8, no_lib(), Tristate::FALSE);
+    let pool = CompilerCheckerPool::new(program.clone(), &counters);
+    assert_eq!(pool.checker_count(), 4);
+    let sources: Vec<NodeId> = program.files().iter().map(|file| file.source()).collect();
+    let plan = pool.association_plan().unwrap().clone();
+    let checkers = pool.checkers().unwrap();
+    for (index, &source) in sources.iter().enumerate() {
+        let owner = pool.checker_for_file_non_exclusive(source).unwrap();
+        assert!(Arc::ptr_eq(owner, &checkers[plan.associations[index]]));
+        assert!(Arc::ptr_eq(
+            owner,
+            pool.checker_for_file_non_exclusive(source).unwrap()
+        ));
+        let operation = pool.checker_for_file_exclusive(source).unwrap();
+        assert!(Arc::ptr_eq(operation.owner(), owner));
+        drop(operation);
+        let mut served = None;
+        pool.with_checker(CheckerLifetime::Temporary, Some(source), &mut |operation| {
+            served = Some(operation.owner().clone());
+            Ok(())
+        })
+        .unwrap();
+        assert!(Arc::ptr_eq(&served.unwrap(), owner));
+    }
+    let mut first = None;
+    pool.with_checker(CheckerLifetime::Temporary, None, &mut |operation| {
+        first = Some(operation.owner().clone());
+        Ok(())
+    })
+    .unwrap();
+    assert!(Arc::ptr_eq(&first.unwrap(), &checkers[0]));
+    assert!(Arc::ptr_eq(
+        pool.checker_non_exclusive().unwrap(),
+        &checkers[0]
+    ));
+
+    let source = sources[0];
+    for per_call in [false, true] {
+        let released = AtomicBool::new(false);
+        let (held, wait) = mpsc::channel();
+        std::thread::scope(|scope| {
+            scope.spawn(|| {
+                let operation = pool.checker_for_file_exclusive(source).unwrap();
+                held.send(()).unwrap();
+                std::thread::sleep(std::time::Duration::from_millis(200));
+                released.store(true, Ordering::SeqCst);
+                drop(operation);
+            });
+            wait.recv().unwrap();
+            let operation = if per_call {
+                pool.checker_for_file_non_exclusive(source)
+                    .unwrap()
+                    .operation()
+                    .unwrap()
+            } else {
+                pool.checker_for_file_exclusive(source).unwrap()
+            };
+            assert!(
+                released.load(Ordering::SeqCst),
+                "the second acquisition waited for the release"
+            );
+            drop(operation);
+        });
+    }
+
+    let visits = Mutex::new(Vec::new());
+    pool.for_each_checker_group_do(&sources, false, &|operation, position, file| {
+        let checker = checkers
+            .iter()
+            .position(|owner| Arc::ptr_eq(owner, operation.owner()))
+            .unwrap();
+        visits
+            .lock()
+            .unwrap()
+            .push((checker, std::thread::current().id(), position, file));
+    })
+    .unwrap();
+    let visits = visits.into_inner().unwrap();
+    assert_eq!(visits.len(), sources.len());
+    let mut threads = std::collections::BTreeSet::new();
+    for checker in 0..checkers.len() {
+        let mine: Vec<_> = visits.iter().filter(|visit| visit.0 == checker).collect();
+        let expected: Vec<usize> = (0..sources.len())
+            .filter(|&position| plan.associations[position] == checker)
+            .collect();
+        assert_eq!(
+            mine.iter().map(|visit| visit.2).collect::<Vec<_>>(),
+            expected
+        );
+        assert!(mine.iter().all(|visit| visit.3 == sources[visit.2]));
+        let thread = mine.first().map(|visit| visit.1);
+        assert!(
+            mine.iter().all(|visit| Some(visit.1) == thread),
+            "one task per checker"
+        );
+        if let Some(thread) = thread {
+            assert_ne!(thread, std::thread::current().id());
+            threads.insert(format!("{thread:?}"));
+        }
+    }
+    assert_eq!(
+        threads.len(),
+        plan.associations
+            .iter()
+            .collect::<std::collections::BTreeSet<_>>()
+            .len()
+    );
+}
+
+/// Contract 3, work groups (core/workgroup.go `NewWorkGroup`, the
+/// single-threaded group's `Queue`, `RunAndWait` and `pop`, the parallel
+/// group's; compiler/checkerpool.go `forEachCheckerGroupDo`,
+/// `forEachCheckerParallel`, `GetGlobalDiagnostics`): a single-threaded group
+/// runs the checkers' tasks on the caller's thread, the last queued first,
+/// which is the order the pin's shows wherever task order is observable; a
+/// parallel group runs every checker's task on its own thread; and the
+/// pool's global diagnostics, every checker's concatenated, sorted and
+/// deduplicated, equal one checker's.
+#[test]
+fn work_groups_order_tasks_as_the_pin_and_global_diagnostics_merge() {
+    use std::sync::Mutex;
+
+    let (program, counters) = files_program(8, no_lib(), Tristate::FALSE);
+    let pool = CompilerCheckerPool::new(program.clone(), &counters);
+    let sources: Vec<NodeId> = program.files().iter().map(|file| file.source()).collect();
+    let checkers = pool.checkers().unwrap();
+    let plan = pool.association_plan().unwrap().clone();
+    let used: std::collections::BTreeSet<usize> = plan.associations.iter().copied().collect();
+    assert!(
+        used.len() > 1,
+        "the witness spreads its files over several checkers"
+    );
+
+    let caller = std::thread::current().id();
+    let order = Mutex::new(Vec::new());
+    pool.for_each_checker_group_do(&sources, true, &|operation, _, _| {
+        let checker = checkers
+            .iter()
+            .position(|owner| Arc::ptr_eq(owner, operation.owner()))
+            .unwrap();
+        assert_eq!(std::thread::current().id(), caller);
+        let mut order = order.lock().unwrap();
+        if order.last() != Some(&checker) {
+            order.push(checker);
+        }
+    })
+    .unwrap();
+    let mut expected: Vec<usize> = used.iter().copied().collect();
+    expected.reverse();
+    assert_eq!(order.into_inner().unwrap(), expected, "last queued first");
+
+    let threads = Mutex::new(Vec::new());
+    pool.for_each_checker_parallel(&|index, operation| {
+        assert!(Arc::ptr_eq(operation.owner(), &checkers[index]));
+        threads.lock().unwrap().push(std::thread::current().id());
+    })
+    .unwrap();
+    let threads = threads.into_inner().unwrap();
+    assert_eq!(threads.len(), checkers.len());
+    assert!(threads.iter().all(|thread| *thread != caller));
+    assert_eq!(
+        threads
+            .iter()
+            .map(|thread| format!("{thread:?}"))
+            .collect::<std::collections::BTreeSet<_>>()
+            .len(),
+        checkers.len()
+    );
+
+    let merged = pool.global_diagnostics().unwrap();
+    assert!(
+        !merged.is_empty(),
+        "a no-lib program reports its missing global types"
+    );
+    let single = checker(&program, &counters, None)
+        .operation()
+        .unwrap()
+        .global_diagnostics()
+        .unwrap();
+    assert_eq!(
+        merged,
+        program.sort_and_deduplicate_diagnostics(&single).unwrap()
+    );
 }
