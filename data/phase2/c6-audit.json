@@ -6,51 +6,6 @@
    "reason": "The release the non-exclusive acquisitions return in the pin; the Rust non-exclusive acquisitions hand out the checker owner, whose every call acquires and releases its own operation, so there is no release to return.",
    "reviewed_from": "pinned body and its callers; C6.3 source audit",
    "rust": "crates/tsr_compiler/src/checker_pool.rs:533"
-  },
-  "tsc/internal/compiler/program.go:Program.ForEachCheckerParallel": {
-   "disposition": "gap",
-   "item": "C6.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/program.go:Program.GetCheckerPool": {
-   "disposition": "gap",
-   "item": "C6.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/program.go:Program.GetTypeChecker": {
-   "disposition": "gap",
-   "item": "C6.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/program.go:Program.GetTypeCheckerForFile": {
-   "disposition": "gap",
-   "item": "C6.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/program.go:Program.GetTypeCheckerForFileExclusive": {
-   "disposition": "gap",
-   "item": "C6.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/program.go:Program.collectCheckerDiagnostics": {
-   "disposition": "gap",
-   "item": "C6.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/program.go:Program.collectCheckerDiagnosticsFromFiles": {
-   "disposition": "gap",
-   "item": "C6.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/program.go:Program.collectDiagnosticsFromFiles": {
-   "disposition": "gap",
-   "item": "C6.4",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/compiler/program.go:Program.initCheckerPool": {
-   "disposition": "gap",
-   "item": "C6.4",
-   "reason": "Not yet ported; the item that closes it is named."
   }
  },
  "groups": {

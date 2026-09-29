@@ -3,8 +3,10 @@
 //! unsupported source operations fail with a named boundary.
 mod bind_diagnostics;
 mod cache;
+mod checked_program;
 mod checker_diagnostics;
 mod checker_host;
+pub use checked_program::{CheckedProgram, CheckerCollect, FileCheckers};
 mod checker_pool;
 pub use checker_pool::{
     checker_association_base_weight, checker_association_order, checker_association_policy,

@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import phase2_assignments as assignments  # noqa: E402
 import phase2_audit as audit  # noqa: E402
 import phase2_blockers as blockers  # noqa: E402
+import phase2_corpus as corpus  # noqa: E402
 import phase2_native_concurrent as concurrent  # noqa: E402
 import phase2_producers as producers  # noqa: E402
 
@@ -112,6 +113,51 @@ class Assignments(unittest.TestCase):
         self.assertNotIn("FMSUB", amd64)
         self.assertNotIn("VFMADD", amd64)
         self.assertNotIn("VFNMADD", amd64)
+
+
+class Modes(unittest.TestCase):
+    """C6.4: a request names its test-program mode and a pooled row records
+    its mode and checker count; union ordering covers every checker."""
+
+    def row(self, mode, count, checkers):
+        row = {"load": {"state": "executed"}, "phase2": {
+            "trace": {"state": "disabled"},
+            "union_ordering": {"state": "executed", "checkers": checkers, "unions": 7 * checkers, "inconsistent": 0},
+            "parent_pointers": {"state": "executed", "files": 1, "nodes": 1, "failure": None}}}
+        if mode is not None:
+            row["mode"] = mode
+        if count is not None:
+            row["checker_count"] = count
+        return row
+
+    def validate(self, request, row):
+        with unittest.mock.patch.object(corpus.p5, "validate_row"), \
+                unittest.mock.patch.object(corpus, "pre_emit_view", side_effect=lambda _, base: base):
+            return corpus.validate_row(dict(request, loading={"options": {}}), row)
+
+    def test_a_pooled_row_records_its_mode_and_checker_count(self):
+        self.validate({"mode": "concurrent"}, self.row("concurrent", 4, 4))
+        self.validate({"mode": "single"}, self.row("single", 1, 1))
+        self.validate({}, self.row(None, None, 1))
+        for request, row, message in (
+                ({"mode": "concurrent"}, self.row(None, None, 4), "mode differs"),
+                ({"mode": "concurrent"}, self.row("single", 4, 4), "mode differs"),
+                ({"mode": "single"}, self.row("single", 4, 4), "checker count"),
+                ({"mode": "concurrent"}, self.row("concurrent", 0, 0), "checker count"),
+                ({"mode": "concurrent"}, self.row("concurrent", 4, 1), "every checker"),
+                ({}, self.row("single", 1, 1), "without a mode"),
+                ({}, self.row(None, None, 2), "exactly one checker")):
+            with self.subTest(message=message), self.assertRaisesRegex(ValueError, message):
+                self.validate(request, row)
+
+    def test_the_single_mode_refuses_a_concurrent_capture(self):
+        report = {"mode": "concurrent", "single_threaded": False}
+        with unittest.mock.patch.object(corpus.phase2_native, "load_capture", return_value=(ROOT, report, [])), \
+                unittest.mock.patch.object(corpus.phase2_native, "current"):
+            with self.assertRaisesRegex(ValueError, "single-threaded native capture"):
+                corpus.load_native(ROOT, "single")
+        with self.assertRaisesRegex(ValueError, "unknown mode"):
+            corpus.requests(ROOT, mode="parallel")
 
 
 if __name__ == "__main__":

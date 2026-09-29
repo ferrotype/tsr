@@ -4,8 +4,9 @@
 //!
 //! A `program` line carries a corpus row's request (the frozen loading request
 //! and the native harness inputs the config parse reads); the program loads as
-//! the corpus loads it, but in the concurrent mode (not single-threaded), and
-//! the plan is the pool's for its checker count. A
+//! the corpus loads it, in the concurrent mode (the program's own
+//! single-threaded setting unknown), and the plan is the pool's for its
+//! checker count. A
 //! `synthetic` line carries per-file inputs and a checker count, and the plan
 //! is computed from them directly. Output is one JSON line per input line.
 #[path = "../../../tools/s08/p4/config.rs"]
@@ -90,8 +91,9 @@ fn program(line: &Value) -> Value {
             return json!({"id": line["id"], "state": "config_failed", "reason": error.to_string()})
         }
     };
-    let mut options = observation::program_options(&request["loading"], parsed);
-    options.single_threaded = tsr_core::Tristate::FALSE;
+    // The concurrent-mode harness leaves the program's setting unknown, so
+    // the compiler option decides (harnessutil.createProgram).
+    let options = observation::program_options(&request["loading"], parsed);
     let counters = tsr_arena::Counters::new();
     let program = match Program::load(options, &mut FileCache::new(), &counters) {
         Ok(program) => Arc::new(program),

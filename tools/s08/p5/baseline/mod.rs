@@ -183,15 +183,17 @@ impl Trace {
     }
 }
 
-struct Walker<'a, 'operation> {
+struct Walker<'a, 'checkers, 'operation> {
     program: &'a Program,
-    op: &'a mut Operation<'operation>,
+    /// The checker of each file (one, or every checker of the pool).
+    op: &'a mut tsr_compiler::FileCheckers<'checkers, 'operation>,
     had_errors: bool,
     trace: &'a mut Trace,
     timing: &'a mut dyn Timing,
-    type_strings: Vec<(Value, TypeRef)>,
+    /// Each walked type with the index of the checker that owns it.
+    type_strings: Vec<(Value, TypeRef, usize)>,
 }
-impl Walker<'_, '_> {
+impl Walker<'_, '_, '_> {
     fn baseline(&mut self, files: &[InputFile<'_>], header: &[u8], symbols: bool) -> Result<Value> {
         let mut output = Vec::new();
         for input in files {
@@ -205,6 +207,8 @@ impl Walker<'_, '_> {
                 .file(path.as_bytes())
                 .ok_or("baseline source absent from program")?
                 .source();
+            // The pin's walker asks for this file's checker.
+            self.op.select(source)?;
             let mut rows = Vec::new();
             for id in nodes(self.program, source)? {
                 let view = ast(self.program, id)?;
@@ -212,7 +216,7 @@ impl Walker<'_, '_> {
                 if self.trace.record_queries {
                     self.trace.active = self.stamp(source, id, "ClassifyNode")?;
                 }
-                let selected = self.op.is_expression_node(id)?
+                let selected = self.op.current_mut().is_expression_node(id)?
                     || node.kind() == K::Identifier
                     || classify::declaration_name(view, id)?
                     || node.kind() == K::QualifiedName
@@ -276,6 +280,28 @@ pub fn generate_with_timing(
     trace: &mut Trace,
     timing: &mut dyn Timing,
 ) -> Value {
+    let mut checkers = tsr_compiler::FileCheckers::single(op);
+    generate_for_checkers(
+        program,
+        &mut checkers,
+        files,
+        header,
+        had_errors,
+        trace,
+        timing,
+    )
+}
+
+/// The walk with each file's own checker (the pin's `GetTypeCheckerForFile`).
+pub fn generate_for_checkers(
+    program: &Program,
+    op: &mut tsr_compiler::FileCheckers<'_, '_>,
+    files: &[InputFile<'_>],
+    header: &[u8],
+    had_errors: bool,
+    trace: &mut Trace,
+    timing: &mut dyn Timing,
+) -> Value {
     let mut walker = Walker {
         program,
         op,
@@ -296,7 +322,7 @@ pub fn generate_with_timing(
             if walker.trace.collect_type_strings {
                 let display = (|| -> Result<Vec<Value>> {
                     let mut rows = Vec::new();
-                    for (mut row, typ) in walker.type_strings {
+                    for (mut row, typ, checker) in walker.type_strings {
                         if walker.trace.record_queries {
                             walker.trace.active = row.clone();
                         } else {
@@ -306,7 +332,7 @@ pub fn generate_with_timing(
                         let text = {
                             #[cfg(feature = "s08-phase-timer")]
                             let _display = instrument::Display::begin();
-                            walker.op.type_to_string(typ,
+                            walker.op.checker(checker).type_to_string(typ,
                                 tsr_checker::type_format_flags::ALLOW_UNIQUE_ES_SYMBOL_TYPE
                                     | tsr_checker::type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE)
                         };
