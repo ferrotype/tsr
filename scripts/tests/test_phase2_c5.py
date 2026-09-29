@@ -220,7 +220,7 @@ class Wiring(unittest.TestCase):
                       "data/phase2/services-replay.json.xz"):
             self.assertIn(extra, spec["inputs"])
         self.assertIn("C5", blockers.CHECKPOINT_CLAIMS)
-        self.assertEqual(producers.CHECKPOINTS[-1], "C5")
+        self.assertIn("C5", producers.CHECKPOINTS)
         self.assertIn("c5-contracts", producers.WITNESSES)
         document = audit.load(ROOT / "data/phase2/c5-audit.json")
         self.assertEqual(document["checkpoint"], "C5")

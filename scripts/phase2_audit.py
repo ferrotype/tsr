@@ -123,11 +123,28 @@ C5_REVIEWED_GROUPS = {
 # Every file group of the C5 scope covers its complete pinned file.
 C5_COMPLETE_FILES = {group: "tsc/internal/checker/" + group.rsplit("(", 1)[1].rstrip(")") + ":"
                      for group in C5_REVIEWED_GROUPS if group.endswith(".go)")}
+# C6 (docs/PHASE2-C6-plan.md, C6.1): the compiler checker pool, the tracer and
+# the work groups as complete files; the program's checker driving, the
+# cancellation functions and polling sites, the relater's tracer call and the
+# checker constructor as reviewed selections.
+C6_REVIEWED_GROUPS = {
+    "C6.3 compiler checker pool (checkerpool.go)": (18, "e9a149f26d0847bea6710dcc6fe62eadc407ffaecc0614832523240623ce8e06"),
+    "C6.2 tracer (tracer.go)": (38, "78fbe68a50f8e6652efb02b7da9fc43ca90d6c793018c1e4475f337743e70b7c"),
+    "C6.4 work groups (workgroup.go)": (9, "92ad6e89f8a05b9914b85e10ec7e709c27b4ccd04c4a3ca058c41121bad7733f"),
+    "C6.4 program driving (program.go)": (15, "9ebb13722d026a72b123c2bd2e6be23525842afb0d0ca9c77e3f40137333a171"),
+    "C6.5 cancellation (checker.go, utilities.go, exports.go)": (7, "e3ccd4d5902edafa6a8dac4b9585beb4d00592869ad979c3135cfc7b4b6a4b89"),
+    "C6.2 tracer call sites (relater.go)": (1, "95911734da0cd7e3cef044aff0631a9e10e4824d4c22188faea6b3f6d6308424"),
+    "C6.3 checker constructor (checker.go)": (1, "a4f66d6b8a3775c48bc2fef0974040c7bc79bb37b8595af47f0d3041c33bc410"),
+}
+C6_COMPLETE_FILES = {"C6.3 compiler checker pool (checkerpool.go)": "tsc/internal/compiler/checkerpool.go:",
+                     "C6.2 tracer (tracer.go)": "tsc/internal/checker/tracer.go:",
+                     "C6.4 work groups (workgroup.go)": "tsc/internal/core/workgroup.go:"}
 SCOPES = {"C1": (REVIEWED_GROUPS, COMPLETE_FILES, REQUIRED_HANDOFFS),
           "C2": (C2_REVIEWED_GROUPS, C2_COMPLETE_FILES, {}),
           "C3": (C3_REVIEWED_GROUPS, C3_COMPLETE_FILES, {}),
           "C4": (C4_REVIEWED_GROUPS, C4_COMPLETE_FILES, {}),
-          "C5": (C5_REVIEWED_GROUPS, C5_COMPLETE_FILES, {})}
+          "C5": (C5_REVIEWED_GROUPS, C5_COMPLETE_FILES, {}),
+          "C6": (C6_REVIEWED_GROUPS, C6_COMPLETE_FILES, {})}
 
 
 def inventory():

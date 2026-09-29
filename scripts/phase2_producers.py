@@ -101,6 +101,10 @@ CHECKPOINT_AUTHORITIES = {
     "C5": {**{name: ROOT / f"data/phase2/c5-{name}{'.json.gz' if name == 'baseline' else '.json'}"
               for name in ("claims", "audit", "baseline")},
            "services": ROOT / "data/phase2/services-replay.json"},
+    # C6 owns no rows; its concurrent native capture, assignment record, mode
+    # comparison and contracts join as their items land (docs/PHASE2-C6-plan.md, C6.10).
+    "C6": {name: ROOT / f"data/phase2/c6-{name}{'.json.gz' if name == 'baseline' else '.json'}"
+           for name in ("claims", "audit", "baseline")},
 }
 WITNESSES = {
     "c1-contracts": {
@@ -323,7 +327,7 @@ def _c1_claim_metrics(comparison, claims, blockers=None):
     return metrics
 
 
-CHECKPOINTS = ("C2", "C3", "C4", "C5")
+CHECKPOINTS = ("C2", "C3", "C4", "C5", "C6")
 
 
 def newest_checkpoint(loaded):
