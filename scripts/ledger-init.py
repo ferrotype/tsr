@@ -94,6 +94,12 @@ KNOWN_OS = {"aix", "android", "darwin", "dragonfly", "freebsd", "illumos", "ios"
 KNOWN_ARCH = {"386", "amd64", "arm", "arm64", "loong64", "mips", "mips64", "mips64le", "mipsle", "ppc64", "ppc64le", "riscv64", "s390x", "wasm"}
 
 
+# Files whose parity phase is not their package's. The compiler checker pool is
+# Phase 2's (docs/PHASE2-plan.md decision 4, docs/PHASE2-C6-plan.md decision 1);
+# the rest of internal/compiler stays Phase 4's.
+FILE_PHASES = {"tsc/internal/compiler/checkerpool.go": 2}
+
+
 def crate_for(pkg):
     best = None
     for prefix, val in CRATES.items():
@@ -317,6 +323,7 @@ def build_ledger(upstream, pin, previous, blobs):
         head = "\n".join(text.splitlines()[:15])
         pkg = path.removeprefix("tsc/").rsplit("/", 1)[0]
         krate, phase = crate_for(pkg)
+        phase = FILE_PHASES.get(path, phase)
         if any(pkg == p or pkg.startswith(p + "/") for p in HARNESS_PREFIXES):
             kind = "harness"
         elif path.endswith("_generated.go") or "Code generated" in head:
