@@ -185,9 +185,9 @@ fn source_assignment_diagnostics_match_pinned_native_ranges_and_payload_on_repea
 #[test]
 fn source_check_repeats_its_result_across_operations_for_diagnostics_and_unported_input() {
     // `typeof before` resolves now, so the program that once stopped at an
-    // unported boundary reports its assignment diagnostic instead. JSX input is
-    // still unported, and a failure must repeat across operations just as a
-    // diagnostic does.
+    // unported boundary reports its assignment diagnostic instead. Checking a
+    // JSON module is still unported, and a failure must repeat across
+    // operations just as a diagnostic does.
     let (checker, source) = checker(
         b"let before: number = \"wrong\"; type Later = typeof before;",
         options(),
@@ -206,15 +206,21 @@ fn source_check_repeats_its_result_across_operations_for_diagnostics_and_unporte
         );
     }
     let (owner, program, _) = fixture_files(
-        b"/main.tsx",
-        &[(b"/main.tsx", b"export const a = <div/>;")],
-        options(),
+        b"/main.ts",
+        &[
+            (b"/main.ts", b"import data from \"./data.json\";"),
+            (b"/data.json", b"{ \"a\": 1 }"),
+        ],
+        CompilerOptions {
+            resolve_json_module: Tristate::TRUE,
+            ..options()
+        },
     );
-    let source = program.file(b"/main.tsx").unwrap().source();
+    let source = program.file(b"/data.json").unwrap().source();
     for _ in 0..3 {
         assert_eq!(
             owner.operation().unwrap().semantic_diagnostics(source),
-            Err(Error::Unsupported("checkExpressionWorker"))
+            Err(Error::Unsupported("checkSourceFile: non-script input"))
         );
     }
 }
