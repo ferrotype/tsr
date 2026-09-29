@@ -75,7 +75,7 @@
   "tsc/internal/checker/checker.go:Checker.getClassOrInterfaceDeclarationsOfSymbol": {
    "disposition": "equivalent",
    "reason": "the declaration filter is inline where the pin calls it",
-   "rust": "crates/tsr_checker/src/class_check.rs:493"
+   "rust": "crates/tsr_checker/src/class_check.rs:491"
   },
   "tsc/internal/checker/checker.go:Checker.getConstraintFromIndexedAccess": {
    "disposition": "equivalent",
@@ -90,7 +90,7 @@
   "tsc/internal/checker/checker.go:Checker.getDeclarationNodeFlagsFromSymbol": {
    "disposition": "equivalent",
    "reason": "get_combined_node_flags over the value declaration at the call sites",
-   "rust": "crates/tsr_checker/src/check.rs:227"
+   "rust": "crates/tsr_checker/src/check.rs:217"
   },
   "tsc/internal/checker/checker.go:Checker.getDeclaredTypeOfAlias": {
    "disposition": "equivalent",
@@ -234,7 +234,7 @@
   "tsc/internal/checker/checker.go:Checker.getTypeOfFuncClassEnumModule": {
    "disposition": "equivalent",
    "reason": "the worker is ported; its value-links cache is the query state's",
-   "rust": "crates/tsr_checker/src/enums.rs:257"
+   "rust": "crates/tsr_checker/src/enums.rs:256"
   },
   "tsc/internal/checker/checker.go:Checker.getTypeParametersForTypeAndSymbol": {
    "disposition": "mapped",
@@ -409,7 +409,7 @@
   "tsc/internal/checker/checker.go:isConstEnumSymbol": {
    "disposition": "equivalent",
    "reason": "const_enum_object_type tests the symbol's const-enum flag inline",
-   "rust": "crates/tsr_checker/src/enums.rs:732"
+   "rust": "crates/tsr_checker/src/enums.rs:731"
   },
   "tsc/internal/checker/checker.go:isGenericTupleType": {
    "disposition": "equivalent",

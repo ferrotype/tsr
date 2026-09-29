@@ -223,6 +223,8 @@ pub mod semaphore;
 // Phase 1 operation-table groups core and concurrency
 // (docs/PHASE1-mutation-witnesses.md, section 9).
 pub mod bfs;
+mod cancellation;
+pub use cancellation::CancellationToken;
 pub mod context;
 pub mod linkstore;
 pub mod node_modules;

@@ -286,9 +286,7 @@ impl CheckerState {
             }
         }
         let nodes = self.source_list(node, self.node(node)?.type_argument_list())?;
-        for &node in &nodes {
-            self.check_source_element(node)?;
-        }
+        self.check_source_elements(nodes)?;
         let read = self.node(node)?;
         let const_assertion =
             tsr_ast::utilities_middle::is_const_type_reference(self.ast(node)?, &read)?

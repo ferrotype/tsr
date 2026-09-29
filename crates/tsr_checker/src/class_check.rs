@@ -220,9 +220,7 @@ impl CheckerState {
         self.check_source_index_constraints(static_type, node, true)?;
         self.check_class_property_initialization(node, &members)?;
         if self.node(node)?.kind() != K::ClassExpression {
-            for member in members {
-                self.check_source_element(member)?;
-            }
+            self.check_source_elements(members)?;
             self.register_for_unused_identifiers_check(node)?;
         }
         Ok(())

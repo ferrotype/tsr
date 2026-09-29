@@ -163,6 +163,30 @@ impl CheckerPool {
     }
 }
 
+impl CheckerPool {
+    /// Disposes a canceled checker when its checkout is released, as the pin's
+    /// release does (`WasCanceled`): the slot's next acquisition creates a
+    /// fresh checker. Retained results keep the canceled owner alive, and its
+    /// generation is not retired.
+    fn dispose_canceled(&self, index: usize, owner: &Arc<CheckerOwner>) {
+        let displaced = {
+            let Ok(mut slots) = self.slots.lock() else {
+                return;
+            };
+            let current = slots[index]
+                .checker
+                .get()
+                .and_then(|result| result.as_ref().ok());
+            if !current.is_some_and(|current| Arc::ptr_eq(current, owner)) {
+                return;
+            }
+            std::mem::take(&mut slots[index].checker)
+        };
+        // As in evict_idle, a checker's destructor runs outside the pool lock.
+        drop(displaced);
+    }
+}
+
 struct RetireOnUnwind<'a>(&'a Generation);
 impl Drop for RetireOnUnwind<'_> {
     fn drop(&mut self) {
@@ -192,6 +216,15 @@ impl Drop for Reservation {
 pub struct PooledChecker {
     owner: Arc<CheckerOwner>,
     reservation: Reservation,
+}
+impl Drop for PooledChecker {
+    fn drop(&mut self) {
+        if self.owner.was_canceled() {
+            self.reservation
+                .pool
+                .dispose_canceled(self.reservation.index, &self.owner);
+        }
+    }
 }
 impl PooledChecker {
     pub fn owner(&self) -> &Arc<CheckerOwner> {

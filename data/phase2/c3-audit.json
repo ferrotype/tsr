@@ -77,7 +77,7 @@
    "disposition": "equivalent",
    "reason": "The pin's static-block check runs the grammar check and visits the block's statements; the Rust source-element arm does the same at this site.",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check.rs:173"
+   "rust": "crates/tsr_checker/src/check.rs:163"
   },
   "tsc/internal/checker/checker.go:Checker.checkCollisionWithGlobalObjectInGeneratedCode": {
    "disposition": "equivalent",
@@ -107,7 +107,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkExpressionStatement).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check.rs:329"
+   "rust": "crates/tsr_checker/src/check.rs:316"
   },
   "tsc/internal/checker/checker.go:Checker.checkJSDocComment": {
    "disposition": "equivalent",
@@ -158,10 +158,8 @@
    "rust": "crates/tsr_checker/src/access_expressions.rs:28"
   },
   "tsc/internal/checker/checker.go:Checker.checkSourceElements": {
-   "disposition": "equivalent",
-   "reason": "The pin's statement loop with its cancellation poll; the Rust checker iterates the source elements at this site (C6.5 adds the poll).",
-   "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check.rs:120"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C6.5 (cancellation.rs): the statement loop polls the cancellation before each element, and every caller that loops over source elements goes through it."
   },
   "tsc/internal/checker/checker.go:Checker.checkThisType": {
    "disposition": "mapped",
@@ -171,19 +169,19 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkTypeOperator).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check.rs:297"
+   "rust": "crates/tsr_checker/src/check.rs:284"
   },
   "tsc/internal/checker/checker.go:Checker.checkTypeQuery": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkTypeQuery).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check.rs:205"
+   "rust": "crates/tsr_checker/src/check.rs:195"
   },
   "tsc/internal/checker/checker.go:Checker.checkVariableStatement": {
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkVariableStatement).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check.rs:209"
+   "rust": "crates/tsr_checker/src/check.rs:199"
   },
   "tsc/internal/checker/checker.go:Checker.checkVoidExpression": {
    "disposition": "equivalent",
@@ -260,9 +258,8 @@
    "rust": "crates/tsr_checker/src/binary.rs:54"
   },
   "tsc/internal/checker/checker.go:Checker.getDiagnostics": {
-   "disposition": "later",
-   "owner": "C5",
-   "reason": "the public GetDiagnostics and GetSuggestionDiagnostics entry points are the C5.2 API surface; the compiler reaches the per-file diagnostics through the operation"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C6.5 (cancellation.rs): the canceled-checker refusal, the check with the caller's context and no diagnostics from a canceled check; semantic and suggestion diagnostics both go through it."
   },
   "tsc/internal/checker/checker.go:Checker.getEmitSyntaxForModuleSpecifierExpression": {
    "disposition": "equivalent",
@@ -438,7 +435,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (hasShadowedNamespace).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/source_modules.rs:358"
+   "rust": "crates/tsr_checker/src/source_modules.rs:356"
   },
   "tsc/internal/checker/checker.go:Checker.invocationError": {
    "disposition": "equivalent",
@@ -492,7 +489,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (isPropertyWithoutInitializer).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/class_check.rs:422"
+   "rust": "crates/tsr_checker/src/class_check.rs:420"
   },
   "tsc/internal/checker/checker.go:Checker.isReadonlyTypeOperator": {
    "disposition": "equivalent",
@@ -526,7 +523,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (isUnwrappedReturnTypeUndefinedVoidOrAny).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check_bodies.rs:996"
+   "rust": "crates/tsr_checker/src/check_bodies.rs:999"
   },
   "tsc/internal/checker/checker.go:Checker.lookupOrIssueError": {
    "disposition": "equivalent",
@@ -676,7 +673,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same check (getFirstNonAmbientClassOrFunctionDeclaration).",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/source_modules.rs:40"
+   "rust": "crates/tsr_checker/src/source_modules.rs:38"
   },
   "tsc/internal/checker/checker.go:getIndexNodeForAccessExpression": {
    "disposition": "equivalent",
@@ -728,7 +725,7 @@
    "disposition": "equivalent",
    "reason": "No caller in the pinned checker package.",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/class_check.rs:422"
+   "rust": "crates/tsr_checker/src/class_check.rs:420"
   },
   "tsc/internal/checker/checker.go:isNotReplacableByMethod": {
    "disposition": "equivalent",
@@ -858,7 +855,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller; the Rust site carries the same logic (checkGrammarIndexSignature).",
    "reviewed_from": "pinned body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check_type_syntax.rs:342"
+   "rust": "crates/tsr_checker/src/check_type_syntax.rs:340"
   },
   "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarTopLevelElementForRequiredDeclareModifier": {
    "disposition": "equivalent",
@@ -921,9 +918,8 @@
    "rust": "crates/tsr_checker/src/calls.rs:621"
   },
   "tsc/internal/checker/utilities.go:Checker.checkNotCanceled": {
-   "disposition": "later",
-   "owner": "C6",
-   "reason": "cancellation is C6.5: the poisoned-checker refusal at diagnostics and the node builder"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C6.5 (cancellation.rs): the pin's panic is Error::PreviouslyCanceled with the pin's message."
   },
   "tsc/internal/checker/utilities.go:Checker.getPackagesMap": {
    "disposition": "equivalent",
@@ -932,9 +928,8 @@
    "rust": "crates/tsr_compiler/src/checker_host.rs:260"
   },
   "tsc/internal/checker/utilities.go:Checker.isCanceled": {
-   "disposition": "later",
-   "owner": "C6",
-   "reason": "cancellation polling is C6.5"
+   "disposition": "mapped",
+   "reason": "Ported with a marker at C6.5 (cancellation.rs)."
   },
   "tsc/internal/checker/utilities.go:Checker.packageBundlesTypes": {
    "disposition": "equivalent",
@@ -1034,7 +1029,7 @@
    "disposition": "equivalent",
    "reason": "Inlined at the port of its pinned caller: the Rust site computes the predicate from the node or type accessors directly (getDeclarationsOfKind).",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/check_type_syntax.rs:611"
+   "rust": "crates/tsr_checker/src/check_type_syntax.rs:609"
   },
   "tsc/internal/checker/utilities.go:getEnclosingContainer": {
    "disposition": "equivalent",
@@ -1112,7 +1107,7 @@
    "disposition": "equivalent",
    "reason": "No caller in the pinned checker package; the Rust site named is where the same fact is computed for its own callers.",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1066"
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1068"
   },
   "tsc/internal/checker/utilities.go:introducesArgumentsExoticObject": {
    "disposition": "mapped",
@@ -1248,7 +1243,7 @@
    "disposition": "equivalent",
    "reason": "No caller in the pinned checker package; the Rust site named is where the same fact is computed for its own callers.",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1177"
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1179"
   },
   "tsc/internal/checker/utilities.go:isJsxIntrinsicTagName": {
    "disposition": "mapped",
@@ -1450,7 +1445,7 @@
    "disposition": "equivalent",
    "reason": "The pin's only caller, the class expression helper check, walks up outer expressions to the class expression's use; the Rust port walks the same parenthesized and assertion parents at this site.",
    "reviewed_from": "pinned utilities.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/class_expressions.rs:34"
+   "rust": "crates/tsr_checker/src/class_expressions.rs:33"
   }
  },
  "groups": {

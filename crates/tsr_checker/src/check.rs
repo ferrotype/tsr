@@ -19,14 +19,6 @@ fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
 }
 
 impl CheckerState {
-    // port: tsc/internal/checker/checker.go:Checker.checkSourceFile
-    pub(crate) fn check_source_file(&mut self, source: NodeId) -> Result<(), Error> {
-        let options = self.program()?.host.options();
-        let check_unused = options.no_unused_locals == Tristate::TRUE
-            || options.no_unused_parameters == Tristate::TRUE;
-        self.check_source_file_ex(source, check_unused)
-    }
-
     /// `checkUnused` is also requested by suggestion collection, which runs the
     /// unused-identifier pass regardless of the compiler options.
     pub(crate) fn check_source_file_ex(
@@ -77,7 +69,7 @@ impl CheckerState {
             // This pass depends on a completed type check, but its own failure
             // must not poison later requests that need only type checking.
             let result = (|| {
-                if !self.source_file_read(source)?.is_declaration_file {
+                if !self.source_file_read(source)?.is_declaration_file && !self.is_canceled() {
                     let nodes = self
                         .query
                         .identifier_check_nodes
@@ -116,15 +108,13 @@ impl CheckerState {
             .node_slice(view.node(source)?.statements(view)?)?
             .iter()
             .collect();
-        for statement in statements.into_iter().flatten() {
-            self.check_source_element(statement)?;
-        }
+        self.check_source_elements(statements.into_iter().flatten())?;
         self.finish_deferred_function_bodies(source)?;
         if tsr_ast::utilities::is_external_or_common_js_module(&self.source_file_read(source)?) {
             self.check_external_module_exports(source)?;
             self.register_for_unused_identifiers_check(source)?;
         }
-        if !self.source_file_read(source)?.is_declaration_file {
+        if !self.source_file_read(source)?.is_declaration_file && !self.is_canceled() {
             self.check_unused_renamed_binding_elements()?;
         }
         self.check_deferred_diagnostics()?;
@@ -245,10 +235,7 @@ impl CheckerState {
                 )?;
                 let declarations: Vec<_> =
                     view.node_slice(view.list(list)?.nodes())?.iter().collect();
-                for declaration in declarations.into_iter().flatten() {
-                    self.check_source_element(declaration)?;
-                }
-                Ok(())
+                self.check_source_elements(declarations.into_iter().flatten())
             }
             Some(K::PropertySignature) => self.check_property_signature(node),
             Some(K::VariableDeclaration) => self.check_variable_declaration(node),
@@ -442,9 +429,8 @@ impl CheckerState {
             self.check_interface_inheritance(name, symbol)?;
             self.check_object_duplicate_declarations(node, false)?;
             self.check_interface_heritage(node)?;
-            for member in self.source_list(node, self.node(node)?.member_list())? {
-                self.check_source_element(member)?;
-            }
+            let members = self.source_list(node, self.node(node)?.member_list())?;
+            self.check_source_elements(members)?;
             self.check_class_or_interface_duplicate_indexes(node)?;
         } else {
             let annotation = required(self.node(node)?.type_node(), "type alias annotation")?;
@@ -481,10 +467,8 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkTypeLiteral
     fn check_object_type_members(&mut self, node: NodeId) -> Result<(), Error> {
         self.check_object_duplicate_declarations(node, false)?;
-        for member in self.source_list(node, self.node(node)?.member_list())? {
-            self.check_source_element(member)?;
-        }
-        Ok(())
+        let members = self.source_list(node, self.node(node)?.member_list())?;
+        self.check_source_elements(members)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkVariableDeclaration

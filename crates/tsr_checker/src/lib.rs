@@ -249,6 +249,7 @@ mod widening;
 pub use relater::RelationKind;
 #[cfg(feature = "services-replay")]
 pub use replay_view::{LiteralView, SignatureView, TypeView, TypeViewData};
+mod cancellation;
 mod trace;
 mod type_display;
 mod type_parameters;
@@ -339,6 +340,10 @@ pub enum Error {
     },
     /// A link upstream would have set before this read (a nil dereference there).
     MissingLink(&'static str),
+    /// The checker was canceled during an earlier check and refuses
+    /// diagnostics and node building (the pin's `checkNotCanceled` panic,
+    /// `Checker was previously cancelled`). The generation stays live.
+    PreviouslyCanceled,
 }
 
 impl From<tsr_vfs::Error> for Error {
@@ -384,6 +389,7 @@ impl std::fmt::Display for Error {
                 write!(output, "unexpected {kind:?} type in {context}")
             }
             Self::MissingLink(what) => write!(output, "missing {what}"),
+            Self::PreviouslyCanceled => output.write_str("Checker was previously cancelled"),
         }
     }
 }

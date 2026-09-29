@@ -113,6 +113,8 @@ impl NodeBuilder<'_> {
     // port: tsc/internal/checker/nodecopy.go:NodeBuilderImpl.tryReuseExistingNodeHelper
     // port: tsc/internal/checker/nodecopy.go:NodeBuilderImpl.finalizeBoundary
     pub(super) fn reuse_node(&mut self, node: NodeId) -> Result<Option<NodeId>, Error> {
+        // createRecoveryBoundary refuses a previously canceled checker.
+        self.checker.check_not_canceled()?;
         self.reuse_retain(node)?;
         self.reuse_boundaries.push(RecoveryBoundary {
             had_error: false,

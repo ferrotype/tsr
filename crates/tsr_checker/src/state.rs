@@ -68,6 +68,10 @@ pub(crate) struct CheckerState {
     pub(crate) types: TypeStore,
     /// `Checker.tracer`: the optional trace session of `NewChecker`.
     pub(crate) tracer: Option<crate::trace::Tracer>,
+    /// `Checker.ctx` while a source check runs: its cancellation.
+    pub(crate) cancellation: Option<tsr_core::CancellationToken>,
+    /// `Checker.wasCanceled`: set by a canceled check, never cleared.
+    pub(crate) was_canceled: bool,
     pub(crate) signatures: SignatureStore,
     pub(crate) resolution: ResolutionStack,
     pub(crate) mapped_symbol_links: LinkStore<SymbolId, crate::mapped::MappedSymbolLinks>,
@@ -159,6 +163,8 @@ impl CheckerState {
             source_checks: crate::types::Map::default(),
             types: TypeStore::new(),
             tracer: None,
+            cancellation: None,
+            was_canceled: false,
             signatures: SignatureStore::new(),
             resolution: ResolutionStack::new(),
             value_symbol_links: LinkStore::new(),

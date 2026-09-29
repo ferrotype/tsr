@@ -35,9 +35,8 @@ impl CheckerState {
         } else {
             self.check_grammar_type_arguments(node)?;
         }
-        for argument in self.source_list(node, self.node(node)?.type_argument_list())? {
-            self.check_source_element(argument)?;
-        }
+        let arguments = self.source_list(node, self.node(node)?.type_argument_list())?;
+        self.check_source_elements(arguments)?;
         if value_expression {
             let mut parent = self.node(node)?.parent();
             while let Some(id) = parent {

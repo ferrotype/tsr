@@ -291,9 +291,7 @@ impl CheckerState {
                         break;
                     }
                 }
-                for element in elements {
-                    self.check_source_element(element)?;
-                }
+                self.check_source_elements(elements)?;
                 self.get_type_from_type_node(node)?;
                 Ok(())
             }

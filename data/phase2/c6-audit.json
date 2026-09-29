@@ -1,21 +1,6 @@
 {
  "checkpoint": "C6",
  "dispositions": {
-  "tsc/internal/checker/checker.go:Checker.checkSourceElements": {
-   "disposition": "gap",
-   "item": "C6.5",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/utilities.go:Checker.checkNotCanceled": {
-   "disposition": "gap",
-   "item": "C6.5",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
-  "tsc/internal/checker/utilities.go:Checker.isCanceled": {
-   "disposition": "gap",
-   "item": "C6.5",
-   "reason": "Not yet ported; the item that closes it is named."
-  },
   "tsc/internal/compiler/checkerpool.go:checkerPool.GetChecker": {
    "disposition": "gap",
    "item": "C6.3",

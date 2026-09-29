@@ -11,10 +11,8 @@ fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
 }
 impl CheckerState {
     pub(crate) fn check_module_block(&mut self, node: NodeId) -> Result<(), Error> {
-        for statement in self.source_list(node, self.node(node)?.statement_list())? {
-            self.check_source_element(statement)?;
-        }
-        Ok(())
+        let statements = self.source_list(node, self.node(node)?.statement_list())?;
+        self.check_source_elements(statements)
     }
     // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarModuleElementContext
     pub(crate) fn check_grammar_module_context(

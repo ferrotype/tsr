@@ -1139,9 +1139,7 @@ impl CheckerState {
                 let type_arguments =
                     self.source_list(node, self.node(node)?.type_argument_list())?;
                 if !type_arguments.is_empty() {
-                    for &argument in &type_arguments {
-                        self.check_source_element(argument)?;
-                    }
+                    self.check_source_elements(type_arguments.iter().copied())?;
                     let view = self.ast(node)?;
                     let file = self.jsx_source_file(node)?;
                     let list =

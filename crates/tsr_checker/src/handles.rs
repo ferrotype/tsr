@@ -544,6 +544,7 @@ impl Operation<'_> {
     }
 
     pub fn global_diagnostics(&mut self) -> Result<Vec<tsr_ast::Diagnostic>, Error> {
+        self.state().check_not_canceled()?;
         Ok(self
             .state_mut()
             .diagnostics_for_file(None)?
@@ -556,13 +557,7 @@ impl Operation<'_> {
         &mut self,
         source: NodeId,
     ) -> Result<Vec<tsr_ast::Diagnostic>, Error> {
-        self.state_mut().check_source_file(source)?;
-        Ok(self
-            .state_mut()
-            .diagnostics_for_file(Some(source))?
-            .into_iter()
-            .cloned()
-            .collect())
+        self.state_mut().diagnostics_in(source, None, false)
     }
 
     /// Suggestions produced by queries and checking, including the
@@ -571,13 +566,7 @@ impl Operation<'_> {
         &mut self,
         source: NodeId,
     ) -> Result<Vec<tsr_ast::Diagnostic>, Error> {
-        self.state_mut().check_source_file_ex(source, true)?;
-        Ok(self
-            .state_mut()
-            .suggestions_for_file(Some(source))?
-            .into_iter()
-            .cloned()
-            .collect())
+        self.state_mut().diagnostics_in(source, None, true)
     }
 
     pub(crate) fn checker(&self) -> ArenaId {

@@ -32,7 +32,7 @@
     "tsc/internal/checker/checker.go:Checker.checkConditionalType": {
       "disposition": "equivalent",
       "reason": "The ConditionalType source-element arm visits every source child with check_source_element, matching ForEachChild(checkSourceElement).",
-      "rust": "crates/tsr_checker/src/check.rs:281"
+      "rust": "crates/tsr_checker/src/check.rs:268"
     },
     "tsc/internal/checker/checker.go:Checker.checkIndexConstraintForIndexSignature": {
       "disposition": "equivalent",
@@ -337,7 +337,7 @@
     "tsc/internal/checker/checker.go:Checker.hasCorrectTypeArgumentArity": {
       "disposition": "equivalent",
       "reason": "Overload candidate selection admits an absent type-argument list or a count between min_type_argument_count and the signature parameter count, exactly the native predicate.",
-      "rust": "crates/tsr_checker/src/calls.rs:874"
+      "rust": "crates/tsr_checker/src/calls.rs:871"
     },
     "tsc/internal/checker/checker.go:Checker.inferSignatureInstantiationForOverloadFailure": {
       "disposition": "equivalent",
@@ -556,7 +556,7 @@
       "disposition": "equivalent",
       "reason": "A function or method declaration counts only when it has a body; every other node counts, matching both export-duplicate diagnostic call sites.",
       "reviewed_from": "pinned implementation and all pinned caller shapes; C2 source audit",
-      "rust": "crates/tsr_checker/src/source_modules.rs:452"
+      "rust": "crates/tsr_checker/src/source_modules.rs:450"
     },
     "tsc/internal/checker/checker.go:isPartOfImportEqualsModuleReference": {
       "disposition": "mapped",

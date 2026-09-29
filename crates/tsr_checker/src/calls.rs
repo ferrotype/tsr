@@ -626,9 +626,8 @@ impl CheckerState {
             kind.known(),
             Some(K::BinaryExpression | K::Decorator | K::JsxOpeningFragment)
         ) {
-            for argument in self.source_list(node, self.node(node)?.type_argument_list())? {
-                self.check_source_element(argument)?;
-            }
+            let arguments = self.source_list(node, self.node(node)?.type_argument_list())?;
+            self.check_source_elements(arguments)?;
         }
         match kind.known() {
             Some(K::JsxOpeningElement | K::JsxSelfClosingElement) => {
@@ -767,9 +766,7 @@ impl CheckerState {
             } else {
                 self.source_list(node, read.type_argument_list())?
             };
-        for &argument in &type_arguments {
-            self.check_source_element(argument)?;
-        }
+        self.check_source_elements(type_arguments.iter().copied())?;
         let candidates = self.reorder_call_candidates(signatures, call_chain_flags)?;
         let requested = self.calls.candidates_request == Some(node);
         if candidates.is_empty() {

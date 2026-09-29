@@ -25,6 +25,9 @@ use tsr_arena::{CheckerIdentity, CheckerLease, Counters};
 pub struct CheckerOwner {
     identity: Arc<CheckerIdentity>,
     state: Mutex<CheckerState>,
+    /// Mirrors the state's `was_canceled` so a pool can read it at release
+    /// without taking the checker's operation.
+    canceled: std::sync::atomic::AtomicBool,
 }
 
 impl CheckerOwner {
@@ -41,6 +44,7 @@ impl CheckerOwner {
         Ok(Self {
             identity,
             state: Mutex::new(state),
+            canceled: std::sync::atomic::AtomicBool::new(false),
         })
     }
 
@@ -78,7 +82,19 @@ impl CheckerOwner {
         Ok(Self {
             identity,
             state: Mutex::new(state),
+            canceled: std::sync::atomic::AtomicBool::new(false),
         })
+    }
+
+    /// `WasCanceled` without an operation: whether a check of this checker was
+    /// canceled. A pool disposes such a checker when it is released.
+    pub fn was_canceled(&self) -> bool {
+        self.canceled.load(std::sync::atomic::Ordering::Acquire)
+    }
+
+    pub(crate) fn mark_canceled(&self) {
+        self.canceled
+            .store(true, std::sync::atomic::Ordering::Release);
     }
 
     /// Begins an exclusive operation: validates the generation, takes the permit,
