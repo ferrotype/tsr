@@ -19,7 +19,7 @@
      "kind": "unsupported",
      "operation": "content-mapper execution"
     },
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
     "domains": [
      "display",
@@ -43,7 +43,7 @@
      "--case",
      "compiler/contentMapperAliasDiagnostic.ts#configuration=0"
     ],
-    "request_sha256": "c9332ae08c78b338b4087ce3caa7c266fa8cbb530e70e36d075b9f91f970b987",
+    "request_sha256": "33eb62ca520f9c5600c53eb34de953d6cc228c1ae4ffe65dc1222b76a48aa722",
     "trace": {
      "path": "data/phase2/c3-content-mapper/trace.json",
      "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
@@ -79,7 +79,7 @@
      "kind": "unsupported",
      "operation": "content-mapper execution"
     },
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
     "domains": [
      "display",
@@ -103,7 +103,7 @@
      "--case",
      "compiler/contentMapperDeclarationEmit.ts#configuration=0"
     ],
-    "request_sha256": "3371f5369131f9407a5953f2a1680ca7e5286ac22dbf95c35d376316bab51605",
+    "request_sha256": "0b88a7853654b37146b25665a1b7a70b5086629ba9cdb97ea6a20e41dc027ff5",
     "trace": {
      "path": "data/phase2/c3-content-mapper/trace.json",
      "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
@@ -139,7 +139,7 @@
      "kind": "unsupported",
      "operation": "content-mapper execution"
     },
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
     "domains": [
      "display",
@@ -163,7 +163,7 @@
      "--case",
      "compiler/contentMapperDeclarationEmitFailure.ts#configuration=0"
     ],
-    "request_sha256": "a302dbf1c9a97713fb7e542eb3b58544841aa1d9655ad78c078ad78e1a283e04",
+    "request_sha256": "fb103e5d0b432593dc37ba4601d1e1e642a8419f4d1b0266277d495689c048a3",
     "trace": {
      "path": "data/phase2/c3-content-mapper/trace.json",
      "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
@@ -199,7 +199,7 @@
      "kind": "unsupported",
      "operation": "content-mapper execution"
     },
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
     "domains": [
      "errors",
@@ -220,7 +220,7 @@
      "--case",
      "compiler/contentMapperDiagnosticDirectives.ts#configuration=0"
     ],
-    "request_sha256": "98d10a8b7a255c997b0a87e5ca972284647c3bf25bfe6020a39ccbcc7c66a49d",
+    "request_sha256": "7b0c57c76695c189b9508b3761dc86af7b34cff10a932c7e6beeffd90b5c3b71",
     "trace": {
      "path": "data/phase2/c3-content-mapper/trace.json",
      "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
@@ -256,7 +256,7 @@
      "kind": "unsupported",
      "operation": "content-mapper execution"
     },
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
     "domains": [
      "display",
@@ -280,7 +280,7 @@
      "--case",
      "compiler/contentMapperDiagnostics.ts#configuration=0"
     ],
-    "request_sha256": "81ee4cd9a05a37f565f164e0ba1e22e083c951561d388f029c99ab8475b316fe",
+    "request_sha256": "4431be09aef0ad17a9e19a4fd8ea8fcafbba0a977755a1d61a15893a5d7bb12a",
     "trace": {
      "path": "data/phase2/c3-content-mapper/trace.json",
      "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
@@ -316,7 +316,7 @@
      "kind": "unsupported",
      "operation": "content-mapper execution"
     },
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
     "domains": [
      "errors",
@@ -337,7 +337,7 @@
      "--case",
      "compiler/contentMapperInvalidDiagnosticDirectives.ts#configuration=0"
     ],
-    "request_sha256": "5909b67e430c8e5e9c51ce66d39982474f35a876890bc6ac64fcddc06b13c25a",
+    "request_sha256": "011feaebeaa0b24e25be94f702bdf070bb7b7c665b899b76630c02d30c0caba4",
     "trace": {
      "path": "data/phase2/c3-content-mapper/trace.json",
      "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
@@ -373,7 +373,7 @@
      "kind": "unsupported",
      "operation": "content-mapper execution"
     },
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
     "domains": [
      "errors",
@@ -394,7 +394,7 @@
      "--case",
      "compiler/contentMapperInvalidExtension.ts#configuration=0"
     ],
-    "request_sha256": "0ed981ee167e843df2e73d986d18ded74526ebd64ece46612fcb94fb319a02b1",
+    "request_sha256": "4383422aa916750adb3ffe6948fd5dd511ee93f7ac09e67ba2624ec5b813f049",
     "trace": {
      "path": "data/phase2/c3-content-mapper/trace.json",
      "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
@@ -430,7 +430,7 @@
      "kind": "unsupported",
      "operation": "content-mapper execution"
     },
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
     "domains": [
      "errors",
@@ -451,7 +451,7 @@
      "--case",
      "compiler/contentMapperPerFileExtension.ts#configuration=0"
     ],
-    "request_sha256": "8c91b101de8355bfe9a0171ee04ef5a1bda9b0054493cf2f38bb58295d5fb03f",
+    "request_sha256": "331aeaac2ee33ba88d657fe6095c468008bd29b25e813d6840b487dfd62e13bf",
     "trace": {
      "path": "data/phase2/c3-content-mapper/trace.json",
      "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
@@ -487,7 +487,7 @@
      "kind": "unsupported",
      "operation": "content-mapper execution"
     },
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
     "domains": [
      "display",
@@ -511,7 +511,7 @@
      "--case",
      "compiler/contentMapperSupplementalDiagnostics.ts#configuration=0"
     ],
-    "request_sha256": "be863de001eda97160eaae15992089b5e36c70b4f66a3488eb51cfaffc850088",
+    "request_sha256": "a683e5c54d1119f47fee2eafc575680d926dac2bff4c30df8606dc3dd58458e1",
     "trace": {
      "path": "data/phase2/c3-content-mapper/trace.json",
      "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
@@ -547,7 +547,7 @@
      "kind": "unsupported",
      "operation": "content-mapper execution"
     },
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
     "domains": [
      "display",
@@ -571,7 +571,7 @@
      "--case",
      "compiler/contentMapperSupplementalFileCollision.ts#configuration=0"
     ],
-    "request_sha256": "5549bef73caac306e0a011c14dd3c8c8f0f83ff5e0c986758d9d874a70f4a7dc",
+    "request_sha256": "3dcc1568a015ac9d3f8b125beb713e7702616b73a5c94e43b0adc091c4808323",
     "trace": {
      "path": "data/phase2/c3-content-mapper/trace.json",
      "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
@@ -607,7 +607,7 @@
      "kind": "unsupported",
      "operation": "content-mapper execution"
     },
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
     "domains": [
      "display",
@@ -631,7 +631,7 @@
      "--case",
      "compiler/contentMapperSupplementalGlobals.ts#configuration=0"
     ],
-    "request_sha256": "704283bd0e49542930cf3e121e562c2abb2aa90112e975d234d695a96acf8120",
+    "request_sha256": "28b7cdfdfda077965a32bf3738a13eea8178c7e5ad2f20edf25bd2b196ae40b6",
     "trace": {
      "path": "data/phase2/c3-content-mapper/trace.json",
      "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
@@ -667,7 +667,7 @@
      "kind": "unsupported",
      "operation": "content-mapper execution"
     },
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
     "domains": [
      "display",
@@ -691,7 +691,7 @@
      "--case",
      "compiler/contentMapperSupplementalModule.ts#configuration=0"
     ],
-    "request_sha256": "13f40c38c469bad332b086b673f81fd792343c692d014e17b4a09c2d8103803f",
+    "request_sha256": "3e5863cc1e69c46f24596fcdf0c1cb42d4acf29410b3dea775564d88b0bf0aad",
     "trace": {
      "path": "data/phase2/c3-content-mapper/trace.json",
      "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
@@ -727,7 +727,7 @@
      "kind": "unsupported",
      "operation": "content-mapper execution"
     },
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
     "domains": [
      "display",
@@ -751,7 +751,7 @@
      "--case",
      "compiler/contentMapperSymlink.ts#configuration=0"
     ],
-    "request_sha256": "a0d01b7cf77fda5557c69898d2796dc0e27b4ebd6c107e0f34e6d819dce7b9a1",
+    "request_sha256": "056d21adf73e72c1e756850341553568acf86117b0e2f58d2b9af2ccb76f228e",
     "trace": {
      "path": "data/phase2/c3-content-mapper/trace.json",
      "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
@@ -787,7 +787,7 @@
      "kind": "unsupported",
      "operation": "content-mapper execution"
     },
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
     "domains": [
      "errors",
@@ -808,7 +808,7 @@
      "--case",
      "compiler/contentMapperSynthesizedUnusedDiagnostics.ts#configuration=0"
     ],
-    "request_sha256": "66be6d92bb6a6b93cd7062f2da27b051e576bdb794437b86d0cf50c8f5b795f9",
+    "request_sha256": "f29f2f95dd1b6cd1513fb9ba1b32bb8f5cabc67b5c1e99c222d2fddffa49c83e",
     "trace": {
      "path": "data/phase2/c3-content-mapper/trace.json",
      "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"
@@ -844,7 +844,7 @@
      "kind": "unsupported",
      "operation": "content-mapper execution"
     },
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "content-mapper execution: the native harness transforms the source through the content-mapper plugin before checking; the Rust loader refuses that operation (crates/tsr_compiler/src/loader.rs), so every compared domain of the row is withheld",
     "domains": [
      "display",
@@ -868,7 +868,7 @@
      "--case",
      "compiler/contentMapperTransform.ts#configuration=0"
     ],
-    "request_sha256": "284370b14c0efe53d90178dcb9876fc099150df804b12ee9215692157425021f",
+    "request_sha256": "b17d467b09154cb5bc24496bce3e9f49ba990709a66a4d5eb655e0592bb3d4af",
     "trace": {
      "path": "data/phase2/c3-content-mapper/trace.json",
      "sha256": "64636d6f8762fae51d6c56eb2c446cf4f78facc6704f442df9fe712afcfe5811"

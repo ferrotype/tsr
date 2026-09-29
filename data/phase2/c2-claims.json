@@ -2975,14 +2975,14 @@
    "bucket": "emit order: native pre/post-emit sets differ",
    "go": "tsc/internal/transformers/inliners/constenum.go:ConstEnumInliningTransformer.visit",
    "handoff": {
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "JavaScript constant-enum inlining asks GetConstantValue about v[k] before semantic checking, first resolving the circular constraints at v and attaching TS2751.",
     "domains": [
      "errors"
     ],
     "go": "tsc/internal/transformers/inliners/constenum.go:ConstEnumInliningTransformer.visit",
     "owner": "C5",
-    "raw_observation_sha256": "7680d2077da8da9feb440ad7b726bfab05852de9f5c5c300e445bb495873b2ca",
+    "raw_observation_sha256": "c277e1be830c56a1d9d887227c03199b3c1f30b0d6c0859b6dfa6a00346badf4",
     "reproduce": [
      "python3",
      "scripts/phase2_corpus.py",
@@ -2994,7 +2994,7 @@
      "--case",
      "compiler/incorrectRecursiveMappedTypeConstraint.ts#configuration=0"
     ],
-    "request_sha256": "e6878d40253b2c859633473624b1568984099202f8af53493f5adb27e47c0872",
+    "request_sha256": "b798e413cec0c9de11fa5636bbc324349befb9a781b70b83e6be41efd52854f5",
     "trace": {
      "path": "data/phase2/c2-emit-handoffs/stacks.json",
      "sha256": "400258c2041e7572e119b6b0d76732d207fa4d677105e289f2d25b8f87bc706d"
@@ -5099,14 +5099,14 @@
    "bucket": "emit order: native pre/post-emit sets differ",
    "go": "tsc/internal/transformers/tstransforms/importelision.go:ImportElisionTransformer.visit",
    "handoff": {
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "JavaScript import elision marks linked references, checking the property receiver before semantic checking; this changes the first circular-constraint or mapped-property diagnostic location.",
     "domains": [
      "errors"
     ],
     "go": "tsc/internal/transformers/tstransforms/importelision.go:ImportElisionTransformer.visit",
     "owner": "C5",
-    "raw_observation_sha256": "53dc29d5608687573593e75d0b0562d6487c7f8f9a74974dad233cbb1699a6c6",
+    "raw_observation_sha256": "b581f9589758f3dbfd3af4ad4ebbd580ed78f9cb89c05482b516906c96c9594f",
     "reproduce": [
      "python3",
      "scripts/phase2_corpus.py",
@@ -5118,7 +5118,7 @@
      "--case",
      "compiler/typeParameterWithInvalidConstraintType.ts#configuration=0"
     ],
-    "request_sha256": "9677e24f46552f4f1c83ed9337af68b8f637b6be1901958f4bf27c64a559de4e",
+    "request_sha256": "ef41077c5146653bb84e6a1cfb24710018c1bd6808cceb5f1e364530aab0add7",
     "trace": {
      "path": "data/phase2/c2-emit-handoffs/stacks.json",
      "sha256": "400258c2041e7572e119b6b0d76732d207fa4d677105e289f2d25b8f87bc706d"
@@ -7174,14 +7174,14 @@
    "bucket": "emit order: native pre/post-emit sets differ",
    "go": "tsc/internal/transformers/tstransforms/importelision.go:ImportElisionTransformer.visit",
    "handoff": {
-    "capture_sha256": "c45af9d47a312128692d0f4f8b8a39cc8fac3a7f584ce54f9d31999bf17c471e",
+    "capture_sha256": "62c649b89a768cea6bf67cef58afe40a20deacf71cbb254ec9c7b6e24ae75c24",
     "cause": "JavaScript import elision marks linked references, checking the property receiver before semantic checking; this changes the first circular-constraint or mapped-property diagnostic location.",
     "domains": [
      "errors"
     ],
     "go": "tsc/internal/transformers/tstransforms/importelision.go:ImportElisionTransformer.visit",
     "owner": "C5",
-    "raw_observation_sha256": "c07fc5df3707fc732793656032b5dbe79cc01b1a80df112c7f216cbfd9bc2663",
+    "raw_observation_sha256": "484063bf3cfcdb9d39afccc92bb7b3f76df33cd3ba7bee12881652c146805330",
     "reproduce": [
      "python3",
      "scripts/phase2_corpus.py",
@@ -7193,7 +7193,7 @@
      "--case",
      "conformance/types/mapped/recursiveMappedTypes.ts#configuration=0"
     ],
-    "request_sha256": "305056cc0599dcd654b04c11f91cd03367a44be8fa532b7db9f2367856588cba",
+    "request_sha256": "db4624319dd190b6e15a10630ebda05bfb6fdc916b2e6b6d077059464419a015",
     "trace": {
      "path": "data/phase2/c2-emit-handoffs/stacks.json",
      "sha256": "400258c2041e7572e119b6b0d76732d207fa4d677105e289f2d25b8f87bc706d"
