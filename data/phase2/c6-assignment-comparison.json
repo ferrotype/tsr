@@ -15,7 +15,7 @@
  "programs": 13432,
  "programs_equal": 13417,
  "record_sha256": "73e304765dd34ae6dfe2b6c2218c15b429ff38e0c881077c139b3d970e4210a1",
- "rust_sources_sha256": "eff62976e39b9f5e7e6bd9a56a901a44ad1b77b6a63a1ccdd138012159f7a062",
+ "rust_sources_sha256": "816e7c9920e70e0861c7491123c04e2a9fdfdf10d9a825dc7425f2b0c0445c26",
  "synthetic": 27,
  "synthetic_equal": 27,
  "unsupported": 15,

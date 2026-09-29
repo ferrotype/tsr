@@ -295,3 +295,51 @@ every input true and every count zero:
 C1 to C5 accounting is unavailable, as chosen when their baselines were kept
 as history. The recording, `cargo xtask run checker` and
 `cargo xtask status --record`, is the owner's.
+
+## Review follow-up
+
+The PR review raised six points.
+
+1. **Thread per task.** A parallel work group started a reserved-stack thread
+   for every task. `91a04ab2` bounds it: up to `worker_bound()` tasks (the
+   host's parallelism, at least four) each run on their own thread, and more
+   run on that many workers taking tasks from the queue. Each task's panic is
+   caught and rethrown after the rest finish. A worker that cannot start, as
+   on a target without threads (point 4), leaves its work to the caller.
+2. **The dropped context.** `CheckedProgram`'s entry points take a
+   `CheckerRequest`, the part of the pin's context they use: the lifetime
+   selects a supplied pool's checker, and the token cancels the checks. The
+   program's bind-and-check, semantic and suggestion diagnostics gain
+   cancellable forms. Contract 4 now also cancels through the program API. It
+   shows a diagnostics request is served by the project pool's diagnostics
+   checker, which that pool then disposes.
+3. **Scheduling and raw observations.** Two concurrent-mode runs of the same
+   sources were compared by raw digest. 3 of 13,432 rows differ, and only in
+   the numeric type ids of the walker's query trace, where pairs of ids swap
+   between runs:
+   - `jsFileCompilationEmitTrippleSlashReference`;
+   - `nodeModulesGeneratedNameCollisions`, configurations 1 and 3.
+
+   Their type strings, baselines and outcomes are identical. The per-file
+   declaration and emit tasks that share a checker reach it in a different
+   order each run, and the pin's schedule has the same freedom. None of the
+   three rows is a handoff, so no rebind depends on them.
+4. **Threadless targets.** Covered by the fallback in point 1.
+5. **S07 re-freeze scope.** The owner approved the exit re-freeze and the
+   end-of-phase list.
+6. **Foreign files.** A group of the compiler pool now skips a file outside the
+   program, as the pin's nil association does (contract 2).
+
+Mutants for the request's lifetime and token, and for the foreign file, are
+each killed. The follow-up moved one S07 anchor, so the review was re-frozen
+again (mapping-only).
+
+Both exit captures were retaken on these sources, and every number of the
+exit reproduces:
+
+- 13,417 of 13,432 match in each mode, and all 9,367 regression rows match;
+- no regression and no changed observation against the C6 start;
+- 0 outcome differences between the modes.
+
+The handoffs, the register, the assignment comparison and the C1 to C6
+receipts followed the new captures.
