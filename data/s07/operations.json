@@ -34323,7 +34323,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_core/src/workgroup.rs",
-          "line": 41
+          "line": 58
         }
       ],
       "source_sha256": "3a7cdb6ec7932d1c7572dac0b4cec3ef937fbd941a0572c733f519547e3e9266",

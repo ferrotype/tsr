@@ -619,10 +619,17 @@ impl CompilerCheckerPool {
         task: &(dyn Fn(&mut Operation<'_>, usize, NodeId) + Sync),
     ) -> Result<(), Error> {
         let checkers = self.create_checkers()?;
-        let mut associated = Vec::with_capacity(files.len());
-        for &file in files {
-            associated.push(Self::checker_index_for_file(checkers, file)?);
-        }
+        // A file outside the program matches no checker and is skipped, as the
+        // pin's association lookup returns nil for it.
+        let associated: Vec<Option<usize>> = files
+            .iter()
+            .map(|file| {
+                checkers
+                    .file_indices
+                    .get(file)
+                    .map(|&index| checkers.plan.associations[index])
+            })
+            .collect();
         let failure = Mutex::new(None);
         let group = WorkGroup::new(single_threaded);
         for (checker_index, owner) in checkers.owners.iter().enumerate() {
@@ -630,7 +637,7 @@ impl CompilerCheckerPool {
             group.queue(move || match owner.operation() {
                 Ok(mut operation) => {
                     for (position, &file) in files.iter().enumerate() {
-                        if associated[position] != checker_index {
+                        if associated[position] != Some(checker_index) {
                             continue;
                         }
                         // A panic on another checker retires the pool's

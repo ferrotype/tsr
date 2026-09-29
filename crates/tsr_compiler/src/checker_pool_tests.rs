@@ -8,6 +8,7 @@ use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{mpsc, Arc, Barrier, Mutex};
 use tsr_arena::{Counters, NodeId};
+use tsr_checker::CheckerRequest;
 use tsr_core::{CompilerOptions, Tristate};
 use tsr_jsstring::JsString;
 use tsr_tsoptions::ParsedCommandLine;
@@ -64,7 +65,7 @@ fn shared_pool_panic_retirement() {
     let counters = Counters::new();
     let program = program(&counters);
     let expected = CheckedProgram::new(program.clone(), &counters, None)
-        .semantic_diagnostics(None)
+        .semantic_diagnostics(&CheckerRequest::default(), None)
         .unwrap();
     assert_eq!(expected.len(), 8, "every file reports its assignment error");
     let baseline = counters.snapshot();
@@ -156,7 +157,12 @@ fn shared_pool_panic_retirement() {
     assert_eq!(counters.snapshot(), baseline);
 
     let fresh = CheckedProgram::new(program, &counters, None);
-    assert_eq!(fresh.semantic_diagnostics(None).unwrap(), expected);
+    assert_eq!(
+        fresh
+            .semantic_diagnostics(&CheckerRequest::default(), None)
+            .unwrap(),
+        expected
+    );
 }
 
 #[test]
@@ -311,5 +317,7 @@ fn a_retirement_between_files_publishes_nothing() {
         4,
         "one file per checker"
     );
-    assert!(checked.semantic_diagnostics(None).is_err());
+    assert!(checked
+        .semantic_diagnostics(&CheckerRequest::default(), None)
+        .is_err());
 }

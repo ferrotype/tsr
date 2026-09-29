@@ -18,6 +18,16 @@ pub enum CheckerLifetime {
     Api,
 }
 
+/// What the pin's context carries into a program's checker requests: the
+/// lifetime a pool serves them with (`core.GetCheckerLifetime(ctx)`) and their
+/// cancellation (the context `checkSourceFile` polls). The default is the
+/// harness's `context.Background()`: a temporary checker, never canceled.
+#[derive(Clone, Debug, Default)]
+pub struct CheckerRequest {
+    pub lifetime: CheckerLifetime,
+    pub cancellation: Option<tsr_core::CancellationToken>,
+}
+
 /// The pin's `CheckerPool` interface: `GetChecker(ctx, file)` returns a
 /// checker held exclusively by the caller and a release the caller calls
 /// once; with a file, the pool may use it as an affinity hint. Here the hold

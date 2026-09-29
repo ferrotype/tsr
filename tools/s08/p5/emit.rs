@@ -144,10 +144,12 @@ fn run_checked(request: &Value, cache: &mut FileCache) -> Result<Post> {
             let (checked, program) = (&checked, &program);
             group.queue(move || {
                 let mut result = None;
-                let served = checked.with_type_checker_for_file(file.source(), &mut |op| {
-                    result = Some(schedule_file(program, op, file));
-                    Ok(())
-                });
+                let request = tsr_checker::CheckerRequest::default();
+                let served =
+                    checked.with_type_checker_for_file(&request, file.source(), &mut |op| {
+                        result = Some(schedule_file(program, op, file));
+                        Ok(())
+                    });
                 *slot
                     .lock()
                     .unwrap_or_else(std::sync::PoisonError::into_inner) = Some(

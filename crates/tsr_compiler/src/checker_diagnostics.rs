@@ -59,18 +59,32 @@ impl Program {
 
     /// Bind and checker diagnostics after per-file selection and directive filtering.
     /// The caller keeps the checker operation so query and checking caches share one generation.
-    // port: tsc/internal/compiler/program.go:Program.getBindAndCheckDiagnosticsWithChecker
     pub fn bind_and_check_diagnostics_with_checker(
         &self,
         operation: &mut Operation<'_>,
         file: &ProgramFile,
+    ) -> Result<Vec<Diagnostic>, Error> {
+        self.bind_and_check_diagnostics_in(operation, file, None)
+    }
+
+    /// `bind_and_check_diagnostics_with_checker` under the request's
+    /// cancellation: a canceled check contributes no checker diagnostics.
+    // port: tsc/internal/compiler/program.go:Program.getBindAndCheckDiagnosticsWithChecker
+    pub fn bind_and_check_diagnostics_in(
+        &self,
+        operation: &mut Operation<'_>,
+        file: &ProgramFile,
+        cancellation: Option<&tsr_core::CancellationToken>,
     ) -> Result<Vec<Diagnostic>, Error> {
         if self.skip_type_checking(file, false)? {
             return Ok(Vec::new());
         }
         let source = file.bound().view().source_file()?;
         let mut diagnostics = source.bind_diagnostics().to_vec();
-        diagnostics.extend(operation.semantic_diagnostics(file.source())?);
+        diagnostics.extend(match cancellation {
+            Some(token) => operation.semantic_diagnostics_cancellable(file.source(), token)?,
+            None => operation.semantic_diagnostics(file.source())?,
+        });
         if tsr_ast::utilities_middle::is_plain_js_file(Some(&source), self.options().check_js) {
             diagnostics
                 .retain(|diagnostic| super::plain_js_errors::is_plain_js_error(diagnostic.code));
@@ -102,27 +116,50 @@ impl Program {
     /// Suggestion diagnostics after the same per-file selection as semantic
     /// diagnostics: a default library, a declaration file under skipLibCheck or a
     /// noCheck program is never checked for suggestions.
-    // port: tsc/internal/compiler/program.go:Program.getSuggestionDiagnosticsWithChecker
     pub fn suggestion_diagnostics_with_checker(
         &self,
         operation: &mut Operation<'_>,
         file: &ProgramFile,
     ) -> Result<Vec<Diagnostic>, Error> {
+        self.suggestion_diagnostics_in(operation, file, None)
+    }
+
+    /// `suggestion_diagnostics_with_checker` under the request's cancellation.
+    // port: tsc/internal/compiler/program.go:Program.getSuggestionDiagnosticsWithChecker
+    pub fn suggestion_diagnostics_in(
+        &self,
+        operation: &mut Operation<'_>,
+        file: &ProgramFile,
+        cancellation: Option<&tsr_core::CancellationToken>,
+    ) -> Result<Vec<Diagnostic>, Error> {
         if self.skip_type_checking(file, false)? {
             return Ok(Vec::new());
         }
-        Ok(operation.recorded_suggestions(file.source())?)
+        Ok(match cancellation {
+            Some(token) => operation.suggestion_diagnostics_cancellable(file.source(), token)?,
+            None => operation.recorded_suggestions(file.source())?,
+        })
     }
 
     /// Native semantic diagnostics include the include processor's file diagnostics
     /// after checking, while noEmit filtering applies only to bind/check diagnostics.
-    // port: tsc/internal/compiler/program.go:Program.getSemanticDiagnosticsWithChecker
     pub fn semantic_diagnostics_with_checker(
         &self,
         operation: &mut Operation<'_>,
         file: &ProgramFile,
     ) -> Result<Vec<Diagnostic>, Error> {
-        let mut diagnostics = self.bind_and_check_diagnostics_with_checker(operation, file)?;
+        self.semantic_diagnostics_in(operation, file, None)
+    }
+
+    /// `semantic_diagnostics_with_checker` under the request's cancellation.
+    // port: tsc/internal/compiler/program.go:Program.getSemanticDiagnosticsWithChecker
+    pub fn semantic_diagnostics_in(
+        &self,
+        operation: &mut Operation<'_>,
+        file: &ProgramFile,
+        cancellation: Option<&tsr_core::CancellationToken>,
+    ) -> Result<Vec<Diagnostic>, Error> {
+        let mut diagnostics = self.bind_and_check_diagnostics_in(operation, file, cancellation)?;
         if self.options().no_emit.is_true() {
             diagnostics.retain(|diagnostic| !diagnostic.skipped_on_no_emit);
         }

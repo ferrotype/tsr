@@ -288,7 +288,7 @@ pub use links::{LinkKey, LinkStore};
 pub use node_builder::VerbosityContext;
 pub use owner::{CheckerOwner, Operation};
 mod pool;
-pub use pool::{CheckerLifetime, CheckerPool};
+pub use pool::{CheckerLifetime, CheckerPool, CheckerRequest};
 #[cfg(test)]
 use resolution::TypeResolution;
 pub use resolution::TypeSystemPropertyName;

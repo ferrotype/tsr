@@ -10,12 +10,16 @@
 //! resolver of a file's declaration transform holds the file's checker for
 //! that transform, which is one of the interleavings the pin's per-call locks
 //! allow.
+//!
+//! Where the pin's program functions take a context, these take a
+//! [`CheckerRequest`]: its lifetime selects the checker a supplied pool serves
+//! (the compiler's pool has no lifetimes) and its token cancels the checks.
 use crate::{CompilerCheckerPool, Error, Program, ProgramFile};
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex, PoisonError};
 use tsr_arena::{Counters, NodeId};
 use tsr_ast::Diagnostic;
-use tsr_checker::{CheckerLifetime, CheckerPool, Operation, TraceSink};
+use tsr_checker::{CheckerPool, CheckerRequest, Operation, TraceSink};
 use tsr_core::workgroup::WorkGroup;
 
 /// A per-file collection for the checker: it receives the file's checker.
@@ -75,13 +79,12 @@ impl CheckedProgram {
     // port: tsc/internal/compiler/program.go:Program.GetTypeChecker
     pub fn with_type_checker(
         &self,
+        request: &CheckerRequest,
         task: &mut dyn FnMut(&mut Operation<'_>) -> Result<(), tsr_checker::Error>,
     ) -> Result<(), tsr_checker::Error> {
         match &self.compiler_pool {
             Some(pool) => task(&mut pool.checker_non_exclusive()?.operation()?),
-            None => self
-                .pool
-                .with_checker(CheckerLifetime::Temporary, None, task),
+            None => self.pool.with_checker(request.lifetime, None, task),
         }
     }
 
@@ -90,14 +93,13 @@ impl CheckedProgram {
     // port: tsc/internal/compiler/program.go:Program.GetTypeCheckerForFile
     pub fn with_type_checker_for_file(
         &self,
+        request: &CheckerRequest,
         file: NodeId,
         task: &mut dyn FnMut(&mut Operation<'_>) -> Result<(), tsr_checker::Error>,
     ) -> Result<(), tsr_checker::Error> {
         match &self.compiler_pool {
             Some(pool) => task(&mut pool.checker_for_file_non_exclusive(file)?.operation()?),
-            None => self
-                .pool
-                .with_checker(CheckerLifetime::Temporary, Some(file), task),
+            None => self.pool.with_checker(request.lifetime, Some(file), task),
         }
     }
 
@@ -105,14 +107,13 @@ impl CheckedProgram {
     // port: tsc/internal/compiler/program.go:Program.GetTypeCheckerForFileExclusive
     pub fn with_type_checker_for_file_exclusive(
         &self,
+        request: &CheckerRequest,
         file: NodeId,
         task: &mut dyn FnMut(&mut Operation<'_>) -> Result<(), tsr_checker::Error>,
     ) -> Result<(), tsr_checker::Error> {
         match &self.compiler_pool {
             Some(pool) => task(&mut pool.checker_for_file_exclusive(file)?),
-            None => self
-                .pool
-                .with_checker(CheckerLifetime::Temporary, Some(file), task),
+            None => self.pool.with_checker(request.lifetime, Some(file), task),
         }
     }
 
@@ -165,6 +166,7 @@ impl CheckedProgram {
     // port: tsc/internal/compiler/program.go:Program.collectCheckerDiagnosticsFromFiles
     pub fn collect_checker_diagnostics_from_files<R: Send>(
         &self,
+        request: &CheckerRequest,
         files: &[Arc<ProgramFile>],
         collect: &CheckerCollect<'_, R>,
     ) -> Result<Vec<Option<R>>, Error> {
@@ -191,7 +193,7 @@ impl CheckedProgram {
                 let failure = &failure;
                 group.queue(move || {
                     let served = self.pool.with_checker(
-                        CheckerLifetime::Temporary,
+                        request.lifetime,
                         Some(file.source()),
                         &mut |operation| {
                             *slot.lock().unwrap_or_else(PoisonError::into_inner) =
@@ -224,6 +226,7 @@ impl CheckedProgram {
     // port: tsc/internal/compiler/program.go:Program.collectCheckerDiagnostics
     fn collect_checker_diagnostics(
         &self,
+        request: &CheckerRequest,
         file: Option<&ProgramFile>,
         collect: &CheckerCollect<'_, Result<Vec<Diagnostic>, Error>>,
     ) -> Result<Vec<Diagnostic>, Error> {
@@ -232,7 +235,7 @@ impl CheckedProgram {
                 return Ok(Vec::new());
             }
             let mut result = None;
-            self.with_type_checker_for_file_exclusive(file.source(), &mut |operation| {
+            self.with_type_checker_for_file_exclusive(request, file.source(), &mut |operation| {
                 result = Some(collect(operation, file));
                 Ok(())
             })?;
@@ -240,7 +243,7 @@ impl CheckedProgram {
         } else {
             let mut diagnostics = Vec::new();
             for result in self
-                .collect_checker_diagnostics_from_files(self.program.files(), collect)?
+                .collect_checker_diagnostics_from_files(request, self.program.files(), collect)?
                 .into_iter()
                 .flatten()
             {
@@ -254,22 +257,26 @@ impl CheckedProgram {
     // port: tsc/internal/compiler/program.go:Program.GetSemanticDiagnostics
     pub fn semantic_diagnostics(
         &self,
+        request: &CheckerRequest,
         file: Option<&ProgramFile>,
     ) -> Result<Vec<Diagnostic>, Error> {
-        self.collect_checker_diagnostics(file, &|operation, file| {
+        let cancellation = request.cancellation.as_ref();
+        self.collect_checker_diagnostics(request, file, &|operation, file| {
             self.program
-                .semantic_diagnostics_with_checker(operation, file)
+                .semantic_diagnostics_in(operation, file, cancellation)
         })
     }
 
     // port: tsc/internal/compiler/program.go:Program.GetSuggestionDiagnostics
     pub fn suggestion_diagnostics(
         &self,
+        request: &CheckerRequest,
         file: Option<&ProgramFile>,
     ) -> Result<Vec<Diagnostic>, Error> {
-        self.collect_checker_diagnostics(file, &|operation, file| {
+        let cancellation = request.cancellation.as_ref();
+        self.collect_checker_diagnostics(request, file, &|operation, file| {
             self.program
-                .suggestion_diagnostics_with_checker(operation, file)
+                .suggestion_diagnostics_in(operation, file, cancellation)
         })
     }
 
@@ -278,14 +285,15 @@ impl CheckedProgram {
     // port: tsc/internal/compiler/program.go:Program.GetDeclarationDiagnostics
     pub fn declaration_diagnostics(
         &self,
+        request: &CheckerRequest,
         file: Option<&ProgramFile>,
     ) -> Result<Vec<Diagnostic>, Error> {
         let diagnostics = if let Some(file) = file {
-            self.declaration_diagnostics_for_file(file)?
+            self.declaration_diagnostics_for_file(request, file)?
         } else {
             let mut diagnostics = Vec::new();
             for result in self.collect_diagnostics_from_files(self.program.files(), true, &|file| {
-                self.declaration_diagnostics_for_file(file)
+                self.declaration_diagnostics_for_file(request, file)
             }) {
                 diagnostics.extend(result?);
             }
@@ -298,10 +306,11 @@ impl CheckedProgram {
     /// emit resolver.
     pub fn declaration_diagnostics_for_file(
         &self,
+        request: &CheckerRequest,
         file: &ProgramFile,
     ) -> Result<Vec<Diagnostic>, Error> {
         let mut result = None;
-        self.with_type_checker_for_file(file.source(), &mut |operation| {
+        self.with_type_checker_for_file(request, file.source(), &mut |operation| {
             result = Some(
                 self.program
                     .declaration_diagnostics_with_checker(operation, file),

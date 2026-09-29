@@ -6,6 +6,7 @@
 //! contracts (`docs/PHASE2-C6-plan.md`).
 use crate::semaphore::LimitedSemaphore;
 use std::{
+    collections::VecDeque,
     sync::{
         atomic::{AtomicBool, Ordering},
         Arc, Mutex, PoisonError,
@@ -20,13 +21,29 @@ pub const RESERVED_STACK: usize = 256 << 20;
 
 type Task<'env> = Box<dyn FnOnce() + Send + 'env>;
 
-/// Go's `WorkGroup`: queue functions, then run them all and wait. A parallel
-/// group runs each function on its own thread with [`RESERVED_STACK`]; a
+/// The most threads a parallel work group starts: the host's parallelism, and
+/// at least four, the pin's default checker count, so a group of one function
+/// per checker gives each its own thread, as the pin's goroutines are.
+pub fn worker_bound() -> usize {
+    std::thread::available_parallelism()
+        .map_or(4, std::num::NonZeroUsize::get)
+        .max(4)
+}
+
+/// Go's `WorkGroup`: queue functions, then run them all and wait. A
 /// single-threaded group runs them on the caller's thread, last queued first,
 /// as the pin's does, which is observable wherever the functions' order is.
+/// A parallel group runs them on threads with [`RESERVED_STACK`], in an order
+/// nothing observes: up to [`worker_bound`] functions each on its own thread,
+/// and more on that many workers taking them from the queue. The pin starts a
+/// goroutine per function; a thread per function would start thousands of
+/// reserved stacks for a large program's per-file collections, and bounding
+/// cannot deadlock, since no function waits for one that has not started.
+/// Where a thread cannot start (a target without threads), its work runs on
+/// the caller.
 ///
-/// The pin's parallel `Queue` starts its goroutine at once; here the threads
-/// start in `run_and_wait`, which the interface allows ("It may be invoked
+/// The pin's parallel `Queue` starts its goroutine at once; here the work
+/// starts in `run_and_wait`, which the interface allows ("It may be invoked
 /// immediately, or deferred until RunAndWait"). Functions borrow from the
 /// caller for `'env`, so, unlike the pin's, they cannot queue more work on
 /// the group that runs them; no pinned caller does. A panicking function
@@ -76,28 +93,58 @@ impl<'env> WorkGroup<'env> {
             }
             return;
         }
-        let tasks = std::mem::take(&mut *self.tasks.lock().unwrap_or_else(PoisonError::into_inner));
-        std::thread::scope(|scope| {
-            let handles: Vec<_> = tasks
-                .into_iter()
-                .map(|task| {
-                    std::thread::Builder::new()
-                        .name("tsr-work".into())
-                        .stack_size(RESERVED_STACK)
-                        .spawn_scoped(scope, task)
-                        .expect("could not start a work group thread")
-                })
-                .collect();
-            let mut first_panic = None;
-            for handle in handles {
-                if let Err(panic) = handle.join() {
-                    first_panic.get_or_insert(panic);
-                }
+        let mut queue: VecDeque<Task<'env>> =
+            std::mem::take(&mut *self.tasks.lock().unwrap_or_else(PoisonError::into_inner)).into();
+        // Each worker starts with its own function, so a group within the
+        // bound runs every function on its own thread.
+        let first: Vec<Mutex<Option<Task<'env>>>> = (0..queue.len().min(worker_bound()))
+            .map(|_| Mutex::new(queue.pop_front()))
+            .collect();
+        let queue = Mutex::new(queue);
+        let first_panic = Mutex::new(None);
+        let run = |task: Task<'env>| {
+            if let Err(panic) = std::panic::catch_unwind(std::panic::AssertUnwindSafe(task)) {
+                first_panic
+                    .lock()
+                    .unwrap_or_else(PoisonError::into_inner)
+                    .get_or_insert(panic);
             }
-            if let Some(panic) = first_panic {
-                std::panic::resume_unwind(panic);
+        };
+        let work = |slot: &Mutex<Option<Task<'env>>>| {
+            if let Some(task) = slot.lock().unwrap_or_else(PoisonError::into_inner).take() {
+                run(task);
+            }
+            loop {
+                let next = queue
+                    .lock()
+                    .unwrap_or_else(PoisonError::into_inner)
+                    .pop_front();
+                let Some(task) = next else { break };
+                run(task);
+            }
+        };
+        std::thread::scope(|scope| {
+            let mut started = 0;
+            for slot in &first {
+                let worker = std::thread::Builder::new()
+                    .name("tsr-work".into())
+                    .stack_size(RESERVED_STACK)
+                    .spawn_scoped(scope, || work(slot));
+                if worker.is_err() {
+                    break;
+                }
+                started += 1;
+            }
+            for slot in &first[started..] {
+                work(slot);
             }
         });
+        if let Some(panic) = first_panic
+            .into_inner()
+            .unwrap_or_else(PoisonError::into_inner)
+        {
+            std::panic::resume_unwind(panic);
+        }
     }
 
     /// port: tsc/internal/core/workgroup.go:singleThreadedWorkGroup.pop
@@ -202,6 +249,49 @@ mod work_group_tests {
         let mut seen = seen.lock().unwrap();
         seen.sort_unstable();
         assert_eq!(*seen, [0, 1, 2, 3]);
+    }
+
+    #[test]
+    fn a_large_parallel_group_runs_on_bounded_workers() {
+        let tasks = super::worker_bound() * 8;
+        let threads = Mutex::new(std::collections::BTreeSet::new());
+        let ran = Mutex::new(0);
+        let group = WorkGroup::new(false);
+        for _ in 0..tasks {
+            group.queue(|| {
+                threads
+                    .lock()
+                    .unwrap()
+                    .insert(format!("{:?}", std::thread::current().id()));
+                *ran.lock().unwrap() += 1;
+            });
+        }
+        group.run_and_wait();
+        assert_eq!(*ran.lock().unwrap(), tasks);
+        let threads = threads.lock().unwrap().len();
+        assert!(
+            (1..=super::worker_bound()).contains(&threads),
+            "{threads} threads for {tasks} tasks"
+        );
+    }
+
+    #[test]
+    fn a_small_parallel_group_gives_each_task_its_own_thread() {
+        let barrier = std::sync::Barrier::new(4);
+        let threads = Mutex::new(std::collections::BTreeSet::new());
+        let group = WorkGroup::new(false);
+        for _ in 0..4 {
+            group.queue(|| {
+                // All four run at once, or this waits forever.
+                barrier.wait();
+                threads
+                    .lock()
+                    .unwrap()
+                    .insert(format!("{:?}", std::thread::current().id()));
+            });
+        }
+        group.run_and_wait();
+        assert_eq!(threads.lock().unwrap().len(), 4);
     }
 
     #[test]

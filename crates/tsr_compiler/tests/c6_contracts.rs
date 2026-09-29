@@ -24,7 +24,8 @@ use std::collections::BTreeMap;
 use std::sync::Arc;
 use tsr_arena::{CheckerIdentity, Counters, Generation, NodeId};
 use tsr_checker::{
-    CheckerOwner, MemoryTraceSink, TraceLocation, TraceSink, TraceTypeRecord, TraceValue, Tracer,
+    CheckerOwner, CheckerRequest, MemoryTraceSink, TraceLocation, TraceSink, TraceTypeRecord,
+    TraceValue, Tracer,
 };
 use tsr_compiler::{
     CheckerAssociationPlan, CompilerCheckerPool, FileCache, Program, ProgramCheckerHost,
@@ -349,7 +350,9 @@ fn no_lib() -> CompilerOptions {
 /// poll and returns no diagnostics; the checker reports `WasCanceled` and from
 /// then on refuses diagnostics, global diagnostics and node building with the
 /// pin's message, without retiring its generation; the project pool disposes
-/// it at release and serves a fresh checker that checks the file.
+/// it at release and serves a fresh checker that checks the file. Through the
+/// program API the request's token cancels the check, and its lifetime
+/// selects the project pool's diagnostics checker.
 #[test]
 fn cancellation_between_statements_stops_the_check_and_poisons_the_checker() {
     let text: &[u8] = b"let a: number = \"x\";\nlet b: number = \"y\";\nlet c: number = \"z\";\n";
@@ -454,6 +457,81 @@ fn cancellation_between_statements_stops_the_check_and_poisons_the_checker() {
         .map(|d| d.code)
         .collect();
     assert_eq!(codes, vec![2322, 2322, 2322]);
+    drop(checkout);
+
+    // Through the program API (program.go `GetSemanticDiagnostics(ctx, file)`):
+    // the request's token cancels the file's check, which leaves the program
+    // only its bind diagnostics (none here) and poisons the file's checker.
+    let file = program.file(b"/a.ts").unwrap();
+    let request = CheckerRequest {
+        cancellation: Some(canceled.clone()),
+        ..CheckerRequest::default()
+    };
+    let checked = tsr_compiler::CheckedProgram::new(program.clone(), &counters, None);
+    assert_eq!(
+        checked.semantic_diagnostics(&request, Some(file)).unwrap(),
+        vec![]
+    );
+    assert!(matches!(
+        checked.semantic_diagnostics(&CheckerRequest::default(), Some(file)),
+        Err(tsr_compiler::Error::Checker(
+            tsr_checker::Error::PreviouslyCanceled
+        ))
+    ));
+    // The request's lifetime selects a supplied pool's checker: a diagnostics
+    // request is served by the project pool's diagnostics checker, which is
+    // canceled and then disposed, while its query checker is untouched.
+    let host: Arc<dyn tsr_checker::CheckerHost> =
+        Arc::new(ProgramCheckerHost::new(program.clone()));
+    let project =
+        tsr_project::Project::new(tsr_project::CheckerPool::for_program(host, &counters, 1));
+    let diagnostics_owner = project
+        .pool()
+        .acquire(tsr_project::CheckerSlot::Diagnostics)
+        .unwrap()
+        .owner()
+        .clone();
+    let query_owner = project
+        .pool()
+        .acquire(tsr_project::CheckerSlot::Query(0))
+        .unwrap()
+        .owner()
+        .clone();
+    let supplied =
+        tsr_compiler::CheckedProgram::with_pool(program.clone(), Arc::new(project.clone()));
+    let diagnostics = CheckerRequest {
+        lifetime: tsr_checker::CheckerLifetime::Diagnostics,
+        cancellation: Some(canceled),
+    };
+    assert_eq!(
+        supplied
+            .semantic_diagnostics(&diagnostics, Some(file))
+            .unwrap(),
+        vec![]
+    );
+    assert!(diagnostics_owner.was_canceled());
+    assert!(!query_owner.was_canceled());
+    let fresh = CheckerRequest {
+        lifetime: tsr_checker::CheckerLifetime::Diagnostics,
+        cancellation: None,
+    };
+    let codes: Vec<i32> = supplied
+        .semantic_diagnostics(&fresh, Some(file))
+        .unwrap()
+        .iter()
+        .map(|d| d.code)
+        .collect();
+    assert_eq!(codes, vec![2322, 2322, 2322]);
+    let served = project
+        .pool()
+        .acquire(tsr_project::CheckerSlot::Diagnostics)
+        .unwrap()
+        .owner()
+        .clone();
+    assert!(
+        !Arc::ptr_eq(&served, &diagnostics_owner),
+        "the canceled diagnostics checker was disposed"
+    );
 }
 
 /// Contract 5, cancellation during deferred nodes and at the unused-identifier
@@ -696,7 +774,8 @@ fn partitioning_equals_the_pins_associations_and_count_rule() {
 /// the same on every call and is the one the association plan names; an
 /// exclusive acquisition holds its checker until it is released, so another
 /// thread's acquisition of that checker, exclusive or through the lock-free
-/// hand-out's per-call operation (a resolver call), waits for the release;
+/// hand-out's per-call operation (a resolver call), waits for the release; a
+/// file outside the program matches no checker;
 /// the interface's `GetChecker` serves the file's checker and, without a
 /// file, the first; and one task per checker, each on its own thread,
 /// visits exactly that checker's files, in program order.
@@ -813,6 +892,19 @@ fn acquisition_is_exclusive_per_checker_and_affinity_is_stable() {
             .collect::<std::collections::BTreeSet<_>>()
             .len()
     );
+
+    // A file outside the program matches no checker and is skipped, as the
+    // pin's nil association is.
+    let (other, _) = files_program(1, no_lib(), Tristate::FALSE);
+    let mut with_foreign = sources.clone();
+    with_foreign.insert(1, other.files()[0].source());
+    let visited = Mutex::new(0);
+    pool.for_each_checker_group_do(&with_foreign, false, &|_, position, _| {
+        assert_ne!(position, 1);
+        *visited.lock().unwrap() += 1;
+    })
+    .unwrap();
+    assert_eq!(visited.into_inner().unwrap(), sources.len());
 }
 
 /// Contract 3, work groups (core/workgroup.go `NewWorkGroup`, the
@@ -933,7 +1025,7 @@ fn a_panic_in_one_pool_checker_retires_the_pool_and_a_fresh_pool_succeeds() {
 
     let (program, counters) = deep_program(DEEP_RELATIONS);
     let reference = CheckedProgram::new(program.clone(), &counters, None)
-        .semantic_diagnostics(None)
+        .semantic_diagnostics(&CheckerRequest::default(), None)
         .unwrap();
     let checked = CheckedProgram::new(program.clone(), &counters, None);
     let pool = checked.compiler_checker_pool().unwrap();
@@ -943,8 +1035,10 @@ fn a_panic_in_one_pool_checker_retires_the_pool_and_a_fresh_pool_succeeds() {
         .unwrap()
         .begin_recursion_probe(Some(8))
         .unwrap();
-    let panic = catch_unwind(AssertUnwindSafe(|| checked.semantic_diagnostics(None)))
-        .expect_err("the relation reaches the injected panic");
+    let panic = catch_unwind(AssertUnwindSafe(|| {
+        checked.semantic_diagnostics(&CheckerRequest::default(), None)
+    }))
+    .expect_err("the relation reaches the injected panic");
     let message = panic
         .downcast_ref::<String>()
         .map(String::as_str)
@@ -962,7 +1056,7 @@ fn a_panic_in_one_pool_checker_retires_the_pool_and_a_fresh_pool_succeeds() {
         ));
     }
     assert!(matches!(
-        checked.semantic_diagnostics(None),
+        checked.semantic_diagnostics(&CheckerRequest::default(), None),
         Err(tsr_compiler::Error::Checker(tsr_checker::Error::Arena(
             tsr_arena::Error::Retired
         )))
@@ -970,21 +1064,30 @@ fn a_panic_in_one_pool_checker_retires_the_pool_and_a_fresh_pool_succeeds() {
     assert!(checked.global_diagnostics().is_err());
 
     let fresh = CheckedProgram::new(program.clone(), &counters, None);
-    assert_eq!(fresh.semantic_diagnostics(None).unwrap(), reference);
+    assert_eq!(
+        fresh
+            .semantic_diagnostics(&CheckerRequest::default(), None)
+            .unwrap(),
+        reference
+    );
 
     let canceled = CheckedProgram::new(program.clone(), &counters, None);
     let token = tsr_core::CancellationToken::new();
     token.cancel();
     let target = program.file(b"/f0.ts").unwrap().source();
     canceled
-        .with_type_checker_for_file_exclusive(target, &mut |operation| {
-            assert_eq!(
-                operation.semantic_diagnostics_cancellable(target, &token)?,
-                vec![]
-            );
-            assert!(operation.was_canceled());
-            Ok(())
-        })
+        .with_type_checker_for_file_exclusive(
+            &CheckerRequest::default(),
+            target,
+            &mut |operation| {
+                assert_eq!(
+                    operation.semantic_diagnostics_cancellable(target, &token)?,
+                    vec![]
+                );
+                assert!(operation.was_canceled());
+                Ok(())
+            },
+        )
         .unwrap();
     let pool = canceled.compiler_checker_pool().unwrap();
     assert!(pool.generation().validate().is_ok());
@@ -996,7 +1099,9 @@ fn a_panic_in_one_pool_checker_retires_the_pool_and_a_fresh_pool_succeeds() {
         .unwrap()];
     for (file, &checker) in program.files().iter().zip(&plan.associations) {
         if checker != target_checker {
-            assert!(canceled.semantic_diagnostics(Some(file)).is_ok());
+            assert!(canceled
+                .semantic_diagnostics(&CheckerRequest::default(), Some(file))
+                .is_ok());
         }
     }
 }
@@ -1082,7 +1187,10 @@ fn pool_threads_carry_reserved_stacks_and_the_pool_lives_with_its_program() {
     let (flow, flow_counters) = deep_program(DEEP_FLOW);
     let deep_flow = flow.file(b"/deep.ts").unwrap().source();
     let reference = CheckedProgram::new(flow.clone(), &flow_counters, None)
-        .semantic_diagnostics(Some(flow.file(b"/deep.ts").unwrap()))
+        .semantic_diagnostics(
+            &CheckerRequest::default(),
+            Some(flow.file(b"/deep.ts").unwrap()),
+        )
         .unwrap();
     let flow_checked = CheckedProgram::new(flow.clone(), &flow_counters, None);
     let observed = Mutex::new(None);
@@ -1120,8 +1228,12 @@ fn pool_threads_carry_reserved_stacks_and_the_pool_lives_with_its_program() {
 
     // Created once, released with the program's pool.
     let first: Vec<_> = pool.checkers().unwrap().iter().map(Arc::as_ptr).collect();
-    checked.semantic_diagnostics(None).unwrap();
-    checked.semantic_diagnostics(None).unwrap();
+    checked
+        .semantic_diagnostics(&CheckerRequest::default(), None)
+        .unwrap();
+    checked
+        .semantic_diagnostics(&CheckerRequest::default(), None)
+        .unwrap();
     let again: Vec<_> = pool.checkers().unwrap().iter().map(Arc::as_ptr).collect();
     assert_eq!(first, again);
     let weak: Vec<_> = pool

@@ -324,6 +324,12 @@ pub fn observe(
     row
 }
 
+/// The context the pin's harness passes its program (`context.Background()`):
+/// a temporary checker, never canceled.
+fn background() -> tsr_checker::CheckerRequest {
+    tsr_checker::CheckerRequest::default()
+}
+
 /// Per-file results of one diagnostic phase in file order, as the single
 /// owner's loop records them.
 fn file_results(
@@ -394,12 +400,16 @@ fn observe_pooled(
         .expect("the program's own pool");
     row["mode"] = request["mode"].clone();
     row["checker_count"] = json!(pool.checker_count());
-    let semantic = checked.collect_checker_diagnostics_from_files(program.files(), &|op, file| {
-        (
-            program.skip_type_checking(file, false),
-            program.semantic_diagnostics_with_checker(op, file),
-        )
-    });
+    let semantic = checked.collect_checker_diagnostics_from_files(
+        &background(),
+        program.files(),
+        &|op, file| {
+            (
+                program.skip_type_checking(file, false),
+                program.semantic_diagnostics_with_checker(op, file),
+            )
+        },
+    );
     let (selections, results): (Vec<_>, Vec<_>) = match semantic {
         Ok(results) => results
             .into_iter()
@@ -419,16 +429,17 @@ fn observe_pooled(
     };
     if row["phases"].get("declaration").is_some() {
         let results = checked.collect_diagnostics_from_files(program.files(), true, &|file| {
-            checked.declaration_diagnostics(Some(file))
+            checked.declaration_diagnostics(&background(), Some(file))
         });
         let files = file_results(program, results, None, &mut diagnostic_values);
         row["phases"]["declaration"] = json!({"state":phase_state(&files),"files":files,"api":"Program.getDeclarationDiagnostics"});
     }
     if row["phases"].get("suggestion").is_some() {
-        let results = checked
-            .collect_checker_diagnostics_from_files(program.files(), &|op, file| {
-                program.suggestion_diagnostics_with_checker(op, file)
-            });
+        let results = checked.collect_checker_diagnostics_from_files(
+            &background(),
+            program.files(),
+            &|op, file| program.suggestion_diagnostics_with_checker(op, file),
+        );
         let files = match results {
             Ok(results) => file_results(
                 program,
@@ -518,21 +529,21 @@ pub fn harness_diagnostics_checked(
     );
     values.extend(
         checked
-            .semantic_diagnostics(None)
+            .semantic_diagnostics(&background(), None)
             .map_err(compiler_failure)?,
     );
     values.extend(checked.global_diagnostics().map_err(compiler_failure)?);
     if requested("declaration") {
         values.extend(
             checked
-                .declaration_diagnostics(None)
+                .declaration_diagnostics(&background(), None)
                 .map_err(compiler_failure)?,
         );
     }
     if requested("suggestion") {
         values.extend(
             checked
-                .suggestion_diagnostics(None)
+                .suggestion_diagnostics(&background(), None)
                 .map_err(compiler_failure)?,
         );
     }
@@ -559,7 +570,7 @@ pub fn any_program_diagnostics_checked(
             if values.len() == config {
                 values.extend(
                     checked
-                        .semantic_diagnostics(None)
+                        .semantic_diagnostics(&background(), None)
                         .map_err(compiler_failure)?,
                 );
                 values.extend(checked.global_diagnostics().map_err(compiler_failure)?);
@@ -567,7 +578,7 @@ pub fn any_program_diagnostics_checked(
             if program.options().emit_declarations() && values.len() == config {
                 values.extend(
                     checked
-                        .declaration_diagnostics(None)
+                        .declaration_diagnostics(&background(), None)
                         .map_err(compiler_failure)?,
                 );
             }
