@@ -14,7 +14,6 @@ use crate::{
     object_flags, type_flags, CheckerState, Error, IndexInfoId, SignatureId, TypeId, TypePredicate,
     TypePredicateId, TypePredicateKind,
 };
-use std::collections::HashMap;
 use tsr_arena::SymbolId;
 use tsr_ast::{check_flags, internal_symbol_names, symbol_flags, JsString, SymbolTableId};
 use tsr_jsnum::{Number, PseudoBigInt};
@@ -347,7 +346,7 @@ impl CheckerState {
             name(b"globalThis"),
             check_flags::READONLY,
         )?;
-        let mut globals_table = HashMap::new();
+        let mut globals_table = tsr_ast::SymbolTable::default();
         globals_table.insert(name(b"globalThis"), Some(global_this_symbol));
         let globals = self.alloc_symbol_table(globals_table);
         self.symbol_mut(global_this_symbol)?.exports = Some(globals);

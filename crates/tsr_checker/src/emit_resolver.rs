@@ -23,7 +23,7 @@ impl DeclarationEmitResolver for Operation<'_> {
             K::ModuleDeclaration,
             Some(name),
             Some(host),
-            [(local_name, Some(symbol))].into(),
+            tsr_ast::SymbolTable::from_iter([(local_name, Some(symbol))]),
             None,
         )
     }

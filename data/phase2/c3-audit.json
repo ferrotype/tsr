@@ -643,7 +643,7 @@
    "disposition": "equivalent",
    "reason": "The pin sizes the global table by counting file symbols; Rust builds the global table in the initialization state at this site.",
    "reviewed_from": "pinned checker.go body and the pinned caller's port; C3 source audit",
-   "rust": "crates/tsr_checker/src/init.rs:38"
+   "rust": "crates/tsr_checker/src/init.rs:37"
   },
   "tsc/internal/checker/checker.go:createDiagnosticForNode": {
    "disposition": "equivalent",

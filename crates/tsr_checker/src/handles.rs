@@ -15,7 +15,6 @@ use crate::{
     element_flags, CheckerOwner, ElementFlags, Error, ObjectFlags, Operation, SignatureId,
     TupleElementInfo, TypeFlags, TypeId, TypeKind, TypeList, UnionReduction,
 };
-use std::collections::HashMap;
 use std::sync::Arc;
 use tsr_arena::{ArenaId, NodeId, SymbolId};
 use tsr_ast::{CheckFlags, JsString, NodeKind, SymbolFlags};
@@ -849,7 +848,10 @@ impl Operation<'_> {
         members: &[MemberSpec<'_>],
     ) -> Result<TypeRef, Error> {
         let symbol = symbol.map(|s| self.check_symbol(s)).transpose()?;
-        let mut table = HashMap::with_capacity(members.len());
+        let mut table = tsr_ast::SymbolTable::with_capacity_and_hasher(
+            members.len(),
+            tsr_arena::hash::FastState::default(),
+        );
         for member in members {
             let t = self.check_type(member.r#type)?;
             let flags = tsr_ast::symbol_flags::PROPERTY

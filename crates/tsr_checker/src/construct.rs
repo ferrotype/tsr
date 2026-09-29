@@ -10,7 +10,6 @@ use crate::{
     ReferenceData, SignatureId, SymbolList, TupleData, TupleElementInfo, TypeFlags, TypeId,
     TypeKind, TypeList, TypeParameterData,
 };
-use std::collections::HashMap;
 use std::sync::Arc;
 use tsr_arena::{NodeId, SymbolId};
 use tsr_ast::{
@@ -486,7 +485,7 @@ impl CheckerState {
             .filter(|e| e.flags & (element_flags::REQUIRED | element_flags::VARIADIC) != 0)
             .count();
         let mut type_parameters: Vec<TypeId> = Vec::new();
-        let mut members: HashMap<JsString, Option<SymbolId>> = HashMap::new();
+        let mut members = tsr_ast::SymbolTable::default();
         let mut combined_flags: ElementFlags = element_flags::NONE;
         let readonly_flags = if readonly { check_flags::READONLY } else { 0 };
         if arity != 0 {
