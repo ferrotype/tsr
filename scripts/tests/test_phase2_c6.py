@@ -160,5 +160,126 @@ class Modes(unittest.TestCase):
             corpus.requests(ROOT, mode="parallel")
 
 
+class Producer(unittest.TestCase):
+    """C6.10: the concurrent mode's evidence, the modes' parity and the
+    assignments decide C6's completion."""
+
+    EXECUTED = 3
+
+    def passing(self, stack, **changes):
+        """Patch every loader of `concurrent_metrics` to a passing state."""
+        facts = {"source_stable": True, "harness_errors": 0, "outcome_differences": 0, "mode": "concurrent",
+                 "failed": [], **changes}
+        report = {"observation_sha256": "concurrent", "mode": "concurrent", "single_threaded": False}
+        review = {"reference_disagreements": [], "input_mismatches": [], "states": {"executed": self.EXECUTED}}
+        replayed = {"summary": {"partial": False, "harness_errors": facts["harness_errors"], "observed": self.EXECUTED},
+                    "source_stable": facts["source_stable"]}
+        context = unittest.mock.Mock(replayed=replayed, metadata={
+            "mode": facts["mode"], "native": {"observation_sha256": "concurrent"},
+            "requests_sha256": producers.digest(producers.phase2_corpus.p4.canonical([]) + b"\n")})
+        modes = {"outcome_differences": facts["outcome_differences"],
+                 "single": {"harness_errors": 0, "rust_capture_sha256": "single-rust"}}
+        concurrent = {"rows": [{"id": vid, "outcomes": {"errors": "failed"}} for vid in facts["failed"]]}
+        patch = unittest.mock.patch.object
+        stack.enter_context(patch(producers.phase2_native_concurrent, "load_capture", return_value=(ROOT, report, [])))
+        stack.enter_context(patch(producers.phase2_native_concurrent, "current"))
+        stack.enter_context(patch(producers.phase2_native_concurrent, "review", return_value=review))
+        stack.enter_context(patch(producers, "strict_json_loads", side_effect=lambda raw: json.loads(raw)))
+        stack.enter_context(patch(producers.phase2_compare, "load_context", return_value=context))
+        stack.enter_context(patch(producers.phase2_corpus, "requests", return_value=(None, [], None)))
+        stack.enter_context(patch(producers.phase2_compare, "modes", return_value=modes))
+        stack.enter_context(patch(producers.phase2_compare, "report", return_value=concurrent))
+        stack.enter_context(patch(producers, "assignments_current", return_value=facts.get("assignments", True)))
+        stack.enter_context(patch(Path, "read_bytes", lambda path: json.dumps(
+            {"observation_sha256": "concurrent"} if path.name == "verified.json" else review).encode()))
+
+    def metrics(self, **changes):
+        import contextlib
+        with contextlib.ExitStack() as stack:
+            self.passing(stack, **changes)
+            claims = {"native_modes": {"differences": [], "single": {"capture_observation_sha256": "single"},
+                                       "concurrent": {"capture_observation_sha256": "concurrent"}}}
+            comparison = {"rust_capture_sha256": "single-rust", "native_observation_sha256": "single", "rows": []}
+            authorities = producers.CHECKPOINT_AUTHORITIES["C6"]
+            return producers.concurrent_metrics(ROOT, ROOT, ROOT, ROOT, {"counts": {"executed": self.EXECUTED}},
+                                                comparison, claims, authorities)
+
+    def test_the_passing_state_passes(self):
+        self.assertEqual(self.metrics(), {"native_verified_concurrent": True, "harness_valid_concurrent": True,
+                                          "c6_mode_parity": True, "c6_assignments": True,
+                                          "c6_failures_concurrent": 0})
+
+    def test_one_outcome_difference_keeps_mode_parity_false(self):
+        self.assertIs(self.metrics(outcome_differences=1)["c6_mode_parity"], False)
+
+    def test_a_stale_or_single_mode_concurrent_capture_is_not_a_valid_harness(self):
+        for changes in ({"source_stable": False}, {"harness_errors": 1}, {"mode": "single"}):
+            with self.subTest(changes=changes):
+                metrics = self.metrics(**changes)
+                self.assertIs(metrics["harness_valid_concurrent"], False)
+                self.assertIs(metrics["c6_mode_parity"], False)
+
+    def test_an_assignment_difference_keeps_assignments_false(self):
+        self.assertIs(self.metrics(assignments=False)["c6_assignments"], False)
+
+    def test_a_concurrent_only_failure_counts(self):
+        self.assertEqual(self.metrics(failed=["a", "b"])["c6_failures_concurrent"], 2)
+
+    def test_each_c6_boolean_gates_completion_and_failures_add(self):
+        base = {"native_verified_concurrent": True, "harness_valid_concurrent": True, "c6_mode_parity": True,
+                "c6_assignments": True, "c6_failures_concurrent": 0}
+        comparison = {"rows": []}
+        with unittest.mock.patch.object(producers.phase2_compare, "validate_complete_rows"):
+            def complete(extra):
+                return producers.checkpoint_metrics("C6", comparison, None, True, None, True, 1, None,
+                                                    prerequisites={name: True for name in (
+                                                        "inventory_frozen", "native_verified", "harness_valid",
+                                                        "result_recorded", "blockers_named")}, extra=extra)
+            self.assertFalse(complete(base)["c6_complete"], "counters missing without claims")
+            for name in ("native_verified_concurrent", "harness_valid_concurrent", "c6_mode_parity", "c6_assignments"):
+                metrics = complete(dict(base, **{name: False}))
+                self.assertIs(metrics[name], False)
+                self.assertFalse(metrics["c6_complete"])
+            self.assertNotIn("c6_failures_concurrent", complete(base))
+
+
+class AssignmentsCurrent(unittest.TestCase):
+    """The recorded comparison binds the record, the Rust sources and the host."""
+
+    def setUp(self):
+        import tempfile
+        import phase2_assignments
+        self.assignments = phase2_assignments
+        self.temp = Path(tempfile.mkdtemp())
+        pin = json.loads((ROOT / "data/upstream.json").read_text())["pin"]
+        self.record = {"pin": pin, "inputs": {"a": "1"}, "step_check": {"equal": True}, "goarch": "arm64",
+                       "synthetic": [{}, {}]}
+        self.write()
+
+    def write(self, **changes):
+        (self.temp / "record.json").write_text(json.dumps(self.record))
+        comparison = {"record_sha256": producers.digest((self.temp / "record.json").read_bytes()),
+                      "rust_sources_sha256": "sources", "machine": "arm64", "equal": True, "programs": 5,
+                      "programs_equal": 4, "unsupported": 1, "synthetic": 2, "synthetic_equal": 2, **changes}
+        (self.temp / "comparison.json").write_text(json.dumps(comparison))
+
+    def current(self):
+        with unittest.mock.patch.object(self.assignments, "input_digests", return_value={"a": "1"}), \
+                unittest.mock.patch.object(self.assignments, "rust_sources_sha256", return_value="sources"):
+            return producers.assignments_current(self.temp / "record.json", self.temp / "comparison.json", 5)
+
+    def test_every_binding_is_required(self):
+        self.assertTrue(self.current())
+        for changes in ({"equal": False}, {"rust_sources_sha256": "stale"}, {"machine": "x86_64"},
+                        {"programs_equal": 3}, {"synthetic_equal": 1}, {"record_sha256": "other"}):
+            with self.subTest(changes=changes):
+                self.write(**changes)
+                self.assertFalse(self.current())
+        self.write()
+        self.record["inputs"] = {"a": "2"}
+        self.write()
+        self.assertFalse(self.current(), "a changed witness input invalidates the record")
+
+
 if __name__ == "__main__":
     unittest.main()

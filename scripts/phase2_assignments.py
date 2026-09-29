@@ -17,12 +17,15 @@ assignment. The synthetic step is the pin's helper sequence over given inputs;
 it is trusted only after it reproduces every corpus record.
 
     record  --output DIR [--shards N] [--jobs J] [--record]
-    compare --capture DIR [--native DIR] [--jobs J]   # the Rust partitioner over the same programs
+    compare --capture DIR [--native DIR] [--jobs J] [--record]   # the Rust partitioner over the same programs
     fusion  [--record | --check]          # the arm64/amd64 score arithmetic
 
-`--record` writes data/phase2/c6-assignments.json: the host, the toolchain,
-the overlay fingerprint, the synthetic set in full and the corpus records by
-digest (they stay in the capture directory). `fusion --record` writes
+`record --record` writes data/phase2/c6-assignments.json: the host, the
+toolchain, the overlay fingerprint, the synthetic set in full and the corpus
+records by digest (they stay in the capture directory). `compare --record`
+writes data/phase2/c6-assignment-comparison.json: the Rust result bound to
+that record, to the Rust sources it was built from and to the host's machine,
+which the checker producer requires current for `c6_assignments`. `fusion --record` writes
 data/phase2/c6-fusion-arm64-go1.27.1.txt from the Go compiler's assembly;
 `--check` requires the committed file to equal a fresh extraction.
 """
@@ -51,6 +54,7 @@ from s08_oracle import ROOT, canonical, digest  # noqa: E402
 
 INPUTS = ROOT / "tools/phase2/assignments"
 RECORD = ROOT / "data/phase2/c6-assignments.json"
+COMPARISON = ROOT / "data/phase2/c6-assignment-comparison.json"
 FUSION = ROOT / "data/phase2/c6-fusion-arm64-go1.27.1.txt"
 EXAMPLE = "phase2_assignments"
 TEST = "TestPhase2Assignments"
@@ -427,11 +431,23 @@ def run_rust(binary, lines):
     return [strict_json_loads(line) for line in completed.stdout.splitlines()]
 
 
-def compare(capture, jobs, native_dir):
+def rust_sources_sha256():
+    """The Rust inputs of the comparison: the corpus driver's production and
+    adapter sources, which include the example and the partitioner."""
+    import phase2_corpus
+
+    return digest(canonical(phase2_corpus.sources()))
+
+
+def compare(capture, jobs, native_dir, write_record=False):
     import phase2_corpus
 
     capture = Path(capture).resolve()
     report = strict_json_loads((capture / "report.json").read_bytes())
+    if write_record and canonical({key: report[key] for key in json.loads(RECORD.read_text())}) != canonical(
+            json.loads(RECORD.read_text())):
+        raise ValueError("the capture is not the recorded assignment witness")
+    sources = rust_sources_sha256()
     if digest((capture / "assignments.ndjson").read_bytes()) != report["assignments_sha256"]:
         raise ValueError("the capture's records changed")
     rows = [strict_json_loads(line) for line in (capture / "assignments.ndjson").read_bytes().splitlines()]
@@ -481,7 +497,10 @@ def compare(capture, jobs, native_dir):
         else:
             synthetic_differences.append({"id": case["id"], "features": case["features"],
                                           "fields": sorted(k for k in observed if observed[k] != case["native"][k])})
+    if rust_sources_sha256() != sources:
+        raise ValueError("the Rust sources changed during the comparison")
     result = {"host": platform.platform(), "machine": platform.machine(), "rust_binary_sha256": binary_sha256,
+              "rust_sources_sha256": sources, "record_sha256": digest(RECORD.read_bytes()),
               "capture": {"goos": report["goos"], "goarch": report["goarch"], "go": report["go"],
                           "assignments_sha256": report["assignments_sha256"]},
               "programs": len(wanted), "programs_equal": equal, "equal_by_checker_count": dict(sorted(by_count.items())),
@@ -492,6 +511,13 @@ def compare(capture, jobs, native_dir):
               "synthetic_differences": synthetic_differences,
               "equal": not differences and not synthetic_differences}
     (directory / "comparison.json").write_bytes(canonical(result) + b"\n")
+    if write_record:
+        if not result["equal"]:
+            raise ValueError("an unequal comparison is not recorded")
+        COMPARISON.write_text(json.dumps({key: result[key] for key in (
+            "machine", "rust_sources_sha256", "record_sha256", "capture", "programs", "programs_equal",
+            "equal_by_checker_count", "unsupported", "unsupported_reasons", "unsupported_rows", "synthetic",
+            "synthetic_equal", "equal")}, indent=1, sort_keys=True) + "\n")
     print(json.dumps({key: result[key] for key in ("programs", "programs_equal", "equal_by_checker_count",
                                                      "unsupported", "unsupported_reasons",
                                                      "program_difference_count", "synthetic", "synthetic_equal",
@@ -565,6 +591,7 @@ def main():
     cmp_.add_argument("--jobs", type=int, default=os.cpu_count() or 4)
     cmp_.add_argument("--native", default=str(ROOT / "target/phase2/native"),
                       help="the verified native capture whose harness inputs the corpus requests carry")
+    cmp_.add_argument("--record", action="store_true", help="write data/phase2/c6-assignment-comparison.json")
     fus = sub.add_parser("fusion")
     group = fus.add_mutually_exclusive_group()
     group.add_argument("--record", action="store_true")
@@ -573,7 +600,7 @@ def main():
     if args.command == "record":
         record(args.output, args.shards, args.jobs, args.timeout_minutes, args.record)
     elif args.command == "compare":
-        result = compare(args.capture, args.jobs, args.native)
+        result = compare(args.capture, args.jobs, args.native, args.record)
         if not result["equal"]:
             sys.exit(1)
     else:
