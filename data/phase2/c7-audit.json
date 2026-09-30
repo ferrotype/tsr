@@ -2,94 +2,34 @@
  "checkpoint": "C7",
  "dispositions": {
   "tsc/internal/ast/ast.go:SourceFile.copyFrom": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+   "disposition": "equivalent",
+   "reason": "factory_copy and copy_parser_fields split the pinned copy; the content-mapper metadata is copied first, as in the pin.",
+   "rust": "crates/tsr_ast/src/source_file.rs:391"
   },
   "tsc/internal/compiler/emitHost.go:emitHost.ContentMapperExtensions": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+   "disposition": "equivalent",
+   "reason": "Rust has no separate emit host: the output-path helpers read the program's mapper extensions, which the pinned emit host forwards.",
+   "rust": "crates/tsr_compiler/src/loader.rs:200"
   },
   "tsc/internal/compiler/emitter.go:emitter.emitDeclarationFile": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+   "disposition": "later",
+   "owner": "Phase 3",
+   "reason": "Declaration printing, with the mapped file's declaration-map positions and supplemental references; the Phase 2 corpus compares diagnostics and the emit schedule, not declaration output."
   },
   "tsc/internal/compiler/emitter.go:emitter.getDeclarationTransformers": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/fileloader.go:ContentMapperInitializationDiagnostic": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+   "disposition": "later",
+   "owner": "Phase 3",
+   "reason": "Declaration printing, with the mapped file's declaration-map positions and supplemental references; the Phase 2 corpus compares diagnostics and the emit schedule, not declaration output."
   },
   "tsc/internal/compiler/fileloader.go:ContentMapperProjectDiagnostic": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/fileloader.go:ContentMapperProjectErrorDiagnostic": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/fileloader.go:contentMapperMappingDiagnostic": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnostic": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnosticChain": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnosticWithDetail": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/fileloader.go:fileLoader.contentMapperUnavailable": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/fileloader.go:fileLoader.emptyContentMappedFile": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/fileloader.go:fileLoader.getContentMapperTransformIdentity": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/fileloader.go:fileLoader.parseContentMappedFile": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/fileloader.go:fileLoader.recordContentMapperFailure": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/fileloader.go:fileLoader.recordContentMapperInitializationFailure": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+   "disposition": "later",
+   "owner": "Phase 4",
+   "reason": "Only the tsc, build and watch commands report a project setup failure this way; the harness opens its project without it."
   },
   "tsc/internal/compiler/fileloader.go:processAllProgramFiles": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+   "disposition": "equivalent",
+   "reason": "Loader::new and Loader::run split the pinned function; the mapper extensions reach the supported-extension set and the resolver as in the pin.",
+   "rust": "crates/tsr_compiler/src/loader.rs:571"
   },
   "tsc/internal/compiler/host.go:NewCachedFSCompilerHost": {
    "disposition": "later",
@@ -97,19 +37,14 @@
    "reason": "The tsc and build commands' cached-filesystem host; the harness builds its host with NewCompilerHost."
   },
   "tsc/internal/compiler/host.go:NewCompilerHost": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+   "disposition": "equivalent",
+   "reason": "The Rust compiler host carries no mapper project; the caller hands the project to the program load, where the pin reads it back from the host.",
+   "rust": "crates/tsr_compiler/src/loader.rs:142"
   },
   "tsc/internal/compiler/host.go:compilerHost.ContentMapperProject": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/host.go:compilerHost.GetContentMappedSourceFiles": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+   "disposition": "equivalent",
+   "reason": "The project the pinned host returns is the one passed to load_with_content_mapper_project.",
+   "rust": "crates/tsr_compiler/src/loader.rs:142"
   },
   "tsc/internal/compiler/program.go:GetDiagnosticsOfAnyProgram": {
    "disposition": "later",
@@ -117,39 +52,19 @@
    "reason": "The tsc command's diagnostics gathering over any program kind; the corpus reads the program's diagnostics directly."
   },
   "tsc/internal/compiler/program.go:NewProgram": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/program.go:Program.ContentMapperExtensions": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/program.go:Program.ContentMapperProject": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
-  },
-  "tsc/internal/compiler/program.go:Program.GetContentMapper": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+   "disposition": "equivalent",
+   "reason": "Loader::run ends as the pin's constructor does: option verification, then the mapper projects' option diagnostics.",
+   "rust": "crates/tsr_compiler/src/loader.rs:880"
   },
   "tsc/internal/compiler/program.go:Program.GetSourceFileFromReference": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+   "disposition": "later",
+   "owner": "Phase 3",
+   "reason": "Serves the declaration transformer's reference paths (and later the language service); getDeclarationDiagnostics does not call it."
   },
   "tsc/internal/compiler/program.go:Program.ReuseProgram": {
    "disposition": "later",
    "owner": "Phase 4",
    "reason": "Program reuse across edits (incremental and watch builds); the corpus builds each program fresh, and the mapped-file branch rides with the reuse port."
-  },
-  "tsc/internal/compiler/program.go:Program.collectContentMapperOptionDiagnostics": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
   },
   "tsc/internal/testutil/contentmappertest/spawner.go:NewSpawnerWithProjectLifecycle": {
    "disposition": "later",
@@ -157,19 +72,19 @@
    "reason": "The spawner that records mapper project calls for the project system's lifecycle tests (with the dynamic-verbatim mapper); no compiler or conformance row runs it."
   },
   "tsc/internal/transformers/declarations/supplementalreferences.go:NewSupplementalReferencesTransformer": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+   "disposition": "later",
+   "owner": "Phase 3",
+   "reason": "Part of the declaration transformers the emitter runs; getDeclarationDiagnostics runs only the declaration transformer."
   },
   "tsc/internal/transformers/declarations/supplementalreferences.go:SupplementalReferencesTransformer.GetDiagnostics": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+   "disposition": "later",
+   "owner": "Phase 3",
+   "reason": "Part of the declaration transformers the emitter runs; getDeclarationDiagnostics runs only the declaration transformer."
   },
   "tsc/internal/transformers/declarations/supplementalreferences.go:SupplementalReferencesTransformer.TransformSourceFile": {
-   "disposition": "gap",
-   "item": "C7.8.3",
-   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+   "disposition": "later",
+   "owner": "Phase 3",
+   "reason": "Part of the declaration transformers the emitter runs; getDeclarationDiagnostics runs only the declaration transformer."
   }
  },
  "groups": {
@@ -424,68 +339,7 @@
   ]
  },
  "handoffs": [],
- "open_issues": [
-  {
-   "go": "tsc/internal/compiler/emitter.go:sourceFileMayBeEmitted",
-   "id": "C7-R02",
-   "item": "C7.8.3",
-   "reason": "A mapped file is emitted only for declarations; reviewed once mapped files load."
-  },
-  {
-   "go": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeDiagnostic",
-   "id": "C7-R03",
-   "item": "C7.8.3",
-   "reason": "The supplemental-file include reason; reviewed once supplemental files load."
-  },
-  {
-   "go": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.toRelatedInfo",
-   "id": "C7-R04",
-   "item": "C7.8.3",
-   "reason": "The supplemental-file include reason; reviewed once supplemental files load."
-  },
-  {
-   "go": "tsc/internal/compiler/fileloader.go:fileLoader.parseSourceFile",
-   "id": "C7-R05",
-   "item": "C7.8.3",
-   "reason": "Routes files with a mapper's extension through the content mapper; the Rust loader refuses such programs."
-  },
-  {
-   "go": "tsc/internal/compiler/filesparser.go:filesParser.getProcessedFiles",
-   "id": "C7-R06",
-   "item": "C7.8.3",
-   "reason": "Carries the content-mapper file metadata and the loader's content-mapper diagnostics into the program; reviewed once mapped files load."
-  },
-  {
-   "go": "tsc/internal/compiler/filesparser.go:parseTask.load",
-   "id": "C7-R07",
-   "item": "C7.8.3",
-   "reason": "Queues a mapped file's supplemental files with their include reason; reviewed once mapped files load."
-  },
-  {
-   "go": "tsc/internal/compiler/program.go:Program.GetProgramDiagnostics",
-   "id": "C7-R08",
-   "item": "C7.8.3",
-   "reason": "Includes the content-mapper and content-mapper option diagnostics; reviewed once mapped files load."
-  },
-  {
-   "go": "tsc/internal/compiler/program.go:Program.getBindAndCheckDiagnosticsWithChecker",
-   "id": "C7-R09",
-   "item": "C7.8.3",
-   "reason": "Applies the mapped diagnostic directives to a mapped file's diagnostics; reviewed once mapped files load."
-  },
-  {
-   "go": "tsc/internal/compiler/program.go:applyContentMapperDiagnosticDirectives",
-   "id": "C7-R10",
-   "item": "C7.8.3",
-   "reason": "Ported before its inputs existed; reviewed against the mapped files' directives."
-  },
-  {
-   "go": "tsc/internal/compiler/program.go:filterAndSortDiagnostics",
-   "id": "C7-R11",
-   "item": "C7.8.3",
-   "reason": "Drops unnecessary-code diagnostics whose virtual span has no original fidelity; the Rust span map does not translate spans yet."
-  }
- ],
+ "open_issues": [],
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
  "scope": "C7 audit over the complete files content-mapper execution moves to Phase 2 (contentmapper, spanmap, jsonrpc, the ipc files the in-process spawner reaches and the seven test mappers with their shared registry, spawner and protocol) and over the program integration: every pinned ast, compiler and declaration-transformer function whose body handles content-mapped files (docs/PHASE2-C7-plan.md, C7.8.0). Open gaps and review issues name the C7.8 item that closes them.",
  "version": 1

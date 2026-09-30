@@ -64,7 +64,9 @@ class LedgerMove(unittest.TestCase):
         altered["groups"]["C7.8.1 IPC connection and protocol (ipc)"].pop()
         self.assertTrue(any("complete pinned file" in problem or "reviewed function inventory" in problem
                             for problem in audit.problems(altered, allow_open=True)))
-        self.assertFalse(audit.complete(document))
+        # C7.8.3 closed the last gaps and review issues.
+        self.assertTrue(audit.complete(document))
+        self.assertEqual(document["open_issues"], [])
 
 
 class Fingerprints(unittest.TestCase):

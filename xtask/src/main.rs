@@ -626,6 +626,11 @@ fn build_report_in_context(root: &Path, archived: Option<&ViewMetadata>) -> Repo
             }
         }
     }
+    // A marker is unknown only when it names no inventory function; one that
+    // names a function in a harness or other uncounted file is valid but not
+    // counted.
+    let inventory_keys: std::collections::HashSet<&str> =
+        inventory.values().flatten().map(String::as_str).collect();
     let mut fn_ported = 0.0;
     let mut per_pkg_ported: BTreeMap<String, f64> = BTreeMap::new();
     let mut ported_keys: std::collections::HashSet<String> = std::collections::HashSet::new();
@@ -642,7 +647,7 @@ fn build_report_in_context(root: &Path, archived: Option<&ViewMetadata>) -> Repo
                     .unwrap_or_default();
                 *per_pkg_ported.entry(pkg).or_insert(0.0) += 1.0;
             }
-        } else {
+        } else if !inventory_keys.contains(m.as_str()) {
             unknown.push(m.clone());
         }
     }

@@ -485,6 +485,16 @@ fn unknown_markers_and_duplicate_sprint_ids_block_check() {
     );
     f.write("crates/demo/lib.rs", "// port: tsc/demo.go:Missing\n");
     assert!(!f.report().sprints[0].done);
+    // A marker naming an inventory function outside the counted source files
+    // (a harness file) is known, though not counted.
+    f.replace(
+        "data/go-functions.tsv",
+        "tsc/demo.go:B.Map\n",
+        "tsc/demo.go:B.Map\ntsc/harness.go\tharness\t\tServe\t1\t2\ttsc/harness.go:Serve\n",
+    );
+    f.write("crates/demo/lib.rs", "// port: tsc/harness.go:Serve\n");
+    let r = f.report();
+    assert!(r.unknown_markers.is_empty(), "{:?}", r.unknown_markers);
     f.write("crates/demo/lib.rs", "");
     fs::copy(f.0.join("sprints/S01.toml"), f.0.join("sprints/S02.toml")).unwrap();
     let r = f.report();

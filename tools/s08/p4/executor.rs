@@ -26,7 +26,13 @@ pub trait Hooks {
         cache: &mut FileCache,
         counters: &tsr_arena::Counters,
     ) -> Result<Arc<Program>, ts_compiler_error::Error> {
-        Program::load(options, cache, counters).map(Arc::new)
+        Program::load_with_content_mapper_project(
+            options,
+            content_mapper_project(),
+            cache,
+            counters,
+        )
+        .map(Arc::new)
     }
     fn create_checker(
         &mut self,
@@ -62,6 +68,69 @@ pub trait Hooks {
         true
     }
 }
+thread_local! {
+    /// The request's content-mapper project, shared by its programs.
+    static CONTENT_MAPPER_PROJECT: std::cell::RefCell<Option<Arc<dyn tsr_contentmapper::Project>>> =
+        const { std::cell::RefCell::new(None) };
+}
+
+/// The content-mapper project of the request being observed.
+pub fn content_mapper_project() -> Option<Arc<dyn tsr_contentmapper::Project>> {
+    CONTENT_MAPPER_PROJECT.with(|project| project.borrow().clone())
+}
+
+/// The harness's content-mapper host for one request (`harnessutil.
+/// CompileFilesEx`): when the options trust external code and the config
+/// declares mappers, the test mappers are served in process through one host
+/// the pre- and post-emit programs share; dropping the scope closes the
+/// project, then the host, as the harness's deferred closes do.
+pub struct ContentMapperScope {
+    host: Option<tsr_contentmapper::HostImpl>,
+    project: Option<Arc<dyn tsr_contentmapper::Project>>,
+}
+
+impl ContentMapperScope {
+    pub fn open(config: &tsr_tsoptions::ParsedCommandLine) -> Self {
+        let mappers = config.content_mappers.as_deref().unwrap_or_default();
+        if !config.options.run_external_code.is_true() || mappers.is_empty() {
+            return Self {
+                host: None,
+                project: None,
+            };
+        }
+        let host = tsr_contentmapper::new_host(
+            &tsr_ipc::Context::background(),
+            tsr_contentmappertest::new_spawner(),
+            tsr_locale::Locale::default(),
+        );
+        let project = tsr_contentmapper::Host::project(
+            &host,
+            tsr_contentmapper::ProjectSpec {
+                config_file_name: config.config_name(),
+                mappers: Arc::from(mappers.to_vec()),
+                compiler_options: Arc::new(config.options.clone()),
+            },
+        );
+        CONTENT_MAPPER_PROJECT.with(|current| current.borrow_mut().clone_from(&project));
+        Self {
+            host: Some(host),
+            project,
+        }
+    }
+}
+
+impl Drop for ContentMapperScope {
+    fn drop(&mut self) {
+        CONTENT_MAPPER_PROJECT.with(|current| current.borrow_mut().take());
+        if let Some(project) = self.project.take() {
+            let _ = project.close();
+        }
+        if let Some(host) = self.host.take() {
+            let _ = tsr_contentmapper::Host::close(&host);
+        }
+    }
+}
+
 #[allow(dead_code)]
 pub struct NoHooks;
 impl Hooks for NoHooks {}
@@ -144,6 +213,7 @@ pub fn observe(
     };
     let mut options = observation::program_options(&request["loading"], parsed_config);
     options.single_threaded = mode_single_threaded(request);
+    let _content_mappers = ContentMapperScope::open(&options.config);
     let program = match hooks.load_program(options, cache, &counters) {
         Ok(program) => {
             hooks.loaded(&program);
@@ -621,7 +691,8 @@ pub fn load_fresh(request: &Value, cache: &mut FileCache) -> Result<Fresh, Value
 #[allow(dead_code)]
 /// A program's diagnostics in the pin's harness collection order: config,
 /// program, syntactic, semantic, global, then the requested declaration and
-/// suggestion phases (`harnessutil.compileFilesWithHost`), unsorted.
+/// suggestion phases (`harnessutil.compileFilesWithHost`); each checker phase
+/// is filtered and sorted as `collectCheckerDiagnostics` returns it.
 pub fn harness_diagnostics(
     program: &Program,
     op: &mut tsr_checker::Operation<'_>,
@@ -639,13 +710,19 @@ pub fn harness_diagnostics(
             .syntactic_diagnostics(None)
             .map_err(compiler_failure)?,
     );
+    let mut semantic = Vec::new();
     for file in program.files() {
-        values.extend(
+        semantic.extend(
             program
                 .semantic_diagnostics_with_checker(op, file)
                 .map_err(compiler_failure)?,
         );
     }
+    values.extend(
+        program
+            .filter_and_sort_diagnostics(&semantic)
+            .map_err(compiler_failure)?,
+    );
     values.extend(op.global_diagnostics().map_err(checker_failure)?);
     if requested("declaration") {
         for file in program.files() {
@@ -657,13 +734,19 @@ pub fn harness_diagnostics(
         }
     }
     if requested("suggestion") {
+        let mut suggestions = Vec::new();
         for file in program.files() {
-            values.extend(
+            suggestions.extend(
                 program
                     .suggestion_diagnostics_with_checker(op, file)
                     .map_err(compiler_failure)?,
             );
         }
+        values.extend(
+            program
+                .filter_and_sort_diagnostics(&suggestions)
+                .map_err(compiler_failure)?,
+        );
     }
     Ok(values)
 }
@@ -688,13 +771,19 @@ pub fn any_program_diagnostics(
         if !program.options().list_files_only.is_true() {
             values.extend(op.global_diagnostics().map_err(checker_failure)?);
             if values.len() == config {
+                let mut semantic = Vec::new();
                 for file in program.files() {
-                    values.extend(
+                    semantic.extend(
                         program
                             .semantic_diagnostics_with_checker(op, file)
                             .map_err(compiler_failure)?,
                     );
                 }
+                values.extend(
+                    program
+                        .filter_and_sort_diagnostics(&semantic)
+                        .map_err(compiler_failure)?,
+                );
                 values.extend(op.global_diagnostics().map_err(checker_failure)?);
             }
             if program.options().emit_declarations() && values.len() == config {

@@ -300,7 +300,14 @@ def pre_emit_view(request, row):
             if (errors.get("class") != "unsupported" or type(counts) is not list or len(counts) != 2
                     or counts[0] == counts[1]):
                 raise ValueError("malformed pre/post-emit count failure")
-    view = {key: value for key, value in errors.items() if key not in ("pre_diagnostics", "counts")}
+    if "render_diagnostics" in errors:
+        # The rendered selection without content-mapped files' diagnostics.
+        p5.diagnostics(errors["render_diagnostics"])
+    view = {key: value for key, value in errors.items()
+            if key not in ("pre_diagnostics", "counts", "render_diagnostics")}
+    if "render_diagnostics" in errors:
+        # The baseline renders the selection, so its content answers to it.
+        view["diagnostics"] = errors["render_diagnostics"]
     return dict(row, error_baseline=dict(view, emit="not_executed"))
 
 

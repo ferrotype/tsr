@@ -120,6 +120,12 @@ pub struct Program {
     include_diagnostics: OnceLock<Result<Vec<Diagnostic>, tsr_arena::Error>>,
     trace: Vec<tsr_module::DiagAndArgs>,
     single_threaded: Tristate,
+    /// The host's content-mapper project the program's mapped files came from.
+    content_mapper_project: Option<Arc<dyn tsr_contentmapper::Project>>,
+    /// Failed mapper initializations and disabled mappers.
+    pub(crate) content_mapper_diagnostics: Vec<Diagnostic>,
+    /// Mapper reports on their configured options, at the config's syntax.
+    pub(crate) content_mapper_option_diagnostics: Vec<Diagnostic>,
 }
 impl Program {
     pub fn load(
@@ -127,7 +133,19 @@ impl Program {
         cache: &mut FileCache,
         counters: &Counters,
     ) -> Result<Self, Error> {
-        Loader::new(options, cache, counters, false, false)?.run()
+        Loader::new(options, None, cache, counters, false, false)?.run()
+    }
+    /// `load` with the host's content-mapper project (the pin's
+    /// `CompilerHost.ContentMapperProject`), which transforms the files the
+    /// configured content mappers register. Without one, those files fail to
+    /// transform.
+    pub fn load_with_content_mapper_project(
+        options: ProgramOptions,
+        project: Option<Arc<dyn tsr_contentmapper::Project>>,
+        cache: &mut FileCache,
+        counters: &Counters,
+    ) -> Result<Self, Error> {
+        Loader::new(options, project, cache, counters, false, false)?.run()
     }
     /// `load` for a host that asks for the source of each project reference
     /// instead of its built output (the pin's `UseSourceOfProjectReference`).
@@ -141,6 +159,7 @@ impl Program {
     ) -> Result<Self, Error> {
         Loader::new(
             options,
+            None,
             cache,
             counters,
             false,
@@ -159,7 +178,76 @@ impl Program {
         cache: &mut FileCache,
         counters: &Counters,
     ) -> Result<Self, Error> {
-        Loader::new(options, cache, counters, true, false)?.run()
+        Loader::new(options, None, cache, counters, true, false)?.run()
+    }
+    /// The mapper a content-mapped file came from, when the program's config
+    /// still maps its name to a mapper of the same identity.
+    /// port: tsc/internal/compiler/program.go:Program.GetContentMapper
+    pub fn content_mapper(
+        &self,
+        source: &tsr_ast::SourceFileState,
+    ) -> Option<&tsr_tsoptions::config_mappers::ContentMapper> {
+        if source.content_mapper().is_empty() {
+            return None;
+        }
+        self.config
+            .content_mapper_for_file_name(source.file_name())
+            .filter(|mapper| {
+                tsr_contentmapper::identity(mapper).as_bytes() == source.content_mapper()
+            })
+    }
+    /// port: tsc/internal/compiler/program.go:Program.ContentMapperExtensions
+    pub fn content_mapper_extensions(&self) -> Vec<JsString> {
+        self.config.content_mapper_extensions()
+    }
+    /// port: tsc/internal/compiler/program.go:Program.ContentMapperProject
+    pub fn content_mapper_project(&self) -> Option<&Arc<dyn tsr_contentmapper::Project>> {
+        self.content_mapper_project.as_ref()
+    }
+    /// The option diagnostics of the mapper projects the program opened.
+    /// port: tsc/internal/compiler/program.go:Program.collectContentMapperOptionDiagnostics
+    fn collect_content_mapper_option_diagnostics(&self) -> Vec<Diagnostic> {
+        use tsr_tsoptions::config_mappers::{option_diagnostic_location, OptionPathSegment};
+        let Some(project) = &self.content_mapper_project else {
+            return Vec::new();
+        };
+        let mappers = self.config.content_mappers.as_deref().unwrap_or_default();
+        project
+            .diagnostics()
+            .into_iter()
+            .map(|diagnostic| {
+                let path: Vec<OptionPathSegment> = diagnostic
+                    .path
+                    .iter()
+                    .map(|segment| {
+                        if segment.is_index {
+                            OptionPathSegment::Index(
+                                isize::try_from(segment.index).unwrap_or(isize::MAX),
+                            )
+                        } else {
+                            OptionPathSegment::Property(JsString::from_bytes(
+                                segment.property.as_bytes(),
+                            ))
+                        }
+                    })
+                    .collect();
+                let location = mappers
+                    .get(diagnostic.mapper)
+                    .and_then(|mapper| option_diagnostic_location(&self.config, mapper, &path));
+                let (file, loc) = location
+                    .map_or((None, tsr_core::TextRange::new(-1, -1)), |(source, loc)| {
+                        (Some(source.root), loc)
+                    });
+                Diagnostic::external(
+                    file,
+                    loc,
+                    JsString::from_bytes(diagnostic.source.as_bytes()),
+                    tsr_diagnostics::Category::Error as i32,
+                    diagnostic.code,
+                    JsString::from_bytes(diagnostic.message_text.as_bytes()),
+                )
+            })
+            .collect()
     }
     pub fn config(&self) -> &tsr_tsoptions::ParsedCommandLine {
         &self.config
@@ -440,6 +528,7 @@ struct Loader<'a> {
     /// Each path's processing diagnostics in the order its load made them;
     /// collection publishes those of the paths it keeps.
     processing: BTreeMap<JsString, Vec<ProcessingDiagnostic>>,
+    content_mappers: crate::content_mapped::ContentMapperState,
 }
 type ReferenceFailure = (&'static tsr_diagnostics::Message, Vec<JsString>);
 /// port: tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource
@@ -481,19 +570,16 @@ fn add_project_reference_tasks(
 impl<'a> Loader<'a> {
     fn new(
         input: ProgramOptions,
+        project: Option<Arc<dyn tsr_contentmapper::Project>>,
         cache: &'a mut FileCache,
         counters: &'a Counters,
         allow_live_host: bool,
         use_source_of_project_reference: bool,
     ) -> Result<Self, Error> {
-        if input
-            .config
-            .content_mappers
-            .as_ref()
-            .is_some_and(|mappers| !mappers.is_empty())
-        {
-            return Err(Error::Unsupported("content-mapper execution"));
-        }
+        let content_mappers = crate::content_mapped::ContentMapperState::new(
+            project,
+            input.config.content_mapper_extensions(),
+        );
         let can_use_project_reference_source =
             can_use_project_reference_source(use_source_of_project_reference, &input.config);
         let references = add_project_reference_tasks(
@@ -509,6 +595,7 @@ impl<'a> Loader<'a> {
             input.current_directory.as_bytes(),
             tsr_module::ResolverOptions {
                 allow_live_host,
+                extra_extensions: content_mappers.extensions.clone(),
                 ..Default::default()
             },
         )?;
@@ -552,6 +639,7 @@ impl<'a> Loader<'a> {
             redirected: BTreeMap::new(),
             redirect_outputs: BTreeSet::new(),
             processing: BTreeMap::new(),
+            content_mappers,
         })
     }
     fn run(mut self) -> Result<Program, Error> {
@@ -783,8 +871,13 @@ impl<'a> Loader<'a> {
             include_diagnostics: OnceLock::new(),
             trace: self.trace,
             single_threaded: self.single_threaded,
+            content_mapper_project: self.content_mappers.project,
+            content_mapper_diagnostics: self.content_mappers.diagnostics,
+            content_mapper_option_diagnostics: Vec::new(),
         };
         program.option_verification = crate::verify_compiler_options(&program)?;
+        program.content_mapper_option_diagnostics =
+            program.collect_content_mapper_option_diagnostics();
         Ok(program)
     }
     /// port: tsc/internal/compiler/fileloader.go:fileLoader.toPath
@@ -1017,13 +1110,16 @@ impl<'a> Loader<'a> {
     /// The canonical file name's extension is one the options load.
     /// port: tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension
     fn is_supported_extension(&self, canonical_file_name: &[u8]) -> bool {
-        tsr_tsoptions::supported_extensions_with_json(&self.options, &[])
-            .iter()
-            .any(|group| {
-                group
-                    .iter()
-                    .any(|ext| canonical_file_name.ends_with(ext.as_bytes()))
-            })
+        tsr_tsoptions::supported_extensions_with_json(
+            &self.options,
+            &self.content_mappers.extensions,
+        )
+        .iter()
+        .any(|group| {
+            group
+                .iter()
+                .any(|ext| canonical_file_name.ends_with(ext.as_bytes()))
+        })
     }
     /// The failure is the message and arguments of the caller's diagnostic.
     /// port: tsc/internal/compiler/fileloader.go:fileLoader.getSourceFileFromReference
@@ -1034,7 +1130,8 @@ impl<'a> Loader<'a> {
         source: Option<&ProgramFile>,
     ) -> Result<Result<Vec<u8>, ReferenceFailure>, Error> {
         let diagnostic_name = JsString::from_bytes(path::normalize_slashes(reference).into_owned());
-        let groups = tsr_tsoptions::supported_extensions(&self.options, &[]);
+        let groups =
+            tsr_tsoptions::supported_extensions(&self.options, &self.content_mappers.extensions);
         let quoted_extensions = || {
             let mut text = Vec::new();
             for ext in groups.iter().flatten() {
@@ -1224,7 +1321,12 @@ impl<'a> Loader<'a> {
             return Ok(());
         }
         let kind = ScriptKind::ensure_from_file_name(&name);
-        if path::has_extension(&name) && !self.options.allow_non_ts_extensions.is_true() {
+        // A supplemental file arrives parsed with its canonical file.
+        let supplemental = self.content_mappers.supplementals.remove(&key);
+        if supplemental.is_none()
+            && path::has_extension(&name)
+            && !self.options.allow_non_ts_extensions.is_true()
+        {
             let canonical = path::canonical(&name, self.host.use_case_sensitive_file_names());
             if !self.is_supported_extension(&canonical) {
                 return Err(Error::Unsupported(
@@ -1232,14 +1334,18 @@ impl<'a> Loader<'a> {
                 ));
             }
         }
-        let meta = metadata::load(
+        let mut meta = metadata::load(
             &mut self.resolver,
             &name,
             &self.options,
             is_lib,
             self.skip_resolution,
         )?;
-        let Some(file) = self.parse_source_file(&name, &key, &meta, kind)? else {
+        let file = match supplemental {
+            Some(parsed) => Some(bind(parsed)?),
+            None => self.parse_source_file(&name, &key, &meta, kind)?,
+        };
+        let Some(file) = file else {
             self.missing
                 .entry(key.clone())
                 .or_insert_with(|| JsString::from_bytes(name.as_slice()));
@@ -1257,9 +1363,16 @@ impl<'a> Loader<'a> {
         if is_lib {
             self.libs.insert(key.clone());
         }
-        self.metadata.insert(key.clone(), meta.clone());
         let view = file.bound.view().ast();
         let state = view.source_file(file.source())?;
+        let virtual_file_name = state.virtual_file_name();
+        if !virtual_file_name.is_empty() {
+            meta.implied_node_format = metadata::implied_node_format_for_file(
+                virtual_file_name,
+                meta.package_json_type.as_bytes(),
+            );
+        }
+        self.metadata.insert(key.clone(), meta.clone());
         let resolution = self.file_resolution(key.as_bytes(), &name)?;
         if !self.skip_resolution {
             if !self.options.no_resolve.is_true() {
@@ -1319,6 +1432,17 @@ impl<'a> Loader<'a> {
             }
             self.resolve_imports_and_module_augmentations(&file, &key, &meta, &resolution, kind)?;
         }
+        // port: tsc/internal/compiler/filesparser.go:parseTask.load
+        for supplemental in state.supplemental_file_names() {
+            self.add_sub_task(
+                &key,
+                supplemental.as_bytes(),
+                None,
+                IncludeReasonData::ContentMapperSupplemental { file: key.clone() },
+                depth,
+                false,
+            );
+        }
         self.child_tasks
             .insert(key, self.pending_children(pending_start, depth));
         self.files.push(file);
@@ -1344,7 +1468,166 @@ impl<'a> Loader<'a> {
                 meta,
             ),
         };
+        if tsr_tspath::file_extension_is_one_of(name, &self.content_mappers.extensions) {
+            return self.parse_content_mapped_file(options);
+        }
         self.get_source_file(options, kind)
+    }
+    /// A content-mapped file's virtual source through the host's mapper,
+    /// keeping its original name and text. After a failed initialization or
+    /// an exhausted failure budget the file is added empty without another
+    /// report. `None` only when the file cannot be read.
+    /// port: tsc/internal/compiler/fileloader.go:fileLoader.parseContentMappedFile
+    fn parse_content_mapped_file(
+        &mut self,
+        options: SourceFileParseOptions,
+    ) -> Result<Option<Arc<ProgramFile>>, Error> {
+        let mappers = self.config.content_mappers.as_deref().unwrap_or_default();
+        let Some(mapper) = self
+            .config
+            .content_mapper_for_file_name(options.file_name.as_bytes())
+        else {
+            return Err(Error::Unsupported("content-mapped file without a mapper"));
+        };
+        let index = mappers
+            .iter()
+            .position(|candidate| std::ptr::eq(candidate, mapper))
+            .expect("the config's own mapper");
+        let mapper = mapper.clone();
+        let label = tsr_contentmapper::diagnostic_name(&mapper).clone();
+        let identity = tsr_contentmapper::identity(&mapper);
+        let transform_identity = self.content_mapper_transform_identity(&mapper, index);
+        if self.content_mappers.unavailable(index) {
+            let file = self.empty_content_mapped_file(options, identity, transform_identity)?;
+            return Ok(Some(bind(file)?));
+        }
+        let files = match self.content_mapped_source_files(&options, &mapper, index)? {
+            Ok(Some(files)) => files,
+            Ok(None) => return Ok(None),
+            Err(error) => {
+                let mut file =
+                    self.empty_content_mapped_file(options, identity, transform_identity)?;
+                if error.transform_kind() == Some(tsr_contentmapper::TransformErrorKind::Initialize)
+                {
+                    self.content_mappers
+                        .record_initialization_failure(index, &label, &error);
+                } else if self.content_mappers.record_failure(index, &label) {
+                    let root = file.root();
+                    let diagnostic = match &error {
+                        tsr_contentmapper::Error::Mapping(problem) => {
+                            crate::content_mapped::mapping_diagnostic(root, &label, problem)
+                        }
+                        error => crate::content_mapped::transform_diagnostic(root, &label, error),
+                    };
+                    let state = file.root_source_file_mut()?;
+                    let mut diagnostics = state.diagnostics().to_vec();
+                    diagnostics.push(diagnostic);
+                    state.set_diagnostics(diagnostics);
+                }
+                return Ok(Some(bind(file)?));
+            }
+        };
+        for file in files.supplemental {
+            let name = file
+                .view()
+                .source_file(file.root())?
+                .parse_options()
+                .file_name
+                .clone();
+            let key = self.to_path(name.as_bytes());
+            self.content_mappers.supplementals.insert(key, file);
+        }
+        Ok(Some(bind(files.canonical)?))
+    }
+    /// The host's transform of one content-mapped file, with the collision
+    /// check on its supplemental names.
+    /// port: tsc/internal/compiler/host.go:compilerHost.GetContentMappedSourceFiles
+    fn content_mapped_source_files(
+        &mut self,
+        options: &SourceFileParseOptions,
+        mapper: &tsr_tsoptions::config_mappers::ContentMapper,
+        index: usize,
+    ) -> Result<Result<Option<tsr_contentmapper::SourceFiles>, tsr_contentmapper::Error>, Error>
+    {
+        let Some(project) = self.content_mappers.project.clone() else {
+            // ErrProjectUnavailable
+            return Ok(Err(tsr_contentmapper::Error::Message(
+                "content mapper project is unavailable".into(),
+            )));
+        };
+        let Some(content) = self.host.read_file(options.file_name.as_bytes())? else {
+            return Ok(Ok(None));
+        };
+        let files = match tsr_contentmapper::transform_and_parse(
+            options,
+            content.text.as_bytes(),
+            mapper,
+            index,
+            project.as_ref(),
+            self.counters,
+        ) {
+            Ok(files) => files,
+            Err(error) => return Ok(Err(error)),
+        };
+        let host = self.host.clone();
+        let mut exists = |name: &[u8]| host.file_exists(name).unwrap_or(false);
+        Ok(
+            tsr_contentmapper::check_supplemental_file_name_collisions(&files, &mut exists)
+                .map(|()| Some(files)),
+        )
+    }
+    /// port: tsc/internal/compiler/fileloader.go:fileLoader.getContentMapperTransformIdentity
+    fn content_mapper_transform_identity(
+        &self,
+        mapper: &tsr_tsoptions::config_mappers::ContentMapper,
+        index: usize,
+    ) -> JsString {
+        if let Some(project) = &self.content_mappers.project {
+            if let Ok(identity) = project.identity(index) {
+                return JsString::from_bytes(identity.into_bytes());
+            }
+        }
+        JsString::from_bytes(
+            tsr_contentmapper::hex(&tsr_contentmapper::transform_identity(
+                mapper,
+                Some(&self.options),
+            ))
+            .into_bytes(),
+        )
+    }
+    /// An empty TypeScript file for a content-mapped file whose transform
+    /// could not be used; it keeps the original content for diagnostics and
+    /// stays content-mapped, so it is excluded from emit like a mapped file.
+    /// port: tsc/internal/compiler/fileloader.go:fileLoader.emptyContentMappedFile
+    fn empty_content_mapped_file(
+        &mut self,
+        options: SourceFileParseOptions,
+        mapper_identity: JsString,
+        transform_identity: JsString,
+    ) -> Result<tsr_ast::ParsedFile, Error> {
+        let content = self
+            .host
+            .read_file(options.file_name.as_bytes())?
+            .map_or_else(tsr_jsstring::SourceText::default, |content| content.text);
+        let mut file = tsr_parser::parse_source_file_with_counters(
+            tsr_jsstring::SourceText::from_bytes(b"".as_slice()),
+            ScriptKind::TS,
+            options.clone(),
+            self.counters,
+        );
+        let mut virtual_file_name = options.file_name.as_bytes().to_vec();
+        virtual_file_name.extend_from_slice(b".ts");
+        file.root_source_file_mut()?.set_content_mapper_info(
+            tsr_ast::ContentMapperSourceFileInfo {
+                content_mapper: mapper_identity,
+                transform_identity,
+                parse_options: options,
+                virtual_file_name: JsString::from_bytes(virtual_file_name),
+                original_text: content,
+                ..Default::default()
+            },
+        );
+        Ok(file)
     }
     /// Read the file and parse it through the retained file cache.
     /// port: tsc/internal/compiler/host.go:compilerHost.GetSourceFile
@@ -1712,6 +1995,13 @@ impl<'a> Loader<'a> {
 }
 /// The host's trace callback: the program keeps the log, in emission order.
 /// port: tsc/internal/compiler/host.go:compilerHost.Trace
+/// Binds a file the loader parsed itself: a content-mapped file or one of
+/// its supplemental files.
+fn bind(parsed: tsr_ast::ParsedFile) -> Result<Arc<ProgramFile>, Error> {
+    // port: tsc/internal/compiler/program.go:Program.BindSourceFiles
+    let bound = tsr_binder::bind_parsed_file(parsed)?;
+    Ok(Arc::new(ProgramFile { bound }))
+}
 fn host_trace(log: &mut Vec<tsr_module::DiagAndArgs>, traces: Vec<tsr_module::DiagAndArgs>) {
     log.extend(traces);
 }
