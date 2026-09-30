@@ -67,13 +67,21 @@ SOURCE_PATTERNS = ("tools/phase2/**/*.rs", "tools/s08/p5/**/*", "rust-toolchain.
                    "xtask/**/*", "tools/s03/**/*", "scripts/generate_locale_tables.py")
 
 
+def test_only(path):
+    """A crate's integration suites and fixtures (`crates/<crate>/tests/**`): no
+    corpus executable builds them, so they stay with the contract receipts that
+    run them (docs/PHASE2-C7-plan.md decision 8)."""
+    parts = path.split("/")
+    return len(parts) > 3 and parts[0] == "crates" and parts[2] == "tests"
+
+
 def sources():
     result = p4.sources()
     for pattern in SOURCE_PATTERNS:
         for path in ROOT.glob(pattern):
             if path.is_file() and not ({"target", "__pycache__"} & set(path.relative_to(ROOT).parts)) and path.name != ".DS_Store":
                 result[str(path.relative_to(ROOT))] = digest(path.read_bytes())
-    return dict(sorted(result.items()))
+    return dict(sorted((path, value) for path, value in result.items() if not test_only(path)))
 
 
 def loading_requests():

@@ -376,7 +376,7 @@ class Registration(unittest.TestCase):
         self.assertEqual(set(benchmark.sources()) - registered, set())
 
     def test_capture_closures_cover_assets_workspace_and_generators(self):
-        required = producers.source_inputs(producers.PRODUCTION_PATTERNS)
+        required = producers.production_inputs()
         for actual in (corpus.sources(), benchmark.sources()):
             self.assertEqual({path: actual.get(path) for path in required}, required)
         for path in ("tools/s10/corpus-adapter/Cargo.toml", "crates/tsr_bundled/bundled/libs/lib.d.ts",
@@ -428,7 +428,7 @@ class Registration(unittest.TestCase):
         diagnostic = {**order_trace.native_inputs(), "data/phase2/c2-order-traces.json":
                       producers.digest((ROOT / "data/phase2/c2-order-traces.json").read_bytes())}
         self.assertEqual({path: inputs.get(path) for path in diagnostic}, diagnostic)
-        production = producers.source_inputs(producers.PRODUCTION_PATTERNS)
+        production = producers.production_inputs()
         self.assertFalse(set(diagnostic) & set(production))
         tests = producers.witness_tests(spec)
         self.assertIn("order_contract::source_creation_order_matches_native_without_changing_ordinary_outputs", tests)

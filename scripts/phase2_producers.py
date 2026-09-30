@@ -204,6 +204,14 @@ def source_inputs(paths):
     return found
 
 
+def production_inputs():
+    """The production and configuration identity the captures must carry: the
+    contract sources without the crates' test-only suites, which the contract
+    receipts bind instead (docs/PHASE2-C7-plan.md decision 8)."""
+    return {path: value for path, value in source_inputs(PRODUCTION_PATTERNS).items()
+            if not phase2_corpus.test_only(path)}
+
+
 def witness_tests(spec):
     """Exact contract inventory, including explicitly reviewed test modules."""
     root = ROOT / spec["test_source"]
@@ -481,7 +489,7 @@ def measurement_identity(directory, comparison, rust, *, context=None):
     else:
         context.require_directories(context.native_directory, rust)
         corpus, replay = context.metadata, context.replayed
-    required = source_inputs(PRODUCTION_PATTERNS)
+    required = production_inputs()
     if (result.get("smoke") or not result.get("source_stable")
             or result.get("pin") != comparison["pin"] or capture.get("pin") != comparison["pin"]
             or replay["summary"]["partial"] or replay["summary"]["harness_errors"]

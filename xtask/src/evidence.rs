@@ -97,16 +97,22 @@ impl Context {
             && self.environment == other.environment
     }
     pub fn capture(root: &Path, pin: &str) -> Result<Self> {
-        Self::capture_sources(root, pin, &default_sources())
+        Self::capture_sources(root, pin, &default_sources(), &[])
     }
     fn capture_run(root: &Path, pin: &str, spec: &RunSpec) -> Result<Self> {
-        Self::capture_sources(root, pin, &spec.sources)
+        Self::capture_sources(root, pin, &spec.sources, &spec.exclude)
     }
-    fn capture_sources(root: &Path, pin: &str, sources: &[String]) -> Result<Self> {
+    fn capture_sources(
+        root: &Path,
+        pin: &str,
+        sources: &[String],
+        exclude: &[String],
+    ) -> Result<Self> {
         Self::capture_sources_with_identity(
             root,
             pin,
             sources,
+            exclude,
             &current_host(),
             &current_toolchain()?,
         )
@@ -115,6 +121,7 @@ impl Context {
         root: &Path,
         pin: &str,
         sources: &[String],
+        exclude: &[String],
         host: &str,
         toolchain: &str,
     ) -> Result<Self> {
@@ -124,7 +131,13 @@ impl Context {
             .to_string();
         // Git's glob pathspecs include tracked deletions and nonignored additions.
         // Positive declarations omit docs/policy by default, but can opt them in.
-        let patterns: Vec<String> = sources.iter().map(|p| format!(":(top,glob){p}")).collect();
+        // Exclusions take paths back out of the positive set, for example test-only
+        // suites that a run's executables never build.
+        let patterns: Vec<String> = sources
+            .iter()
+            .map(|p| format!(":(top,glob){p}"))
+            .chain(exclude.iter().map(|p| format!(":(top,glob,exclude){p}")))
+            .collect();
         let mut args = vec![
             "ls-files",
             "--cached",
@@ -324,6 +337,10 @@ pub struct RunSpec {
     inputs: Vec<String>,
     #[serde(default = "default_sources")]
     sources: Vec<String>,
+    // Omitted from the serialized spec when empty, so declaring no exclusions
+    // leaves a run's spec digest unchanged.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    exclude: Vec<String>,
     target: String,
     config: String,
     #[serde(default)]
@@ -361,6 +378,7 @@ pub fn specs(root: &Path) -> Result<BTreeMap<String, RunSpec>> {
             || s.inputs.is_empty()
             || s.sources.is_empty()
             || s.sources.iter().any(|p| !valid_source_pattern(p))
+            || s.exclude.iter().any(|p| !valid_source_pattern(p))
         {
             return Err(format!("invalid run declaration: {id}"));
         }
@@ -684,6 +702,7 @@ fn load_in_environment(
                 root,
                 &context.upstream_pin,
                 &spec.sources,
+                &spec.exclude,
                 &context.host,
                 &context.toolchain,
             )?;
