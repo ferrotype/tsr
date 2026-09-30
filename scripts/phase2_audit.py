@@ -139,12 +139,37 @@ C6_REVIEWED_GROUPS = {
 C6_COMPLETE_FILES = {"C6.3 compiler checker pool (checkerpool.go)": "tsc/internal/compiler/checkerpool.go:",
                      "C6.2 tracer (tracer.go)": "tsc/internal/checker/tracer.go:",
                      "C6.4 work groups (workgroup.go)": "tsc/internal/core/workgroup.go:"}
+# C7 (docs/PHASE2-C7-plan.md, C7.8.0): the files content-mapper execution moves
+# to Phase 2, each group covering its complete pinned files, and the program
+# integration: every pinned ast, compiler and declaration-transformer function
+# whose body handles content-mapped files (content mappers, span maps,
+# supplemental files, mapped diagnostics or runExternalCode), marked or not.
+C7_REVIEWED_GROUPS = {
+    "C7.8.1 JSON-RPC base protocol (jsonrpc)": (20, "6178f6d89b77b279ce5abb24830c2db8d2bec2686154e771c0bcdd4ed0ab4bec"),
+    "C7.8.1 IPC connection and protocol (ipc)": (27, "cb65666ca991ba68c5e6162ae1c4bae1a99381b6189b7516326130f227663e16"),
+    "C7.8.2 content-mapper host (contentmapper)": (78, "a74f676529f82bc64b2ae3a57fafc625921a090ccf0546a4f04df6439de34901"),
+    "C7.8.2 span maps (spanmap.go)": (34, "0d0d75c9f683e9f6a622b43c03e93b3d0bef1d1843b76266a17dfb33ecb23df5"),
+    "C7.8.3 program integration (ast, compiler, declarations)": (56, "b89b410581028a4da1101c8c7caf824417804d8af25ded3279c82656895ce703"),
+    "C7.8.4 test mappers (contentmappertest)": (22, "fba44f83109f320749816bd7a557b5d3580344661b25dacd4f866e16ce1424ac"),
+}
+C7_COMPLETE_FILES = {
+    "C7.8.1 JSON-RPC base protocol (jsonrpc)": ("tsc/internal/jsonrpc/baseproto.go:", "tsc/internal/jsonrpc/jsonrpc.go:"),
+    "C7.8.1 IPC connection and protocol (ipc)": tuple(f"tsc/internal/ipc/{name}.go:" for name in (
+        "conn", "conn_async", "protocol", "protocol_jsonrpc", "timing")),
+    "C7.8.2 content-mapper host (contentmapper)": tuple(f"tsc/internal/contentmapper/{name}.go:" for name in (
+        "contentmapper", "host", "hostimpl", "transform")),
+    "C7.8.2 span maps (spanmap.go)": "tsc/internal/spanmap/spanmap.go:",
+    "C7.8.4 test mappers (contentmappertest)": tuple(f"tsc/internal/testutil/contentmappertest/{name}.go:" for name in (
+        "failing", "lisp", "protocol", "registry", "spawner", "supplemental", "supplemental_diagnostics",
+        "supplemental_globals", "supplemental_module", "transforming")),
+}
 SCOPES = {"C1": (REVIEWED_GROUPS, COMPLETE_FILES, REQUIRED_HANDOFFS),
           "C2": (C2_REVIEWED_GROUPS, C2_COMPLETE_FILES, {}),
           "C3": (C3_REVIEWED_GROUPS, C3_COMPLETE_FILES, {}),
           "C4": (C4_REVIEWED_GROUPS, C4_COMPLETE_FILES, {}),
           "C5": (C5_REVIEWED_GROUPS, C5_COMPLETE_FILES, {}),
-          "C6": (C6_REVIEWED_GROUPS, C6_COMPLETE_FILES, {})}
+          "C6": (C6_REVIEWED_GROUPS, C6_COMPLETE_FILES, {}),
+          "C7": (C7_REVIEWED_GROUPS, C7_COMPLETE_FILES, {})}
 
 
 def inventory():
@@ -223,7 +248,7 @@ def problems(document, *, allow_open=False, root=ROOT, known=None, mapped=None,
         binding = (len(members), digest(canonical(sorted(members))))
         if group not in reviewed or binding != reviewed[group]:
             found.append(f"group {group} differs from its reviewed function inventory")
-        prefix = complete_files.get(group)
+        prefix = complete_files.get(group)  # one file's prefix, or a tuple of them
         if prefix and set(members) != {identity for identity in known if identity.startswith(prefix)}:
             found.append(f"group {group} does not cover its complete pinned file")
         for identity in members:

@@ -428,6 +428,23 @@ run, rather than amending the P2B exit.
        shared `contentmappertest` files (`registry.go`, `spawner.go`,
        `protocol.go`, `manifest.go` and what they call), and
        `tsbaseline/contentmapper_baseline.go`.
+
+       Traced (static calls and function references, interface calls
+       followed into the four runtime packages, the seven mappers' handlers
+       as roots): 22 files. They are the four `contentmapper` files,
+       `spanmap.go`, both `jsonrpc` files and five `ipc` files (`conn.go`,
+       `conn_async.go`, `protocol.go`, `protocol_jsonrpc.go`, `timing.go`).
+       The other ten are the seven mappers with `registry.go`, `spawner.go`
+       and `protocol.go`. Four candidates stay in their packages' phases:
+       - `ipc/transport*.go`: the spawner connects over an in-memory pipe.
+       - `ipc/conn_sync.go`: nothing reached constructs a synchronous conn.
+       - `contentmappertest/manifest.go`: nothing reached calls it.
+       - `tsbaseline/contentmapper_baseline.go`: the native oracle's driver
+         never takes the content-mapper baseline, so the rows do not execute
+         it.
+
+       The span map's port continues in `tsr_ast`'s `span_map.rs`, which the
+       ledger already names, rather than a new crate.
      - Move those files to Phase 2 with `FILE_PHASES` in
        `scripts/ledger-init.py`, then regenerate `PORTS.toml` and
        `data/upstream.json`.

@@ -1,0 +1,1383 @@
+{
+ "checkpoint": "C7",
+ "dispositions": {
+  "tsc/internal/ast/ast.go:SourceFile.copyFrom": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/emitHost.go:emitHost.ContentMapperExtensions": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/emitter.go:emitter.emitDeclarationFile": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/emitter.go:emitter.getDeclarationTransformers": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/fileloader.go:ContentMapperInitializationDiagnostic": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/fileloader.go:ContentMapperProjectDiagnostic": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/fileloader.go:ContentMapperProjectErrorDiagnostic": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/fileloader.go:contentMapperMappingDiagnostic": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnostic": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnosticChain": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnosticWithDetail": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/fileloader.go:fileLoader.contentMapperUnavailable": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/fileloader.go:fileLoader.emptyContentMappedFile": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/fileloader.go:fileLoader.getContentMapperTransformIdentity": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/fileloader.go:fileLoader.parseContentMappedFile": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/fileloader.go:fileLoader.recordContentMapperFailure": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/fileloader.go:fileLoader.recordContentMapperInitializationFailure": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/fileloader.go:processAllProgramFiles": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/host.go:NewCachedFSCompilerHost": {
+   "disposition": "later",
+   "owner": "Phase 4",
+   "reason": "The tsc and build commands' cached-filesystem host; the harness builds its host with NewCompilerHost."
+  },
+  "tsc/internal/compiler/host.go:NewCompilerHost": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/host.go:compilerHost.ContentMapperProject": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/host.go:compilerHost.GetContentMappedSourceFiles": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/program.go:GetDiagnosticsOfAnyProgram": {
+   "disposition": "later",
+   "owner": "Phase 4",
+   "reason": "The tsc command's diagnostics gathering over any program kind; the corpus reads the program's diagnostics directly."
+  },
+  "tsc/internal/compiler/program.go:NewProgram": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/program.go:Program.ContentMapperExtensions": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/program.go:Program.ContentMapperProject": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/program.go:Program.GetContentMapper": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/program.go:Program.GetSourceFileFromReference": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/compiler/program.go:Program.ReuseProgram": {
+   "disposition": "later",
+   "owner": "Phase 4",
+   "reason": "Program reuse across edits (incremental and watch builds); the corpus builds each program fresh, and the mapped-file branch rides with the reuse port."
+  },
+  "tsc/internal/compiler/program.go:Program.collectContentMapperOptionDiagnostics": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/contentmapper/contentmapper.go:IsSupportedVirtualExtension": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/contentmapper.go:Mapper.DiagnosticName": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/contentmapper.go:Mapper.Identity": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/contentmapper.go:Mapper.MarshalDeclaredOptions": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/contentmapper.go:Mapper.TransformIdentity": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/contentmapper.go:Mapper.manifestIdentity": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/host.go:DiagnosticDirectiveError.Error": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/host.go:InitializeError.Error": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/host.go:InvalidVirtualExtensionError.Error": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/host.go:NewTransformError": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/host.go:ProjectError.Error": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/host.go:SupplementalFileCollisionError.Error": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/host.go:Timings.Since": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/host.go:TransformError.Error": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/host.go:TransformError.Unwrap": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/host.go:operationTimingSince": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:MappedDiagnosticDirective.MarshalJSONTo": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:MappedDiagnosticDirective.UnmarshalJSONFrom": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:NewHost": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:NewHostWithOptions": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:SpawnerFunc.Spawn": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:closeOnceReadWriteCloser.Close": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:closeOnceReadWriteCloser.ExitCode": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:combinedIdentity": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:decodeMappedOutput": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:decodeTransformResult": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:handshake": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:host.Acquire": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:host.Close": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:host.Project": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:host.SetLocale": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:host.Timings": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:host.Transform": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:host.closeProject": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:host.connFor": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:host.connForLocked": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:host.openProjectLocked": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:host.release": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:host.transformLocked": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:loggedProcess.Close": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:loggingProtocol.ReadMessage": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:loggingProtocol.WriteError": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:loggingProtocol.WriteNotification": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:loggingProtocol.WriteRequest": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:loggingProtocol.WriteResponse": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:loggingProtocol.log": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:mapperTimingCollector.finishRequest": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:mapperTimingCollector.startRequest": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:newPositionNormalizer": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:newWithDial": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:normalizeDiagnosticDirectives": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:normalizeMappings": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:operationTiming.record": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:operationTiming.snapshot": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:positionNormalizer.normalize": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:positionNormalizer.normalizeTextPos": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:projectLease.Close": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:projectLease.Diagnostics": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:projectLease.Identities": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:projectLease.Identity": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:projectLease.Refresh": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:projectLease.Transform": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:projectLease.WatchedFiles": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:projectLease.release": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:projectLease.retainLocked": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:projectSpecKey": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:rejectHandler.HandleNotification": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:rejectHandler.HandleRequest": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:retainedProject.Close": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:stderrLogger.Write": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:stderrLogger.flush": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:stderrLogger.log": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:timingCollector.mapper": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/hostimpl.go:timingCollector.snapshot": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/transform.go:CheckSupplementalFileNameCollisions": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/transform.go:ParseResult": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/transform.go:TransformAndParse": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/contentmapper/transform.go:isModuleVirtualExtension": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The host, its projects, the spawner seam and the mapping requests; tsr_contentmapper does not exist yet."
+  },
+  "tsc/internal/ipc/conn.go:UnmarshalParams": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/conn_async.go:AsyncConn.Call": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/conn_async.go:AsyncConn.Notify": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/conn_async.go:AsyncConn.Run": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/conn_async.go:AsyncConn.SetCollectTiming": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/conn_async.go:AsyncConn.closePendingCalls": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/conn_async.go:AsyncConn.closePendingCallsLocked": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/conn_async.go:AsyncConn.handleNotification": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/conn_async.go:AsyncConn.handleRequest": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/conn_async.go:AsyncConn.handleResponse": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/conn_async.go:AsyncConn.recordRequestError": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/conn_async.go:AsyncConn.recordTerminalErrorLocked": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/conn_async.go:NewAsyncConn": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/conn_async.go:NewAsyncConnWithProtocol": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/protocol_jsonrpc.go:JSONRPCProtocol.ReadMessage": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/protocol_jsonrpc.go:JSONRPCProtocol.WriteError": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/protocol_jsonrpc.go:JSONRPCProtocol.WriteNotification": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/protocol_jsonrpc.go:JSONRPCProtocol.WriteRequest": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/protocol_jsonrpc.go:JSONRPCProtocol.WriteResponse": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/protocol_jsonrpc.go:NewJSONRPCProtocol": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/timing.go:disabledServerTimingInfo": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/timing.go:durationToMillis": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/timing.go:newTimingCollector": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/timing.go:serverTimingSnapshot": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/timing.go:timingCollector.record": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/timing.go:timingCollector.reset": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/ipc/timing.go:timingCollector.snapshot": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The asynchronous connection, the JSON-RPC protocol and timing the host and the in-process mappers run on; tsr_ipc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/baseproto.go:NewReader": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/baseproto.go:NewWriter": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/baseproto.go:Reader.Read": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/baseproto.go:Writer.Write": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:ID.MarshalJSON": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:ID.MustInt": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:ID.String": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:ID.TryInt": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:ID.UnmarshalJSON": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:JSONRPCVersion.MarshalJSON": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:JSONRPCVersion.UnmarshalJSON": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:Message.IsNotification": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:Message.IsRequest": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:Message.IsResponse": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:Message.Kind": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:NewID": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:NewIDInt": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:NewIDString": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:ResponseError.Error": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/jsonrpc/jsonrpc.go:ResponseError.String": {
+   "disposition": "gap",
+   "item": "C7.8.1",
+   "reason": "The JSON-RPC base protocol and message types the in-process mapper connections speak; tsr_jsonrpc does not exist yet."
+  },
+  "tsc/internal/spanmap/spanmap.go:Fidelity.IsExact": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:Fidelity.IsNone": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:Fidelity.IsSingleSegment": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:MappingError.Error": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.AliasForVirtualSpan": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.Marshal": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.OriginalToVirtualIntersectingSpans": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.OriginalToVirtualPositions": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.OriginalToVirtualSpans": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.Segments": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.Validate": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.VirtualToOriginalPosition": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.VirtualToOriginalPositionExact": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.VirtualToOriginalPositionForFeature": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.VirtualToOriginalSpanForFeature": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.insertionPoint": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.mapHigh": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.mapLow": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.origIndex": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:SpanMap.virtualSpanSupportsFeature": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:Unmarshal": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:clamp": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:originalEndProjections": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:originalIndex.collectSegmentsEndingAtOrAfter": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:originalIndex.segmentGroupsAtOriginalPosition": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:originalIndex.segmentsAtOriginalPosition": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:originalIndex.segmentsEndingAfterPosition": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:originalStartProjections": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:originalToVirtualSpansInSegments": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:sameOriginalRange": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/spanmap/spanmap.go:supportsFeature": {
+   "disposition": "gap",
+   "item": "C7.8.2",
+   "reason": "The virtual-to-original span translation the mapped diagnostics and the mapping validation read; tsr_ast's span map holds the data only."
+  },
+  "tsc/internal/testutil/contentmappertest/failing.go:failingHandler.HandleRequest": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/lisp.go:lispHandler.HandleRequest": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/protocol.go:identityMappedOutput": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/protocol.go:initializeResult": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/protocol.go:noNotifications.HandleNotification": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/protocol.go:staticProjectHandler.HandleRequest": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/registry.go:handlerForMapper": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/spawner.go:NewSpawner": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/spawner.go:NewSpawnerWithProjectLifecycle": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/spawner.go:Serve": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/spawner.go:spawner.Spawn": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/supplemental.go:supplementalHandler.HandleRequest": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/supplemental_diagnostics.go:supplementalDiagnosticsHandler.HandleRequest": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/supplemental_globals.go:supplementalGlobalsHandler.HandleRequest": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/supplemental_module.go:supplementalModuleHandler.HandleRequest": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/transforming.go:Handler.CloseProject": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/transforming.go:Handler.HandleRequest": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/transforming.go:Handler.OpenProject": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/transforming.go:diagnosticDirectives": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/transforming.go:mappedExtension": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/transforming.go:renderOption": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/testutil/contentmappertest/transforming.go:transform": {
+   "disposition": "gap",
+   "item": "C7.8.4",
+   "reason": "The seven test mappers the corpus's runExternalCode rows name, served in process through the spawner seam; not ported."
+  },
+  "tsc/internal/transformers/declarations/supplementalreferences.go:NewSupplementalReferencesTransformer": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/transformers/declarations/supplementalreferences.go:SupplementalReferencesTransformer.GetDiagnostics": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  },
+  "tsc/internal/transformers/declarations/supplementalreferences.go:SupplementalReferencesTransformer.TransformSourceFile": {
+   "disposition": "gap",
+   "item": "C7.8.3",
+   "reason": "The loader refuses a program with content mappers, so this mapped-file path has no Rust counterpart yet."
+  }
+ },
+ "groups": {
+  "C7.8.1 IPC connection and protocol (ipc)": [
+   "tsc/internal/ipc/conn.go:UnmarshalParams",
+   "tsc/internal/ipc/conn_async.go:AsyncConn.Call",
+   "tsc/internal/ipc/conn_async.go:AsyncConn.Notify",
+   "tsc/internal/ipc/conn_async.go:AsyncConn.Run",
+   "tsc/internal/ipc/conn_async.go:AsyncConn.SetCollectTiming",
+   "tsc/internal/ipc/conn_async.go:AsyncConn.closePendingCalls",
+   "tsc/internal/ipc/conn_async.go:AsyncConn.closePendingCallsLocked",
+   "tsc/internal/ipc/conn_async.go:AsyncConn.handleNotification",
+   "tsc/internal/ipc/conn_async.go:AsyncConn.handleRequest",
+   "tsc/internal/ipc/conn_async.go:AsyncConn.handleResponse",
+   "tsc/internal/ipc/conn_async.go:AsyncConn.recordRequestError",
+   "tsc/internal/ipc/conn_async.go:AsyncConn.recordTerminalErrorLocked",
+   "tsc/internal/ipc/conn_async.go:NewAsyncConn",
+   "tsc/internal/ipc/conn_async.go:NewAsyncConnWithProtocol",
+   "tsc/internal/ipc/protocol_jsonrpc.go:JSONRPCProtocol.ReadMessage",
+   "tsc/internal/ipc/protocol_jsonrpc.go:JSONRPCProtocol.WriteError",
+   "tsc/internal/ipc/protocol_jsonrpc.go:JSONRPCProtocol.WriteNotification",
+   "tsc/internal/ipc/protocol_jsonrpc.go:JSONRPCProtocol.WriteRequest",
+   "tsc/internal/ipc/protocol_jsonrpc.go:JSONRPCProtocol.WriteResponse",
+   "tsc/internal/ipc/protocol_jsonrpc.go:NewJSONRPCProtocol",
+   "tsc/internal/ipc/timing.go:disabledServerTimingInfo",
+   "tsc/internal/ipc/timing.go:durationToMillis",
+   "tsc/internal/ipc/timing.go:newTimingCollector",
+   "tsc/internal/ipc/timing.go:serverTimingSnapshot",
+   "tsc/internal/ipc/timing.go:timingCollector.record",
+   "tsc/internal/ipc/timing.go:timingCollector.reset",
+   "tsc/internal/ipc/timing.go:timingCollector.snapshot"
+  ],
+  "C7.8.1 JSON-RPC base protocol (jsonrpc)": [
+   "tsc/internal/jsonrpc/baseproto.go:NewReader",
+   "tsc/internal/jsonrpc/baseproto.go:NewWriter",
+   "tsc/internal/jsonrpc/baseproto.go:Reader.Read",
+   "tsc/internal/jsonrpc/baseproto.go:Writer.Write",
+   "tsc/internal/jsonrpc/jsonrpc.go:ID.MarshalJSON",
+   "tsc/internal/jsonrpc/jsonrpc.go:ID.MustInt",
+   "tsc/internal/jsonrpc/jsonrpc.go:ID.String",
+   "tsc/internal/jsonrpc/jsonrpc.go:ID.TryInt",
+   "tsc/internal/jsonrpc/jsonrpc.go:ID.UnmarshalJSON",
+   "tsc/internal/jsonrpc/jsonrpc.go:JSONRPCVersion.MarshalJSON",
+   "tsc/internal/jsonrpc/jsonrpc.go:JSONRPCVersion.UnmarshalJSON",
+   "tsc/internal/jsonrpc/jsonrpc.go:Message.IsNotification",
+   "tsc/internal/jsonrpc/jsonrpc.go:Message.IsRequest",
+   "tsc/internal/jsonrpc/jsonrpc.go:Message.IsResponse",
+   "tsc/internal/jsonrpc/jsonrpc.go:Message.Kind",
+   "tsc/internal/jsonrpc/jsonrpc.go:NewID",
+   "tsc/internal/jsonrpc/jsonrpc.go:NewIDInt",
+   "tsc/internal/jsonrpc/jsonrpc.go:NewIDString",
+   "tsc/internal/jsonrpc/jsonrpc.go:ResponseError.Error",
+   "tsc/internal/jsonrpc/jsonrpc.go:ResponseError.String"
+  ],
+  "C7.8.2 content-mapper host (contentmapper)": [
+   "tsc/internal/contentmapper/contentmapper.go:IsSupportedVirtualExtension",
+   "tsc/internal/contentmapper/contentmapper.go:Mapper.DiagnosticName",
+   "tsc/internal/contentmapper/contentmapper.go:Mapper.Identity",
+   "tsc/internal/contentmapper/contentmapper.go:Mapper.MarshalDeclaredOptions",
+   "tsc/internal/contentmapper/contentmapper.go:Mapper.TransformIdentity",
+   "tsc/internal/contentmapper/contentmapper.go:Mapper.manifestIdentity",
+   "tsc/internal/contentmapper/host.go:DiagnosticDirectiveError.Error",
+   "tsc/internal/contentmapper/host.go:InitializeError.Error",
+   "tsc/internal/contentmapper/host.go:InvalidVirtualExtensionError.Error",
+   "tsc/internal/contentmapper/host.go:NewTransformError",
+   "tsc/internal/contentmapper/host.go:ProjectError.Error",
+   "tsc/internal/contentmapper/host.go:SupplementalFileCollisionError.Error",
+   "tsc/internal/contentmapper/host.go:Timings.Since",
+   "tsc/internal/contentmapper/host.go:TransformError.Error",
+   "tsc/internal/contentmapper/host.go:TransformError.Unwrap",
+   "tsc/internal/contentmapper/host.go:operationTimingSince",
+   "tsc/internal/contentmapper/hostimpl.go:MappedDiagnosticDirective.MarshalJSONTo",
+   "tsc/internal/contentmapper/hostimpl.go:MappedDiagnosticDirective.UnmarshalJSONFrom",
+   "tsc/internal/contentmapper/hostimpl.go:NewHost",
+   "tsc/internal/contentmapper/hostimpl.go:NewHostWithOptions",
+   "tsc/internal/contentmapper/hostimpl.go:SpawnerFunc.Spawn",
+   "tsc/internal/contentmapper/hostimpl.go:closeOnceReadWriteCloser.Close",
+   "tsc/internal/contentmapper/hostimpl.go:closeOnceReadWriteCloser.ExitCode",
+   "tsc/internal/contentmapper/hostimpl.go:combinedIdentity",
+   "tsc/internal/contentmapper/hostimpl.go:decodeMappedOutput",
+   "tsc/internal/contentmapper/hostimpl.go:decodeTransformResult",
+   "tsc/internal/contentmapper/hostimpl.go:handshake",
+   "tsc/internal/contentmapper/hostimpl.go:host.Acquire",
+   "tsc/internal/contentmapper/hostimpl.go:host.Close",
+   "tsc/internal/contentmapper/hostimpl.go:host.Project",
+   "tsc/internal/contentmapper/hostimpl.go:host.SetLocale",
+   "tsc/internal/contentmapper/hostimpl.go:host.Timings",
+   "tsc/internal/contentmapper/hostimpl.go:host.Transform",
+   "tsc/internal/contentmapper/hostimpl.go:host.closeProject",
+   "tsc/internal/contentmapper/hostimpl.go:host.connFor",
+   "tsc/internal/contentmapper/hostimpl.go:host.connForLocked",
+   "tsc/internal/contentmapper/hostimpl.go:host.openProjectLocked",
+   "tsc/internal/contentmapper/hostimpl.go:host.release",
+   "tsc/internal/contentmapper/hostimpl.go:host.transformLocked",
+   "tsc/internal/contentmapper/hostimpl.go:loggedProcess.Close",
+   "tsc/internal/contentmapper/hostimpl.go:loggingProtocol.ReadMessage",
+   "tsc/internal/contentmapper/hostimpl.go:loggingProtocol.WriteError",
+   "tsc/internal/contentmapper/hostimpl.go:loggingProtocol.WriteNotification",
+   "tsc/internal/contentmapper/hostimpl.go:loggingProtocol.WriteRequest",
+   "tsc/internal/contentmapper/hostimpl.go:loggingProtocol.WriteResponse",
+   "tsc/internal/contentmapper/hostimpl.go:loggingProtocol.log",
+   "tsc/internal/contentmapper/hostimpl.go:mapperTimingCollector.finishRequest",
+   "tsc/internal/contentmapper/hostimpl.go:mapperTimingCollector.startRequest",
+   "tsc/internal/contentmapper/hostimpl.go:newPositionNormalizer",
+   "tsc/internal/contentmapper/hostimpl.go:newWithDial",
+   "tsc/internal/contentmapper/hostimpl.go:normalizeDiagnosticDirectives",
+   "tsc/internal/contentmapper/hostimpl.go:normalizeMappings",
+   "tsc/internal/contentmapper/hostimpl.go:operationTiming.record",
+   "tsc/internal/contentmapper/hostimpl.go:operationTiming.snapshot",
+   "tsc/internal/contentmapper/hostimpl.go:positionNormalizer.normalize",
+   "tsc/internal/contentmapper/hostimpl.go:positionNormalizer.normalizeTextPos",
+   "tsc/internal/contentmapper/hostimpl.go:projectLease.Close",
+   "tsc/internal/contentmapper/hostimpl.go:projectLease.Diagnostics",
+   "tsc/internal/contentmapper/hostimpl.go:projectLease.Identities",
+   "tsc/internal/contentmapper/hostimpl.go:projectLease.Identity",
+   "tsc/internal/contentmapper/hostimpl.go:projectLease.Refresh",
+   "tsc/internal/contentmapper/hostimpl.go:projectLease.Transform",
+   "tsc/internal/contentmapper/hostimpl.go:projectLease.WatchedFiles",
+   "tsc/internal/contentmapper/hostimpl.go:projectLease.release",
+   "tsc/internal/contentmapper/hostimpl.go:projectLease.retainLocked",
+   "tsc/internal/contentmapper/hostimpl.go:projectSpecKey",
+   "tsc/internal/contentmapper/hostimpl.go:rejectHandler.HandleNotification",
+   "tsc/internal/contentmapper/hostimpl.go:rejectHandler.HandleRequest",
+   "tsc/internal/contentmapper/hostimpl.go:retainedProject.Close",
+   "tsc/internal/contentmapper/hostimpl.go:stderrLogger.Write",
+   "tsc/internal/contentmapper/hostimpl.go:stderrLogger.flush",
+   "tsc/internal/contentmapper/hostimpl.go:stderrLogger.log",
+   "tsc/internal/contentmapper/hostimpl.go:timingCollector.mapper",
+   "tsc/internal/contentmapper/hostimpl.go:timingCollector.snapshot",
+   "tsc/internal/contentmapper/transform.go:CheckSupplementalFileNameCollisions",
+   "tsc/internal/contentmapper/transform.go:ParseResult",
+   "tsc/internal/contentmapper/transform.go:TransformAndParse",
+   "tsc/internal/contentmapper/transform.go:isModuleVirtualExtension"
+  ],
+  "C7.8.2 span maps (spanmap.go)": [
+   "tsc/internal/spanmap/spanmap.go:Fidelity.IsExact",
+   "tsc/internal/spanmap/spanmap.go:Fidelity.IsNone",
+   "tsc/internal/spanmap/spanmap.go:Fidelity.IsSingleSegment",
+   "tsc/internal/spanmap/spanmap.go:MappingError.Error",
+   "tsc/internal/spanmap/spanmap.go:New",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.AliasForVirtualSpan",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.Marshal",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.OriginalToVirtualIntersectingSpans",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.OriginalToVirtualPositions",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.OriginalToVirtualSpans",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.Segments",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.Validate",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.VirtualToOriginalPosition",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.VirtualToOriginalPositionExact",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.VirtualToOriginalPositionForFeature",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.VirtualToOriginalSpan",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.VirtualToOriginalSpanForFeature",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.insertionPoint",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.mapHigh",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.mapLow",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.origIndex",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.segmentIndexAt",
+   "tsc/internal/spanmap/spanmap.go:SpanMap.virtualSpanSupportsFeature",
+   "tsc/internal/spanmap/spanmap.go:Unmarshal",
+   "tsc/internal/spanmap/spanmap.go:clamp",
+   "tsc/internal/spanmap/spanmap.go:originalEndProjections",
+   "tsc/internal/spanmap/spanmap.go:originalIndex.collectSegmentsEndingAtOrAfter",
+   "tsc/internal/spanmap/spanmap.go:originalIndex.segmentGroupsAtOriginalPosition",
+   "tsc/internal/spanmap/spanmap.go:originalIndex.segmentsAtOriginalPosition",
+   "tsc/internal/spanmap/spanmap.go:originalIndex.segmentsEndingAfterPosition",
+   "tsc/internal/spanmap/spanmap.go:originalStartProjections",
+   "tsc/internal/spanmap/spanmap.go:originalToVirtualSpansInSegments",
+   "tsc/internal/spanmap/spanmap.go:sameOriginalRange",
+   "tsc/internal/spanmap/spanmap.go:supportsFeature"
+  ],
+  "C7.8.3 program integration (ast, compiler, declarations)": [
+   "tsc/internal/ast/ast.go:SourceFile.CanonicalSourceFile",
+   "tsc/internal/ast/ast.go:SourceFile.ContentMapper",
+   "tsc/internal/ast/ast.go:SourceFile.ContentMapperParseOptions",
+   "tsc/internal/ast/ast.go:SourceFile.ContentMapperTransformIdentity",
+   "tsc/internal/ast/ast.go:SourceFile.DiagnosticDirectives",
+   "tsc/internal/ast/ast.go:SourceFile.IsContentMapperFailureStub",
+   "tsc/internal/ast/ast.go:SourceFile.IsContentMapperSupplemental",
+   "tsc/internal/ast/ast.go:SourceFile.OriginalText",
+   "tsc/internal/ast/ast.go:SourceFile.SetContentMapperInfo",
+   "tsc/internal/ast/ast.go:SourceFile.SpanMap",
+   "tsc/internal/ast/ast.go:SourceFile.SupplementalSourceFiles",
+   "tsc/internal/ast/ast.go:SourceFile.VirtualFileName",
+   "tsc/internal/ast/ast.go:SourceFile.copyFrom",
+   "tsc/internal/ast/diagnostic.go:Diagnostic.displayMessageArgs",
+   "tsc/internal/compiler/emitHost.go:emitHost.ContentMapperExtensions",
+   "tsc/internal/compiler/emitter.go:emitter.emitDeclarationFile",
+   "tsc/internal/compiler/emitter.go:emitter.getDeclarationTransformers",
+   "tsc/internal/compiler/emitter.go:sourceFileMayBeEmitted",
+   "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeDiagnostic",
+   "tsc/internal/compiler/fileInclude.go:FileIncludeReason.toRelatedInfo",
+   "tsc/internal/compiler/fileloader.go:ContentMapperInitializationDiagnostic",
+   "tsc/internal/compiler/fileloader.go:ContentMapperProjectDiagnostic",
+   "tsc/internal/compiler/fileloader.go:ContentMapperProjectErrorDiagnostic",
+   "tsc/internal/compiler/fileloader.go:contentMapperMappingDiagnostic",
+   "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnostic",
+   "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnosticChain",
+   "tsc/internal/compiler/fileloader.go:contentMapperTransformDiagnosticWithDetail",
+   "tsc/internal/compiler/fileloader.go:fileLoader.contentMapperUnavailable",
+   "tsc/internal/compiler/fileloader.go:fileLoader.emptyContentMappedFile",
+   "tsc/internal/compiler/fileloader.go:fileLoader.getContentMapperTransformIdentity",
+   "tsc/internal/compiler/fileloader.go:fileLoader.parseContentMappedFile",
+   "tsc/internal/compiler/fileloader.go:fileLoader.parseSourceFile",
+   "tsc/internal/compiler/fileloader.go:fileLoader.recordContentMapperFailure",
+   "tsc/internal/compiler/fileloader.go:fileLoader.recordContentMapperInitializationFailure",
+   "tsc/internal/compiler/fileloader.go:processAllProgramFiles",
+   "tsc/internal/compiler/filesparser.go:filesParser.getProcessedFiles",
+   "tsc/internal/compiler/filesparser.go:parseTask.load",
+   "tsc/internal/compiler/host.go:NewCachedFSCompilerHost",
+   "tsc/internal/compiler/host.go:NewCompilerHost",
+   "tsc/internal/compiler/host.go:compilerHost.ContentMapperProject",
+   "tsc/internal/compiler/host.go:compilerHost.GetContentMappedSourceFiles",
+   "tsc/internal/compiler/program.go:GetDiagnosticsOfAnyProgram",
+   "tsc/internal/compiler/program.go:NewProgram",
+   "tsc/internal/compiler/program.go:Program.ContentMapperExtensions",
+   "tsc/internal/compiler/program.go:Program.ContentMapperProject",
+   "tsc/internal/compiler/program.go:Program.GetContentMapper",
+   "tsc/internal/compiler/program.go:Program.GetProgramDiagnostics",
+   "tsc/internal/compiler/program.go:Program.GetSourceFileFromReference",
+   "tsc/internal/compiler/program.go:Program.ReuseProgram",
+   "tsc/internal/compiler/program.go:Program.collectContentMapperOptionDiagnostics",
+   "tsc/internal/compiler/program.go:Program.getBindAndCheckDiagnosticsWithChecker",
+   "tsc/internal/compiler/program.go:applyContentMapperDiagnosticDirectives",
+   "tsc/internal/compiler/program.go:filterAndSortDiagnostics",
+   "tsc/internal/transformers/declarations/supplementalreferences.go:NewSupplementalReferencesTransformer",
+   "tsc/internal/transformers/declarations/supplementalreferences.go:SupplementalReferencesTransformer.GetDiagnostics",
+   "tsc/internal/transformers/declarations/supplementalreferences.go:SupplementalReferencesTransformer.TransformSourceFile"
+  ],
+  "C7.8.4 test mappers (contentmappertest)": [
+   "tsc/internal/testutil/contentmappertest/failing.go:failingHandler.HandleRequest",
+   "tsc/internal/testutil/contentmappertest/lisp.go:lispHandler.HandleRequest",
+   "tsc/internal/testutil/contentmappertest/protocol.go:identityMappedOutput",
+   "tsc/internal/testutil/contentmappertest/protocol.go:initializeResult",
+   "tsc/internal/testutil/contentmappertest/protocol.go:noNotifications.HandleNotification",
+   "tsc/internal/testutil/contentmappertest/protocol.go:staticProjectHandler.HandleRequest",
+   "tsc/internal/testutil/contentmappertest/registry.go:handlerForMapper",
+   "tsc/internal/testutil/contentmappertest/spawner.go:NewSpawner",
+   "tsc/internal/testutil/contentmappertest/spawner.go:NewSpawnerWithProjectLifecycle",
+   "tsc/internal/testutil/contentmappertest/spawner.go:Serve",
+   "tsc/internal/testutil/contentmappertest/spawner.go:spawner.Spawn",
+   "tsc/internal/testutil/contentmappertest/supplemental.go:supplementalHandler.HandleRequest",
+   "tsc/internal/testutil/contentmappertest/supplemental_diagnostics.go:supplementalDiagnosticsHandler.HandleRequest",
+   "tsc/internal/testutil/contentmappertest/supplemental_globals.go:supplementalGlobalsHandler.HandleRequest",
+   "tsc/internal/testutil/contentmappertest/supplemental_module.go:supplementalModuleHandler.HandleRequest",
+   "tsc/internal/testutil/contentmappertest/transforming.go:Handler.CloseProject",
+   "tsc/internal/testutil/contentmappertest/transforming.go:Handler.HandleRequest",
+   "tsc/internal/testutil/contentmappertest/transforming.go:Handler.OpenProject",
+   "tsc/internal/testutil/contentmappertest/transforming.go:diagnosticDirectives",
+   "tsc/internal/testutil/contentmappertest/transforming.go:mappedExtension",
+   "tsc/internal/testutil/contentmappertest/transforming.go:renderOption",
+   "tsc/internal/testutil/contentmappertest/transforming.go:transform"
+  ]
+ },
+ "handoffs": [],
+ "open_issues": [
+  {
+   "go": "tsc/internal/ast/diagnostic.go:Diagnostic.displayMessageArgs",
+   "id": "C7-R01",
+   "item": "C7.8.3",
+   "reason": "Aliases a mapped diagnostic's arguments through the span map (AliasForVirtualSpan), which the Rust span map does not implement yet."
+  },
+  {
+   "go": "tsc/internal/compiler/emitter.go:sourceFileMayBeEmitted",
+   "id": "C7-R02",
+   "item": "C7.8.3",
+   "reason": "A mapped file is emitted only for declarations; reviewed once mapped files load."
+  },
+  {
+   "go": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeDiagnostic",
+   "id": "C7-R03",
+   "item": "C7.8.3",
+   "reason": "The supplemental-file include reason; reviewed once supplemental files load."
+  },
+  {
+   "go": "tsc/internal/compiler/fileInclude.go:FileIncludeReason.toRelatedInfo",
+   "id": "C7-R04",
+   "item": "C7.8.3",
+   "reason": "The supplemental-file include reason; reviewed once supplemental files load."
+  },
+  {
+   "go": "tsc/internal/compiler/fileloader.go:fileLoader.parseSourceFile",
+   "id": "C7-R05",
+   "item": "C7.8.3",
+   "reason": "Routes files with a mapper's extension through the content mapper; the Rust loader refuses such programs."
+  },
+  {
+   "go": "tsc/internal/compiler/filesparser.go:filesParser.getProcessedFiles",
+   "id": "C7-R06",
+   "item": "C7.8.3",
+   "reason": "Carries the content-mapper file metadata and the loader's content-mapper diagnostics into the program; reviewed once mapped files load."
+  },
+  {
+   "go": "tsc/internal/compiler/filesparser.go:parseTask.load",
+   "id": "C7-R07",
+   "item": "C7.8.3",
+   "reason": "Queues a mapped file's supplemental files with their include reason; reviewed once mapped files load."
+  },
+  {
+   "go": "tsc/internal/compiler/program.go:Program.GetProgramDiagnostics",
+   "id": "C7-R08",
+   "item": "C7.8.3",
+   "reason": "Includes the content-mapper and content-mapper option diagnostics; reviewed once mapped files load."
+  },
+  {
+   "go": "tsc/internal/compiler/program.go:Program.getBindAndCheckDiagnosticsWithChecker",
+   "id": "C7-R09",
+   "item": "C7.8.3",
+   "reason": "Applies the mapped diagnostic directives to a mapped file's diagnostics; reviewed once mapped files load."
+  },
+  {
+   "go": "tsc/internal/compiler/program.go:applyContentMapperDiagnosticDirectives",
+   "id": "C7-R10",
+   "item": "C7.8.3",
+   "reason": "Ported before its inputs existed; reviewed against the mapped files' directives."
+  },
+  {
+   "go": "tsc/internal/compiler/program.go:filterAndSortDiagnostics",
+   "id": "C7-R11",
+   "item": "C7.8.3",
+   "reason": "Drops unnecessary-code diagnostics whose virtual span has no original fidelity; the Rust span map does not translate spans yet."
+  }
+ ],
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "scope": "C7 audit over the complete files content-mapper execution moves to Phase 2 (contentmapper, spanmap, jsonrpc, the ipc files the in-process spawner reaches and the seven test mappers with their shared registry, spawner and protocol) and over the program integration: every pinned ast, compiler and declaration-transformer function whose body handles content-mapped files (docs/PHASE2-C7-plan.md, C7.8.0). Open gaps and review issues name the C7.8 item that closes them.",
+ "version": 1
+}
