@@ -513,6 +513,14 @@ run, rather than amending the P2B exit.
      a failing mapper, supplemental diagnostics, globals and modules, the
      directives, and the host's lifecycle across the pre-emit and post-emit
      programs. It gets a `c7-contracts` witness and receipt.
+     As implemented, the pinned observations are the 15 rows' native error
+     observations in both modes (`fixtures/c7`, frozen by its `regenerate.py`)
+     and the `.contentmapper` baselines the pin commits for them
+     (`compilerTest.verifyContentMapper`). The corpus error baseline renders
+     that baseline as a `content_mapper` field, which the corpus view strips.
+     A sixth contract pins the host's lease semantics (`projectLease.release`,
+     `host.Close`), because closing the last project already ends a mapper's
+     connection, so the harness's host close cannot be observed through a row.
 - Exit: the 15 rows match in every domain in both modes; the register is
   empty; `c7_content_mappers` true (the contracts receipt current, the C7
   audit complete).

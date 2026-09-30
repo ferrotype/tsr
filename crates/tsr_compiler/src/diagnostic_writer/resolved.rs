@@ -1,6 +1,6 @@
 //! Borrowed AST diagnostics retain their original identities. Resolution is a
 //! presentation operation; neither locations nor chains in the AST are mutated.
-use super::{localized_with_locale, Diagnostic, DiagnosticWriter, File, Result};
+use super::{localized_with_args, Diagnostic, DiagnosticWriter, File, Result};
 use std::{borrow::Cow, sync::Arc};
 use tsr_ast::SourceFileRead;
 use tsr_core::TextRange;
@@ -126,11 +126,23 @@ impl DiagnosticWriter<'_> {
         }
         Ok(chain)
     }
+    /// A message as `Diagnostic.Localize` shows it: a name a content mapper
+    /// aliases reads in its original spelling (`displayMessageArgs`).
+    fn localized(&self, d: &Diagnostic) -> Result<Vec<u8>> {
+        let args = match d.file {
+            Some(id) => {
+                let source = self.source(id)?;
+                d.display_message_args_in(&source)
+            }
+            None => d.message_args.clone(),
+        };
+        localized_with_args(d, &args, &self.options.locale)
+    }
     /// Flatten display chains, including virtual-code notes, without changing
     /// the stored chain or recursing on the native stack.
     /// port: tsc/internal/diagnosticwriter/diagnosticwriter.go:WriteFlattenedDiagnosticMessage
     pub fn flatten(&self, d: &Diagnostic, new_line: &[u8]) -> Result<Vec<u8>> {
-        let mut out = localized_with_locale(d, &self.options.locale)?;
+        let mut out = self.localized(d)?;
         enum Task<'a> {
             Node(&'a Diagnostic, usize),
             Note(Box<Diagnostic>, usize),
@@ -152,7 +164,7 @@ impl DiagnosticWriter<'_> {
             };
             out.extend_from_slice(new_line);
             out.extend(std::iter::repeat_n(b' ', level * 2));
-            out.extend_from_slice(&localized_with_locale(value, &self.options.locale)?);
+            out.extend_from_slice(&self.localized(value)?);
             if let Task::Node(value, _) = task {
                 enqueue(&mut pending, value, level + 1)?;
                 pending.extend(

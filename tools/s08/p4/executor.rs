@@ -91,6 +91,14 @@ pub struct ContentMapperScope {
 
 impl ContentMapperScope {
     pub fn open(config: &tsr_tsoptions::ParsedCommandLine) -> Self {
+        Self::open_with(config, tsr_contentmappertest::new_spawner())
+    }
+
+    /// `open` with the mapper processes `spawner` starts.
+    pub fn open_with(
+        config: &tsr_tsoptions::ParsedCommandLine,
+        spawner: Arc<dyn tsr_contentmapper::Spawner>,
+    ) -> Self {
         let mappers = config.content_mappers.as_deref().unwrap_or_default();
         if !config.options.run_external_code.is_true() || mappers.is_empty() {
             return Self {
@@ -100,7 +108,7 @@ impl ContentMapperScope {
         }
         let host = tsr_contentmapper::new_host(
             &tsr_ipc::Context::background(),
-            tsr_contentmappertest::new_spawner(),
+            spawner,
             tsr_locale::Locale::default(),
         );
         let project = tsr_contentmapper::Host::project(
@@ -117,6 +125,18 @@ impl ContentMapperScope {
             project,
         }
     }
+}
+
+#[allow(dead_code)]
+/// The scope `observe` opens for `request`, over the mapper processes
+/// `spawner` starts.
+pub fn content_mapper_scope(
+    request: &Value,
+    spawner: Arc<dyn tsr_contentmapper::Spawner>,
+) -> Result<ContentMapperScope, Value> {
+    let parsed = config::parse(request).map_err(|error| failure(error, "config_parse"))?;
+    let options = observation::program_options(&request["loading"], parsed);
+    Ok(ContentMapperScope::open_with(&options.config, spawner))
 }
 
 impl Drop for ContentMapperScope {

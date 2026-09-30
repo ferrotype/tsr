@@ -189,6 +189,17 @@ WITNESSES["c6-contracts"] = {
                 "tools/s08/p4", "tools/s08/p5", "tools/s07/config", "tools/s07/program", "tools/phase2/subtests.rs",
                 "upstream/tsc/testdata/tests/cases/compiler/binderBinaryExpressionStress.ts"],
 }
+WITNESSES["c7-contracts"] = {
+    "commands": [["cargo", "test", "-p", "tsr_compiler", "--features", "recursion-probe",
+                  "--test", "c7_contracts", "--locked", *release] for release in ([], ["--release"])],
+    "test_source": "crates/tsr_compiler/tests/c7_contracts.rs", "minimum_tests": 6,
+    "test_modules": {},
+    # The frozen rows and their native observations, the pin's content-mapper
+    # baselines the contracts compare, and the corpus driver they run.
+    "sources": [*WITNESSES["c1-contracts"]["sources"], "crates/tsr_compiler/tests/fixtures/c7", "data/upstream.json",
+                "upstream/tsc/testdata/baselines/reference/compiler/contentMapper*.contentmapper",
+                "tools/s08/p4", "tools/s08/p5", "tools/s07/config", "tools/s07/program", "tools/phase2/subtests.rs"],
+}
 PRODUCTION_PATTERNS = tuple(path for path in WITNESSES["c1-contracts"]["sources"]
                             if path != "scripts/phase2_producers.py")
 

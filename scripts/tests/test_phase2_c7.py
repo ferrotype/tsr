@@ -119,6 +119,10 @@ class Wiring(unittest.TestCase):
         for path in ("data/phase2/c7-audit.json", "data/phase2/informational.json",
                      "data/phase2/native-provenance-concurrent.json", "data/divergences.toml"):
             self.assertIn(path, spec["inputs"])
+        # Every contract witness's receipt, C7.8.5's among them, binds the run.
+        self.assertIn("c7-contracts", producers.WITNESSES)
+        for witness in producers.WITNESSES:
+            self.assertIn(f"data/phase2/receipts/{witness}.json", spec["inputs"])
         declared = set(tomllib.loads((ROOT / "status/runs.toml").read_text()))
         self.assertEqual(declared, {*producers.PREREQUISITE_RUNS, "checker"})
 

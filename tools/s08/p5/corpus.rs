@@ -219,27 +219,33 @@ fn error_baseline(
         .filter(|input| unhex(&input["name_hex"]).is_ok_and(|name| !unit_is_mapped(&name)))
         .cloned()
         .collect();
-    let rendered = (|| -> Result<Value, Box<dyn std::error::Error>> {
+    type Rendered = (Value, Option<Vec<u8>>);
+    let rendered = (|| -> Result<Rendered, Box<dyn std::error::Error>> {
         let contents = input_files(request, "error_inputs")?;
         let inputs: Vec<_> = contents
             .iter()
             .filter(|(name, _)| !unit_is_mapped(name))
             .map(|(name, content)| errors::InputFile { name, content })
             .collect();
-        errors::render(
+        let baseline = errors::render(
             program,
             &inputs,
             &rendered_values,
             program.options().pretty.is_true(),
-        )
+        )?;
+        // The content-mapped files' own baseline (`verifyContentMapper`).
+        Ok((baseline, errors::content_mapper(program, values)?))
     })();
     let mut result = match rendered {
-        Ok(baseline) => {
+        Ok((baseline, content_mapper)) => {
             let mut result = json!({"state":"executed","diagnostics":diagnostics,"baseline":baseline,
             "emit":emit,"pretty":program.options().pretty.is_true(),"inputs":rendered_inputs});
             if !mapped.is_empty() {
                 result["render_diagnostics"] =
                     executor::diagnostics::phase(program, &rendered_values)["diagnostics"].take();
+            }
+            if let Some(text) = content_mapper {
+                result["content_mapper"] = json!({"text_hex":errors::hex(&text)});
             }
             result
         }

@@ -303,8 +303,15 @@ def pre_emit_view(request, row):
     if "render_diagnostics" in errors:
         # The rendered selection without content-mapped files' diagnostics.
         p5.diagnostics(errors["render_diagnostics"])
+    if "content_mapper" in errors:
+        # The content-mapped files' own baseline, which the C7 contracts
+        # compare with the pin's reference; the native capture has none.
+        mapped = errors["content_mapper"]
+        if ("render_diagnostics" not in errors or not isinstance(mapped, dict) or set(mapped) != {"text_hex"}
+                or not isinstance(mapped["text_hex"], str)):
+            raise ValueError("malformed content-mapper baseline")
     view = {key: value for key, value in errors.items()
-            if key not in ("pre_diagnostics", "counts", "render_diagnostics")}
+            if key not in ("pre_diagnostics", "counts", "render_diagnostics", "content_mapper")}
     if "render_diagnostics" in errors:
         # The baseline renders the selection, so its content answers to it.
         view["diagnostics"] = errors["render_diagnostics"]
