@@ -140,6 +140,12 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
+      "name": "tsr_contentmappertest",
+      "manifest": "crates/tsr_contentmappertest/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
       "name": "tsr_core",
       "manifest": "crates/tsr_core/Cargo.toml",
       "publish": true,

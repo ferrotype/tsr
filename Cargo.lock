@@ -998,6 +998,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "tsr_contentmappertest"
+version = "0.1.0"
+dependencies = [
+ "tsr_ast",
+ "tsr_contentmapper",
+ "tsr_core",
+ "tsr_ipc",
+ "tsr_json",
+ "tsr_jsstring",
+ "tsr_locale",
+ "tsr_tsoptions",
+]
+
+[[package]]
 name = "tsr_core"
 version = "0.1.0"
 dependencies = [
