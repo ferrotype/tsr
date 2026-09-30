@@ -388,5 +388,56 @@ class Dispositions(unittest.TestCase):
             self.assertFalse(self.dispositions.complete())
 
 
+
+class Divergences(unittest.TestCase):
+    """C7.3: approved divergences hold against both final comparisons."""
+
+    def setUp(self):
+        import phase2_divergences
+        from test_phase2_c1 import comparison, row
+        self.divergences, self.row, self.comparison = phase2_divergences, row, comparison
+        self.variant = inventory.executed()[0]["id"]
+        self.native = {field: [field] for field in phase2_divergences.NATIVE_ERROR_FIELDS}
+        self.ledger = {"divergence": [{
+            "id": "D001", "title": "t", "scope": [self.variant], "kind": "message", "rationale": "r",
+            "approved_by": "owner", "approved_on": "2026-10-01",
+            "upstream_pin": phase2_divergences.pin(),
+            "observations": [{"variant_id": self.variant, "metric": "errors_parity",
+                              "native_sha256": phase2_divergences.canonical_digest(self.native),
+                              "rust_sha256": "a" * 64}]}]}
+
+    def problems(self, outcome="different", rust="a" * 64, native=None, ledger=None):
+        row = self.row(self.variant, errors=outcome)
+        row["digests"]["errors"] = rust
+        modes = {"single": self.comparison([row]), "concurrent": self.comparison([row])}
+        rows = {mode: {self.variant: native or self.native} for mode in modes}
+        return self.divergences.problems(self.divergences.approvals(ledger or self.ledger), modes, rows)
+
+    def test_the_committed_ledger_is_empty_and_valid(self):
+        self.assertEqual(self.divergences.approvals(), {})
+        self.assertEqual(self.divergences.approved_coverage(), set())
+        empty = self.comparison([self.row(self.variant)])
+        self.assertTrue(self.divergences.valid(empty, empty))
+        with self.assertRaises(ValueError):
+            self.divergences.valid(empty, None)
+
+    def test_a_witness_holds_only_for_the_differing_observations_it_names(self):
+        self.assertEqual(self.problems(), [])
+        self.assertEqual(self.divergences.approved_coverage(self.ledger), {(self.variant, "errors")})
+        for kwargs, text in (({"outcome": "match"}, "unused"), ({"outcome": "failed"}, "cannot be approved"),
+                             ({"rust": "s" * 64}, "Rust observation changed"),
+                             ({"native": {**self.native, "errors": ["other"]}}, "native observation differs")):
+            with self.subTest(text=text):
+                found = self.problems(**kwargs)
+                self.assertTrue(found and all(text in problem for problem in found), found)
+        unchecked = copy.deepcopy(self.ledger)
+        unchecked["divergence"][0]["observations"][0]["metric"] = "types_parity"
+        self.assertTrue(all("does not recompute" in p for p in self.problems(ledger=unchecked)))
+        unapproved = copy.deepcopy(self.ledger)
+        del unapproved["divergence"][0]["approved_by"]
+        with self.assertRaises(ValueError):
+            self.divergences.approvals(unapproved)
+
+
 if __name__ == "__main__":
     unittest.main()
