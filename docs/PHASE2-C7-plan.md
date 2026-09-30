@@ -70,7 +70,7 @@ nothing.
 | The claims, blockers and handoffs | `data/phase2/cN-claims.json` for C1 to C6. C3 has 15 `blocked` content-mapper handoffs. C2 has 3 `handed` emit-order rows, now matching since C5's post-emit schedule, whose C5 `incoming` entries are closed. C6 has no rows and records the two native modes. `data/phase2/blockers.json` is rebuilt from evidence, never edited by hand; its only entry is B01 (content-mapper execution, Phase 5, 15 executed C3 rows). The emit-order entry closed at the C5 exit | the residual list C7.1 consolidates |
 | The assignment witnesses | `data/phase2/c6-assignments.json` (the pin's partition of every corpus program in the concurrent mode and 27 synthetic graphs, on darwin/arm64), `data/phase2/c6-assignment-comparison.json` (the Rust partitioner equal on 13,417 programs and every synthetic graph), `data/phase2/c6-fusion-arm64-go1.27.1.txt` | rerun on the final sources; the Linux host capture joins them in C7.6 |
 | Performance captures | `data/phase2/c2-benchmark.json`: the owner's C2 checkerbench over the S08 workload, 2026-09-26, `host_busy`. Rust over Go: elapsed 2.136, allocated bytes 0.574, retained bytes 1.415, type footprint 0.813. Also `[e5]` (peak RSS, allocated bytes and the type footprint against 0.85, ADR 0022) and `[e6]` (parse and bind wall time against 1.25 and 1.45, ADR 0021); full checking remains extrapolated at those gates | the figures C7.5 reports side by side |
-| CI | the `status` workflow. Its failing steps at the C6 head (run `36624002745`), identical on both producer runners: the Phase 1 manifest, harness and producer contracts (the coverage report and the syntax captures record Rust closures that the Phase 2 sources changed; the syntax schedule is stale against `data/upstream.json` after the ledger move); the Phase 1 operation audit; the binder, program and configuration contracts, where the C2 order contract's fixture still binds the pre-C6 trace build (fixed in its own PR after #73); config, options and program loading for every frozen variant; the build, smoke and quality results; S03 to S06 closing on the runner's evidence. The committed-views check turns green once a recording is committed | the phase-end green-up C7.6 targets on both runners |
+| CI | the `status` workflow. Its failing steps at the C6 head (run `36624002745`), identical on both producer runners: the Phase 1 manifest, harness and producer contracts (the coverage report and the syntax captures record Rust closures that the Phase 2 sources changed; the syntax schedule is stale against `data/upstream.json` after the ledger move); the Phase 1 operation audit; the binder, program and configuration contracts, where the C2 order contract's fixture still bound the pre-C6 trace build (fixed with this plan's revision); config, options and program loading for every frozen variant; the build, smoke and quality results; S03 to S06 closing on the runner's evidence. The committed-views check turns green once a recording is committed | the phase-end green-up C7.6 targets on both runners |
 
 C7 uses fresh capture directories for its final runs; nothing is moved or
 overwritten. The recorded `checker` run is the owner's.
@@ -363,6 +363,15 @@ comparison therefore compares outcomes, never raw digests.
     by a recorded evidence artifact of that run (named by its evidence id)
     whose report holds the value, and the sprint view names the artifact.
     `sprints/P2B.toml`'s items C1 to C6 name their runs as decision 2 fixes.
+  - **Fingerprints.** The corpus capture's source set (`phase2_corpus.py`
+    `SOURCE_PATTERNS`, `crates/**/*`) and the `[checker]` run's sources
+    include test-only files, the `crates/*/tests/**` suites and their
+    fixtures. A fixture fix therefore stales every corpus capture and the
+    recorded `checker` run although the executable is unchanged; the C2
+    order-contract fixture fix after the C6 exit did exactly that. Exclude
+    test-only paths from the capture and run source sets, keeping the build
+    inputs of the executables, and leave them to the contract receipts, which
+    run those tests (decision 8).
   - All new authorities are `[checker]` inputs. C7.7 lands first, so the
     metrics exist while the residuals close.
 - Exit: `scripts/tests/test_phase2_c7.py` shows each of the following:
@@ -385,7 +394,7 @@ comparison therefore compares outcomes, never raw digests.
 | --- | --- | --- |
 | C1 to C6 complete | the checkpoints | done; each recorded (section 2's table); C1 to C5 accounting is history since the ledger move |
 | Content-mapper execution (B01; 15 executed C3 rows) | Phase 5 | decision 1: pulled forward as a C7 prerequisite, or named in an owner-approved amendment of the P2B exit |
-| The C2 order-contract fixture binding the pre-C6 trace build | C6 follow-up | its own PR after #73; C7.2 reruns C2's contracts with `creation-trace` |
+| The C2 order-contract fixture binding the pre-C6 trace build | C6 follow-up | fixed with this plan's revision, all six receipts refreshed; C7.2 reruns C2's contracts with `creation-trace` |
 | The Linux host capture and the loader-side project-reference operations | Phase 1 | the capture is taken in C7.6; the operations stay Phase 1 with a named owner in the disposition |
 | The owner's recordings (`checker` in both modes, `e3`, `checkerbench`, `bindworkload`, `e5`, `e6`, `status --record`) and the quiet host | owner | C7.6 |
 | Owner decisions of section 9 | owner | before C7.1 |
@@ -518,3 +527,8 @@ Linux host capture are the owner's.
 7. **Exit recording and Phase 7.** `c7_complete` is computed only from the
    recorded runs; C7 does not start Phase 7's four-week acceptance, it hands
    over the report. Confirm.
+8. **Test-only paths out of the capture and run fingerprints.** C7.7's
+   narrowing of the corpus capture's and the `checker` run's source sets.
+   A test or fixture change then stales only the contract receipts that run
+   it. Changing the `[checker]` sources is itself a spec change that stales
+   the current recording once. Confirm.
