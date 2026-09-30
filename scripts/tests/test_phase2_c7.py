@@ -2,6 +2,7 @@
 crates' test-only suites to the contract receipts (docs/PHASE2-C7-plan.md, C7.8.0 and decision 8)."""
 import copy
 import importlib.util
+import json
 from pathlib import Path
 import subprocess
 import sys
@@ -38,6 +39,17 @@ class LedgerMove(unittest.TestCase):
                             ("tsc/internal/testutil/contentmappertest/verbatim.go", 1),
                             ("tsc/internal/testutil/tsbaseline/contentmapper_baseline.go", 1)):
             self.assertEqual(phases[path], phase, path)
+
+    def test_the_retaken_native_captures_stay_current(self):
+        # Every script, data file and oracle source the native captures bind:
+        # a C7 change to one of them stales both captures until they are
+        # retaken, so C7's tools live beside them instead.
+        import phase2_native as native
+        import phase2_native_concurrent as concurrent
+        for module, path in ((native, "data/phase2/native-provenance.json"),
+                             (concurrent, "data/phase2/native-provenance-concurrent.json")):
+            recorded = json.loads((ROOT / path).read_text())["inputs"]
+            self.assertEqual(module.input_digests(), recorded, path)
 
     def test_the_c7_audit_scope_is_bound_over_complete_files_and_the_integration(self):
         document = audit.load(ROOT / "data/phase2/c7-audit.json")

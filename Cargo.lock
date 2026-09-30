@@ -1045,6 +1045,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "tsr_ipc"
+version = "0.1.0"
+dependencies = [
+ "tsr_json",
+ "tsr_jsonrpc",
+]
+
+[[package]]
 name = "tsr_jsnum"
 version = "0.1.0"
 dependencies = [
@@ -1061,6 +1069,14 @@ dependencies = [
  "stacker",
  "tsr_core",
  "tsr_jsnum",
+ "tsr_jsstring",
+]
+
+[[package]]
+name = "tsr_jsonrpc"
+version = "0.1.0"
+dependencies = [
+ "tsr_json",
  "tsr_jsstring",
 ]
 
