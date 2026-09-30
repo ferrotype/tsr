@@ -226,7 +226,9 @@ fn source(f: &mut AstBuilder, name: &str) -> NodeId {
             content_mapper: string(b"mapper"),
             virtual_file_name: string(b"/s06/codec.virtual.ts"),
             original_text: SourceText::from_loaded_bytes("X😀Y\n".as_bytes()),
-            span_map: Some(segments.into()),
+            span_map: Some(std::sync::Arc::new(tsr_ast::span_map::SpanMap::new(
+                &segments,
+            ))),
             supplemental_source_files,
             canonical_source_file: Some(canonical),
             diagnostic_directives,

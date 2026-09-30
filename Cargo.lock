@@ -859,6 +859,7 @@ dependencies = [
  "tsr_core",
  "tsr_diagnostics",
  "tsr_jsnum",
+ "tsr_json",
  "tsr_jsstring",
  "tsr_locale",
 ]
@@ -975,6 +976,25 @@ dependencies = [
  "tsr_tsoptions",
  "tsr_tspath",
  "tsr_vfs",
+]
+
+[[package]]
+name = "tsr_contentmapper"
+version = "0.1.0"
+dependencies = [
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_ipc",
+ "tsr_json",
+ "tsr_jsonrpc",
+ "tsr_jsstring",
+ "tsr_locale",
+ "tsr_parser",
+ "tsr_tsoptions",
+ "tsr_tspath",
+ "xxhash-rust",
 ]
 
 [[package]]

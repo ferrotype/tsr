@@ -101,10 +101,15 @@ pub struct ContentMapperSourceFileInfo {
     pub parse_options: SourceFileParseOptions,
     pub virtual_file_name: JsString,
     pub original_text: SourceText,
-    pub span_map: Option<std::sync::Arc<[SpanSegment]>>,
+    pub span_map: Option<std::sync::Arc<crate::span_map::SpanMap>>,
     pub diagnostic_directives: DiagnosticDirectiveSlice,
     pub supplemental_source_files: SourceNodeSlice,
     pub canonical_source_file: Option<NodeId>,
+    /// A program parses each file into its own arena, so a mapped file names
+    /// its supplemental files, and a supplemental file its canonical file, by
+    /// file name where the pin keeps pointers.
+    pub supplemental_file_names: Vec<JsString>,
+    pub canonical_file_name: Option<JsString>,
 }
 
 /// The mutable parser frame becomes immutable with AST publication. Derived
@@ -249,7 +254,7 @@ impl SourceFileState {
         }
     }
     /// port: tsc/internal/ast/ast.go:SourceFile.SpanMap
-    pub fn span_map(&self) -> Option<&[SpanSegment]> {
+    pub fn span_map(&self) -> Option<&crate::span_map::SpanMap> {
         self.content_mapper_info
             .as_ref()
             .and_then(|info| info.span_map.as_deref())
@@ -286,7 +291,19 @@ impl SourceFileState {
     }
     /// port: tsc/internal/ast/ast.go:SourceFile.IsContentMapperSupplemental
     pub fn is_content_mapper_supplemental(&self) -> bool {
-        self.canonical_source_file().is_some()
+        self.canonical_source_file().is_some() || self.canonical_file_name().is_some()
+    }
+    /// The canonical file of a supplemental file in a program, by name.
+    pub fn canonical_file_name(&self) -> Option<&JsString> {
+        self.content_mapper_info
+            .as_ref()
+            .and_then(|info| info.canonical_file_name.as_ref())
+    }
+    /// The supplemental files of a mapped file in a program, by name.
+    pub fn supplemental_file_names(&self) -> &[JsString] {
+        self.content_mapper_info
+            .as_ref()
+            .map_or(&[], |info| &info.supplemental_file_names)
     }
     /// port: tsc/internal/ast/ast.go:SourceFile.Diagnostics
     pub fn diagnostics(&self) -> &[Diagnostic] {
@@ -432,10 +449,17 @@ struct SourceFileCopy {
     external_module_indicator: Option<NodeId>,
 }
 
-pub struct OriginalFileName<'a>(SourceFileRead<'a>);
+pub struct OriginalFileName<'a>(OriginalName<'a>);
+enum OriginalName<'a> {
+    Source(SourceFileRead<'a>),
+    Canonical(&'a [u8]),
+}
 impl OriginalFileName<'_> {
     pub fn as_bytes(&self) -> &[u8] {
-        self.0.file_name()
+        match &self.0 {
+            OriginalName::Source(source) => source.file_name(),
+            OriginalName::Canonical(name) => name,
+        }
     }
 }
 impl Deref for OriginalFileName<'_> {
@@ -501,8 +525,13 @@ impl<'a> SourceFileRead<'a> {
 
     /// port: tsc/internal/ast/ast.go:SourceFile.OriginalFileName
     pub fn original_file_name(&self) -> Result<OriginalFileName<'a>, Error> {
+        if let Some(name) = self.state_ref().canonical_file_name() {
+            return Ok(OriginalFileName(OriginalName::Canonical(name.as_bytes())));
+        }
         let id = self.canonical_source_file().unwrap_or(self.node);
-        self.view.source_file(id).map(OriginalFileName)
+        self.view
+            .source_file(id)
+            .map(|source| OriginalFileName(OriginalName::Source(source)))
     }
 
     /// port: tsc/internal/ast/ast.go:SourceFile.Imports

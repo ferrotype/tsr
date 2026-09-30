@@ -103,8 +103,7 @@ impl DiagnosticWriter<'_> {
         }
         let source = self.source(id)?;
         if let Some(segments) = source.span_map() {
-            let (loc, fidelity) =
-                tsr_ast::span_map::virtual_to_original_span(Some(segments), d.loc);
+            let (loc, fidelity) = segments.virtual_to_original_span(d.loc);
             if fidelity == tsr_ast::span_map::Fidelity::None {
                 result.synthesized = true;
             } else {

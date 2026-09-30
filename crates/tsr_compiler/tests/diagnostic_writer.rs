@@ -107,14 +107,16 @@ fn mapped_diagnostics_select_text_without_mutating_the_ast() {
         .set_content_mapper_info(ContentMapperSourceFileInfo {
             content_mapper: JsString::from_bytes(b"test-mapper".as_slice()),
             original_text: SourceText::from_bytes(b"\nfoo".as_slice()),
-            span_map: Some(tsr_ast::span_map::new(&[SpanSegment {
-                virtual_start: 3,
-                virtual_end: 6,
-                original_start: 1,
-                original_end: 4,
-                kind: 0,
-                features: 0,
-            }])),
+            span_map: Some(std::sync::Arc::new(tsr_ast::span_map::SpanMap::new(&[
+                SpanSegment {
+                    virtual_start: 3,
+                    virtual_end: 6,
+                    original_start: 1,
+                    original_end: 4,
+                    kind: 0,
+                    features: 0,
+                },
+            ]))),
             ..Default::default()
         });
     let sources = Sources(parsed.publish_unbound(), root);

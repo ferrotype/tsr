@@ -111,6 +111,8 @@ impl<'a> DiagnosticWriter<'a> {
         let source = self.source(id)?;
         let name = if let Some(canonical) = source.canonical_source_file() {
             self.source(canonical)?.parse_options().file_name.clone()
+        } else if let Some(canonical) = source.canonical_file_name() {
+            canonical.clone()
         } else {
             source.parse_options().file_name.clone()
         };

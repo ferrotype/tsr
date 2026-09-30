@@ -361,7 +361,12 @@ fn record_source_file(
     let lib_refs =
         structured::references(&state.lib_reference_directives()?, positions, structured);
     let original_positions = PositionMap::new(state.original_text());
-    let spans = structured::spans(state.span_map(), positions, &original_positions, structured);
+    let spans = structured::spans(
+        state.span_map().map(tsr_ast::span_map::SpanMap::segments),
+        positions,
+        &original_positions,
+        structured,
+    );
     let supplemental = state
         .supplemental_source_files()?
         .iter()
