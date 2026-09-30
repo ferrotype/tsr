@@ -1,0 +1,14 @@
+{
+ "captures": {
+  "concurrent": {
+   "native_observation_sha256": "431c35946062b6a4e04bcd8c623bafb3a7491d277262692a12ea8fe8cfab952e",
+   "rust_capture_sha256": "024de75e1c3067301108755196abe10fec5286bb983961b50807f575f622f1fd"
+  },
+  "single": {
+   "native_observation_sha256": "836321ebe7ffc46ed87a56b18e2e6daffd8f1b64523c3d3e7d57cb8458eeb8c9",
+   "rust_capture_sha256": "402f1cdae3db371f4df0ac2fefccd9d5aa17c1ca3f71906db0bec1b7ef7e94c6"
+  }
+ },
+ "rows": [],
+ "version": 1
+}

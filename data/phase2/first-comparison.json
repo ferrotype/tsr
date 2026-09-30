@@ -1,20 +1,12 @@
 {
- "all_domains_match": 13417,
- "buckets": [
-  {
-   "bucket": "unsupported: content-mapper execution",
-   "owner": "Phase 5 (content mapper)",
-   "representative": "compiler/contentMapperInvalidExtension.ts#configuration=0",
-   "variants": 15
-  }
- ],
+ "all_domains_match": 13432,
+ "buckets": [],
  "by_checkpoint": {
   "C2": {
    "match": 2954
   },
   "C3": {
-   "match": 170,
-   "open": 15
+   "match": 185
   },
   "C4": {
    "match": 926
@@ -26,21 +18,17 @@
  "categories": {
   "display": {
    "disabled": 679,
-   "match": 12743,
-   "unsupported": 10
+   "match": 12753
   },
   "errors": {
-   "match": 13417,
-   "unsupported": 15
+   "match": 13432
   },
   "parent_pointers": {
-   "match": 13417,
-   "unsupported": 15
+   "match": 13432
   },
   "symbols": {
    "disabled": 679,
-   "match": 12743,
-   "unsupported": 10
+   "match": 12753
   },
   "trace": {
    "disabled": 13278,
@@ -48,49 +36,29 @@
   },
   "types": {
    "disabled": 679,
-   "match": 12743,
-   "unsupported": 10
+   "match": 12753
   },
   "union_ordering": {
-   "match": 13417,
-   "unsupported": 15
+   "match": 13432
   }
  },
  "changed_observations": [],
  "dimensions": {
-  "area": {
-   "unsupported: content-mapper execution": 15
-  },
-  "family": {
-   "content_mapper_execution": 15
-  },
-  "first_code": {
-   "(none)": 15
-  },
-  "jsx": {
-   "preserve": 1,
-   "unset": 14
-  },
-  "module": {
-   "esnext": 11,
-   "unset": 4
-  },
-  "strict": {
-   "False": 3,
-   "True": 12
-  },
-  "target": {
-   "es2020": 11,
-   "unset": 4
-  }
+  "area": {},
+  "family": {},
+  "first_code": {},
+  "jsx": {},
+  "module": {},
+  "strict": {},
+  "target": {}
  },
  "executed": 13432,
  "harness_errors": 0,
  "inventory_sha256": "c09721d36d361eb8646b2321ec3478da0fbdbf12253c086e7b1c34e966aea9b9",
- "native_observation_sha256": "2859fdb25a721980db34b2a182bdb630193d06463b599fdd4a155caeb64d7edb",
+ "native_observation_sha256": "836321ebe7ffc46ed87a56b18e2e6daffd8f1b64523c3d3e7d57cb8458eeb8c9",
  "partial": false,
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
- "previous": "2dd11085a2eb46bed4a14ea10bf89ada65f29280fde786e17d37c2d717a7e9e1",
+ "previous": null,
  "regression_subset": {
   "all_domains_match": 9367,
   "by_domain": {
@@ -123,15 +91,13 @@
   "rows": 9367
  },
  "regressions": [],
- "rust_capture_sha256": "05bf1411eb7d865ff836960358bae7f1a88960d33476eacc05658906be656ccf",
+ "rust_capture_sha256": "402f1cdae3db371f4df0ac2fefccd9d5aa17c1ca3f71906db0bec1b7ef7e94c6",
  "rust_source_stable": true,
  "selection": {
   "cases": [],
   "limit": null,
   "sample": false
  },
- "unsupported_operations": {
-  "content-mapper execution": 75
- },
+ "unsupported_operations": {},
  "version": 1
 }

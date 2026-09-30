@@ -1,0 +1,643 @@
+{
+ "captures": {
+  "concurrent": {
+   "native_observation_sha256": "431c35946062b6a4e04bcd8c623bafb3a7491d277262692a12ea8fe8cfab952e",
+   "rust_capture_sha256": "024de75e1c3067301108755196abe10fec5286bb983961b50807f575f622f1fd"
+  },
+  "single": {
+   "native_observation_sha256": "836321ebe7ffc46ed87a56b18e2e6daffd8f1b64523c3d3e7d57cb8458eeb8c9",
+   "rust_capture_sha256": "402f1cdae3db371f4df0ac2fefccd9d5aa17c1ca3f71906db0bec1b7ef7e94c6"
+  }
+ },
+ "consumable": [
+  {
+   "item": "the emit resolver's JavaScript half and the declaration-diagnostics path, with the harness's post-emit schedule",
+   "phase": "Phase 3"
+  },
+  {
+   "item": "tsr_compiler::CheckedProgram, the program's checker driving through the compiler pool or a supplied one, with CheckerRequest carrying the checker lifetime and the cancellation",
+   "phase": "Phase 4 and 5"
+  },
+  {
+   "item": "CompilerCheckerPool, with its count rule and the per-architecture FENNEL partition",
+   "phase": "Phase 4"
+  },
+  {
+   "item": "tsr_core::CancellationToken and the poisoned-checker contract",
+   "phase": "Phase 4 and 5"
+  },
+  {
+   "item": "the TraceSink seam with its in-memory and JSON-lines sinks; the file writer is Phase 4's",
+   "phase": "Phase 4"
+  },
+  {
+   "item": "the bounded tsr_core::workgroup::WorkGroup",
+   "phase": "Phase 4"
+  },
+  {
+   "item": "the checkers option and the program's own single-threaded setting",
+   "phase": "Phase 4"
+  },
+  {
+   "item": "the services operations, the recorded fourslash replay and hover expansion",
+   "phase": "Phase 5 and 6"
+  },
+  {
+   "item": "the content-mapper host, the IPC and JSON-RPC layers and span maps, ported for the harness's in-process mappers; the project system's child-process spawner completes them",
+   "phase": "Phase 5"
+  },
+  {
+   "item": "the project pool's CheckerPool implementation and its disposal of a canceled checker",
+   "phase": "Phase 5"
+  },
+  {
+   "item": "the public API",
+   "phase": "Phase 6"
+  },
+  {
+   "item": "the creation-trace mode and the assignment witnesses",
+   "phase": "diagnostics"
+  },
+  {
+   "item": "the E3 contracts through the compiler pool",
+   "phase": "Phase 4"
+  }
+ ],
+ "dashboard": {
+  "concurrent": {
+   "all_domains_match": 13432,
+   "categories": {
+    "display": {
+     "disabled": 679,
+     "match": 12753
+    },
+    "errors": {
+     "match": 13432
+    },
+    "parent_pointers": {
+     "match": 13432
+    },
+    "symbols": {
+     "disabled": 679,
+     "match": 12753
+    },
+    "trace": {
+     "disabled": 13278,
+     "match": 154
+    },
+    "types": {
+     "disabled": 679,
+     "match": 12753
+    },
+    "union_ordering": {
+     "match": 13432
+    }
+   },
+   "executed": 13432,
+   "rates": {
+    "checkpoint": {
+     "C2": {
+      "matched": 2954,
+      "rows": 2954
+     },
+     "C3": {
+      "matched": 185,
+      "rows": 185
+     },
+     "C4": {
+      "matched": 926,
+      "rows": 926
+     },
+     "regression": {
+      "matched": 9367,
+      "rows": 9367
+     }
+    },
+    "family": {
+     "(none)": {
+      "matched": 9367,
+      "rows": 9367
+     },
+     "conditional_types": {
+      "matched": 279,
+      "rows": 279
+     },
+     "content_mapper_execution": {
+      "matched": 15,
+      "rows": 15
+     },
+     "decorators": {
+      "matched": 490,
+      "rows": 490
+     },
+     "emitted_output_only": {
+      "matched": 413,
+      "rows": 413
+     },
+     "explicit_type_parameters": {
+      "matched": 2542,
+      "rows": 2542
+     },
+     "import_types": {
+      "matched": 119,
+      "rows": 119
+     },
+     "indexed_access_types": {
+      "matched": 389,
+      "rows": 389
+     },
+     "infer_types": {
+      "matched": 122,
+      "rows": 122
+     },
+     "jsx": {
+      "matched": 436,
+      "rows": 436
+     },
+     "mapped_types": {
+      "matched": 311,
+      "rows": 311
+     },
+     "nonempty_type_arguments": {
+      "matched": 2128,
+      "rows": 2128
+     },
+     "template_literal_types": {
+      "matched": 65,
+      "rows": 65
+     }
+    },
+    "jsx": {
+     "preserve": {
+      "matched": 226,
+      "rows": 226
+     },
+     "react": {
+      "matched": 163,
+      "rows": 163
+     },
+     "react-jsx": {
+      "matched": 38,
+      "rows": 38
+     },
+     "react-jsxdev": {
+      "matched": 19,
+      "rows": 19
+     },
+     "react-native": {
+      "matched": 2,
+      "rows": 2
+     },
+     "unset": {
+      "matched": 12984,
+      "rows": 12984
+     }
+    },
+    "module": {
+     "commonjs": {
+      "matched": 1654,
+      "rows": 1654
+     },
+     "es2015": {
+      "matched": 75,
+      "rows": 75
+     },
+     "es2020": {
+      "matched": 29,
+      "rows": 29
+     },
+     "es2022": {
+      "matched": 24,
+      "rows": 24
+     },
+     "esnext": {
+      "matched": 346,
+      "rows": 346
+     },
+     "node16": {
+      "matched": 103,
+      "rows": 103
+     },
+     "node18": {
+      "matched": 101,
+      "rows": 101
+     },
+     "node20": {
+      "matched": 104,
+      "rows": 104
+     },
+     "nodenext": {
+      "matched": 175,
+      "rows": 175
+     },
+     "preserve": {
+      "matched": 62,
+      "rows": 62
+     },
+     "unset": {
+      "matched": 10759,
+      "rows": 10759
+     }
+    },
+    "strict": {
+     "False": {
+      "matched": 12000,
+      "rows": 12000
+     },
+     "True": {
+      "matched": 1432,
+      "rows": 1432
+     }
+    },
+    "suite": {
+     "compiler": {
+      "matched": 6843,
+      "rows": 6843
+     },
+     "conformance": {
+      "matched": 6589,
+      "rows": 6589
+     }
+    },
+    "target": {
+     "es2015": {
+      "matched": 11446,
+      "rows": 11446
+     },
+     "es2016": {
+      "matched": 9,
+      "rows": 9
+     },
+     "es2017": {
+      "matched": 124,
+      "rows": 124
+     },
+     "es2018": {
+      "matched": 42,
+      "rows": 42
+     },
+     "es2019": {
+      "matched": 16,
+      "rows": 16
+     },
+     "es2020": {
+      "matched": 102,
+      "rows": 102
+     },
+     "es2021": {
+      "matched": 22,
+      "rows": 22
+     },
+     "es2022": {
+      "matched": 573,
+      "rows": 573
+     },
+     "es2023": {
+      "matched": 4,
+      "rows": 4
+     },
+     "es2024": {
+      "matched": 3,
+      "rows": 3
+     },
+     "es2025": {
+      "matched": 2,
+      "rows": 2
+     },
+     "esnext": {
+      "matched": 760,
+      "rows": 760
+     },
+     "unset": {
+      "matched": 329,
+      "rows": 329
+     }
+    }
+   }
+  },
+  "single": {
+   "all_domains_match": 13432,
+   "categories": {
+    "display": {
+     "disabled": 679,
+     "match": 12753
+    },
+    "errors": {
+     "match": 13432
+    },
+    "parent_pointers": {
+     "match": 13432
+    },
+    "symbols": {
+     "disabled": 679,
+     "match": 12753
+    },
+    "trace": {
+     "disabled": 13278,
+     "match": 154
+    },
+    "types": {
+     "disabled": 679,
+     "match": 12753
+    },
+    "union_ordering": {
+     "match": 13432
+    }
+   },
+   "executed": 13432,
+   "rates": {
+    "checkpoint": {
+     "C2": {
+      "matched": 2954,
+      "rows": 2954
+     },
+     "C3": {
+      "matched": 185,
+      "rows": 185
+     },
+     "C4": {
+      "matched": 926,
+      "rows": 926
+     },
+     "regression": {
+      "matched": 9367,
+      "rows": 9367
+     }
+    },
+    "family": {
+     "(none)": {
+      "matched": 9367,
+      "rows": 9367
+     },
+     "conditional_types": {
+      "matched": 279,
+      "rows": 279
+     },
+     "content_mapper_execution": {
+      "matched": 15,
+      "rows": 15
+     },
+     "decorators": {
+      "matched": 490,
+      "rows": 490
+     },
+     "emitted_output_only": {
+      "matched": 413,
+      "rows": 413
+     },
+     "explicit_type_parameters": {
+      "matched": 2542,
+      "rows": 2542
+     },
+     "import_types": {
+      "matched": 119,
+      "rows": 119
+     },
+     "indexed_access_types": {
+      "matched": 389,
+      "rows": 389
+     },
+     "infer_types": {
+      "matched": 122,
+      "rows": 122
+     },
+     "jsx": {
+      "matched": 436,
+      "rows": 436
+     },
+     "mapped_types": {
+      "matched": 311,
+      "rows": 311
+     },
+     "nonempty_type_arguments": {
+      "matched": 2128,
+      "rows": 2128
+     },
+     "template_literal_types": {
+      "matched": 65,
+      "rows": 65
+     }
+    },
+    "jsx": {
+     "preserve": {
+      "matched": 226,
+      "rows": 226
+     },
+     "react": {
+      "matched": 163,
+      "rows": 163
+     },
+     "react-jsx": {
+      "matched": 38,
+      "rows": 38
+     },
+     "react-jsxdev": {
+      "matched": 19,
+      "rows": 19
+     },
+     "react-native": {
+      "matched": 2,
+      "rows": 2
+     },
+     "unset": {
+      "matched": 12984,
+      "rows": 12984
+     }
+    },
+    "module": {
+     "commonjs": {
+      "matched": 1654,
+      "rows": 1654
+     },
+     "es2015": {
+      "matched": 75,
+      "rows": 75
+     },
+     "es2020": {
+      "matched": 29,
+      "rows": 29
+     },
+     "es2022": {
+      "matched": 24,
+      "rows": 24
+     },
+     "esnext": {
+      "matched": 346,
+      "rows": 346
+     },
+     "node16": {
+      "matched": 103,
+      "rows": 103
+     },
+     "node18": {
+      "matched": 101,
+      "rows": 101
+     },
+     "node20": {
+      "matched": 104,
+      "rows": 104
+     },
+     "nodenext": {
+      "matched": 175,
+      "rows": 175
+     },
+     "preserve": {
+      "matched": 62,
+      "rows": 62
+     },
+     "unset": {
+      "matched": 10759,
+      "rows": 10759
+     }
+    },
+    "strict": {
+     "False": {
+      "matched": 12000,
+      "rows": 12000
+     },
+     "True": {
+      "matched": 1432,
+      "rows": 1432
+     }
+    },
+    "suite": {
+     "compiler": {
+      "matched": 6843,
+      "rows": 6843
+     },
+     "conformance": {
+      "matched": 6589,
+      "rows": 6589
+     }
+    },
+    "target": {
+     "es2015": {
+      "matched": 11446,
+      "rows": 11446
+     },
+     "es2016": {
+      "matched": 9,
+      "rows": 9
+     },
+     "es2017": {
+      "matched": 124,
+      "rows": 124
+     },
+     "es2018": {
+      "matched": 42,
+      "rows": 42
+     },
+     "es2019": {
+      "matched": 16,
+      "rows": 16
+     },
+     "es2020": {
+      "matched": 102,
+      "rows": 102
+     },
+     "es2021": {
+      "matched": 22,
+      "rows": 22
+     },
+     "es2022": {
+      "matched": 573,
+      "rows": 573
+     },
+     "es2023": {
+      "matched": 4,
+      "rows": 4
+     },
+     "es2024": {
+      "matched": 3,
+      "rows": 3
+     },
+     "es2025": {
+      "matched": 2,
+      "rows": 2
+     },
+     "esnext": {
+      "matched": 760,
+      "rows": 760
+     },
+     "unset": {
+      "matched": 329,
+      "rows": 329
+     }
+    }
+   }
+  }
+ },
+ "dispositions": {
+  "counts": {
+   "equivalent": 793,
+   "later": 9,
+   "mapped": 2331
+  },
+  "files": 54,
+  "functions": 3133,
+  "later_phase_handoffs": 15,
+  "rejected": 0
+ },
+ "divergences": {
+  "approved": 0,
+  "proposals": 0
+ },
+ "performance": {
+  "checkerbench": {
+   "allocated_bytes_ratio": 0.573940517161814,
+   "elapsed_ratio": 2.1357708737976204,
+   "host_busy": true,
+   "retained_bytes_ratio": 1.4145281189678158,
+   "source": "data/phase2/c2-benchmark.json",
+   "type_footprint_ratio": 0.8125803394967038
+  },
+  "e5": {
+   "criteria": [
+    {
+     "metric": "run.e5.peak_rss_ratio",
+     "op": "<=",
+     "threshold": 0.85,
+     "value": 0.6996409886061942
+    },
+    {
+     "metric": "run.e5.allocated_bytes_ratio",
+     "op": "<=",
+     "threshold": 0.85,
+     "value": 0.7002799023663339
+    },
+    {
+     "metric": "run.e5.type_footprint_ratio",
+     "op": "<=",
+     "threshold": 0.85,
+     "value": 0.8116240487004439
+    }
+   ],
+   "date": "2026-09-19",
+   "host": "macos-aarch64"
+  },
+  "e6": {
+   "criteria": [
+    {
+     "metric": "run.e6.one_thread_wall_time_ratio",
+     "op": "<=",
+     "threshold": 1.25,
+     "value": 1.15342707188501
+    },
+    {
+     "metric": "run.e6.eight_threads_wall_time_ratio",
+     "op": "<=",
+     "threshold": 1.45,
+     "value": 1.3987726958215447
+    }
+   ],
+   "date": "2026-09-19",
+   "host": "macos-aarch64"
+  }
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "residuals": {
+  "count": 0,
+  "rows": []
+ },
+ "version": 1
+}
