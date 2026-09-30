@@ -154,6 +154,25 @@ pub fn union_ordering(op: &tsr_checker::Operation<'_>) -> Value {
 /// `verifyUnionOrdering` over every checker of the program
 /// (`ForEachCheckerParallel`): the counts sum over the checkers.
 pub fn union_ordering_checkers(checkers: &[&tsr_checker::Operation<'_>]) -> Value {
+    union_ordering_checkers_by(checkers, &mut |op, a, b| {
+        op.compare_type_order(Some(a), Some(b))
+    })
+}
+
+/// A union type and the comparator the ordering check sorts with.
+pub type TypeOrder<'a> = dyn FnMut(
+        &tsr_checker::Operation<'_>,
+        tsr_checker::TypeRef,
+        tsr_checker::TypeRef,
+    ) -> std::result::Result<Ordering, tsr_checker::Error>
+    + 'a;
+
+/// `union_ordering_checkers` with the comparator a test passes in, so a
+/// broken comparator shows that the production check reports what it sees.
+pub fn union_ordering_checkers_by(
+    checkers: &[&tsr_checker::Operation<'_>],
+    compare: &mut TypeOrder<'_>,
+) -> Value {
     let result = (|| -> Result<Value> {
         let (mut total, mut inconsistent) = (0, 0);
         for op in checkers {
@@ -162,8 +181,7 @@ pub fn union_ordering_checkers(checkers: &[&tsr_checker::Operation<'_>]) -> Valu
                 .into_iter()
                 .map(|union| op.constituents(union))
                 .collect::<std::result::Result<Vec<_>, _>>()?;
-            inconsistent +=
-                inconsistent_orderings(&unions, |a, b| op.compare_type_order(Some(a), Some(b)))?;
+            inconsistent += inconsistent_orderings(&unions, |a, b| compare(op, a, b))?;
             total += unions.len();
         }
         Ok(
@@ -182,11 +200,21 @@ pub trait ParentTree<T> {
 
 /// Go's recursive `ForEachChild` walk in the same pre-order. Returns the first
 /// failure's message, as the pinned assertion would report it.
+#[allow(dead_code)]
 pub fn first_parent_failure<T: Copy + PartialEq>(
     tree: &impl ParentTree<T>,
     root: T,
     nodes: &mut u64,
 ) -> Result<Option<String>> {
+    Ok(first_failing_node(tree, root, nodes)?.map(|(message, _)| message))
+}
+
+/// `first_parent_failure` with the node that failed.
+pub fn first_failing_node<T: Copy + PartialEq>(
+    tree: &impl ParentTree<T>,
+    root: T,
+    nodes: &mut u64,
+) -> Result<Option<(String, T)>> {
     let mut work: Vec<(T, T)> = tree
         .children(root)?
         .into_iter()
@@ -196,11 +224,14 @@ pub fn first_parent_failure<T: Copy + PartialEq>(
     while let Some((node, parent)) = work.pop() {
         *nodes += 1;
         match tree.parent(node)? {
-            None => return Ok(Some("parent node does not exist".into())),
+            None => return Ok(Some(("parent node does not exist".into(), node))),
             Some(recorded) if recorded != parent => {
-                return Ok(Some(format!(
-                    "parent node does not match traversed parent: {}",
-                    tree.describe(node)
+                return Ok(Some((
+                    format!(
+                        "parent node does not match traversed parent: {}",
+                        tree.describe(node)
+                    ),
+                    node,
                 )))
             }
             Some(_) => {}
@@ -249,11 +280,14 @@ impl ChildVisitor for Children<'_> {
     }
 }
 
-struct FileTree<'a>(AstView<'a>);
+/// The parent a node records; a test passes another to show the walk fails.
+pub type ParentOf<'a> = dyn Fn(AstView<'_>, NodeId) -> Result<Option<NodeId>> + 'a;
 
-impl ParentTree<NodeId> for FileTree<'_> {
+struct FileTree<'a, 'p>(AstView<'a>, &'p ParentOf<'p>);
+
+impl ParentTree<NodeId> for FileTree<'_, '_> {
     fn parent(&self, node: NodeId) -> Result<Option<NodeId>> {
-        Ok(self.0.node(node)?.parent())
+        (self.1)(self.0, node)
     }
     fn children(&self, node: NodeId) -> Result<Vec<NodeId>> {
         let mut children = Children {
@@ -276,8 +310,14 @@ impl ParentTree<NodeId> for FileTree<'_> {
 }
 
 pub fn parent_pointers(program: &Program) -> Value {
+    parent_pointers_with(program, &|view, node| Ok(view.node(node)?.parent()))
+}
+
+/// `parent_pointers` reading each node's parent through `parent_of`. A failure
+/// names the node: its kind, file and span.
+pub fn parent_pointers_with(program: &Program, parent_of: &ParentOf<'_>) -> Value {
     let result = (|| -> Result<Value> {
-        let (mut files, mut nodes, mut failure) = (0u64, 0u64, None);
+        let (mut files, mut nodes, mut failure, mut failing) = (0u64, 0u64, None, None);
         for file in program.files() {
             let path = file
                 .bound()
@@ -291,13 +331,21 @@ pub fn parent_pointers(program: &Program) -> Value {
                 continue;
             }
             files += 1;
-            let tree = FileTree(file.bound().view().ast());
-            if let Some(message) = first_parent_failure(&tree, file.source(), &mut nodes)? {
+            let view = file.bound().view().ast();
+            let tree = FileTree(view, parent_of);
+            if let Some((message, node)) = first_failing_node(&tree, file.source(), &mut nodes)? {
+                let read = view.node(node)?;
                 failure = Some(message);
+                failing = Some(json!({"kind":format!("{:?}", read.kind()),
+                    "file":String::from_utf8_lossy(&path),"pos":read.pos(),"end":read.end()}));
                 break;
             }
         }
-        Ok(json!({"state":"executed","files":files,"nodes":nodes,"failure":failure}))
+        let mut value = json!({"state":"executed","files":files,"nodes":nodes,"failure":failure});
+        if let Some(node) = failing {
+            value["node"] = node;
+        }
+        Ok(value)
     })();
     result.unwrap_or_else(|error| failure(error, "compiler_error"))
 }
