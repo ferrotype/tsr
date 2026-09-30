@@ -104,10 +104,11 @@ class Rebind(unittest.TestCase):
             {"id": "a", "status": "blocked", "handoff": handoff(["errors"], "areq", "araw")},
             {"id": "b", "status": "handed", "handoff": handoff(["types"], "breq", "braw")},
             {"id": "c", "status": "closed", "commit": "abcdef1"},
-            {"id": "d", "status": "handed", "handoff": handoff(["errors"], "dreq", "old")}]}
+            {"id": "d", "status": "handed", "handoff": handoff(["errors"], "dreq", "old")},
+            {"id": "e", "status": "blocked", "handoff": handoff(["errors"], "ereq", "old")}]}
         current = comparison([row("a", errors="unsupported"), row("b", errors="different"), row("c"),
-                              row("d", errors="different")], rust_capture_sha256="n" * 64)
-        digests = {vid: {"request_sha256": vid + "req", "raw_observation_sha256": vid + "raw"} for vid in "abcd"}
+                              row("d", errors="different"), row("e")], rust_capture_sha256="n" * 64)
+        digests = {vid: {"request_sha256": vid + "req", "raw_observation_sha256": vid + "raw"} for vid in "abcde"}
         import tempfile
         with tempfile.TemporaryDirectory() as directory:
             trace = Path(directory) / "t"
@@ -118,7 +119,9 @@ class Rebind(unittest.TestCase):
             result = claims_module.rebind(claims, current, "n" * 64, digests, root=Path(directory))
         # a: unchanged observation, still covered: rebound. b: no longer covered.
         # d: covered, but its observation changed: fresh attribution, no rebind.
-        self.assertEqual(result, {"stale": ["b"], "changed": ["d"]})
+        # e: its observation changed and it now matches: resolved, kept as history.
+        self.assertEqual(result, {"stale": ["b"], "changed": ["d"], "resolved": ["e"]})
+        self.assertEqual(claims["rows"][4]["handoff"]["capture_sha256"], "r" * 64)
         self.assertEqual(claims["rows"][0]["handoff"]["capture_sha256"], "n" * 64)
         self.assertEqual(claims["rows"][0]["handoff"]["raw_observation_sha256"], "araw")
         self.assertEqual(claims["rows"][1]["handoff"]["capture_sha256"], "r" * 64)

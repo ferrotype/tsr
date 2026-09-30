@@ -116,7 +116,7 @@ class Wiring(unittest.TestCase):
         self.assertEqual(producers.CHECKPOINTS[-1], "C7")
         self.assertEqual(producers.newest_checkpoint({name: None for name in producers.CHECKPOINTS}), "C7")
         spec = tomllib.loads((ROOT / "status/runs.toml").read_text())["checker"]
-        for path in ("data/phase2/c7-audit.json", "data/phase2/informational.json",
+        for path in ("data/phase2/c7-audit.json", "data/phase2/informational.json", "data/phase2/residuals.json",
                      "data/phase2/native-provenance-concurrent.json", "data/divergences.toml"):
             self.assertIn(path, spec["inputs"])
         # Every contract witness's receipt, C7.8.5's among them, binds the run.
@@ -254,6 +254,73 @@ class SkipList(unittest.TestCase):
             target["options"] = dict(target["options"], **change) if change else {}
             with self.subTest(row=row["id"]), self.assertRaisesRegex(ValueError, "rule"):
                 informational.informational(document)
+
+
+
+class Residuals(unittest.TestCase):
+    """C7.1: the residual list over both modes' comparisons."""
+
+    def setUp(self):
+        import phase2_residuals
+        from test_phase2_c1 import comparison, row
+        self.residuals, self.row, self.comparison = phase2_residuals, row, comparison
+        self.single = comparison([row("a"), row("b", errors="different"), row("c", types="unsupported"),
+                                  row("d")])
+        self.concurrent = comparison([row("a"), row("b", errors="different", union_ordering="different"),
+                                      row("c"), row("d", symbols="failed")], rust_capture_sha256="k" * 64)
+
+    def test_open_rows_join_both_modes_and_drop_approved_pairs(self):
+        self.assertEqual(self.residuals.open_rows(self.single, self.concurrent), {
+            "b": {"single": ["errors"], "concurrent": ["errors", "union_ordering"]},
+            "c": {"single": ["types"], "concurrent": []},
+            "d": {"single": [], "concurrent": ["symbols"]}})
+        covered = {("b", "errors"), ("b", "union_ordering"), ("c", "types")}
+        self.assertEqual(self.residuals.open_rows(self.single, self.concurrent, covered),
+                         {"d": {"single": [], "concurrent": ["symbols"]}})
+
+    def test_each_row_names_its_owner_attribution_blocker_and_resolution(self):
+        handoff = {"owner": "Phase 5", "go": "tsc/internal/x.go:F", "cause": "c",
+                   "trace": {"path": "t", "sha256": "s" * 64}}
+        register = {"entries": [{"id": "B01", "ownership": [{"variant": "c", "domain": "types"}]}]}
+        rows = self.residuals.residual_rows(
+            self.single, self.concurrent, owners={"b": "C2", "c": "C3", "d": "C4"}, handoffs={"c": handoff},
+            register=register, proposed={"d"})
+        self.assertEqual([(row["id"], row["owner"], row["blocker"], row["resolution"]) for row in rows],
+                         [("b", "C2", None, "checkpoint"), ("c", "Phase 5", "B01", "joint"),
+                          ("d", "C4", None, "divergence")])
+        self.assertEqual(rows[1]["attribution"], {"from": None, "go": "tsc/internal/x.go:F", "cause": "c",
+                                                  "trace": {"path": "t", "sha256": "s" * 64}})
+        self.assertIsNone(rows[0]["attribution"])
+
+    def test_the_count_holds_only_for_the_comparisons_the_list_names(self):
+        rows = self.residuals.residual_rows(self.single, self.concurrent, owners={"b": "C2", "c": "C3", "d": "C4"},
+                                            handoffs={}, register=None)
+        value = self.residuals.document(self.single, self.concurrent, rows)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "residuals.json"
+            path.write_text(self.residuals.render(value))
+            with unittest.mock.patch.object(self.residuals, "divergence_coverage", return_value=(set(), set())):
+                self.assertEqual(self.residuals.verified_count(self.single, self.concurrent, path), 3)
+                for single, concurrent in ((self.concurrent, self.single), (self.single, None),
+                                           (self.single, self.comparison(self.concurrent["rows"][:1] + [
+                                               self.row("b", errors="different")], rust_capture_sha256="k" * 64))):
+                    with self.subTest(concurrent=concurrent and concurrent["rust_capture_sha256"]):
+                        with self.assertRaises(ValueError):
+                            self.residuals.verified_count(single, concurrent, path)
+            empty = self.comparison([self.row("a")])
+            path.write_text(self.residuals.render(self.residuals.document(empty, empty, [])))
+            self.assertEqual(self.residuals.verified_count(empty, empty, path), 0)
+
+    def test_a_malformed_list_is_rejected(self):
+        value = self.residuals.document(self.single, self.concurrent, [])
+        for broken in ({**value, "version": 2}, {**value, "captures": {"single": {}}},
+                       {**value, "rows": [{"id": "b", "domains": {"single": [], "concurrent": []}, "owner": "C2",
+                                           "attribution": None, "blocker": None, "resolution": "checkpoint"}]},
+                       {**value, "rows": [{"id": "b", "domains": {"single": ["errors"], "concurrent": []},
+                                           "owner": "C2", "attribution": None, "blocker": None,
+                                           "resolution": "later"}]}):
+            with self.assertRaises(ValueError):
+                self.residuals.validate(broken)
 
 
 if __name__ == "__main__":

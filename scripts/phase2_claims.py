@@ -13,7 +13,9 @@ attributes one observation: only an entry whose request and raw-observation
 digests are unchanged is rebound. A row whose observation changed (`changed`)
 needs fresh attribution, and a handoff that no longer covers its row (`stale`)
 is reported; both are left unchanged, so their rows count as open for their
-owner. The claims file's own bindings (`rust_capture_sha256`,
+owner. A handoff whose row now matches in every domain after its observation
+changed (`resolved`) has nothing left to attribute: it is reported and kept
+as history, and does not fail the rebind. The claims file's own bindings (`rust_capture_sha256`,
 `baseline_sha256`, `inventory_sha256`) name the checkpoint's start capture and
 do not move: the producer checks them against the baseline, and only the
 handoffs follow the fresh capture.
@@ -48,7 +50,7 @@ def rebind(claims, comparison, capture_sha256, digests, *, root=ROOT):
     rows = {row["id"]: row for row in comparison["rows"] if "outcomes" in row}
     if comparison["rust_capture_sha256"] != capture_sha256:
         raise ValueError("the comparison was made against another capture")
-    stale, changed = [], []
+    stale, changed, resolved = [], [], []
     for entry in claims.get("rows", []):
         vid = entry["id"]
         for key in ("handoff", "incoming"):
@@ -70,10 +72,10 @@ def rebind(claims, comparison, capture_sha256, digests, *, root=ROOT):
             # old cause: it is reported for fresh attribution, never rebound.
             if (current["request_sha256"] != handoff.get("request_sha256")
                     or current["raw_observation_sha256"] != handoff.get("raw_observation_sha256")):
-                changed.append(vid)
+                (changed if unmet else resolved).append(vid)
                 continue
             handoff["capture_sha256"] = capture_sha256
-    return {"stale": sorted(set(stale)), "changed": sorted(set(changed))}
+    return {"stale": sorted(set(stale)), "changed": sorted(set(changed)), "resolved": sorted(set(resolved))}
 
 
 def main():
@@ -93,8 +95,9 @@ def main():
     held = len(result["stale"]) + len(result["changed"])
     print(json.dumps({"checkpoint": args.checkpoint, "capture_sha256": capture_sha256,
                       "rebound": sum(1 for e in claims["rows"] if e.get("status") in ("handed", "blocked")
-                                     or "incoming" in e) - held,
-                      "stale": result["stale"], "changed": result["changed"]}, indent=1))
+                                     or "incoming" in e) - held - len(result["resolved"]),
+                      "stale": result["stale"], "changed": result["changed"],
+                      "resolved": result["resolved"]}, indent=1))
     if held:
         raise SystemExit(1)
 
