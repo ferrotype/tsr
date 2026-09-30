@@ -145,19 +145,19 @@ def render(record):
     lines += ["", "## Final counts", "",
               f"Executed rows: {single['executed']}. Rows matching in every domain: "
               f"{single['all_domains_match']} single-threaded, {concurrent['all_domains_match']} concurrent.", "",
-              "| Domain | " + " | ".join(f"{mode} {category}" for mode in MODES for category in ("match", "other")) + " |",
-              "| --- |" + " ---: |" * 4]
+              "| Domain | " + " | ".join(f"{mode} {category}" for mode in MODES
+                                         for category in ("match", "disabled", "other")) + " |",
+              "| --- |" + " ---: |" * 6]
     for domain in phase2_compare.DOMAINS:
         cells = []
         for mode in MODES:
             categories = record["dashboard"][mode]["categories"][domain]
-            matched = sum(count for category, count in categories.items() if category in phase2_compare.MATCHED)
             other = {category: count for category, count in categories.items()
                      if category not in phase2_compare.MATCHED}
-            cells += [str(matched), ", ".join(f"{count} {category}" for category, count in sorted(other.items()))
-                      or "0"]
+            cells += [str(categories.get("match", 0)), str(categories.get("disabled", 0)),
+                      ", ".join(f"{count} {category}" for category, count in sorted(other.items())) or "0"]
         lines.append(f"| {domain} | " + " | ".join(cells) + " |")
-    lines += ["", "Matched counts include rows the native runner disables for a domain.", "",
+    lines += ["", "A disabled domain is one the native runner does not compare for that row.", "",
               "## Pass rates", "", "Rows matching in every domain, per group value and mode.", ""]
     for group in GROUPS:
         lines += [f"### By {group}", "", f"| {group} | Rows | Single-threaded | Concurrent |",
@@ -181,7 +181,9 @@ def render(record):
               "", "## Dispositions", "",
               f"{dispositions['functions']} functions in {dispositions['files']} Phase 2 files: {counts['mapped']} "
               f"mapped, {counts['equivalent']} equivalent and {counts['later']} later; {dispositions['rejected']} "
-              f"rejected. {dispositions['later_phase_handoffs']} checkpoint handoffs name a later phase.",
+              f"rejected. {dispositions['later_phase_handoffs']} checkpoint handoffs to a later phase are on record; "
+              + ("none withholds a row." if not record["residuals"]["count"]
+                 else "the residual list shows the rows they withhold."),
               "", "## What later phases can consume", ""]
     lines += [f"- {entry['phase']}: {entry['item']}." for entry in record["consumable"]]
     performance = record["performance"]
