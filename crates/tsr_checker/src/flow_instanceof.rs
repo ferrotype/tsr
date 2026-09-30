@@ -241,9 +241,10 @@ impl CheckerState {
             return Ok(ty);
         }
         let identifier_type = self.get_type_of_expression(identifier)?;
-        if self.signatures_of_type(identifier_type, false)?.is_empty()
-            && !self.is_constructor_type(identifier_type)?
-        {
+        // isFunctionType: an object type with call signatures.
+        let function = self.types.flags(identifier_type)? & tf::OBJECT != 0
+            && !self.signatures_of_type(identifier_type, false)?.is_empty();
+        if !function && !self.is_constructor_type(identifier_type)? {
             return Ok(ty);
         }
         let Some(candidate) = self.property_type(identifier_type, b"prototype")? else {

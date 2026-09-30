@@ -39,11 +39,18 @@ impl CheckerState {
                     let parts = self.types.compound_types(ty)?.clone();
                     let mut instantiable = false;
                     let mut nullable_empty = false;
+                    // shouldNormalizeIntersection: the pin stops testing once
+                    // both hold, and tests emptiness only until one part is
+                    // nullable or empty (resolving members has effects).
                     for &part in parts.iter() {
                         let flags = self.types.flags(part)?;
-                        instantiable |= flags & tf::INSTANTIABLE != 0;
-                        nullable_empty |= flags & tf::NULLABLE != 0
+                        instantiable = instantiable || flags & tf::INSTANTIABLE != 0;
+                        nullable_empty = nullable_empty
+                            || flags & tf::NULLABLE != 0
                             || self.is_empty_anonymous_object_type(part)?;
+                        if instantiable && nullable_empty {
+                            break;
+                        }
                     }
                     if instantiable && nullable_empty {
                         let mut normalized = Vec::new();

@@ -273,6 +273,22 @@ comparison therefore compares outcomes, never raw digests.
     owner.
 - Exit: `c7_dispositions` true; `cargo xtask status` shows the Phase 2 files
   verified; `cargo xtask validate` passes.
+- As implemented: the 54 Phase 2 files hold 3,133 functions. 115 had neither
+  a marker nor a disposition in any audit, and two were C3 handoffs to C5 that
+  C5 never recorded. The C7 audit gives them two reviewed groups: six
+  functions gained a marker, one was ported inline, and the rest are
+  `equivalent` at their Rust sites or `later` (language-service and
+  command-line module specifier entry points). The review found three porting
+  divergences, now fixed:
+  - constructor narrowing omitted `isFunctionType`'s object-flag test;
+  - intersection normalization tested emptiness past the pin's short circuit;
+  - the mapped-type members check reported through `error_at`, not
+    `grammarErrorOnNode`.
+
+  `phase2_dispositions.py build` derives the ledger bindings from the
+  dispositions, and `ledger-init.py` reproduces the rebound `PORTS.toml`. The
+  result is 2,331 mapped, 793 equivalent and 9 later, with none rejected. The
+  register (c) is rebuilt from the final captures in C7.2.
 
 ### C7.5 The dashboard and the C7 record
 

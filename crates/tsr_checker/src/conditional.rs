@@ -475,6 +475,7 @@ impl CheckerState {
         }
         Ok(Some(elements.len()))
     }
+    // port: tsc/internal/checker/checker.go:Checker.isDeferredType
     fn deferred_conditional_type(&mut self, ty: TypeId, tuples: bool) -> Result<bool, Error> {
         if self.is_generic_type(ty)? {
             return Ok(true);

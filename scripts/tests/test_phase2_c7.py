@@ -55,7 +55,7 @@ class LedgerMove(unittest.TestCase):
         document = audit.load(ROOT / "data/phase2/c7-audit.json")
         self.assertEqual(document["checkpoint"], "C7")
         self.assertEqual(audit.problems(document, allow_open=True), [])
-        self.assertEqual(sum(count for count, _ in audit.C7_REVIEWED_GROUPS.values()), 237)
+        self.assertEqual(sum(count for count, _ in audit.C7_REVIEWED_GROUPS.values()), 347)
         known = audit.inventory()
         moved = {path + ":" for path in ledger_init.CONTENT_MAPPER_FILES}
         covered = {identity for group in audit.C7_COMPLETE_FILES for identity in document["groups"][group]}
@@ -117,6 +117,7 @@ class Wiring(unittest.TestCase):
         self.assertEqual(producers.newest_checkpoint({name: None for name in producers.CHECKPOINTS}), "C7")
         spec = tomllib.loads((ROOT / "status/runs.toml").read_text())["checker"]
         for path in ("data/phase2/c7-audit.json", "data/phase2/informational.json", "data/phase2/residuals.json",
+                     "data/phase2/dispositions.json", "PORTS.toml",
                      "data/phase2/native-provenance-concurrent.json", "data/divergences.toml"):
             self.assertIn(path, spec["inputs"])
         # Every contract witness's receipt, C7.8.5's among them, binds the run.
@@ -321,6 +322,70 @@ class Residuals(unittest.TestCase):
                                            "resolution": "later"}]}):
             with self.assertRaises(ValueError):
                 self.residuals.validate(broken)
+
+
+
+class Dispositions(unittest.TestCase):
+    """C7.4: every Phase 2 function's disposition and the ledger's bindings."""
+
+    def setUp(self):
+        import phase2_dispositions
+        self.dispositions = phase2_dispositions
+
+    def test_each_file_binds_the_run_level_checks_of_its_kind(self):
+        movers = self.dispositions.content_mapper_files()
+        verify = self.dispositions.verify_for
+        self.assertEqual(verify("tsc/internal/checker/relater.go", movers), list(self.dispositions.PARITY))
+        self.assertEqual(verify("tsc/internal/checker/printer.go", movers)[-1], "run.checker.display_parity == 1")
+        self.assertIn("run.checker.services == true", verify("tsc/internal/checker/services.go", movers))
+        self.assertEqual(verify("tsc/internal/modulespecifiers/util.go", movers), ["run.checker.display_parity == 1"])
+        self.assertEqual(verify("tsc/internal/compiler/checkerpool.go", movers),
+                         ["run.checker.mode_parity == true", "run.checker.assignments == true"])
+        self.assertEqual(verify("tsc/internal/spanmap/spanmap.go", movers), ["run.checker.content_mappers == true"])
+        with self.assertRaises(ValueError):
+            verify("tsc/internal/parser/parser.go", movers)
+
+    def test_a_function_without_a_valid_disposition_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "crates/x/src").mkdir(parents=True)
+            (root / "crates/x/src/lib.rs").write_text("fn a() {}\nfn b() {}\n")
+            audits = {
+                "g:equivalent": ("C3", {"disposition": "equivalent", "rust": "crates/x/src/lib.rs:2", "reason": "r"}),
+                "g:missing_site": ("C3", {"disposition": "equivalent", "rust": "crates/x/src/lib.rs:9", "reason": "r"}),
+                "g:later": ("C7", {"disposition": "later", "owner": "Phase 4", "reason": "r"}),
+                "g:inside": ("C3", {"disposition": "later", "owner": "C5", "reason": "r"}),
+                "g:gap": ("C7", {"disposition": "gap", "item": "C7.8.3", "reason": "r"}),
+                "g:unmarked": ("C2", {"disposition": "mapped"})}
+            rows, rejected = self.dispositions.dispositions(
+                ["g:marked", "g:none", *audits], {"g:marked": "crates/x/src/lib.rs:1"}, audits, root)
+        self.assertEqual([(row["id"], row["disposition"]) for row in rows],
+                         [("g:marked", "mapped"), ("g:equivalent", "equivalent"), ("g:later", "later")])
+        self.assertEqual([entry["id"] for entry in rejected],
+                         ["g:none", "g:missing_site", "g:inside", "g:gap", "g:unmarked"])
+
+    def test_the_ledger_rebinding_touches_only_the_bound_files(self):
+        text = ('pin = "p"\n\n[[file]]\ngo = "a.go"\nstatus = "planned"\nrust = []\nverify = []\n'
+                '\n[[file]]\ngo = "b.go"\nstatus = "planned"\nrust = []\nverify = []\n')
+        bound = self.dispositions.rebind_ledger(text, {"a.go": {"status": "ported", "rust": ["crates/a.rs"],
+                                                              "verify": ["run.checker.errors_parity == 1"]}})
+        ledger = tomllib.loads(bound)
+        self.assertEqual([entry["status"] for entry in ledger["file"]], ["ported", "planned"])
+        self.assertEqual(ledger["file"][0]["verify"], ["run.checker.errors_parity == 1"])
+        with self.assertRaises(ValueError):
+            self.dispositions.rebind_ledger(text, {"c.go": {"status": "ported", "rust": [], "verify": []}})
+
+    def test_the_committed_dispositions_are_complete_and_stale_without_a_marker(self):
+        self.assertTrue(self.dispositions.complete())
+        document = json.loads((ROOT / "data/phase2/dispositions.json").read_text())
+        self.assertEqual(document["rejected"], [])
+        self.assertEqual(sum(document["counts"].values()), document["functions"])
+        self.assertTrue(all(entry["state"] == "closed" for entry in document["inheritances"]))
+        sites = self.dispositions.marker_sites()
+        mapped = next(row["id"] for row in document["dispositions"] if row["disposition"] == "mapped")
+        sites.pop(mapped)
+        with unittest.mock.patch.object(self.dispositions, "marker_sites", return_value=sites):
+            self.assertFalse(self.dispositions.complete())
 
 
 if __name__ == "__main__":

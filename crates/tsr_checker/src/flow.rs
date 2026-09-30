@@ -806,6 +806,7 @@ impl CheckerState {
     fn is_auto_flow_type(&self, ty: TypeId) -> bool {
         ty == self.builtins.auto_type || self.query.global_types.get("autoArrayType") == Some(&ty)
     }
+    // port: tsc/internal/checker/checker.go:Checker.convertAutoToAny
     fn convert_auto_flow_type(&self, ty: TypeId) -> TypeId {
         if ty == self.builtins.auto_type {
             self.builtins.any_type

@@ -151,6 +151,12 @@ C7_REVIEWED_GROUPS = {
     "C7.8.2 span maps (spanmap.go)": (34, "0d0d75c9f683e9f6a622b43c03e93b3d0bef1d1843b76266a17dfb33ecb23df5"),
     "C7.8.3 program integration (ast, compiler, declarations)": (56, "b89b410581028a4da1101c8c7caf824417804d8af25ded3279c82656895ce703"),
     "C7.8.4 test mappers (contentmappertest)": (22, "fba44f83109f320749816bd7a557b5d3580344661b25dacd4f866e16ce1424ac"),
+    # C7.4 (b): the Phase 2 functions no port marker names and no earlier
+    # audit disposed of, reviewed against their Rust sites.
+    "C7.4 Phase 2 functions outside the checkpoint audits": (
+        108, "c51edf93804eb1fb4763ce8e8ba37fca3a357b0db6dff40372f99b8e1d4921dc"),
+    "C7.4 Phase 2 handoffs to C5 that C5 left unrecorded": (
+        2, "510a39dad941f08f4954093a6f715797e8e3370bcf8f60c666c00276878dffe9"),
 }
 C7_COMPLETE_FILES = {
     "C7.8.1 JSON-RPC base protocol (jsonrpc)": ("tsc/internal/jsonrpc/baseproto.go:", "tsc/internal/jsonrpc/jsonrpc.go:"),
