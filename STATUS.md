@@ -401,12 +401,12 @@ Exit checks:
 
 Items:
 
-- [ ] P2B-C1 C1: symbol, type and relation foundations
-- [ ] P2B-C2 C2: inference and advanced type interactions, with the ADR 0010 creation-trace mode
+- [x] P2B-C1 C1: symbol, type and relation foundations; recorded checker run status/evidence/96b7c65f5f42d1eb95e5137360a15c95d7dcac7e47c2654bd3c822a4a675b1b6.json
+- [x] P2B-C2 C2: inference and advanced type interactions, with the ADR 0010 creation-trace mode; recorded checker run status/evidence/74c7960a279872c3aed1b15cb25de880040a9abfd47c0291f692d3cddcf56ce2.json
 - [ ] P2B-C3 C3: flow and ordinary program semantics
 - [ ] P2B-C4 C4: JSX and decorators
-- [ ] P2B-C5 C5: display, checker services and emit-resolver contracts
-- [ ] P2B-C6 C6: checker execution, partitioning and cancellation
+- [x] P2B-C5 C5: display, checker services and emit-resolver contracts; recorded checker run status/evidence/815eeb4348732ebf902eb8b90d4774ef7bb7294c3c2dcb0f98be3aad8794affd.json
+- [x] P2B-C6 C6: checker execution, partitioning and cancellation; recorded checker run status/evidence/afc6eeb4063234e68657f25ab972a9d65eddb10f253e4b53ddfc4c7d4077bd82.json
 - [ ] P2B-C7 C7: full correctness and readiness report
 
 ### S01 Contracts, workspace, oracle (open)

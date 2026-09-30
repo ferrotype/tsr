@@ -860,3 +860,62 @@ fn metric_checks_require_every_requested_check_and_current_valid_evidence() {
     );
     assert!(!checks_pass(&f.report(), &[ok]));
 }
+#[test]
+fn recorded_conditions_close_on_the_named_artifact_after_the_run_goes_stale() {
+    let f = Fixture::new();
+    assert!(evidence::run(&f.0, "proof", PIN).unwrap());
+    let id = f.report().evidence_artifacts["proof"]
+        .trim_start_matches("status/evidence/")
+        .trim_end_matches(".json")
+        .to_owned();
+    let item = |check: &str| {
+        f.write(
+            "sprints/S01.toml",
+            &format!(
+                "id = \"S01\"\ntitle = \"fixture\"\nexit = [\"ledger.files_total > 0\"]\n[[item]]\nid = \"recorded\"\ntitle = \"Closes on a recorded run\"\ndone_when = [\"{check}\"]\n"
+            ),
+        );
+        let report = f.report();
+        let sprint = report.sprints.iter().find(|s| s.id == "S01").unwrap();
+        (sprint.items[0].2, sprint.items[0].1.clone())
+    };
+    let (result, label) = item(&format!("recorded.proof.{id}.ok == true"));
+    assert_eq!(result, Some(true));
+    assert!(label.contains(&format!("recorded proof run status/evidence/{id}.json")));
+    // A later source change stales the run; the recorded fact still holds.
+    f.write(
+        "producer.py",
+        "import json\nprint(json.dumps({'metrics': {'ok': False}}))\n",
+    );
+    assert_ne!(f.report().evidence_states["proof"], "current");
+    assert_eq!(
+        item(&format!("recorded.proof.{id}.ok == true")).0,
+        Some(true)
+    );
+    // The run does not hold the metric, the value differs, the id names no
+    // artifact, or the artifact belongs to another run: the item stays open.
+    assert_eq!(
+        item(&format!("recorded.proof.{id}.missing == true")).0,
+        Some(false)
+    );
+    assert_eq!(
+        item(&format!("recorded.proof.{id}.ok == false")).0,
+        Some(false)
+    );
+    assert_eq!(
+        item(&format!("recorded.proof.{}.ok == true", "c".repeat(64))).0,
+        Some(false)
+    );
+    assert_eq!(
+        item(&format!("recorded.other.{id}.ok == true")).0,
+        Some(false)
+    );
+    // An altered artifact no longer matches its evidence id.
+    let path = f.0.join(format!("status/evidence/{id}.json"));
+    let bytes = fs::read(&path).unwrap();
+    fs::write(&path, [bytes.as_slice(), b" "].concat()).unwrap();
+    assert_eq!(
+        item(&format!("recorded.proof.{id}.ok == true")).0,
+        Some(false)
+    );
+}

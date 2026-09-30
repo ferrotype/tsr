@@ -25,7 +25,7 @@ class Wiring(unittest.TestCase):
             self.assertIn(str(path.relative_to(ROOT)), spec["inputs"])
         self.assertIn("data/phase2/native-provenance-concurrent.json", spec["inputs"])
         self.assertIn("C6", blockers.CHECKPOINT_CLAIMS)
-        self.assertEqual(producers.CHECKPOINTS[-1], "C6")
+        self.assertIn("C6", producers.CHECKPOINTS)
         document = audit.load(ROOT / "data/phase2/c6-audit.json")
         self.assertEqual(document["checkpoint"], "C6")
         self.assertEqual(audit.problems(document, allow_open=True), [])

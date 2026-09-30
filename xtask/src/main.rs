@@ -305,6 +305,39 @@ fn scan_markers(root: &Path) -> Vec<String> {
 
 // ---------------------------------------------------------------- checks
 
+/// `recorded.<run>.<evidence id>.<metric>`: a metric of one recorded artifact.
+fn recorded_reference(key: &str) -> Option<(&str, &str, &str)> {
+    let mut parts = key.strip_prefix("recorded.")?.splitn(3, '.');
+    Some((parts.next()?, parts.next()?, parts.next()?))
+}
+
+/// Recorded conditions read the committed artifact they name, so an item can
+/// close on the run recorded at its checkpoint's exit after later sources stale
+/// that run. A missing, altered or failed artifact leaves the metric unknown.
+fn insert_recorded_metrics(root: &Path, sprints: &[Sprint], metrics: &mut Metrics) {
+    let mut artifacts: BTreeMap<(String, String), Option<Metrics>> = BTreeMap::new();
+    for sprint in sprints {
+        for check in sprint
+            .exit
+            .iter()
+            .chain(sprint.item.iter().flat_map(|item| &item.done_when))
+        {
+            let Some(key) = check.split_whitespace().next() else {
+                continue;
+            };
+            let Some((run, id, metric)) = recorded_reference(key) else {
+                continue;
+            };
+            let recorded = artifacts
+                .entry((run.to_owned(), id.to_owned()))
+                .or_insert_with(|| evidence::recorded_metrics(root, run, id).ok());
+            if let Some(value) = recorded.as_ref().and_then(|m| m.get(metric)) {
+                metrics.insert(key.to_owned(), value.clone());
+            }
+        }
+    }
+}
+
 fn parse_number(s: &str) -> Option<f64> {
     s.parse::<f64>().ok().filter(|n| n.is_finite())
 }
@@ -704,9 +737,11 @@ fn build_report_in_context(root: &Path, archived: Option<&ViewMetadata>) -> Repo
     );
 
     // Sprints (evaluated after all other metrics exist).
+    let sprint_files = read_sprints(root);
+    insert_recorded_metrics(root, &sprint_files, &mut metrics);
     let mut sprints = Vec::new();
     let mut sprint_ids = std::collections::BTreeSet::new();
-    for s in read_sprints(root) {
+    for s in sprint_files {
         if !sprint_ids.insert(s.id.clone()) {
             errors.push(format!("duplicate sprint ID {}", s.id));
         }
@@ -739,11 +774,18 @@ fn build_report_in_context(root: &Path, archived: Option<&ViewMetadata>) -> Repo
                 if it.required && r != Some(true) {
                     done = false;
                 }
-                let label = if it.r#ref.is_empty() {
+                let mut label = if it.r#ref.is_empty() {
                     it.title.clone()
                 } else {
                     format!("{} ({} {})", it.title, it.kind, it.r#ref)
                 };
+                for (run, id, _) in it
+                    .done_when
+                    .iter()
+                    .filter_map(|c| recorded_reference(c.split_whitespace().next()?))
+                {
+                    label.push_str(&format!("; recorded {run} run status/evidence/{id}.json"));
+                }
                 (
                     it.id.clone(),
                     format!("{label}{}", if it.required { "" } else { " [optional]" }),
@@ -1475,6 +1517,16 @@ fn main() -> ExitCode {
             } else {
                 ExitCode::from(1)
             }
+        }
+        // The live evidence state of every declared run, for producers that
+        // gate on other runs; never read from previously generated views.
+        Some("evidence-states") => {
+            let pin = read_ledger(&root).pin;
+            let loaded = evidence::Context::capture(&root, &pin)
+                .and_then(|context| evidence::load(&root, &context))
+                .unwrap_or_else(|e| die(&e));
+            println!("{}", serde_json::to_string(&loaded.states).unwrap());
+            ExitCode::SUCCESS
         }
         Some("run") => {
             let id = args

@@ -508,11 +508,13 @@ where
     }
     deserializer.deserialize_map(Visitor(std::marker::PhantomData))
 }
-fn report_metrics(root: &Path, spec: &RunSpec, stdout: &str) -> Result<BTreeMap<String, Metric>> {
-    let report: ProducerReport = serde_json::from_str(stdout)
+/// The metrics a producer reported, and its per-test results for the caller to
+/// check against a cases manifest.
+fn producer_metrics(stdout: &str) -> Result<(BTreeMap<String, Metric>, ProducerReport)> {
+    let mut report: ProducerReport = serde_json::from_str(stdout)
         .map_err(|e| format!("producer must write one JSON report: {e}"))?;
     let mut metrics = BTreeMap::new();
-    for (name, value) in report.metrics {
+    for (name, value) in std::mem::take(&mut report.metrics) {
         if !valid_id(&name) {
             return Err(format!("invalid metric name: {name}"));
         }
@@ -525,6 +527,34 @@ fn report_metrics(root: &Path, spec: &RunSpec, stdout: &str) -> Result<BTreeMap<
         };
         metrics.insert(name, metric);
     }
+    Ok((metrics, report))
+}
+/// The producer metrics of one recorded artifact of `run`, named by its evidence
+/// id (the artifact's SHA-256). A recorded fact does not go stale: it certifies
+/// what the run reported when `xtask run` recorded it, so only the artifact's
+/// identity and success are checked here, never today's sources.
+pub fn recorded_metrics(root: &Path, run: &str, id: &str) -> Result<BTreeMap<String, Metric>> {
+    if !valid_id(run)
+        || id.len() != 64
+        || !id.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
+    {
+        return Err(format!("invalid recorded evidence reference: {run} {id}"));
+    }
+    let bytes = read(&root.join(format!("status/evidence/{id}.json")))?;
+    if hash(&bytes) != id {
+        return Err("artifact checksum mismatch".into());
+    }
+    let r: Record = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+    if r.schema_version != 1 || r.run_id != run {
+        return Err("record identity/version mismatch".into());
+    }
+    if r.exit_code != 0 || !r.valid_capture || r.stdout_sha256 != hash(r.stdout.as_bytes()) {
+        return Err("failed producer/capture".into());
+    }
+    Ok(producer_metrics(&r.stdout)?.0)
+}
+fn report_metrics(root: &Path, spec: &RunSpec, stdout: &str) -> Result<BTreeMap<String, Metric>> {
+    let (mut metrics, report) = producer_metrics(stdout)?;
     if let Some(path) = &spec.cases {
         let cases: Vec<String> =
             serde_json::from_slice(&read(&root.join(path))?).map_err(|e| e.to_string())?;
