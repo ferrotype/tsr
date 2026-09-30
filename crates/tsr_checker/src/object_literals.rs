@@ -560,6 +560,9 @@ impl CheckerState {
             return Ok(());
         };
         for property in self.source_list(node, self.node(node)?.property_list())? {
+            if self.is_canceled() {
+                return Ok(());
+            }
             if let Some(name) = self.node(property)?.name() {
                 if self.node(name)?.kind() != K::ComputedPropertyName {
                     let text = self.node_text(name)?.into_js_string();

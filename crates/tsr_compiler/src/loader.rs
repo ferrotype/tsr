@@ -10,7 +10,7 @@ use std::{
 use tsr_arena::Counters;
 use tsr_ast::utilities_middle::new_has_file_name;
 use tsr_ast::{Diagnostic, NodeId, SourceFileParseOptions};
-use tsr_core::{CompilerOptions, ModuleKind, ScriptKind};
+use tsr_core::{CompilerOptions, ModuleKind, ScriptKind, Tristate};
 use tsr_jsstring::JsString;
 use tsr_module::{ResolvedModule, ResolvedTypeReferenceDirective, Resolver};
 use tsr_tsoptions::ParsedCommandLine;
@@ -62,6 +62,11 @@ pub struct ProgramOptions {
     pub current_directory: JsString,
     pub default_library_path: JsString,
     pub skip_module_resolution: bool,
+    /// The program's own `SingleThreaded` (the pin's
+    /// `ProgramOptions.SingleThreaded`), which the compiler option
+    /// `singleThreaded` supplies when unknown; the test harness sets it from
+    /// `TS_TEST_PROGRAM_SINGLE_THREADED`.
+    pub single_threaded: Tristate,
 }
 #[derive(Clone, Debug)]
 pub struct Resolution {
@@ -114,6 +119,7 @@ pub struct Program {
     processing_diagnostics: Vec<ProcessingDiagnostic>,
     include_diagnostics: OnceLock<Result<Vec<Diagnostic>, tsr_arena::Error>>,
     trace: Vec<tsr_module::DiagAndArgs>,
+    single_threaded: Tristate,
 }
 impl Program {
     pub fn load(
@@ -157,6 +163,12 @@ impl Program {
     }
     pub fn config(&self) -> &tsr_tsoptions::ParsedCommandLine {
         &self.config
+    }
+    /// port: tsc/internal/compiler/program.go:Program.SingleThreaded
+    pub fn single_threaded(&self) -> bool {
+        self.single_threaded
+            .default_if_unknown(self.options.single_threaded)
+            .is_true()
     }
     /// The loading host's current directory.
     /// port: tsc/internal/compiler/program.go:Program.GetCurrentDirectory
@@ -399,6 +411,7 @@ struct Loader<'a> {
     lib_path: JsString,
     lib_files: BTreeMap<Vec<u8>, Vec<u8>>,
     skip_resolution: bool,
+    single_threaded: Tristate,
     resolver: Resolver,
     cache: &'a mut FileCache,
     counters: &'a Counters,
@@ -517,6 +530,7 @@ impl<'a> Loader<'a> {
             lib_path,
             lib_files: BTreeMap::new(),
             skip_resolution: input.skip_module_resolution,
+            single_threaded: input.single_threaded,
             resolver,
             cache,
             counters,
@@ -768,6 +782,7 @@ impl<'a> Loader<'a> {
             processing_diagnostics: collected.processing,
             include_diagnostics: OnceLock::new(),
             trace: self.trace,
+            single_threaded: self.single_threaded,
         };
         program.option_verification = crate::verify_compiler_options(&program)?;
         Ok(program)

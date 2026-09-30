@@ -157,9 +157,8 @@ impl CheckerState {
             }
         }
         if pattern {
-            for element in self.source_list(name, self.node(name)?.element_list())? {
-                self.check_source_element(element)?;
-            }
+            let elements = self.source_list(name, self.node(name)?.element_list())?;
+            self.check_source_elements(elements)?;
         }
         if initializer.is_some() && parameter && !self.parameter_function_body_present(root)? {
             self.error_at(Some(node),d::A_parameter_initializer_is_only_allowed_in_a_function_or_constructor_implementation,vec![])?;

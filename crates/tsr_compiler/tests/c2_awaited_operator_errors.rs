@@ -69,6 +69,7 @@ fn awaited_operator_errors_match_native_compatibility_and_related_spans() {
                 current_directory: JsString::from_bytes(b"/".as_slice()),
                 default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
                 skip_module_resolution: false,
+                single_threaded: tsr_core::Tristate::UNKNOWN,
             },
             &mut FileCache::new(),
             &counters,

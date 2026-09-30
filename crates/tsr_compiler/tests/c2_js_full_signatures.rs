@@ -136,6 +136,7 @@ fn observe(id: &str) {
                 ),
                 default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
                 skip_module_resolution: false,
+                single_threaded: tsr_core::Tristate::UNKNOWN,
             },
             &mut FileCache::new(),
             &counters,

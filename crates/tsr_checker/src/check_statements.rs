@@ -443,9 +443,11 @@ impl CheckerState {
                 .node_slice(view.node(clause)?.statements(view)?)?
                 .iter()
                 .collect();
-            for statement in statements {
-                self.check_source_element(required(statement, "case statement")?)?;
-            }
+            let statements = statements
+                .into_iter()
+                .map(|statement| required(statement, "case statement"))
+                .collect::<Result<Vec<_>, _>>()?;
+            self.check_source_elements(statements)?;
             if self
                 .program()?
                 .host

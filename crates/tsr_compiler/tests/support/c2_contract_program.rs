@@ -31,6 +31,7 @@ pub fn program(files: &[(&str, &str)]) -> Arc<Program> {
                 current_directory: JsString::from_bytes(b"/".as_slice()),
                 default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
                 skip_module_resolution: false,
+                single_threaded: tsr_core::Tristate::UNKNOWN,
             },
             &mut FileCache::new(),
             &Counters::new(),

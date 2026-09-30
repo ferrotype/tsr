@@ -154,6 +154,7 @@ fn load(request: &Value) -> Result<Program, Stop> {
             current_directory: workspace.cwd,
             default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
             skip_module_resolution: false,
+            single_threaded: tsr_core::Tristate::UNKNOWN,
         },
         spec["use_source_of_project_reference"].as_bool() == Some(true),
         &mut FileCache::new(),

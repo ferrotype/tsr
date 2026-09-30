@@ -1,0 +1,121 @@
+{
+ "checkpoint": "C6",
+ "dispositions": {
+  "tsc/internal/compiler/checkerpool.go:noop": {
+   "disposition": "equivalent",
+   "reason": "The release the non-exclusive acquisitions return in the pin; the Rust non-exclusive acquisitions hand out the checker owner, whose every call acquires and releases its own operation, so there is no release to return.",
+   "reviewed_from": "pinned body and its callers; C6.3 source audit",
+   "rust": "crates/tsr_compiler/src/checker_pool.rs:533"
+  }
+ },
+ "groups": {
+  "C6.3 compiler checker pool (checkerpool.go)": [
+   "tsc/internal/compiler/checkerpool.go:checkerPool.GetChecker",
+   "tsc/internal/compiler/checkerpool.go:checkerPool.GetGlobalDiagnostics",
+   "tsc/internal/compiler/checkerpool.go:checkerPool.createCheckers",
+   "tsc/internal/compiler/checkerpool.go:checkerPool.forEachCheckerGroupDo",
+   "tsc/internal/compiler/checkerpool.go:checkerPool.forEachCheckerParallel",
+   "tsc/internal/compiler/checkerpool.go:checkerPool.getCheckerForFileExclusive",
+   "tsc/internal/compiler/checkerpool.go:checkerPool.getCheckerForFileNonExclusive",
+   "tsc/internal/compiler/checkerpool.go:checkerPool.getCheckerNonExclusive",
+   "tsc/internal/compiler/checkerpool.go:checkerPool.getImportAdjacency",
+   "tsc/internal/compiler/checkerpool.go:getCheckerAssociationBaseWeight",
+   "tsc/internal/compiler/checkerpool.go:getCheckerAssociationOrder",
+   "tsc/internal/compiler/checkerpool.go:getCheckerAssociationPolicy",
+   "tsc/internal/compiler/checkerpool.go:getCheckerAssociationWeights",
+   "tsc/internal/compiler/checkerpool.go:getCheckerAssociationsInOrder",
+   "tsc/internal/compiler/checkerpool.go:newCheckerPool",
+   "tsc/internal/compiler/checkerpool.go:newCheckerPoolWithTracing",
+   "tsc/internal/compiler/checkerpool.go:noop",
+   "tsc/internal/compiler/checkerpool.go:shouldPrioritizeSourceFiles"
+  ],
+  "C6.2 tracer (tracer.go)": [
+   "tsc/internal/checker/tracer.go:NewTracer",
+   "tsc/internal/checker/tracer.go:Tracer.Instant",
+   "tsc/internal/checker/tracer.go:Tracer.Push",
+   "tsc/internal/checker/tracer.go:Tracer.RecordType",
+   "tsc/internal/checker/tracer.go:Tracer.copyWithCheckerIndex",
+   "tsc/internal/checker/tracer.go:Tracer.temporarilyAddCheckerIndex",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.AliasSymbol",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.AliasTypeArguments",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.ConditionalCheckType",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.ConditionalExtendsType",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.ConditionalFalseType",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.ConditionalTrueType",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.Display",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.EvolvingArrayElementType",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.EvolvingArrayFinalType",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.FormatFlags",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.Id",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.IndexType",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.IndexedAccessIndexType",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.IndexedAccessObjectType",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.IntersectionTypes",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.IntrinsicName",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.IsConditional",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.IsTuple",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.Pattern",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.RecursionIdentity",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.ReferenceNode",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.ReferenceTarget",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.ReferenceTypeArguments",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.ReverseMappedConstraintType",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.ReverseMappedMappedType",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.ReverseMappedSourceType",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.SubstitutionBaseType",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.SubstitutionConstraintType",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.Symbol",
+   "tsc/internal/checker/tracer.go:tracedTypeAdapter.UnionTypes",
+   "tsc/internal/checker/tracer.go:wrapType",
+   "tsc/internal/checker/tracer.go:wrapTypes"
+  ],
+  "C6.4 work groups (workgroup.go)": [
+   "tsc/internal/core/workgroup.go:NewThrottleGroup",
+   "tsc/internal/core/workgroup.go:NewWorkGroup",
+   "tsc/internal/core/workgroup.go:ThrottleGroup.Go",
+   "tsc/internal/core/workgroup.go:ThrottleGroup.Wait",
+   "tsc/internal/core/workgroup.go:parallelWorkGroup.Queue",
+   "tsc/internal/core/workgroup.go:parallelWorkGroup.RunAndWait",
+   "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.Queue",
+   "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.RunAndWait",
+   "tsc/internal/core/workgroup.go:singleThreadedWorkGroup.pop"
+  ],
+  "C6.4 program driving (program.go)": [
+   "tsc/internal/compiler/program.go:Program.ForEachCheckerParallel",
+   "tsc/internal/compiler/program.go:Program.GetCheckerPool",
+   "tsc/internal/compiler/program.go:Program.GetTypeChecker",
+   "tsc/internal/compiler/program.go:Program.GetTypeCheckerForFile",
+   "tsc/internal/compiler/program.go:Program.GetTypeCheckerForFileExclusive",
+   "tsc/internal/compiler/program.go:Program.SingleThreaded",
+   "tsc/internal/compiler/program.go:Program.collectCheckerDiagnostics",
+   "tsc/internal/compiler/program.go:Program.collectCheckerDiagnosticsFromFiles",
+   "tsc/internal/compiler/program.go:Program.collectDiagnostics",
+   "tsc/internal/compiler/program.go:Program.collectDiagnosticsFromFiles",
+   "tsc/internal/compiler/program.go:Program.getBindAndCheckDiagnosticsWithChecker",
+   "tsc/internal/compiler/program.go:Program.getSemanticDiagnosticsWithChecker",
+   "tsc/internal/compiler/program.go:Program.getSuggestionDiagnosticsWithChecker",
+   "tsc/internal/compiler/program.go:Program.initCheckerPool",
+   "tsc/internal/compiler/program.go:filterAndSortDiagnostics"
+  ],
+  "C6.5 cancellation (checker.go, utilities.go, exports.go)": [
+   "tsc/internal/checker/checker.go:Checker.checkContextualDeprecations",
+   "tsc/internal/checker/checker.go:Checker.checkDeferredNodes",
+   "tsc/internal/checker/checker.go:Checker.checkSourceElements",
+   "tsc/internal/checker/checker.go:Checker.checkSourceFile",
+   "tsc/internal/checker/exports.go:Checker.WasCanceled",
+   "tsc/internal/checker/utilities.go:Checker.checkNotCanceled",
+   "tsc/internal/checker/utilities.go:Checker.isCanceled"
+  ],
+  "C6.2 tracer call sites (relater.go)": [
+   "tsc/internal/checker/relater.go:Relater.traceUnionsOrIntersectionsTooLarge"
+  ],
+  "C6.3 checker constructor (checker.go)": [
+   "tsc/internal/checker/checker.go:NewChecker"
+  ]
+ },
+ "handoffs": [],
+ "open_issues": [],
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "scope": "C6 audit over the complete compiler checkerpool.go, checker tracer.go and core workgroup.go inventories, the program's checker driving in program.go, the cancellation functions and the pin's polling sites, the relater's tracer call and the checker constructor (docs/PHASE2-C6-plan.md, C6.1). Open gaps name the item that closes them.",
+ "version": 1
+}

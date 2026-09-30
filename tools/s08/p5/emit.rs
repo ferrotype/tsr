@@ -36,10 +36,18 @@ pub enum Post {
     Pre { schedule: Value },
     Fresh {
         program: Arc<Program>,
-        _owner: Arc<CheckerOwner>,
+        _checkers: Checkers,
         diagnostics: Vec<tsr_ast::Diagnostic>,
         schedule: Value,
     },
+}
+
+/// What keeps the post-emit program's checkers alive with its diagnostics;
+/// held, never read.
+#[allow(dead_code)]
+pub enum Checkers {
+    Owner(Arc<CheckerOwner>),
+    Pool(tsr_compiler::CheckedProgram),
 }
 
 type Result<T> = std::result::Result<T, Value>;
@@ -75,6 +83,9 @@ pub fn run(request: &Value, cache: &mut FileCache, pre: &Program) -> Result<Post
             schedule: identity("pre", Some("no JavaScript output"), &[], &Value::Null),
         });
     }
+    if request["mode"].is_string() {
+        return run_checked(request, cache);
+    }
     let fresh = executor::load_fresh(request, cache)?;
     let program = fresh.program.clone();
     let (diagnostics, schedule) = {
@@ -101,9 +112,72 @@ pub fn run(request: &Value, cache: &mut FileCache, pre: &Program) -> Result<Post
     };
     Ok(Post::Fresh {
         program,
-        _owner: fresh.owner,
+        _checkers: Checkers::Owner(fresh.owner),
         diagnostics,
         schedule,
+    })
+}
+
+/// `run` through the post-emit program's checker pool: the `noEmitOnError`
+/// gate with the pool's diagnostics, then each emitted file scheduled with
+/// its own checker in the program's work group (`Program.Emit`), which a
+/// single-threaded program runs last file first.
+fn run_checked(request: &Value, cache: &mut FileCache) -> Result<Post> {
+    let checked = executor::load_fresh_checked(request, cache)?;
+    let program = checked.program().clone();
+    let mut gate = Value::Null;
+    let mut skipped = false;
+    if program.options().no_emit_on_error.is_true() {
+        let found = executor::any_program_diagnostics_checked(&checked)?;
+        skipped = !found.is_empty();
+        gate = json!({"diagnostics":found.len(),"emit_skipped":skipped});
+    }
+    let mut files = Vec::new();
+    if !skipped {
+        let emitted = program.javascript_emit_files().map_err(compiler)?;
+        let results: Vec<std::sync::Mutex<Option<Result<Value>>>> = emitted
+            .iter()
+            .map(|_| std::sync::Mutex::new(None))
+            .collect();
+        let group = tsr_core::workgroup::WorkGroup::new(program.single_threaded());
+        for (file, slot) in emitted.iter().zip(&results) {
+            let (checked, program) = (&checked, &program);
+            group.queue(move || {
+                let mut result = None;
+                let request = tsr_checker::CheckerRequest::default();
+                let served =
+                    checked.with_type_checker_for_file(&request, file.source(), &mut |op| {
+                        result = Some(schedule_file(program, op, file));
+                        Ok(())
+                    });
+                *slot
+                    .lock()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner) = Some(
+                    served
+                        .map_err(checker)
+                        .and_then(|()| result.expect("the task ran")),
+                );
+            });
+        }
+        group.run_and_wait();
+        drop(group);
+        for slot in results {
+            files.push(
+                slot.into_inner()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner)
+                    .expect("every queued schedule ran")?,
+            );
+        }
+    }
+    let values = executor::harness_diagnostics_checked(&checked, &request["diagnostic_phases"])?;
+    let diagnostics = program
+        .sort_and_deduplicate_diagnostics(&values)
+        .map_err(compiler)?;
+    Ok(Post::Fresh {
+        program,
+        _checkers: Checkers::Pool(checked),
+        diagnostics,
+        schedule: identity("fresh", None, &files, &gate),
     })
 }
 

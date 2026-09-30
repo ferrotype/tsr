@@ -50,6 +50,10 @@ pub trait Hooks {
     /// Query results the walker retains as roots of the retained checkpoint.
     fn roots(&mut self, _types: &[tsr_checker::TypeRef]) {}
     fn checkpoint(&mut self, _op: &mut tsr_checker::Operation<'_>) {}
+    /// The checkpoint of a pooled observation, with every checker held.
+    fn checkpoint_checkers(&mut self, checkers: &mut tsr_compiler::FileCheckers<'_, '_>) {
+        self.checkpoint(checkers.checker(0));
+    }
     /// Whether the row needs the loaded graph's observation (file digests,
     /// metadata, imports). A driver that compares only checker output skips
     /// it: hashing every file text per variant is most of the child's time
@@ -86,13 +90,27 @@ pub struct BaselineResults {
     pub errors: Value,
 }
 
+/// The program's own single-threaded setting for a request's mode, as the
+/// pin's harness sets it (`harnessutil.createProgram`): true in the
+/// single-threaded mode, unknown otherwise, so the compiler option decides.
+pub fn mode_single_threaded(request: &Value) -> tsr_core::Tristate {
+    if request["mode"] == "single" {
+        tsr_core::Tristate::TRUE
+    } else {
+        tsr_core::Tristate::UNKNOWN
+    }
+}
+
+/// A request that names a mode is observed through the program's checker
+/// pool, in either mode, as the pin's harness observes it; a request without
+/// one keeps the single checker owner of the earlier producers.
 pub fn observe(
     request: &Value,
     cache: &mut FileCache,
     hooks: &mut dyn Hooks,
     baseline: impl FnOnce(
         &Program,
-        &mut tsr_checker::Operation<'_>,
+        &mut tsr_compiler::FileCheckers<'_, '_>,
         &Value,
         Option<&[tsr_ast::Diagnostic]>,
         &mut dyn Hooks,
@@ -124,11 +142,9 @@ pub fn observe(
             return row;
         }
     };
-    let program = match hooks.load_program(
-        observation::program_options(&request["loading"], parsed_config),
-        cache,
-        &counters,
-    ) {
+    let mut options = observation::program_options(&request["loading"], parsed_config);
+    options.single_threaded = mode_single_threaded(request);
+    let program = match hooks.load_program(options, cache, &counters) {
         Ok(program) => {
             hooks.loaded(&program);
             program
@@ -177,6 +193,18 @@ pub fn observe(
     // separately applies native selection, directives and plain-JS filtering.
     row["bind_diagnostics"] = diagnostics::phase(&program, &bind);
     hooks.resume();
+    if request["mode"].is_string() {
+        return observe_pooled(
+            row,
+            request,
+            &program,
+            &counters,
+            hooks,
+            cache,
+            diagnostic_values,
+            baseline,
+        );
+    }
     hooks.init_start();
     let owner = match hooks.create_checker(program.clone(), &counters) {
         Ok(owner) => owner,
@@ -279,7 +307,7 @@ pub fn observe(
     if request["type_baseline_requested"] == true || capture_errors {
         let results = baseline(
             &program,
-            &mut op,
+            &mut tsr_compiler::FileCheckers::single(&mut op),
             &row["phases"],
             diagnostic_values.as_deref(),
             hooks,
@@ -294,6 +322,269 @@ pub fn observe(
     }
     hooks.checkpoint(&mut op);
     row
+}
+
+/// The context the pin's harness passes its program (`context.Background()`):
+/// a temporary checker, never canceled.
+fn background() -> tsr_checker::CheckerRequest {
+    tsr_checker::CheckerRequest::default()
+}
+
+/// Per-file results of one diagnostic phase in file order, as the single
+/// owner's loop records them.
+fn file_results(
+    program: &Program,
+    results: Vec<Result<Vec<tsr_ast::Diagnostic>, ts_compiler_error::Error>>,
+    selections: Option<Vec<Result<bool, ts_compiler_error::Error>>>,
+    diagnostic_values: &mut Option<Vec<tsr_ast::Diagnostic>>,
+) -> Vec<Value> {
+    let mut files = Vec::new();
+    let mut selections = selections.map(Vec::into_iter);
+    for (file, values) in program.files().iter().zip(results) {
+        let source = file.bound().view().source_file().expect("published source");
+        let name = diagnostics::hex(source.parse_options().file_name.as_bytes());
+        let selection = selections
+            .as_mut()
+            .map(|selections| selections.next().expect("one selection per file"));
+        let result = match (selection, values) {
+            (Some(Err(error)), _) | (_, Err(error)) => compiler_failure(error),
+            (selection, Ok(values)) => {
+                let mut value = diagnostics::captured_phase(program, &values, diagnostic_values);
+                if let Some(Ok(skipped)) = selection {
+                    value["selection"] = json!(if skipped { "native_skip" } else { "checked" });
+                }
+                value
+            }
+        };
+        files.push(json!({"file_hex":name,"result":result}));
+    }
+    files
+}
+
+fn phase_state(files: &[Value]) -> &'static str {
+    if files.iter().all(|r| r["result"]["state"] == "executed") {
+        "executed"
+    } else {
+        "failed"
+    }
+}
+
+/// The phases after binding through the program's checker pool: semantic
+/// and suggestion diagnostics grouped by checker, each checker's files in
+/// program order (`collectCheckerDiagnostics`); the pool's merged global
+/// diagnostics; declaration diagnostics in the concurrent collection, each
+/// file with its own checker, which a single-threaded program runs last file
+/// first (`collectDiagnosticsFromFiles`); then the baselines with every
+/// checker held, each file walked by its own.
+#[allow(clippy::too_many_arguments)]
+fn observe_pooled(
+    mut row: Value,
+    request: &Value,
+    program: &Arc<Program>,
+    counters: &tsr_arena::Counters,
+    hooks: &mut dyn Hooks,
+    cache: &mut FileCache,
+    mut diagnostic_values: Option<Vec<tsr_ast::Diagnostic>>,
+    baseline: impl FnOnce(
+        &Program,
+        &mut tsr_compiler::FileCheckers<'_, '_>,
+        &Value,
+        Option<&[tsr_ast::Diagnostic]>,
+        &mut dyn Hooks,
+        &mut FileCache,
+    ) -> BaselineResults,
+) -> Value {
+    let checked = tsr_compiler::CheckedProgram::new(program.clone(), counters, None);
+    let pool = checked
+        .compiler_checker_pool()
+        .expect("the program's own pool");
+    row["mode"] = request["mode"].clone();
+    row["checker_count"] = json!(pool.checker_count());
+    let semantic = checked.collect_checker_diagnostics_from_files(
+        &background(),
+        program.files(),
+        &|op, file| {
+            (
+                program.skip_type_checking(file, false),
+                program.semantic_diagnostics_with_checker(op, file),
+            )
+        },
+    );
+    let (selections, results): (Vec<_>, Vec<_>) = match semantic {
+        Ok(results) => results
+            .into_iter()
+            .map(|result| result.expect("the compiler's pool visits every file"))
+            .unzip(),
+        Err(error) => {
+            row["phases"]["semantic"] = compiler_failure(error);
+            row["phases"]["global"] = absent("checker pool failed");
+            return row;
+        }
+    };
+    let files = file_results(program, results, Some(selections), &mut diagnostic_values);
+    row["phases"]["semantic"] = json!({"state":phase_state(&files),"files":files,"api":"Program.getSemanticDiagnosticsWithChecker"});
+    row["phases"]["global"] = match checked.global_diagnostics() {
+        Ok(values) => diagnostics::captured_phase(program, &values, &mut diagnostic_values),
+        Err(error) => compiler_failure(error),
+    };
+    if row["phases"].get("declaration").is_some() {
+        let results = checked.collect_diagnostics_from_files(program.files(), true, &|file| {
+            checked.declaration_diagnostics(&background(), Some(file))
+        });
+        let files = file_results(program, results, None, &mut diagnostic_values);
+        row["phases"]["declaration"] = json!({"state":phase_state(&files),"files":files,"api":"Program.getDeclarationDiagnostics"});
+    }
+    if row["phases"].get("suggestion").is_some() {
+        let results = checked.collect_checker_diagnostics_from_files(
+            &background(),
+            program.files(),
+            &|op, file| program.suggestion_diagnostics_with_checker(op, file),
+        );
+        let files = match results {
+            Ok(results) => file_results(
+                program,
+                results
+                    .into_iter()
+                    .map(|result| result.expect("the compiler's pool visits every file"))
+                    .collect(),
+                None,
+                &mut diagnostic_values,
+            ),
+            Err(error) => vec![json!({"result":compiler_failure(error)})],
+        };
+        row["phases"]["suggestion"] = json!({"state":phase_state(&files),"files":files,"api":"Checker.GetSuggestionDiagnostics"});
+    }
+    let mut operations = Vec::new();
+    for owner in pool.checkers().expect("created by the semantic phase") {
+        match owner.operation() {
+            Ok(operation) => operations.push(operation),
+            Err(error) => {
+                row["type_symbol_baselines"] = checker_failure(error);
+                return row;
+            }
+        }
+    }
+    let mut checkers =
+        match tsr_compiler::FileCheckers::for_pool(pool, operations.iter_mut().collect()) {
+            Ok(checkers) => checkers,
+            Err(error) => {
+                row["type_symbol_baselines"] = compiler_failure(error);
+                return row;
+            }
+        };
+    if request["type_baseline_requested"] == true || request["error_baseline_requested"] == true {
+        let results = baseline(
+            program,
+            &mut checkers,
+            &row["phases"],
+            diagnostic_values.as_deref(),
+            hooks,
+            cache,
+        );
+        row["type_symbol_baselines"] = results.type_symbols;
+        if request["error_baseline_requested"] == true {
+            row["error_baseline"] = results.errors;
+        }
+    }
+    hooks.checkpoint_checkers(&mut checkers);
+    row
+}
+
+/// The configuration's program loaded again with its checker pool, as the
+/// pin's harness loads its post-emit program in the request's mode.
+#[allow(dead_code)]
+pub fn load_fresh_checked(
+    request: &Value,
+    cache: &mut FileCache,
+) -> Result<tsr_compiler::CheckedProgram, Value> {
+    let counters = tsr_arena::Counters::new();
+    let parsed = config::parse(request).map_err(|error| failure(error, "config_parse"))?;
+    let mut options = observation::program_options(&request["loading"], parsed);
+    options.single_threaded = mode_single_threaded(request);
+    let program = NoHooks
+        .load_program(options, cache, &counters)
+        .map_err(compiler_failure)?;
+    Ok(tsr_compiler::CheckedProgram::new(program, &counters, None))
+}
+
+#[allow(dead_code)]
+/// The harness's diagnostics through the program's checker pool, in the
+/// order `harness_diagnostics` collects them.
+pub fn harness_diagnostics_checked(
+    checked: &tsr_compiler::CheckedProgram,
+    phases: &Value,
+) -> Result<Vec<tsr_ast::Diagnostic>, Value> {
+    let program = checked.program();
+    let requested = |name: &str| {
+        phases
+            .as_array()
+            .is_some_and(|phases| phases.iter().any(|phase| phase == name))
+    };
+    let mut values = program.config().config_file_parsing_diagnostics();
+    values.extend_from_slice(program.program_diagnostics().map_err(compiler_failure)?);
+    values.extend(
+        program
+            .syntactic_diagnostics(None)
+            .map_err(compiler_failure)?,
+    );
+    values.extend(
+        checked
+            .semantic_diagnostics(&background(), None)
+            .map_err(compiler_failure)?,
+    );
+    values.extend(checked.global_diagnostics().map_err(compiler_failure)?);
+    if requested("declaration") {
+        values.extend(
+            checked
+                .declaration_diagnostics(&background(), None)
+                .map_err(compiler_failure)?,
+        );
+    }
+    if requested("suggestion") {
+        values.extend(
+            checked
+                .suggestion_diagnostics(&background(), None)
+                .map_err(compiler_failure)?,
+        );
+    }
+    Ok(values)
+}
+
+#[allow(dead_code)]
+/// `any_program_diagnostics` through the program's checker pool.
+pub fn any_program_diagnostics_checked(
+    checked: &tsr_compiler::CheckedProgram,
+) -> Result<Vec<tsr_ast::Diagnostic>, Value> {
+    let program = checked.program();
+    let mut values = program.config().config_file_parsing_diagnostics();
+    let config = values.len();
+    values.extend(
+        program
+            .syntactic_diagnostics(None)
+            .map_err(compiler_failure)?,
+    );
+    if values.len() == config {
+        values.extend_from_slice(program.program_diagnostics().map_err(compiler_failure)?);
+        if !program.options().list_files_only.is_true() {
+            values.extend(checked.global_diagnostics().map_err(compiler_failure)?);
+            if values.len() == config {
+                values.extend(
+                    checked
+                        .semantic_diagnostics(&background(), None)
+                        .map_err(compiler_failure)?,
+                );
+                values.extend(checked.global_diagnostics().map_err(compiler_failure)?);
+            }
+            if program.options().emit_declarations() && values.len() == config {
+                values.extend(
+                    checked
+                        .declaration_diagnostics(&background(), None)
+                        .map_err(compiler_failure)?,
+                );
+            }
+        }
+    }
+    Ok(values)
 }
 
 #[allow(dead_code)]

@@ -215,9 +215,9 @@ impl CheckerState {
                     let operand = read
                         .type_node()
                         .ok_or(Error::MissingLink("keyof operand"))?;
-                    self.check_source_element(operand)?;
-                    self.get_type_from_type_node(node)?;
-                    return Ok(());
+                    // checkTypeOperator checks the operand only; the `keyof`
+                    // type itself is created when something reads it.
+                    return self.check_source_element(operand);
                 }
                 if data.operator() == K::UniqueKeyword {
                     return self.check_unique_type_operator(node);
@@ -291,9 +291,7 @@ impl CheckerState {
                         break;
                     }
                 }
-                for element in elements {
-                    self.check_source_element(element)?;
-                }
+                self.check_source_elements(elements)?;
                 self.get_type_from_type_node(node)?;
                 Ok(())
             }

@@ -128,7 +128,7 @@ pub fn observe_with(
                             .as_str()
                             .ok_or("missing baseline header")?;
                         hooks.resume();
-                        let result = baseline::generate_with_timing(
+                        let result = baseline::generate_for_checkers(
                             program,
                             op,
                             &files,

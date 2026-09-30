@@ -5,7 +5,7 @@
 use std::cell::RefCell;
 use std::sync::{Arc, Mutex, OnceLock};
 use tsr_arena::{ArenaId, CheckerIdentity, Counters, Generation};
-use tsr_checker::{CheckerHost, CheckerOptions, CheckerOwner, Error, Operation};
+use tsr_checker::{CheckerHost, CheckerLifetime, CheckerOptions, CheckerOwner, Error, Operation};
 
 /// The API checker is persistent; diagnostics and query slots can be evicted
 /// only after their last checkout returns (project/checkerpool.go at the pin).
@@ -163,6 +163,56 @@ impl CheckerPool {
     }
 }
 
+impl CheckerPool {
+    /// Disposes a canceled checker when its checkout is released, as the pin's
+    /// release does (`WasCanceled`): the slot's next acquisition creates a
+    /// fresh checker. Retained results keep the canceled owner alive, and its
+    /// generation is not retired.
+    fn dispose_canceled(&self, index: usize, owner: &Arc<CheckerOwner>) {
+        let displaced = {
+            let Ok(mut slots) = self.slots.lock() else {
+                return;
+            };
+            let current = slots[index]
+                .checker
+                .get()
+                .and_then(|result| result.as_ref().ok());
+            if !current.is_some_and(|current| Arc::ptr_eq(current, owner)) {
+                return;
+            }
+            std::mem::take(&mut slots[index].checker)
+        };
+        // As in evict_idle, a checker's destructor runs outside the pool lock.
+        drop(displaced);
+    }
+}
+
+/// The pin's `GetChecker` picks the checker by the request's lifetime: the
+/// diagnostics checker, the persistent API checker, or a query checker. The
+/// pin's query acquisition finds or creates an idle query checker and keeps
+/// per-request affinity (`findOrCreateQueryCheckerLocked`), which is the
+/// project system's scheduling (Phase 5); this pool serves its first query
+/// slot. The file hint is unused, as in the pin. Releasing a canceled checker
+/// disposes it ([`PooledChecker`]'s drop). A project's pool serves the
+/// programs of its snapshots, so the project implements the interface.
+impl tsr_checker::CheckerPool for Project {
+    fn with_checker(
+        &self,
+        lifetime: CheckerLifetime,
+        _file: Option<tsr_arena::NodeId>,
+        task: &mut dyn FnMut(&mut Operation<'_>) -> Result<(), Error>,
+    ) -> Result<(), Error> {
+        let slot = match lifetime {
+            CheckerLifetime::Diagnostics => CheckerSlot::Diagnostics,
+            CheckerLifetime::Api => CheckerSlot::Api,
+            CheckerLifetime::Temporary => CheckerSlot::Query(0),
+        };
+        let checkout = self.pool.acquire(slot)?;
+        let mut operation = checkout.operation()?;
+        task(&mut operation)
+    }
+}
+
 struct RetireOnUnwind<'a>(&'a Generation);
 impl Drop for RetireOnUnwind<'_> {
     fn drop(&mut self) {
@@ -192,6 +242,15 @@ impl Drop for Reservation {
 pub struct PooledChecker {
     owner: Arc<CheckerOwner>,
     reservation: Reservation,
+}
+impl Drop for PooledChecker {
+    fn drop(&mut self) {
+        if self.owner.was_canceled() {
+            self.reservation
+                .pool
+                .dispose_canceled(self.reservation.index, &self.owner);
+        }
+    }
 }
 impl PooledChecker {
     pub fn owner(&self) -> &Arc<CheckerOwner> {

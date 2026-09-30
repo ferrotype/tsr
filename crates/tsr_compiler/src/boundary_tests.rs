@@ -74,6 +74,7 @@ fn options(config: ParsedCommandLine, host: Host) -> ProgramOptions {
         current_directory: JsString::from_bytes(b"/src".as_slice()),
         default_library_path: JsString::from_bytes(b"/lib".as_slice()),
         skip_module_resolution: false,
+        single_threaded: tsr_core::Tristate::UNKNOWN,
     }
 }
 fn load(config: ParsedCommandLine, host: Host, counters: &Counters) -> Result<Program, Error> {

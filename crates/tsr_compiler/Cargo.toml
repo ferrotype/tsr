@@ -33,6 +33,10 @@ name = "c5_contracts"
 required-features = ["recursion-probe", "services-replay"]
 
 [[test]]
+name = "c6_contracts"
+required-features = ["recursion-probe"]
+
+[[test]]
 name = "c2_review_fixes"
 required-features = ["relation-probe"]
 
@@ -84,9 +88,12 @@ tsr_locale = { version = "0.1.0", path = "../tsr_locale" }
 workspace = true
 
 [dev-dependencies]
+# The retirement contention observer of the ownership scenarios.
+tsr_arena = { version = "0.1.0", path = "../tsr_arena", features = ["harness"] }
 serde = { version = "1", features = ["derive"] }
 tsr_nodebuilder = { version = "0.1.0", path = "../tsr_nodebuilder" }
 tsr_astnav = { version = "0.1.0", path = "../tsr_astnav" }
+tsr_project = { version = "0.1.0", path = "../tsr_project" }
 serde_json = "1"
 sha2 = "0.10"
 mimalloc = "=0.1.48"

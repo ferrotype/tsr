@@ -837,6 +837,11 @@ impl CheckerState {
                 .and_then(|queue| queue.nodes.get(index))
                 .copied();
             let Some(node) = node else { break };
+            if self.is_canceled() {
+                break;
+            }
+            // checkDeferredNode's sampled event.
+            let trace = self.trace_node_span("checkDeferredNode", node)?;
             let saved = self.current_node.replace(node);
             self.instantiation.count = 0;
             let kind = self.node(node)?.kind();
@@ -879,6 +884,7 @@ impl CheckerState {
                 self.check_function_expression_body(node)
             };
             self.current_node = saved;
+            drop(trace);
             result?;
             index += 1;
         }
@@ -1176,12 +1182,7 @@ impl CheckerState {
         let restore_flow =
             tsr_ast::utilities::is_function_or_module_block(self.ast(block)?, block)?;
         let saved_disabled = self.flow.disabled;
-        let result: Result<(), Error> = (|| {
-            for statement in statements {
-                self.check_source_element(statement)?;
-            }
-            Ok(())
-        })();
+        let result = self.check_source_elements(statements);
         if restore_flow {
             self.flow.disabled = saved_disabled;
         }

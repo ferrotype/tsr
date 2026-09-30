@@ -82,7 +82,7 @@
    "disposition": "equivalent",
    "reason": "Inlined in tryReuseExistingNonParameterTypeNode's port: the annotation's type is the type, or the host has a question token and the type without undefined is it.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:271"
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:273"
   },
   "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeParameterShadowsOtherTypeParameterInScope": {
    "disposition": "equivalent",
@@ -140,33 +140,33 @@
   },
   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.createRecoveryBoundary": {
    "disposition": "equivalent",
-   "reason": "The boundary push of tryReuseExistingNodeHelper's port saves the approximate length and error state and routes reports and tracked symbols into the boundary. Its checkNotCanceled has no Rust counterpart until C6 gives the checker a cancelled state (was_canceled is false).",
+   "reason": "The boundary push of tryReuseExistingNodeHelper's port saves the approximate length and error state and routes reports and tracked symbols into the boundary. Its checkNotCanceled is the refusal at the head of reuse_node (C6.5): a previously canceled checker returns Error::PreviouslyCanceled.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:117"
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:119"
   },
   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.getEnclosingDeclarationIgnoringFakeScope": {
    "disposition": "equivalent",
    "reason": "Inlined at its only caller, the unique-symbol reuse test: the enclosing declaration walks out of synthetic signature scopes (the fake-scope link of the pin).",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1268"
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1270"
   },
   "tsc/internal/checker/nodecopy.go:NodeBuilderImpl.rewriteModuleSpecifier": {
    "disposition": "equivalent",
    "reason": "Inlined in the literal import type's reuse: an overridden specifier becomes a new string literal whose original is the source literal; otherwise the literal is visited.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1681"
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1683"
   },
   "tsc/internal/checker/nodecopy.go:getExistingNodeTreeVisitor": {
    "disposition": "equivalent",
    "reason": "The visitor is the reuse_visit family: reuse_visit_scoped is its per-node closure (recovery scope, new scopes for function-like and mapped nodes, cloning, fallback), reuse_visit_worker the symbol-aware worker.",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1107"
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:1109"
   },
   "tsc/internal/checker/nodecopy.go:newWrappingTracker": {
    "disposition": "equivalent",
    "reason": "The wrapping tracker is the innermost reuse boundary: while one is pushed, report and track_symbol defer to it (defer_reuse_report, defer_reuse_symbol).",
    "reviewed_from": "pinned body and its callers; C5.4 source audit",
-   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:117"
+   "rust": "crates/tsr_checker/src/node_builder_reuse.rs:119"
   },
   "tsc/internal/checker/nodecopy.go:wrappingTracker.PopErrorFallbackNode": {
    "disposition": "equivalent",

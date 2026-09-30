@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def inventory():
-    return {"version": 4, "suites": {
+    return {"version": 5, "suites": {
         name: {"package": package, "filter": prefix,
                "cases": [prefix + "commit_before_retirement", prefix + "retirement_before_commit"]}
         for name, (package, prefix) in SUITES.items()
@@ -77,7 +77,7 @@ class CheckerOwnershipProducer(unittest.TestCase):
             with self.assertRaises(ValueError):
                 validate_manifest(missing)
             # A package no suite names, so the retarget is a change for every one.
-            for key, value in (("package", "tsr_compiler"), ("filter", "unrelated::"),
+            for key, value in (("package", "tsr_parser"), ("filter", "unrelated::"),
                                ("skip", ["retirement_before_commit"]), ("exact", True)):
                 changed = copy.deepcopy(self.manifest)
                 changed["suites"][name][key] = value
@@ -159,7 +159,7 @@ class CheckerOwnershipProducer(unittest.TestCase):
                 for criterion in CRITERIA:
                     self.assertFalse(report["metrics"][criterion])
                     self.assertFalse(report["metrics"][f"{criterion}_{mode}"])
-                self.assertEqual(report["metrics"]["checker_ownership_tests"], 4)
+                self.assertEqual(report["metrics"]["checker_ownership_tests"], 6)
 
     def test_scratch_failure_is_informational_without_changing_s09_4_or_completing_s09_3(self):
         for mode in MODES:
@@ -171,7 +171,7 @@ class CheckerOwnershipProducer(unittest.TestCase):
             self.assertFalse(report["metrics"]["api_print_scratch_disposal"])
             self.assertFalse(report["metrics"][f"api_print_scratch_disposal_{mode}"])
             self.assertEqual(report["metrics"]["api_print_scratch_tests"], 0)
-            self.assertEqual(report["metrics"]["checker_ownership_tests"], 6)
+            self.assertEqual(report["metrics"]["checker_ownership_tests"], 8)
             # Printing is half of S09-3, so the criterion fails with it.
             self.assertFalse(report["metrics"]["api_scratch_disposal"])
             self.assertFalse(report["metrics"][f"api_scratch_disposal_{mode}"])
@@ -245,7 +245,7 @@ class CheckerOwnershipProducer(unittest.TestCase):
         report = {"metrics": {}}
         publish_metrics(report, self.modes, self.arena, self.manifest)
         self.assertTrue(all(report["metrics"][criterion] for criterion in CRITERIA))
-        self.assertEqual(report["metrics"]["checker_ownership_tests"], 6)
+        self.assertEqual(report["metrics"]["checker_ownership_tests"], 8)
         for unavailable in ("independent_checker_merges",
                             "live_owner_delta", "live_allocation_delta", "miri", "address_sanitizer"):
             self.assertNotIn(unavailable, report["metrics"])
@@ -271,7 +271,7 @@ class CheckerOwnershipProducer(unittest.TestCase):
                                     "the sibling criteria keep their own outcomes")
                     self.assertTrue(all(report["metrics"][name] for name in CRITERIA), "and so does S09-4")
                     self.assertEqual(report["metrics"]["checker_retention_tests"], 4)
-                    self.assertEqual(report["metrics"]["checker_ownership_tests"], 6)
+                    self.assertEqual(report["metrics"]["checker_ownership_tests"], 8)
         # A pool or registry failure is S09-4's to report; the retention suites
         # ran and passed, so their criteria are not falsified by association.
         for suite in OWNERSHIP_SUITES:

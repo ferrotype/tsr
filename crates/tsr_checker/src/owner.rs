@@ -25,6 +25,9 @@ use tsr_arena::{CheckerIdentity, CheckerLease, Counters};
 pub struct CheckerOwner {
     identity: Arc<CheckerIdentity>,
     state: Mutex<CheckerState>,
+    /// Mirrors the state's `was_canceled` so a pool can read it at release
+    /// without taking the checker's operation.
+    canceled: std::sync::atomic::AtomicBool,
 }
 
 impl CheckerOwner {
@@ -41,6 +44,7 @@ impl CheckerOwner {
         Ok(Self {
             identity,
             state: Mutex::new(state),
+            canceled: std::sync::atomic::AtomicBool::new(false),
         })
     }
 
@@ -55,18 +59,42 @@ impl CheckerOwner {
         counters: &Counters,
         host: Arc<dyn crate::CheckerHost>,
     ) -> Result<Self, Error> {
+        Self::for_program_with_tracer(identity, counters, host, None)
+    }
+
+    /// A checker for a program with the optional tracer `NewChecker` takes: the
+    /// session receives the checker's trace events and records every type it
+    /// creates under the tracer's checker index.
+    pub fn for_program_with_tracer(
+        identity: Arc<CheckerIdentity>,
+        counters: &Counters,
+        host: Arc<dyn crate::CheckerHost>,
+        tracer: Option<crate::trace::Tracer>,
+    ) -> Result<Self, Error> {
         let options = host.options();
         let options = CheckerOptions {
             strict_null_checks: options.strict_option_value(options.strict_null_checks),
             exact_optional_property_types: options.exact_optional_property_types.is_true(),
         };
-        let mut state = CheckerState::new(&identity, counters, options)?;
+        let mut state = CheckerState::new_with_tracer(&identity, counters, options, tracer)?;
         state.program = Some(crate::program::ProgramContext::new(host));
         state.initialize_program()?;
         Ok(Self {
             identity,
             state: Mutex::new(state),
+            canceled: std::sync::atomic::AtomicBool::new(false),
         })
+    }
+
+    /// `WasCanceled` without an operation: whether a check of this checker was
+    /// canceled. A pool disposes such a checker when it is released.
+    pub fn was_canceled(&self) -> bool {
+        self.canceled.load(std::sync::atomic::Ordering::Acquire)
+    }
+
+    pub(crate) fn mark_canceled(&self) {
+        self.canceled
+            .store(true, std::sync::atomic::Ordering::Release);
     }
 
     /// Begins an exclusive operation: validates the generation, takes the permit,

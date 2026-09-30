@@ -25,9 +25,8 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.checkClassExpressionDeferred
     pub(crate) fn check_class_expression_deferred(&mut self, node: NodeId) -> Result<(), Error> {
-        for member in self.source_list(node, self.node(node)?.member_list())? {
-            self.check_source_element(member)?;
-        }
+        let members = self.source_list(node, self.node(node)?.member_list())?;
+        self.check_source_elements(members)?;
         self.register_for_unused_identifiers_check(node)
     }
 

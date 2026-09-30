@@ -284,6 +284,10 @@ impl CheckerState {
             observer.push(*result);
         }
         let overflow = relater.frame().overflow;
+        let stack_depths = (
+            relater.frame().source_stack.len(),
+            relater.frame().target_stack.len(),
+        );
         let retained = relater.frame().retained;
         if !retained {
             relater.checker.relations.frames[frame.index(0).expect("allocated relation frame")] =
@@ -301,6 +305,18 @@ impl CheckerState {
             )?;
             relater.checker.relations.caches[kind.index()]
                 .insert(key, FAILED | COMPLEXITY_OVERFLOW);
+            relater.checker.trace_instant(
+                crate::trace::TracePhase::CheckTypes,
+                "checkTypeRelatedTo_DepthLimit",
+                || {
+                    crate::trace::args([
+                        ("sourceId", crate::trace::int(source.get())),
+                        ("targetId", crate::trace::int(target.get())),
+                        ("depth", crate::trace::int(stack_depths.0)),
+                        ("targetDepth", crate::trace::int(stack_depths.1)),
+                    ])
+                },
+            );
         }
         let diagnostic = if overflow {
             let source = relater
@@ -755,6 +771,7 @@ impl Relater<'_> {
                 if s & tf::SINGLETON != 0 {
                     return Ok(tr::TRUE);
                 }
+                self.trace_unions_or_intersections_too_large(source, target)?;
                 return self.recursive_related(source, target, recursion, 0);
             }
             if s & tf::TYPE_PARAMETER != 0
@@ -813,6 +830,7 @@ impl Relater<'_> {
                     return Ok(tr::FALSE);
                 }
             }
+            self.trace_unions_or_intersections_too_large(source, target)?;
             let skip = s & tf::UNION != 0
                 && self.checker.types.types_of(source)?.len() < 4
                 && t & tf::UNION == 0
@@ -888,6 +906,44 @@ impl Relater<'_> {
                 vec![self.checker.symbol_to_string(target)?, self.checker.symbol_to_string(property)?, crate::enums::EnumValue::String(value).diagnostic_text()]),
         };
         self.report_error(message, args);
+        Ok(())
+    }
+
+    // port: tsc/internal/checker/relater.go:Relater.traceUnionsOrIntersectionsTooLarge
+    fn trace_unions_or_intersections_too_large(
+        &self,
+        source: TypeId,
+        target: TypeId,
+    ) -> Result<(), Error> {
+        if self.checker.tracer.is_none() {
+            return Ok(());
+        }
+        let (s, t) = (
+            self.checker.types.get(source)?,
+            self.checker.types.get(target)?,
+        );
+        if s.flags & tf::UNION_OR_INTERSECTION != 0 && t.flags & tf::UNION_OR_INTERSECTION != 0 {
+            if s.object_flags & t.object_flags & crate::object_flags::PRIMITIVE_UNION != 0 {
+                // There's a fast path for comparing primitive unions
+                return Ok(());
+            }
+            let source_size = self.checker.types.types_of(source)?.len();
+            let target_size = self.checker.types.types_of(target)?.len();
+            if source_size * target_size > 1_000_000 {
+                self.checker.trace_instant(
+                    crate::trace::TracePhase::CheckTypes,
+                    "traceUnionsOrIntersectionsTooLarge_DepthLimit",
+                    || {
+                        crate::trace::args([
+                            ("sourceId", crate::trace::int(source.get())),
+                            ("sourceSize", crate::trace::int(source_size)),
+                            ("targetId", crate::trace::int(target.get())),
+                            ("targetSize", crate::trace::int(target_size)),
+                        ])
+                    },
+                );
+            }
+        }
         Ok(())
     }
 
@@ -982,8 +1038,35 @@ impl Relater<'_> {
                 self.frame_mut().expanding |= TARGET;
             }
             if self.frame().expanding == BOTH {
+                let depths = (
+                    self.frame().source_stack.len(),
+                    self.frame().target_stack.len(),
+                );
+                self.checker.trace_instant(
+                    crate::trace::TracePhase::CheckTypes,
+                    "recursiveTypeRelatedTo_DepthLimit",
+                    || {
+                        crate::trace::args([
+                            ("sourceId", crate::trace::int(source.get())),
+                            ("targetId", crate::trace::int(target.get())),
+                            ("depth", crate::trace::int(depths.0)),
+                            ("targetDepth", crate::trace::int(depths.1)),
+                        ])
+                    },
+                );
                 Ok(tr::MAYBE)
             } else {
+                let _trace = self.checker.trace_span(
+                    crate::trace::TracePhase::CheckTypes,
+                    "structuredTypeRelatedTo",
+                    |_| {
+                        Ok(crate::trace::args([
+                            ("sourceId", crate::trace::int(source.get())),
+                            ("targetId", crate::trace::int(target.get())),
+                        ]))
+                    },
+                    false,
+                )?;
                 self.structured_related(source, target, intersection)
             }
         })();

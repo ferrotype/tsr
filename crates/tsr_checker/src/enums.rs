@@ -93,9 +93,8 @@ impl CheckerState {
         self.check_grammar_modifiers(declaration)?;
         self.check_collisions_for_declaration_name(declaration)?;
         self.check_exports_on_merged_declarations(declaration)?;
-        for member in self.source_list(declaration, self.node(declaration)?.member_list())? {
-            self.check_source_element(member)?;
-        }
+        let members = self.source_list(declaration, self.node(declaration)?.member_list())?;
+        self.check_source_elements(members)?;
         if self
             .program()?
             .host

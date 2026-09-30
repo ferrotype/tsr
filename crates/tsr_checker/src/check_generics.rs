@@ -198,6 +198,25 @@ impl CheckerState {
             }
         }
         if modifiers == mf::IN || modifiers == mf::OUT {
+            // The pin reads the container's declared type only for this event.
+            let parent_type = match self.tracer {
+                Some(_) => Some(self.get_declared_type_of_symbol(parent_symbol)?),
+                None => None,
+            };
+            let _trace = self.trace_span(
+                crate::trace::TracePhase::CheckTypes,
+                "checkTypeParameterDeferred",
+                |_| {
+                    Ok(crate::trace::args([
+                        (
+                            "parent",
+                            crate::trace::int(parent_type.map_or(0, TypeId::get)),
+                        ),
+                        ("id", crate::trace::int(parameter.get())),
+                    ]))
+                },
+                false,
+            )?;
             let (sub, super_) = (
                 self.builtins.marker_sub_type_for_check,
                 self.builtins.marker_super_type_for_check,
@@ -267,9 +286,7 @@ impl CheckerState {
             }
         }
         let nodes = self.source_list(node, self.node(node)?.type_argument_list())?;
-        for &node in &nodes {
-            self.check_source_element(node)?;
-        }
+        self.check_source_elements(nodes)?;
         let read = self.node(node)?;
         let const_assertion =
             tsr_ast::utilities_middle::is_const_type_reference(self.ast(node)?, &read)?

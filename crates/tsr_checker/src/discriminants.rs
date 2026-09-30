@@ -180,7 +180,21 @@ impl Relater<'_> {
             } else {
                 1
             };
-            if count == 0 || count > 25 {
+            if count > 25 {
+                self.checker.trace_instant(
+                    crate::trace::TracePhase::CheckTypes,
+                    "typeRelatedToDiscriminatedType_DepthLimit",
+                    || {
+                        crate::trace::args([
+                            ("sourceId", crate::trace::int(source.get())),
+                            ("targetId", crate::trace::int(target.get())),
+                            ("numCombinations", crate::trace::int(count)),
+                        ])
+                    },
+                );
+                return Ok(tr::FALSE);
+            }
+            if count == 0 {
                 return Ok(tr::FALSE);
             }
         }

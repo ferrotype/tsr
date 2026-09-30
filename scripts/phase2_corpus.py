@@ -13,8 +13,15 @@ protocol violation or a panic located in the adapter is a harness error: it
 invalidates the run instead of becoming a compiler failure. A production panic,
 a deadline or a named refusal (`Error::Unsupported`) is a measured gap.
 
-    run    --native DIR --output DIR [--sample] [--case ID ...] [--resume]
+    run    --native DIR --output DIR [--mode single|concurrent] [--sample] [--case ID ...] [--resume]
     replay --output DIR        # recompute categories from the raw outputs
+
+`--mode` mirrors `TS_TEST_PROGRAM_SINGLE_THREADED` (C6.4): every request names
+it, and the driver checks each program through its checker pool, as the pin's
+harness does: one checker and single-threaded work groups in the `single`
+mode, the pool's checker count and parallel work groups in the `concurrent`
+mode, whose rows compare with the concurrent-mode native capture
+(`phase2_native_concurrent.py`). Each row records its checker count.
 """
 from __future__ import annotations
 
@@ -36,11 +43,13 @@ import s08_p5_corpus as p5  # noqa: E402
 from s08_oracle import ROOT, digest  # noqa: E402
 import phase2_inventory  # noqa: E402
 import phase2_native  # noqa: E402
+import phase2_native_concurrent  # noqa: E402
 
 EXAMPLE = "phase2_checker"
 SOURCE_OBSERVATIONS = ROOT / "target/s07-subset/source-observations.ndjson"
 PHASES = ("config", "program", "syntactic", "semantic", "global")
 SUBTESTS = ("trace", "union_ordering", "parent_pointers")
+MODES = ("single", "concurrent")
 # The post-emit schedule the Rust driver runs before the error baseline's
 # diagnostics (C5.7), and the emit work it leaves unexecuted.
 EMIT_TRANSFORMS = ["import_elision", "runtime_syntax_enum_members", "const_enum_inlining"]
@@ -116,12 +125,27 @@ def select_rows(rows, *, sample=False, cases=(), limit=None):
     return rows
 
 
-def requests(native_dir, limit=None, *, sample=False, cases=(), emit_schedule=True):
+def load_native(native_dir, mode):
+    """The verified native capture of `mode`, current with its inputs."""
+    if mode == "concurrent":
+        directory, report, observed = phase2_native_concurrent.load_capture(native_dir)
+        phase2_native_concurrent.current(report)
+    else:
+        directory, report, observed = phase2_native.load_capture(native_dir)
+        phase2_native.current(report)
+        if report.get("mode") == "concurrent" or report.get("single_threaded") is False:
+            raise ValueError("the single mode compares with a single-threaded native capture")
+    return directory, report, observed
+
+
+def requests(native_dir, limit=None, *, sample=False, cases=(), emit_schedule=True, mode="single"):
     """The Rust requests of the selected rows. `emit_schedule` asks the driver
     for the harness's post-emit program (C5.7); only replays of rows recorded
-    before it turn it off."""
-    directory, report, observed = phase2_native.load_capture(native_dir)
-    phase2_native.current(report)
+    before it turn it off. `mode` names the test-program mode; `None` omits it,
+    for requests recorded before C6.4 (one checker owner, no pool)."""
+    if mode not in (*MODES, None):
+        raise ValueError("unknown mode: " + str(mode))
+    directory, report, observed = load_native(native_dir, mode)
     if not (directory / "verified.json").exists():
         raise ValueError("the Rust run requires a verified native capture")
     document = phase2_inventory.read()
@@ -148,6 +172,8 @@ def requests(native_dir, limit=None, *, sample=False, cases=(), emit_schedule=Tr
                  "public_type_strings": True}
         if emit_schedule:
             entry["emit_schedule"] = True
+        if mode is not None:
+            entry["mode"] = mode
         if native["state"] == "executed":
             entry["error_inputs"] = native["error_inputs"]
             if types:
@@ -162,7 +188,7 @@ def validate_row(request, row):
     """The S08 P5 row contract plus the sub-test observations."""
     if not isinstance(row, dict):
         raise ValueError("observation is not an object")
-    extra = {key: row[key] for key in ("phase2", "panic_location") if key in row}
+    extra = {key: row[key] for key in ("phase2", "panic_location", "mode", "checker_count") if key in row}
     base = {key: value for key, value in row.items() if key not in extra}
     p5.validate_row(request, pre_emit_view(request, base))
     if "fatal" in base:
@@ -175,6 +201,17 @@ def validate_row(request, row):
         return row
     if "panic_location" in extra:
         raise ValueError("completed observation carries a panic location")
+    mode = request.get("mode")
+    if mode is None:
+        if "mode" in extra or "checker_count" in extra:
+            raise ValueError("a request without a mode has a pooled observation")
+    elif base["load"]["state"] == "executed":
+        # The pooled path records both as soon as the program loads.
+        if extra.get("mode") != mode:
+            raise ValueError("the observation's mode differs from the request's")
+        count = extra.get("checker_count")
+        if type(count) is not int or count < 1 or (mode == "single" and count != 1):
+            raise ValueError("invalid checker count for the mode")
     subtests = extra.get("phase2")
     if not isinstance(subtests, dict):
         raise ValueError("sub-test observations missing")
@@ -217,8 +254,10 @@ def validate_row(request, row):
                 raise ValueError("malformed executed sub-test: " + name)
             if any(type(value[key]) is not int or value[key] < 0 for key in counts):
                 raise ValueError("sub-test counts must be nonnegative integers: " + name)
-            if name == "union_ordering" and value["checkers"] != 1:
+            if name == "union_ordering" and "mode" not in request and value["checkers"] != 1:
                 raise ValueError("C0 union ordering must execute exactly one checker")
+            if name == "union_ordering" and "mode" in request and value["checkers"] != extra.get("checker_count"):
+                raise ValueError("union ordering must execute every checker of the program")
             if name == "parent_pointers" and value["failure"] is not None and not isinstance(value["failure"], str):
                 raise ValueError("parent-pointer failure must be a string or null")
     enabled = request["loading"]["options"].get("traceResolution") is True
@@ -361,10 +400,12 @@ def attribute(row, stderr):
     return "harness", f"unattributed {fatal['class']}: {fatal['reason']}"
 
 
-def run(native_dir, output, jobs, timeout, resume=False, limit=None, *, sample=False, cases=(), emit_schedule=True):
+def run(native_dir, output, jobs, timeout, resume=False, limit=None, *, sample=False, cases=(), emit_schedule=True,
+        mode="single"):
     output = Path(output).resolve()
     selected = selection(sample, cases, limit)
-    report, request_rows, _ = requests(native_dir, limit, sample=sample, cases=cases, emit_schedule=emit_schedule)
+    report, request_rows, _ = requests(native_dir, limit, sample=sample, cases=cases, emit_schedule=emit_schedule,
+                                       mode=mode)
     native_meta = {"directory": str(Path(native_dir).resolve()), "report_sha256":
                    digest((Path(native_dir) / "report.json").read_bytes()),
                    "observation_sha256": report["observation_sha256"]}
@@ -385,7 +426,7 @@ def run(native_dir, output, jobs, timeout, resume=False, limit=None, *, sample=F
         p4.atomic(output / "build/build.json", record)
         metadata = {"version": 1, "requests_sha256": digest(p4.canonical(request_rows) + b"\n"), "build": record,
                     "timeout_seconds": timeout, "native": native_meta, "partial": selected != selection(),
-                    "selection": selected,
+                    "selection": selected, "mode": mode,
                     "inventory_sha256": digest(phase2_inventory.INVENTORY.read_bytes())}
         shutil.copy2(record["binary"], output / "executable")
         p4.write_new(output / "requests.json", request_rows)
@@ -470,8 +511,10 @@ def replay(output):
             harness.extend({"id": request["id"], "problem": problem} for problem in completed_problems(row))
         rows.append(row)
     states = Counter("fatal:" + row["fatal"]["class"] if "fatal" in row else "completed" for row in rows)
+    checkers = Counter(str(row["checker_count"]) for row in rows if "checker_count" in row)
     summary = {"requested": len(request_rows), "observed": len(rows), "states": dict(sorted(states.items())),
-               "harness_errors": len(harness), "partial": selected != selection()}
+               "harness_errors": len(harness), "partial": selected != selection(),
+               "mode": metadata.get("mode"), "checker_counts": dict(sorted(checkers.items()))}
     result = {"version": 1, "summary": summary, "harness_errors": harness, "production_failures": attributed,
               "selection": selected,
               "capture_sha256": digest(p4.canonical(metadata) + b"\n"),
@@ -492,13 +535,16 @@ def main():
     sub.add_argument("--sample", action="store_true", help="the frozen 300-variant intermediate sample; informational")
     sub.add_argument("--case", action="append", default=[], help="executed variant ID; repeatable, additive to --sample")
     sub.add_argument("--limit", type=int, help="development smoke over the first N rows; never recorded")
+    sub.add_argument("--mode", choices=MODES, default="single",
+                     help="the test-program mode (TS_TEST_PROGRAM_SINGLE_THREADED); concurrent needs the concurrent capture")
     sub = commands.add_parser("replay")
     sub.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "run":
         if not math.isfinite(args.timeout) or args.timeout <= 0:
             parser.error("--timeout must be positive and finite")
-        run(args.native, args.output, args.jobs, args.timeout, args.resume, args.limit, sample=args.sample, cases=args.case)
+        run(args.native, args.output, args.jobs, args.timeout, args.resume, args.limit, sample=args.sample, cases=args.case,
+            mode=args.mode)
     else:
         print(json.dumps(replay(args.output)["summary"], sort_keys=True))
 

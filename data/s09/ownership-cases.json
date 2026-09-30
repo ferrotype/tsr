@@ -30,6 +30,16 @@
       "filter": "tests::",
       "package": "tsr_project"
     },
+    "compiler_pool": {
+      "package": "tsr_compiler",
+      "filter": "checker_pool::ownership::",
+      "cases": [
+        "checker_pool::ownership::a_retirement_between_files_publishes_nothing",
+        "checker_pool::ownership::release_boundaries",
+        "checker_pool::ownership::shared_pool_panic_retirement",
+        "checker_pool::ownership::wrong_owner_rejected"
+      ]
+    },
     "registry": {
       "cases": [
         "tests::callback_reentry_requires_releasing_the_operation_and_rechecks_retirement",
@@ -100,5 +110,5 @@
       ]
     }
   },
-  "version": 4
+  "version": 5
 }

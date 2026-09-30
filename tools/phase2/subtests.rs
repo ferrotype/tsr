@@ -148,16 +148,26 @@ pub fn inconsistent_orderings<T: Copy + PartialEq, E>(
 }
 
 pub fn union_ordering(op: &tsr_checker::Operation<'_>) -> Value {
+    union_ordering_checkers(&[op])
+}
+
+/// `verifyUnionOrdering` over every checker of the program
+/// (`ForEachCheckerParallel`): the counts sum over the checkers.
+pub fn union_ordering_checkers(checkers: &[&tsr_checker::Operation<'_>]) -> Value {
     let result = (|| -> Result<Value> {
-        let unions = op
-            .union_types()
-            .into_iter()
-            .map(|union| op.constituents(union))
-            .collect::<std::result::Result<Vec<_>, _>>()?;
-        let inconsistent =
-            inconsistent_orderings(&unions, |a, b| op.compare_type_order(Some(a), Some(b)))?;
+        let (mut total, mut inconsistent) = (0, 0);
+        for op in checkers {
+            let unions = op
+                .union_types()
+                .into_iter()
+                .map(|union| op.constituents(union))
+                .collect::<std::result::Result<Vec<_>, _>>()?;
+            inconsistent +=
+                inconsistent_orderings(&unions, |a, b| op.compare_type_order(Some(a), Some(b)))?;
+            total += unions.len();
+        }
         Ok(
-            json!({"state":"executed","checkers":1,"unions":unions.len(),"inconsistent":inconsistent}),
+            json!({"state":"executed","checkers":checkers.len(),"unions":total,"inconsistent":inconsistent}),
         )
     })();
     result.unwrap_or_else(|error| failure(error, "checker_error"))

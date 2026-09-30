@@ -74,6 +74,19 @@ impl executor::Hooks for Phase2 {
         self.subtests =
             Some(json!({"trace":trace,"union_ordering":ordering,"parent_pointers":parents}));
     }
+
+    // A pooled observation verifies union ordering on every checker.
+    fn checkpoint_checkers(&mut self, checkers: &mut tsr_compiler::FileCheckers<'_, '_>) {
+        let Some(program) = self.program.clone() else {
+            return;
+        };
+        let trace = guarded(|| subtests::trace(&program, self.trace_resolution));
+        let operations: Vec<_> = checkers.iter().collect();
+        let ordering = guarded(|| subtests::union_ordering_checkers(&operations));
+        let parents = guarded(|| subtests::parent_pointers(&program));
+        self.subtests =
+            Some(json!({"trace":trace,"union_ordering":ordering,"parent_pointers":parents}));
+    }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

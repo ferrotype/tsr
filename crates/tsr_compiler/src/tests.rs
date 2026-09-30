@@ -137,6 +137,7 @@ fn live_filesystem_snapshots_preserve_retained_program_files() {
         current_directory: cwd.clone(),
         default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
         skip_module_resolution: false,
+        single_threaded: tsr_core::Tristate::UNKNOWN,
     };
     let counters = Counters::new();
     let mut cache = FileCache::new();

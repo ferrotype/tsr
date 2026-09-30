@@ -1,0 +1,42 @@
+{
+ "capture": {
+  "assignments_sha256": "aa9e629affb4ed1a40d9a64bcae4d7c77f89f44a6bd1ee06ef67d63a67df1425",
+  "go": "go1.27.1",
+  "goarch": "arm64",
+  "goos": "darwin"
+ },
+ "equal": true,
+ "equal_by_checker_count": {
+  "1": 7,
+  "2": 4,
+  "4": 13406
+ },
+ "machine": "arm64",
+ "programs": 13432,
+ "programs_equal": 13417,
+ "record_sha256": "73e304765dd34ae6dfe2b6c2218c15b429ff38e0c881077c139b3d970e4210a1",
+ "rust_sources_sha256": "816e7c9920e70e0861c7491123c04e2a9fdfdf10d9a825dc7425f2b0c0445c26",
+ "synthetic": 27,
+ "synthetic_equal": 27,
+ "unsupported": 15,
+ "unsupported_reasons": {
+  "content-mapper execution": 15
+ },
+ "unsupported_rows": [
+  "compiler/contentMapperAliasDiagnostic.ts#configuration=0",
+  "compiler/contentMapperDeclarationEmit.ts#configuration=0",
+  "compiler/contentMapperDeclarationEmitFailure.ts#configuration=0",
+  "compiler/contentMapperDiagnosticDirectives.ts#configuration=0",
+  "compiler/contentMapperDiagnostics.ts#configuration=0",
+  "compiler/contentMapperInvalidDiagnosticDirectives.ts#configuration=0",
+  "compiler/contentMapperInvalidExtension.ts#configuration=0",
+  "compiler/contentMapperPerFileExtension.ts#configuration=0",
+  "compiler/contentMapperSupplementalDiagnostics.ts#configuration=0",
+  "compiler/contentMapperSupplementalFileCollision.ts#configuration=0",
+  "compiler/contentMapperSupplementalGlobals.ts#configuration=0",
+  "compiler/contentMapperSupplementalModule.ts#configuration=0",
+  "compiler/contentMapperSymlink.ts#configuration=0",
+  "compiler/contentMapperSynthesizedUnusedDiagnostics.ts#configuration=0",
+  "compiler/contentMapperTransform.ts#configuration=0"
+ ]
+}

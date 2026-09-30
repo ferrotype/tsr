@@ -18,6 +18,13 @@ differing diagnostic code, area) are counted, never used to invent a result.
 
     report --native DIR --rust DIR [--previous REPORT] [--record]
     baseline --rust DIR [--native DIR] [--output data/phase2/c1-baseline.json.gz]
+    modes --native DIR --rust DIR --native-concurrent DIR --rust-concurrent DIR
+
+A Rust capture compares with the native capture of its own test-program mode
+(`phase2_corpus.py --mode`). `modes` (C6.4, C6.8) compares each run with its
+own mode's native capture and counts the rows and domains whose outcomes
+differ between the two runs; a raw observation may differ between the modes
+exactly where the pin's does, so outcomes, not observations, are compared.
 
 `report --previous` lists two things about an earlier row report: rows that
 stayed `different` with a changed observation (`changed_observations`) and
@@ -320,8 +327,8 @@ class CaptureContext:
 
 
 def load_context(native_dir, rust_dir):
-    native_dir, native_report, native_rows = phase2_native.load_capture(native_dir)
-    phase2_native.current(native_report)
+    mode = p4.read(Path(rust_dir) / "capture.json").get("mode") or "single"
+    native_dir, native_report, native_rows = phase2_corpus.load_native(native_dir, mode)
     replayed, requests, rust_rows, harness, attributions = load_rust(rust_dir)
     all_inventory = phase2_inventory.executed()
     if [r["id"] for r in all_inventory] != [r["id"] for r in native_rows]:
@@ -490,6 +497,8 @@ def report(native_dir, rust_dir, previous=None, record=False, *, write=True, con
     partial = replayed["summary"]["partial"]
     if record and partial:
         raise ValueError("a partial Rust run is informational and cannot be recorded as acceptance")
+    if record and context.metadata.get("mode") == "concurrent":
+        raise ValueError("the recorded comparison is the single-threaded mode's")
     earlier = strict_json_loads(Path(previous).read_bytes()) if previous else None
     rows, categories = [], {domain: Counter() for domain in DOMAINS}
     buckets = defaultdict(list)
@@ -568,6 +577,48 @@ def report(native_dir, rust_dir, previous=None, record=False, *, write=True, con
     return full
 
 
+def modes(native_dir, rust_dir, native_concurrent_dir, rust_concurrent_dir, *, write=True):
+    """Each mode's run against its own native capture, then the per-row,
+    per-domain outcome differences between the two runs."""
+    single_context = load_context(native_dir, rust_dir)
+    concurrent_context = load_context(native_concurrent_dir, rust_concurrent_dir)
+    if single_context.metadata.get("mode") not in (None, "single"):
+        raise ValueError("--rust must be a single-threaded run")
+    if concurrent_context.metadata.get("mode") != "concurrent":
+        raise ValueError("--rust-concurrent must be a concurrent-mode run")
+    if single_context.replayed["selection"] != concurrent_context.replayed["selection"]:
+        raise ValueError("the two runs selected different rows")
+    single = report(native_dir, rust_dir, write=False, context=single_context)
+    concurrent = report(native_concurrent_dir, rust_concurrent_dir, write=False, context=concurrent_context)
+    differences, observation_changes = [], Counter()
+    for left, right in zip(single["rows"], concurrent["rows"], strict=True):
+        if left["id"] != right["id"]:
+            raise ValueError("the two runs' rows are reordered")
+        if "outcomes" not in left or "outcomes" not in right:
+            if ("outcomes" in left) != ("outcomes" in right):
+                differences.append({"id": left["id"], "domain": "(harness)"})
+            continue
+        for domain in DOMAINS:
+            if left["outcomes"][domain] != right["outcomes"][domain]:
+                differences.append({"id": left["id"], "domain": domain, "single": left["outcomes"][domain],
+                                    "concurrent": right["outcomes"][domain]})
+            if left["digests"][domain] != right["digests"][domain]:
+                observation_changes[domain] += 1
+    summary = {"version": 1, "rows": len(single["rows"]),
+               "single": {key: single[key] for key in ("rust_capture_sha256", "native_observation_sha256",
+                                                        "all_domains_match", "harness_errors", "partial")},
+               "concurrent": {key: concurrent[key] for key in ("rust_capture_sha256", "native_observation_sha256",
+                                                                "all_domains_match", "harness_errors", "partial")},
+               "checker_counts": concurrent_context.replayed["summary"]["checker_counts"],
+               "outcome_differences": len(differences), "differences": differences[:100],
+               "rust_observation_differences": dict(sorted(observation_changes.items()))}
+    if write:
+        Path(rust_concurrent_dir, "modes.json").write_bytes(canonical(summary) + b"\n")
+    print(json.dumps({key: summary[key] for key in ("rows", "outcome_differences", "checker_counts",
+                                                     "rust_observation_differences")}, sort_keys=True))
+    return summary
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -580,9 +631,16 @@ def main():
     base.add_argument("--rust", type=Path, required=True)
     base.add_argument("--native", type=Path, default=ROOT / "target/phase2/native")
     base.add_argument("--output", type=Path, default=BASELINE)
+    both = commands.add_parser("modes", help="compare the single-threaded and concurrent runs' outcomes")
+    both.add_argument("--native", type=Path, default=ROOT / "target/phase2/native")
+    both.add_argument("--rust", type=Path, required=True)
+    both.add_argument("--native-concurrent", type=Path, default=ROOT / "target/phase2/native-concurrent")
+    both.add_argument("--rust-concurrent", type=Path, required=True)
     args = parser.parse_args()
     if args.command == "baseline":
         baseline(args.rust, args.output, native_dir=args.native)
+    elif args.command == "modes":
+        modes(args.native, args.rust, args.native_concurrent, args.rust_concurrent)
     else:
         report(args.native, args.rust, args.previous, args.record)
 

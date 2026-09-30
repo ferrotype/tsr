@@ -61,6 +61,53 @@ impl CheckerState {
         if let Some(variances) = self.variance.links.get(&symbol) {
             return Ok(variances.clone());
         }
+        // The pin reads the declared type only for this event, whose end
+        // records the variances the computation left in the links.
+        let mut trace = match self.tracer {
+            Some(_) => {
+                let arity = parameters.len();
+                let id = self.get_declared_type_of_symbol(symbol)?;
+                self.trace_span(
+                    crate::trace::TracePhase::CheckTypes,
+                    "getVariancesWorker",
+                    |_| {
+                        Ok(crate::trace::args([
+                            ("arity", crate::trace::int(arity)),
+                            ("id", crate::trace::int(id.get())),
+                        ]))
+                    },
+                    true,
+                )?
+            }
+            None => None,
+        };
+        let result = self.variances_worker_uncached(symbol, parameters);
+        if let Some(span) = &mut trace {
+            let formatted = self
+                .variance
+                .links
+                .get(&symbol)
+                .map(|variances| {
+                    variances
+                        .iter()
+                        .map(|&v| crate::variance_flags_string(v))
+                        .collect()
+                })
+                .unwrap_or_default();
+            span.args_mut().insert(
+                "variances".into(),
+                crate::trace::TraceValue::Strs(formatted),
+            );
+        }
+        drop(trace);
+        result
+    }
+
+    fn variances_worker_uncached(
+        &mut self,
+        symbol: SymbolId,
+        parameters: &TypeList,
+    ) -> Result<Vec<VarianceFlags>, Error> {
         if let Some(start) = self.variance.stack.iter().position(|(s, _)| *s == symbol) {
             #[cfg(feature = "recursion-probe")]
             if let Some(counts) = &mut self.variance.contract_cycles {

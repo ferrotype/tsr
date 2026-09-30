@@ -163,6 +163,11 @@ impl CheckerState {
     pub(crate) fn check_cross_product_union(&mut self, types: &[TypeId]) -> Result<bool, Error> {
         let size = self.get_cross_product_union_size(types)?;
         if size >= 100_000 {
+            self.trace_instant(
+                crate::trace::TracePhase::CheckTypes,
+                "checkCrossProductUnion_DepthLimit",
+                || crate::trace::args([("size", crate::trace::int(size))]),
+            );
             self.error_at(
                 self.current_node,
                 tsr_diagnostics::Expression_produces_a_union_type_that_is_too_complex_to_represent,

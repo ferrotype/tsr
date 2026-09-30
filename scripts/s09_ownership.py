@@ -19,6 +19,8 @@ import s09_printing
 SUITES = {
     "generation": ("tsr_arena", "lease::"),
     "pool": ("tsr_project", "tests::"),
+    # C6.6: the E3 pool scenarios over the compiler's checker pool.
+    "compiler_pool": ("tsr_compiler", "checker_pool::ownership::"),
     "registry": ("tsr_api", "tests::"),
     "scratch": ("tsr_api", "printing::scratch_checks::"),
     "insertion": ("tsr_api", "formatting::scratch_checks::"),
@@ -26,7 +28,7 @@ SUITES = {
     "ast": ("tsr_project", "retention::ast::"),
     "builder": ("tsr_checker", "node_builder::cache::retention::"),
 }
-OWNERSHIP_SUITES = ("generation", "pool", "registry")
+OWNERSHIP_SUITES = ("generation", "pool", "compiler_pool", "registry")
 # S09-1 and S09-2: each criterion is one suite. The first two run over a
 # program-backed pool and the third over the checker's cached node builder. They
 # are scored apart from S09-4, so a regression names the contract it broke.
@@ -43,7 +45,7 @@ def load_cases(root):
 
 def validate_manifest(manifest):
     if (type(manifest) is not dict or set(manifest) != {"version", "suites"}
-            or type(manifest["version"]) is not int or manifest["version"] != 4
+            or type(manifest["version"]) is not int or manifest["version"] != 5
             or type(manifest["suites"]) is not dict
             or set(manifest["suites"]) != set(SUITES)):
         raise ValueError("invalid S09 ownership inventory")

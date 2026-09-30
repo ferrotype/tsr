@@ -249,6 +249,8 @@ mod widening;
 pub use relater::RelationKind;
 #[cfg(feature = "services-replay")]
 pub use replay_view::{LiteralView, SignatureView, TypeView, TypeViewData};
+mod cancellation;
+mod trace;
 mod type_display;
 mod type_parameters;
 mod types;
@@ -285,6 +287,8 @@ pub(crate) use key::CacheKey;
 pub use links::{LinkKey, LinkStore};
 pub use node_builder::VerbosityContext;
 pub use owner::{CheckerOwner, Operation};
+mod pool;
+pub use pool::{CheckerLifetime, CheckerPool, CheckerRequest};
 #[cfg(test)]
 use resolution::TypeResolution;
 pub use resolution::TypeSystemPropertyName;
@@ -294,6 +298,10 @@ pub(crate) use signatures::{IndexInfo, Signature};
 pub(crate) use signatures::{SignatureStore, TypePredicate};
 pub use state::CheckerOptions;
 pub(crate) use state::CheckerState;
+pub use trace::{
+    write_type_records, JsonLinesTraceSink, MemoryTraceSink, TraceArgs, TraceEvent, TraceLocation,
+    TracePhase, TraceSink, TraceTypeRecord, TraceValue, Tracer,
+};
 #[cfg(test)]
 use type_display::{alias_symbol, alias_type_arguments};
 pub use type_display::{
@@ -334,6 +342,10 @@ pub enum Error {
     },
     /// A link upstream would have set before this read (a nil dereference there).
     MissingLink(&'static str),
+    /// The checker was canceled during an earlier check and refuses
+    /// diagnostics and node building (the pin's `checkNotCanceled` panic,
+    /// `Checker was previously cancelled`). The generation stays live.
+    PreviouslyCanceled,
 }
 
 impl From<tsr_vfs::Error> for Error {
@@ -379,6 +391,7 @@ impl std::fmt::Display for Error {
                 write!(output, "unexpected {kind:?} type in {context}")
             }
             Self::MissingLink(what) => write!(output, "missing {what}"),
+            Self::PreviouslyCanceled => output.write_str("Checker was previously cancelled"),
         }
     }
 }

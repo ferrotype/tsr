@@ -395,9 +395,9 @@ impl Operation<'_> {
     }
 
     // port: tsc/internal/checker/exports.go:Checker.WasCanceled
-    /// Cancellation is C6's; a checker that is never cancelled answers false.
+    /// Whether a check of this checker was canceled; it never clears.
     pub fn was_canceled(&self) -> bool {
-        false
+        self.state().was_canceled
     }
 
     // port: tsc/internal/checker/exports.go:Checker.GetSignaturesOfType

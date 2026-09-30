@@ -12,7 +12,7 @@ const TYPE_FLAGS: u32 = ff::NO_TRUNCATION
 const IGNORE_ERRORS: u32 = tsr_nodebuilder::flags::IGNORE_ERRORS;
 const ALLOW_UNRESOLVED_NAMES: i32 = tsr_nodebuilder::internal_flags::ALLOW_UNRESOLVED_NAMES;
 
-impl Walker<'_, '_> {
+impl Walker<'_, '_, '_> {
     pub(super) fn stamp(&self, source: NodeId, id: NodeId, operation: &str) -> Result<Value> {
         let view = ast(self.program, id)?;
         let node = view.node(id)?;
@@ -29,8 +29,8 @@ impl Walker<'_, '_> {
         let typ = if self.trace.record_queries {
             let mut q = self.stamp(source, id, "GetTypeAtLocation")?;
             self.trace.active = q.clone();
-            let typ = self.op.get_type_at_location(id)?;
-            q["result_flags"] = json!(self.op.type_flags(typ)?);
+            let typ = self.op.current_mut().get_type_at_location(id)?;
+            q["result_flags"] = json!(self.op.current_mut().type_flags(typ)?);
             q["type_id"] = json!(typ.id());
             self.trace.queries.push(q);
             typ
@@ -38,7 +38,7 @@ impl Walker<'_, '_> {
             self.timing.pause();
             self.trace.count("GetTypeAtLocation");
             self.timing.resume();
-            self.op.get_type_at_location(id)?
+            self.op.current_mut().get_type_at_location(id)?
         };
         self.timing.pause();
         if self.trace.retain_types {
@@ -50,7 +50,7 @@ impl Walker<'_, '_> {
             } else {
                 json!({})
             };
-            self.type_strings.push((stamp, typ));
+            self.type_strings.push((stamp, typ, self.op.current()));
         }
         self.timing.resume();
         Ok(typ)
@@ -81,7 +81,7 @@ impl Walker<'_, '_> {
         if symbols {
             return self.symbol(source, id, parent, line, source_text);
         }
-        if self.op.is_part_of_type_node(id)?
+        if self.op.current_mut().is_part_of_type_node(id)?
             || matches!(
                 node.kind().known(),
                 Some(K::AsExpression | K::SatisfiesExpression)
@@ -106,7 +106,12 @@ impl Walker<'_, '_> {
             None
         };
         if typ
-            .map(|t| self.op.type_flags(t).map(|f| f & tf::ANY != 0))
+            .map(|t| {
+                self.op
+                    .current_mut()
+                    .type_flags(t)
+                    .map(|f| f & tf::ANY != 0)
+            })
             .transpose()?
             .unwrap_or(true)
         {
@@ -114,7 +119,7 @@ impl Walker<'_, '_> {
         }
         let typ = typ.ok_or("type query result")?;
         let plain_any = !self.had_errors
-            && self.op.type_flags(typ)? & tf::ANY != 0
+            && self.op.current_mut().type_flags(typ)? & tf::ANY != 0
             && !matches!(
                 parent_node.kind().known(),
                 Some(
@@ -129,7 +134,11 @@ impl Walker<'_, '_> {
             && !classify::import_or_export_name(view, id, parent)?
             && !classify::intrinsic_jsx(view, id, parent, &source_text)?;
         let display = if plain_any {
-            self.op.intrinsic_type_name(typ)?.as_bytes().to_vec()
+            self.op
+                .current_mut()
+                .intrinsic_type_name(typ)?
+                .as_bytes()
+                .to_vec()
         } else {
             let flags = (TYPE_FLAGS & ff::NODE_BUILDER_FLAGS_MASK) | IGNORE_ERRORS;
             self.timing.pause();
@@ -147,7 +156,7 @@ impl Walker<'_, '_> {
             self.timing.resume();
             #[cfg(feature = "s08-phase-timer")]
             let _display = super::instrument::Display::begin();
-            let mut builder = self.op.node_builder();
+            let mut builder = self.op.current_mut().node_builder();
             let mut generated =
                 builder.type_to_type_node(typ, Some(parent), flags, ALLOW_UNRESOLVED_NAMES)?;
             let retry = if let Some(generated) = generated {
@@ -207,7 +216,7 @@ impl Walker<'_, '_> {
         let symbol = if self.trace.record_queries {
             let mut q = self.stamp(source, id, "GetSymbolAtLocation")?;
             self.trace.active = q.clone();
-            let symbol = self.op.get_symbol_at_location(id)?;
+            let symbol = self.op.current_mut().get_symbol_at_location(id)?;
             if symbol.is_none() {
                 q["absent"] = json!(true);
             }
@@ -217,7 +226,7 @@ impl Walker<'_, '_> {
             self.timing.pause();
             self.trace.count("GetSymbolAtLocation");
             self.timing.resume();
-            self.op.get_symbol_at_location(id)?
+            self.op.current_mut().get_symbol_at_location(id)?
         };
         let Some(symbol) = symbol else {
             return Ok(None);
@@ -235,7 +244,7 @@ impl Walker<'_, '_> {
             self.timing.resume();
             #[cfg(feature = "s08-phase-timer")]
             let _display = super::instrument::Display::begin();
-            self.op.symbol_to_string_at(
+            self.op.current_mut().symbol_to_string_at(
                 symbol,
                 Some(parent),
                 tsr_ast::symbol_flags::NONE,
@@ -244,7 +253,7 @@ impl Walker<'_, '_> {
         };
         let mut display = b"Symbol(".to_vec();
         display.extend_from_slice(&tsr_ast::escape_all_internal_symbol_names(text.as_bytes()));
-        let declarations = self.op.symbol_declarations(symbol)?;
+        let declarations = self.op.current_mut().symbol_declarations(symbol)?;
         for (index, declaration) in declarations.iter().enumerate() {
             if index >= 5 {
                 display.extend_from_slice(
