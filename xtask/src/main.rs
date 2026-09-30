@@ -1183,8 +1183,60 @@ fn record_history(root: &Path, r: &Report) {
     fs::write(&p, text).unwrap_or_else(|e| die(&format!("history.jsonl: {e}")));
 }
 
+/// The Phase 2 pass-rate dashboard from the C7 record
+/// (`data/phase2/c7-report.json`, written by `scripts/phase2_report.py`);
+/// empty until the record exists.
+fn render_phase2_dashboard(root: &Path) -> String {
+    let Ok(text) = fs::read_to_string(root.join("data/phase2/c7-report.json")) else {
+        return String::new();
+    };
+    let Ok(record) = serde_json::from_str::<serde_json::Value>(&text) else {
+        return String::new();
+    };
+    let dashboard = &record["dashboard"];
+    let rate = |counts: &serde_json::Value| {
+        let rows = counts["rows"].as_f64().unwrap_or(0.0);
+        if rows == 0.0 {
+            0.0
+        } else {
+            counts["matched"].as_f64().unwrap_or(0.0) / rows
+        }
+    };
+    let mut rows = String::new();
+    for group in ["checkpoint", "suite"] {
+        let Some(values) = dashboard["single"]["rates"][group].as_object() else {
+            continue;
+        };
+        for (value, counts) in values {
+            let single = rate(counts);
+            let concurrent = rate(&dashboard["concurrent"]["rates"][group][value]);
+            rows.push_str(&format!(
+                "<tr><td>{}</td><td>{}</td><td class=\"num\">{}</td><td><div class=\"bar\"><div style=\"width:{:.1}%\"></div></div></td><td class=\"num\">{}</td><td class=\"num\">{}</td></tr>\n",
+                escape_html(group),
+                escape_html(value),
+                counts["rows"].as_u64().unwrap_or(0),
+                single * 100.0,
+                pct(single),
+                pct(concurrent)
+            ));
+        }
+    }
+    format!(
+        r#"  <h2>Phase 2 checker parity</h2>
+  <p>Rows matching the pinned checker in every domain, from the C7 record ({single} of {executed} single-threaded, {concurrent} concurrent; {residuals} residuals). <a href="PHASE2-C7.md">Full dashboard</a></p>
+  <table><thead><tr><th>Group</th><th>Value</th><th class="num">Rows</th><th>Single-threaded</th><th class="num"></th><th class="num">Concurrent</th></tr></thead><tbody>
+{rows}</tbody></table>
+"#,
+        single = dashboard["single"]["all_domains_match"],
+        concurrent = dashboard["concurrent"]["all_domains_match"],
+        executed = dashboard["single"]["executed"],
+        residuals = record["residuals"]["count"],
+    )
+}
+
 fn render_dashboard(root: &Path, r: &Report) -> String {
     let m = &r.metrics;
+    let phase2 = render_phase2_dashboard(root);
     let history = fs::read_to_string(root.join("status/history.jsonl")).unwrap_or_default();
     let points: Vec<(String, f64, f64)> = history
         .lines()
@@ -1353,7 +1405,7 @@ fn render_dashboard(root: &Path, r: &Report) -> String {
   <h2>By phase</h2>
   <table><thead><tr><th>Phase</th><th class="num">Files</th><th class="num">Lines</th><th>Verified</th><th class="num"></th></tr></thead><tbody>
 {phase_rows}</tbody></table>
-  <h2>Experiments</h2>
+{phase2}  <h2>Experiments</h2>
   <table><thead><tr><th></th><th>Title</th><th>Threshold</th><th>Measured</th><th>Result</th></tr></thead><tbody>
 {exp_rows}</tbody></table>
   <h2>Evidence</h2>

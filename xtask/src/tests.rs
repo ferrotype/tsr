@@ -929,3 +929,26 @@ fn recorded_conditions_close_on_the_named_artifact_after_the_run_goes_stale() {
         Some(false)
     );
 }
+#[test]
+fn the_phase2_dashboard_renders_from_the_c7_record_when_it_exists() {
+    let f = Fixture::new();
+    assert_eq!(render_phase2_dashboard(&f.0), "");
+    fs::create_dir_all(f.0.join("data/phase2")).unwrap();
+    let counts = |rows: u64, matched: u64| serde_json::json!({"rows": rows, "matched": matched});
+    let mode = |matched| {
+        serde_json::json!({"executed": 4, "all_domains_match": matched,
+            "rates": {"checkpoint": {"C2": counts(4, matched)}, "suite": {"compiler": counts(4, matched)}}})
+    };
+    f.write(
+        "data/phase2/c7-report.json",
+        &serde_json::json!({"dashboard": {"single": mode(3), "concurrent": mode(4)}, "residuals": {"count": 1}})
+            .to_string(),
+    );
+    let html = render_phase2_dashboard(&f.0);
+    assert!(
+        html.contains("3 of 4 single-threaded, 4 concurrent; 1 residuals"),
+        "{html}"
+    );
+    assert!(html.contains("<td>checkpoint</td><td>C2</td>"), "{html}");
+    assert!(html.contains("75.0%") && html.contains("100.0%"), "{html}");
+}

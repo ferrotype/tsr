@@ -117,7 +117,7 @@ class Wiring(unittest.TestCase):
         self.assertEqual(producers.newest_checkpoint({name: None for name in producers.CHECKPOINTS}), "C7")
         spec = tomllib.loads((ROOT / "status/runs.toml").read_text())["checker"]
         for path in ("data/phase2/c7-audit.json", "data/phase2/informational.json", "data/phase2/residuals.json",
-                     "data/phase2/dispositions.json", "PORTS.toml",
+                     "data/phase2/dispositions.json", "PORTS.toml", "data/phase2/c7-report.json", "docs/PHASE2-C7.md",
                      "data/phase2/native-provenance-concurrent.json", "data/divergences.toml"):
             self.assertIn(path, spec["inputs"])
         # Every contract witness's receipt, C7.8.5's among them, binds the run.
@@ -437,6 +437,58 @@ class Divergences(unittest.TestCase):
         del unapproved["divergence"][0]["approved_by"]
         with self.assertRaises(ValueError):
             self.divergences.approvals(unapproved)
+
+
+
+class Report(unittest.TestCase):
+    """C7.5: the dashboard and the C7 record."""
+
+    def setUp(self):
+        import phase2_report
+        from test_phase2_c1 import comparison, row
+        self.report = phase2_report
+        categories = {domain: {"match": 3} for domain in ("types", "symbols", "display", "union_ordering",
+                                                           "parent_pointers")}
+        categories.update(errors={"match": 2, "different": 1}, trace={"disabled": 3})
+        self.comparison = comparison([row("a", checkpoint="C2"), row("b", checkpoint="C2", errors="different"),
+                                      row("c", checkpoint="C3")], categories=categories)
+        self.inventory = {
+            "a": {"checkpoint": "C2", "suite": "compiler", "families": ["jsx"], "options": {"strict": True}},
+            "b": {"checkpoint": "C2", "suite": "compiler", "families": ["jsx", "decorators"], "options": {}},
+            "c": {"checkpoint": "C3", "suite": "conformance", "families": [], "options": {}}}
+
+    def test_the_dashboard_counts_rows_and_matches_per_group_value(self):
+        dashboard = self.report.dashboard(self.comparison, self.inventory)
+        rates = dashboard["rates"]
+        self.assertEqual(rates["checkpoint"], {"C2": {"rows": 2, "matched": 1}, "C3": {"rows": 1, "matched": 1}})
+        self.assertEqual(rates["family"], {"(none)": {"rows": 1, "matched": 1}, "decorators": {"rows": 1, "matched": 0},
+                                           "jsx": {"rows": 2, "matched": 1}})
+        self.assertEqual(rates["strict"], {"False": {"rows": 2, "matched": 1}, "True": {"rows": 1, "matched": 1}})
+        self.assertEqual(dashboard["all_domains_match"], 2)
+
+    def test_the_page_renders_the_record(self):
+        dashboard = self.report.dashboard(self.comparison, self.inventory)
+        record = {"captures": {mode: {"rust_capture_sha256": "r" * 64, "native_observation_sha256": "n" * 64}
+                               for mode in self.report.MODES},
+                  "dashboard": {mode: dashboard for mode in self.report.MODES},
+                  "residuals": {"count": 1, "rows": [{"id": "b", "owner": "C2", "resolution": "checkpoint",
+                                                       "domains": {"single": ["errors"], "concurrent": []}}]},
+                  "divergences": {"approved": 0, "proposals": 0},
+                  "dispositions": {"files": 1, "functions": 3, "counts": {"mapped": 1, "equivalent": 1, "later": 1},
+                                   "rejected": 0, "later_phase_handoffs": 0},
+                  "consumable": [{"phase": "Phase 4", "item": "x"}],
+                  "performance": {"checkerbench": {"source": "s", "host_busy": True, "elapsed_ratio": 2.0,
+                                                   "allocated_bytes_ratio": 0.5, "retained_bytes_ratio": 1.4,
+                                                   "type_footprint_ratio": 0.8},
+                                  "e5": None, "e6": {"host": "h", "date": "2026-09-19", "criteria": [
+                                      {"metric": "run.e6.one_thread_wall_time_ratio", "op": "<=", "threshold": 1.25,
+                                       "value": 1.15}]}}}
+        page = self.report.render(record)
+        self.assertIn("| C2 | 2 | 50.00% | 50.00% |", page)
+        self.assertIn("- `b`: C2 (checkpoint), single errors, concurrent -", page)
+        self.assertIn("`run.e6.one_thread_wall_time_ratio` 1.150 against <= 1.25", page)
+        self.assertIn("(taken on a busy host)", page)
+        self.assertIn("- E5: no recorded run.", page)
 
 
 if __name__ == "__main__":

@@ -787,7 +787,8 @@ def c7_metrics(metrics, audit_ok, states, state, comparison, *, root=ROOT):
     out["c7_dispositions"] = c7_optional("dispositions", lambda: __import__("phase2_dispositions").complete()) is True
     out["c7_divergences_valid"] = c7_optional("divergences", lambda: __import__("phase2_divergences").valid(
         comparison, state["concurrent"])) is True
-    out["c7_report"] = c7_optional("report", lambda: __import__("phase2_report").current()) is True
+    out["c7_report"] = c7_optional("report", lambda: __import__("phase2_report").current(
+        comparison, state["concurrent"])) is True
     exit_ok = all(metrics.get(name) is value if isinstance(value, bool) else metrics.get(name) == value
                   for name, value in P2B_EXIT)
     recorded = all(recorded_metric(evidence_id, metric, root=root) is True
