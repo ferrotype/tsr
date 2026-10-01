@@ -1259,6 +1259,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "tsr_sourcemap"
+version = "0.1.0"
+dependencies = [
+ "hashbrown",
+ "tsr_arena",
+ "tsr_core",
+ "tsr_json",
+ "tsr_jsstring",
+ "tsr_tspath",
+]
+
+[[package]]
 name = "tsr_testhost"
 version = "0.1.0"
 dependencies = [
