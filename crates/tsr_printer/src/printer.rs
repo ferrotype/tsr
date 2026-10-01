@@ -81,8 +81,9 @@ pub struct PrinterOptions {
 }
 
 /// `WriteKind`: which writer method a piece of text goes through.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum WriteKind {
+    #[default]
     None,
     Keyword,
     Operator,
@@ -142,7 +143,9 @@ pub struct Printer<'c> {
 
 /// Printer state upstream keeps on the `Printer` across `Write` and `Emit`
 /// calls: `Write` neither saves nor resets it. Each write takes it into its
-/// [`Session`] and hands it back when it ends.
+/// [`Session`], which hands it back when it ends, by returning or by
+/// unwinding: a write that panics leaves upstream's fields as they were at
+/// the panic, and the next write starts from them.
 #[derive(Debug, Default)]
 struct CarriedState {
     /// `nextListElementPos`, set by each list element `emitList` prints.
@@ -157,6 +160,15 @@ struct CarriedState {
     /// `sourceMapSourceIsJson`, set by `setSourceMapSource` only for a source
     /// other than the most recent one.
     source_map_source_is_json: bool,
+    /// `writeKind`, `containerPos`, `containerEnd`,
+    /// `declarationListContainerEnd` and `inExtends`: every function that
+    /// sets one restores it, so they differ from their initial values only
+    /// after a write that panicked in between.
+    write_kind: WriteKind,
+    container_pos: i64,
+    container_end: i64,
+    declaration_list_container_end: i64,
+    in_extends: bool,
 }
 
 /// The emit context's `Factory` reads for a printer, which reads a fixed
@@ -256,6 +268,11 @@ impl<'c> Printer<'c> {
                 detached_comments_info: Vec::new(),
                 comments_disabled: options.remove_comments,
                 source_map_source_is_json: false,
+                write_kind: WriteKind::None,
+                container_pos: -1,
+                container_end: -1,
+                declaration_list_container_end: -1,
+                in_extends: false,
             }),
             options,
         }
@@ -330,31 +347,40 @@ impl<'c> Printer<'c> {
             unique_helper_names: None,
             external_helpers_module_name: None,
             next_list_element_pos: carried.next_list_element_pos,
-            write_kind: WriteKind::None,
+            write_kind: carried.write_kind,
             source_maps_disabled: source_map_generator.is_none(),
             source_map_generator,
             source_map_source: None,
             source_map_source_index: -1,
             source_map_source_is_json: carried.source_map_source_is_json,
             source_map_line_char_cache: None,
-            container_pos: -1,
-            container_end: -1,
-            declaration_list_container_end: -1,
+            container_pos: carried.container_pos,
+            container_end: carried.container_end,
+            declaration_list_container_end: carried.declaration_list_container_end,
             detached_comments_info: carried.detached_comments_info,
             comments_disabled: carried.comments_disabled,
-            in_extends: false,
+            in_extends: carried.in_extends,
         };
-        let result = session.set_source_file(source_file).and_then(|()| {
+        session.set_source_file(source_file).and_then(|()| {
             session.writer.clear();
             session.write_root(node)
-        });
-        *self.carried.borrow_mut() = CarriedState {
-            next_list_element_pos: session.next_list_element_pos,
-            detached_comments_info: session.detached_comments_info,
-            comments_disabled: session.comments_disabled,
-            source_map_source_is_json: session.source_map_source_is_json,
+        })
+    }
+}
+
+impl Drop for Session<'_, '_> {
+    fn drop(&mut self) {
+        *self.printer.carried.borrow_mut() = CarriedState {
+            next_list_element_pos: self.next_list_element_pos,
+            detached_comments_info: std::mem::take(&mut self.detached_comments_info),
+            comments_disabled: self.comments_disabled,
+            source_map_source_is_json: self.source_map_source_is_json,
+            write_kind: self.write_kind,
+            container_pos: self.container_pos,
+            container_end: self.container_end,
+            declaration_list_container_end: self.declaration_list_container_end,
+            in_extends: self.in_extends,
         };
-        result
     }
 }
 
