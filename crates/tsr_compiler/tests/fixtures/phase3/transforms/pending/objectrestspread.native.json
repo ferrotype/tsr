@@ -1,0 +1,232 @@
+{
+ "cases": [
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "var __rest = (this && this.__rest) || function (s, e) {\r\n    var t = {};\r\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\r\n        t[p] = s[p];\r\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\r\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\r\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\r\n                t[p[i]] = s[p[i]];\r\n        }\r\n    return t;\r\n};\r\nconst p = Object.assign({ a: 1 }, o);\r\nconst { a } = p, r = __rest(p, [\"a\"]);\r\nexport { r };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "script-spread-and-rest",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e7374206f3a20616e793b0a636f6e73742070203d207b20613a20312c202e2e2e6f207d3b0a636f6e7374207b20612c202e2e2e72207d203d20703b0a6578706f7274207b2072207d3b0a"
+    },
+    "id": "script-spread-and-rest",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare const o: any;\nconst p = { a: 1, ...o };\nconst { a, ...r } = p;\nexport { r };\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "var __rest = (this && this.__rest) || function (s, e) {\r\n    var t = {};\r\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\r\n        t[p] = s[p];\r\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\r\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\r\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\r\n                t[p[i]] = s[p[i]];\r\n        }\r\n    return t;\r\n};\r\nexport function f(_a, b) {\r\n    var { a } = _a, r = __rest(_a, [\"a\"]);\r\n    if (b === void 0) { b = 1; }\r\n    try { }\r\n    catch (_b) {\r\n        var e = __rest(_b, []);\r\n    }\r\n    return [a, r, b];\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "script-params-and-catch",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f72742066756e6374696f6e2066287b20612c202e2e2e72207d3a20616e792c2062203d203129207b20747279207b207d20636174636820287b202e2e2e65207d29207b207d2072657475726e205b612c20722c20625d3b207d0a"
+    },
+    "id": "script-params-and-catch",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nexport function f({ a, ...r }: any, b = 1) { try { } catch ({ ...e }) { } return [a, r, b]; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "var __rest = (this && this.__rest) || function (s, e) {\r\n    var t = {};\r\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\r\n        t[p] = s[p];\r\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\r\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\r\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\r\n                t[p[i]] = s[p[i]];\r\n        }\r\n    return t;\r\n};\r\nlet a, r;\r\nfor (let _a of xs) {\r\n    const s = __rest(_a, []);\r\n    ({ a } = s, r = __rest(s, [\"a\"]), s);\r\n}\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "script-for-of-and-assignment",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e73742078733a20616e795b5d3b0a6c657420613a20616e792c20723a20616e793b0a666f722028636f6e7374207b202e2e2e73207d206f6620787329207b20287b20612c202e2e2e72207d203d2073293b207d0a6578706f7274207b7d3b0a"
+    },
+    "id": "script-for-of-and-assignment",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare const xs: any[];\nlet a: any, r: any;\nfor (const { ...s } of xs) { ({ a, ...r } = s); }\nexport {};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "var __rest = (this && this.__rest) || function (s, e) {\r\n    var t = {};\r\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\r\n        t[p] = s[p];\r\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\r\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\r\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\r\n                t[p[i]] = s[p[i]];\r\n        }\r\n    return t;\r\n};\r\nexport const { a } = o, r = __rest(o, [\"a\"]);\r\nexport const c = Object.assign({}, o);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "script-es2015-module",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e7374206f3a20616e793b0a6578706f727420636f6e7374207b20612c202e2e2e72207d203d206f3b0a6578706f727420636f6e73742063203d207b202e2e2e6f207d3b0a"
+    },
+    "id": "script-es2015-module",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @module: es2015\ndeclare const o: any;\nexport const { a, ...r } = o;\nexport const c = { ...o };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "var __rest = (this && this.__rest) || function (s, e) {\r\n    var t = {};\r\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\r\n        t[p] = s[p];\r\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\r\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\r\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\r\n                t[p[i]] = s[p[i]];\r\n        }\r\n    return t;\r\n};\r\nvar __asyncValues = (this && this.__asyncValues) || function (o) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var m = o[Symbol.asyncIterator], i;\r\n    return m ? m.call(o) : (o = typeof __values === \"function\" ? __values(o) : o[Symbol.iterator](), i = {}, verb(\"next\"), verb(\"throw\"), verb(\"return\"), i[Symbol.asyncIterator] = function () { return this; }, i);\r\n    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }\r\n    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }\r\n};\r\nexport const f = async (_a) => { var _b, e_1, _c, _d; var r = __rest(_a, []); try {\r\n    for (var _e = true, r_1 = __asyncValues(r), r_1_1; r_1_1 = await r_1.next(), _b = r_1_1.done, !_b; _e = true) {\r\n        _d = r_1_1.value;\r\n        _e = false;\r\n        let _f = _d;\r\n        const s = __rest(_f, []);\r\n    }\r\n}\r\ncatch (e_1_1) { e_1 = { error: e_1_1 }; }\r\nfinally {\r\n    try {\r\n        if (!_e && !_b && (_c = r_1.return)) await _c.call(r_1);\r\n    }\r\n    finally { if (e_1) throw e_1.error; }\r\n} };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "script-async-rest",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f727420636f6e73742066203d206173796e6320287b202e2e2e72207d3a20616e7929203d3e207b20666f722061776169742028636f6e7374207b202e2e2e73207d206f66207229207b207d207d3b0a"
+    },
+    "id": "script-async-rest",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nexport const f = async ({ ...r }: any) => { for await (const { ...s } of r) { } };\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

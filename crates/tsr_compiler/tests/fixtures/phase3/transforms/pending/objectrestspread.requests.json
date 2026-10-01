@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "id": "script-spread-and-rest",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any;\nconst p = { a: 1, ...o };\nconst { a, ...r } = p;\nexport { r };\n",
+      "chains": [
+        [
+          "script"
+        ]
+      ]
+    },
+    {
+      "id": "script-params-and-catch",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nexport function f({ a, ...r }: any, b = 1) { try { } catch ({ ...e }) { } return [a, r, b]; }\n",
+      "chains": [
+        [
+          "script"
+        ]
+      ]
+    },
+    {
+      "id": "script-for-of-and-assignment",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const xs: any[];\nlet a: any, r: any;\nfor (const { ...s } of xs) { ({ a, ...r } = s); }\nexport {};\n",
+      "chains": [
+        [
+          "script"
+        ]
+      ]
+    },
+    {
+      "id": "script-es2015-module",
+      "name": "probe.ts",
+      "source": "// @target: es2017\n// @module: es2015\ndeclare const o: any;\nexport const { a, ...r } = o;\nexport const c = { ...o };\n",
+      "chains": [
+        [
+          "script"
+        ]
+      ]
+    },
+    {
+      "id": "script-async-rest",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nexport const f = async ({ ...r }: any) => { for await (const { ...s } of r) { } };\n",
+      "chains": [
+        [
+          "script"
+        ]
+      ]
+    }
+  ]
+}
