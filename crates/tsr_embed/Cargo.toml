@@ -35,5 +35,9 @@ tsr_vfs = { version = "0.1.0", path = "../tsr_vfs" }
 name = "lifetime"
 required-features = ["checker"]
 
+[[test]]
+name = "emit"
+required-features = ["checker"]
+
 [lints]
 workspace = true

@@ -2,12 +2,15 @@
 //!
 //! Loaded source preserves its original bytes. The host supplies canonical
 //! source-file options. The checker feature adds an immutable program session
-//! with scoped queries and explicit retained handles.
+//! with scoped queries, explicit retained handles and an in-memory emit.
 
 #[cfg(feature = "checker")]
 mod session;
 #[cfg(feature = "checker")]
-pub use session::{FileCache, Program, ProgramOptions, Session};
+pub use session::{
+    EmitOnly, EmitOptions, EmitOutput, EmittedFile, FileCache, Program, ProgramFile,
+    ProgramOptions, Session,
+};
 
 use tsr_ast::{AstFile, SourceFileParseOptions, SourceHash};
 use tsr_core::ScriptKind;
