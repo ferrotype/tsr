@@ -26,6 +26,18 @@ pub(crate) const NIL: &str = "runtime error: invalid memory address or nil point
 
 pub(super) use crate::utilities::is_simple_copiable_expression;
 
+/// `Node.Text()` of an identifier or private identifier.
+pub(crate) fn identifier_text(factory: &dyn Factory, node: NodeId) -> JsString {
+    let read = factory.node(node);
+    if let Some(data) = read.as_identifier() {
+        return data.text_owned();
+    }
+    if let Some(data) = read.as_private_identifier() {
+        return data.text_owned();
+    }
+    panic!("Unhandled case in Node.Text: {:?}", read.kind())
+}
+
 /// The storage view of the visitor's factory, which the AST predicates read;
 /// a factory without one (a lazy JSDoc transaction) cannot be transformed.
 pub(crate) fn view(factory: &dyn RuntimeFactory) -> Result<AstView<'_>, Error> {
@@ -376,6 +388,87 @@ pub struct SuperAccessState {
 
     pub(crate) super_binding: Cell<Option<NodeId>>,
     pub(crate) super_index_binding: Cell<Option<NodeId>>,
+}
+
+/// The super-access fields one async or async-generator body saves and
+/// restores around itself.
+pub(crate) struct SavedSuperAccess {
+    captured_super_properties: Option<OrderedSet<JsString>>,
+    has_super_element_access: bool,
+    has_super_property_assignment: bool,
+    super_binding: Option<NodeId>,
+    super_index_binding: Option<NodeId>,
+}
+
+impl SuperAccessState {
+    /// Upstream's field-by-field save before a body replaces the fields.
+    pub(crate) fn save(&self) -> SavedSuperAccess {
+        SavedSuperAccess {
+            captured_super_properties: self.captured_super_properties.borrow_mut().take(),
+            has_super_element_access: self.has_super_element_access.get(),
+            has_super_property_assignment: self.has_super_property_assignment.get(),
+            super_binding: self.super_binding.get(),
+            super_index_binding: self.super_index_binding.get(),
+        }
+    }
+
+    /// Upstream's field-by-field restore after a body.
+    pub(crate) fn restore(&self, saved: SavedSuperAccess) {
+        *self.captured_super_properties.borrow_mut() = saved.captured_super_properties;
+        self.has_super_element_access
+            .set(saved.has_super_element_access);
+        self.has_super_property_assignment
+            .set(saved.has_super_property_assignment);
+        self.super_binding.set(saved.super_binding);
+        self.super_index_binding.set(saved.super_index_binding);
+    }
+
+    /// The fresh fields of a body: an empty set and new `_super` and
+    /// `_superIndex` names, created in that order.
+    pub(crate) fn reset(&self, factory: &mut dyn Factory) {
+        use tsr_printer::generated_identifier_flags as g;
+        *self.captured_super_properties.borrow_mut() = Some(OrderedSet::default());
+        self.has_super_element_access.set(false);
+        self.has_super_property_assignment.set(false);
+        let mut context = self.emit_context.clone();
+        let options = AutoGenerateOptions {
+            flags: g::OPTIMISTIC | g::FILE_LEVEL,
+            ..AutoGenerateOptions::default()
+        };
+        let binding = context.new_unique_name_ex(
+            factory,
+            JsString::from_bytes(&b"_super"[..]),
+            options.clone(),
+        );
+        self.super_binding.set(Some(binding));
+        let binding =
+            context.new_unique_name_ex(factory, JsString::from_bytes(&b"_superIndex"[..]), options);
+        self.super_index_binding.set(Some(binding));
+    }
+
+    /// `capturedSuperProperties.Size()`; the set must exist.
+    pub(crate) fn captured_super_property_count(&self) -> usize {
+        self.captured_super_properties
+            .borrow()
+            .as_ref()
+            .expect(NIL)
+            .len()
+    }
+
+    /// Runs `f` with upstream's `superAccessVisitor` over `visitor`'s factory.
+    pub(crate) fn with_super_access_visitor<R>(
+        &self,
+        visitor: &mut NodeVisitor<'_>,
+        f: impl FnOnce(&mut NodeVisitor<'_>) -> R,
+    ) -> R {
+        let visit = |visitor: &mut NodeVisitor<'_>, node: Option<NodeId>| {
+            self.visit_super_access_node(visitor, node)
+        };
+        let mut super_access_visitor = self
+            .hooks
+            .new_node_visitor(Some(&visit), visitor.factory_mut());
+        f(&mut super_access_visitor)
+    }
 }
 
 impl SuperAccessState {

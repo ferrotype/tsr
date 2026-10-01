@@ -71,7 +71,7 @@ pub fn new_async_transformer<'a>(opts: &TransformOptions<'a>) -> Option<Transfor
         context: opts.context.clone(),
         hooks: opts.context.visitor_hooks(),
         failure: opts.failure.clone(),
-        super_access: SuperAccessState::init_super_access_visitor(&opts.context, &opts.failure),
+        super_access: SuperAccessState::new(&opts.context),
         context_flags: Cell::new(0),
         enclosing_function_parameter_names: RefCell::new(None),
         lexical_arguments: Cell::new(LexicalArgumentsInfo::default()),
@@ -1214,7 +1214,7 @@ impl AsyncTransformer {
                 .with_super_access_visitor(m, |visitor| visitor.visit_nodes(inner_parameters));
             async_body = self
                 .super_access
-                .substitute_super_accesses_in_body(m, async_body)
+                .substitute_super_accesses_in_body(m.factory_mut(), Some(async_body))
                 .expect(NIL);
         }
 
