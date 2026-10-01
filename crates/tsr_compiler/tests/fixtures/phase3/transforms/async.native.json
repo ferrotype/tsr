@@ -2205,6 +2205,45 @@
    },
    "name": "probe.ts",
    "source": "// @target: es2016\nasync function f(a, b) {\n    return (await a) + (await (await b));\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait",
+        "async"
+       ],
+       "text": "var __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\r\nvar __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var g = generator.apply(thisArg, _arguments || []), i, q = [];\r\n    return i = Object.create((typeof AsyncIterator === \"function\" ? AsyncIterator : Object).prototype), verb(\"next\"), verb(\"throw\"), verb(\"return\", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;\r\n    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }\r\n    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }\r\n    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }\r\n    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }\r\n    function fulfill(value) { resume(\"next\", value); }\r\n    function reject(value) { resume(\"throw\", value); }\r\n    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }\r\n};\r\nclass B {\r\n    m() { return 1; }\r\n}\r\nclass C extends B {\r\n    g() {\r\n        const _super = Object.create(null, {\r\n            m: { get: () => super.m }\r\n        });\r\n        return __asyncGenerator(this, arguments, function* g_1() {\r\n            yield yield __await(_super.m.call(this));\r\n            yield __await(0);\r\n        });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "async-generator-method-super",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b206d2829207b2072657475726e20313b207d207d0a636c617373204320657874656e64732042207b0a202020206173796e63202a672829207b0a20202020202020207969656c642073757065722e6d28293b0a2020202020202020617761697420303b0a202020207d0a7d0a"
+    },
+    "id": "async-generator-method-super",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { m() { return 1; } }\nclass C extends B {\n    async *g() {\n        yield super.m();\n        await 0;\n    }\n}\n"
   }
  ],
  "go": "go1.27.1",

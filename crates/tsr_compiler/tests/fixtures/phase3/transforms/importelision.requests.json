@@ -529,6 +529,226 @@
      "importelision"
     ]
    ]
+  },
+  {
+   "id": "go-importequals-1-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x = require(\"other\"); x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importequals-2-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x = require(\"other\");\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-1-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport \"m\";\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-2-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport * as x from \"other\"; x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-3-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x from \"other\"; x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-4-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { x } from \"other\"; x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-5-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport * as x from \"other\";\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-6-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x from \"other\";\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-7-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { x } from \"other\";\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-1-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-2-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * as x from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-3-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-4-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * as x from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-5-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x } from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-6-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x } from \"other\";\n// @filename: node_modules/other/index.ts\nexport type x = any;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-7-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x }; let x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-8",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x }; type x = any;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-9-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { x } from \"other\"; export { x };\n// @filename: node_modules/other/index.ts\nexport type x = any;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportassignment-1-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nlet x; export default x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportassignment-2",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\ntype x = any; export default x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
   }
  ]
 }

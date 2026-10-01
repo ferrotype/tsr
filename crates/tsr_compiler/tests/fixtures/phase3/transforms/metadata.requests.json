@@ -381,16 +381,6 @@
    ]
   },
   {
-   "id": "target-es5",
-   "name": "probe.ts",
-   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es5\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: bigint;\n    @dec b: Missing;\n    @dec m(x: string, ...y: number[]): Missing { return null as any; }\n}\n",
-   "chains": [
-    [
-     "metadata"
-    ]
-   ]
-  },
-  {
    "id": "target-esnext",
    "name": "probe.ts",
    "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: esnext\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: bigint;\n    @dec static accessor b: string;\n    @dec m(x: string): Promise<void> { return Promise.resolve(); }\n}\n",

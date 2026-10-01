@@ -3,7 +3,7 @@
   {
    "id": "commonjs-module",
    "name": "probe.ts",
-   "source": "// @module: commonjs\nimport { a } from \"./a\";\nexport const b = a;\n// @filename: a.ts\nexport const a = 1;\n",
+   "source": "// @module: commonjs\n// @filename: probe.ts\nimport { a } from \"./a\";\nexport const b = a;\n// @filename: a.ts\nexport const a = 1;\n",
    "chains": [
     [
      "impliedmodule"
@@ -13,7 +13,7 @@
   {
    "id": "esnext-module",
    "name": "probe.ts",
-   "source": "// @module: esnext\nimport { a } from \"./a\";\nexport const b = a;\n// @filename: a.ts\nexport const a = 1;\n",
+   "source": "// @module: esnext\n// @filename: probe.ts\nimport { a } from \"./a\";\nexport const b = a;\n// @filename: a.ts\nexport const a = 1;\n",
    "chains": [
     [
      "impliedmodule"
@@ -53,27 +53,7 @@
   {
    "id": "preserve",
    "name": "probe.ts",
-   "source": "// @module: preserve\nimport x = require(\"./a\");\nexport const y = x;\n// @filename: a.ts\nexport = 1;\n",
-   "chains": [
-    [
-     "impliedmodule"
-    ]
-   ]
-  },
-  {
-   "id": "system-falls-to-commonjs",
-   "name": "probe.ts",
-   "source": "// @module: system\nexport const a = 1;\n",
-   "chains": [
-    [
-     "impliedmodule"
-    ]
-   ]
-  },
-  {
-   "id": "none-target-es5",
-   "name": "probe.ts",
-   "source": "// @target: es5\nexport const a = 1;\n",
+   "source": "// @module: preserve\n// @filename: probe.ts\nimport x = require(\"./a\");\nexport const y = x;\n// @filename: a.ts\nexport = 1;\n",
    "chains": [
     [
      "impliedmodule"

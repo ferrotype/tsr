@@ -16,10 +16,6 @@
    "source": "// @target: es2016\nclass B { m() { return 1; } }\nclass C extends B {\n    async *g() {\n        yield super.m();\n        await 0;\n    }\n}\n",
    "chains": [
     [
-     "forawait",
-     "async"
-    ],
-    [
      "script"
     ]
    ]

@@ -379,6 +379,424 @@
    },
    "name": "probe.ts",
    "source": "// @target: es2018\nconst x = () => { try { } catch (e) { } };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "try { }\r\ncatch (_a) { }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalcatch-01",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "747279207b207d206361746368207b207d0a"
+    },
+    "id": "optionalcatch-01",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } catch { }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "try {\r\n    throw 1;\r\n}\r\ncatch (_a) {\r\n    console.log(1);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalcatch-02",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "747279207b207468726f7720313b207d206361746368207b20636f6e736f6c652e6c6f672831293b207d0a"
+    },
+    "id": "optionalcatch-02",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { throw 1; } catch { console.log(1); }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "try { }\r\ncatch (_a) { }\r\nfinally { }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalcatch-04",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "747279207b207d206361746368207b207d2066696e616c6c79207b207d0a"
+    },
+    "id": "optionalcatch-04",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } catch { } finally { }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "try { }\r\ncatch (_a) {\r\n    try { }\r\n    catch (_b) { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalcatch-05",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "747279207b207d206361746368207b20747279207b207d206361746368207b207d207d0a"
+    },
+    "id": "optionalcatch-05",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } catch { try { } catch { } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "function f() {\r\n    try {\r\n        return 1;\r\n    }\r\n    catch (_a) {\r\n        return 2;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalcatch-06",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e20662829207b0a20202020747279207b2072657475726e20313b207d206361746368207b2072657475726e20323b207d0a7d0a"
+    },
+    "id": "optionalcatch-06",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\nfunction f() {\n    try { return 1; } catch { return 2; }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "const g = () => { try { }\r\ncatch (_a) { } };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalcatch-10",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742067203d202829203d3e207b20747279207b207d206361746368207b207d207d3b0a"
+    },
+    "id": "optionalcatch-10",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\nconst g = () => { try { } catch { } };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "class C {\r\n    m() { try { }\r\n    catch (_a) { } }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalcatch-11",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020206d2829207b20747279207b207d206361746368207b207d207d0a7d0a"
+    },
+    "id": "optionalcatch-11",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\nclass C {\n    m() { try { } catch { } }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "try { }\r\ncatch (_a) { }\r\ntry { }\r\ncatch (e) {\r\n    try { }\r\n    catch (_b) { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalcatch-12",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "747279207b207d206361746368207b207d0a747279207b207d20636174636820286529207b20747279207b207d206361746368207b207d207d0a"
+    },
+    "id": "optionalcatch-12",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } catch { }\ntry { } catch (e) { try { } catch { } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "export function h() { try { }\r\ncatch (_a) { } }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalcatch-13",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f72742066756e6374696f6e20682829207b20747279207b207d206361746368202f2a632a2f207b207d207d0a"
+    },
+    "id": "optionalcatch-13",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\nexport function h() { try { } catch /*c*/ { } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "try { }\r\ncatch (_b) {\r\n    let _a = 1;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalcatch-14",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "747279207b207d206361746368207b206c6574205f61203d20313b207d0a"
+    },
+    "id": "optionalcatch-14",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } catch { let _a = 1; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "for (;;) {\r\n    try {\r\n        break;\r\n    }\r\n    catch (_a) {\r\n        continue;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalcatch-15",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "666f7220283b3b29207b20747279207b20627265616b3b207d206361746368207b20636f6e74696e75653b207d207d0a"
+    },
+    "id": "optionalcatch-15",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\nfor (;;) { try { break; } catch { continue; } }\n"
   }
  ],
  "go": "go1.27.1",

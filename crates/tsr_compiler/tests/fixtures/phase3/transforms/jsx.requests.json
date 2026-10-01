@@ -29,6 +29,206 @@
      "jsx"
     ]
    ]
+  },
+  {
+   "id": "automatic-basic",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\nexport const a = <div />;\nexport const b = <div id=\"x\">text</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "automatic-static-children",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\nexport const a = <div><b /><i /></div>;\nexport const b = <div>{...[1, 2]}</div>;\nexport const c = <div>{1}</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "automatic-key",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var k: string;\nexport const a = <div key=\"k1\" id=\"x\" />;\nexport const b = <div key={k}>c</div>;\nexport const c = <div key />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "automatic-key-after-spread",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\nexport const a = <div {...p} key=\"k\" />;\nexport const b = <div key=\"k\" {...p} />;\nexport const c = <div {...{a: 1}} key=\"k\" />;\nexport const d = <div {...{...p}} key=\"k\">x</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "automatic-fragment",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\nexport const a = <>x<b /></>;\nexport const b = <></>;\nexport const c = <>{1}</>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "automatic-import-source-option",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\n// @jsxImportSource: preact\nexport const a = <div><span /></div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "automatic-import-source-pragma",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\n/** @jsxImportSource solid-js */\nexport const a = <div />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "automatic-runtime-pragma",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n/** @jsxRuntime automatic */\nexport const a = <div>x</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "automatic-import-source-pragma-react-mode",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n/** @jsxImportSource preact */\nexport const a = <><div /></>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "automatic-prologue",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\n\"use strict\";\n\"other\";\nexport const a = <div />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "automatic-spread-es2017",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\n// @target: es2017\ndeclare var p: any;\nexport const a = <div {...p} x=\"1\">c</div>;\nexport const b = <div x=\"1\"><i /><b /></div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "automatic-script-legacy",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\n// @moduleDetection: legacy\nconst a = <div />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "automatic-commonjs",
+   "name": "probe.jsx",
+   "source": "// @jsx: react-jsx\n// @allowJs: true\n// @moduleDetection: legacy\n// @module: commonjs\n// @filename: probe.jsx\nconst x = require('./other');\nmodule.exports = <div>{x}</div>;\n// @filename: other.js\nmodule.exports = 1;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "automatic-nested-multiline",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\nexport const a = (\n  <ul>\n    <li>one</li>\n    <li>{2}</li>\n  </ul>\n);\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "dev-basic",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\nexport const a = <div />;\nexport const b = <div key=\"k\">x</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "dev-static-and-position",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\nexport const a = (\n    <div>\n      <b>one</b>\n      <i>two</i>\n    </div>\n);\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "dev-fragment",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\nexport const a = <><span /></>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "dev-utf16-column",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\nexport const s = \"é😀\"; export const a = <div />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "dev-key-after-spread",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\ndeclare var p: any;\nexport const a = <div {...p} key=\"k\" />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "dev-in-class",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\nexport class C {\n  render() {\n    return <div>{this.x}</div>;\n  }\n  x = 1;\n}\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
   }
  ]
 }

@@ -99,6 +99,116 @@
      "optionalcatch"
     ]
    ]
+  },
+  {
+   "id": "optionalcatch-01",
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } catch { }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-02",
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { throw 1; } catch { console.log(1); }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-04",
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } catch { } finally { }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-05",
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } catch { try { } catch { } }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-06",
+   "name": "probe.ts",
+   "source": "// @target: es2018\nfunction f() {\n    try { return 1; } catch { return 2; }\n}\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-10",
+   "name": "probe.ts",
+   "source": "// @target: es2018\nconst g = () => { try { } catch { } };\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-11",
+   "name": "probe.ts",
+   "source": "// @target: es2018\nclass C {\n    m() { try { } catch { } }\n}\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-12",
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } catch { }\ntry { } catch (e) { try { } catch { } }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-13",
+   "name": "probe.ts",
+   "source": "// @target: es2018\nexport function h() { try { } catch /*c*/ { } }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-14",
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } catch { let _a = 1; }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-15",
+   "name": "probe.ts",
+   "source": "// @target: es2018\nfor (;;) { try { break; } catch { continue; } }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
   }
  ]
 }
