@@ -82,6 +82,16 @@ pub trait RuntimeFactory: Factory {
         }
         flags
     }
+    /// The builder behind this factory, for transform helpers that read
+    /// through its `AstView` (subtree facts, the binding-pattern utilities) or
+    /// take the builder itself. `None` for a factory that is not a builder.
+    fn ast_builder(&self) -> Option<&AstBuilder> {
+        None
+    }
+    /// See [`RuntimeFactory::ast_builder`].
+    fn ast_builder_mut(&mut self) -> Option<&mut AstBuilder> {
+        None
+    }
 }
 
 fn override_parent_with_factory<F: RuntimeFactory + ?Sized>(
@@ -122,6 +132,12 @@ impl RuntimeFactory for AstBuilder {
         if !scratch.is_empty() || !self.override_core_parents(node) {
             override_parent_with_factory(self, node, scratch);
         }
+    }
+    fn ast_builder(&self) -> Option<&AstBuilder> {
+        Some(self)
+    }
+    fn ast_builder_mut(&mut self) -> Option<&mut AstBuilder> {
+        Some(self)
     }
     fn read_list(&self, id: NodeListId) -> NodeListRead<'_> {
         self.view().list(id).expect("factory list")
@@ -666,5 +682,11 @@ impl<T: RuntimeFactory + ?Sized> RuntimeFactory for crate::BorrowedFactory<'_, T
     }
     fn modifiers_to_flags(&self, nodes: NodeSlice) -> u32 {
         self.0.modifiers_to_flags(nodes)
+    }
+    fn ast_builder(&self) -> Option<&AstBuilder> {
+        self.0.ast_builder()
+    }
+    fn ast_builder_mut(&mut self) -> Option<&mut AstBuilder> {
+        self.0.ast_builder_mut()
     }
 }

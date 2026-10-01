@@ -25,6 +25,8 @@ use tsr_printer::{EmitContext, EmitVisitorHooks};
 pub enum Error {
     Arena(tsr_arena::Error),
     Resolver(EmitResolverError),
+    /// A failure of one of the printer's factory helpers.
+    Printer(tsr_printer::Error),
     /// A transformer or a construct the port does not transform yet, by
     /// upstream name.
     Unsupported(&'static str),
@@ -42,11 +44,18 @@ impl From<EmitResolverError> for Error {
     }
 }
 
+impl From<tsr_printer::Error> for Error {
+    fn from(error: tsr_printer::Error) -> Self {
+        Self::Printer(error)
+    }
+}
+
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Arena(error) => write!(f, "{error:?}"),
             Self::Resolver(error) => write!(f, "{error}"),
+            Self::Printer(error) => write!(f, "{error}"),
             Self::Unsupported(name) => write!(f, "unsupported: {name}"),
         }
     }

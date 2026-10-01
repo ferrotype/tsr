@@ -28,6 +28,8 @@ pub use transformer::{
 };
 
 #[cfg(test)]
+mod destructuring_tests;
+#[cfg(test)]
 mod transformer_tests;
 #[cfg(test)]
 mod utilities_tests;
