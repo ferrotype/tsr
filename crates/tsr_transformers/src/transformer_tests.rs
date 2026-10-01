@@ -132,7 +132,7 @@ fn parse(text: &str) -> Fixture {
     }
 }
 
-fn options<'a>(context: &EmitContext) -> TransformOptions<'a> {
+pub(crate) fn options<'a>(context: &EmitContext) -> TransformOptions<'a> {
     TransformOptions {
         context: context.clone(),
         compiler_options: Arc::new(CompilerOptions::default()),
