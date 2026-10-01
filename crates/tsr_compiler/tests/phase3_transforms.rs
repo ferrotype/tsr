@@ -111,7 +111,18 @@ fn transform(
     drop(chosen);
     drop(opts);
     let mut writer = TextWriter::new(new_line(program.options().new_line), 0);
-    Printer::new(printer_options(program), &context)
+    // Generated names for namespaces and enums read the file's binder state,
+    // as the pin reads it from the bound nodes.
+    let bound = program
+        .files()
+        .iter()
+        .find(|file| file.source() == source)
+        .expect("the file is the program's")
+        .bound()
+        .view();
+    let mut printer = Printer::new(printer_options(program), &context);
+    printer.bindings = Some(&bound);
+    printer
         .write(output.view(), file, Some(file), &mut writer, None)
         .map_err(|error| format!("{error:?}"))?;
     Ok(writer.text().to_vec())
