@@ -10,6 +10,7 @@
 //! `IsAssignmentExpression`, `IsSuperProperty`, `HasSyntacticModifier`) and the
 //! printer's `RestoreOuterExpressions`, which needs the concrete builder, are
 //! re-expressed here over `Factory` reads; they carry no port marker.
+use super::async_::{assignment_target_contains_super_property, is_update_expression};
 use crate::extract_modifiers;
 use crate::transformer::Error;
 use std::cell::{Cell, RefCell};
@@ -244,64 +245,6 @@ fn member_name_text(factory: &dyn Factory, name: NodeId) -> JsString {
         return identifier.text_owned();
     }
     panic!("Unhandled case in Node.Text: {:?}", read.kind())
-}
-
-// TODO(a8): estransforms.assignmentTargetContainsSuperProperty
-/// Checks top-down whether an assignment target expression contains a super
-/// property or element access (`super.x` or `super[x]`). A local copy of
-/// `async.go`'s function, which the async unit ports.
-fn assignment_target_contains_super_property(factory: &dyn RuntimeFactory, node: NodeId) -> bool {
-    let read = factory.node(node);
-    match read.kind().known() {
-        Some(K::PropertyAccessExpression | K::ElementAccessExpression) => {
-            return factory.node(read.expression().expect(NIL)).kind() == K::SuperKeyword;
-        }
-        // Upstream's separate parenthesized and spread-element cases.
-        Some(K::ParenthesizedExpression | K::SpreadElement) => {
-            return assignment_target_contains_super_property(
-                factory,
-                read.expression().expect(NIL),
-            );
-        }
-        Some(K::ArrayLiteralExpression) => {
-            let elements = list_nodes(factory, Some(read.element_list().expect(NIL)));
-            return elements
-                .into_iter()
-                .any(|element| assignment_target_contains_super_property(factory, element));
-        }
-        Some(K::ObjectLiteralExpression) => {
-            for property in list_nodes(factory, Some(read.property_list().expect(NIL))) {
-                let property_read = factory.node(property);
-                let target = match property_read.kind().known() {
-                    Some(K::PropertyAssignment) => property_read.initializer(),
-                    Some(K::ShorthandPropertyAssignment) => property_read.name(),
-                    Some(K::SpreadAssignment) => property_read.expression(),
-                    _ => continue,
-                };
-                if assignment_target_contains_super_property(factory, target.expect(NIL)) {
-                    return true;
-                }
-            }
-        }
-        _ => {}
-    }
-    false
-}
-
-// TODO(a8): estransforms.isUpdateExpression
-/// Whether a prefix or postfix unary expression is `++` or `--`. A local copy
-/// of `async.go`'s function, which the async unit ports.
-fn is_update_expression(factory: &dyn Factory, node: NodeId) -> bool {
-    let read = factory.node(node);
-    if let Some(prefix) = read.as_prefix_unary_expression() {
-        let operator = prefix.operator();
-        return operator == K::PlusPlusToken || operator == K::MinusMinusToken;
-    }
-    if let Some(postfix) = read.as_postfix_unary_expression() {
-        let operator = postfix.operator();
-        return operator == K::PlusPlusToken || operator == K::MinusMinusToken;
-    }
-    false
 }
 
 /// The class expression for a class declaration, without its `export` and

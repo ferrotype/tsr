@@ -1,5 +1,6 @@
 //! `transformers/estransforms/forawait.go`: lowers `for await` loops and async
 //! generators for targets before ES2018.
+use super::async_::is_simple_parameter_list;
 use super::utilities::SuperAccessState;
 use crate::transformer::{Failure, TransformOptions, Transformer};
 use std::cell::Cell;
@@ -183,13 +184,6 @@ impl ForawaitTransformer {
         visitor.visit_each_child(Some(node)).expect(NIL)
     }
 
-    /// `trackSuperAccess(node)`.
-    fn track(&self, visitor: &NodeVisitor<'_>, node: NodeId) -> bool {
-        self.super_access
-            .track_super_access(visitor.factory(), node);
-        true
-    }
-
     // port: tsc/internal/transformers/estransforms/forawait.go:forawaitTransformer.fallbackVisitor
     fn fallback_visitor(&self, visitor: &mut NodeVisitor<'_>, node: NodeId) -> Option<NodeId> {
         if self
@@ -213,9 +207,8 @@ impl ForawaitTransformer {
         ) {
             return Some(node);
         }
-        if !self.track(visitor, node) {
-            return Some(node);
-        }
+        self.super_access
+            .track_super_access(visitor.factory(), node);
         let visit: &NodeVisit<'_> = &|visitor: &mut NodeVisitor<'_>, node: Option<NodeId>| {
             self.visit_fallback(visitor, node)
         };
@@ -249,9 +242,7 @@ impl ForawaitTransformer {
         {
             return self.fallback_visitor(visitor, id);
         }
-        if !self.track(visitor, id) {
-            return node;
-        }
+        self.super_access.track_super_access(visitor.factory(), id);
         match visitor.node(id).kind().known() {
             Some(K::SourceFile) => Some(self.visit_source_file(visitor, id)),
             Some(K::AwaitExpression) => self.visit_await_expression(visitor, id),
@@ -1065,7 +1056,11 @@ impl ForawaitTransformer {
     ) -> Option<NodeListId> {
         let parameter_list = visitor.node(node).parameter_list();
         let parameters = list_nodes(visitor.factory(), parameter_list);
-        if is_simple_parameter_list(visitor.factory(), &parameters) {
+        let parameter_ids: Vec<NodeId> = parameters
+            .iter()
+            .map(|parameter| parameter.expect(NIL))
+            .collect();
+        if is_simple_parameter_list(visitor.factory(), &parameter_ids) {
             return self.ctx().visit_parameters(parameter_list, visitor);
         }
         // Add fixed parameters to preserve the function's `length` property.
@@ -1113,7 +1108,10 @@ impl ForawaitTransformer {
             (read.parameter_list(), read.body().expect(NIL), read.name())
         };
         let (body_statements, body_multi_line) = block_parts(visitor.factory(), body);
-        let parameters = list_nodes(visitor.factory(), parameter_list);
+        let parameters: Vec<NodeId> = list_nodes(visitor.factory(), parameter_list)
+            .into_iter()
+            .map(|parameter| parameter.expect(NIL))
+            .collect();
         let inner_parameters = if is_simple_parameter_list(visitor.factory(), &parameters) {
             None
         } else {
@@ -1251,17 +1249,4 @@ fn captured_size(state: &SuperAccessState) -> usize {
         .as_ref()
         .expect(NIL)
         .len()
-}
-
-/// Whether every parameter has no initializer and an Identifier name.
-// TODO(a8): estransforms.isSimpleParameterList
-fn is_simple_parameter_list(factory: &dyn RuntimeFactory, parameters: &[Option<NodeId>]) -> bool {
-    parameters.iter().all(|parameter| {
-        let read = factory.node(parameter.expect(NIL));
-        let data = read
-            .as_parameter_declaration()
-            .expect("interface conversion: ast.nodeData is not *ast.ParameterDeclaration");
-        data.initializer().is_none()
-            && factory.node(data.name().expect(NIL)).kind() == K::Identifier
-    })
 }

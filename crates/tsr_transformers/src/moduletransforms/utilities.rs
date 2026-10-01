@@ -202,14 +202,6 @@ pub fn is_file_level_reserved_generated_identifier(
 /// value could not possibly change between any such locations.
 // port: tsc/internal/transformers/moduletransforms/utilities.go:isSimpleInlineableExpression
 pub fn is_simple_inlineable_expression(factory: &dyn Factory, expression: NodeId) -> bool {
-    let read = factory.node(expression);
-    !tsr_ast::is_identifier(&read) && is_simple_copiable_expression(&read)
-}
-
-// TODO(h1): transformers.IsSimpleCopiableExpression
-fn is_simple_copiable_expression(expression: &tsr_ast::NodeRead<'_>) -> bool {
-    tsr_ast::utilities::is_string_literal_like(expression)
-        || tsr_ast::is_numeric_literal(expression)
-        || tsr_ast::is_keyword_kind(expression.kind())
-        || tsr_ast::is_identifier(expression)
+    !tsr_ast::is_identifier(&factory.node(expression))
+        && crate::utilities::is_simple_copiable_expression(factory, expression)
 }

@@ -2,6 +2,7 @@
 //! and export bindings of a module, collected for the module transformers, and
 //! the `tslib` import of `--importHelpers`.
 use crate::transformer::{Error, SharedReferenceResolver};
+use crate::utilities::is_local_name;
 use std::collections::{HashMap, HashSet};
 use std::hash::Hash;
 use tsr_ast::{
@@ -482,11 +483,6 @@ impl ExternalModuleInfoCollector<'_, '_> {
         }
         Ok(())
     }
-}
-
-// TODO(h1): transformers.IsLocalName
-fn is_local_name(emit_context: &EmitContext, name: NodeId) -> bool {
-    emit_context.emit_flags(name) & emit_flags::LOCAL_NAME != 0
 }
 
 const EXTERNAL_HELPERS_MODULE_NAME_TEXT: &[u8] = b"tslib";

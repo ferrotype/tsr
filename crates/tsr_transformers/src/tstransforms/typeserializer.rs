@@ -6,6 +6,7 @@
 //! parsed and synthesized nodes alike; a failed read or resolver query is an
 //! [`Error`] the transformer records.
 use crate::transformer::{Error, SharedEmitResolver};
+use crate::utilities::is_generated_identifier;
 use std::cell::Cell;
 use tsr_ast::{
     node_flags, token_flags, AstView, FactoryMethods, JsString, NodeId, NodeListId, RuntimeFactory,
@@ -64,12 +65,6 @@ fn text(view: AstView<'_>, node: NodeId) -> Result<Vec<u8>, Error> {
         return Ok(literal.text().to_vec());
     }
     panic!("Unhandled case in Node.Text: {:?}", read.kind())
-}
-
-/// `transformers.IsGeneratedIdentifier`.
-// TODO(h1): transformers.IsGeneratedIdentifier
-fn is_generated_identifier(emit_context: &EmitContext, name: NodeId) -> bool {
-    emit_context.has_auto_generate_info(name)
 }
 
 #[derive(Clone, Copy, Default)]

@@ -10,6 +10,7 @@
 //! visitors create one where upstream calls back into `tx.visit`.
 use super::utilities::{identifier_text, new_node_list, SuperAccessState};
 use crate::transformer::{Failure, TransformOptions, Transformer};
+use crate::utilities::convert_binding_pattern_to_assignment_pattern;
 use std::cell::{Cell, RefCell};
 use std::collections::HashSet;
 use std::rc::Rc;
@@ -894,7 +895,7 @@ impl AsyncTransformer {
                 let name = m.node(*all.first().expect(NIL)).name().expect(NIL);
                 let target = if tsr_ast::utilities::is_binding_pattern(&m.node(name)) {
                     convert_binding_pattern_to_assignment_pattern(
-                        &mut self.context.clone(),
+                        &self.context,
                         m.factory_mut(),
                         name,
                     )
@@ -952,7 +953,7 @@ impl AsyncTransformer {
         };
         let mut context = self.context.clone();
         let target = if tsr_ast::utilities::is_binding_pattern(&m.node(name)) {
-            convert_binding_pattern_to_assignment_pattern(&mut context, m.factory_mut(), name)
+            convert_binding_pattern_to_assignment_pattern(&context, m.factory_mut(), name)
         } else {
             name
         };
@@ -1420,7 +1421,7 @@ pub(super) fn is_update_expression(factory: &dyn RuntimeFactory, node: NodeId) -
 
 /// Checks if every parameter has no initializer and an Identifier name.
 // port: tsc/internal/transformers/estransforms/async.go:isSimpleParameterList
-fn is_simple_parameter_list(factory: &dyn RuntimeFactory, params: &[NodeId]) -> bool {
+pub(super) fn is_simple_parameter_list(factory: &dyn RuntimeFactory, params: &[NodeId]) -> bool {
     for &param in params {
         let (initializer, _, name) = parameter_parts(factory, param);
         if initializer.is_some() || factory.node(name.expect(NIL)).kind() != K::Identifier {
@@ -1518,180 +1519,4 @@ fn for_in_or_of_parts(
         .as_for_in_or_of_statement()
         .expect("ForInOrOfStatement payload");
     (data.initializer(), data.expression(), data.statement())
-}
-
-/// A binding element's rest token, name and initializer.
-fn binding_element_parts(
-    factory: &dyn RuntimeFactory,
-    element: NodeId,
-) -> (Option<NodeId>, Option<NodeId>, Option<NodeId>) {
-    let read = factory.node(element);
-    let data = read.as_binding_element().expect("BindingElement payload");
-    (data.dot_dot_dot_token(), data.name(), data.initializer())
-}
-
-// TODO(h1): transformers.convertBindingElementToArrayAssignmentElement
-fn convert_binding_element_to_array_assignment_element(
-    context: &mut EmitContext,
-    factory: &mut dyn RuntimeFactory,
-    element: NodeId,
-) -> NodeId {
-    let (dot_dot_dot_token, name, initializer) = binding_element_parts(factory, element);
-    let Some(name) = name else {
-        let elision = factory.new_omitted_expression();
-        context.set_original(elision, element);
-        context.assign_comment_and_source_map_ranges(factory, elision, element);
-        return elision;
-    };
-    if dot_dot_dot_token.is_some() {
-        let spread = factory.new_spread_element(Some(name));
-        context.set_original(spread, element);
-        context.assign_comment_and_source_map_ranges(factory, spread, element);
-        return spread;
-    }
-    let expression = convert_binding_name_to_assignment_element_target(context, factory, name);
-    if let Some(initializer) = initializer {
-        let assignment = context.new_assignment_expression(factory, expression, initializer);
-        context.set_original(assignment, element);
-        context.assign_comment_and_source_map_ranges(factory, assignment, element);
-        return assignment;
-    }
-    expression
-}
-
-// TODO(h1): transformers.convertBindingElementToObjectAssignmentElement
-fn convert_binding_element_to_object_assignment_element(
-    context: &mut EmitContext,
-    factory: &mut dyn RuntimeFactory,
-    element: NodeId,
-) -> NodeId {
-    let (dot_dot_dot_token, name, initializer) = binding_element_parts(factory, element);
-    if dot_dot_dot_token.is_some() {
-        let spread = factory.new_spread_assignment(name);
-        context.set_original(spread, element);
-        context.assign_comment_and_source_map_ranges(factory, spread, element);
-        return spread;
-    }
-    let property_name = factory
-        .node(element)
-        .as_binding_element()
-        .expect("BindingElement payload")
-        .property_name();
-    if let Some(property_name) = property_name {
-        let mut expression =
-            convert_binding_name_to_assignment_element_target(context, factory, name.expect(NIL));
-        if let Some(initializer) = initializer {
-            expression = context.new_assignment_expression(factory, expression, initializer);
-        }
-        let assignment = factory.new_property_assignment(
-            None, /*modifiers*/
-            Some(property_name),
-            None, /*postfixToken*/
-            None, /*typeNode*/
-            Some(expression),
-        );
-        context.set_original(assignment, element);
-        context.assign_comment_and_source_map_ranges(factory, assignment, element);
-        return assignment;
-    }
-    let equals_token = initializer.map(|_| factory.new_token(K::EqualsToken.into()));
-    let assignment = factory.new_shorthand_property_assignment(
-        None, /*modifiers*/
-        name,
-        None, /*postfixToken*/
-        None, /*typeNode*/
-        equals_token,
-        initializer,
-    );
-    context.set_original(assignment, element);
-    context.assign_comment_and_source_map_ranges(factory, assignment, element);
-    assignment
-}
-
-// TODO(h1): transformers.ConvertBindingPatternToAssignmentPattern
-fn convert_binding_pattern_to_assignment_pattern(
-    context: &mut EmitContext,
-    factory: &mut dyn RuntimeFactory,
-    element: NodeId,
-) -> NodeId {
-    match factory.node(element).kind().known() {
-        Some(K::ArrayBindingPattern) => {
-            convert_binding_element_to_array_assignment_pattern(context, factory, element)
-        }
-        Some(K::ObjectBindingPattern) => {
-            convert_binding_element_to_object_assignment_pattern(context, factory, element)
-        }
-        _ => panic!("Unknown binding pattern"),
-    }
-}
-
-// TODO(h1): transformers.convertBindingElementToObjectAssignmentPattern
-fn convert_binding_element_to_object_assignment_pattern(
-    context: &mut EmitContext,
-    factory: &mut dyn RuntimeFactory,
-    element: NodeId,
-) -> NodeId {
-    let elements = factory
-        .node(element)
-        .as_binding_pattern()
-        .expect("BindingPattern payload")
-        .elements()
-        .expect(NIL);
-    let mut properties = Vec::new();
-    for binding_element in list_nodes(factory, elements) {
-        properties.push(convert_binding_element_to_object_assignment_element(
-            context,
-            factory,
-            binding_element,
-        ));
-    }
-    let property_list = new_node_list(factory, properties);
-    let loc = factory.read_list(elements).loc();
-    factory.set_list_location(property_list, loc);
-    let object =
-        factory.new_object_literal_expression(Some(property_list), false /*multiLine*/);
-    context.set_original(object, element);
-    context.assign_comment_and_source_map_ranges(factory, object, element);
-    object
-}
-
-// TODO(h1): transformers.convertBindingElementToArrayAssignmentPattern
-fn convert_binding_element_to_array_assignment_pattern(
-    context: &mut EmitContext,
-    factory: &mut dyn RuntimeFactory,
-    element: NodeId,
-) -> NodeId {
-    let elements = factory
-        .node(element)
-        .as_binding_pattern()
-        .expect("BindingPattern payload")
-        .elements()
-        .expect(NIL);
-    let mut converted = Vec::new();
-    for binding_element in list_nodes(factory, elements) {
-        converted.push(convert_binding_element_to_array_assignment_element(
-            context,
-            factory,
-            binding_element,
-        ));
-    }
-    let element_list = new_node_list(factory, converted);
-    let loc = factory.read_list(elements).loc();
-    factory.set_list_location(element_list, loc);
-    let object = factory.new_array_literal_expression(Some(element_list), false /*multiLine*/);
-    context.set_original(object, element);
-    context.assign_comment_and_source_map_ranges(factory, object, element);
-    object
-}
-
-// TODO(h1): transformers.convertBindingNameToAssignmentElementTarget
-fn convert_binding_name_to_assignment_element_target(
-    context: &mut EmitContext,
-    factory: &mut dyn RuntimeFactory,
-    element: NodeId,
-) -> NodeId {
-    if tsr_ast::utilities::is_binding_pattern(&factory.node(element)) {
-        return convert_binding_pattern_to_assignment_pattern(context, factory, element);
-    }
-    element
 }
