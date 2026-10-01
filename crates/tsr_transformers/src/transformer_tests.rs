@@ -36,7 +36,10 @@ impl ReferenceResolver for Unasked {
     fn get_referenced_value_declaration(&mut self, _: NodeId) -> ResolverResult<Option<NodeId>> {
         unreachable!()
     }
-    fn get_referenced_value_declarations(&mut self, _: NodeId) -> ResolverResult<Vec<NodeId>> {
+    fn get_referenced_value_declarations(
+        &mut self,
+        _: NodeId,
+    ) -> ResolverResult<Option<Vec<NodeId>>> {
         unreachable!()
     }
     fn get_element_access_expression_name(&mut self, _: NodeId) -> ResolverResult<JsString> {
@@ -76,7 +79,7 @@ impl EmitResolver for Unasked {
     }
     fn get_type_reference_serialization_kind(
         &mut self,
-        _: NodeId,
+        _: Option<NodeId>,
         _: Option<NodeId>,
     ) -> ResolverResult<TypeReferenceSerializationKind> {
         unreachable!()

@@ -67,7 +67,7 @@ pub enum TypeReferenceSerializationKind {
     /// The TypeReferenceNode resolves to an Array-like type.
     ArrayLikeType,
     /// The TypeReferenceNode resolves to the ESSymbol type.
-    ESSymbolType,
+    EsSymbolType,
     /// The TypeReferenceNode resolved to the global Promise constructor symbol.
     Promise,
     /// The TypeReferenceNode resolves to a Function type or a type with call signatures.
@@ -88,7 +88,11 @@ pub trait ReferenceResolver {
     fn get_referenced_import_declaration(&mut self, node: NodeId)
         -> ResolverResult<Option<NodeId>>;
     fn get_referenced_value_declaration(&mut self, node: NodeId) -> ResolverResult<Option<NodeId>>;
-    fn get_referenced_value_declarations(&mut self, node: NodeId) -> ResolverResult<Vec<NodeId>>;
+    /// Upstream's nil slice is `None`.
+    fn get_referenced_value_declarations(
+        &mut self,
+        node: NodeId,
+    ) -> ResolverResult<Option<Vec<NodeId>>>;
     fn get_element_access_expression_name(
         &mut self,
         expression: NodeId,
@@ -119,7 +123,7 @@ pub trait EmitResolver: ReferenceResolver {
     // decorator metadata
     fn get_type_reference_serialization_kind(
         &mut self,
-        name: NodeId,
+        name: Option<NodeId>,
         serial_scope: Option<NodeId>,
     ) -> ResolverResult<TypeReferenceSerializationKind>;
 
@@ -140,4 +144,99 @@ pub trait EmitResolver: ReferenceResolver {
         node: NodeId,
         reference: NodeId,
     ) -> ResolverResult<()>;
+}
+
+/// A borrowed resolver is a resolver, so a transformation can share one it
+/// does not own.
+impl<T: ReferenceResolver + ?Sized> ReferenceResolver for &mut T {
+    fn get_referenced_export_container(
+        &mut self,
+        node: NodeId,
+        prefix_locals: bool,
+    ) -> ResolverResult<Option<NodeId>> {
+        (**self).get_referenced_export_container(node, prefix_locals)
+    }
+    fn get_referenced_import_declaration(
+        &mut self,
+        node: NodeId,
+    ) -> ResolverResult<Option<NodeId>> {
+        (**self).get_referenced_import_declaration(node)
+    }
+    fn get_referenced_value_declaration(&mut self, node: NodeId) -> ResolverResult<Option<NodeId>> {
+        (**self).get_referenced_value_declaration(node)
+    }
+    fn get_referenced_value_declarations(
+        &mut self,
+        node: NodeId,
+    ) -> ResolverResult<Option<Vec<NodeId>>> {
+        (**self).get_referenced_value_declarations(node)
+    }
+    fn get_element_access_expression_name(
+        &mut self,
+        expression: NodeId,
+    ) -> ResolverResult<JsString> {
+        (**self).get_element_access_expression_name(expression)
+    }
+    fn get_referenced_member_value_declaration(
+        &mut self,
+        node: NodeId,
+    ) -> ResolverResult<Option<NodeId>> {
+        (**self).get_referenced_member_value_declaration(node)
+    }
+}
+
+impl<T: EmitResolver + ?Sized> EmitResolver for &mut T {
+    fn is_referenced_alias_declaration(&mut self, node: NodeId) -> ResolverResult<bool> {
+        (**self).is_referenced_alias_declaration(node)
+    }
+    fn is_value_alias_declaration(&mut self, node: NodeId) -> ResolverResult<bool> {
+        (**self).is_value_alias_declaration(node)
+    }
+    fn is_top_level_value_import_equals_with_entity_name(
+        &mut self,
+        node: NodeId,
+    ) -> ResolverResult<bool> {
+        (**self).is_top_level_value_import_equals_with_entity_name(node)
+    }
+    fn mark_linked_references_recursively(&mut self, file: NodeId) -> ResolverResult<()> {
+        (**self).mark_linked_references_recursively(file)
+    }
+    fn get_external_module_file_from_declaration(
+        &mut self,
+        node: NodeId,
+    ) -> ResolverResult<Option<NodeId>> {
+        (**self).get_external_module_file_from_declaration(node)
+    }
+    fn get_effective_declaration_flags(&mut self, node: NodeId, flags: u32) -> ResolverResult<u32> {
+        (**self).get_effective_declaration_flags(node, flags)
+    }
+    fn get_type_reference_serialization_kind(
+        &mut self,
+        name: Option<NodeId>,
+        serial_scope: Option<NodeId>,
+    ) -> ResolverResult<TypeReferenceSerializationKind> {
+        (**self).get_type_reference_serialization_kind(name, serial_scope)
+    }
+    fn get_constant_value(&mut self, node: NodeId) -> ResolverResult<Option<ConstantValue>> {
+        (**self).get_constant_value(node)
+    }
+    fn get_enum_member_value(&mut self, node: NodeId) -> ResolverResult<EnumMemberValue> {
+        (**self).get_enum_member_value(node)
+    }
+    fn get_jsx_factory_entity(&mut self, location: NodeId) -> ResolverResult<Option<NodeId>> {
+        (**self).get_jsx_factory_entity(location)
+    }
+    fn get_jsx_fragment_factory_entity(
+        &mut self,
+        location: NodeId,
+    ) -> ResolverResult<Option<NodeId>> {
+        (**self).get_jsx_fragment_factory_entity(location)
+    }
+    fn set_referenced_import_declaration(
+        &mut self,
+        node: NodeId,
+        reference: NodeId,
+    ) -> ResolverResult<()> {
+        (**self).set_referenced_import_declaration(node, reference)
+    }
 }
