@@ -326,8 +326,9 @@ impl EmitContext {
             append_if_unique(&mut emit_node.helpers, helper);
         }
     }
-    /// The predicate runs before the tables are locked, once per source helper
-    /// in order, so it may read this context.
+    /// The predicate runs with no table lock held, once per source helper in
+    /// order, so it may read this context: it sees the target's helpers as
+    /// they are after the moves before it.
     // port: tsc/internal/printer/emitcontext.go:EmitContext.MoveEmitHelpers
     pub fn move_emit_helpers(
         &mut self,
@@ -346,24 +347,19 @@ impl EmitContext {
         if source_emit_helpers.is_empty() {
             return;
         }
-        let moved: Vec<bool> = source_emit_helpers
-            .iter()
-            .map(|&helper| predicate(helper))
-            .collect();
-        let mut tables = self.tables();
-        tables.emit_node(target);
+        self.tables().emit_node(target);
         let mut helpers_removed = 0;
         let mut kept = Vec::with_capacity(source_emit_helpers.len());
-        for (&helper, moved) in source_emit_helpers.iter().zip(moved) {
-            if moved {
+        for &helper in &source_emit_helpers {
+            if predicate(helper) {
                 helpers_removed += 1;
-                append_if_unique(&mut tables.emit_node(target).helpers, helper);
+                append_if_unique(&mut self.tables().emit_node(target).helpers, helper);
             } else {
                 kept.push(helper);
             }
         }
         if helpers_removed > 0 {
-            tables.emit_node(source).helpers = kept;
+            self.tables().emit_node(source).helpers = kept;
         }
     }
     // port: tsc/internal/printer/emitcontext.go:EmitContext.GetEmitHelpers

@@ -1748,11 +1748,16 @@ impl EmitContext {
 fn flatten_comma_element(factory: &dyn Factory, node: NodeId, expressions: &mut Vec<NodeId>) {
     let read = factory.node(node);
     if let Some(binary) = read.as_binary_expression() {
-        let operator = binary
-            .operator_token()
-            .expect("runtime error: invalid memory address or nil pointer dereference");
+        // The operator token is read only for a synthesized binary expression.
         if tsr_ast::utilities::node_is_synthesized(&read)
-            && factory.node(operator).kind() == K::CommaToken
+            && factory
+                .node(
+                    binary
+                        .operator_token()
+                        .expect("runtime error: invalid memory address or nil pointer dereference"),
+                )
+                .kind()
+                == K::CommaToken
         {
             let (left, right) = (binary.left(), binary.right());
             drop(read);

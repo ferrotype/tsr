@@ -293,8 +293,20 @@ fn common_source_directory_prefers_root_dir_then_config_directory() {
 #[test]
 fn computed_common_directory_of_a_bare_root_is_the_current_directory() {
     use tsr_tsoptions::output_paths::computed_common;
-    assert_eq!(computed_common(&[text("/"), text("/a/b.ts")], b"/w", true), b"/w");
-    assert_eq!(computed_common(&[text("/a/b.ts"), text("/")], b"/w", true), b"/w");
-    assert_eq!(computed_common(&[text("/a/b.ts"), text("/c/d.ts")], b"/w", true), b"/");
-    assert_eq!(computed_common(&[text("/a/x/b.ts"), text("/a/d.ts")], b"/w", true), b"/a");
+    assert_eq!(
+        computed_common(&[text("/"), text("/a/b.ts")], b"/w", true),
+        b"/w"
+    );
+    assert_eq!(
+        computed_common(&[text("/a/b.ts"), text("/")], b"/w", true),
+        b"/w"
+    );
+    assert_eq!(
+        computed_common(&[text("/a/b.ts"), text("/c/d.ts")], b"/w", true),
+        b"/"
+    );
+    assert_eq!(
+        computed_common(&[text("/a/x/b.ts"), text("/a/d.ts")], b"/w", true),
+        b"/a"
+    );
 }

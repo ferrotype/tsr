@@ -515,10 +515,8 @@ impl EmitContext {
         let declarations = list_read
             .as_variable_declaration_list()
             .expect("interface conversion: ast.nodeData is not *ast.VariableDeclarationList")
-            .declarations();
-        let Some(declarations) = declarations else {
-            return true;
-        };
+            .declarations()
+            .expect("runtime error: invalid memory address or nil pointer dereference");
         let nodes = factory.read_list(declarations).nodes();
         factory.read_nodes(nodes).iter().all(|declaration| {
             is_hoisted_variable(
