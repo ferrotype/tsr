@@ -53,20 +53,23 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
 
     // port: tsc/internal/transformers/declarations/transform.go:hasAnyBindingInitializers
     fn has_any_binding_initializers(&self, binding_pattern: NodeId) -> bool {
-        for elem in self.list_nodes(self.node(binding_pattern).element_list()) {
-            if self.kind(elem) != K::BindingElement {
-                continue;
-            }
-            if self.node(elem).initializer().is_some() {
-                return true;
-            }
-            if let Some(name) = self.node(elem).name() {
-                if self.is_binding_pattern(name) && self.has_any_binding_initializers(name) {
+        // Recursion once per nested pattern.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            for elem in self.list_nodes(self.node(binding_pattern).element_list()) {
+                if self.kind(elem) != K::BindingElement {
+                    continue;
+                }
+                if self.node(elem).initializer().is_some() {
                     return true;
                 }
+                if let Some(name) = self.node(elem).name() {
+                    if self.is_binding_pattern(name) && self.has_any_binding_initializers(name) {
+                        return true;
+                    }
+                }
             }
-        }
-        false
+            false
+        })
     }
 
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformCjsRequireVariableDeclaration

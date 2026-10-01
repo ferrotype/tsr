@@ -160,3 +160,33 @@ fn deep_inputs_downlevel_through_the_growth_guards() {
         class_depth
     );
 }
+
+/// Depth of the nested `using` blocks: the transform's cost grows about as
+/// the cube of the depth (300 blocks take over five minutes in a debug
+/// build), and without its growth guard 70 blocks overflow the 256 KiB
+/// thread.
+const USING_DEPTH: usize = 100;
+
+/// `USING_DEPTH` nested blocks with a `using` declaration each, at ES2022:
+/// the `using` transform visits a block's statements directly, once per
+/// nested block (`usingDeclarationTransformer.visit`). Emitted
+/// single-threaded on a 256 KiB thread and concurrently on the work group's
+/// reserved stacks with the same output; every block gets its disposable
+/// resource.
+#[test]
+fn deep_using_blocks_downlevel_through_the_growth_guards() {
+    let n = USING_DEPTH;
+    let text = format!(
+        "export function f(): void {{ {}{} }}\n",
+        "{ using a = null; ".repeat(n),
+        "}".repeat(n)
+    );
+    let observed = support::emit_deep(
+        &files(&[("/lib.d.ts", LIB), ("/a.ts", &text)]),
+        &target(ScriptTarget::ES2022),
+    );
+    assert_eq!(
+        support::occurrences(observed.text("/a.js"), "= __addDisposableResource(env_"),
+        n
+    );
+}

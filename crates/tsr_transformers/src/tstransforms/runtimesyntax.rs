@@ -382,6 +382,13 @@ impl RuntimeSyntaxTransformer<'_> {
     /// the first declaration for the provided symbol.
     // port: tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.recordDeclarationInScope
     fn record_declaration_in_scope(&self, factory: &dyn RuntimeFactory, node: NodeId) {
+        // A binding pattern recurses here directly, once per nested pattern.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.record_declaration_in_scope_worker(factory, node);
+        });
+    }
+
+    fn record_declaration_in_scope_worker(&self, factory: &dyn RuntimeFactory, node: NodeId) {
         let read = factory.node(node);
         match read.kind().known() {
             Some(K::VariableStatement) => {

@@ -58,7 +58,11 @@ impl CheckerState {
         if let Some(Some(value)) = self.emit.visible.try_get(node) {
             return Ok(*value);
         }
-        let value = self.determine_declaration_visible(node)?;
+        // A binding element asks for its pattern's declaration, once per
+        // nested pattern.
+        let value = stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.determine_declaration_visible(node)
+        })?;
         *self.emit.visible.get_or_default(node) = Some(value);
         Ok(value)
     }

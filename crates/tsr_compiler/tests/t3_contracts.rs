@@ -349,3 +349,48 @@ fn deep_inputs_transform_through_the_growth_guards() {
         2 * decorated_depth
     );
 }
+
+/// Depth of the nested destructuring patterns.
+const PATTERN_DEPTH: usize = 300;
+
+/// A declared object destructuring `PATTERN_DEPTH` patterns deep with a rest
+/// element at the bottom. At ESNext the runtime-syntax transform's
+/// `recordDeclarationInScope` and the declaration transform's binding-name
+/// walks (`getBindingNameVisible`, its binding-name visitor) recurse once per
+/// nested pattern; at ES2017 the destructuring flattener
+/// (`flattenBindingOrAssignmentElement`) and its pattern walks
+/// (`bindingOrAssignmentElementAssignsToName`,
+/// `bindingOrAssignmentElementContainsNonLiteralComputedName`) do too. The
+/// checker's visibility walk takes a deeper pattern to overflow; the T7
+/// contracts declare one. Each target is emitted single-threaded on a 256
+/// KiB thread and concurrently on the work group's reserved stacks with the
+/// same output, and the whole depth is kept, or lowered to one property
+/// access chain and one `__rest`.
+#[test]
+fn deep_destructuring_patterns_transform_through_the_growth_guards() {
+    let _serial = serial();
+    let n = PATTERN_DEPTH;
+    let text = format!(
+        "declare const s: any;\nexport const {{ {}a, ...r{} }} = s;\n",
+        "a: { ".repeat(n),
+        " }".repeat(n)
+    );
+    for target in [ScriptTarget::ESNEXT, ScriptTarget::ES2017] {
+        let options = CompilerOptions {
+            target,
+            declaration: Tristate::TRUE,
+            ..esnext()
+        };
+        let observed =
+            support::emit_deep(&files(&[("/lib.d.ts", LIB), ("/a.ts", &text)]), &options);
+        let script = observed.text("/a.js");
+        if target == ScriptTarget::ESNEXT {
+            assert_eq!(support::occurrences(script, "a: { "), n);
+        } else {
+            let chain = format!("(_a = s{}, _a)", ".a".repeat(n));
+            assert_eq!(support::occurrences(script, &chain), 1);
+            assert_eq!(support::occurrences(script, "r = __rest(_a, [\"a\"])"), 1);
+        }
+        assert_eq!(support::occurrences(observed.text("/a.d.ts"), "a: { "), n);
+    }
+}

@@ -118,6 +118,13 @@ impl UsingDeclarationTransformer {
 
     // port: tsc/internal/transformers/estransforms/using.go:usingDeclarationTransformer.visit
     fn visit(&self, visitor: &mut NodeVisitor<'_>, node: Option<NodeId>) -> Option<NodeId> {
+        // A block's statements are visited here directly, once per nested block.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.visit_worker(visitor, node)
+        })
+    }
+
+    fn visit_worker(&self, visitor: &mut NodeVisitor<'_>, node: Option<NodeId>) -> Option<NodeId> {
         if self.failure.is_set() {
             return node;
         }
