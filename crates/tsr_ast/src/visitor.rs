@@ -35,6 +35,12 @@ pub trait RuntimeFactory: Factory {
     fn set_list_modifier_flags(&mut self, id: NodeListId, flags: u32) {
         self.mutable_list(id).set_modifier_flags(flags);
     }
+    /// A syntax view over this factory's nodes, parsed and synthesized, for
+    /// the `ast` predicates a transformer shares with the checker. `None` for
+    /// a factory that has none.
+    fn ast_view(&self) -> Option<AstView<'_>> {
+        None
+    }
     fn clone_source(&mut self, original: NodeId) -> NodeId;
     fn update_source(
         &mut self,
@@ -134,6 +140,9 @@ fn override_parent_with_factory<F: RuntimeFactory + ?Sized>(
 }
 
 impl RuntimeFactory for AstBuilder {
+    fn ast_view(&self) -> Option<AstView<'_>> {
+        Some(self.view())
+    }
     fn override_parent_in_immediate_children(&mut self, node: NodeId, scratch: &mut Vec<NodeId>) {
         if !scratch.is_empty() || !self.override_core_parents(node) {
             override_parent_with_factory(self, node, scratch);

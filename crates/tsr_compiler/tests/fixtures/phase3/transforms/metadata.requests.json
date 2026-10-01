@@ -1,0 +1,444 @@
+{
+ "cases": [
+  {
+   "id": "primitives",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: string;\n    @dec b: number;\n    @dec c: boolean;\n    @dec d: symbol;\n    @dec e: object;\n    @dec f: any;\n    @dec g: unknown;\n    @dec h: never;\n    @dec i: void;\n    @dec j: undefined;\n    @dec k: null;\n    @dec l;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "bigint-es2017",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: bigint;\n    @dec b: 1n;\n    @dec c: -1n;\n    @dec d: bigint | 2n;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "bigint-es2020",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2020\ndeclare function dec(...args: any[]): any;\ntype B = bigint;\nclass C {\n    @dec a: bigint;\n    @dec b: 1n;\n    @dec c: B;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "literals",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: \"a\";\n    @dec b: 1;\n    @dec c: -1;\n    @dec d: true;\n    @dec e: false;\n    @dec f: `x`;\n    @dec g: `a${string}`;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "unions-strict",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @strict: true\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: string | null;\n    @dec b: string | undefined;\n    @dec c: number | string;\n    @dec d: \"a\" | \"b\";\n    @dec e: 1 | 2;\n    @dec f: string | never;\n    @dec g: string | unknown;\n    @dec h: any | string;\n    @dec i: null | undefined;\n    @dec j: never | never;\n    @dec k: boolean | true;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "unions-nonstrict",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: string | null;\n    @dec b: string | undefined;\n    @dec c: number | null | undefined;\n    @dec d: null | undefined;\n    @dec e: void | undefined;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "intersections",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2016\n// @strict: true\ndeclare function dec(...args: any[]): any;\nclass A {}\nclass B {}\nclass C {\n    @dec a: string & never;\n    @dec b: string & unknown;\n    @dec c: A & B;\n    @dec d: string & number;\n    @dec e: A & A;\n    @dec f: unknown & unknown;\n    @dec g: any & string;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "arrays-tuples",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: string[];\n    @dec b: Array<string>;\n    @dec c: [string, number];\n    @dec d: readonly string[];\n    @dec e: ReadonlyArray<number>;\n    @dec f: readonly [string];\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "functions",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ninterface Callable { (): void }\ninterface Newable { new (): object }\ntype F = (x: number) => string;\nclass C {\n    @dec a: () => void;\n    @dec b: new () => C;\n    @dec c: Function;\n    @dec d: Callable;\n    @dec e: Newable;\n    @dec f: F;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "class-refs",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2018\ndeclare function dec(...args: any[]): any;\nclass A {}\nconst B = class {};\ndeclare class D {}\nclass C {\n    @dec a: A;\n    @dec b: C;\n    @dec d: D;\n    @dec e: A | A;\n    @dec f: A | D;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "imported-class",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @module: commonjs\n// @filename: a.ts\nexport class A {}\nexport interface I {}\nexport default class Def {}\n// @filename: probe.ts\nimport Def, { A, I } from \"./a\";\nimport * as ns from \"./a\";\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: A;\n    @dec b: I;\n    @dec c: Def;\n    @dec d: ns.A;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "type-only-import",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @module: esnext\n// @filename: a.ts\nexport class A {}\nexport class B {}\n// @filename: probe.ts\nimport type { A } from \"./a\";\nimport { type B } from \"./a\";\ndeclare function dec(...args: any[]): any;\nclass C {\n    constructor(@dec a: A, @dec b: B) {}\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "interfaces-and-literals",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ninterface I { x: number }\nclass C {\n    @dec a: I;\n    @dec b: { x: number };\n    @dec c: this;\n    @dec d: C[\"a\"];\n    @dec e: { [K in keyof I]: I[K] };\n    @dec f: typeof globalThis;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "generics",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C<T, U extends string> {\n    @dec a: T;\n    @dec b: U;\n    @dec c: Map<string, number>;\n    @dec d: Promise<number>;\n    @dec e: Set<T>;\n    @dec method<V>(@dec v: V, t: T): V { return v; }\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "enums",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nenum E { A, B }\nenum S { A = \"a\" }\nenum M { A = 1, B = \"b\" }\nconst enum K { A }\nclass C {\n    @dec a: E;\n    @dec b: S;\n    @dec c: M;\n    @dec d: K;\n    @dec e: E.A;\n    @dec f: S.A;\n    @dec g: E | E;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "type-queries",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nconst x = 1;\nclass C {\n    @dec a: typeof x;\n    @dec b: typeof C;\n    @dec c: keyof C;\n    @dec d: unique symbol;\n    @dec e: import(\"./probe\").C;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "conditional-types",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @strict: true\ndeclare function dec(...args: any[]): any;\nclass C<T> {\n    @dec a: T extends string ? string : number;\n    @dec b: T extends string ? string : string;\n    @dec c: T extends string ? Missing : number;\n    @dec d: T extends string ? Missing : Missing;\n    @dec e: T extends string ? null : undefined;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "promise-and-async",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec async a() {}\n    @dec async b(): Promise<void> {}\n    @dec c(): Promise<number> { return Promise.resolve(1); }\n    @dec d() {}\n    @dec async *e() {}\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "constructor-parameters",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass A {}\n@dec\nclass C {\n    constructor(a: string, @dec b: number, c?: A, d = 1, ...rest: string[]) {}\n}\n@dec\nclass D {\n    constructor(...rest: Array<number>) {}\n}\n@dec\nclass E {\n    constructor(...rest) {}\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "parameter-decorators-only",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    constructor(@dec a: string) {}\n    m(@dec x: number, y: string): boolean { return true; }\n    set s(@dec v: string) {}\n    n(this: C, @dec x: number) {}\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "methods",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a(x: string, y?: number): string { return x; }\n    @dec b(x: unknown): x is string { return true; }\n    @dec c(x: unknown): asserts x is string {}\n    @dec d(x: unknown): asserts x {}\n    @dec *e(): Generator<number> {}\n    @dec f(this: C, x: number): void {}\n    @dec g(...args: number[]): void {}\n    @dec static h(): number { return 1; }\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "accessors",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec get a(): string { return \"\"; }\n    set a(v: string) {}\n    @dec get b(): number { return 1; }\n    @dec set c(v: boolean) {}\n    get d(): string { return \"\"; }\n    @dec set d(v: string) {}\n    @dec set e(this: C, v: number) {}\n    @dec get f() { return 1; }\n    set f(v) {}\n    @dec static get g(): string { return \"\"; }\n    static set g(v: string) {}\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-param-types",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec get a(): string { return \"\"; }\n    set a(v: number) {}\n    @dec set b(v) {}\n    @dec get c(): string { return \"\"; }\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "class-decorators",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\n@dec\nclass A {}\n@dec\nclass B {\n    constructor(x: string, y: B) {}\n}\n@dec\nclass C extends B {}\n@dec\nclass D {\n    constructor();\n    constructor(x?: number) {}\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "class-expressions",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nconst A = @dec class {\n    constructor(x: string) {}\n};\nconst B = @dec class Named {\n    @dec p: number;\n};\nconst C = class {\n    @dec m(x: string): void {}\n};\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-modifiers",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @module: esnext\ndeclare function dec(...args: any[]): any;\n@dec\nexport class A {\n    constructor(x: string) {}\n}\nexport @dec class B {\n    constructor(x: number) {}\n}\n@dec\nexport default class C {\n    constructor(x: boolean) {}\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "abstract-and-modifiers",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nabstract class A {\n    @dec static x: string;\n    @dec public readonly y: number;\n    @dec private z?: boolean;\n    @dec protected abstract m(x: string): void;\n    @dec declare d: string;\n    @dec accessor q: number;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "unresolved-references",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: Missing;\n    @dec b: NS.Missing;\n    @dec c: A.B.C;\n    @dec d: A.B.C.D;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "unresolved-unions",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @strict: true\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: Missing | Missing;\n    @dec b: Missing | Other;\n    @dec c: N.Missing | N.Missing;\n    @dec d: A.B.C | A.B.C;\n    @dec e: Missing | string;\n    @dec f: Missing | null;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "namespaces",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nnamespace N {\n    export class C {}\n    export namespace M {\n        export class D {}\n    }\n    export enum E { A }\n}\nclass X {\n    @dec a: N.C;\n    @dec b: N.M.D;\n    @dec c: N.C | N.C;\n    @dec d: N.C | N.M.D;\n    @dec e: N.E;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "es-decorators-no-metadata",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: false\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: string;\n    @dec m(x: number): void {}\n}\n@dec\nclass D {\n    constructor(x: string) {}\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "no-decorators",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    a: string;\n    m(x: number): void {}\n}\nfunction f() { return class { x: Missing; }; }\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "nested-scopes",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nfunction f() {\n    class C {\n        @dec a: Missing;\n    }\n    return C;\n}\nnamespace N {\n    class D {\n        @dec b: Missing;\n    }\n}\nswitch (1 as number) {\n    case 1:\n        class E {\n            @dec c: A.B.C;\n        }\n}\n{\n    class F {\n        @dec d: Missing;\n    }\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "nested-classes",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass Outer {\n    @dec x = class Inner {\n        @dec y: string;\n        @dec m(a: number): void {}\n    };\n    @dec z: number;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "jsdoc-types",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: ?string;\n    @dec b: !number;\n    @dec c: *;\n    @dec d: ?;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "parenthesized",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @strict: true\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: (string);\n    @dec b: (string | null);\n    @dec c: ((number)) | (number);\n    @dec d: (() => void);\n    @dec e: (string)[];\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "aliases",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ntype S = string;\ntype N = number;\ntype B = boolean;\ntype V = void;\ntype A = string[];\ntype Sym = symbol;\ntype Fn = () => void;\ntype O = { x: number };\ntype U = string | number;\ntype P = Promise<number>;\nclass C {\n    @dec a: S;\n    @dec b: N;\n    @dec c: B;\n    @dec d: V;\n    @dec e: A;\n    @dec f: Sym;\n    @dec g: Fn;\n    @dec h: O;\n    @dec i: U;\n    @dec j: P;\n    @dec k: Symbol;\n    @dec l: String;\n    @dec m: Object;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "object-literal-method",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nconst o = {\n    @dec m(x: string) {}\n};\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "target-es5",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es5\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: bigint;\n    @dec b: Missing;\n    @dec m(x: string, ...y: number[]): Missing { return null as any; }\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "target-esnext",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: esnext\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: bigint;\n    @dec static accessor b: string;\n    @dec m(x: string): Promise<void> { return Promise.resolve(); }\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "module-commonjs-uses",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @module: commonjs\ndeclare function dec(...args: any[]): any;\nimport { Foo } from \"./foo\";\nclass C {\n    @dec a: Foo;\n}\nexport {};\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "decorated-getter-second",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    get a(): string { return \"\"; }\n    @dec set a(v: string) {}\n    @dec get b(): number { return 1; }\n    @dec set b(v: number) {}\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "class-ctor-param-decorated-only",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass A {}\nclass C {\n    constructor(@dec a: A, b: string) {}\n}\nclass D {\n    constructor(private readonly x: number, @dec y: string) {}\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "non-strict-union-objects",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass A {}\nclass C {\n    @dec a: A | null;\n    @dec b: A | undefined;\n    @dec c: string | A;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  }
+ ]
+}
