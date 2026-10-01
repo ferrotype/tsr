@@ -14,11 +14,12 @@ denominator as the runner does and records
 A sub-test the runner does not run for a row is `disabled` with the pin's
 reason. The transpile runner is captured by its own command.
 
-The rows are the executed rows of the Phase 2 inventory, as the S08 request
-shape. A capture binds to the digest of those requests, not to the inventory
-file: re-freezing the inventory for an input digest alone leaves the requests,
-and so the capture, current. The Phase 2 scripts are inputs of recorded Phase 2
-captures; this script imports none of the capture ones and edits none.
+The rows are the requests of data/phase3/inventory.json (the executed variants
+of the Phase 2 denominator, in the S08 request shape). A capture binds to the
+digest of those requests, not to the inventory file, so re-classifying a row
+leaves the capture current. `review` also holds each native outcome against
+what the inventory says the runner owes. The Phase 2 scripts are inputs of
+recorded Phase 2 captures; this script imports none of them and edits none.
 
     capture   --output DIR [--mode single|concurrent] [--shards N] [--scheme contiguous|interleaved]
               [--jobs J] [--oracle-from DIR] [--stride K] [--limit N] [--case ID ...] [--texts]
@@ -43,7 +44,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import phase2_inventory  # noqa: E402
+import phase3_inventory  # noqa: E402
 import s08_baselines  # noqa: E402
 from s04 import go_environment, verified_upstream  # noqa: E402
 from s04_common import strict_json_loads  # noqa: E402
@@ -85,32 +86,6 @@ def shard_indices(count, shards, scheme):
         return [list(range(start, count, shards)) for start in range(shards)]
     size = -(-count // shards)
     return [list(range(start, min(count, start + size))) for start in range(0, count, size)]
-
-
-def requests():
-    """Executed rows in inventory order, with the S08 request fields. The
-    inventory's own input digests are the Phase 2 producer's to keep; the
-    rows are read as committed."""
-    document = json.loads(phase2_inventory.INVENTORY.read_bytes())
-    subset = strict_json_loads((ROOT / "data/s07/subset.json").read_bytes())
-    index = {variant["id"]: (case, variant) for case in subset["cases"] for variant in case["variants"]}
-    result = []
-    for row in phase2_inventory.executed(document):
-        case, variant = index[row["id"]]
-        name = Path(case["source"]["path"]).name
-        extension = Path(name).suffix
-        base = name[:-len(extension)]
-        configured = variant["configured_name"]
-        if not configured.startswith(base) or not configured.endswith(extension):
-            raise ValueError("invalid configured filename: " + row["id"])
-        label = configured[len(base):-len(extension)]
-        if label and (not label.startswith("(") or not label.endswith(")")):
-            raise ValueError("invalid configuration label: " + row["id"])
-        result.append({"id": row["id"], "path": case["source"]["path"], "acceptance_tier": "executed",
-                       "raw_sha256": case["source"]["raw_sha256"], "loaded_sha256": case["source"]["loaded_sha256"],
-                       "settings": case["source"]["configurations"][variant["configuration"]],
-                       "configuration_name": label[1:-1] if label else "", "configured_name": configured})
-    return document, result
 
 
 def provenance(mode):
@@ -278,7 +253,8 @@ def capture(output, mode, shards, scheme, jobs, timeout_minutes, *, oracle_from=
     upstream = pinned_upstream()
     env = go_environment()
     inputs = input_digests()
-    document, request_rows = requests()
+    document = phase3_inventory.read()
+    request_rows = phase3_inventory.requests(document)
     full = len(request_rows)
     request_rows = select(request_rows, limit, stride, cases)
     raw = canonical(request_rows) + b"\n"
@@ -384,6 +360,29 @@ def reference_bytes(name):
     return path.read_bytes() if path.is_file() else None
 
 
+def against_inventory(row, result):
+    """Where the native outcome is not what the inventory says the runner owes."""
+    found = []
+    if result["has_non_dts_files"] is not row["has_non_dts_files"]:
+        found.append("has_non_dts_files")
+    output, native = row["output"], result["output"]
+    if output["state"] == "disabled":
+        expected = ("disabled", output["reason"])
+    else:
+        expected = ("content" if output["owes"] == "reference" else "no_content", None)
+    if (native["state"], native.get("reason")) != expected:
+        found.append("output")
+    for domain in DOMAINS[1:]:
+        states = ("content",) if row[domain] == "reference" else ("no_content", "not_baselined")
+        if result[domain]["state"] not in states:
+            found.append(domain)
+    for domain, kind in zip(DOMAINS, phase3_inventory.EMIT_KINDS, strict=True):
+        if result[domain]["state"] == "content" and (
+                phase3_inventory.git_blob(bytes.fromhex(result[domain]["text_hex"])) != row["references"].get(kind)):
+            found.append(domain + "_reference")
+    return [{"id": row["id"], "field": field} for field in found]
+
+
 def review(directory, record, *, partial=False):
     if partial and record:
         raise ValueError("a partial capture is never recorded")
@@ -395,9 +394,12 @@ def review(directory, record, *, partial=False):
         raise ValueError("review requires a verified capture (run verify first)")
     outcomes, disagreements = Counter(), []
     reprint = Counter()
+    owed = {row["id"]: row for row in phase3_inventory.read()["rows"]}
+    inventory_disagreements = []
     for result in observed:
         if result["state"] != "executed":
             continue
+        inventory_disagreements.extend(against_inventory(owed[result["id"]], result))
         for domain in DOMAINS:
             item = result[domain]
             state = item["state"]
@@ -425,6 +427,7 @@ def review(directory, record, *, partial=False):
         "reference_outcomes": [{"domain": d, "native_state": s, "agrees": ok, "variants": n}
                                for (d, s, ok), n in sorted(outcomes.items(), key=lambda item: (item[0][0], item[0][1], str(item[0][2])))],
         "reference_disagreements": disagreements,
+        "inventory_disagreements": inventory_disagreements,
         "disabled": {domain: dict(Counter(row[domain]["reason"] for row in executed if row[domain]["state"] == "disabled"))
                      for domain in DOMAINS},
         "failed_domains": [{"id": row["id"], "domain": domain, "reason": row[domain]["reason"]}
@@ -439,7 +442,8 @@ def review(directory, record, *, partial=False):
         DATA.mkdir(parents=True, exist_ok=True)
         provenance(report["mode"]).write_bytes(canonical(summary) + b"\n")
     brief = {"requests": summary["requests"], "states": summary["states"],
-             "reference_disagreements": len(disagreements), "failed_domains": len(summary["failed_domains"]),
+             "reference_disagreements": len(disagreements),
+             "inventory_disagreements": len(inventory_disagreements), "failed_domains": len(summary["failed_domains"]),
              "reference_outcomes": summary["reference_outcomes"], "reprint": summary["reprint"],
              "emit_skipped": summary["emit_skipped"], "pre_post_different": len(summary["pre_post_different"])}
     print(json.dumps(brief, sort_keys=True))
