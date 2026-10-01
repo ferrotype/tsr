@@ -5,6 +5,8 @@ The oracle is an access-only overlay of the pinned compiler runner
 (`tools/phase3/oracle/emit_test.go`): it compiles each variant of the Phase 2
 denominator as the runner does and records
 
+- the inputs of the baseline writers (the header and the runner's three file
+  groups), which are the only native values a Rust request carries;
 - the emitted files (name, digest, size) and the emit result;
 - the text the runner's `output`, `sourcemap` and `sourcemap record` sub-tests
   compose for their baselines, taken where `baseline.Run` would compare it;
@@ -212,6 +214,13 @@ def validate(requests, observed):
                 raise ValueError("non-content outcome carries text: " + vid)
             if item["state"] in ("disabled", "failed") and not item.get("reason"):
                 raise ValueError(f"{domain} {item['state']} without a reason: {vid}")
+        inputs = result["baseline_inputs"]
+        bytes.fromhex(inputs["header_hex"])
+        for group in ("ts_config_files", "to_be_compiled", "other_files"):
+            for item in inputs[group]:
+                if set(item) != {"name_hex", "content_hex"}:
+                    raise ValueError("malformed baseline input: " + vid)
+                bytes.fromhex(item["name_hex"]), bytes.fromhex(item["content_hex"])
         if not result["has_non_dts_files"] and result["output"]["state"] != "disabled":
             raise ValueError("the output sub-test ran for a row without a non-declaration input: " + vid)
         if any(result[domain]["state"] == "disabled" for domain in DOMAINS[1:]):

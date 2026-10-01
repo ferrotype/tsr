@@ -78,6 +78,19 @@ class NativeRows(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "never disables"):
             native.validate(self.requests, rows)
 
+    def test_baseline_inputs_are_the_writers_three_groups(self):
+        inputs = self.observed[CONTENT]["baseline_inputs"]
+        self.assertEqual(bytes.fromhex(inputs["header_hex"]), b"tests/cases/compiler/bom-utf16be.ts")
+        self.assertEqual([len(inputs[group]) for group in ("ts_config_files", "to_be_compiled", "other_files")], [0, 1, 0])
+        rows = self.rows()
+        rows[CONTENT]["baseline_inputs"]["to_be_compiled"][0]["extra"] = ""
+        with self.assertRaisesRegex(ValueError, "malformed baseline input"):
+            native.validate(self.requests, rows)
+        rows = self.rows()
+        del rows[CONTENT]["baseline_inputs"]
+        with self.assertRaises(KeyError):
+            native.validate(self.requests, rows)
+
     def test_inventory_disagreements_name_the_field(self):
         def fields(index, change):
             row = copy.deepcopy(self.observed[index])

@@ -105,6 +105,14 @@ func phase3Files(files *collections.OrderedMap[string, *harnessutil.TestFile], t
 	return result
 }
 
+func phase3Inputs(files []*harnessutil.TestFile) []map[string]string {
+	result := []map[string]string{}
+	for _, file := range files {
+		result = append(result, map[string]string{"name_hex": phase3Hex(file.UnitName), "content_hex": phase3Hex(file.Content)})
+	}
+	return result
+}
+
 func phase3Print(file *ast.SourceFile, removeComments bool, texts bool) (result map[string]any) {
 	defer func() {
 		if value := recover(); value != nil {
@@ -261,6 +269,10 @@ func TestPhase3Emit(t *testing.T) {
 				suite = "conformance"
 			}
 			header := tspath.GetPathFromPathComponents(tspath.GetPathComponentsRelativeTo(repo.TestDataPath(), path, tspath.ComparePathsOptions{}))
+			// What the baseline writers read besides the compilation result: the
+			// only native values a Rust request carries.
+			row["baseline_inputs"] = map[string]any{"header_hex": phase3Hex(header), "ts_config_files": phase3Inputs(c.tsConfigFiles),
+				"to_be_compiled": phase3Inputs(c.toBeCompiled), "other_files": phase3Inputs(c.otherFiles)}
 			// Each of the runner's sub-tests is its own t.Run there; a failure in
 			// one does not stop the others, and it is that domain's outcome here.
 			domain := func(name, stageName string, body func(t *testing.T)) map[string]any {
