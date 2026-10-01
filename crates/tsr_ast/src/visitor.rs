@@ -63,12 +63,6 @@ pub trait RuntimeFactory: Factory {
         *self.mutable_list(new) = original;
         new
     }
-    /// The factory's storage as one [`AstView`], for the pinned `ast`
-    /// predicates over transformed trees (`Node.SubtreeFacts`,
-    /// `GetFunctionFlags`); `None` for a factory without one.
-    fn ast_view(&self) -> Option<AstView<'_>> {
-        None
-    }
     fn list_has_trailing_comma(&self, list: NodeListId) -> bool {
         let list = self.read_list(list);
         let nodes = self.read_nodes(list.nodes());
@@ -692,9 +686,6 @@ impl<T: RuntimeFactory + ?Sized> RuntimeFactory for crate::BorrowedFactory<'_, T
     }
     fn clone_modifier_list_header(&mut self, original: NodeListId) -> NodeListId {
         self.0.clone_modifier_list_header(original)
-    }
-    fn ast_view(&self) -> Option<AstView<'_>> {
-        self.0.ast_view()
     }
     fn list_has_trailing_comma(&self, list: NodeListId) -> bool {
         self.0.list_has_trailing_comma(list)

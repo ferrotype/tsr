@@ -1,14 +1,14 @@
 //! `transformers/estransforms/forawait.go`: lowers `for await` loops and async
 //! generators for targets before ES2018.
-use super::utilities::{ast_view, list_nodes, new_node_list, SuperAccessState};
+use super::utilities::SuperAccessState;
 use crate::transformer::{Failure, TransformOptions, Transformer};
 use std::cell::Cell;
 use std::rc::Rc;
 use tsr_ast::{
     node_flags, subtree_flags,
     utilities_containers::{function_flags, get_function_flags},
-    Factory, FactoryMethods, JsString, NodeId, NodeListId, NodeVisit, NodeVisitor, RuntimeFactory,
-    SyntaxKind as K,
+    AstView, Factory, FactoryMethods, JsString, NodeId, NodeListId, NodeVisit, NodeVisitor,
+    RuntimeFactory, SyntaxKind as K,
 };
 use tsr_core::{collections::OrderedSet, TextRange};
 use tsr_printer::{
@@ -17,6 +17,27 @@ use tsr_printer::{
 };
 
 const NIL: &str = "runtime error: invalid memory address or nil pointer dereference";
+
+/// The transform factory's storage view, for the pinned `ast` predicates.
+fn ast_view(factory: &dyn RuntimeFactory) -> AstView<'_> {
+    factory
+        .ast_view()
+        .expect("the transform factory has an AstView")
+}
+
+/// `NodeFactory.NewNodeList`: a list with an undefined location.
+fn new_node_list(factory: &mut dyn RuntimeFactory, nodes: Vec<Option<NodeId>>) -> NodeListId {
+    let nodes = factory.alloc_nodes(nodes);
+    factory.alloc_list(TextRange::new(-1, -1), nodes)
+}
+
+/// The nodes of `list` (`NodeList.Nodes`); a nil list has none.
+fn list_nodes(factory: &dyn RuntimeFactory, list: Option<NodeListId>) -> Vec<Option<NodeId>> {
+    list.map_or_else(Vec::new, |list| {
+        let nodes = factory.read_list(list).nodes();
+        factory.read_nodes(nodes).iter().collect()
+    })
+}
 
 /// Facts we track as we traverse the tree (`forAwaitHierarchyFacts`).
 mod facts {
@@ -71,7 +92,7 @@ pub fn new_for_await_transformer<'a>(opts: &TransformOptions<'a>) -> Option<Tran
         emit_context: opts.context.clone(),
         hooks: opts.context.visitor_hooks(),
         failure: opts.failure.clone(),
-        super_access: SuperAccessState::new(&opts.context, opts.failure.clone()),
+        super_access: SuperAccessState::new(&opts.context),
         enclosing_function_flags: Cell::new(function_flags::NORMAL),
         for_await_hierarchy_facts: Cell::new(facts::NONE),
         exported_variable_statement: Cell::new(false),
@@ -162,13 +183,11 @@ impl ForawaitTransformer {
         visitor.visit_each_child(Some(node)).expect(NIL)
     }
 
-    /// `trackSuperAccess(node)`; false after recording a failed read.
+    /// `trackSuperAccess(node)`.
     fn track(&self, visitor: &NodeVisitor<'_>, node: NodeId) -> bool {
-        self.failure
-            .ok(self
-                .super_access
-                .track_super_access(visitor.factory(), node))
-            .is_some()
+        self.super_access
+            .track_super_access(visitor.factory(), node);
+        true
     }
 
     // port: tsc/internal/transformers/estransforms/forawait.go:forawaitTransformer.fallbackVisitor
@@ -1138,7 +1157,7 @@ impl ForawaitTransformer {
         let emit_super_helpers = captured_size(state) > 0 || state.has_super_element_access.get();
         if emit_super_helpers {
             async_body = state
-                .substitute_super_accesses_in_body(factory, async_body)
+                .substitute_super_accesses_in_body(factory, Some(async_body))
                 .expect(NIL);
         }
 
