@@ -1674,6 +1674,11 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitIfStatement
     fn emit_if_statement(&mut self, node: NodeId) -> Result<(), Error> {
+        // An `else if` is emitted here directly, once per link of the chain.
+        guard(|| self.emit_if_statement_worker(node))
+    }
+
+    fn emit_if_statement_worker(&mut self, node: NodeId) -> Result<(), Error> {
         let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let statement = read
@@ -3013,6 +3018,11 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitJsxChild
     fn emit_jsx_child(&mut self, node: NodeId) -> Result<(), Error> {
+        // A nested element is emitted here directly, once per level.
+        guard(|| self.emit_jsx_child_worker(node))
+    }
+
+    fn emit_jsx_child_worker(&mut self, node: NodeId) -> Result<(), Error> {
         match self.known_kind(node)? {
             K::JsxText => self.emit_jsx_text(node),
             K::JsxExpression => self.emit_jsx_expression(node),
