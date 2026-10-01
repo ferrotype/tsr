@@ -828,10 +828,12 @@ impl HostImpl {
         result.map(|_| ()).map_err(Error::Ipc)
     }
 
-    /// Sends one file to its mapper and decodes the result.
+    /// Sends one file to its mapper and decodes the result. The caller holds
+    /// the lifecycle read guard `locale` came from.
     /// port: tsc/internal/contentmapper/hostimpl.go:host.transformLocked
     fn transform_locked(
         &self,
+        locale: &Locale,
         mapper: &ContentMapper,
         request: &Request,
         project_handle: &str,
@@ -842,7 +844,7 @@ impl HostImpl {
             ));
         }
         let (conn, position_encoding, diagnostic_source) = self
-            .conn_for(mapper)
+            .conn_for(locale, mapper)
             .map_err(|error| transform_error(TransformErrorKind::Initialize, Some(error)))?;
         let mapper_timing = self.0.timing.mapper(&lossy(identity(mapper).as_bytes()));
         let start = self.0.timing.start_request();
@@ -870,15 +872,18 @@ impl HostImpl {
         .map_err(|error| transform_error(TransformErrorKind::Response, Some(error)))
     }
 
-    /// The connection of a mapper's identity, spawning it on first use.
+    /// The connection of a mapper's identity, spawning it on first use. Like
+    /// the pin it takes only the state lock: the caller already holds the
+    /// lifecycle read guard `locale` came from, and a second read could wait
+    /// behind a queued `set_locale` or `close` that waits for the first.
     /// port: tsc/internal/contentmapper/hostimpl.go:host.connFor
     fn conn_for(
         &self,
+        locale: &Locale,
         mapper: &ContentMapper,
     ) -> Result<(Arc<dyn Conn>, PositionEncoding, String), Error> {
-        let locale = self.locale();
         let mut state = self.state();
-        self.conn_for_locked(&mut state, &locale, mapper)
+        self.conn_for_locked(&mut state, locale, mapper)
     }
 
     /// port: tsc/internal/contentmapper/hostimpl.go:host.connForLocked
@@ -1387,10 +1392,10 @@ impl Project for ProjectLease {
             let entry = &state.projects.as_ref().expect("open host")[&key];
             (entry.mapper.clone(), entry.project_handle.clone())
         };
-        drop(locale);
-        let _locale = self.host.locale();
+        // One guard from opening to transforming: a locale change in between
+        // would replace the connection that opened the project.
         self.host
-            .transform_locked(&content_mapper, request, &handle)
+            .transform_locked(&locale, &content_mapper, request, &handle)
     }
 
     /// Every reference, the first lease or a retained one, closes once.
