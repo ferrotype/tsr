@@ -1,0 +1,2457 @@
+{
+ "cases": [
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-01-es2015-plain-export",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f727420636f6e73742061203d20313b0a"
+    },
+    "id": "esm-01-es2015-plain-export",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "var x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-02-script-not-module",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "7661722078203d20313b0a"
+    },
+    "id": "esm-02-script-not-module",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\nvar x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "var x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-03-isolated-script",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "7661722078203d20313b0a"
+    },
+    "id": "esm-03-isolated-script",
+    "options": {
+     "isolatedModules": true,
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @isolatedModules: true\nvar x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "var x = 1;\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-04-force-detection-es2015",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "7661722078203d20313b0a"
+    },
+    "id": "esm-04-force-detection-es2015",
+    "options": {
+     "module": 5,
+     "moduleDetection": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @moduleDetection: force\nvar x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "var x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-05-force-detection-preserve",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "7661722078203d20313b0a"
+    },
+    "id": "esm-05-force-detection-preserve",
+    "options": {
+     "module": 200,
+     "moduleDetection": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: preserve\n// @moduleDetection: force\nvar x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const b = 1;\r\n"
+      }
+     ],
+     "name": "/.src/b.ts"
+    }
+   ],
+   "id": "esm-06-declaration-file",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.d.ts": "6578706f7274206465636c61726520636f6e737420613a206e756d6265723b",
+     "/.src/b.ts": "6578706f727420636f6e73742062203d20313b0a"
+    },
+    "id": "esm-06-declaration-file",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/a.d.ts",
+     "/.src/b.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @filename: a.d.ts\nexport declare const a: number;\n// @filename: b.ts\nexport const b = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "module.exports = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "const x = require(\"./a\");\r\nmodule.exports = x;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-07-preserve-import-equals",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f7274203d20313b0a",
+     "/.src/probe.ts": "696d706f72742078203d207265717569726528222e2f6122293b0a6578706f7274203d20783b"
+    },
+    "id": "esm-07-preserve-import-equals",
+    "options": {
+     "module": 200,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: preserve\n// @filename: probe.ts\nimport x = require(\"./a\");\nexport = x;\n// @filename: a.ts\nexport = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "module.exports = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "const x = require(\"./a\");\r\nexport { x };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-08-preserve-export-import-equals",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f7274203d20313b0a",
+     "/.src/probe.ts": "6578706f727420696d706f72742078203d207265717569726528222e2f6122293b"
+    },
+    "id": "esm-08-preserve-export-import-equals",
+    "options": {
+     "module": 200,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: preserve\n// @filename: probe.ts\nexport import x = require(\"./a\");\n// @filename: a.ts\nexport = 1;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export {};\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "console.log(x);\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-09-es2015-import-equals-elided",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f7274203d20313b0a",
+     "/.src/probe.ts": "696d706f72742078203d207265717569726528222e2f6122293b0a636f6e736f6c652e6c6f672878293b"
+    },
+    "id": "esm-09-es2015-import-equals-elided",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @filename: probe.ts\nimport x = require(\"./a\");\nconsole.log(x);\n// @filename: a.ts\nexport = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export {};\r\n"
+      }
+     ],
+     "name": "/.src/a.cts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "import { createRequire as _createRequire } from \"module\";\r\nconst __require = _createRequire(import.meta.url);\r\nconst x = __require(\"./a.cjs\");\r\nconsole.log(x);\r\n"
+      }
+     ],
+     "name": "/.src/probe.mts"
+    }
+   ],
+   "id": "esm-10-node16-mts-create-require",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.cts": "6578706f7274203d20313b0a",
+     "/.src/probe.mts": "696d706f72742078203d207265717569726528222e2f612e636a7322293b0a636f6e736f6c652e6c6f672878293b"
+    },
+    "id": "esm-10-node16-mts-create-require",
+    "options": {
+     "module": 100,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.mts",
+     "/.src/a.cts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: node16\n// @filename: probe.mts\nimport x = require(\"./a.cjs\");\nconsole.log(x);\n// @filename: a.cts\nexport = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export {};\r\n"
+      }
+     ],
+     "name": "/.src/a.cts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "import { createRequire as _createRequire } from \"module\";\r\nconst __require = _createRequire(import.meta.url);\r\nconst x = __require(\"./a.cjs\");\r\nconst y = __require(\"./a.cjs\");\r\nexport { x, y };\r\n"
+      }
+     ],
+     "name": "/.src/probe.mts"
+    }
+   ],
+   "id": "esm-11-nodenext-two-requires",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.cts": "6578706f7274203d20313b0a",
+     "/.src/probe.mts": "696d706f72742078203d207265717569726528222e2f612e636a7322293b0a696d706f72742079203d207265717569726528222e2f612e636a7322293b0a6578706f7274207b20782c2079207d3b"
+    },
+    "id": "esm-11-nodenext-two-requires",
+    "options": {
+     "module": 199,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.mts",
+     "/.src/a.cts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: probe.mts\nimport x = require(\"./a.cjs\");\nimport y = require(\"./a.cjs\");\nexport { x, y };\n// @filename: a.cts\nexport = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export {};\r\n"
+      }
+     ],
+     "name": "/.src/a.cts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "\"use strict\";\r\n\"use asm\";\r\nimport { createRequire as _createRequire } from \"module\";\r\nconst __require = _createRequire(import.meta.url);\r\nconst x = __require(\"./a.cjs\");\r\nconsole.log(x);\r\n"
+      }
+     ],
+     "name": "/.src/probe.mts"
+    }
+   ],
+   "id": "esm-12-nodenext-prologues",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.cts": "6578706f7274203d20313b0a",
+     "/.src/probe.mts": "2275736520737472696374223b0a227573652061736d223b0a696d706f72742078203d207265717569726528222e2f612e636a7322293b0a636f6e736f6c652e6c6f672878293b"
+    },
+    "id": "esm-12-nodenext-prologues",
+    "options": {
+     "module": 199,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.mts",
+     "/.src/a.cts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: probe.mts\n\"use strict\";\n\"use asm\";\nimport x = require(\"./a.cjs\");\nconsole.log(x);\n// @filename: a.cts\nexport = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export {};\r\n"
+      }
+     ],
+     "name": "/.src/a.cts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "import { createRequire as _createRequire } from \"module\";\r\nconst __require = _createRequire(import.meta.url);\r\nconst x = __require(\"./a.cjs\");\r\nexport { x };\r\n"
+      }
+     ],
+     "name": "/.src/probe.mts"
+    }
+   ],
+   "id": "esm-13-nodenext-export-import-equals",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.cts": "6578706f7274203d20313b0a",
+     "/.src/probe.mts": "6578706f727420696d706f72742078203d207265717569726528222e2f612e636a7322293b"
+    },
+    "id": "esm-13-nodenext-export-import-equals",
+    "options": {
+     "module": 199,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.mts",
+     "/.src/a.cts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: probe.mts\nexport import x = require(\"./a.cjs\");\n// @filename: a.cts\nexport = 1;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "const a = 1;\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-14-es2015-export-equals-elided",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742061203d20313b0a6578706f7274203d20613b0a"
+    },
+    "id": "esm-14-es2015-export-equals-elided",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\nconst a = 1;\nexport = a;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "const a = 1;\r\nmodule.exports = a;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-15-preserve-export-equals",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742061203d20313b0a6578706f7274203d20613b0a"
+    },
+    "id": "esm-15-preserve-export-equals",
+    "options": {
+     "module": 200,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: preserve\nconst a = 1;\nexport = a;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export default function f() { return 1; }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-16-export-default",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f72742064656661756c742066756e6374696f6e20662829207b2072657475726e20313b207d0a"
+    },
+    "id": "esm-16-export-default",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\nexport default function f() { return 1; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "import * as ns_1 from \"./a\";\r\nexport { ns_1 as ns };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-17-es2015-export-star-as-ns",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e73742061203d20313b0a",
+     "/.src/probe.ts": "6578706f7274202a206173206e732066726f6d20222e2f61223b"
+    },
+    "id": "esm-17-es2015-export-star-as-ns",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @filename: probe.ts\nexport * as ns from \"./a\";\n// @filename: a.ts\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "import * as default_1 from \"./a\";\r\nexport default default_1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-18-es2015-export-star-as-default",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e73742061203d20313b0a",
+     "/.src/probe.ts": "6578706f7274202a2061732064656661756c742066726f6d20222e2f61223b"
+    },
+    "id": "esm-18-es2015-export-star-as-default",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @filename: probe.ts\nexport * as default from \"./a\";\n// @filename: a.ts\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export * as ns from \"./a\";\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-19-esnext-export-star-as-ns",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e73742061203d20313b0a",
+     "/.src/probe.ts": "6578706f7274202a206173206e732066726f6d20222e2f61223b"
+    },
+    "id": "esm-19-esnext-export-star-as-ns",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: probe.ts\nexport * as ns from \"./a\";\n// @filename: a.ts\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export * from \"./a\";\r\nexport { a as b } from \"./a\";\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-20-es2015-export-star",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e73742061203d20313b0a",
+     "/.src/probe.ts": "6578706f7274202a2066726f6d20222e2f61223b0a6578706f7274207b20612061732062207d2066726f6d20222e2f61223b"
+    },
+    "id": "esm-20-es2015-export-star",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @filename: probe.ts\nexport * from \"./a\";\nexport { a as b } from \"./a\";\n// @filename: a.ts\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "const a = 1;\r\nexport { a };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-21-local-export",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742061203d20313b0a6578706f7274207b2061207d3b0a"
+    },
+    "id": "esm-21-local-export",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\nconst a = 1;\nexport { a };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export default 2;\r\n"
+      }
+     ],
+     "name": "/.src/b.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "import { a } from \"./a.js\";\r\nimport \"./a.js\";\r\nimport b from \"./b.js\";\r\nexport const c = a + b;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-22-rewrite-import-declaration",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e73742061203d20313b",
+     "/.src/b.ts": "6578706f72742064656661756c7420323b0a",
+     "/.src/probe.ts": "696d706f7274207b2061207d2066726f6d20222e2f612e7473223b0a696d706f727420222e2f612e7473223b0a696d706f727420622066726f6d20222e2f622e6a73223b0a6578706f727420636f6e73742063203d2061202b20623b"
+    },
+    "id": "esm-22-rewrite-import-declaration",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts",
+     "/.src/b.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nimport { a } from \"./a.ts\";\nimport \"./a.ts\";\nimport b from \"./b.js\";\nexport const c = a + b;\n// @filename: a.ts\nexport const a = 1;\n// @filename: b.ts\nexport default 2;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export { a } from \"./a.js\";\r\nexport * from \"./a.js\";\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-23-rewrite-export-from",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e73742061203d20313b0a",
+     "/.src/probe.ts": "6578706f7274207b2061207d2066726f6d20222e2f612e7473223b0a6578706f7274202a2066726f6d20222e2f612e7473223b"
+    },
+    "id": "esm-23-rewrite-export-from",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nexport { a } from \"./a.ts\";\nexport * from \"./a.ts\";\n// @filename: a.ts\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "import * as ns_1 from \"./a.js\";\r\nexport { ns_1 as ns };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-24-rewrite-es2015-export-star-as",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e73742061203d20313b0a",
+     "/.src/probe.ts": "6578706f7274202a206173206e732066726f6d20222e2f612e7473223b"
+    },
+    "id": "esm-24-rewrite-es2015-export-star-as",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nexport * as ns from \"./a.ts\";\n// @filename: a.ts\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const p = import(\"./a.js\");\r\nexport const q = import(\"./a.js\", { with: { type: \"x\" } });\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-25-rewrite-dynamic-import-literal",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e73742061203d20313b0a",
+     "/.src/probe.ts": "6578706f727420636f6e73742070203d20696d706f727428222e2f612e747322293b0a6578706f727420636f6e73742071203d20696d706f727428222e2f612e7473222c207b20776974683a207b20747970653a20227822207d207d293b"
+    },
+    "id": "esm-25-rewrite-dynamic-import-literal",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nexport const p = import(\"./a.ts\");\nexport const q = import(\"./a.ts\", { with: { type: \"x\" } });\n// @filename: a.ts\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "var __rewriteRelativeImportExtension = (this && this.__rewriteRelativeImportExtension) || function (path, preserveJsx) {\r\n    if (typeof path === \"string\" && /^\\.\\.?\\//.test(path)) {\r\n        return path.replace(/\\.(tsx)$|((?:\\.d)?)((?:\\.[^./]+?)?)\\.([cm]?)ts$/i, function (m, tsx, d, ext, cm) {\r\n            return tsx ? preserveJsx ? \".jsx\" : \".js\" : d && (!ext || !cm) ? m : (d + ext + \".\" + cm.toLowerCase() + \"js\");\r\n        });\r\n    }\r\n    return path;\r\n};\r\nexport function f(x: string) { return import(__rewriteRelativeImportExtension(x)); }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-26-rewrite-dynamic-import-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f72742066756e6374696f6e206628783a20737472696e6729207b2072657475726e20696d706f72742878293b207d0a"
+    },
+    "id": "esm-26-rewrite-dynamic-import-expression",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\nexport function f(x: string) { return import(x); }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "var __rewriteRelativeImportExtension = (this && this.__rewriteRelativeImportExtension) || function (path, preserveJsx) {\r\n    if (typeof path === \"string\" && /^\\.\\.?\\//.test(path)) {\r\n        return path.replace(/\\.(tsx)$|((?:\\.d)?)((?:\\.[^./]+?)?)\\.([cm]?)ts$/i, function (m, tsx, d, ext, cm) {\r\n            return tsx ? preserveJsx ? \".jsx\" : \".js\" : d && (!ext || !cm) ? m : (d + ext + \".\" + cm.toLowerCase() + \"js\");\r\n        });\r\n    }\r\n    return path;\r\n};\r\nexport function f(x: string) { return import(__rewriteRelativeImportExtension(x, true)); }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-27-rewrite-dynamic-import-jsx-preserve",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f72742066756e6374696f6e206628783a20737472696e6729207b2072657475726e20696d706f72742878293b207d0a"
+    },
+    "id": "esm-27-rewrite-dynamic-import-jsx-preserve",
+    "options": {
+     "jsx": 1,
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @jsx: preserve\n// @rewriteRelativeImportExtensions: true\nexport function f(x: string) { return import(x); }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "import { __rewriteRelativeImportExtension } from \"tslib\";\r\nexport function f(x: string) { return import(__rewriteRelativeImportExtension(x)); }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-28-rewrite-import-helpers",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f72742066756e6374696f6e206628783a20737472696e6729207b2072657475726e20696d706f72742878293b207d0a"
+    },
+    "id": "esm-28-rewrite-import-helpers",
+    "options": {
+     "importHelpers": true,
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @importHelpers: true\n// @rewriteRelativeImportExtensions: true\nexport function f(x: string) { return import(x); }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "var __rewriteRelativeImportExtension = (this && this.__rewriteRelativeImportExtension) || function (path, preserveJsx) {\r\n    if (typeof path === \"string\" && /^\\.\\.?\\//.test(path)) {\r\n        return path.replace(/\\.(tsx)$|((?:\\.d)?)((?:\\.[^./]+?)?)\\.([cm]?)ts$/i, function (m, tsx, d, ext, cm) {\r\n            return tsx ? preserveJsx ? \".jsx\" : \".js\" : d && (!ext || !cm) ? m : (d + ext + \".\" + cm.toLowerCase() + \"js\");\r\n        });\r\n    }\r\n    return path;\r\n};\r\nconst a = require(\"./a.js\");\r\nconst b = require(__rewriteRelativeImportExtension(name));\r\nconst c = require(\"./a.ts\", 2);\r\nexport { a, b, c };\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "esm-29-rewrite-js-require",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e73742061203d20313b0a",
+     "/.src/probe.js": "636f6e73742061203d207265717569726528222e2f612e747322293b0a636f6e73742062203d2072657175697265286e616d65293b0a636f6e73742063203d207265717569726528222e2f612e7473222c2032293b0a6578706f7274207b20612c20622c2063207d3b"
+    },
+    "id": "esm-29-rewrite-js-require",
+    "options": {
+     "allowJs": true,
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @allowJs: true\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.js\nconst a = require(\"./a.ts\");\nconst b = require(name);\nconst c = require(\"./a.ts\", 2);\nexport { a, b, c };\n// @filename: a.ts\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "declare function require(x: string): any;\r\nexport const a = require(\"./a.ts\");\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-30-rewrite-ts-require-not-rewritten",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e207265717569726528783a20737472696e67293a20616e793b0a6578706f727420636f6e73742061203d207265717569726528222e2f612e747322293b0a"
+    },
+    "id": "esm-30-rewrite-ts-require-not-rewritten",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\ndeclare function require(x: string): any;\nexport const a = require(\"./a.ts\");\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "const tslib_1 = __require(\"tslib\");\r\nimport { createRequire as _createRequire } from \"module\";\r\nconst __require = _createRequire(import.meta.url);\r\nexport function f(x: string) { return import(tslib_1.__rewriteRelativeImportExtension(x)); }\r\n"
+      }
+     ],
+     "name": "/.src/probe.cts"
+    }
+   ],
+   "id": "esm-31-nodenext-cts-import-helpers",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.cts": "6578706f72742066756e6374696f6e206628783a20737472696e6729207b2072657475726e20696d706f72742878293b207d0a"
+    },
+    "id": "esm-31-nodenext-cts-import-helpers",
+    "options": {
+     "importHelpers": true,
+     "module": 199,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.cts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @importHelpers: true\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.cts\nexport function f(x: string) { return import(x); }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "panic": "runtime error: invalid memory address or nil pointer dereference"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-32-commonjs-import-helpers",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f72742066756e6374696f6e206628783a20737472696e6729207b2072657475726e20696d706f72742878293b207d0a"
+    },
+    "id": "esm-32-commonjs-import-helpers",
+    "options": {
+     "importHelpers": true,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @importHelpers: true\n// @rewriteRelativeImportExtensions: true\nexport function f(x: string) { return import(x); }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "panic": "import= for internal module references should be handled in an earlier transformer."
+      }
+     ],
+     "name": "/.src/probe.mts"
+    }
+   ],
+   "id": "esm-33-node16-internal-import-equals-panics",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.mts": "6e616d657370616365204e207b206578706f727420636f6e73742079203d20313b207d0a696d706f72742078203d204e2e793b0a6578706f7274207b2078207d3b0a"
+    },
+    "id": "esm-33-node16-internal-import-equals-panics",
+    "options": {
+     "module": 100,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.mts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: node16\n// @filename: probe.mts\nnamespace N { export const y = 1; }\nimport x = N.y;\nexport { x };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "module.exports = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "// leading\r\nconst x = require(\"./a\"); // trailing\r\nexport { x };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-34-import-equals-comments",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f7274203d20313b0a",
+     "/.src/probe.ts": "2f2f206c656164696e670a696d706f72742078203d207265717569726528222e2f6122293b202f2f20747261696c696e670a6578706f7274207b2078207d3b"
+    },
+    "id": "esm-34-import-equals-comments",
+    "options": {
+     "module": 200,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: preserve\n// @filename: probe.ts\n// leading\nimport x = require(\"./a\"); // trailing\nexport { x };\n// @filename: a.ts\nexport = 1;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "import * as _a from \"./a\";\r\nexport { _a as \"a-b\" };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-35-export-star-as-string-name",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e73742061203d20313b0a",
+     "/.src/probe.ts": "6578706f7274202a2061732022612d62222066726f6d20222e2f61223b"
+    },
+    "id": "esm-35-export-star-as-string-name",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @filename: probe.ts\nexport * as \"a-b\" from \"./a\";\n// @filename: a.ts\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export default 1;\r\nexport const b = 2;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "import a from \"./a.js\" with { type: \"x\" };\r\nexport { b } from \"./a.js\" with { type: \"x\" };\r\nexport const c = a;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-36-import-attributes",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742062203d20323b0a",
+     "/.src/probe.ts": "696d706f727420612066726f6d20222e2f612e7473222077697468207b20747970653a20227822207d3b0a6578706f7274207b2062207d2066726f6d20222e2f612e7473222077697468207b20747970653a20227822207d3b0a6578706f727420636f6e73742063203d20613b"
+    },
+    "id": "esm-36-import-attributes",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nimport a from \"./a.ts\" with { type: \"x\" };\nexport { b } from \"./a.ts\" with { type: \"x\" };\nexport const c = a;\n// @filename: a.ts\nexport default 1;\nexport const b = 2;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export type A = number;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export { A } from \"./a\";\r\nimport * as T_1 from \"./a\";\r\nexport { T_1 as T };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-37-type-only-export-from",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420747970652041203d206e756d6265723b0a",
+     "/.src/probe.ts": "6578706f72742074797065207b2041207d2066726f6d20222e2f61223b0a6578706f72742074797065202a20617320542066726f6d20222e2f61223b"
+    },
+    "id": "esm-37-type-only-export-from",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @filename: probe.ts\nexport type { A } from \"./a\";\nexport type * as T from \"./a\";\n// @filename: a.ts\nexport type A = number;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export async function f() { const m = await import(\"./a.js\"); return m; }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-38-nested-dynamic-import",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274206173796e632066756e6374696f6e20662829207b20636f6e7374206d203d20617761697420696d706f727428222e2f612e74737822293b2072657475726e206d3b207d0a"
+    },
+    "id": "esm-38-nested-dynamic-import",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\nexport async function f() { const m = await import(\"./a.tsx\"); return m; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "module.exports = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "const x = require(\"./a.js\");\r\nexport { x };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-39-preserve-import-equals-rewrite",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f7274203d20313b0a",
+     "/.src/probe.ts": "696d706f72742078203d207265717569726528222e2f612e747322293b0a6578706f7274207b2078207d3b"
+    },
+    "id": "esm-39-preserve-import-equals-rewrite",
+    "options": {
+     "module": 200,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: preserve\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nimport x = require(\"./a.ts\");\nexport { x };\n// @filename: a.ts\nexport = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export {};\r\n"
+      }
+     ],
+     "name": "/.src/a.cts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "import { createRequire as _createRequire_1 } from \"module\";\r\nconst __require_1 = _createRequire_1(import.meta.url);\r\nconst __require = 1;\r\nconst _createRequire = 2;\r\nconst x = __require_1(\"./a.cjs\");\r\nexport { x, __require, _createRequire };\r\n"
+      }
+     ],
+     "name": "/.src/probe.mts"
+    }
+   ],
+   "id": "esm-40-nodenext-unique-name-collision",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.cts": "6578706f7274203d20313b0a",
+     "/.src/probe.mts": "636f6e7374205f5f72657175697265203d20313b0a636f6e7374205f63726561746552657175697265203d20323b0a696d706f72742078203d207265717569726528222e2f612e636a7322293b0a6578706f7274207b20782c205f5f726571756972652c205f63726561746552657175697265207d3b"
+    },
+    "id": "esm-40-nodenext-unique-name-collision",
+    "options": {
+     "module": 199,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.mts",
+     "/.src/a.cts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: probe.mts\nconst __require = 1;\nconst _createRequire = 2;\nimport x = require(\"./a.cjs\");\nexport { x, __require, _createRequire };\n// @filename: a.cts\nexport = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "var x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-41-verbatim-script",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "7661722078203d20313b0a"
+    },
+    "id": "esm-41-verbatim-script",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "verbatimModuleSyntax": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @verbatimModuleSyntax: true\nvar x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "var __rewriteRelativeImportExtension = (this && this.__rewriteRelativeImportExtension) || function (path, preserveJsx) {\r\n    if (typeof path === \"string\" && /^\\.\\.?\\//.test(path)) {\r\n        return path.replace(/\\.(tsx)$|((?:\\.d)?)((?:\\.[^./]+?)?)\\.([cm]?)ts$/i, function (m, tsx, d, ext, cm) {\r\n            return tsx ? preserveJsx ? \".jsx\" : \".js\" : d && (!ext || !cm) ? m : (d + ext + \".\" + cm.toLowerCase() + \"js\");\r\n        });\r\n    }\r\n    return path;\r\n};\r\nfunction f(x: string) { return import(__rewriteRelativeImportExtension(x)); }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-42-isolated-script-import-helpers",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e206628783a20737472696e6729207b2072657475726e20696d706f72742878293b207d0a"
+    },
+    "id": "esm-42-isolated-script-import-helpers",
+    "options": {
+     "importHelpers": true,
+     "isolatedModules": true,
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @isolatedModules: true\n// @importHelpers: true\n// @rewriteRelativeImportExtensions: true\nfunction f(x: string) { return import(x); }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const p = import.defer(\"./a.js\");\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-43-import-defer",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e73742061203d20313b0a",
+     "/.src/probe.ts": "6578706f727420636f6e73742070203d20696d706f72742e646566657228222e2f612e747322293b"
+    },
+    "id": "esm-43-import-defer",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nexport const p = import.defer(\"./a.ts\");\n// @filename: a.ts\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const p = import(`./a.ts`);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-44-template-literal-import",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e73742061203d20313b0a",
+     "/.src/probe.ts": "6578706f727420636f6e73742070203d20696d706f727428602e2f612e747360293b"
+    },
+    "id": "esm-44-template-literal-import",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nexport const p = import(`./a.ts`);\n// @filename: a.ts\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export {};\r\n"
+      }
+     ],
+     "name": "/.src/a.mts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export {};\r\n"
+      }
+     ],
+     "name": "/.src/b.cts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export {};\r\n"
+      }
+     ],
+     "name": "/.src/c.tsx"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "import \"./a.mjs\";\r\nimport \"./b.cjs\";\r\nimport \"./c.jsx\";\r\nimport \"./d.d.ts\";\r\nimport \"../e.js\";\r\nimport \"f.ts\";\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esm-45-rewrite-cts-mts-tsx",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.mts": "6578706f7274207b7d3b",
+     "/.src/b.cts": "6578706f7274207b7d3b",
+     "/.src/c.tsx": "6578706f7274207b7d3b0a",
+     "/.src/probe.ts": "696d706f727420222e2f612e6d7473223b0a696d706f727420222e2f622e637473223b0a696d706f727420222e2f632e747378223b0a696d706f727420222e2f642e642e7473223b0a696d706f727420222e2e2f652e7473223b0a696d706f72742022662e7473223b"
+    },
+    "id": "esm-45-rewrite-cts-mts-tsx",
+    "options": {
+     "jsx": 1,
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.mts",
+     "/.src/b.cts",
+     "/.src/c.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @jsx: preserve\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nimport \"./a.mts\";\nimport \"./b.cts\";\nimport \"./c.tsx\";\nimport \"./d.d.ts\";\nimport \"../e.ts\";\nimport \"f.ts\";\n// @filename: a.mts\nexport {};\n// @filename: b.cts\nexport {};\n// @filename: c.tsx\nexport {};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export {};\r\n"
+      }
+     ],
+     "name": "/.src/a.cts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "import { createRequire as _createRequire } from \"module\";\r\nconst __require = _createRequire(import.meta.url);\r\nconst x = __require(\"./a.cjs\");\r\nexport { x };\r\n"
+      }
+     ],
+     "name": "/.src/probe.mts"
+    }
+   ],
+   "id": "esm-46-node16-require-rewrite",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.cts": "6578706f7274203d20313b0a",
+     "/.src/probe.mts": "696d706f72742078203d207265717569726528222e2f612e63747322293b0a6578706f7274207b2078207d3b"
+    },
+    "id": "esm-46-node16-require-rewrite",
+    "options": {
+     "module": 100,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.mts",
+     "/.src/a.cts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: node16\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.mts\nimport x = require(\"./a.cts\");\nexport { x };\n// @filename: a.cts\nexport = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "impliedmodule"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "impliedmodule"
+       ],
+       "text": "import { a } from \"./a\";\r\nexport const b = a;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "implied-01-esnext",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e73742061203d20313b0a",
+     "/.src/probe.ts": "696d706f7274207b2061207d2066726f6d20222e2f61223b0a6578706f727420636f6e73742062203d20613b"
+    },
+    "id": "implied-01-esnext",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: probe.ts\nimport { a } from \"./a\";\nexport const b = a;\n// @filename: a.ts\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "impliedmodule"
+       ],
+       "text": "import { createRequire as _createRequire } from \"module\";\r\nconst __require = _createRequire(import.meta.url);\r\nconst x = __require(\"./a.cjs\");\r\nexport default x;\r\n"
+      }
+     ],
+     "name": "/.src/probe.mts"
+    }
+   ],
+   "id": "implied-02-node16-mts",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.mts": "696d706f72742078203d207265717569726528222e2f612e636a7322293b0a6578706f72742064656661756c7420783b0a"
+    },
+    "id": "implied-02-node16-mts",
+    "options": {
+     "module": 100,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.mts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: node16\n// @filename: probe.mts\nimport x = require(\"./a.cjs\");\nexport default x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "impliedmodule"
+       ],
+       "text": "import { createRequire as _createRequire } from \"module\";\r\nconst __require = _createRequire(import.meta.url);\r\nconst x = __require(\"./a.cjs\");\r\nexport const y = x;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "implied-03-nodenext-package-type-module",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/package.json": "7b2274797065223a20226d6f64756c65227d",
+     "/.src/probe.ts": "696d706f72742078203d207265717569726528222e2f612e636a7322293b0a6578706f727420636f6e73742079203d20783b0a"
+    },
+    "id": "implied-03-nodenext-package-type-module",
+    "options": {
+     "module": 199,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: package.json\n{\"type\": \"module\"}\n// @filename: probe.ts\nimport x = require(\"./a.cjs\");\nexport const y = x;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "impliedmodule"
+       ],
+       "text": "module.exports = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "impliedmodule"
+       ],
+       "text": "const x = require(\"./a\");\r\nmodule.exports = x;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "implied-04-preserve",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f7274203d20313b0a",
+     "/.src/probe.ts": "696d706f72742078203d207265717569726528222e2f6122293b0a6578706f7274203d20783b"
+    },
+    "id": "implied-04-preserve",
+    "options": {
+     "module": 200,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: preserve\n// @filename: probe.ts\nimport x = require(\"./a\");\nexport = x;\n// @filename: a.ts\nexport = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "impliedmodule"
+       ],
+       "text": "export * as ns from \"./a\";\r\n"
+      }
+     ],
+     "name": "/.src/b.ts"
+    }
+   ],
+   "id": "implied-05-declaration-file",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.d.ts": "6578706f7274206465636c61726520636f6e737420613a206e756d6265723b",
+     "/.src/b.ts": "6578706f7274202a206173206e732066726f6d20222e2f61223b0a"
+    },
+    "id": "implied-05-declaration-file",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/a.d.ts",
+     "/.src/b.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: a.d.ts\nexport declare const a: number;\n// @filename: b.ts\nexport * as ns from \"./a\";\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "impliedmodule"
+       ],
+       "text": "var x = 1;\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "implied-06-es2015-force",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "7661722078203d20313b0a"
+    },
+    "id": "implied-06-es2015-force",
+    "options": {
+     "module": 5,
+     "moduleDetection": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @moduleDetection: force\nvar x = 1;\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

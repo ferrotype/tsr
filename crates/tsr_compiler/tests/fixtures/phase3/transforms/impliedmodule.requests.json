@@ -1,0 +1,34 @@
+{
+ "cases": [
+  {
+   "id": "esnext-module",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: probe.ts\nimport { a } from \"./a\";\nexport const b = a;\n// @filename: a.ts\nexport const a = 1;\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
+  },
+  {
+   "id": "es2015-module",
+   "name": "probe.ts",
+   "source": "// @module: es2015\nexport default 1;\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
+  },
+  {
+   "id": "preserve",
+   "name": "probe.ts",
+   "source": "// @module: preserve\n// @filename: probe.ts\nimport x = require(\"./a\");\nexport const y = x;\n// @filename: a.ts\nexport = 1;\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
+  }
+ ]
+}

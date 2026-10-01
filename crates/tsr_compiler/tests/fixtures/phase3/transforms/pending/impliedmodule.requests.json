@@ -11,26 +11,6 @@
    ]
   },
   {
-   "id": "esnext-module",
-   "name": "probe.ts",
-   "source": "// @module: esnext\n// @filename: probe.ts\nimport { a } from \"./a\";\nexport const b = a;\n// @filename: a.ts\nexport const a = 1;\n",
-   "chains": [
-    [
-     "impliedmodule"
-    ]
-   ]
-  },
-  {
-   "id": "es2015-module",
-   "name": "probe.ts",
-   "source": "// @module: es2015\nexport default 1;\n",
-   "chains": [
-    [
-     "impliedmodule"
-    ]
-   ]
-  },
-  {
    "id": "node16-mts-cts",
    "name": "probe.ts",
    "source": "// @module: node16\n// @filename: a.mts\nexport const a = 1;\n// @filename: b.cts\nexport const b = 2;\n// @filename: c.ts\nexport const c = 3;\n",
@@ -44,16 +24,6 @@
    "id": "nodenext-package-type-module",
    "name": "probe.ts",
    "source": "// @module: nodenext\n// @filename: package.json\n{\"type\": \"module\"}\n// @filename: a.ts\nexport const a = 1;\n// @filename: b.cts\nimport x = require(\"./c.cjs\");\nexport = x;\n// @filename: c.cts\nexport = 1;\n",
-   "chains": [
-    [
-     "impliedmodule"
-    ]
-   ]
-  },
-  {
-   "id": "preserve",
-   "name": "probe.ts",
-   "source": "// @module: preserve\n// @filename: probe.ts\nimport x = require(\"./a\");\nexport const y = x;\n// @filename: a.ts\nexport = 1;\n",
    "chains": [
     [
      "impliedmodule"

@@ -1,0 +1,524 @@
+{
+ "cases": [
+  {
+   "id": "esm-01-es2015-plain-export",
+   "name": "probe.ts",
+   "source": "// @module: es2015\nexport const a = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-02-script-not-module",
+   "name": "probe.ts",
+   "source": "// @module: es2015\nvar x = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-03-isolated-script",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @isolatedModules: true\nvar x = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-04-force-detection-es2015",
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @moduleDetection: force\nvar x = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-05-force-detection-preserve",
+   "name": "probe.ts",
+   "source": "// @module: preserve\n// @moduleDetection: force\nvar x = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-06-declaration-file",
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @filename: a.d.ts\nexport declare const a: number;\n// @filename: b.ts\nexport const b = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-07-preserve-import-equals",
+   "name": "probe.ts",
+   "source": "// @module: preserve\n// @filename: probe.ts\nimport x = require(\"./a\");\nexport = x;\n// @filename: a.ts\nexport = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-08-preserve-export-import-equals",
+   "name": "probe.ts",
+   "source": "// @module: preserve\n// @filename: probe.ts\nexport import x = require(\"./a\");\n// @filename: a.ts\nexport = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-09-es2015-import-equals-elided",
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @filename: probe.ts\nimport x = require(\"./a\");\nconsole.log(x);\n// @filename: a.ts\nexport = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-10-node16-mts-create-require",
+   "name": "probe.ts",
+   "source": "// @module: node16\n// @filename: probe.mts\nimport x = require(\"./a.cjs\");\nconsole.log(x);\n// @filename: a.cts\nexport = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-11-nodenext-two-requires",
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: probe.mts\nimport x = require(\"./a.cjs\");\nimport y = require(\"./a.cjs\");\nexport { x, y };\n// @filename: a.cts\nexport = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-12-nodenext-prologues",
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: probe.mts\n\"use strict\";\n\"use asm\";\nimport x = require(\"./a.cjs\");\nconsole.log(x);\n// @filename: a.cts\nexport = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-13-nodenext-export-import-equals",
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: probe.mts\nexport import x = require(\"./a.cjs\");\n// @filename: a.cts\nexport = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-14-es2015-export-equals-elided",
+   "name": "probe.ts",
+   "source": "// @module: es2015\nconst a = 1;\nexport = a;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-15-preserve-export-equals",
+   "name": "probe.ts",
+   "source": "// @module: preserve\nconst a = 1;\nexport = a;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-16-export-default",
+   "name": "probe.ts",
+   "source": "// @module: es2015\nexport default function f() { return 1; }\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-17-es2015-export-star-as-ns",
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @filename: probe.ts\nexport * as ns from \"./a\";\n// @filename: a.ts\nexport const a = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-18-es2015-export-star-as-default",
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @filename: probe.ts\nexport * as default from \"./a\";\n// @filename: a.ts\nexport const a = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-19-esnext-export-star-as-ns",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: probe.ts\nexport * as ns from \"./a\";\n// @filename: a.ts\nexport const a = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-20-es2015-export-star",
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @filename: probe.ts\nexport * from \"./a\";\nexport { a as b } from \"./a\";\n// @filename: a.ts\nexport const a = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-21-local-export",
+   "name": "probe.ts",
+   "source": "// @module: es2015\nconst a = 1;\nexport { a };\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-22-rewrite-import-declaration",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nimport { a } from \"./a.ts\";\nimport \"./a.ts\";\nimport b from \"./b.js\";\nexport const c = a + b;\n// @filename: a.ts\nexport const a = 1;\n// @filename: b.ts\nexport default 2;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-23-rewrite-export-from",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nexport { a } from \"./a.ts\";\nexport * from \"./a.ts\";\n// @filename: a.ts\nexport const a = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-24-rewrite-es2015-export-star-as",
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nexport * as ns from \"./a.ts\";\n// @filename: a.ts\nexport const a = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-25-rewrite-dynamic-import-literal",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nexport const p = import(\"./a.ts\");\nexport const q = import(\"./a.ts\", { with: { type: \"x\" } });\n// @filename: a.ts\nexport const a = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-26-rewrite-dynamic-import-expression",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\nexport function f(x: string) { return import(x); }\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-27-rewrite-dynamic-import-jsx-preserve",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @jsx: preserve\n// @rewriteRelativeImportExtensions: true\nexport function f(x: string) { return import(x); }\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-28-rewrite-import-helpers",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @importHelpers: true\n// @rewriteRelativeImportExtensions: true\nexport function f(x: string) { return import(x); }\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-29-rewrite-js-require",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @allowJs: true\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.js\nconst a = require(\"./a.ts\");\nconst b = require(name);\nconst c = require(\"./a.ts\", 2);\nexport { a, b, c };\n// @filename: a.ts\nexport const a = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-30-rewrite-ts-require-not-rewritten",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\ndeclare function require(x: string): any;\nexport const a = require(\"./a.ts\");\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-31-nodenext-cts-import-helpers",
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @importHelpers: true\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.cts\nexport function f(x: string) { return import(x); }\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-32-commonjs-import-helpers",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @importHelpers: true\n// @rewriteRelativeImportExtensions: true\nexport function f(x: string) { return import(x); }\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-33-node16-internal-import-equals-panics",
+   "name": "probe.ts",
+   "source": "// @module: node16\n// @filename: probe.mts\nnamespace N { export const y = 1; }\nimport x = N.y;\nexport { x };\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-34-import-equals-comments",
+   "name": "probe.ts",
+   "source": "// @module: preserve\n// @filename: probe.ts\n// leading\nimport x = require(\"./a\"); // trailing\nexport { x };\n// @filename: a.ts\nexport = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-35-export-star-as-string-name",
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @filename: probe.ts\nexport * as \"a-b\" from \"./a\";\n// @filename: a.ts\nexport const a = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-36-import-attributes",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nimport a from \"./a.ts\" with { type: \"x\" };\nexport { b } from \"./a.ts\" with { type: \"x\" };\nexport const c = a;\n// @filename: a.ts\nexport default 1;\nexport const b = 2;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-37-type-only-export-from",
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @filename: probe.ts\nexport type { A } from \"./a\";\nexport type * as T from \"./a\";\n// @filename: a.ts\nexport type A = number;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-38-nested-dynamic-import",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\nexport async function f() { const m = await import(\"./a.tsx\"); return m; }\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-39-preserve-import-equals-rewrite",
+   "name": "probe.ts",
+   "source": "// @module: preserve\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nimport x = require(\"./a.ts\");\nexport { x };\n// @filename: a.ts\nexport = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-40-nodenext-unique-name-collision",
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: probe.mts\nconst __require = 1;\nconst _createRequire = 2;\nimport x = require(\"./a.cjs\");\nexport { x, __require, _createRequire };\n// @filename: a.cts\nexport = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-41-verbatim-script",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @verbatimModuleSyntax: true\nvar x = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-42-isolated-script-import-helpers",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @isolatedModules: true\n// @importHelpers: true\n// @rewriteRelativeImportExtensions: true\nfunction f(x: string) { return import(x); }\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-43-import-defer",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nexport const p = import.defer(\"./a.ts\");\n// @filename: a.ts\nexport const a = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-44-template-literal-import",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nexport const p = import(`./a.ts`);\n// @filename: a.ts\nexport const a = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-45-rewrite-cts-mts-tsx",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @jsx: preserve\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nimport \"./a.mts\";\nimport \"./b.cts\";\nimport \"./c.tsx\";\nimport \"./d.d.ts\";\nimport \"../e.ts\";\nimport \"f.ts\";\n// @filename: a.mts\nexport {};\n// @filename: b.cts\nexport {};\n// @filename: c.tsx\nexport {};\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "esm-46-node16-require-rewrite",
+   "name": "probe.ts",
+   "source": "// @module: node16\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.mts\nimport x = require(\"./a.cts\");\nexport { x };\n// @filename: a.cts\nexport = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "implied-01-esnext",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: probe.ts\nimport { a } from \"./a\";\nexport const b = a;\n// @filename: a.ts\nexport const a = 1;\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
+  },
+  {
+   "id": "implied-02-node16-mts",
+   "name": "probe.ts",
+   "source": "// @module: node16\n// @filename: probe.mts\nimport x = require(\"./a.cjs\");\nexport default x;\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
+  },
+  {
+   "id": "implied-03-nodenext-package-type-module",
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: package.json\n{\"type\": \"module\"}\n// @filename: probe.ts\nimport x = require(\"./a.cjs\");\nexport const y = x;\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
+  },
+  {
+   "id": "implied-04-preserve",
+   "name": "probe.ts",
+   "source": "// @module: preserve\n// @filename: probe.ts\nimport x = require(\"./a\");\nexport = x;\n// @filename: a.ts\nexport = 1;\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
+  },
+  {
+   "id": "implied-05-declaration-file",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: a.d.ts\nexport declare const a: number;\n// @filename: b.ts\nexport * as ns from \"./a\";\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
+  },
+  {
+   "id": "implied-06-es2015-force",
+   "name": "probe.ts",
+   "source": "// @module: es2015\n// @moduleDetection: force\nvar x = 1;\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
+  }
+ ]
+}
