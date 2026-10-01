@@ -1,0 +1,534 @@
+{
+  "cases": [
+    {
+      "id": "no-using",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nconst a = 1;\nfunction f() { let b = a; return b; }\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "block-sync",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f() {\n    using x = g();\n    x.run();\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "block-async",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nasync function f() {\n    await using x = g();\n    x.run();\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "block-mixed-kinds",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nasync function f() {\n    using a = g();\n    await using b = h();\n    using c = i();\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "block-multiple-declarators",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f() {\n    using a = g(), b = h(), c = null;\n    return a;\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "block-missing-initializer",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f() {\n    using x;\n    x;\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "block-binding-pattern",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f() {\n    using { a } = g();\n    using [b] = h();\n    using c = i();\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "block-named-evaluation-class",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f() {\n    using c = class { static x = 1; };\n    using d = function () { };\n    using e = () => { };\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "block-prologue",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f() {\n    \"use strict\";\n    'another';\n    using x = g();\n    return x;\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "block-statements-before-and-after",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f() {\n    const a = 1;\n    using x = g(a);\n    const b = 2;\n    function inner() { return b; }\n    class K { }\n    return x;\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "block-nested",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f() {\n    using a = g();\n    {\n        using b = h();\n        {\n            await_(b);\n        }\n    }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "block-nested-async-in-sync",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nasync function f() {\n    using a = g();\n    {\n        await using b = h();\n    }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "arrow-and-method-bodies",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nconst f = () => {\n    using a = g();\n};\nclass C {\n    m() {\n        using b = h();\n    }\n    static {\n        using c = i();\n    }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "for-using-initializer",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f() {\n    for (using x = g(); x.ok; x.next()) {\n        x.step();\n    }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-using-initializer",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nasync function f() {\n    for (await using x = g(), y = h(); ;) {\n        break;\n    }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "for-plain-with-using-body",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f() {\n    for (let i = 0; i < 3; i++) {\n        using x = g(i);\n    }\n    for (;;) { using y = h(); break; }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "for-of-using-block",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f(xs) {\n    for (using x of xs) {\n        x.run();\n        x.stop();\n    }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "for-of-using-statement-body",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f(xs) {\n    for (using x of xs) x.run();\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "for-of-using-empty-body",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f(xs) {\n    for (using x of xs);\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "for-of-await-using",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nasync function f(xs) {\n    for (await using x of xs) {\n        x.run();\n    }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-of-await-using",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nasync function f(xs) {\n    for await (await using x of xs) {\n        x.run();\n    }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-of-using",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nasync function f(xs) {\n    for await (using x of xs) {\n    }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "for-of-plain-with-using-body",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f(xs) {\n    for (const x of xs) {\n        using y = x;\n    }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "for-of-labeled",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f(xs) {\n    outer: for (using x of xs) {\n        for (using y of x) {\n            continue outer;\n        }\n    }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "for-in-using",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f(o) {\n    for (using x in o) {\n        x;\n    }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "switch-case",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f(n) {\n    switch (n) {\n        case 0:\n            using a = g();\n            break;\n        default: {\n            using b = h();\n        }\n    }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "top-level-script",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nusing x = g();\nx.run();\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "top-level-script-leading",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nconst a = 1;\nfunction before() { using q = g(); }\nusing x = g(a);\nconst b = 2;\nfunction after() { return b; }\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "top-level-prologue",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n\"use strict\";\nusing x = g();\nlet y = x;\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "top-level-await-using",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nawait using x = g();\nexport const y = 1;\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-imports-and-exports",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nimport { w } from \"mod\";\nconst x = w;\nusing y = g();\nimport z from \"other\";\nexport { x as renamed };\nexport * from \"star\";\nexport function f() {\n    return z;\n}\nconst t = 1;\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-export-variables",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nusing r = g();\nexport const a = 1, b = 2;\nexport let c;\nvar d = 3, e;\nlet f;\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-export-destructuring",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nusing r = g();\nexport const { a, b: [c, , d], ...e } = o;\nconst [f = 1, { g: h }] = p;\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-class",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nusing r = g();\nclass C {\n    static m() { return C; }\n}\nnew C();\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-export-class",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nusing r = g();\nexport class C {\n    x = 1;\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-export-default-class-named",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nusing r = g();\nexport default class C {\n    m() { }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-export-default-class-anonymous",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nusing r = g();\nexport default class {\n    m() { }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-export-default-expression",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nusing r = g();\nexport default r.value + 1;\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-export-default-parenthesized-arrow",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nusing r = g();\nexport default (() => r);\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-export-default-assignment-class",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nlet k;\nusing r = g();\nexport default k = class { };\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-export-default-twice",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nusing r = g();\nexport default 1;\nexport default 2;\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-export-default-then-anonymous-class",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nusing r = g();\nexport default 1;\nexport default class { }\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-export-default-then-named-class",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nusing r = g();\nexport default 1;\nexport default class D { }\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-duplicate-export-class",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nusing r = g();\nexport class C { }\nexport class C { }\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-export-equals",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: commonjs\nusing r = g();\nexport = r;\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-export-equals-twice",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: commonjs\nusing r = g();\nexport = 1;\nexport = 2;\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-import-equals",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: commonjs\nusing r = g();\nimport fs = require(\"fs\");\nexport import p = fs.path;\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "module-nested-using-in-hoisted",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @module: esnext\nusing r = g();\nexport function f() {\n    using s = h();\n}\nexport class K {\n    m() { using t = i(); }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "target-es2017",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f() {\n    await using x = g();\n    using y = h();\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "target-es2015",
+      "name": "probe.ts",
+      "source": "// @target: es2015\nfunction f() {\n    using x = g();\n}\nusing y = h();\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "target-es2016",
+      "name": "probe.ts",
+      "source": "// @target: es2016\nfunction f() {\n    using x = g();\n    for (using y of z) { }\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "comments",
+      "name": "probe.ts",
+      "source": "// @target: es2022\nfunction f() {\n    // leading\n    using x = g(); // trailing\n    /* block */ using y = h();\n}\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    },
+    {
+      "id": "declaration-file",
+      "name": "probe.ts",
+      "source": "// @target: es2022\n// @filename: decl.d.ts\ndeclare function g(): any;\nusing x = g();\n// @filename: main.ts\nusing y = g();\n",
+      "chains": [
+        [
+          "using"
+        ]
+      ]
+    }
+  ]
+}
