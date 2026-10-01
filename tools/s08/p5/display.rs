@@ -238,6 +238,7 @@ pub fn observe(request: &Value) -> Result<Value> {
                             node,
                             enclosing.map(|_| context_source),
                             &mut writer,
+                            None,
                         )?;
                         result["text_hex"] = json!(hex(writer.text()));
                     } else {

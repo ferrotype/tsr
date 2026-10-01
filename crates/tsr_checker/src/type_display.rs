@@ -101,7 +101,7 @@ impl CheckerState {
                 &builder.emit,
             );
             let mut writer = SingleLineStringWriter::new();
-            printer.write(builder.ast.view(), node, source, &mut writer)?;
+            printer.write(builder.ast.view(), node, source, &mut writer, None)?;
             Ok(JsString::from_bytes(writer.text().to_vec()))
         })
     }
@@ -176,7 +176,7 @@ impl CheckerState {
                 b"".as_slice()
             };
             let mut writer = TextWriter::new(newline, 0);
-            printer.write(builder.ast.view(), node, source, &mut writer)?;
+            printer.write(builder.ast.view(), node, source, &mut writer, None)?;
             Ok(JsString::from_bytes(writer.text().to_vec()))
         })?;
         let maximum = if no_truncation {
@@ -253,11 +253,11 @@ impl CheckerState {
             );
             if flags & type_format_flags::MULTILINE_OBJECT_LITERALS != 0 {
                 let mut writer = TextWriter::new(b"\n", 0);
-                printer.write(builder.ast.view(), node, source, &mut writer)?;
+                printer.write(builder.ast.view(), node, source, &mut writer, None)?;
                 return Ok(JsString::from_bytes(writer.text().to_vec()));
             }
             let mut writer = SingleLineStringWriter::new();
-            printer.write(builder.ast.view(), node, source, &mut writer)?;
+            printer.write(builder.ast.view(), node, source, &mut writer, None)?;
             Ok(JsString::from_bytes(writer.text().to_vec()))
         })?;
         if let (Some(verbosity), Some(signals)) = (verbosity, signals) {
@@ -301,7 +301,7 @@ impl CheckerState {
                 &builder.emit,
             );
             let mut writer = SingleLineStringWriter::new();
-            printer.write(builder.ast.view(), node, source, &mut writer)?;
+            printer.write(builder.ast.view(), node, source, &mut writer, None)?;
             Ok(JsString::from_bytes(writer.text().to_vec()))
         })
     }
@@ -336,7 +336,7 @@ impl CheckerState {
                 &builder.emit,
             );
             let mut writer = TextWriter::new(b"\n", 0);
-            printer.write(builder.ast.view(), node, source, &mut writer)?;
+            printer.write(builder.ast.view(), node, source, &mut writer, None)?;
             Ok(JsString::from_bytes(writer.text().to_vec()))
         })?;
         if let (Some(verbosity), Some(signals)) = (verbosity, signals) {
@@ -390,7 +390,7 @@ impl CheckerState {
                     &builder.emit,
                 );
                 let mut writer = SingleLineStringWriter::new();
-                printer.write(builder.ast.view(), node, None, &mut writer)?;
+                printer.write(builder.ast.view(), node, None, &mut writer, None)?;
                 Ok(JsString::from_bytes(writer.text().to_vec()))
             },
         )

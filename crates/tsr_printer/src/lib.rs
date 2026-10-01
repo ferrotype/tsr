@@ -11,9 +11,9 @@
 //! flags and list formats, literal text, type-node precedence, and the printer's
 //! emission of whole source files with their comments, shebang, prologue,
 //! triple-slash directives and preserved source lines, with the emit helpers
-//! recorded on the emit context and the names the name generator makes for
-//! generated identifiers. Source maps are a named boundary: the printer
-//! returns [`Error::Unsupported`] instead of guessing.
+//! recorded on the emit context, the names the name generator makes for
+//! generated identifiers, and source maps through a `tsr_sourcemap`
+//! generator.
 //!
 //! Output is bytes. Upstream strings may hold arbitrary bytes and the text
 //! contract (`docs/design/text.md`) forbids lossy conversion, so writers accept
@@ -57,7 +57,9 @@ pub use namegenerator::{
     format_generated_name, GetTextOfNodeFn, IsFileLevelUniqueNameFn, NameGenerator,
     NameGeneratorHost,
 };
-pub use printer::{Printer, PrinterBindings, PrinterOptions, WriteKind};
+pub use printer::{
+    MapSourcePosition, Printer, PrinterBindings, PrinterOptions, SourceMapSource, WriteKind,
+};
 pub use semicolon_writer::TrailingSemicolonDeferringWriter;
 pub use single_line_string_writer::SingleLineStringWriter;
 pub use text_writer::{get_default_indent_size, TextWriter};
@@ -135,6 +137,8 @@ fn node_data_name(kind: tsr_ast::NodeKind) -> String {
 mod printer_emit_tests;
 #[cfg(test)]
 mod printer_parenthesize_tests;
+#[cfg(test)]
+mod printer_source_map_tests;
 #[cfg(test)]
 mod printer_tests;
 #[cfg(test)]

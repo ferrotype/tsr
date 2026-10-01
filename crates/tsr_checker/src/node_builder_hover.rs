@@ -1192,7 +1192,7 @@ impl CheckerState {
                     text.push(b'\n');
                 }
                 let mut writer = tsr_printer::TextWriter::new(b"\n", 0);
-                printer.write(builder.ast.view(), node, source, &mut writer)?;
+                printer.write(builder.ast.view(), node, source, &mut writer, None)?;
                 text.extend_from_slice(writer.text());
             }
             Ok(JsString::from_bytes(text))

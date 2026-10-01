@@ -6,11 +6,9 @@
 //! where every balanced enter/exit pair restores it, so a printer that is not
 //! reentered observes the same values.
 //!
-//! Source maps are a named boundary. `Printer.Write` receives no generator
-//! here, so `sourceMapsDisabled` is always set and the guards upstream checks
-//! first answer "no map" before any generator call; the generator calls
-//! themselves return [`Error::Unsupported`] until they are wired.
+//! The source-map positions themselves are `printer_source_maps.rs`.
 
+use super::source_maps::SourceMapState;
 use super::{position_is_synthesized, Session, ViewFactory};
 use crate::utilities::{is_jsdoc_like_text, is_pinned_comment, is_recognized_triple_slash_comment};
 use crate::{emit_flags as ef, EmitFlags, EmitTextWriter, Error, SynthesizedComment};
@@ -52,19 +50,8 @@ impl CommentState {
     }
 }
 
-/// `sourceMapState`. No value exists while source maps are a boundary: every
-/// path that would create one returns [`Error::Unsupported`] first.
-#[derive(Debug)]
-pub(crate) enum SourceMapState {}
-
-/// `sourcemap.Source` as the printer holds it. `setSourceMapSource` is the
-/// source-map boundary and returns while maps are disabled, so no value is ever
-/// held.
-#[derive(Clone, Copy, Debug)]
-pub(crate) enum SourceMapSource {}
-
 /// `printerState`.
-#[derive(Debug, Default)]
+#[derive(Clone, Copy, Debug, Default)]
 pub(crate) struct PrinterState {
     comment_state: Option<CommentState>,
     source_map_state: Option<SourceMapState>,
@@ -88,14 +75,17 @@ pub(crate) struct DetachedCommentsInfo {
 /// The parts of a node comment emission reads: its kind, emit flags, comment
 /// range and, for a node of the tree, its identity (synthetic comments are
 /// keyed by it). Upstream also creates a few nodes while printing; those have
-/// no identity here, no emit flags and no synthetic comments, as a fresh node
-/// upstream has none.
+/// no identity here and no synthetic comments, as a node upstream creates or
+/// copies has none, and carry their source-map range for the source maps.
 #[derive(Clone, Copy, Debug)]
 pub(crate) struct CommentTarget {
     pub(crate) node: Option<NodeId>,
     pub(crate) kind: NodeKind,
     pub(crate) emit_flags: EmitFlags,
     pub(crate) comment_range: TextRange,
+    /// `EmitContext.SourceMapRange` of a created node; unread for a node of
+    /// the tree.
+    pub(crate) source_map_range: TextRange,
 }
 
 /// Upstream's `core.Tristate` for `emitLeadingComments`.
@@ -292,6 +282,7 @@ impl Session<'_, '_> {
                 .emit_context
                 .comment_range(node)
                 .unwrap_or_else(|| read.range()),
+            source_map_range: read.range(),
         })
     }
 
@@ -338,7 +329,7 @@ impl Session<'_, '_> {
     /// Tokens other than braces have no positions: they are noisy, but coverage
     /// tools need branch braces. Declaration files omit those too.
     // port: tsc/internal/printer/printer.go:Printer.shouldEmitTokenSourceMaps
-    fn should_emit_token_source_maps(
+    pub(crate) fn should_emit_token_source_maps(
         &self,
         token: K,
         _pos: i64,
@@ -1123,62 +1114,6 @@ impl Session<'_, '_> {
     }
 
     //
-    // Source maps (boundary)
-    //
-
-    /// Boundary: positions reach a source-map generator, which `Write` does not
-    /// take yet. With maps disabled this returns before any generator call, as
-    /// upstream does.
-    fn emit_pos(&mut self, pos: i64) {
-        if self.source_maps_disabled || position_is_synthesized(pos) {
-            return;
-        }
-        if let Some(source) = self.source_map_source {
-            match source {}
-        }
-    }
-
-    /// Boundary: `emitSourceMapsBeforeNode` past its guard needs the generator.
-    fn emit_source_maps_before_node(
-        &mut self,
-        node: Option<NodeId>,
-    ) -> Result<Option<SourceMapState>, Error> {
-        if !self.should_emit_source_maps(node)? {
-            return Ok(None);
-        }
-        Err(Error::Unsupported("source-map emission"))
-    }
-
-    /// Boundary: no source-map state exists to finish.
-    fn emit_source_maps_after_node(state: Option<SourceMapState>) {
-        if let Some(state) = state {
-            match state {}
-        }
-    }
-
-    /// Boundary: `emitSourceMapsBeforeToken` past its guard needs the
-    /// generator.
-    fn emit_source_maps_before_token(
-        &mut self,
-        token: K,
-        pos: i64,
-        context: Option<NodeId>,
-        flags: tef::TokenEmitFlags,
-    ) -> Result<Option<SourceMapState>, Error> {
-        if !self.should_emit_token_source_maps(token, pos, context, flags)? {
-            return Ok(None);
-        }
-        Err(Error::Unsupported("source-map emission"))
-    }
-
-    /// Boundary: no source-map state exists to finish.
-    fn emit_source_maps_after_token(state: Option<SourceMapState>) {
-        if let Some(state) = state {
-            match state {}
-        }
-    }
-
-    //
     // Scoped operations
     //
 
@@ -1186,7 +1121,7 @@ impl Session<'_, '_> {
     pub(crate) fn enter_node(&mut self, node: NodeId) -> Result<PrinterState, Error> {
         self.writer.on_before_emit_node(node);
         let comment_state = self.emit_comments_before_node(node)?;
-        let source_map_state = self.emit_source_maps_before_node(Some(node))?;
+        let source_map_state = self.emit_source_maps_before_node(node)?;
         Ok(PrinterState {
             comment_state,
             source_map_state,
@@ -1195,7 +1130,10 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.exitNode
     pub(crate) fn exit_node(&mut self, node: NodeId, state: PrinterState) -> Result<(), Error> {
-        Self::emit_source_maps_after_node(state.source_map_state);
+        if state.source_map_state.is_some() {
+            let kind = self.node(node)?.kind();
+            self.emit_source_maps_after_node(kind, state.source_map_state);
+        }
         if state.comment_state.is_some() {
             let kind = self.node(node)?.kind();
             let identity = self.comment_identity(node);
@@ -1216,7 +1154,11 @@ impl Session<'_, '_> {
         } else {
             None
         };
-        let source_map_state = self.emit_source_maps_before_node(None)?;
+        let source_map_state = self.emit_source_maps_before_created_node(
+            target.kind,
+            target.emit_flags,
+            target.source_map_range,
+        )?;
         Ok(PrinterState {
             comment_state,
             source_map_state,
@@ -1229,7 +1171,7 @@ impl Session<'_, '_> {
         target: &CommentTarget,
         state: PrinterState,
     ) -> Result<(), Error> {
-        Self::emit_source_maps_after_node(state.source_map_state);
+        self.emit_source_maps_after_node(target.kind, state.source_map_state);
         self.emit_comments_after_node(target.node, target.kind, state.comment_state)
     }
 
@@ -1245,7 +1187,7 @@ impl Session<'_, '_> {
             state.comment_state = self.emit_comments_before_node(node)?;
         }
         if flags & tef::NO_SOURCE_MAPS == 0 {
-            state.source_map_state = self.emit_source_maps_before_node(Some(node))?;
+            state.source_map_state = self.emit_source_maps_before_node(node)?;
         }
         Ok(state)
     }
@@ -1256,7 +1198,10 @@ impl Session<'_, '_> {
         node: NodeId,
         state: PrinterState,
     ) -> Result<(), Error> {
-        Self::emit_source_maps_after_node(state.source_map_state);
+        if state.source_map_state.is_some() {
+            let kind = self.node(node)?.kind();
+            self.emit_source_maps_after_node(kind, state.source_map_state);
+        }
         if state.comment_state.is_some() {
             let kind = self.node(node)?.kind();
             let identity = self.comment_identity(node);
@@ -1289,7 +1234,7 @@ impl Session<'_, '_> {
         context: Option<NodeId>,
         state: PrinterState,
     ) -> Result<(), Error> {
-        Self::emit_source_maps_after_token(state.source_map_state);
+        self.emit_source_maps_after_token(pos, state.source_map_state);
         self.emit_comments_after_token(token, pos, context, state.comment_state)
     }
 }

@@ -234,6 +234,14 @@ impl EmitContext {
             .and_then(|emit_node| emit_node.source_map_range);
         range.unwrap_or_else(|| factory.node(node).range())
     }
+    /// The source-map range set on `node`, if one was (upstream's
+    /// `hasSourceMapRange`): what a copy of the node's emit metadata carries.
+    pub(crate) fn source_map_range_if_set(&self, node: NodeId) -> Option<TextRange> {
+        self.tables()
+            .emit_nodes
+            .get(&node)
+            .and_then(|emit_node| emit_node.source_map_range)
+    }
     /// Sets the range to use for a node when emitting source maps.
     // port: tsc/internal/printer/emitcontext.go:EmitContext.SetSourceMapRange
     pub fn set_source_map_range(&mut self, node: NodeId, loc: TextRange) {

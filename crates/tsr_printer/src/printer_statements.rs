@@ -26,6 +26,7 @@ pub(crate) struct NoAsiParens {
     context: Option<NodeId>,
     emit_flags: crate::EmitFlags,
     comment_range: TextRange,
+    source_map_range: TextRange,
 }
 
 /// One rewrite of `parenthesizeExpressionForNoAsi` while it prints.
@@ -973,6 +974,11 @@ impl Session<'_, '_> {
                                         .emit_context
                                         .comment_range(node)
                                         .unwrap_or(range),
+                                    source_map_range: self
+                                        .printer
+                                        .emit_context
+                                        .source_map_range_if_set(node)
+                                        .unwrap_or(range),
                                 }
                             }
                             _ => NoAsiParens {
@@ -982,6 +988,7 @@ impl Session<'_, '_> {
                                 context: None,
                                 emit_flags: ef::NONE,
                                 comment_range: TextRange::new(-1, -1),
+                                source_map_range: TextRange::new(-1, -1),
                             },
                         };
                         return Ok(Some(NoAsiRewrite {
@@ -1066,6 +1073,7 @@ impl Session<'_, '_> {
             kind: K::ParenthesizedExpression.into(),
             emit_flags: parens.emit_flags,
             comment_range: parens.comment_range,
+            source_map_range: parens.source_map_range,
         };
         let state = self.enter_created_node(&target)?;
         // Inside the parentheses the partially emitted expression is itself.

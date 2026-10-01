@@ -172,6 +172,7 @@ impl Session<'_, '_> {
             kind: K::ParenthesizedExpression.into(),
             emit_flags: ef::NONE,
             comment_range: span.range(),
+            source_map_range: span.range(),
         };
         guard(|| {
             let state = self.enter_created_node(&target)?;

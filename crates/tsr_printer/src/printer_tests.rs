@@ -550,13 +550,13 @@ fn printer_matches_the_pinned_go_printer_on_every_case() {
         let result = if options["writer"].as_str() == Some("single_line") {
             let mut writer = SingleLineStringWriter::new();
             printer
-                .write(ast.view(), node, None, &mut writer)
+                .write(ast.view(), node, None, &mut writer, None)
                 .map(|()| writer.text().to_vec())
         } else {
             let new_line = options["new_line"].as_str().unwrap_or("");
             let mut writer = TextWriter::new(new_line.as_bytes(), 0);
             printer
-                .write(ast.view(), node, None, &mut writer)
+                .write(ast.view(), node, None, &mut writer, None)
                 .map(|()| writer.text().to_vec())
         };
         match (
@@ -991,7 +991,7 @@ fn class_static_blocks_print_their_own_body_field() {
         let class = ast.new_class_declaration(None, Some(name), None, None, Some(members));
         let mut writer = TextWriter::new(b"\n", 0);
         Printer::new(PrinterOptions::default(), &context)
-            .write(ast.view(), class, None, &mut writer)
+            .write(ast.view(), class, None, &mut writer, None)
             .expect("print");
         assert_eq!(
             String::from_utf8_lossy(writer.text()),

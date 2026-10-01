@@ -273,7 +273,7 @@ fn recursive_printer_grows_and_unwinds_without_retaining_session_state() {
                     panic_on_keyword: false,
                 };
                 printer
-                    .write(ast.view(), expression, None, &mut writer)
+                    .write(ast.view(), expression, None, &mut writer, None)
                     .unwrap();
                 assert_eq!(writer.text().len(), 1 + depth * 4);
                 assert!(
@@ -286,7 +286,9 @@ fn recursive_printer_grows_and_unwinds_without_retaining_session_state() {
                     [(qualified, 1 + 2 * depth), (binding, 1 + 2 * depth)]
                 {
                     writer.greatest_remaining = 0;
-                    printer.write(ast.view(), node, None, &mut writer).unwrap();
+                    printer
+                        .write(ast.view(), node, None, &mut writer, None)
+                        .unwrap();
                     assert_eq!(writer.text().len(), expected_length);
                     assert!(
                         writer.greatest_remaining > STACK,
@@ -296,7 +298,7 @@ fn recursive_printer_grows_and_unwinds_without_retaining_session_state() {
                 writer.greatest_remaining = 0;
                 writer.panic_on_keyword = true;
                 let panic = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                    printer.write(ast.view(), typ, None, &mut writer)
+                    printer.write(ast.view(), typ, None, &mut writer, None)
                 }));
                 assert!(panic.is_err());
                 assert!(
@@ -304,7 +306,9 @@ fn recursive_printer_grows_and_unwinds_without_retaining_session_state() {
                     "the writer panic must occur after native growth"
                 );
                 writer.panic_on_keyword = false;
-                printer.write(ast.view(), typ, None, &mut writer).unwrap();
+                printer
+                    .write(ast.view(), typ, None, &mut writer, None)
+                    .unwrap();
                 assert_eq!(
                     writer.text(),
                     format!("{}string{}", "(".repeat(depth), ")".repeat(depth)).as_bytes()

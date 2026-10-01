@@ -26,6 +26,7 @@ fn print(builder: &NodeBuilder<'_>, node: NodeId) -> Result<JsString, Error> {
         node,
         None,
         &mut writer,
+        None,
     )?;
     Ok(JsString::from_bytes(writer.text()))
 }

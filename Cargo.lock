@@ -1204,6 +1204,7 @@ dependencies = [
  "tsr_nodebuilder",
  "tsr_parser",
  "tsr_scanner",
+ "tsr_sourcemap",
  "tsr_tspath",
 ]
 

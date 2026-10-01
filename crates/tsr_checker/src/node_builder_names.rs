@@ -1453,6 +1453,7 @@ impl NodeBuilder<'_> {
                     tuple,
                     None,
                     &mut writer,
+                    None,
                 )?;
                 Some(String::from_utf8_lossy(writer.text()).into_owned())
             } else {

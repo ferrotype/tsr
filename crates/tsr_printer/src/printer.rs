@@ -8,8 +8,8 @@
 //! file, the comment containers, the writer) on the printer itself and saves
 //! and restores it around `Write`.
 //!
-//! Named boundary, returning [`Error::Unsupported`] where it is reached:
-//! source-map emission (`Write` takes no generator here).
+//! A write given a source-map generator records the positions of the printed
+//! nodes in it (`printer_source_maps.rs`).
 //!
 //! Upstream creates a few nodes while printing: the unique helper names of
 //! `getUniqueHelperName`, the `tslib_1.__helper` access of
@@ -23,14 +23,16 @@
 mod comments;
 #[path = "printer_expressions.rs"]
 mod expressions;
+#[path = "printer_source_maps.rs"]
+mod source_maps;
 #[path = "printer_statements.rs"]
 mod statements;
 #[path = "printer_text.rs"]
 mod text;
 
-use comments::{
-    token_emit_flags as tef, CommentSeparator, CommentTarget, DetachedCommentsInfo, SourceMapSource,
-};
+use comments::{token_emit_flags as tef, CommentSeparator, CommentTarget, DetachedCommentsInfo};
+use source_maps::LineCharacterCache;
+pub use source_maps::{MapSourcePosition, SourceMapSource};
 
 use crate::emit_flags as ef;
 use crate::list_format as lf;
@@ -55,8 +57,7 @@ use tsr_core::{NewLineKind, ScriptTarget, TextRange};
 use tsr_jsstring::LiteralEscapeFlags;
 use tsr_scanner::token_to_string;
 
-/// `PrinterOptions`. The source-map options are not taken: `Write` has no
-/// source-map generator here.
+/// `PrinterOptions`.
 #[derive(Clone, Debug, Default)]
 pub struct PrinterOptions {
     pub remove_comments: bool,
@@ -65,6 +66,12 @@ pub struct PrinterOptions {
     /// Skips the unscoped emit helpers.
     pub no_emit_helpers: bool,
     pub target: ScriptTarget,
+    /// Unread by the printer at the pin; the emitter sets it.
+    pub source_map: bool,
+    /// Unread by the printer at the pin; the emitter sets it.
+    pub inline_source_map: bool,
+    /// Records each mapped source's text in the source map.
+    pub inline_sources: bool,
     pub omit_brace_source_map_positions: bool,
     pub only_print_js_doc_style: bool,
     pub never_ascii_escape: bool,
@@ -118,7 +125,12 @@ pub struct Printer<'c> {
     pub id_to_symbol: Option<HashMap<NodeId, SymbolId>>,
     /// Binder reads for generated names; see [`PrinterBindings`].
     pub bindings: Option<&'c dyn PrinterBindings>,
+    /// `PrintHandlers.MapSourcePosition`.
+    pub map_source_position: Option<MapSourcePosition<'c>>,
     own_writer: Option<TextWriter>,
+    /// `mostRecentSourceMapSource` and `mostRecentSourceMapSourceIndex`,
+    /// which upstream keeps on the printer across writes.
+    most_recent_source_map_source: RefCell<(Option<SourceMapSource>, tsr_sourcemap::SourceIndex)>,
     /// `nameGenerator`. Upstream keeps it on the printer, so names generated
     /// by one `Write` stay reserved in the next.
     name_generator: RefCell<NameGenerator<'static>>,
@@ -213,7 +225,9 @@ impl<'c> Printer<'c> {
             emit_context,
             id_to_symbol: None,
             bindings: None,
+            map_source_position: None,
             own_writer: None,
+            most_recent_source_map_source: RefCell::new((None, 0)),
             name_generator: RefCell::new(NameGenerator::new(Some(emit_context.clone()))),
         }
     }
@@ -231,7 +245,7 @@ impl<'c> Printer<'c> {
             .own_writer
             .take()
             .unwrap_or_else(|| TextWriter::new(new_line, 0));
-        let result = self.write(view, node, source_file, &mut writer);
+        let result = self.write(view, node, source_file, &mut writer, None);
         let text = writer.text().to_vec();
         writer.clear();
         self.own_writer = Some(writer);
@@ -250,8 +264,8 @@ impl<'c> Printer<'c> {
 
     /// Prints one node through `writer`. `source_file` is the file whose text
     /// parsed literals, identifiers and comments are read from, as upstream's
-    /// `currentSourceFile`. No source-map generator is taken, so source maps
-    /// are disabled, as upstream's `Write` with a nil generator.
+    /// `currentSourceFile`. Without a source-map generator source maps are
+    /// disabled.
     // port: tsc/internal/printer/printer.go:Printer.Write
     pub fn write(
         &self,
@@ -259,6 +273,7 @@ impl<'c> Printer<'c> {
         node: NodeId,
         source_file: Option<NodeId>,
         writer: &mut dyn EmitTextWriter,
+        source_map_generator: Option<&mut tsr_sourcemap::Generator>,
     ) -> Result<(), Error> {
         let mut deferring;
         let writer: &mut dyn EmitTextWriter = if self.options.omit_trailing_semicolon {
@@ -285,8 +300,12 @@ impl<'c> Printer<'c> {
             external_helpers_module_name: None,
             next_list_element_pos: 0,
             write_kind: WriteKind::None,
-            source_maps_disabled: true,
+            source_maps_disabled: source_map_generator.is_none(),
+            source_map_generator,
             source_map_source: None,
+            source_map_source_index: -1,
+            source_map_source_is_json: false,
+            source_map_line_char_cache: None,
             container_pos: -1,
             container_end: -1,
             declaration_list_container_end: -1,
@@ -319,7 +338,11 @@ pub(crate) struct Session<'a, 'c> {
     next_list_element_pos: i64,
     write_kind: WriteKind,
     source_maps_disabled: bool,
+    source_map_generator: Option<&'a mut tsr_sourcemap::Generator>,
     source_map_source: Option<SourceMapSource>,
+    source_map_source_index: tsr_sourcemap::SourceIndex,
+    source_map_source_is_json: bool,
+    source_map_line_char_cache: Option<LineCharacterCache<'a>>,
     container_pos: i64,
     container_end: i64,
     declaration_list_container_end: i64,
@@ -454,7 +477,6 @@ impl<'a, 'c> Session<'a, 'c> {
     // Top-level setup
     //
 
-    /// Source maps are disabled, so `setSourceMapSource` returns at its guard.
     // port: tsc/internal/printer/printer.go:Printer.setSourceFile
     fn set_source_file(&mut self, source_file: Option<NodeId>) -> Result<(), Error> {
         let current_source = match source_file {
@@ -473,7 +495,7 @@ impl<'a, 'c> Session<'a, 'c> {
                 .printer
                 .emit_context
                 .get_external_helpers_module_name(&ViewFactory(self.view), file);
-            self.set_source_map_source(file)?;
+            self.set_source_map_source(SourceMapSource::File(file));
         }
         Ok(())
     }
@@ -504,15 +526,6 @@ impl<'a, 'c> Session<'a, 'c> {
             target: self.printer.options.target,
             current_source: self.current_source.as_ref().map(|(file, _)| *file),
         }
-    }
-
-    /// Boundary: past its guard this registers the file with the source-map
-    /// generator.
-    fn set_source_map_source(&mut self, _source: NodeId) -> Result<(), Error> {
-        if self.source_maps_disabled {
-            return Ok(());
-        }
-        Err(Error::Unsupported("source-map emission"))
     }
 
     //
@@ -1645,6 +1658,7 @@ impl<'a, 'c> Session<'a, 'c> {
             kind: kind.into(),
             emit_flags: ef::NONE,
             comment_range: self.comment_range_of(node)?,
+            source_map_range: self.source_map_range_of(node)?,
         })
     }
 
@@ -1656,7 +1670,16 @@ impl<'a, 'c> Session<'a, 'c> {
             kind: self.node(node)?.kind(),
             emit_flags: self.emit_flags(node),
             comment_range: self.comment_range_of(node)?,
+            source_map_range: self.source_map_range_of(node)?,
         })
+    }
+
+    /// `EmitContext.SourceMapRange`.
+    fn source_map_range_of(&self, node: NodeId) -> Result<TextRange, Error> {
+        match self.printer.emit_context.source_map_range_if_set(node) {
+            Some(range) => Ok(range),
+            None => Ok(self.node(node)?.range()),
+        }
     }
 
     /// `EmitContext.CommentRange`.

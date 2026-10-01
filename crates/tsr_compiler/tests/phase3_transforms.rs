@@ -111,7 +111,7 @@ fn transform(
     drop(opts);
     let mut writer = TextWriter::new(new_line(program.options().new_line), 0);
     Printer::new(printer_options(program), &context)
-        .write(output.view(), file, Some(file), &mut writer)
+        .write(output.view(), file, Some(file), &mut writer, None)
         .map_err(|error| format!("{error:?}"))?;
     Ok(writer.text().to_vec())
 }

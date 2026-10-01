@@ -22,6 +22,7 @@ tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
 tsr_jsnum = { version = "0.1.0", path = "../tsr_jsnum" }
 tsr_nodebuilder = { version = "0.1.0", path = "../tsr_nodebuilder" }
 tsr_scanner = { version = "0.1.0", path = "../tsr_scanner" }
+tsr_sourcemap = { version = "0.1.0", path = "../tsr_sourcemap" }
 tsr_tspath = { version = "0.1.0", path = "../tsr_tspath" }
 
 [dev-dependencies]

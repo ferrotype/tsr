@@ -292,7 +292,7 @@ pub fn print_and_position_node(
         },
         emit_context,
     );
-    printer.write(builder.view(), node, None, &mut writer)?;
+    printer.write(builder.view(), node, None, &mut writer, None)?;
     let mut text = writer.text().to_vec();
     if !new_line.is_empty() && text.ends_with(new_line) {
         text.truncate(text.len() - new_line.len());
