@@ -56,23 +56,30 @@ impl HarnessProgram {
 
 // source: tsc/internal/testutil/harnessutil/harnessutil.go:createProgram
 pub fn create_program(program: Arc<CheckedProgram>) -> Result<HarnessProgram, tsr_compiler::Error> {
-    let config = program.program().config();
-    if config.options.incremental.is_true() {
-        let host: Arc<dyn CompilerHost> =
-            Arc::new(ProgramCompilerHost::new(program.program().clone()));
-        let old_program = read_build_info_program(
-            config,
-            &get_test_build_info_reader(host.clone()),
-            host.as_ref(),
-        );
-        let incremental_program = new_program(
-            program,
-            old_program.as_ref(),
-            create_host(host),
-            None,
-            false,
-        )?;
-        return Ok(HarnessProgram::Incremental(Box::new(incremental_program)));
+    if program.program().config().options.incremental.is_true() {
+        return incremental_program(program);
     }
     Ok(HarnessProgram::Program(program))
+}
+
+/// `createProgram`'s incremental program: the old program read from the
+/// build info with the test reader, and the incremental program over both.
+pub fn incremental_program(
+    program: Arc<CheckedProgram>,
+) -> Result<HarnessProgram, tsr_compiler::Error> {
+    let config = program.program().config();
+    let host: Arc<dyn CompilerHost> = Arc::new(ProgramCompilerHost::new(program.program().clone()));
+    let old_program = read_build_info_program(
+        config,
+        &get_test_build_info_reader(host.clone()),
+        host.as_ref(),
+    );
+    let incremental_program = new_program(
+        program,
+        old_program.as_ref(),
+        create_host(host),
+        None,
+        false,
+    )?;
+    Ok(HarnessProgram::Incremental(Box::new(incremental_program)))
 }

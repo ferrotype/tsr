@@ -22,7 +22,10 @@ A case gives `source` (the compiler-test format, one configuration) or
 has `actions` (`emit`: `Emit(ctx, EmitOptions{})`; `diagnostics`: the
 harness's post-emit diagnostics) and optionally `edits` (absolute name to
 text, `null` deletes), `roots` (the program's new root names) and `options`
-(compiler options set with `ParseCompilerOptions`).
+(compiler options set with `ParseCompilerOptions`). A case with
+`"program": "incremental"` wraps every program in `incremental.NewProgram`
+whatever its options (with `build`, the non-incremental build info of
+`tsc -b`); otherwise `createProgram` decides.
 
     capture --requests FILE --output FILE    # run the driver, write the native fixture
     check   --requests FILE --native FILE    # run it again and require the same fixture
@@ -107,8 +110,10 @@ def read_requests(path, upstream):
     cases = []
     for case in document["cases"]:
         keys = set(case)
-        if keys not in ({"id", "name", "source", "steps"}, {"id", "corpus", "steps"}):
+        if keys - {"program"} not in ({"id", "name", "source", "steps"}, {"id", "corpus", "steps"}):
             raise ValueError("a case has id, steps and either name and source or corpus: " + str(case.get("id")))
+        if case.get("program", "incremental") != "incremental":
+            raise ValueError("a case's program is \"incremental\" or absent: " + case["id"])
         if not isinstance(case["id"], str) or not case["id"] or case["id"] in seen:
             raise ValueError("empty or duplicate case id: " + str(case["id"]))
         seen.add(case["id"])
@@ -137,7 +142,8 @@ def read_requests(path, upstream):
             if not isinstance(step.get("options", {}), dict):
                 raise ValueError("step options are an object: " + case["id"])
         cases.append({"id": case["id"], "name": name, "source": source, "steps": steps,
-                      **({"corpus": case["corpus"]} if "corpus" in case else {})})
+                      **({"corpus": case["corpus"]} if "corpus" in case else {}),
+                      **({"program": case["program"]} if "program" in case else {})})
     return cases
 
 
@@ -161,6 +167,7 @@ def run(cases):
     env.pop("TS_TEST_PROGRAM_SINGLE_THREADED", None)
     binary, identity = oracle(upstream, env)
     requests = [{"id": case["id"], "name": case["name"], "source_hex": case["source"].encode().hex(),
+                 "program": case.get("program", ""),
                  "steps": [{"edits": step.get("edits", {}), "roots": step.get("roots"),
                             "options": step.get("options"), "actions": step["actions"]} for step in case["steps"]]}
                 for case in cases]
@@ -196,6 +203,8 @@ def run(cases):
             steps.append({"request": request, "loading": step["loading"], "actions": step["actions"], "emits": emits,
                           "diagnostics": [diagnostics(values) for values in step["diagnostics"]], "outputs": outputs})
         entry = {"id": case["id"], "name": case["name"], "error_inputs": row["error_inputs"], "steps": steps}
+        if "program" in case:
+            entry["program"] = case["program"]
         if "corpus" in case:
             entry["corpus"] = case["corpus"]
         else:

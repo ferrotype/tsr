@@ -46,6 +46,9 @@ type phase3IncrementalCase struct {
 	Name      string                  `json:"name"`
 	SourceHex string                  `json:"source_hex"`
 	Steps     []phase3IncrementalStep `json:"steps"`
+	// "incremental" wraps every program in incremental.NewProgram, as
+	// createProgram wraps an incremental one; "" is createProgram's choice.
+	Program string `json:"program"`
 }
 
 func phase3Hex(text string) string {
@@ -175,7 +178,7 @@ func TestPhase3Incremental(t *testing.T) {
 				}
 				loading := map[string]any{"id": request.ID, "cwd": c.currentDirectory, "case_sensitive": c.harnessOptions.UseCaseSensitiveFileNames,
 					"files": inputs, "symlinks": symlinks, "roots": config.FileNames(), "options": config.CompilerOptions(), "skip_module_resolution": false}
-				result := harnessutil.Phase3IncrementalStep(files, symlinks, c.harnessOptions.UseCaseSensitiveFileNames, c.currentDirectory, config, step.Actions)
+				result := harnessutil.Phase3IncrementalStep(files, symlinks, c.harnessOptions.UseCaseSensitiveFileNames, c.currentDirectory, config, step.Actions, request.Program == "incremental")
 				emits := []map[string]any{}
 				for _, emit := range result.Emits {
 					if emit == nil {

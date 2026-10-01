@@ -13,18 +13,17 @@
 #[path = "../../../tools/s08/p4/executor.rs"]
 #[allow(dead_code)]
 mod executor;
+/// The harness's `createProgram`, which the corpus harness shares.
+#[path = "../../../tools/phase3/harness/incremental.rs"]
+#[allow(dead_code)]
+mod harness;
 
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::path::Path;
 use std::sync::{Arc, Mutex, PoisonError};
 use tsr_checker::CheckerRequest;
-use tsr_compiler::{EmitOptions, EmitResult, FileCache, ProgramLike, WriteFileData};
-use tsr_incremental::{
-    create_host, new_build_info_reader, new_program, read_build_info_program, BuildInfo,
-    BuildInfoReader, CompilerHost, ProgramCompilerHost,
-};
-use tsr_tsoptions::ParsedCommandLine;
+use tsr_compiler::{EmitOptions, EmitResult, FileCache, WriteFileData};
 
 fn fixture() -> Value {
     let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/buildinfo.native.json");
@@ -32,20 +31,6 @@ fn fixture() -> Value {
         .expect("fixture JSON");
     assert_eq!(document["version"], 1, "unknown fixture version");
     document
-}
-
-/// The harness's `testBuildInfoReader`: the build info, with the current
-/// compiler version as its version.
-struct TestBuildInfoReader {
-    inner: Box<dyn BuildInfoReader>,
-}
-
-impl BuildInfoReader for TestBuildInfoReader {
-    fn read_build_info(&self, config: &ParsedCommandLine) -> Option<BuildInfo> {
-        let mut r = self.inner.read_build_info(config)?;
-        r.version = tsr_jsstring::JsString::from_bytes(tsr_core::version().as_bytes());
-        Some(r)
-    }
 }
 
 /// The harness's output recorder: one entry per real path, the last write's
@@ -121,19 +106,15 @@ fn run_step(case: &Value, step: &Value) -> Result<Value, String> {
             .map_err(|failure| failure.to_string())?,
     );
     let loaded = checked.program().clone();
-    let host: Arc<dyn CompilerHost> = Arc::new(ProgramCompilerHost::new(loaded.clone()));
-    let reader = TestBuildInfoReader {
-        inner: new_build_info_reader(host.clone()),
-    };
-    let old_program = read_build_info_program(loaded.config(), &reader, host.as_ref());
-    let program = new_program(
-        checked,
-        old_program.as_ref(),
-        create_host(host),
-        None,
-        false,
-    )
+    // A case whose program is "incremental" wraps every program, as the
+    // driver's `forceIncremental` does.
+    let program = if case["program"] == "incremental" {
+        harness::incremental_program(checked)
+    } else {
+        harness::create_program(checked)
+    }
     .map_err(|error| format!("{error:?}"))?;
+    let program = program.program_like();
     let recorder = Recorder::default();
     let write_file = |name: &[u8], text: &[u8], _: &mut WriteFileData| {
         let real = loaded
@@ -164,16 +145,12 @@ fn run_step(case: &Value, step: &Value) -> Result<Value, String> {
                 let mut values = Vec::new();
                 let mut collect = || -> Result<(), tsr_compiler::Error> {
                     values.extend(program.config_file_parsing_diagnostics());
-                    values.extend(ProgramLike::program_diagnostics(&program)?);
-                    values.extend(ProgramLike::syntactic_diagnostics(
-                        &program, &request, None,
-                    )?);
-                    values.extend(ProgramLike::semantic_diagnostics(&program, &request, None)?);
-                    values.extend(ProgramLike::global_diagnostics(&program, &request)?);
-                    if ProgramLike::options(&program).emit_declarations() {
-                        values.extend(ProgramLike::declaration_diagnostics(
-                            &program, &request, None,
-                        )?);
+                    values.extend(program.program_diagnostics()?);
+                    values.extend(program.syntactic_diagnostics(&request, None)?);
+                    values.extend(program.semantic_diagnostics(&request, None)?);
+                    values.extend(program.global_diagnostics(&request)?);
+                    if program.options().emit_declarations() {
+                        values.extend(program.declaration_diagnostics(&request, None)?);
                     }
                     Ok(())
                 };

@@ -14,6 +14,7 @@ import (
 	"github.com/microsoft/TypeScript/tsc/internal/ast"
 	"github.com/microsoft/TypeScript/tsc/internal/bundled"
 	"github.com/microsoft/TypeScript/tsc/internal/compiler"
+	"github.com/microsoft/TypeScript/tsc/internal/execute/incremental"
 	"github.com/microsoft/TypeScript/tsc/internal/tsoptions"
 	"github.com/microsoft/TypeScript/tsc/internal/vfs/vfstest"
 )
@@ -28,8 +29,11 @@ type Phase3StepResult struct {
 
 // Phase3IncrementalStep runs `actions` ("emit": `Emit(ctx, EmitOptions{})`;
 // "diagnostics": the post-emit program's diagnostics in compileFilesWithHost's
-// order) on a program created by createProgram over `files`.
-func Phase3IncrementalStep(files map[string]string, symlinks map[string]string, caseSensitive bool, currentDirectory string, config *tsoptions.ParsedCommandLine, actions []string) *Phase3StepResult {
+// order) on a program created by createProgram over `files`. With
+// `forceIncremental` the program is wrapped as createProgram wraps an
+// `incremental` one whatever its options (a `tsc -b` program's
+// non-incremental build info).
+func Phase3IncrementalStep(files map[string]string, symlinks map[string]string, caseSensitive bool, currentDirectory string, config *tsoptions.ParsedCommandLine, actions []string, forceIncremental bool) *Phase3StepResult {
 	testfs := map[string]any{}
 	for name, content := range files {
 		testfs[name] = &fstest.MapFile{Data: []byte(content)}
@@ -42,6 +46,10 @@ func Phase3IncrementalStep(files map[string]string, symlinks map[string]string, 
 	fs = NewOutputRecorderFS(fs)
 	host := createCompilerHost(fs, bundled.LibPath(), currentDirectory, nil)
 	program := createProgram(host, config)
+	if forceIncremental && !config.CompilerOptions().Incremental.IsTrue() {
+		oldProgram := incremental.ReadBuildInfoProgram(config, getTestBuildInfoReader(host), host)
+		program = incremental.NewProgram(program.(*compiler.Program), oldProgram, incremental.CreateHost(host), nil, false)
+	}
 	ctx := context.Background()
 	result := &Phase3StepResult{}
 	for _, action := range actions {

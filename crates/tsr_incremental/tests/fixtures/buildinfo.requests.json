@@ -1,7 +1,857 @@
-{"cases": [
- {"id": "corpus-incrementalConfig", "corpus": "compiler/incrementalConfig.ts", "steps": [{"actions": ["emit"]}]},
- {"id": "corpus-incrementalTsBuildInfoFile", "corpus": "compiler/incrementalTsBuildInfoFile.ts", "steps": [{"actions": ["emit"]}]},
- {"id": "corpus-noEmitAndIncremental", "corpus": "compiler/noEmitAndIncremental.ts", "steps": [{"actions": ["emit"]}]},
- {"id": "two-files", "name": "a.ts", "source": "// @incremental: true\n// @target: es2015\n// @tsBuildInfoFile: /.src/out.tsbuildinfo\n// @filename: /.src/a.ts\nexport const a = 1;\n// @filename: /.src/b.ts\nimport { a } from './a';\nexport const b: string = a;\n",
-  "steps": [{"actions": ["diagnostics", "emit"]}, {"actions": ["emit"]}, {"edits": {"/.src/a.ts": "export const a = '1';\n"}, "actions": ["emit"]}]}
-]}
+{
+ "cases": [
+  {
+   "id": "corpus-incrementalConcurrentSafeAliasFollowing",
+   "corpus": "compiler/incrementalConcurrentSafeAliasFollowing.ts",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "corpus-incrementalConfig",
+   "corpus": "compiler/incrementalConfig.ts",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/a.ts": "const x = 11;\n"
+     },
+     "actions": [
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "corpus-incrementalTsBuildInfoFile",
+   "corpus": "compiler/incrementalTsBuildInfoFile.ts",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "corpus-jsEmitIntersectionProperty",
+   "corpus": "compiler/jsEmitIntersectionProperty.ts",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "corpus-noEmitAndIncremental",
+   "corpus": "compiler/noEmitAndIncremental.ts",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "corpus-noEmitAndIncrementalListFilesOnly",
+   "corpus": "compiler/noEmitAndIncrementalListFilesOnly.ts",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "references",
+   "name": "a.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @module: commonjs\n// @tsBuildInfoFile: /.src/out/app.tsbuildinfo\n// @outDir: /.src/out\n// @filename: /.src/a.ts\nexport const a = 1;\nexport interface Shape { x: number }\n// @filename: /.src/b.ts\nimport { a, Shape } from \"./a\";\nexport const b = a + 1;\nexport function area(s: Shape) { return s.x; }\n// @filename: /.src/c.ts\nimport { b } from \"./b\";\nexport const c: number = b;\n// @filename: /.src/d.ts\n/// <reference path=\"./globals.d.ts\" />\nimport \"./c\";\ndeclare module \"./a\" { interface Shape { y?: number } }\nexport const d = GLOBAL_FLAG;\n// @filename: /.src/globals.d.ts\ndeclare var GLOBAL_FLAG: boolean;\n// @filename: /.src/ambient.d.ts\ndeclare module \"ambient-mod\" { export const z: number; }\n// @filename: /.src/e.ts\nimport { z } from \"ambient-mod\";\nexport const e = z;\n",
+   "steps": [
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/a.ts": "export const a = 1;\nexport interface Shape { x: number; w: number }\n"
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/c.ts": "import { b } from \"./b\";\nexport const c: number = b + 0;\n"
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/e.ts": null
+     },
+     "roots": [
+      "/.src/a.ts",
+      "/.src/b.ts",
+      "/.src/c.ts",
+      "/.src/d.ts",
+      "/.src/globals.d.ts",
+      "/.src/ambient.d.ts"
+     ],
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/b.ts": null
+     },
+     "roots": [
+      "/.src/a.ts",
+      "/.src/c.ts",
+      "/.src/d.ts",
+      "/.src/globals.d.ts",
+      "/.src/ambient.d.ts"
+     ],
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "composite",
+   "name": "lib.ts",
+   "source": "// @composite: true\n// @incremental: true\n// @target: es2015\n// @outDir: /.src/out\n// @rootDir: /.src\n// @tsBuildInfoFile: /.src/out/tsconfig.tsbuildinfo\n// @filename: /.src/lib.ts\nexport function hello(name: string) { return \"hi \" + name; }\n// @filename: /.src/main.ts\nimport { hello } from \"./lib\";\nexport const greeting = hello(\"x\");\n",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/lib.ts": "export function hello(name: string) { return \"hello \" + name; }\n"
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/lib.ts": "export function hello(name: string) { return \"hello \" + name; }\nexport const extra = 2;\n"
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "options": {
+      "declarationMap": true
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "options": {
+      "declarationMap": false
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "composite-blocked",
+   "name": "a.ts",
+   "source": "// @composite: true\n// @incremental: true\n// @noEmitOnError: true\n// @target: es2015\n// @outDir: /.src/out\n// @rootDir: /.src\n// @tsBuildInfoFile: /.src/out/tsconfig.tsbuildinfo\n// @filename: /.src/a.ts\nexport const a = 1;\n// @filename: /.src/b.ts\nexport const b: string = 1;\n",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/b.ts": "export const b: string = \"1\";\n"
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "options": {
+      "declarationMap": true
+     },
+     "edits": {
+      "/.src/b.ts": "export const b: number = \"2\";\n"
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/b.ts": "export const b: number = 2;\n"
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "options": {
+      "declarationMap": false
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "build-non-incremental",
+   "name": "a.ts",
+   "source": "// @target: es2015\n// @declaration: true\n// @tsBuildInfoFile: /.src/nb.tsbuildinfo\n// @filename: /.src/a.ts\nexport const a: string = 1;\n// @filename: /.src/b.ts\nexport const C = class { private p = 1; };\n",
+   "steps": [
+    {
+     "options": {
+      "build": true
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/a.ts": "export const a: string = \"1\";\n",
+      "/.src/b.ts": "export const b = 1;\n"
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/a.ts": "export const a: string = 2;\n"
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ],
+   "program": "incremental"
+  },
+  {
+   "id": "unicode-names",
+   "name": "a.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @tsBuildInfoFile: /.src/out dir/ü.tsbuildinfo\n// @filename: /.src/naïve <&>.ts\nexport const café: number = \" \";\n// @filename: /.src/a.ts\nimport { café } from \"./naïve <&>\";\nexport const b = café;\n",
+   "steps": [
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "const-enum",
+   "name": "enums.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @declaration: true\n// @tsBuildInfoFile: /.src/x.tsbuildinfo\n// @filename: /.src/enums.ts\nexport const enum E { A = 1 }\n// @filename: /.src/user.ts\nimport { E } from \"./enums\";\nexport const v = E.A;\n// @filename: /.src/reexport.ts\nexport { E as F } from \"./enums\";\n// @filename: /.src/user2.ts\nimport { F } from \"./reexport\";\nexport const w = F.A;\n",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/enums.ts": "export const enum E { A = 2 }\n"
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/enums.ts": "export const enum E { A = 2, B = 3 }\n"
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "global-scope",
+   "name": "global1.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @tsBuildInfoFile: /.src/g.tsbuildinfo\n// @filename: /.src/global1.ts\nvar g1 = 1;\n// @filename: /.src/global2.ts\nvar g2 = g1 + 1;\n// @filename: /.src/mod.ts\nexport const m = 1;\n",
+   "steps": [
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/global1.ts": "var g1 = \"1\";\n"
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/global1.ts": "export var g1 = 1;\n"
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/global2.ts": null
+     },
+     "roots": [
+      "/.src/global1.ts",
+      "/.src/mod.ts"
+     ],
+     "actions": [
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "composite-without-incremental",
+   "name": "lib.ts",
+   "source": "// @composite: true\n// @target: es2015\n// @outDir: /.src/out\n// @rootDir: /.src\n// @tsBuildInfoFile: /.src/out/tsconfig.tsbuildinfo\n// @filename: /.src/lib.ts\nexport const one = 1;\n",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "global-file-deleted",
+   "name": "script.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @tsBuildInfoFile: /.src/gd.tsbuildinfo\n// @filename: /.src/script.ts\nvar shared = 1;\n// @filename: /.src/user.ts\nexport const u = 1;\n",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/script.ts": null
+     },
+     "roots": [
+      "/.src/user.ts"
+     ],
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "semantic-errors",
+   "name": "m.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @noUnusedLocals: true\n// @tsBuildInfoFile: /.src/e.tsbuildinfo\n// @filename: /.src/s1.ts\nlet dup = 1;\n// @filename: /.src/s2.ts\nlet dup = 2;\n// @filename: /.src/m.ts\nexport function f() { const unused = 1; const n: number = \"héllo <&>\\t\"; return n; }\nexport const big: Map<string, number> = new Set<string>();\nexport let fn: (a: string) => void = (a: number) => {};\ndeclare const lit: \"héllo <&>\\t\"\u0001\";\nexport const n2: \"x\" = lit;\n",
+   "steps": [
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/m.ts": "export function f() { return 1; }\n"
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/m.ts": "export function f() { return 2; }\n"
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "no-emit-on-error",
+   "name": "a.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @noEmitOnError: true\n// @declaration: true\n// @tsBuildInfoFile: /.src/n.tsbuildinfo\n// @filename: /.src/a.ts\nexport const a: string = 1;\n// @filename: /.src/b.ts\nexport const b = 2;\n",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/a.ts": "export const a: string = \"1\";\n"
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "actions": [
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "no-emit",
+   "name": "a.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @noEmit: true\n// @tsBuildInfoFile: /.src/ne.tsbuildinfo\n// @filename: /.src/a.ts\nexport const a: string = 1;\n// @filename: /.src/b.ts\nexport const b = 2;\n",
+   "steps": [
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/a.ts": "export const a: string = 2;\n",
+      "/.src/c.ts": "export const c = 3;\n"
+     },
+     "roots": [
+      "/.src/a.ts",
+      "/.src/b.ts",
+      "/.src/c.ts"
+     ],
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "options": {
+      "noEmit": false
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "declaration-errors",
+   "name": "a.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @declaration: true\n// @tsBuildInfoFile: /.src/d.tsbuildinfo\n// @filename: /.src/a.ts\nexport const C = class { private p = 1; };\n// @filename: /.src/b.ts\nexport function g(): number { return 1; }\n",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/b.ts": "export function g(): number { return 2; }\n"
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/a.ts": "export const C = class { p = 1; };\n"
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "emit-kinds",
+   "name": "a.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @declaration: true\n// @emitDeclarationOnly: true\n// @declarationMap: true\n// @sourceMap: true\n// @tsBuildInfoFile: /.src/m.tsbuildinfo\n// @outDir: /.src/dist\n// @filename: /.src/a.ts\nexport const a = 1;\n// @filename: /.src/b.ts\nexport const b = 2;\n",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "options": {
+      "emitDeclarationOnly": false
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "options": {
+      "sourceMap": false,
+      "inlineSourceMap": true
+     },
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "options": {
+      "declaration": false,
+      "declarationMap": false
+     },
+     "actions": [
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "options",
+   "name": "a.ts",
+   "source": "// @incremental: true\n// @tsBuildInfoFile: /.src/build/o.tsbuildinfo\n// @target: es2020\n// @module: commonjs\n// @strict: true\n// @noImplicitReturns: true\n// @noFallthroughCasesInSwitch: true\n// @exactOptionalPropertyTypes: true\n// @removeComments: true\n// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @jsx: react-jsx\n// @jsxImportSource: preact\n// @outDir: /.src/build/out\n// @rootDir: /.src\n// @declarationDir: /.src/build/types\n// @declaration: true\n// @sourceRoot: /src-root/\n// @mapRoot: /.src/maps\n// @sourceMap: true\n// @newLine: crlf\n// @useDefineForClassFields: false\n// @preserveConstEnums: true\n// @stripInternal: true\n// @noEmitHelpers: true\n// @allowJs: true\n// @checkJs: true\n// @skipLibCheck: true\n// @noUncheckedIndexedAccess: true\n// @verbatimModuleSyntax: false\n// @filename: /.src/a.ts\nexport class A { x = 1; }\n// @filename: /.src/b.js\nexport const b = 1;\n",
+   "steps": [
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "options": {
+      "strict": false,
+      "removeComments": false
+     },
+     "actions": [
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "json-module",
+   "name": "a.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @resolveJsonModule: true\n// @module: commonjs\n// @esModuleInterop: true\n// @tsBuildInfoFile: /.src/j.tsbuildinfo\n// @filename: /.src/data.json\n{ \"value\": 1 }\n// @filename: /.src/a.ts\nimport data from \"./data.json\";\nexport const v = data.value;\n",
+   "steps": [
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/data.json": "{ \"value\": \"one\" }"
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "no-check",
+   "name": "a.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @noCheck: true\n// @tsBuildInfoFile: /.src/nc.tsbuildinfo\n// @filename: /.src/a.ts\nexport const a: string = 1;\n",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "options": {
+      "noCheck": false
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "isolated-modules",
+   "name": "a.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @isolatedModules: true\n// @declaration: true\n// @tsBuildInfoFile: /.src/im.tsbuildinfo\n// @filename: /.src/a.ts\nexport const a = 1;\n// @filename: /.src/b.ts\nimport { a } from \"./a\";\nexport const b = a;\n// @filename: /.src/c.ts\nimport { b } from \"./b\";\nexport const c = b;\n",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/a.ts": "export const a = \"1\";\n"
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "direct-dependencies",
+   "name": "a.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @assumeChangesOnlyAffectDirectDependencies: true\n// @declaration: true\n// @tsBuildInfoFile: /.src/dd.tsbuildinfo\n// @filename: /.src/a.ts\nexport const a = 1;\n// @filename: /.src/b.ts\nimport { a } from \"./a\";\nexport const b = a;\n// @filename: /.src/c.ts\nimport { b } from \"./b\";\nexport const c = b;\n",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/a.ts": "export const a = \"1\";\n"
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "package-json",
+   "name": "index.ts",
+   "source": "// @filename: /tsconfig.json\n{ \"compilerOptions\": { \"incremental\": true, \"module\": \"node16\", \"strict\": true } }\n// @filename: /package.json\n{ \"name\": \"app\", \"type\": \"module\" }\n// @filename: /index.ts\nimport { x } from \"pkg\";\nimport \"nope\";\nexport const z = x + 1;\n// @filename: /other.ts\nimport y from \"untyped\";\nexport const u = y;\n// @filename: /node_modules/pkg/package.json\n{ \"name\": \"pkg\", \"version\": \"1.0.0\", \"types\": \"index.d.ts\" }\n// @filename: /node_modules/pkg/index.d.ts\nexport declare const x: number;\n// @filename: /node_modules/untyped/package.json\n{ \"name\": \"untyped\", \"version\": \"1.0.0\" }\n// @filename: /node_modules/untyped/index.js\nmodule.exports = 1;\n",
+   "steps": [
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/index.ts": "import { x } from \"pkg\";\nimport \"nope\";\nexport const z = x + 2;\n"
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mode-mismatch",
+   "name": "cjs.ts",
+   "source": "// @filename: /tsconfig.json\n{ \"compilerOptions\": { \"incremental\": true, \"module\": \"node16\" } }\n// @filename: /package.json\n{ \"name\": \"app\" }\n// @filename: /cjs.ts\nimport { e } from \"esm-only\";\nexport const c = e;\n// @filename: /other.ts\nexport const o = 1;\n// @filename: /node_modules/esm-only/package.json\n{ \"name\": \"esm-only\", \"version\": \"1.0.0\", \"type\": \"module\", \"exports\": \"./index.js\" }\n// @filename: /node_modules/esm-only/index.d.ts\nexport declare const e: number;\n",
+   "steps": [
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/other.ts": "export const o = 2;\n"
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "skipped-on-no-emit",
+   "name": "a.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @module: commonjs\n// @noEmit: true\n// @tsBuildInfoFile: /.src/s.tsbuildinfo\n// @filename: /.src/a.ts\nexport {};\nconst require = 1;\n",
+   "steps": [
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "options": {
+      "noEmit": false
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "type-reference",
+   "name": "a.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @tsBuildInfoFile: /.src/t.tsbuildinfo\n// @filename: /.src/node_modules/@types/foo/index.d.ts\ndeclare const fooGlobal: number;\n// @filename: /.src/a.ts\n/// <reference types=\"foo\" />\nexport const a = fooGlobal;\n",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/node_modules/@types/foo/index.d.ts": "declare const fooGlobal: string;\n"
+     },
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "deleted-import",
+   "name": "a.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @declaration: true\n// @tsBuildInfoFile: /.src/di.tsbuildinfo\n// @filename: /.src/a.ts\nimport { b } from \"./b\";\nexport const a = b;\n// @filename: /.src/b.ts\nexport const b = 1;\n",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/b.ts": null
+     },
+     "roots": [
+      "/.src/a.ts"
+     ],
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/.src/b.ts": "export const b = 2;\n"
+     },
+     "roots": [
+      "/.src/a.ts",
+      "/.src/b.ts"
+     ],
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    }
+   ]
+  }
+ ]
+}
