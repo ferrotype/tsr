@@ -244,9 +244,13 @@ dependencies = [
  "tsr_bundled",
  "tsr_checker",
  "tsr_compiler",
+ "tsr_contentmapper",
+ "tsr_contentmappertest",
  "tsr_core",
  "tsr_embed",
+ "tsr_ipc",
  "tsr_jsstring",
+ "tsr_locale",
  "tsr_module",
  "tsr_nodebuilder",
  "tsr_printer",
@@ -373,6 +377,7 @@ dependencies = [
  "tsr_core",
  "tsr_diagnostics",
  "tsr_jsnum",
+ "tsr_json",
  "tsr_jsstring",
  "tsr_locale",
 ]
@@ -443,6 +448,7 @@ dependencies = [
  "tsr_binder",
  "tsr_bundled",
  "tsr_checker",
+ "tsr_contentmapper",
  "tsr_core",
  "tsr_diagnostics",
  "tsr_jsstring",
@@ -455,6 +461,37 @@ dependencies = [
  "tsr_tsoptions",
  "tsr_tspath",
  "tsr_vfs",
+]
+
+[[package]]
+name = "tsr_contentmapper"
+version = "0.1.0"
+dependencies = [
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_ipc",
+ "tsr_json",
+ "tsr_jsonrpc",
+ "tsr_jsstring",
+ "tsr_locale",
+ "tsr_parser",
+ "tsr_tsoptions",
+ "tsr_tspath",
+ "xxhash-rust",
+]
+
+[[package]]
+name = "tsr_contentmappertest"
+version = "0.1.0"
+dependencies = [
+ "tsr_ast",
+ "tsr_contentmapper",
+ "tsr_core",
+ "tsr_ipc",
+ "tsr_json",
+ "tsr_jsstring",
 ]
 
 [[package]]
@@ -506,6 +543,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "tsr_ipc"
+version = "0.1.0"
+dependencies = [
+ "tsr_json",
+ "tsr_jsonrpc",
+]
+
+[[package]]
 name = "tsr_jsnum"
 version = "0.1.0"
 dependencies = [
@@ -522,6 +567,14 @@ dependencies = [
  "stacker",
  "tsr_core",
  "tsr_jsnum",
+ "tsr_jsstring",
+]
+
+[[package]]
+name = "tsr_jsonrpc"
+version = "0.1.0"
+dependencies = [
+ "tsr_json",
  "tsr_jsstring",
 ]
 

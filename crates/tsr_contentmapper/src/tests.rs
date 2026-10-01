@@ -1,6 +1,8 @@
 //! The host over an in-process mapper, as the harness serves its mappers.
 use crate::*;
-use std::sync::{Arc, Mutex};
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::{Arc, Barrier, Mutex};
+use std::time::Duration;
 use tsr_core::CompilerOptions;
 use tsr_ipc::{Context, Handler, HandlerError, HandlerResult};
 use tsr_json::RawValue;
@@ -160,6 +162,132 @@ fn a_project_opens_once_transforms_and_closes_its_mapper_project() {
     );
     host.close().unwrap();
     assert!(host.project(ProjectSpec::default()).is_none());
+}
+
+/// Logs each request as `connection:method`, connections numbered in spawn
+/// order, and holds the request named in `held` between the two barriers of
+/// its gate.
+struct Gated {
+    conn: usize,
+    log: Arc<Mutex<Vec<String>>>,
+    held: Option<(&'static str, Arc<(Barrier, Barrier)>)>,
+}
+
+impl Handler for Gated {
+    fn handle_request(&self, _: &Context, method: &str, _: &[u8]) -> HandlerResult {
+        self.log
+            .lock()
+            .unwrap()
+            .push(format!("{}:{method}", self.conn));
+        if let Some((held, gate)) = &self.held {
+            if method == *held {
+                gate.0.wait();
+                gate.1.wait();
+            }
+        }
+        match method {
+            METHOD_INITIALIZE => Ok(Some(Box::new(source("box")))),
+            METHOD_OPEN_PROJECT => Ok(Some(Box::new(OpenProjectResult::default()))),
+            METHOD_CLOSE_PROJECT => Ok(None),
+            METHOD_TRANSFORM => Ok(Some(Box::new(identity_output("x")))),
+            _ => Err(format!("unexpected method {method}").into()),
+        }
+    }
+    fn handle_notification(&self, _: &Context, _: &str, _: &[u8]) -> Result<(), HandlerError> {
+        Ok(())
+    }
+}
+
+/// A locale change queued behind a transform must wait until the transform
+/// is done with the connection that opened its project. Another reader, a
+/// transform held by a second mapper, keeps the lock read-locked through the
+/// window a guard released between opening and transforming would leave, so
+/// the queued writer is the next to take the lock whatever the lock's wake-up
+/// order.
+#[test]
+fn a_locale_change_waits_for_the_transform_in_flight() {
+    let log = Arc::new(Mutex::new(Vec::new()));
+    let holding = Arc::new((Barrier::new(2), Barrier::new(2)));
+    let opening = Arc::new((Barrier::new(2), Barrier::new(2)));
+    let spawned = AtomicUsize::new(0);
+    let (handler_log, held_transform, held_open) = (log.clone(), holding.clone(), opening.clone());
+    let spawner = SpawnerFunc(
+        move |_: &[JsString], _: &[u8], _: Box<dyn std::io::Write + Send>| {
+            let conn = spawned.fetch_add(1, Ordering::SeqCst);
+            let held = match conn {
+                0 => Some((METHOD_TRANSFORM, held_transform.clone())),
+                1 => Some((METHOD_OPEN_PROJECT, held_open.clone())),
+                _ => None,
+            };
+            let (client, server) = tsr_ipc::pipe();
+            let handler = Arc::new(Gated {
+                conn,
+                log: handler_log.clone(),
+                held,
+            });
+            let conn = tsr_ipc::AsyncConn::new(server, handler);
+            std::thread::spawn(move || {
+                let _ = tsr_ipc::Conn::run(&conn, &Context::background());
+            });
+            Ok(client)
+        },
+    );
+    let host = new_host(
+        &Context::background(),
+        Arc::new(spawner),
+        tsr_locale::Locale::default(),
+    );
+    let mut blocker = mapper();
+    blocker.manifest.name = JsString::from_bytes(b"blocker".as_slice());
+    let blocking = host
+        .project(ProjectSpec {
+            config_file_name: JsString::from_bytes(b"/tsconfig.json".as_slice()),
+            mappers: Arc::from(vec![blocker]),
+            compiler_options: Arc::new(CompilerOptions::default()),
+        })
+        .unwrap();
+    let project = project(&host);
+    std::thread::scope(|scope| {
+        // Connection 0: a transform that holds the lifecycle guard.
+        let reader = scope.spawn(|| blocking.transform(0, &request("x")));
+        holding.0.wait();
+        // Connection 1: the transform under test, opening its project.
+        let transform = scope.spawn(|| project.transform(0, &request("x")));
+        opening.0.wait();
+        let relocale = scope.spawn(|| host.set_locale(tsr_locale::Locale::parse("de").0));
+        // Let the locale change queue for the write lock, then end the open.
+        std::thread::sleep(Duration::from_millis(50));
+        opening.1.wait();
+        std::thread::sleep(Duration::from_millis(50));
+        holding.1.wait();
+        reader.join().unwrap().unwrap();
+        transform.join().unwrap().unwrap();
+        relocale.join().unwrap();
+    });
+    let connection = |conn: &str| -> Vec<String> {
+        log.lock()
+            .unwrap()
+            .iter()
+            .filter(|entry| entry.starts_with(conn))
+            .cloned()
+            .collect()
+    };
+    // The transform went to the connection that opened its project; the
+    // locale change replaced the connection only afterwards.
+    assert_eq!(
+        connection("1:"),
+        ["1:initialize", "1:openProject", "1:transform"]
+    );
+    assert!(connection("2:").is_empty());
+    // The next transform reopens the project on the new connection.
+    project.transform(0, &request("x")).unwrap();
+    assert_eq!(
+        connection("2:"),
+        ["2:initialize", "2:openProject", "2:transform"]
+    );
+    project.close().unwrap();
+    blocking.close().unwrap();
+    host.close().unwrap();
 }
 
 #[test]
