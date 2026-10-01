@@ -1,7 +1,7 @@
 use crate::{
-    modifier_flags, AstBuilder, AstTransaction, ChildRole, Factory, FactoryMethods, NodeData,
-    NodeId, NodeKind, NodeList, NodeListId, NodeListRead, NodeRead, NodeSlice, NodeSliceRead,
-    SyntaxKind, VisitContext, VisitorMethods,
+    modifier_flags, AstBuilder, AstTransaction, AstView, ChildRole, Factory, FactoryMethods,
+    NodeData, NodeId, NodeKind, NodeList, NodeListId, NodeListRead, NodeRead, NodeSlice,
+    NodeSliceRead, SyntaxKind, VisitContext, VisitorMethods,
 };
 use tsr_core::TextRange;
 
@@ -42,6 +42,12 @@ pub trait RuntimeFactory: Factory {
         statements: Option<NodeListId>,
         eof: Option<NodeId>,
     ) -> NodeId;
+    /// The parsed view of the factory's storage, for the AST predicates a
+    /// transformer asks of the nodes it visits. `None` for a factory with no
+    /// complete storage (a lazy JSDoc transaction).
+    fn ast_view(&self) -> Option<AstView<'_>> {
+        None
+    }
 
     // port: tsc/internal/ast/ast.go:NodeList.Clone
     fn clone_list_header(&mut self, original: NodeListId) -> NodeListId {
@@ -170,6 +176,9 @@ impl RuntimeFactory for AstBuilder {
         eof: Option<NodeId>,
     ) -> NodeId {
         self.update_source_file(original, statements, eof)
+    }
+    fn ast_view(&self) -> Option<AstView<'_>> {
+        Some(self.view())
     }
 }
 impl RuntimeFactory for AstTransaction<'_, '_> {
@@ -667,6 +676,9 @@ impl<T: RuntimeFactory + ?Sized> RuntimeFactory for crate::BorrowedFactory<'_, T
         eof: Option<NodeId>,
     ) -> NodeId {
         self.0.update_source(original, statements, eof)
+    }
+    fn ast_view(&self) -> Option<AstView<'_>> {
+        self.0.ast_view()
     }
     fn clone_list_header(&mut self, original: NodeListId) -> NodeListId {
         self.0.clone_list_header(original)
