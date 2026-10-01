@@ -1,0 +1,1134 @@
+{
+ "cases": [
+  {
+   "id": "instance-field-set",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    x = 1;\n    y;\n    \"s\" = 2;\n    3 = 4;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "instance-field-define",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    x = 1;\n    y;\n    \"s\" = 2;\n    3 = 4;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "instance-field-es2022-set",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass C {\n    // leading\n    x = 1; // trailing\n    y;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "instance-field-es2022-define",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: true\nclass C {\n    x = 1;\n    y;\n    static z = 2;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "instance-field-esnext-set",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\nclass C {\n    x = 1;\n    static y = 2;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "esnext-define-untouched",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: true\nclass C {\n    x = 1;\n    #y = 2;\n    static z = this;\n    accessor w = 3;\n    static { this.z; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "existing-constructor",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    x = 1;\n    constructor(a) {\n        \"use strict\";\n        var v = a;\n        this.a = a;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "derived-with-super",
+   "name": "probe.ts",
+   "source": "// @target: es2016\n// @useDefineForClassFields: false\nclass B {}\nclass C extends B {\n    x = 1;\n    constructor() {\n        \"use strict\";\n        foo();\n        super();\n        bar();\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "derived-synthetic-constructor",
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @useDefineForClassFields: true\nclass B {}\nclass C extends B {\n    x = 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "derived-super-in-try",
+   "name": "probe.ts",
+   "source": "// @target: es2018\n// @useDefineForClassFields: false\nclass B {}\nclass C extends B {\n    x = 1;\n    constructor() {\n        try {\n            super();\n            after();\n        } catch (e) {\n            handle(e);\n        } finally {\n            done();\n        }\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "extends-null",
+   "name": "probe.ts",
+   "source": "// @target: es2019\n// @useDefineForClassFields: true\nclass C extends null {\n    x = 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "constructor-no-fields",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    y;\n    constructor() {\n        this.z = 1;\n    }\n    m() {}\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-field-set",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    static x = 1;\n    static y;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-field-define",
+   "name": "probe.ts",
+   "source": "// @target: es2020\n// @useDefineForClassFields: true\nclass C {\n    static x = 1;\n    static y;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-field-es2022-set",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass C {\n    static x = 1;\n    static y;\n    static z = this.x;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-this",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    static a = 1;\n    static b = this.a + 1;\n    static c = () => this;\n    static d = function () { return this; };\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-in-class-expression",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class C {\n    static x = 1;\n    static y = this.x;\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-anonymous-class-expression",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nlet D = class {\n    static x = 1;\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-class-static",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\n// @module: esnext\nexport default class C {\n    static x = 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-anonymous-class-static",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\n// @module: esnext\nexport default class {\n    static x = 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "export-class-private",
+   "name": "probe.ts",
+   "source": "// @target: es2021\n// @useDefineForClassFields: true\n// @module: esnext\nexport class C {\n    #x = 1;\n    static y = 2;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-field",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 1;\n    #y;\n    get() { return this.#x; }\n    set(v) { this.#x = v; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-field-compound",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 1;\n    m(o) {\n        this.#x += 1;\n        o.#x *= 2;\n        f().#x -= 3;\n        const v = (this.#x ||= 4);\n        return v;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-field-increment",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 0;\n    m(o) {\n        this.#x++;\n        ++this.#x;\n        o.#x--;\n        const a = this.#x++;\n        const b = --f().#x;\n        const c = (this.#x)++;\n        return [a, b, c];\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-method",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #m(a) { return a; }\n    *#g() { yield 1; }\n    async #a() {}\n    call(o) {\n        this.#m(1);\n        o.#m(2);\n        f().#m(3);\n        o?.#m(4);\n        return this.#m;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-accessor",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    get #p() { return 1; }\n    set #p(v) {}\n    get #r() { return 2; }\n    set #w(v) {}\n    m() {\n        this.#p = this.#p + this.#r;\n        this.#w = 3;\n        this.#p += 1;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-static",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static #x = 1;\n    static #m() { return C.#x; }\n    static get #a() { return 2; }\n    static set #a(v) {}\n    static f() {\n        C.#x = C.#m() + C.#a;\n        C.#a = 3;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-in",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x;\n    #m() {}\n    static #s = 1;\n    static is(o) {\n        return #x in o && #m in o && #s in o;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-es2022-untouched",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass C {\n    #x = 1;\n    #m() { return this.#x; }\n    static #s = 2;\n    y = this.#x;\n    is(o) { return #x in o; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-esnext-set",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\nclass C {\n    #x = 1;\n    y = 2;\n    static #s = 3;\n    m() { return this.#x + C.#s; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-destructuring-object",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x;\n    m(o) {\n        ({ a: this.#x } = o);\n        ({ a: o.#x = 1 } = o);\n        ({ ...this.#x } = o);\n        ({ a: f().#x } = o);\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-destructuring-array",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x;\n    m(o, arr) {\n        [this.#x] = arr;\n        [o.#x = 1, , ...this.#x] = arr;\n        [f().#x] = arr;\n        [{ a: this.#x }] = arr;\n        return [this.#x] = arr;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-tagged-template",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #tag(s) { return s; }\n    #f = (s) => s;\n    m(o) {\n        this.#tag`a${1}b`;\n        o.#f`x`;\n        f().#tag`y`;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-optional-chain",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 1;\n    m(o) {\n        return [o?.#x, o?.a.#x, o.#x.y];\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-nested-classes",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass A {\n    #x = 1;\n    m() {\n        class B {\n            #x = 2;\n            n(a) { return a.#x + this.#x; }\n        }\n        return this.#x;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-in-nested-function",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 1;\n    m() {\n        const self = this;\n        return function () { return self.#x; };\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-duplicate",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 1;\n    #x = 2;\n    m() { return this.#x; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-undeclared",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    m() { return this.#y; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-names-with-instance-methods-constructor",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    #m() {}\n    #x = this.#m();\n    y = 1;\n    constructor(a) {\n        this.a = a;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-for-statement",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #i = 0;\n    m() {\n        for (this.#i = 0; this.#i < 10; this.#i++) {}\n        for (; ; this.#i++, this.#i--) break;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-in-loop-class-expression",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nfor (const k of [1, 2]) {\n    const C = class {\n        #x = k;\n        [k] = 1;\n        get() { return this.#x; }\n    };\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-class-name-prefix",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst o = {\n    Foo: class {\n        #x = 1;\n        static #y = 2;\n    },\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-block",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static x = 1;\n    static {\n        var y = this.x;\n        C.z = y;\n    }\n    static {\n        // only a comment\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-block-es2022",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: true\nclass C {\n    static {\n        this.x = 1;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-block-class-expression",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class {\n    static {\n        this.x = 1;\n    }\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-block-super",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B { static f() { return 1; } }\nclass C extends B {\n    static {\n        super.x = 1;\n        super[k()] += 2;\n        super.y++;\n        const v = super.y--;\n        ++super[k()];\n        super.f();\n        super[k()]();\n        super.f`t`;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-super-get",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B {}\nclass C extends B {\n    static a = super.x;\n    static b = super[\"y\"];\n    static c = super[k()];\n    static d = super.f();\n    static e = super.g`x`;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-super-assign",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass B {}\nclass C extends B {\n    static a = (super.x = 1);\n    static b = (super[k()] = 2);\n    static c = (super.x += 3);\n    static d = (super[k()] *= 4);\n    static e = super.x++;\n    static f = --super[k()];\n    static g = ++super[\"z\"];\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-super-destructuring",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B {}\nclass C extends B {\n    static {\n        ({ a: super.x } = o);\n        [super[k()]] = arr;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-super-es2022",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass B {}\nclass C extends B {\n    static a = super.x;\n    static { super.y = 1; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-field",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    accessor x = 1;\n    accessor y;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-static",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static accessor x = 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-private",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    accessor #x = 1;\n    static accessor #y = 2;\n    m() { return this.#x + C.#y; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-computed",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    accessor [f()] = 1;\n    accessor [\"s\"] = 2;\n    accessor [k] = 3;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-es2022",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: true\nclass C {\n    accessor x = 1;\n    static accessor y = 2;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-esnext-set",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\nclass C {\n    accessor x = 1;\n    y = 2;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-esnext-set-no-hoist",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\nclass C {\n    accessor x = 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-anonymous-class-static",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class {\n    static accessor x = 1;\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-comments",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    /** doc */\n    accessor x = 1; // trailing\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "computed-field-set",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    [f()] = 1;\n    [g()];\n    [\"s\"] = 2;\n    [k] = 3;\n    m() {}\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "computed-field-define",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    [f()] = 1;\n    [g()];\n    static [h()] = 2;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "computed-method-and-field",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    [a()] = 1;\n    [b()]() {}\n    static [c()] = 2;\n    get [d()]() { return 1; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "computed-es2022-set",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass C {\n    [f()] = 1;\n    static [g()] = 2;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "computed-es2022-this",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass C {\n    [this.k] = 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "computed-this-in-nested-class",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass A {\n    static k = \"a\";\n    static B = class {\n        [this.k] = 1;\n    };\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "computed-class-expression",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nconst D = class {\n    [f()] = 1;\n    static [g()] = 2;\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "computed-in-loop",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nwhile (cond()) {\n    const C = class {\n        [f()] = 1;\n    };\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "computed-comma-name",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    [(a(), b())] = 1;\n    [(c, d)];\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "named-evaluation-property-assignment",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst o = {\n    C: class { static x = 1; },\n    \"s\": class { static #p = 2; },\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "named-evaluation-parameter",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nfunction f(C = class { static x = 1; }) {}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "named-evaluation-binding-element",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst { C = class { static x = 1; } } = {};\nconst [D = class { static { } }] = [];\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "named-evaluation-assignment",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nlet C;\nC = class { static x = 1; };\nC ||= class { static y = 2; };\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "named-evaluation-export-default",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\n// @module: esnext\nexport default (class { static x = 1; });\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "named-evaluation-destructuring",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nlet C, D;\n[C = class { static x = 1; }] = [];\n({ D = class { static y = 2; } } = {});\n({ a: C = class { static z = 3; } } = {});\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "named-evaluation-static-field",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass A {\n    static B = class { static x = 1; };\n    C = class { static y = 2; };\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "named-evaluation-not-needed",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nlet C = class { m() {} };\nlet D = class { x = 1; };\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "constructor-reference-static",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static #x = 1;\n    static f() { return C.#x; }\n    static g = () => C;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "constructor-reference-private-method",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #m() { return C; }\n    static y = 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "constructor-reference-class-expression",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class C {\n    static x = 1;\n    static f() { return C.x; }\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "constructor-reference-unrelated",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    x = 1;\n    m() { return C; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "decorated-class",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\ndeclare function dec(c: any): any;\n@dec\nclass C {\n    static x = super.y;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "decorated-class-legacy",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\n// @experimentalDecorators: true\ndeclare function dec(c: any): any;\n@dec\nclass C {\n    static x = this;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "class-with-semicolons-and-index",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    ;\n    x = 1;\n    ;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "no-class-fields",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nfunction f() { return this; }\nconst g = () => this;\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "export-equals-class",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\n// @module: commonjs\nexport = class { static x = 1; };\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "generator-private-access",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 1;\n    *g() { yield this.#x; }\n    async a() { await this.#x; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-method-static-anonymous",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class {\n    static #m() { return 1; }\n    static f() { return D.#m(); }\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-accessor-instance-in-class-expression",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class {\n    get #p() { return 1; }\n    m() { return this.#p; }\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "es2016-instance-and-static",
+   "name": "probe.ts",
+   "source": "// @target: es2016\n// @useDefineForClassFields: false\nclass C {\n    a = 1;\n    static b = 2;\n    #c = 3;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "es2019-fields",
+   "name": "probe.ts",
+   "source": "// @target: es2019\n// @useDefineForClassFields: false\nclass C {\n    a = this.b;\n    static c = C.a;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "es2021-define",
+   "name": "probe.ts",
+   "source": "// @target: es2021\n// @useDefineForClassFields: true\nclass C {\n    a;\n    static b;\n    #c;\n    static #d;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "useless-static-block",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static {}\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "arrow-this-in-static",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static x = () => () => this.y;\n    static y = 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "this-in-nested-class-in-static",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static x = class { m() { return this; } };\n    static y = this;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "computed-parenthesized-method-after-elided-field",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    [a()] = 1;\n    [(b())]() {}\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-method-duplicate",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #m() { return 1; }\n    #m() { return 2; }\n    f() { return this.#m(); }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-computed-cache-assignment",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nlet k;\nclass C {\n    accessor [k = f()] = 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "computed-cache-assignment-field",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nlet k;\nclass C {\n    [k = f()] = 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "decorated-class-element-access-super",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\ndeclare function dec(c: any): any;\nclass B {}\n@dec\nclass C extends B {\n    static a = super[k()];\n    static b = (super.x = 1);\n    static c = super.y++;\n    static {\n        ({ a: super.z } = o);\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-identifier-statement",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x;\n    m() {\n        #x;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-in-undeclared",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x;\n    m(o) { return #y in o; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-receiver-is-private-access",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #a;\n    #b = 0;\n    m() {\n        this.#a.#b += 1;\n        this.#a.#b++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-discarded-parenthesized",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 0;\n    m() {\n        (this.#x++);\n        ((this.#x) = 1);\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-method-assignment",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #m() {}\n    get #g() { return 1; }\n    m() {\n        this.#m = 1;\n        this.#g = 2;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-anonymous-class-static-es2022",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: true\nconst D = class {\n    static accessor x = 1;\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "abstract-members",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nabstract class C {\n    abstract x;\n    y = 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "class-name-from-non-identifier-string",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst o = {\n    \"a-b\": class { #p = 1; static #q = 2; },\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "decorated-class-expression-static",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\ndeclare function dec(c: any): any;\nconst C = @dec class {\n    static x = 1;\n    [f()] = 2;\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "class-expression-deferred-temp",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class C {\n    #x = 1;\n    m() { return C; }\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "class-expression-late-temp-alias",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nconst D = class C {\n    [f()] = 1;\n    m() { return C; }\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "computed-comma-without-parentheses",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    [a(), b()];\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-destructuring-undeclared",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x;\n    m(arr) {\n        [this.#zz] = arr;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-private-method-class-expression-reference",
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @useDefineForClassFields: true\nconst D = class C {\n    static #m() { return C; }\n    static f() { return C.#m(); }\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  }
+ ]
+}

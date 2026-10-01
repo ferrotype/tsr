@@ -1,0 +1,4454 @@
+{
+ "cases": [
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    constructor() {\r\n        this.x = 1;\r\n        this[\"s\"] = 2;\r\n        this[3] = 4;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "instance-field-set",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202078203d20313b0a20202020793b0a20202020227322203d20323b0a2020202033203d20343b0a7d0a"
+    },
+    "id": "instance-field-set",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    x = 1;\n    y;\n    \"s\" = 2;\n    3 = 4;\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    constructor() {\r\n        Object.defineProperty(this, \"x\", {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: 1\r\n        });\r\n        Object.defineProperty(this, \"y\", {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: void 0\r\n        });\r\n        Object.defineProperty(this, \"s\", {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: 2\r\n        });\r\n        Object.defineProperty(this, 3, {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: 4\r\n        });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "instance-field-define",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202078203d20313b0a20202020793b0a20202020227322203d20323b0a2020202033203d20343b0a7d0a"
+    },
+    "id": "instance-field-define",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    x = 1;\n    y;\n    \"s\" = 2;\n    3 = 4;\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    constructor() {\r\n        // leading\r\n        this.x = 1; // trailing\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "instance-field-es2022-set",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020202f2f206c656164696e670a2020202078203d20313b202f2f20747261696c696e670a20202020793b0a7d0a"
+    },
+    "id": "instance-field-es2022-set",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass C {\n    // leading\n    x = 1; // trailing\n    y;\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    x = 1;\r\n    y;\r\n    static z = 2;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "instance-field-es2022-define",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202078203d20313b0a20202020793b0a20202020737461746963207a203d20323b0a7d0a"
+    },
+    "id": "instance-field-es2022-define",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: true\nclass C {\n    x = 1;\n    y;\n    static z = 2;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    constructor() {\r\n        this.x = 1;\r\n    }\r\n    static { this.y = 2; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "instance-field-esnext-set",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202078203d20313b0a202020207374617469632079203d20323b0a7d0a"
+    },
+    "id": "instance-field-esnext-set",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 99,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\nclass C {\n    x = 1;\n    static y = 2;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    x = 1;\r\n    #y = 2;\r\n    static z = this;\r\n    accessor w = 3;\r\n    static { this.z; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "esnext-define-untouched",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202078203d20313b0a202020202379203d20323b0a20202020737461746963207a203d20746869733b0a202020206163636573736f722077203d20333b0a20202020737461746963207b20746869732e7a3b207d0a7d0a"
+    },
+    "id": "esnext-define-untouched",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 99,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: true\nclass C {\n    x = 1;\n    #y = 2;\n    static z = this;\n    accessor w = 3;\n    static { this.z; }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    constructor(a) {\r\n        \"use strict\";\r\n        this.x = 1;\r\n        var v = a;\r\n        this.a = a;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "existing-constructor",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202078203d20313b0a20202020636f6e7374727563746f72286129207b0a20202020202020202275736520737472696374223b0a20202020202020207661722076203d20613b0a2020202020202020746869732e61203d20613b0a202020207d0a7d0a"
+    },
+    "id": "existing-constructor",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    x = 1;\n    constructor(a) {\n        \"use strict\";\n        var v = a;\n        this.a = a;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class B {\r\n}\r\nclass C extends B {\r\n    constructor() {\r\n        \"use strict\";\r\n        foo();\r\n        super();\r\n        this.x = 1;\r\n        bar();\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "derived-with-super",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b7d0a636c617373204320657874656e64732042207b0a2020202078203d20313b0a20202020636f6e7374727563746f722829207b0a20202020202020202275736520737472696374223b0a2020202020202020666f6f28293b0a2020202020202020737570657228293b0a202020202020202062617228293b0a202020207d0a7d0a"
+    },
+    "id": "derived-with-super",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\n// @useDefineForClassFields: false\nclass B {}\nclass C extends B {\n    x = 1;\n    constructor() {\n        \"use strict\";\n        foo();\n        super();\n        bar();\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class B {\r\n}\r\nclass C extends B {\r\n    constructor() {\r\n        super(...arguments);\r\n        Object.defineProperty(this, \"x\", {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: 1\r\n        });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "derived-synthetic-constructor",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b7d0a636c617373204320657874656e64732042207b0a2020202078203d20313b0a7d0a"
+    },
+    "id": "derived-synthetic-constructor",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @useDefineForClassFields: true\nclass B {}\nclass C extends B {\n    x = 1;\n}\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class B {\r\n}\r\nclass C extends B {\r\n    constructor() {\r\n        try {\r\n            super();\r\n            this.x = 1;\r\n            after();\r\n        }\r\n        catch (e) {\r\n            handle(e);\r\n        }\r\n        finally {\r\n            done();\r\n        }\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "derived-super-in-try",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b7d0a636c617373204320657874656e64732042207b0a2020202078203d20313b0a20202020636f6e7374727563746f722829207b0a2020202020202020747279207b0a202020202020202020202020737570657228293b0a202020202020202020202020616674657228293b0a20202020202020207d20636174636820286529207b0a20202020202020202020202068616e646c652865293b0a20202020202020207d2066696e616c6c79207b0a202020202020202020202020646f6e6528293b0a20202020202020207d0a202020207d0a7d0a"
+    },
+    "id": "derived-super-in-try",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\n// @useDefineForClassFields: false\nclass B {}\nclass C extends B {\n    x = 1;\n    constructor() {\n        try {\n            super();\n            after();\n        } catch (e) {\n            handle(e);\n        } finally {\n            done();\n        }\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C extends null {\r\n    constructor() {\r\n        Object.defineProperty(this, \"x\", {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: 1\r\n        });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "extends-null",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c617373204320657874656e6473206e756c6c207b0a2020202078203d20313b0a7d0a"
+    },
+    "id": "extends-null",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\n// @useDefineForClassFields: true\nclass C extends null {\n    x = 1;\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    constructor() {\r\n        this.z = 1;\r\n    }\r\n    m() { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "constructor-no-fields",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020793b0a20202020636f6e7374727563746f722829207b0a2020202020202020746869732e7a203d20313b0a202020207d0a202020206d2829207b7d0a7d0a"
+    },
+    "id": "constructor-no-fields",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    y;\n    constructor() {\n        this.z = 1;\n    }\n    m() {}\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n}\r\nC.x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-field-set",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020207374617469632078203d20313b0a2020202073746174696320793b0a7d0a"
+    },
+    "id": "static-field-set",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    static x = 1;\n    static y;\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n}\r\nObject.defineProperty(C, \"x\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: 1\r\n});\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-field-define",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020207374617469632078203d20313b0a2020202073746174696320793b0a7d0a"
+    },
+    "id": "static-field-define",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\n// @useDefineForClassFields: true\nclass C {\n    static x = 1;\n    static y;\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    static { this.x = 1; }\r\n    static { this.z = this.x; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-field-es2022-set",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020207374617469632078203d20313b0a2020202073746174696320793b0a20202020737461746963207a203d20746869732e783b0a7d0a"
+    },
+    "id": "static-field-es2022-set",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass C {\n    static x = 1;\n    static y;\n    static z = this.x;\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a;\r\nclass C {\r\n}\r\n_a = C;\r\nC.a = 1;\r\nC.b = _a.a + 1;\r\nC.c = () => _a;\r\nC.d = function () { return this; };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-this",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020207374617469632061203d20313b0a202020207374617469632062203d20746869732e61202b20313b0a202020207374617469632063203d202829203d3e20746869733b0a202020207374617469632064203d2066756e6374696f6e202829207b2072657475726e20746869733b207d3b0a7d0a"
+    },
+    "id": "static-this",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    static a = 1;\n    static b = this.a + 1;\n    static c = () => this;\n    static d = function () { return this; };\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a;\r\nconst D = (_a = class C {\r\n    },\r\n    Object.defineProperty(_a, \"x\", {\r\n        enumerable: true,\r\n        configurable: true,\r\n        writable: true,\r\n        value: 1\r\n    }),\r\n    Object.defineProperty(_a, \"y\", {\r\n        enumerable: true,\r\n        configurable: true,\r\n        writable: true,\r\n        value: _a.x\r\n    }),\r\n    _a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-in-class-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742044203d20636c6173732043207b0a202020207374617469632078203d20313b0a202020207374617469632079203d20746869732e783b0a7d3b0a"
+    },
+    "id": "static-in-class-expression",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class C {\n    static x = 1;\n    static y = this.x;\n};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\nvar _a;\r\nlet D = (_a = class {\r\n    },\r\n    __setFunctionName(_a, \"D\"),\r\n    Object.defineProperty(_a, \"x\", {\r\n        enumerable: true,\r\n        configurable: true,\r\n        writable: true,\r\n        value: 1\r\n    }),\r\n    _a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-anonymous-class-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c65742044203d20636c617373207b0a202020207374617469632078203d20313b0a7d3b0a"
+    },
+    "id": "static-anonymous-class-expression",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nlet D = class {\n    static x = 1;\n};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n}\r\nC.x = 1;\r\nexport default C;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "export-default-class-static",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f72742064656661756c7420636c6173732043207b0a202020207374617469632078203d20313b0a7d0a"
+    },
+    "id": "export-default-class-static",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\n// @module: esnext\nexport default class C {\n    static x = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class default_1 {\r\n}\r\ndefault_1.x = 1;\r\nexport default default_1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "export-default-anonymous-class-static",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f72742064656661756c7420636c617373207b0a202020207374617469632078203d20313b0a7d0a"
+    },
+    "id": "export-default-anonymous-class-static",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\n// @module: esnext\nexport default class {\n    static x = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _C_x;\r\nexport class C {\r\n    constructor() {\r\n        _C_x.set(this, 1);\r\n    }\r\n}\r\n_C_x = new WeakMap();\r\nObject.defineProperty(C, \"y\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: 2\r\n});\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "export-class-private",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f727420636c6173732043207b0a202020202378203d20313b0a202020207374617469632079203d20323b0a7d0a"
+    },
+    "id": "export-class-private",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 8,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2021\n// @useDefineForClassFields: true\n// @module: esnext\nexport class C {\n    #x = 1;\n    static y = 2;\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _C_x, _C_y;\r\nclass C {\r\n    constructor() {\r\n        _C_x.set(this, 1);\r\n        _C_y.set(this, void 0);\r\n    }\r\n    get() { return __classPrivateFieldGet(this, _C_x, \"f\"); }\r\n    set(v) { __classPrivateFieldSet(this, _C_x, v, \"f\"); }\r\n}\r\n_C_x = new WeakMap(), _C_y = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-field",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020202378203d20313b0a2020202023793b0a202020206765742829207b2072657475726e20746869732e23783b207d0a20202020736574287629207b20746869732e2378203d20763b207d0a7d0a"
+    },
+    "id": "private-field",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 1;\n    #y;\n    get() { return this.#x; }\n    set(v) { this.#x = v; }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _C_x;\r\nclass C {\r\n    constructor() {\r\n        _C_x.set(this, 1);\r\n    }\r\n    m(o) {\r\n        var _a, _b;\r\n        __classPrivateFieldSet(this, _C_x, __classPrivateFieldGet(this, _C_x, \"f\") + 1, \"f\");\r\n        __classPrivateFieldSet(_a = o, _C_x, __classPrivateFieldGet(_a, _C_x, \"f\") * 2, \"f\");\r\n        __classPrivateFieldSet(_b = f(), _C_x, __classPrivateFieldGet(_b, _C_x, \"f\") - 3, \"f\");\r\n        const v = (__classPrivateFieldSet(this, _C_x, __classPrivateFieldGet(this, _C_x, \"f\") || 4, \"f\"));\r\n        return v;\r\n    }\r\n}\r\n_C_x = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-field-compound",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020202378203d20313b0a202020206d286f29207b0a2020202020202020746869732e2378202b3d20313b0a20202020202020206f2e2378202a3d20323b0a20202020202020206628292e2378202d3d20333b0a2020202020202020636f6e73742076203d2028746869732e2378207c7c3d2034293b0a202020202020202072657475726e20763b0a202020207d0a7d0a"
+    },
+    "id": "private-field-compound",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 1;\n    m(o) {\n        this.#x += 1;\n        o.#x *= 2;\n        f().#x -= 3;\n        const v = (this.#x ||= 4);\n        return v;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _C_x;\r\nclass C {\r\n    constructor() {\r\n        _C_x.set(this, 0);\r\n    }\r\n    m(o) {\r\n        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;\r\n        __classPrivateFieldSet(this, _C_x, (_a = __classPrivateFieldGet(this, _C_x, \"f\"), _a++, _a), \"f\");\r\n        __classPrivateFieldSet(this, _C_x, (_b = __classPrivateFieldGet(this, _C_x, \"f\"), ++_b), \"f\");\r\n        __classPrivateFieldSet(_c = o, _C_x, (_d = __classPrivateFieldGet(_c, _C_x, \"f\"), _d--, _d), \"f\");\r\n        const a = (__classPrivateFieldSet(this, _C_x, (_f = __classPrivateFieldGet(this, _C_x, \"f\"), _e = _f++, _f), \"f\"), _e);\r\n        const b = __classPrivateFieldSet(_g = f(), _C_x, (_h = __classPrivateFieldGet(_g, _C_x, \"f\"), --_h), \"f\");\r\n        const c = (__classPrivateFieldSet(this, _C_x, (_k = __classPrivateFieldGet(this, _C_x, \"f\"), _j = _k++, _k), \"f\"), _j);\r\n        return [a, b, c];\r\n    }\r\n}\r\n_C_x = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-field-increment",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020202378203d20303b0a202020206d286f29207b0a2020202020202020746869732e23782b2b3b0a20202020202020202b2b746869732e23783b0a20202020202020206f2e23782d2d3b0a2020202020202020636f6e73742061203d20746869732e23782b2b3b0a2020202020202020636f6e73742062203d202d2d6628292e23783b0a2020202020202020636f6e73742063203d2028746869732e2378292b2b3b0a202020202020202072657475726e205b612c20622c20635d3b0a202020207d0a7d0a"
+    },
+    "id": "private-field-increment",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 0;\n    m(o) {\n        this.#x++;\n        ++this.#x;\n        o.#x--;\n        const a = this.#x++;\n        const b = --f().#x;\n        const c = (this.#x)++;\n        return [a, b, c];\n    }\n}\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar _C_instances, _C_m, _C_g, _C_a;\r\nclass C {\r\n    constructor() {\r\n        _C_instances.add(this);\r\n    }\r\n    call(o) {\r\n        var _a;\r\n        __classPrivateFieldGet(this, _C_instances, \"m\", _C_m).call(this, 1);\r\n        __classPrivateFieldGet(o, _C_instances, \"m\", _C_m).call(o, 2);\r\n        __classPrivateFieldGet((_a = f()), _C_instances, \"m\", _C_m).call(_a, 3);\r\n        __classPrivateFieldGet(o, _C_instances, \"m\", _C_m).call(o, 4);\r\n        return __classPrivateFieldGet(this, _C_instances, \"m\", _C_m);\r\n    }\r\n}\r\n_C_instances = new WeakSet(), _C_m = function _C_m(a) { return a; }, _C_g = function* _C_g() { yield 1; }, _C_a = async function _C_a() { };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-method",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020236d286129207b2072657475726e20613b207d0a202020202a23672829207b207969656c6420313b207d0a202020206173796e632023612829207b7d0a2020202063616c6c286f29207b0a2020202020202020746869732e236d2831293b0a20202020202020206f2e236d2832293b0a20202020202020206628292e236d2833293b0a20202020202020206f3f2e236d2834293b0a202020202020202072657475726e20746869732e236d3b0a202020207d0a7d0a"
+    },
+    "id": "private-method",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #m(a) { return a; }\n    *#g() { yield 1; }\n    async #a() {}\n    call(o) {\n        this.#m(1);\n        o.#m(2);\n        f().#m(3);\n        o?.#m(4);\n        return this.#m;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _C_instances, _C_p_get, _C_p_set, _C_r_get, _C_w_set;\r\nclass C {\r\n    constructor() {\r\n        _C_instances.add(this);\r\n    }\r\n    m() {\r\n        __classPrivateFieldSet(this, _C_instances, __classPrivateFieldGet(this, _C_instances, \"a\", _C_p_get) + __classPrivateFieldGet(this, _C_instances, \"a\", _C_r_get), \"a\", _C_p_set);\r\n        __classPrivateFieldSet(this, _C_instances, 3, \"a\", _C_w_set);\r\n        __classPrivateFieldSet(this, _C_instances, __classPrivateFieldGet(this, _C_instances, \"a\", _C_p_get) + 1, \"a\", _C_p_set);\r\n    }\r\n}\r\n_C_instances = new WeakSet(), _C_p_get = function _C_p_get() { return 1; }, _C_p_set = function _C_p_set(v) { }, _C_r_get = function _C_r_get() { return 2; }, _C_w_set = function _C_w_set(v) { };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-accessor",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020206765742023702829207b2072657475726e20313b207d0a20202020736574202370287629207b7d0a202020206765742023722829207b2072657475726e20323b207d0a20202020736574202377287629207b7d0a202020206d2829207b0a2020202020202020746869732e2370203d20746869732e2370202b20746869732e23723b0a2020202020202020746869732e2377203d20333b0a2020202020202020746869732e2370202b3d20313b0a202020207d0a7d0a"
+    },
+    "id": "private-accessor",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    get #p() { return 1; }\n    set #p(v) {}\n    get #r() { return 2; }\n    set #w(v) {}\n    m() {\n        this.#p = this.#p + this.#r;\n        this.#w = 3;\n        this.#p += 1;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _a, _C_x, _C_m, _C_a_get, _C_a_set;\r\nclass C {\r\n    static f() {\r\n        __classPrivateFieldSet(_a, _a, __classPrivateFieldGet(_a, _a, \"m\", _C_m).call(_a) + __classPrivateFieldGet(_a, _a, \"a\", _C_a_get), \"f\", _C_x);\r\n        __classPrivateFieldSet(_a, _a, 3, \"a\", _C_a_set);\r\n    }\r\n}\r\n_a = C, _C_m = function _C_m() { return __classPrivateFieldGet(_a, _a, \"f\", _C_x); }, _C_a_get = function _C_a_get() { return 2; }, _C_a_set = function _C_a_set(v) { };\r\n_C_x = { value: 1 };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-static",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020737461746963202378203d20313b0a2020202073746174696320236d2829207b2072657475726e20432e23783b207d0a20202020737461746963206765742023612829207b2072657475726e20323b207d0a2020202073746174696320736574202361287629207b7d0a2020202073746174696320662829207b0a2020202020202020432e2378203d20432e236d2829202b20432e23613b0a2020202020202020432e2361203d20333b0a202020207d0a7d0a"
+    },
+    "id": "private-static",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static #x = 1;\n    static #m() { return C.#x; }\n    static get #a() { return 2; }\n    static set #a(v) {}\n    static f() {\n        C.#x = C.#m() + C.#a;\n        C.#a = 3;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldIn = (this && this.__classPrivateFieldIn) || function(state, receiver) {\r\n    if (receiver === null || (typeof receiver !== \"object\" && typeof receiver !== \"function\")) throw new TypeError(\"Cannot use 'in' operator on non-object\");\r\n    return typeof state === \"function\" ? receiver === state : state.has(receiver);\r\n};\r\nvar _C_instances, _a, _C_x, _C_m, _C_s;\r\nclass C {\r\n    constructor() {\r\n        _C_instances.add(this);\r\n        _C_x.set(this, void 0);\r\n    }\r\n    static is(o) {\r\n        return __classPrivateFieldIn(_C_x, o) && __classPrivateFieldIn(_C_instances, o) && __classPrivateFieldIn(_a, o);\r\n    }\r\n}\r\n_a = C, _C_x = new WeakMap(), _C_instances = new WeakSet(), _C_m = function _C_m() { };\r\n_C_s = { value: 1 };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-in",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202023783b0a20202020236d2829207b7d0a20202020737461746963202373203d20313b0a20202020737461746963206973286f29207b0a202020202020202072657475726e20237820696e206f20262620236d20696e206f20262620237320696e206f3b0a202020207d0a7d0a"
+    },
+    "id": "private-in",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x;\n    #m() {}\n    static #s = 1;\n    static is(o) {\n        return #x in o && #m in o && #s in o;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    constructor() {\r\n        this.#x = 1;\r\n        this.y = this.#x;\r\n    }\r\n    #x;\r\n    #m() { return this.#x; }\r\n    static #s = 2;\r\n    is(o) { return #x in o; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-es2022-untouched",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020202378203d20313b0a20202020236d2829207b2072657475726e20746869732e23783b207d0a20202020737461746963202373203d20323b0a2020202079203d20746869732e23783b0a202020206973286f29207b2072657475726e20237820696e206f3b207d0a7d0a"
+    },
+    "id": "private-es2022-untouched",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass C {\n    #x = 1;\n    #m() { return this.#x; }\n    static #s = 2;\n    y = this.#x;\n    is(o) { return #x in o; }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    constructor() {\r\n        this.#x = 1;\r\n        this.y = 2;\r\n    }\r\n    #x;\r\n    static #s = 3;\r\n    m() { return this.#x + C.#s; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-esnext-set",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020202378203d20313b0a2020202079203d20323b0a20202020737461746963202373203d20333b0a202020206d2829207b2072657475726e20746869732e2378202b20432e23733b207d0a7d0a"
+    },
+    "id": "private-esnext-set",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 99,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\nclass C {\n    #x = 1;\n    y = 2;\n    static #s = 3;\n    m() { return this.#x + C.#s; }\n}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _C_x;\r\nclass C {\r\n    constructor() {\r\n        _C_x.set(this, void 0);\r\n    }\r\n    m(o) {\r\n        var _a, _b, _c;\r\n        (_a = this, { a: ({ set value(_d) { __classPrivateFieldSet(_a, _C_x, _d, \"f\"); } }).value } = o);\r\n        ({ a: ({ set value(_d) { __classPrivateFieldSet(o, _C_x, _d, \"f\"); } }).value = 1 } = o);\r\n        (_b = this, { ...({ set value(_d) { __classPrivateFieldSet(_b, _C_x, _d, \"f\"); } }).value } = o);\r\n        (_c = f(), { a: ({ set value(_d) { __classPrivateFieldSet(_c, _C_x, _d, \"f\"); } }).value } = o);\r\n    }\r\n}\r\n_C_x = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-destructuring-object",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202023783b0a202020206d286f29207b0a2020202020202020287b20613a20746869732e2378207d203d206f293b0a2020202020202020287b20613a206f2e2378203d2031207d203d206f293b0a2020202020202020287b202e2e2e746869732e2378207d203d206f293b0a2020202020202020287b20613a206628292e2378207d203d206f293b0a202020207d0a7d0a"
+    },
+    "id": "private-destructuring-object",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x;\n    m(o) {\n        ({ a: this.#x } = o);\n        ({ a: o.#x = 1 } = o);\n        ({ ...this.#x } = o);\n        ({ a: f().#x } = o);\n    }\n}\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _C_x;\r\nclass C {\r\n    constructor() {\r\n        _C_x.set(this, void 0);\r\n    }\r\n    m(o, arr) {\r\n        var _a, _b, _c, _d, _e;\r\n        _a = this, [({ set value(_f) { __classPrivateFieldSet(_a, _C_x, _f, \"f\"); } }).value] = arr;\r\n        _b = this, [({ set value(_f) { __classPrivateFieldSet(o, _C_x, _f, \"f\"); } }).value = 1, , ...({ set value(_f) { __classPrivateFieldSet(_b, _C_x, _f, \"f\"); } }).value] = arr;\r\n        _c = f(), [({ set value(_f) { __classPrivateFieldSet(_c, _C_x, _f, \"f\"); } }).value] = arr;\r\n        _d = this, [{ a: ({ set value(_f) { __classPrivateFieldSet(_d, _C_x, _f, \"f\"); } }).value }] = arr;\r\n        return _e = this, [({ set value(_f) { __classPrivateFieldSet(_e, _C_x, _f, \"f\"); } }).value] = arr;\r\n    }\r\n}\r\n_C_x = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-destructuring-array",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202023783b0a202020206d286f2c2061727229207b0a20202020202020205b746869732e23785d203d206172723b0a20202020202020205b6f2e2378203d20312c202c202e2e2e746869732e23785d203d206172723b0a20202020202020205b6628292e23785d203d206172723b0a20202020202020205b7b20613a20746869732e2378207d5d203d206172723b0a202020202020202072657475726e205b746869732e23785d203d206172723b0a202020207d0a7d0a"
+    },
+    "id": "private-destructuring-array",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x;\n    m(o, arr) {\n        [this.#x] = arr;\n        [o.#x = 1, , ...this.#x] = arr;\n        [f().#x] = arr;\n        [{ a: this.#x }] = arr;\n        return [this.#x] = arr;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 5,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar _C_instances, _C_tag, _C_f;\r\nclass C {\r\n    constructor() {\r\n        _C_instances.add(this);\r\n        _C_f.set(this, (s) => s);\r\n    }\r\n    m(o) {\r\n        var _a;\r\n        __classPrivateFieldGet(this, _C_instances, \"m\", _C_tag).bind(this) `a${1}b`;\r\n        __classPrivateFieldGet(o, _C_f, \"f\").bind(o) `x`;\r\n        __classPrivateFieldGet((_a = f()), _C_instances, \"m\", _C_tag).bind(_a) `y`;\r\n    }\r\n}\r\n_C_f = new WeakMap(), _C_instances = new WeakSet(), _C_tag = function _C_tag(s) { return s; };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-tagged-template",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202023746167287329207b2072657475726e20733b207d0a202020202366203d20287329203d3e20733b0a202020206d286f29207b0a2020202020202020746869732e237461676061247b317d62603b0a20202020202020206f2e23666078603b0a20202020202020206628292e237461676079603b0a202020207d0a7d0a"
+    },
+    "id": "private-tagged-template",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #tag(s) { return s; }\n    #f = (s) => s;\n    m(o) {\n        this.#tag`a${1}b`;\n        o.#f`x`;\n        f().#tag`y`;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar _C_x;\r\nclass C {\r\n    constructor() {\r\n        _C_x.set(this, 1);\r\n    }\r\n    m(o) {\r\n        return [__classPrivateFieldGet(o, _C_x, \"f\"), __classPrivateFieldGet(o?.a, _C_x, \"f\"), __classPrivateFieldGet(o, _C_x, \"f\").y];\r\n    }\r\n}\r\n_C_x = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-optional-chain",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020202378203d20313b0a202020206d286f29207b0a202020202020202072657475726e205b6f3f2e23782c206f3f2e612e23782c206f2e23782e795d3b0a202020207d0a7d0a"
+    },
+    "id": "private-optional-chain",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 1;\n    m(o) {\n        return [o?.#x, o?.a.#x, o.#x.y];\n    }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar _A_x;\r\nclass A {\r\n    constructor() {\r\n        _A_x.set(this, 1);\r\n    }\r\n    m() {\r\n        var _B_x;\r\n        class B {\r\n            constructor() {\r\n                _B_x.set(this, 2);\r\n            }\r\n            n(a) { return __classPrivateFieldGet(a, _B_x, \"f\") + __classPrivateFieldGet(this, _B_x, \"f\"); }\r\n        }\r\n        _B_x = new WeakMap();\r\n        return __classPrivateFieldGet(this, _A_x, \"f\");\r\n    }\r\n}\r\n_A_x = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-nested-classes",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732041207b0a202020202378203d20313b0a202020206d2829207b0a2020202020202020636c6173732042207b0a2020202020202020202020202378203d20323b0a2020202020202020202020206e286129207b2072657475726e20612e2378202b20746869732e23783b207d0a20202020202020207d0a202020202020202072657475726e20746869732e23783b0a202020207d0a7d0a"
+    },
+    "id": "private-nested-classes",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass A {\n    #x = 1;\n    m() {\n        class B {\n            #x = 2;\n            n(a) { return a.#x + this.#x; }\n        }\n        return this.#x;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar _C_x;\r\nclass C {\r\n    constructor() {\r\n        _C_x.set(this, 1);\r\n    }\r\n    m() {\r\n        const self = this;\r\n        return function () { return __classPrivateFieldGet(self, _C_x, \"f\"); };\r\n    }\r\n}\r\n_C_x = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-in-nested-function",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020202378203d20313b0a202020206d2829207b0a2020202020202020636f6e73742073656c66203d20746869733b0a202020202020202072657475726e2066756e6374696f6e202829207b2072657475726e2073656c662e23783b207d3b0a202020207d0a7d0a"
+    },
+    "id": "private-in-nested-function",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 1;\n    m() {\n        const self = this;\n        return function () { return self.#x; };\n    }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar _C_x, _C_x_1;\r\nclass C {\r\n    constructor() {\r\n        _C_x_1.set(this, 1);\r\n        _C_x_1.set(this, 2);\r\n    }\r\n    #x = 1;\r\n    #x = 2;\r\n    m() { return __classPrivateFieldGet(this, _C_x_1, \"f\"); }\r\n}\r\n_C_x = new WeakMap(), _C_x_1 = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-duplicate",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020202378203d20313b0a202020202378203d20323b0a202020206d2829207b2072657475726e20746869732e23783b207d0a7d0a"
+    },
+    "id": "private-duplicate",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 1;\n    #x = 2;\n    m() { return this.#x; }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    m() { return this.; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-undeclared",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020206d2829207b2072657475726e20746869732e23793b207d0a7d0a"
+    },
+    "id": "private-undeclared",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    m() { return this.#y; }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar _C_instances, _C_m, _C_x;\r\nclass C {\r\n    constructor(a) {\r\n        _C_instances.add(this);\r\n        _C_x.set(this, __classPrivateFieldGet(this, _C_instances, \"m\", _C_m).call(this));\r\n        this.y = 1;\r\n        this.a = a;\r\n    }\r\n}\r\n_C_x = new WeakMap(), _C_instances = new WeakSet(), _C_m = function _C_m() { };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-names-with-instance-methods-constructor",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020236d2829207b7d0a202020202378203d20746869732e236d28293b0a2020202079203d20313b0a20202020636f6e7374727563746f72286129207b0a2020202020202020746869732e61203d20613b0a202020207d0a7d0a"
+    },
+    "id": "private-names-with-instance-methods-constructor",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    #m() {}\n    #x = this.#m();\n    y = 1;\n    constructor(a) {\n        this.a = a;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar _C_i;\r\nclass C {\r\n    constructor() {\r\n        _C_i.set(this, 0);\r\n    }\r\n    m() {\r\n        var _a, _b, _c, _d, _e;\r\n        for (__classPrivateFieldSet(this, _C_i, 0, \"f\"); __classPrivateFieldGet(this, _C_i, \"f\") < 10; __classPrivateFieldSet(this, _C_i, (_a = __classPrivateFieldGet(this, _C_i, \"f\"), _a++, _a), \"f\")) { }\r\n        for (;; __classPrivateFieldSet(this, _C_i, (_c = __classPrivateFieldGet(this, _C_i, \"f\"), _b = _c++, _c), \"f\"), _b, __classPrivateFieldSet(this, _C_i, (_e = __classPrivateFieldGet(this, _C_i, \"f\"), _d = _e--, _e), \"f\"), _d)\r\n            break;\r\n    }\r\n}\r\n_C_i = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-for-statement",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020202369203d20303b0a202020206d2829207b0a2020202020202020666f722028746869732e2369203d20303b20746869732e2369203c2031303b20746869732e23692b2b29207b7d0a2020202020202020666f7220283b203b20746869732e23692b2b2c20746869732e23692d2d2920627265616b3b0a202020207d0a7d0a"
+    },
+    "id": "private-for-statement",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #i = 0;\n    m() {\n        for (this.#i = 0; this.#i < 10; this.#i++) {}\n        for (; ; this.#i++, this.#i--) break;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nfor (const k of [1, 2]) {\r\n    let _C_x, _a, _b;\r\n    const C = (_b = class {\r\n            constructor() {\r\n                _C_x.set(this, k);\r\n                Object.defineProperty(this, _a, {\r\n                    enumerable: true,\r\n                    configurable: true,\r\n                    writable: true,\r\n                    value: 1\r\n                });\r\n            }\r\n            get() { return __classPrivateFieldGet(this, _C_x, \"f\"); }\r\n        },\r\n        _C_x = new WeakMap(),\r\n        _a = k,\r\n        _b);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-in-loop-class-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "666f722028636f6e7374206b206f66205b312c20325d29207b0a20202020636f6e73742043203d20636c617373207b0a20202020202020202378203d206b3b0a20202020202020205b6b5d203d20313b0a20202020202020206765742829207b2072657475726e20746869732e23783b207d0a202020207d3b0a7d0a"
+    },
+    "id": "private-in-loop-class-expression",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nfor (const k of [1, 2]) {\n    const C = class {\n        #x = k;\n        [k] = 1;\n        get() { return this.#x; }\n    };\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\nvar _a, _Foo_x, _Foo_y;\r\nconst o = {\r\n    Foo: (_a = class {\r\n            constructor() {\r\n                _Foo_x.set(this, 1);\r\n            }\r\n        },\r\n        _Foo_x = new WeakMap(),\r\n        __setFunctionName(_a, \"Foo\"),\r\n        _Foo_y = { value: 2 },\r\n        _a),\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-class-name-prefix",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e7374206f203d207b0a20202020466f6f3a20636c617373207b0a20202020202020202378203d20313b0a2020202020202020737461746963202379203d20323b0a202020207d2c0a7d3b0a"
+    },
+    "id": "private-class-name-prefix",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst o = {\n    Foo: class {\n        #x = 1;\n        static #y = 2;\n    },\n};\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a;\r\nclass C {\r\n}\r\n_a = C;\r\nObject.defineProperty(C, \"x\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: 1\r\n});\r\n(() => {\r\n    var y = _a.x;\r\n    _a.z = y;\r\n})();\r\n(() => {\r\n    // only a comment\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-block",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020207374617469632078203d20313b0a20202020737461746963207b0a20202020202020207661722079203d20746869732e783b0a2020202020202020432e7a203d20793b0a202020207d0a20202020737461746963207b0a20202020202020202f2f206f6e6c79206120636f6d6d656e740a202020207d0a7d0a"
+    },
+    "id": "static-block",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static x = 1;\n    static {\n        var y = this.x;\n        C.z = y;\n    }\n    static {\n        // only a comment\n    }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    static {\r\n        this.x = 1;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-block-es2022",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020737461746963207b0a2020202020202020746869732e78203d20313b0a202020207d0a7d0a"
+    },
+    "id": "static-block-es2022",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: true\nclass C {\n    static {\n        this.x = 1;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\nvar _a;\r\nconst D = (_a = class {\r\n    },\r\n    __setFunctionName(_a, \"D\"),\r\n    (() => {\r\n        _a.x = 1;\r\n    })(),\r\n    _a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-block-class-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742044203d20636c617373207b0a20202020737461746963207b0a2020202020202020746869732e78203d20313b0a202020207d0a7d3b0a"
+    },
+    "id": "static-block-class-expression",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class {\n    static {\n        this.x = 1;\n    }\n};\n"
+  },
+  {
+   "diagnostics": 10,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a, _b;\r\nclass B {\r\n    static f() { return 1; }\r\n}\r\nclass C extends (_b = B) {\r\n}\r\n_a = C;\r\n(() => {\r\n    var _c, _d, _e, _f, _g, _h;\r\n    Reflect.set(_b, \"x\", 1, _a);\r\n    Reflect.set(_b, _c = k(), Reflect.get(_b, _c, _a) + 2, _a);\r\n    Reflect.set(_b, \"y\", (_d = Reflect.get(_b, \"y\", _a), _d++, _d), _a);\r\n    const v = (Reflect.set(_b, \"y\", (_f = Reflect.get(_b, \"y\", _a), _e = _f--, _f), _a), _e);\r\n    Reflect.set(_b, _g = k(), (_h = Reflect.get(_b, _g, _a), ++_h), _a);\r\n    Reflect.get(_b, \"f\", _a).call(_a);\r\n    Reflect.get(_b, k(), _a).call(_a);\r\n    Reflect.get(_b, \"f\", _a).bind(_a) `t`;\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-block-super",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b2073746174696320662829207b2072657475726e20313b207d207d0a636c617373204320657874656e64732042207b0a20202020737461746963207b0a202020202020202073757065722e78203d20313b0a202020202020202073757065725b6b28295d202b3d20323b0a202020202020202073757065722e792b2b3b0a2020202020202020636f6e73742076203d2073757065722e792d2d3b0a20202020202020202b2b73757065725b6b28295d3b0a202020202020202073757065722e6628293b0a202020202020202073757065725b6b28295d28293b0a202020202020202073757065722e666074603b0a202020207d0a7d0a"
+    },
+    "id": "static-block-super",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B { static f() { return 1; } }\nclass C extends B {\n    static {\n        super.x = 1;\n        super[k()] += 2;\n        super.y++;\n        const v = super.y--;\n        ++super[k()];\n        super.f();\n        super[k()]();\n        super.f`t`;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 6,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a, _b;\r\nclass B {\r\n}\r\nclass C extends (_b = B) {\r\n}\r\n_a = C;\r\nObject.defineProperty(C, \"a\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: Reflect.get(_b, \"x\", _a)\r\n});\r\nObject.defineProperty(C, \"b\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: Reflect.get(_b, \"y\", _a)\r\n});\r\nObject.defineProperty(C, \"c\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: Reflect.get(_b, k(), _a)\r\n});\r\nObject.defineProperty(C, \"d\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: Reflect.get(_b, \"f\", _a).call(_a)\r\n});\r\nObject.defineProperty(C, \"e\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: Reflect.get(_b, \"g\", _a).bind(_a) `x`\r\n});\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-super-get",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b7d0a636c617373204320657874656e64732042207b0a202020207374617469632061203d2073757065722e783b0a202020207374617469632062203d2073757065725b2279225d3b0a202020207374617469632063203d2073757065725b6b28295d3b0a202020207374617469632064203d2073757065722e6628293b0a202020207374617469632065203d2073757065722e676078603b0a7d0a"
+    },
+    "id": "static-super-get",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B {}\nclass C extends B {\n    static a = super.x;\n    static b = super[\"y\"];\n    static c = super[k()];\n    static d = super.f();\n    static e = super.g`x`;\n}\n"
+  },
+  {
+   "diagnostics": 10,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;\r\nclass B {\r\n}\r\nclass C extends (_b = B) {\r\n}\r\n_a = C;\r\nC.a = (Reflect.set(_b, \"x\", _c = 1, _a), _c);\r\nC.b = (Reflect.set(_b, k(), _d = 2, _a), _d);\r\nC.c = (Reflect.set(_b, \"x\", _e = Reflect.get(_b, \"x\", _a) + 3, _a), _e);\r\nC.d = (Reflect.set(_b, _f = k(), _g = Reflect.get(_b, _f, _a) * 4, _a), _g);\r\nC.e = (Reflect.set(_b, \"x\", (_j = Reflect.get(_b, \"x\", _a), _h = _j++, _j), _a), _h);\r\nC.f = (Reflect.set(_b, _k = k(), (_m = Reflect.get(_b, _k, _a), _l = --_m), _a), _l);\r\nC.g = (Reflect.set(_b, \"z\", (_p = Reflect.get(_b, \"z\", _a), _o = ++_p), _a), _o);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-super-assign",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b7d0a636c617373204320657874656e64732042207b0a202020207374617469632061203d202873757065722e78203d2031293b0a202020207374617469632062203d202873757065725b6b28295d203d2032293b0a202020207374617469632063203d202873757065722e78202b3d2033293b0a202020207374617469632064203d202873757065725b6b28295d202a3d2034293b0a202020207374617469632065203d2073757065722e782b2b3b0a202020207374617469632066203d202d2d73757065725b6b28295d3b0a202020207374617469632067203d202b2b73757065725b227a225d3b0a7d0a"
+    },
+    "id": "static-super-assign",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass B {}\nclass C extends B {\n    static a = (super.x = 1);\n    static b = (super[k()] = 2);\n    static c = (super.x += 3);\n    static d = (super[k()] *= 4);\n    static e = super.x++;\n    static f = --super[k()];\n    static g = ++super[\"z\"];\n}\n"
+  },
+  {
+   "diagnostics": 5,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a, _b;\r\nclass B {\r\n}\r\nclass C extends (_b = B) {\r\n}\r\n_a = C;\r\n(() => {\r\n    ({ a: ({ set value(_c) { Reflect.set(_b, \"x\", _c, _a); } }).value } = o);\r\n    [({ set value(_c) { Reflect.set(_b, k(), _c, _a); } }).value] = arr;\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-super-destructuring",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b7d0a636c617373204320657874656e64732042207b0a20202020737461746963207b0a2020202020202020287b20613a2073757065722e78207d203d206f293b0a20202020202020205b73757065725b6b28295d5d203d206172723b0a202020207d0a7d0a"
+    },
+    "id": "static-super-destructuring",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B {}\nclass C extends B {\n    static {\n        ({ a: super.x } = o);\n        [super[k()]] = arr;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class B {\r\n}\r\nclass C extends B {\r\n    static { this.a = super.x; }\r\n    static { super.y = 1; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-super-es2022",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b7d0a636c617373204320657874656e64732042207b0a202020207374617469632061203d2073757065722e783b0a20202020737461746963207b2073757065722e79203d20313b207d0a7d0a"
+    },
+    "id": "static-super-es2022",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass B {}\nclass C extends B {\n    static a = super.x;\n    static { super.y = 1; }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _C_x_accessor_storage, _C_y_accessor_storage;\r\nclass C {\r\n    constructor() {\r\n        _C_x_accessor_storage.set(this, 1);\r\n        _C_y_accessor_storage.set(this, void 0);\r\n    }\r\n    get x() { return __classPrivateFieldGet(this, _C_x_accessor_storage, \"f\"); }\r\n    set x(value) { __classPrivateFieldSet(this, _C_x_accessor_storage, value, \"f\"); }\r\n    get y() { return __classPrivateFieldGet(this, _C_y_accessor_storage, \"f\"); }\r\n    set y(value) { __classPrivateFieldSet(this, _C_y_accessor_storage, value, \"f\"); }\r\n}\r\n_C_x_accessor_storage = new WeakMap(), _C_y_accessor_storage = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessor-field",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020206163636573736f722078203d20313b0a202020206163636573736f7220793b0a7d0a"
+    },
+    "id": "accessor-field",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    accessor x = 1;\n    accessor y;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _a, _C_x_accessor_storage;\r\nclass C {\r\n    static get x() { return __classPrivateFieldGet(_a, _a, \"f\", _C_x_accessor_storage); }\r\n    static set x(value) { __classPrivateFieldSet(_a, _a, value, \"f\", _C_x_accessor_storage); }\r\n}\r\n_a = C;\r\n_C_x_accessor_storage = { value: 1 };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessor-static",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020737461746963206163636573736f722078203d20313b0a7d0a"
+    },
+    "id": "accessor-static",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static accessor x = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _C_instances, _a, _C_x_get, _C_x_set, _C_y_get, _C_y_set, _C_x_accessor_storage, _C_y_accessor_storage;\r\nclass C {\r\n    constructor() {\r\n        _C_instances.add(this);\r\n        _C_x_accessor_storage.set(this, 1);\r\n    }\r\n    m() { return __classPrivateFieldGet(this, _C_instances, \"a\", _C_x_get) + __classPrivateFieldGet(_a, _a, \"a\", _C_y_get); }\r\n}\r\n_a = C, _C_instances = new WeakSet(), _C_x_accessor_storage = new WeakMap(), _C_x_get = function _C_x_get() { return __classPrivateFieldGet(this, _C_x_accessor_storage, \"f\"); }, _C_x_set = function _C_x_set(value) { __classPrivateFieldSet(this, _C_x_accessor_storage, value, \"f\"); }, _C_y_get = function _C_y_get() { return __classPrivateFieldGet(_a, _a, \"f\", _C_y_accessor_storage); }, _C_y_set = function _C_y_set(value) { __classPrivateFieldSet(_a, _a, value, \"f\", _C_y_accessor_storage); };\r\n_C_y_accessor_storage = { value: 2 };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessor-private",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020206163636573736f72202378203d20313b0a20202020737461746963206163636573736f72202379203d20323b0a202020206d2829207b2072657475726e20746869732e2378202b20432e23793b207d0a7d0a"
+    },
+    "id": "accessor-private",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    accessor #x = 1;\n    static accessor #y = 2;\n    m() { return this.#x + C.#y; }\n}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _C__a_accessor_storage, _C__b_accessor_storage, _C__c_accessor_storage, _a, _b;\r\nclass C {\r\n    constructor() {\r\n        _C__a_accessor_storage.set(this, 1);\r\n        _C__b_accessor_storage.set(this, 2);\r\n        _C__c_accessor_storage.set(this, 3);\r\n    }\r\n    get [(_C__a_accessor_storage = new WeakMap(), _C__b_accessor_storage = new WeakMap(), _C__c_accessor_storage = new WeakMap(), _a = f())]() { return __classPrivateFieldGet(this, _C__a_accessor_storage, \"f\"); }\r\n    set [_a](value) { __classPrivateFieldSet(this, _C__a_accessor_storage, value, \"f\"); }\r\n    get [\"s\"]() { return __classPrivateFieldGet(this, _C__b_accessor_storage, \"f\"); }\r\n    set [\"s\"](value) { __classPrivateFieldSet(this, _C__b_accessor_storage, value, \"f\"); }\r\n    get [_b = k]() { return __classPrivateFieldGet(this, _C__c_accessor_storage, \"f\"); }\r\n    set [_b](value) { __classPrivateFieldSet(this, _C__c_accessor_storage, value, \"f\"); }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessor-computed",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020206163636573736f72205b6628295d203d20313b0a202020206163636573736f72205b2273225d203d20323b0a202020206163636573736f72205b6b5d203d20333b0a7d0a"
+    },
+    "id": "accessor-computed",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    accessor [f()] = 1;\n    accessor [\"s\"] = 2;\n    accessor [k] = 3;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    #x_accessor_storage = 1;\r\n    get x() { return this.#x_accessor_storage; }\r\n    set x(value) { this.#x_accessor_storage = value; }\r\n    static #y_accessor_storage = 2;\r\n    static get y() { return C.#y_accessor_storage; }\r\n    static set y(value) { C.#y_accessor_storage = value; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessor-es2022",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020206163636573736f722078203d20313b0a20202020737461746963206163636573736f722079203d20323b0a7d0a"
+    },
+    "id": "accessor-es2022",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: true\nclass C {\n    accessor x = 1;\n    static accessor y = 2;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    constructor() {\r\n        this.#x_accessor_storage = 1;\r\n        this.y = 2;\r\n    }\r\n    #x_accessor_storage;\r\n    get x() { return this.#x_accessor_storage; }\r\n    set x(value) { this.#x_accessor_storage = value; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessor-esnext-set",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020206163636573736f722078203d20313b0a2020202079203d20323b0a7d0a"
+    },
+    "id": "accessor-esnext-set",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 99,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\nclass C {\n    accessor x = 1;\n    y = 2;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    accessor x = 1;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessor-esnext-set-no-hoist",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020206163636573736f722078203d20313b0a7d0a"
+    },
+    "id": "accessor-esnext-set-no-hoist",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 99,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\nclass C {\n    accessor x = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\nvar __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _a, _D_x_accessor_storage;\r\nconst D = (_a = class {\r\n        static get x() { return __classPrivateFieldGet(_a, _a, \"f\", _D_x_accessor_storage); }\r\n        static set x(value) { __classPrivateFieldSet(_a, _a, value, \"f\", _D_x_accessor_storage); }\r\n    },\r\n    __setFunctionName(_a, \"D\"),\r\n    _D_x_accessor_storage = { value: 1 },\r\n    _a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessor-anonymous-class-static",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742044203d20636c617373207b0a20202020737461746963206163636573736f722078203d20313b0a7d3b0a"
+    },
+    "id": "accessor-anonymous-class-static",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class {\n    static accessor x = 1;\n};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _C_x_accessor_storage;\r\nclass C {\r\n    constructor() {\r\n        _C_x_accessor_storage.set(this, 1);\r\n    }\r\n    /** doc */\r\n    get x() { return __classPrivateFieldGet(this, _C_x_accessor_storage, \"f\"); } // trailing\r\n    set x(value) { __classPrivateFieldSet(this, _C_x_accessor_storage, value, \"f\"); }\r\n}\r\n_C_x_accessor_storage = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessor-comments",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020202f2a2a20646f63202a2f0a202020206163636573736f722078203d20313b202f2f20747261696c696e670a7d0a"
+    },
+    "id": "accessor-comments",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    /** doc */\n    accessor x = 1; // trailing\n}\n"
+  },
+  {
+   "diagnostics": 6,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a, _b;\r\nclass C {\r\n    constructor() {\r\n        this[_a] = 1;\r\n        this[\"s\"] = 2;\r\n        this[_b] = 3;\r\n    }\r\n    m() { }\r\n}\r\n_a = f(), g(), _b = k;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-field-set",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020205b6628295d203d20313b0a202020205b6728295d3b0a202020205b2273225d203d20323b0a202020205b6b5d203d20333b0a202020206d2829207b7d0a7d0a"
+    },
+    "id": "computed-field-set",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    [f()] = 1;\n    [g()];\n    [\"s\"] = 2;\n    [k] = 3;\n    m() {}\n}\n"
+  },
+  {
+   "diagnostics": 7,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a, _b, _c;\r\nclass C {\r\n    constructor() {\r\n        Object.defineProperty(this, _a, {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: 1\r\n        });\r\n        Object.defineProperty(this, _b, {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: void 0\r\n        });\r\n    }\r\n}\r\n_a = f(), _b = g(), _c = h();\r\nObject.defineProperty(C, _c, {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: 2\r\n});\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-field-define",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020205b6628295d203d20313b0a202020205b6728295d3b0a20202020737461746963205b6828295d203d20323b0a7d0a"
+    },
+    "id": "computed-field-define",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    [f()] = 1;\n    [g()];\n    static [h()] = 2;\n}\n"
+  },
+  {
+   "diagnostics": 6,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a, _b;\r\nclass C {\r\n    constructor() {\r\n        this[_a] = 1;\r\n    }\r\n    [(_a = a(), b())]() { }\r\n    get [(_b = c(), d())]() { return 1; }\r\n}\r\nC[_b] = 2;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-method-and-field",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020205b6128295d203d20313b0a202020205b6228295d2829207b7d0a20202020737461746963205b6328295d203d20323b0a20202020676574205b6428295d2829207b2072657475726e20313b207d0a7d0a"
+    },
+    "id": "computed-method-and-field",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    [a()] = 1;\n    [b()]() {}\n    static [c()] = 2;\n    get [d()]() { return 1; }\n}\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a, _b;\r\nclass C {\r\n    constructor() {\r\n        this[_a] = 1;\r\n    }\r\n    static { _a = f(), _b = g(); }\r\n    static { this[_b] = 2; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-es2022-set",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020205b6628295d203d20313b0a20202020737461746963205b6728295d203d20323b0a7d0a"
+    },
+    "id": "computed-es2022-set",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass C {\n    [f()] = 1;\n    static [g()] = 2;\n}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a, _b;\r\n_b = () => { _a = this.k; };\r\nclass C {\r\n    constructor() {\r\n        this[_a] = 1;\r\n    }\r\n    static { _b(); }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-es2022-this",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020205b746869732e6b5d203d20313b0a7d0a"
+    },
+    "id": "computed-es2022-this",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass C {\n    [this.k] = 1;\n}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a, _b, _c;\r\nclass A {\r\n}\r\n_a = A;\r\nObject.defineProperty(A, \"k\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: \"a\"\r\n});\r\nObject.defineProperty(A, \"B\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: (_c = class {\r\n            constructor() {\r\n                Object.defineProperty(this, _b, {\r\n                    enumerable: true,\r\n                    configurable: true,\r\n                    writable: true,\r\n                    value: 1\r\n                });\r\n            }\r\n        },\r\n        _b = _a.k,\r\n        _c)\r\n});\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-this-in-nested-class",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732041207b0a20202020737461746963206b203d202261223b0a202020207374617469632042203d20636c617373207b0a20202020202020205b746869732e6b5d203d20313b0a202020207d3b0a7d0a"
+    },
+    "id": "computed-this-in-nested-class",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass A {\n    static k = \"a\";\n    static B = class {\n        [this.k] = 1;\n    };\n}\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\nvar _a, _b, _c;\r\nconst D = (_a = class {\r\n        constructor() {\r\n            this[_b] = 1;\r\n        }\r\n    },\r\n    _b = f(),\r\n    _c = g(),\r\n    __setFunctionName(_a, \"D\"),\r\n    _a[_c] = 2,\r\n    _a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-class-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742044203d20636c617373207b0a202020205b6628295d203d20313b0a20202020737461746963205b6728295d203d20323b0a7d3b0a"
+    },
+    "id": "computed-class-expression",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nconst D = class {\n    [f()] = 1;\n    static [g()] = 2;\n};\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "while (cond()) {\r\n    let _a, _b;\r\n    const C = (_b = class {\r\n            constructor() {\r\n                Object.defineProperty(this, _a, {\r\n                    enumerable: true,\r\n                    configurable: true,\r\n                    writable: true,\r\n                    value: 1\r\n                });\r\n            }\r\n        },\r\n        _a = f(),\r\n        _b);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-in-loop",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "7768696c652028636f6e64282929207b0a20202020636f6e73742043203d20636c617373207b0a20202020202020205b6628295d203d20313b0a202020207d3b0a7d0a"
+    },
+    "id": "computed-in-loop",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nwhile (cond()) {\n    const C = class {\n        [f()] = 1;\n    };\n}\n"
+  },
+  {
+   "diagnostics": 8,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a;\r\nclass C {\r\n    constructor() {\r\n        this[_a] = 1;\r\n    }\r\n}\r\n_a = (a(), b()), (c, d);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-comma-name",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020205b286128292c20622829295d203d20313b0a202020205b28632c2064295d3b0a7d0a"
+    },
+    "id": "computed-comma-name",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    [(a(), b())] = 1;\n    [(c, d)];\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\nvar _a, _b, _s_p;\r\nconst o = {\r\n    C: (_a = class {\r\n        },\r\n        __setFunctionName(_a, \"C\"),\r\n        Object.defineProperty(_a, \"x\", {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: 1\r\n        }),\r\n        _a),\r\n    \"s\": (_b = class {\r\n        },\r\n        __setFunctionName(_b, \"s\"),\r\n        _s_p = { value: 2 },\r\n        _b),\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "named-evaluation-property-assignment",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e7374206f203d207b0a20202020433a20636c617373207b207374617469632078203d20313b207d2c0a202020202273223a20636c617373207b20737461746963202370203d20323b207d2c0a7d3b0a"
+    },
+    "id": "named-evaluation-property-assignment",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst o = {\n    C: class { static x = 1; },\n    \"s\": class { static #p = 2; },\n};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\nfunction f(C) { var _a; if (C === void 0) { C = (_a = class {\r\n    },\r\n    __setFunctionName(_a, \"C\"),\r\n    Object.defineProperty(_a, \"x\", {\r\n        enumerable: true,\r\n        configurable: true,\r\n        writable: true,\r\n        value: 1\r\n    }),\r\n    _a); } }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "named-evaluation-parameter",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e20662843203d20636c617373207b207374617469632078203d20313b207d29207b7d0a"
+    },
+    "id": "named-evaluation-parameter",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nfunction f(C = class { static x = 1; }) {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\nvar _a, _b;\r\nconst { C = (_a = class {\r\n    },\r\n    __setFunctionName(_a, \"C\"),\r\n    Object.defineProperty(_a, \"x\", {\r\n        enumerable: true,\r\n        configurable: true,\r\n        writable: true,\r\n        value: 1\r\n    }),\r\n    _a) } = {};\r\nconst [D = (_b = class {\r\n    },\r\n    __setFunctionName(_b, \"D\"),\r\n    (() => {\r\n    })(),\r\n    _b)] = [];\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "named-evaluation-binding-element",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e7374207b2043203d20636c617373207b207374617469632078203d20313b207d207d203d207b7d3b0a636f6e7374205b44203d20636c617373207b20737461746963207b207d207d5d203d205b5d3b0a"
+    },
+    "id": "named-evaluation-binding-element",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst { C = class { static x = 1; } } = {};\nconst [D = class { static { } }] = [];\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\nvar _a, _b;\r\nlet C;\r\nC = (_a = class {\r\n    },\r\n    __setFunctionName(_a, \"C\"),\r\n    Object.defineProperty(_a, \"x\", {\r\n        enumerable: true,\r\n        configurable: true,\r\n        writable: true,\r\n        value: 1\r\n    }),\r\n    _a);\r\nC ||= (_b = class {\r\n    },\r\n    __setFunctionName(_b, \"C\"),\r\n    Object.defineProperty(_b, \"y\", {\r\n        enumerable: true,\r\n        configurable: true,\r\n        writable: true,\r\n        value: 2\r\n    }),\r\n    _b);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "named-evaluation-assignment",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c657420433b0a43203d20636c617373207b207374617469632078203d20313b207d3b0a43207c7c3d20636c617373207b207374617469632079203d20323b207d3b0a"
+    },
+    "id": "named-evaluation-assignment",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nlet C;\nC = class { static x = 1; };\nC ||= class { static y = 2; };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\nvar _a;\r\nexport default (_a = class {\r\n    },\r\n    __setFunctionName(_a, \"default\"),\r\n    Object.defineProperty(_a, \"x\", {\r\n        enumerable: true,\r\n        configurable: true,\r\n        writable: true,\r\n        value: 1\r\n    }),\r\n    _a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "named-evaluation-export-default",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f72742064656661756c742028636c617373207b207374617469632078203d20313b207d293b0a"
+    },
+    "id": "named-evaluation-export-default",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\n// @module: esnext\nexport default (class { static x = 1; });\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\nvar _a, _b, _c;\r\nlet C, D;\r\n[C = (_a = class {\r\n        },\r\n        __setFunctionName(_a, \"C\"),\r\n        Object.defineProperty(_a, \"x\", {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: 1\r\n        }),\r\n        _a)] = [];\r\n({ D = (_b = class {\r\n        },\r\n        __setFunctionName(_b, \"D\"),\r\n        Object.defineProperty(_b, \"y\", {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: 2\r\n        }),\r\n        _b) } = {});\r\n({ a: C = (_c = class {\r\n        },\r\n        __setFunctionName(_c, \"C\"),\r\n        Object.defineProperty(_c, \"z\", {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: 3\r\n        }),\r\n        _c) } = {});\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "named-evaluation-destructuring",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c657420432c20443b0a5b43203d20636c617373207b207374617469632078203d20313b207d5d203d205b5d3b0a287b2044203d20636c617373207b207374617469632079203d20323b207d207d203d207b7d293b0a287b20613a2043203d20636c617373207b20737461746963207a203d20333b207d207d203d207b7d293b0a"
+    },
+    "id": "named-evaluation-destructuring",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nlet C, D;\n[C = class { static x = 1; }] = [];\n({ D = class { static y = 2; } } = {});\n({ a: C = class { static z = 3; } } = {});\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\nvar _a;\r\nclass A {\r\n    constructor() {\r\n        var _b;\r\n        Object.defineProperty(this, \"C\", {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: (_b = class {\r\n                },\r\n                __setFunctionName(_b, \"C\"),\r\n                Object.defineProperty(_b, \"y\", {\r\n                    enumerable: true,\r\n                    configurable: true,\r\n                    writable: true,\r\n                    value: 2\r\n                }),\r\n                _b)\r\n        });\r\n    }\r\n}\r\nObject.defineProperty(A, \"B\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: (_a = class {\r\n        },\r\n        __setFunctionName(_a, \"B\"),\r\n        Object.defineProperty(_a, \"x\", {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: 1\r\n        }),\r\n        _a)\r\n});\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "named-evaluation-static-field",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732041207b0a202020207374617469632042203d20636c617373207b207374617469632078203d20313b207d3b0a2020202043203d20636c617373207b207374617469632079203d20323b207d3b0a7d0a"
+    },
+    "id": "named-evaluation-static-field",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass A {\n    static B = class { static x = 1; };\n    C = class { static y = 2; };\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "let C = class {\r\n    m() { }\r\n};\r\nlet D = class {\r\n    constructor() {\r\n        Object.defineProperty(this, \"x\", {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: 1\r\n        });\r\n    }\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "named-evaluation-not-needed",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c65742043203d20636c617373207b206d2829207b7d207d3b0a6c65742044203d20636c617373207b2078203d20313b207d3b0a"
+    },
+    "id": "named-evaluation-not-needed",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nlet C = class { m() {} };\nlet D = class { x = 1; };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar _a, _C_x;\r\nclass C {\r\n    static f() { return __classPrivateFieldGet(_a, _a, \"f\", _C_x); }\r\n}\r\n_a = C;\r\n_C_x = { value: 1 };\r\nObject.defineProperty(C, \"g\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: () => _a\r\n});\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "constructor-reference-static",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020737461746963202378203d20313b0a2020202073746174696320662829207b2072657475726e20432e23783b207d0a202020207374617469632067203d202829203d3e20433b0a7d0a"
+    },
+    "id": "constructor-reference-static",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static #x = 1;\n    static f() { return C.#x; }\n    static g = () => C;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _C_instances, _a, _C_m;\r\nclass C {\r\n    constructor() {\r\n        _C_instances.add(this);\r\n    }\r\n}\r\n_a = C, _C_instances = new WeakSet(), _C_m = function _C_m() { return _a; };\r\nObject.defineProperty(C, \"y\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: 1\r\n});\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "constructor-reference-private-method",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020236d2829207b2072657475726e20433b207d0a202020207374617469632079203d20313b0a7d0a"
+    },
+    "id": "constructor-reference-private-method",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #m() { return C; }\n    static y = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a;\r\nconst D = (_a = class C {\r\n        static f() { return _a.x; }\r\n    },\r\n    Object.defineProperty(_a, \"x\", {\r\n        enumerable: true,\r\n        configurable: true,\r\n        writable: true,\r\n        value: 1\r\n    }),\r\n    _a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "constructor-reference-class-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742044203d20636c6173732043207b0a202020207374617469632078203d20313b0a2020202073746174696320662829207b2072657475726e20432e783b207d0a7d3b0a"
+    },
+    "id": "constructor-reference-class-expression",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class C {\n    static x = 1;\n    static f() { return C.x; }\n};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    constructor() {\r\n        Object.defineProperty(this, \"x\", {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: 1\r\n        });\r\n    }\r\n    m() { return C; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "constructor-reference-unrelated",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202078203d20313b0a202020206d2829207b2072657475726e20433b207d0a7d0a"
+    },
+    "id": "constructor-reference-unrelated",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    x = 1;\n    m() { return C; }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "declare function dec(c: any): any;\r\nclass C {\r\n}\r\nObject.defineProperty(C, \"x\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: (void 0).y\r\n});\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "decorated-class",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064656328633a20616e79293a20616e793b0a406465630a636c6173732043207b0a202020207374617469632078203d2073757065722e793b0a7d0a"
+    },
+    "id": "decorated-class",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\ndeclare function dec(c: any): any;\n@dec\nclass C {\n    static x = super.y;\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "declare function dec(c: any): any;\r\nclass C {\r\n}\r\nObject.defineProperty(C, \"x\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: (void 0)\r\n});\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "decorated-class-legacy",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064656328633a20616e79293a20616e793b0a406465630a636c6173732043207b0a202020207374617469632078203d20746869733b0a7d0a"
+    },
+    "id": "decorated-class-legacy",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\n// @experimentalDecorators: true\ndeclare function dec(c: any): any;\n@dec\nclass C {\n    static x = this;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    constructor() {\r\n        this.x = 1;\r\n    }\r\n    ;\r\n    ;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-with-semicolons-and-index",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020203b0a2020202078203d20313b0a202020203b0a7d0a"
+    },
+    "id": "class-with-semicolons-and-index",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    ;\n    x = 1;\n    ;\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "function f() { return this; }\r\nconst g = () => this;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "no-class-fields",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e20662829207b2072657475726e20746869733b207d0a636f6e73742067203d202829203d3e20746869733b0a"
+    },
+    "id": "no-class-fields",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nfunction f() { return this; }\nconst g = () => this;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a;\r\nexport = (_a = class {\r\n    },\r\n    Object.defineProperty(_a, \"x\", {\r\n        enumerable: true,\r\n        configurable: true,\r\n        writable: true,\r\n        value: 1\r\n    }),\r\n    _a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "export-equals-class",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274203d20636c617373207b207374617469632078203d20313b207d3b0a"
+    },
+    "id": "export-equals-class",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\n// @module: commonjs\nexport = class { static x = 1; };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar _C_x;\r\nclass C {\r\n    constructor() {\r\n        _C_x.set(this, 1);\r\n    }\r\n    *g() { yield __classPrivateFieldGet(this, _C_x, \"f\"); }\r\n    async a() { await __classPrivateFieldGet(this, _C_x, \"f\"); }\r\n}\r\n_C_x = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "generator-private-access",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020202378203d20313b0a202020202a672829207b207969656c6420746869732e23783b207d0a202020206173796e6320612829207b20617761697420746869732e23783b207d0a7d0a"
+    },
+    "id": "generator-private-access",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 1;\n    *g() { yield this.#x; }\n    async a() { await this.#x; }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar _a, _D_m;\r\nconst D = (_a = class {\r\n        static f() { return __classPrivateFieldGet(D, _a, \"m\", _D_m).call(D); }\r\n    },\r\n    _D_m = function _D_m() { return 1; },\r\n    _a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-method-static-anonymous",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742044203d20636c617373207b0a2020202073746174696320236d2829207b2072657475726e20313b207d0a2020202073746174696320662829207b2072657475726e20442e236d28293b207d0a7d3b0a"
+    },
+    "id": "private-method-static-anonymous",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class {\n    static #m() { return 1; }\n    static f() { return D.#m(); }\n};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar _D_instances, _D_p_get, _a;\r\nconst D = (_a = class {\r\n        constructor() {\r\n            _D_instances.add(this);\r\n        }\r\n        m() { return __classPrivateFieldGet(this, _D_instances, \"a\", _D_p_get); }\r\n    },\r\n    _D_instances = new WeakSet(),\r\n    _D_p_get = function _D_p_get() { return 1; },\r\n    _a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-accessor-instance-in-class-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742044203d20636c617373207b0a202020206765742023702829207b2072657475726e20313b207d0a202020206d2829207b2072657475726e20746869732e23703b207d0a7d3b0a"
+    },
+    "id": "private-accessor-instance-in-class-expression",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class {\n    get #p() { return 1; }\n    m() { return this.#p; }\n};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _C_c;\r\nclass C {\r\n    constructor() {\r\n        this.a = 1;\r\n        _C_c.set(this, 3);\r\n    }\r\n}\r\n_C_c = new WeakMap();\r\nC.b = 2;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "es2016-instance-and-static",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202061203d20313b0a202020207374617469632062203d20323b0a202020202363203d20333b0a7d0a"
+    },
+    "id": "es2016-instance-and-static",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\n// @useDefineForClassFields: false\nclass C {\n    a = 1;\n    static b = 2;\n    #c = 3;\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n    constructor() {\r\n        this.a = this.b;\r\n    }\r\n}\r\nC.c = C.a;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "es2019-fields",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202061203d20746869732e623b0a202020207374617469632063203d20432e613b0a7d0a"
+    },
+    "id": "es2019-fields",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\n// @useDefineForClassFields: false\nclass C {\n    a = this.b;\n    static c = C.a;\n}\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a, _C_c, _C_d;\r\nclass C {\r\n    constructor() {\r\n        Object.defineProperty(this, \"a\", {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: void 0\r\n        });\r\n        _C_c.set(this, void 0);\r\n    }\r\n}\r\n_a = C, _C_c = new WeakMap();\r\n_C_d = { value: void 0 };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "es2021-define",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020613b0a2020202073746174696320623b0a2020202023633b0a202020207374617469632023643b0a7d0a"
+    },
+    "id": "es2021-define",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 8,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2021\n// @useDefineForClassFields: true\nclass C {\n    a;\n    static b;\n    #c;\n    static #d;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n}\r\n(() => {\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "useless-static-block",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020737461746963207b7d0a7d0a"
+    },
+    "id": "useless-static-block",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a;\r\nclass C {\r\n}\r\n_a = C;\r\nObject.defineProperty(C, \"x\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: () => () => _a.y\r\n});\r\nObject.defineProperty(C, \"y\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: 1\r\n});\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "arrow-this-in-static",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020207374617469632078203d202829203d3e202829203d3e20746869732e793b0a202020207374617469632079203d20313b0a7d0a"
+    },
+    "id": "arrow-this-in-static",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static x = () => () => this.y;\n    static y = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a;\r\nclass C {\r\n}\r\n_a = C;\r\nObject.defineProperty(C, \"x\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: class {\r\n        m() { return this; }\r\n    }\r\n});\r\nObject.defineProperty(C, \"y\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: _a\r\n});\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "this-in-nested-class-in-static",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020207374617469632078203d20636c617373207b206d2829207b2072657475726e20746869733b207d207d3b0a202020207374617469632079203d20746869733b0a7d0a"
+    },
+    "id": "this-in-nested-class-in-static",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static x = class { m() { return this; } };\n    static y = this;\n}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a;\r\nclass C {\r\n    constructor() {\r\n        this[_a] = 1;\r\n    }\r\n    [(_a = a(), b())]() { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-parenthesized-method-after-elided-field",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020205b6128295d203d20313b0a202020205b28622829295d2829207b7d0a7d0a"
+    },
+    "id": "computed-parenthesized-method-after-elided-field",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    [a()] = 1;\n    [(b())]() {}\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar _C_instances, _C_m, _C_m_1;\r\nclass C {\r\n    constructor() {\r\n        _C_instances.add(this);\r\n    }\r\n    #m() { return 1; }\r\n    #m() { return 2; }\r\n    f() { return __classPrivateFieldGet(this, _C_instances, \"m\", _C_m_1).call(this); }\r\n}\r\n_C_instances = new WeakSet();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-method-duplicate",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020236d2829207b2072657475726e20313b207d0a20202020236d2829207b2072657475726e20323b207d0a20202020662829207b2072657475726e20746869732e236d28293b207d0a7d0a"
+    },
+    "id": "private-method-duplicate",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #m() { return 1; }\n    #m() { return 2; }\n    f() { return this.#m(); }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _C__a_accessor_storage;\r\nlet k;\r\nclass C {\r\n    constructor() {\r\n        _C__a_accessor_storage.set(this, 1);\r\n    }\r\n    get [(_C__a_accessor_storage = new WeakMap(), k = f())]() { return __classPrivateFieldGet(this, _C__a_accessor_storage, \"f\"); }\r\n    set [k](value) { __classPrivateFieldSet(this, _C__a_accessor_storage, value, \"f\"); }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessor-computed-cache-assignment",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c6574206b3b0a636c6173732043207b0a202020206163636573736f72205b6b203d206628295d203d20313b0a7d0a"
+    },
+    "id": "accessor-computed-cache-assignment",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nlet k;\nclass C {\n    accessor [k = f()] = 1;\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "let k;\r\nclass C {\r\n    constructor() {\r\n        this[_a] = 1;\r\n    }\r\n}\r\nk = f();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-cache-assignment-field",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c6574206b3b0a636c6173732043207b0a202020205b6b203d206628295d203d20313b0a7d0a"
+    },
+    "id": "computed-cache-assignment-field",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nlet k;\nclass C {\n    [k = f()] = 1;\n}\n"
+  },
+  {
+   "diagnostics": 6,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "declare function dec(c: any): any;\r\nclass B {\r\n}\r\nclass C extends B {\r\n}\r\nObject.defineProperty(C, \"a\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: (void 0)[k()]\r\n});\r\nObject.defineProperty(C, \"b\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: ((void 0).x = 1)\r\n});\r\nObject.defineProperty(C, \"c\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: (void 0).y++\r\n});\r\n(() => {\r\n    ({ a: (void 0).z } = o);\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "decorated-class-element-access-super",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064656328633a20616e79293a20616e793b0a636c6173732042207b7d0a406465630a636c617373204320657874656e64732042207b0a202020207374617469632061203d2073757065725b6b28295d3b0a202020207374617469632062203d202873757065722e78203d2031293b0a202020207374617469632063203d2073757065722e792b2b3b0a20202020737461746963207b0a2020202020202020287b20613a2073757065722e7a207d203d206f293b0a202020207d0a7d0a"
+    },
+    "id": "decorated-class-element-access-super",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\ndeclare function dec(c: any): any;\nclass B {}\n@dec\nclass C extends B {\n    static a = super[k()];\n    static b = (super.x = 1);\n    static c = super.y++;\n    static {\n        ({ a: super.z } = o);\n    }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _C_x;\r\nclass C {\r\n    constructor() {\r\n        _C_x.set(this, void 0);\r\n    }\r\n    m() {\r\n        #x;\r\n    }\r\n}\r\n_C_x = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-identifier-statement",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202023783b0a202020206d2829207b0a202020202020202023783b0a202020207d0a7d0a"
+    },
+    "id": "private-identifier-statement",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x;\n    m() {\n        #x;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _C_x;\r\nclass C {\r\n    constructor() {\r\n        _C_x.set(this, void 0);\r\n    }\r\n    m(o) { return  in o; }\r\n}\r\n_C_x = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-in-undeclared",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202023783b0a202020206d286f29207b2072657475726e20237920696e206f3b207d0a7d0a"
+    },
+    "id": "private-in-undeclared",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x;\n    m(o) { return #y in o; }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _C_a, _C_b;\r\nclass C {\r\n    constructor() {\r\n        _C_a.set(this, void 0);\r\n        _C_b.set(this, 0);\r\n    }\r\n    m() {\r\n        var _a, _b, _c;\r\n        __classPrivateFieldSet(_a = __classPrivateFieldGet(this, _C_a, \"f\"), _C_b, __classPrivateFieldGet(_a, _C_b, \"f\") + 1, \"f\");\r\n        __classPrivateFieldSet(_b = __classPrivateFieldGet(this, _C_a, \"f\"), _C_b, (_c = __classPrivateFieldGet(_b, _C_b, \"f\"), _c++, _c), \"f\");\r\n    }\r\n}\r\n_C_a = new WeakMap(), _C_b = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-receiver-is-private-access",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202023613b0a202020202362203d20303b0a202020206d2829207b0a2020202020202020746869732e23612e2362202b3d20313b0a2020202020202020746869732e23612e23622b2b3b0a202020207d0a7d0a"
+    },
+    "id": "private-receiver-is-private-access",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #a;\n    #b = 0;\n    m() {\n        this.#a.#b += 1;\n        this.#a.#b++;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _C_x;\r\nclass C {\r\n    constructor() {\r\n        _C_x.set(this, 0);\r\n    }\r\n    m() {\r\n        var _a;\r\n        (__classPrivateFieldSet(this, _C_x, (_a = __classPrivateFieldGet(this, _C_x, \"f\"), _a++, _a), \"f\"));\r\n        (__classPrivateFieldSet(this, _C_x, 1, \"f\"));\r\n    }\r\n}\r\n_C_x = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-discarded-parenthesized",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020202378203d20303b0a202020206d2829207b0a202020202020202028746869732e23782b2b293b0a20202020202020202828746869732e237829203d2031293b0a202020207d0a7d0a"
+    },
+    "id": "private-discarded-parenthesized",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 0;\n    m() {\n        (this.#x++);\n        ((this.#x) = 1);\n    }\n}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {\r\n    if (kind === \"m\") throw new TypeError(\"Private method is not writable\");\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a setter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot write private member to an object whose class did not declare it\");\r\n    return (kind === \"a\" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;\r\n};\r\nvar _C_instances, _C_m, _C_g_get;\r\nclass C {\r\n    constructor() {\r\n        _C_instances.add(this);\r\n    }\r\n    m() {\r\n        __classPrivateFieldSet(this, _C_instances, 1, \"m\");\r\n        __classPrivateFieldSet(this, _C_instances, 2, \"a\");\r\n    }\r\n}\r\n_C_instances = new WeakSet(), _C_m = function _C_m() { }, _C_g_get = function _C_g_get() { return 1; };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-method-assignment",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020236d2829207b7d0a202020206765742023672829207b2072657475726e20313b207d0a202020206d2829207b0a2020202020202020746869732e236d203d20313b0a2020202020202020746869732e2367203d20323b0a202020207d0a7d0a"
+    },
+    "id": "private-method-assignment",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #m() {}\n    get #g() { return 1; }\n    m() {\n        this.#m = 1;\n        this.#g = 2;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a;\r\nconst D = class {\r\n    static #x_accessor_storage = 1;\r\n    static get x() { return _a.#x_accessor_storage; }\r\n    static set x(value) { _a.#x_accessor_storage = value; }\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessor-anonymous-class-static-es2022",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742044203d20636c617373207b0a20202020737461746963206163636573736f722078203d20313b0a7d3b0a"
+    },
+    "id": "accessor-anonymous-class-static-es2022",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: true\nconst D = class {\n    static accessor x = 1;\n};\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "abstract class C {\r\n    constructor() {\r\n        this.y = 1;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "abstract-members",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "616273747261637420636c6173732043207b0a20202020616273747261637420783b0a2020202079203d20313b0a7d0a"
+    },
+    "id": "abstract-members",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nabstract class C {\n    abstract x;\n    y = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\nvar _a, _p, _q;\r\nconst o = {\r\n    \"a-b\": (_a = class {\r\n            constructor() {\r\n                _p.set(this, 1);\r\n            }\r\n        },\r\n        _p = new WeakMap(),\r\n        __setFunctionName(_a, \"a-b\"),\r\n        _q = { value: 2 },\r\n        _a),\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-name-from-non-identifier-string",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e7374206f203d207b0a2020202022612d62223a20636c617373207b202370203d20313b20737461746963202371203d20323b207d2c0a7d3b0a"
+    },
+    "id": "class-name-from-non-identifier-string",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst o = {\n    \"a-b\": class { #p = 1; static #q = 2; },\n};\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\nvar _a, _b;\r\ndeclare function dec(c: any): any;\r\nconst C = _a = class {\r\n    constructor() {\r\n        Object.defineProperty(this, _b, {\r\n            enumerable: true,\r\n            configurable: true,\r\n            writable: true,\r\n            value: 2\r\n        });\r\n    }\r\n};\r\n_b = f();\r\n__setFunctionName(_a, \"C\");\r\nObject.defineProperty(class_1, \"x\", {\r\n    enumerable: true,\r\n    configurable: true,\r\n    writable: true,\r\n    value: 1\r\n});\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "decorated-class-expression-static",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064656328633a20616e79293a20616e793b0a636f6e73742043203d204064656320636c617373207b0a202020207374617469632078203d20313b0a202020205b6628295d203d20323b0a7d3b0a"
+    },
+    "id": "decorated-class-expression-static",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\ndeclare function dec(c: any): any;\nconst C = @dec class {\n    static x = 1;\n    [f()] = 2;\n};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _C_x, _a;\r\nconst D = (_a = class C {\r\n        constructor() {\r\n            _C_x.set(this, 1);\r\n        }\r\n        m() { return _a; }\r\n    },\r\n    _C_x = new WeakMap(),\r\n    _a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-expression-deferred-temp",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742044203d20636c6173732043207b0a202020202378203d20313b0a202020206d2829207b2072657475726e20433b207d0a7d3b0a"
+    },
+    "id": "class-expression-deferred-temp",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class C {\n    #x = 1;\n    m() { return C; }\n};\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _a, _b;\r\nconst D = (_b = class C {\r\n        constructor() {\r\n            this[_a] = 1;\r\n        }\r\n        m() { return C; }\r\n    },\r\n    _a = f(),\r\n    _b);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-expression-late-temp-alias",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742044203d20636c6173732043207b0a202020205b6628295d203d20313b0a202020206d2829207b2072657475726e20433b207d0a7d3b0a"
+    },
+    "id": "class-expression-late-temp-alias",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nconst D = class C {\n    [f()] = 1;\n    m() { return C; }\n};\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "class C {\r\n}\r\na(), b();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-comma-without-parentheses",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020205b6128292c206228295d3b0a7d0a"
+    },
+    "id": "computed-comma-without-parentheses",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    [a(), b()];\n}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var _C_x;\r\nclass C {\r\n    constructor() {\r\n        _C_x.set(this, void 0);\r\n    }\r\n    m(arr) {\r\n        [this.#zz] = arr;\r\n    }\r\n}\r\n_C_x = new WeakMap();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-destructuring-undeclared",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202023783b0a202020206d2861727229207b0a20202020202020205b746869732e237a7a5d203d206172723b0a202020207d0a7d0a"
+    },
+    "id": "private-destructuring-undeclared",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x;\n    m(arr) {\n        [this.#zz] = arr;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields"
+       ],
+       "text": "var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {\r\n    if (kind === \"a\" && !f) throw new TypeError(\"Private accessor was defined without a getter\");\r\n    if (typeof state === \"function\" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError(\"Cannot read private member from an object whose class did not declare it\");\r\n    return kind === \"m\" ? f : kind === \"a\" ? f.call(receiver) : f ? f.value : state.get(receiver);\r\n};\r\nvar _a, _C_m;\r\nconst D = (_a = class C {\r\n        static f() { return __classPrivateFieldGet(C, _a, \"m\", _C_m).call(C); }\r\n    },\r\n    _C_m = function _C_m() { return C; },\r\n    _a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-private-method-class-expression-reference",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742044203d20636c6173732043207b0a2020202073746174696320236d2829207b2072657475726e20433b207d0a2020202073746174696320662829207b2072657475726e20432e236d28293b207d0a7d3b0a"
+    },
+    "id": "static-private-method-class-expression-reference",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4,
+     "useDefineForClassFields": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @useDefineForClassFields: true\nconst D = class C {\n    static #m() { return C; }\n    static f() { return C.#m(); }\n};\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}
