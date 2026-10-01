@@ -13,6 +13,7 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
+stacker = "=0.1.25"
 tsr_arena = { version = "0.1.0", path = "../tsr_arena" }
 tsr_ast = { version = "0.1.0", path = "../tsr_ast" }
 tsr_core = { version = "0.1.0", path = "../tsr_core" }

@@ -401,6 +401,11 @@ impl<'a, R: DeclarationEmitResolver> Transformer<'a, R> {
     /// utilizing `SyntaxList` nodes.
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.visit
     pub fn visit(&mut self, node: Option<NodeId>) -> Result<Option<NodeId>, R::Error> {
+        // The transformer's own visitor recurses here once per nested node.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || self.visit_worker(node))
+    }
+
+    fn visit_worker(&mut self, node: Option<NodeId>) -> Result<Option<NodeId>, R::Error> {
         let Some(node) = node else { return Ok(None) };
         match self.kind(node) {
             K::SourceFile => self.visit_source_file(node).map(Some),

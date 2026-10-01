@@ -273,6 +273,17 @@ impl RuntimeSyntaxTransformer<'_> {
         visitor: &mut NodeVisitor<'_>,
         node: Option<NodeId>,
     ) -> Result<Option<NodeId>, Error> {
+        // A constructor's body is visited here directly, once per nested class.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.visit_worker(visitor, node)
+        })
+    }
+
+    fn visit_worker(
+        &self,
+        visitor: &mut NodeVisitor<'_>,
+        node: Option<NodeId>,
+    ) -> Result<Option<NodeId>, Error> {
         let id = node.expect(NIL);
         let grandparent_node = self.push_node(id);
         let _pop_node = PopNode {

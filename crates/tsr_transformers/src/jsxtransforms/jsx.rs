@@ -371,6 +371,13 @@ impl JsxTransformer<'_> {
 
     // port: tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.visit
     fn visit(&self, visitor: &mut NodeVisitor<'_>, node: Option<NodeId>) -> Option<NodeId> {
+        // A JSX child is visited here directly, once per nesting level.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.visit_worker(visitor, node)
+        })
+    }
+
+    fn visit_worker(&self, visitor: &mut NodeVisitor<'_>, node: Option<NodeId>) -> Option<NodeId> {
         let node = node?;
         if self.failure.is_set() {
             return Some(node);

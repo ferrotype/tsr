@@ -1289,6 +1289,7 @@ name = "tsr_transformers"
 version = "0.1.0"
 dependencies = [
  "serde_json",
+ "stacker",
  "tsr_arena",
  "tsr_ast",
  "tsr_core",

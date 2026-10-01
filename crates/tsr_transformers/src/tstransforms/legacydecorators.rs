@@ -1058,6 +1058,18 @@ impl LegacyDecoratorsTransformer<'_> {
         n: NodeId,
         class_node: NodeId,
     ) -> Result<bool, Error> {
+        // The walk recurses here once per nested node.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.is_or_contains_static_self_reference_worker(factory, n, class_node)
+        })
+    }
+
+    fn is_or_contains_static_self_reference_worker(
+        &self,
+        factory: &dyn RuntimeFactory,
+        n: NodeId,
+        class_node: NodeId,
+    ) -> Result<bool, Error> {
         if tsr_ast::is_identifier(&factory.node(n)) {
             let original = self.emit_context.most_original(n);
             let declaration = self

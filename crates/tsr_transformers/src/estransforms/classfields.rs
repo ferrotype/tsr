@@ -2795,6 +2795,19 @@ impl<'a> ClassFieldsTransformer<'a> {
         class_name: Option<NodeId>,
         class_original: NodeId,
     ) -> bool {
+        // The walk recurses here once per nested node.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.contains_constructor_reference_worker(factory, n, class_name, class_original)
+        })
+    }
+
+    fn contains_constructor_reference_worker(
+        &self,
+        factory: &dyn RuntimeFactory,
+        n: NodeId,
+        class_name: Option<NodeId>,
+        class_original: NodeId,
+    ) -> bool {
         let kind = kind_of(factory, n);
         if kind == K::Identifier && Some(n) != class_name {
             let declaration = self

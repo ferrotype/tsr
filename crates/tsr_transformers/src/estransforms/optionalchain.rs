@@ -279,6 +279,19 @@ impl OptionalChainTransformer {
         capture_this_arg: bool,
         is_delete: bool,
     ) -> NodeId {
+        // The chain's left side is visited here directly, once per link.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.visit_non_optional_expression_worker(visitor, node, capture_this_arg, is_delete)
+        })
+    }
+
+    fn visit_non_optional_expression_worker(
+        &self,
+        visitor: &mut NodeVisitor<'_>,
+        node: NodeId,
+        capture_this_arg: bool,
+        is_delete: bool,
+    ) -> NodeId {
         match visitor.factory().node(node).kind().known() {
             Some(K::ParenthesizedExpression) => {
                 self.visit_parenthesized_expression(visitor, node, capture_this_arg, is_delete)
