@@ -253,7 +253,7 @@ impl<N: NodeRecord, S> StorageHandle<N, S> {
 }
 
 // Strong/weak counters followed by the payload, including payload alignment.
-fn arc_bytes<T>() -> usize {
+pub(crate) fn arc_bytes<T>() -> usize {
     std::alloc::Layout::new::<[usize; 2]>()
         .extend(std::alloc::Layout::new::<T>())
         .expect("Arc allocation layout")

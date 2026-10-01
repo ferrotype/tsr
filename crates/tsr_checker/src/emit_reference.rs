@@ -344,17 +344,28 @@ impl CheckerState {
         name: JsString,
         parent: Option<NodeId>,
     ) -> Result<(), Error> {
-        if let Some(parent) = parent {
-            self.node(parent)?;
-            if parent.arena() != self.factory.id().arena() {
-                self.retain_flow_source(parent)?;
+        let key = (parent, name);
+        let stand_in = if let Some(&stand_in) = self.emit.identifiers.get(&key) {
+            stand_in
+        } else {
+            if let Some(parent) = parent {
+                self.node(parent)?;
+                if parent.arena() != self.factory.id().arena() {
+                    self.retain_flow_source(parent)?;
+                }
             }
-        }
-        let stand_in = self.factory.new_identifier(name);
-        let flags = self.factory.view().node(stand_in)?.flags() & !tsr_ast::node_flags::SYNTHESIZED;
-        self.factory.set_node_flags(stand_in, flags);
-        self.factory.set_node_parent(stand_in, parent);
-        self.emit.parse_tree_stand_ins.insert(node, stand_in);
+            let stand_in = self.factory.new_identifier(key.1.clone());
+            let flags =
+                self.factory.view().node(stand_in)?.flags() & !tsr_ast::node_flags::SYNTHESIZED;
+            self.factory.set_node_flags(stand_in, flags);
+            self.factory.set_node_parent(stand_in, parent);
+            self.emit.identifiers.insert(key, stand_in);
+            stand_in
+        };
+        self.emit
+            .transient
+            .parse_tree_stand_ins
+            .insert(node, stand_in);
         Ok(())
     }
 

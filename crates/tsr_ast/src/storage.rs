@@ -25,6 +25,11 @@ pub struct AstBuilder {
     // Unrestricted syntax mutation can only invalidate this proof, never restore it.
     construction_edges_valid: bool,
 }
+
+/// A shared index of completed syntax retained by a set of transform builders.
+/// Construct once per program emit, then attach without copying its owner map.
+#[derive(Clone, Debug, Default)]
+pub struct AstDependencies(pub(crate) tsr_arena::StorageImports<StoredNode>);
 impl std::fmt::Debug for AstBuilder {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.storage.fmt(f)
@@ -83,6 +88,10 @@ impl AstBuilder {
     /// Importing a mapped member retains its complete bundle and dependencies.
     pub fn retain_file(&mut self, file: AstFile) {
         self.storage.retain_file(file.0);
+        self.construction_edges_valid = false;
+    }
+    pub fn retain_dependencies(&mut self, files: &AstDependencies) {
+        self.storage.retain_imports(&files.0);
         self.construction_edges_valid = false;
     }
     pub fn node_mut(&mut self, id: NodeId) -> Result<NodeMut<'_>, Error> {

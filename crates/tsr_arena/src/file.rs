@@ -1,9 +1,9 @@
+use crate::StorageImports;
 use crate::{
     arena::Arena, bundle::Root, counters::Track, lazy::LazyArena, ArenaId, AuxId, AuxiliaryRead,
     CoreScopeMut, Counters, Error, FileId, NodeId, NodeParentRecord, NodeRecord, StorageHandle,
     StorageRead, StorageTransaction, SymbolId,
 };
-use hashbrown::HashMap;
 use std::sync::{Arc, OnceLock};
 use tsr_jsstring::{PositionMap, SourceText};
 
@@ -50,31 +50,6 @@ impl<'a, N: NodeRecord> CoreDataRead<'a, N> {
     }
 }
 
-// Only the imported capability requires shared payloads. Keeping that bound on
-// this private object preserves Send-only exclusive builders with no imports.
-trait RetainedImport<N: NodeRecord, S>: Send + Sync {
-    fn owner(&self) -> &StorageOwner<N, S>;
-    fn handle(&self) -> StorageHandle<N, S>;
-    fn borrowed_handle(&self) -> &StorageHandle<N, S>;
-}
-impl<N, S> RetainedImport<N, S> for StorageHandle<N, S>
-where
-    N: NodeRecord + Send + Sync,
-    N::Aux: Send + Sync,
-    N::CoreAux: Send + Sync,
-    N::Store: Send + Sync,
-    S: Send + Sync,
-{
-    fn owner(&self) -> &StorageOwner<N, S> {
-        self
-    }
-    fn handle(&self) -> StorageHandle<N, S> {
-        self.clone()
-    }
-    fn borrowed_handle(&self) -> &StorageHandle<N, S> {
-        self
-    }
-}
 impl<N: NodeRecord, S> std::fmt::Debug for StorageBuilder<N, S> {
     fn fmt(&self, out: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         out.debug_struct("StorageBuilder")
@@ -99,8 +74,7 @@ impl<N: NodeRecord, S> StorageBuilder<N, S> {
                 canonical: None,
                 supplemental: Vec::new(),
                 metadata: None,
-                imports: Vec::new(),
-                imported_arenas: HashMap::default(),
+                imports: StorageImports::default(),
                 _owner: counters.owner(),
             },
             counters: counters.clone(),
@@ -297,15 +271,18 @@ impl<N: NodeRecord, S> StorageBuilder<N, S> {
         N::Store: Send + Sync + 'static,
         S: Send + Sync + 'static,
     {
-        if self.owner.imported_arenas.contains_key(&file.core.id) {
-            return;
-        }
-        for member in file.into_members() {
-            for dependency in &member.imports {
-                self.owner.retain_import(dependency.handle());
-            }
-            self.owner.retain_import(member);
-        }
+        self.owner.imports.retain_file(file);
+    }
+    /// Share a dependency index, preserving any dependencies already retained.
+    pub fn retain_imports(&mut self, imports: &StorageImports<N, S>)
+    where
+        N: Send + Sync + 'static,
+        N::Aux: Send + Sync + 'static,
+        N::CoreAux: Send + Sync + 'static,
+        N::Store: Send + Sync + 'static,
+        S: Send + Sync + 'static,
+    {
+        self.owner.imports.extend(imports);
     }
     /// Borrow all prospective bundle owners while validating their cross-file
     /// identities. The operation cannot return a view borrowing this group table.
@@ -419,8 +396,7 @@ pub struct StorageOwner<N: NodeRecord, S = ()> {
     canonical: Option<FileId>,
     supplemental: Vec<FileId>,
     metadata: Option<AuxId>,
-    imports: Vec<Box<dyn RetainedImport<N, S>>>,
-    imported_arenas: HashMap<ArenaId, usize, crate::hash::FastState>,
+    pub(crate) imports: StorageImports<N, S>,
     _owner: Track,
 }
 impl<N: NodeRecord, S> std::fmt::Debug for StorageOwner<N, S> {
@@ -435,40 +411,13 @@ impl<N: NodeRecord, S> std::fmt::Debug for StorageOwner<N, S> {
 }
 impl<N: NodeRecord, S> StorageOwner<N, S> {
     pub(crate) fn imported_view(&self, arena: ArenaId) -> Option<StorageView<'_, N, S>> {
-        let import = self.imports.get(*self.imported_arenas.get(&arena)?)?;
-        import.borrowed_handle().view().for_arena(arena).ok()
-    }
-    fn retain_import(&mut self, file: StorageHandle<N, S>)
-    where
-        N: Send + Sync + 'static,
-        N::Aux: Send + Sync + 'static,
-        N::CoreAux: Send + Sync + 'static,
-        N::Store: Send + Sync + 'static,
-        S: Send + Sync + 'static,
-    {
-        if self.imported_arenas.contains_key(&file.core.id) {
-            return;
-        }
-        let index = self.imports.len();
-        for arena in [
-            file.core.id,
-            file.lazy_arena(),
-            file.auxiliary_arena(),
-            file.lazy_auxiliary_arena(),
-        ] {
-            self.imported_arenas.insert(arena, index);
-        }
-        self.imports.push(Box::new(file));
+        self.imports.view(arena)
     }
     pub(crate) fn imported_owner(&self, arena: ArenaId) -> Option<&StorageOwner<N, S>> {
-        self.imported_arenas
-            .get(&arena)
-            .map(|&index| self.imports[index].owner())
+        self.imports.owner(arena)
     }
     pub(crate) fn imported_file(&self, id: FileId) -> Option<StorageHandle<N, S>> {
-        self.imported_arenas
-            .get(&id.0)
-            .map(|&index| self.imports[index].handle())
+        self.imports.file(id)
     }
     pub fn id(&self) -> FileId {
         FileId(self.core.id)
@@ -949,24 +898,15 @@ impl<N: NodeRecord, S> StorageOwner<N, S> {
             + store_known
             + lazy_known
             + self.supplemental.capacity() * size_of::<FileId>()
-            + self.imports.capacity() * size_of::<Box<dyn RetainedImport<N, S>>>()
-            + self.imported_arenas.allocation_size()
             + census.text(self.source.backing_bytes())
             + self
                 .position_map
                 .get()
                 .map_or(0, PositionMap::structural_bytes);
         let mut unmeasured = store_unmeasured + lazy_unmeasured;
-        for import in &self.imports {
-            // The box retains a handle; its referenced owner may be a bound
-            // program file or a previously published checker-created frame.
-            known += size_of_val(&**import);
-            let (bytes, unknown) = import
-                .borrowed_handle()
-                .structural_bytes_with(store, census);
-            known += bytes;
-            unmeasured += unknown;
-        }
+        let (bytes, unknown) = self.imports.structural_bytes_with(store, census);
+        known += bytes;
+        unmeasured += unknown;
         (known, unmeasured)
     }
 }

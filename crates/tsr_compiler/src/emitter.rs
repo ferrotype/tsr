@@ -559,10 +559,8 @@ impl Emitter<'_, '_> {
             &counters,
             emit_context.factory_hooks(),
         );
-        // A transform may read any file its resolver answers with.
-        for file in self.host.source_files() {
-            output.retain_completed(file.bound());
-        }
+        // Every output shares the program's owner index, built once per emit.
+        output.retain_dependencies(self.host.dependencies());
 
         let transformed =
             self.run_script_transformers(&emit_context, &mut output, &counters, source_file)?;
@@ -629,10 +627,7 @@ impl Emitter<'_, '_> {
             &counters,
             emit_context.factory_hooks(),
         );
-        // The transform may read any file its resolver answers with.
-        for file in self.host.source_files() {
-            output.retain_completed(file.bound());
-        }
+        output.retain_dependencies(self.host.dependencies());
         let (transformed, diags) = self.run_declaration_transformers(
             &emit_context,
             &mut output,

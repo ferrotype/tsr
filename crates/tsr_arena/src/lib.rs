@@ -9,6 +9,9 @@ mod counters;
 mod error;
 mod file;
 mod ids;
+mod imports;
+#[cfg(test)]
+mod imports_tests;
 mod initialization;
 mod lazy;
 mod lease;
@@ -27,6 +30,7 @@ pub mod growth;
 pub mod hash;
 pub use file::{CoreDataRead, CoreNodesMut, StorageBuilder, StorageOwner, StorageView};
 pub use ids::{ArenaId, AuxId, FileId, NodeId, SymbolId};
+pub use imports::StorageImports;
 pub use initialization::{InitializationDomain, InitializationGuard};
 pub use lazy::{StorageTransaction, TokenKey};
 #[cfg(any(test, feature = "harness"))]
