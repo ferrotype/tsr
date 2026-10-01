@@ -2065,7 +2065,7 @@ fn entities(entity: &[u8]) -> Option<i32> {
 }
 
 /// The text rewrites over inputs of the `jsx` probes, with the strings the
-/// pin printed for them (`tests/fixtures/phase3/transforms/pending/jsx.native.json`,
+/// pin printed for them (`tests/fixtures/phase3/transforms/jsx.native.json`,
 /// cases `classic-entities-text`, `classic-entities-attr` and `classic-whitespace`).
 #[cfg(test)]
 mod tests {
