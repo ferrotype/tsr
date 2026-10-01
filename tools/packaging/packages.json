@@ -332,6 +332,12 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
+      "name": "tsr_transpile",
+      "manifest": "crates/tsr_transpile/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
       "name": "tsr_tsoptions",
       "manifest": "crates/tsr_tsoptions/Cargo.toml",
       "publish": true,

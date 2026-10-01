@@ -1304,6 +1304,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "tsr_transpile"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_checker",
+ "tsr_compiler",
+ "tsr_core",
+ "tsr_jsstring",
+ "tsr_tsoptions",
+ "tsr_tspath",
+ "tsr_vfs",
+]
+
+[[package]]
 name = "tsr_tsoptions"
 version = "0.1.0"
 dependencies = [
