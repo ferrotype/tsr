@@ -261,3 +261,39 @@ fn build_info_and_outputs_match_native() {
         failures.join("\n")
     );
 }
+
+/// Every build info the pin wrote reads back (the reader's
+/// `json.Unmarshal` into `BuildInfo`) and writes again as the same bytes.
+#[test]
+fn native_build_infos_round_trip() {
+    let document = fixture();
+    let mut checked = 0;
+    for case in document["cases"].as_array().expect("cases") {
+        for step in case["steps"].as_array().expect("steps") {
+            for output in step["outputs"].as_array().expect("outputs") {
+                let name = output["name"].as_str().expect("output name");
+                if !name.ends_with(".tsbuildinfo") {
+                    continue;
+                }
+                let text = output["text"].as_str().expect("build info text");
+                let mut build_info = tsr_incremental::BuildInfo::default();
+                tsr_json::unmarshal(
+                    text.as_bytes(),
+                    &mut build_info,
+                    tsr_json::Options::default(),
+                )
+                .unwrap_or_else(|error| panic!("{name} does not read back: {error:?}"));
+                let written = tsr_json::marshal(&build_info, tsr_json::Options::default())
+                    .expect("the build info writes");
+                assert_eq!(
+                    String::from_utf8_lossy(&written),
+                    text,
+                    "{name} of {} does not write back as read",
+                    case["id"]
+                );
+                checked += 1;
+            }
+        }
+    }
+    assert!(checked > 0, "no build info read back");
+}
