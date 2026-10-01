@@ -372,6 +372,7 @@ impl CheckerState {
                             error,
                             resolved,
                             &module_reference,
+                            mode,
                         )?;
                     }
                     if matches!(
@@ -426,7 +427,7 @@ impl CheckerState {
                 if augmentation {
                     self.error_at(Some(error),d::Invalid_module_name_in_augmentation_Module_0_resolves_to_an_untyped_module_at_1_which_cannot_be_augmented,vec![module_reference,resolved.resolved_file_name.clone()])?;
                 } else {
-                    self.external_implicit_any_module(options.strict_option_value(options.no_implicit_any) && message.is_some(),error,resolved,&module_reference)?;
+                    self.external_implicit_any_module(options.strict_option_value(options.no_implicit_any) && message.is_some(),error,resolved,&module_reference,mode)?;
                 }
                 return Ok(None);
             }
@@ -512,13 +513,14 @@ impl CheckerState {
         node: NodeId,
         resolved: &tsr_module::ResolvedModule,
         name: &JsString,
+        mode: ModuleKind,
     ) -> Result<(), Error> {
         if self.side_effect_import(node)? {
             return Ok(());
         }
         let chain =
             if !tsr_module::is_relative(name.as_bytes()) && !resolved.package_id.name.is_empty() {
-                Some(self.module_not_found_chain(node, resolved, name)?)
+                Some(self.module_not_found_chain(node, resolved, name, mode)?)
             } else {
                 None
             };
@@ -975,74 +977,35 @@ impl CheckerState {
         Ok(mode.is_some())
     }
 
-    /// The repopulate marker Go attaches for incremental builds has no Rust
-    /// counterpart; the message and arguments are the observable payload.
+    /// The chain entry carries the repopulate marker the incremental program
+    /// serializes into its build info.
     // port: tsc/internal/checker/checker.go:Checker.createModeMismatchDetails
-    // port: tsc/internal/checker/utilities.go:CreateModeMismatchDetails
     fn mode_mismatch_details(
         &mut self,
         source: NodeId,
         error_node: NodeId,
     ) -> Result<tsr_ast::Diagnostic, Error> {
-        let file_name = self
+        let parse_options = self
             .ast(source)?
             .source_file(source)?
             .parse_options()
-            .file_name
             .clone();
-        let target_extension: &[u8] = match try_get_extension_from_path(file_name.as_bytes()) {
-            Some(b".ts") => b".mts",
-            Some(b".js") => b".mjs",
-            _ => b"",
-        };
-        let path = self
-            .ast(source)?
-            .source_file(source)?
-            .parse_options()
-            .path
-            .clone();
-        let meta = self
-            .program()?
-            .host
-            .get_source_file_meta_data(path.as_bytes())?;
-        let package_json_type = meta.package_json_type.clone();
-        let package_json_directory = meta.package_json_directory.clone();
-        let package_json = || {
-            JsString::from_bytes(
-                path::combine(
-                    package_json_directory.as_bytes(),
-                    &[b"package.json".as_slice()],
-                )
-                .as_slice(),
-            )
-        };
-        let (message, args): (&'static Message, Vec<JsString>) = if package_json_directory
-            .is_empty()
-            || !package_json_type.is_empty()
-        {
-            if target_extension.is_empty() {
-                (
-                        d::To_convert_this_file_to_an_ECMAScript_module_create_a_local_package_json_file_with_type_Colon_module,
-                        vec![],
-                    )
-            } else {
-                (
-                        d::To_convert_this_file_to_an_ECMAScript_module_change_its_file_extension_to_0_or_create_a_local_package_json_file_with_type_Colon_module,
-                        vec![JsString::from_bytes(target_extension)],
-                    )
-            }
-        } else if target_extension.is_empty() {
-            (
-                    d::To_convert_this_file_to_an_ECMAScript_module_add_the_field_type_Colon_module_to_0,
-                    vec![package_json()],
-                )
-        } else {
-            (
-                    d::To_convert_this_file_to_an_ECMAScript_module_change_its_file_extension_to_0_or_add_the_field_type_Colon_module_to_1,
-                    vec![JsString::from_bytes(target_extension), package_json()],
-                )
-        };
-        self.diagnostic_for_node(Some(error_node), message, args)
+        let host = self.program()?.host.clone();
+        let DiagnosticDetails { message, args } = create_mode_mismatch_details(
+            host.as_ref(),
+            parse_options.file_name.as_bytes(),
+            parse_options.path.as_bytes(),
+        )?;
+        let mut result = self.diagnostic_for_node(Some(error_node), message, args)?;
+        result.set_repopulate_info(Some(std::sync::Arc::new(
+            tsr_ast::diagnostic_api::RepopulateDiagnosticInfo {
+                kind: tsr_ast::diagnostic_api::REPOPULATE_MODE_MISMATCH,
+                module_reference: JsString::default(),
+                mode: 0,
+                package_name: JsString::default(),
+            },
+        )));
+        Ok(result)
     }
 }
 
@@ -1078,17 +1041,144 @@ fn try_get_extension_from_path(file: &[u8]) -> Option<&'static [u8]> {
     Some(path::try_get_extension_from_path(file)).filter(|extension| !extension.is_empty())
 }
 
+/// A diagnostic chain entry's message and arguments, which the checker and
+/// the incremental program's repopulation of cached diagnostics share.
+// source: tsc/internal/checker/utilities.go:DiagnosticDetails
+pub struct DiagnosticDetails {
+    pub message: &'static Message,
+    pub args: Vec<JsString>,
+}
+
+/// The message and arguments of a module-not-found chain entry of the file
+/// `file_name`, from the program's resolution of `module_reference`.
+/// Mirrors createModuleNotFoundChain in the TypeScript compiler's utilities.ts.
+// port: tsc/internal/checker/utilities.go:CreateModuleNotFoundChain
+pub fn create_module_not_found_chain(
+    program: &dyn crate::CheckerHost,
+    file_name: &[u8],
+    module_reference: &JsString,
+    mode: ModuleKind,
+    package_name: &[u8],
+) -> Result<DiagnosticDetails, Error> {
+    let resolved_module =
+        program.get_resolved_module(file_name, module_reference.as_bytes(), mode)?;
+
+    if let Some(resolved_module) =
+        resolved_module.filter(|resolved| !resolved.alternate_result.is_empty())
+    {
+        let mut package_name = package_name.to_vec();
+        if resolved_module
+            .alternate_result
+            .as_bytes()
+            .windows(b"/node_modules/@types/".len())
+            .any(|window| window == b"/node_modules/@types/")
+        {
+            let mut types = b"@types/".to_vec();
+            types.extend_from_slice(&tsr_module::mangle_scoped_package_name(&package_name));
+            package_name = types;
+        }
+        return Ok(DiagnosticDetails {
+            message: d::There_are_types_at_0_but_this_result_could_not_be_resolved_when_respecting_package_json_exports_The_1_library_may_need_to_update_its_package_json_or_typings,
+            args: vec![
+                resolved_module.alternate_result.clone(),
+                JsString::from_bytes(package_name),
+            ],
+        });
+    }
+
+    if program
+        .package_bundles_types(&tsr_module::get_types_package_name(package_name))?
+        .is_some()
+    {
+        return Ok(DiagnosticDetails {
+            message: d::If_the_0_package_actually_exposes_this_module_consider_sending_a_pull_request_to_amend_https_Colon_Slash_Slashgithub_com_SlashDefinitelyTyped_SlashDefinitelyTyped_Slashtree_Slashmaster_Slashtypes_Slash_1,
+            args: vec![
+                JsString::from_bytes(package_name),
+                JsString::from_bytes(tsr_module::mangle_scoped_package_name(package_name)),
+            ],
+        });
+    }
+    if program.package_bundles_types(package_name)? == Some(true) {
+        return Ok(DiagnosticDetails {
+            message: d::If_the_0_package_actually_exposes_this_module_try_adding_a_new_declaration_d_ts_file_containing_declare_module_1,
+            args: vec![JsString::from_bytes(package_name), module_reference.clone()],
+        });
+    }
+    Ok(DiagnosticDetails {
+        message: d::Try_npm_i_save_dev_types_Slash_1_if_it_exists_or_add_a_new_declaration_d_ts_file_containing_declare_module_0,
+        args: vec![
+            module_reference.clone(),
+            JsString::from_bytes(tsr_module::mangle_scoped_package_name(package_name)),
+        ],
+    })
+}
+
+/// The message and arguments of a mode-mismatch chain entry of the file
+/// named `file_name` at `file_path`. Mirrors createModeMismatchDetails in the
+/// TypeScript compiler's utilities.ts.
+// port: tsc/internal/checker/utilities.go:CreateModeMismatchDetails
+pub fn create_mode_mismatch_details(
+    program: &dyn crate::CheckerHost,
+    file_name: &[u8],
+    file_path: &[u8],
+) -> Result<DiagnosticDetails, Error> {
+    let target_extension: &[u8] = match try_get_extension_from_path(file_name) {
+        Some(b".ts") => b".mts",
+        Some(b".js") => b".mjs",
+        _ => b"",
+    };
+    let meta = program.get_source_file_meta_data(file_path)?;
+    let package_json_type = &meta.package_json_type;
+    let package_json_directory = &meta.package_json_directory;
+
+    if !package_json_directory.is_empty() && package_json_type.is_empty() {
+        let package_json = JsString::from_bytes(path::combine(
+            package_json_directory.as_bytes(),
+            &[b"package.json".as_slice()],
+        ));
+        if !target_extension.is_empty() {
+            return Ok(DiagnosticDetails {
+                message: d::To_convert_this_file_to_an_ECMAScript_module_change_its_file_extension_to_0_or_add_the_field_type_Colon_module_to_1,
+                args: vec![JsString::from_bytes(target_extension), package_json],
+            });
+        }
+        return Ok(DiagnosticDetails {
+            message:
+                d::To_convert_this_file_to_an_ECMAScript_module_add_the_field_type_Colon_module_to_0,
+            args: vec![package_json],
+        });
+    }
+    if !target_extension.is_empty() {
+        return Ok(DiagnosticDetails {
+            message: d::To_convert_this_file_to_an_ECMAScript_module_change_its_file_extension_to_0_or_create_a_local_package_json_file_with_type_Colon_module,
+            args: vec![JsString::from_bytes(target_extension)],
+        });
+    }
+    Ok(DiagnosticDetails {
+        message: d::To_convert_this_file_to_an_ECMAScript_module_create_a_local_package_json_file_with_type_Colon_module,
+        args: Vec::new(),
+    })
+}
+
 impl CheckerState {
-    /// The repopulate marker Go attaches for incremental builds has no Rust
-    /// counterpart; the message and arguments are the observable payload.
+    /// The chain entry carries the repopulate marker the incremental program
+    /// serializes into its build info.
+    /// Go's `CreateModuleNotFoundChain` reads the resolution through the
+    /// program; the checker passes the resolution it already holds.
     // port: tsc/internal/checker/checker.go:Checker.createModuleNotFoundChain
-    // port: tsc/internal/checker/utilities.go:CreateModuleNotFoundChain
     fn module_not_found_chain(
         &mut self,
         error_node: NodeId,
         resolved: &tsr_module::ResolvedModule,
         module_reference: &JsString,
+        mode: ModuleKind,
     ) -> Result<tsr_ast::Diagnostic, Error> {
+        // Store the original packageName for repopulateInfo before any modifications
+        let stored_package_name = if resolved.package_id.name == *module_reference {
+            JsString::default()
+        } else {
+            resolved.package_id.name.clone()
+        };
         let mut package_name = resolved.package_id.name.as_bytes().to_vec();
         let (message, args): (&'static Message, Vec<JsString>) = if resolved
             .alternate_result
@@ -1135,7 +1225,16 @@ impl CheckerState {
                 ],
             )
         };
-        self.diagnostic_for_node(Some(error_node), message, args)
+        let mut result = self.diagnostic_for_node(Some(error_node), message, args)?;
+        result.set_repopulate_info(Some(std::sync::Arc::new(
+            tsr_ast::diagnostic_api::RepopulateDiagnosticInfo {
+                kind: tsr_ast::diagnostic_api::REPOPULATE_MODULE_NOT_FOUND,
+                module_reference: module_reference.clone(),
+                mode: mode.0,
+                package_name: stored_package_name,
+            },
+        )));
+        Ok(result)
     }
 }
 

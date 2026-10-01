@@ -2,7 +2,9 @@
 //! result, `noEmit` and `noEmitOnError` (`HandleNoEmitOptions` with
 //! `GetDiagnosticsOfAnyProgram`), the emit-blocked outputs, and the per-file
 //! emitters in the program's work group with their results combined in input
-//! order. Build-info emit is Phase 4's: no caller passes one here.
+//! order. The incremental program (`tsr_incremental`) passes its build-info
+//! emit to `HandleNoEmitOptions` and asks the emitter for `BuilderSignature`
+//! declarations.
 use crate::emit_host::new_emit_host;
 use crate::emitter::{self, Emitter, ScriptTransformers};
 use crate::{CheckedProgram, Error, Program, ProgramCheckerHost, ProgramFile};
@@ -10,6 +12,7 @@ use std::sync::{Arc, Mutex, PoisonError};
 use tsr_ast::{Diagnostic, NodeId};
 use tsr_checker::{CheckerRequest, TraceArgs, TracePhase, TraceSink, TraceValue};
 use tsr_core::workgroup::WorkGroup;
+use tsr_core::CompilerOptions;
 use tsr_jsstring::JsString;
 use tsr_printer::{EmitTextWriter, TextWriter};
 use tsr_sourcemap::RawSourceMap;
@@ -25,10 +28,13 @@ pub enum EmitOnly {
     BuilderSignature,
 }
 
-/// `WriteFileData`. `BuildInfo` is the build-info writer's (Phase 4).
+/// `WriteFileData`.
 #[derive(Clone, Debug, Default)]
 pub struct WriteFileData {
     pub source_map_url_pos: isize,
+    /// The build info a build-info write carries (the pin's `BuildInfo any`):
+    /// `tsr_incremental`'s `BuildInfo`.
+    pub build_info: Option<Arc<dyn std::any::Any + Send + Sync>>,
     pub diagnostics: Vec<Diagnostic>,
     pub skipped_dts_write: bool,
     /// The emitted source file.
@@ -288,12 +294,12 @@ pub fn combine_emit_results(results: Vec<Option<EmitResult>>) -> EmitResult {
 /// pin's nil result: the emit proceeds.
 // port: tsc/internal/compiler/program.go:HandleNoEmitOptions
 pub fn handle_no_emit_options(
-    program: &CheckedProgram,
+    program: &dyn ProgramLike,
     request: &CheckerRequest,
     files: Option<&[Arc<ProgramFile>]>,
-    emit_build_info: Option<&dyn Fn() -> Option<EmitResult>>,
+    emit_build_info: Option<&dyn Fn() -> Result<Option<EmitResult>, Error>>,
 ) -> Result<Option<EmitResult>, Error> {
-    let options = program.program().options();
+    let options = program.options();
     if !options.no_emit.is_true() {
         if !options.no_emit_on_error.is_true() {
             return Ok(None); // NoEmit is false and NoEmitOnError is also false, so we can proceed with normal emit
@@ -304,11 +310,7 @@ pub fn handle_no_emit_options(
             request,
             files,
             true,
-            &|file| {
-                program
-                    .program()
-                    .bind_diagnostics(file.map(ProgramFile::source))
-            },
+            &|file| program.bind_diagnostics(request, file),
             &|file| program.semantic_diagnostics(request, file),
         )?;
         if diagnostics.is_empty() {
@@ -327,7 +329,7 @@ pub fn handle_no_emit_options(
         }));
     }
     if let Some(emit_build_info) = emit_build_info {
-        let result = emit_build_info();
+        let result = emit_build_info()?;
         if result.is_some() {
             return Ok(result);
         }
@@ -337,15 +339,14 @@ pub fn handle_no_emit_options(
 
 // port: tsc/internal/compiler/program.go:GetDiagnosticsOfAnyProgram
 pub fn get_diagnostics_of_any_program(
-    program: &CheckedProgram,
+    program: &dyn ProgramLike,
     request: &CheckerRequest,
     files: Option<&[Arc<ProgramFile>]>,
     skip_no_emit_check_for_dts_diagnostics: bool,
     get_bind_diagnostics: &FileDiagnostics<'_>,
     get_semantic_diagnostics: &FileDiagnostics<'_>,
 ) -> Result<Vec<Diagnostic>, Error> {
-    let loaded = program.program();
-    let mut all_diagnostics = loaded.config_file_parsing_diagnostics();
+    let mut all_diagnostics = program.config_file_parsing_diagnostics();
     let config_file_parsing_diagnostics_length = all_diagnostics.len();
 
     let append_diagnostics_for_all_files =
@@ -363,34 +364,39 @@ pub fn get_diagnostics_of_any_program(
 
     let mut syntactic_diagnostics = Vec::new();
     append_diagnostics_for_all_files(&mut syntactic_diagnostics, &|file| {
-        loaded.syntactic_diagnostics(file)
+        program.syntactic_diagnostics(request, file)
     })?;
     if !syntactic_diagnostics.is_empty() {
         // Per-file content mapper failures are syntactic diagnostics, but the locationless diagnostic
         // that disables a repeatedly failing mapper must still be reported.
-        all_diagnostics.extend_from_slice(&loaded.content_mapper_diagnostics);
+        all_diagnostics.extend_from_slice(
+            &program
+                .checked_program()
+                .program()
+                .content_mapper_diagnostics,
+        );
     }
     all_diagnostics.extend(syntactic_diagnostics);
 
     // If we didn't have any syntactic errors, then also try getting the program (options),
     // global and semantic errors.
     if all_diagnostics.len() == config_file_parsing_diagnostics_length {
-        all_diagnostics.extend_from_slice(loaded.program_diagnostics()?);
+        all_diagnostics.extend(program.program_diagnostics()?);
 
         // Do binding early so we can track the time.
         append_diagnostics_for_all_files(&mut Vec::new(), get_bind_diagnostics)?;
 
-        if !loaded.options().list_files_only.is_true() {
-            all_diagnostics.extend(program.global_diagnostics()?);
+        if !program.options().list_files_only.is_true() {
+            all_diagnostics.extend(program.global_diagnostics(request)?);
 
             if all_diagnostics.len() == config_file_parsing_diagnostics_length {
                 append_diagnostics_for_all_files(&mut all_diagnostics, get_semantic_diagnostics)?;
                 // Ask for the global diagnostics again (they were empty above); we may have found new during checking, e.g. missing globals.
-                all_diagnostics.extend(program.global_diagnostics()?);
+                all_diagnostics.extend(program.global_diagnostics(request)?);
             }
 
-            if (skip_no_emit_check_for_dts_diagnostics || loaded.options().no_emit.is_true())
-                && loaded.options().emit_declarations()
+            if (skip_no_emit_check_for_dts_diagnostics || program.options().no_emit.is_true())
+                && program.options().emit_declarations()
                 && all_diagnostics.len() == config_file_parsing_diagnostics_length
             {
                 append_diagnostics_for_all_files(&mut all_diagnostics, &|file| {
@@ -400,4 +406,128 @@ pub fn get_diagnostics_of_any_program(
         }
     }
     Ok(all_diagnostics)
+}
+
+/// `ProgramLike`: the program surface the no-emit handling, the harness and
+/// the incremental program share. [`CheckedProgram`] is the compiler's
+/// program; `tsr_incremental`'s program implements it over one. Where the
+/// pin's methods take a context, these take a [`CheckerRequest`].
+// source: tsc/internal/compiler/program.go:ProgramLike
+pub trait ProgramLike: Sync {
+    fn options(&self) -> &CompilerOptions;
+    fn source_file(&self, file_name: &[u8]) -> Option<&ProgramFile>;
+    fn source_files(&self) -> &[Arc<ProgramFile>];
+    fn config_file_parsing_diagnostics(&self) -> Vec<Diagnostic>;
+    fn syntactic_diagnostics(
+        &self,
+        request: &CheckerRequest,
+        file: Option<&ProgramFile>,
+    ) -> Result<Vec<Diagnostic>, Error>;
+    fn bind_diagnostics(
+        &self,
+        request: &CheckerRequest,
+        file: Option<&ProgramFile>,
+    ) -> Result<Vec<Diagnostic>, Error>;
+    fn program_diagnostics(&self) -> Result<Vec<Diagnostic>, Error>;
+    fn global_diagnostics(&self, request: &CheckerRequest) -> Result<Vec<Diagnostic>, Error>;
+    fn semantic_diagnostics(
+        &self,
+        request: &CheckerRequest,
+        file: Option<&ProgramFile>,
+    ) -> Result<Vec<Diagnostic>, Error>;
+    fn declaration_diagnostics(
+        &self,
+        request: &CheckerRequest,
+        file: Option<&ProgramFile>,
+    ) -> Result<Vec<Diagnostic>, Error>;
+    fn suggestion_diagnostics(
+        &self,
+        request: &CheckerRequest,
+        file: Option<&ProgramFile>,
+    ) -> Result<Vec<Diagnostic>, Error>;
+    /// `None` is the pin's nil result (a canceled request).
+    fn emit(
+        &self,
+        request: &CheckerRequest,
+        options: &EmitOptions<'_>,
+    ) -> Result<Option<EmitResult>, Error>;
+    fn common_source_directory(&self) -> Result<Vec<u8>, Error>;
+    fn is_source_file_default_library(&self, path: &[u8]) -> bool;
+    /// The pin's `Program()`: the compiler program underneath.
+    fn checked_program(&self) -> &CheckedProgram;
+}
+
+impl ProgramLike for CheckedProgram {
+    fn options(&self) -> &CompilerOptions {
+        self.program().options()
+    }
+    fn source_file(&self, file_name: &[u8]) -> Option<&ProgramFile> {
+        self.program().source_file(file_name)
+    }
+    fn source_files(&self) -> &[Arc<ProgramFile>] {
+        self.program().files()
+    }
+    fn config_file_parsing_diagnostics(&self) -> Vec<Diagnostic> {
+        self.program().config_file_parsing_diagnostics()
+    }
+    fn syntactic_diagnostics(
+        &self,
+        _request: &CheckerRequest,
+        file: Option<&ProgramFile>,
+    ) -> Result<Vec<Diagnostic>, Error> {
+        self.program().syntactic_diagnostics(file)
+    }
+    fn bind_diagnostics(
+        &self,
+        _request: &CheckerRequest,
+        file: Option<&ProgramFile>,
+    ) -> Result<Vec<Diagnostic>, Error> {
+        self.program()
+            .bind_diagnostics(file.map(ProgramFile::source))
+    }
+    fn program_diagnostics(&self) -> Result<Vec<Diagnostic>, Error> {
+        Ok(self.program().program_diagnostics()?.to_vec())
+    }
+    fn global_diagnostics(&self, _request: &CheckerRequest) -> Result<Vec<Diagnostic>, Error> {
+        CheckedProgram::global_diagnostics(self)
+    }
+    fn semantic_diagnostics(
+        &self,
+        request: &CheckerRequest,
+        file: Option<&ProgramFile>,
+    ) -> Result<Vec<Diagnostic>, Error> {
+        CheckedProgram::semantic_diagnostics(self, request, file)
+    }
+    fn declaration_diagnostics(
+        &self,
+        request: &CheckerRequest,
+        file: Option<&ProgramFile>,
+    ) -> Result<Vec<Diagnostic>, Error> {
+        CheckedProgram::declaration_diagnostics(self, request, file)
+    }
+    fn suggestion_diagnostics(
+        &self,
+        request: &CheckerRequest,
+        file: Option<&ProgramFile>,
+    ) -> Result<Vec<Diagnostic>, Error> {
+        CheckedProgram::suggestion_diagnostics(self, request, file)
+    }
+    fn emit(
+        &self,
+        request: &CheckerRequest,
+        options: &EmitOptions<'_>,
+    ) -> Result<Option<EmitResult>, Error> {
+        CheckedProgram::emit(self, request, options)
+    }
+    fn common_source_directory(&self) -> Result<Vec<u8>, Error> {
+        Ok(crate::output_paths::common_source_directory(
+            self.program(),
+        )?)
+    }
+    fn is_source_file_default_library(&self, path: &[u8]) -> bool {
+        self.program().is_lib(path)
+    }
+    fn checked_program(&self) -> &CheckedProgram {
+        self
+    }
 }

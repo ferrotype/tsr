@@ -6,7 +6,9 @@ mod cache;
 mod checked_program;
 mod checker_diagnostics;
 mod checker_host;
-pub use checked_program::{CheckedProgram, CheckerCollect, FileCheckers};
+pub use checked_program::{
+    filter_no_emit_semantic_diagnostics, CheckedProgram, CheckerCollect, FileCheckers,
+};
 mod checker_pool;
 pub use checker_pool::{
     checker_association_base_weight, checker_association_order, checker_association_policy,
@@ -15,6 +17,7 @@ pub use checker_pool::{
 };
 mod checker_module_specifiers;
 mod content_mapped;
+pub use content_mapped::content_mapper_project_diagnostic;
 mod declaration_diagnostics;
 mod declaration_host;
 pub use declaration_host::ProgramDeclarationHost;
@@ -29,7 +32,8 @@ mod program_diagnostics;
 mod program_emit;
 pub use program_emit::{
     combine_emit_results, get_diagnostics_of_any_program, handle_no_emit_options, EmitOnly,
-    EmitOptions, EmitResult, FileDiagnostics, SourceMapEmitResult, WriteFile, WriteFileData,
+    EmitOptions, EmitResult, FileDiagnostics, ProgramLike, SourceMapEmitResult, WriteFile,
+    WriteFileData,
 };
 mod project_references;
 pub use project_references::CompilerConfigHost;
@@ -41,7 +45,7 @@ mod metadata;
 mod resolver_host;
 pub use cache::{FileCache, ProgramFile};
 pub use checker_host::ProgramCheckerHost;
-pub use loader::{Error, Program, ProgramOptions, Resolution, TypeResolution};
+pub use loader::{Error, LibFile, Program, ProgramOptions, Resolution, TypeResolution};
 pub use resolver_host::ProgramResolverHost;
 pub use tsr_ast::SourceFileMetaData;
 /// The message catalog that `Program::explain_file_include` takes its messages from.

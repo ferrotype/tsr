@@ -106,6 +106,9 @@ mod expression_errors;
 mod expressions;
 mod external_aliases;
 mod external_resolution;
+pub use external_resolution::{
+    create_mode_mismatch_details, create_module_not_found_chain, DiagnosticDetails,
+};
 mod flags;
 mod flow;
 mod flow_arrays;

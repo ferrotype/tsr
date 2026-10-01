@@ -1,0 +1,7 @@
+{"cases": [
+ {"id": "corpus-incrementalConfig", "corpus": "compiler/incrementalConfig.ts", "steps": [{"actions": ["emit"]}]},
+ {"id": "corpus-incrementalTsBuildInfoFile", "corpus": "compiler/incrementalTsBuildInfoFile.ts", "steps": [{"actions": ["emit"]}]},
+ {"id": "corpus-noEmitAndIncremental", "corpus": "compiler/noEmitAndIncremental.ts", "steps": [{"actions": ["emit"]}]},
+ {"id": "two-files", "name": "a.ts", "source": "// @incremental: true\n// @target: es2015\n// @tsBuildInfoFile: /.src/out.tsbuildinfo\n// @filename: /.src/a.ts\nexport const a = 1;\n// @filename: /.src/b.ts\nimport { a } from './a';\nexport const b: string = a;\n",
+  "steps": [{"actions": ["diagnostics", "emit"]}, {"actions": ["emit"]}, {"edits": {"/.src/a.ts": "export const a = '1';\n"}, "actions": ["emit"]}]}
+]}

@@ -1,0 +1,478 @@
+{
+ "affects_build_info": [
+  "declaration",
+  "declarationMap",
+  "emitDeclarationOnly",
+  "sourceMap",
+  "inlineSourceMap",
+  "assumeChangesOnlyAffectDirectDependencies",
+  "target",
+  "module",
+  "allowJs",
+  "checkJs",
+  "jsx",
+  "outFile",
+  "outDir",
+  "rootDir",
+  "composite",
+  "tsBuildInfoFile",
+  "removeComments",
+  "importHelpers",
+  "downlevelIteration",
+  "verbatimModuleSyntax",
+  "isolatedDeclarations",
+  "erasableSyntaxOnly",
+  "strict",
+  "noImplicitAny",
+  "strictNullChecks",
+  "strictFunctionTypes",
+  "strictBindCallApply",
+  "strictPropertyInitialization",
+  "strictBuiltinIteratorReturn",
+  "noImplicitThis",
+  "useUnknownInCatchVariables",
+  "alwaysStrict",
+  "stableTypeOrdering",
+  "noUnusedLocals",
+  "noUnusedParameters",
+  "exactOptionalPropertyTypes",
+  "noImplicitReturns",
+  "noFallthroughCasesInSwitch",
+  "noUncheckedIndexedAccess",
+  "noImplicitOverride",
+  "noPropertyAccessFromIndexSignature",
+  "allowSyntheticDefaultImports",
+  "esModuleInterop",
+  "allowUmdGlobalAccess",
+  "allowImportingTsExtensions",
+  "rewriteRelativeImportExtensions",
+  "noUncheckedSideEffectImports",
+  "sourceRoot",
+  "mapRoot",
+  "inlineSources",
+  "experimentalDecorators",
+  "emitDecoratorMetadata",
+  "jsxImportSource",
+  "reactNamespace",
+  "skipDefaultLibCheck",
+  "emitBOM",
+  "newLine",
+  "noErrorTruncation",
+  "stripInternal",
+  "noEmitHelpers",
+  "noEmitOnError",
+  "preserveConstEnums",
+  "declarationDir",
+  "skipLibCheck",
+  "allowUnusedLabels",
+  "allowUnreachableCode",
+  "useDefineForClassFields"
+ ],
+ "cases": [
+  {
+   "corpus": "compiler/incrementalConfig.ts",
+   "error_inputs": [
+    {
+     "content_hex": "7b207d0a0a",
+     "name_hex": "2f7473636f6e6669672e6a736f6e"
+    },
+    {
+     "content_hex": "636f6e73742078203d2031303b0a",
+     "name_hex": "2f612e7473"
+    }
+   ],
+   "id": "corpus-incrementalConfig",
+   "name": "incrementalConfig.ts",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ],
+     "diagnostics": [],
+     "emits": [
+      {
+       "diagnostics": [],
+       "emit_skipped": false,
+       "emitted_files": [
+        "/a.js",
+        "/tsconfig.tsbuildinfo"
+       ]
+      }
+     ],
+     "loading": {
+      "case_sensitive": true,
+      "cwd": "/.src",
+      "files": {
+       "/a.ts": "636f6e73742078203d2031303b0a"
+      },
+      "id": "corpus-incrementalConfig",
+      "options": {
+       "configFilePath": "/tsconfig.json",
+       "incremental": true,
+       "newLine": 1,
+       "noErrorTruncation": true,
+       "skipDefaultLibCheck": true,
+       "target": 2
+      },
+      "roots": [
+       "/a.ts"
+      ],
+      "skip_module_resolution": false,
+      "symlinks": {}
+     },
+     "outputs": [
+      {
+       "name": "/a.js",
+       "text": "\"use strict\";\r\nconst x = 10;\r\n"
+      },
+      {
+       "name": "/tsconfig.tsbuildinfo",
+       "text": "{\"version\":\"7.1.0-dev\",\"root\":[20],\"fileNames\":[\"lib.es6.d.ts\",\"lib.es5.d.ts\",\"lib.es2015.d.ts\",\"lib.dom.d.ts\",\"lib.dom.iterable.d.ts\",\"lib.webworker.importscripts.d.ts\",\"lib.scripthost.d.ts\",\"lib.es2015.core.d.ts\",\"lib.es2015.collection.d.ts\",\"lib.es2015.generator.d.ts\",\"lib.es2015.iterable.d.ts\",\"lib.es2015.promise.d.ts\",\"lib.es2015.proxy.d.ts\",\"lib.es2015.reflect.d.ts\",\"lib.es2015.symbol.d.ts\",\"lib.es2015.symbol.wellknown.d.ts\",\"lib.es2018.asynciterable.d.ts\",\"lib.decorators.d.ts\",\"lib.decorators.legacy.d.ts\",\"./a.ts\"],\"fileInfos\":[\"d5989fd19a90632be70bb582dce051c9\",{\"version\":\"16934abaab7026ac114da441aabea1a0\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},\"d4306fb2e47f74835e8674ffac07d76f\",{\"version\":\"aae8996e8b5684814785a42cbbefcd79\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},\"abad6dd56cc8caf095c165df8124d237\",{\"version\":\"2a9941db0809c9ad0e8837ed629b1dcc\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"d051b93324f36bcc68d152a5ca0988cd\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"926204c28cd3d073865348473ae28d2e\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"f25e42c801b2cb3cf2b39792006a9beb\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"6344b55f26a4e81d9608777dbfb877dd\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"3c0ed28e53d3695b363e256ec1c023fd\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"4c2761daba7f17141c25baa0821ac5da\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"b87656acabd63e69379ff6ffcfe52fc7\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"597469522da047a5af5222cc6989f405\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"1708ea4d34dc37fadadc63ca01127e80\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"55d97a8c6fbf34a30450a7b1e5f7a298\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"b612fb5cf8e5d964b92063a75207632a\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"f64453cbf9671f28158677fa5c43967a\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"33f317af5428801f944a478d2c1e38e5\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"0d2ad3e819d09cb4d464cb9598082538\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1}],\"options\":{\"newLine\":1,\"noErrorTruncation\":true,\"skipDefaultLibCheck\":true,\"target\":2},\"semanticDiagnosticsPerFile\":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]}"
+      }
+     ],
+     "request": {
+      "actions": [
+       "emit"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "corpus": "compiler/incrementalTsBuildInfoFile.ts",
+   "error_inputs": [
+    {
+     "content_hex": "636f6e73742078203d2031303b0a0a0a",
+     "name_hex": "2f612e7473"
+    }
+   ],
+   "id": "corpus-incrementalTsBuildInfoFile",
+   "name": "incrementalTsBuildInfoFile.ts",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ],
+     "diagnostics": [],
+     "emits": [
+      {
+       "diagnostics": [],
+       "emit_skipped": false,
+       "emitted_files": [
+        "/a.js",
+        "/a.tsbuildinfo"
+       ]
+      }
+     ],
+     "loading": {
+      "case_sensitive": true,
+      "cwd": "/.src",
+      "files": {
+       "/a.ts": "636f6e73742078203d2031303b0a0a0a"
+      },
+      "id": "corpus-incrementalTsBuildInfoFile",
+      "options": {
+       "incremental": true,
+       "newLine": 1,
+       "noErrorTruncation": true,
+       "skipDefaultLibCheck": true,
+       "target": 2,
+       "tsBuildInfoFile": "/a.tsbuildinfo"
+      },
+      "roots": [
+       "/a.ts"
+      ],
+      "skip_module_resolution": false,
+      "symlinks": {}
+     },
+     "outputs": [
+      {
+       "name": "/a.js",
+       "text": "\"use strict\";\r\nconst x = 10;\r\n"
+      },
+      {
+       "name": "/a.tsbuildinfo",
+       "text": "{\"version\":\"7.1.0-dev\",\"root\":[20],\"fileNames\":[\"lib.es6.d.ts\",\"lib.es5.d.ts\",\"lib.es2015.d.ts\",\"lib.dom.d.ts\",\"lib.dom.iterable.d.ts\",\"lib.webworker.importscripts.d.ts\",\"lib.scripthost.d.ts\",\"lib.es2015.core.d.ts\",\"lib.es2015.collection.d.ts\",\"lib.es2015.generator.d.ts\",\"lib.es2015.iterable.d.ts\",\"lib.es2015.promise.d.ts\",\"lib.es2015.proxy.d.ts\",\"lib.es2015.reflect.d.ts\",\"lib.es2015.symbol.d.ts\",\"lib.es2015.symbol.wellknown.d.ts\",\"lib.es2018.asynciterable.d.ts\",\"lib.decorators.d.ts\",\"lib.decorators.legacy.d.ts\",\"./a.ts\"],\"fileInfos\":[\"d5989fd19a90632be70bb582dce051c9\",{\"version\":\"16934abaab7026ac114da441aabea1a0\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},\"d4306fb2e47f74835e8674ffac07d76f\",{\"version\":\"aae8996e8b5684814785a42cbbefcd79\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},\"abad6dd56cc8caf095c165df8124d237\",{\"version\":\"2a9941db0809c9ad0e8837ed629b1dcc\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"d051b93324f36bcc68d152a5ca0988cd\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"926204c28cd3d073865348473ae28d2e\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"f25e42c801b2cb3cf2b39792006a9beb\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"6344b55f26a4e81d9608777dbfb877dd\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"3c0ed28e53d3695b363e256ec1c023fd\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"4c2761daba7f17141c25baa0821ac5da\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"b87656acabd63e69379ff6ffcfe52fc7\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"597469522da047a5af5222cc6989f405\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"1708ea4d34dc37fadadc63ca01127e80\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"55d97a8c6fbf34a30450a7b1e5f7a298\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"b612fb5cf8e5d964b92063a75207632a\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"f64453cbf9671f28158677fa5c43967a\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"33f317af5428801f944a478d2c1e38e5\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"7c3d6fdfb41a166e66a50cd405c0b3f2\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1}],\"options\":{\"newLine\":1,\"noErrorTruncation\":true,\"skipDefaultLibCheck\":true,\"target\":2,\"tsBuildInfoFile\":\"./a.tsbuildinfo\"},\"semanticDiagnosticsPerFile\":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]}"
+      }
+     ],
+     "request": {
+      "actions": [
+       "emit"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "corpus": "compiler/noEmitAndIncremental.ts",
+   "error_inputs": [
+    {
+     "content_hex": "7b0a2020202022636f6d70696c65724f7074696f6e73223a207b0a2020202020202020226e6f456d6974223a20747275652c0a202020202020202022696e6372656d656e74616c223a20747275650a202020207d0a7d0a0a",
+     "name_hex": "2f7473636f6e6669672e6a736f6e"
+    },
+    {
+     "content_hex": "636f6e73742078203d2031303b0a",
+     "name_hex": "2f612e7473"
+    }
+   ],
+   "id": "corpus-noEmitAndIncremental",
+   "name": "noEmitAndIncremental.ts",
+   "steps": [
+    {
+     "actions": [
+      "emit"
+     ],
+     "diagnostics": [],
+     "emits": [
+      {
+       "diagnostics": [],
+       "emit_skipped": false,
+       "emitted_files": [
+        "/tsconfig.tsbuildinfo"
+       ]
+      }
+     ],
+     "loading": {
+      "case_sensitive": true,
+      "cwd": "/.src",
+      "files": {
+       "/a.ts": "636f6e73742078203d2031303b0a"
+      },
+      "id": "corpus-noEmitAndIncremental",
+      "options": {
+       "configFilePath": "/tsconfig.json",
+       "incremental": true,
+       "newLine": 1,
+       "noEmit": true,
+       "noErrorTruncation": true,
+       "skipDefaultLibCheck": true,
+       "target": 2
+      },
+      "roots": [
+       "/a.ts"
+      ],
+      "skip_module_resolution": false,
+      "symlinks": {}
+     },
+     "outputs": [
+      {
+       "name": "/tsconfig.tsbuildinfo",
+       "text": "{\"version\":\"7.1.0-dev\",\"root\":[20],\"fileNames\":[\"lib.es6.d.ts\",\"lib.es5.d.ts\",\"lib.es2015.d.ts\",\"lib.dom.d.ts\",\"lib.dom.iterable.d.ts\",\"lib.webworker.importscripts.d.ts\",\"lib.scripthost.d.ts\",\"lib.es2015.core.d.ts\",\"lib.es2015.collection.d.ts\",\"lib.es2015.generator.d.ts\",\"lib.es2015.iterable.d.ts\",\"lib.es2015.promise.d.ts\",\"lib.es2015.proxy.d.ts\",\"lib.es2015.reflect.d.ts\",\"lib.es2015.symbol.d.ts\",\"lib.es2015.symbol.wellknown.d.ts\",\"lib.es2018.asynciterable.d.ts\",\"lib.decorators.d.ts\",\"lib.decorators.legacy.d.ts\",\"./a.ts\"],\"fileInfos\":[\"d5989fd19a90632be70bb582dce051c9\",{\"version\":\"16934abaab7026ac114da441aabea1a0\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},\"d4306fb2e47f74835e8674ffac07d76f\",{\"version\":\"aae8996e8b5684814785a42cbbefcd79\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},\"abad6dd56cc8caf095c165df8124d237\",{\"version\":\"2a9941db0809c9ad0e8837ed629b1dcc\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"d051b93324f36bcc68d152a5ca0988cd\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"926204c28cd3d073865348473ae28d2e\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"f25e42c801b2cb3cf2b39792006a9beb\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"6344b55f26a4e81d9608777dbfb877dd\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"3c0ed28e53d3695b363e256ec1c023fd\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"4c2761daba7f17141c25baa0821ac5da\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"b87656acabd63e69379ff6ffcfe52fc7\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"597469522da047a5af5222cc6989f405\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"1708ea4d34dc37fadadc63ca01127e80\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"55d97a8c6fbf34a30450a7b1e5f7a298\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"b612fb5cf8e5d964b92063a75207632a\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"f64453cbf9671f28158677fa5c43967a\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"33f317af5428801f944a478d2c1e38e5\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"0d2ad3e819d09cb4d464cb9598082538\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1}],\"options\":{\"newLine\":1,\"noErrorTruncation\":true,\"skipDefaultLibCheck\":true,\"target\":2},\"semanticDiagnosticsPerFile\":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],\"affectedFilesPendingEmit\":[20]}"
+      }
+     ],
+     "request": {
+      "actions": [
+       "emit"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "error_inputs": [
+    {
+     "content_hex": "6578706f727420636f6e73742061203d20313b",
+     "name_hex": "2f2e7372632f612e7473"
+    },
+    {
+     "content_hex": "696d706f7274207b2061207d2066726f6d20272e2f61273b0a6578706f727420636f6e737420623a20737472696e67203d20613b0a",
+     "name_hex": "2f2e7372632f622e7473"
+    }
+   ],
+   "id": "two-files",
+   "name": "a.ts",
+   "source": "// @incremental: true\n// @target: es2015\n// @tsBuildInfoFile: /.src/out.tsbuildinfo\n// @filename: /.src/a.ts\nexport const a = 1;\n// @filename: /.src/b.ts\nimport { a } from './a';\nexport const b: string = a;\n",
+   "steps": [
+    {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ],
+     "diagnostics": [
+      [
+       {
+        "code": 2322,
+        "end": 39,
+        "file": "/.src/b.ts",
+        "message": "Type 'number' is not assignable to type 'string'.",
+        "pos": 38
+       }
+      ]
+     ],
+     "emits": [
+      {
+       "diagnostics": [],
+       "emit_skipped": false,
+       "emitted_files": [
+        "/.src/a.js",
+        "/.src/b.js",
+        "/.src/out.tsbuildinfo"
+       ]
+      }
+     ],
+     "loading": {
+      "case_sensitive": true,
+      "cwd": "/.src",
+      "files": {
+       "/.src/a.ts": "6578706f727420636f6e73742061203d20313b",
+       "/.src/b.ts": "696d706f7274207b2061207d2066726f6d20272e2f61273b0a6578706f727420636f6e737420623a20737472696e67203d20613b0a"
+      },
+      "id": "two-files",
+      "options": {
+       "incremental": true,
+       "newLine": 1,
+       "noErrorTruncation": true,
+       "skipDefaultLibCheck": true,
+       "target": 2,
+       "tsBuildInfoFile": "/.src/out.tsbuildinfo"
+      },
+      "roots": [
+       "/.src/a.ts",
+       "/.src/b.ts"
+      ],
+      "skip_module_resolution": false,
+      "symlinks": {}
+     },
+     "outputs": [
+      {
+       "name": "/.src/a.js",
+       "text": "export const a = 1;\r\n"
+      },
+      {
+       "name": "/.src/b.js",
+       "text": "import { a } from './a';\r\nexport const b = a;\r\n"
+      },
+      {
+       "name": "/.src/out.tsbuildinfo",
+       "text": "{\"version\":\"7.1.0-dev\",\"root\":[[20,21]],\"fileNames\":[\"lib.es6.d.ts\",\"lib.es5.d.ts\",\"lib.es2015.d.ts\",\"lib.dom.d.ts\",\"lib.dom.iterable.d.ts\",\"lib.webworker.importscripts.d.ts\",\"lib.scripthost.d.ts\",\"lib.es2015.core.d.ts\",\"lib.es2015.collection.d.ts\",\"lib.es2015.generator.d.ts\",\"lib.es2015.iterable.d.ts\",\"lib.es2015.promise.d.ts\",\"lib.es2015.proxy.d.ts\",\"lib.es2015.reflect.d.ts\",\"lib.es2015.symbol.d.ts\",\"lib.es2015.symbol.wellknown.d.ts\",\"lib.es2018.asynciterable.d.ts\",\"lib.decorators.d.ts\",\"lib.decorators.legacy.d.ts\",\"./a.ts\",\"./b.ts\"],\"fileInfos\":[\"d5989fd19a90632be70bb582dce051c9\",{\"version\":\"16934abaab7026ac114da441aabea1a0\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},\"d4306fb2e47f74835e8674ffac07d76f\",{\"version\":\"aae8996e8b5684814785a42cbbefcd79\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},\"abad6dd56cc8caf095c165df8124d237\",{\"version\":\"2a9941db0809c9ad0e8837ed629b1dcc\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"d051b93324f36bcc68d152a5ca0988cd\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"926204c28cd3d073865348473ae28d2e\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"f25e42c801b2cb3cf2b39792006a9beb\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"6344b55f26a4e81d9608777dbfb877dd\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"3c0ed28e53d3695b363e256ec1c023fd\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"4c2761daba7f17141c25baa0821ac5da\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"b87656acabd63e69379ff6ffcfe52fc7\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"597469522da047a5af5222cc6989f405\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"1708ea4d34dc37fadadc63ca01127e80\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"55d97a8c6fbf34a30450a7b1e5f7a298\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"b612fb5cf8e5d964b92063a75207632a\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"f64453cbf9671f28158677fa5c43967a\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"33f317af5428801f944a478d2c1e38e5\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},\"f5c8fff6e1fca35f4a292d48868d4086\",\"690d76525a7ab7ad346edb2476dc8c33\"],\"fileIdsList\":[[20]],\"options\":{\"newLine\":1,\"noErrorTruncation\":true,\"skipDefaultLibCheck\":true,\"target\":2,\"tsBuildInfoFile\":\"./out.tsbuildinfo\"},\"referencedMap\":[[21,1]],\"semanticDiagnosticsPerFile\":[[21,[{\"pos\":38,\"end\":39,\"code\":2322,\"category\":1,\"messageKey\":\"Type_0_is_not_assignable_to_type_1_2322\",\"messageArgs\":[\"number\",\"string\"]}]]]}"
+      }
+     ],
+     "request": {
+      "actions": [
+       "diagnostics",
+       "emit"
+      ]
+     }
+    },
+    {
+     "actions": [
+      "emit"
+     ],
+     "diagnostics": [],
+     "emits": [
+      {
+       "diagnostics": [],
+       "emit_skipped": false,
+       "emitted_files": []
+      }
+     ],
+     "loading": {
+      "case_sensitive": true,
+      "cwd": "/.src",
+      "files": {
+       "/.src/a.js": "6578706f727420636f6e73742061203d20313b0d0a",
+       "/.src/a.ts": "6578706f727420636f6e73742061203d20313b",
+       "/.src/b.js": "696d706f7274207b2061207d2066726f6d20272e2f61273b0d0a6578706f727420636f6e73742062203d20613b0d0a",
+       "/.src/b.ts": "696d706f7274207b2061207d2066726f6d20272e2f61273b0a6578706f727420636f6e737420623a20737472696e67203d20613b0a",
+       "/.src/out.tsbuildinfo": "7b2276657273696f6e223a22372e312e302d646576222c22726f6f74223a5b5b32302c32315d5d2c2266696c654e616d6573223a5b226c69622e6573362e642e7473222c226c69622e6573352e642e7473222c226c69622e6573323031352e642e7473222c226c69622e646f6d2e642e7473222c226c69622e646f6d2e6974657261626c652e642e7473222c226c69622e776562776f726b65722e696d706f7274736372697074732e642e7473222c226c69622e736372697074686f73742e642e7473222c226c69622e6573323031352e636f72652e642e7473222c226c69622e6573323031352e636f6c6c656374696f6e2e642e7473222c226c69622e6573323031352e67656e657261746f722e642e7473222c226c69622e6573323031352e6974657261626c652e642e7473222c226c69622e6573323031352e70726f6d6973652e642e7473222c226c69622e6573323031352e70726f78792e642e7473222c226c69622e6573323031352e7265666c6563742e642e7473222c226c69622e6573323031352e73796d626f6c2e642e7473222c226c69622e6573323031352e73796d626f6c2e77656c6c6b6e6f776e2e642e7473222c226c69622e6573323031382e6173796e636974657261626c652e642e7473222c226c69622e6465636f7261746f72732e642e7473222c226c69622e6465636f7261746f72732e6c65676163792e642e7473222c222e2f612e7473222c222e2f622e7473225d2c2266696c65496e666f73223a5b226435393839666431396139303633326265373062623538326463653035316339222c7b2276657273696f6e223a223136393334616261616237303236616331313464613434316161626561316130222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c226434333036666232653437663734383335653836373466666163303764373666222c7b2276657273696f6e223a226161653839393665386235363834383134373835613432636262656663643739222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c226162616436646435366363386361663039356331363564663831323464323337222c7b2276657273696f6e223a223261393934316462303830396339616430653838333765643632396231646363222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a226430353162393333323466333662636336386431353261356361303938386364222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223932363230346332386364336430373338363533343834373361653238643265222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a226632356534326338303162326362336366326233393739323030366139626562222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223633343462353566323661346538316439363038373737646266623837376464222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223363306564323865353364333639356233363365323536656331633032336664222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223463323736316461626137663137313431633235626161303832316163356461222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a226238373635366163616264363365363933373966663666666366653532666337222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223539373436393532326461303437613561663532323263633639383966343035222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223137303865613464333464633337666164616463363363613031313237653830222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223535643937613863366662663334613330343530613762316535663761323938222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a226236313266623563663865356439363462393230363361373532303736333261222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a226636343435336362663936373166323831353836373766613563343339363761222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223333663331376166353432383830316639343461343738643263316533386535222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c226635633866666636653166636133356634613239326434383836386434303836222c223639306437363532356137616237616433343665646232343736646338633333225d2c2266696c654964734c697374223a5b5b32305d5d2c226f7074696f6e73223a7b226e65774c696e65223a312c226e6f4572726f725472756e636174696f6e223a747275652c22736b697044656661756c744c6962436865636b223a747275652c22746172676574223a322c2274734275696c64496e666f46696c65223a222e2f6f75742e74736275696c64696e666f227d2c227265666572656e6365644d6170223a5b5b32312c315d5d2c2273656d616e746963446961676e6f737469637350657246696c65223a5b5b32312c5b7b22706f73223a33382c22656e64223a33392c22636f6465223a323332322c2263617465676f7279223a312c226d6573736167654b6579223a22547970655f305f69735f6e6f745f61737369676e61626c655f746f5f747970655f315f32333232222c226d65737361676541726773223a5b226e756d626572222c22737472696e67225d7d5d5d5d7d"
+      },
+      "id": "two-files",
+      "options": {
+       "incremental": true,
+       "newLine": 1,
+       "noErrorTruncation": true,
+       "skipDefaultLibCheck": true,
+       "target": 2,
+       "tsBuildInfoFile": "/.src/out.tsbuildinfo"
+      },
+      "roots": [
+       "/.src/a.ts",
+       "/.src/b.ts"
+      ],
+      "skip_module_resolution": false,
+      "symlinks": {}
+     },
+     "outputs": [],
+     "request": {
+      "actions": [
+       "emit"
+      ]
+     }
+    },
+    {
+     "actions": [
+      "emit"
+     ],
+     "diagnostics": [],
+     "emits": [
+      {
+       "diagnostics": [],
+       "emit_skipped": false,
+       "emitted_files": [
+        "/.src/a.js",
+        "/.src/b.js",
+        "/.src/out.tsbuildinfo"
+       ]
+      }
+     ],
+     "loading": {
+      "case_sensitive": true,
+      "cwd": "/.src",
+      "files": {
+       "/.src/a.js": "6578706f727420636f6e73742061203d20313b0d0a",
+       "/.src/a.ts": "6578706f727420636f6e73742061203d202731273b0a",
+       "/.src/b.js": "696d706f7274207b2061207d2066726f6d20272e2f61273b0d0a6578706f727420636f6e73742062203d20613b0d0a",
+       "/.src/b.ts": "696d706f7274207b2061207d2066726f6d20272e2f61273b0a6578706f727420636f6e737420623a20737472696e67203d20613b0a",
+       "/.src/out.tsbuildinfo": "7b2276657273696f6e223a22372e312e302d646576222c22726f6f74223a5b5b32302c32315d5d2c2266696c654e616d6573223a5b226c69622e6573362e642e7473222c226c69622e6573352e642e7473222c226c69622e6573323031352e642e7473222c226c69622e646f6d2e642e7473222c226c69622e646f6d2e6974657261626c652e642e7473222c226c69622e776562776f726b65722e696d706f7274736372697074732e642e7473222c226c69622e736372697074686f73742e642e7473222c226c69622e6573323031352e636f72652e642e7473222c226c69622e6573323031352e636f6c6c656374696f6e2e642e7473222c226c69622e6573323031352e67656e657261746f722e642e7473222c226c69622e6573323031352e6974657261626c652e642e7473222c226c69622e6573323031352e70726f6d6973652e642e7473222c226c69622e6573323031352e70726f78792e642e7473222c226c69622e6573323031352e7265666c6563742e642e7473222c226c69622e6573323031352e73796d626f6c2e642e7473222c226c69622e6573323031352e73796d626f6c2e77656c6c6b6e6f776e2e642e7473222c226c69622e6573323031382e6173796e636974657261626c652e642e7473222c226c69622e6465636f7261746f72732e642e7473222c226c69622e6465636f7261746f72732e6c65676163792e642e7473222c222e2f612e7473222c222e2f622e7473225d2c2266696c65496e666f73223a5b226435393839666431396139303633326265373062623538326463653035316339222c7b2276657273696f6e223a223136393334616261616237303236616331313464613434316161626561316130222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c226434333036666232653437663734383335653836373466666163303764373666222c7b2276657273696f6e223a226161653839393665386235363834383134373835613432636262656663643739222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c226162616436646435366363386361663039356331363564663831323464323337222c7b2276657273696f6e223a223261393934316462303830396339616430653838333765643632396231646363222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a226430353162393333323466333662636336386431353261356361303938386364222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223932363230346332386364336430373338363533343834373361653238643265222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a226632356534326338303162326362336366326233393739323030366139626562222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223633343462353566323661346538316439363038373737646266623837376464222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223363306564323865353364333639356233363365323536656331633032336664222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223463323736316461626137663137313431633235626161303832316163356461222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a226238373635366163616264363365363933373966663666666366653532666337222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223539373436393532326461303437613561663532323263633639383966343035222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223137303865613464333464633337666164616463363363613031313237653830222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223535643937613863366662663334613330343530613762316535663761323938222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a226236313266623563663865356439363462393230363361373532303736333261222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a226636343435336362663936373166323831353836373766613563343339363761222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c7b2276657273696f6e223a223333663331376166353432383830316639343461343738643263316533386535222c2261666665637473476c6f62616c53636f7065223a747275652c22696d706c6965644e6f6465466f726d6174223a317d2c226635633866666636653166636133356634613239326434383836386434303836222c223639306437363532356137616237616433343665646232343736646338633333225d2c2266696c654964734c697374223a5b5b32305d5d2c226f7074696f6e73223a7b226e65774c696e65223a312c226e6f4572726f725472756e636174696f6e223a747275652c22736b697044656661756c744c6962436865636b223a747275652c22746172676574223a322c2274734275696c64496e666f46696c65223a222e2f6f75742e74736275696c64696e666f227d2c227265666572656e6365644d6170223a5b5b32312c315d5d2c2273656d616e746963446961676e6f737469637350657246696c65223a5b5b32312c5b7b22706f73223a33382c22656e64223a33392c22636f6465223a323332322c2263617465676f7279223a312c226d6573736167654b6579223a22547970655f305f69735f6e6f745f61737369676e61626c655f746f5f747970655f315f32333232222c226d65737361676541726773223a5b226e756d626572222c22737472696e67225d7d5d5d5d7d"
+      },
+      "id": "two-files",
+      "options": {
+       "incremental": true,
+       "newLine": 1,
+       "noErrorTruncation": true,
+       "skipDefaultLibCheck": true,
+       "target": 2,
+       "tsBuildInfoFile": "/.src/out.tsbuildinfo"
+      },
+      "roots": [
+       "/.src/a.ts",
+       "/.src/b.ts"
+      ],
+      "skip_module_resolution": false,
+      "symlinks": {}
+     },
+     "outputs": [
+      {
+       "name": "/.src/a.js",
+       "text": "export const a = '1';\r\n"
+      },
+      {
+       "name": "/.src/b.js",
+       "text": "import { a } from './a';\r\nexport const b = a;\r\n"
+      },
+      {
+       "name": "/.src/out.tsbuildinfo",
+       "text": "{\"version\":\"7.1.0-dev\",\"root\":[[20,21]],\"fileNames\":[\"lib.es6.d.ts\",\"lib.es5.d.ts\",\"lib.es2015.d.ts\",\"lib.dom.d.ts\",\"lib.dom.iterable.d.ts\",\"lib.webworker.importscripts.d.ts\",\"lib.scripthost.d.ts\",\"lib.es2015.core.d.ts\",\"lib.es2015.collection.d.ts\",\"lib.es2015.generator.d.ts\",\"lib.es2015.iterable.d.ts\",\"lib.es2015.promise.d.ts\",\"lib.es2015.proxy.d.ts\",\"lib.es2015.reflect.d.ts\",\"lib.es2015.symbol.d.ts\",\"lib.es2015.symbol.wellknown.d.ts\",\"lib.es2018.asynciterable.d.ts\",\"lib.decorators.d.ts\",\"lib.decorators.legacy.d.ts\",\"./a.ts\",\"./b.ts\"],\"fileInfos\":[\"d5989fd19a90632be70bb582dce051c9\",{\"version\":\"16934abaab7026ac114da441aabea1a0\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},\"d4306fb2e47f74835e8674ffac07d76f\",{\"version\":\"aae8996e8b5684814785a42cbbefcd79\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},\"abad6dd56cc8caf095c165df8124d237\",{\"version\":\"2a9941db0809c9ad0e8837ed629b1dcc\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"d051b93324f36bcc68d152a5ca0988cd\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"926204c28cd3d073865348473ae28d2e\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"f25e42c801b2cb3cf2b39792006a9beb\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"6344b55f26a4e81d9608777dbfb877dd\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"3c0ed28e53d3695b363e256ec1c023fd\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"4c2761daba7f17141c25baa0821ac5da\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"b87656acabd63e69379ff6ffcfe52fc7\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"597469522da047a5af5222cc6989f405\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"1708ea4d34dc37fadadc63ca01127e80\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"55d97a8c6fbf34a30450a7b1e5f7a298\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"b612fb5cf8e5d964b92063a75207632a\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"f64453cbf9671f28158677fa5c43967a\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"33f317af5428801f944a478d2c1e38e5\",\"affectsGlobalScope\":true,\"impliedNodeFormat\":1},{\"version\":\"b981a0c167ac626da7a9ae0572e4eb7e\",\"signature\":\"5a355f122748ed2d9d6d58af9953feac\",\"impliedNodeFormat\":1},{\"version\":\"690d76525a7ab7ad346edb2476dc8c33\",\"signature\":\"bcc3a89ac3fb461c52adfbc4e5f56cf5\",\"impliedNodeFormat\":1}],\"fileIdsList\":[[20]],\"options\":{\"newLine\":1,\"noErrorTruncation\":true,\"skipDefaultLibCheck\":true,\"target\":2,\"tsBuildInfoFile\":\"./out.tsbuildinfo\"},\"referencedMap\":[[21,1]],\"semanticDiagnosticsPerFile\":[20,21]}"
+      }
+     ],
+     "request": {
+      "actions": [
+       "emit"
+      ],
+      "edits": {
+       "/.src/a.ts": "export const a = '1';\n"
+      }
+     }
+    }
+   ]
+  }
+ ],
+ "compiler_version": "7.1.0-dev",
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "testrunner/phase3_incremental_test.go": "cc2175934ca9ba69cb235344b4009812f63ed176869588a5c0b81ff7dc20cd78",
+  "testutil/harnessutil/phase3_incremental_step.go": "09c523eb36974309cbd2bf8142f946c4de50c280fa6be4002ac0cd916697375d"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "version": 1
+}

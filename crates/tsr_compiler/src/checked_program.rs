@@ -277,6 +277,33 @@ impl CheckedProgram {
         })
     }
 
+    /// Each of `source_files`' bind and checker diagnostics, filtered and
+    /// sorted but not filtered for `noEmit`, aligned with `source_files` (the
+    /// pin's map from file to diagnostics); a file another pool skips has
+    /// none.
+    // port: tsc/internal/compiler/program.go:Program.GetSemanticDiagnosticsWithoutNoEmitFiltering
+    pub fn semantic_diagnostics_without_no_emit_filtering(
+        &self,
+        request: &CheckerRequest,
+        source_files: &[Arc<ProgramFile>],
+    ) -> Result<Vec<Vec<Diagnostic>>, Error> {
+        let cancellation = request.cancellation.as_ref();
+        let all_diags = self.collect_checker_diagnostics_from_files(
+            request,
+            source_files,
+            &|operation, file| {
+                self.program
+                    .bind_and_check_diagnostics_in(operation, file, cancellation)
+            },
+        )?;
+        let mut result = Vec::with_capacity(all_diags.len());
+        for diags in all_diags {
+            let diags = diags.transpose()?.unwrap_or_default();
+            result.push(self.program.filter_and_sort_diagnostics(&diags)?);
+        }
+        Ok(result)
+    }
+
     // port: tsc/internal/compiler/program.go:Program.GetSuggestionDiagnostics
     pub fn suggestion_diagnostics(
         &self,
@@ -432,4 +459,19 @@ impl<'a, 'op> FileCheckers<'a, 'op> {
     pub fn checker(&mut self, index: usize) -> &mut Operation<'op> {
         self.operations[index]
     }
+}
+
+/// Without `noEmit`, `diagnostics`; with it, those not skipped on `noEmit`.
+// port: tsc/internal/compiler/program.go:FilterNoEmitSemanticDiagnostics
+pub fn filter_no_emit_semantic_diagnostics(
+    diagnostics: Vec<Diagnostic>,
+    options: &tsr_core::CompilerOptions,
+) -> Vec<Diagnostic> {
+    if !options.no_emit.is_true() {
+        return diagnostics;
+    }
+    diagnostics
+        .into_iter()
+        .filter(|d| !d.skipped_on_no_emit)
+        .collect()
 }

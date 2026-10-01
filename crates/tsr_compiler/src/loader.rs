@@ -79,6 +79,13 @@ pub struct Resolution {
     pub mode: ModuleKind,
     pub result: ResolvedModule,
 }
+/// The pin's `LibFile`: a default library's name (`lib.es5.d.ts`) and
+/// whether `libReplacement` resolved it to a package.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LibFile {
+    pub name: JsString,
+    pub replaced: bool,
+}
 #[derive(Clone, Debug)]
 pub struct TypeResolution {
     pub file: JsString,
@@ -107,6 +114,8 @@ pub struct Program {
     option_verification: crate::OptionVerification,
     config: tsr_tsoptions::ParsedCommandLine,
     cwd: JsString,
+    /// The default library directory the program loaded its libraries from.
+    default_library_path: JsString,
     external_paths: BTreeSet<JsString>,
     options: Arc<CompilerOptions>,
     host: Arc<dyn FileSystem>,
@@ -114,6 +123,8 @@ pub struct Program {
     by_path: BTreeMap<JsString, usize>,
     pub(crate) metadata: BTreeMap<JsString, SourceFileMetaData>,
     libs: BTreeSet<JsString>,
+    /// The default library of each path in `libs`.
+    default_lib_files: BTreeMap<JsString, LibFile>,
     missing: Vec<JsString>,
     resolutions: Vec<Resolution>,
     type_resolutions: Vec<TypeResolution>,
@@ -268,6 +279,11 @@ impl Program {
     pub fn current_directory(&self) -> &[u8] {
         self.cwd.as_bytes()
     }
+    /// The default library directory (the pin's
+    /// `CompilerHost.DefaultLibraryPath`), made absolute.
+    pub fn default_library_path(&self) -> &[u8] {
+        self.default_library_path.as_bytes()
+    }
     /// Whether the file at `path` was found searching node_modules.
     /// port: tsc/internal/compiler/program.go:Program.IsSourceFileFromExternalLibrary
     pub fn is_external_library(&self, path: &[u8]) -> bool {
@@ -316,6 +332,54 @@ impl Program {
     /// port: tsc/internal/compiler/program.go:Program.IsSourceFileDefaultLibrary
     pub fn is_lib(&self, path: &[u8]) -> bool {
         self.libs.contains(path)
+    }
+    /// The default library loaded at `path`, if it is one.
+    // port: tsc/internal/compiler/program.go:Program.GetDefaultLibFile
+    pub fn default_lib_file(&self, path: &[u8]) -> Option<&LibFile> {
+        self.default_lib_files.get(path)
+    }
+    /// Visits the package.json cache of the program's resolver until `visit`
+    /// returns false.
+    // port: tsc/internal/compiler/program.go:Program.PackageJsonCacheEntries
+    pub fn package_json_cache_entries(
+        &self,
+        visit: impl FnMut(&JsString, &Arc<tsr_module::InfoCacheEntry>) -> bool,
+    ) {
+        self.package_resolver
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .package_json_cache_entries(visit);
+    }
+    /// The type reference directive resolutions of the file at `path` (the
+    /// pin's `GetResolvedTypeReferenceDirectives()[path]`), in name order.
+    // port: tsc/internal/compiler/program.go:Program.GetResolvedTypeReferenceDirectives
+    pub fn resolved_type_reference_directives<'a>(
+        &'a self,
+        path: &'a [u8],
+    ) -> impl Iterator<Item = &'a TypeResolution> {
+        self.type_resolutions
+            .iter()
+            .filter(move |resolution| resolution.file.as_bytes() == path)
+    }
+    /// The retained file that owns `node` (the pin's `ast.GetSourceFileOfNode`
+    /// for a node of this program).
+    pub fn file_of_node(&self, node: NodeId) -> Option<&Arc<ProgramFile>> {
+        self.owners
+            .node_file_index(node)
+            .map(|index| &self.files[index])
+    }
+    /// Whether `file` may be emitted, as `Program.SourceFileMayBeEmitted`
+    /// decides for the checker host.
+    pub fn source_file_may_be_emitted(
+        &self,
+        file: &ProgramFile,
+        force_dts_emit: bool,
+    ) -> Result<bool, Error> {
+        Ok(crate::output_paths::may_emit_with_force_dts(
+            file,
+            self,
+            force_dts_emit,
+        )?)
     }
     /// The configuration's syntax diagnostics followed by its option errors.
     /// port: tsc/internal/compiler/program.go:Program.GetConfigFileParsingDiagnostics
@@ -502,7 +566,9 @@ struct Loader<'a> {
     host: Arc<dyn FileSystem>,
     cwd: JsString,
     lib_path: JsString,
-    lib_files: BTreeMap<Vec<u8>, Vec<u8>>,
+    /// Each default library name with its file name and whether a
+    /// `libReplacement` resolution replaced it (the pin's `LibFile`).
+    lib_files: BTreeMap<Vec<u8>, (Vec<u8>, bool)>,
     skip_resolution: bool,
     single_threaded: Tristate,
     resolver: Resolver,
@@ -843,6 +909,23 @@ impl<'a> Loader<'a> {
             .collect();
         let mut references = self.references;
         references.release_loader();
+        let mut default_lib_files = BTreeMap::new();
+        for (name, (filename, replaced)) in &self.lib_files {
+            let key = path::to_path(
+                filename,
+                self.cwd.as_bytes(),
+                self.host.use_case_sensitive_file_names(),
+            );
+            if self.libs.contains(&key) {
+                default_lib_files.insert(
+                    key,
+                    LibFile {
+                        name: JsString::from_bytes(name.as_slice()),
+                        replaced: *replaced,
+                    },
+                );
+            }
+        }
         let mut program = Program {
             include_reasons: self.include_reasons,
             references,
@@ -860,6 +943,7 @@ impl<'a> Loader<'a> {
             },
             config: self.config,
             cwd: self.cwd,
+            default_library_path: self.lib_path,
             external_paths,
             owners: crate::resolver_host::OwnerIndex::from_files(&self.files),
             options: self.options,
@@ -868,6 +952,7 @@ impl<'a> Loader<'a> {
             by_path,
             metadata: self.metadata,
             libs: self.libs,
+            default_lib_files,
             missing: collected.missing,
             resolutions: self.resolutions,
             type_resolutions: self.type_resolutions,
@@ -1222,7 +1307,7 @@ impl<'a> Loader<'a> {
         parent: Option<&JsString>,
         reason: IncludeReasonData,
     ) -> Result<(), Error> {
-        if let Some(filename) = self.lib_files.get(name) {
+        if let Some((filename, _)) = self.lib_files.get(name) {
             let filename = filename.clone();
             self.link(parent, &filename, None, reason);
             self.load(
@@ -1238,6 +1323,7 @@ impl<'a> Loader<'a> {
             &path::combine(self.lib_path.as_bytes(), &[name]),
             self.cwd.as_bytes(),
         );
+        let mut replaced = false;
         if !self.skip_resolution && self.options.lib_replacement.is_true() && name != b"lib.d.ts" {
             let library_name = library_name_from_lib_file_name(name);
             let resolve_from =
@@ -1247,6 +1333,7 @@ impl<'a> Loader<'a> {
             self.library_traces.insert(key.clone(), trace);
             if result.is_resolved() {
                 filename = result.resolved_file_name.as_bytes().to_vec();
+                replaced = true;
             }
             self.resolutions.push(Resolution {
                 file: key,
@@ -1255,7 +1342,8 @@ impl<'a> Loader<'a> {
                 result,
             });
         }
-        self.lib_files.insert(name.to_vec(), filename.clone());
+        self.lib_files
+            .insert(name.to_vec(), (filename.clone(), replaced));
         self.link(parent, &filename, None, reason);
         self.load(
             &filename,
