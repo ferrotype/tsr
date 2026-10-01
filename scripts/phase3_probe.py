@@ -22,7 +22,11 @@ file. `names` lists the transformer names.
     check   --requests FILE --native FILE    # run it again and require the same fixture
     names
 
-The fixture binds the pin, the overlay sources and the requests by digest. The
+Each case of the fixture carries its `loading` request (the S07 shape: cwd,
+files, roots, effective options), so a Rust test loads the same program
+without porting the test-file format, and each file's text per chain.
+
+The fixture binds the pin and the overlay sources by digest. The
 oracle binary is cached under target/phase3/probe-oracle by overlay digest.
 """
 from __future__ import annotations
@@ -153,7 +157,7 @@ def run(cases):
                 chains.append(entry)
             files.append({"name": bytes.fromhex(file["name_hex"]).decode(), "chains": chains})
         results.append({"id": case["id"], "name": case["name"], "source": case["source"],
-                        "diagnostics": row["diagnostics"], "files": files})
+                        "diagnostics": row["diagnostics"], "loading": row["loading"], "files": files})
     return {"version": 1, "pin": pin(), "overlay_sha256": identity,
             "go": summary["go"], "transformers": summary["transformers"], "cases": results}
 

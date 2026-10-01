@@ -13,10 +13,12 @@ import (
 	"io"
 	"os"
 	"runtime"
+	"slices"
 	"testing"
 
 	"github.com/microsoft/TypeScript/tsc/internal/compiler"
 	"github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil"
+	"github.com/microsoft/TypeScript/tsc/internal/tspath"
 )
 
 type phase3Probe struct {
@@ -96,6 +98,26 @@ func TestPhase3Probe(t *testing.T) {
 			program := c.result.Program.Program()
 			row["options"] = c.options
 			row["diagnostics"] = len(c.result.Diagnostics)
+			// The program's inputs in the S07 loading-request shape, so a Rust
+			// test loads the same program without porting the test-file format.
+			inputs, roots, symlinks := map[string]string{}, []string{}, map[string]string{}
+			for _, unit := range slices.Concat(c.toBeCompiled, c.otherFiles) {
+				inputs[tspath.GetNormalizedAbsolutePath(unit.UnitName, c.currentDirectory)] = hex.EncodeToString([]byte(unit.Content))
+			}
+			for _, unit := range c.toBeCompiled {
+				name := tspath.GetNormalizedAbsolutePath(unit.UnitName, c.currentDirectory)
+				if !tspath.FileExtensionIs(name, tspath.ExtensionJson) && !tspath.FileExtensionIs(name, tspath.ExtensionTsBuildInfo) {
+					roots = append(roots, name)
+				}
+			}
+			for from, to := range c.result.Symlinks {
+				symlinks[tspath.GetNormalizedAbsolutePath(from, c.currentDirectory)] = tspath.GetNormalizedAbsolutePath(to, c.currentDirectory)
+			}
+			if len(c.tsConfigFiles) != 0 {
+				t.Fatal("a probe is configured by settings, not by a tsconfig unit")
+			}
+			row["loading"] = map[string]any{"id": probe.ID, "cwd": c.currentDirectory, "case_sensitive": c.harnessOptions.UseCaseSensitiveFileNames,
+				"files": inputs, "symlinks": symlinks, "roots": roots, "options": c.options, "skip_module_resolution": false}
 			files := []map[string]any{}
 			for _, file := range program.GetSourceFiles() {
 				if program.IsSourceFileDefaultLibrary(file.Path()) || file.IsDeclarationFile {
