@@ -16,6 +16,9 @@ pub mod usestrict;
 pub mod using;
 pub mod utilities;
 
+#[cfg(test)]
+mod helpers_tests;
+
 use crate::transformer::{chain, TransformOptions, Transformer, TransformerFactory};
 use tsr_core::ScriptTarget;
 
