@@ -1706,6 +1706,156 @@
    ]
   },
   {
+   "id": "reuse/panicked-write-remove-comments",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "var a = 1;\n/*c*/ y;"
+   },
+   "generators": 2,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    },
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 2
+    },
+    {
+     "file": 0,
+     "kind": "ExpressionStatement",
+     "index": 0,
+     "generator": 0
+    }
+   ],
+   "remove_comments": true,
+   "expected_outputs": [
+    {
+     "text": "var a = 1;\ny;\n"
+    },
+    {
+     "text": "panic: sourceIndex is out of range"
+    },
+    {
+     "text": "y;"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,IAAI,CAAC,GAAG,CAAC,CAAC;AACJ,CAAC,CAAC\"}"
+    },
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[],\"names\":[],\"mappings\":\"\"}"
+    }
+   ]
+  },
+  {
+   "id": "reuse/panicked-write-no-nested-comments",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f() {\n    x;\n}\n/*c*/ y;"
+   },
+   "generators": 2,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    },
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 2
+    },
+    {
+     "file": 0,
+     "kind": "ExpressionStatement",
+     "index": 1,
+     "generator": 0
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "Block",
+     "index": 0,
+     "flags": 512
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f() {\n    x;\n}\ny;\n"
+    },
+    {
+     "text": "panic: sourceIndex is out of range"
+    },
+    {
+     "text": "/*c*/ y;"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC;IACN,CAAC,CAAC;AACN,CAAC;AACK,CAAC,CAAC\"}"
+    },
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[],\"names\":[],\"mappings\":\"\"}"
+    }
+   ]
+  },
+  {
+   "id": "reuse/panicked-write-container-end",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f() { } // t\nvar x;"
+   },
+   "generators": 2,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    },
+    {
+     "file": 0,
+     "kind": "FunctionDeclaration",
+     "index": 0,
+     "generator": 2
+    },
+    {
+     "file": 0,
+     "kind": "FunctionDeclaration",
+     "index": 0,
+     "generator": 0
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f() { } // t\nvar x;\n"
+    },
+    {
+     "text": "panic: sourceIndex is out of range"
+    },
+    {
+     "text": "function f() { }"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,KAAK,CAAC,CAAC,IAAI;AACrB,IAAI,CAAC,CAAC\"}"
+    },
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[],\"names\":[],\"mappings\":\"\"}"
+    }
+   ]
+  },
+  {
    "id": "flags/no-leading-source-map",
    "file_name": "/a.ts",
    "source": {

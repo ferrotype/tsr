@@ -359,7 +359,7 @@ fn expected_list(case: &Value, key: &str) -> Vec<Vec<u8>> {
 fn printed_files_and_source_maps_match_the_pin() {
     let document: Value = serde_json::from_str(FIXTURE).expect("fixture");
     let cases = document["cases"].as_array().expect("cases");
-    assert!(cases.len() >= 114);
+    assert!(cases.len() >= 117);
     let mut failures = Vec::new();
     for case in cases {
         let id = case["id"].as_str().expect("id");

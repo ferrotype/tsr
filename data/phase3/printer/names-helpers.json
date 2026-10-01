@@ -534,6 +534,38 @@
    ]
   },
   {
+   "id": "noasi-nested-pee-access-chain",
+   "source": "function f() {\n    return ((// c\n    x).y).z;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    x).y.z;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-nested-pee-doubled-chain",
+   "source": "function f() {\n    return (((// c\n    x).y)).z;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    x).y.z;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-nested-pee-top",
+   "source": "function f() {\n    return ((// c\n    x).y);\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    x).y;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-shared-nested-pee-call",
+   "source": "function f() {\n    return ((// c\n    g).h)($lastpee);\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    g).h(// c\n    g.h);\n}\n"
+   ]
+  },
+  {
    "id": "listener-plain",
    "source": "class C { m() { return a.b + 1; } }",
    "listener": true,
@@ -570,6 +602,16 @@
    "expected": [
     "function f() {\n    return ( // c\n    x).y +\n        // c\n        x.y;\n}\n",
     "SourceFile - -\nFunctionDeclaration 0 71\nIdentifier 9 10\nBlock 13 71\nReturnStatement 15 69\nBinaryExpression - -\nPropertyAccessExpression 44 68\nPartiallyEmittedExpression 44 66\nIdentifier 57 66\nIdentifier 67 68\nPlusToken - -\nPropertyAccessExpression 44 68\nPartiallyEmittedExpression 44 66\nIdentifier 57 66\nIdentifier 67 68\nEndOfFile - -"
+   ]
+  },
+  {
+   "id": "listener-noasi-nested-pee-top",
+   "source": "function f() {\n    return ((// c\n    x).y);\n}",
+   "pee": "original",
+   "listener": true,
+   "expected": [
+    "function f() {\n    return ( // c\n    x).y;\n}\n",
+    "SourceFile - -\nFunctionDeclaration 0 44\nIdentifier 9 10\nBlock 13 44\nReturnStatement 15 42\nPartiallyEmittedExpression - -\nPropertyAccessExpression - -\nPartiallyEmittedExpression - -\nIdentifier 33 38\nIdentifier 40 41\nEndOfFile - -"
    ]
   },
   {

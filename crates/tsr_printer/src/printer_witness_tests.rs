@@ -541,7 +541,7 @@ impl EmitTextWriter for ListeningWriter {
 fn generated_names_helpers_and_no_asi_parentheses_print_as_pinned() {
     let document: Value = serde_json::from_str(FIXTURE).expect("fixture");
     let cases = document["cases"].as_array().expect("cases");
-    assert!(cases.len() >= 132);
+    assert!(cases.len() >= 137);
     let mut failures = Vec::new();
     for case in cases {
         let id = case["id"].as_str().expect("id");
