@@ -15,6 +15,7 @@ mod executor;
 
 use serde_json::{json, Value};
 use std::cell::RefCell;
+use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::path::Path;
 use std::rc::Rc;
 use tsr_arena::NodeId;
@@ -116,6 +117,17 @@ fn transform(
     Ok(writer.text().to_vec())
 }
 
+/// The message of a caught panic.
+fn panic_text(payload: &(dyn std::any::Any + Send)) -> String {
+    if let Some(text) = payload.downcast_ref::<String>() {
+        return text.clone();
+    }
+    if let Some(text) = payload.downcast_ref::<&str>() {
+        return (*text).to_owned();
+    }
+    "<non-string panic>".to_owned()
+}
+
 fn load(case: &Value) -> Result<CheckedProgram, String> {
     let request = json!({"id": case["id"], "loading": case["loading"], "mode": "single"});
     executor::load_fresh_checked(&request, &mut FileCache::new())
@@ -179,7 +191,13 @@ fn ported_transformers_print_what_the_pinned_ones_print() {
                         &CheckerRequest::default(),
                         source,
                         &mut |op| {
-                            result = Some(transform(&program, op, source, &chain));
+                            // A panic inside one chain is that chain's refusal.
+                            let outcome = catch_unwind(AssertUnwindSafe(|| {
+                                transform(&program, op, source, &chain)
+                            }));
+                            result = Some(outcome.unwrap_or_else(|payload| {
+                                Err(format!("panicked: {}", panic_text(&*payload)))
+                            }));
                             Ok(())
                         },
                     );
