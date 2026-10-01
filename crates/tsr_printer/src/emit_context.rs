@@ -336,7 +336,7 @@ impl EmitContext {
         name
     }
     // port: tsc/internal/printer/emitcontext.go:EmitContext.getNodeForGeneratedNameWorker
-    fn generated_name_root(
+    pub(crate) fn generated_name_root(
         &self,
         factory: &dyn Factory,
         mut node: NodeId,
@@ -399,7 +399,7 @@ impl EmitContext {
         )
     }
     // port: tsc/internal/printer/factory.go:NodeFactory.newGeneratedIdentifier
-    fn new_generated_identifier(
+    pub(crate) fn new_generated_identifier(
         &mut self,
         factory: &mut dyn Factory,
         kind: generated_identifier_flags::Flags,
@@ -408,15 +408,7 @@ impl EmitContext {
         options: AutoGenerateOptions,
     ) -> NodeId {
         use generated_identifier_flags as g;
-        static NEXT_ID: AtomicU32 = AtomicU32::new(0);
-        // Exhaustion must not alias a retained generated name. Unlike a source
-        // integer, this counter is an internal identity and cannot wrap safely.
-        let id = AutoGenerateId(
-            NEXT_ID
-                .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
-                .expect("generated-name identity space exhausted")
-                + 1,
-        );
+        let id = next_auto_generate_id();
         let text = if text.is_empty() {
             let base = match source {
                 None => JsString::from_bytes(format!("(auto@{})", id.get()).into_bytes()),
@@ -457,7 +449,7 @@ impl EmitContext {
             text
         };
         let node = factory.new_identifier(text);
-        self.tables().auto_generate.insert(
+        self.set_auto_generate_info(
             node,
             AutoGenerateInfo {
                 id,
@@ -469,6 +461,25 @@ impl EmitContext {
         );
         node
     }
+    /// `c.autoGenerate[name] = autoGenerate`, shared by the identifier and
+    /// private-identifier constructors.
+    pub(crate) fn set_auto_generate_info(&mut self, node: NodeId, info: AutoGenerateInfo) {
+        self.tables().auto_generate.insert(node, info);
+    }
+}
+
+/// `AutoGenerateId(nextAutoGenerateId.Add(1))`: one process-wide counter for
+/// generated identifiers and generated private identifiers.
+pub(crate) fn next_auto_generate_id() -> AutoGenerateId {
+    static NEXT_ID: AtomicU32 = AtomicU32::new(0);
+    // Exhaustion must not alias a retained generated name. Unlike a source
+    // integer, this counter is an internal identity and cannot wrap safely.
+    AutoGenerateId(
+        NEXT_ID
+            .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+            .expect("generated-name identity space exhausted")
+            + 1,
+    )
 }
 
 struct EmitHooks(Arc<Mutex<SideTables>>);

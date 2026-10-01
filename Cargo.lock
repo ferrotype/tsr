@@ -1197,11 +1197,14 @@ dependencies = [
  "stacker",
  "tsr_arena",
  "tsr_ast",
+ "tsr_binder",
  "tsr_core",
  "tsr_jsnum",
  "tsr_jsstring",
  "tsr_nodebuilder",
+ "tsr_parser",
  "tsr_scanner",
+ "tsr_tspath",
 ]
 
 [[package]]

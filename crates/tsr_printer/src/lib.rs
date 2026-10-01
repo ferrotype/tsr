@@ -24,8 +24,11 @@ mod emit_context;
 pub mod emit_flags;
 pub mod emit_resolver;
 mod emit_text_writer;
+mod factory_names;
+mod generatedidentifierflags;
 pub mod list_format;
 mod literal_text;
+mod namegenerator;
 mod printer;
 mod semicolon_writer;
 mod single_line_string_writer;
@@ -41,8 +44,13 @@ pub use emit_context::{
 };
 pub use emit_flags::EmitFlags;
 pub use emit_text_writer::EmitTextWriter;
+pub use generatedidentifierflags::GeneratedIdentifierFlagsExt;
 pub use list_format::ListFormat;
 pub use literal_text::LiteralTextFlags;
+pub use namegenerator::{
+    format_generated_name, GetTextOfNodeFn, IsFileLevelUniqueNameFn, NameGenerator,
+    NameGeneratorHost,
+};
 pub(crate) use printer::Session;
 pub use printer::{Printer, PrinterOptions, WriteKind};
 pub use semicolon_writer::TrailingSemicolonDeferringWriter;
