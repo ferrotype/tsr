@@ -6,7 +6,7 @@ use std::rc::Rc;
 use std::sync::Arc;
 use tsr_arena::NodeId;
 use tsr_ast::JsString;
-use tsr_binder::name_resolver::ResolverOptions;
+use tsr_binder::name_resolver::{ResolverHost, ResolverOptions};
 use tsr_binder::reference_resolver::{
     NoReferenceResolverHooks, ReferenceResolver as BinderResolver,
 };
@@ -26,12 +26,25 @@ struct BoundReferenceResolver<'a> {
     resolver: BinderResolver,
 }
 
+impl BoundReferenceResolver<'_> {
+    /// Whether `node` belongs to storage the program does not retain: a node
+    /// of a transform's factory. Upstream resolves such a node's name from
+    /// the node itself; it has no parent, so no scope holds the name and the
+    /// identifier queries below answer nil without reading it.
+    fn is_transform_node(&self, node: NodeId) -> bool {
+        matches!(self.host.ast(node), Err(tsr_arena::Error::WrongOwner))
+    }
+}
+
 impl ReferenceResolver for BoundReferenceResolver<'_> {
     fn get_referenced_export_container(
         &mut self,
         node: NodeId,
         prefix_locals: bool,
     ) -> ResolverResult<Option<NodeId>> {
+        if self.is_transform_node(node) {
+            return Ok(None);
+        }
         Ok(self.resolver.get_referenced_export_container(
             &mut self.host,
             &mut NoReferenceResolverHooks,
@@ -43,6 +56,9 @@ impl ReferenceResolver for BoundReferenceResolver<'_> {
         &mut self,
         node: NodeId,
     ) -> ResolverResult<Option<NodeId>> {
+        if self.is_transform_node(node) {
+            return Ok(None);
+        }
         Ok(self.resolver.get_referenced_import_declaration(
             &mut self.host,
             &mut NoReferenceResolverHooks,
@@ -50,6 +66,9 @@ impl ReferenceResolver for BoundReferenceResolver<'_> {
         )?)
     }
     fn get_referenced_value_declaration(&mut self, node: NodeId) -> ResolverResult<Option<NodeId>> {
+        if self.is_transform_node(node) {
+            return Ok(None);
+        }
         Ok(self.resolver.get_referenced_value_declaration(
             &mut self.host,
             &mut NoReferenceResolverHooks,
@@ -60,6 +79,9 @@ impl ReferenceResolver for BoundReferenceResolver<'_> {
         &mut self,
         node: NodeId,
     ) -> ResolverResult<Option<Vec<NodeId>>> {
+        if self.is_transform_node(node) {
+            return Ok(None);
+        }
         Ok(self.resolver.get_referenced_value_declarations(
             &mut self.host,
             &mut NoReferenceResolverHooks,

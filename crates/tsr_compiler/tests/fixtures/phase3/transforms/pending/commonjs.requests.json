@@ -1,0 +1,94 @@
+{
+ "cases": [
+  {
+   "id": "script-export-enum",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport enum E { A, B = A + 1 }\nE.A;\nexport const enum K { X }\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-export-namespace",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport namespace N { export const v = 1; export function f() { return v; } }\nN.f();\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-import-equals-entity",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nnamespace N { export const v = 1; }\nimport m = N.v;\nexport import n = N.v;\nexport { m };\nm + n;\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-class-static-fields",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @target: es2015\n// @filename: main.ts\nexport class C { static s = 1; static t = C.s; #p = 2; }\nexport default class { static u = 3; }\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-legacy-decorated-class",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @experimentalDecorators: true\n// @filename: main.ts\ndeclare function dec(t: any): any;\n@dec export class C { m() {} }\n@dec export default class D {}\nnew C();\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-es-decorated-class",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @target: es2022\n// @filename: main.ts\ndeclare function dec(t: any, c: any): any;\n@dec export class C { static s = C; }\nnew C();\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-object-rest-export",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @target: es2017\n// @filename: main.ts\nconst o = { a: 1, b: 2 };\nexport const { a, ...rest } = o;\nexport let x;\n({ a: x, ...x } = o);\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-es2015-exports",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @target: es2015\n// @filename: main.ts\nimport { x } from \"./a\";\nexport let y = x;\nexport function f() { return y++; }\nexport class K { m() { return x; } }\nfor (const v of [1]) { y += v; }\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-namespace-merged-export",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport function F() {}\nexport namespace F { export const v = 1; }\nexport class C {}\nexport namespace C { export const w = 2; }\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  }
+ ]
+}

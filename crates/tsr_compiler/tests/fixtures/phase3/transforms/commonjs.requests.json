@@ -1,0 +1,1260 @@
+{
+ "cases": [
+  {
+   "id": "import-side-effect",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport \"./a\";\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-namespace",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport * as ns from \"./a\";\nns.x;\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-namespace-interop",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @esModuleInterop: true\n// @filename: main.ts\nimport * as ns from \"./a\";\nns.f();\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-default",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport d from \"./a\";\nd;\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-named",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport { x, f as g } from \"./a\";\nx;\ng();\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-default-and-named",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport d, { x } from \"./a\";\nd + x;\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-default-and-namespace",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport d, * as ns from \"./a\";\nd + ns.x;\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-named-default-reference",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport { default as d2, x } from \"./a\";\nd2 + x;\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-named-default-only",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport { default as d2 } from \"./a\";\nd2;\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-string-names",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @target: es2022\n// @filename: main.ts\nimport { \"x\" as sx, \"a-b\" as ab } from \"./b\";\nsx + ab;\n// @filename: b.ts\nconst q = 1;\nexport { q as \"a-b\", q as x };\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-reexported-live",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport { x } from \"./a\";\nexport { x };\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-default-reexported",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport d from \"./a\";\nexport { d, d as e };\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-namespace-reexported",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport * as ns from \"./a\";\nexport { ns };\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-reexported-under-export-equals",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport { x } from \"./a\";\nexport { x };\nexport = x;\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-equals",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport a = require(\"./a\");\na.x;\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-equals-exported",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport import a = require(\"./a\");\na.f();\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-equals-reexported",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport a = require(\"./a\");\nexport { a, a as b };\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-equals-internal-panics",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\ndeclare namespace N { const v: number; }\nimport m = N.v;\nexport { m };\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-shorthand-reference",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport { x } from \"./a\";\nconst o = { x };\nexport { o };\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-tagged-template",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport { f } from \"./a\";\nf`t${1}`;\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-call-member",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport * as ns from \"./a\";\nns.f();\nimport { f } from \"./a\";\nf?.();\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-in-nested-function",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport d, { x } from \"./a\";\nfunction g() { return d + x; }\ng();\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-attributes-json",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @resolveJsonModule: true\n// @esModuleInterop: true\n// @filename: main.ts\nimport data from \"./data.json\" with { type: \"json\" };\nexport const v = data.k;\n// @filename: data.json\n{ \"k\": 1 }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-json-namespace",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @resolveJsonModule: true\n// @filename: main.ts\nimport * as data from \"./data.json\";\nimport { k } from \"./data.json\";\ndata.k + k;\n// @filename: data.json\n{ \"k\": 1 }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-star",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport * from \"./a\";\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-star-as",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport * as ns from \"./a\";\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-star-as-default",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport * as default from \"./a\";\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-star-as-string",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @target: es2022\n// @filename: main.ts\nexport * as \"a-b\" from \"./a\";\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-named-from",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport { x, y as z } from \"./a\";\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-from",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport { default, default as d, x as default2 } from \"./a\";\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-string-names-from",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @target: es2022\n// @filename: main.ts\nexport { x as \"a-b\", \"y\" as yy } from \"./a\";\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-star-and-local",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport * from \"./a\";\nexport const local = 1;\nexport { x as other } from \"./a\";\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-const-list",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport const a = 1, b = a + 1;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-let-uninitialized",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport let a;\nexport var b;\na = 1;\nb = a;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-function-class-expressions",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport var f = () => 1, g = function () { return 2; }, C = class {};\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-binding-pattern",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nconst o = { a: 1, b: [2, 3] };\nexport const { a, b: [c, d] } = o;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-binding-pattern-realiased",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nconst o = { a: 1, b: 2 };\nexport const { a, b } = o;\nexport { a as aa };\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-binding-pattern-rest",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nconst o = { a: 1, b: 2 };\nexport const { a, ...rest } = o;\nexport const [first, , ...others] = [1, 2, 3];\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-expression",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nconst v = 1;\nexport default v + 1;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-function-anonymous",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport default function () { return 1; }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-function-named",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport default function g() { return g; }\ng();\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-class-anonymous",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport default class { m() {} }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-class-named",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport default class K { static s = K; }\nnew K();\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-function-hoisted",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nf();\nexport function f() { return 1; }\nexport function* gen() { yield 1; }\nexport async function af() {}\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-function-by-specifier",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nfunction f() {}\nfunction g() {}\nexport { f, g as h, f as \"str\" };\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-class",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport class C { static x = 1; m() { return C.x; } }\nnew C();\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-class-by-specifier",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nclass D {}\nexport { D, D as E };\nclass F extends D {}\nexport { F };\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-class-extends-import",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport { f } from \"./a\";\nexport class C extends (f) {}\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-equals",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nconst v = { a: 1 };\nexport = v;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-equals-with-exports",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport var a = 1;\nexport function f() {}\nexport class C {}\nvar q = 1;\nexport { q };\nexport = a;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-equals-import",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport { x } from \"./a\";\nexport = x;\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-empty",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport {};\nvar x = 1;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-specifier-dedupe",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nvar x = 1;\nexport { x, x as y, x as \"a-b\", x as \"a-b\" };\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-many-names",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport let v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31, v32, v33, v34, v35, v36, v37, v38, v39, v40, v41, v42, v43, v44, v45, v46, v47, v48, v49, v50, v51, v52;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-string-names-local",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @target: es2022\n// @filename: main.ts\nvar x = 1;\nexport { x as \"a-b\", x as \"c d\" };\nx = 2;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-specifier",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nvar x = 1;\nexport { x as default };\nx++;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-lowered-enum",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nvar E;\n(function (E) {\n    E[E[\"A\"] = 0] = \"A\";\n})(E || (E = {}));\nexport { E };\nexport var F;\n(function (F) {\n    F[F[\"B\"] = 0] = \"B\";\n})(F || (F = {}));\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "export-lowered-namespace",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport var N;\n(function (N) {\n    N.v = 1;\n})(N || (N = {}));\nN.v;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "assign-direct-export",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport let x = 0;\nx = 1;\nx += 2;\nconst y = (x = 3);\nfunction g() { x = 4; }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "assign-specifier-export",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nlet x = 0;\nexport { x };\nx = 1;\nx ||= 2;\nlet z = x = 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "assign-multi-export",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nlet x = 0;\nexport { x, x as y };\nx = 5;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "prefix-update",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nlet x = 0;\nexport { x };\n++x;\nconst y = --x;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "postfix-update-discarded",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nlet x = 0;\nexport { x };\nx++;\nx--, x++;\n(x++);\nvoid x++;\nfor (;; x++) break;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "postfix-update-value",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nlet x = 0;\nexport { x, x as w };\nlet y = x++;\nconsole.log(x--);\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "postfix-update-direct",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport let c = 0;\nc++;\nconst d = c++;\nfunction inc() { return ++c; }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "update-not-exported",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nlet x = 0;\nx++;\n++x;\nx = 2;\nexport const y = x;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "destructure-direct-export",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport let a = 0, b = 0;\n[a, b] = [1, 2];\n({ a, b } = { a: 3, b: 4 });\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "destructure-specifier-export",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nlet a = 0, b = 0;\nexport { a, b };\n[a, b] = [1, 2];\n({ a, b: b } = { a: 3, b: 4 });\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "destructure-value-used",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nlet a = 0;\nexport { a };\nconst r = [a] = [1];\nconsole.log(({ a } = { a: 2 }));\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "destructure-realiased",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport let a = 0;\nexport { a as b };\n[a] = [1];\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "destructure-defaults-and-rest",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport let a = 0, rest;\nlet q;\nexport { q };\n({ a = 1, ...rest } = {});\n[q = 2, ...rest] = [];\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "destructure-nested",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nlet a = 0, b;\nexport { a };\n({ p: { a }, q: [b] } = { p: { a: 1 }, q: [2] });\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "destructure-shorthand-initializer",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport let a;\n({ a = 1 } = {});\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "destructure-with-method",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport let a;\n({ a, m() {} } = {});\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "destructure-export-name-plain",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nlet a = 0;\n({ a } = { a: 1 });\n[a] = [2];\nexport const z = a;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "shorthand-exported",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport let y = 1;\nconst o = { y };\nconst p = { y: y };\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "nested-for-var",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport { x };\nfor (var x = 0, q = 1; x < 2; x++) { }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "nested-for-var-no-export",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nfor (var i = 0; i < 2; i++) { }\nfor (let j = 0; j < 2; j++) { }\nexport {};\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "nested-for-in-block",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport { k };\nconst o = { a: 1 };\nfor (var k in o) { console.log(k); }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "nested-for-in-statement",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport { k };\nconst o = { a: 1 };\nfor (var k in o) console.log(k);\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "nested-for-of-var-and-let",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport { v };\nfor (var v of [1]) { }\nfor (let w of [1]) { }\nfor (v of [2]) { }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "nested-for-of-destructuring",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport { a };\nfor (var [a, b] of [[1, 2]]) { }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "nested-blocks",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport { a, b, c, d, e, g, h };\nif (Math.random()) { var a = 1; } else var b = 2;\n{ var c = 3; }\ntry { var d = 4; } catch (err) { var e = 5; } finally { var g = 6; }\nswitch (a) { case 1: var h = 7; break; default: h = 8; }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "nested-loops",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport { a, b, c };\ndo { var a = 1; } while (a < 1);\nwhile (b) { var b = 0; }\nl: { var c = 3; break l; }\nl2: for (;;) { break l2; }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "nested-if-only-then",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport let z = 0;\nif (z) z++;\nif (z) ; else z--;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "nested-var-uninitialized",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport { a, b };\nvar a, b = 1;\nif (a) { var c; }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "nested-with",
+   "name": "main.js",
+   "source": "// @module: commonjs\n// @allowJs: true\n// @filename: main.js\nexport { a };\nwith ({}) { var a = 1; }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "dynamic-import-literal",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport const p = import(\"./a\");\n// @filename: a.ts\nexport const x = 1;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "dynamic-import-expression",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nconst m = \"./a\";\nexport const p = import(m);\nexport const q = import(`./${m}`);\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "dynamic-import-script",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nconst p = import(\"./a\");\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "dynamic-import-target-es2020",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @target: es2020\n// @filename: main.ts\nexport const p = import(\"./a\");\nimport(\"./a\").then(m => m);\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "dynamic-import-with-options",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport const p = import(\"./a\", { with: { type: \"json\" } });\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "dynamic-import-no-arguments-spread",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nconst args = [\"./a\"];\nexport const p = import(...args);\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "dynamic-import-mts",
+   "name": "main.mts",
+   "source": "// @module: commonjs\n// @filename: main.mts\nexport const p = import(\"./a\");\nexport default 1;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "rewrite-relative-import-call",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @rewriteRelativeImportExtensions: true\n// @filename: main.ts\nconst m = \"./b.ts\";\nexport const p = import(\"./a.ts\");\nexport const q = import(m);\nimport \"./c.ts\";\nexport * from \"./d.ts\";\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "rewrite-relative-import-jsx-preserve",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @rewriteRelativeImportExtensions: true\n// @jsx: preserve\n// @filename: main.ts\nconst m = \"./b.ts\";\nexport const q = import(m);\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "rewrite-relative-require-js",
+   "name": "main.js",
+   "source": "// @module: commonjs\n// @rewriteRelativeImportExtensions: true\n// @allowJs: true\n// @moduleDetection: force\n// @filename: main.js\nconst a = require(\"./a.ts\");\nconst m = \"./b.ts\";\nconst b = require(m);\nconst b2 = require(m, 2);\nconst c = require(\"./c.js\", m);\nconst d = require(\"pkg\");\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "rewrite-relative-unchanged-literal",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @rewriteRelativeImportExtensions: true\n// @filename: main.ts\nexport const p = import(\"./a.js\");\nexport const q = import(\"pkg\");\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "cts-file",
+   "name": "main.cts",
+   "source": "// @module: commonjs\n// @filename: main.cts\nimport d from \"./a\";\nexport const v = d;\nexport const p = import(\"./a\");\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "mts-file-imports",
+   "name": "main.mts",
+   "source": "// @module: commonjs\n// @filename: main.mts\nimport d from \"./a\";\nexport const v = d;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "js-commonjs-file",
+   "name": "main.js",
+   "source": "// @module: commonjs\n// @allowJs: true\n// @filename: main.js\nconst a = require(\"./a\");\nmodule.exports.v = a;\nexport const w = 1;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "js-commonjs-only",
+   "name": "main.js",
+   "source": "// @module: commonjs\n// @allowJs: true\n// @moduleDetection: force\n// @filename: main.js\nconst a = require(\"./a\");\nmodule.exports = a;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "script-file",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nvar x = 1;\nx++;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "use-strict-prologue",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\n\"use strict\";\n\"other directive\";\nimport { x } from \"./a\";\nexport const y = x;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-helpers",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @importHelpers: true\n// @filename: main.ts\nimport * as ns from \"./a\";\nimport d from \"./a\";\nexport * from \"./a\";\nexport function f() { return ns.x + d; }\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-helpers-mts",
+   "name": "main.mts",
+   "source": "// @module: commonjs\n// @importHelpers: true\n// @filename: main.mts\nimport * as ns from \"./a\";\nexport const v = ns.x;\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "import-meta",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @target: es2022\n// @filename: main.ts\nexport const u = import.meta;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "top-level-this",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport const t = this;\nfunction g() { return this; }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "require-shadowed",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport d from \"./a\";\nfunction require(n) { return n; }\nexport const v = d;\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "require-local-variable",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nconst require = 1;\nimport { x } from \"./a\";\nexport { x, require };\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "exports-shadowed-in-function",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport let x = 1;\nfunction g(exports) { return x + exports; }\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "comments-on-exports",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\n/** a */\nexport const a = 1;\n// b\nexport function b() {}\n/* c */\nexport default a;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "elide-type-import",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport { T, x } from \"./t\";\nlet v: T = x;\nexport { v };\n// @filename: t.ts\nexport interface T {}\nexport const x = 1;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision",
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "elide-unused-import",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport { x } from \"./t\";\nimport * as ns from \"./t\";\nimport d from \"./t\";\nexport const v = 1;\n// @filename: t.ts\nexport const x = 1;\nexport default 2;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision",
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "elide-type-only-export",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport type { T } from \"./t\";\nexport type { T };\nexport type U = number;\nexport interface I {}\nexport declare const d: number;\nexport const e: number = 1;\n// @filename: t.ts\nexport interface T {}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision",
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "elide-reexport-type",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport { T, x } from \"./t\";\nexport * from \"./t\";\n// @filename: t.ts\nexport interface T {}\nexport const x = 1;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision",
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "elide-import-equals-unused",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport t = require(\"./t\");\nimport u = require(\"./t\");\nexport const v = u.x;\n// @filename: t.ts\nexport const x = 1;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision",
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "elide-verbatim",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @verbatimModuleSyntax: true\n// @filename: main.ts\nimport t = require(\"./t\");\nimport type { T } from \"./t\";\nlet v: T;\nexport = t;\n// @filename: t.ts\nexport interface T {}\nexport const x = 1;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "elide-verbatim-esm-syntax",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @verbatimModuleSyntax: true\n// @filename: main.ts\nimport { x } from \"./t\";\nexport const v = x;\n// @filename: t.ts\nexport const x = 1;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "elide-typed-exports",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport let a: number = 1, b!: string;\nexport function f(p: number): number { return p; }\nexport class C<T> implements I { m(): void {} }\ninterface I {}\na = f(2);\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision",
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "elide-esmodule-interop",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @esModuleInterop: true\n// @filename: main.ts\nimport d, { x, type T } from \"./t\";\nlet v: T = d;\nexport { v, x };\n// @filename: t.ts\nexport interface T {}\nexport const x = 1;\nexport default 2;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision",
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "verbatim-live-bindings",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @verbatimModuleSyntax: true\n// @filename: main.ts\nimport a = require(\"./a\");\nlet x = a.x;\nx++;\nx = 2;\n[x] = [3];\nexport = { x, f: a.f };\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-modules-exports",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @isolatedModules: true\n// @filename: main.ts\nexport let x = 1;\nx++;\nlet y = 0;\nexport { y };\n({ y } = { y: 2 });\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  },
+  {
+   "id": "rewrite-relative-mts-import-call",
+   "name": "main.mts",
+   "source": "// @module: commonjs\n// @rewriteRelativeImportExtensions: true\n// @filename: main.mts\nconst m = \"./b.ts\";\nexport const p = import(\"./a.ts\", { with: { type: \"json\" } });\nexport const q = import(m, {});\nexport const r = import(\"pkg\");\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  }
+ ]
+}

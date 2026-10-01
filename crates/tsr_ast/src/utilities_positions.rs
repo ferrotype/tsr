@@ -326,7 +326,7 @@ pub fn is_expression(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
 }
 
 /// `IsImportCall`, whose home is the parser's reference collector.
-pub(crate) fn is_import_call(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
+pub fn is_import_call(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
     let read = view.node(node)?;
     if read.kind() != K::CallExpression {
         return Ok(false);
