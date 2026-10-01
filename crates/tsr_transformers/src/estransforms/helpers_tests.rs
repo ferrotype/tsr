@@ -687,19 +687,11 @@ fn panic_text(payload: &(dyn std::any::Any + Send)) -> String {
     "<non-string panic>".to_owned()
 }
 
-/// Cases whose expected text needs printer support this worktree does not
-/// have yet: the name generator (`NameGenerator.GenerateName`, for the
-/// generated names of computed keys and backing fields) and string literals
-/// printed from a template text source. They are compared, and they pass once
-/// the printer lands; until then a difference is tolerated as long as no
-/// panic other than the printer's own occurs.
-const PENDING_PRINTER: &[&str] = &[
-    "tr-objects-computed",
-    "tr-class-members-computed",
-    "pn-computed",
-    "pn-template",
-    "bf-kinds",
-];
+/// Cases whose expected text needs printer support the printer does not have
+/// yet. A difference is tolerated as long as no panic other than the
+/// printer's own occurs. None remain: the computed-key, backing-field and
+/// template-text cases pass since the printer's name generator landed.
+const PENDING_PRINTER: &[&str] = &[];
 
 fn execute(case: &Case) -> String {
     let mut run = Run::parse(&case.source);
