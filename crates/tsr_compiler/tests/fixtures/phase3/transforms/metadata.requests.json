@@ -429,6 +429,140 @@
      "metadata"
     ]
    ]
+  },
+  {
+   "id": "md-es-decorators-class-expression",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: false\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nconst A = @dec class {\n    constructor(x: string) {}\n    @dec m(y: number): void {}\n};\nconst B = @dec class Named { @dec p: string; };\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "md-undecorated-members-with-decorated-children",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    x = class { @dec y: string; };\n    m() { class K { @dec p: number; } return K; }\n    get g() { class K { @dec q: boolean; } return K; }\n    set s(v: any) { class K { @dec r: string; } }\n    static n() { return class { @dec t: symbol; }; }\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "md-strict-false-unions",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @strict: false\ndeclare function dec(...args: any[]): any;\nclass A {}\nclass C {\n    @dec a: string | null;\n    @dec b: number | undefined | null;\n    @dec c: null | undefined;\n    @dec d: A | null;\n    @dec e: string | null | number;\n    @dec f: never | undefined;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "md-strict-true-unions",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @strict: true\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: string | null;\n    @dec b: null | undefined;\n    @dec c: string | never;\n    @dec d: void | undefined;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "md-setter-without-parameter",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec set a() {}\n    @dec set b(this: C) {}\n    @dec set c(this: C, v: number) {}\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "md-typeeraser-then-metadata",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nabstract class A {\n    constructor(@dec x: string) {}\n}\nclass B {\n    public m(@dec x: number): void {}\n    private set s(@dec v: string) {}\n    @dec public readonly p: string;\n}\n@dec\nexport abstract class E { constructor(y: number) {} }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "metadata"
+    ],
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "md-object-literal-in-class",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass X {\n    m() { return { @dec n(x: string) {} }; }\n}\nconst o = { @dec get g(): string { return \"\"; }, @dec set g(v: string) {} };\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "md-rest-type-kind",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: ...string;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "md-jsdoc-postfix-kinds",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: string?;\n    @dec b: number!;\n    @dec c: string=;\n    @dec m(...r: ...string): void {}\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "md-unresolved-union-parens",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @strict: true\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: A.B.C | A.B.C;\n    @dec b: Missing | Missing | Missing;\n    @dec c: A.B.C | A.B.D;\n    @dec d: N.Missing | N.Other;\n    @dec e: bigint | bigint;\n    @dec f: Missing | string;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "md-export-default-modifier-orders",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @module: esnext\ndeclare function dec(...args: any[]): any;\nexport default @dec class C {\n    constructor(x: string) {}\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "md-export-modifier-orders",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @module: esnext\ndeclare function dec(...args: any[]): any;\nexport @dec class A { constructor(x: string) {} }\n@dec export class B { constructor(x: number) {} }\n@dec export declare class Q { constructor(x: number); }\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "md-class-in-blocks-and-case",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nnamespace N { export namespace M { @dec export class C { constructor(x: Missing) {} } } }\n{ class D { @dec p: Missing; } }\nswitch (1 as number) { case 1: class E { @dec q: Missing; } }\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
   }
  ]
 }

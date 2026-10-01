@@ -1754,6 +1754,538 @@
    },
    "name": "probe.ts",
    "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass A {}\nclass C {\n    @dec a: A | null;\n    @dec b: A | undefined;\n    @dec c: string | A;\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "declare function dec(...args: any[]): any;\r\nconst A = \r\n@dec\r\nclass {\r\n    constructor(x: string) { }\r\n    @dec\r\n    m(y: number): void { }\r\n};\r\nconst B = \r\n@dec\r\nclass Named {\r\n    @dec\r\n    p: string;\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "md-es-decorators-class-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a636f6e73742041203d204064656320636c617373207b0a20202020636f6e7374727563746f7228783a20737472696e6729207b7d0a2020202040646563206d28793a206e756d626572293a20766f6964207b7d0a7d3b0a636f6e73742042203d204064656320636c617373204e616d6564207b204064656320703a20737472696e673b207d3b0a"
+    },
+    "id": "md-es-decorators-class-expression",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": false,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: false\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nconst A = @dec class {\n    constructor(x: string) {}\n    @dec m(y: number): void {}\n};\nconst B = @dec class Named { @dec p: string; };\n"
+  },
+  {
+   "diagnostics": 7,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function dec(...args: any[]): any;\r\nclass C {\r\n    x = class {\r\n        @dec\r\n        y: string;\r\n    };\r\n    m() { class K {\r\n        @dec\r\n        @__metadata(\"design:type\", Number)\r\n        p: number;\r\n    } return K; }\r\n    get g() { class K {\r\n        @dec\r\n        @__metadata(\"design:type\", Boolean)\r\n        q: boolean;\r\n    } return K; }\r\n    set s(v: any) { class K {\r\n        @dec\r\n        @__metadata(\"design:type\", String)\r\n        r: string;\r\n    } }\r\n    static n() { return class {\r\n        @dec\r\n        t: symbol;\r\n    }; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "md-undecorated-members-with-decorated-children",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a2020202078203d20636c617373207b204064656320793a20737472696e673b207d3b0a202020206d2829207b20636c617373204b207b204064656320703a206e756d6265723b207d2072657475726e204b3b207d0a2020202067657420672829207b20636c617373204b207b204064656320713a20626f6f6c65616e3b207d2072657475726e204b3b207d0a20202020736574207328763a20616e7929207b20636c617373204b207b204064656320723a20737472696e673b207d207d0a20202020737461746963206e2829207b2072657475726e20636c617373207b204064656320743a2073796d626f6c3b207d3b207d0a7d0a"
+    },
+    "id": "md-undecorated-members-with-decorated-children",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    x = class { @dec y: string; };\n    m() { class K { @dec p: number; } return K; }\n    get g() { class K { @dec q: boolean; } return K; }\n    set s(v: any) { class K { @dec r: string; } }\n    static n() { return class { @dec t: symbol; }; }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function dec(...args: any[]): any;\r\nclass A {\r\n}\r\nclass C {\r\n    @dec\r\n    @__metadata(\"design:type\", String)\r\n    a: string | null;\r\n    @dec\r\n    @__metadata(\"design:type\", Number)\r\n    b: number | undefined | null;\r\n    @dec\r\n    @__metadata(\"design:type\", void 0)\r\n    c: null | undefined;\r\n    @dec\r\n    @__metadata(\"design:type\", A)\r\n    d: A | null;\r\n    @dec\r\n    @__metadata(\"design:type\", Object)\r\n    e: string | null | number;\r\n    @dec\r\n    @__metadata(\"design:type\", void 0)\r\n    f: never | undefined;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "md-strict-false-unions",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732041207b7d0a636c6173732043207b0a202020204064656320613a20737472696e67207c206e756c6c3b0a202020204064656320623a206e756d626572207c20756e646566696e6564207c206e756c6c3b0a202020204064656320633a206e756c6c207c20756e646566696e65643b0a202020204064656320643a2041207c206e756c6c3b0a202020204064656320653a20737472696e67207c206e756c6c207c206e756d6265723b0a202020204064656320663a206e65766572207c20756e646566696e65643b0a7d0a"
+    },
+    "id": "md-strict-false-unions",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "strict": false,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @strict: false\ndeclare function dec(...args: any[]): any;\nclass A {}\nclass C {\n    @dec a: string | null;\n    @dec b: number | undefined | null;\n    @dec c: null | undefined;\n    @dec d: A | null;\n    @dec e: string | null | number;\n    @dec f: never | undefined;\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function dec(...args: any[]): any;\r\nclass C {\r\n    @dec\r\n    @__metadata(\"design:type\", Object)\r\n    a: string | null;\r\n    @dec\r\n    @__metadata(\"design:type\", void 0)\r\n    b: null | undefined;\r\n    @dec\r\n    @__metadata(\"design:type\", String)\r\n    c: string | never;\r\n    @dec\r\n    @__metadata(\"design:type\", void 0)\r\n    d: void | undefined;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "md-strict-true-unions",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a202020204064656320613a20737472696e67207c206e756c6c3b0a202020204064656320623a206e756c6c207c20756e646566696e65643b0a202020204064656320633a20737472696e67207c206e657665723b0a202020204064656320643a20766f6964207c20756e646566696e65643b0a7d0a"
+    },
+    "id": "md-strict-true-unions",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "strict": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @strict: true\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: string | null;\n    @dec b: null | undefined;\n    @dec c: string | never;\n    @dec d: void | undefined;\n}\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function dec(...args: any[]): any;\r\nclass C {\r\n    @dec\r\n    @__metadata(\"design:type\", Object)\r\n    @__metadata(\"design:paramtypes\", [])\r\n    set a() { }\r\n    @dec\r\n    @__metadata(\"design:type\", C)\r\n    @__metadata(\"design:paramtypes\", [])\r\n    set b(this: C) { }\r\n    @dec\r\n    @__metadata(\"design:type\", Number)\r\n    @__metadata(\"design:paramtypes\", [Number])\r\n    set c(this: C, v: number) { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "md-setter-without-parameter",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a20202020406465632073657420612829207b7d0a202020204064656320736574206228746869733a204329207b7d0a202020204064656320736574206328746869733a20432c20763a206e756d62657229207b7d0a7d0a"
+    },
+    "id": "md-setter-without-parameter",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec set a() {}\n    @dec set b(this: C) {}\n    @dec set c(this: C, v: number) {}\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\n@__metadata(\"design:paramtypes\", [Object])\r\nclass A {\r\n    constructor(\r\n    @dec\r\n    x) { }\r\n}\r\nclass B {\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [Object])\r\n    @__metadata(\"design:returntype\", void 0)\r\n    m(\r\n    @dec\r\n    x) { }\r\n    set s(\r\n    @dec\r\n    v) { }\r\n    @dec\r\n    @__metadata(\"design:type\", Object)\r\n    p;\r\n}\r\n@dec\r\n@__metadata(\"design:paramtypes\", [Object])\r\nexport class E {\r\n    constructor(y) { }\r\n}\r\n"
+      },
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function dec(...args: any[]): any;\r\n@__metadata(\"design:paramtypes\", [String])\r\nabstract class A {\r\n    constructor(\r\n    @dec\r\n    x: string) { }\r\n}\r\nclass B {\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [Number])\r\n    @__metadata(\"design:returntype\", void 0)\r\n    public m(\r\n    @dec\r\n    x: number): void { }\r\n    private set s(\r\n    @dec\r\n    v: string) { }\r\n    @dec\r\n    @__metadata(\"design:type\", String)\r\n    public readonly p: string;\r\n}\r\n@dec\r\n@__metadata(\"design:paramtypes\", [Number])\r\nexport abstract class E {\r\n    constructor(y: number) { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "md-typeeraser-then-metadata",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a616273747261637420636c6173732041207b0a20202020636f6e7374727563746f72284064656320783a20737472696e6729207b7d0a7d0a636c6173732042207b0a202020207075626c6963206d284064656320783a206e756d626572293a20766f6964207b7d0a2020202070726976617465207365742073284064656320763a20737472696e6729207b7d0a2020202040646563207075626c696320726561646f6e6c7920703a20737472696e673b0a7d0a406465630a6578706f727420616273747261637420636c6173732045207b20636f6e7374727563746f7228793a206e756d62657229207b7d207d0a"
+    },
+    "id": "md-typeeraser-then-metadata",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nabstract class A {\n    constructor(@dec x: string) {}\n}\nclass B {\n    public m(@dec x: number): void {}\n    private set s(@dec v: string) {}\n    @dec public readonly p: string;\n}\n@dec\nexport abstract class E { constructor(y: number) {} }\n"
+  },
+  {
+   "diagnostics": 26,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "declare function dec(...args: any[]): any;\r\nclass X {\r\n    m() { return {};  n(x, string); { } }\r\n    ;\r\n}\r\nconst o = {};\r\nget;\r\ng();\r\nstring;\r\n{\r\n    return \"\";\r\n}\r\nset;\r\ng(v, string);\r\n{ }\r\n;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "md-object-literal-in-class",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732058207b0a202020206d2829207b2072657475726e207b2040646563206e28783a20737472696e6729207b7d207d3b207d0a7d0a636f6e7374206f203d207b204064656320676574206728293a20737472696e67207b2072657475726e2022223b207d2c204064656320736574206728763a20737472696e6729207b7d207d3b0a"
+    },
+    "id": "md-object-literal-in-class",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass X {\n    m() { return { @dec n(x: string) {} }; }\n}\nconst o = { @dec get g(): string { return \"\"; }, @dec set g(v: string) {} };\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar _a;\r\ndeclare function dec(...args: any[]): any;\r\nclass C {\r\n    @dec\r\n    @__metadata(\"design:type\", typeof (_a = typeof  !== \"undefined\" && ) === \"function\" ? _a : Object)\r\n    a: ;\r\n    string;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "md-rest-type-kind",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a202020204064656320613a202e2e2e737472696e673b0a7d0a"
+    },
+    "id": "md-rest-type-kind",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: ...string;\n}\n"
+  },
+  {
+   "diagnostics": 5,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function dec(...args: any[]): any;\r\nclass C {\r\n    @dec\r\n    @__metadata(\"design:type\", String)\r\n    a: ?string;\r\n    @dec\r\n    @__metadata(\"design:type\", Number)\r\n    b: !number;\r\n    @dec\r\n    @__metadata(\"design:type\", String)\r\n    c: string = ;\r\n    @dec\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [Object, Object])\r\n    @__metadata(\"design:returntype\", void 0)\r\n    m(...r: , ...string): void { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "md-jsdoc-postfix-kinds",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a202020204064656320613a20737472696e673f3b0a202020204064656320623a206e756d626572213b0a202020204064656320633a20737472696e673d3b0a2020202040646563206d282e2e2e723a202e2e2e737472696e67293a20766f6964207b7d0a7d0a"
+    },
+    "id": "md-jsdoc-postfix-kinds",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: string?;\n    @dec b: number!;\n    @dec c: string=;\n    @dec m(...r: ...string): void {}\n}\n"
+  },
+  {
+   "diagnostics": 11,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;\r\ndeclare function dec(...args: any[]): any;\r\nclass C {\r\n    @dec\r\n    @__metadata(\"design:type\", typeof (_b = typeof A !== \"undefined\" && (_a = A.B) !== void 0 && _a.C) === \"function\" ? _b : Object)\r\n    a: A.B.C | A.B.C;\r\n    @dec\r\n    @__metadata(\"design:type\", typeof (_e = typeof Missing !== \"undefined\" && Missing) === \"function\" ? _e : Object)\r\n    b: Missing | Missing | Missing;\r\n    @dec\r\n    @__metadata(\"design:type\", Object)\r\n    c: A.B.C | A.B.D;\r\n    @dec\r\n    @__metadata(\"design:type\", Object)\r\n    d: N.Missing | N.Other;\r\n    @dec\r\n    @__metadata(\"design:type\", typeof BigInt === \"function\" ? BigInt : Object)\r\n    e: bigint | bigint;\r\n    @dec\r\n    @__metadata(\"design:type\", Object)\r\n    f: Missing | string;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "md-unresolved-union-parens",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a202020204064656320613a20412e422e43207c20412e422e433b0a202020204064656320623a204d697373696e67207c204d697373696e67207c204d697373696e673b0a202020204064656320633a20412e422e43207c20412e422e443b0a202020204064656320643a204e2e4d697373696e67207c204e2e4f746865723b0a202020204064656320653a20626967696e74207c20626967696e743b0a202020204064656320663a204d697373696e67207c20737472696e673b0a7d0a"
+    },
+    "id": "md-unresolved-union-parens",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "strict": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @strict: true\ndeclare function dec(...args: any[]): any;\nclass C {\n    @dec a: A.B.C | A.B.C;\n    @dec b: Missing | Missing | Missing;\n    @dec c: A.B.C | A.B.D;\n    @dec d: N.Missing | N.Other;\n    @dec e: bigint | bigint;\n    @dec f: Missing | string;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function dec(...args: any[]): any;\r\nexport default \r\n@dec\r\n@__metadata(\"design:paramtypes\", [String])\r\nclass C {\r\n    constructor(x: string) { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "md-export-default-modifier-orders",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6578706f72742064656661756c74204064656320636c6173732043207b0a20202020636f6e7374727563746f7228783a20737472696e6729207b7d0a7d0a"
+    },
+    "id": "md-export-default-modifier-orders",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @module: esnext\ndeclare function dec(...args: any[]): any;\nexport default @dec class C {\n    constructor(x: string) {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function dec(...args: any[]): any;\r\nexport \r\n@dec\r\n@__metadata(\"design:paramtypes\", [String])\r\nclass A {\r\n    constructor(x: string) { }\r\n}\r\n@dec\r\n@__metadata(\"design:paramtypes\", [Number])\r\nexport class B {\r\n    constructor(x: number) { }\r\n}\r\n@dec\r\nexport declare class Q {\r\n    constructor(x: number);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "md-export-modifier-orders",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6578706f7274204064656320636c6173732041207b20636f6e7374727563746f7228783a20737472696e6729207b7d207d0a40646563206578706f727420636c6173732042207b20636f6e7374727563746f7228783a206e756d62657229207b7d207d0a40646563206578706f7274206465636c61726520636c6173732051207b20636f6e7374727563746f7228783a206e756d626572293b207d0a"
+    },
+    "id": "md-export-modifier-orders",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @module: esnext\ndeclare function dec(...args: any[]): any;\nexport @dec class A { constructor(x: string) {} }\n@dec export class B { constructor(x: number) {} }\n@dec export declare class Q { constructor(x: number); }\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar _a, _b, _c;\r\ndeclare function dec(...args: any[]): any;\r\nnamespace N {\r\n    export namespace M {\r\n        @dec\r\n        @__metadata(\"design:paramtypes\", [typeof (_a = typeof Missing !== \"undefined\" && Missing) === \"function\" ? _a : Object])\r\n        export class C {\r\n            constructor(x: Missing) { }\r\n        }\r\n    }\r\n}\r\n{\r\n    class D {\r\n        @dec\r\n        @__metadata(\"design:type\", typeof (_b = typeof Missing !== \"undefined\" && Missing) === \"function\" ? _b : Object)\r\n        p: Missing;\r\n    }\r\n}\r\nswitch (1 as number) {\r\n    case 1: class E {\r\n        @dec\r\n        @__metadata(\"design:type\", typeof (_c = typeof Missing !== \"undefined\" && Missing) === \"function\" ? _c : Object)\r\n        q: Missing;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "md-class-in-blocks-and-case",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6e616d657370616365204e207b206578706f7274206e616d657370616365204d207b2040646563206578706f727420636c6173732043207b20636f6e7374727563746f7228783a204d697373696e6729207b7d207d207d207d0a7b20636c6173732044207b204064656320703a204d697373696e673b207d207d0a737769746368202831206173206e756d62657229207b206361736520313a20636c6173732045207b204064656320713a204d697373696e673b207d207d0a"
+    },
+    "id": "md-class-in-blocks-and-case",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nnamespace N { export namespace M { @dec export class C { constructor(x: Missing) {} } } }\n{ class D { @dec p: Missing; } }\nswitch (1 as number) { case 1: class E { @dec q: Missing; } }\n"
   }
  ],
  "go": "go1.27.1",

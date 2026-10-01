@@ -412,6 +412,14 @@ impl Run {
             }
             "finish" => {
                 for expression in self.top_level_expressions() {
+                    // A partially emitted expression has no source form: the
+                    // mode wraps each expression in one, as an earlier
+                    // transform would.
+                    let expression = if case.mode == "partiallyEmitted" {
+                        self.ast.new_partially_emitted_expression(Some(expression))
+                    } else {
+                        expression
+                    };
                     let name = self.string_literal(&case.name);
                     let result = finish_transform_named_evaluation(
                         &ec,

@@ -797,6 +797,242 @@
    },
    "name": "probe.ts",
    "source": "// @target: es2018\nfor (;;) { try { break; } catch { continue; } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "var _a = 1, _b = 2;\r\ntry { }\r\ncatch (_d) {\r\n    var _c = 3;\r\n}\r\nfunction f(_a: any) { try { }\r\ncatch (_d) { } try { }\r\ncatch (_e) { } }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "ocatch-temp-name-collisions",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "766172205f61203d20312c205f62203d20323b0a747279207b207d206361746368207b20766172205f63203d20333b207d0a66756e6374696f6e2066285f613a20616e7929207b20747279207b207d206361746368207b207d20747279207b207d206361746368207b207d207d0a"
+    },
+    "id": "ocatch-temp-name-collisions",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\nvar _a = 1, _b = 2;\ntry { } catch { var _c = 3; }\nfunction f(_a: any) { try { } catch { } try { } catch { } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "class C {\r\n    static { try { }\r\n    catch (_a) { } }\r\n    m = () => { try {\r\n        k();\r\n    }\r\n    catch (_a) { } };\r\n}\r\ndeclare function k(): void;\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "optionalcatch"
+       ],
+       "text": "class C {\r\n    static { try { }\r\n    catch (_a) { } }\r\n    m = () => { try {\r\n        k();\r\n    }\r\n    catch (_a) { } };\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "ocatch-class-static-block",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b20737461746963207b20747279207b207d206361746368207b207d207d206d203d202829203d3e207b20747279207b206b28293b207d206361746368207b207d207d3b207d0a6465636c6172652066756e6374696f6e206b28293a20766f69643b0a"
+    },
+    "id": "ocatch-class-static-block",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\nclass C { static { try { } catch { } } m = () => { try { k(); } catch { } }; }\ndeclare function k(): void;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "async function* g() { try {\r\n    yield 1;\r\n}\r\ncatch (_a) {\r\n    await 0;\r\n}\r\nfinally { } }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "ocatch-async-generator",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6173796e632066756e6374696f6e2a20672829207b20747279207b207969656c6420313b207d206361746368207b20617761697420303b207d2066696e616c6c79207b207d207d0a"
+    },
+    "id": "ocatch-async-generator",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\nasync function* g() { try { yield 1; } catch { await 0; } finally { } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "try /*a*/ { } /*b*/\r\ncatch (_a) { /*d*/ } /*e*/\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "ocatch-comments",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "747279202f2a612a2f207b207d202f2a622a2f206361746368202f2a632a2f207b202f2a642a2f207d202f2a652a2f0a"
+    },
+    "id": "ocatch-comments",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry /*a*/ { } /*b*/ catch /*c*/ { /*d*/ } /*e*/\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "try { }\r\ncatch (_a) { }\r\nexport const x = () => { try { }\r\ncatch (_a) { } };\r\n"
+      }
+     ],
+     "name": "/.src/main.js"
+    }
+   ],
+   "id": "ocatch-js-file",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.js": "747279207b207d206361746368207b207d0a6578706f727420636f6e73742078203d202829203d3e207b20747279207b207d206361746368207b207d207d3b0a"
+    },
+    "id": "ocatch-js-file",
+    "options": {
+     "allowJs": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/main.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.js",
+   "source": "// @target: es2018\n// @allowJs: true\n// @filename: main.js\ntry { } catch { }\nexport const x = () => { try { } catch { } };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "l: try { }\r\ncatch (_a) {\r\n    break l;\r\n}\r\nswitch (1) {\r\n    case 1: try { }\r\n    catch (_b) { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "ocatch-labelled-and-switch",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c3a20747279207b207d206361746368207b20627265616b206c3b207d0a73776974636820283129207b206361736520313a20747279207b207d206361746368207b207d207d0a"
+    },
+    "id": "ocatch-labelled-and-switch",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\nl: try { } catch { break l; }\nswitch (1) { case 1: try { } catch { } }\n"
   }
  ],
  "go": "go1.27.1",

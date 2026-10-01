@@ -579,6 +579,214 @@
      "optionalchain"
     ]
    ]
+  },
+  {
+   "id": "oc-super-call-in-method",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nclass C extends Object {\n    m() { return super.toString?.(); }\n    n() { return super[\"valueOf\"]?.(1); }\n    static s() { return super.name?.length; }\n}\n",
+   "chains": [
+    [
+     "optionalchain"
+    ],
+    [
+     "typeeraser",
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-simple-this-arg-call",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na.b?.();\na[0]?.(1, 2);\n/*lead*/ a /*mid*/ .b?.(c);\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-this-property-call",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nclass C { p: any; m() { this.p?.(); this[\"p\"]?.(1); this?.p(); } }\n",
+   "chains": [
+    [
+     "optionalchain"
+    ],
+    [
+     "typeeraser",
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-as-any-after-typeeraser",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a as any)?.b;\n(<any>a)?.b();\n(a as any).b?.();\n(a!)?.[b];\na!?.b;\n(a satisfies any)?.c;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-as-any-call-after-typeeraser",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a.b as any)?.();\n(o.p! as any)?.(1);\n(k() as any)?.();\n",
+   "chains": [
+    [
+     "typeeraser",
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-nonsimple-captured-left",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na.b.c?.d;\nk().x?.y;\no[k()]?.z;\n(a + b)?.c;\nnew o.C()?.d;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ],
+    [
+     "typeeraser",
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-nonsimple-left-call",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na.b.c?.();\na.b[c]?.(1);\nk().m?.();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ],
+    [
+     "typeeraser",
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-parenthesized-call-capture",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a.b.c)?.();\n(a.b)?.();\n(a[k()])?.();\n((a.b))?.();\n(k())?.();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ],
+    [
+     "typeeraser",
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-parenthesized-chain-call-capture",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a?.b.c[k()])();\n(a?.[0])(1);\n(a.b?.c.d)();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-delete-element",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete a?.[k()];\ndelete a?.b[c];\ndelete (a.b?.c);\ndelete ((a?.[0]));\n",
+   "chains": [
+    [
+     "optionalchain"
+    ],
+    [
+     "typeeraser",
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-delete-call-chain",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete a?.b();\ndelete a?.();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-nested-in-arguments",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b(c?.d, k()?.e)?.f(o?.[a?.b]);\n",
+   "chains": [
+    [
+     "optionalchain"
+    ],
+    [
+     "typeeraser",
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-chain-in-chain-expression",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.[b?.c]?.[k()?.d];\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-tagged-template-chain",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b`x`;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-no-optional",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na.b.c();\ndelete a.b;\n(a.b)();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-in-nested-functions",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f() { return () => a?.b?.(); }\nclass D { x = a?.b; static y = o?.p?.(); }\n",
+   "chains": [
+    [
+     "optionalchain"
+    ],
+    [
+     "typeeraser",
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "oc-type-arguments-call",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.<string>();\na?.b<number>(1);\n(a?.b)<string>();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ],
+    [
+     "typeeraser",
+     "optionalchain"
+    ]
+   ]
   }
  ]
 }

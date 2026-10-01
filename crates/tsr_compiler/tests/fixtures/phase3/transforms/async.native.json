@@ -2244,6 +2244,692 @@
    },
    "name": "probe.ts",
    "source": "// @target: es2016\nclass B { m() { return 1; } }\nclass C extends B {\n    async *g() {\n        yield super.m();\n        await 0;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 6,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    m(k) {\r\n        const _superIndex = name => super[name];\r\n        return () => __awaiter(this, void 0, void 0, function* () { return _superIndex(k) + (yield 1); });\r\n    }\r\n    n(k) {\r\n        const _superIndex = (function (geti, seti) {\r\n            const cache = Object.create(null);\r\n            return name => cache[name] || (cache[name] = { get value() { return geti(name); }, set value(v) { seti(name, v); } });\r\n        })(name => super[name], (name, value) => super[name] = value);\r\n        const f = () => __awaiter(this, void 0, void 0, function* () { _superIndex(k).value = yield 1; });\r\n        return f;\r\n    }\r\n    o(k) {\r\n        const _superIndex = name => super[name];\r\n        return () => __awaiter(this, void 0, void 0, function* () { return _superIndex(k).call(this, yield 1); });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-super-element-single-line-method",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206d286b29207b2072657475726e206173796e63202829203d3e2073757065725b6b5d202b20617761697420313b207d0a202020206e286b29207b20636f6e73742066203d206173796e63202829203d3e207b2073757065725b6b5d203d20617761697420313b207d3b2072657475726e20663b207d0a202020206f286b29207b2072657475726e206173796e63202829203d3e2073757065725b6b5d2861776169742031293b207d0a7d0a"
+    },
+    "id": "as-super-element-single-line-method",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    m(k) { return async () => super[k] + await 1; }\n    n(k) { const f = async () => { super[k] = await 1; }; return f; }\n    o(k) { return async () => super[k](await 1); }\n}\n"
+  },
+  {
+   "diagnostics": 5,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    n(k) {\r\n        const _superIndex = (function (geti, seti) {\r\n            const cache = Object.create(null);\r\n            return name => cache[name] || (cache[name] = { get value() { return geti(name); }, set value(v) { seti(name, v); } });\r\n        })(name => super[name], (name, value) => super[name] = value);\r\n        const _super = Object.create(null, {\r\n            x: { get: () => super.x, set: v => super.x = v },\r\n            m: { get: () => super.m, set: v => super.m = v }\r\n        });\r\n        return __awaiter(this, void 0, void 0, function* () {\r\n            _superIndex(k).value.call(this, 1, yield 2);\r\n            _super.x = 1;\r\n            return _super.m.call(this, _superIndex(k).value);\r\n        });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-super-element-call-with-assignment",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206173796e63206e286b29207b0a202020202020202073757065725b6b5d28312c2061776169742032293b0a202020202020202073757065722e78203d20313b0a202020202020202072657475726e2073757065722e6d2873757065725b6b5d293b0a202020207d0a7d0a"
+    },
+    "id": "as-super-element-call-with-assignment",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(k) {\n        super[k](1, await 2);\n        super.x = 1;\n        return super.m(super[k]);\n    }\n}\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    n(k) {\r\n        const _superIndex = (function (geti, seti) {\r\n            const cache = Object.create(null);\r\n            return name => cache[name] || (cache[name] = { get value() { return geti(name); }, set value(v) { seti(name, v); } });\r\n        })(name => super[name], (name, value) => super[name] = value);\r\n        const _super = Object.create(null, {\r\n            x: { get: () => super.x, set: v => super.x = v }\r\n        });\r\n        return __awaiter(this, void 0, void 0, function* () {\r\n            _superIndex(k).value += yield 1;\r\n            _super.x ||= 2;\r\n            _superIndex(k).value **= 2;\r\n        });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-super-element-compound-assignment",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206173796e63206e286b29207b0a202020202020202073757065725b6b5d202b3d20617761697420313b0a202020202020202073757065722e78207c7c3d20323b0a202020202020202073757065725b6b5d202a2a3d20323b0a202020207d0a7d0a"
+    },
+    "id": "as-super-element-compound-assignment",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(k) {\n        super[k] += await 1;\n        super.x ||= 2;\n        super[k] **= 2;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    n() {\r\n        const _superIndex = name => super[name];\r\n        const _super = Object.create(null, {\r\n            k: { get: () => super.k }\r\n        });\r\n        return __awaiter(this, void 0, void 0, function* () {\r\n            return _superIndex(super.k) + _superIndex(super[0]) + (yield 1);\r\n        });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-super-element-nested-super-key",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206173796e63206e2829207b0a202020202020202072657475726e2073757065725b73757065722e6b5d202b2073757065725b73757065725b305d5d202b20617761697420313b0a202020207d0a7d0a"
+    },
+    "id": "as-super-element-nested-super-key",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n() {\n        return super[super.k] + super[super[0]] + await 1;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 5,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    n(o, a) {\r\n        const _super = Object.create(null, {\r\n            x: { get: () => super.x, set: v => super.x = v },\r\n            y: { get: () => super.y, set: v => super.y = v },\r\n            z: { get: () => super.z, set: v => super.z = v }\r\n        });\r\n        return __awaiter(this, void 0, void 0, function* () {\r\n            yield 0;\r\n            ({ ..._super.x } = o);\r\n            [..._super.y] = a;\r\n            ({ z: (_super.z) } = o);\r\n            ({ w } = o);\r\n        });\r\n    }\r\n}\r\nlet w;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-super-spread-targets",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206173796e63206e286f2c206129207b0a2020202020202020617761697420303b0a2020202020202020287b202e2e2e73757065722e78207d203d206f293b0a20202020202020205b2e2e2e73757065722e795d203d20613b0a2020202020202020287b207a3a202873757065722e7a29207d203d206f293b0a2020202020202020287b2077207d203d206f293b0a202020207d0a7d0a6c657420773b0a"
+    },
+    "id": "as-super-spread-targets",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(o, a) {\n        await 0;\n        ({ ...super.x } = o);\n        [...super.y] = a;\n        ({ z: (super.z) } = o);\n        ({ w } = o);\n    }\n}\nlet w;\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    n(o, k) {\r\n        const _super = Object.create(null, {\r\n            x: { get: () => super.x }\r\n        });\r\n        return __awaiter(this, void 0, void 0, function* () {\r\n            yield 0;\r\n            return [_super.x, this.a.b, o[k], o.m(), o[k](), k()];\r\n        });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-super-non-super-accesses",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206173796e63206e286f2c206b29207b0a2020202020202020617761697420303b0a202020202020202072657475726e205b73757065722e782c20746869732e612e622c206f5b6b5d2c206f2e6d28292c206f5b6b5d28292c206b28295d3b0a202020207d0a7d0a"
+    },
+    "id": "as-super-non-super-accesses",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(o, k) {\n        await 0;\n        return [super.x, this.a.b, o[k], o.m(), o[k](), k()];\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nfunction f() {\r\n    return __awaiter(this, arguments, void 0, function* (a = arguments) {\r\n        return yield a;\r\n    });\r\n}\r\nfunction g() {\r\n    return (...args_1) => __awaiter(this, [...args_1], void 0, function* (b = arguments[0]) { return yield b; });\r\n}\r\nclass C {\r\n    m() {\r\n        return __awaiter(this, arguments, void 0, function* (c = arguments.length) { return c + (yield 0); });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-arguments-in-parameter-initializer",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6173796e632066756e6374696f6e20662861203d20617267756d656e747329207b0a2020202072657475726e20617761697420613b0a7d0a66756e6374696f6e20672829207b0a2020202072657475726e206173796e63202862203d20617267756d656e74735b305d29203d3e20617761697420623b0a7d0a636c6173732043207b206173796e63206d2863203d20617267756d656e74732e6c656e67746829207b2072657475726e2063202b20617761697420303b207d207d0a"
+    },
+    "id": "as-arguments-in-parameter-initializer",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(a = arguments) {\n    return await a;\n}\nfunction g() {\n    return async (b = arguments[0]) => await b;\n}\nclass C { async m(c = arguments.length) { return c + await 0; } }\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nfunction f(a) {\r\n    var arguments_1 = arguments;\r\n    return __awaiter(this, void 0, void 0, function* () {\r\n        var a;\r\n        a = arguments_1;\r\n        yield 0;\r\n        return a;\r\n    });\r\n}\r\nfunction g(b) {\r\n    var arguments_2 = arguments;\r\n    return __awaiter(this, void 0, void 0, function* () {\r\n        var b;\r\n        for (b = arguments_2.length;;) {\r\n            yield b;\r\n            break;\r\n        }\r\n    });\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-arguments-colliding-var",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6173796e632066756e6374696f6e2066286129207b0a202020207661722061203d20617267756d656e74733b0a20202020617761697420303b0a2020202072657475726e20613b0a7d0a6173796e632066756e6374696f6e2067286229207b0a20202020666f7220287661722062203d20617267756d656e74732e6c656e6774683b203b29207b20617761697420623b20627265616b3b207d0a7d0a"
+    },
+    "id": "as-arguments-colliding-var",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(a) {\n    var a = arguments;\n    await 0;\n    return a;\n}\nasync function g(b) {\n    for (var b = arguments.length; ;) { await b; break; }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nclass C {\r\n    x = () => {\r\n        var arguments_1 = arguments;\r\n        return __awaiter(this, void 0, void 0, function* () { return arguments_1.length + (yield 0); });\r\n    };\r\n    static y = () => __awaiter(this, void 0, void 0, function* () { return yield arguments_1[0]; });\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-arguments-in-class-field",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a2020202078203d206173796e63202829203d3e20617267756d656e74732e6c656e677468202b20617761697420303b0a202020207374617469632079203d206173796e63202829203d3e20617761697420617267756d656e74735b305d3b0a7d0a"
+    },
+    "id": "as-arguments-in-class-field",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass C {\n    x = async () => arguments.length + await 0;\n    static y = async () => await arguments[0];\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nfunction f() {\r\n    var arguments_1 = arguments;\r\n    return __awaiter(this, void 0, void 0, function* () {\r\n        yield 0;\r\n        return { arguments_1 };\r\n    });\r\n}\r\nfunction g() {\r\n    return () => {\r\n        var arguments_2 = arguments;\r\n        return __awaiter(this, void 0, void 0, function* () { return ({ arguments_2, a: yield 1 }); });\r\n    };\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-arguments-shorthand",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6173796e632066756e6374696f6e20662829207b0a20202020617761697420303b0a2020202072657475726e207b20617267756d656e7473207d3b0a7d0a66756e6374696f6e20672829207b0a2020202072657475726e206173796e63202829203d3e20287b20617267756d656e74732c20613a2061776169742031207d293b0a7d0a"
+    },
+    "id": "as-arguments-shorthand",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f() {\n    await 0;\n    return { arguments };\n}\nfunction g() {\n    return async () => ({ arguments, a: await 1 });\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nfunction f(o) {\r\n    return __awaiter(this, void 0, void 0, function* () {\r\n        yield 0;\r\n        class K {\r\n            arguments() { return 1; }\r\n        }\r\n        return [o.arguments, { arguments: 1 }, { arguments() { return arguments; } }, K];\r\n    });\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-arguments-property-names",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6173796e632066756e6374696f6e2066286f29207b0a20202020617761697420303b0a20202020636c617373204b207b20617267756d656e74732829207b2072657475726e20313b207d207d0a2020202072657475726e205b6f2e617267756d656e74732c207b20617267756d656e74733a2031207d2c207b20617267756d656e74732829207b2072657475726e20617267756d656e74733b207d207d2c204b5d3b0a7d0a"
+    },
+    "id": "as-arguments-property-names",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(o) {\n    await 0;\n    class K { arguments() { return 1; } }\n    return [o.arguments, { arguments: 1 }, { arguments() { return arguments; } }, K];\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nfunction f() { return () => __awaiter(this, void 0, void 0, function* () { return yield 1; }); }\r\nconst g = function () { return function () {\r\n    return __awaiter(this, void 0, void 0, function* () { yield 2; });\r\n}; };\r\nconst h = () => () => __awaiter(void 0, void 0, void 0, function* () { return yield 3; });\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-await-in-non-async-functions",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e20662829207b2072657475726e206173796e63202829203d3e20617761697420313b207d0a636f6e73742067203d2066756e6374696f6e202829207b2072657475726e206173796e632066756e6374696f6e202829207b20617761697420323b207d3b207d3b0a636f6e73742068203d202829203d3e206173796e63202829203d3e20617761697420333b0a6578706f7274207b7d3b0a"
+    },
+    "id": "as-await-in-non-async-functions",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\n// @module: esnext\nfunction f() { return async () => await 1; }\nconst g = function () { return async function () { await 2; }; };\nconst h = () => async () => await 3;\nexport {};\n"
+  },
+  {
+   "diagnostics": 7,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nconst f = (a_1, _a, ...args_1) => __awaiter(void 0, [a_1, _a, ...args_1], void 0, function* (a, { b }, c = 1, ...d) { return a + b + c + d.length + (yield 0); });\r\nconst g = (_a, b_1) => __awaiter(void 0, [_a, b_1], void 0, function* ([a], b) { return (yield a) + b; });\r\nconst h = (a, ...b) => __awaiter(void 0, void 0, void 0, function* () { return yield b[a]; });\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-arrow-param-forwarding",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742066203d206173796e632028612c207b2062207d2c2063203d20312c202e2e2e6429203d3e2061202b2062202b2063202b20642e6c656e677468202b20617761697420303b0a636f6e73742067203d206173796e6320285b615d2c206229203d3e2061776169742061202b20623b0a636f6e73742068203d206173796e632028612c202e2e2e6229203d3e207b2072657475726e20617761697420625b615d3b207d3b0a"
+    },
+    "id": "as-arrow-param-forwarding",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst f = async (a, { b }, c = 1, ...d) => a + b + c + d.length + await 0;\nconst g = async ([a], b) => await a + b;\nconst h = async (a, ...b) => { return await b[a]; };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nfunction f() {\r\n    return () => {\r\n        var arguments_1 = arguments;\r\n        return __awaiter(this, void 0, void 0, function* () {\r\n            const g = () => __awaiter(this, void 0, void 0, function* () { return arguments_1[0] + (yield 1); });\r\n            return arguments_1.length + (yield g());\r\n        });\r\n    };\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-arguments-arrow-in-arrow",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e20662829207b0a2020202072657475726e206173796e63202829203d3e207b0a2020202020202020636f6e73742067203d206173796e63202829203d3e20617267756d656e74735b305d202b20617761697420313b0a202020202020202072657475726e20617267756d656e74732e6c656e677468202b206177616974206728293b0a202020207d3b0a7d0a"
+    },
+    "id": "as-arguments-arrow-in-arrow",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nfunction f() {\n    return async () => {\n        const g = async () => arguments[0] + await 1;\n        return arguments.length + await g();\n    };\n}\n"
+  },
+  {
+   "diagnostics": 7,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    constructor() { const _super = Object.create(null, {\r\n        x: { get: () => super.x }\r\n    }); super(); const f = () => __awaiter(this, void 0, void 0, function* () { return _super.x + (yield 0); }); }\r\n    get g() {\r\n        const _superIndex = name => super[name];\r\n        return (k) => __awaiter(this, void 0, void 0, function* () { return _superIndex(k) + (yield 0); });\r\n    }\r\n    set s(v) {\r\n        const _superIndex = (function (geti, seti) {\r\n            const cache = Object.create(null);\r\n            return name => cache[name] || (cache[name] = { get value() { return geti(name); }, set value(v) { seti(name, v); } });\r\n        })(name => super[name], (name, value) => super[name] = value);\r\n        const f = (k) => __awaiter(this, void 0, void 0, function* () { _superIndex(k).value = yield v; });\r\n    }\r\n    static m() { const _super = Object.create(null, {\r\n        name: { get: () => super.name }\r\n    }); return () => __awaiter(this, void 0, void 0, function* () { return _super.name + (yield 0); }); }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-super-in-accessors-and-constructor",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a20202020636f6e7374727563746f722829207b20737570657228293b20636f6e73742066203d206173796e63202829203d3e2073757065722e78202b20617761697420303b207d0a2020202067657420672829207b2072657475726e206173796e6320286b29203d3e2073757065725b6b5d202b20617761697420303b207d0a202020207365742073287629207b20636f6e73742066203d206173796e6320286b29203d3e207b2073757065725b6b5d203d20617761697420763b207d3b207d0a20202020737461746963206d2829207b2072657475726e206173796e63202829203d3e2073757065722e6e616d65202b20617761697420303b207d0a7d0a"
+    },
+    "id": "as-super-in-accessors-and-constructor",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    constructor() { super(); const f = async () => super.x + await 0; }\n    get g() { return async (k) => super[k] + await 0; }\n    set s(v) { const f = async (k) => { super[k] = await v; }; }\n    static m() { return async () => super.name + await 0; }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    n(k) {\r\n        const _superIndex = name => super[name];\r\n        return __awaiter(this, void 0, void 0, function* () {\r\n            return _superIndex(k) + (yield 1);\r\n        });\r\n    }\r\n}\r\nconst f = (x) => __awaiter(void 0, void 0, void 0, function* () { return yield x; });\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-typeeraser-chain",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206173796e63206e286b3a20737472696e67293a2050726f6d6973653c6e756d6265723e207b0a202020202020202072657475726e202873757065725b6b5d206173206e756d62657229202b2028617761697420283120617320616e792929213b0a202020207d0a7d0a636f6e73742066203d206173796e63203c542c3e28783a2054293a2050726f6d6973653c543e203d3e20617761697420783b0a"
+    },
+    "id": "as-typeeraser-chain",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(k: string): Promise<number> {\n        return (super[k] as number) + (await (1 as any))!;\n    }\n}\nconst f = async <T,>(x: T): Promise<T> => await x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nconst o = {\r\n    m(k) {\r\n        const _superIndex = name => super[name];\r\n        return __awaiter(this, void 0, void 0, function* () { return _superIndex(k) + (yield 0); });\r\n    },\r\n    get g() { const _super = Object.create(null, {\r\n        x: { get: () => super.x }\r\n    }); return () => __awaiter(this, void 0, void 0, function* () { return _super.x + (yield 0); }); },\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-object-literal-super-element",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e7374206f203d207b0a202020206173796e63206d286b29207b2072657475726e2073757065725b6b5d202b20617761697420303b207d2c0a2020202067657420672829207b2072657475726e206173796e63202829203d3e2073757065722e78202b20617761697420303b207d2c0a7d3b0a"
+    },
+    "id": "as-object-literal-super-element",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst o = {\n    async m(k) { return super[k] + await 0; },\n    get g() { return async () => super.x + await 0; },\n};\n"
+  },
+  {
+   "diagnostics": 12,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    m1(o) {\r\n        const _super = Object.create(null, {\r\n            x: { get: () => super.x, set: v => super.x = v }\r\n        });\r\n        return __awaiter(this, void 0, void 0, function* () { ({ ..._super.x } = o); yield 0; });\r\n    }\r\n    m2(a) {\r\n        const _super = Object.create(null, {\r\n            y: { get: () => super.y, set: v => super.y = v }\r\n        });\r\n        return __awaiter(this, void 0, void 0, function* () { [..._super.y] = a; yield 0; });\r\n    }\r\n    m3(o) {\r\n        const _super = Object.create(null, {\r\n            z: { get: () => super.z, set: v => super.z = v }\r\n        });\r\n        return __awaiter(this, void 0, void 0, function* () { ({ z: (_super.z) } = o); yield 0; });\r\n    }\r\n    m4(o) {\r\n        const _super = Object.create(null, {\r\n            v: { get: () => super.v }\r\n        });\r\n        return __awaiter(this, void 0, void 0, function* () { ({ w } = o); [w] = [_super.v]; yield 0; });\r\n    }\r\n    m5(o) {\r\n        const _super = Object.create(null, {\r\n            q: { get: () => super.q, set: v => super.q = v }\r\n        });\r\n        return __awaiter(this, void 0, void 0, function* () { ({ q: [_super.q] } = o); yield 0; });\r\n    }\r\n    m6(a) {\r\n        const _super = Object.create(null, {\r\n            r: { get: () => super.r, set: v => super.r = v }\r\n        });\r\n        return __awaiter(this, void 0, void 0, function* () { [(_super.r)] = a; yield 0; });\r\n    }\r\n}\r\nlet w;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "as-super-assignment-forms-isolated",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206173796e63206d31286f29207b20287b202e2e2e73757065722e78207d203d206f293b20617761697420303b207d0a202020206173796e63206d32286129207b205b2e2e2e73757065722e795d203d20613b20617761697420303b207d0a202020206173796e63206d33286f29207b20287b207a3a202873757065722e7a29207d203d206f293b20617761697420303b207d0a202020206173796e63206d34286f29207b20287b2077207d203d206f293b205b775d203d205b73757065722e765d3b20617761697420303b207d0a202020206173796e63206d35286f29207b20287b20713a205b73757065722e715d207d203d206f293b20617761697420303b207d0a202020206173796e63206d36286129207b205b2873757065722e72295d203d20613b20617761697420303b207d0a7d0a6c657420773b0a"
+    },
+    "id": "as-super-assignment-forms-isolated",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async m1(o) { ({ ...super.x } = o); await 0; }\n    async m2(a) { [...super.y] = a; await 0; }\n    async m3(o) { ({ z: (super.z) } = o); await 0; }\n    async m4(o) { ({ w } = o); [w] = [super.v]; await 0; }\n    async m5(o) { ({ q: [super.q] } = o); await 0; }\n    async m6(a) { [(super.r)] = a; await 0; }\n}\nlet w;\n"
   }
  ],
  "go": "go1.27.1",

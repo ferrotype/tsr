@@ -509,6 +509,168 @@
           "forawait"
         ]
       ]
+    },
+    {
+      "id": "fa-super-destructuring-targets",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass B { }\nclass C extends B {\n    async *m(a, o) {\n        [super.x, ...super.y] = a;\n        ({ p: super.z, ...super.w } = o);\n        (super.v) = 1;\n        ((super.u)) += 2;\n        yield super.x;\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "fa-super-element-call-with-assignment",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass B { }\nclass C extends B {\n    async *m(k) {\n        yield super[k](1, 2);\n        super.x = 3;\n        super[k] = super.x;\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "fa-super-element-read-only",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass B { }\nclass C extends B {\n    async *m(k) { yield super[k](1); }\n    async *n(k) { yield super[k]; yield super.q; }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "fa-nested-async-generator-methods",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass B { }\nclass C extends B {\n    async *outer(k) {\n        const o = {\n            async *inner() { yield super.toString(); }\n        };\n        class D extends B { async *deep() { yield super[k]; } }\n        yield super.x;\n        yield* o.inner();\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "fa-nested-functions-under-super-capture",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass B { }\nclass C extends B {\n    async *m() {\n        function f() { return 1; }\n        const g = function () { return 2; };\n        const o = { n() { return super.n; }, get p() { return 1; }, set p(v) { } };\n        class E { constructor() { } }\n        yield super.x + f() + g();\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "fa-function-expression-kinds",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nconst g = function* () { yield async function* () { yield 1; }; };\nconst f = function () { return async function* () { yield 1; }; };\nconst h = async function () { for await (const x of []) { } };\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "fa-function-declaration-kinds",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nfunction* g() { yield async function* () { yield 1; }; }\nfunction f() { return async function* () { yield 1; }; }\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "fa-accessors-and-constructor-with-async-generator",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass C {\n    constructor() { this.g = async function* () { yield this; }; }\n    get a() { return async function* () { yield 1; }; }\n    set a(v) { const g = async function* () { yield v; }; }\n    static async *s() { yield this; }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "fa-await-in-async-generator-arrow",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function* g(p) {\n    const f = () => p;\n    const h = async () => { for await (const x of p) { } };\n    yield await f();\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "fa-for-await-expression-kinds",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(o, k) {\n    for await (const x of o.p) { }\n    for await (const x of o[k]) { }\n    for await (const x of (o)) { }\n    for await (const x of [1, 2]) { }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "fa-for-await-in-async-generator-in-loops",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function* g(xss) {\n    while (true) {\n        for await (const x of xss) { yield x; }\n        break;\n    }\n    for (;;) { for await (const y of xss) { return y; } }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "fa-for-await-in-class-and-arrow",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xs) {\n    class K { m() { return 1; } }\n    const g = async () => { for (;;) { for await (const x of xs) { } } };\n    return K;\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "fa-yield-star-in-non-async-generator",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nfunction* g() { yield* [async function* () { yield* []; }]; return 1; }\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "fa-typeeraser-chain",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass B { }\nclass C extends B {\n    async *m(k: string): AsyncGenerator<number> {\n        for await (const x of (k as any)) { yield x as number; }\n        yield super[k] as number;\n    }\n}\n",
+      "chains": [
+        [
+          "typeeraser",
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "fa-forawait-then-async",
+      "name": "probe.ts",
+      "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async *m(k) { super[k] = 1; yield super.x; }\n    async n(xs) { for await (const x of xs) { await x; } }\n}\n",
+      "chains": [
+        [
+          "forawait",
+          "async"
+        ]
+      ]
+    },
+    {
+      "id": "fa-super-assignment-forms-isolated",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass B { }\nclass C extends B {\n    async *m1(o) { ({ ...super.x } = o); }\n    async *m2(a) { [...super.y] = a; }\n    async *m3(o) { ({ z: (super.z) } = o); }\n    async *m4(o) { ({ w } = o); yield super.v; }\n    async *m5(a) { (super.u) = a; }\n    async *m6(k) { super[k]++; }\n}\nlet w;\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
     }
   ]
 }

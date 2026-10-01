@@ -749,6 +749,161 @@
      "importelision"
     ]
    ]
+  },
+  {
+   "id": "ie-jsx-synthesized-import",
+   "name": "main.tsx",
+   "source": "// @jsx: react-jsx\n// @module: esnext\n// @filename: main.tsx\nexport const e = <div>{1}</div>;\nexport const f = <><span key=\"k\" /></>;\n",
+   "chains": [
+    [
+     "jsx",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-jsx-synthesized-import-with-user-imports",
+   "name": "main.tsx",
+   "source": "// @jsx: react-jsxdev\n// @module: esnext\n// @filename: main.tsx\nimport { a, T } from \"./other\";\nimport d from \"./other\";\nlet t: T;\nexport const e = <div>{a}</div>;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "jsx",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-jsx-synthesized-import-source",
+   "name": "main.tsx",
+   "source": "// @jsx: react-jsx\n// @jsxImportSource: preact\n// @module: esnext\n// @filename: main.tsx\nimport type { T } from \"./other\";\nexport const e = <div {...{ a: 1 }} key=\"k\" />;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "jsx",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-defer-namespace-used",
+   "name": "main.ts",
+   "source": "// @module: esnext\n// @filename: main.ts\nimport defer * as ns from \"./other\";\nns.a;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-defer-namespace-unused",
+   "name": "main.ts",
+   "source": "// @module: esnext\n// @filename: main.ts\nimport defer * as ns from \"./other\";\nexport const k = 1;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-defer-type-only-use",
+   "name": "main.ts",
+   "source": "// @module: preserve\n// @filename: main.ts\nimport defer * as ns from \"./other\";\nlet t: ns.T;\nexport {};\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-two-pass-partial",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport d, { a, b, T } from \"./other\";\nimport * as ns from \"./other\";\nimport x = require(\"./other\");\nexport { a as c, T };\nlet t: T = b;\nexport default ns;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision",
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-two-pass-elided",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport d, { a } from \"./other\";\nexport { T } from \"./other\";\nimport x = require(\"./other\");\nexport const k = 1;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-two-pass-namespace-equals",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nimport y = N.v;\nnamespace M { import z = N.v; export const w = z; }\n",
+   "chains": [
+    [
+     "importelision",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-verbatim-module-syntax-panics",
+   "name": "main.ts",
+   "source": "// @verbatimModuleSyntax: true\n// @module: esnext\n// @filename: main.ts\nimport { a } from \"./other\";\na;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-equals-interface",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\ninterface I {}\nexport = I;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-equals-value",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nconst v = 1;\nexport = v;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-js-namespace-and-equals",
+   "name": "main.js",
+   "source": "// @allowJs: true\n// @filename: main.js\nimport * as ns from \"./other.js\";\nimport d, { a } from \"./other.js\";\nexport { a as c };\nexport default 1;\n// @filename: other.js\nexport default 1;\nexport const a = 1;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-namespace-export-unused",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N {\n    import { a } from \"./other\";\n    export const q = 1;\n}\nexport {};\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
   }
  ]
 }

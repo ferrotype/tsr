@@ -1139,6 +1139,640 @@
    },
    "name": "probe.ts",
    "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk `\\u`;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nk(__makeTemplateObject([\"ok\\n\\t\", \"midA\", void 0], [\"ok\\\\n\\\\t\", \"mid\\\\x41\", \"\\\\u\"]), a, b);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "tt-cooked-and-raw-mixed",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6b606f6b5c6e5c74247b617d6d69645c783431247b627d5c75603b0a"
+    },
+    "id": "tt-cooked-and-raw-mixed",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`ok\\n\\t${a}mid\\x41${b}\\u`;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nk(__makeTemplateObject([void 0, \"\", \"\", \"\"], [\"\\\\u\", \"\", \"\", \"\"]), a, b, c);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "tt-empty-middle-raw",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6b605c75247b617d247b627d247b637d603b0a"
+    },
+    "id": "tt-empty-middle-raw",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\u${a}${b}${c}`;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nk(__makeTemplateObject([void 0], [\"\\\\`\\\\${a}\\\\\\\\\\\\u\"]));\r\nk(__makeTemplateObject([void 0], [\"line\\\\\\ncontinued\\\\x\"]));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "tt-escaped-delimiters",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6b605c605c247b617d5c5c5c75603b0a6b606c696e655c0a636f6e74696e7565645c78603b0a"
+    },
+    "id": "tt-escaped-delimiters",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\`\\${a}\\\\\\u`;\nk`line\\\ncontinued\\x`;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nk(__makeTemplateObject([void 0, \"\\uD83D\\uDE00\"], [\"\\u00E9\\u4E2D\\\\u\", \"\\uD83D\\uDE00\"]), a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "tt-non-ascii",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6b60c3a9e4b8ad5c75247b617df09f9880603b0a"
+    },
+    "id": "tt-non-ascii",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`é中\\u${a}😀`;\n"
+  },
+  {
+   "diagnostics": 6,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nk(__makeTemplateObject([void 0], [\"\\\\8\"]));\r\nk(__makeTemplateObject([void 0], [\"\\\\9\"]));\r\nk(__makeTemplateObject([void 0], [\"\\\\x4\"]));\r\nk(__makeTemplateObject([void 0], [\"\\\\u{g}\"]));\r\nk(__makeTemplateObject([void 0], [\"\\\\u12\"]));\r\nk(__makeTemplateObject([void 0], [\"\\\\0\\\\1\"]));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "tt-invalid-escape-kinds",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6b605c38603b0a6b605c39603b0a6b605c7834603b0a6b605c757b677d603b0a6b605c753132603b0a6b605c305c31603b0a"
+    },
+    "id": "tt-invalid-escape-kinds",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\8`;\nk`\\9`;\nk`\\x4`;\nk`\\u{g}`;\nk`\\u12`;\nk`\\0\\1`;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nk(__makeTemplateObject([void 0], [\"\\\\u\"]))(__makeTemplateObject([void 0], [\"\\\\x\"]));\r\nk `ok`(__makeTemplateObject([void 0, \"\"], [\"\\\\u\", \"\"]), a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "tt-tag-is-tagged-template",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6b605c7560605c78603b0a6b606f6b60605c75247b617d603b0a"
+    },
+    "id": "tt-tag-is-tagged-template",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\u``\\x`;\nk`ok``\\u${a}`;\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nexport const x = k(templateObject_1 || (templateObject_1 = __makeTemplateObject([void 0], [\"\\\\u\"]))), y = k(templateObject_2 || (templateObject_2 = __makeTemplateObject([void 0, \"\"], [\"\\\\x\", \"\"])), a);\r\nfunction f() { return k(templateObject_3 || (templateObject_3 = __makeTemplateObject([void 0], [\"\\\\u{\"]))); }\r\nvar templateObject_1, templateObject_2, templateObject_3;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "tt-module-cache-multiple",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6578706f727420636f6e73742078203d206b605c75602c2079203d206b605c78247b617d603b0a66756e6374696f6e20662829207b2072657475726e206b605c757b603b207d0a"
+    },
+    "id": "tt-module-cache-multiple",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nexport const x = k`\\u`, y = k`\\x${a}`;\nfunction f() { return k`\\u{`; }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nvar templateObject = 1, templateObject_1 = 2;\r\nexport const x = k(templateObject_2 || (templateObject_2 = __makeTemplateObject([void 0], [\"\\\\u\"])));\r\nexport const y = k(templateObject_3 || (templateObject_3 = __makeTemplateObject([void 0], [\"\\\\u\"])));\r\nvar templateObject_2, templateObject_3;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "tt-module-cache-name-collision",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a7661722074656d706c6174654f626a656374203d20312c2074656d706c6174654f626a6563745f31203d20323b0a6578706f727420636f6e73742078203d206b605c75603b0a6578706f727420636f6e73742079203d206b605c75603b0a"
+    },
+    "id": "tt-module-cache-name-collision",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nvar templateObject = 1, templateObject_1 = 2;\nexport const x = k`\\u`;\nexport const y = k`\\u`;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "export const v = 1;\r\n"
+      }
+     ],
+     "name": "/.src/m.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\ndeclare function k(...a: any[]): any;\r\nimport * as m from \"./m\";\r\nk(templateObject_1 || (templateObject_1 = __makeTemplateObject([void 0, \"\"], [\"\\\\u\", \"\"])), m);\r\nexport = k(templateObject_2 || (templateObject_2 = __makeTemplateObject([void 0], [\"\\\\x\"])));\r\nvar templateObject_1, templateObject_2;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "tt-module-commonjs",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/m.ts": "6578706f727420636f6e73742076203d20313b0a",
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e206b282e2e2e613a20616e795b5d293a20616e793b0a696d706f7274202a206173206d2066726f6d20222e2f6d223b0a6b605c75247b6d7d603b0a6578706f7274203d206b605c78603b"
+    },
+    "id": "tt-module-commonjs",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/m.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @module: commonjs\n// @filename: probe.ts\ndeclare function k(...a: any[]): any;\nimport * as m from \"./m\";\nk`\\u${m}`;\nexport = k`\\x`;\n// @filename: m.ts\nexport const v = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "export const v = 1;\r\n"
+      }
+     ],
+     "name": "/.src/m.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\ndeclare function k(...a: any[]): any;\r\nimport { v } from \"./m\";\r\nexport default k(templateObject_1 || (templateObject_1 = __makeTemplateObject([void 0, \"\"], [\"\\\\u\", \"\"])), v);\r\nvar templateObject_1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "tt-module-esnext",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/m.ts": "6578706f727420636f6e73742076203d20313b0a",
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e206b282e2e2e613a20616e795b5d293a20616e793b0a696d706f7274207b2076207d2066726f6d20222e2f6d223b0a6578706f72742064656661756c74206b605c75247b767d603b"
+    },
+    "id": "tt-module-esnext",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/m.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @module: esnext\n// @filename: probe.ts\ndeclare function k(...a: any[]): any;\nimport { v } from \"./m\";\nexport default k`\\u${v}`;\n// @filename: m.ts\nexport const v = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\ndeclare function k(...a: any[]): any;\r\nk(templateObject_1 || (templateObject_1 = __makeTemplateObject([void 0], [\"\\\\u\"])));\r\nvar templateObject_1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "tt-module-detection-force",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e206b282e2e2e613a20616e795b5d293a20616e793b0a6b605c75603b0a"
+    },
+    "id": "tt-module-detection-force",
+    "options": {
+     "moduleDetection": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @moduleDetection: force\ndeclare function k(...a: any[]): any;\nk`\\u`;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "module.exports = 1;\r\n"
+      }
+     ],
+     "name": "/.src/m.js"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\nconst m = require(\"./m\");\r\nfunction k() { }\r\nk(__makeTemplateObject([void 0, \"\"], [\"\\\\u\", \"\"]), m);\r\nmodule.exports = k(__makeTemplateObject([void 0], [\"\\\\x\"]));\r\n"
+      }
+     ],
+     "name": "/.src/main.js"
+    }
+   ],
+   "id": "tt-js-commonjs-require",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/m.js": "6d6f64756c652e6578706f727473203d20313b0a",
+     "/.src/main.js": "636f6e7374206d203d207265717569726528222e2f6d22293b0a66756e6374696f6e206b2829207b7d0a6b605c75247b6d7d603b0a6d6f64756c652e6578706f727473203d206b605c78603b"
+    },
+    "id": "tt-js-commonjs-require",
+    "options": {
+     "allowJs": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/main.js",
+     "/.src/m.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.js",
+   "source": "// @target: es2017\n// @allowJs: true\n// @filename: main.js\nconst m = require(\"./m\");\nfunction k() {}\nk`\\u${m}`;\nmodule.exports = k`\\x`;\n// @filename: m.js\nmodule.exports = 1;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "export default 1;\r\n"
+      }
+     ],
+     "name": "/.src/m.js"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\nimport m from \"./m.js\";\r\nfunction k() { }\r\nk(templateObject_1 || (templateObject_1 = __makeTemplateObject([void 0, \"\"], [\"\\\\u\", \"\"])), m);\r\nvar templateObject_1;\r\n"
+      }
+     ],
+     "name": "/.src/main.js"
+    }
+   ],
+   "id": "tt-js-esm",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/m.js": "6578706f72742064656661756c7420313b0a",
+     "/.src/main.js": "696d706f7274206d2066726f6d20222e2f6d2e6a73223b0a66756e6374696f6e206b2829207b7d0a6b605c75247b6d7d603b"
+    },
+    "id": "tt-js-esm",
+    "options": {
+     "allowJs": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/main.js",
+     "/.src/m.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.js",
+   "source": "// @target: es2017\n// @allowJs: true\n// @filename: main.js\nimport m from \"./m.js\";\nfunction k() {}\nk`\\u${m}`;\n// @filename: m.js\nexport default 1;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nk(__makeTemplateObject([\"a\\n\", void 0, \"\\n\"], [\"a\\n\", \"\\n\\\\u\\n\", \"\\n\"]), b, c);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "tt-crlf-raw-pieces",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6b60610a247b627d0a5c750d247b637d0d603b0a"
+    },
+    "id": "tt-crlf-raw-pieces",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`a\r\n${b}\r\n\\u\r${c}\r`;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nexport class C {\r\n    static s = k(templateObject_1 || (templateObject_1 = __makeTemplateObject([void 0], [\"\\\\u\"])));\r\n    m() { return () => o.p(templateObject_2 || (templateObject_2 = __makeTemplateObject([void 0, \"\"], [\"\\\\x\", \"\"])), this); }\r\n}\r\nvar templateObject_1, templateObject_2;\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "taggedtemplate"
+       ],
+       "text": "var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {\r\n    if (Object.defineProperty) { Object.defineProperty(cooked, \"raw\", { value: raw }); } else { cooked.raw = raw; }\r\n    return cooked;\r\n};\r\nexport class C {\r\n    static s = k(templateObject_1 || (templateObject_1 = __makeTemplateObject([void 0], [\"\\\\u\"])));\r\n    m() { return () => o.p(templateObject_2 || (templateObject_2 = __makeTemplateObject([void 0, \"\"], [\"\\\\x\", \"\"])), this); }\r\n}\r\nvar templateObject_1, templateObject_2;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "tt-in-class-and-arrow",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6578706f727420636c6173732043207b207374617469632073203d206b605c75603b206d2829207b2072657475726e202829203d3e206f2e70605c78247b746869737d603b207d207d0a"
+    },
+    "id": "tt-in-class-and-arrow",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nexport class C { static s = k`\\u`; m() { return () => o.p`\\x${this}`; } }\n"
   }
  ],
  "go": "go1.27.1",

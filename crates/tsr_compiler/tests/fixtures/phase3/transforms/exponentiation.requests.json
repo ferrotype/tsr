@@ -249,6 +249,85 @@
      "exponentiation"
     ]
    ]
+  },
+  {
+   "id": "ex-element-targets",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\no[a ** b] **= c;\no[a][b] **= c ** a;\no[k()][0] **= 2;\n/*l*/ o /*m*/ [ /*n*/ a /*o*/ ] /*p*/ **= /*q*/ b;\n",
+   "chains": [
+    [
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "ex-property-targets",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\no.p.q **= o.r **= 2;\nk().length **= 2;\n/*l*/ o /*m*/ . /*n*/ p /*o*/ **= /*q*/ b;\nnew o.C().p **= 2;\n",
+   "chains": [
+    [
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "ex-parenthesized-targets",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\n(o[k()]) **= 2;\n((o.p)) **= a ** b;\n(a) **= 2;\n",
+   "chains": [
+    [
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "ex-super-targets",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nclass C extends Object { m(): any { super.x **= 2; super[k()] **= 3; return super[\"y\"] **= a; } }\n",
+   "chains": [
+    [
+     "exponentiation"
+    ],
+    [
+     "typeeraser",
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "ex-this-private-targets",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nclass D { #p = 1; q = 1; m() { this.#p **= 2; this.q **= 2; this[\"q\"] **= 2; } }\n",
+   "chains": [
+    [
+     "exponentiation"
+    ],
+    [
+     "typeeraser",
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "ex-typeeraser-targets",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\n(o as any).p **= 2;\no!.p **= 2;\n(<any>o)[k()] **= 2;\n(o.p as number) **= 2;\no.p! **= 2;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "ex-nested-functions",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nfunction f() { o[a] **= 2; return () => o.p **= 3; }\nclass E { static s = o[k()] **= 2; x = o.p **= 2; }\n",
+   "chains": [
+    [
+     "exponentiation"
+    ]
+   ]
   }
  ]
 }

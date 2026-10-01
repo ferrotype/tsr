@@ -590,6 +590,187 @@
      "async"
     ]
    ]
+  },
+  {
+   "id": "as-super-element-single-line-method",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    m(k) { return async () => super[k] + await 1; }\n    n(k) { const f = async () => { super[k] = await 1; }; return f; }\n    o(k) { return async () => super[k](await 1); }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-super-element-call-with-assignment",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(k) {\n        super[k](1, await 2);\n        super.x = 1;\n        return super.m(super[k]);\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-super-element-compound-assignment",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(k) {\n        super[k] += await 1;\n        super.x ||= 2;\n        super[k] **= 2;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-super-element-nested-super-key",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n() {\n        return super[super.k] + super[super[0]] + await 1;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-super-spread-targets",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(o, a) {\n        await 0;\n        ({ ...super.x } = o);\n        [...super.y] = a;\n        ({ z: (super.z) } = o);\n        ({ w } = o);\n    }\n}\nlet w;\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-super-non-super-accesses",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(o, k) {\n        await 0;\n        return [super.x, this.a.b, o[k], o.m(), o[k](), k()];\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-arguments-in-parameter-initializer",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(a = arguments) {\n    return await a;\n}\nfunction g() {\n    return async (b = arguments[0]) => await b;\n}\nclass C { async m(c = arguments.length) { return c + await 0; } }\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-arguments-colliding-var",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(a) {\n    var a = arguments;\n    await 0;\n    return a;\n}\nasync function g(b) {\n    for (var b = arguments.length; ;) { await b; break; }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-arguments-in-class-field",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass C {\n    x = async () => arguments.length + await 0;\n    static y = async () => await arguments[0];\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-arguments-shorthand",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f() {\n    await 0;\n    return { arguments };\n}\nfunction g() {\n    return async () => ({ arguments, a: await 1 });\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-arguments-property-names",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(o) {\n    await 0;\n    class K { arguments() { return 1; } }\n    return [o.arguments, { arguments: 1 }, { arguments() { return arguments; } }, K];\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-await-in-non-async-functions",
+   "name": "probe.ts",
+   "source": "// @target: es2016\n// @module: esnext\nfunction f() { return async () => await 1; }\nconst g = function () { return async function () { await 2; }; };\nconst h = () => async () => await 3;\nexport {};\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-arrow-param-forwarding",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst f = async (a, { b }, c = 1, ...d) => a + b + c + d.length + await 0;\nconst g = async ([a], b) => await a + b;\nconst h = async (a, ...b) => { return await b[a]; };\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-arguments-arrow-in-arrow",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nfunction f() {\n    return async () => {\n        const g = async () => arguments[0] + await 1;\n        return arguments.length + await g();\n    };\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-super-in-accessors-and-constructor",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    constructor() { super(); const f = async () => super.x + await 0; }\n    get g() { return async (k) => super[k] + await 0; }\n    set s(v) { const f = async (k) => { super[k] = await v; }; }\n    static m() { return async () => super.name + await 0; }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-typeeraser-chain",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(k: string): Promise<number> {\n        return (super[k] as number) + (await (1 as any))!;\n    }\n}\nconst f = async <T,>(x: T): Promise<T> => await x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-object-literal-super-element",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst o = {\n    async m(k) { return super[k] + await 0; },\n    get g() { return async () => super.x + await 0; },\n};\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "as-super-assignment-forms-isolated",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async m1(o) { ({ ...super.x } = o); await 0; }\n    async m2(a) { [...super.y] = a; await 0; }\n    async m3(o) { ({ z: (super.z) } = o); await 0; }\n    async m4(o) { ({ w } = o); [w] = [super.v]; await 0; }\n    async m5(o) { ({ q: [super.q] } = o); await 0; }\n    async m6(a) { [(super.r)] = a; await 0; }\n}\nlet w;\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
   }
  ]
 }

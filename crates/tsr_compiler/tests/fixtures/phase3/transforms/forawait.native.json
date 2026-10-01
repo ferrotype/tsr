@@ -1937,6 +1937,616 @@
    },
    "name": "probe.ts",
    "source": "// @target: es2017\nclass B { m() { return 1; } }\nclass C extends B {\n    async *m(a = super.m()) {\n        yield a;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 9,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "var __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\r\nvar __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var g = generator.apply(thisArg, _arguments || []), i, q = [];\r\n    return i = Object.create((typeof AsyncIterator === \"function\" ? AsyncIterator : Object).prototype), verb(\"next\"), verb(\"throw\"), verb(\"return\", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;\r\n    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }\r\n    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }\r\n    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }\r\n    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }\r\n    function fulfill(value) { resume(\"next\", value); }\r\n    function reject(value) { resume(\"throw\", value); }\r\n    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    m(a, o) {\r\n        const _super = Object.create(null, {\r\n            x: { get: () => super.x, set: v => super.x = v },\r\n            y: { get: () => super.y, set: v => super.y = v },\r\n            z: { get: () => super.z, set: v => super.z = v },\r\n            w: { get: () => super.w, set: v => super.w = v },\r\n            v: { get: () => super.v, set: v => super.v = v },\r\n            u: { get: () => super.u, set: v => super.u = v }\r\n        });\r\n        return __asyncGenerator(this, arguments, function* m_1() {\r\n            [_super.x, ..._super.y] = a;\r\n            ({ p: _super.z, ..._super.w } = o);\r\n            (_super.v) = 1;\r\n            ((_super.u)) += 2;\r\n            yield yield __await(_super.x);\r\n        });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-super-destructuring-targets",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206173796e63202a6d28612c206f29207b0a20202020202020205b73757065722e782c202e2e2e73757065722e795d203d20613b0a2020202020202020287b20703a2073757065722e7a2c202e2e2e73757065722e77207d203d206f293b0a20202020202020202873757065722e7629203d20313b0a2020202020202020282873757065722e752929202b3d20323b0a20202020202020207969656c642073757065722e783b0a202020207d0a7d0a"
+    },
+    "id": "fa-super-destructuring-targets",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nclass B { }\nclass C extends B {\n    async *m(a, o) {\n        [super.x, ...super.y] = a;\n        ({ p: super.z, ...super.w } = o);\n        (super.v) = 1;\n        ((super.u)) += 2;\n        yield super.x;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 5,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "var __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\r\nvar __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var g = generator.apply(thisArg, _arguments || []), i, q = [];\r\n    return i = Object.create((typeof AsyncIterator === \"function\" ? AsyncIterator : Object).prototype), verb(\"next\"), verb(\"throw\"), verb(\"return\", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;\r\n    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }\r\n    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }\r\n    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }\r\n    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }\r\n    function fulfill(value) { resume(\"next\", value); }\r\n    function reject(value) { resume(\"throw\", value); }\r\n    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    m(k) {\r\n        const _superIndex = (function (geti, seti) {\r\n            const cache = Object.create(null);\r\n            return name => cache[name] || (cache[name] = { get value() { return geti(name); }, set value(v) { seti(name, v); } });\r\n        })(name => super[name], (name, value) => super[name] = value);\r\n        const _super = Object.create(null, {\r\n            x: { get: () => super.x, set: v => super.x = v }\r\n        });\r\n        return __asyncGenerator(this, arguments, function* m_1() {\r\n            yield yield __await(_superIndex(k).value.call(this, 1, 2));\r\n            _super.x = 3;\r\n            _superIndex(k).value = _super.x;\r\n        });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-super-element-call-with-assignment",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206173796e63202a6d286b29207b0a20202020202020207969656c642073757065725b6b5d28312c2032293b0a202020202020202073757065722e78203d20333b0a202020202020202073757065725b6b5d203d2073757065722e783b0a202020207d0a7d0a"
+    },
+    "id": "fa-super-element-call-with-assignment",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nclass B { }\nclass C extends B {\n    async *m(k) {\n        yield super[k](1, 2);\n        super.x = 3;\n        super[k] = super.x;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 5,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "var __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\r\nvar __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var g = generator.apply(thisArg, _arguments || []), i, q = [];\r\n    return i = Object.create((typeof AsyncIterator === \"function\" ? AsyncIterator : Object).prototype), verb(\"next\"), verb(\"throw\"), verb(\"return\", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;\r\n    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }\r\n    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }\r\n    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }\r\n    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }\r\n    function fulfill(value) { resume(\"next\", value); }\r\n    function reject(value) { resume(\"throw\", value); }\r\n    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    m(k) {\r\n        const _superIndex = name => super[name];\r\n        return __asyncGenerator(this, arguments, function* m_1() { yield yield __await(_superIndex(k).call(this, 1)); });\r\n    }\r\n    n(k) {\r\n        const _superIndex = name => super[name];\r\n        const _super = Object.create(null, {\r\n            q: { get: () => super.q }\r\n        });\r\n        return __asyncGenerator(this, arguments, function* n_1() { yield yield __await(_superIndex(k)); yield yield __await(_super.q); });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-super-element-read-only",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206173796e63202a6d286b29207b207969656c642073757065725b6b5d2831293b207d0a202020206173796e63202a6e286b29207b207969656c642073757065725b6b5d3b207969656c642073757065722e713b207d0a7d0a"
+    },
+    "id": "fa-super-element-read-only",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nclass B { }\nclass C extends B {\n    async *m(k) { yield super[k](1); }\n    async *n(k) { yield super[k]; yield super.q; }\n}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "var __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\r\nvar __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var g = generator.apply(thisArg, _arguments || []), i, q = [];\r\n    return i = Object.create((typeof AsyncIterator === \"function\" ? AsyncIterator : Object).prototype), verb(\"next\"), verb(\"throw\"), verb(\"return\", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;\r\n    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }\r\n    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }\r\n    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }\r\n    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }\r\n    function fulfill(value) { resume(\"next\", value); }\r\n    function reject(value) { resume(\"throw\", value); }\r\n    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }\r\n};\r\nvar __asyncValues = (this && this.__asyncValues) || function (o) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var m = o[Symbol.asyncIterator], i;\r\n    return m ? m.call(o) : (o = typeof __values === \"function\" ? __values(o) : o[Symbol.iterator](), i = {}, verb(\"next\"), verb(\"throw\"), verb(\"return\"), i[Symbol.asyncIterator] = function () { return this; }, i);\r\n    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }\r\n    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }\r\n};\r\nvar __asyncDelegator = (this && this.__asyncDelegator) || function (o) {\r\n    var i, p;\r\n    return i = {}, verb(\"next\"), verb(\"throw\", function (e) { throw e; }), verb(\"return\"), i[Symbol.iterator] = function () { return this; }, i;\r\n    function verb(n, f) { i[n] = o[n] ? function (v) { return (p = !p) ? { value: __await(o[n](v)), done: false } : f ? f(v) : v; } : f; }\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    outer(k) {\r\n        const _super = Object.create(null, {\r\n            x: { get: () => super.x }\r\n        });\r\n        return __asyncGenerator(this, arguments, function* outer_1() {\r\n            const o = {\r\n                inner() { const _super = Object.create(null, {\r\n                    toString: { get: () => super.toString }\r\n                }); return __asyncGenerator(this, arguments, function* inner_1() { yield yield __await(_super.toString.call(this)); }); }\r\n            };\r\n            class D extends B {\r\n                deep() {\r\n                    const _superIndex = name => super[name];\r\n                    return __asyncGenerator(this, arguments, function* deep_1() { yield yield __await(_superIndex(k)); });\r\n                }\r\n            }\r\n            yield yield __await(_super.x);\r\n            yield __await(yield* __asyncDelegator(__asyncValues(o.inner())));\r\n        });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-nested-async-generator-methods",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206173796e63202a6f75746572286b29207b0a2020202020202020636f6e7374206f203d207b0a2020202020202020202020206173796e63202a696e6e65722829207b207969656c642073757065722e746f537472696e6728293b207d0a20202020202020207d3b0a2020202020202020636c617373204420657874656e64732042207b206173796e63202a646565702829207b207969656c642073757065725b6b5d3b207d207d0a20202020202020207969656c642073757065722e783b0a20202020202020207969656c642a206f2e696e6e657228293b0a202020207d0a7d0a"
+    },
+    "id": "fa-nested-async-generator-methods",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nclass B { }\nclass C extends B {\n    async *outer(k) {\n        const o = {\n            async *inner() { yield super.toString(); }\n        };\n        class D extends B { async *deep() { yield super[k]; } }\n        yield super.x;\n        yield* o.inner();\n    }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "var __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\r\nvar __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var g = generator.apply(thisArg, _arguments || []), i, q = [];\r\n    return i = Object.create((typeof AsyncIterator === \"function\" ? AsyncIterator : Object).prototype), verb(\"next\"), verb(\"throw\"), verb(\"return\", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;\r\n    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }\r\n    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }\r\n    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }\r\n    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }\r\n    function fulfill(value) { resume(\"next\", value); }\r\n    function reject(value) { resume(\"throw\", value); }\r\n    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    m() {\r\n        const _super = Object.create(null, {\r\n            n: { get: () => super.n },\r\n            x: { get: () => super.x }\r\n        });\r\n        return __asyncGenerator(this, arguments, function* m_1() {\r\n            function f() { return 1; }\r\n            const g = function () { return 2; };\r\n            const o = { n() { return super.n; }, get p() { return 1; }, set p(v) { } };\r\n            class E {\r\n                constructor() { }\r\n            }\r\n            yield yield __await(_super.x + f() + g());\r\n        });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-nested-functions-under-super-capture",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206173796e63202a6d2829207b0a202020202020202066756e6374696f6e20662829207b2072657475726e20313b207d0a2020202020202020636f6e73742067203d2066756e6374696f6e202829207b2072657475726e20323b207d3b0a2020202020202020636f6e7374206f203d207b206e2829207b2072657475726e2073757065722e6e3b207d2c2067657420702829207b2072657475726e20313b207d2c207365742070287629207b207d207d3b0a2020202020202020636c6173732045207b20636f6e7374727563746f722829207b207d207d0a20202020202020207969656c642073757065722e78202b20662829202b206728293b0a202020207d0a7d0a"
+    },
+    "id": "fa-nested-functions-under-super-capture",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nclass B { }\nclass C extends B {\n    async *m() {\n        function f() { return 1; }\n        const g = function () { return 2; };\n        const o = { n() { return super.n; }, get p() { return 1; }, set p(v) { } };\n        class E { constructor() { } }\n        yield super.x + f() + g();\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "var __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\r\nvar __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var g = generator.apply(thisArg, _arguments || []), i, q = [];\r\n    return i = Object.create((typeof AsyncIterator === \"function\" ? AsyncIterator : Object).prototype), verb(\"next\"), verb(\"throw\"), verb(\"return\", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;\r\n    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }\r\n    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }\r\n    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }\r\n    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }\r\n    function fulfill(value) { resume(\"next\", value); }\r\n    function reject(value) { resume(\"throw\", value); }\r\n    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }\r\n};\r\nvar __asyncValues = (this && this.__asyncValues) || function (o) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var m = o[Symbol.asyncIterator], i;\r\n    return m ? m.call(o) : (o = typeof __values === \"function\" ? __values(o) : o[Symbol.iterator](), i = {}, verb(\"next\"), verb(\"throw\"), verb(\"return\"), i[Symbol.asyncIterator] = function () { return this; }, i);\r\n    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }\r\n    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }\r\n};\r\nconst g = function* () { yield function () { return __asyncGenerator(this, arguments, function* () { yield yield __await(1); }); }; };\r\nconst f = function () { return function () { return __asyncGenerator(this, arguments, function* () { yield yield __await(1); }); }; };\r\nconst h = async function () { var _a, e_1, _b, _c; try {\r\n    for (var _d = true, _e = __asyncValues([]), _f; _f = await _e.next(), _a = _f.done, !_a; _d = true) {\r\n        _c = _f.value;\r\n        _d = false;\r\n        const x = _c;\r\n    }\r\n}\r\ncatch (e_1_1) { e_1 = { error: e_1_1 }; }\r\nfinally {\r\n    try {\r\n        if (!_d && !_a && (_b = _e.return)) await _b.call(_e);\r\n    }\r\n    finally { if (e_1) throw e_1.error; }\r\n} };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-function-expression-kinds",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742067203d2066756e6374696f6e2a202829207b207969656c64206173796e632066756e6374696f6e2a202829207b207969656c6420313b207d3b207d3b0a636f6e73742066203d2066756e6374696f6e202829207b2072657475726e206173796e632066756e6374696f6e2a202829207b207969656c6420313b207d3b207d3b0a636f6e73742068203d206173796e632066756e6374696f6e202829207b20666f722061776169742028636f6e73742078206f66205b5d29207b207d207d3b0a"
+    },
+    "id": "fa-function-expression-kinds",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nconst g = function* () { yield async function* () { yield 1; }; };\nconst f = function () { return async function* () { yield 1; }; };\nconst h = async function () { for await (const x of []) { } };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "var __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\r\nvar __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var g = generator.apply(thisArg, _arguments || []), i, q = [];\r\n    return i = Object.create((typeof AsyncIterator === \"function\" ? AsyncIterator : Object).prototype), verb(\"next\"), verb(\"throw\"), verb(\"return\", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;\r\n    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }\r\n    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }\r\n    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }\r\n    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }\r\n    function fulfill(value) { resume(\"next\", value); }\r\n    function reject(value) { resume(\"throw\", value); }\r\n    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }\r\n};\r\nfunction* g() { yield function () { return __asyncGenerator(this, arguments, function* () { yield yield __await(1); }); }; }\r\nfunction f() { return function () { return __asyncGenerator(this, arguments, function* () { yield yield __await(1); }); }; }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-function-declaration-kinds",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e2a20672829207b207969656c64206173796e632066756e6374696f6e2a202829207b207969656c6420313b207d3b207d0a66756e6374696f6e20662829207b2072657475726e206173796e632066756e6374696f6e2a202829207b207969656c6420313b207d3b207d0a"
+    },
+    "id": "fa-function-declaration-kinds",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nfunction* g() { yield async function* () { yield 1; }; }\nfunction f() { return async function* () { yield 1; }; }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "var __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\r\nvar __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var g = generator.apply(thisArg, _arguments || []), i, q = [];\r\n    return i = Object.create((typeof AsyncIterator === \"function\" ? AsyncIterator : Object).prototype), verb(\"next\"), verb(\"throw\"), verb(\"return\", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;\r\n    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }\r\n    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }\r\n    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }\r\n    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }\r\n    function fulfill(value) { resume(\"next\", value); }\r\n    function reject(value) { resume(\"throw\", value); }\r\n    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }\r\n};\r\nclass C {\r\n    constructor() { this.g = function () { return __asyncGenerator(this, arguments, function* () { yield yield __await(this); }); }; }\r\n    get a() { return function () { return __asyncGenerator(this, arguments, function* () { yield yield __await(1); }); }; }\r\n    set a(v) { const g = function () { return __asyncGenerator(this, arguments, function* () { yield yield __await(v); }); }; }\r\n    static s() { return __asyncGenerator(this, arguments, function* s_1() { yield yield __await(this); }); }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-accessors-and-constructor-with-async-generator",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020636f6e7374727563746f722829207b20746869732e67203d206173796e632066756e6374696f6e2a202829207b207969656c6420746869733b207d3b207d0a2020202067657420612829207b2072657475726e206173796e632066756e6374696f6e2a202829207b207969656c6420313b207d3b207d0a202020207365742061287629207b20636f6e73742067203d206173796e632066756e6374696f6e2a202829207b207969656c6420763b207d3b207d0a20202020737461746963206173796e63202a732829207b207969656c6420746869733b207d0a7d0a"
+    },
+    "id": "fa-accessors-and-constructor-with-async-generator",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nclass C {\n    constructor() { this.g = async function* () { yield this; }; }\n    get a() { return async function* () { yield 1; }; }\n    set a(v) { const g = async function* () { yield v; }; }\n    static async *s() { yield this; }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "var __asyncValues = (this && this.__asyncValues) || function (o) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var m = o[Symbol.asyncIterator], i;\r\n    return m ? m.call(o) : (o = typeof __values === \"function\" ? __values(o) : o[Symbol.iterator](), i = {}, verb(\"next\"), verb(\"throw\"), verb(\"return\"), i[Symbol.asyncIterator] = function () { return this; }, i);\r\n    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }\r\n    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }\r\n};\r\nvar __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\r\nvar __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var g = generator.apply(thisArg, _arguments || []), i, q = [];\r\n    return i = Object.create((typeof AsyncIterator === \"function\" ? AsyncIterator : Object).prototype), verb(\"next\"), verb(\"throw\"), verb(\"return\", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;\r\n    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }\r\n    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }\r\n    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }\r\n    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }\r\n    function fulfill(value) { resume(\"next\", value); }\r\n    function reject(value) { resume(\"throw\", value); }\r\n    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }\r\n};\r\nfunction g(p) {\r\n    return __asyncGenerator(this, arguments, function* g_1() {\r\n        const f = () => p;\r\n        const h = async () => { var _a, e_1, _b, _c; try {\r\n            for (var _d = true, p_1 = __asyncValues(p), p_1_1; p_1_1 = await p_1.next(), _a = p_1_1.done, !_a; _d = true) {\r\n                _c = p_1_1.value;\r\n                _d = false;\r\n                const x = _c;\r\n            }\r\n        }\r\n        catch (e_1_1) { e_1 = { error: e_1_1 }; }\r\n        finally {\r\n            try {\r\n                if (!_d && !_a && (_b = p_1.return)) await _b.call(p_1);\r\n            }\r\n            finally { if (e_1) throw e_1.error; }\r\n        } };\r\n        yield yield __await(yield __await(f()));\r\n    });\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-await-in-async-generator-arrow",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6173796e632066756e6374696f6e2a2067287029207b0a20202020636f6e73742066203d202829203d3e20703b0a20202020636f6e73742068203d206173796e63202829203d3e207b20666f722061776169742028636f6e73742078206f66207029207b207d207d3b0a202020207969656c64206177616974206628293b0a7d0a"
+    },
+    "id": "fa-await-in-async-generator-arrow",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nasync function* g(p) {\n    const f = () => p;\n    const h = async () => { for await (const x of p) { } };\n    yield await f();\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "var __asyncValues = (this && this.__asyncValues) || function (o) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var m = o[Symbol.asyncIterator], i;\r\n    return m ? m.call(o) : (o = typeof __values === \"function\" ? __values(o) : o[Symbol.iterator](), i = {}, verb(\"next\"), verb(\"throw\"), verb(\"return\"), i[Symbol.asyncIterator] = function () { return this; }, i);\r\n    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }\r\n    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }\r\n};\r\nasync function f(o, k) {\r\n    var _a, e_1, _b, _c, _d, e_2, _e, _f, _g, e_3, _h, _j, _k, e_4, _l, _m;\r\n    try {\r\n        for (var _o = true, _p = __asyncValues(o.p), _q; _q = await _p.next(), _a = _q.done, !_a; _o = true) {\r\n            _c = _q.value;\r\n            _o = false;\r\n            const x = _c;\r\n        }\r\n    }\r\n    catch (e_1_1) { e_1 = { error: e_1_1 }; }\r\n    finally {\r\n        try {\r\n            if (!_o && !_a && (_b = _p.return)) await _b.call(_p);\r\n        }\r\n        finally { if (e_1) throw e_1.error; }\r\n    }\r\n    try {\r\n        for (var _r = true, _s = __asyncValues(o[k]), _t; _t = await _s.next(), _d = _t.done, !_d; _r = true) {\r\n            _f = _t.value;\r\n            _r = false;\r\n            const x = _f;\r\n        }\r\n    }\r\n    catch (e_2_1) { e_2 = { error: e_2_1 }; }\r\n    finally {\r\n        try {\r\n            if (!_r && !_d && (_e = _s.return)) await _e.call(_s);\r\n        }\r\n        finally { if (e_2) throw e_2.error; }\r\n    }\r\n    try {\r\n        for (var _u = true, _v = __asyncValues((o)), _w; _w = await _v.next(), _g = _w.done, !_g; _u = true) {\r\n            _j = _w.value;\r\n            _u = false;\r\n            const x = _j;\r\n        }\r\n    }\r\n    catch (e_3_1) { e_3 = { error: e_3_1 }; }\r\n    finally {\r\n        try {\r\n            if (!_u && !_g && (_h = _v.return)) await _h.call(_v);\r\n        }\r\n        finally { if (e_3) throw e_3.error; }\r\n    }\r\n    try {\r\n        for (var _x = true, _y = __asyncValues([1, 2]), _z; _z = await _y.next(), _k = _z.done, !_k; _x = true) {\r\n            _m = _z.value;\r\n            _x = false;\r\n            const x = _m;\r\n        }\r\n    }\r\n    catch (e_4_1) { e_4 = { error: e_4_1 }; }\r\n    finally {\r\n        try {\r\n            if (!_x && !_k && (_l = _y.return)) await _l.call(_y);\r\n        }\r\n        finally { if (e_4) throw e_4.error; }\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-for-await-expression-kinds",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6173796e632066756e6374696f6e2066286f2c206b29207b0a20202020666f722061776169742028636f6e73742078206f66206f2e7029207b207d0a20202020666f722061776169742028636f6e73742078206f66206f5b6b5d29207b207d0a20202020666f722061776169742028636f6e73742078206f6620286f2929207b207d0a20202020666f722061776169742028636f6e73742078206f66205b312c20325d29207b207d0a7d0a"
+    },
+    "id": "fa-for-await-expression-kinds",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nasync function f(o, k) {\n    for await (const x of o.p) { }\n    for await (const x of o[k]) { }\n    for await (const x of (o)) { }\n    for await (const x of [1, 2]) { }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "var __asyncValues = (this && this.__asyncValues) || function (o) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var m = o[Symbol.asyncIterator], i;\r\n    return m ? m.call(o) : (o = typeof __values === \"function\" ? __values(o) : o[Symbol.iterator](), i = {}, verb(\"next\"), verb(\"throw\"), verb(\"return\"), i[Symbol.asyncIterator] = function () { return this; }, i);\r\n    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }\r\n    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }\r\n};\r\nvar __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\r\nvar __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var g = generator.apply(thisArg, _arguments || []), i, q = [];\r\n    return i = Object.create((typeof AsyncIterator === \"function\" ? AsyncIterator : Object).prototype), verb(\"next\"), verb(\"throw\"), verb(\"return\", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;\r\n    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }\r\n    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }\r\n    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }\r\n    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }\r\n    function fulfill(value) { resume(\"next\", value); }\r\n    function reject(value) { resume(\"throw\", value); }\r\n    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }\r\n};\r\nfunction g(xss) {\r\n    return __asyncGenerator(this, arguments, function* g_1() {\r\n        var _a, e_1, _b, _c, _d, e_2, _e, _f;\r\n        while (true) {\r\n            try {\r\n                for (var _g = true, xss_1 = (e_1 = void 0, __asyncValues(xss)), xss_1_1; xss_1_1 = yield __await(xss_1.next()), _a = xss_1_1.done, !_a; _g = true) {\r\n                    _c = xss_1_1.value;\r\n                    _g = false;\r\n                    const x = _c;\r\n                    yield yield __await(x);\r\n                }\r\n            }\r\n            catch (e_1_1) { e_1 = { error: e_1_1 }; }\r\n            finally {\r\n                try {\r\n                    if (!_g && !_a && (_b = xss_1.return)) yield __await(_b.call(xss_1));\r\n                }\r\n                finally { if (e_1) throw e_1.error; }\r\n            }\r\n            break;\r\n        }\r\n        for (;;) {\r\n            try {\r\n                for (var _h = true, xss_2 = (e_2 = void 0, __asyncValues(xss)), xss_2_1; xss_2_1 = yield __await(xss_2.next()), _d = xss_2_1.done, !_d; _h = true) {\r\n                    _f = xss_2_1.value;\r\n                    _h = false;\r\n                    const y = _f;\r\n                    return yield __await(y);\r\n                }\r\n            }\r\n            catch (e_2_1) { e_2 = { error: e_2_1 }; }\r\n            finally {\r\n                try {\r\n                    if (!_h && !_d && (_e = xss_2.return)) yield __await(_e.call(xss_2));\r\n                }\r\n                finally { if (e_2) throw e_2.error; }\r\n            }\r\n        }\r\n    });\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-for-await-in-async-generator-in-loops",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6173796e632066756e6374696f6e2a20672878737329207b0a202020207768696c6520287472756529207b0a2020202020202020666f722061776169742028636f6e73742078206f662078737329207b207969656c6420783b207d0a2020202020202020627265616b3b0a202020207d0a20202020666f7220283b3b29207b20666f722061776169742028636f6e73742079206f662078737329207b2072657475726e20793b207d207d0a7d0a"
+    },
+    "id": "fa-for-await-in-async-generator-in-loops",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nasync function* g(xss) {\n    while (true) {\n        for await (const x of xss) { yield x; }\n        break;\n    }\n    for (;;) { for await (const y of xss) { return y; } }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "var __asyncValues = (this && this.__asyncValues) || function (o) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var m = o[Symbol.asyncIterator], i;\r\n    return m ? m.call(o) : (o = typeof __values === \"function\" ? __values(o) : o[Symbol.iterator](), i = {}, verb(\"next\"), verb(\"throw\"), verb(\"return\"), i[Symbol.asyncIterator] = function () { return this; }, i);\r\n    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }\r\n    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }\r\n};\r\nasync function f(xs) {\r\n    class K {\r\n        m() { return 1; }\r\n    }\r\n    const g = async () => { var _a, e_1, _b, _c; for (;;) {\r\n        try {\r\n            for (var _d = true, xs_1 = (e_1 = void 0, __asyncValues(xs)), xs_1_1; xs_1_1 = await xs_1.next(), _a = xs_1_1.done, !_a; _d = true) {\r\n                _c = xs_1_1.value;\r\n                _d = false;\r\n                const x = _c;\r\n            }\r\n        }\r\n        catch (e_1_1) { e_1 = { error: e_1_1 }; }\r\n        finally {\r\n            try {\r\n                if (!_d && !_a && (_b = xs_1.return)) await _b.call(xs_1);\r\n            }\r\n            finally { if (e_1) throw e_1.error; }\r\n        }\r\n    } };\r\n    return K;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-for-await-in-class-and-arrow",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6173796e632066756e6374696f6e206628787329207b0a20202020636c617373204b207b206d2829207b2072657475726e20313b207d207d0a20202020636f6e73742067203d206173796e63202829203d3e207b20666f7220283b3b29207b20666f722061776169742028636f6e73742078206f6620787329207b207d207d207d3b0a2020202072657475726e204b3b0a7d0a"
+    },
+    "id": "fa-for-await-in-class-and-arrow",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nasync function f(xs) {\n    class K { m() { return 1; } }\n    const g = async () => { for (;;) { for await (const x of xs) { } } };\n    return K;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "var __asyncValues = (this && this.__asyncValues) || function (o) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var m = o[Symbol.asyncIterator], i;\r\n    return m ? m.call(o) : (o = typeof __values === \"function\" ? __values(o) : o[Symbol.iterator](), i = {}, verb(\"next\"), verb(\"throw\"), verb(\"return\"), i[Symbol.asyncIterator] = function () { return this; }, i);\r\n    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }\r\n    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }\r\n};\r\nvar __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\r\nvar __asyncDelegator = (this && this.__asyncDelegator) || function (o) {\r\n    var i, p;\r\n    return i = {}, verb(\"next\"), verb(\"throw\", function (e) { throw e; }), verb(\"return\"), i[Symbol.iterator] = function () { return this; }, i;\r\n    function verb(n, f) { i[n] = o[n] ? function (v) { return (p = !p) ? { value: __await(o[n](v)), done: false } : f ? f(v) : v; } : f; }\r\n};\r\nvar __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var g = generator.apply(thisArg, _arguments || []), i, q = [];\r\n    return i = Object.create((typeof AsyncIterator === \"function\" ? AsyncIterator : Object).prototype), verb(\"next\"), verb(\"throw\"), verb(\"return\", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;\r\n    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }\r\n    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }\r\n    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }\r\n    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }\r\n    function fulfill(value) { resume(\"next\", value); }\r\n    function reject(value) { resume(\"throw\", value); }\r\n    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }\r\n};\r\nfunction* g() { yield* [function () { return __asyncGenerator(this, arguments, function* () { yield __await(yield* __asyncDelegator(__asyncValues([]))); }); }]; return 1; }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-yield-star-in-non-async-generator",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e2a20672829207b207969656c642a205b6173796e632066756e6374696f6e2a202829207b207969656c642a205b5d3b207d5d3b2072657475726e20313b207d0a"
+    },
+    "id": "fa-yield-star-in-non-async-generator",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nfunction* g() { yield* [async function* () { yield* []; }]; return 1; }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "forawait"
+       ],
+       "text": "var __asyncValues = (this && this.__asyncValues) || function (o) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var m = o[Symbol.asyncIterator], i;\r\n    return m ? m.call(o) : (o = typeof __values === \"function\" ? __values(o) : o[Symbol.iterator](), i = {}, verb(\"next\"), verb(\"throw\"), verb(\"return\"), i[Symbol.asyncIterator] = function () { return this; }, i);\r\n    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }\r\n    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }\r\n};\r\nvar __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\r\nvar __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var g = generator.apply(thisArg, _arguments || []), i, q = [];\r\n    return i = Object.create((typeof AsyncIterator === \"function\" ? AsyncIterator : Object).prototype), verb(\"next\"), verb(\"throw\"), verb(\"return\", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;\r\n    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }\r\n    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }\r\n    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }\r\n    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }\r\n    function fulfill(value) { resume(\"next\", value); }\r\n    function reject(value) { resume(\"throw\", value); }\r\n    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    m(k) {\r\n        const _superIndex = name => super[name];\r\n        return __asyncGenerator(this, arguments, function* m_1() {\r\n            var _a, e_1, _b, _c;\r\n            try {\r\n                for (var _d = true, _e = __asyncValues(k), _f; _f = yield __await(_e.next()), _a = _f.done, !_a; _d = true) {\r\n                    _c = _f.value;\r\n                    _d = false;\r\n                    const x = _c;\r\n                    yield yield __await(x);\r\n                }\r\n            }\r\n            catch (e_1_1) { e_1 = { error: e_1_1 }; }\r\n            finally {\r\n                try {\r\n                    if (!_d && !_a && (_b = _e.return)) yield __await(_b.call(_e));\r\n                }\r\n                finally { if (e_1) throw e_1.error; }\r\n            }\r\n            yield yield __await(_superIndex(k));\r\n        });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-typeeraser-chain",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206173796e63202a6d286b3a20737472696e67293a204173796e6347656e657261746f723c6e756d6265723e207b0a2020202020202020666f722061776169742028636f6e73742078206f6620286b20617320616e792929207b207969656c642078206173206e756d6265723b207d0a20202020202020207969656c642073757065725b6b5d206173206e756d6265723b0a202020207d0a7d0a"
+    },
+    "id": "fa-typeeraser-chain",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nclass B { }\nclass C extends B {\n    async *m(k: string): AsyncGenerator<number> {\n        for await (const x of (k as any)) { yield x as number; }\n        yield super[k] as number;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait",
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nvar __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\r\nvar __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var g = generator.apply(thisArg, _arguments || []), i, q = [];\r\n    return i = Object.create((typeof AsyncIterator === \"function\" ? AsyncIterator : Object).prototype), verb(\"next\"), verb(\"throw\"), verb(\"return\", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;\r\n    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }\r\n    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }\r\n    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }\r\n    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }\r\n    function fulfill(value) { resume(\"next\", value); }\r\n    function reject(value) { resume(\"throw\", value); }\r\n    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }\r\n};\r\nvar __asyncValues = (this && this.__asyncValues) || function (o) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var m = o[Symbol.asyncIterator], i;\r\n    return m ? m.call(o) : (o = typeof __values === \"function\" ? __values(o) : o[Symbol.iterator](), i = {}, verb(\"next\"), verb(\"throw\"), verb(\"return\"), i[Symbol.asyncIterator] = function () { return this; }, i);\r\n    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }\r\n    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    m(k) {\r\n        const _superIndex = (function (geti, seti) {\r\n            const cache = Object.create(null);\r\n            return name => cache[name] || (cache[name] = { get value() { return geti(name); }, set value(v) { seti(name, v); } });\r\n        })(name => super[name], (name, value) => super[name] = value);\r\n        const _super = Object.create(null, {\r\n            x: { get: () => super.x, set: v => super.x = v }\r\n        });\r\n        return __asyncGenerator(this, arguments, function* m_1() { _superIndex(k).value = 1; yield yield __await(_super.x); });\r\n    }\r\n    n(xs) {\r\n        return __awaiter(this, void 0, void 0, function* () { var _a, xs_1, xs_1_1; var _b, e_1, _c, _d; try {\r\n            for (_a = true, xs_1 = __asyncValues(xs); xs_1_1 = yield xs_1.next(), _b = xs_1_1.done, !_b; _a = true) {\r\n                _d = xs_1_1.value;\r\n                _a = false;\r\n                const x = _d;\r\n                yield x;\r\n            }\r\n        }\r\n        catch (e_1_1) { e_1 = { error: e_1_1 }; }\r\n        finally {\r\n            try {\r\n                if (!_a && !_b && (_c = xs_1.return)) yield _c.call(xs_1);\r\n            }\r\n            finally { if (e_1) throw e_1.error; }\r\n        } });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-forawait-then-async",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206173796e63202a6d286b29207b2073757065725b6b5d203d20313b207969656c642073757065722e783b207d0a202020206173796e63206e28787329207b20666f722061776169742028636f6e73742078206f6620787329207b20617761697420783b207d207d0a7d0a"
+    },
+    "id": "fa-forawait-then-async",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async *m(k) { super[k] = 1; yield super.x; }\n    async n(xs) { for await (const x of xs) { await x; } }\n}\n"
+  },
+  {
+   "diagnostics": 12,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "var __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\r\nvar __asyncGenerator = (this && this.__asyncGenerator) || function (thisArg, _arguments, generator) {\r\n    if (!Symbol.asyncIterator) throw new TypeError(\"Symbol.asyncIterator is not defined.\");\r\n    var g = generator.apply(thisArg, _arguments || []), i, q = [];\r\n    return i = Object.create((typeof AsyncIterator === \"function\" ? AsyncIterator : Object).prototype), verb(\"next\"), verb(\"throw\"), verb(\"return\", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;\r\n    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }\r\n    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }\r\n    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }\r\n    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }\r\n    function fulfill(value) { resume(\"next\", value); }\r\n    function reject(value) { resume(\"throw\", value); }\r\n    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }\r\n};\r\nclass B {\r\n}\r\nclass C extends B {\r\n    m1(o) { const _super = Object.create(null, {\r\n        x: { get: () => super.x, set: v => super.x = v }\r\n    }); return __asyncGenerator(this, arguments, function* m1_1() { ({ ..._super.x } = o); }); }\r\n    m2(a) { const _super = Object.create(null, {\r\n        y: { get: () => super.y, set: v => super.y = v }\r\n    }); return __asyncGenerator(this, arguments, function* m2_1() { [..._super.y] = a; }); }\r\n    m3(o) { const _super = Object.create(null, {\r\n        z: { get: () => super.z, set: v => super.z = v }\r\n    }); return __asyncGenerator(this, arguments, function* m3_1() { ({ z: (_super.z) } = o); }); }\r\n    m4(o) { const _super = Object.create(null, {\r\n        v: { get: () => super.v }\r\n    }); return __asyncGenerator(this, arguments, function* m4_1() { ({ w } = o); yield yield __await(_super.v); }); }\r\n    m5(a) { const _super = Object.create(null, {\r\n        u: { get: () => super.u, set: v => super.u = v }\r\n    }); return __asyncGenerator(this, arguments, function* m5_1() { (_super.u) = a; }); }\r\n    m6(k) {\r\n        const _superIndex = (function (geti, seti) {\r\n            const cache = Object.create(null);\r\n            return name => cache[name] || (cache[name] = { get value() { return geti(name); }, set value(v) { seti(name, v); } });\r\n        })(name => super[name], (name, value) => super[name] = value);\r\n        return __asyncGenerator(this, arguments, function* m6_1() { _superIndex(k).value++; });\r\n    }\r\n}\r\nlet w;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "fa-super-assignment-forms-isolated",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b207d0a636c617373204320657874656e64732042207b0a202020206173796e63202a6d31286f29207b20287b202e2e2e73757065722e78207d203d206f293b207d0a202020206173796e63202a6d32286129207b205b2e2e2e73757065722e795d203d20613b207d0a202020206173796e63202a6d33286f29207b20287b207a3a202873757065722e7a29207d203d206f293b207d0a202020206173796e63202a6d34286f29207b20287b2077207d203d206f293b207969656c642073757065722e763b207d0a202020206173796e63202a6d35286129207b202873757065722e7529203d20613b207d0a202020206173796e63202a6d36286b29207b2073757065725b6b5d2b2b3b207d0a7d0a6c657420773b0a"
+    },
+    "id": "fa-super-assignment-forms-isolated",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nclass B { }\nclass C extends B {\n    async *m1(o) { ({ ...super.x } = o); }\n    async *m2(a) { [...super.y] = a; }\n    async *m3(o) { ({ z: (super.z) } = o); }\n    async *m4(o) { ({ w } = o); yield super.v; }\n    async *m5(a) { (super.u) = a; }\n    async *m6(k) { super[k]++; }\n}\nlet w;\n"
   }
  ],
  "go": "go1.27.1",

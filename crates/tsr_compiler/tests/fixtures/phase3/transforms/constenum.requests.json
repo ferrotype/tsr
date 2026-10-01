@@ -339,6 +339,88 @@
      "constenum"
     ]
    ]
+  },
+  {
+   "id": "ce-two-pass",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1, S = \"s\", N = -2 }\nlet x = [E.A, E[\"S\"], E.N, (E).A];\n",
+   "chains": [
+    [
+     "constenum",
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "ce-after-typeeraser",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1, B = \"b\" }\nlet x: number = E.A!;\nlet y = (E as any).A;\nlet z = <number>E.A + (E.B satisfies string).length;\nfunction f(p: E = E.A): E { return E.B as any; }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "constenum"
+    ],
+    [
+     "constenum",
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "ce-after-optionalchain",
+   "name": "probe.ts",
+   "source": "// @target: es2019\nconst enum E { A = 1 }\ndeclare let o: any;\nlet x = o?.[E.A] ?? E.A;\nlet y = E?.A;\n",
+   "chains": [
+    [
+     "optionalchain",
+     "constenum"
+    ],
+    [
+     "nullishcoalescing",
+     "optionalchain",
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "ce-in-jsx",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nconst enum E { A = 1, S = \"s\" }\nexport const a = <div x={E.A} {...{ [E.S]: E.A }}>{E.S}</div>;\n",
+   "chains": [
+    [
+     "jsx",
+     "constenum"
+    ],
+    [
+     "constenum",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "ce-in-exponentiation",
+   "name": "probe.ts",
+   "source": "// @target: es2015\nconst enum E { A = 2 }\ndeclare let o: any;\no[E.A] **= E.A;\nlet x = E.A ** E.A;\n",
+   "chains": [
+    [
+     "exponentiation",
+     "constenum"
+    ],
+    [
+     "constenum",
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "ce-comment-texts",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1 }\nlet x = E[/* c */\"A\"];\nlet y = E\n    .A;\nlet z = E[`A`];\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
   }
  ]
 }

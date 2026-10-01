@@ -2042,6 +2042,875 @@
    },
    "name": "probe.tsx",
    "source": "// @jsx: react\ndeclare const React: any;\nexport let t: { [<b />]: number } = <i />;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "module.exports = 1;\r\n"
+      }
+     ],
+     "name": "/.src/other.js"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "\"use strict\";\r\nconst { jsxDEV: _jsxDEV } = require(\"react/jsx-dev-runtime\");\r\nconst _jsxFileName = \"/.src/probe.jsx\";\r\nconst x = require('./other');\r\nmodule.exports = _jsxDEV(\"div\", { children: [x, _jsxDEV(\"span\", {}, \"k\", false, { fileName: _jsxFileName, lineNumber: 3, columnNumber: 26 }, this)] }, void 0, true, { fileName: _jsxFileName, lineNumber: 3, columnNumber: 18 }, this);\r\n"
+      }
+     ],
+     "name": "/.src/probe.jsx"
+    }
+   ],
+   "id": "jx-dev-commonjs-require-jsx",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/other.js": "6d6f64756c652e6578706f727473203d20313b0a",
+     "/.src/probe.jsx": "2275736520737472696374223b0a636f6e73742078203d207265717569726528272e2f6f7468657227293b0a6d6f64756c652e6578706f727473203d203c6469763e7b787d3c7370616e206b65793d226b22202f3e3c2f6469763e3b"
+    },
+    "id": "jx-dev-commonjs-require-jsx",
+    "options": {
+     "allowJs": true,
+     "jsx": 5,
+     "module": 1,
+     "moduleDetection": 2,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.jsx",
+     "/.src/other.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.jsx",
+   "source": "// @jsx: react-jsxdev\n// @allowJs: true\n// @moduleDetection: legacy\n// @module: commonjs\n// @filename: probe.jsx\n\"use strict\";\nconst x = require('./other');\nmodule.exports = <div>{x}<span key=\"k\" /></div>;\n// @filename: other.js\nmodule.exports = 1;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "export default 1;\r\n"
+      }
+     ],
+     "name": "/.src/other.js"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { Fragment as _Fragment, jsxDEV as _jsxDEV } from \"react/jsx-dev-runtime\";\r\nconst _jsxFileName = \"/.src/probe.jsx\";\r\nimport x from './other.js';\r\nexport default _jsxDEV(_Fragment, { children: _jsxDEV(\"b\", { children: x }, void 0, false, { fileName: _jsxFileName, lineNumber: 2, columnNumber: 18 }, this) }, void 0, false, { fileName: _jsxFileName, lineNumber: 2, columnNumber: 16 }, this);\r\n"
+      }
+     ],
+     "name": "/.src/probe.jsx"
+    }
+   ],
+   "id": "jx-dev-esm-jsx-allowjs",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/other.js": "6578706f72742064656661756c7420313b0a",
+     "/.src/probe.jsx": "696d706f727420782066726f6d20272e2f6f746865722e6a73273b0a6578706f72742064656661756c74203c3e3c623e7b787d3c2f623e3c2f3e3b"
+    },
+    "id": "jx-dev-esm-jsx-allowjs",
+    "options": {
+     "allowJs": true,
+     "jsx": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.jsx",
+     "/.src/other.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.jsx",
+   "source": "// @jsx: react-jsxdev\n// @allowJs: true\n// @filename: probe.jsx\nimport x from './other.js';\nexport default <><b>{x}</b></>;\n// @filename: other.js\nexport default 1;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "const _jsxFileName = \"/.src/probe.tsx\";\r\nconst a = _jsxDEV(\"div\", {}, void 0, false, { fileName: _jsxFileName, lineNumber: 1, columnNumber: 11 }, this);\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-dev-script-no-imports",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "636f6e73742061203d203c646976202f3e3b0a"
+    },
+    "id": "jx-dev-script-no-imports",
+    "options": {
+     "jsx": 5,
+     "moduleDetection": 2,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\n// @moduleDetection: legacy\nconst a = <div />;\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict",
+        "jsx"
+       ],
+       "text": "\"use strict\";\r\n\"use client\";\r\nimport { jsxDEV as _jsxDEV } from \"react/jsx-dev-runtime\";\r\nconst _jsxFileName = \"/.src/probe.tsx\";\r\nexport const a = _jsxDEV(\"div\", { children: 1 }, void 0, false, { fileName: _jsxFileName, lineNumber: 2, columnNumber: 18 }, this);\r\n"
+      },
+      {
+       "chain": [
+        "jsx",
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\n\"use client\";\r\nimport { jsxDEV as _jsxDEV } from \"react/jsx-dev-runtime\";\r\nconst _jsxFileName = \"/.src/probe.tsx\";\r\nexport const a = _jsxDEV(\"div\", { children: 1 }, void 0, false, { fileName: _jsxFileName, lineNumber: 2, columnNumber: 18 }, this);\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-prologue-usestrict-chain",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "2275736520636c69656e74223b0a6578706f727420636f6e73742061203d203c6469763e7b317d3c2f6469763e3b0a"
+    },
+    "id": "jx-prologue-usestrict-chain",
+    "options": {
+     "jsx": 5,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\n// @module: commonjs\n\"use client\";\nexport const a = <div>{1}</div>;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict",
+        "jsx"
+       ],
+       "text": "\"use strict\";\r\nmodule.exports = 1;\r\n"
+      }
+     ],
+     "name": "/.src/other.js"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict",
+        "jsx"
+       ],
+       "text": "\"use strict\";\r\nconst { Fragment: _Fragment, jsx: _jsx } = require(\"react/jsx-runtime\");\r\nconst x = require('./other');\r\nmodule.exports = _jsx(_Fragment, { children: _jsx(\"i\", {}) });\r\n"
+      }
+     ],
+     "name": "/.src/probe.jsx"
+    }
+   ],
+   "id": "jx-prologue-usestrict-chain-commonjs-jsx",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/other.js": "6d6f64756c652e6578706f727473203d20313b0a",
+     "/.src/probe.jsx": "636f6e73742078203d207265717569726528272e2f6f7468657227293b0a6d6f64756c652e6578706f727473203d203c3e3c69202f3e3c2f3e3b"
+    },
+    "id": "jx-prologue-usestrict-chain-commonjs-jsx",
+    "options": {
+     "allowJs": true,
+     "jsx": 4,
+     "module": 1,
+     "moduleDetection": 2,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.jsx",
+     "/.src/other.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.jsx",
+   "source": "// @jsx: react-jsx\n// @allowJs: true\n// @moduleDetection: legacy\n// @module: commonjs\n// @filename: probe.jsx\nconst x = require('./other');\nmodule.exports = <><i /></>;\n// @filename: other.js\nmodule.exports = 1;\n"
+  },
+  {
+   "diagnostics": 6,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { Fragment as _Fragment, jsx as _jsx, jsxs as _jsxs } from \"react/jsx-runtime\";\r\nimport { createElement as _createElement } from \"react\";\r\nexport const a = _createElement(\"div\", { ...p, key: \"k\" });\r\nexport const b = _jsxs(\"div\", { children: [1, 2] });\r\nexport const c = _jsx(_Fragment, { children: _jsx(\"i\", {}) });\r\nexport const d = _jsx(\"span\", {});\r\ndeclare var p: any;\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-two-import-sources",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6578706f727420636f6e73742061203d203c646976207b2e2e2e707d206b65793d226b22202f3e3b0a6578706f727420636f6e73742062203d203c6469763e7b317d7b327d3c2f6469763e3b0a6578706f727420636f6e73742063203d203c3e3c69202f3e3c2f3e3b0a6578706f727420636f6e73742064203d203c7370616e202f3e3b0a6465636c6172652076617220703a20616e793b0a"
+    },
+    "id": "jx-two-import-sources",
+    "options": {
+     "jsx": 4,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\nexport const a = <div {...p} key=\"k\" />;\nexport const b = <div>{1}{2}</div>;\nexport const c = <><i /></>;\nexport const d = <span />;\ndeclare var p: any;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\nexport const a = React.createElement(\"div\", { a: true, b: true });\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "jsx"
+       ],
+       "text": "export const a = React.createElement(\"div\", { a: true, b: true });\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-empty-attribute-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6578706f727420636f6e73742061203d203c64697620613d7b7d20623d7b2f2a2063202a2f7d202f3e3b0a"
+    },
+    "id": "jx-empty-attribute-expression",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div a={} b={/* c */} />;\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { jsx as _jsx } from \"react/jsx-runtime\";\r\nexport const a = _jsx(\"div\", { a: true }, true);\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-empty-attribute-expression-automatic",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6578706f727420636f6e73742061203d203c64697620613d7b7d206b65793d7b7d202f3e3b0a"
+    },
+    "id": "jx-empty-attribute-expression-automatic",
+    "options": {
+     "jsx": 4,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\nexport const a = <div a={} key={} />;\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\nexport const a = React.createElement(\"div\", null,\r\n    React.createElement(React.Fragment, null, \"x\"),\r\n    React.createElement(React.Fragment, null, \"y\"));\r\nexport const b = React.createElement(\"div\", null, React.createElement(React.Fragment, null, \"z\"));\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-fragment-in-child-classic",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6578706f727420636f6e73742061203d203c6469763e3c3e783c2f3e3c3e793c2f3e3c2f6469763e3b0a6578706f727420636f6e73742062203d203c6469763e7b3c3e7a3c2f3e7d3c2f6469763e3b0a"
+    },
+    "id": "jx-fragment-in-child-classic",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div><>x</><>y</></div>;\nexport const b = <div>{<>z</>}</div>;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\nexport const a = React.createElement(\"div\", null, \"\\u00E9 \\u4E2D \\uD83D\\uDE00 x\\u00A0\");\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-multibyte-text",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6578706f727420636f6e73742061203d203c6469763ec3a920e4b8ad0a2020f09f98802078c2a03c2f6469763e3b0a"
+    },
+    "id": "jx-multibyte-text",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div>é 中\n  😀 x </div>;\n"
+  },
+  {
+   "diagnostics": 5,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\nexport const a = React.createElement(\"div\", null, \"a & b\");\r\nexport const b = React.createElement(\"div\", null, \"&; &#1a; &#xZZ; \\uFFFD \\0 \\uD800 &amp\");\r\nexport const c = React.createElement(\"div\", { title: \"x & y\", t2: \"&#1a;\" });\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-entity-edge-cases",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6578706f727420636f6e73742061203d203c6469763e61202620623c2f6469763e3b0a6578706f727420636f6e73742062203d203c6469763e263b20262331613b202623785a5a3b202623783131303030303b202623303b20262378643830303b2026616d703c2f6469763e3b0a6578706f727420636f6e73742063203d203c646976207469746c653d227820262079222074323d22262331613b22202f3e3b0a"
+    },
+    "id": "jx-entity-edge-cases",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div>a & b</div>;\nexport const b = <div>&; &#1a; &#xZZ; &#x110000; &#0; &#xd800; &amp</div>;\nexport const c = <div title=\"x & y\" t2=\"&#1a;\" />;\n"
+  },
+  {
+   "diagnostics": 9,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { jsx as _jsx } from \"react/jsx-runtime\";\r\nexport const a = _jsx(\"div\", {});\r\nexport const b = _jsx(\"div\", {});\r\nexport const c = _jsx(\"div\", { children: \" \" });\r\nexport const d = _jsx(\"div\", {});\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-whitespace-only-children",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6578706f727420636f6e73742061203d203c6469763e0ac2a00a3c2f6469763e3b0a6578706f727420636f6e73742062203d203c6469763e0a20207b7d0a20207b2f2a2063202a2f7d0a3c2f6469763e3b0a6578706f727420636f6e73742063203d203c6469763e203c2f6469763e3b0a6578706f727420636f6e73742064203d203c6469763e0b0a3c2f6469763e3b0a"
+    },
+    "id": "jx-whitespace-only-children",
+    "options": {
+     "jsx": 4,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\nexport const a = <div>\n \n</div>;\nexport const b = <div>\n  {}\n  {/* c */}\n</div>;\nexport const c = <div> </div>;\nexport const d = <div>\u000b\n</div>;\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\nexport const a = React.createElement(\"div\", null);\r\nexport const b = React.createElement(\"div\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-whitespace-only-children-classic",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6578706f727420636f6e73742061203d203c6469763e0a20207b7d0a20207b2f2a2063202a2f7d0a3c2f6469763e3b0a6578706f727420636f6e73742062203d203c6469763e7b7d7b7d3c2f6469763e3b0a"
+    },
+    "id": "jx-whitespace-only-children-classic",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div>\n  {}\n  {/* c */}\n</div>;\nexport const b = <div>{}{}</div>;\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "namespace M {\r\n    export var React: any;\r\n    export namespace N {\r\n        export var x = M.React.createElement(\"div\", null,\r\n            M.React.createElement(\"span\", null));\r\n    }\r\n}\r\nnamespace Q {\r\n    var React: any;\r\n    export var y = React.createElement(\"i\", null);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-namespace-container-auto-and-nested",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6e616d657370616365204d207b0a20206578706f7274207661722052656163743a20616e793b0a20206578706f7274206e616d657370616365204e207b206578706f7274207661722078203d203c6469763e3c7370616e202f3e3c2f6469763e3b207d0a7d0a6e616d6573706163652051207b0a20207661722052656163743a20616e793b0a20206578706f7274207661722079203d203c69202f3e3b0a7d0a"
+    },
+    "id": "jx-namespace-container-auto-and-nested",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\nnamespace M {\n  export var React: any;\n  export namespace N { export var x = <div><span /></div>; }\n}\nnamespace Q {\n  var React: any;\n  export var y = <i />;\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "namespace M {\r\n    export declare function h(...a: any[]): any;\r\n    export declare var F: any;\r\n    export var x = h(M.F, null,\r\n        h(\"b\", null));\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-classic-jsxfactory-namespace-member",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6e616d657370616365204d207b0a20206578706f7274206465636c6172652066756e6374696f6e2068282e2e2e613a20616e795b5d293a20616e793b0a20206578706f7274206465636c6172652076617220463a20616e793b0a20206578706f7274207661722078203d203c3e3c62202f3e3c2f3e3b0a7d0a"
+    },
+    "id": "jx-classic-jsxfactory-namespace-member",
+    "options": {
+     "jsx": 3,
+     "jsxFactory": "h",
+     "jsxFragmentFactory": "F",
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @jsxFactory: h\n// @jsxFragmentFactory: F\nnamespace M {\n  export declare function h(...a: any[]): any;\n  export declare var F: any;\n  export var x = <><b /></>;\n}\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "jsx"
+       ],
+       "text": "import { jsx as _jsx } from \"react/jsx-runtime\";\r\nexport const a = _jsx(\"div\", { x: 1, children: 2 });\r\nexport function f(p) { return _jsx(\"span\", { ...p }); }\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-typeeraser-then-jsx",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "696e746572666163652050207b20783a206e756d626572207d0a6578706f727420636f6e73742061203d203c64697620783d7b31206173206e756d6265727d3e7b283220617320616e7929217d3c2f6469763e3b0a6578706f72742066756e6374696f6e20663c542c3e28703a205429207b2072657475726e203c7370616e207b2e2e2e287020617320616e79297d202f3e3b207d0a"
+    },
+    "id": "jx-typeeraser-then-jsx",
+    "options": {
+     "jsx": 4,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ninterface P { x: number }\nexport const a = <div x={1 as number}>{(2 as any)!}</div>;\nexport function f<T,>(p: T) { return <span {...(p as any)} />; }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx",
+        "importelision"
+       ],
+       "text": "export function createElement(...a: any[]): any { }\r\nexport const Unused = 1;\r\n"
+      },
+      {
+       "chain": [
+        "importelision",
+        "jsx"
+       ],
+       "text": "export function createElement(...a: any[]): any { }\r\nexport const Unused = 1;\r\n"
+      }
+     ],
+     "name": "/.src/react.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx",
+        "importelision"
+       ],
+       "text": "import * as React from \"./react\";\r\nexport const a = React.createElement(\"div\", null);\r\n"
+      },
+      {
+       "chain": [
+        "importelision",
+        "jsx"
+       ],
+       "text": "import * as React from \"./react\";\r\nexport const a = React.createElement(\"div\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-jsx-then-importelision",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "696d706f7274202a2061732052656163742066726f6d20222e2f7265616374223b0a696d706f7274207b20556e75736564207d2066726f6d20222e2f7265616374223b0a6578706f727420636f6e73742061203d203c646976202f3e3b",
+     "/.src/react.ts": "6578706f72742066756e6374696f6e20637265617465456c656d656e74282e2e2e613a20616e795b5d293a20616e79207b207d0a6578706f727420636f6e737420556e75736564203d20313b0a"
+    },
+    "id": "jx-jsx-then-importelision",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx",
+     "/.src/react.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @filename: probe.tsx\nimport * as React from \"./react\";\nimport { Unused } from \"./react\";\nexport const a = <div />;\n// @filename: react.ts\nexport function createElement(...a: any[]): any { }\nexport const Unused = 1;\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "jsx"
+       ],
+       "text": "export const a = h(\"div\", { x: 1 }, \"x\");\r\nexport const b = h(Frag, null,\r\n    h(\"i\", null));\r\n"
+      },
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "/** @jsx h */\r\n/** @jsxFrag Frag */\r\ndeclare function h(...a: any[]): any;\r\ndeclare var Frag: any;\r\nexport const a = h(\"div\", { x: 1 as any }, \"x\");\r\nexport const b = h(Frag, null,\r\n    h(\"i\", null));\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-pragma-after-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "2f2a2a20406a73782068202a2f0a2f2a2a20406a7378467261672046726167202a2f0a6465636c6172652066756e6374696f6e2068282e2e2e613a20616e795b5d293a20616e793b0a6465636c6172652076617220467261673a20616e793b0a6578706f727420636f6e73742061203d203c64697620783d7b3120617320616e797d3e783c2f6469763e3b0a6578706f727420636f6e73742062203d203c3e3c69202f3e3c2f3e3b0a"
+    },
+    "id": "jx-pragma-after-typeeraser",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n/** @jsx h */\n/** @jsxFrag Frag */\ndeclare function h(...a: any[]): any;\ndeclare var Frag: any;\nexport const a = <div x={1 as any}>x</div>;\nexport const b = <><i /></>;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "jsx"
+       ],
+       "text": "export const a = preact.h(preact.Fragment, null,\r\n    preact.h(\"b\", null, 1));\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-factory-option-after-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c61726520766172207072656163743a20616e793b0a6578706f727420636f6e73742061203d203c3e3c623e7b31206173206e756d6265727d3c2f623e3c2f3e3b0a"
+    },
+    "id": "jx-factory-option-after-typeeraser",
+    "options": {
+     "jsx": 3,
+     "jsxFactory": "preact.h",
+     "jsxFragmentFactory": "preact.Fragment",
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @jsxFactory: preact.h\n// @jsxFragmentFactory: preact.Fragment\ndeclare var preact: any;\nexport const a = <><b>{1 as number}</b></>;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "jsx"
+       ],
+       "text": "namespace M {\r\n    export var MyReact;\r\n    export const a = M.MyReact.createElement(M.MyReact.Fragment, null,\r\n        M.MyReact.createElement(\"b\", null));\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jx-react-namespace-after-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6e616d657370616365204d207b0a20206578706f727420766172204d7952656163743a20616e793b0a20206578706f727420636f6e73742061203d203c3e3c62202f3e3c2f3e3b0a7d0a"
+    },
+    "id": "jx-react-namespace-after-typeeraser",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "reactNamespace": "MyReact",
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @reactNamespace: MyReact\nnamespace M {\n  export var MyReact: any;\n  export const a = <><b /></>;\n}\n"
   }
  ],
  "go": "go1.27.1",

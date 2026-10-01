@@ -529,6 +529,228 @@
      "jsx"
     ]
    ]
+  },
+  {
+   "id": "jx-dev-commonjs-require-jsx",
+   "name": "probe.jsx",
+   "source": "// @jsx: react-jsxdev\n// @allowJs: true\n// @moduleDetection: legacy\n// @module: commonjs\n// @filename: probe.jsx\n\"use strict\";\nconst x = require('./other');\nmodule.exports = <div>{x}<span key=\"k\" /></div>;\n// @filename: other.js\nmodule.exports = 1;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-dev-esm-jsx-allowjs",
+   "name": "probe.jsx",
+   "source": "// @jsx: react-jsxdev\n// @allowJs: true\n// @filename: probe.jsx\nimport x from './other.js';\nexport default <><b>{x}</b></>;\n// @filename: other.js\nexport default 1;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-dev-script-no-imports",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\n// @moduleDetection: legacy\nconst a = <div />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-prologue-usestrict-chain",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\n// @module: commonjs\n\"use client\";\nexport const a = <div>{1}</div>;\n",
+   "chains": [
+    [
+     "usestrict",
+     "jsx"
+    ],
+    [
+     "jsx",
+     "usestrict"
+    ]
+   ]
+  },
+  {
+   "id": "jx-prologue-usestrict-chain-commonjs-jsx",
+   "name": "probe.jsx",
+   "source": "// @jsx: react-jsx\n// @allowJs: true\n// @moduleDetection: legacy\n// @module: commonjs\n// @filename: probe.jsx\nconst x = require('./other');\nmodule.exports = <><i /></>;\n// @filename: other.js\nmodule.exports = 1;\n",
+   "chains": [
+    [
+     "usestrict",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-two-import-sources",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\nexport const a = <div {...p} key=\"k\" />;\nexport const b = <div>{1}{2}</div>;\nexport const c = <><i /></>;\nexport const d = <span />;\ndeclare var p: any;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-empty-attribute-expression",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div a={} b={/* c */} />;\n",
+   "chains": [
+    [
+     "jsx"
+    ],
+    [
+     "typeeraser",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-empty-attribute-expression-automatic",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\nexport const a = <div a={} key={} />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-fragment-in-child-classic",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div><>x</><>y</></div>;\nexport const b = <div>{<>z</>}</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-multibyte-text",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div>é 中\n  😀 x </div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-entity-edge-cases",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div>a & b</div>;\nexport const b = <div>&; &#1a; &#xZZ; &#x110000; &#0; &#xd800; &amp</div>;\nexport const c = <div title=\"x & y\" t2=\"&#1a;\" />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-whitespace-only-children",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\nexport const a = <div>\n \n</div>;\nexport const b = <div>\n  {}\n  {/* c */}\n</div>;\nexport const c = <div> </div>;\nexport const d = <div>\u000b\n</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-whitespace-only-children-classic",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div>\n  {}\n  {/* c */}\n</div>;\nexport const b = <div>{}{}</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-namespace-container-auto-and-nested",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\nnamespace M {\n  export var React: any;\n  export namespace N { export var x = <div><span /></div>; }\n}\nnamespace Q {\n  var React: any;\n  export var y = <i />;\n}\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-classic-jsxfactory-namespace-member",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @jsxFactory: h\n// @jsxFragmentFactory: F\nnamespace M {\n  export declare function h(...a: any[]): any;\n  export declare var F: any;\n  export var x = <><b /></>;\n}\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-typeeraser-then-jsx",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ninterface P { x: number }\nexport const a = <div x={1 as number}>{(2 as any)!}</div>;\nexport function f<T,>(p: T) { return <span {...(p as any)} />; }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-jsx-then-importelision",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @filename: probe.tsx\nimport * as React from \"./react\";\nimport { Unused } from \"./react\";\nexport const a = <div />;\n// @filename: react.ts\nexport function createElement(...a: any[]): any { }\nexport const Unused = 1;\n",
+   "chains": [
+    [
+     "jsx",
+     "importelision"
+    ],
+    [
+     "importelision",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-pragma-after-typeeraser",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n/** @jsx h */\n/** @jsxFrag Frag */\ndeclare function h(...a: any[]): any;\ndeclare var Frag: any;\nexport const a = <div x={1 as any}>x</div>;\nexport const b = <><i /></>;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "jsx"
+    ],
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-factory-option-after-typeeraser",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @jsxFactory: preact.h\n// @jsxFragmentFactory: preact.Fragment\ndeclare var preact: any;\nexport const a = <><b>{1 as number}</b></>;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "jx-react-namespace-after-typeeraser",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @reactNamespace: MyReact\nnamespace M {\n  export var MyReact: any;\n  export const a = <><b /></>;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "jsx"
+    ]
+   ]
   }
  ]
 }

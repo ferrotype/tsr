@@ -209,6 +209,70 @@
      "optionalcatch"
     ]
    ]
+  },
+  {
+   "id": "ocatch-temp-name-collisions",
+   "name": "probe.ts",
+   "source": "// @target: es2018\nvar _a = 1, _b = 2;\ntry { } catch { var _c = 3; }\nfunction f(_a: any) { try { } catch { } try { } catch { } }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "ocatch-class-static-block",
+   "name": "probe.ts",
+   "source": "// @target: es2018\nclass C { static { try { } catch { } } m = () => { try { k(); } catch { } }; }\ndeclare function k(): void;\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ],
+    [
+     "typeeraser",
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "ocatch-async-generator",
+   "name": "probe.ts",
+   "source": "// @target: es2018\nasync function* g() { try { yield 1; } catch { await 0; } finally { } }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "ocatch-comments",
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry /*a*/ { } /*b*/ catch /*c*/ { /*d*/ } /*e*/\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "ocatch-js-file",
+   "name": "main.js",
+   "source": "// @target: es2018\n// @allowJs: true\n// @filename: main.js\ntry { } catch { }\nexport const x = () => { try { } catch { } };\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "ocatch-labelled-and-switch",
+   "name": "probe.ts",
+   "source": "// @target: es2018\nl: try { } catch { break l; }\nswitch (1) { case 1: try { } catch { } }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
   }
  ]
 }

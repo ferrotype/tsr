@@ -29,6 +29,16 @@
      "script"
     ]
    ]
+  },
+  {
+   "id": "no-lexical-this-static-in-async-method",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass A {\n    async m() {\n        await 0;\n        class B {\n            static x = this;\n            static {\n                await 1;\n                const y = this;\n            }\n        }\n        return this;\n    }\n}\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
   }
  ]
 }

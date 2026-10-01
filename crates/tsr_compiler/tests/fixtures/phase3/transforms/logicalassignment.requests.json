@@ -259,6 +259,95 @@
      "logicalassignment"
     ]
    ]
+  },
+  {
+   "id": "la-nonsimple-targets-element",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no.p[k()] ||= 1;\n(a, o)[b] &&= 2;\nnew o.C()[c] ??= 3;\no[a + b] ||= 4;\no[a.b] ??= 5;\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "la-nonsimple-targets-property",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a || o).p ??= 1;\no[0].q &&= 2;\n(await o).p ||= 3;\n`t`.length ??= 1;\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "la-simple-argument-kinds",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no[1n] ||= 1;\no[\"s\" + \"t\"] ??= 2;\no[this] &&= 3;\no[-1] ||= 4;\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "la-parenthesized-access-targets",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n((o.p)) ??= 1;\n(o[k()]) ||= 2;\n(k().p) &&= 3;\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "la-super-and-private",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nclass C extends Object { #p: any; m() { super[k()] ||= 1; super.x &&= 2; this.#p ??= 3; this[k()] ||= 4; } }\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ],
+    [
+     "typeeraser",
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "la-typeeraser-targets",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(o as any).p ||= 1;\no!.p ??= 2;\n(o.p as any) &&= 3;\n(<any>o)[k()] ??= 4;\no.p! ||= 5;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "la-nested-in-right",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no[k()] ||= o.p ??= a &&= b;\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "la-in-functions-and-classes",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f() { return () => o[k()] ??= 1; }\nclass D { static s = o.p.q ||= 1; x = k().y &&= 2; }\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ],
+    [
+     "typeeraser",
+     "logicalassignment"
+    ]
+   ]
   }
  ]
 }

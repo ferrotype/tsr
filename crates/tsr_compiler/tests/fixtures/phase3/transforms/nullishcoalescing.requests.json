@@ -299,6 +299,61 @@
      "nullishcoalescing"
     ]
    ]
+  },
+  {
+   "id": "nc-typeeraser-operands",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = (a as any) ?? b;\nlet y = a! ?? b;\nlet z = <any>a ?? (b as any);\nlet w = (o.p satisfies any) ?? c;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nc-super-private-await",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nclass C extends Object { #p: any; m() { return super.x ?? this.#p ?? this ?? 1; } async n() { return (await a) ?? b; } }\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ],
+    [
+     "typeeraser",
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nc-parameter-and-static-temps",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f(p = o.q ?? 1) { return () => k() ?? p; }\nclass D { static s = k() ?? 1; x = o.p ?? 2; }\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nc-in-optional-chain-and-template",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`${o.p ?? a}`;\no?.[a ?? b];\nnew (k() ?? o)();\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nc-right-not-copied",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = a ?? k() ?? o.p;\nlet y = (a ?? b) ?? (c ?? k());\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
   }
  ]
 }

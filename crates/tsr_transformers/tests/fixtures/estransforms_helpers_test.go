@@ -207,6 +207,11 @@ func (r *a5Run) run(c *a5Case) {
 		r.printHoisted()
 	case "finish":
 		for _, expression := range r.topLevelExpressions() {
+			// A partially emitted expression has no source form: the mode
+			// wraps each expression in one, as an earlier transform would.
+			if c.Mode == "partiallyEmitted" {
+				expression = r.f.NewPartiallyEmittedExpression(expression)
+			}
 			name := r.f.NewStringLiteral(c.Name, ast.TokenFlagsNone)
 			r.line("%s", r.print(finishTransformNamedEvaluation(r.ec, expression, name, c.Flag)))
 		}

@@ -249,6 +249,106 @@
      "usestrict"
     ]
    ]
+  },
+  {
+   "id": "us-directive-after-other-prologue",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n\"foo\";\n\"use strict\";\nlet x = 1;\n",
+   "chains": [
+    [
+     "usestrict"
+    ]
+   ]
+  },
+  {
+   "id": "us-other-prologue-only",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n'bar';\nlet x = 1;\n",
+   "chains": [
+    [
+     "usestrict"
+    ]
+   ]
+  },
+  {
+   "id": "us-shebang",
+   "name": "probe.ts",
+   "source": "#!/usr/bin/env node\n// @target: es2015\nlet x = 1;\n",
+   "chains": [
+    [
+     "usestrict"
+    ]
+   ]
+  },
+  {
+   "id": "us-js-cjs-mjs",
+   "name": "a.cjs",
+   "source": "// @target: es2015\n// @module: nodenext\n// @allowJs: true\n// @filename: a.cjs\nexports.a = 1;\n// @filename: b.mjs\nexport const b = 1;\n// @filename: c.js\nconst c = 1;\n",
+   "chains": [
+    [
+     "usestrict"
+    ]
+   ]
+  },
+  {
+   "id": "us-mts-commonjs",
+   "name": "a.mts",
+   "source": "// @target: es2015\n// @module: commonjs\n// @filename: a.mts\nexport const a = 1;\n// @filename: b.cts\nexport const b = 1;\n",
+   "chains": [
+    [
+     "usestrict"
+    ]
+   ]
+  },
+  {
+   "id": "us-cts-esnext",
+   "name": "a.cts",
+   "source": "// @target: es2015\n// @module: esnext\n// @filename: a.cts\nexport const a = 1;\n// @filename: b.mts\nexport const b = 1;\n",
+   "chains": [
+    [
+     "usestrict"
+    ]
+   ]
+  },
+  {
+   "id": "us-node18",
+   "name": "c.ts",
+   "source": "// @target: es2015\n// @module: node18\n// @filename: c.ts\nexport const c = 1;\n// @filename: d.mts\nimport { c } from \"./c.js\";\nexport const d = c;\n",
+   "chains": [
+    [
+     "usestrict"
+    ]
+   ]
+  },
+  {
+   "id": "us-moduledetection-legacy",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: esnext\n// @moduleDetection: legacy\nlet x = 1;\n",
+   "chains": [
+    [
+     "usestrict"
+    ]
+   ]
+  },
+  {
+   "id": "us-json-esnext",
+   "name": "main.ts",
+   "source": "// @target: es2015\n// @module: esnext\n// @resolveJsonModule: true\n// @filename: data.json\n{ \"a\": 1 }\n// @filename: main.ts\nimport d from \"./data.json\";\nexport const x = d;\n",
+   "chains": [
+    [
+     "usestrict"
+    ]
+   ]
+  },
+  {
+   "id": "us-comment-and-directive",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: commonjs\n/* header */\n\"use strict\"; // trailing\nexport const x = 1;\n",
+   "chains": [
+    [
+     "usestrict"
+    ]
+   ]
   }
  ]
 }

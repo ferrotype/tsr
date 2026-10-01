@@ -1345,10 +1345,14 @@ impl JsxTransformer<'_> {
         visitor: &mut NodeVisitor<'_>,
         parent: NodeId,
     ) -> NodeId {
+        // Upstream passes the visited file, which an earlier transform may
+        // have updated; an update copies the parsed file's pragmas, so the
+        // resolver answers for the parsed file, the only one it can read.
+        let location = self.context.most_original(self.current_source_file());
         let e = self
             .emit_resolver
             .borrow_mut()
-            .get_jsx_factory_entity(self.current_source_file());
+            .get_jsx_factory_entity(location);
         let e = self.failure.ok(e).flatten();
         self.create_jsx_pseudo_factory_expression(visitor, parent, e.as_deref(), b"createElement")
     }
@@ -1359,10 +1363,14 @@ impl JsxTransformer<'_> {
         visitor: &mut NodeVisitor<'_>,
         parent: NodeId,
     ) -> NodeId {
+        // Upstream passes the visited file, which an earlier transform may
+        // have updated; an update copies the parsed file's pragmas, so the
+        // resolver answers for the parsed file, the only one it can read.
+        let location = self.context.most_original(self.current_source_file());
         let e = self
             .emit_resolver
             .borrow_mut()
-            .get_jsx_fragment_factory_entity(self.current_source_file());
+            .get_jsx_fragment_factory_entity(location);
         let e = self.failure.ok(e).flatten();
         self.create_jsx_pseudo_factory_expression(visitor, parent, e.as_deref(), b"Fragment")
     }
