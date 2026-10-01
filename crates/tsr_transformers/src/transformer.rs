@@ -186,20 +186,6 @@ impl<'a> Transformer<'a> {
     }
 }
 
-/// A transformer that is not ported yet: it fails the file by name and leaves
-/// it unchanged.
-pub(crate) fn unported<'a>(opts: &TransformOptions<'a>, name: &'static str) -> Transformer<'a> {
-    let failure = opts.failure.clone();
-    Transformer::new(
-        move |_: &mut NodeVisitor<'_>, node: Option<NodeId>| {
-            failure.record(Error::Unsupported(name));
-            node
-        },
-        Some(opts.context.clone()),
-        opts.failure.clone(),
-    )
-}
-
 // port: tsc/internal/transformers/chain.go:chainedTransformer.visit
 fn chained_visit(
     components: &[Transformer<'_>],
