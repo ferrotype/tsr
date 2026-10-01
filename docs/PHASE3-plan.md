@@ -68,8 +68,10 @@ fixed and S08/S09 exercised.
 
 By the numbers: the Phase 3 ledger files hold 71 files (61 `planned`, 10
 `in-progress`), 38,906 lines and 1,882 functions, 518 of them marked (28%);
-the two compiler files that move here (section 2) add 719 lines and 48
-functions, none marked. The pin's printer and TypeScript-transform tests are
+the two compiler files that move here (section 2) add 719 lines and 50
+functions, 3 of them marked (`getSourceFilesToEmit`, `sourceFileMayBeEmitted`
+and `getDeclarationDiagnostics`); the destination audit counted 48 of them
+as Phase 3 operations. The pin's printer and TypeScript-transform tests are
 3,797 lines; the source-map generator has 32 more tests.
 
 ## 2. Scope and phase boundaries
