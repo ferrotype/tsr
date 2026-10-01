@@ -22,6 +22,7 @@
 mod change_tracker_writer;
 mod emit_context;
 pub mod emit_flags;
+pub mod emit_helpers;
 pub mod emit_resolver;
 mod emit_text_writer;
 mod factory_names;
@@ -39,10 +40,13 @@ pub use change_tracker_writer::{
     create_synthetic_source_file, print_and_position_node, ChangeTrackerWriter,
 };
 pub use emit_context::{
-    generated_identifier_flags, AutoGenerateId, AutoGenerateInfo, AutoGenerateOptions, EmitContext,
+    generated_identifier_flags, get_emit_context, AssignedNameOptions, AutoGenerateId,
+    AutoGenerateInfo, AutoGenerateOptions, EmitContext, EmitVisitorHooks, HasGlobalName,
+    NameOptions, PooledEmitContext, PrivateIdentifierKind, SnippetElement, SnippetKind,
     SynthesizedComment,
 };
 pub use emit_flags::EmitFlags;
+pub use emit_helpers::{compare_emit_helpers, EmitHelper, Priority};
 pub use emit_text_writer::EmitTextWriter;
 pub use generatedidentifierflags::GeneratedIdentifierFlagsExt;
 pub use list_format::ListFormat;
