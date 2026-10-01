@@ -3,6 +3,17 @@
   {
    "native": {
     "acceptance_tier": "executed",
+    "baseline_inputs": {
+     "header_hex": "74657374732f63617365732f636f6d70696c65722f32644172726179732e7473",
+     "other_files": [],
+     "to_be_compiled": [
+      {
+       "content_hex": "636c6173732043656c6c207b0a7d0a0a636c6173732053686970207b0a20202020697353756e6b3a20626f6f6c65616e203d2066616c73653b0a7d0a0a636c61737320426f617264207b0a2020202073686970733a20536869705b5d203d205b5d3b0a2020202063656c6c733a2043656c6c5b5d203d205b5d3b0a0a202020207072697661746520616c6c536869707353756e6b2829207b0a202020202020202072657475726e20746869732e73686970732e65766572792866756e6374696f6e202876616c29207b2072657475726e2076616c2e697353756e6b3b207d293b0a202020207d202020200a7d",
+       "name_hex": "2f2e7372632f32644172726179732e7473"
+      }
+     ],
+     "ts_config_files": []
+    },
     "diagnostics": 0,
     "emit": {
      "diagnostics": [],
@@ -14,6 +25,22 @@
      "state": "executed"
     },
     "execution_stage": "complete",
+    "harness_options": {
+     "BaselineFile": "",
+     "CaptureSuggestions": false,
+     "CurrentDirectory": "/.src",
+     "FileName": "",
+     "FullEmitPaths": false,
+     "IncludeBuiltFile": "",
+     "LibFiles": null,
+     "Link": "",
+     "NoImplicitReferences": false,
+     "NoTypesAndSymbols": false,
+     "ReportDiagnostics": false,
+     "Symlink": "",
+     "TypescriptVersion": "",
+     "UseCaseSensitiveFileNames": true
+    },
     "has_non_dts_files": true,
     "id": "compiler/2dArrays.ts#configuration=0",
     "loaded_sha256": "15f3cb88aefd8b61e4aea913e6cd400c12e020c7389cbbb301c5ad0e0b595e7c",
@@ -21,6 +48,17 @@
      "name": "compiler/2dArrays.js",
      "state": "content",
      "text_hex": "2f2f2f2f205b74657374732f63617365732f636f6d70696c65722f32644172726179732e74735d202f2f2f2f0d0a0d0a2f2f2f2f205b32644172726179732e74735d0d0a636c6173732043656c6c207b0a7d0a0a636c6173732053686970207b0a20202020697353756e6b3a20626f6f6c65616e203d2066616c73653b0a7d0a0a636c61737320426f617264207b0a2020202073686970733a20536869705b5d203d205b5d3b0a2020202063656c6c733a2043656c6c5b5d203d205b5d3b0a0a202020207072697661746520616c6c536869707353756e6b2829207b0a202020202020202072657475726e20746869732e73686970732e65766572792866756e6374696f6e202876616c29207b2072657475726e2076616c2e697353756e6b3b207d293b0a202020207d202020200a7d0d0a0d0a2f2f2f2f205b32644172726179732e6a735d0d0a2275736520737472696374223b0d0a636c6173732043656c6c207b0d0a7d0d0a636c6173732053686970207b0d0a20202020636f6e7374727563746f722829207b0d0a2020202020202020746869732e697353756e6b203d2066616c73653b0d0a202020207d0d0a7d0d0a636c61737320426f617264207b0d0a20202020636f6e7374727563746f722829207b0d0a2020202020202020746869732e7368697073203d205b5d3b0d0a2020202020202020746869732e63656c6c73203d205b5d3b0d0a202020207d0d0a20202020616c6c536869707353756e6b2829207b0d0a202020202020202072657475726e20746869732e73686970732e65766572792866756e6374696f6e202876616c29207b2072657475726e2076616c2e697353756e6b3b207d293b0d0a202020207d0d0a7d0d0a"
+    },
+    "outputs": {
+     "dts": [],
+     "js": [
+      {
+       "bytes": 307,
+       "name_hex": "2f2e7372632f32644172726179732e6a73",
+       "sha256": "5e566621e60062657ff589690db29127970b66abbc0b56138021301003c588da"
+      }
+     ],
+     "maps": []
     },
     "post_diagnostics": 0,
     "pre_diagnostics": 0,
@@ -65,6 +103,7 @@
      ],
      "ts_config_files": []
     },
+    "configured_name": "2dArrays.ts",
     "emit": true,
     "error_inputs": [
      {
@@ -72,6 +111,12 @@
       "name_hex": "2f2e7372632f32644172726179732e7473"
      }
     ],
+    "harness_options": {
+     "CaptureSuggestions": false,
+     "CurrentDirectory": "/.src",
+     "FullEmitPaths": false,
+     "LibFiles": null
+    },
     "id": "compiler/2dArrays.ts#configuration=0",
     "loading": {
      "case_sensitive": true,
@@ -97,14 +142,47 @@
      "owes": "reference",
      "state": "runs"
     },
-    "reprint": true
+    "reprint": true,
+    "suite": "compiler"
    },
    "rust": {
     "acceptance_tier": "executed",
+    "compilations": [
+     {
+      "compilation": "first",
+      "post_diagnostics": 0,
+      "pre_diagnostics": 0
+     },
+     {
+      "compilation": "repeat",
+      "post_diagnostics": 0,
+      "pre_diagnostics": 0
+     }
+    ],
     "emit": {
-     "class": "unsupported",
-     "reason": "Program.Emit is Phase 3 T8",
-     "state": "failed"
+     "diagnostics": 0,
+     "outputs": {
+      "dts": [],
+      "js": [
+       {
+        "bytes": 307,
+        "name_hex": "2f2e7372632f32644172726179732e6a73",
+        "sha256": "5e566621e60062657ff589690db29127970b66abbc0b56138021301003c588da"
+       }
+      ],
+      "maps": []
+     },
+     "post_diagnostics": 0,
+     "pre_diagnostics": 0,
+     "result": {
+      "diagnostics": [],
+      "emit_skipped": false,
+      "emitted_files_hex": [
+       "2f2e7372632f32644172726179732e6a73"
+      ],
+      "source_maps": 0
+     },
+     "state": "executed"
     },
     "id": "compiler/2dArrays.ts#configuration=0",
     "load": {
@@ -114,9 +192,10 @@
     },
     "mode": "single",
     "output": {
-     "class": "unsupported",
-     "reason": "Program.Emit is Phase 3 T8",
-     "state": "failed"
+     "bytes": 635,
+     "name": "compiler/2dArrays.js",
+     "sha256": "eba00ce4cafe29db7d3b998d8cfd0b0a972ee5dafc0ef3bd995c0bfc37cad373",
+     "state": "content"
     },
     "reprint": {
      "files": [
@@ -140,14 +219,11 @@
      "state": "executed"
     },
     "sourcemap": {
-     "class": "unsupported",
-     "reason": "Program.Emit is Phase 3 T8",
-     "state": "failed"
+     "state": "not_baselined"
     },
     "sourcemap_record": {
-     "class": "unsupported",
-     "reason": "Program.Emit is Phase 3 T8",
-     "state": "failed"
+     "name": "compiler/2dArrays.sourcemap.txt",
+     "state": "no_content"
     },
     "version": 1
    }
@@ -155,6 +231,17 @@
   {
    "native": {
     "acceptance_tier": "executed",
+    "baseline_inputs": {
+     "header_hex": "74657374732f63617365732f636f6d70696c65722f6d697373696e6752657175697265644465636c6172652e642e7473",
+     "other_files": [],
+     "to_be_compiled": [
+      {
+       "content_hex": "7661722078203d20313b",
+       "name_hex": "2f2e7372632f6d697373696e6752657175697265644465636c6172652e642e7473"
+      }
+     ],
+     "ts_config_files": []
+    },
     "diagnostics": 2,
     "emit": {
      "diagnostics": [],
@@ -164,12 +251,33 @@
      "state": "executed"
     },
     "execution_stage": "complete",
+    "harness_options": {
+     "BaselineFile": "",
+     "CaptureSuggestions": false,
+     "CurrentDirectory": "/.src",
+     "FileName": "",
+     "FullEmitPaths": false,
+     "IncludeBuiltFile": "",
+     "LibFiles": null,
+     "Link": "",
+     "NoImplicitReferences": false,
+     "NoTypesAndSymbols": false,
+     "ReportDiagnostics": false,
+     "Symlink": "",
+     "TypescriptVersion": "",
+     "UseCaseSensitiveFileNames": true
+    },
     "has_non_dts_files": false,
     "id": "compiler/missingRequiredDeclare.d.ts#configuration=0",
     "loaded_sha256": "658589420ac74de8eaf0388bfd6c45db89fccd47cc196489b1536ea65f13bbd0",
     "output": {
      "reason": "no input file other than declaration files",
      "state": "disabled"
+    },
+    "outputs": {
+     "dts": [],
+     "js": [],
+     "maps": []
     },
     "post_diagnostics": 2,
     "pre_diagnostics": 2,
@@ -214,6 +322,7 @@
      ],
      "ts_config_files": []
     },
+    "configured_name": "missingRequiredDeclare.d.ts",
     "emit": true,
     "error_inputs": [
      {
@@ -221,6 +330,12 @@
       "name_hex": "2f2e7372632f6d697373696e6752657175697265644465636c6172652e642e7473"
      }
     ],
+    "harness_options": {
+     "CaptureSuggestions": false,
+     "CurrentDirectory": "/.src",
+     "FullEmitPaths": false,
+     "LibFiles": null
+    },
     "id": "compiler/missingRequiredDeclare.d.ts#configuration=0",
     "loading": {
      "case_sensitive": true,
@@ -246,14 +361,34 @@
      "reason": "no input file other than declaration files",
      "state": "disabled"
     },
-    "reprint": true
+    "reprint": true,
+    "suite": "compiler"
    },
    "rust": {
     "acceptance_tier": "executed",
+    "compilations": [
+     {
+      "compilation": "first",
+      "post_diagnostics": 2,
+      "pre_diagnostics": 2
+     }
+    ],
     "emit": {
-     "class": "unsupported",
-     "reason": "Program.Emit is Phase 3 T8",
-     "state": "failed"
+     "diagnostics": 2,
+     "outputs": {
+      "dts": [],
+      "js": [],
+      "maps": []
+     },
+     "post_diagnostics": 2,
+     "pre_diagnostics": 2,
+     "result": {
+      "diagnostics": [],
+      "emit_skipped": false,
+      "emitted_files_hex": [],
+      "source_maps": 0
+     },
+     "state": "executed"
     },
     "id": "compiler/missingRequiredDeclare.d.ts#configuration=0",
     "load": {
@@ -288,14 +423,11 @@
      "state": "executed"
     },
     "sourcemap": {
-     "class": "unsupported",
-     "reason": "Program.Emit is Phase 3 T8",
-     "state": "failed"
+     "state": "not_baselined"
     },
     "sourcemap_record": {
-     "class": "unsupported",
-     "reason": "Program.Emit is Phase 3 T8",
-     "state": "failed"
+     "name": "compiler/missingRequiredDeclare.sourcemap.txt",
+     "state": "no_content"
     },
     "version": 1
    }
@@ -303,6 +435,17 @@
   {
    "native": {
     "acceptance_tier": "executed",
+    "baseline_inputs": {
+     "header_hex": "74657374732f63617365732f636f6e666f726d616e63652f6a73646f632f696d706f727454616731312e7473",
+     "other_files": [],
+     "to_be_compiled": [
+      {
+       "content_hex": "2f2a2a0a202a2040696d706f727420666f6f0a202a2f0a",
+       "name_hex": "2f666f6f2e6a73"
+      }
+     ],
+     "ts_config_files": []
+    },
     "diagnostics": 2,
     "emit": {
      "diagnostics": [],
@@ -312,12 +455,33 @@
      "state": "executed"
     },
     "execution_stage": "complete",
+    "harness_options": {
+     "BaselineFile": "",
+     "CaptureSuggestions": false,
+     "CurrentDirectory": "/.src",
+     "FileName": "/foo.js",
+     "FullEmitPaths": false,
+     "IncludeBuiltFile": "",
+     "LibFiles": null,
+     "Link": "",
+     "NoImplicitReferences": false,
+     "NoTypesAndSymbols": false,
+     "ReportDiagnostics": false,
+     "Symlink": "",
+     "TypescriptVersion": "",
+     "UseCaseSensitiveFileNames": true
+    },
     "has_non_dts_files": true,
     "id": "conformance/jsdoc/importTag11.ts#configuration=0",
     "loaded_sha256": "6d18140dde4b2807dc1ad8c903cf1183cabea1d271f0e9f4afab1572c3fc74d4",
     "output": {
      "name": "conformance/importTag11.js",
      "state": "no_content"
+    },
+    "outputs": {
+     "dts": [],
+     "js": [],
+     "maps": []
     },
     "post_diagnostics": 2,
     "pre_diagnostics": 2,
@@ -360,6 +524,7 @@
      ],
      "ts_config_files": []
     },
+    "configured_name": "importTag11.ts",
     "emit": true,
     "error_inputs": [
      {
@@ -367,6 +532,12 @@
       "name_hex": "2f666f6f2e6a73"
      }
     ],
+    "harness_options": {
+     "CaptureSuggestions": false,
+     "CurrentDirectory": "/.src",
+     "FullEmitPaths": false,
+     "LibFiles": null
+    },
     "id": "conformance/jsdoc/importTag11.ts#configuration=0",
     "loading": {
      "case_sensitive": true,
@@ -396,14 +567,34 @@
      "owes": "no_content",
      "state": "runs"
     },
-    "reprint": true
+    "reprint": true,
+    "suite": "conformance"
    },
    "rust": {
     "acceptance_tier": "executed",
+    "compilations": [
+     {
+      "compilation": "first",
+      "post_diagnostics": 2,
+      "pre_diagnostics": 2
+     }
+    ],
     "emit": {
-     "class": "unsupported",
-     "reason": "Program.Emit is Phase 3 T8",
-     "state": "failed"
+     "diagnostics": 2,
+     "outputs": {
+      "dts": [],
+      "js": [],
+      "maps": []
+     },
+     "post_diagnostics": 2,
+     "pre_diagnostics": 2,
+     "result": {
+      "diagnostics": [],
+      "emit_skipped": false,
+      "emitted_files_hex": [],
+      "source_maps": 0
+     },
+     "state": "executed"
     },
     "id": "conformance/jsdoc/importTag11.ts#configuration=0",
     "load": {
@@ -413,9 +604,8 @@
     },
     "mode": "single",
     "output": {
-     "class": "unsupported",
-     "reason": "Program.Emit is Phase 3 T8",
-     "state": "failed"
+     "name": "conformance/importTag11.js",
+     "state": "no_content"
     },
     "reprint": {
      "files": [
@@ -437,14 +627,11 @@
      "state": "executed"
     },
     "sourcemap": {
-     "class": "unsupported",
-     "reason": "Program.Emit is Phase 3 T8",
-     "state": "failed"
+     "state": "not_baselined"
     },
     "sourcemap_record": {
-     "class": "unsupported",
-     "reason": "Program.Emit is Phase 3 T8",
-     "state": "failed"
+     "name": "conformance/importTag11.sourcemap.txt",
+     "state": "no_content"
     },
     "version": 1
    }
@@ -452,6 +639,27 @@
   {
    "native": {
     "acceptance_tier": "executed",
+    "baseline_inputs": {
+     "header_hex": "74657374732f63617365732f636f6d70696c65722f636f6e74656e744d6170706572537570706c656d656e74616c4d6f64756c652e7473",
+     "other_files": [
+      {
+       "content_hex": "7b0a20202020226e616d65223a20226d6170706572222c0a202020202276657273696f6e223a2022312e302e30222c0a202020202274797065736372697074223a207b2022636f6e74656e744d6170706572223a207b202265786563223a205b22737570706c656d656e74616c2d6d6f64756c652d6d6170706572225d207d207d0a7d0a",
+       "name_hex": "2f6e6f64655f6d6f64756c65732f6d61707065722f7061636b6167652e6a736f6e"
+      }
+     ],
+     "to_be_compiled": [
+      {
+       "content_hex": "6578706f72742064656661756c7420313b",
+       "name_hex": "2f636f6d706f6e656e742e767565"
+      }
+     ],
+     "ts_config_files": [
+      {
+       "content_hex": "7b0a2020202022636f6d70696c65724f7074696f6e73223a207b0a202020202020202022746172676574223a2022657332303230222c0a2020202020202020226d6f64756c65223a202265736e657874222c0a2020202020202020226d6f64756c655265736f6c7574696f6e223a202262756e646c6572222c0a202020202020202022737472696374223a20747275650a202020207d2c0a2020202022636f6e74656e744d617070657273223a205b0a20202020202020207b20227061636b616765223a20226d6170706572222c2022657874656e73696f6e73223a205b222e767565225d207d0a202020205d0a7d0a",
+       "name_hex": "2f7473636f6e6669672e6a736f6e"
+      }
+     ]
+    },
     "diagnostics": 1,
     "emit": {
      "diagnostics": [],
@@ -464,6 +672,22 @@
      "state": "executed"
     },
     "execution_stage": "complete",
+    "harness_options": {
+     "BaselineFile": "",
+     "CaptureSuggestions": false,
+     "CurrentDirectory": "/.src",
+     "FileName": "/component.vue",
+     "FullEmitPaths": false,
+     "IncludeBuiltFile": "",
+     "LibFiles": null,
+     "Link": "",
+     "NoImplicitReferences": false,
+     "NoTypesAndSymbols": false,
+     "ReportDiagnostics": false,
+     "Symlink": "",
+     "TypescriptVersion": "",
+     "UseCaseSensitiveFileNames": true
+    },
     "has_non_dts_files": true,
     "id": "compiler/contentMapperSupplementalModule.ts#configuration=0",
     "loaded_sha256": "6d5efff527c0e0dfd39c118b9dea5b1f0d1ffeef64f0ed646df5b39125dde11c",
@@ -471,6 +695,22 @@
      "name": "compiler/contentMapperSupplementalModule.js",
      "state": "content",
      "text_hex": "2f2f2f2f205b74657374732f63617365732f636f6d70696c65722f636f6e74656e744d6170706572537570706c656d656e74616c4d6f64756c652e74735d202f2f2f2f0d0a0d0a2f2f2f2f205b7061636b6167652e6a736f6e5d0d0a7b0a20202020226e616d65223a20226d6170706572222c0a202020202276657273696f6e223a2022312e302e30222c0a202020202274797065736372697074223a207b2022636f6e74656e744d6170706572223a207b202265786563223a205b22737570706c656d656e74616c2d6d6f64756c652d6d6170706572225d207d207d0a7d0a0d0a2f2f2f2f205b636f6d706f6e656e742e7675655d0d0a6578706f72742064656661756c7420313b0d0a0d0a0d0a0d0a2f2f2f2f205b636f6d706f6e656e742e7675652e302e642e74735d0d0a6578706f7274206465636c61726520636f6e7374207072697661746556616c75653a206e756d6265723b0d0a2f2f2f2f205b636f6d706f6e656e742e642e7675652e74735d0d0a2f2f2f203c7265666572656e636520706174683d222e2f636f6d706f6e656e742e7675652e302e642e747322202f3e0d0a6465636c61726520636f6e7374205f64656661756c74203d20313b0d0a6578706f72742064656661756c74205f64656661756c743b0d0a"
+    },
+    "outputs": {
+     "dts": [
+      {
+       "bytes": 44,
+       "name_hex": "2f636f6d706f6e656e742e7675652e302e642e7473",
+       "sha256": "97c1ef6331ce8be48a90e2ea614ecf392dd202a7e66e6d89afd1a999c7de661b"
+      },
+      {
+       "bytes": 104,
+       "name_hex": "2f636f6d706f6e656e742e642e7675652e7473",
+       "sha256": "8e04121f6611fb6a16c171bd951cd61ff80f13218b90f6d2e6598aa284c31876"
+      }
+     ],
+     "js": [],
+     "maps": []
     },
     "post_diagnostics": 0,
     "pre_diagnostics": 0,
@@ -541,6 +781,7 @@
       }
      ]
     },
+    "configured_name": "contentMapperSupplementalModule.ts",
     "emit": true,
     "error_inputs": [
      {
@@ -556,6 +797,12 @@
       "name_hex": "2f6e6f64655f6d6f64756c65732f6d61707065722f7061636b6167652e6a736f6e"
      }
     ],
+    "harness_options": {
+     "CaptureSuggestions": false,
+     "CurrentDirectory": "/.src",
+     "FullEmitPaths": false,
+     "LibFiles": null
+    },
     "id": "compiler/contentMapperSupplementalModule.ts#configuration=0",
     "loading": {
      "case_sensitive": true,
@@ -588,14 +835,53 @@
      "owes": "reference",
      "state": "runs"
     },
-    "reprint": true
+    "reprint": true,
+    "suite": "compiler"
    },
    "rust": {
     "acceptance_tier": "executed",
+    "compilations": [
+     {
+      "compilation": "first",
+      "post_diagnostics": 1,
+      "pre_diagnostics": 1
+     },
+     {
+      "compilation": "repeat",
+      "post_diagnostics": 0,
+      "pre_diagnostics": 0
+     }
+    ],
     "emit": {
-     "class": "unsupported",
-     "reason": "Program.Emit is Phase 3 T8",
-     "state": "failed"
+     "diagnostics": 1,
+     "outputs": {
+      "dts": [
+       {
+        "bytes": 44,
+        "name_hex": "2f636f6d706f6e656e742e7675652e302e642e7473",
+        "sha256": "97c1ef6331ce8be48a90e2ea614ecf392dd202a7e66e6d89afd1a999c7de661b"
+       },
+       {
+        "bytes": 55,
+        "name_hex": "2f636f6d706f6e656e742e642e7675652e7473",
+        "sha256": "02900c87a7418bd0e1847c6cafcc8f8167ae92796f3dac886c5ece7c06bdae4e"
+       }
+      ],
+      "js": [],
+      "maps": []
+     },
+     "post_diagnostics": 1,
+     "pre_diagnostics": 1,
+     "result": {
+      "diagnostics": [],
+      "emit_skipped": false,
+      "emitted_files_hex": [
+       "2f636f6d706f6e656e742e7675652e302e642e7473",
+       "2f636f6d706f6e656e742e642e7675652e7473"
+      ],
+      "source_maps": 0
+     },
+     "state": "executed"
     },
     "id": "compiler/contentMapperSupplementalModule.ts#configuration=0",
     "load": {
@@ -605,9 +891,10 @@
     },
     "mode": "single",
     "output": {
-     "class": "unsupported",
-     "reason": "Program.Emit is Phase 3 T8",
-     "state": "failed"
+     "bytes": 428,
+     "name": "compiler/contentMapperSupplementalModule.js",
+     "sha256": "86d0d1905bc3e09f9f3922935072c1352ae31109cce7bb6b4a979ac89a2e82fd",
+     "state": "content"
     },
     "reprint": {
      "files": [
@@ -647,18 +934,15 @@
      "state": "executed"
     },
     "sourcemap": {
-     "class": "unsupported",
-     "reason": "Program.Emit is Phase 3 T8",
-     "state": "failed"
+     "state": "not_baselined"
     },
     "sourcemap_record": {
-     "class": "unsupported",
-     "reason": "Program.Emit is Phase 3 T8",
-     "state": "failed"
+     "name": "compiler/contentMapperSupplementalModule.sourcemap.txt",
+     "state": "no_content"
     },
     "version": 1
    }
   }
  ],
- "source": "target/phase3/native-single (single mode) and a phase3_corpus.py run over it; native rows without their outputs and options"
+ "source": "target/phase3/native-single (single mode) and the C2 phase3_corpus.py run over it (target/phase3/c2-rust-single); native rows without their options"
 }

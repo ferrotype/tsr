@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-"""Phase 3 T0: compare a Rust emit run with the native emit contract.
+"""Phase 3: compare a Rust emit run with the native emit contract.
 
 Domains per executed variant: `reprint` (the printer over every non-library
 source file, with and without comments), `output`, `sourcemap`,
-`sourcemap_record` (the runner's three emit sub-tests) and `emit_diagnostics`
-(the emit result's diagnostics). Every domain of every row lands in exactly
-one category: match, different, failed (production panic, deadline or
-error), unsupported (a named production refusal), disabled (the native runner
-disables the sub-test; it carries the pin's reason), unexecuted (the row or
-domain was not run). Harness defects are not categories: they invalidate the
-report (`valid: false`) and are listed separately.
+`sourcemap_record` (the runner's three emit sub-tests), `emit_diagnostics`
+(the emit result and the diagnostic counts) and `declaration` (the emitted
+declaration files). Every domain of every row lands in exactly one category:
+match, different, failed (production panic, deadline or error), unsupported
+(a named production refusal), disabled (the native runner disables the
+sub-test; it carries the pin's reason), unexecuted (the row or domain was not
+run). Harness defects are not categories: they invalidate the report
+(`valid: false`) and are listed separately.
 
 `reprint` matches when both sides list the same files (name, source digest,
 order), each file has the pin's script kind and language variant, and every
@@ -18,6 +19,28 @@ reason is the pinned panic's message. A refusal where the pin printed, or with
 another reason than the pin's panic, is `different`. Its differences are
 bucketed by the extension of the first differing file, by kind and, file by
 file, by the Rust refusal reason.
+
+`output`, `sourcemap` and `sourcemap_record` match when the composed
+baseline has the native state and name and, with content, the native text's
+digest and size. The pinned writer's assertion or runtime fault on the Rust
+outputs is `different` (the pin composed a baseline there). A difference is
+attributed to the first emitted file that differs from the native one among
+the kinds the baseline shows (`js`, `dts`, `map`: name list, then digest),
+or to the baseline's own sections (`baseline`: the DtsFileErrors block, the
+noCheck repeat's blocks, an ordering) when every such file agrees.
+
+`emit_diagnostics` matches when the emit result agrees (nil or not,
+`EmitSkipped`, `EmittedFiles` in order, the emit diagnostics field by field,
+the number of source maps) and the counts agree: `len(result.Diagnostics)`
+of the first compilation, and the pre- and post-emit counts of the row's last
+compilation (the native oracle's diagnostics hook records every
+`compileFilesWithHost` of the row, so its counts are the last one's: the
+noCheck repeat when the `.js` baseline runs it, else the declaration
+re-compilation, else the first compilation).
+
+`declaration` compares the emitted declaration files (name, digest, size,
+in the harness's order). It is required where the native outputs include a
+declaration file; elsewhere it matches when Rust emits none either.
 
     report --native DIR --rust DIR [--output FILE] [--record]
     modes  --native DIR --rust DIR --native-concurrent DIR --rust-concurrent DIR
@@ -35,6 +58,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter, defaultdict
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -47,13 +71,21 @@ import phase3_inventory  # noqa: E402
 import phase3_native  # noqa: E402
 
 RECORD = ROOT / "data/phase3/first-comparison.json"
-DOMAINS = ("reprint", "output", "sourcemap", "sourcemap_record", "emit_diagnostics")
+DOMAINS = ("reprint", "output", "sourcemap", "sourcemap_record", "emit_diagnostics", "declaration")
 CATEGORIES = ("match", "different", "failed", "unsupported", "disabled", "unexecuted")
 MATCHED = ("match", "disabled")
 BASELINE_STATES = ("content", "no_content", "not_baselined")
 FILE_KIND = ("script_kind", "language_variant")
 EXAMPLES = 3
 DECLARATION_EXTENSIONS = (".d.ts", ".d.mts", ".d.cts")
+# The emitted files each baseline shows, in the order a difference is
+# attributed to them: the `.js` baseline lists the scripts and declarations,
+# the `.js.map` baseline the maps with their scripts, the record all three.
+SHOWN = {"output": ("js", "dts"), "sourcemap": ("maps", "js"), "sourcemap_record": ("maps", "js", "dts")}
+KIND_NAMES = {"js": "js", "dts": "dts", "maps": "map"}
+# A writer's assertion or runtime fault on the Rust outputs: the pinned
+# sub-test would fail where the pin composed a baseline.
+WRITER_FAULTS = ("assertion", "runtime")
 
 
 def outcome(category, **detail):
@@ -147,6 +179,34 @@ def compare_reprint(native, rust):
     return outcome("match")
 
 
+def output_entries(files):
+    return [(item["name_hex"], item["sha256"], item["bytes"]) for item in files]
+
+
+def first_output_difference(native, rust, kinds):
+    """The first emitted file among `kinds` where the Rust outputs differ from
+    the native ones: a different name list, then a different digest. None
+    when every such file agrees."""
+    outputs = rust["emit"]["outputs"]
+    for kind in kinds:
+        expected, actual = output_entries(native["outputs"][kind]), output_entries(outputs[kind])
+        if [entry[0] for entry in expected] != [entry[0] for entry in actual]:
+            missing = [entry[0] for entry in expected if entry[0] not in {e[0] for e in actual}]
+            extra = [entry[0] for entry in actual if entry[0] not in {e[0] for e in expected}]
+            name = (missing or extra or [next(left[0] for left, right in zip(expected, actual)
+                                               if left[0] != right[0])])[0]
+            return {"kind": KIND_NAMES[kind], "file_difference": "missing" if missing else "extra" if extra else "order",
+                    "file": name_of(name)}
+        for left, right in zip(expected, actual):
+            if left != right:
+                return {"kind": KIND_NAMES[kind], "file_difference": "text", "file": name_of(left[0])}
+    return None
+
+
+def text_digest(text_hex):
+    return hashlib.sha256(bytes.fromhex(text_hex)).hexdigest()
+
+
 def compare_baseline(domain, native, rust):
     expected = native[domain]
     if expected["state"] == "disabled":
@@ -155,26 +215,84 @@ def compare_baseline(domain, native, rust):
     if value["state"] == "not_requested":
         return outcome("unexecuted", reason="emit not requested")
     if value["state"] == "failed":
-        return failure_outcome(value)
+        if (value["class"] not in WRITER_FAULTS or rust["emit"]["state"] != "executed"
+                or expected["state"] == "failed"):
+            return failure_outcome(value)
+        found = first_output_difference(native, rust, SHOWN[domain]) or {"kind": "baseline"}
+        return outcome("different", difference=value["class"], reason=value["reason"][:300],
+                       native_state=expected["state"], rust_state="failed", **found)
     if expected["state"] == "failed":
         return outcome("unexecuted", reason="native " + expected.get("reason", "failed"))
     if value.get("state") not in BASELINE_STATES:
         raise ValueError(f"unknown Rust {domain} outcome")
-    same = (value["state"] == expected["state"] and value.get("text_hex") == expected.get("text_hex")
-            and value.get("name") == expected.get("name"))
-    return outcome("match" if same else "different", native_state=expected["state"], rust_state=value["state"])
+    same = value["state"] == expected["state"] and value.get("name") == expected.get("name")
+    if same and value["state"] == "content":
+        same = value["sha256"] == text_digest(expected["text_hex"]) and value["bytes"] * 2 == len(expected["text_hex"])
+    if same:
+        return outcome("match")
+    found = first_output_difference(native, rust, SHOWN[domain]) or {"kind": "baseline"}
+    difference = ("state" if value["state"] != expected["state"]
+                  else "name" if value.get("name") != expected.get("name") else "text")
+    return outcome("different", difference=difference, native_state=expected["state"], rust_state=value["state"],
+                   **found)
+
+
+def last_compilation(rust):
+    return rust["compilations"][-1] if rust["compilations"] else {}
 
 
 def compare_emit_diagnostics(native, rust):
+    """The emit result, then the counts (module docstring)."""
     value = rust["emit"]
     if value["state"] == "not_requested":
         return outcome("unexecuted", reason="emit not requested")
     if value["state"] == "failed":
         return failure_outcome(value)
     expected = native["emit"]
-    same = (value.get("diagnostics") == expected.get("diagnostics")
-            and value.get("emit_skipped") == expected.get("emit_skipped"))
-    return outcome("match" if same else "different")
+    result = value["result"]
+    if (expected["state"] == "executed") != (result is not None):
+        return outcome("different", kind="result", native_state=expected["state"],
+                       rust_state="executed" if result is not None else "absent")
+    if result is not None:
+        for key, kind in (("emit_skipped", "emit_skipped"), ("emitted_files_hex", "emitted_files"),
+                          ("diagnostics", "diagnostics"), ("source_maps", "source_maps")):
+            if result[key] != expected[key]:
+                detail = {}
+                if kind == "emitted_files":
+                    detail = {"native": [name_of(n) for n in expected[key]][:10],
+                              "rust": [name_of(n) for n in result[key]][:10]}
+                elif kind == "diagnostics":
+                    detail = {"native_codes": [d["code"] for d in expected[key]][:10],
+                              "rust_codes": [d["code"] for d in result[key]][:10]}
+                elif kind == "emit_skipped":
+                    detail = {"native": expected[key], "rust": result[key]}
+                return outcome("different", kind=kind, **detail)
+    last = last_compilation(rust)
+    counts = (last.get("pre_diagnostics"), last.get("post_diagnostics"), value["diagnostics"])
+    native_counts = (native.get("pre_diagnostics"), native.get("post_diagnostics"), native.get("diagnostics"))
+    if counts != native_counts:
+        return outcome("different", kind="counts", compilation=last.get("compilation"), native=list(native_counts),
+                       rust=list(counts))
+    return outcome("match")
+
+
+def compare_declaration(native, rust):
+    """The emitted declaration files, against the native ones."""
+    value = rust["emit"]
+    if value["state"] == "not_requested":
+        return outcome("unexecuted", reason="emit not requested")
+    if value["state"] == "failed":
+        return failure_outcome(value)
+    found = first_output_difference(native, rust, ("dts",))
+    if found is None:
+        return outcome("match")
+    return outcome("different", **found)
+
+
+def declaration_required(native, rust_outcome):
+    """Whether a row counts toward `declaration_parity`: the pin emitted a
+    declaration file, or the Rust row does not match it."""
+    return bool(native.get("outputs", {}).get("dts")) or rust_outcome["category"] not in MATCHED
 
 
 def compare_row(native, rust, problem=None, attribution=None):
@@ -198,7 +316,8 @@ def compare_row(native, rust, problem=None, attribution=None):
             "output": compare_baseline("output", native, rust),
             "sourcemap": compare_baseline("sourcemap", native, rust),
             "sourcemap_record": compare_baseline("sourcemap_record", native, rust),
-            "emit_diagnostics": compare_emit_diagnostics(native, rust)}
+            "emit_diagnostics": compare_emit_diagnostics(native, rust),
+            "declaration": compare_declaration(native, rust)}
 
 
 def refusals(native, rust):
@@ -261,7 +380,7 @@ def report(native_dir, rust_dir, *, native=None, capture=None):
     results = []
     counts = {domain: Counter() for domain in DOMAINS}
     by_extension, by_kind, by_refusal, confirmed_refusals = new_table(), new_table(), new_table(), new_table()
-    failed, unsupported = new_table(), new_table()
+    failed, unsupported, differences = new_table(), new_table(), new_table()
     for request, row, stderr in zip(requests, rows, stderrs, strict=True):
         native_row = native_by_id[request["id"]]
         problem, attribution = None, None
@@ -289,10 +408,15 @@ def report(native_dir, rust_dir, *, native=None, capture=None):
         if reprint["category"] == "different":
             bucket(by_extension, reprint["extension"], request["id"])
             bucket(by_kind, reprint["kind"], request["id"])
+        for domain in DOMAINS[1:]:
+            if outcomes[domain]["category"] == "different":
+                bucket(differences, (domain, outcomes[domain].get("kind", "")), request["id"])
         if "fatal" not in row and native_row["state"] == "executed":
             for reason, confirmed, _name, _mode in refusals(native_row, row):
                 bucket(confirmed_refusals if confirmed else by_refusal, reason, request["id"])
-        entry = {"id": request["id"], "outcomes": {d: outcomes[d]["category"] for d in DOMAINS}}
+        entry = {"id": request["id"], "outcomes": {d: outcomes[d]["category"] for d in DOMAINS},
+                 "declaration_required": native_row["state"] == "executed"
+                 and declaration_required(native_row, outcomes["declaration"])}
         details = {d: outcomes[d] for d in DOMAINS if outcomes[d]["category"] not in MATCHED}
         if details:
             entry["details"] = details
@@ -303,9 +427,10 @@ def report(native_dir, rust_dir, *, native=None, capture=None):
         "domains": {domain: {category: counts[domain][category] for category in CATEGORIES} for domain in DOMAINS},
         "all_domains_met": sum(all(o in MATCHED for o in row["outcomes"].values()) for row in results),
         "unsupported_rows": sum(any(o == "unsupported" for o in row["outcomes"].values()) for row in results),
+        "declaration_required": sum(row["declaration_required"] for row in results),
     }
     return {
-        "version": 2, "pin": native_report["pin"], "summary": summary,
+        "version": 3, "pin": native_report["pin"], "summary": summary,
         "native": {"report_sha256": metadata["native"]["report_sha256"],
                    "observation_sha256": native_report["observation_sha256"], "mode": native_report["mode"]},
         "rust": {"capture_sha256": digest(p4.canonical(metadata) + b"\n"), "selection": metadata["selection"],
@@ -319,6 +444,7 @@ def report(native_dir, rust_dir, *, native=None, capture=None):
             "reprint_refusals_matching_a_pinned_panic": finish(confirmed_refusals),
             "failed": by_domain(failed),
             "unsupported": by_domain(unsupported),
+            "different": [dict(domain=key[0], kind=key[1], **value) for key, value in finish(differences).items()],
         },
         "harness_errors": harness,
         "rows": results,
@@ -429,7 +555,13 @@ def main():
     print(json.dumps({"summary": result["summary"],
                       "reprint_by_extension": result["buckets"]["reprint_by_extension"],
                       "reprint_by_kind": result["buckets"]["reprint_by_kind"],
-                      "reprint_by_refusal": result["buckets"]["reprint_by_refusal"]}, sort_keys=True))
+                      "reprint_by_refusal": result["buckets"]["reprint_by_refusal"],
+                      "different": [{key: item[key] for key in ("domain", "kind", "rows")}
+                                    for item in result["buckets"]["different"]],
+                      "failed": [{key: item[key] for key in ("domain", "reason", "rows")}
+                                 for item in result["buckets"]["failed"][:20]],
+                      "unsupported": [{key: item[key] for key in ("domain", "reason", "rows")}
+                                      for item in result["buckets"]["unsupported"]]}, sort_keys=True))
 
 
 if __name__ == "__main__":

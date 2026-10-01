@@ -1,6 +1,6 @@
-"""Phase 3 T0: the comparison over whole captures, the recorded result, the
+"""Phase 3: the comparison over whole captures, the recorded result, the
 blocker register, the two-mode comparison and the `emit` producer's harness
-validity, over captures built from the four real rows of
+validity and parity metrics, over captures built from the four real rows of
 fixtures/phase3/corpus-rows.json (a native capture of those rows and a Rust
 capture of each mode). A tampered, partial or stale capture is rejected."""
 import copy
@@ -24,7 +24,7 @@ from s08_oracle import canonical, digest  # noqa: E402
 FIXTURE = ROOT / "scripts/tests/fixtures/phase3/corpus-rows.json"
 SOURCE = "tools/phase3/harness/reprint.rs"
 SOURCES = {SOURCE: digest((ROOT / SOURCE).read_bytes())}
-EMIT = "Program.Emit is Phase 3 T8"
+REFUSAL = "unsupported checker operation: GetReferencedImportDeclaration"
 FULL = {"sample": False, "cases": [], "limit": None}
 
 
@@ -111,10 +111,15 @@ class Comparison(Fixture):
         result = compare.report(native_dir, rust_dir)
         summary = result["summary"]
         self.assertEqual((summary["rows"], summary["valid"], summary["partial"], summary["all_domains_met"],
-                          summary["unsupported_rows"]), (4, True, False, 0, 4))
+                          summary["unsupported_rows"], summary["declaration_required"]), (4, True, False, 3, 0, 1))
         self.assertEqual(summary["domains"]["reprint"]["match"], 4)
-        self.assertEqual(summary["domains"]["output"], {"match": 0, "different": 0, "failed": 0, "unsupported": 3,
+        self.assertEqual(summary["domains"]["output"], {"match": 2, "different": 1, "failed": 0, "unsupported": 0,
                                                         "disabled": 1, "unexecuted": 0})
+        for domain in ("sourcemap", "sourcemap_record", "emit_diagnostics"):
+            self.assertEqual(summary["domains"][domain]["match"], 4)
+        self.assertEqual(summary["domains"]["declaration"]["different"], 1)
+        self.assertEqual([(item["domain"], item["kind"], item["rows"]) for item in result["buckets"]["different"]],
+                         [("declaration", "dts", 1), ("output", "dts", 1)])
         self.assertTrue(result["rust"]["source_stable"])
         self.assertEqual(result["buckets"]["reprint_refusals_matching_a_pinned_panic"]
                          ["unhandled statement: KindJSImportDeclaration"]["rows"], 1)
@@ -227,6 +232,43 @@ class HarnessValidity(Fixture):
         self.assertNotEqual(json.loads(target.read_bytes()), compare.acceptance_summary(again))
 
 
+class Parity(Fixture):
+    def test_parity_is_the_matched_fraction_of_each_domain(self):
+        comparison = compare.report(*self.captures())
+        metrics = producers.parity(comparison["rows"])
+        self.assertEqual(metrics, {"output_parity": 0.75, "sourcemap_parity": 1.0, "sourcemap_record_parity": 1.0,
+                                   "emit_diagnostics_parity": 1.0, "declaration_parity": 0.0})
+        self.assertEqual(producers.matched_ratio(comparison["rows"], "reprint"), 1.0)
+
+    def test_declaration_parity_counts_the_rows_that_require_it(self):
+        """The pin's declaration rows, and any row where Rust differs: a
+        Rust-only declaration counts against it."""
+        def extra(rows):
+            rows[0]["emit"]["outputs"]["dts"] = [{"name_hex": "2f2e7372632f32644172726179732e642e7473",
+                                                  "sha256": "0" * 64, "bytes": 0}]
+        comparison = compare.report(*self.captures(mutate=extra))
+        self.assertEqual([row["declaration_required"] for row in comparison["rows"]], [True, False, False, True])
+        self.assertEqual(producers.parity(comparison["rows"])["declaration_parity"], 0.0)
+        self.root = self.root / "matching"
+        self.root.mkdir()
+
+        def matching(rows):
+            rows[3]["emit"]["outputs"]["dts"] = copy.deepcopy(self.fixture[3]["native"]["outputs"]["dts"])
+        comparison = compare.report(*self.captures(mutate=matching))
+        self.assertEqual(producers.parity(comparison["rows"])["declaration_parity"], 1.0)
+
+    def test_failures_count_against_every_domain(self):
+        def refused(rows):
+            for name in corpus.EMIT_DOMAINS:
+                rows[0][name] = {"state": "failed", "class": "unsupported", "reason": REFUSAL}
+            rows[0]["compilations"] = []
+        comparison = compare.report(*self.captures(mutate=refused))
+        metrics = producers.parity(comparison["rows"])
+        self.assertEqual((metrics["output_parity"], metrics["sourcemap_parity"], metrics["emit_diagnostics_parity"]),
+                         (0.5, 0.75, 0.75))
+        self.assertEqual(comparison["summary"]["unsupported_rows"], 1)
+
+
 class Modes(Fixture):
     def test_the_two_modes_agree(self):
         single = self.captures("single")
@@ -263,9 +305,9 @@ class Register(Fixture):
         native_dir, rust_dir = self.captures()
         register = blockers.build(native_dir, rust_dir)
         self.assertEqual([(e["kind"], e["cause"], e["owner"], e["variants"], e["domains"]) for e in register["entries"]],
-                         [("unsupported", EMIT, "T8", 4,
-                           {"emit_diagnostics": 4, "output": 3, "sourcemap": 4, "sourcemap_record": 4})])
-        self.assertEqual(register["by_owner"], {"T8": 1})
+                         [("different", "declaration differs: dts", "T7", 1, {"declaration": 1}),
+                          ("different", "output differs: dts", "T8", 1, {"output": 1})])
+        self.assertEqual(register["by_owner"], {"T7": 1, "T8": 1})
         comparison = compare.report(native_dir, rust_dir)
         self.assertTrue(blockers.complete(register, comparison))
         self.assertEqual({item["dependency"]: item["state"] for item in register["cross_phase"]},
@@ -293,7 +335,9 @@ class Register(Fixture):
         self.assertFalse(blockers.complete(rebuilt, comparison))
 
     def test_owners_follow_the_cause_and_domains(self):
-        self.assertEqual(blockers.owner_of("unsupported", EMIT, {"output": 1}), ("T8", False))
+        self.assertEqual(blockers.owner_of("unsupported", "Program.Emit is Phase 3 T8", {"output": 1}), ("T8", False))
+        self.assertEqual(blockers.owner_of("different", "declaration differs: dts", {"declaration": 1}),
+                         ("T7", False))
         self.assertEqual(blockers.owner_of("unsupported", "unsupported checker operation: GetConstantValue",
                                            {"output": 1}), (blockers.RESOLVER_OWNER, True))
         self.assertEqual(blockers.owner_of("failed", "panic: boom", {"reprint": 1}), ("T1", False))
@@ -302,13 +346,15 @@ class Register(Fixture):
 
     def test_a_resolver_refusal_is_a_cross_phase_entry(self):
         def resolver(rows):
-            rows[0]["emit"] = {"state": "failed", "class": "unsupported",
-                               "reason": "unsupported checker operation: GetReferencedImportDeclaration"}
+            for name in corpus.EMIT_DOMAINS:
+                rows[0][name] = {"state": "failed", "class": "unsupported", "reason": REFUSAL}
+            rows[0]["compilations"] = []
         native_dir, rust_dir = self.captures(mutate=resolver)
         register = blockers.build(native_dir, rust_dir)
         entry = next(e for e in register["entries"] if e["cross_phase"])
         self.assertEqual((entry["owner"], entry["variants"], entry["domains"]),
-                         (blockers.RESOLVER_OWNER, 1, {"emit_diagnostics": 1}))
+                         (blockers.RESOLVER_OWNER, 1, {"declaration": 1, "emit_diagnostics": 1, "output": 1,
+                                                       "sourcemap": 1, "sourcemap_record": 1}))
         self.assertEqual(register["cross_phase"][1]["state"], "observed")
         self.assertTrue(blockers.complete(register, compare.report(native_dir, rust_dir)))
 

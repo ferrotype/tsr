@@ -14,8 +14,9 @@ checkpoint of docs/PHASE3-plan.md section 4:
   resolver query Phase 2 lacks: a cross-phase entry owned by Phase 2
   maintenance (plan section 3);
 * any other cause is owned by its domains' checkpoints: `reprint` T1, the
-  source-map sub-tests T2, `output` and `emit_diagnostics` T8 (the driver,
-  until the comparison attributes a difference to a transform).
+  source-map sub-tests T2, `declaration` T7, `output` and `emit_diagnostics`
+  T8 (the driver, until the comparison attributes a difference to a
+  transform).
 
 The plan's two cross-phase dependencies are reported from the evidence: the
 resolver queries as above, and the bounded work group from the production
@@ -45,7 +46,7 @@ NATIVE = ROOT / "target/phase3/native-single"
 RUST = ROOT / "target/phase3/rust-single"
 CHECKPOINTS = tuple(f"T{number}" for number in range(1, 9))
 DOMAIN_OWNERS = {"reprint": "T1", "sourcemap": "T2", "sourcemap_record": "T2", "output": "T8",
-                 "emit_diagnostics": "T8"}
+                 "emit_diagnostics": "T8", "declaration": "T7"}
 NAMED_CHECKPOINT = re.compile(r"\bPhase 3 (T[1-8])\b")
 # tsr_checker::Error::Unsupported's Display: a resolver query the checker lacks.
 CHECKER_UNSUPPORTED = "unsupported checker operation: "

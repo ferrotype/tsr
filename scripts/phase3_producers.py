@@ -25,6 +25,12 @@ committed transpile observation. Metrics:
   committed data/phase3/first-comparison.json;
 * reprint_parity -- rows whose reprint domain matches, over the executed
   denominator;
+* output_parity, sourcemap_parity, sourcemap_record_parity,
+  emit_diagnostics_parity -- rows whose domain matches (or is disabled with
+  the pin's reason), over the executed denominator;
+* declaration_parity -- rows whose declaration domain matches, over the
+  rows that require it (the pin emitted a declaration file, or the Rust row
+  differs from it);
 * unsupported_required -- executed variants with an unsupported domain;
 * mode_parity -- both modes' native captures verified and Rust captures
   harness-valid, and zero outcome differences between the two runs, each
@@ -35,7 +41,8 @@ committed transpile observation. Metrics:
   that cannot pass with an owning checkpoint.
 
 The ratios and counts are emitted only over a harness-valid single-mode run;
-the other parity metrics of docs/PHASE3-plan.md section 5 come with T1 to T8.
+`transpile_parity` and the closure metrics of docs/PHASE3-plan.md section 5
+come with T8's closure.
 No threshold is introduced. A missing or stale capture leaves its metric false.
 """
 from __future__ import annotations
@@ -137,6 +144,18 @@ def matched_ratio(rows, domain):
     return sum(row["outcomes"][domain] in phase3_compare.MATCHED for row in rows) / len(rows) if rows else None
 
 
+PARITY = {"output_parity": "output", "sourcemap_parity": "sourcemap", "sourcemap_record_parity": "sourcemap_record",
+          "emit_diagnostics_parity": "emit_diagnostics"}
+
+
+def parity(rows):
+    """The emit parity metrics over the comparison's rows."""
+    metrics = {name: matched_ratio(rows, domain) for name, domain in PARITY.items()}
+    required = [row for row in rows if row["declaration_required"]]
+    metrics["declaration_parity"] = matched_ratio(required, "declaration")
+    return metrics
+
+
 def emit(native=None, rust=None):
     native = native or NATIVE
     rust = rust or RUST
@@ -183,6 +202,7 @@ def emit(native=None, rust=None):
         print("recorded comparison unavailable: " + str(error), file=sys.stderr)
     rows = comparison["rows"]
     metrics["reprint_parity"] = matched_ratio(rows, "reprint")
+    metrics.update(parity(rows))
     metrics["unsupported_required"] = sum(any(o == "unsupported" for o in row["outcomes"].values()) for row in rows)
     try:
         register = phase3_blockers.build(native["single"], rust["single"], comparison=comparison, capture=capture)

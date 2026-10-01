@@ -1,14 +1,27 @@
 #!/usr/bin/env python3
-"""Phase 3 T0: run the Rust emit harness over the executed inventory.
+"""Phase 3: run the Rust emit harness over the executed inventory.
 
 Each row is the S08 P5 protocol (one process per variant, deadline, raw
 stdout/stderr/observation, atomic immutable completion record, resume and
 replay against the captured executable) running `phase3_emit`, which loads
-the variant's program as the pin's harness loads its post-emit program and
-records the reprint witness (decision 7) and the emit domains. Requests carry
-only native *inputs*: the loading request, the native capture's baseline
-inputs and what the inventory says the `output` sub-test is (it runs, or the
-pin disables it with a reason), never expected outputs.
+the variant's program as the pin's harness loads its pre-emit program,
+records the reprint witness (decision 7), and runs what the pin's runner
+runs for its `output`, `sourcemap` and `sourcemap record` sub-tests: the
+post-emit program's emit with an in-memory recorder, the harness's output
+ordering, the three baseline writers, the declaration re-compilation and the
+`noCheck` repeat (`tools/phase3/harness/emit.rs`). Requests carry only
+native *inputs*: the loading request, the native capture's baseline inputs,
+the configured name and suite, the harness options the writers read and
+what the inventory says the `output` sub-test is (it runs, or the pin
+disables it with a reason), never expected outputs.
+
+A row records the emit result as the native row does (`EmitSkipped`,
+`EmittedFiles`, the emit diagnostics, the number of source maps), the
+first compilation's pre- and post-emit diagnostic counts and
+`len(result.Diagnostics)`, the outputs in the harness's order (name, digest,
+size), every compilation the row runs with its counts (`compilations`, in
+the pin's order: first, declaration, repeat), and each sub-test's composed
+baseline (state, name, digest, size) or failure.
 
 Harness health is separate from compiler outcomes. A malformed response, a
 protocol violation or a panic located in the adapter is a harness error: it
@@ -47,7 +60,20 @@ import phase3_native  # noqa: E402
 EXAMPLE = "phase3_emit"
 MODES = ("single", "concurrent")
 EMIT_DOMAINS = ("emit", "output", "sourcemap", "sourcemap_record")
-ROW_FIELDS = {"version", "id", "acceptance_tier", "mode", "load", "reprint", *EMIT_DOMAINS}
+ROW_FIELDS = {"version", "id", "acceptance_tier", "mode", "load", "reprint", "compilations", *EMIT_DOMAINS}
+BASELINE_DOMAINS = EMIT_DOMAINS[1:]
+OUTPUT_KINDS = ("js", "dts", "maps")
+# The emit domains' failure classes: production refusals and errors
+# (executor.compiler_failure), panics, the pinned writer's assertion or
+# runtime fault on the Rust outputs, the DtsFileErrors renderer's own
+# coverage assertions, and harness defects.
+FAILURE_CLASSES = ("unsupported", "compiler_error", "checker_error", "config_parse", "panic", "assertion",
+                   "runtime", "error_baseline", "harness")
+# The compilations a row runs, in the pin's order: the first compilation,
+# then the `.js` baseline's declaration re-compilation and noCheck repeat.
+COMPILATIONS = ("first", "declaration", "repeat")
+DIAGNOSTIC_FIELDS = {"file_hex", "pos", "end", "code", "category", "key_hex", "text_hex", "args_hex", "chain",
+                     "related"}
 PRINT_STATES = ("printed", "refused", "failed")
 # A reprinted file: its name and source digest, the pin's `ScriptKind` and
 # `LanguageVariant` integers (the native row records the same two), and the
@@ -56,10 +82,12 @@ REPRINT_FILE_FIELDS = {"name_hex", "source_sha256", "script_kind", "language_var
 # What decides a Rust row: the production crates and the S08 executor
 # (p4.sources), the Phase 3 harness modules and the build configuration.
 # Requests and the native capture are bound by digest in capture.json.
-SOURCE_PATTERNS = ("tools/phase3/harness/**/*", "rust-toolchain.toml", ".cargo/**/*", "crates/**/*",
+SOURCE_PATTERNS = ("tools/phase3/harness/**/*", "tools/s08/p5/errors.rs", "tools/s08/p5/paths.rs",
+                   "rust-toolchain.toml", ".cargo/**/*", "crates/**/*",
                    "tools/**/Cargo.toml", "tools/s08/relater-prototype/**/*", "xtask/**/*", "tools/s03/**/*",
                    "scripts/generate_locale_tables.py")
-ADAPTER_SOURCES = ("tools/s08/p4", "tools/phase3/harness", "crates/tsr_compiler/examples/phase3_emit.rs")
+ADAPTER_SOURCES = ("tools/s08/p4", "tools/s08/p5/errors.rs", "tools/s08/p5/paths.rs", "tools/phase3/harness",
+                   "crates/tsr_compiler/examples/phase3_emit.rs")
 _ADAPTER_TEXT = None
 
 
@@ -95,16 +123,23 @@ def native_binding(native_dir, report):
 
 
 INPUT_GROUPS = ("ts_config_files", "to_be_compiled", "other_files")
+# The harness options the writers and the declaration re-compilation read.
+HARNESS_OPTIONS = ("CaptureSuggestions", "CurrentDirectory", "FullEmitPaths", "LibFiles")
 
 
 def build_request(row, native, loading, mode):
     """One Rust request: native inputs only. `error_inputs` are the runner's
     three input groups in its order, which the executor's config parse reads
     (the configuration's content mappers come from it); they equal the Phase 2
-    requests' `error_inputs`."""
+    requests' `error_inputs`. The inventory gives the configured name and
+    suite the baselines are named by; the native row the harness options the
+    writers read (`HARNESS_OPTIONS`), which the runner derives from the
+    configuration."""
     inputs = native["baseline_inputs"]
     return {"id": row["id"], "acceptance_tier": "executed", "loading": loading, "mode": mode,
-            "reprint": True, "emit": True, "output": row["output"], "baseline_inputs": inputs,
+            "reprint": True, "emit": True, "output": row["output"], "configured_name": row["configured_name"],
+            "suite": row["suite"], "harness_options": {key: native["harness_options"][key] for key in HARNESS_OPTIONS},
+            "baseline_inputs": inputs,
             "error_inputs": [item for group in INPUT_GROUPS for item in inputs[group]]}
 
 
@@ -203,13 +238,165 @@ def validate_reprint(request, row):
         validate_print(item["no_comments"])
 
 
+def _emit_failure(value, name):
+    """A failed emit domain: a closed class and a reason; a panic also names
+    its location (or null when the hook saw none)."""
+    if not isinstance(value, dict) or value.get("state") != "failed":
+        raise ValueError("malformed failure: " + name)
+    expected = {"state", "class", "reason"} | ({"location"} if value.get("class") == "panic" else set())
+    if (set(value) != expected or value["class"] not in FAILURE_CLASSES or not isinstance(value["reason"], str)
+            or not value["reason"]):
+        raise ValueError("malformed failure: " + name)
+    if value.get("location") is not None and not isinstance(value["location"], str):
+        raise ValueError("malformed failure location: " + name)
+
+
+def _hex(value, name):
+    if not isinstance(value, str) or len(value) % 2 or any(c not in "0123456789abcdef" for c in value):
+        raise ValueError("malformed hex: " + name)
+
+
+def _count(value, name):
+    if type(value) is not int or value < 0:
+        raise ValueError("malformed count: " + name)
+
+
+def validate_diagnostic(value):
+    """One diagnostic in the native oracle's `phase3Diagnostics` shape."""
+    if not isinstance(value, dict) or set(value) != DIAGNOSTIC_FIELDS:
+        raise ValueError("malformed emit diagnostic")
+    if value["file_hex"] is not None:
+        _hex(value["file_hex"], "diagnostic file")
+    for key in ("key_hex", "text_hex"):
+        _hex(value[key], "diagnostic " + key)
+    for key in ("pos", "end", "code", "category"):
+        if type(value[key]) is not int:
+            raise ValueError("malformed diagnostic " + key)
+    if not isinstance(value["args_hex"], list):
+        raise ValueError("malformed diagnostic arguments")
+    for argument in value["args_hex"]:
+        _hex(argument, "diagnostic argument")
+    for key in ("chain", "related"):
+        if not isinstance(value[key], list):
+            raise ValueError("malformed diagnostic " + key)
+        for item in value[key]:
+            validate_diagnostic(item)
+
+
+def validate_outputs(value):
+    """The harness's outputs by kind, in `newCompilationResult` order: name,
+    digest and size, each name once."""
+    if not isinstance(value, dict) or set(value) != set(OUTPUT_KINDS):
+        raise ValueError("malformed emit outputs")
+    for kind in OUTPUT_KINDS:
+        names = set()
+        if not isinstance(value[kind], list):
+            raise ValueError("malformed emit outputs")
+        for item in value[kind]:
+            if not isinstance(item, dict) or set(item) != {"name_hex", "sha256", "bytes"}:
+                raise ValueError("malformed emitted file")
+            _hex(item["name_hex"], "output name")
+            _digest_text(item["sha256"], "output")
+            _count(item["bytes"], "output size")
+            if item["name_hex"] in names:
+                raise ValueError("an output is listed twice")
+            names.add(item["name_hex"])
+
+
+def validate_emit_result(value):
+    if set(value) != {"state", "result", "pre_diagnostics", "post_diagnostics", "diagnostics", "outputs"}:
+        raise ValueError("malformed executed emit")
+    for key in ("pre_diagnostics", "post_diagnostics", "diagnostics"):
+        _count(value[key], key)
+    pre, post = value["pre_diagnostics"], value["post_diagnostics"]
+    # compileFilesWithHost: the post-emit set, or the shorter set and the
+    # count-mismatch diagnostic.
+    if value["diagnostics"] != (post if pre == post else min(pre, post) + 1):
+        raise ValueError("the diagnostic count is not the harness's for its pre- and post-emit counts")
+    result = value["result"]
+    if result is not None:
+        if (not isinstance(result, dict) or set(result) != {"emit_skipped", "emitted_files_hex", "diagnostics",
+                                                             "source_maps"}
+                or type(result["emit_skipped"]) is not bool or not isinstance(result["emitted_files_hex"], list)
+                or not isinstance(result["diagnostics"], list)):
+            raise ValueError("malformed emit result")
+        _count(result["source_maps"], "source maps")
+        for name in result["emitted_files_hex"]:
+            _hex(name, "emitted file")
+        for item in result["diagnostics"]:
+            validate_diagnostic(item)
+    validate_outputs(value["outputs"])
+
+
+def validate_compilations(request, row):
+    """The compilations the row ran, in the pin's order: the first one (with
+    the emit's counts), then at most a declaration re-compilation and a
+    repeat, which only the `output` sub-test runs."""
+    value = row["compilations"]
+    if not isinstance(value, list):
+        raise ValueError("malformed compilations")
+    if row["emit"].get("state") != "executed":
+        if value:
+            raise ValueError("compilations recorded without an executed emit")
+        return
+    names = []
+    for item in value:
+        if (not isinstance(item, dict) or set(item) != {"compilation", "pre_diagnostics", "post_diagnostics"}
+                or item["compilation"] not in COMPILATIONS):
+            raise ValueError("malformed compilation")
+        _count(item["pre_diagnostics"], "compilation pre-emit count")
+        _count(item["post_diagnostics"], "compilation post-emit count")
+        names.append(item["compilation"])
+    if not names or names[0] != "first" or len(set(names)) != len(names) or names != sorted(names, key=COMPILATIONS.index):
+        raise ValueError("compilations out of the pin's order")
+    first = value[0]
+    if (first["pre_diagnostics"], first["post_diagnostics"]) != (row["emit"]["pre_diagnostics"],
+                                                                 row["emit"]["post_diagnostics"]):
+        raise ValueError("the first compilation's counts differ from the emit's")
+    if len(names) > 1 and request["output"]["state"] == "disabled":
+        raise ValueError("a disabled output sub-test ran its compilations")
+
+
+def validate_baseline(request, name, value):
+    """One composed baseline: content (name, digest, size), `<no content>`
+    (name), not baselined (only the `.js.map` writer calls no baseline.Run)
+    or a failure."""
+    state = value.get("state")
+    if state == "failed":
+        _emit_failure(value, name)
+        return
+    if state == "not_baselined":
+        if value != {"state": "not_baselined"} or name != "sourcemap":
+            raise ValueError("only the sourcemap sub-test composes no baseline: " + name)
+        return
+    if state == "content":
+        if set(value) != {"state", "name", "sha256", "bytes"}:
+            raise ValueError("malformed composed baseline: " + name)
+        _digest_text(value["sha256"], name)
+        _count(value["bytes"], name)
+    elif state == "no_content":
+        if set(value) != {"state", "name"}:
+            raise ValueError("malformed composed baseline: " + name)
+    else:
+        raise ValueError(f"unknown {name} state")
+    if not isinstance(value["name"], str) or not value["name"].startswith(request["suite"] + "/"):
+        raise ValueError("a baseline outside the request's suite: " + name)
+
+
 def validate_emit(request, row):
     if request.get("emit") is not True:
-        if any(row[name] != {"state": "not_requested"} for name in EMIT_DOMAINS):
+        if any(row[name] != {"state": "not_requested"} for name in EMIT_DOMAINS) or row["compilations"] != []:
             raise ValueError("unrequested emit domain was observed")
         return
     output = request["output"]
-    for name in EMIT_DOMAINS:
+    emit = row["emit"]
+    if not isinstance(emit, dict):
+        raise ValueError("emit domain is not an object")
+    if emit.get("state") == "executed":
+        validate_emit_result(emit)
+    else:
+        _emit_failure(emit, "emit")
+    for name in BASELINE_DOMAINS:
         value = row[name]
         if name == "output" and output["state"] == "disabled":
             if value != {"state": "disabled", "reason": output["reason"]}:
@@ -219,8 +406,14 @@ def validate_emit(request, row):
             raise ValueError("emit domain is not an object: " + name)
         if value.get("state") == "disabled":
             raise ValueError("Rust disabled a sub-test the runner runs: " + name)
-        # Until T8 every emit domain is a named failure; T8 adds the executed shapes.
-        _failure(value, name)
+        if emit["state"] != "executed":
+            # Without the first compilation no writer runs: each sub-test
+            # carries the compilation's failure.
+            if value != emit:
+                raise ValueError("a sub-test without a compilation differs from its failure: " + name)
+            continue
+        validate_baseline(request, name, value)
+    validate_compilations(request, row)
 
 
 def validate_row(request, row):
@@ -269,6 +462,20 @@ def adapter_literal(reason):
     return bool(reason) and f'"{reason}"' in _ADAPTER_TEXT
 
 
+def failure_problem(value, name):
+    """A harness defect behind one failed emit domain: a harness-class failure,
+    or a panic outside the production crates."""
+    if not isinstance(value, dict) or value.get("state") != "failed":
+        return None
+    if value.get("class") == "harness":
+        return f"harness failure in {name}: {value['reason']}"
+    if value.get("class") == "panic":
+        location = value.get("location") or ""
+        if not location.startswith("crates/") or "/examples/" in location:
+            return f"{name} panic at {location or 'unknown location'}"
+    return None
+
+
 def completed_problems(row):
     """Harness defects hidden inside a completed row."""
     problems = []
@@ -282,6 +489,15 @@ def completed_problems(row):
                 location = value.get("location") or ""
                 if not location.startswith("crates/") or "/examples/" in location:
                     problems.append(f"reprint panic at {location or 'unknown location'}")
+    emit_failure = failure_problem(row.get("emit"), "emit")
+    if emit_failure:
+        problems.append(emit_failure)
+    for name in BASELINE_DOMAINS:
+        # A sub-test that carries the compilation's failure is that one defect.
+        if row.get(name) != row.get("emit"):
+            problem = failure_problem(row.get(name), name)
+            if problem:
+                problems.append(problem)
     return problems
 
 
@@ -403,6 +619,7 @@ def replay(output, *, write=True, capture=None):
     metadata, request_rows, rows, stderrs = capture or load_capture(output)
     harness, attributed = [], []
     reprint_states = Counter()
+    emit_states = {name: Counter() for name in EMIT_DOMAINS}
     for request, row, stderr in zip(request_rows, rows, stderrs, strict=True):
         if "fatal" in row:
             owner, reason = attribute(row, stderr.read_bytes())
@@ -415,11 +632,15 @@ def replay(output, *, write=True, capture=None):
         for item in row["reprint"].get("files", []):
             for key in ("comments", "no_comments"):
                 reprint_states[f"{key}:{item[key]['state']}"] += 1
+        for name in EMIT_DOMAINS:
+            value = row[name]
+            emit_states[name][value["state"] + (":" + value["class"] if value["state"] == "failed" else "")] += 1
     states = Counter("fatal:" + row["fatal"]["class"] if "fatal" in row else "completed" for row in rows)
     loads = Counter(row["load"]["state"] for row in rows if "fatal" not in row)
     selected = phase2_corpus.capture_selection(metadata)
     summary = {"requested": len(request_rows), "observed": len(rows), "states": dict(sorted(states.items())),
                "loads": dict(sorted(loads.items())), "reprint_files": dict(sorted(reprint_states.items())),
+               "emit_domains": {name: dict(sorted(emit_states[name].items())) for name in EMIT_DOMAINS},
                "harness_errors": len(harness), "production_failures": len(attributed),
                "partial": selected != phase2_corpus.selection(), "mode": metadata["mode"]}
     result = {"version": 1, "summary": summary, "harness_errors": harness, "production_failures": attributed,
