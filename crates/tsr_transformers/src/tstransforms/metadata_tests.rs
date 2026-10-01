@@ -99,13 +99,13 @@ impl EmitResolver for Kinds {
     ) -> ResolverResult<Option<Vec<JsString>>> {
         unreachable!()
     }
-    fn get_referenced_export_container_of_name(
+    fn treat_as_parse_tree_identifier(
         &mut self,
+        _: NodeId,
         _: &[u8],
         _: Option<NodeId>,
-        _: bool,
-    ) -> ResolverResult<Option<NodeId>> {
-        unreachable!()
+    ) -> ResolverResult<()> {
+        Ok(())
     }
     fn set_referenced_import_declaration(&mut self, _: NodeId, _: NodeId) -> ResolverResult<()> {
         unreachable!()

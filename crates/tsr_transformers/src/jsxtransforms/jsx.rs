@@ -1270,16 +1270,17 @@ impl JsxTransformer<'_> {
         // If the identifier refers to an exported member of a namespace, substitute with
         // a qualified namespace property access (e.g., `React` -> `M.React`).
         // See also: RuntimeSyntaxTransformer.visitExpressionIdentifier in runtimesyntax.go
-        // The resolver cannot read this factory's node: it resolves an
-        // identifier of its own with the same name and parse-tree parent.
+        // The resolver cannot read this factory's node: it is told what the
+        // node stands for.
+        let declared = self
+            .emit_resolver
+            .borrow_mut()
+            .treat_as_parse_tree_identifier(react, react_namespace, parse_parent);
+        self.failure.ok(declared);
         let container = self
             .emit_resolver
             .borrow_mut()
-            .get_referenced_export_container_of_name(
-                react_namespace,
-                parse_parent,
-                false, /*prefixLocals*/
-            );
+            .get_referenced_export_container(react, false /*prefixLocals*/);
         if let Some(container) = self.failure.ok(container).flatten() {
             if kind(visitor.factory(), container) == K::ModuleDeclaration {
                 let container_name = self

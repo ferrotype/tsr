@@ -539,14 +539,25 @@ fn answer<T>(result: Result<T, Error>) -> ResolverResult<T> {
 
 impl Operation<'_> {
     /// Whether `node` belongs to storage this checker does not retain: a node
-    /// of a transform's factory, which is never a parse-tree node. Upstream's
-    /// `!ast.IsParseTreeNode(node)` guards answer for it; the checker cannot
-    /// read it.
+    /// of a transform's factory. Unless the transform declared it a
+    /// parse-tree identifier, upstream's `!ast.IsParseTreeNode(node)` guards
+    /// answer for it; the checker cannot read it.
     fn is_transform_node(&self, node: NodeId) -> bool {
         matches!(
             self.state().node(node),
             Err(Error::Arena(tsr_arena::Error::WrongOwner))
         )
+    }
+
+    /// The node a reference query about `node` reads: `node` itself, the
+    /// stand-in of a transform's identifier declared a parse-tree identifier,
+    /// or nothing for any other node of a transform.
+    fn reference_node(&self, node: NodeId) -> Option<NodeId> {
+        if self.is_transform_node(node) {
+            self.state().emit.parse_tree_stand_ins.get(&node).copied()
+        } else {
+            Some(node)
+        }
     }
 }
 
@@ -557,33 +568,33 @@ impl ReferenceResolver for Operation<'_> {
         node: NodeId,
         prefix_locals: bool,
     ) -> ResolverResult<Option<NodeId>> {
-        if self.is_transform_node(node) {
+        let Some(node) = self.reference_node(node) else {
             return Ok(None);
-        }
+        };
         answer(self.referenced_export_container(node, prefix_locals))
     }
     fn get_referenced_import_declaration(
         &mut self,
         node: NodeId,
     ) -> ResolverResult<Option<NodeId>> {
-        if self.is_transform_node(node) {
+        let Some(node) = self.reference_node(node) else {
             return Ok(self.state().emit.import_refs.get(&node).copied());
-        }
+        };
         answer(self.referenced_import_declaration(node))
     }
     fn get_referenced_value_declaration(&mut self, node: NodeId) -> ResolverResult<Option<NodeId>> {
-        if self.is_transform_node(node) {
+        let Some(node) = self.reference_node(node) else {
             return Ok(None);
-        }
+        };
         answer(self.referenced_value_declaration(node))
     }
     fn get_referenced_value_declarations(
         &mut self,
         node: NodeId,
     ) -> ResolverResult<Option<Vec<NodeId>>> {
-        if self.is_transform_node(node) {
+        let Some(node) = self.reference_node(node) else {
             return Ok(None);
-        }
+        };
         answer(self.referenced_value_declarations(node))
     }
     fn get_element_access_expression_name(
@@ -686,16 +697,16 @@ impl EmitResolver for Operation<'_> {
                 }),
         )
     }
-    fn get_referenced_export_container_of_name(
+    fn treat_as_parse_tree_identifier(
         &mut self,
+        node: NodeId,
         name: &[u8],
         parent: Option<NodeId>,
-        prefix_locals: bool,
-    ) -> ResolverResult<Option<NodeId>> {
-        answer(self.state_mut().emit_referenced_export_container_of_name(
+    ) -> ResolverResult<()> {
+        answer(self.state_mut().emit_parse_tree_stand_in(
+            node,
             tsr_ast::JsString::from_bytes(name),
             parent,
-            prefix_locals,
         ))
     }
     fn set_referenced_import_declaration(

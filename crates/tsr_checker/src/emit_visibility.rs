@@ -11,6 +11,10 @@ pub(crate) struct EmitState {
     pub(crate) aliases_marked: LinkStore<NodeId, bool>,
     /// `jsxLinks.importRef`: the import a transformed JSX reference points at.
     pub(crate) import_refs: crate::types::Map<NodeId, NodeId>,
+    /// For an identifier of a transform's factory that upstream's resolver
+    /// takes for a parse-tree node, the identifier of this checker's factory
+    /// that stands in for it: same name, same parse-tree parent.
+    pub(crate) parse_tree_stand_ins: crate::types::Map<NodeId, NodeId>,
 }
 
 impl CheckerState {

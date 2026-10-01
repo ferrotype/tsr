@@ -658,6 +658,18 @@ impl<'a> MetadataSerializer<'a> {
                     .current_lexical_scope
                     .and_then(|scope| self.ec.parse_node(f, scope));
                 f.set_node_parent(name, parent);
+                // The clone has the flags of `node`: without `Synthesized`
+                // it is a parse-tree node to the resolver, which cannot read
+                // it and is told what it stands for.
+                let (flags, text) = {
+                    let view = view(f)?;
+                    (view.node(name)?.flags(), text(view, name)?)
+                };
+                if flags & node_flags::SYNTHESIZED == 0 {
+                    self.resolver
+                        .borrow_mut()
+                        .treat_as_parse_tree_identifier(name, &text, parent)?;
+                }
                 Ok(Some(name))
             }
             Some(K::QualifiedName) => self
