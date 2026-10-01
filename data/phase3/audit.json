@@ -1,5 +1,5 @@
 {
- "complete": false,
+ "complete": true,
  "files": {
   "tsc/internal/compiler/emitHost.go": {
    "counts": {
@@ -12628,35 +12628,40 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending_c3": 5,
+    "mapped": 5,
+    "pending_c3": 0,
     "total": 5
    },
    "functions": {
     "tsc/internal/transpile/fs.go:transpileFS.DirectoryExists": {
-     "owner": "C3",
-     "reason": "Unit C3 ports the transpile package concurrently; crate tsr_transpile is not on this branch.",
-     "status": "pending_c3"
+     "rust": [
+      "crates/tsr_transpile/src/fs.rs:71"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/transpile/fs.go:transpileFS.FileExists": {
-     "owner": "C3",
-     "reason": "Unit C3 ports the transpile package concurrently; crate tsr_transpile is not on this branch.",
-     "status": "pending_c3"
+     "rust": [
+      "crates/tsr_transpile/src/fs.rs:56"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/transpile/fs.go:transpileFS.ReadFile": {
-     "owner": "C3",
-     "reason": "Unit C3 ports the transpile package concurrently; crate tsr_transpile is not on this branch.",
-     "status": "pending_c3"
+     "rust": [
+      "crates/tsr_transpile/src/fs.rs:63"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/transpile/fs.go:transpileFS.Realpath": {
-     "owner": "C3",
-     "reason": "Unit C3 ports the transpile package concurrently; crate tsr_transpile is not on this branch.",
-     "status": "pending_c3"
+     "rust": [
+      "crates/tsr_transpile/src/fs.rs:79"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/transpile/fs.go:transpileFS.UseCaseSensitiveFileNames": {
-     "owner": "C3",
-     "reason": "Unit C3 ports the transpile package concurrently; crate tsr_transpile is not on this branch.",
-     "status": "pending_c3"
+     "rust": [
+      "crates/tsr_transpile/src/fs.rs:47"
+     ],
+     "status": "mapped"
     }
    },
    "group": "T8"
@@ -12667,25 +12672,28 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending_c3": 3,
+    "mapped": 3,
+    "pending_c3": 0,
     "total": 3
    },
    "functions": {
     "tsc/internal/transpile/transpile.go:TranspileDeclaration": {
-     "owner": "C3",
-     "reason": "Unit C3 ports the transpile package concurrently; crate tsr_transpile is not on this branch.",
-     "status": "pending_c3"
+     "rust": [
+      "crates/tsr_transpile/src/lib.rs:139"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/transpile/transpile.go:TranspileModule": {
-     "owner": "C3",
-     "reason": "Unit C3 ports the transpile package concurrently; crate tsr_transpile is not on this branch.",
-     "status": "pending_c3"
+     "rust": [
+      "crates/tsr_transpile/src/lib.rs:113"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/transpile/transpile.go:transpileWorker": {
-     "owner": "C3",
-     "reason": "Unit C3 ports the transpile package concurrently; crate tsr_transpile is not on this branch.",
-     "status": "pending_c3"
+     "rust": [
+      "crates/tsr_transpile/src/lib.rs:155"
+     ],
+     "status": "mapped"
     }
    },
    "group": "T8"
@@ -12863,8 +12871,8 @@
     "equivalent": 3,
     "gap": 0,
     "later": 0,
-    "mapped": 79,
-    "pending_c3": 8,
+    "mapped": 87,
+    "pending_c3": 0,
     "total": 90
    },
    "files": [
@@ -12909,8 +12917,8 @@
   "equivalent": 14,
   "gap": 0,
   "later": 0,
-  "mapped": 1920,
-  "pending_c3": 8,
+  "mapped": 1928,
+  "pending_c3": 0,
   "total": 1942
  },
  "unknown_markers": {},
