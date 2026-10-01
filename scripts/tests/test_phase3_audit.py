@@ -32,10 +32,10 @@ class Audit(unittest.TestCase):
         self.assertEqual(self.document["problems"], [])
         self.assertEqual(audit.AUDIT.read_text(), audit.render(self.document))
         self.assertEqual(audit.check(), [])
-        # The transpile package is pending until unit C3 lands, so T8's
-        # closure check still fails.
-        self.assertFalse(self.document["complete"])
-        self.assertTrue(audit.check(complete=True))
+        # Every function in scope is mapped or equivalent: T8's closure check
+        # passes.
+        self.assertTrue(self.document["complete"])
+        self.assertEqual(audit.check(complete=True), [])
 
     def test_the_scope_is_the_ledger_phase_3_files_the_moved_files_and_the_emit_family(self):
         ledger = tomllib.loads((ROOT / "PORTS.toml").read_text())
