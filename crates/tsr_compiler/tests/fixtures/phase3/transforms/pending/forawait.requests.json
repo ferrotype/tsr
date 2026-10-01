@@ -1,0 +1,484 @@
+{
+  "cases": [
+    {
+      "id": "for-await-async-fn",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xs) {\n    for await (const x of xs) {\n        console.log(x);\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-call-expr",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f() {\n    for await (const x of g()) {\n        console.log(x);\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-non-block-body",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xs) {\n    for await (const x of xs) console.log(x);\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-expression-head",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nlet y;\nasync function f(xs) {\n    for await (y of xs) {\n        console.log(y);\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-property-head",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nconst o = { p: 0 };\nasync function f(xs) {\n    for await (o.p of xs) { }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-array-destructuring",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xs) {\n    for await (const [a, b = 1, ...c] of xs) {\n        console.log(a, b, c);\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-object-destructuring",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xs) {\n    for await (let { a, b: { c } } of xs) {\n        a = c;\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-var-head",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xs) {\n    for await (var x of xs) { }\n    return x;\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-break-continue-return",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xs) {\n    for await (const x of xs) {\n        if (x === 1) continue;\n        if (x === 2) break;\n        if (x === 3) return x;\n    }\n    return 0;\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-label",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xs) {\n    outer: for await (const x of xs) {\n        if (x) continue outer;\n        break outer;\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-nested-labels",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xs) {\n    a: b: for await (const x of xs) {\n        if (x) continue a;\n        break b;\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "label-non-for-await-in-async",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xs) {\n    lbl: for (const y of xs) {\n        for await (const x of y) { break lbl; }\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "label-block-in-async",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xs) {\n    lbl: {\n        for await (const x of xs) { break lbl; }\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "label-outside-async",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nlbl: {\n    var g = async function* () { yield 1; };\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "nested-for-await",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xss) {\n    for await (const xs of xss) {\n        for await (const x of xs) {\n            console.log(x);\n        }\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-in-while",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xs) {\n    while (true) {\n        for await (const x of xs) { }\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-in-do-for-forin",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xs, o) {\n    do {\n        for await (const x of xs) { }\n    } while (false);\n    for (let i = 0; i < 1; i++) {\n        for await (const x of xs) { }\n    }\n    for (const k in o) {\n        for await (const x of xs) { }\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-of-containing-for-await",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xss) {\n    for (const xs of xss) {\n        for await (const x of xs) { }\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-in-async-generator",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function* g(xs) {\n    for await (const x of xs) {\n        yield x;\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-declaration",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function* g() {\n    yield 1;\n    yield;\n    const v = await 2;\n    return v;\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-return-void",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function* g(a) {\n    if (a) return;\n    yield a;\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-yield-star",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function* g(xs) {\n    yield* xs;\n    const r = yield* [1, 2];\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-expression",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nconst g = async function* named(a, b) {\n    yield a + b;\n};\nconst h = async function* () { yield 1; };\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-default-params",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function* g(a, b = 1, c) {\n    yield a + b + c;\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-destructured-params",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function* g(a, { b }, [c], ...rest) {\n    yield a + b + c + rest.length;\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-rest-first",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function* g(...rest) {\n    yield rest;\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-export-and-args",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nexport async function* g() {\n    yield arguments.length;\n    yield this;\n}\nexport default async function* () { yield 0; }\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-method",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass C {\n    async *m(a) {\n        yield a;\n        await a;\n    }\n    static async *s() { yield* this.m(1); }\n}\nconst o = {\n    async *m() { yield 1; }\n};\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-method-super-property",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass B { m() { return 1; } get p() { return 2; } }\nclass C extends B {\n    async *m() {\n        yield super.m();\n        yield super.p;\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-method-super-element",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass B { m() { return 1; } }\nclass C extends B {\n    async *m(k) {\n        yield super[k];\n        yield super['m']();\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-method-super-assignment",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass B { }\nclass C extends B {\n    async *m(k) {\n        super.x = 1;\n        super[k] = 2;\n        super.y++;\n        --super.z;\n        yield super.x;\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-super-in-arrow-and-nested",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass B { m() { return 1; } }\nclass C extends B {\n    async *m() {\n        const f = () => super.m();\n        function inner() { return 1; }\n        const o = { get q() { return 1; } };\n        yield f();\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-method-for-await",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass C {\n    async m(xs) {\n        for await (const x of xs) { }\n    }\n    constructor(xs) {\n        const f = async () => { for await (const x of xs) { } };\n    }\n    get g() { return async function* () { yield 1; }; }\n    set s(v) { const f = async function* () { yield v; }; }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-arrow-for-await",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nconst f = async (xs) => {\n    for await (const x of xs) { }\n};\nconst h = async () => { for await (const x of []) { } };\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "await-in-nested-async-arrow",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function* g(p) {\n    const f = async () => await p;\n    yield await f();\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "sync-generator-yield-async-generator",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nfunction* g() {\n    yield async function* () { yield 1; };\n    yield 2;\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "return-in-sync-function",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nfunction f() {\n    return async function* () { yield 1; };\n}\nfunction h() { return; }\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "class-expression-async-generator",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nconst C = class {\n    async *[Symbol.asyncIterator]() { yield 1; }\n};\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-in-async-generator-labeled",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function* g(xs) {\n    l: for await (const x of xs) {\n        if (x) break l;\n        yield x;\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-identifier-shadowing",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(e, e_1) {\n    for await (const x of e) { }\n    for await (const y of e_1) { }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "top-level-for-await-module",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nexport {};\nfor await (const x of []) { console.log(x); }\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-object-method-super",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nconst o = {\n    async *m() {\n        yield super.toString();\n    }\n};\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "await-operand-async-generator",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(g) {\n    await g(async function* () { yield 1; });\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "sync-generator-method-with-async-generator",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass C {\n    *m() {\n        yield async function* () { yield 1; };\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-overload",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function* g(): AsyncGenerator<number>;\nasync function* g() {\n    yield 1;\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-in-for-of-in-async-generator",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function* g(xss) {\n    for (const xs of xss) {\n        for await (const x of xs) {\n            yield x;\n        }\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-labeled-continue-nested",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nasync function f(xss) {\n    outer: for await (const xs of xss) {\n        inner: for await (const x of xs) {\n            if (x) continue outer;\n            break inner;\n        }\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "async-generator-super-in-param-default",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass B { m() { return 1; } }\nclass C extends B {\n    async *m(a = super.m()) {\n        yield a;\n    }\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+ "cases": [
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "const a = 1;\r\nfunction f() { return a; }\r\nasync function g() { await a; }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "plain-no-facts",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742061203d20313b0a66756e6374696f6e20662829207b2072657475726e20613b207d0a6173796e632066756e6374696f6e20672829207b20617761697420613b207d0a"
+    },
+    "id": "plain-no-facts",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nconst a = 1;\nfunction f() { return a; }\nasync function g() { await a; }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "function* g() {\r\n    yield 1;\r\n    yield* [2];\r\n}\r\nasync function f(xs) {\r\n    for (const x of xs)\r\n        await x;\r\n    l: while (false) {\r\n        break l;\r\n    }\r\n    return;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "no-facts-generators-and-loops",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e2a20672829207b0a202020207969656c6420313b0a202020207969656c642a205b325d3b0a7d0a6173796e632066756e6374696f6e206628787329207b0a20202020666f722028636f6e73742078206f662078732920617761697420783b0a202020206c3a207768696c65202866616c736529207b20627265616b206c3b207d0a2020202072657475726e3b0a7d0a"
+    },
+    "id": "no-facts-generators-and-loops",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nfunction* g() {\n    yield 1;\n    yield* [2];\n}\nasync function f(xs) {\n    for (const x of xs) await x;\n    l: while (false) { break l; }\n    return;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "forawait"
+       ],
+       "text": "class C {\r\n    async m() { await 0; }\r\n    *n() { yield this; }\r\n    get p() { return 1; }\r\n    constructor() { }\r\n}\r\nconst h = async () => { await 1; };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "no-facts-classes",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020206173796e63206d2829207b20617761697420303b207d0a202020202a6e2829207b207969656c6420746869733b207d0a2020202067657420702829207b2072657475726e20313b207d0a20202020636f6e7374727563746f722829207b207d0a7d0a636f6e73742068203d206173796e63202829203d3e207b20617761697420313b207d3b0a"
+    },
+    "id": "no-facts-classes",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nclass C {\n    async m() { await 0; }\n    *n() { yield this; }\n    get p() { return 1; }\n    constructor() { }\n}\nconst h = async () => { await 1; };\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

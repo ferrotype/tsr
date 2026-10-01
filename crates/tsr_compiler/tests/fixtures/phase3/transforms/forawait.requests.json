@@ -1,0 +1,34 @@
+{
+  "cases": [
+    {
+      "id": "plain-no-facts",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nconst a = 1;\nfunction f() { return a; }\nasync function g() { await a; }\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "no-facts-generators-and-loops",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nfunction* g() {\n    yield 1;\n    yield* [2];\n}\nasync function f(xs) {\n    for (const x of xs) await x;\n    l: while (false) { break l; }\n    return;\n}\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    },
+    {
+      "id": "no-facts-classes",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass C {\n    async m() { await 0; }\n    *n() { yield this; }\n    get p() { return 1; }\n    constructor() { }\n}\nconst h = async () => { await 1; };\n",
+      "chains": [
+        [
+          "forawait"
+        ]
+      ]
+    }
+  ]
+}
