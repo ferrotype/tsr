@@ -496,49 +496,7 @@ impl CheckerState {
                 Ok(target)
             }
             Some(K::ExportSpecifier) => {
-                let data = read
-                    .data_source()
-                    .as_export_specifier()
-                    .ok_or(tsr_arena::Error::InvalidGraph)?;
-                let name = data
-                    .property_name()
-                    .or(data.name())
-                    .ok_or(Error::MissingLink("export alias name"))?;
-                let type_only = data.is_type_only();
-                let parent = read
-                    .parent()
-                    .ok_or(Error::MissingLink("named export parent"))?;
-                let declaration = self
-                    .ast(parent)?
-                    .node(parent)?
-                    .parent()
-                    .ok_or(Error::MissingLink("export declaration"))?;
-                let declaration_read = self.node(declaration)?;
-                let declaration_data = declaration_read
-                    .data_source()
-                    .as_export_declaration()
-                    .ok_or(tsr_arena::Error::InvalidGraph)?;
-                if declaration_data.module_specifier().is_some() {
-                    return self.target_of_external_alias(node);
-                }
-                let declaration_type_only = declaration_data.is_type_only();
-                let target = if self.node(name)?.kind() == K::StringLiteral {
-                    None
-                } else {
-                    self.resolve_entity_name_ex(
-                        name,
-                        sf::VALUE | sf::TYPE | sf::NAMESPACE,
-                        false,
-                        true,
-                    )?
-                };
-                if type_only || declaration_type_only {
-                    let symbol = self
-                        .get_symbol_of_declaration(node)?
-                        .ok_or(Error::MissingLink("type-only export symbol"))?;
-                    self.module_aliases.type_only.entry(symbol).or_insert(node);
-                }
-                Ok(target)
+                self.target_of_export_specifier(node, sf::VALUE | sf::TYPE | sf::NAMESPACE, true)
             }
             Some(K::ExportAssignment) => {
                 if self.contained_by_namespace(node)? {
@@ -583,6 +541,63 @@ impl CheckerState {
                 "getTargetOfAliasDeclaration: external or CommonJS alias",
             )),
         }
+    }
+    /// `getTargetOfExportSpecifier`. `resolveEntityName` follows an alias only
+    /// while the symbol lacks `meaning`, so a caller whose meaning includes
+    /// `Alias` gets the local alias a name refers to, whatever
+    /// `dont_resolve_alias` says.
+    pub(crate) fn target_of_export_specifier(
+        &mut self,
+        node: NodeId,
+        meaning: tsr_ast::SymbolFlags,
+        dont_resolve_alias: bool,
+    ) -> Result<Option<SymbolId>, Error> {
+        let read = self.node(node)?;
+        let data = read
+            .data_source()
+            .as_export_specifier()
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
+        let name = data
+            .property_name()
+            .or(data.name())
+            .ok_or(Error::MissingLink("export alias name"))?;
+        let type_only = data.is_type_only();
+        let parent = read
+            .parent()
+            .ok_or(Error::MissingLink("named export parent"))?;
+        let declaration = self
+            .ast(parent)?
+            .node(parent)?
+            .parent()
+            .ok_or(Error::MissingLink("export declaration"))?;
+        let declaration_read = self.node(declaration)?;
+        let declaration_data = declaration_read
+            .data_source()
+            .as_export_declaration()
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
+        if declaration_data.module_specifier().is_some() {
+            return match self.target_of_external_alias(node)? {
+                Some(target)
+                    if !dont_resolve_alias && self.symbol(target)?.flags() & sf::ALIAS != 0 =>
+                {
+                    Ok(Some(self.resolve_alias(target)?))
+                }
+                target => Ok(target),
+            };
+        }
+        let declaration_type_only = declaration_data.is_type_only();
+        let target = if self.node(name)?.kind() == K::StringLiteral {
+            None
+        } else {
+            self.resolve_entity_name_ex(name, meaning, false, dont_resolve_alias)?
+        };
+        if type_only || declaration_type_only {
+            let symbol = self
+                .get_symbol_of_declaration(node)?
+                .ok_or(Error::MissingLink("type-only export symbol"))?;
+            self.module_aliases.type_only.entry(symbol).or_insert(node);
+        }
+        Ok(target)
     }
     // port: tsc/internal/checker/checker.go:Checker.getTypeOfAlias
     pub(crate) fn type_of_alias(&mut self, symbol: SymbolId) -> Result<TypeId, Error> {

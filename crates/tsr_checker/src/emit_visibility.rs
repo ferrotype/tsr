@@ -247,12 +247,9 @@ impl CheckerState {
             let name = self.node_text(node)?.into_js_string();
             self.resolve_name(Some(node), name.as_bytes(), meaning, None, false)?
         } else if self.node(parent)?.kind() == K::ExportSpecifier {
-            // The normal alias resolver also marks type-only aliases. Resolve its
-            // result here, because this native call requests dontResolveAlias=false.
-            match self.target_of_alias_declaration(parent)? {
-                Some(s) if self.symbol(s)?.flags() & sf::ALIAS != 0 => Some(self.resolve_alias(s)?),
-                other => other,
-            }
+            // The meaning includes Alias: the name of a local `export { x }`
+            // resolves to the import that declares `x`, which becomes visible.
+            self.target_of_export_specifier(parent, meaning, false)?
         } else {
             None
         };
