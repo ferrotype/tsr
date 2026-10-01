@@ -286,3 +286,15 @@ fn common_source_directory_prefers_root_dir_then_config_directory() {
         get_common_source_directory(&CompilerOptions::default(), Vec::new, b"/cwd", true, None);
     assert_eq!(directory, b"/cwd/");
 }
+
+// Derived from computeCommonSourceDirectoryOfFilenames: a file with no
+// directory component is not a mismatch at index 0; it truncates the common
+// path to nothing and the current directory is returned.
+#[test]
+fn computed_common_directory_of_a_bare_root_is_the_current_directory() {
+    use tsr_tsoptions::output_paths::computed_common;
+    assert_eq!(computed_common(&[text("/"), text("/a/b.ts")], b"/w", true), b"/w");
+    assert_eq!(computed_common(&[text("/a/b.ts"), text("/")], b"/w", true), b"/w");
+    assert_eq!(computed_common(&[text("/a/b.ts"), text("/c/d.ts")], b"/w", true), b"/");
+    assert_eq!(computed_common(&[text("/a/x/b.ts"), text("/a/d.ts")], b"/w", true), b"/a");
+}

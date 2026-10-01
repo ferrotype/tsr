@@ -101,10 +101,12 @@ impl Decode for RawSourceMap {
         "sourcemap.RawSourceMap"
     }
     /// json v2's struct decoding: case-sensitive member names, unknown members
-    /// skipped, and `null` leaving the destination as it is.
+    /// skipped, and `null` resetting the destination to its zero value
+    /// (`makeStructArshaler`: `va.SetZero()` without the legacy merge flag).
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), tsr_json::Error> {
         if input.peek_kind() == Kind::Null {
             input.read_token()?;
+            *self = Self::default();
             return Ok(());
         }
         input.object(|name, input| match name {

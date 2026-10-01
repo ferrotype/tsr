@@ -451,3 +451,16 @@ fn json_strings_are_escaped_and_invalid_utf8_repaired() {
         "{\"version\":3,\"file\":\"a\\\"b\u{fffd}c.js\",\"sourceRoot\":\"\",\"sources\":[],\"names\":[],\"mappings\":\"\"}".as_bytes()
     );
 }
+
+// json v2 resets a struct to its zero value on `null` (`makeStructArshaler`).
+#[test]
+fn decoding_null_resets_a_populated_map() {
+    let mut map = RawSourceMap {
+        version: 3,
+        file: js("a.js"),
+        mappings: js("AAAA"),
+        ..RawSourceMap::default()
+    };
+    tsr_json::unmarshal(b"null", &mut map, tsr_json::Options::default()).unwrap();
+    assert_eq!(map, RawSourceMap::default());
+}

@@ -400,17 +400,20 @@ pub fn computed_common(files: &[JsString], cwd: &[u8], case_sensitive: bool) -> 
         let mut components = path::normalized_components(file.as_bytes(), cwd);
         components.pop();
         if let Some(common) = &mut common {
-            let length = common
-                .iter()
-                .zip(&components)
-                .take_while(|(a, b)| {
-                    path::canonical(a, case_sensitive) == path::canonical(b, case_sensitive)
-                })
-                .count();
-            if length == 0 {
-                return Vec::new();
+            let mismatch = common.iter().zip(&components).position(|(a, b)| {
+                path::canonical(a, case_sensitive) != path::canonical(b, case_sensitive)
+            });
+            match mismatch {
+                // Failed to find any common path component
+                Some(0) => return Vec::new(),
+                // New common path found that is 0 -> i-1
+                Some(index) => common.truncate(index),
+                None => {}
             }
-            common.truncate(length);
+            // If the sourcePathComponents was shorter than the commonPathComponents, truncate to the sourcePathComponents
+            if components.len() < common.len() {
+                common.truncate(components.len());
+            }
         } else {
             common = Some(components);
         }
