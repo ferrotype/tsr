@@ -127,6 +127,14 @@ pub struct Compiled {
     pub diagnostics: Vec<tsr_ast::Diagnostic>,
 }
 
+/// Why the declaration program was not compiled: a harness defect, or the
+/// production loader's or checker's error (a refusal stays nameable).
+pub enum CompileError {
+    Harness(Failure),
+    Load(ts_compiler_error::Error),
+    Diagnostics(ts_compiler_error::Error),
+}
+
 /// `request` is the first compilation's request (`loading`, `error_inputs`,
 /// `mode`); `loading` the declaration program's [`loading_request`].
 pub fn compile(
@@ -136,8 +144,32 @@ pub fn compile(
     content_mapper_project: Option<Arc<dyn tsr_contentmapper::Project>>,
     cache: &mut FileCache,
 ) -> Result<Compiled, Failure> {
-    let input = |error: String| Failure::Input(error);
-    let parsed = config::parse(request).map_err(|error| input(format!("config parse: {error}")))?;
+    compile_checked(
+        request,
+        loading,
+        capture_suggestions,
+        content_mapper_project,
+        cache,
+    )
+    .map_err(|error| match error {
+        CompileError::Harness(failure) => failure,
+        CompileError::Load(error) => Failure::Input(format!("declaration program load: {error:?}")),
+        CompileError::Diagnostics(error) => {
+            Failure::Input(format!("declaration program diagnostics: {error:?}"))
+        }
+    })
+}
+
+/// [`compile`] with the production error kept.
+pub fn compile_checked(
+    request: &Value,
+    loading: &Value,
+    capture_suggestions: bool,
+    content_mapper_project: Option<Arc<dyn tsr_contentmapper::Project>>,
+    cache: &mut FileCache,
+) -> Result<Compiled, CompileError> {
+    let parsed = config::parse(request)
+        .map_err(|error| CompileError::Harness(Failure::Input(format!("config parse: {error}"))))?;
     let mut options: ProgramOptions = observation::program_options(loading, parsed);
     // compileDeclarationFiles passes the configuration file and its content
     // mappers, not the first parse's option errors.
@@ -154,21 +186,21 @@ pub fn compile(
         cache,
         &counters,
     )
-    .map_err(|error: ts_compiler_error::Error| {
-        input(format!("declaration program load: {error:?}"))
-    })?;
+    .map_err(CompileError::Load)?;
     let checked = CheckedProgram::new(Arc::new(program), &counters, None);
-    let diagnostics = harness_diagnostics(&checked, capture_suggestions)
-        .map_err(|error| input(format!("declaration program diagnostics: {error:?}")))?;
+    let diagnostics =
+        harness_diagnostics(&checked, capture_suggestions).map_err(CompileError::Diagnostics)?;
     Ok(Compiled {
         checked,
         diagnostics,
     })
 }
 
-/// The post-emit collection of `compileFilesWithHost`.
+/// The post-emit collection of `compileFilesWithHost`, sorted and
+/// deduplicated; the first compilation's pre- and post-emit programs are
+/// collected the same way.
 // source: tsc/internal/testutil/harnessutil/harnessutil.go:compileFilesWithHost
-fn harness_diagnostics(
+pub fn harness_diagnostics(
     checked: &CheckedProgram,
     capture_suggestions: bool,
 ) -> Result<Vec<tsr_ast::Diagnostic>, ts_compiler_error::Error> {
