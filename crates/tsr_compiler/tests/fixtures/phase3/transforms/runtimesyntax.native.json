@@ -3408,6 +3408,248 @@
    },
    "name": "probe.ts",
    "source": "namespace N {\n    var N_1 = 1;\n    export var x = N_1;\n    export namespace N { export var y = x; }\n}\nenum E { A, E = A }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.C = exports.E = exports.N = void 0;\r\nvar N;\r\n(function (N) {\r\n    N.x = 1;\r\n    function f() { return N.x; }\r\n    N.f = f;\r\n})(N || (exports.N = N = {}));\r\nvar E;\r\n(function (E) {\r\n    E[E[\"A\"] = 0] = \"A\";\r\n    E[E[\"B\"] = 0] = \"B\";\r\n})(E || (exports.E = E = {}));\r\nclass C {\r\n    a;\r\n    constructor(a) {\r\n        this.a = a;\r\n    }\r\n}\r\nexports.C = C;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "script-commonjs-exported-namespace-enum",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274206e616d657370616365204e207b206578706f7274207661722078203d20313b206578706f72742066756e6374696f6e20662829207b2072657475726e20783b207d207d0a6578706f727420656e756d2045207b20412c2042203d2041207d0a6578706f727420636c6173732043207b20636f6e7374727563746f72287075626c696320613a206e756d62657229207b7d207d0a"
+    },
+    "id": "script-commonjs-exported-namespace-enum",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\nexport namespace N { export var x = 1; export function f() { return x; } }\nexport enum E { A, B = A }\nexport class C { constructor(public a: number) {} }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.E = exports.N = void 0;\r\nvar N;\r\n(function (N) {\r\n    N.x = 1;\r\n})(N || (exports.N = N = {}));\r\n(function (N) {\r\n    N.y = N.x;\r\n})(N || (exports.N = N = {}));\r\nvar E;\r\n(function (E) {\r\n    E[E[\"A\"] = 0] = \"A\";\r\n})(E || (exports.E = E = {}));\r\n(function (E) {\r\n    E[E[\"B\"] = 2] = \"B\";\r\n})(E || (exports.E = E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "script-commonjs-merged-exported-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274206e616d657370616365204e207b206578706f7274207661722078203d20313b207d0a6578706f7274206e616d657370616365204e207b206578706f7274207661722079203d20783b207d0a6578706f727420656e756d2045207b2041207d0a6578706f727420656e756d2045207b2042203d2032207d0a"
+    },
+    "id": "script-commonjs-merged-exported-namespace",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\nexport namespace N { export var x = 1; }\nexport namespace N { export var y = x; }\nexport enum E { A }\nexport enum E { B = 2 }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "export var N;\r\n(function (N) {\r\n    N.a = 1;\r\n    let o = { a: N.a };\r\n})(N || (N = {}));\r\nvar E;\r\n(function (E) {\r\n    E[E[\"A\"] = 1] = \"A\";\r\n    E[E[\"B\"] = 2] = \"B\";\r\n})(E || (E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "script-esnext-target-es2015",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274206e616d657370616365204e207b206578706f727420636f6e73742061203d20313b206c6574206f203d207b2061207d3b207d0a656e756d2045207b2041203d20312c2042203d2041203c3c2031207d0a"
+    },
+    "id": "script-esnext-target-es2015",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @target: es2015\nexport namespace N { export const a = 1; let o = { a }; }\nenum E { A = 1, B = A << 1 }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.v = void 0;\r\nexports.v = 1;\r\n"
+      }
+     ],
+     "name": "/.src/m.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.y = exports.X = void 0;\r\nconst m = require(\"./m\");\r\nvar A;\r\n(function (A) {\r\n    A.x = m.v;\r\n})(A || (A = {}));\r\nexports.X = A;\r\nvar Y = A;\r\nexports.y = exports.X.x + Y.x;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "script-commonjs-import-equals",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/m.ts": "6578706f727420636f6e73742076203d20313b",
+     "/.src/probe.ts": "696d706f7274206d203d207265717569726528222e2f6d22293b0a6e616d6573706163652041207b206578706f7274207661722078203d206d2e763b207d0a6578706f727420696d706f72742058203d20413b0a696d706f72742059203d20413b0a6578706f7274206c65742079203d20582e78202b20592e783b0a"
+    },
+    "id": "script-commonjs-import-equals",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: m.ts\nexport const v = 1;\n// @filename: probe.ts\nimport m = require(\"./m\");\nnamespace A { export var x = m.v; }\nexport import X = A;\nimport Y = A;\nexport let y = X.x + Y.x;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.A = void 0;\r\nvar A;\r\n(function (A) {\r\n    var B;\r\n    (function (B) {\r\n        var C;\r\n        (function (C) {\r\n            C.x = 1;\r\n        })(C = B.C || (B.C = {}));\r\n    })(B = A.B || (A.B = {}));\r\n})(A || (exports.A = A = {}));\r\nvar Local;\r\n(function (Local) {\r\n    var Inner;\r\n    (function (Inner) {\r\n        Inner.k = 1 /* K.V */;\r\n    })(Inner = Local.Inner || (Local.Inner = {}));\r\n})(Local || (Local = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "script-commonjs-dotted-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274206e616d65737061636520412e422e43207b206578706f7274207661722078203d20313b207d0a6e616d657370616365204c6f63616c2e496e6e6572207b206578706f727420636f6e737420656e756d204b207b2056203d2031207d206578706f727420766172206b203d204b2e563b207d0a"
+    },
+    "id": "script-commonjs-dotted-namespace",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\nexport namespace A.B.C { export var x = 1; }\nnamespace Local.Inner { export const enum K { V = 1 } export var k = K.V; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.E = exports.N = void 0;\r\nvar N;\r\n(function (N) {\r\n    N.a = 1;\r\n})(N || (exports.N = N = {}));\r\nvar E;\r\n(function (E) {\r\n    E[E[\"A\"] = N.a] = \"A\";\r\n})(E || (exports.E = E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "script-isolated-modules",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274206e616d657370616365204e207b206578706f7274207661722061203d20313b207d0a6578706f727420656e756d2045207b2041203d204e2e61207d0a"
+    },
+    "id": "script-isolated-modules",
+    "options": {
+     "isolatedModules": true,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @isolatedModules: true\nexport namespace N { export var a = 1; }\nexport enum E { A = N.a }\n"
   }
  ],
  "go": "go1.27.1",

@@ -29,6 +29,56 @@
      "impliedmodule"
     ]
    ]
+  },
+  {
+   "id": "commonjs-module",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: probe.ts\nimport { a } from \"./a\";\nexport const b = a;\n// @filename: a.ts\nexport const a = 1;\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
+  },
+  {
+   "id": "node16-mts-cts",
+   "name": "probe.ts",
+   "source": "// @module: node16\n// @filename: a.mts\nexport const a = 1;\n// @filename: b.cts\nexport const b = 2;\n// @filename: c.ts\nexport const c = 3;\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
+  },
+  {
+   "id": "nodenext-package-type-module",
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: package.json\n{\"type\": \"module\"}\n// @filename: a.ts\nexport const a = 1;\n// @filename: b.cts\nimport x = require(\"./c.cjs\");\nexport = x;\n// @filename: c.cts\nexport = 1;\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
+  },
+  {
+   "id": "declaration-file",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: a.d.ts\nexport declare const a: number;\n// @filename: b.ts\nimport { a } from \"./a\";\nexport const b = a;\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
+  },
+  {
+   "id": "script-file",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\nvar x = 1;\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
   }
  ]
 }

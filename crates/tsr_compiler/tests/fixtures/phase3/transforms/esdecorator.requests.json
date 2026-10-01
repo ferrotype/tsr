@@ -1089,6 +1089,76 @@
      "esdecorator"
     ]
    ]
+  },
+  {
+   "id": "esdecorator-script-es2015",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { @dec m() {} @dec x = 1; @dec static accessor #y = 2; }\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-script-es2022",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends Base { @dec m() {} static a = super.x; @dec accessor b = 1; }\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-script-esnext-define",
+   "name": "probe.ts",
+   "source": "// @target: esnext\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { @dec accessor x = 1; @dec #m() {} }\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-script-esnext-no-define",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { @dec accessor x = 1; @dec #m() {} }\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-script-es2015-commonjs-default",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: commonjs\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nexport default @dec class { @dec static m() {} }\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-script-es2022-esm-export",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @module: esnext\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nexport @dec class C { @dec static x = 1; }\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-script-es2017-expression",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nconst C = @dec class { @dec async m() { await 1; } static { this.m; } };\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
   }
  ]
 }

@@ -5379,6 +5379,366 @@
    },
    "name": "main.mts",
    "source": "// @module: commonjs\n// @rewriteRelativeImportExtensions: true\n// @filename: main.mts\nconst m = \"./b.ts\";\nexport const p = import(\"./a.ts\", { with: { type: \"json\" } });\nexport const q = import(m, {});\nexport const r = import(\"pkg\");\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.E = void 0;\r\nvar E;\r\n(function (E) {\r\n    E[E[\"A\"] = 0] = \"A\";\r\n    E[E[\"B\"] = 1] = \"B\";\r\n})(E || (exports.E = E = {}));\r\nE.A;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "script-export-enum",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f727420656e756d2045207b20412c2042203d2041202b2031207d0a452e413b0a6578706f727420636f6e737420656e756d204b207b2058207d0a"
+    },
+    "id": "script-export-enum",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport enum E { A, B = A + 1 }\nE.A;\nexport const enum K { X }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.N = void 0;\r\nvar N;\r\n(function (N) {\r\n    N.v = 1;\r\n    function f() { return N.v; }\r\n    N.f = f;\r\n})(N || (exports.N = N = {}));\r\nN.f();\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "script-export-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274206e616d657370616365204e207b206578706f727420636f6e73742076203d20313b206578706f72742066756e6374696f6e20662829207b2072657475726e20763b207d207d0a4e2e6628293b0a"
+    },
+    "id": "script-export-namespace",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport namespace N { export const v = 1; export function f() { return v; } }\nN.f();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.m = exports.n = void 0;\r\nvar N;\r\n(function (N) {\r\n    N.v = 1;\r\n})(N || (N = {}));\r\nvar m = N.v;\r\nexports.m = m;\r\nexports.n = N.v;\r\nm + exports.n;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "script-import-equals-entity",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6e616d657370616365204e207b206578706f727420636f6e73742076203d20313b207d0a696d706f7274206d203d204e2e763b0a6578706f727420696d706f7274206e203d204e2e763b0a6578706f7274207b206d207d3b0a6d202b206e3b0a"
+    },
+    "id": "script-import-equals-entity",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nnamespace N { export const v = 1; }\nimport m = N.v;\nexport import n = N.v;\nexport { m };\nm + n;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nvar _C_p;\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.C = void 0;\r\nclass C {\r\n    constructor() {\r\n        _C_p.set(this, 2);\r\n    }\r\n}\r\nexports.C = C;\r\n_C_p = new WeakMap();\r\nC.s = 1;\r\nC.t = C.s;\r\nclass default_1 {\r\n}\r\ndefault_1.u = 3;\r\nexports.default = default_1;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "script-class-static-fields",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f727420636c6173732043207b207374617469632073203d20313b207374617469632074203d20432e733b202370203d20323b207d0a6578706f72742064656661756c7420636c617373207b207374617469632075203d20333b207d0a"
+    },
+    "id": "script-class-static-fields",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @target: es2015\n// @filename: main.ts\nexport class C { static s = 1; static t = C.s; #p = 2; }\nexport default class { static u = 3; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nvar __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.C = void 0;\r\nlet C = class C {\r\n    m() { }\r\n};\r\nexports.C = C;\r\nexports.C = C = __decorate([\r\n    dec\r\n], C);\r\nlet D = class D {\r\n};\r\nD = __decorate([\r\n    dec\r\n], D);\r\nexports.default = D;\r\nnew C();\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "script-legacy-decorated-class",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6465636c6172652066756e6374696f6e2064656328743a20616e79293a20616e793b0a40646563206578706f727420636c6173732043207b206d2829207b7d207d0a40646563206578706f72742064656661756c7420636c6173732044207b7d0a6e6577204328293b0a"
+    },
+    "id": "script-legacy-decorated-class",
+    "options": {
+     "experimentalDecorators": true,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @experimentalDecorators: true\n// @filename: main.ts\ndeclare function dec(t: any): any;\n@dec export class C { m() {} }\n@dec export default class D {}\nnew C();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nvar __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\nvar __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.C = void 0;\r\nlet C = (() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    var C = class {\r\n        static { _classThis = this; }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            C = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        static s = C;\r\n        static {\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return C = _classThis;\r\n})();\r\nexports.C = C;\r\nnew C();\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "script-es-decorated-class",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6465636c6172652066756e6374696f6e2064656328743a20616e792c20633a20616e79293a20616e793b0a40646563206578706f727420636c6173732043207b207374617469632073203d20433b207d0a6e6577204328293b0a"
+    },
+    "id": "script-es-decorated-class",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @target: es2022\n// @filename: main.ts\ndeclare function dec(t: any, c: any): any;\n@dec export class C { static s = C; }\nnew C();\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nvar __rest = (this && this.__rest) || function (s, e) {\r\n    var t = {};\r\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\r\n        t[p] = s[p];\r\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\r\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\r\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\r\n                t[p[i]] = s[p[i]];\r\n        }\r\n    return t;\r\n};\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.x = exports.rest = exports.a = void 0;\r\nconst o = { a: 1, b: 2 };\r\n({ a: exports.a } = o, exports.rest = __rest(o, [\"a\"]));\r\n({ a: exports.x } = o, exports.x = __rest(o, [\"a\"]));\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "script-object-rest-export",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "636f6e7374206f203d207b20613a20312c20623a2032207d3b0a6578706f727420636f6e7374207b20612c202e2e2e72657374207d203d206f3b0a6578706f7274206c657420783b0a287b20613a20782c202e2e2e78207d203d206f293b0a"
+    },
+    "id": "script-object-rest-export",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @target: es2017\n// @filename: main.ts\nconst o = { a: 1, b: 2 };\nexport const { a, ...rest } = o;\nexport let x;\n({ a: x, ...x } = o);\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.y = exports.x = void 0;\r\nexports.f = f;\r\nexports.x = 1;\r\nexports.y = 2;\r\nfunction f() { }\r\nexports.default = 3;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.K = exports.y = void 0;\r\nexports.f = f;\r\nconst a_1 = require(\"./a\");\r\nexports.y = a_1.x;\r\nfunction f() { return exports.y++; }\r\nclass K {\r\n    m() { return a_1.x; }\r\n}\r\nexports.K = K;\r\nfor (const v of [1]) {\r\n    exports.y += v;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "script-es2015-exports",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e73742078203d20313b0a6578706f727420636f6e73742079203d20323b0a6578706f72742066756e6374696f6e20662829207b7d0a6578706f72742064656661756c7420333b0a",
+     "/.src/main.ts": "696d706f7274207b2078207d2066726f6d20222e2f61223b0a6578706f7274206c65742079203d20783b0a6578706f72742066756e6374696f6e20662829207b2072657475726e20792b2b3b207d0a6578706f727420636c617373204b207b206d2829207b2072657475726e20783b207d207d0a666f722028636f6e73742076206f66205b315d29207b2079202b3d20763b207d"
+    },
+    "id": "script-es2015-exports",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @target: es2015\n// @filename: main.ts\nimport { x } from \"./a\";\nexport let y = x;\nexport function f() { return y++; }\nexport class K { m() { return x; } }\nfor (const v of [1]) { y += v; }\n// @filename: a.ts\nexport const x = 1;\nexport const y = 2;\nexport function f() {}\nexport default 3;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.C = void 0;\r\nexports.F = F;\r\nfunction F() { }\r\n(function (F) {\r\n    F.v = 1;\r\n})(F || (exports.F = F = {}));\r\nclass C {\r\n}\r\nexports.C = C;\r\n(function (C) {\r\n    C.w = 2;\r\n})(C || (exports.C = C = {}));\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "script-namespace-merged-export",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f72742066756e6374696f6e20462829207b7d0a6578706f7274206e616d6573706163652046207b206578706f727420636f6e73742076203d20313b207d0a6578706f727420636c6173732043207b7d0a6578706f7274206e616d6573706163652043207b206578706f727420636f6e73742077203d20323b207d0a"
+    },
+    "id": "script-namespace-merged-export",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nexport function F() {}\nexport namespace F { export const v = 1; }\nexport class C {}\nexport namespace C { export const w = 2; }\n"
   }
  ],
  "go": "go1.27.1",

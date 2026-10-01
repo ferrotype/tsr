@@ -519,6 +519,36 @@
      "impliedmodule"
     ]
    ]
+  },
+  {
+   "id": "implied-mixed-node16-mts-cts",
+   "name": "probe.ts",
+   "source": "// @module: node16\n// @filename: probe.mts\nimport x = require(\"./a.cjs\");\nexport default x;\n// @filename: a.cts\nexport = 1;\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
+  },
+  {
+   "id": "implied-mixed-nodenext-package-type-module",
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: package.json\n{\"type\": \"module\"}\n// @filename: probe.ts\nimport x = require(\"./a.cjs\");\nexport const y = x;\n// @filename: a.cts\nexport = 1;\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
+  },
+  {
+   "id": "implied-mixed-nodenext-cts-import-helpers",
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @importHelpers: true\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.mts\nexport function f(x: string) { return import(x); }\n// @filename: b.cts\nexport function g(x: string) { return import(x); }\n",
+   "chains": [
+    [
+     "impliedmodule"
+    ]
+   ]
   }
  ]
 }
