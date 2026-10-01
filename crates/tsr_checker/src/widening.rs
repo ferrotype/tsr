@@ -29,6 +29,18 @@ impl CheckerState {
         context: Option<usize>,
         contexts: &mut Vec<Context>,
     ) -> Result<TypeId, Error> {
+        // Widening recurses here once per nested object or array literal type.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.widened_type_with_context_worker(ty, context, contexts)
+        })
+    }
+
+    fn widened_type_with_context_worker(
+        &mut self,
+        ty: TypeId,
+        context: Option<usize>,
+        contexts: &mut Vec<Context>,
+    ) -> Result<TypeId, Error> {
         let record = *self.types.get(ty)?;
         if record.object_flags & of::REQUIRES_WIDENING == 0 {
             return Ok(ty);

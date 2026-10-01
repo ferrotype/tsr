@@ -340,6 +340,27 @@ impl CheckerState {
         dont_resolve_alias: bool,
         location: Option<NodeId>,
     ) -> Result<Option<SymbolId>, Error> {
+        // A qualified name or property-access chain resolves its left side
+        // here, once per link.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.resolve_entity_name_at_worker(
+                name,
+                meaning,
+                ignore_errors,
+                dont_resolve_alias,
+                location,
+            )
+        })
+    }
+
+    fn resolve_entity_name_at_worker(
+        &mut self,
+        name: NodeId,
+        meaning: SymbolFlags,
+        ignore_errors: bool,
+        dont_resolve_alias: bool,
+        location: Option<NodeId>,
+    ) -> Result<Option<SymbolId>, Error> {
         use tsr_ast::{internal_symbol_names as names, SyntaxKind as K};
         let read = self.node(name)?;
         // NodeIsMissing: a synthesized name has no position and is not missing.
