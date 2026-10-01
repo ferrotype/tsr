@@ -1,248 +1,207 @@
-use super::{transform::Transformer, util};
-use tsr_ast::{
-    node_flags as nf, Factory, FactoryMethods, JsString, NodeId, RuntimeFactory, SyntaxKind as K,
+//! The export-assignment transforms of `transform.go`.
+use super::{
+    transform::{Transformer, NIL},
+    util,
 };
-use tsr_printer::{
-    emit_resolver::DeclarationEmitResolver, generated_identifier_flags as gif, AutoGenerateOptions,
-};
+use tsr_ast::{node_flags as nf, FactoryMethods, JsString, NodeId, NodeListId, SyntaxKind as K};
+use tsr_printer::emit_resolver::DeclarationEmitResolver;
 
 impl<R: DeclarationEmitResolver> Transformer<'_, R> {
-    pub fn unique_name(&mut self, text: JsString) -> NodeId {
-        self.emit.new_unique_name_ex(
-            self.output,
-            text,
-            AutoGenerateOptions {
-                flags: gif::OPTIMISTIC,
-                ..Default::default()
-            },
-        )
-    }
-    pub fn syntax_list(&mut self, statements: Vec<NodeId>) -> NodeId {
-        let nodes = self
-            .output
-            .alloc_nodes(statements.into_iter().map(Some).collect());
-        self.output.new_syntax_list(nodes)
-    }
-    #[allow(
-        clippy::unnecessary_wraps,
-        reason = "Returns the optional modifier-list slot expected by all factory declaration constructors, including an allocated empty list"
-    )]
-    pub fn declare_modifiers(&mut self) -> Option<tsr_ast::NodeListId> {
-        let modifiers = if self.needs_declare {
-            vec![Some(self.output.new_token(K::DeclareKeyword.into()))]
-        } else {
-            Vec::new()
-        };
-        let nodes = self.output.alloc_nodes(modifiers);
-        Some(self.output.new_modifier_list(nodes))
-    }
-    pub fn const_variable(
-        &mut self,
-        name: NodeId,
-        ty: Option<NodeId>,
-        initializer: Option<NodeId>,
-    ) -> NodeId {
-        let declaration = self
-            .output
-            .new_variable_declaration(Some(name), None, ty, initializer);
-        let declarations = self.new_list(vec![declaration]);
-        let list = self
-            .output
-            .new_variable_declaration_list(Some(declarations), nf::CONST);
-        let modifiers = self.declare_modifiers();
-        self.output.new_variable_statement(modifiers, Some(list))
-    }
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.tryGetNameOfAssignedExpression
-    pub fn try_assigned_expression_name(
+    pub fn try_get_name_of_assigned_expression(
         &mut self,
-        expression: NodeId,
+        unwrapped: NodeId,
     ) -> Result<Option<NodeId>, R::Error> {
-        let name = if self.node(expression).kind() == K::Identifier {
-            Some(expression)
-        } else if self.node(expression).kind() != K::PropertyAccessExpression {
-            self.node(expression).name()
-        } else {
-            None
-        };
+        let mut name_text = JsString::default();
+        let name = self
+            .node(unwrapped)
+            .name()
+            .filter(|_| self.kind(unwrapped) != K::PropertyAccessExpression);
         if let Some(name) = name {
-            let text = self.output.view().node_text(name)?.into_js_string();
-            if !text.is_empty() && text.as_bytes() != b"default" {
-                return Ok(Some(
-                    if self
-                        .resolver
-                        .name_resolvable(self.enclosing, text.as_bytes())?
-                    {
-                        self.unique_name(text)
-                    } else {
-                        self.output.new_identifier(text)
-                    },
-                ));
+            name_text = self.node_text(name)?;
+        } else if self.kind(unwrapped) == K::Identifier {
+            name_text = self.node_text(unwrapped)?;
+        }
+        let mut name_node = None;
+        if !name_text.is_empty() && name_text.as_bytes() != b"default" {
+            if self
+                .resolver
+                .name_resolvable(self.enclosing_declaration, name_text.as_bytes())?
+            {
+                // create a unique name that shares the same text as its' base
+                name_node = Some(self.new_unique_name(name_text.as_bytes()));
+            } else {
+                // use the node's name as-is, since it's not otherwise in-scope
+                name_node = Some(self.output.new_identifier(name_text));
             }
         }
-        Ok(None)
+        Ok(name_node)
     }
-    fn assigned_expression_name(
+
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.getNameOfExportedAssignedExpression
+    fn get_name_of_exported_assigned_expression(
         &mut self,
-        expression: NodeId,
-        export_equals: bool,
+        unwrapped: NodeId,
+        is_export_equals: bool,
     ) -> Result<NodeId, R::Error> {
-        if let Some(name) = self.try_assigned_expression_name(expression)? {
-            return Ok(name);
-        }
-        let text = if export_equals && self.output.read_source_file(self.source)?.is_js() {
-            b"_exports".as_slice()
-        } else {
-            b"_default".as_slice()
+        let name_node = match self.try_get_name_of_assigned_expression(unwrapped)? {
+            Some(name_node) => name_node,
+            // fallback to a default name
+            None => {
+                if is_export_equals && self.is_source_file_js()? {
+                    // only JS files prefer to use `_exports` for export assignments - TS has always used `_default` for both `export=` and `export default`
+                    self.new_unique_name(b"_exports")
+                } else {
+                    self.new_unique_name(b"_default")
+                }
+            }
         };
-        Ok(self.unique_name(JsString::from_bytes(text)))
+        self.cjs_export_assignment_name = Some(name_node);
+        Ok(name_node)
     }
-    // OEKExpressionTypePassthrough retains assertions; only parentheses and
-    // assignment/comma results preserve the expression's inferred type here.
-    fn assigned_expression(&self, node: NodeId) -> Result<NodeId, R::Error> {
-        Ok(tsr_ast::utilities::skip_outer_expressions(
-            self.output.view(),
-            node,
-            tsr_ast::evaluator::outer_expression_kinds::EXPRESSION_TYPE_PASSTHROUGH,
-        )?)
-    }
+
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformExportAssignment
-    pub fn export_assignment(&mut self, node: NodeId) -> Result<NodeId, R::Error> {
-        let data = self
-            .node(node)
-            .data_source()
-            .as_export_assignment()
-            .unwrap()
-            .to_owned();
-        self.export_assignment_from(
-            node,
-            node,
-            Self::required(data.expression)?,
-            data.is_export_equals,
-        )
-    }
-    pub fn export_assignment_from(
+    pub fn transform_export_assignment(
         &mut self,
         input: NodeId,
-        node: NodeId,
+        assignment: NodeId,
         expression: NodeId,
         is_export_equals: bool,
     ) -> Result<NodeId, R::Error> {
-        let parent = self.node(input).parent().map(|p| self.node(p).kind());
-        if parent == Some(K::SourceFile.into()) {
-            self.external_indicator = true;
+        let parent_kind = self.parent_kind(input);
+        if parent_kind == K::SourceFile {
+            self.result_has_external_module_indicator = true;
         }
-        self.has_scope_marker = true;
-        if self.node(expression).kind() == K::Identifier
-            && matches!(
-                parent.and_then(tsr_ast::NodeKind::known),
-                Some(K::SourceFile | K::ModuleBlock)
-            )
+        self.result_has_scope_marker = true;
+        if self.kind(expression) == K::Identifier
+            && matches!(parent_kind, K::SourceFile | K::ModuleBlock)
         {
-            let result =
+            let export_assignment =
                 self.output
                     .new_export_assignment(None, is_export_equals, None, Some(expression));
-            self.emit.assign_comment_range(self.output, result, input);
-            return Ok(result);
+            self.preserve_js_doc(export_assignment, input);
+            return Ok(export_assignment);
         }
-        let unwrapped = self.assigned_expression(expression)?;
-        let name = self.assigned_expression_name(unwrapped, is_export_equals)?;
-        self.cjs.assignment_name = Some(name);
-        let declaration = if self.node(unwrapped).kind() == K::ClassExpression {
-            let modifiers = self.declare_modifiers();
-            self.class_expression_declaration(unwrapped, name, modifiers)?
-        } else if tsr_ast::utilities::is_function_like(Some(&self.node(unwrapped))) {
-            self.function_expression_declaration(unwrapped, name, self.node(node).type_node())?
-        } else {
-            let old = self.tracker.selector.clone();
-            self.tracker.selector = super::tracker::Selector::fixed(
-                super::diagnostics::SymbolAccessibilityDiagnostic {
-                    diagnostic_message:
-                        tsr_diagnostics::Default_export_of_the_module_has_or_is_using_private_name_0,
-                    error_node: Some(input),
-                    type_name: None,
-                },
-            );
-            self.tracker.fallback.push(Some(node));
-            let result: Result<NodeId, R::Error> = (|| {
-                let literal =
-                    util::unwrap_parenthesized_expression(self.output.view(), expression)?;
-                let initializer = if tsr_ast::utilities_tail::is_primitive_literal_value(
-                    self.output.view(),
-                    &self.node(literal),
-                    true,
-                )? {
-                    let result = self.resolver.create_literal_const_value(
-                        self.output,
-                        self.emit,
-                        node,
-                        &mut self.tracker,
-                    )?;
-                    self.flush_reports()?;
-                    result
-                } else {
-                    None
-                };
-                let ty = if initializer.is_none() {
-                    self.ensure_type(node, false)?
-                } else {
-                    None
-                };
-                Ok(self.const_variable(name, ty, initializer))
-            })();
-            self.tracker.fallback.pop();
-            self.tracker.selector = old;
-            let declaration = result?;
-            self.emit
-                .assign_comment_range(self.output, declaration, input);
-            let assignment =
+
+        // Check if the expression is a class expression - emit as a class declaration + export assignment
+        let unwrapped = tsr_ast::utilities::skip_outer_expressions(
+            self.view(),
+            expression,
+            tsr_ast::evaluator::outer_expression_kinds::EXPRESSION_TYPE_PASSTHROUGH,
+        )?;
+        let new_id = self.get_name_of_exported_assigned_expression(unwrapped, is_export_equals)?;
+        if self.kind(unwrapped) == K::ClassExpression {
+            let mods = self.declare_modifier_list(false);
+            let class_decl =
+                self.transform_class_expression_to_declaration(unwrapped, new_id, mods)?;
+            self.preserve_js_doc(class_decl, input);
+            // Reuse the same name node for the export so unique names resolve consistently
+            let export_assignment =
                 self.output
-                    .new_export_assignment(None, is_export_equals, None, Some(name));
-            return Ok(self.syntax_list(vec![declaration, assignment]));
-        };
-        self.emit
-            .assign_comment_range(self.output, declaration, input);
-        let assignment =
+                    .new_export_assignment(None, is_export_equals, None, Some(new_id));
+            self.remove_all_comments(export_assignment);
+            return Ok(self.new_syntax_list(vec![export_assignment, class_decl]));
+        } else if tsr_ast::utilities::is_function_like(Some(&self.node(unwrapped))) {
+            // Promote function or arrow function expressions to a function declaration
+            let mods = self.declare_modifier_list(false);
+            let full_signature_type = self.node(assignment).type_node();
+            let func_decl = self.transform_function_like_to_declaration(
+                unwrapped,
+                new_id,
+                mods,
+                full_signature_type,
+            )?;
+            self.preserve_js_doc(func_decl, input);
+            // Reuse the same name node for the export so unique names resolve consistently
+            let export_assignment =
+                self.output
+                    .new_export_assignment(None, is_export_equals, None, Some(new_id));
+            self.remove_all_comments(export_assignment);
+            return Ok(self.new_syntax_list(vec![export_assignment, func_decl]));
+        }
+
+        // expression is non-identifier, create _default typed variable to reference
+        self.set_fixed_diagnostic_context(
+            tsr_diagnostics::Default_export_of_the_module_has_or_is_using_private_name_0,
+            input,
+            None,
+        );
+        self.cjs_export_assignment_name = Some(new_id);
+        self.tracker.push_error_fallback_node(Some(assignment));
+        let mut type_ = None;
+        let mut initializer = None;
+        let literal = util::unwrap_parenthesized_expression(self.view(), expression)?;
+        if tsr_ast::utilities_tail::is_primitive_literal_value(
+            self.view(),
+            &self.node(literal),
+            true,
+        )? {
+            let parse_node = self.parse_node(assignment).expect(NIL);
+            initializer = self.resolver.create_literal_const_value(
+                self.output,
+                self.emit,
+                parse_node,
+                &mut self.tracker,
+            )?;
+            self.apply_tracker_reports()?;
+        }
+        if initializer.is_none() {
+            type_ = self.ensure_type(assignment, false)?;
+        }
+        let var_decl = self
+            .output
+            .new_variable_declaration(Some(new_id), None, type_, initializer);
+        self.tracker.pop_error_fallback_node();
+        let mod_list = self.declare_modifier_list(false);
+        let declarations = self.new_node_list(vec![var_decl]);
+        let declaration_list = self
+            .output
+            .new_variable_declaration_list(Some(declarations), nf::CONST);
+        let statement = self
+            .output
+            .new_variable_statement(mod_list, Some(declaration_list));
+        let export_assignment =
             self.output
-                .new_export_assignment(None, is_export_equals, None, Some(name));
-        self.emit
-            .add_emit_flags(assignment, tsr_printer::emit_flags::NO_COMMENTS);
-        Ok(self.syntax_list(vec![assignment, declaration]))
+                .new_export_assignment(None, is_export_equals, None, Some(new_id));
+        // Remove comments from the export declaration and copy them onto the synthetic _default declaration
+        self.preserve_js_doc(statement, input);
+        Ok(self.new_syntax_list(vec![statement, export_assignment]))
     }
+
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformFunctionLikeToDeclaration
-    fn function_expression_declaration(
+    fn transform_function_like_to_declaration(
         &mut self,
-        node: NodeId,
-        name: NodeId,
-        full: Option<NodeId>,
+        unwrapped: NodeId,
+        func_name: NodeId,
+        mods: Option<NodeListId>,
+        full_signature_type: Option<NodeId>,
     ) -> Result<NodeId, R::Error> {
-        let read = self.node(node);
-        let data = read.data_source();
-        let signature = match read.kind().known() {
-            Some(K::FunctionExpression) => data
-                .as_function_expression()
-                .and_then(|d| d.full_signature()),
-            Some(K::ArrowFunction) => data.as_arrow_function().and_then(|d| d.full_signature()),
-            _ => return Self::unsupported("declaration emit: exported function expression kind"),
+        let sig = self
+            .function_like_full_signature(unwrapped)
+            .expect(NIL)
+            .or(full_signature_type);
+        if sig.is_none() {
+            let (type_parameters, parameters) = {
+                let read = self.node(unwrapped);
+                (read.type_parameter_list(), read.parameter_list())
+            };
+            let type_parameters = self.ensure_type_params(unwrapped, type_parameters)?;
+            let parameters = self.update_param_list(unwrapped, parameters)?;
+            let ty = self.ensure_type(unwrapped, false)?;
+            let full_signature = self.visit_single(sig)?;
+            return Ok(self.output.new_function_declaration(
+                mods,
+                None,
+                Some(func_name),
+                type_parameters,
+                Some(parameters),
+                ty,
+                full_signature,
+                None,
+            ));
         }
-        .or(full);
-        drop(read);
-        if let Some(signature) = signature {
-            let ty = self.visit(Some(signature))?;
-            return Ok(self.const_variable(name, ty, None));
-        }
-        let modifiers = self.declare_modifiers();
-        let parameters = self.parameters(node)?;
-        let types = self.type_parameters(node)?;
-        let result = self.ensure_type(node, false)?;
-        Ok(self.output.new_function_declaration(
-            modifiers,
-            None,
-            Some(name),
-            types,
-            parameters,
-            result,
-            None,
-            None,
-        ))
+        // If a full signature type node is present, emit as a variable statement to reuse it
+        let ty = self.visit_single(sig)?;
+        Ok(self.new_single_variable_statement(mods, func_name, ty, None, nf::CONST))
     }
 }

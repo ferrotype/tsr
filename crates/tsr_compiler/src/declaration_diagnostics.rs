@@ -69,12 +69,21 @@ impl Program {
                 &counters,
                 emit.factory_hooks(),
             );
+            // The pin's getDeclarationDiagnostics names no declaration file.
             let options = DeclarationOptions {
                 isolated_declarations: self.options().isolated_declarations.is_true(),
                 strip_internal: self.options().strip_internal.is_true(),
+                declaration_file_path: tsr_jsstring::JsString::default(),
             };
-            let transformed =
-                transform_declarations(operation, &mut output, &mut emit, file.source(), options)?;
+            let host = crate::ProgramDeclarationHost::new(self);
+            let transformed = transform_declarations(
+                operation,
+                &host,
+                &mut output,
+                &mut emit,
+                file.source(),
+                &options,
+            )?;
             // Completion validates generated and retained graph edges even though
             // this query discards syntax after collecting its diagnostics.
             let _completed = output.complete(transformed.root)?;

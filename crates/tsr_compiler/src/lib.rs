@@ -16,6 +16,8 @@ pub use checker_pool::{
 mod checker_module_specifiers;
 mod content_mapped;
 mod declaration_diagnostics;
+mod declaration_host;
+pub use declaration_host::ProgramDeclarationHost;
 pub mod diagnostic_writer;
 pub mod emitter;
 mod include_reason;

@@ -145,6 +145,22 @@ pub(crate) fn output_names(
         paths.declaration_map_path().to_vec(),
     ])
 }
+/// `GetOutputPathsFor(file, options, host, force)` over the program, with the
+/// common source directory the caller computed.
+pub(crate) fn output_paths_for(
+    file: &ProgramFile,
+    program: &Program,
+    common: &[u8],
+    force: ForceEmitPaths,
+) -> Result<tsr_tsoptions::output_paths::OutputPaths, tsr_arena::Error> {
+    let source = file.bound().view().source_file()?;
+    Ok(get_output_paths_for(
+        &source,
+        program.options(),
+        &mut ProgramOutputPathsHost::new(program, common),
+        force,
+    ))
+}
 /// Unconditional workers used by import-map inversion, regardless of emit flags.
 pub(crate) fn module_specifier_output_name(
     file: &[u8],

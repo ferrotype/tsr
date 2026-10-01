@@ -1,900 +1,550 @@
+//! `visitDeclarationSubtree` and the `ensure*` helpers of `transform.go`
+//! that every member and signature transform shares.
 use super::{
-    transform::{Transformer, BUILDER_FLAGS, INTERNAL_FLAGS},
+    tracker::Selector,
+    transform::{
+        Transformer, DECLARATION_EMIT_INTERNAL_NODE_BUILDER_FLAGS,
+        DECLARATION_EMIT_NODE_BUILDER_FLAGS, NIL,
+    },
     util,
 };
 use tsr_ast::{
-    modifier_flags as mf, Factory, FactoryMethods, JsString, NodeId, NodeListId, RuntimeFactory,
-    SyntaxKind as K,
+    modifier_flags as mf, FactoryMethods, NodeId, NodeListId, RuntimeFactory, SyntaxKind as K,
 };
-use tsr_printer::emit_resolver::{
-    DeclarationEmitResolver, DeclarationSymbolTracker, DeclarationTrackerEvent,
-};
+use tsr_core::debug::{assert_never, Argument, Member};
+use tsr_printer::emit_resolver::DeclarationEmitResolver;
 
 impl<R: DeclarationEmitResolver> Transformer<'_, R> {
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.visitDeclarationSubtree
-    pub fn subtree(&mut self, node: NodeId) -> Result<Option<NodeId>, R::Error> {
-        if self.strip_internal(node)? || self.declaration_not_visible(node)? {
+    pub fn visit_declaration_subtree(&mut self, input: NodeId) -> Result<Option<NodeId>, R::Error> {
+        if self.should_strip_internal(Some(input))? {
             return Ok(None);
         }
-        let kind = self.node(node).kind().known();
-        if kind == Some(K::SemicolonClassElement) {
-            return Ok(None);
-        }
-        if tsr_ast::utilities::is_function_like(Some(&self.node(node)))
-            && self.resolver.implementation_of_overload(node)?
-        {
-            return Ok(None);
-        }
-        let dynamic = tsr_ast::has_dynamic_name(self.output.view(), Some(node))?;
-        if dynamic {
-            let name = Self::required(self.node(node).name())?;
-            let expression = Self::required(self.node(name).expression())?;
-            let entity = tsr_ast::is_entity_name_expression(self.output.view(), expression)?;
-            if self.options.isolated_declarations {
-                if !self
-                    .resolver
-                    .definitely_reference_to_global_symbol_object(expression)?
-                {
-                    let parent = Self::required(self.node(node).parent())?;
-                    if matches!(
-                        self.node(parent).kind().known(),
-                        Some(K::ClassDeclaration | K::ObjectLiteralExpression)
-                    ) {
-                        self.diagnostic(node, tsr_diagnostics::Computed_property_names_on_class_or_object_literals_cannot_be_inferred_with_isolatedDeclarations, vec![])?;
-                        return Ok(None);
-                    }
-                    if matches!(
-                        self.node(parent).kind().known(),
-                        Some(K::InterfaceDeclaration | K::TypeLiteral)
-                    ) && !entity
+        if tsr_ast::is_declaration(&self.node(input)) {
+            if util::is_declaration_and_not_visible(self, input)? {
+                return Ok(None);
+            }
+            if tsr_ast::has_dynamic_name(self.view(), Some(input))? {
+                let name_expression = self.node(self.node(input).name().expect(NIL)).expression();
+                if self.isolated_declarations {
+                    // Classes and object literals usually elide properties with computed names that are not of a literal type
+                    // In isolated declarations TSC needs to error on these as we don't know the type in a DTE.
+                    if !self
+                        .resolver
+                        .definitely_reference_to_global_symbol_object(name_expression.expect(NIL))?
                     {
-                        self.diagnostic(node, tsr_diagnostics::Computed_properties_must_be_number_or_string_literals_variables_or_dotted_expressions_with_isolatedDeclarations, vec![])?;
+                        let parent_kind = self.parent_kind(input);
+                        if matches!(
+                            parent_kind,
+                            K::ClassDeclaration | K::ObjectLiteralExpression
+                        ) {
+                            self.add_diagnostic_for_node(
+                                input,
+                                tsr_diagnostics::Computed_property_names_on_class_or_object_literals_cannot_be_inferred_with_isolatedDeclarations,
+                                vec![],
+                            )?;
+                            return Ok(None);
+                        } else if matches!(parent_kind, K::InterfaceDeclaration | K::TypeLiteral)
+                            && !tsr_ast::is_entity_name_expression(
+                                self.view(),
+                                name_expression.expect(NIL),
+                            )?
+                        {
+                            // Type declarations just need to double-check that the input computed name is an entity name expression
+                            self.add_diagnostic_for_node(
+                                input,
+                                tsr_diagnostics::Computed_properties_must_be_number_or_string_literals_variables_or_dotted_expressions_with_isolatedDeclarations,
+                                vec![],
+                            )?;
+                            return Ok(None);
+                        }
+                    }
+                } else {
+                    let parse_node = self.parse_node(input).expect(NIL);
+                    if !self.resolver.late_bound(parse_node)?
+                        || !tsr_ast::is_entity_name_expression(
+                            self.view(),
+                            name_expression.expect(NIL),
+                        )?
+                    {
                         return Ok(None);
                     }
                 }
-            } else if !self.resolver.late_bound(node)? || !entity {
+            }
+        }
+
+        // Elide implementation signatures from overload sets
+        if tsr_ast::utilities::is_function_like(Some(&self.node(input)))
+            && self.resolver.implementation_of_overload(input)?
+        {
+            return Ok(None);
+        }
+
+        if self.kind(input) == K::SemicolonClassElement {
+            return Ok(None);
+        }
+
+        if self.kind(input) == K::HeritageClause {
+            let types = self.list_nodes(
+                self.node(input)
+                    .as_heritage_clause()
+                    .expect("heritage clause payload")
+                    .types(),
+            );
+            if types.is_empty()
+                || (types.len() == 1 && tsr_ast::node_is_missing(Some(&self.node(types[0]))))
+            {
                 return Ok(None);
             }
         }
-        let old_enclosing = self.enclosing;
-        let old_selector = self.tracker.selector.clone();
-        let old_name = self.tracker.error_name;
-        let old_suppress = self.suppress_context;
-        if util::is_enclosing_declaration(&self.node(node)) {
-            self.enclosing = node;
+
+        let previous_enclosing_declaration = self.enclosing_declaration;
+        if util::is_enclosing_declaration(&self.node(input)) {
+            self.enclosing_declaration = input;
         }
-        let produces = util::can_produce_diagnostics(&self.node(node));
-        if produces && !self.suppress_context {
-            self.select_context(node, false)?;
-        }
-        if matches!(kind, Some(K::TypeLiteral | K::MappedType))
-            && !self.node(node).parent().is_some_and(|p| {
-                matches!(
-                    self.node(p).kind().known(),
-                    Some(K::TypeAliasDeclaration | K::JSTypeAliasDeclaration)
-                )
-            })
+
+        let (can_produce_diagnostic, cleanup_diagnostic_context) =
+            self.setup_diagnostic_context(input)?;
+
+        let result = match self.kind(input) {
+            K::MappedType => self.transform_mapped_type_node(input).map(Some),
+            K::HeritageClause => self.transform_heritage_clause(input),
+            K::MethodSignature => self.transform_method_signature_declaration(input),
+            K::MethodDeclaration => self.transform_method_declaration(input),
+            K::ConstructSignature => self
+                .transform_construct_signature_declaration(input)
+                .map(Some),
+            K::Constructor => self.transform_constructor_declaration(input).map(Some),
+            K::GetAccessor => self.transform_get_accesor_declaration(input),
+            K::SetAccessor => self.transform_set_accessor_declaration(input),
+            K::PropertyDeclaration => self.transform_property_declaration(input),
+            K::PropertySignature => self.transform_property_signature_declaration(input),
+            K::CallSignature => self.transform_call_signature_declaration(input).map(Some),
+            K::IndexSignature => self.transform_index_signature_declaration(input).map(Some),
+            K::VariableDeclaration => self.transform_variable_declaration(input),
+            K::TypeParameter => self.transform_type_parameter_declaration(input).map(Some),
+            K::ExpressionWithTypeArguments => self
+                .transform_expression_with_type_arguments(input)
+                .map(Some),
+            K::TypeReference => self.transform_type_reference(input).map(Some),
+            K::ConditionalType => self.transform_conditional_type_node(input).map(Some),
+            K::FunctionType => self.transform_function_type_node(input).map(Some),
+            K::ConstructorType => self.transform_constructor_type_node(input).map(Some),
+            K::ImportType => self.transform_import_type_node(input).map(Some),
+            K::TypeQuery => {
+                let expr_name = self
+                    .node(input)
+                    .as_type_query_node()
+                    .expect("type query payload")
+                    .expr_name()
+                    .expect(NIL);
+                self.check_entity_name_visibility(expr_name, self.enclosing_declaration)?;
+                self.visit_each_child(input).map(Some)
+            }
+            K::QualifiedName => {
+                let right = self
+                    .node(input)
+                    .as_qualified_name()
+                    .expect("qualified name payload")
+                    .right()
+                    .expect(NIL);
+                if self.kind(right) == K::PrivateIdentifier {
+                    let text = self.node_text(right)?;
+                    self.add_diagnostic_for_node(
+                        input,
+                        tsr_diagnostics::Declaration_emit_elides_private_members_but_0_refers_to_a_private_member_Write_an_explicit_type_here,
+                        vec![text],
+                    )?;
+                }
+                self.visit_each_child(input).map(Some)
+            }
+            K::TupleType => {
+                let result = self.visit_each_child(input)?;
+                let single_line = match crate::utilities::is_original_node_single_line(
+                    self.emit,
+                    &*self.output,
+                    Some(input),
+                ) {
+                    Ok(single_line) => single_line,
+                    Err(crate::Error::Arena(error)) => return Err(error.into()),
+                    Err(error) => panic!("IsOriginalNodeSingleLine reads only storage: {error:?}"),
+                };
+                if single_line {
+                    self.emit
+                        .add_emit_flags(result, tsr_printer::emit_flags::SINGLE_LINE);
+                }
+                Ok(Some(result))
+            }
+            K::JSDocTypeExpression => self.transform_js_doc_type_expression(input),
+            K::JSDocTypeLiteral => self.transform_js_doc_type_literal(input).map(Some),
+            K::JSDocPropertyTag => self.transform_js_doc_property_tag(input).map(Some),
+            K::JSDocAllType => Ok(Some(self.transform_js_doc_all_type(input))),
+            K::JSDocNullableType => self.transform_js_doc_nullable_type(input).map(Some),
+            K::JSDocNonNullableType => self.transform_js_doc_non_nullable_type(input),
+            K::JSDocOptionalType => self.transform_js_doc_optional_type(input).map(Some),
+            K::JSDocVariadicType => self.transform_js_doc_variadic_type(input).map(Some),
+            _ => self.visit_each_child(input).map(Some),
+        }?;
+
+        if result.is_some()
+            && can_produce_diagnostic
+            && tsr_ast::has_dynamic_name(self.view(), Some(input))?
         {
-            self.suppress_context = true;
+            self.check_name(input)?;
         }
-        let result = self.subtree_worker(node);
-        let result = match result {
-            Ok(result) => {
-                if result.is_some() && produces && dynamic {
-                    if !self.suppress_context {
-                        self.select_context(node, true)?;
-                    }
-                    self.tracker.error_name = self.node(node).name();
-                    let name = Self::required(self.node(node).name())?;
-                    let expression = Self::required(self.node(name).expression())?;
-                    self.entity_visible(expression)?;
-                }
-                Ok(result)
-            }
-            Err(error) => Err(error),
-        };
-        self.enclosing = old_enclosing;
-        self.tracker.selector = old_selector;
-        self.tracker.error_name = old_name;
-        self.suppress_context = old_suppress;
-        result
-    }
-    #[allow(
-        clippy::match_same_arms,
-        reason = "Keep the pinned upstream per-kind dispatch auditable when individual syntax cases change"
-    )]
-    fn subtree_worker(&mut self, node: NodeId) -> Result<Option<NodeId>, R::Error> {
-        match self.node(node).kind().known() {
-            Some(K::VariableDeclaration) => {
-                if self
-                    .output
-                    .read_source_file(self.source)?
-                    .common_js_module_indicator()
-                    .is_some()
-                    && tsr_ast::is_variable_declaration_initialized_to_require(
-                        self.output.view(),
-                        node,
-                    )?
-                {
-                    return self.cjs_require_variable(node);
-                }
-                self.suppress_context = true;
-                let name = self.node(node).name();
-                if name.is_some_and(|n| {
-                    matches!(
-                        self.node(n).kind().known(),
-                        Some(K::ArrayBindingPattern | K::ObjectBindingPattern)
-                    )
-                }) && self.has_binding_initializer(Self::required(name)?)?
-                {
-                    return self.recreate_binding(Self::required(name)?);
-                }
-                let name = self.binding_name(name)?;
-                let ty = self.ensure_type(node, false)?;
-                let init = self.ensure_initializer(node)?;
-                Ok(Some(
-                    self.output
-                        .update_variable_declaration(node, name, None, ty, init),
-                ))
-            }
-            Some(K::Parameter) => self.parameter(node).map(Some),
-            Some(K::PropertyDeclaration | K::PropertySignature) => {
-                let name = self.node(node).name();
-                if name.is_some_and(|name| self.node(name).kind() == K::PrivateIdentifier) {
-                    return Ok(None);
-                }
-                let mut postfix = self.node(node).postfix_token();
-                if self.node(node).kind() == K::PropertyDeclaration
-                    && postfix.is_some_and(|p| self.node(p).kind() == K::ExclamationToken)
-                {
-                    postfix = None;
-                }
-                let modifiers = self.modifiers(node)?;
-                let ty = self.ensure_type(node, false)?;
-                let init = self.ensure_initializer(node)?;
-                Ok(Some(if self.node(node).kind() == K::PropertySignature {
-                    self.output.update_property_signature_declaration(
-                        node, modifiers, name, postfix, ty, init,
-                    )
-                } else {
-                    self.output
-                        .update_property_declaration(node, modifiers, name, postfix, ty, init)
-                }))
-            }
-            Some(
-                K::CallSignature
-                | K::ConstructSignature
-                | K::MethodDeclaration
-                | K::MethodSignature
-                | K::Constructor
-                | K::GetAccessor
-                | K::SetAccessor
-                | K::IndexSignature
-                | K::FunctionType
-                | K::ConstructorType,
-            ) => self.signature(node),
-            Some(K::TypeReference) => {
-                let name = Self::required(
-                    self.node(node)
-                        .as_type_reference_node()
-                        .unwrap()
-                        .type_name(),
-                )?;
-                self.entity_visible(name)?;
-                self.children(node).map(Some)
-            }
-            Some(K::TypeQuery) => {
-                let name =
-                    Self::required(self.node(node).as_type_query_node().unwrap().expr_name())?;
-                self.entity_visible(name)?;
-                self.children(node).map(Some)
-            }
-            Some(K::ExpressionWithTypeArguments) => {
-                let expression = Self::required(self.node(node).expression())?;
-                if tsr_ast::is_entity_name_expression(self.output.view(), expression)? {
-                    self.entity_visible(expression)?;
-                }
-                self.children(node).map(Some)
-            }
-            Some(K::ConditionalType) => {
-                let data = self
-                    .node(node)
-                    .data_source()
-                    .as_conditional_type_node()
-                    .unwrap()
-                    .to_owned();
-                let check = self.visit(data.check_type)?;
-                let extends = self.visit(data.extends_type)?;
-                let old = self.enclosing;
-                self.enclosing = Self::required(data.true_type)?;
-                let yes = self.visit(data.true_type);
-                self.enclosing = old;
-                let yes = yes?;
-                let no = self.visit(data.false_type)?;
-                Ok(Some(self.output.update_conditional_type_node(
-                    node, check, extends, yes, no,
-                )))
-            }
-            Some(K::MappedType) => {
-                let data = self
-                    .node(node)
-                    .data_source()
-                    .as_mapped_type_node()
-                    .unwrap()
-                    .to_owned();
-                let ty = match data.r#type {
-                    Some(ty) => self.visit(Some(ty))?,
-                    None => Some(self.output.new_keyword_type_node(K::AnyKeyword.into())),
-                };
-                let parameter = self.visit(data.type_parameter)?;
-                let name = self.visit(data.name_type)?;
-                Ok(Some(self.output.update_mapped_type_node(
-                    node,
-                    data.readonly_token,
-                    parameter,
-                    name,
-                    data.question_token,
-                    ty,
-                    None,
-                )))
-            }
-            Some(K::HeritageClause) => {
-                let data = self
-                    .node(node)
-                    .data_source()
-                    .as_heritage_clause()
-                    .unwrap()
-                    .to_owned();
-                let mut types = Vec::new();
-                for element in self.list_nodes(data.types) {
-                    let name = if self.node(element).kind() == K::ExpressionWithTypeArguments {
-                        Self::required(self.node(element).expression())?
-                    } else {
-                        Self::required(
-                            self.node(element)
-                                .as_type_reference_node()
-                                .unwrap()
-                                .type_name(),
-                        )?
-                    };
-                    if tsr_ast::is_entity_name_expression(self.output.view(), name)?
-                        || matches!(self.node(name).kind().known(), Some(K::QualifiedName))
-                        || (data.token == K::ExtendsKeyword
-                            && self.node(name).kind() == K::NullKeyword)
-                    {
-                        if let Some(element) = self.visit(Some(element))? {
-                            types.push(element);
-                        }
-                    }
-                }
-                if types.is_empty() {
-                    return Ok(None);
-                }
-                let list = self.new_list(types);
-                Ok(Some(self.output.update_heritage_clause(
-                    node,
-                    data.token,
-                    Some(list),
-                )))
-            }
-            Some(K::TypeParameter) => {
-                let data = self
-                    .node(node)
-                    .data_source()
-                    .as_type_parameter_declaration()
-                    .unwrap()
-                    .to_owned();
-                let private_method = self.node(node).parent().is_some_and(|parent| {
-                    matches!(self.node(parent).kind().known(), Some(K::MethodDeclaration))
-                }) && self.resolver.effective_declaration_flags(
-                    Self::required(self.node(node).parent())?,
-                    mf::PRIVATE,
-                )? != 0;
-                if private_method && (data.constraint.is_some() || data.default_type.is_some()) {
-                    return Ok(Some(self.output.update_type_parameter_declaration(
-                        node,
-                        data.modifiers,
-                        data.name,
-                        None,
-                        data.expression,
-                        None,
-                    )));
-                }
-                self.children(node).map(Some)
-            }
-            Some(K::QualifiedName) => {
-                let right = Self::required(self.node(node).as_qualified_name().unwrap().right())?;
-                if self.node(right).kind() == K::PrivateIdentifier {
-                    self.diagnostic(node, tsr_diagnostics::Declaration_emit_elides_private_members_but_0_refers_to_a_private_member_Write_an_explicit_type_here, vec![self.output.view().node_text(right)?.into_js_string()])?;
-                }
-                self.children(node).map(Some)
-            }
-            Some(K::ImportType) => {
-                let data = self
-                    .node(node)
-                    .data_source()
-                    .as_import_type_node()
-                    .unwrap()
-                    .to_owned();
-                if data
-                    .argument
-                    .is_none_or(|arg| self.node(arg).kind() != K::LiteralType)
-                {
-                    return Ok(Some(node));
-                }
-                let arguments = self.visit_list_result(data.type_arguments)?;
-                Ok(Some(self.output.update_import_type_node(
-                    node,
-                    data.is_type_of,
-                    data.argument,
-                    data.attributes,
-                    data.qualifier,
-                    arguments,
-                )))
-            }
-            Some(K::JSDocTypeExpression) => self.visit(self.node(node).type_node()),
-            Some(K::JSDocNonNullableType) => self.visit(self.node(node).type_node()),
-            Some(
-                K::JSDocAllType
-                | K::JSDocNullableType
-                | K::JSDocOptionalType
-                | K::JSDocVariadicType
-                | K::JSDocTypeLiteral
-                | K::JSDocPropertyTag,
-            ) => self.jsdoc_type(node).map(Some),
-            _ => self.children(node).map(Some),
-        }
-    }
-    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformJSDocTypeLiteral
-    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformJSDocPropertyTag
-    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformJSDocAllType
-    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformJSDocNullableType
-    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformJSDocOptionalType
-    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformJSDocVariadicType
-    fn jsdoc_type(&mut self, node: NodeId) -> Result<NodeId, R::Error> {
-        let result = match self.node(node).kind().known() {
-            Some(K::JSDocAllType) => self.output.new_keyword_type_node(K::AnyKeyword.into()),
-            Some(K::JSDocTypeLiteral) => {
-                let slice = self
-                    .node(node)
-                    .as_js_doc_type_literal()
-                    .unwrap()
-                    .js_doc_property_tags();
-                let tags: Vec<_> = self.output.read_nodes(slice).iter().flatten().collect();
-                let mut members = Vec::new();
-                for tag in tags {
-                    if let Some(member) = self.visit(Some(tag))? {
-                        members.push(member);
-                    }
-                }
-                let list = self.new_list(members);
-                self.output.new_type_literal_node(Some(list))
-            }
-            Some(K::JSDocPropertyTag) => {
-                let data = self
-                    .node(node)
-                    .data_source()
-                    .as_js_doc_parameter_or_property_tag()
-                    .unwrap()
-                    .to_owned();
-                let name = self.visit(data.tag_name)?;
-                let ty = self.visit(data.type_expression)?;
-                self.output
-                    .new_property_signature_declaration(None, name, None, ty, None)
-            }
-            Some(K::JSDocVariadicType) => {
-                let operand = self
-                    .node(node)
-                    .data_source()
-                    .as_js_doc_variadic_type()
-                    .and_then(|data| data.r#type());
-                let ty = self.visit(operand)?;
-                self.output.new_array_type_node(ty)
-            }
-            Some(K::JSDocNullableType | K::JSDocOptionalType) => {
-                let ty = self.visit(self.node(node).type_node())?;
-                let extra = if self.node(node).kind() == K::JSDocNullableType {
-                    let null = self.output.new_keyword_expression(K::NullKeyword.into());
-                    self.output.new_literal_type_node(Some(null))
-                } else {
-                    self.output
-                        .new_keyword_type_node(K::UndefinedKeyword.into())
-                };
-                let nodes = self.output.alloc_nodes(vec![ty, Some(extra)]);
-                let list = self
-                    .output
-                    .alloc_list(tsr_core::TextRange::new(-1, -1), nodes);
-                self.output.new_union_type_node(Some(list))
-            }
-            _ => return Err(tsr_arena::Error::InvalidGraph.into()),
-        };
-        self.emit.set_original(result, node);
+
+        self.enclosing_declaration = previous_enclosing_declaration;
+        self.cleanup_diagnostic_context(cleanup_diagnostic_context);
         Ok(result)
     }
+
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.checkName
+    pub fn check_name(&mut self, node: NodeId) -> Result<(), R::Error> {
+        let old_diag = self.tracker.selector.clone();
+        if !self.suppress_new_diagnostic_contexts {
+            self.set_diagnostic_context_for_node_name(node)?;
+        }
+        self.tracker.error_name = self.node(node).name();
+        tsr_core::debug::assert(tsr_ast::has_dynamic_name(self.view(), Some(node))?, &[]); // Should only be called with dynamic names
+        let entity_name = self
+            .node(self.node(node).name().expect(NIL))
+            .expression()
+            .expect(NIL);
+        self.check_entity_name_visibility(entity_name, self.enclosing_declaration)?;
+        if !self.suppress_new_diagnostic_contexts {
+            self.tracker.selector = old_diag;
+        }
+        self.tracker.error_name = None;
+        Ok(())
+    }
+
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.ensureType
     pub fn ensure_type(
         &mut self,
         node: NodeId,
         ignore_private: bool,
     ) -> Result<Option<NodeId>, R::Error> {
-        let flags = self.builder_flags();
-        if !ignore_private
-            && self
-                .resolver
-                .effective_declaration_flags(node, mf::PRIVATE)?
-                != 0
-        {
+        if !ignore_private && self.effective_declaration_flags(node, mf::PRIVATE)? != 0 {
+            // Private nodes emit no types (except private parameter properties, whose parameter types are actually visible)
             return Ok(None);
         }
-        if self.should_initializer(node)? {
+
+        if self.should_print_with_initializer(node)? {
+            // Literal const declarations will have an initializer ensured rather than a type
             return Ok(None);
         }
-        let kind = self.node(node).kind();
-        let ty = if matches!(kind.known(), Some(K::ExportAssignment | K::BindingElement)) {
-            None
-        } else {
-            self.node(node).type_node()
-        };
-        if let Some(ty) = ty {
-            if kind != K::Parameter
-                || !self.resolver.requires_adding_implicit_undefined(
-                    node,
-                    None,
-                    Some(self.enclosing),
-                )?
-            {
-                if !self.output.read_source_file(self.source)?.is_js() {
-                    return self.visit(Some(ty));
-                }
-                let result = self.resolver.try_js_type_node_to_type_node(
-                    self.output,
-                    self.emit,
-                    ty,
-                    self.enclosing,
-                    flags,
-                    INTERNAL_FLAGS,
-                    &mut self.tracker,
-                )?;
-                self.flush_reports()?;
-                if result.is_some() {
-                    return Ok(result);
+
+        // Should be removed createTypeOfDeclaration will actually now reuse the existing annotation so there is no real need to duplicate type walking
+        // Left in for now to minimize diff during syntactic type node builder refactor
+        let kind = self.kind(node);
+        if kind != K::ExportAssignment && kind != K::BindingElement {
+            if let Some(ty) = self.node(node).type_node() {
+                if kind != K::Parameter
+                    || !self.resolver.requires_adding_implicit_undefined(
+                        node,
+                        None,
+                        Some(self.enclosing_declaration),
+                    )?
+                {
+                    if self.is_source_file_js()? {
+                        // JS types have a heap of constructs we can't directly emit into .d.ts files; the node builder contains logic to remap those where possible, so we invoke it here
+                        // In strada we always built js declarations symbolically, so all js type nodes went through this postprocessing
+                        let js_flags = self.builder_flags();
+                        let res = self.resolver.try_js_type_node_to_type_node(
+                            self.output,
+                            self.emit,
+                            ty,
+                            self.enclosing_declaration,
+                            js_flags,
+                            DECLARATION_EMIT_INTERNAL_NODE_BUILDER_FLAGS,
+                            &mut self.tracker,
+                        )?;
+                        self.apply_tracker_reports()?;
+                        if res.is_some() {
+                            return Ok(res);
+                        }
+                        // otherwise, fall back to full serialization
+                    } else {
+                        return self.visit(Some(ty));
+                    }
                 }
             }
         }
-        let old_name = self.tracker.error_name;
-        let old_selector = self.tracker.selector.clone();
+
+        let old_error_name_node = self.tracker.error_name;
         self.tracker.error_name = self.node(node).name();
-        if !self.suppress_context && util::can_produce_diagnostics(&self.node(node)) {
-            self.select_context(node, false)?;
+        let mut old_diag = None;
+        if !self.suppress_new_diagnostic_contexts {
+            old_diag = Some(self.tracker.selector.clone());
+            if util::can_produce_diagnostics(&self.node(node)) {
+                self.set_diagnostic_context_for_node(node)?;
+            }
         }
-        let result = if tsr_ast::utilities_tail::has_inferred_type(&self.node(node)) {
+
+        let flags = self.builder_flags();
+        let type_node = if tsr_ast::utilities_tail::has_inferred_type(&self.node(node)) {
             self.resolver.create_type_of_declaration(
                 self.output,
                 self.emit,
                 node,
-                self.enclosing,
+                self.enclosing_declaration,
                 flags,
-                INTERNAL_FLAGS,
+                DECLARATION_EMIT_INTERNAL_NODE_BUILDER_FLAGS,
                 &mut self.tracker,
-            )
+            )?
         } else if tsr_ast::utilities::is_function_like(Some(&self.node(node))) {
             self.resolver.create_return_type_of_signature(
                 self.output,
                 self.emit,
                 node,
-                self.enclosing,
+                self.enclosing_declaration,
                 flags,
-                INTERNAL_FLAGS,
+                DECLARATION_EMIT_INTERNAL_NODE_BUILDER_FLAGS,
                 &mut self.tracker,
-            )
+            )?
         } else {
-            return Self::unsupported("declaration emit: ensureType node kind");
+            let kind_string = self.node(node).kind_string();
+            assert_never(Member::with_kind_string(Argument::Nil, &kind_string), &[]);
         };
-        let flushed = self.flush_reports();
-        self.tracker.error_name = old_name;
-        self.tracker.selector = old_selector;
-        flushed?;
-        result.map(|node| {
-            node.or_else(|| Some(self.output.new_keyword_type_node(K::AnyKeyword.into())))
+        self.apply_tracker_reports()?;
+
+        self.tracker.error_name = old_error_name_node;
+        if !self.suppress_new_diagnostic_contexts {
+            self.tracker.selector = old_diag.unwrap_or_else(Selector::throw);
+        }
+        Ok(Some(type_node.unwrap_or_else(|| {
+            self.output.new_keyword_type_node(K::AnyKeyword.into())
+        })))
+    }
+
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.shouldPrintWithInitializer
+    pub fn should_print_with_initializer(&mut self, node: NodeId) -> Result<bool, R::Error> {
+        Ok(util::can_have_literal_initializer(self, node)?
+            && self.node(node).initializer().is_some()
+            && {
+                let original = self.most_original(node);
+                self.resolver.literal_const_declaration(original)?
+            })
+    }
+
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.ensureTypeParams
+    pub fn ensure_type_params(
+        &mut self,
+        node: NodeId,
+        params: Option<NodeListId>,
+    ) -> Result<Option<NodeListId>, R::Error> {
+        if self.effective_declaration_flags(node, mf::PRIVATE)? != 0 {
+            return Ok(None);
+        }
+        let mut type_parameters = self.visit_nodes(params)?;
+        if type_parameters.is_some() {
+            return Ok(type_parameters);
+        }
+        let old_error_name_node = self.tracker.error_name;
+        self.tracker.error_name = self.node(node).name();
+        let mut old_diag = None;
+        if !self.suppress_new_diagnostic_contexts {
+            old_diag = Some(self.tracker.selector.clone());
+            if util::can_produce_diagnostics(&self.node(node)) {
+                self.set_diagnostic_context_for_node(node)?;
+            }
+        }
+
+        if self.function_like_full_signature(node).flatten().is_some() {
+            let nodes = self.resolver.create_type_parameters_of_signature(
+                self.output,
+                self.emit,
+                node,
+                self.enclosing_declaration,
+                DECLARATION_EMIT_NODE_BUILDER_FLAGS,
+                DECLARATION_EMIT_INTERNAL_NODE_BUILDER_FLAGS,
+                &mut self.tracker,
+            )?;
+            self.apply_tracker_reports()?;
+            if !nodes.is_empty() {
+                let loc = self.node(node).range();
+                let list = self.new_node_list(nodes);
+                self.output.set_list_location(list, loc)?;
+                type_parameters = Some(list);
+            }
+        }
+
+        self.tracker.error_name = old_error_name_node;
+        if !self.suppress_new_diagnostic_contexts {
+            self.tracker.selector = old_diag.unwrap_or_else(Selector::throw);
+        }
+        Ok(type_parameters)
+    }
+
+    /// `node.FunctionLikeData()`'s `FullSignature`: `None` when the node is
+    /// not function-like (its function-like data is nil).
+    #[allow(
+        clippy::option_option,
+        reason = "Go distinguishes a nil FunctionLikeData from a nil FullSignature"
+    )]
+    pub fn function_like_full_signature(&self, node: NodeId) -> Option<Option<NodeId>> {
+        let read = self.node(node);
+        Some(match read.kind().known()? {
+            K::FunctionDeclaration => read.as_function_declaration()?.full_signature(),
+            K::CallSignature => read.as_call_signature_declaration()?.full_signature(),
+            K::ConstructSignature => read.as_construct_signature_declaration()?.full_signature(),
+            K::Constructor => read.as_constructor_declaration()?.full_signature(),
+            K::GetAccessor => read.as_get_accessor_declaration()?.full_signature(),
+            K::SetAccessor => read.as_set_accessor_declaration()?.full_signature(),
+            K::IndexSignature => read.as_index_signature_declaration()?.full_signature(),
+            K::MethodSignature => read.as_method_signature_declaration()?.full_signature(),
+            K::MethodDeclaration => read.as_method_declaration()?.full_signature(),
+            K::ArrowFunction => read.as_arrow_function()?.full_signature(),
+            K::FunctionExpression => read.as_function_expression()?.full_signature(),
+            K::FunctionType => read.as_function_type_node()?.full_signature(),
+            K::ConstructorType => read.as_constructor_type_node()?.full_signature(),
+            K::JSDocSignature => read.as_js_doc_signature()?.full_signature(),
+            _ => return None,
         })
     }
-    pub fn should_initializer(&mut self, node: NodeId) -> Result<bool, R::Error> {
-        let flags = self
-            .resolver
-            .effective_declaration_flags(node, mf::PRIVATE)?;
-        if !util::can_have_literal_initializer(&self.node(node), flags) {
-            return Ok(false);
+
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.updateParamList
+    pub fn update_param_list(
+        &mut self,
+        node: NodeId,
+        params: Option<NodeListId>,
+    ) -> Result<NodeListId, R::Error> {
+        let nodes = self.list_nodes(Some(params.expect(NIL)));
+        if self.effective_declaration_flags(node, mf::PRIVATE)? != 0 || nodes.is_empty() {
+            return Ok(self.new_node_list(Vec::new()));
         }
-        Ok(self.node(node).initializer().is_some()
-            && self.resolver.literal_const_declaration(node)?)
+        let mut results = Vec::with_capacity(nodes.len());
+        for p in nodes {
+            results.push(self.ensure_parameter(p)?);
+        }
+        Ok(self.new_node_list(results))
     }
-    pub fn ensure_initializer(&mut self, node: NodeId) -> Result<Option<NodeId>, R::Error> {
-        if !self.should_initializer(node)? {
-            return Ok(None);
-        }
-        let initializer = Self::required(self.node(node).initializer())?;
-        let unwrapped = util::unwrap_parenthesized_expression(self.output.view(), initializer)?;
-        if !tsr_ast::utilities_tail::is_primitive_literal_value(
-            self.output.view(),
-            &self.node(unwrapped),
-            true,
-        )? {
-            self.tracker
-                .report(DeclarationTrackerEvent::InferenceFallback(node));
-        }
-        let result = self.resolver.create_literal_const_value(
-            self.output,
-            self.emit,
-            node,
-            &mut self.tracker,
-        )?;
-        self.flush_reports()?;
-        Ok(result)
-    }
+
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.ensureParameter
-    pub fn parameter(&mut self, node: NodeId) -> Result<NodeId, R::Error> {
-        let old = self.tracker.selector.clone();
-        if !self.suppress_context {
-            self.select_context(node, false)?;
+    pub fn ensure_parameter(&mut self, p: NodeId) -> Result<NodeId, R::Error> {
+        let old_diag = self.tracker.selector.clone();
+        if !self.suppress_new_diagnostic_contexts {
+            self.set_diagnostic_context_for_node(p)?;
         }
-        let data = self
-            .node(node)
-            .data_source()
-            .as_parameter_declaration()
-            .unwrap()
-            .to_owned();
-        let question = if self.resolver.optional_parameter(node)? {
-            data.question_token
-                .or_else(|| Some(self.output.new_token(K::QuestionToken.into())))
+        let (dot_dot_dot_token, name, question) = {
+            let read = self.node(p);
+            let data = read
+                .as_parameter_declaration()
+                .expect("parameter declaration payload");
+            (data.dot_dot_dot_token(), data.name(), data.question_token())
+        };
+        let question_token = if self.resolver.optional_parameter(p)? {
+            Some(question.unwrap_or_else(|| self.output.new_token(K::QuestionToken.into())))
         } else {
             None
         };
-        let name = self.binding_name(data.name)?;
-        let ty = self.ensure_type(node, true)?;
-        let init = self.ensure_initializer(node)?;
+        let name = self.visit_binding_name_node(name)?;
+        let ty = self.ensure_type(p, true)?;
+        let initializer = self.ensure_no_initializer(p)?;
         let result = self.output.update_parameter_declaration(
-            node,
+            p,
             None,
-            data.dot_dot_dot_token,
+            dot_dot_dot_token,
             name,
-            question,
+            question_token,
             ty,
-            init,
+            initializer,
         );
-        self.tracker.selector = old;
+        self.tracker.selector = old_diag;
         Ok(result)
     }
-    pub fn parameters(&mut self, node: NodeId) -> Result<Option<NodeListId>, R::Error> {
-        let params = self.node(node).parameter_list();
-        let mut result = Vec::new();
-        if self
-            .resolver
-            .effective_declaration_flags(node, mf::PRIVATE)?
-            == 0
-        {
-            for parameter in self.list_nodes(params) {
-                result.push(self.parameter(parameter)?);
+
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.ensureNoInitializer
+    pub fn ensure_no_initializer(&mut self, node: NodeId) -> Result<Option<NodeId>, R::Error> {
+        if self.should_print_with_initializer(node)? {
+            let unwrapped_initializer = util::unwrap_parenthesized_expression(
+                self.view(),
+                self.node(node).initializer().expect(NIL),
+            )?;
+            if !tsr_ast::utilities_tail::is_primitive_literal_value(
+                self.view(),
+                &self.node(unwrapped_initializer),
+                true,
+            )? {
+                self.report_inference_fallback(node)?;
             }
+            let parse_node = self.parse_node(node).expect(NIL);
+            let result = self.resolver.create_literal_const_value(
+                self.output,
+                self.emit,
+                parse_node,
+                &mut self.tracker,
+            )?;
+            self.apply_tracker_reports()?;
+            return Ok(result);
         }
-        Ok(Some(self.new_list(result)))
+        Ok(None)
     }
-    pub fn type_parameters(&mut self, node: NodeId) -> Result<Option<NodeListId>, R::Error> {
-        if self
-            .resolver
-            .effective_declaration_flags(node, mf::PRIVATE)?
-            != 0
-        {
-            return Ok(None);
-        }
-        let params = self.visit_list_result(self.node(node).type_parameter_list())?;
-        if params.is_some() {
-            return Ok(params);
-        }
-        let read = self.node(node);
-        let data = read.data_source();
-        let full = match read.kind().known() {
-            Some(K::FunctionDeclaration) => data
-                .as_function_declaration()
-                .and_then(|d| d.full_signature()),
-            Some(K::MethodDeclaration) => data
-                .as_method_declaration()
-                .and_then(|d| d.full_signature()),
-            Some(K::Constructor) => data
-                .as_constructor_declaration()
-                .and_then(|d| d.full_signature()),
-            Some(K::GetAccessor) => data
-                .as_get_accessor_declaration()
-                .and_then(|d| d.full_signature()),
-            Some(K::SetAccessor) => data
-                .as_set_accessor_declaration()
-                .and_then(|d| d.full_signature()),
-            _ => None,
-        };
-        drop(read);
-        if full.is_none() {
-            return Ok(None);
-        }
-        let old_name = self.tracker.error_name;
-        let old_selector = self.tracker.selector.clone();
-        self.tracker.error_name = self.node(node).name();
-        if !self.suppress_context && util::can_produce_diagnostics(&self.node(node)) {
-            self.select_context(node, false)?;
-        }
-        let result = self.resolver.create_type_parameters_of_signature(
-            self.output,
-            self.emit,
-            node,
-            self.enclosing,
-            BUILDER_FLAGS,
-            INTERNAL_FLAGS,
-            &mut self.tracker,
-        )?;
-        self.flush_reports()?;
-        self.tracker.error_name = old_name;
-        self.tracker.selector = old_selector;
-        Ok((!result.is_empty()).then(|| self.new_list(result)))
-    }
-    pub fn signature(&mut self, node: NodeId) -> Result<Option<NodeId>, R::Error> {
-        let kind = self.node(node).kind();
-        let name = self.node(node).name();
-        if name.is_some_and(|name| self.node(name).kind() == K::PrivateIdentifier) {
-            return Ok(None);
-        }
-        let modifiers = self.modifiers(node)?;
-        if matches!(
-            kind.known(),
-            Some(K::MethodDeclaration | K::MethodSignature)
-        ) && self
-            .resolver
-            .effective_declaration_flags(node, mf::PRIVATE)?
-            != 0
-        {
-            if let Some(symbol) = self.resolver.symbol_of_declaration(node)? {
-                if self
-                    .resolver
-                    .symbol_declarations(symbol)?
-                    .first()
-                    .is_some_and(|first| *first != node)
-                {
-                    return Ok(None);
-                }
-            }
-            return Ok(Some(
-                self.output
-                    .new_property_declaration(modifiers, name, None, None, None),
-            ));
-        }
-        let type_params = if matches!(
-            kind.known(),
-            Some(K::Constructor | K::GetAccessor | K::SetAccessor | K::IndexSignature)
-        ) {
-            None
-        } else {
-            self.type_parameters(node)?
-        };
-        let parameters = if matches!(kind.known(), Some(K::GetAccessor | K::SetAccessor)) {
-            self.accessor_parameters(node)?
-        } else {
-            self.parameters(node)?
-        };
-        let ty =
-            match kind.known() {
-                Some(K::SetAccessor | K::Constructor) => None,
-                Some(K::FunctionType | K::ConstructorType | K::IndexSignature) => {
-                    let ty = self.visit(self.node(node).type_node())?;
-                    if kind == K::IndexSignature {
-                        Some(ty.unwrap_or_else(|| {
-                            self.output.new_keyword_type_node(K::AnyKeyword.into())
-                        }))
-                    } else {
-                        ty
-                    }
-                }
-                _ => self.ensure_type(node, false)?,
-            };
-        let postfix = if matches!(
-            kind.known(),
-            Some(K::MethodDeclaration | K::MethodSignature)
-        ) {
-            self.node(node).postfix_token()
-        } else {
-            None
-        };
-        let result = match kind.known() {
-            Some(K::CallSignature) => {
-                self.output
-                    .update_call_signature_declaration(node, type_params, parameters, ty)
-            }
-            Some(K::ConstructSignature) => self.output.update_construct_signature_declaration(
-                node,
-                type_params,
-                parameters,
-                ty,
-            ),
-            Some(K::MethodSignature) => self.output.update_method_signature_declaration(
-                node,
-                modifiers,
-                name,
-                postfix,
-                type_params,
-                parameters,
-                ty,
-            ),
-            Some(K::MethodDeclaration) => self.output.update_method_declaration(
-                node,
-                modifiers,
-                None,
-                name,
-                postfix,
-                type_params,
-                parameters,
-                ty,
-                None,
-                None,
-            ),
-            Some(K::Constructor) => self.output.update_constructor_declaration(
-                node, modifiers, None, parameters, None, None, None,
-            ),
-            Some(K::GetAccessor) => self.output.update_get_accessor_declaration(
-                node, modifiers, name, None, parameters, ty, None, None,
-            ),
-            Some(K::SetAccessor) => self.output.update_set_accessor_declaration(
-                node, modifiers, name, None, parameters, None, None, None,
-            ),
-            Some(K::IndexSignature) => self
-                .output
-                .update_index_signature_declaration(node, modifiers, parameters, ty),
-            Some(K::FunctionType) => {
-                self.output
-                    .update_function_type_node(node, type_params, parameters, ty)
-            }
-            Some(K::ConstructorType) => self.output.update_constructor_type_node(
-                node,
-                modifiers,
-                type_params,
-                parameters,
-                ty,
-            ),
-            _ => return Err(tsr_arena::Error::InvalidGraph.into()),
-        };
-        Ok(Some(result))
-    }
-    fn accessor_parameters(&mut self, node: NodeId) -> Result<Option<NodeListId>, R::Error> {
-        let private = self
-            .resolver
-            .effective_declaration_flags(node, mf::PRIVATE)?
-            != 0;
-        let parameters = self.list_nodes(self.node(node).parameter_list());
-        let mut result = Vec::new();
-        if !private {
-            if let Some(first) = parameters.first() {
-                if self.node(*first).name().is_some_and(|name| {
-                    self.node(name).kind() == K::Identifier
-                        && self.node(name).as_identifier().unwrap().text() == b"this"
-                }) {
-                    result.push(self.parameter(*first)?);
-                }
-            }
-        }
-        if self.node(node).kind() == K::SetAccessor {
-            let value = if private {
-                None
-            } else {
-                parameters
-                    .get(result.len())
-                    .copied()
-                    .map(|p| self.parameter(p))
-                    .transpose()?
-            };
-            let value = if let Some(value) = value {
-                value
-            } else {
-                let ty =
-                    (!private).then(|| self.output.new_keyword_type_node(K::AnyKeyword.into()));
-                let name = self
-                    .output
-                    .new_identifier(JsString::from_bytes(b"value".as_slice()));
-                self.output
-                    .new_parameter_declaration(None, None, Some(name), None, ty, None)
-            };
-            result.push(value);
-        }
-        Ok(Some(self.new_list(result)))
-    }
-    pub fn binding_name(&mut self, node: Option<NodeId>) -> Result<Option<NodeId>, R::Error> {
+
+    /// `bindingNameVisitor.VisitNode(name)`.
+    pub fn visit_binding_name_node(
+        &mut self,
+        node: Option<NodeId>,
+    ) -> Result<Option<NodeId>, R::Error> {
         let Some(node) = node else { return Ok(None) };
-        match self.node(node).kind().known() {
-            Some(K::ArrayBindingPattern | K::ObjectBindingPattern) => {
-                let elements = self.list_nodes(self.node(node).element_list());
-                let mut result = Vec::new();
-                for e in elements {
-                    if let Some(e) = self.binding_name(Some(e))? {
-                        result.push(e);
-                    }
+        let visited = self.visit_binding_name(node)?;
+        // The binding name visitor never returns a syntax list.
+        Ok(Some(visited))
+    }
+
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.visitBindingName
+    fn visit_binding_name(&mut self, node: NodeId) -> Result<NodeId, R::Error> {
+        match self.kind(node) {
+            K::ArrayBindingPattern | K::ObjectBindingPattern => {
+                // node.VisitEachChild(tx.bindingNameVisitor)
+                let elements = self.node(node).element_list();
+                let nodes = self.list_nodes(elements);
+                let mut visited = Vec::with_capacity(nodes.len());
+                let mut changed = false;
+                for element in nodes {
+                    let result = self.visit_binding_name(element)?;
+                    changed |= result != element;
+                    visited.push(result);
                 }
-                let list = self.new_list(result);
-                Ok(Some(self.output.update_binding_pattern(node, Some(list))))
+                let elements = if changed {
+                    let original = elements.expect(NIL);
+                    let list = self.new_node_list(visited);
+                    let loc = self.output.read_list(original).loc();
+                    self.output.set_list_location(list, loc)?;
+                    Some(list)
+                } else {
+                    elements
+                };
+                Ok(self.output.update_binding_pattern(node, elements))
             }
-            Some(K::BindingElement) => {
-                let data = self
-                    .node(node)
-                    .data_source()
-                    .as_binding_element()
-                    .unwrap()
-                    .to_owned();
-                if let Some(property) = data.property_name {
-                    if self.node(property).kind() == K::ComputedPropertyName {
-                        let expression = Self::required(self.node(property).expression())?;
-                        if tsr_ast::is_entity_name_expression(self.output.view(), expression)? {
-                            self.entity_visible(expression)?;
+            K::BindingElement => {
+                let (dot_dot_dot_token, property_name, name) = {
+                    let read = self.node(node);
+                    let data = read.as_binding_element().expect("binding element payload");
+                    (data.dot_dot_dot_token(), data.property_name(), data.name())
+                };
+                if let Some(property_name) = property_name {
+                    if self.kind(property_name) == K::ComputedPropertyName {
+                        let expression = self.node(property_name).expression().expect(NIL);
+                        if tsr_ast::is_entity_name_expression(self.view(), expression)? {
+                            self.check_entity_name_visibility(
+                                expression,
+                                self.enclosing_declaration,
+                            )?;
                         }
                     }
                 }
-                let name = self.binding_name(data.name)?;
-                Ok(Some(self.output.update_binding_element(
+                let name = self.visit_binding_name_node(name)?;
+                Ok(self.output.update_binding_element(
                     node,
-                    data.dot_dot_dot_token,
-                    data.property_name,
+                    dot_dot_dot_token,
+                    property_name,
                     name,
-                    None,
-                )))
+                    None, /*initializer*/
+                ))
             }
-            _ => Ok(Some(node)),
+            // KindIdentifier, KindOmittedExpression and every other kind
+            _ => Ok(node),
         }
-    }
-    fn has_binding_initializer(&self, pattern: NodeId) -> Result<bool, R::Error> {
-        for element in self.list_nodes(self.node(pattern).element_list()) {
-            if self.node(element).kind() != K::BindingElement {
-                continue;
-            }
-            if self.node(element).initializer().is_some() {
-                return Ok(true);
-            }
-            if let Some(name) = self.node(element).name() {
-                if matches!(
-                    self.node(name).kind().known(),
-                    Some(K::ArrayBindingPattern | K::ObjectBindingPattern)
-                ) && self.has_binding_initializer(name)?
-                {
-                    return Ok(true);
-                }
-            }
-        }
-        Ok(false)
-    }
-    fn recreate_binding(&mut self, pattern: NodeId) -> Result<Option<NodeId>, R::Error> {
-        let mut result = Vec::new();
-        for element in self.list_nodes(self.node(pattern).element_list()) {
-            let Some(name) = self.node(element).name() else {
-                continue;
-            };
-            if !self.binding_visible(element)? {
-                continue;
-            }
-            if matches!(
-                self.node(name).kind().known(),
-                Some(K::ArrayBindingPattern | K::ObjectBindingPattern)
-            ) {
-                if let Some(nested) = self.recreate_binding(name)? {
-                    self.append_flat(nested, &mut result);
-                }
-            } else {
-                let ty = self.ensure_type(element, false)?;
-                result.push(
-                    self.output
-                        .new_variable_declaration(Some(name), None, ty, None),
-                );
-            }
-        }
-        Ok(match result.len() {
-            0 => None,
-            1 => result.first().copied(),
-            _ => {
-                let nodes = self
-                    .output
-                    .alloc_nodes(result.into_iter().map(Some).collect());
-                Some(self.output.new_syntax_list(nodes))
-            }
-        })
     }
 }

@@ -113,7 +113,7 @@ impl CheckerState {
                                 )
                             }),
                         ));
-                        self.resolve_late_member(symbol, early, &mut late, member)?;
+                        self.resolve_late_member(symbol, early, &mut late, member, true)?;
                     }
                 }
             }
@@ -142,7 +142,10 @@ impl CheckerState {
                                 )
                             }),
                         ));
-                        self.resolve_late_member(symbol, early, &mut late, member)?;
+                        // The pin late-binds an assignment declaration's
+                        // name only (`hasLateBindableName`), never an index
+                        // signature.
+                        self.resolve_late_member(symbol, early, &mut late, member, false)?;
                     }
                 }
             }
@@ -239,6 +242,7 @@ impl CheckerState {
         early: Option<SymbolTableId>,
         late: &mut SymbolTable,
         declaration: NodeId,
+        index_signatures: bool,
     ) -> Result<(), Error> {
         let Some(name) = self.late_name(declaration)? else {
             return Ok(());
@@ -246,11 +250,13 @@ impl CheckerState {
         let ty = self.late_name_type(name)?;
         if self.types.flags(ty)? & (tf::STRING_OR_NUMBER_LITERAL | tf::UNIQUE_ES_SYMBOL) != 0 {
             self.late_bind_member(parent, early, late, declaration, name, ty)?;
-        } else if self.source_type_assignable(
-            ty,
-            self.builtins.string_number_symbol_type,
-            &mut Vec::new(),
-        )? {
+        } else if index_signatures
+            && self.source_type_assignable(
+                ty,
+                self.builtins.string_number_symbol_type,
+                &mut Vec::new(),
+            )?
+        {
             self.late_bind_index_signature(early, late, declaration)?;
         }
         Ok(())

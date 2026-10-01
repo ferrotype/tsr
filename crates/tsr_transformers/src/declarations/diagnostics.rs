@@ -1,8 +1,10 @@
 //! Declaration accessibility diagnostics preserve native diagnostic locations
-//! and module-name distinctions. Selectors are stored as source identities by
-//! the walker, rather than closures retaining a checker borrow.
+//! and module-name distinctions. The pin's diagnostic selectors are closures
+//! over a node; here they are `GetSymbolAccessibilityDiagnostic` values
+//! naming the node and the message selector, evaluated against a view of the
+//! node's file.
 use tsr_arena::{Error, NodeId};
-use tsr_ast::{modifier_flags as mf, AstView, SyntaxKind as K};
+use tsr_ast::{modifier_flags as mf, AstView, NodeKind, SyntaxKind as K};
 use tsr_diagnostics::{self as d, Message};
 use tsr_printer::emit_resolver::{SymbolAccessibility, SymbolAccessibilityResult};
 
@@ -13,15 +15,140 @@ pub struct SymbolAccessibilityDiagnostic {
     pub type_name: Option<NodeId>,
 }
 
-fn parent(view: AstView<'_>, node: NodeId) -> Result<NodeId, Error> {
-    view.node(node)?.parent().ok_or(Error::InvalidGraph)
+/// Why a selector gave no diagnostic: a storage failure, or the pin's panic,
+/// raised when the selector is evaluated.
+#[derive(Clone, Debug)]
+pub(super) enum Failure {
+    Arena(Error),
+    Panic(String),
+}
+impl From<Error> for Failure {
+    fn from(error: Error) -> Self {
+        Self::Arena(error)
+    }
+}
+
+/// Go's `ast.Kind.String()`.
+pub(super) fn kind_string(kind: NodeKind) -> String {
+    match kind.known() {
+        Some(kind) => format!("Kind{}", kind.as_str()),
+        None => format!("Kind({})", kind.raw()),
+    }
+}
+
+/// The message selectors a wrapped selector calls.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum MessageSelector {
+    AccessorName,
+    MethodName,
+    VariableDeclarationType,
+    AccessorDeclarationType,
+    ReturnType,
+    ParameterDeclarationType,
+    TypeParameterConstraint,
+    ImportDeclaration,
+}
+
+/// Go's `GetSymbolAccessibilityDiagnostic` closures.
+#[derive(Clone, Copy, Debug)]
+pub(super) enum GetSymbolAccessibilityDiagnostic {
+    Simple(NodeId, MessageSelector),
+    Named(NodeId, MessageSelector),
+    Fallback(NodeId, MessageSelector),
+    /// The inline closure of an `ExpressionWithTypeArguments` context.
+    HeritageClause(NodeId),
+    /// The inline closure of a type alias context.
+    TypeAlias(NodeId),
+    /// The inline closure of an `Object.defineProperty` call context.
+    DefineProperty(NodeId),
+}
+
+const NIL: &str = "runtime error: invalid memory address or nil pointer dereference";
+
+/// A selector's `node.Parent`: a nil parent is the pin's dereference panic,
+/// raised when the selector is called.
+fn parent(view: AstView<'_>, node: NodeId) -> Result<NodeId, Failure> {
+    view.node(node)?
+        .parent()
+        .ok_or_else(|| Failure::Panic(NIL.to_owned()))
 }
 fn static_node(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
     tsr_ast::utilities::is_static(view, node)
 }
-fn class_parent(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
+fn class_parent(view: AstView<'_>, node: NodeId) -> Result<bool, Failure> {
     Ok(view.node(parent(view, node)?)?.kind() == K::ClassDeclaration)
 }
+fn select_message(
+    view: AstView<'_>,
+    selector: MessageSelector,
+    node: NodeId,
+    result: &SymbolAccessibilityResult,
+) -> Result<Option<&'static Message>, Failure> {
+    Ok(Some(match selector {
+        MessageSelector::AccessorName => accessor_name_message(view, node, result)?,
+        MessageSelector::MethodName => method_name_message(view, node, result)?,
+        MessageSelector::VariableDeclarationType => return variable_message(view, node, result),
+        MessageSelector::AccessorDeclarationType => accessor_type_message(view, node, result)?,
+        MessageSelector::ReturnType => return_message(view, node, result)?,
+        MessageSelector::ParameterDeclarationType => parameter_message(view, node, result)?,
+        MessageSelector::TypeParameterConstraint => type_parameter_message(view, node)?,
+        MessageSelector::ImportDeclaration => d::Import_declaration_0_is_using_private_name_1,
+    }))
+}
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:wrapSimpleDiagnosticSelector
+fn wrap_simple_diagnostic_selector(
+    view: AstView<'_>,
+    node: NodeId,
+    selector: MessageSelector,
+    result: &SymbolAccessibilityResult,
+) -> Result<Option<SymbolAccessibilityDiagnostic>, Failure> {
+    let Some(diagnostic_message) = select_message(view, selector, node, result)? else {
+        return Ok(None);
+    };
+    Ok(Some(SymbolAccessibilityDiagnostic {
+        error_node: Some(node),
+        diagnostic_message,
+        type_name: tsr_ast::get_name_of_declaration(view, Some(node))?,
+    }))
+}
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:wrapNamedDiagnosticSelector
+fn wrap_named_diagnostic_selector(
+    view: AstView<'_>,
+    node: NodeId,
+    selector: MessageSelector,
+    result: &SymbolAccessibilityResult,
+) -> Result<Option<SymbolAccessibilityDiagnostic>, Failure> {
+    let Some(diagnostic_message) = select_message(view, selector, node, result)? else {
+        return Ok(None);
+    };
+    let name = tsr_ast::get_name_of_declaration(view, Some(node))?;
+    Ok(Some(SymbolAccessibilityDiagnostic {
+        error_node: name,
+        diagnostic_message,
+        type_name: name,
+    }))
+}
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:wrapFallbackErrorDiagnosticSelector
+fn wrap_fallback_error_diagnostic_selector(
+    view: AstView<'_>,
+    node: NodeId,
+    selector: MessageSelector,
+    result: &SymbolAccessibilityResult,
+) -> Result<Option<SymbolAccessibilityDiagnostic>, Failure> {
+    let Some(diagnostic_message) = select_message(view, selector, node, result)? else {
+        return Ok(None);
+    };
+    let error_node = tsr_ast::get_name_of_declaration(view, Some(node))?.or(Some(node));
+    Ok(Some(SymbolAccessibilityDiagnostic {
+        error_node,
+        diagnostic_message,
+        type_name: None,
+    }))
+}
+
 // port: tsc/internal/transformers/declarations/diagnostics.go:selectDiagnosticBasedOnModuleName
 fn module_message(
     result: &SymbolAccessibilityResult,
@@ -55,7 +182,7 @@ fn accessor_name_message(
     view: AstView<'_>,
     node: NodeId,
     result: &SymbolAccessibilityResult,
-) -> Result<&'static Message, Error> {
+) -> Result<&'static Message, Failure> {
     Ok(if static_node(view, node)? {
         module_message(result, d::Public_static_property_0_of_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named, d::Public_static_property_0_of_exported_class_has_or_is_using_name_1_from_private_module_2, d::Public_static_property_0_of_exported_class_has_or_is_using_private_name_1)
     } else if class_parent(view, node)? {
@@ -74,7 +201,7 @@ fn method_name_message(
     view: AstView<'_>,
     node: NodeId,
     result: &SymbolAccessibilityResult,
-) -> Result<&'static Message, Error> {
+) -> Result<&'static Message, Failure> {
     Ok(if static_node(view, node)? {
         module_message(result, d::Public_static_method_0_of_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named, d::Public_static_method_0_of_exported_class_has_or_is_using_name_1_from_private_module_2, d::Public_static_method_0_of_exported_class_has_or_is_using_private_name_1)
     } else if class_parent(view, node)? {
@@ -93,7 +220,7 @@ fn variable_message(
     view: AstView<'_>,
     node: NodeId,
     result: &SymbolAccessibilityResult,
-) -> Result<Option<&'static Message>, Error> {
+) -> Result<Option<&'static Message>, Failure> {
     let kind = view.node(node)?.kind().known();
     if matches!(kind, Some(K::VariableDeclaration | K::BindingElement)) {
         return Ok(Some(module_message(result, d::Exported_variable_0_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named, d::Exported_variable_0_has_or_is_using_name_1_from_private_module_2, d::Exported_variable_0_has_or_is_using_private_name_1)));
@@ -131,7 +258,7 @@ fn accessor_type_message(
     view: AstView<'_>,
     node: NodeId,
     result: &SymbolAccessibilityResult,
-) -> Result<&'static Message, Error> {
+) -> Result<&'static Message, Failure> {
     Ok(if view.node(node)?.kind() == K::SetAccessor {
         if static_node(view, node)? {
             private_message(result, d::Parameter_type_of_public_static_setter_0_from_exported_class_has_or_is_using_name_1_from_private_module_2, d::Parameter_type_of_public_static_setter_0_from_exported_class_has_or_is_using_private_name_1)
@@ -150,14 +277,14 @@ fn return_message(
     view: AstView<'_>,
     node: NodeId,
     result: &SymbolAccessibilityResult,
-) -> Result<&'static Message, Error> {
+) -> Result<&'static Message, Failure> {
     Ok(match view.node(node)?.kind().known() {
         Some(K::ConstructSignature)=>private_message(result, d::Return_type_of_constructor_signature_from_exported_interface_has_or_is_using_name_0_from_private_module_1, d::Return_type_of_constructor_signature_from_exported_interface_has_or_is_using_private_name_0),
         Some(K::CallSignature)=>private_message(result, d::Return_type_of_call_signature_from_exported_interface_has_or_is_using_name_0_from_private_module_1, d::Return_type_of_call_signature_from_exported_interface_has_or_is_using_private_name_0),
         Some(K::IndexSignature)=>private_message(result, d::Return_type_of_index_signature_from_exported_interface_has_or_is_using_name_0_from_private_module_1, d::Return_type_of_index_signature_from_exported_interface_has_or_is_using_private_name_0),
         Some(K::MethodDeclaration|K::MethodSignature)=>if static_node(view,node)? { module_message(result, d::Return_type_of_public_static_method_from_exported_class_has_or_is_using_name_0_from_external_module_1_but_cannot_be_named, d::Return_type_of_public_static_method_from_exported_class_has_or_is_using_name_0_from_private_module_1, d::Return_type_of_public_static_method_from_exported_class_has_or_is_using_private_name_0) } else if class_parent(view,node)? { module_message(result, d::Return_type_of_public_method_from_exported_class_has_or_is_using_name_0_from_external_module_1_but_cannot_be_named, d::Return_type_of_public_method_from_exported_class_has_or_is_using_name_0_from_private_module_1, d::Return_type_of_public_method_from_exported_class_has_or_is_using_private_name_0) } else { private_message(result, d::Return_type_of_method_from_exported_interface_has_or_is_using_name_0_from_private_module_1, d::Return_type_of_method_from_exported_interface_has_or_is_using_private_name_0) },
         Some(K::FunctionDeclaration)=>module_message(result, d::Return_type_of_exported_function_has_or_is_using_name_0_from_external_module_1_but_cannot_be_named, d::Return_type_of_exported_function_has_or_is_using_name_0_from_private_module_1, d::Return_type_of_exported_function_has_or_is_using_private_name_0),
-        _=>return Err(Error::InvalidGraph),
+        _=>return Err(Failure::Panic(format!("This is unknown kind for signature: {}", kind_string(view.node(node)?.kind())))),
     })
 }
 
@@ -166,7 +293,7 @@ fn parameter_message(
     view: AstView<'_>,
     node: NodeId,
     result: &SymbolAccessibilityResult,
-) -> Result<&'static Message, Error> {
+) -> Result<&'static Message, Failure> {
     let owner = parent(view, node)?;
     Ok(match view.node(owner)?.kind().known() {
         Some(K::Constructor)=>module_message(result, d::Parameter_0_of_constructor_from_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named, d::Parameter_0_of_constructor_from_exported_class_has_or_is_using_name_1_from_private_module_2, d::Parameter_0_of_constructor_from_exported_class_has_or_is_using_private_name_1),
@@ -176,7 +303,7 @@ fn parameter_message(
         Some(K::MethodDeclaration|K::MethodSignature)=>if static_node(view,owner)? { module_message(result, d::Parameter_0_of_public_static_method_from_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named, d::Parameter_0_of_public_static_method_from_exported_class_has_or_is_using_name_1_from_private_module_2, d::Parameter_0_of_public_static_method_from_exported_class_has_or_is_using_private_name_1) } else if class_parent(view,owner)? { module_message(result, d::Parameter_0_of_public_method_from_exported_class_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named, d::Parameter_0_of_public_method_from_exported_class_has_or_is_using_name_1_from_private_module_2, d::Parameter_0_of_public_method_from_exported_class_has_or_is_using_private_name_1) } else { private_message(result, d::Parameter_0_of_method_from_exported_interface_has_or_is_using_name_1_from_private_module_2, d::Parameter_0_of_method_from_exported_interface_has_or_is_using_private_name_1) },
         Some(K::FunctionDeclaration|K::FunctionType|K::ArrowFunction|K::FunctionExpression)=>module_message(result, d::Parameter_0_of_exported_function_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named, d::Parameter_0_of_exported_function_has_or_is_using_name_1_from_private_module_2, d::Parameter_0_of_exported_function_has_or_is_using_private_name_1),
         Some(K::SetAccessor|K::GetAccessor)=>module_message(result, d::Parameter_0_of_accessor_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named, d::Parameter_0_of_accessor_has_or_is_using_name_1_from_private_module_2, d::Parameter_0_of_accessor_has_or_is_using_private_name_1),
-        _=>return Err(Error::InvalidGraph),
+        _=>return Err(Failure::Panic(format!("Unknown parent for parameter: {}", kind_string(view.node(owner)?.kind())))),
     })
 }
 
@@ -234,7 +361,7 @@ pub(super) fn isolated_error_message(kind: K) -> Option<&'static Message> {
 }
 
 // port: tsc/internal/transformers/declarations/diagnostics.go:getTypeParameterConstraintVisibilityDiagnosticMessage
-fn type_parameter_message(view: AstView<'_>, node: NodeId) -> Result<&'static Message, Error> {
+fn type_parameter_message(view: AstView<'_>, node: NodeId) -> Result<&'static Message, Failure> {
     let owner = parent(view, node)?;
     Ok(match view.node(owner)?.kind().known() {
         Some(K::ClassDeclaration)=>d::Type_parameter_0_of_exported_class_has_or_is_using_private_name_1,
@@ -250,122 +377,171 @@ fn type_parameter_message(view: AstView<'_>, node: NodeId) -> Result<&'static Me
         Some(K::FunctionType|K::FunctionDeclaration)=>d::Type_parameter_0_of_exported_function_has_or_is_using_private_name_1,
         Some(K::InferType)=>d::Extends_clause_for_inferred_type_0_has_or_is_using_private_name_1,
         Some(K::TypeAliasDeclaration|K::JSTypeAliasDeclaration)=>d::Type_parameter_0_of_exported_type_alias_has_or_is_using_private_name_1,
-        _=>return Err(Error::InvalidGraph),
+        _=>return Err(Failure::Panic(format!("This is unknown parent for type parameter: {}", kind_string(view.node(owner)?.kind())))),
     })
 }
 
 // port: tsc/internal/transformers/declarations/diagnostics.go:createGetSymbolAccessibilityDiagnosticForNodeName
-// port: tsc/internal/transformers/declarations/diagnostics.go:createGetSymbolAccessibilityDiagnosticForNode
-pub fn accessibility_diagnostic(
+pub(super) fn create_get_symbol_accessibility_diagnostic_for_node_name(
     view: AstView<'_>,
     node: NodeId,
-    name_context: bool,
-    result: &SymbolAccessibilityResult,
-) -> Result<Option<SymbolAccessibilityDiagnostic>, Error> {
-    let kind = view.node(node)?.kind().known().ok_or(Error::InvalidGraph)?;
-    let name = tsr_ast::get_name_of_declaration(view, Some(node))?;
-    let simple = |diagnostic_message| SymbolAccessibilityDiagnostic {
-        error_node: Some(node),
-        diagnostic_message,
-        type_name: name,
-    };
-    if name_context {
-        if matches!(kind, K::SetAccessor | K::GetAccessor) {
-            return Ok(Some(simple(accessor_name_message(view, node, result)?)));
-        }
-        if matches!(kind, K::MethodDeclaration | K::MethodSignature) {
-            return Ok(Some(simple(method_name_message(view, node, result)?)));
-        }
+) -> Result<GetSymbolAccessibilityDiagnostic, Error> {
+    let kind = view.node(node)?.kind().known();
+    if matches!(kind, Some(K::SetAccessor | K::GetAccessor)) {
+        Ok(GetSymbolAccessibilityDiagnostic::Simple(
+            node,
+            MessageSelector::AccessorName,
+        ))
+    } else if matches!(kind, Some(K::MethodDeclaration | K::MethodSignature)) {
+        Ok(GetSymbolAccessibilityDiagnostic::Simple(
+            node,
+            MessageSelector::MethodName,
+        ))
+    } else {
+        create_get_symbol_accessibility_diagnostic_for_node(view, node)
     }
-    let selection = match kind {
-        K::VariableDeclaration
-        | K::PropertyDeclaration
-        | K::PropertySignature
-        | K::PropertyAccessExpression
-        | K::ElementAccessExpression
-        | K::BinaryExpression
-        | K::BindingElement
-        | K::Constructor => {
-            return Ok(variable_message(view, node, result)?.map(simple));
+}
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:createGetSymbolAccessibilityDiagnosticForNode
+pub(super) fn create_get_symbol_accessibility_diagnostic_for_node(
+    view: AstView<'_>,
+    node: NodeId,
+) -> Result<GetSymbolAccessibilityDiagnostic, Error> {
+    use GetSymbolAccessibilityDiagnostic as G;
+    let read = view.node(node)?;
+    Ok(match read.kind().known() {
+        Some(
+            K::VariableDeclaration
+            | K::PropertyDeclaration
+            | K::PropertySignature
+            | K::PropertyAccessExpression
+            | K::ElementAccessExpression
+            | K::BinaryExpression
+            | K::BindingElement
+            | K::Constructor,
+        ) => G::Simple(node, MessageSelector::VariableDeclarationType),
+        Some(K::SetAccessor | K::GetAccessor) => {
+            G::Named(node, MessageSelector::AccessorDeclarationType)
         }
-        K::SetAccessor | K::GetAccessor => SymbolAccessibilityDiagnostic {
-            error_node: name,
-            diagnostic_message: accessor_type_message(view, node, result)?,
-            type_name: name,
-        },
-        K::ConstructSignature
-        | K::CallSignature
-        | K::MethodDeclaration
-        | K::MethodSignature
-        | K::FunctionDeclaration
-        | K::IndexSignature => SymbolAccessibilityDiagnostic {
-            error_node: name.or(Some(node)),
-            diagnostic_message: return_message(view, node, result)?,
-            type_name: None,
-        },
-        K::Parameter => {
-            let owner = parent(view, node)?;
+        Some(
+            K::ConstructSignature
+            | K::CallSignature
+            | K::MethodDeclaration
+            | K::MethodSignature
+            | K::FunctionDeclaration
+            | K::IndexSignature,
+        ) => G::Fallback(node, MessageSelector::ReturnType),
+        Some(K::Parameter) => {
+            let owner = read.parent().expect(NIL);
             if tsr_ast::utilities::is_parameter_property_declaration(view, node, owner)?
                 && tsr_ast::utilities::has_syntactic_modifier(view, owner, mf::PRIVATE)?
             {
-                return Ok(variable_message(view, node, result)?.map(simple));
-            }
-            simple(parameter_message(view, node, result)?)
-        }
-        K::TypeParameter => simple(type_parameter_message(view, node)?),
-        K::ExpressionWithTypeArguments => {
-            let clause = parent(view, node)?;
-            let owner = parent(view, clause)?;
-            let diagnostic_message = if view.node(owner)?.kind() == K::ClassDeclaration {
-                let implements = view.node(clause)?.kind() == K::HeritageClause
-                    && view
-                        .node(clause)?
-                        .data_source()
-                        .as_heritage_clause()
-                        .ok_or(Error::InvalidGraph)?
-                        .token()
-                        == K::ImplementsKeyword;
-                if implements {
-                    d::Implements_clause_of_exported_class_0_has_or_is_using_private_name_1
-                } else if view.node(owner)?.name().is_some() {
-                    d::X_extends_clause_of_exported_class_0_has_or_is_using_private_name_1
-                } else {
-                    d::X_extends_clause_of_exported_class_has_or_is_using_private_name_0
-                }
+                G::Simple(node, MessageSelector::VariableDeclarationType)
             } else {
-                d::X_extends_clause_of_exported_interface_0_has_or_is_using_private_name_1
-            };
-            SymbolAccessibilityDiagnostic {
-                error_node: Some(node),
-                diagnostic_message,
-                type_name: tsr_ast::get_name_of_declaration(view, Some(owner))?,
+                G::Simple(node, MessageSelector::ParameterDeclarationType)
             }
         }
-        K::ImportEqualsDeclaration => simple(d::Import_declaration_0_is_using_private_name_1),
-        K::TypeAliasDeclaration | K::JSTypeAliasDeclaration => SymbolAccessibilityDiagnostic {
-            error_node: view.node(node)?.type_node(),
-            diagnostic_message: private_message(
-                result,
-                d::Exported_type_alias_0_has_or_is_using_private_name_1_from_module_2,
-                d::Exported_type_alias_0_has_or_is_using_private_name_1,
-            ),
-            type_name: name,
-        },
-        K::CallExpression => {
-            let arguments = view.node(node)?.arguments(view)?;
-            let target = view
-                .node_slice(arguments)?
-                .get(1)
-                .flatten()
-                .ok_or(Error::InvalidGraph)?;
-            SymbolAccessibilityDiagnostic {
-                error_node:Some(target),type_name:Some(target),
-                diagnostic_message:module_message(result,d::Exported_variable_0_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named,d::Exported_variable_0_has_or_is_using_name_1_from_private_module_2,d::Exported_variable_0_has_or_is_using_private_name_1),
+        Some(K::TypeParameter) => G::Simple(node, MessageSelector::TypeParameterConstraint),
+        Some(K::ExpressionWithTypeArguments) => G::HeritageClause(node),
+        Some(K::ImportEqualsDeclaration) => G::Simple(node, MessageSelector::ImportDeclaration),
+        Some(K::TypeAliasDeclaration | K::JSTypeAliasDeclaration) => G::TypeAlias(node),
+        Some(K::CallExpression) => G::DefineProperty(node),
+        _ => panic!(
+            "Attempted to set a declaration diagnostic context for unhandled node kind: {}",
+            kind_string(read.kind())
+        ),
+    })
+}
+
+// port: tsc/internal/transformers/declarations/transform.go:throwDiagnostic
+pub(super) fn throw_diagnostic() -> Failure {
+    Failure::Panic("Diagnostic emitted without context".to_owned())
+}
+
+impl GetSymbolAccessibilityDiagnostic {
+    /// Calls the closure with one accessibility result.
+    pub(super) fn evaluate(
+        self,
+        view: AstView<'_>,
+        result: &SymbolAccessibilityResult,
+    ) -> Result<Option<SymbolAccessibilityDiagnostic>, Failure> {
+        match self {
+            Self::Simple(node, selector) => {
+                wrap_simple_diagnostic_selector(view, node, selector, result)
+            }
+            Self::Named(node, selector) => {
+                wrap_named_diagnostic_selector(view, node, selector, result)
+            }
+            Self::Fallback(node, selector) => {
+                wrap_fallback_error_diagnostic_selector(view, node, selector, result)
+            }
+            Self::HeritageClause(node) => {
+                let clause = parent(view, node)?;
+                let owner = parent(view, clause)?;
+                // Heritage clause is written by user so it can always be named
+                let diagnostic_message = if view.node(owner)?.kind() == K::ClassDeclaration {
+                    // Class or Interface implemented/extended is inaccessible
+                    let implements = view.node(clause)?.kind() == K::HeritageClause
+                        && view
+                            .node(clause)?
+                            .data_source()
+                            .as_heritage_clause()
+                            .expect("heritage clause payload")
+                            .token()
+                            == K::ImplementsKeyword;
+                    if implements {
+                        d::Implements_clause_of_exported_class_0_has_or_is_using_private_name_1
+                    } else if view.node(owner)?.name().is_some() {
+                        d::X_extends_clause_of_exported_class_0_has_or_is_using_private_name_1
+                    } else {
+                        d::X_extends_clause_of_exported_class_has_or_is_using_private_name_0
+                    }
+                } else {
+                    // interface is inaccessible
+                    d::X_extends_clause_of_exported_interface_0_has_or_is_using_private_name_1
+                };
+                Ok(Some(SymbolAccessibilityDiagnostic {
+                    diagnostic_message,
+                    error_node: Some(node),
+                    type_name: tsr_ast::get_name_of_declaration(view, Some(owner))?,
+                }))
+            }
+            Self::TypeAlias(node) => {
+                let diagnostic_message = private_message(
+                    result,
+                    d::Exported_type_alias_0_has_or_is_using_private_name_1_from_module_2,
+                    d::Exported_type_alias_0_has_or_is_using_private_name_1,
+                );
+                let read = view.node(node)?;
+                Ok(Some(SymbolAccessibilityDiagnostic {
+                    error_node: read.type_node(),
+                    diagnostic_message,
+                    type_name: read.name(),
+                }))
+            }
+            Self::DefineProperty(node) => {
+                let diagnostic_message = module_message(
+                    result,
+                    d::Exported_variable_0_has_or_is_using_name_1_from_external_module_2_but_cannot_be_named,
+                    d::Exported_variable_0_has_or_is_using_name_1_from_private_module_2,
+                    d::Exported_variable_0_has_or_is_using_private_name_1,
+                );
+                let arguments = view.node(node)?.arguments(view)?;
+                let arguments = view.node_slice(arguments)?;
+                let Some(target) = arguments.get(1) else {
+                    return Err(Failure::Panic(format!(
+                        "runtime error: index out of range [1] with length {}",
+                        arguments.len()
+                    )));
+                };
+                Ok(Some(SymbolAccessibilityDiagnostic {
+                    error_node: target,
+                    diagnostic_message,
+                    type_name: target,
+                }))
             }
         }
-        _ => return Err(Error::InvalidGraph),
-    };
-    Ok(Some(selection))
+    }
 }
 
 // port: tsc/internal/checker/utilities.go:NewDiagnosticForNode
@@ -388,41 +564,69 @@ pub(super) fn diagnostic_for_node(
     Ok(tsr_ast::Diagnostic::new(file, range, message, args))
 }
 
-// port: tsc/internal/transformers/declarations/diagnostics.go:findNearestDeclaration
-fn nearest_declaration(view: AstView<'_>, mut node: NodeId) -> Result<Option<NodeId>, Error> {
-    loop {
-        let read = view.node(node)?;
-        let kind = read.kind().known();
-        if kind == Some(K::ExportAssignment) {
-            return Ok(Some(node));
+// port: tsc/internal/transformers/declarations/tracker.go:createDiagnosticForNode
+pub(super) fn create_diagnostic_for_node(
+    view: AstView<'_>,
+    node: NodeId,
+    message: &'static Message,
+    args: Vec<tsr_ast::JsString>,
+) -> Result<tsr_ast::Diagnostic, Error> {
+    diagnostic_for_node(view, Some(node), message, args)
+}
+
+fn add_related_info(diagnostic: &mut tsr_ast::Diagnostic, related: tsr_ast::Diagnostic) {
+    diagnostic
+        .related_information
+        .push(std::sync::Arc::new(related));
+}
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:isDeclarationEnoughForErrors
+fn is_declaration_enough_for_errors(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
+    Ok(matches!(
+        view.node(node)?.kind().known(),
+        Some(K::ExportAssignment | K::VariableDeclaration | K::PropertyDeclaration | K::Parameter)
+    ) || tsr_ast::utilities::is_statement(view, node)?)
+}
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:isFunctionLikeAndNotConstructor
+fn is_function_like_and_not_constructor(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
+    let read = view.node(node)?;
+    Ok(
+        tsr_ast::utilities::is_function_like_declaration(Some(&read))
+            && read.kind() != K::Constructor,
+    )
+}
+
+fn find_ancestor_by(
+    view: AstView<'_>,
+    mut node: Option<NodeId>,
+    predicate: fn(AstView<'_>, NodeId) -> Result<bool, Error>,
+) -> Result<Option<NodeId>, Error> {
+    while let Some(current) = node {
+        if predicate(view, current)? {
+            return Ok(Some(current));
         }
-        if matches!(
-            kind,
-            Some(K::VariableDeclaration | K::PropertyDeclaration | K::Parameter)
-        ) {
-            return Ok(Some(node));
-        }
-        if tsr_ast::utilities::is_statement(view, node)? {
-            if kind != Some(K::ReturnStatement) {
-                return Ok(None);
-            }
-            let mut current = Some(node);
-            while let Some(node) = current {
-                let read = view.node(node)?;
-                if tsr_ast::utilities::is_function_like_declaration(Some(&read))
-                    && read.kind() != K::Constructor
-                {
-                    return Ok(Some(node));
-                }
-                current = read.parent();
-            }
-            return Ok(None);
-        }
-        match read.parent() {
-            Some(parent) => node = parent,
-            None => return Ok(None),
-        }
+        node = view.node(current)?.parent();
     }
+    Ok(None)
+}
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:findNearestDeclaration
+fn find_nearest_declaration(view: AstView<'_>, node: NodeId) -> Result<Option<NodeId>, Error> {
+    let Some(result) = find_ancestor_by(view, Some(node), is_declaration_enough_for_errors)? else {
+        return Ok(None);
+    };
+    let kind = view.node(result)?.kind();
+    if kind == K::ExportAssignment {
+        return Ok(Some(result));
+    }
+    if kind == K::ReturnStatement {
+        return find_ancestor_by(view, Some(result), is_function_like_and_not_constructor);
+    }
+    if tsr_ast::utilities::is_statement(view, result)? {
+        return Ok(None);
+    }
+    Ok(Some(result))
 }
 
 fn declaration_target_text(view: AstView<'_>, node: NodeId) -> Result<tsr_ast::JsString, Error> {
@@ -433,115 +637,66 @@ fn declaration_target_text(view: AstView<'_>, node: NodeId) -> Result<tsr_ast::J
     }
     Ok(tsr_ast::JsString::default())
 }
+
+/// A nil message reaching `NewDiagnosticForNode` is the pin's nil dereference.
+fn required_message(message: Option<&'static Message>) -> &'static Message {
+    message.expect(NIL)
+}
+
 fn kind(view: AstView<'_>, node: NodeId) -> Result<K, Error> {
     view.node(node)?.kind().known().ok_or(Error::InvalidGraph)
 }
-fn required_message(message: Option<&'static Message>) -> Result<&'static Message, Error> {
-    message.ok_or(Error::InvalidGraph)
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:createEntityInTypeNodeError
+fn create_entity_in_type_node_error(
+    view: AstView<'_>,
+    node: NodeId,
+) -> Result<tsr_ast::Diagnostic, Error> {
+    let mut diagnostic = create_diagnostic_for_node(
+        view,
+        node,
+        d::Type_containing_private_name_0_can_t_be_used_with_isolatedDeclarations,
+        vec![tsr_scanner::get_text_of_node(view, node)?],
+    )?;
+    add_parent_declaration_related_info(view, node, &mut diagnostic)?;
+    Ok(diagnostic)
 }
+
 // port: tsc/internal/transformers/declarations/diagnostics.go:addParentDeclarationRelatedInfo
-fn add_parent_related_info(
+fn add_parent_declaration_related_info(
     view: AstView<'_>,
     node: NodeId,
     diagnostic: &mut tsr_ast::Diagnostic,
 ) -> Result<(), Error> {
-    if let Some(declaration) = nearest_declaration(view, node)? {
-        let text = declaration_target_text(view, declaration)?;
-        let related = diagnostic_for_node(
-            view,
-            Some(declaration),
-            required_message(related_suggestion(kind(view, declaration)?))?,
-            vec![text],
-        )?;
-        diagnostic
-            .related_information
-            .push(std::sync::Arc::new(related));
-    }
+    let Some(parent_declaration) = find_nearest_declaration(view, node)? else {
+        return Ok(());
+    };
+    let target = declaration_target_text(view, parent_declaration)?;
+    let related = create_diagnostic_for_node(
+        view,
+        parent_declaration,
+        required_message(related_suggestion(kind(view, parent_declaration)?)),
+        vec![target],
+    )?;
+    add_related_info(diagnostic, related);
     Ok(())
 }
 
-// port: tsc/internal/transformers/declarations/diagnostics.go:createExpressionErrorEx
-fn expression_error(
-    view: AstView<'_>,
-    node: NodeId,
-    mut message: Option<&'static Message>,
-) -> Result<tsr_ast::Diagnostic, Error> {
-    let Some(declaration) = nearest_declaration(view, node)? else {
-        return diagnostic_for_node(
-            view,
-            Some(node),
-            message.unwrap_or(d::Expression_type_can_t_be_inferred_with_isolatedDeclarations),
-            vec![],
-        );
-    };
-    let text = declaration_target_text(view, declaration)?;
-    let mut target = view.node(node)?.parent();
-    while let Some(parent) = target {
-        let read = view.node(parent)?;
-        if read.kind() == K::ExportAssignment {
-            break;
-        }
-        if tsr_ast::utilities::is_statement(view, parent)? {
-            target = None;
-            break;
-        }
-        if read.kind() != K::ParenthesizedExpression
-            && !tsr_ast::utilities::is_assertion_expression(&read)
-        {
-            break;
-        }
-        target = read.parent();
-    }
-    let direct = target == Some(declaration);
-    if message.is_none() {
-        message = if direct {
-            isolated_error_message(kind(view, declaration)?)
-        } else {
-            Some(d::Expression_type_can_t_be_inferred_with_isolatedDeclarations)
-        };
-    }
-    let mut diagnostic = diagnostic_for_node(view, Some(node), required_message(message)?, vec![])?;
-    diagnostic
-        .related_information
-        .push(std::sync::Arc::new(diagnostic_for_node(
-            view,
-            Some(declaration),
-            required_message(related_suggestion(kind(view, declaration)?))?,
-            vec![text],
-        )?));
-    if !direct {
-        diagnostic.related_information.push(std::sync::Arc::new(diagnostic_for_node(view,Some(node),d::Add_satisfies_and_a_type_assertion_to_this_expression_satisfies_T_as_T_to_make_the_type_explicit,vec![])?));
-    }
-    Ok(diagnostic)
-}
-
 // port: tsc/internal/transformers/declarations/diagnostics.go:createAccessorTypeError
-fn accessor_error<R: tsr_printer::emit_resolver::DeclarationEmitResolver>(
+fn create_accessor_type_error<R: tsr_printer::emit_resolver::DeclarationEmitResolver>(
     resolver: &mut R,
     node: NodeId,
 ) -> Result<tsr_ast::Diagnostic, R::Error> {
     let current_kind = kind(resolver.ast(node)?, node)?;
-    let other_kind = if current_kind == K::SetAccessor {
-        K::GetAccessor
-    } else {
-        K::SetAccessor
-    };
-    let symbol = resolver
-        .bound_symbol_of_declaration(node)?
-        .ok_or(Error::InvalidGraph)?;
-    let mut other = None;
-    for declaration in resolver.symbol_declarations(symbol)? {
-        if kind(resolver.ast(declaration)?, declaration)? == other_kind {
-            other = Some(declaration);
-            break;
-        }
-    }
-    let (getter, setter) = if current_kind == K::SetAccessor {
-        (other, Some(node))
-    } else {
-        (Some(node), other)
-    };
+    let symbol = resolver.bound_symbol_of_declaration(node)?.expect(NIL);
+    let declarations = resolver.symbol_declarations(symbol)?;
     let view = resolver.ast(node)?;
+    let all = tsr_ast::utilities_class::get_all_accessor_declarations_for_declaration(
+        view,
+        node,
+        &declarations,
+    )?;
+    let (get_accessor, set_accessor) = (all.get_accessor, all.set_accessor);
     let mut target = node;
     if current_kind == K::SetAccessor {
         let parameters = view.node(node)?.parameters(view)?;
@@ -549,221 +704,308 @@ fn accessor_error<R: tsr_printer::emit_resolver::DeclarationEmitResolver>(
             target = parameter;
         }
     }
-    let mut diagnostic = diagnostic_for_node(
+    let mut diagnostic = create_diagnostic_for_node(
         view,
-        Some(target),
-        required_message(isolated_error_message(current_kind))?,
+        target,
+        required_message(isolated_error_message(current_kind)),
         vec![],
     )?;
-    // Native related order is setter then getter, independent of source order.
-    for declaration in [setter, getter].into_iter().flatten() {
-        let view = resolver.ast(declaration)?;
-        diagnostic
-            .related_information
-            .push(std::sync::Arc::new(diagnostic_for_node(
-                view,
-                Some(declaration),
-                required_message(related_suggestion(kind(view, declaration)?))?,
-                vec![],
-            )?));
+    if let Some(set_accessor) = set_accessor {
+        let view = resolver.ast(set_accessor)?;
+        let related = create_diagnostic_for_node(
+            view,
+            set_accessor,
+            required_message(related_suggestion(kind(view, set_accessor)?)),
+            vec![],
+        )?;
+        add_related_info(&mut diagnostic, related);
+    }
+    if let Some(get_accessor) = get_accessor {
+        let view = resolver.ast(get_accessor)?;
+        let related = create_diagnostic_for_node(
+            view,
+            get_accessor,
+            required_message(related_suggestion(kind(view, get_accessor)?)),
+            vec![],
+        )?;
+        add_related_info(&mut diagnostic, related);
     }
     Ok(diagnostic)
 }
 
-// Inline copy of `isPartOfTypeExpressionWithTypeArguments`; its Phase 1 home is in tsr_ast (table group positions).
-fn type_heritage(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
-    let owner = parent(view, node)?;
-    let read = view.node(owner)?;
-    Ok(match read.kind().known() {
-        Some(K::HeritageClause) => {
-            let container = parent(view, owner)?;
-            !matches!(
-                view.node(container)?.kind().known(),
-                Some(K::ClassDeclaration | K::ClassExpression)
-            ) || read
-                .data_source()
-                .as_heritage_clause()
-                .ok_or(Error::InvalidGraph)?
-                .token()
-                == K::ImplementsKeyword
-        }
-        Some(K::JSDocImplementsTag | K::JSDocAugmentsTag) => true,
-        _ => false,
-    })
+// port: tsc/internal/transformers/declarations/diagnostics.go:createObjectLiteralError
+fn create_object_literal_error(
+    view: AstView<'_>,
+    node: NodeId,
+) -> Result<tsr_ast::Diagnostic, Error> {
+    let mut diagnostic = create_diagnostic_for_node(
+        view,
+        node,
+        required_message(isolated_error_message(kind(view, node)?)),
+        vec![],
+    )?;
+    add_parent_declaration_related_info(view, node, &mut diagnostic)?;
+    Ok(diagnostic)
 }
-fn type_kind_range(kind: K) -> bool {
-    (K::FirstTypeNode..=K::LastTypeNode).contains(&kind)
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:createArrayLiteralError
+fn create_array_literal_error(
+    view: AstView<'_>,
+    node: NodeId,
+) -> Result<tsr_ast::Diagnostic, Error> {
+    let mut diagnostic = create_diagnostic_for_node(
+        view,
+        node,
+        required_message(isolated_error_message(kind(view, node)?)),
+        vec![],
+    )?;
+    add_parent_declaration_related_info(view, node, &mut diagnostic)?;
+    Ok(diagnostic)
 }
-// Inline copy of `isPartOfTypeNodeInParent`; its Phase 1 home is in tsr_ast (table group positions).
-fn part_of_type_in_parent(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
-    let owner = parent(view, node)?;
-    let read = view.node(owner)?;
-    let Some(kind) = read.kind().known() else {
-        return Err(Error::InvalidGraph);
-    };
-    if kind == K::TypeQuery {
-        return Ok(false);
-    }
-    if kind == K::ImportType {
-        return Ok(!read
-            .data_source()
-            .as_import_type_node()
-            .ok_or(Error::InvalidGraph)?
-            .is_type_of());
-    }
-    if type_kind_range(kind) {
-        return Ok(true);
-    }
-    Ok(match kind {
-        K::ExpressionWithTypeArguments => type_heritage(view, owner)?,
-        K::TypeParameter => {
-            read.data_source()
-                .as_type_parameter_declaration()
-                .ok_or(Error::InvalidGraph)?
-                .constraint()
-                == Some(node)
-        }
-        K::VariableDeclaration
-        | K::Parameter
-        | K::PropertyDeclaration
-        | K::PropertySignature
-        | K::FunctionDeclaration
-        | K::FunctionExpression
-        | K::ArrowFunction
-        | K::Constructor
-        | K::MethodDeclaration
-        | K::MethodSignature
-        | K::GetAccessor
-        | K::SetAccessor
-        | K::CallSignature
-        | K::ConstructSignature
-        | K::IndexSignature
-        | K::TypeAssertionExpression => read.type_node() == Some(node),
-        K::CallExpression | K::NewExpression | K::TaggedTemplateExpression => view
-            .node_slice(read.type_arguments(view)?)?
-            .iter()
-            .flatten()
-            .any(|argument| argument == node),
-        _ => false,
-    })
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:createReturnTypeError
+fn create_return_type_error(view: AstView<'_>, node: NodeId) -> Result<tsr_ast::Diagnostic, Error> {
+    let node_kind = kind(view, node)?;
+    let mut diagnostic = create_diagnostic_for_node(
+        view,
+        node,
+        required_message(isolated_error_message(node_kind)),
+        vec![],
+    )?;
+    add_parent_declaration_related_info(view, node, &mut diagnostic)?;
+    let related = create_diagnostic_for_node(
+        view,
+        node,
+        required_message(related_suggestion(node_kind)),
+        vec![],
+    )?;
+    add_related_info(&mut diagnostic, related);
+    Ok(diagnostic)
 }
-// Inline copy of `IsPartOfTypeNode`; its Phase 1 home is in tsr_ast (table group positions).
-pub(super) fn part_of_type_node(view: AstView<'_>, node: NodeId) -> Result<bool, Error> {
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:createBindingElementError
+fn create_binding_element_error(
+    view: AstView<'_>,
+    node: NodeId,
+) -> Result<tsr_ast::Diagnostic, Error> {
+    create_diagnostic_for_node(
+        view,
+        node,
+        d::Binding_elements_with_initializers_can_t_be_exported_directly_with_isolatedDeclarations,
+        vec![],
+    )
+}
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:createVariableOrPropertyError
+fn create_variable_or_property_error(
+    view: AstView<'_>,
+    node: NodeId,
+) -> Result<tsr_ast::Diagnostic, Error> {
+    let node_kind = kind(view, node)?;
+    let mut diagnostic = create_diagnostic_for_node(
+        view,
+        node,
+        required_message(isolated_error_message(node_kind)),
+        vec![],
+    )?;
+    let name = view.node(node)?.name().expect(NIL);
+    let related = create_diagnostic_for_node(
+        view,
+        node,
+        required_message(related_suggestion(node_kind)),
+        vec![tsr_scanner::get_text_of_node(view, name)?],
+    )?;
+    add_related_info(&mut diagnostic, related);
+    Ok(diagnostic)
+}
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:createExpressionError
+fn create_expression_error(view: AstView<'_>, node: NodeId) -> Result<tsr_ast::Diagnostic, Error> {
+    create_expression_error_ex(view, node, None)
+}
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:createClassExpressionError
+fn create_class_expression_error(
+    view: AstView<'_>,
+    node: NodeId,
+) -> Result<tsr_ast::Diagnostic, Error> {
+    create_expression_error_ex(
+        view,
+        node,
+        Some(d::Inference_from_class_expressions_is_not_supported_with_isolatedDeclarations),
+    )
+}
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:isParentForIDDIagnostic
+fn is_parent_for_idd_diagnostic(
+    view: AstView<'_>,
+    node: NodeId,
+) -> Result<tsr_ast::utilities::FindAncestorResult, Error> {
+    use tsr_ast::utilities::FindAncestorResult as F;
     let read = view.node(node)?;
-    let kind = read.kind().known().ok_or(Error::InvalidGraph)?;
-    if type_kind_range(kind) {
-        return Ok(true);
+    if read.kind() == K::ExportAssignment {
+        return Ok(F::TRUE);
     }
-    Ok(match kind {
-        K::AnyKeyword
-        | K::UnknownKeyword
-        | K::NumberKeyword
-        | K::BigIntKeyword
-        | K::StringKeyword
-        | K::BooleanKeyword
-        | K::SymbolKeyword
-        | K::ObjectKeyword
-        | K::UndefinedKeyword
-        | K::NullKeyword
-        | K::NeverKeyword => true,
-        K::VoidKeyword => view.node(parent(view, node)?)?.kind() != K::VoidExpression,
-        K::ExpressionWithTypeArguments => type_heritage(view, node)?,
-        K::TypeParameter => matches!(
-            view.node(parent(view, node)?)?.kind().known(),
-            Some(K::MappedType | K::InferType)
-        ),
-        K::Identifier => {
-            let owner = parent(view, node)?;
-            let owner_read = view.node(owner)?;
-            let right = if let Some(data) = owner_read.data_source().as_qualified_name() {
-                data.right()
-            } else if owner_read.kind() == K::PropertyAccessExpression {
-                owner_read.name()
-            } else {
-                None
-            };
-            part_of_type_in_parent(view, if right == Some(node) { owner } else { node })?
+    if tsr_ast::utilities::is_statement(view, node)? {
+        return Ok(F::QUIT);
+    }
+    Ok(tsr_ast::utilities::to_find_ancestor_result(
+        read.kind() != K::ParenthesizedExpression
+            && !tsr_ast::utilities::is_assertion_expression(&read),
+    ))
+}
+
+// port: tsc/internal/transformers/declarations/diagnostics.go:createExpressionErrorEx
+fn create_expression_error_ex(
+    view: AstView<'_>,
+    node: NodeId,
+    mut diagnostic_message: Option<&'static Message>,
+) -> Result<tsr_ast::Diagnostic, Error> {
+    use tsr_ast::utilities::FindAncestorResult as F;
+    let Some(parent_declaration) = find_nearest_declaration(view, node)? else {
+        let message = diagnostic_message
+            .unwrap_or(d::Expression_type_can_t_be_inferred_with_isolatedDeclarations);
+        return create_diagnostic_for_node(view, node, message, vec![]);
+    };
+    let target = declaration_target_text(view, parent_declaration)?;
+    // ast.FindAncestorOrQuit(node.Parent, isParentForIDDIagnostic)
+    let mut current = view.node(node)?.parent();
+    let mut parent = None;
+    while let Some(candidate) = current {
+        match is_parent_for_idd_diagnostic(view, candidate)? {
+            F::QUIT => break,
+            F::TRUE => {
+                parent = Some(candidate);
+                break;
+            }
+            _ => {}
         }
-        K::QualifiedName | K::PropertyAccessExpression | K::ThisKeyword => {
-            part_of_type_in_parent(view, node)?
+        current = view.node(candidate)?.parent();
+    }
+    if parent == Some(parent_declaration) {
+        let message = diagnostic_message.unwrap_or_else(|| {
+            required_message(isolated_error_message(
+                kind(view, parent_declaration).expect("parent declaration kind"),
+            ))
+        });
+        let mut diagnostic = create_diagnostic_for_node(view, node, message, vec![])?;
+        let related = create_diagnostic_for_node(
+            view,
+            parent_declaration,
+            required_message(related_suggestion(kind(view, parent_declaration)?)),
+            vec![target],
+        )?;
+        add_related_info(&mut diagnostic, related);
+        return Ok(diagnostic);
+    }
+    if diagnostic_message.is_none() {
+        diagnostic_message = Some(d::Expression_type_can_t_be_inferred_with_isolatedDeclarations);
+    }
+    let mut diagnostic =
+        create_diagnostic_for_node(view, node, required_message(diagnostic_message), vec![])?;
+    let related = create_diagnostic_for_node(
+        view,
+        parent_declaration,
+        required_message(related_suggestion(kind(view, parent_declaration)?)),
+        vec![target],
+    )?;
+    add_related_info(&mut diagnostic, related);
+    let related = create_diagnostic_for_node(
+        view,
+        node,
+        d::Add_satisfies_and_a_type_assertion_to_this_expression_satisfies_T_as_T_to_make_the_type_explicit,
+        vec![],
+    )?;
+    add_related_info(&mut diagnostic, related);
+    Ok(diagnostic)
+}
+
+/// `createParameterError`, the closure of `createGetIsolatedDeclarationErrors`.
+fn create_parameter_error<R: tsr_printer::emit_resolver::DeclarationEmitResolver>(
+    resolver: &mut R,
+    node: NodeId,
+) -> Result<tsr_ast::Diagnostic, R::Error> {
+    let owner = resolver.ast(node)?.node(node)?.parent().expect(NIL);
+    if kind(resolver.ast(owner)?, owner)? == K::SetAccessor {
+        return create_accessor_type_error(resolver, owner);
+    }
+    // skip checker lock - node builder will already have one
+    let add_undefined = resolver.requires_adding_implicit_undefined_unsafe(node, None, None)?;
+    let view = resolver.ast(node)?;
+    if !add_undefined {
+        if let Some(initializer) = view.node(node)?.initializer() {
+            return Ok(create_expression_error(view, initializer)?);
         }
-        _ => false,
-    })
+    }
+    let node_kind = kind(view, node)?;
+    let message = if add_undefined {
+        d::Declaration_emit_for_this_parameter_requires_implicitly_adding_undefined_to_its_type_This_is_not_supported_with_isolatedDeclarations
+    } else {
+        required_message(isolated_error_message(node_kind))
+    };
+    let mut diagnostic = create_diagnostic_for_node(view, node, message, vec![])?;
+    let name = view.node(node)?.name().expect(NIL);
+    let target = tsr_scanner::get_text_of_node(view, name)?;
+    let related = create_diagnostic_for_node(
+        view,
+        node,
+        required_message(related_suggestion(node_kind)),
+        vec![target],
+    )?;
+    add_related_info(&mut diagnostic, related);
+    Ok(diagnostic)
 }
 
 // port: tsc/internal/transformers/declarations/diagnostics.go:createGetIsolatedDeclarationErrors
-pub(super) fn isolated_declaration_error<R: tsr_printer::emit_resolver::DeclarationEmitResolver>(
+pub(super) fn create_get_isolated_declaration_errors<
+    R: tsr_printer::emit_resolver::DeclarationEmitResolver,
+>(
     resolver: &mut R,
     node: NodeId,
 ) -> Result<tsr_ast::Diagnostic, R::Error> {
     let view = resolver.ast(node)?;
-    let mut ancestor = Some(node);
-    while let Some(current) = ancestor {
-        let read = view.node(current)?;
-        if read.kind() == K::HeritageClause {
-            return Ok(diagnostic_for_node(
-                view,
-                Some(node),
-                d::Extends_clause_can_t_contain_an_expression_with_isolatedDeclarations,
-                vec![],
-            )?);
-        }
-        ancestor = read.parent();
+    let heritage_clause =
+        tsr_ast::utilities::find_ancestor_kind(view, Some(node), K::HeritageClause.into())?;
+    if heritage_clause.is_some() {
+        return Ok(create_diagnostic_for_node(
+            view,
+            node,
+            d::Extends_clause_can_t_contain_an_expression_with_isolatedDeclarations,
+            vec![],
+        )?);
     }
     let node_kind = kind(view, node)?;
-    if part_of_type_node(view, node)?
-        || node_kind == K::TypeQuery
-        || tsr_ast::utilities::is_entity_name(&view.node(node)?)
+    if tsr_ast::utilities_positions::is_part_of_type_node(view, node)? || node_kind == K::TypeQuery
+    {
+        return Ok(create_entity_in_type_node_error(view, node)?);
+    }
+    if tsr_ast::utilities::is_entity_name(&view.node(node)?)
         || tsr_ast::is_entity_name_expression(view, node)?
     {
-        let mut diagnostic = diagnostic_for_node(
-            view,
-            Some(node),
-            d::Type_containing_private_name_0_can_t_be_used_with_isolatedDeclarations,
-            vec![tsr_scanner::get_text_of_node(view, node)?],
-        )?;
-        add_parent_related_info(view, node, &mut diagnostic)?;
-        return Ok(diagnostic);
+        return Ok(create_entity_in_type_node_error(view, node)?);
     }
-    let diagnostic=match node_kind {
-        K::GetAccessor|K::SetAccessor=>return accessor_error(resolver,node),
-        K::ComputedPropertyName|K::ShorthandPropertyAssignment|K::SpreadAssignment|K::ArrayLiteralExpression|K::SpreadElement=>{
-            let mut diagnostic=diagnostic_for_node(view,Some(node),required_message(isolated_error_message(node_kind))?,vec![])?;
-            add_parent_related_info(view,node,&mut diagnostic)?;
-            diagnostic
+    Ok(match node_kind {
+        K::GetAccessor | K::SetAccessor => return create_accessor_type_error(resolver, node),
+        K::ComputedPropertyName | K::ShorthandPropertyAssignment | K::SpreadAssignment => {
+            create_object_literal_error(view, node)?
         }
-        K::MethodDeclaration|K::ConstructSignature|K::FunctionExpression|K::ArrowFunction|K::FunctionDeclaration=>{
-            let mut diagnostic=diagnostic_for_node(view,Some(node),required_message(isolated_error_message(node_kind))?,vec![])?;
-            add_parent_related_info(view,node,&mut diagnostic)?;
-            diagnostic.related_information.push(std::sync::Arc::new(diagnostic_for_node(view,Some(node),required_message(related_suggestion(node_kind))?,vec![])?));
-            diagnostic
+        K::ArrayLiteralExpression | K::SpreadElement => create_array_literal_error(view, node)?,
+        K::MethodDeclaration
+        | K::ConstructSignature
+        | K::FunctionExpression
+        | K::ArrowFunction
+        | K::FunctionDeclaration => create_return_type_error(view, node)?,
+        K::BindingElement => create_binding_element_error(view, node)?,
+        K::PropertyDeclaration | K::VariableDeclaration => {
+            create_variable_or_property_error(view, node)?
         }
-        K::BindingElement=>diagnostic_for_node(view,Some(node),d::Binding_elements_with_initializers_can_t_be_exported_directly_with_isolatedDeclarations,vec![])?,
-        K::PropertyDeclaration|K::VariableDeclaration=>{
-            let mut diagnostic=diagnostic_for_node(view,Some(node),required_message(isolated_error_message(node_kind))?,vec![])?;
-            let name=view.node(node)?.name().ok_or(Error::InvalidGraph)?;
-            diagnostic.related_information.push(std::sync::Arc::new(diagnostic_for_node(view,Some(node),required_message(related_suggestion(node_kind))?,vec![tsr_scanner::get_text_of_node(view,name)?])?));
-            diagnostic
+        K::Parameter => return create_parameter_error(resolver, node),
+        K::PropertyAssignment => {
+            create_expression_error(view, view.node(node)?.initializer().expect(NIL))?
         }
-        K::Parameter=>{
-            let owner=parent(view,node)?;
-            if view.node(owner)?.kind()==K::SetAccessor{return accessor_error(resolver,owner);}
-            let add_undefined=resolver.requires_adding_implicit_undefined_unsafe(node,None,None)?;
-            let view=resolver.ast(node)?;
-            if !add_undefined {
-                if let Some(initializer)=view.node(node)?.initializer(){return Ok(expression_error(view,initializer,None)?);}
-            }
-            let message=if add_undefined{d::Declaration_emit_for_this_parameter_requires_implicitly_adding_undefined_to_its_type_This_is_not_supported_with_isolatedDeclarations}else{required_message(isolated_error_message(node_kind))?};
-            let mut diagnostic=diagnostic_for_node(view,Some(node),message,vec![])?;
-            let name=view.node(node)?.name().ok_or(Error::InvalidGraph)?;
-            diagnostic.related_information.push(std::sync::Arc::new(diagnostic_for_node(view,Some(node),required_message(related_suggestion(node_kind))?,vec![tsr_scanner::get_text_of_node(view,name)?])?));
-            diagnostic
-        }
-        K::PropertyAssignment=>expression_error(view,view.node(node)?.initializer().ok_or(Error::InvalidGraph)?,None)?,
-        K::ClassExpression=>expression_error(view,node,Some(d::Inference_from_class_expressions_is_not_supported_with_isolatedDeclarations))?,
-        _=>expression_error(view,node,None)?,
-    };
-    Ok(diagnostic)
+        K::ClassExpression => create_class_expression_error(view, node)?,
+        _ => create_expression_error(view, node)?,
+    })
 }
 
 #[cfg(test)]

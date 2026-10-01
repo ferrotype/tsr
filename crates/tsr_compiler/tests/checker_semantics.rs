@@ -2775,12 +2775,14 @@ fn declaration_transform_reads_the_jsdoc_variadic_operand() {
         &counters,
         emit.factory_hooks(),
     );
+    let host = tsr_compiler::ProgramDeclarationHost::new(&program);
     let transformed = transform_declarations(
         &mut op,
+        &host,
         &mut output,
         &mut emit,
         file.source(),
-        DeclarationOptions::default(),
+        &DeclarationOptions::default(),
     )
     .unwrap();
     let view = output.view();
