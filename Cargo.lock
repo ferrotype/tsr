@@ -970,6 +970,7 @@ dependencies = [
  "tsr_contentmappertest",
  "tsr_core",
  "tsr_diagnostics",
+ "tsr_incremental",
  "tsr_ipc",
  "tsr_json",
  "tsr_jsstring",

@@ -6,7 +6,9 @@
 //!   pre-emit program's diagnostics, then a fresh post-emit program that
 //!   emits (`Program.Emit` with an in-memory write callback recording what
 //!   the harness's `OutputRecorderFS` records) before its diagnostics are
-//!   collected, and the count-mismatch rule.
+//!   collected, and the count-mismatch rule. Both programs are the harness's
+//!   `createProgram`'s: with `incremental`, the incremental program, whose
+//!   emit ends with the build info.
 //! - `newCompilationResult` over the recorded outputs, and the three writers
 //!   of `baselines.rs` over it.
 //! - The `.js` baseline's two compilations: the declaration re-compilation
@@ -25,13 +27,13 @@ use super::baselines::{
     Failure, JsEmitInput, OrderedFiles, RepeatOutputs, SourcemapInput, SourcemapRecordInput,
     TestFile, NO_CONTENT,
 };
-use super::declaration_program::{self, CompileError};
+use super::declaration_program::{self, create_program, CompileError, HarnessProgram};
 use super::program_view::ProgramFacts;
 use super::{errors, executor, reprint};
 use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::panic::{catch_unwind, AssertUnwindSafe};
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use tsr_checker::CheckerRequest;
 use tsr_compiler::{CheckedProgram, EmitOptions, EmitResult, FileCache, Program, WriteFileData};
 
@@ -93,15 +95,16 @@ impl<'p> Recorder<'p> {
 }
 
 /// One `Program.Emit(ctx, EmitOptions{})` with the recorder as the file
-/// system's `WriteFile`.
+/// system's `WriteFile`; the incremental program writes its build info
+/// through it as well.
 pub struct Emitted {
     /// `None` is a nil emit result.
     pub result: Option<EmitResult>,
     pub recorded: Vec<Output>,
 }
 
-fn emit(checked: &CheckedProgram) -> Result<Emitted, tsr_compiler::Error> {
-    let program = checked.program();
+fn emit(created: &HarnessProgram) -> Result<Emitted, tsr_compiler::Error> {
+    let program = created.program();
     let recorder = Recorder::new(program.host());
     let write_file = |name: &[u8], text: &[u8], _: &mut WriteFileData| {
         recorder.write(name, text);
@@ -111,7 +114,9 @@ fn emit(checked: &CheckedProgram) -> Result<Emitted, tsr_compiler::Error> {
         write_file: Some(&write_file),
         ..EmitOptions::default()
     };
-    let result = checked.emit(&CheckerRequest::default(), &options)?;
+    let result = created
+        .program_like()
+        .emit(&CheckerRequest::default(), &options)?;
     Ok(Emitted {
         result,
         recorded: recorder.into_outputs(),
@@ -198,7 +203,7 @@ fn files_json(files: &OrderedFiles<'_>, texts: bool) -> Vec<Value> {
 /// One `compileFilesWithHost`: the post-emit program, what it emitted, and
 /// the harness's diagnostic counts.
 pub struct Compiled {
-    pub post: CheckedProgram,
+    pub post: HarnessProgram,
     pub emitted: Emitted,
     pub pre_diagnostics: usize,
     pub post_diagnostics: usize,
@@ -222,25 +227,26 @@ impl Compiled {
 // source: tsc/internal/testutil/harnessutil/harnessutil.go:compileFilesWithHost
 pub fn compile_files(
     request: &Value,
-    pre: Option<&CheckedProgram>,
+    pre: Option<Arc<CheckedProgram>>,
     capture_suggestions: bool,
     cache: &mut FileCache,
 ) -> Result<Compiled, Value> {
-    let loaded;
-    let pre = if let Some(pre) = pre {
-        pre
-    } else {
-        loaded = executor::load_fresh_checked(request, cache)?;
-        &loaded
+    let pre = match pre {
+        Some(pre) => pre,
+        None => Arc::new(executor::load_fresh_checked(request, cache)?),
     };
-    let pre_diagnostics = declaration_program::harness_diagnostics(pre, capture_suggestions)
-        .map_err(executor::compiler_failure)?
-        .len();
-    let post = executor::load_fresh_checked(request, cache)?;
+    let pre = create_program(pre).map_err(executor::compiler_failure)?;
+    let pre_diagnostics =
+        declaration_program::harness_diagnostics(pre.program_like(), capture_suggestions)
+            .map_err(executor::compiler_failure)?
+            .len();
+    let post = create_program(Arc::new(executor::load_fresh_checked(request, cache)?))
+        .map_err(executor::compiler_failure)?;
     let emitted = emit(&post).map_err(executor::compiler_failure)?;
-    let post_diagnostics = declaration_program::harness_diagnostics(&post, capture_suggestions)
-        .map_err(executor::compiler_failure)?
-        .len();
+    let post_diagnostics =
+        declaration_program::harness_diagnostics(post.program_like(), capture_suggestions)
+            .map_err(executor::compiler_failure)?
+            .len();
     let diagnostics = if pre_diagnostics == post_diagnostics {
         post_diagnostics
     } else {

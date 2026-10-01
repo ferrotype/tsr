@@ -34,7 +34,7 @@ mod reprint;
 
 use serde_json::{json, Value};
 use std::panic::{catch_unwind, AssertUnwindSafe};
-use std::sync::{Mutex, PoisonError};
+use std::sync::{Arc, Mutex, PoisonError};
 use tsr_compiler::{CheckedProgram, FileCache};
 
 /// The location of the last panic, so a fatal row names the code that
@@ -70,7 +70,7 @@ fn disable_output(request: &Value, row: &mut Value) {
 fn emit_domains(
     request: &Value,
     scope: executor::ContentMapperScope,
-    pre: &CheckedProgram,
+    pre: Arc<CheckedProgram>,
     cache: &mut FileCache,
     texts: bool,
     row: &mut Value,
@@ -142,7 +142,7 @@ fn observe(request: &Value, texts: bool) -> Value {
     // serve the first compilation's two programs.
     let scope = executor::content_mapper_scope(request, tsr_contentmappertest::new_spawner());
     let loaded = scope.and_then(|scope| {
-        executor::load_fresh_checked(request, &mut cache).map(|pre| (scope, pre))
+        executor::load_fresh_checked(request, &mut cache).map(|pre| (scope, Arc::new(pre)))
     });
     match loaded {
         Ok((scope, pre)) => {
@@ -165,7 +165,7 @@ fn observe(request: &Value, texts: bool) -> Value {
                 json!({"state":"not_requested"})
             };
             if request["emit"] == true {
-                emit_domains(request, scope, &pre, &mut cache, texts, &mut row);
+                emit_domains(request, scope, pre, &mut cache, texts, &mut row);
             }
         }
         Err(failure) => {
