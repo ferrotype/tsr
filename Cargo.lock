@@ -971,6 +971,7 @@ dependencies = [
  "tsr_core",
  "tsr_diagnostics",
  "tsr_ipc",
+ "tsr_json",
  "tsr_jsstring",
  "tsr_locale",
  "tsr_module",

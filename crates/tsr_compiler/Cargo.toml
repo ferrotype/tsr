@@ -101,6 +101,9 @@ tsr_contentmappertest = { path = "../tsr_contentmappertest" }
 tsr_ipc = { version = "0.1.0", path = "../tsr_ipc" }
 serde_json = "1"
 sha2 = "0.10"
+# The Phase 3 baseline writers' source-map record and map decoding.
+tsr_sourcemap = { version = "0.1.0", path = "../tsr_sourcemap" }
+tsr_json = { version = "0.1.0", path = "../tsr_json" }
 mimalloc = "=0.1.48"
 cap = { version = "=0.1.2", features = ["stats"] }
 s08_relater_prototype = { path = "../../tools/s08/relater-prototype" }
