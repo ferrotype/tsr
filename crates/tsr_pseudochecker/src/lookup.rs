@@ -3,14 +3,15 @@ use crate::{
         bigint, bigint_literal, boolean, direct, false_type, inferred, inferred_with_errors,
         maybe_const_location, no_result, null, number, numeric_literal, object_literal,
         single_call_signature, string, string_literal, true_type, tuple, undefined, union,
-        PseudoObjectElement, PseudoObjectElementData, PseudoParameter, PseudoSignature, PseudoType,
-        PseudoTypeData, PseudoTypeKind,
+        PseudoObjectElement, PseudoParameter, PseudoSignature, PseudoType, PseudoTypeData,
+        PseudoTypeKind,
     },
     Error, Host, PseudoChecker,
 };
 use tsr_arena::NodeId;
 use tsr_ast::{
-    modifier_flags as mf, node_flags as nf, AstView, NodeListId, NodeRead, SyntaxKind as K,
+    modifier_flags as mf, node_flags as nf, AstView, NodeKind, NodeListId, NodeRead,
+    SyntaxKind as K,
 };
 
 type R<T, H> = Result<T, <H as Host>::Error>;
@@ -202,7 +203,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
             Some(K::ExportAssignment) => self.type_from_expression(self.expression(node)?),
             Some(
                 K::PropertyAccessExpression | K::ElementAccessExpression | K::BinaryExpression,
-            ) => Ok(read.type_node().map_or_else(|| no_result(node), direct)),
+            ) => self.type_from_expando_property(node),
             Some(K::PropertyAssignment | K::ShorthandPropertyAssignment) => {
                 self.type_from_property_assignment(node)
             }
@@ -225,6 +226,18 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
         }
         Ok(no_result(node))
     }
+    // This is _not_ redundant with the reparser; see how
+    // expandoFunctionSymbolProperty.ts and similar behaves.
+    // port: tsc/internal/pseudochecker/lookup.go:PseudoChecker.typeFromExpandoProperty
+    fn type_from_expando_property(&self, node: NodeId) -> R<PseudoType, H> {
+        if let Some(declared_type) = self.node(node)?.type_node() {
+            return Ok(direct(declared_type));
+        }
+        // While `node` is an expression, as an expando it should also always
+        // be a declaration with a symbol, which requires declaration fallback
+        // handling.
+        Ok(no_result(node))
+    }
     // port: tsc/internal/pseudochecker/lookup.go:PseudoChecker.typeFromProperty
     fn type_from_property(&self, node: NodeId) -> R<PseudoType, H> {
         let read = self.node(node)?;
@@ -244,7 +257,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
                         if ty.kind() != PseudoTypeKind::Direct
                             && read.question_token(self.ast(node)?)?.is_some()
                         {
-                            return self.add_undefined(ty);
+                            return self.add_undefined_if_definitely_required(ty);
                         }
                         return Ok(ty);
                     }
@@ -285,13 +298,8 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
     // port: tsc/internal/pseudochecker/lookup.go:PseudoChecker.typeFromAccessor
     fn type_from_accessor(&self, node: NodeId) -> R<PseudoType, H> {
         let accessors = self.accessors(node)?;
-        let mut annotation = self.accessor_annotation(Some(node))?;
-        if annotation.is_none() && node != accessors.first {
-            annotation = self.accessor_annotation(Some(accessors.first))?;
-        }
-        if annotation.is_none() && accessors.second.is_some_and(|second| second != node) {
-            annotation = self.accessor_annotation(accessors.second)?;
-        }
+        let annotation =
+            self.get_type_annotation_from_all_accessor_declarations(node, accessors)?;
         if let Some(annotation) = annotation {
             if self.node(annotation)?.kind() != K::TypePredicate {
                 return Ok(direct(annotation));
@@ -319,7 +327,23 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
         }
         Ok(no_result(node))
     }
-    fn accessor_annotation(&self, node: Option<NodeId>) -> R<Option<NodeId>, H> {
+    // port: tsc/internal/pseudochecker/lookup.go:PseudoChecker.getTypeAnnotationFromAllAccessorDeclarations
+    fn get_type_annotation_from_all_accessor_declarations(
+        &self,
+        node: NodeId,
+        accessors: Accessors,
+    ) -> R<Option<NodeId>, H> {
+        let mut accessor_type = self.get_type_annotation_from_accessor(Some(node))?;
+        if accessor_type.is_none() && node != accessors.first {
+            accessor_type = self.get_type_annotation_from_accessor(Some(accessors.first))?;
+        }
+        if accessor_type.is_none() && accessors.second.is_some_and(|second| second != node) {
+            accessor_type = self.get_type_annotation_from_accessor(accessors.second)?;
+        }
+        Ok(accessor_type)
+    }
+    // port: tsc/internal/pseudochecker/lookup.go:PseudoChecker.getTypeAnnotationFromAccessor
+    fn get_type_annotation_from_accessor(&self, node: Option<NodeId>) -> R<Option<NodeId>, H> {
         let Some(node) = node else {
             return Ok(None);
         };
@@ -383,18 +407,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
                 return Ok(direct(annotation));
             }
         }
-        if matches!(
-            read.kind().known(),
-            Some(
-                K::FunctionExpression
-                    | K::ArrowFunction
-                    | K::MethodDeclaration
-                    | K::GetAccessor
-                    | K::SetAccessor
-                    | K::FunctionDeclaration
-                    | K::Constructor
-            )
-        ) {
+        if is_value_signature_declaration(&read) {
             return self.type_from_single_return(node);
         }
         Ok(no_result(node))
@@ -508,15 +521,11 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
             }
             Some(K::NullKeyword) => return Ok(null()),
             Some(K::ArrowFunction | K::FunctionExpression) => {
-                return self.type_from_function_expression(node)
+                return self.type_from_function_like_expression(node)
             }
             Some(K::TypeAssertionExpression | K::AsExpression) => {
                 let annotation = Self::required(read.type_node(), "pseudo assertion annotation")?;
-                return if self.is_const_type_reference(annotation)? {
-                    self.type_from_expression(self.expression(node)?)
-                } else {
-                    Ok(direct(annotation))
-                };
+                return self.type_from_type_assertion(self.expression(node)?, annotation);
             }
             Some(K::PrefixUnaryExpression) => {
                 if tsr_ast::utilities_tail::is_primitive_literal_value(
@@ -524,7 +533,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
                     &read,
                     true,
                 )? {
-                    return self.type_from_primitive_prefix(node);
+                    return self.type_from_primitive_literal_prefix(node);
                 }
             }
             Some(K::ArrayLiteralExpression) => return self.type_from_array(node),
@@ -554,31 +563,43 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
         }
         Ok(inferred(node, false))
     }
-    fn type_from_primitive_prefix(&self, node: NodeId) -> R<PseudoType, H> {
+    // port: tsc/internal/pseudochecker/lookup.go:PseudoChecker.typeFromPrimitiveLiteralPrefix
+    fn type_from_primitive_literal_prefix(&self, node: NodeId) -> R<PseudoType, H> {
         let read = self.node(node)?;
         let data = Self::required(
             read.data_source().as_prefix_unary_expression(),
             "pseudo prefix",
         )?;
         let operand = Self::required(data.operand(), "pseudo prefix operand")?;
-        let literal = if data.operator() == K::PlusToken {
+        let expr = if data.operator() == K::PlusToken {
             operand
         } else {
             node
         };
-        let (const_type, regular) = match self.node(operand)?.kind().known() {
-            Some(K::NumericLiteral) => (numeric_literal(literal), number()),
-            Some(K::BigIntLiteral) => (bigint_literal(literal), bigint()),
-            _ => return Err(self.bad_kind(operand, "primitive literal prefix")?),
-        };
-        Ok(maybe_const_location(node, const_type, regular))
+        let inner = operand;
+        if self.node(inner)?.kind() == K::BigIntLiteral {
+            return Ok(maybe_const_location(node, bigint_literal(expr), bigint()));
+        }
+        if self.node(inner)?.kind() == K::NumericLiteral {
+            return Ok(maybe_const_location(node, numeric_literal(expr), number()));
+        }
+        // Go: debug.FailBadSyntaxKind(inner).
+        Err(self.bad_kind(inner, "primitive literal prefix")?)
     }
-    fn type_from_function_expression(&self, node: NodeId) -> R<PseudoType, H> {
+    // port: tsc/internal/pseudochecker/lookup.go:PseudoChecker.typeFromTypeAssertion
+    fn type_from_type_assertion(&self, expression: NodeId, type_node: NodeId) -> R<PseudoType, H> {
+        if self.is_const_type_reference(type_node)? {
+            return self.type_from_expression(expression);
+        }
+        Ok(direct(type_node))
+    }
+    // port: tsc/internal/pseudochecker/lookup.go:PseudoChecker.typeFromFunctionLikeExpression
+    fn type_from_function_like_expression(&self, node: NodeId) -> R<PseudoType, H> {
         if let Some(annotation) = self.full_signature(node)? {
             return Ok(direct(annotation));
         }
         let return_type = self.create_return_from_signature(node)?;
-        let type_parameters = self.type_parameters(node)?;
+        let type_parameters = self.clone_type_parameters(node)?;
         let parameters = self.clone_parameters(node)?;
         Ok(single_call_signature(PseudoSignature {
             signature: node,
@@ -597,34 +618,34 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
         let mut elements = Vec::with_capacity(properties.len());
         for property in properties {
             let read = self.node(property)?;
-            let name = self.name(property)?;
-            let optional = read.question_token(self.ast(property)?)?.is_some();
             match read.kind().known() {
                 Some(K::MethodDeclaration) => {
+                    let optional = read.question_token(self.ast(property)?)?.is_some();
                     if let Some(full) = self.full_signature(property)? {
                         elements.push(PseudoObjectElement::property(
                             false,
-                            name,
+                            self.name(property)?,
                             optional,
                             direct(full),
                         ));
                     } else {
-                        let type_parameters = self.type_parameters(property)?;
+                        let name = self.name(property)?;
+                        let type_parameters = self.clone_type_parameters(property)?;
                         let parameters = self.clone_parameters(property)?;
                         let return_type = self.create_return_from_signature(property)?;
-                        elements.push(PseudoObjectElement {
+                        elements.push(PseudoObjectElement::method(
+                            property,
                             name,
                             optional,
-                            data: PseudoObjectElementData::Method(PseudoSignature {
-                                signature: property,
-                                parameters,
-                                type_parameters,
-                                return_type,
-                            }),
-                        });
+                            type_parameters,
+                            parameters,
+                            return_type,
+                        ));
                     }
                 }
                 Some(K::PropertyAssignment) => {
+                    let name = self.name(property)?;
+                    let optional = read.question_token(self.ast(property)?)?.is_some();
                     let initializer =
                         Self::required(read.initializer(), "pseudo property initializer")?;
                     elements.push(PseudoObjectElement::property(
@@ -634,8 +655,8 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
                         self.type_from_expression(initializer)?,
                     ));
                 }
-                Some(K::GetAccessor | K::SetAccessor) => {
-                    if let Some(element) = self.accessor_member(property, name)? {
+                Some(K::SetAccessor | K::GetAccessor) => {
+                    if let Some(element) = self.accessor_member(property, self.name(property)?)? {
                         elements.push(element);
                     }
                 }
@@ -659,27 +680,24 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
             false
         };
         if both_annotated {
-            let data = if self.node(node)?.kind() == K::GetAccessor {
-                PseudoObjectElementData::GetAccessor {
-                    signature: node,
-                    ty: self.type_from_accessor(node)?,
-                }
-            } else {
-                let parameter = self
-                    .clone_parameters(node)?
-                    .into_iter()
-                    .next()
-                    .ok_or_else(|| H::Error::from(Error::MissingLink("pseudo setter parameter")))?;
-                PseudoObjectElementData::SetAccessor {
-                    signature: node,
-                    parameter,
-                }
-            };
-            return Ok(Some(PseudoObjectElement {
-                name,
-                optional: false,
-                data,
-            }));
+            // We have possible types for both accessors; we can't know if they
+            // are the same type, so we keep both accessors.
+            if self.node(node)?.kind() == K::GetAccessor {
+                return Ok(Some(PseudoObjectElement::get_accessor(
+                    node,
+                    name,
+                    false,
+                    self.type_from_accessor(node)?,
+                )));
+            }
+            let parameter = self
+                .clone_parameters(node)?
+                .into_iter()
+                .next()
+                .ok_or_else(|| H::Error::from(Error::MissingLink("pseudo setter parameter")))?;
+            return Ok(Some(PseudoObjectElement::set_accessor(
+                node, name, false, parameter,
+            )));
         }
         if node == all.first {
             let ty = self.type_from_accessor(node)?;
@@ -729,23 +747,36 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
     }
     // port: tsc/internal/pseudochecker/lookup.go:PseudoChecker.typeFromArrayLiteral
     fn type_from_array(&self, node: NodeId) -> R<PseudoType, H> {
-        if !self.is_in_const_context(node)? {
-            return Ok(inferred_with_errors(node, false, vec![node]));
+        if let Some(error_nodes) = self.can_get_type_from_array_literal(node)? {
+            return Ok(inferred_with_errors(node, false, error_nodes));
         }
-        let elements = self.list(node, self.node(node)?.element_list())?;
-        for &element in &elements {
-            if self.node(element)?.kind() == K::SpreadElement {
-                return Ok(inferred_with_errors(node, false, vec![element]));
-            }
-        }
-        if self.contextually_typed(node)? {
+        if self.is_in_const_context(node)? && self.contextually_typed(node)? {
+            // An expression in an `as const` cast with a contextual type has
+            // variable readonly state; bail.
             return Ok(inferred(node, false));
         }
+        // We are in a const context producing a tuple type; there are no
+        // spread elements.
+        let elements = self.list(node, self.node(node)?.element_list())?;
         let mut result = Vec::with_capacity(elements.len());
         for element in elements {
             result.push(self.type_from_expression(element)?);
         }
         Ok(tuple(result))
+    }
+    // `None` when the array can be typed; otherwise the error nodes: the array
+    // itself outside a const context, or the first spread element inside one.
+    // port: tsc/internal/pseudochecker/lookup.go:PseudoChecker.canGetTypeFromArrayLiteral
+    fn can_get_type_from_array_literal(&self, node: NodeId) -> R<Option<Vec<NodeId>>, H> {
+        if !self.is_in_const_context(node)? {
+            return Ok(Some(vec![node]));
+        }
+        for element in self.list(node, self.node(node)?.element_list())? {
+            if self.node(element)?.kind() == K::SpreadElement {
+                return Ok(Some(vec![element]));
+            }
+        }
+        Ok(None)
     }
     fn is_in_const_context(&self, node: NodeId) -> R<bool, H> {
         let mut parent = self.node(node)?.parent();
@@ -755,21 +786,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
                 read.kind().known(),
                 Some(K::AsExpression | K::TypeAssertionExpression)
             );
-            if assertion
-                || !matches!(
-                    read.kind().known(),
-                    Some(
-                        K::ArrayLiteralExpression
-                            | K::ObjectLiteralExpression
-                            | K::ParenthesizedExpression
-                            | K::SpreadElement
-                            | K::PropertyAssignment
-                            | K::ShorthandPropertyAssignment
-                            | K::TemplateSpan
-                            | K::PrefixUnaryExpression
-                    )
-                )
-            {
+            if assertion || !is_const_context_propagating_kind(read.kind()) {
                 return self.is_const_assertion(node);
             }
             parent = read.parent();
@@ -830,7 +847,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
             if matches!(
                 ty.kind(),
                 PseudoTypeKind::NoResult | PseudoTypeKind::Inferred
-            ) || is_undefined(ty)
+            ) || is_undefined_pseudo_type(ty)
             {
                 return Ok(true);
             }
@@ -849,12 +866,16 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
         }
         Ok(false)
     }
-    fn add_undefined(&self, ty: PseudoType) -> R<PseudoType, H> {
-        Ok(if self.could_refer_to_undefined(&ty)? {
-            ty
-        } else {
-            union(vec![ty, undefined()])
-        })
+    // Go's free function calls `CouldAlreadyReferToUndefinedType`, which reads
+    // type nodes through the host here, so this is a method of the lookup.
+    // port: tsc/internal/pseudochecker/lookup.go:addUndefinedIfDefinitelyRequired
+    fn add_undefined_if_definitely_required(&self, expr: PseudoType) -> R<PseudoType, H> {
+        // If `expr` doesn't already contain `| undefined` or a direct/inferred
+        // type that may contain `undefined`, add `| undefined`.
+        if self.could_refer_to_undefined(&expr)? {
+            return Ok(expr);
+        }
+        Ok(union(vec![expr, undefined()]))
     }
     fn parameter_rest(&self, node: NodeId) -> R<bool, H> {
         Ok(Self::required(
@@ -864,13 +885,19 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
         .dot_dot_dot_token()
         .is_some())
     }
-    fn last_required_parameter(&self, parameters: &[NodeId]) -> R<usize, H> {
-        for (index, &parameter) in parameters.iter().enumerate().rev() {
-            let read = self.node(parameter)?;
-            if read.initializer().is_none()
-                && read.question_token(self.ast(parameter)?)?.is_none()
-                && !self.parameter_rest(parameter)?
-            {
+    // port: tsc/internal/pseudochecker/lookup.go:isOptionalInitializedOrRestParameter
+    fn is_optional_initialized_or_rest_parameter(&self, node: NodeId) -> R<bool, H> {
+        let read = self.node(node)?;
+        Ok(self.parameter_rest(node)?
+            || read.initializer().is_some()
+            || read.question_token(self.ast(node)?)?.is_some())
+    }
+    // The index just past the last required parameter: one without a question
+    // token, initializer or rest token.
+    // port: tsc/internal/pseudochecker/lookup.go:lastRequiredParamIndex
+    fn last_required_param_index(&self, params: &[NodeId]) -> R<usize, H> {
+        for (index, &param) in params.iter().enumerate().rev() {
+            if !self.is_optional_initialized_or_rest_parameter(param)? {
                 return Ok(index + 1);
             }
         }
@@ -891,7 +918,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
             .iter()
             .position(|&p| p == node)
             .map_or(-1, |i| i as isize);
-        self.type_from_parameter_worker(node, index, self.last_required_parameter(&parameters)?)
+        self.type_from_parameter_worker(node, index, self.last_required_param_index(&parameters)?)
     }
     // port: tsc/internal/pseudochecker/lookup.go:PseudoChecker.typeFromParameterWorker
     fn type_from_parameter_worker(
@@ -912,7 +939,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
                 && read.initializer().is_some()
                 && required_after
             {
-                self.add_undefined(ty)
+                self.add_undefined_if_definitely_required(ty)
             } else {
                 Ok(ty)
             };
@@ -933,7 +960,7 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
                     }
                 }
                 return if self.checker.strict_null_checks && required_after {
-                    self.add_undefined(ty)
+                    self.add_undefined_if_definitely_required(ty)
                 } else {
                     Ok(ty)
                 };
@@ -941,9 +968,20 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
         }
         Ok(no_result(node))
     }
+    // Go takes the owner's type parameter list and returns nil for an absent or
+    // empty list; the owner's list is read here and an empty vector stands for
+    // nil.
+    // port: tsc/internal/pseudochecker/lookup.go:PseudoChecker.cloneTypeParameters
+    fn clone_type_parameters(&self, node: NodeId) -> R<Vec<NodeId>, H> {
+        self.type_parameters(node)
+    }
+    // Go takes the owner's parameter list and returns nil for an absent or
+    // empty list; the owner's list is read here and an empty vector stands for
+    // nil.
+    // port: tsc/internal/pseudochecker/lookup.go:PseudoChecker.cloneParameters
     fn clone_parameters(&self, node: NodeId) -> R<Vec<PseudoParameter>, H> {
         let parameters = self.parameters(node)?;
-        let last_required = self.last_required_parameter(&parameters)?;
+        let last_required = self.last_required_param_index(&parameters)?;
         let mut result = Vec::with_capacity(parameters.len());
         for (index, parameter) in parameters.into_iter().enumerate() {
             let read = self.node(parameter)?;
@@ -1038,7 +1076,41 @@ impl<H: Host + ?Sized> Lookup<'_, H> {
 fn usable(ty: &PseudoType) -> bool {
     !matches!(ty.as_ref(),PseudoTypeData::Inferred{error_nodes,..} if error_nodes.is_empty())
 }
-fn is_undefined(mut ty: &PseudoType) -> bool {
+// port: tsc/internal/pseudochecker/lookup.go:isValueSignatureDeclaration
+fn is_value_signature_declaration(node: &NodeRead<'_>) -> bool {
+    matches!(
+        node.kind().known(),
+        Some(
+            K::FunctionExpression
+                | K::ArrowFunction
+                | K::MethodDeclaration
+                | K::GetAccessor
+                | K::SetAccessor
+                | K::FunctionDeclaration
+                | K::Constructor
+        )
+    )
+}
+// See `isConstContext` in the checker: any node kind mentioned there.
+// port: tsc/internal/pseudochecker/lookup.go:isConstContextPropagatingKind
+fn is_const_context_propagating_kind(kind: NodeKind) -> bool {
+    matches!(
+        kind.known(),
+        Some(
+            K::ArrayLiteralExpression
+                | K::ObjectLiteralExpression
+                | K::ParenthesizedExpression
+                | K::SpreadElement
+                | K::PropertyAssignment
+                | K::ShorthandPropertyAssignment
+                | K::TemplateSpan
+                | K::PrefixUnaryExpression
+        )
+    )
+}
+// Go recurses through the const type of a maybe-const location; this loops.
+// port: tsc/internal/pseudochecker/lookup.go:isUndefinedPseudoType
+fn is_undefined_pseudo_type(mut ty: &PseudoType) -> bool {
     loop {
         match ty.as_ref() {
             PseudoTypeData::Undefined => return true,

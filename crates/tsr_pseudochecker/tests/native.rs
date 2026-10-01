@@ -76,9 +76,15 @@ impl TestHost {
     let mut m=json!({"kind":e.kind() as i8,"name":self.node(e.name),"optional":e.optional});match &e.data {
      PseudoObjectElementData::Method(s)=>self.signature(s,&mut m),
      PseudoObjectElementData::PropertyAssignment{readonly,ty}=>{m["readonly"]=json!(readonly);m["type"]=self.tree(ty);}
-     PseudoObjectElementData::SetAccessor{signature,parameter}=>{m["node"]=self.node(*signature);m["parameter"]=self.parameter(parameter);}
-     PseudoObjectElementData::GetAccessor{signature,ty}=>{m["node"]=self.node(*signature);m["type"]=self.tree(ty);}
-    }m
+     PseudoObjectElementData::SetAccessor{parameter,..}=>{m["parameter"]=self.parameter(parameter);}
+     PseudoObjectElementData::GetAccessor{ty,..}=>{m["type"]=self.tree(ty);}
+    }
+    // The native observer records each element's `Signature` payload field;
+    // Go's `PseudoObjectElement.Signature` returns exactly that field for a
+    // method or accessor and nil for a property assignment, so the element
+    // accessor is what serializes it here.
+    match e.signature(){Some(signature)=>m["node"]=self.node(signature),None=>assert_eq!(e.kind(),PseudoObjectElementKind::PropertyAssignment)}
+    m
    }).collect()),
    PseudoTypeData::Undefined|PseudoTypeData::Null|PseudoTypeData::Any|PseudoTypeData::String|PseudoTypeData::Number|PseudoTypeData::BigInt|PseudoTypeData::Boolean|PseudoTypeData::True|PseudoTypeData::False=>{}
   }
