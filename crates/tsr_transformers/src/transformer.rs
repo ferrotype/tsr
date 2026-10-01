@@ -25,6 +25,9 @@ use tsr_printer::{EmitContext, EmitVisitorHooks};
 pub enum Error {
     Arena(tsr_arena::Error),
     Resolver(EmitResolverError),
+    /// A transformer or a construct the port does not transform yet, by
+    /// upstream name.
+    Unsupported(&'static str),
 }
 
 impl From<tsr_arena::Error> for Error {
@@ -44,6 +47,7 @@ impl std::fmt::Display for Error {
         match self {
             Self::Arena(error) => write!(f, "{error:?}"),
             Self::Resolver(error) => write!(f, "{error}"),
+            Self::Unsupported(name) => write!(f, "unsupported: {name}"),
         }
     }
 }
@@ -170,6 +174,20 @@ impl<'a> Transformer<'a> {
     fn transform_component(&self, factory: &mut dyn RuntimeFactory, file: NodeId) -> NodeId {
         self.visitor(factory).visit_source_file(file)
     }
+}
+
+/// A transformer that is not ported yet: it fails the file by name and leaves
+/// it unchanged.
+pub(crate) fn unported<'a>(opts: &TransformOptions<'a>, name: &'static str) -> Transformer<'a> {
+    let failure = opts.failure.clone();
+    Transformer::new(
+        move |_: &mut NodeVisitor<'_>, node: Option<NodeId>| {
+            failure.record(Error::Unsupported(name));
+            node
+        },
+        Some(opts.context.clone()),
+        opts.failure.clone(),
+    )
 }
 
 // port: tsc/internal/transformers/chain.go:chainedTransformer.visit
