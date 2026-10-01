@@ -121,18 +121,27 @@ deep inputs did: 14 growth guards of the checker's `stacker::maybe_grow`
 pattern, in the printer (`emitJsxChild`, `emitIfStatement`), the transformers
 (JSX, optional chain, declarations, runtime syntax, legacy decorators, class
 fields) and the checker (`resolveEntityName`, `getWidenedTypeWithContext`,
-`isConstContext`, `getContextualType`).
+`isConstContext`, `getContextualType`). The review of #77 added nine more for
+deep binding patterns and nested `using` blocks, in the transformers
+(`recordDeclarationInScope`, the destructuring flattener and its two pattern
+walks, the declaration transform's `hasAnyBindingInitializers`,
+`getBindingNameVisible` and binding-name visitor,
+`usingDeclarationTransformer.visit`) and the checker
+(`isDeclarationVisible`); the T3, T5 and T7 contracts declare and lower
+those depths.
 
-Open findings, each kept as an ignored test in
-`crates/tsr_compiler/tests/phase3_findings.rs`:
+The same review closed the checker's growth across repeated declaration
+emits. Each request serialized a function's return type in fake scopes
+(`enterNewScope`) and declared an expando function in a fake namespace,
+both allocated in checker-owned storage that is never freed, where the pin
+allocates them in the request's own factory. The checker now gives a
+request the scope it created before with the same parent, kinds, name,
+symbol and locals; the T7 retention contract declares inferred and generic
+function return types and an expando function, and its arena counters and
+live heap stay where the first emit left them.
 
-- Deep destructuring patterns and nested `using` blocks still overflow the
-  stack (`recordDeclarationInScope`, two helpers of `destructuring.rs`,
-  `usingDeclarationTransformer.visit`).
-- The checker's live heap grows across repeated declaration emits of
-  functions with inferred return types (12 to 140 KB per emit) while the
-  type, symbol and signature counts stay constant; not root-caused, likely in
-  the node builder's output path.
+Open findings:
+
 - `AstBuilder::factory_view` walks a node's parent chain on every
   imported-node read, so a transform is quadratic in nesting depth:
   `binderBinaryExpressionStress` takes about 60 seconds per mode in a debug
@@ -168,6 +177,15 @@ Open findings, each kept as an ignored test in
    request refuses `EmitOnly::BuilderSignature`, as the pin's API range does.
 7. `scripts/phase2_producers.py` gained `LATER_PHASE_RUNS = ("emit",)` so
    C7's evidence check ignores the new run.
+8. The pin builds the node builder's fake scopes (`enterNewScope`) and an
+   expando function's fake namespace in each request's factory, and they go
+   with the request. The checker's own storage is never freed, so it keeps
+   each scope it creates and gives a later request the one created with the
+   same parent, kinds, name, symbol and locals (`emit_scopes.rs`). A signature
+   scope's table changes only while a nested signature is serialized and is
+   restored afterwards, so it is compared as it is at the request, and the
+   node builder's name caches, the only ones that read a fake scope's table,
+   belong to the request and are cleared with each scope.
 
 ## Changes that reach Phase 2's checker
 
@@ -197,8 +215,10 @@ Each follows the pin and each can change a recorded `checker` result, so the
   `c7-audit.json`, which still lists as `later` or `equivalent` eight
   functions Phase 3 ported and marked.
 - Found and left as they are: `data/phase2/inventory.json` records a stale
-  digest of `data/phase1/syntax-schedule.json`; `tools/s10/sources.json`
-  lacks `crates/tsr_ipc`, which fails one test of `scripts/test_s10.py`.
+  digest of `data/phase1/syntax-schedule.json`. (`tools/s10/sources.json` and
+  the E7 and E8 sources now list the content-mapper, IPC, JSON-RPC and
+  source-map crates the S10 closure reaches, which `scripts/test_s10.py`
+  requires.)
 
 ## Cost
 

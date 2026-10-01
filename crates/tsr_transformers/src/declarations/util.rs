@@ -117,12 +117,15 @@ pub(super) fn get_binding_name_visible<R: DeclarationEmitResolver>(
         K::ArrayBindingPattern | K::ObjectBindingPattern
     ) {
         // If any child binding pattern element has been marked visible (usually by collect linked aliases), then this is visible
-        for elem in tx.list_nodes(tx.node(name).element_list()) {
-            if get_binding_name_visible(tx, elem)? {
-                return Ok(true);
+        // Recursion once per nested pattern.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            for elem in tx.list_nodes(tx.node(name).element_list()) {
+                if get_binding_name_visible(tx, elem)? {
+                    return Ok(true);
+                }
             }
-        }
-        Ok(false)
+            Ok(false)
+        })
     } else {
         tx.resolver.is_declaration_visible(elem)
     }

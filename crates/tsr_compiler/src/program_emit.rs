@@ -177,45 +177,58 @@ impl CheckedProgram {
             force_js_emit,
         )?;
         let checker_host = ProgramCheckerHost::new(program.clone());
+        let dependencies = if source_files.is_empty() {
+            tsr_ast::AstDependencies::default()
+        } else {
+            tsr_ast::AstDependencies::new(program.files().iter().map(|file| file.bound()))
+        };
 
         let emitters: Vec<Mutex<Option<Result<EmitResult, Error>>>> =
             source_files.iter().map(|_| Mutex::new(None)).collect();
         let wg = WorkGroup::new(program.single_threaded());
         for (&source_file, emitter) in source_files.iter().zip(&emitters) {
-            let (checker_host, writer_pool) = (&checker_host, &writer_pool);
+            let (checker_host, writer_pool, dependencies) =
+                (&checker_host, &writer_pool, &dependencies);
             wg.queue(move || {
-                let result = new_emit_host(self, request, checker_host, source_file, &mut |host| {
-                    // take an unused writer
-                    let mut writer = writer_pool
-                        .lock()
-                        .unwrap_or_else(PoisonError::into_inner)
-                        .pop()
-                        .unwrap_or_else(|| TextWriter::new(new_line, 0));
-                    writer.clear();
+                let result = new_emit_host(
+                    self,
+                    request,
+                    checker_host,
+                    dependencies,
+                    source_file,
+                    &mut |host| {
+                        // take an unused writer
+                        let mut writer = writer_pool
+                            .lock()
+                            .unwrap_or_else(PoisonError::into_inner)
+                            .pop()
+                            .unwrap_or_else(|| TextWriter::new(new_line, 0));
+                        writer.clear();
 
-                    // attach writer and perform emit
-                    let result = file_emit(
-                        host,
-                        &mut writer,
-                        source_file,
-                        options,
-                        ForceEmitPaths {
-                            dts: force_dts_emit,
-                            js: force_js_emit,
-                            declaration_map: options.force_emit
-                                && options.emit_only == EmitOnly::Dts,
-                        },
-                        script_transformers,
-                        self.tracing(),
-                    );
+                        // attach writer and perform emit
+                        let result = file_emit(
+                            host,
+                            &mut writer,
+                            source_file,
+                            options,
+                            ForceEmitPaths {
+                                dts: force_dts_emit,
+                                js: force_js_emit,
+                                declaration_map: options.force_emit
+                                    && options.emit_only == EmitOnly::Dts,
+                            },
+                            script_transformers,
+                            self.tracing(),
+                        );
 
-                    // put the writer back in the pool
-                    writer_pool
-                        .lock()
-                        .unwrap_or_else(PoisonError::into_inner)
-                        .push(writer);
-                    result
-                });
+                        // put the writer back in the pool
+                        writer_pool
+                            .lock()
+                            .unwrap_or_else(PoisonError::into_inner)
+                            .push(writer);
+                        result
+                    },
+                );
                 *emitter.lock().unwrap_or_else(PoisonError::into_inner) =
                     Some(result.and_then(|result| result));
             });

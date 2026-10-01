@@ -413,7 +413,12 @@ impl CheckerState {
         self.synthetic_scopes.census(&mut census);
         census.links("query_links", &self.emit.visible);
         census.links("query_links", &self.emit.aliases_marked);
-        census.map("query_links", &self.emit.import_refs);
+        census.map("query_links", &self.emit.transient.import_refs);
+        census.map("query_links", &self.emit.transient.parse_tree_stand_ins);
+        census.map("query_links", &self.emit.identifiers);
+        for (_, name) in self.emit.identifiers.keys() {
+            census.text("query_links", name);
+        }
         census.links("query_links", &self.emit_checks.node_flags);
         census.links("query_links", &self.emit_checks.requested_helpers);
         census.links("query_links", &self.emit_checks.helpers_module);

@@ -9,6 +9,15 @@ use tsr_printer::emit_resolver::SymbolAccessibilityResult;
 pub(crate) struct EmitState {
     pub(crate) visible: LinkStore<NodeId, Option<bool>>,
     pub(crate) aliases_marked: LinkStore<NodeId, bool>,
+    pub(crate) transient: EmitTransient,
+    /// A stand-in is determined entirely by its spelling and parse-tree parent.
+    /// Reuse it across emits of this immutable program, rather than allocating
+    /// a new checker node and symbol-link entry for each temporary transform ID.
+    pub(crate) identifiers: crate::types::Map<(Option<NodeId>, tsr_ast::JsString), NodeId>,
+}
+
+#[derive(Default)]
+pub(crate) struct EmitTransient {
     /// `jsxLinks.importRef`: the import a transformed JSX reference points at.
     pub(crate) import_refs: crate::types::Map<NodeId, NodeId>,
     /// For an identifier of a transform's factory that upstream's resolver
@@ -49,7 +58,11 @@ impl CheckerState {
         if let Some(Some(value)) = self.emit.visible.try_get(node) {
             return Ok(*value);
         }
-        let value = self.determine_declaration_visible(node)?;
+        // A binding element asks for its pattern's declaration, once per
+        // nested pattern.
+        let value = stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.determine_declaration_visible(node)
+        })?;
         *self.emit.visible.get_or_default(node) = Some(value);
         Ok(value)
     }

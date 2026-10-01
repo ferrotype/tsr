@@ -11,6 +11,18 @@ use tsr_ast::{
 pub(crate) struct SyntheticScopes {
     pub(crate) bindings: crate::types::Map<NodeId, NodeBinding>,
     pub(crate) signature_kinds: crate::types::Map<NodeId, &'static str>,
+    /// Every scope by its parent and signature kind, so a request for an
+    /// identical scope gets the existing one.
+    created: crate::types::Map<(NodeId, Option<&'static str>), Vec<CreatedScope>>,
+}
+
+/// What a scope was created with besides its parent, signature kind and
+/// locals, which are its key and its table.
+struct CreatedScope {
+    node: NodeId,
+    kind: K,
+    name: Option<JsString>,
+    symbol: Option<SymbolId>,
 }
 impl SyntheticScopes {
     #[cfg(any(test, feature = "storage-pilot"))]
@@ -24,6 +36,11 @@ impl SyntheticScopes {
             "query_links",
             self.signature_kinds.len(),
             self.signature_kinds.allocation_size(),
+        );
+        census.add(
+            "query_links",
+            self.created.len(),
+            self.created.allocation_size(),
         );
         // Local names/entries are in CheckerState.tables, counted there once.
     }
@@ -66,6 +83,15 @@ impl CheckerState {
         for symbol in locals.values().flatten() {
             self.symbol(*symbol)?;
         }
+        // Each emit asks for the same scopes again. The pin's belong to the
+        // request's factory and go with it; this checker's storage is never
+        // freed, so an identical request gets the scope it had before and
+        // repeated emits add nothing.
+        if let Some(scope) =
+            self.identical_emit_scope(parent, kind, name.as_ref(), symbol, &locals, signature_kind)?
+        {
+            return Ok(scope);
+        }
         if parent.arena() != self.factory.id().arena() {
             self.retain_flow_source(parent)?;
         }
@@ -78,7 +104,7 @@ impl CheckerState {
         } else {
             let name = self
                 .factory
-                .new_identifier(name.expect("validated namespace name"));
+                .new_identifier(name.clone().expect("validated namespace name"));
             let body = self.factory.new_module_block(Some(list));
             let node = self.factory.new_module_declaration(
                 None,
@@ -107,7 +133,55 @@ impl CheckerState {
         if let Some(kind) = signature_kind {
             self.synthetic_scopes.signature_kinds.insert(node, kind);
         }
+        self.synthetic_scopes
+            .created
+            .entry((parent, signature_kind))
+            .or_default()
+            .push(CreatedScope {
+                node,
+                kind,
+                name,
+                symbol,
+            });
         Ok(node)
+    }
+
+    /// A scope created with the same parent, kinds, name and symbol whose
+    /// locals are now the requested ones. A signature scope's table is
+    /// extended only while a nested signature is serialized and restored
+    /// afterwards, so it is compared as it is now.
+    fn identical_emit_scope(
+        &self,
+        parent: NodeId,
+        kind: K,
+        name: Option<&JsString>,
+        symbol: Option<SymbolId>,
+        locals: &SymbolTable,
+        signature_kind: Option<&'static str>,
+    ) -> Result<Option<NodeId>, Error> {
+        let Some(created) = self.synthetic_scopes.created.get(&(parent, signature_kind)) else {
+            return Ok(None);
+        };
+        for scope in created {
+            if scope.kind != kind || scope.name.as_ref() != name || scope.symbol != symbol {
+                continue;
+            }
+            let table = self
+                .synthetic_scopes
+                .bindings
+                .get(&scope.node)
+                .and_then(|binding| binding.locals)
+                .ok_or(Error::MissingLink("emit scope locals"))?;
+            let current = self.tables.get(table)?;
+            if current.len() == locals.len()
+                && locals
+                    .iter()
+                    .all(|(name, symbol)| current.get(name.as_bytes()) == Some(*symbol))
+            {
+                return Ok(Some(scope.node));
+            }
+        }
+        Ok(None)
     }
 }
 

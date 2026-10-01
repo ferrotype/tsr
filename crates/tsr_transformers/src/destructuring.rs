@@ -677,6 +677,24 @@ impl<'f, 'v> Flattener<'f, 'v, '_> {
     fn flatten_binding_or_assignment_element(
         &mut self,
         element: NodeId,
+        value: Option<NodeId>,
+        location: TextRange,
+        skip_initializer: bool,
+    ) -> Result<(), Error> {
+        // A nested pattern is flattened here directly, once per level.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.flatten_binding_or_assignment_element_worker(
+                element,
+                value,
+                location,
+                skip_initializer,
+            )
+        })
+    }
+
+    fn flatten_binding_or_assignment_element_worker(
+        &mut self,
+        element: NodeId,
         mut value: Option<NodeId>,
         location: TextRange,
         skip_initializer: bool,
@@ -956,12 +974,15 @@ fn binding_or_assignment_pattern_assigns_to_name(
     pattern: NodeId,
     name: &[u8],
 ) -> Result<bool, Error> {
-    for element in elements_of_pattern(view, pattern)? {
-        if binding_or_assignment_element_assigns_to_name(view, element.expect(NIL), name)? {
-            return Ok(true);
+    // Recursion once per nested pattern.
+    stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+        for element in elements_of_pattern(view, pattern)? {
+            if binding_or_assignment_element_assigns_to_name(view, element.expect(NIL), name)? {
+                return Ok(true);
+            }
         }
-    }
-    Ok(false)
+        Ok(false)
+    })
 }
 
 /// Checks if any element has a non-literal computed property name.
@@ -994,15 +1015,18 @@ fn binding_or_assignment_pattern_contains_non_literal_computed_name(
     view: AstView<'_>,
     pattern: NodeId,
 ) -> Result<bool, Error> {
-    for element in elements_of_pattern(view, pattern)? {
-        if binding_or_assignment_element_contains_non_literal_computed_name(
-            view,
-            element.expect(NIL),
-        )? {
-            return Ok(true);
+    // Recursion once per nested pattern.
+    stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+        for element in elements_of_pattern(view, pattern)? {
+            if binding_or_assignment_element_contains_non_literal_computed_name(
+                view,
+                element.expect(NIL),
+            )? {
+                return Ok(true);
+            }
         }
-    }
-    Ok(false)
+        Ok(false)
+    })
 }
 
 /// Returns the initializer/default value of a binding or assignment element.

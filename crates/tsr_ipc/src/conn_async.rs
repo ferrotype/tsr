@@ -7,8 +7,7 @@ use std::collections::HashMap;
 use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::sync::atomic::{AtomicI64, Ordering};
 use std::sync::mpsc::{sync_channel, RecvTimeoutError, SyncSender};
-use std::sync::{Arc, Mutex};
-use std::thread::JoinHandle;
+use std::sync::{Arc, Condvar, Mutex};
 use std::time::{Duration, Instant};
 use tsr_json::{Encode, RawValue};
 use tsr_jsonrpc::{Id, Message, ResponseError, CODE_INTERNAL_ERROR};
@@ -20,6 +19,38 @@ struct Pending {
     has_cause: bool,
 }
 
+/// The handlers still running, which `run` waits for before it returns (the
+/// pin's `sync.WaitGroup`): a finished handler leaves nothing behind, however
+/// long the connection lives.
+#[derive(Default)]
+struct Handlers {
+    active: Mutex<usize>,
+    idle: Condvar,
+}
+
+impl Handlers {
+    fn wait(&self) {
+        let mut active = self.active.lock().expect("handler count");
+        while *active > 0 {
+            active = self.idle.wait(active).expect("handler count");
+        }
+    }
+}
+
+/// Counts its handler done when the handler's thread ends, by a panic too.
+struct HandlerDone(Arc<Inner>);
+
+impl Drop for HandlerDone {
+    fn drop(&mut self) {
+        let handlers = &self.0.handlers;
+        let mut active = handlers.active.lock().expect("handler count");
+        *active -= 1;
+        if *active == 0 {
+            handlers.idle.notify_all();
+        }
+    }
+}
+
 struct Inner {
     closer: Option<Arc<dyn Closer>>,
     protocol: Arc<dyn Protocol>,
@@ -29,7 +60,7 @@ struct Inner {
     seq: AtomicI64,
     pending: Mutex<Pending>,
     write: Mutex<()>,
-    handlers: Mutex<Vec<JoinHandle<()>>>,
+    handlers: Handlers,
 }
 
 /// A bidirectional JSON-RPC connection. Cloning shares the connection.
@@ -58,7 +89,7 @@ impl AsyncConn {
             seq: AtomicI64::new(0),
             pending: Mutex::new(Pending::default()),
             write: Mutex::new(()),
-            handlers: Mutex::new(Vec::new()),
+            handlers: Handlers::default(),
         }))
     }
 
@@ -73,9 +104,15 @@ impl AsyncConn {
         self.0.timing.lock().expect("timing lock").clone()
     }
 
+    /// Runs a handler on its own thread, detached: only the count of running
+    /// handlers is kept.
     fn spawn(&self, work: impl FnOnce() + Send + 'static) {
-        let handle = std::thread::spawn(work);
-        self.0.handlers.lock().expect("handler list").push(handle);
+        *self.0.handlers.active.lock().expect("handler count") += 1;
+        let done = HandlerDone(self.0.clone());
+        std::thread::spawn(move || {
+            let _done = done;
+            work();
+        });
     }
 
     fn close(&self) {
@@ -299,10 +336,7 @@ impl Conn for AsyncConn {
         };
         self.close_pending_calls(result.as_ref().err());
         handler_ctx.cancel();
-        let handlers = std::mem::take(&mut *self.0.handlers.lock().expect("handler list"));
-        for handler in handlers {
-            let _ = handler.join();
-        }
+        self.0.handlers.wait();
         match (result, request_error.try_recv()) {
             (Ok(()), Ok(request_error)) => Err(request_error),
             (Err(error), Ok(request_error)) => Err(error.join(request_error)),
@@ -373,5 +407,89 @@ impl Conn for AsyncConn {
         }
         let _write = self.0.write.lock().expect("write lock");
         self.0.protocol.write_notification(method, Some(params))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{pipe, HandlerError, HandlerResult};
+
+    /// Counts the notifications it handled; a `hold` notification waits
+    /// until the test releases it.
+    #[derive(Default)]
+    struct Counting {
+        handled: Mutex<usize>,
+        released: Mutex<bool>,
+        changed: Condvar,
+    }
+
+    impl Handler for Counting {
+        fn handle_request(&self, _: &Context, _: &str, _: &[u8]) -> HandlerResult {
+            Ok(None)
+        }
+        fn handle_notification(
+            &self,
+            _: &Context,
+            method: &str,
+            _: &[u8],
+        ) -> Result<(), HandlerError> {
+            if method == "hold" {
+                let mut released = self.released.lock().unwrap();
+                while !*released {
+                    released = self.changed.wait(released).unwrap();
+                }
+            }
+            *self.handled.lock().unwrap() += 1;
+            self.changed.notify_all();
+            Ok(())
+        }
+    }
+
+    fn active(conn: &AsyncConn) -> usize {
+        *conn.0.handlers.active.lock().unwrap()
+    }
+
+    /// Waits up to ten seconds for `ready`.
+    fn eventually(mut ready: impl FnMut() -> bool) {
+        let deadline = Instant::now() + Duration::from_secs(10);
+        while !ready() {
+            assert!(Instant::now() < deadline, "timed out");
+            std::thread::sleep(Duration::from_millis(1));
+        }
+    }
+
+    #[test]
+    fn finished_handlers_leave_nothing_behind_and_run_waits_for_the_rest() {
+        let (client_end, server_end) = pipe();
+        let closer = client_end.closer.clone();
+        let counting = Arc::new(Counting::default());
+        let server = AsyncConn::new(server_end, counting.clone());
+        let running = server.clone();
+        let server_run = std::thread::spawn(move || running.run(&Context::background()));
+        let client = AsyncConn::new(client_end, Arc::new(Counting::default()));
+        let reading = client.clone();
+        let client_run = std::thread::spawn(move || reading.run(&Context::background()));
+        let ctx = Context::background();
+        let params = RawValue(b"{}".to_vec());
+        for _ in 0..2000 {
+            client.notify(&ctx, "log", &params).unwrap();
+        }
+        for _ in 0..100 {
+            client.call(&ctx, "nothing", &params).unwrap();
+        }
+        eventually(|| *counting.handled.lock().unwrap() == 2000 && active(&server) == 0);
+        // A handler still running when the stream ends holds `run` back.
+        client.notify(&ctx, "hold", &params).unwrap();
+        eventually(|| active(&server) == 1);
+        closer.close().unwrap();
+        std::thread::sleep(Duration::from_millis(50));
+        assert!(!server_run.is_finished());
+        *counting.released.lock().unwrap() = true;
+        counting.changed.notify_all();
+        server_run.join().unwrap().unwrap();
+        assert_eq!(*counting.handled.lock().unwrap(), 2001);
+        assert_eq!(active(&server), 0);
+        let _ = client_run.join().unwrap();
     }
 }

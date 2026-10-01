@@ -217,7 +217,11 @@ impl Operation<'_> {
         node: NodeId,
         declaration: NodeId,
     ) -> Result<(), Error> {
-        self.state_mut().emit.import_refs.insert(node, declaration);
+        self.state_mut()
+            .emit
+            .transient
+            .import_refs
+            .insert(node, declaration);
         Ok(())
     }
 
@@ -225,7 +229,7 @@ impl Operation<'_> {
     pub fn referenced_import_declaration(&mut self, node: NodeId) -> Result<Option<NodeId>, Error> {
         let state = self.state_mut();
         if !state.emit_parse_node(node)? {
-            return Ok(state.emit.import_refs.get(&node).copied());
+            return Ok(state.emit.transient.import_refs.get(&node).copied());
         }
         let Some(symbol) = state.referenced_value_or_alias_symbol(node)? else {
             return Ok(None);
@@ -554,7 +558,12 @@ impl Operation<'_> {
     /// or nothing for any other node of a transform.
     fn reference_node(&self, node: NodeId) -> Option<NodeId> {
         if self.is_transform_node(node) {
-            self.state().emit.parse_tree_stand_ins.get(&node).copied()
+            self.state()
+                .emit
+                .transient
+                .parse_tree_stand_ins
+                .get(&node)
+                .copied()
         } else {
             Some(node)
         }
@@ -578,7 +587,7 @@ impl ReferenceResolver for Operation<'_> {
         node: NodeId,
     ) -> ResolverResult<Option<NodeId>> {
         let Some(node) = self.reference_node(node) else {
-            return Ok(self.state().emit.import_refs.get(&node).copied());
+            return Ok(self.state().emit.transient.import_refs.get(&node).copied());
         };
         answer(self.referenced_import_declaration(node))
     }

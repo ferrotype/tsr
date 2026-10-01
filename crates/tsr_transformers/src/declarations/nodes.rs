@@ -487,7 +487,10 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
         node: Option<NodeId>,
     ) -> Result<Option<NodeId>, R::Error> {
         let Some(node) = node else { return Ok(None) };
-        let visited = self.visit_binding_name(node)?;
+        // A binding element's name is visited here, once per nested pattern.
+        let visited = stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.visit_binding_name(node)
+        })?;
         // The binding name visitor never returns a syntax list.
         Ok(Some(visited))
     }

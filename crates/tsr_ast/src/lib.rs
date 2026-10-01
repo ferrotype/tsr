@@ -113,7 +113,8 @@ pub use source_metadata::{
     emit_module_format_of_file, implied_node_format_for_emit, SourceFileMetaData,
 };
 pub use storage::{
-    AstBuilder, AstBundle, AstFile, AstTransaction, AstView, ParsedFile, RetainedNode,
+    AstBuilder, AstBundle, AstDependencies, AstFile, AstTransaction, AstView, ParsedFile,
+    RetainedNode,
 };
 pub use subtree_facts::{is_left_hand_side_expression_kind, subtree_flags, SubtreeFacts};
 pub use subtree_generated::SubtreeContext;

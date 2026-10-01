@@ -11,7 +11,7 @@ use crate::{output_paths, CheckedProgram, Error, Program, ProgramCheckerHost, Pr
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
-use tsr_ast::{AstBuilder, FileReference, NodeId};
+use tsr_ast::{AstBuilder, AstDependencies, FileReference, NodeId};
 use tsr_checker::{CheckerHost, CheckerRequest, Operation, ProjectReferenceSource};
 use tsr_core::{CompilerOptions, ModuleKind, ResolutionMode};
 use tsr_jsstring::JsString;
@@ -36,6 +36,7 @@ pub struct EmitHost<'a> {
     declaration_resolver: Rc<RefCell<dyn DeclarationResolver + 'a>>,
     /// `Program.CommonSourceDirectory`, which the program computes once.
     common_source_directory: JsString,
+    dependencies: &'a AstDependencies,
 }
 
 /// The declaration transformer over the checker behind an emit host.
@@ -71,27 +72,34 @@ pub(crate) fn new_emit_host<R>(
     checked: &CheckedProgram,
     request: &CheckerRequest,
     checker_host: &ProgramCheckerHost,
+    dependencies: &AstDependencies,
     file: &ProgramFile,
     task: &mut dyn FnMut(&EmitHost<'_>) -> R,
 ) -> Result<R, Error> {
     let common_source_directory = JsString::from_bytes(checker_host.common_source_directory()?);
     let mut result = None;
     checked.with_type_checker_for_file(request, file.source(), &mut |operation| {
-        let resolver = Rc::new(RefCell::new(operation));
-        let host = EmitHost {
-            program: checked.program(),
-            checker_host,
-            emit_resolver: resolver.clone(),
-            declaration_resolver: resolver,
-            common_source_directory: common_source_directory.clone(),
-        };
-        result = Some(task(&host));
+        operation.with_emit_scope(|operation| {
+            let resolver = Rc::new(RefCell::new(operation));
+            let host = EmitHost {
+                program: checked.program(),
+                checker_host,
+                emit_resolver: resolver.clone(),
+                declaration_resolver: resolver,
+                common_source_directory: common_source_directory.clone(),
+                dependencies,
+            };
+            result = Some(task(&host));
+        });
         Ok(())
     })?;
     Ok(result.expect("the emit task ran"))
 }
 
 impl<'a> EmitHost<'a> {
+    pub(crate) fn dependencies(&self) -> &AstDependencies {
+        self.dependencies
+    }
     pub fn program(&self) -> &'a Program {
         self.program
     }
