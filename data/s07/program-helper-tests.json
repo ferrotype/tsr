@@ -121,7 +121,7 @@
       "target": "lib",
       "tests": [
         "boundary_tests::empty_references_and_mappers_preserve_normal_loading",
-        "boundary_tests::parsed_enabled_mappers_are_rejected_and_disabled_diagnostics_are_retained",
+        "boundary_tests::enabled_mappers_without_a_project_stub_their_files_and_disabled_diagnostics_are_retained",
         "boundary_tests::parsed_project_references_load_the_referenced_configs",
         "boundary_tests::source_of_project_reference_mode_skips_checking_referenced_sources",
         "boundary_tests::source_of_project_reference_mode_with_outputs_is_an_explicit_boundary"
