@@ -11,7 +11,8 @@ use tsr_transformers::declarations::{transform_declarations, DeclarationOptions}
 impl Program {
     /// The declaration diagnostics of one file, or of every file, sorted and
     /// deduplicated as the pin's program collects them.
-    // port: tsc/internal/compiler/program.go:Program.GetDeclarationDiagnostics
+    // The single-owner form of Program.GetDeclarationDiagnostics, with one
+    // operation for every file; CheckedProgram::declaration_diagnostics is the port.
     pub fn declaration_diagnostics(
         &self,
         operation: &mut Operation<'_>,

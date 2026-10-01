@@ -253,6 +253,7 @@ impl Program {
             })
             .collect()
     }
+    /// port: tsc/internal/compiler/program.go:Program.CommandLine
     pub fn config(&self) -> &tsr_tsoptions::ParsedCommandLine {
         &self.config
     }
