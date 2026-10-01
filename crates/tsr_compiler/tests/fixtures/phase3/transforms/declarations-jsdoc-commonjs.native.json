@@ -1,0 +1,208 @@
+{
+ "cases": [
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "/**\r\n * @typedef {{x: string}} Foo\r\n */\r\ndeclare const _exports: {\r\n    a: number;\r\n    b: string;\r\n};\r\nexport = _exports;\r\nexport type Foo = {\r\n    x: string;\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/a.js"
+    }
+   ],
+   "id": "typedef-module-exports-object",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.js": "2f2a2a0a202a204074797065646566207b7b783a20737472696e677d7d20466f6f0a202a2f0a6d6f64756c652e6578706f727473203d207b20613a20312c20623a202268656c6c6f22207d3b0a"
+    },
+    "id": "typedef-module-exports-object",
+    "options": {
+     "checkJs": true,
+     "declaration": true,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "outDir": "/.src/out",
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/a.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "a.js",
+   "source": "// @module: commonjs\n// @declaration: true\n// @checkJs: true\n// @outDir: ./out\n// @filename: a.js\n/**\n * @typedef {{x: string}} Foo\n */\nmodule.exports = { a: 1, b: \"hello\" };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export = loader;\r\nexport type Options = {\r\n    opt: string;\r\n};\r\n/**\r\n * @typedef {{opt: string}} Options\r\n */\r\n/** @param {Options} options */\r\ndeclare function loader(options: Options): void;\r\n"
+      }
+     ],
+     "name": "/.src/index.js"
+    }
+   ],
+   "id": "typedef-module-exports-function",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/index.js": "2f2a2a0a202a204074797065646566207b7b6f70743a20737472696e677d7d204f7074696f6e730a202a2f0a2f2a2a2040706172616d207b4f7074696f6e737d206f7074696f6e73202a2f0a66756e6374696f6e206c6f61646572286f7074696f6e7329207b7d0a6d6f64756c652e6578706f727473203d206c6f616465723b0a"
+    },
+    "id": "typedef-module-exports-function",
+    "options": {
+     "checkJs": true,
+     "declaration": true,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "outDir": "/.src/out",
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/index.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "index.js",
+   "source": "// @module: commonjs\n// @declaration: true\n// @checkJs: true\n// @outDir: ./out\n// @filename: index.js\n/**\n * @typedef {{opt: string}} Options\n */\n/** @param {Options} options */\nfunction loader(options) {}\nmodule.exports = loader;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export type Foo = {\r\n    x: string;\r\n};\r\n/**\r\n * @typedef {{x: string}} Foo\r\n */\r\nexport declare const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.js"
+    }
+   ],
+   "id": "typedef-esm",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.js": "2f2a2a0a202a204074797065646566207b7b783a20737472696e677d7d20466f6f0a202a2f0a6578706f727420636f6e73742061203d20313b0a"
+    },
+    "id": "typedef-esm",
+    "options": {
+     "checkJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "outDir": "/.src/out",
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/a.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "a.js",
+   "source": "// @declaration: true\n// @checkJs: true\n// @outDir: ./out\n// @filename: a.js\n/**\n * @typedef {{x: string}} Foo\n */\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "/**\r\n * @typedef {{x: string}} N.Foo\r\n */\r\ndeclare const _exports: {\r\n    a: number;\r\n};\r\nexport = _exports;\r\nexport declare namespace N {\r\n    export type Foo = {\r\n        x: string;\r\n    };\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/a.js"
+    }
+   ],
+   "id": "typedef-dotted-module-exports",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.js": "2f2a2a0a202a204074797065646566207b7b783a20737472696e677d7d204e2e466f6f0a202a2f0a6d6f64756c652e6578706f727473203d207b20613a2031207d3b0a"
+    },
+    "id": "typedef-dotted-module-exports",
+    "options": {
+     "checkJs": true,
+     "declaration": true,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "outDir": "/.src/out",
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/a.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "a.js",
+   "source": "// @module: commonjs\n// @declaration: true\n// @checkJs: true\n// @outDir: ./out\n// @filename: a.js\n/**\n * @typedef {{x: string}} N.Foo\n */\nmodule.exports = { a: 1 };\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

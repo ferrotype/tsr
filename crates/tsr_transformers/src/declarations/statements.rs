@@ -422,7 +422,7 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             mask ^= mf::AMBIENT;
             additions = mf::NONE;
         }
-        if tsr_ast::is_implicitly_exported_js_doc_declaration(self.view(), node)? {
+        if self.is_implicitly_exported_js_doc_declaration(node)? {
             additions |= mf::EXPORT;
         }
         Ok(util::mask_modifier_flags(
@@ -431,6 +431,26 @@ impl<R: DeclarationEmitResolver> Transformer<'_, R> {
             mask,
             additions,
         )?)
+    }
+
+    /// `ast.IsImplicitlyExportedJSDocDeclaration`. The file is read through
+    /// the output builder, which selects the file's binding: the binder sets
+    /// the CommonJS indicator, and the builder's own view does not carry it.
+    fn is_implicitly_exported_js_doc_declaration(&self, node: NodeId) -> Result<bool, R::Error> {
+        let parent = self.parent(node).expect(NIL);
+        if self.kind(parent) != K::SourceFile
+            || !tsr_ast::utilities::is_external_or_common_js_module(
+                &self.output.read_source_file(parent)?,
+            )
+        {
+            return Ok(false);
+        }
+        let read = self.node(node);
+        // A reparsed ModuleDeclaration synthesized from a JSDoc @typedef/@callback
+        // dotted name should also be treated as implicitly exported in modules.
+        Ok(read.kind() == K::JSTypeAliasDeclaration
+            || read.kind() == K::ModuleDeclaration
+                && read.flags() & tsr_ast::node_flags::REPARSED != 0)
     }
 
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformImportEqualsDeclaration
