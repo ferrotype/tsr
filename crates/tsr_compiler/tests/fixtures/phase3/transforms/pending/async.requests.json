@@ -1,0 +1,38 @@
+{
+ "cases": [
+  {
+   "id": "static-block-arrow",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass C {\n    static {\n        const f = async () => await this.x + arguments.length;\n    }\n}\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "async-generator-method-super",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { m() { return 1; } }\nclass C extends B {\n    async *g() {\n        yield super.m();\n        await 0;\n    }\n}\n",
+   "chains": [
+    [
+     "forawait",
+     "async"
+    ],
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-chain-async",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(k) {\n        super[k] = await 1;\n        return arguments;\n    }\n}\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  }
+ ]
+}

@@ -1,0 +1,584 @@
+{
+ "cases": [
+  {
+   "id": "function-declaration",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(x) {\n    await x;\n    return 1;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "function-expression",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst f = async function () {\n    await g();\n};\nconst h = async function named(a) {\n    return await a;\n};\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "arrow-expression-body",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst f = async (x) => await x;\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "arrow-block-body",
+   "name": "probe.ts",
+   "source": "// @target: es2015\nconst f = async (x) => {\n    const y = await x;\n    return y;\n};\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "arrow-this-top-level",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst f = async () => {\n    await this.x;\n};\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "arrow-this-in-function",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nfunction outer() {\n    return async () => {\n        await this.x;\n    };\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "class-method",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass C {\n    async m(a) {\n        await this.x;\n        return a;\n    }\n    n() { return 1; }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "static-method-and-class-expression",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst K = class {\n    static async s() {\n        await 0;\n    }\n};\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "object-literal-method",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst o = {\n    async m() {\n        return await this.v;\n    },\n    plain() { return 2; }\n};\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "arguments-in-function",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f() {\n    await 0;\n    return arguments.length;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "arguments-in-arrow",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nfunction f() {\n    return async () => {\n        await 0;\n        return arguments[0];\n    };\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "arguments-sibling-arrows",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nfunction f() {\n    const a = async () => arguments[0] + await 1;\n    const b = async () => arguments[1] + await 2;\n    return [a, b];\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "arguments-unused-arrow",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nfunction f() {\n    const a = async () => await 1;\n    return arguments.length;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "arguments-name-and-label",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(o) {\n    arguments: for (;;) {\n        break arguments;\n    }\n    await o.arguments;\n    return { arguments: 1 };\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "arguments-in-nested-function",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f() {\n    await 0;\n    function g() { return arguments; }\n    return g;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "super-property-call",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { m() { return 1; } }\nclass C extends B {\n    async n() {\n        await 0;\n        return super.m(1, 2);\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "super-property-read",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { get x() { return 1; } }\nclass C extends B {\n    async n() {\n        return super.x + await 1;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "super-element-read",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(k) {\n        return super[k] + await 1;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "super-element-call",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(k) {\n        await 0;\n        return super[k](3);\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "super-element-assignment",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(k) {\n        await 0;\n        super[k] = 1;\n        super.y = super[k];\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "super-property-assignment",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n() {\n        super.x = await 1;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "super-update-expressions",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n() {\n        await 0;\n        super.a++;\n        --super.b;\n        -super.c;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "super-destructuring-targets",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(arr, o) {\n        await 0;\n        [super.a, ...super.b] = arr;\n        ({ p: super.c, ...super.d } = o);\n        (super.e) = 1;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "super-in-arrow-in-method",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { m() { return 1; } }\nclass C extends B {\n    n() {\n        return async () => super.m() + await 1;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "super-element-in-arrow-in-method",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    n(k) {\n        return async () => super[k] + await 1;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "super-in-object-literal",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst base = { x: 1 };\nconst o = {\n    __proto__: base,\n    async m() {\n        return super.x + await 0;\n    }\n};\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "super-in-parameter-default",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n(a = super.x) {\n        return await a;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "super-in-nested-class-skipped",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    async n() {\n        await 0;\n        class D extends B { m() { return super.z; } }\n        function g() { return 1; }\n        return [super.q, D, g];\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "constructor-with-async-arrow",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass C {\n    constructor() {\n        this.f = async () => await this.x;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "accessors-with-async-arrows",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { }\nclass C extends B {\n    get g() {\n        return async () => await super.y;\n    }\n    set s(v) {\n        this.f = async () => { await v; };\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "default-parameters",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(a, b = 1, c) {\n    return a + b + await c;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "destructuring-parameters",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f({ a, b }, [c, , d]) {\n    return a + b + c + d + await 0;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "rest-parameter",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(a, ...rest) {\n    return await rest[a];\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "arrow-default-parameters",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst f = async (a, b = 1, c) => a + b + c + await 0;\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "arrow-rest-parameter",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst f = async (a, ...r) => await r[a];\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "arrow-destructuring-parameter",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst f = async ({ a }, b) => await a + b;\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "arrow-defaults-with-arguments",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nfunction outer() {\n    return async (a = 1) => arguments[0] + a + await 0;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "method-default-parameters",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass C {\n    async m(a = 1, { b } = {}) {\n        return await a + b;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "var-collides-with-parameter",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(x, y) {\n    var x = 1, z = 2;\n    var y;\n    await x;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "var-no-collision",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(x) {\n    var y = 1;\n    let x2 = 2;\n    await y;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "var-destructuring-collision",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(a, b) {\n    var { a, c: [b] } = await g();\n    var [, d = 1, ...e] = [];\n    return [a, b, d, e];\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "for-statement-collision",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(i, j) {\n    for (var i = 0; i < 2; i++) { await i; }\n    for (var j; ;) { break; }\n    for (let k = 0; k < 1; k++) { }\n    for (; ;) { break; }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "for-in-collision",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(k, o) {\n    for (var k in o) { await k; }\n    for (var m in o) { }\n    for (k in o) { }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "for-of-collision",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(x, y, z, arr) {\n    for (var x of arr) { await x; }\n    for (var [y] of arr) { }\n    for (var { p: z, q = 1, ...rest } of arr) { }\n    for (var x = 1 of arr) { }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "for-await-in-async",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(it) {\n    for await (const x of it) {\n        await x;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "catch-shadows-parameter",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(e, g) {\n    try {\n        await 0;\n    } catch (e) {\n        var e = 1;\n        var g = 2;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "catch-no-shadow",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(x) {\n    try {\n        await 0;\n    } catch ({ message }) {\n        var x = message;\n    } finally {\n        var x;\n    }\n    try { } catch { var x = 3; }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "nested-statements-collision",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(a, o) {\n    if (o) { var a = 1; } else var a = 2;\n    while (o) { var a = 3; break; }\n    do { var a = 4; } while (false);\n    switch (o) {\n        case 1: var a = 5; break;\n        default: var a = 6;\n    }\n    label: { var a = 7; }\n    { var a = await 8; }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "with-statement-collision",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(a, o) {\n    with (o) { var a = 1; }\n    await a;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "top-level-await",
+   "name": "probe.ts",
+   "source": "// @target: es2016\n// @module: esnext\nawait Promise.resolve(1);\nconst f = async () => await 2;\nexport {};\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "nested-async-functions",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function outer(a) {\n    async function inner(b) {\n        return await b;\n    }\n    const arrow = async () => await inner(a);\n    return await arrow();\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "generators-untouched",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nfunction* g() {\n    yield 1;\n}\nasync function f() {\n    function* h() { yield 2; }\n    await 0;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "async-generator",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function* g() {\n    await 1;\n    yield 2;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "no-await-anywhere",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nfunction f(a) {\n    return a + 1;\n}\nclass C { m() { return this; } }\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "async-without-await",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f() {\n    return 1;\n}\nconst g = async () => 2;\nclass C { async m() { } }\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-async",
+   "name": "probe.ts",
+   "source": "// @target: es2016\n// @module: commonjs\nexport default async function () {\n    await 0;\n}\nexport async function named() {\n    await 1;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "arrow-in-async-method-this",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass C {\n    async m() {\n        const f = async () => await this.x;\n        return f();\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "await-in-nested-expressions",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(a, b) {\n    return (await a) + (await (await b));\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  }
+ ]
+}
