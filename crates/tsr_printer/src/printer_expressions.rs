@@ -1,5 +1,5 @@
 //! Expression forms retained in generated parameter and computed-property names.
-use super::{comments::CommentTarget, guard, Session, Span, WriteKind};
+use super::{comments::CommentTarget, guard, statements::Operand, Session, Span, WriteKind};
 use crate::{emit_flags as ef, list_format as lf, Error};
 use tsr_ast::{operator_precedence as op, NodeId, NodeKind, SyntaxKind as K};
 
@@ -46,10 +46,11 @@ impl Session<'_, '_> {
             return Ok(());
         }
         let parent_read = self.node(parent)?;
-        let skipped = self.skip_partially_emitted_expressions_rewritten(callee)?;
+        let skipped =
+            self.skip_partially_emitted_expressions_rewritten(self.left_operand(callee))?;
         if parent_read.kind() == K::CallExpression
             && skipped.map_or(Ok(false), |skipped| {
-                self.is_new_expression_without_arguments(skipped)
+                self.is_new_expression_without_arguments(skipped.node)
             })?
         {
             // Parenthesize `new C` inside of a CallExpression so it is treated as `(new C)()` and not `new C()`
@@ -162,11 +163,7 @@ impl Session<'_, '_> {
         expression: NodeId,
     ) -> Result<(), Error> {
         let read = self.node(expression)?;
-        let span = Span {
-            node: None,
-            pos: i64::from(read.pos()),
-            end: i64::from(read.end()),
-        };
+        let span = Span::created(i64::from(read.pos()), i64::from(read.end()));
         let target = CommentTarget {
             node: None,
             kind: K::ParenthesizedExpression.into(),
@@ -182,35 +179,38 @@ impl Session<'_, '_> {
         })
     }
 
-    fn binary_operator(&self, node: NodeId) -> Result<Option<NodeKind>, Error> {
-        let Some(node) = self.skip_partially_emitted_expressions_rewritten(node)? else {
+    fn binary_operator(&self, operand: Operand) -> Result<Option<NodeKind>, Error> {
+        let Some(operand) = self.skip_partially_emitted_expressions_rewritten(operand)? else {
             return Ok(None);
         };
-        if self.node(node)?.kind() != K::BinaryExpression {
+        if self.node(operand.node)?.kind() != K::BinaryExpression {
             return Ok(None);
         }
-        let (_, operator, _) = self.binary_parts(node)?;
+        let (_, operator, _) = self.binary_parts(operand.node)?;
         Ok(Some(self.node(operator)?.kind()))
     }
 
     // port: tsc/internal/printer/printer.go:Printer.getLiteralKindOfBinaryPlusOperand
-    fn literal_kind_of_binary_plus_operand(&self, node: NodeId) -> Result<Option<NodeKind>, Error> {
-        let mut pending = vec![node];
+    fn literal_kind_of_binary_plus_operand(
+        &self,
+        operand: Operand,
+    ) -> Result<Option<NodeKind>, Error> {
+        let mut pending = vec![operand];
         let mut literal = None;
-        while let Some(node) = pending.pop() {
-            let Some(node) = self.skip_partially_emitted_expressions_rewritten(node)? else {
+        while let Some(operand) = pending.pop() {
+            let Some(operand) = self.skip_partially_emitted_expressions_rewritten(operand)? else {
                 return Ok(None);
             };
-            let kind = self.node(node)?.kind();
+            let kind = self.node(operand.node)?.kind();
             if tsr_ast::is_literal_kind(kind) {
                 if literal.is_some_and(|previous| previous != kind) {
                     return Ok(None);
                 }
                 literal = Some(kind);
-            } else if self.binary_operator(node)? == Some(K::PlusToken.into()) {
-                let (left, _, right) = self.binary_parts(node)?;
-                pending.push(right);
-                pending.push(left);
+            } else if self.binary_operator(operand)? == Some(K::PlusToken.into()) {
+                let (left, _, right) = self.binary_parts(operand.node)?;
+                pending.push(Operand::plain(right));
+                pending.push(self.operand_left(operand, left));
             } else {
                 return Ok(None);
             }
@@ -221,9 +221,9 @@ impl Session<'_, '_> {
     // port: tsc/internal/printer/printer.go:Printer.getBinaryExpressionPrecedence
     fn binary_operand_precedences(
         &self,
-        left: NodeId,
+        left: Operand,
         operator: NodeId,
-        right: NodeId,
+        right: Operand,
     ) -> Result<(i32, i32), Error> {
         let kind = self.node(operator)?.kind();
         let precedence = self.binary_precedence(operator)?;
@@ -274,14 +274,18 @@ impl Session<'_, '_> {
     // port: tsc/internal/printer/printer.go:Printer.emitBinaryExpression
     pub(super) fn emit_binary_expression(&mut self, node: NodeId) -> Result<(), Error> {
         let (left, operator, right) = self.binary_parts(node)?;
+        let (left_operand, right_operand) = (self.left_operand(left), Operand::plain(right));
         let (mut left_prec, mut right_prec) =
-            self.binary_operand_precedences(left, operator, right)?;
+            self.binary_operand_precedences(left_operand, operator, right_operand)?;
         let outer = self.node(operator)?.kind();
-        for (operand, precedence) in [(left, &mut left_prec), (right, &mut right_prec)] {
+        for (operand, precedence) in [
+            (left_operand, &mut left_prec),
+            (right_operand, &mut right_prec),
+        ] {
             let Some(skipped) = self.skip_partially_emitted_expressions_rewritten(operand)? else {
                 continue;
             };
-            if tsr_ast::utilities::node_is_synthesized(&self.node(skipped)?) {
+            if tsr_ast::utilities::node_is_synthesized(&self.node(skipped.node)?) {
                 if let Some(inner) = self.binary_operator(skipped)? {
                     // port: tsc/internal/printer/utilities.go:mixingBinaryOperatorsRequiresParentheses
                     let logical = |kind: NodeKind| {
@@ -302,7 +306,7 @@ impl Session<'_, '_> {
         self.emit_expression(left, left_prec)?;
         let before = self.get_lines_between_nodes(
             node,
-            self.operand_span(left)?,
+            self.operand_span(left_operand)?,
             Span::of(&self.node(operator)?),
         )?;
         let after = self.get_lines_between_nodes(

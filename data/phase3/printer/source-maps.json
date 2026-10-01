@@ -1,14 +1,14 @@
 {
- "description": "Native printer output and source maps: each case parses `source` as `file_name`, prints it through Printer.Write with a source-map generator (NewGenerator(\"main.js\", \"\", \"/\", case-sensitive, cwd \"/\")) as emitter.go's printSourceFile does, and records the text and generator.String(). The compiler cases are upstream tests that set sourceMap, printed without transforms; `mapped` installs a MapSourcePosition handler that maps positions divisible by 3 to generated-only mappings and the others to a source named /original.ts with the same text.",
+ "description": "Native printer output and source maps: each case parses `source` as `file_name`, prints it through Printer.Write with a source-map generator (NewGenerator(\"main.js\", \"\", \"/\", case-sensitive, cwd \"/\")) as emitter.go's printSourceFile does, and records the text and generator.String(). The compiler cases are upstream tests that set sourceMap, printed without transforms; `mapped` installs a MapSourcePosition handler that maps positions divisible by 3 to generated-only mappings and the others to a source named /original.ts with the same text. A case with `writes` reuses one printer: it also parses `extra_files`, rewrites markers with `rewrite` ($notemitted; becomes a NotEmittedStatement, $created_<x> a created identifier, $ranged_<x> one with the marker's source-map range), applies `edits` (emit flags, source-map, comment and token source-map ranges) to nodes picked by kind name and pre-order index, and performs each write in order (the picked node of the picked file, with or without its source file, with generator `generator` (1-based) of `generators` or none); `expected_outputs` holds each write's text (or its panic) and `expected_maps` each generator's String().",
  "producer": "tools/phase3/printer_witness/a1_sourcemap_test.go, overlaid into tsc/internal/printer and run as TestA1SourceMaps",
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
- "producer_sha256": "482e0b6d65018c71636ef46753d5240cbc007731bf7499542a34aae99a770b9c",
+ "producer_sha256": "0c2090b0a37e9ec804ba98b6071d68197c961662482757262119eb7b6fd41475",
  "cases": [
   {
    "id": "compiler/emitBOM.ts",
    "file_name": "/main.ts",
    "source": {
-    "text": "﻿// @target: es2015\r\n//@emitBOM: true\r\n//@declaration: true\r\n//@sourcemap: true\r\n\r\n// JS and d.ts output should have a BOM but not the sourcemap\r\nvar x;"
+    "text": "\ufeff// @target: es2015\r\n//@emitBOM: true\r\n//@declaration: true\r\n//@sourcemap: true\r\n\r\n// JS and d.ts output should have a BOM but not the sourcemap\r\nvar x;"
    },
    "expected_output": {
     "text": "// @target: es2015\n//@emitBOM: true\n//@declaration: true\n//@sourcemap: true\n// JS and d.ts output should have a BOM but not the sourcemap\nvar x;\n"
@@ -383,10 +383,10 @@
    "file_name": "/main.ts",
    "omit_braces": true,
    "source": {
-    "text": "// @target: ES5, ES2015\r\n// @sourcemap: true\r\nvar endsWithlineSeparator = 10;  var endsWithParagraphSeparator = 10;  var endsWithNextLine = 1;var endsWithLineFeed = 1;\r\nvar endsWithCarriageReturnLineFeed = 1;\r\nvar endsWithCarriageReturn = 1;\r\nvar endsWithLineFeedCarriageReturn = 1;\r\n\r\nvar endsWithLineFeedCarriageReturnLineFeed = 1;\r\n\r\nvar stringLiteralWithLineFeed = \"line 1\\\r\nline 2\";\r\nvar stringLiteralWithCarriageReturnLineFeed = \"line 1\\\r\nline 2\";\r\nvar stringLiteralWithCarriageReturn = \"line 1\\\r\nline 2\";\r\n\r\nvar stringLiteralWithLineSeparator = \"line 1\\ line 2\"; var stringLiteralWithParagraphSeparator = \"line 1\\ line 2\"; var stringLiteralWithNextLine = \"line 1\\line 2\";"
+    "text": "// @target: ES5, ES2015\r\n// @sourcemap: true\r\nvar endsWithlineSeparator = 10; \u2028var endsWithParagraphSeparator = 10; \u2029var endsWithNextLine = 1;\u0085var endsWithLineFeed = 1;\r\nvar endsWithCarriageReturnLineFeed = 1;\r\nvar endsWithCarriageReturn = 1;\r\nvar endsWithLineFeedCarriageReturn = 1;\r\n\r\nvar endsWithLineFeedCarriageReturnLineFeed = 1;\r\n\r\nvar stringLiteralWithLineFeed = \"line 1\\\r\nline 2\";\r\nvar stringLiteralWithCarriageReturnLineFeed = \"line 1\\\r\nline 2\";\r\nvar stringLiteralWithCarriageReturn = \"line 1\\\r\nline 2\";\r\n\r\nvar stringLiteralWithLineSeparator = \"line 1\\\u2028line 2\";\u2029var stringLiteralWithParagraphSeparator = \"line 1\\\u2029line 2\";\u2029var stringLiteralWithNextLine = \"line 1\\\u0085line 2\";"
    },
    "expected_output": {
-    "text": "// @target: ES5, ES2015\n// @sourcemap: true\nvar endsWithlineSeparator = 10;\nvar endsWithParagraphSeparator = 10;\nvar endsWithNextLine = 1;\nvar endsWithLineFeed = 1;\nvar endsWithCarriageReturnLineFeed = 1;\nvar endsWithCarriageReturn = 1;\nvar endsWithLineFeedCarriageReturn = 1;\nvar endsWithLineFeedCarriageReturnLineFeed = 1;\nvar stringLiteralWithLineFeed = \"line 1\\\r\nline 2\";\nvar stringLiteralWithCarriageReturnLineFeed = \"line 1\\\r\nline 2\";\nvar stringLiteralWithCarriageReturn = \"line 1\\\r\nline 2\";\nvar stringLiteralWithLineSeparator = \"line 1\\ line 2\";\nvar stringLiteralWithParagraphSeparator = \"line 1\\ line 2\";\nvar stringLiteralWithNextLine = \"line 1\\line 2\";\n"
+    "text": "// @target: ES5, ES2015\n// @sourcemap: true\nvar endsWithlineSeparator = 10;\nvar endsWithParagraphSeparator = 10;\nvar endsWithNextLine = 1;\nvar endsWithLineFeed = 1;\nvar endsWithCarriageReturnLineFeed = 1;\nvar endsWithCarriageReturn = 1;\nvar endsWithLineFeedCarriageReturn = 1;\nvar endsWithLineFeedCarriageReturnLineFeed = 1;\nvar stringLiteralWithLineFeed = \"line 1\\\r\nline 2\";\nvar stringLiteralWithCarriageReturnLineFeed = \"line 1\\\r\nline 2\";\nvar stringLiteralWithCarriageReturn = \"line 1\\\r\nline 2\";\nvar stringLiteralWithLineSeparator = \"line 1\\\u2028line 2\";\nvar stringLiteralWithParagraphSeparator = \"line 1\\\u2029line 2\";\nvar stringLiteralWithNextLine = \"line 1\\\u0085line 2\";\n"
    },
    "expected_map": {
     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"main.ts\"],\"names\":[],\"mappings\":\"AAAA,uBAAuB;AACvB,mBAAmB;AACnB,IAAI,qBAAqB,GAAG,EAAE,CAAC;AAC/B,IAAI,0BAA0B,GAAG,EAAE,CAAC;AACpC,IAAI,gBAAgB,GAAG,CAAC,CAAC;AAAC,IAAI,gBAAgB,GAAG,CAAC,CAAC;AACnD,IAAI,8BAA8B,GAAG,CAAC,CAAC;AACvC,IAAI,sBAAsB,GAAG,CAAC,CAAC;AAC/B,IAAI,8BAA8B,GAAG,CAAC,CAAC;AAEvC,IAAI,sCAAsC,GAAG,CAAC,CAAC;AAE/C,IAAI,yBAAyB,GAAG;OACzB,CAAC;AACR,IAAI,uCAAuC,GAAG;OACvC,CAAC;AACR,IAAI,+BAA+B,GAAG;OAC/B,CAAC;AAER,IAAI,8BAA8B,GAAG;OAC9B,CAAC;AACR,IAAI,mCAAmC,GAAG;OACnC,CAAC;AACR,IAAI,yBAAyB,GAAG,gBAAgB,CAAC\"}"
@@ -742,10 +742,10 @@
    "id": "small/non-ascii",
    "file_name": "/main.ts",
    "source": {
-    "text": "var s = 'héllo wörld'; /* ünïcode */ function f() { return '€'; }\nvar t = 1;\n"
+    "text": "var s = 'h\u00e9llo w\u00f6rld'; /* \u00fcn\u00efcode */ function f() { return '\u20ac'; }\nvar t = 1;\n"
    },
    "expected_output": {
-    "text": "var s = 'héllo wörld'; /* ünïcode */\nfunction f() { return '€'; }\nvar t = 1;\n"
+    "text": "var s = 'h\u00e9llo w\u00f6rld'; /* \u00fcn\u00efcode */\nfunction f() { return '\u20ac'; }\nvar t = 1;\n"
    },
    "expected_map": {
     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"main.ts\"],\"names\":[],\"mappings\":\"AAAA,IAAI,CAAC,GAAG,aAAa,CAAC,CAAC,aAAa;AAAC,SAAS,CAAC,KAAK,OAAO,GAAG,CAAC,CAAC,CAAC;AACjE,IAAI,CAAC,GAAG,CAAC,CAAC\"}"
@@ -755,10 +755,10 @@
    "id": "small/surrogate-pairs",
    "file_name": "/main.ts",
    "source": {
-    "text": "var e = '😀😀'; var x = { a: '𝒳' };\nif (x) { e; }\n"
+    "text": "var e = '\ud83d\ude00\ud83d\ude00'; var x = { a: '\ud835\udcb3' };\nif (x) { e; }\n"
    },
    "expected_output": {
-    "text": "var e = '😀😀';\nvar x = { a: '𝒳' };\nif (x) {\n    e;\n}\n"
+    "text": "var e = '\ud83d\ude00\ud83d\ude00';\nvar x = { a: '\ud835\udcb3' };\nif (x) {\n    e;\n}\n"
    },
    "expected_map": {
     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"main.ts\"],\"names\":[],\"mappings\":\"AAAA,IAAI,CAAC,GAAG,MAAM,CAAC;AAAC,IAAI,CAAC,GAAG,EAAE,CAAC,EAAE,IAAI,EAAE,CAAC;AACpC,IAAI,CAAC,EAAE,CAAC;IAAC,CAAC,CAAC;AAAC,CAAC\"}"
@@ -769,13 +769,13 @@
    "file_name": "/main.ts",
    "inline_sources": true,
    "source": {
-    "text": "let a = '😀';\nlet b = a + '𝒳';\n"
+    "text": "let a = '\ud83d\ude00';\nlet b = a + '\ud835\udcb3';\n"
    },
    "expected_output": {
-    "text": "let a = '😀';\nlet b = a + '𝒳';\n"
+    "text": "let a = '\ud83d\ude00';\nlet b = a + '\ud835\udcb3';\n"
    },
    "expected_map": {
-    "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"main.ts\"],\"names\":[],\"mappings\":\"AAAA,IAAI,CAAC,GAAG,IAAI,CAAC;AACb,IAAI,CAAC,GAAG,CAAC,GAAG,IAAI,CAAC\",\"sourcesContent\":[\"let a = '😀';\\nlet b = a + '𝒳';\\n\"]}"
+    "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"main.ts\"],\"names\":[],\"mappings\":\"AAAA,IAAI,CAAC,GAAG,IAAI,CAAC;AACb,IAAI,CAAC,GAAG,CAAC,GAAG,IAAI,CAAC\",\"sourcesContent\":[\"let a = '\ud83d\ude00';\\nlet b = a + '\ud835\udcb3';\\n\"]}"
    }
   },
   {
@@ -965,6 +965,1714 @@
    "expected_map": {
     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"main.ts\"],\"names\":[],\"mappings\":\"\"}"
    }
+  },
+  {
+   "id": "reuse/preserve-newlines-class-twice",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "class C {\n    m() { }\n}"
+   },
+   "generators": 0,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "ClassDeclaration",
+     "index": 0,
+     "generator": 0
+    },
+    {
+     "file": 0,
+     "kind": "ClassDeclaration",
+     "index": 0,
+     "generator": 0
+    }
+   ],
+   "preserve_source_newlines": true,
+   "expected_outputs": [
+    {
+     "text": "class C {\n    m() { }\n}"
+    },
+    {
+     "text": "class C {m() { }\n}"
+    }
+   ],
+   "expected_maps": []
+  },
+  {
+   "id": "reuse/preserve-newlines-members-twice",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "class C {\n    constructor() {}\n    public foo() {}\n}"
+   },
+   "generators": 0,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "ClassDeclaration",
+     "index": 0,
+     "generator": 0
+    },
+    {
+     "file": 0,
+     "kind": "ClassDeclaration",
+     "index": 0,
+     "generator": 0
+    }
+   ],
+   "preserve_source_newlines": true,
+   "expected_outputs": [
+    {
+     "text": "class C {\n    constructor() { }\n    public foo() { }\n}"
+    },
+    {
+     "text": "class C {\n    constructor() { }\n    public foo() { }\n}"
+    }
+   ],
+   "expected_maps": []
+  },
+  {
+   "id": "reuse/preserve-newlines-file-then-class",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "class C {\n    m() { }\n}\nvar y;"
+   },
+   "generators": 0,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 0
+    },
+    {
+     "file": 0,
+     "kind": "ClassDeclaration",
+     "index": 0,
+     "generator": 0
+    }
+   ],
+   "preserve_source_newlines": true,
+   "expected_outputs": [
+    {
+     "text": "class C {\n    m() { }\n}\nvar y;"
+    },
+    {
+     "text": "class C {\n    m() { }\n}"
+    }
+   ],
+   "expected_maps": []
+  },
+  {
+   "id": "reuse/detached-comments-pending",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f() {\n    /*a*/\n\n    x;\n}"
+   },
+   "generators": 0,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "FunctionDeclaration",
+     "index": 0,
+     "generator": 0
+    },
+    {
+     "file": 0,
+     "kind": "Identifier",
+     "index": 1,
+     "generator": 0
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "ExpressionStatement",
+     "index": 0,
+     "flags": 128
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f() {\n    /*a*/\n    x;\n}"
+    },
+    {
+     "text": "x"
+    }
+   ],
+   "expected_maps": []
+  },
+  {
+   "id": "reuse/detached-comments-unflagged",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f() {\n    /*a*/\n\n    x;\n}"
+   },
+   "generators": 0,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "FunctionDeclaration",
+     "index": 0,
+     "generator": 0
+    },
+    {
+     "file": 0,
+     "kind": "Identifier",
+     "index": 1,
+     "generator": 0
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f() {\n    /*a*/\n    x;\n}"
+    },
+    {
+     "text": "/*a*/\nx"
+    }
+   ],
+   "expected_maps": []
+  },
+  {
+   "id": "reuse/detached-comments-file",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "/*a*/\n\nx;\n/*b*/\n\ny;"
+   },
+   "generators": 0,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "ExpressionStatement",
+     "index": 1,
+     "generator": 0
+    },
+    {
+     "file": 0,
+     "kind": "Identifier",
+     "index": 1,
+     "generator": 0
+    },
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 0
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "ExpressionStatement",
+     "index": 1,
+     "flags": 128
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "y;"
+    },
+    {
+     "text": "/*b*/\ny"
+    },
+    {
+     "text": "/*a*/\nx;\ny;\n"
+    }
+   ],
+   "expected_maps": []
+  },
+  {
+   "id": "reuse/no-nested-comments",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f() {\n    x;\n}\n/*c*/ y;"
+   },
+   "generators": 0,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "FunctionDeclaration",
+     "index": 0,
+     "generator": 0
+    },
+    {
+     "file": 0,
+     "kind": "ExpressionStatement",
+     "index": 1,
+     "generator": 0
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "Block",
+     "index": 0,
+     "flags": 512
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f() {\n    x;\n}"
+    },
+    {
+     "text": "y;"
+    }
+   ],
+   "expected_maps": []
+  },
+  {
+   "id": "reuse/no-nested-comments-file-restores",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f() {\n    x;\n}\n/*c*/ y;"
+   },
+   "generators": 0,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "FunctionDeclaration",
+     "index": 0,
+     "generator": 0
+    },
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 0
+    },
+    {
+     "file": 0,
+     "kind": "ExpressionStatement",
+     "index": 1,
+     "generator": 0
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "Block",
+     "index": 0,
+     "flags": 512
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f() {\n    x;\n}"
+    },
+    {
+     "text": "function f() {\n    x;\n}\ny;\n"
+    },
+    {
+     "text": "y;"
+    }
+   ],
+   "expected_maps": []
+  },
+  {
+   "id": "reuse/remove-comments-twice",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "/*a*/ x;"
+   },
+   "generators": 0,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 0
+    },
+    {
+     "file": 0,
+     "kind": "ExpressionStatement",
+     "index": 0,
+     "generator": 0
+    }
+   ],
+   "remove_comments": true,
+   "expected_outputs": [
+    {
+     "text": "x;\n"
+    },
+    {
+     "text": "x;"
+    }
+   ],
+   "expected_maps": []
+  },
+  {
+   "id": "reuse/json-then-file",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "var a = 1;"
+   },
+   "generators": 2,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    },
+    {
+     "file": 1,
+     "kind": "",
+     "index": 0,
+     "generator": 2
+    },
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 2
+    }
+   ],
+   "extra_files": [
+    {
+     "file_name": "/j.json",
+     "source": {
+      "text": "{ \"a\": [1, 2] }"
+     }
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "var a = 1;\n"
+    },
+    {
+     "text": "{ \"a\": [1, 2] }\n"
+    },
+    {
+     "text": "var a = 1;\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,IAAI,CAAC,GAAG,CAAC,CAAC\"}"
+    },
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[],\"names\":[],\"mappings\":\"\"}"
+    }
+   ]
+  },
+  {
+   "id": "reuse/json-then-other-file",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "var a = 1;"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 1,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    },
+    {
+     "file": 2,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    },
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "extra_files": [
+    {
+     "file_name": "/j.json",
+     "source": {
+      "text": "{ \"a\": 1 }"
+     }
+    },
+    {
+     "file_name": "/b.ts",
+     "source": {
+      "text": "var b;"
+     }
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "{ \"a\": 1 }\n"
+    },
+    {
+     "text": "var b;\n"
+    },
+    {
+     "text": "var a = 1;\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"b.ts\",\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,IAAI,CAAC,CAAC,NCAN,IAAI,CAAC,GAAG,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "reuse/two-files-one-generator",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "var a = 1;"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    },
+    {
+     "file": 1,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    },
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    },
+    {
+     "file": 1,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "extra_files": [
+    {
+     "file_name": "/b.ts",
+     "source": {
+      "text": "let b = [2];"
+     }
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "var a = 1;\n"
+    },
+    {
+     "text": "let b = [2];\n"
+    },
+    {
+     "text": "var a = 1;\n"
+    },
+    {
+     "text": "let b = [2];\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\",\"b.ts\"],\"names\":[],\"mappings\":\"AAAA,IAAI,CAAC,GAAG,CAAC,CAAC,VCAV,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,ZDAZ,IAAI,CAAC,GAAG,CAAC,CAAC,VCAV,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "reuse/same-file-two-generators",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "var a = 1;\nvar c;"
+   },
+   "generators": 2,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    },
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 2
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "var a = 1;\nvar c;\n"
+    },
+    {
+     "text": "panic: sourceIndex is out of range"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,IAAI,CAAC,GAAG,CAAC,CAAC;AACV,IAAI,CAAC,CAAC\"}"
+    },
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[],\"names\":[],\"mappings\":\"\"}"
+    }
+   ]
+  },
+  {
+   "id": "reuse/same-file-node-then-file",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "var a = 1;\nvar c;"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "VariableStatement",
+     "index": 1,
+     "generator": 1
+    },
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "var c;"
+    },
+    {
+     "text": "var a = 1;\nvar c;\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AACA,IAAI,CAAC,CAAC,NADN,IAAI,CAAC,GAAG,CAAC,CAAC;AACV,IAAI,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "reuse/no-generator-between",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "var a = 1;"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    },
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 0
+    },
+    {
+     "file": 1,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    },
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "extra_files": [
+    {
+     "file_name": "/b.ts",
+     "source": {
+      "text": "b;"
+     }
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "var a = 1;\n"
+    },
+    {
+     "text": "var a = 1;\n"
+    },
+    {
+     "text": "b;\n"
+    },
+    {
+     "text": "var a = 1;\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\",\"b.ts\"],\"names\":[],\"mappings\":\"AAAA,IAAI,CAAC,GAAG,CAAC,CAAC,VCAV,CAAC,CAAC,FDAF,IAAI,CAAC,GAAG,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "reuse/nil-source-file-between",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "var a = 1;"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    },
+    {
+     "file": 0,
+     "kind": "VariableStatement",
+     "index": 0,
+     "generator": 1,
+     "no_source_file": true
+    },
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "var a = 1;\n"
+    },
+    {
+     "text": "var a = 1;"
+    },
+    {
+     "text": "var a = 1;\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,IAAI,CAAC,GAAG,CAAC,CAAC,VAAV,IAAI,CAAC,GAAG,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "reuse/inline-sources-two-files",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "var a;"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    },
+    {
+     "file": 1,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    },
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "extra_files": [
+    {
+     "file_name": "/b.ts",
+     "source": {
+      "text": "b();"
+     }
+    }
+   ],
+   "inline_sources": true,
+   "expected_outputs": [
+    {
+     "text": "var a;\n"
+    },
+    {
+     "text": "b();\n"
+    },
+    {
+     "text": "var a;\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\",\"b.ts\"],\"names\":[],\"mappings\":\"AAAA,IAAI,CAAC,CAAC,NCAN,CAAC,EAAE,CAAC,JDAJ,IAAI,CAAC,CAAC\",\"sourcesContent\":[\"var a;\",\"b();\"]}"
+    }
+   ]
+  },
+  {
+   "id": "flags/no-leading-source-map",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "BinaryExpression",
+     "index": 0,
+     "flags": 4
+    },
+    {
+     "file": 0,
+     "kind": "ReturnStatement",
+     "index": 1,
+     "flags": 4
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;IACR,IAAI,CAAC,EAAE,CAAC;QAAC,OAAO,CAAC,GAAG,CAAC,CAAC;IAAC,CAAC;WACjB,EAAE,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC;AACzB,CAAC;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "flags/no-trailing-source-map",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "BinaryExpression",
+     "index": 0,
+     "flags": 8
+    },
+    {
+     "file": 0,
+     "kind": "ReturnStatement",
+     "index": 1,
+     "flags": 8
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;IACR,IAAI,CAAC,EAAE,CAAC;QAAC,OAAO,CAAC,GAAG,CAAC,CAAC;IAAC,CAAC;IACxB,OAAO,EAAE,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE;AACxB,CAAC;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "flags/no-source-map",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "IfStatement",
+     "index": 0,
+     "flags": 12
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;QACJ,CAAC,EAAE,CAAC;QAAC,OAAO,CAAC,GAAG,CAAC,CAAC;IAAC,CAAC;IACxB,OAAO,EAAE,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC;AACzB,CAAC;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "flags/no-nested-source-maps",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "IfStatement",
+     "index": 0,
+     "flags": 16
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;IACR;;KAAwB;IACxB,OAAO,EAAE,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC;AACzB,CAAC;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "flags/no-nested-source-maps-file",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "SourceFile",
+     "index": 0,
+     "flags": 16
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;IACR,IAAI,CAAC,EAAE,CAAC;QAAC,OAAO,CAAC,GAAG,CAAC,CAAC;IAAC,CAAC;IACxB,OAAO,EAAE,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC;AACzB,CAAC;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "flags/no-token-leading-source-maps",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "Block",
+     "index": 0,
+     "flags": 32
+    },
+    {
+     "file": 0,
+     "kind": "ObjectLiteralExpression",
+     "index": 0,
+     "flags": 32
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;IACR,IAAI,CAAC,EAAE,CAAC;QAAC,OAAO,CAAC,GAAG,CAAC,CAAC;IAAC,CAAC;IACxB,OAAO,EAAE,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC;CACxB;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "flags/no-token-trailing-source-maps",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "Block",
+     "index": 0,
+     "flags": 64
+    },
+    {
+     "file": 0,
+     "kind": "Block",
+     "index": 1,
+     "flags": 64
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;IACR,IAAI,CAAC,EAAE;QAAE,OAAO,CAAC,GAAG,CAAC,CAAC;IAAC,CAAC;IACxB,OAAO,EAAE,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC;AACzB,CAAC;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "flags/no-token-source-maps",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "Block",
+     "index": 1,
+     "flags": 96
+    },
+    {
+     "file": 0,
+     "kind": "ArrayLiteralExpression",
+     "index": 0,
+     "flags": 96
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;IACR,IAAI,CAAC,EAAE;QAAE,OAAO,CAAC,GAAG,CAAC,CAAC;KAAE;IACxB,OAAO,EAAE,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC;AACzB,CAAC;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "flags/no-token-source-maps-omit-braces",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "Block",
+     "index": 0,
+     "flags": 32
+    }
+   ],
+   "omit_braces": true,
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;IACR,IAAI,CAAC,EAAE;QAAE,OAAO,CAAC,GAAG,CAAC,CAAC;KAAE;IACxB,OAAO,EAAE,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC;CACxB;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "flags/no-comments-with-maps",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "/*a*/ var x = 1; // b\n/*c*/ y;"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "VariableStatement",
+     "index": 0,
+     "flags": 384
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "var x = 1;\n/*c*/ y;\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAM,IAAI,CAAC,GAAG,CAAC,CAAC;AAChB,KAAK,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "ranges/source-map-range",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "Identifier",
+     "index": 4,
+     "source_map_range": [
+      0,
+      3
+     ]
+    },
+    {
+     "file": 0,
+     "kind": "ReturnStatement",
+     "index": 0,
+     "source_map_range": [
+      60,
+      70
+     ]
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;IACR,IAAI,CAAC,EAAE,CAAC;QACI,OADI,CAAC,GAAG,CAAC,CACA;IADE,CAAC;IACxB,OAAO,EAAE,AAFb,CAAG,EAEa,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC;AACzB,CAAC;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "ranges/source-map-range-synthesized",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "Identifier",
+     "index": 4,
+     "source_map_range": [
+      -1,
+      -1
+     ]
+    },
+    {
+     "file": 0,
+     "kind": "ReturnStatement",
+     "index": 0,
+     "source_map_range": [
+      -1,
+      40
+     ]
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;IACR,IAAI,CAAC,EAAE,CAAC;eAAQ,CAAC,GAAG,CAAC,CAAD;IAAG,CAAC;IACxB,OAAO,EAAE,GAAG,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC;AACzB,CAAC;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "ranges/source-map-range-end-synthesized",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "ReturnStatement",
+     "index": 1,
+     "source_map_range": [
+      45,
+      -1
+     ]
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;IACR,IAAI,CAAC,EAAE,CAAC;QAAC,OAAO,CAAC,GAAG,CAAC,CAAC;IAAC,CAAC;IACxB,OAAO,EAAE,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE;AACxB,CAAC;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "ranges/token-range",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "Block",
+     "index": 0,
+     "token": "OpenBraceToken",
+     "token_range": [
+      100,
+      101
+     ]
+    },
+    {
+     "file": 0,
+     "kind": "Block",
+     "index": 0,
+     "token": "CloseBraceToken",
+     "token_range": [
+      0,
+      2
+     ]
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;IACR,IAAI,CAAC,EAAE,CAAC;QAAC,OAAO,CAAC,GAAG,CAAC,CAAC;IAAC,CAAC;IACxB,OAAO,EAAE,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC;AAFzB,CAGC;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "ranges/token-range-synthesized",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "Block",
+     "index": 1,
+     "token": "OpenBraceToken",
+     "token_range": [
+      -1,
+      -1
+     ]
+    },
+    {
+     "file": 0,
+     "kind": "ObjectLiteralExpression",
+     "index": 0,
+     "token": "CloseBraceToken",
+     "token_range": [
+      -1,
+      5
+     ]
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;IACR,IAAI,CAAC,EAAE;QAAE,OAAO,CAAC,GAAG,CAAC,CAAC;IAAC,CAAC;IACxB,OAAO,EAAE,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC;AACzB,CAAC;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "ranges/token-range-flagged",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "Block",
+     "index": 0,
+     "token": "OpenBraceToken",
+     "token_range": [
+      3,
+      4
+     ],
+     "flags": 64
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;IACR,IAAI,CAAC,EAAE,CAAC;QAAC,OAAO,CAAC,GAAG,CAAC,CAAC;IAAC,CAAC;IACxB,OAAO,EAAE,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC;AACzB,CAAC;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "ranges/token-range-omit-braces",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f(a) {\n    if (a) { return a + 1; }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "Block",
+     "index": 0,
+     "token": "OpenBraceToken",
+     "token_range": [
+      3,
+      4
+     ]
+    }
+   ],
+   "omit_braces": true,
+   "expected_outputs": [
+    {
+     "text": "function f(a) {\n    if (a) {\n        return a + 1;\n    }\n    return { b: [a, 2] };\n}\nvar x = f(1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC,CAAC,CAAC;IACR,IAAI,CAAC,EAAE;QAAE,OAAO,CAAC,GAAG,CAAC,CAAC;KAAE;IACxB,OAAO,EAAE,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC,CAAC,EAAE,CAAC;CACxB;AACD,IAAI,CAAC,GAAG,CAAC,CAAC,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "ranges/comment-range",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "/*a*/ x;\n/*b*/ y;"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "edits": [
+    {
+     "file": 0,
+     "kind": "ExpressionStatement",
+     "index": 1,
+     "comment_range": [
+      0,
+      8
+     ]
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "/*a*/ x;\n/*a*/ \n/*b*/ y;\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,KAAK,CAAC,CAAC,CAAC;AAAR,KAAK,CACC;AAAN,KAAK,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "created/not-emitted-statement",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "$notemitted;\nvar x = 1;\n$notemitted;"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "rewrite": true,
+   "expected_outputs": [
+    {
+     "text": "var x = 1;\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AACA,IAAI,CAAC,GAAG,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "created/not-emitted-statement-comments",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "// a\n$notemitted; // b\n/* c */ var x = 1;"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "rewrite": true,
+   "expected_outputs": [
+    {
+     "text": "/* c */ var x = 1;\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAEA,OAAO,CAAC,IAAI,CAAC,GAAG,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "created/not-emitted-only",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "// a\n$notemitted;"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "rewrite": true,
+   "expected_outputs": [
+    {
+     "text": ""
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"\"}"
+    }
+   ]
+  },
+  {
+   "id": "created/identifiers",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "var x = $created_y + $ranged_z;\n$created_f($ranged_g, 1);"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "rewrite": true,
+   "expected_outputs": [
+    {
+     "text": "var x = y + z;\nf(g, 1);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,IAAI,CAAC,GAAG,IAAa,CAAS,CAAC;AAC/B,EAAW,CAAS,EAAE,CAAC,CAAC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "created/nested-in-block",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "function f() {\n    return $created_a.$ranged_b;\n}"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "rewrite": true,
+   "expected_outputs": [
+    {
+     "text": "function f() {\n    return a.b;\n}\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,SAAS,CAAC;IACN,OAAO,EAAW,CAAS,CAAC;AAChC,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "created/flags-on-created",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "var x = $created_y + $ranged_z;"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1
+    }
+   ],
+   "rewrite": true,
+   "edits": [
+    {
+     "file": 0,
+     "kind": "Identifier",
+     "index": 1,
+     "flags": 4
+    },
+    {
+     "file": 0,
+     "kind": "Identifier",
+     "index": 2,
+     "flags": 8
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "var x = y + z;\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[\"a.ts\"],\"names\":[],\"mappings\":\"AAAA,IAAI,CAAC,GAAG,IAAa,CAAS,CAAC\"}"
+    }
+   ]
+  },
+  {
+   "id": "nil-source/file-node",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "var a = 1;\nf(a);"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "",
+     "index": 0,
+     "generator": 1,
+     "no_source_file": true
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "var a = 1;\nf(a);\n"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[],\"names\":[],\"mappings\":\"\"}"
+    }
+   ]
+  },
+  {
+   "id": "nil-source/statement",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "var a = { b: 1 };"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "VariableStatement",
+     "index": 0,
+     "generator": 1,
+     "no_source_file": true
+    }
+   ],
+   "expected_outputs": [
+    {
+     "text": "var a = { b: 1 };"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[],\"names\":[],\"mappings\":\"\"}"
+    }
+   ]
+  },
+  {
+   "id": "nil-source/created",
+   "file_name": "/a.ts",
+   "source": {
+    "text": "var x = $created_y + $ranged_z;"
+   },
+   "generators": 1,
+   "writes": [
+    {
+     "file": 0,
+     "kind": "VariableStatement",
+     "index": 0,
+     "generator": 1,
+     "no_source_file": true
+    }
+   ],
+   "rewrite": true,
+   "expected_outputs": [
+    {
+     "text": "var x = y + z;"
+    }
+   ],
+   "expected_maps": [
+    {
+     "text": "{\"version\":3,\"file\":\"main.js\",\"sourceRoot\":\"\",\"sources\":[],\"names\":[],\"mappings\":\"\"}"
+    }
+   ]
   }
  ]
 }

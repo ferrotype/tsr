@@ -3,10 +3,11 @@
 //! order of writes, comments included.
 //!
 //! A `Printer` holds options and the emit context. Each `write` opens a
-//! [`Session`] over one AST view and one writer; nothing about a node is cached
-//! across sessions. Upstream keeps the per-write state (the current source
-//! file, the comment containers, the writer) on the printer itself and saves
-//! and restores it around `Write`.
+//! [`Session`] over one AST view and one writer. Upstream keeps the per-write
+//! state (the current source file, the comment containers, the writer) on the
+//! printer itself and saves and restores it around `Write`; the fields `Write`
+//! leaves alone (the name generator, the most recent source-map source and
+//! [`CarriedState`]) stay on the printer from one write to the next.
 //!
 //! A write given a source-map generator records the positions of the printed
 //! nodes in it (`printer_source_maps.rs`).
@@ -134,6 +135,28 @@ pub struct Printer<'c> {
     /// `nameGenerator`. Upstream keeps it on the printer, so names generated
     /// by one `Write` stay reserved in the next.
     name_generator: RefCell<NameGenerator<'static>>,
+    /// The printer fields upstream's `Write` neither saves nor resets, which a
+    /// write leaves for the next one; see [`CarriedState`].
+    carried: RefCell<CarriedState>,
+}
+
+/// Printer state upstream keeps on the `Printer` across `Write` and `Emit`
+/// calls: `Write` neither saves nor resets it. Each write takes it into its
+/// [`Session`] and hands it back when it ends.
+#[derive(Debug, Default)]
+struct CarriedState {
+    /// `nextListElementPos`, set by each list element `emitList` prints.
+    next_list_element_pos: i64,
+    /// `detachedCommentsInfo`: pushed by `emitDetachedCommentsAndUpdateCommentsInfo`
+    /// and popped only when a later leading-comment position matches.
+    detached_comments_info: Vec<DetachedCommentsInfo>,
+    /// `commentsDisabled`, initialized from `RemoveComments` by `NewPrinter`.
+    /// `emitDetachedCommentsBeforeStatementList` sets it for a node flagged
+    /// `NoNestedComments` and only `emitSourceFile` restores it.
+    comments_disabled: bool,
+    /// `sourceMapSourceIsJson`, set by `setSourceMapSource` only for a source
+    /// other than the most recent one.
+    source_map_source_is_json: bool,
 }
 
 /// The emit context's `Factory` reads for a printer, which reads a fixed
@@ -221,7 +244,6 @@ impl<'c> Printer<'c> {
     // port: tsc/internal/printer/printer.go:NewPrinter
     pub fn new(options: PrinterOptions, emit_context: &'c EmitContext) -> Self {
         Self {
-            options,
             emit_context,
             id_to_symbol: None,
             bindings: None,
@@ -229,6 +251,13 @@ impl<'c> Printer<'c> {
             own_writer: None,
             most_recent_source_map_source: RefCell::new((None, 0)),
             name_generator: RefCell::new(NameGenerator::new(Some(emit_context.clone()))),
+            carried: RefCell::new(CarriedState {
+                next_list_element_pos: 0,
+                detached_comments_info: Vec::new(),
+                comments_disabled: options.remove_comments,
+                source_map_source_is_json: false,
+            }),
+            options,
         }
     }
 
@@ -289,6 +318,7 @@ impl<'c> Printer<'c> {
             current_source: Rc::clone(&current_source_file),
         }
         .install(&mut self.name_generator.borrow_mut());
+        let carried = std::mem::take(&mut *self.carried.borrow_mut());
         let mut session = Session {
             printer: self,
             view,
@@ -296,26 +326,35 @@ impl<'c> Printer<'c> {
             current_source: None,
             current_source_file,
             no_asi: Vec::new(),
+            expression_depth: 0,
             unique_helper_names: None,
             external_helpers_module_name: None,
-            next_list_element_pos: 0,
+            next_list_element_pos: carried.next_list_element_pos,
             write_kind: WriteKind::None,
             source_maps_disabled: source_map_generator.is_none(),
             source_map_generator,
             source_map_source: None,
             source_map_source_index: -1,
-            source_map_source_is_json: false,
+            source_map_source_is_json: carried.source_map_source_is_json,
             source_map_line_char_cache: None,
             container_pos: -1,
             container_end: -1,
             declaration_list_container_end: -1,
-            detached_comments_info: Vec::new(),
-            comments_disabled: self.options.remove_comments,
+            detached_comments_info: carried.detached_comments_info,
+            comments_disabled: carried.comments_disabled,
             in_extends: false,
         };
-        session.set_source_file(source_file)?;
-        session.writer.clear();
-        session.write_root(node)
+        let result = session.set_source_file(source_file).and_then(|()| {
+            session.writer.clear();
+            session.write_root(node)
+        });
+        *self.carried.borrow_mut() = CarriedState {
+            next_list_element_pos: session.next_list_element_pos,
+            detached_comments_info: session.detached_comments_info,
+            comments_disabled: session.comments_disabled,
+            source_map_source_is_json: session.source_map_source_is_json,
+        };
+        result
     }
 }
 
@@ -330,6 +369,9 @@ pub(crate) struct Session<'a, 'c> {
     current_source_file: Rc<Cell<Option<NodeId>>>,
     /// The spines `parenthesizeExpressionForNoAsi` rewrote that are printing.
     no_asi: Vec<statements::NoAsiRewrite>,
+    /// The number of `emitExpression` calls in progress: the frame a spine
+    /// node of `no_asi` is open at.
+    expression_depth: usize,
     /// `uniqueHelperNames`, present for a file flagged `ExternalHelpers`: the
     /// generated text of each helper's unique name.
     unique_helper_names: Option<HashMap<JsString, JsString>>,
@@ -358,6 +400,10 @@ pub(crate) struct Span {
     node: Option<NodeId>,
     pos: i64,
     end: i64,
+    /// For the synthesized parentheses `parenthesizeExpressionForNoAsi`
+    /// creates around a partially emitted expression, that expression:
+    /// `skipSynthesizedParentheses` unwraps them to it.
+    synthesized_parens_of: Option<NodeId>,
 }
 
 impl Span {
@@ -366,6 +412,17 @@ impl Span {
             node: Some(node.id()),
             pos: i64::from(node.pos()),
             end: i64::from(node.end()),
+            synthesized_parens_of: None,
+        }
+    }
+    /// A range without a node of the tree: a token or node the printer
+    /// creates.
+    fn created(pos: i64, end: i64) -> Self {
+        Self {
+            node: None,
+            pos,
+            end,
+            synthesized_parens_of: None,
         }
     }
     /// `ast.NodeIsSynthesized`: the node's position is synthesized.
@@ -1100,6 +1157,9 @@ impl<'a, 'c> Session<'a, 'c> {
     // port: tsc/internal/printer/utilities.go:skipSynthesizedParentheses
     fn skip_synthesized_parentheses(&self, span: Span) -> Result<Span, Error> {
         let mut span = span;
+        if let Some(expression) = span.synthesized_parens_of {
+            span = Span::of(&self.node(expression)?);
+        }
         while let Some(id) = span.node {
             let read = self.node(id)?;
             if read.kind() != K::ParenthesizedExpression
@@ -3484,14 +3544,14 @@ impl<'a, 'c> Session<'a, 'c> {
 
     /// `ast.GetExpressionPrecedence` of the expression under any partially
     /// emitted wrappers.
-    fn expression_precedence(&self, node: NodeId) -> Result<i32, Error> {
-        let Some(skipped) = self.skip_partially_emitted_expressions_rewritten(node)? else {
+    fn expression_precedence(&self, operand: statements::Operand) -> Result<i32, Error> {
+        let Some(skipped) = self.skip_partially_emitted_expressions_rewritten(operand)? else {
             // The parentheses `parenthesizeExpressionForNoAsi` created.
             return Ok(op::PRIMARY);
         };
         Ok(tsr_ast::get_expression_precedence(
             self.view,
-            &self.node(skipped)?,
+            &self.node(skipped.node)?,
         )?)
     }
 
@@ -3502,18 +3562,41 @@ impl<'a, 'c> Session<'a, 'c> {
         })
     }
 
+    /// One expression frame: the occurrence of `node` it prints is the next
+    /// spine node of a `parenthesizeExpressionForNoAsi` rewrite when that
+    /// rewrite expects it.
     fn emit_expression_worker(&mut self, node: NodeId, precedence: i32) -> Result<(), Error> {
-        let parens = self.expression_precedence(node)? < precedence;
+        let operand = self.take_spine_occurrence(node);
+        self.expression_depth += 1;
+        let result = self.emit_expression_occurrence(operand, precedence);
+        self.expression_depth -= 1;
+        result
+    }
+
+    fn emit_expression_occurrence(
+        &mut self,
+        operand: statements::Operand,
+        precedence: i32,
+    ) -> Result<(), Error> {
+        let parens = self.expression_precedence(operand)? < precedence;
         if parens {
             self.write_punctuation(b"(");
         }
-        if let Some((index, created)) = self.no_asi_parens(node) {
-            self.emit_no_asi_parens(index, created)?;
-            if parens {
-                self.write_punctuation(b")");
-            }
-            return Ok(());
+        if let Some(created) = self.no_asi_parens(operand) {
+            self.emit_no_asi_parens(created)?;
+        } else {
+            self.open_spine(operand);
+            self.emit_expression_kind(operand.node)?;
+            self.close_spine(operand);
         }
+        if parens {
+            self.write_punctuation(b")");
+        }
+        Ok(())
+    }
+
+    /// The emitter of an expression's kind.
+    fn emit_expression_kind(&mut self, node: NodeId) -> Result<(), Error> {
         let kind = self.known_kind(node)?;
         match kind {
             K::TrueKeyword | K::FalseKeyword | K::NullKeyword => {
@@ -3571,9 +3654,6 @@ impl<'a, 'c> Session<'a, 'c> {
                 })
             }
         }
-        if parens {
-            self.write_punctuation(b")");
-        }
         Ok(())
     }
 
@@ -3621,11 +3701,15 @@ impl<'a, 'c> Session<'a, 'c> {
     /// A numeric literal written without a dot or exponent needs `..` before a
     /// member name, as in `1..toString`.
     // port: tsc/internal/printer/printer.go:Printer.mayNeedDotDotForPropertyAccess
-    fn may_need_dot_dot_for_property_access(&self, expression: NodeId) -> Result<bool, Error> {
+    fn may_need_dot_dot_for_property_access(
+        &self,
+        expression: statements::Operand,
+    ) -> Result<bool, Error> {
         let Some(expression) = self.skip_partially_emitted_expressions_rewritten(expression)?
         else {
             return Ok(false);
         };
+        let expression = expression.node;
         let read = self.node(expression)?;
         if read.kind() != K::NumericLiteral {
             return Ok(false);
@@ -3668,16 +3752,13 @@ impl<'a, 'c> Session<'a, 'c> {
             op::MEMBER
         };
         self.emit_expression(expression, precedence)?;
-        let expression_span = self.operand_span(expression)?;
+        let expression_operand = self.left_operand(expression);
+        let expression_span = self.operand_span(expression_operand)?;
         let name_read = self.node(name)?;
         // Upstream synthesizes a dot token spanning the gap when none was parsed.
         let token = match question_dot {
             Some(token) => Span::of(&self.node(token)?),
-            None => Span {
-                node: None,
-                pos: expression_span.end,
-                end: i64::from(name_read.pos()),
-            },
+            None => Span::created(expression_span.end, i64::from(name_read.pos())),
         };
         let token_kind = match question_dot {
             Some(token) => self.known_kind(token)?,
@@ -3687,7 +3768,7 @@ impl<'a, 'c> Session<'a, 'c> {
         self.write_line_repeat(lines_before_dot);
         self.increase_indent_if(lines_before_dot > 0);
         let should_emit_dot_dot = token_kind != K::QuestionDotToken
-            && self.may_need_dot_dot_for_property_access(expression)?
+            && self.may_need_dot_dot_for_property_access(expression_operand)?
             && !self.writer.has_trailing_comment()
             && !self.writer.has_trailing_whitespace();
         if should_emit_dot_dot {
@@ -3742,7 +3823,10 @@ impl<'a, 'c> Session<'a, 'c> {
             K::OpenBracketToken,
             greatest_end(
                 -1,
-                &[Some(self.operand_span(expression)?.end), question_end],
+                &[
+                    Some(self.operand_span(self.left_operand(expression))?.end),
+                    question_end,
+                ],
             ),
             WriteKind::Punctuation,
             node,

@@ -1,8 +1,8 @@
 {
- "description": "Native printer output for generated names, emit helpers and the parentheses parenthesizeExpressionForNoAsi creates. Each case parses `source` as /main.ts, rewrites marker identifiers with the emit context's node visitor ($temp, $loop, $affixed, $unique_<n>, $optimistic_<n>, $filelevel_<n>, $helper_<n>, $node_<n>, $strtemp, $strunique_<n>, #unique_<n>; functions named reuse* get ReuseTempVariableScope; `pee` turns parenthesized expressions into partially emitted ones), records the helpers and flags, and prints the file `writes` times with one printer.",
+ "description": "Native printer output for generated names, emit helpers, text sources, snippet tab stops and the parentheses parenthesizeExpressionForNoAsi creates. Each case parses `source` as /main.ts (/main.tsx with `jsx`), binds it with `bind`, rewrites markers with the emit context's node visitor ($temp, $loop, $affixed, $unique_<n>, $optimistic_<n>, $filelevel_<n>, $helper_<n>, $nlhelper_<n> (a helper name flagged StartOnNewLine), $node_<n>, $decl_<i> (the generated name for top-level statement i), $strtemp, $strunique_<n>, $strtext_<t> and $strascii_<t> (a string literal whose text source is an identifier <t>, the second flagged NoAsciiEscaping), string literals \"$strjsx_<t>\" and \"$strasciijsx_<t>\" likewise, a JSX attribute value \"$strns\" (the attribute name as text source), #unique_<n>, $lastpee and $lastpae (the last partially emitted expression or property access the visitor produced, shared); functions named reuse* get ReuseTempVariableScope; `pee` turns parenthesized expressions into partially emitted ones; `tab_stops` gives each empty statement a tab-stop snippet), records the helpers and flags, and prints the file `writes` times with one printer (NeverAsciiEscape from `never_ascii_escape`). With `listener`, a last entry lists each node of the printed tree in pre-order with the writer positions OnBeforeEmitNode and OnAfterEmitNode recorded for it, or - when they were not called with it.",
  "producer": "tools/phase3/printer_witness/a1_witness_test.go, overlaid into tsc/internal/printer and run as TestA1Witness",
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
- "producer_sha256": "e55c27d904d2c195bd324b2307a95fb1da2d073a1bafd5039742318d264f80a4",
+ "producer_sha256": "bc407ec5e0431b5e5b07f33d6603a5edfb8424ab2d4155c7d8be813996cdcefa",
  "cases": [
   {
    "id": "temp-scopes",
@@ -403,6 +403,672 @@
    "pee": "original",
    "expected": [
     "var a = 1..toFixed();\n"
+   ]
+  },
+  {
+   "id": "noasi-break-binary-synthetic",
+   "source": "function f() {\n    return (x)\n        + 1;\n}",
+   "pee": "synthetic",
+   "expected": [
+    "function f() {\n    return (\n    // c\n    x)\n        + 1;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-break-conditional-synthetic",
+   "source": "function f() {\n    return (x)\n        ? 1 : 2;\n}",
+   "pee": "synthetic",
+   "expected": [
+    "function f() {\n    return (\n    // c\n    x)\n        ? 1 : 2;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-break-binary-original",
+   "source": "function f() {\n    return (// c\n    x)\n        + 1;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    x)\n        + 1;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-break-conditional-original",
+   "source": "function f() {\n    return (// c\n    x)\n        ? 1\n        : 2;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    x)\n        ? 1\n        : 2;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-break-property-synthetic",
+   "source": "function f() {\n    return (x)\n        .y;\n}",
+   "pee": "synthetic",
+   "expected": [
+    "function f() {\n    return (\n    // c\n    x).y;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-break-nested-synthetic",
+   "source": "function f() {\n    return (x).y\n        + 1;\n}",
+   "pee": "synthetic",
+   "expected": [
+    "function f() {\n    return (\n    // c\n    x).y\n        + 1;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-break-binary-no-comment",
+   "source": "function f() {\n    return (x)\n        + 1;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return x\n        + 1;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-shared-pee-binary",
+   "source": "function f() {\n    return (// c\n    x) + $lastpee;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    x) +\n        // c\n        x;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-shared-pee-binary-synthetic",
+   "source": "function f() {\n    return (x) + $lastpee;\n}",
+   "pee": "synthetic",
+   "expected": [
+    "function f() {\n    return (\n    // c\n    x) + \n    // c\n    x;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-shared-pae-binary",
+   "source": "function f() {\n    return (// c\n    x).y + $lastpae;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    x).y +\n        // c\n        x.y;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-shared-pae-synthetic",
+   "source": "function f() {\n    return (x).y + $lastpae;\n}",
+   "pee": "synthetic",
+   "expected": [
+    "function f() {\n    return (\n    // c\n    x).y + \n    // c\n    x.y;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-shared-call-argument",
+   "source": "function f() {\n    return (// c\n    g)($lastpee);\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    g)(// c\n    g);\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-shared-conditional",
+   "source": "function f() {\n    return (// c\n    a) ? $lastpee : 0;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    a) ?\n        // c\n        a : 0;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-shared-plus-literals",
+   "source": "function f() {\n    return (// c\n    \"a\") + \"b\" + $lastpee;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    \"a\") + \"b\" +\n        // c\n        \"a\";\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-shared-element-access",
+   "source": "function f() {\n    return (// c\n    a)[$lastpee];\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    a)[// c\n    a];\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-shared-pae-call",
+   "source": "function f() {\n    return (// c\n    a).b($lastpae);\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    a).b(// c\n    a.b);\n}\n"
+   ]
+  },
+  {
+   "id": "listener-plain",
+   "source": "class C { m() { return a.b + 1; } }",
+   "listener": true,
+   "expected": [
+    "class C {\n    m() { return a.b + 1; }\n}\n",
+    "SourceFile - -\nClassDeclaration 0 39\nIdentifier 6 7\nMethodDeclaration 10 37\nIdentifier 10 15\nBlock 18 37\nReturnStatement 20 35\nBinaryExpression 27 34\nPropertyAccessExpression 27 30\nIdentifier 27 28\nIdentifier 29 30\nPlusToken - -\nNumericLiteral 33 34\nEndOfFile - -"
+   ]
+  },
+  {
+   "id": "listener-noasi-original",
+   "source": "function f() {\n    return (// c\n    x).y;\n}",
+   "pee": "original",
+   "listener": true,
+   "expected": [
+    "function f() {\n    return ( // c\n    x).y;\n}\n",
+    "SourceFile - -\nFunctionDeclaration 0 44\nIdentifier 9 10\nBlock 13 44\nReturnStatement 15 42\nPropertyAccessExpression - -\nPartiallyEmittedExpression - -\nIdentifier 33 38\nIdentifier 40 41\nEndOfFile - -"
+   ]
+  },
+  {
+   "id": "listener-noasi-synthetic",
+   "source": "function f() {\n    return (x).y;\n}",
+   "pee": "synthetic",
+   "listener": true,
+   "expected": [
+    "function f() {\n    return (\n    // c\n    x).y;\n}\n",
+    "SourceFile - -\nFunctionDeclaration 0 48\nIdentifier 9 10\nBlock 13 48\nReturnStatement 15 46\nPropertyAccessExpression - -\nPartiallyEmittedExpression 27 42\nIdentifier 37 42\nIdentifier 44 45\nEndOfFile - -"
+   ]
+  },
+  {
+   "id": "listener-noasi-shared",
+   "source": "function f() {\n    return (// c\n    x).y + $lastpae;\n}",
+   "pee": "original",
+   "listener": true,
+   "expected": [
+    "function f() {\n    return ( // c\n    x).y +\n        // c\n        x.y;\n}\n",
+    "SourceFile - -\nFunctionDeclaration 0 71\nIdentifier 9 10\nBlock 13 71\nReturnStatement 15 69\nBinaryExpression - -\nPropertyAccessExpression 44 68\nPartiallyEmittedExpression 44 66\nIdentifier 57 66\nIdentifier 67 68\nPlusToken - -\nPropertyAccessExpression 44 68\nPartiallyEmittedExpression 44 66\nIdentifier 57 66\nIdentifier 67 68\nEndOfFile - -"
+   ]
+  },
+  {
+   "id": "listener-helper-module",
+   "source": "$helper___assign(x);",
+   "helpers_module": true,
+   "listener": true,
+   "expected": [
+    "tslib_1.__assign(x);\n",
+    "SourceFile - -\nExpressionStatement 0 20\nCallExpression 0 19\nIdentifier - -\nIdentifier 17 18\nEndOfFile - -"
+   ]
+  },
+  {
+   "id": "listener-helper-unique",
+   "source": "var __assign;\n$helper___assign(x);",
+   "external_helpers": true,
+   "listener": true,
+   "expected": [
+    "var __assign;\n__assign_1(x);\n",
+    "SourceFile - -\nVariableStatement 0 13\nVariableDeclarationList 0 12\nVariableDeclaration 4 12\nIdentifier 4 12\nExpressionStatement 14 28\nCallExpression 14 27\nIdentifier - -\nIdentifier 25 26\nEndOfFile - -"
+   ]
+  },
+  {
+   "id": "decl-namespace-local-unbound",
+   "source": "namespace N { var N; }\n$decl_0;",
+   "expected": [
+    "namespace N {\n    var N;\n}\nN;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-local-bound",
+   "source": "namespace N { var N; }\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "namespace N {\n    var N;\n}\nN_1;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-export-unbound",
+   "source": "namespace N { export var N; }\n$decl_0;",
+   "expected": [
+    "namespace N {\n    export var N;\n}\nN;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-export-bound",
+   "source": "namespace N { export var N; }\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "namespace N {\n    export var N;\n}\nN_1;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-function-unbound",
+   "source": "namespace N { function N() {} }\n$decl_0;",
+   "expected": [
+    "namespace N {\n    function N() { }\n}\nN;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-function-bound",
+   "source": "namespace N { function N() {} }\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "namespace N {\n    function N() { }\n}\nN_1;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-alias-unbound",
+   "source": "namespace N { import N = M; }\n$decl_0;",
+   "expected": [
+    "namespace N {\n    import N = M;\n}\nN;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-alias-bound",
+   "source": "namespace N { import N = M; }\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "namespace N {\n    import N = M;\n}\nN_1;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-type-only-unbound",
+   "source": "namespace N { interface N {} }\n$decl_0;",
+   "expected": [
+    "namespace N {\n    interface N {\n    }\n}\nN;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-type-only-bound",
+   "source": "namespace N { interface N {} }\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "namespace N {\n    interface N {\n    }\n}\nN;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-unique-unbound",
+   "source": "namespace N { var x; }\n$decl_0;",
+   "expected": [
+    "namespace N {\n    var x;\n}\nN;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-unique-bound",
+   "source": "namespace N { var x; }\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "namespace N {\n    var x;\n}\nN;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-nested-unbound",
+   "source": "namespace N { namespace M { var N; } }\n$decl_0;",
+   "expected": [
+    "namespace N {\n    namespace M {\n        var N;\n    }\n}\nN;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-nested-bound",
+   "source": "namespace N { namespace M { var N; } }\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "namespace N {\n    namespace M {\n        var N;\n    }\n}\nN_1;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-dotted-unbound",
+   "source": "namespace N.M { var N; }\n$decl_0;",
+   "expected": [
+    "namespace N.M {\n    var N;\n}\nN;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-dotted-bound",
+   "source": "namespace N.M { var N; }\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "namespace N.M {\n    var N;\n}\nN_1;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-twice-unbound",
+   "source": "namespace N { var N; }\n$decl_0;\n$decl_0;\nvar N_1;",
+   "expected": [
+    "namespace N {\n    var N;\n}\nN;\nN;\nvar N_1;\n"
+   ]
+  },
+  {
+   "id": "decl-namespace-twice-bound",
+   "source": "namespace N { var N; }\n$decl_0;\n$decl_0;\nvar N_1;",
+   "bind": true,
+   "expected": [
+    "namespace N {\n    var N;\n}\nN_2;\nN_2;\nvar N_1;\n"
+   ]
+  },
+  {
+   "id": "decl-enum-unbound",
+   "source": "enum E { A }\n$decl_0;",
+   "expected": [
+    "enum E {\n    A\n}\nE;\n"
+   ]
+  },
+  {
+   "id": "decl-enum-bound",
+   "source": "enum E { A }\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "enum E {\n    A\n}\nE;\n"
+   ]
+  },
+  {
+   "id": "decl-enum-taken-unbound",
+   "source": "enum E { E }\nvar E;\n$decl_0;",
+   "expected": [
+    "enum E {\n    E\n}\nvar E;\nE;\n"
+   ]
+  },
+  {
+   "id": "decl-enum-taken-bound",
+   "source": "enum E { E }\nvar E;\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "enum E {\n    E\n}\nvar E;\nE;\n"
+   ]
+  },
+  {
+   "id": "decl-import-unbound",
+   "source": "import * as x from \"./some-mod.js\";\n$decl_0;",
+   "expected": [
+    "import * as x from \"./some-mod.js\";\nsome_mod_js_1;\n"
+   ]
+  },
+  {
+   "id": "decl-import-bound",
+   "source": "import * as x from \"./some-mod.js\";\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "import * as x from \"./some-mod.js\";\nsome_mod_js_1;\n"
+   ]
+  },
+  {
+   "id": "decl-import-default-unbound",
+   "source": "import d from \"lib\";\n$decl_0;\n$decl_0;",
+   "expected": [
+    "import d from \"lib\";\nlib_1;\nlib_1;\n"
+   ]
+  },
+  {
+   "id": "decl-import-default-bound",
+   "source": "import d from \"lib\";\n$decl_0;\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "import d from \"lib\";\nlib_1;\nlib_1;\n"
+   ]
+  },
+  {
+   "id": "decl-import-equals-module-unbound",
+   "source": "import x = require(\"m\");\n$decl_1;",
+   "expected": [
+    "import x = require(\"m\");\n_a;\n"
+   ]
+  },
+  {
+   "id": "decl-import-equals-module-bound",
+   "source": "import x = require(\"m\");\n$decl_1;",
+   "bind": true,
+   "expected": [
+    "import x = require(\"m\");\n_a;\n"
+   ]
+  },
+  {
+   "id": "decl-export-from-unbound",
+   "source": "export { a } from \"./a-b\";\n$decl_0;",
+   "expected": [
+    "export { a } from \"./a-b\";\na_b_1;\n"
+   ]
+  },
+  {
+   "id": "decl-export-from-bound",
+   "source": "export { a } from \"./a-b\";\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "export { a } from \"./a-b\";\na_b_1;\n"
+   ]
+  },
+  {
+   "id": "decl-export-star-unbound",
+   "source": "export * from \"m\";\nvar m_1;\n$decl_0;",
+   "expected": [
+    "export * from \"m\";\nvar m_1;\nm_2;\n"
+   ]
+  },
+  {
+   "id": "decl-export-star-bound",
+   "source": "export * from \"m\";\nvar m_1;\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "export * from \"m\";\nvar m_1;\nm_2;\n"
+   ]
+  },
+  {
+   "id": "decl-class-unbound",
+   "source": "class C {}\n$decl_0;",
+   "expected": [
+    "class C {\n}\nC_1;\n"
+   ]
+  },
+  {
+   "id": "decl-class-bound",
+   "source": "class C {}\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "class C {\n}\nC_1;\n"
+   ]
+  },
+  {
+   "id": "decl-class-default-unbound",
+   "source": "export default class {}\n$decl_0;",
+   "expected": [
+    "export default class {\n}\ndefault_1;\n"
+   ]
+  },
+  {
+   "id": "decl-class-default-bound",
+   "source": "export default class {}\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "export default class {\n}\ndefault_1;\n"
+   ]
+  },
+  {
+   "id": "decl-function-unbound",
+   "source": "function g() {}\n$decl_0;",
+   "expected": [
+    "function g() { }\ng_1;\n"
+   ]
+  },
+  {
+   "id": "decl-function-bound",
+   "source": "function g() {}\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "function g() { }\ng_1;\n"
+   ]
+  },
+  {
+   "id": "decl-function-default-unbound",
+   "source": "export default function () {}\n$decl_0;\n$decl_0;",
+   "expected": [
+    "export default function () { }\ndefault_1;\ndefault_1;\n"
+   ]
+  },
+  {
+   "id": "decl-function-default-bound",
+   "source": "export default function () {}\n$decl_0;\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "export default function () { }\ndefault_1;\ndefault_1;\n"
+   ]
+  },
+  {
+   "id": "decl-export-assignment-unbound",
+   "source": "export default 1;\n$decl_0;",
+   "expected": [
+    "export default 1;\ndefault_1;\n"
+   ]
+  },
+  {
+   "id": "decl-export-assignment-bound",
+   "source": "export default 1;\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "export default 1;\ndefault_1;\n"
+   ]
+  },
+  {
+   "id": "decl-export-equals-unbound",
+   "source": "export = x;\n$decl_0;",
+   "expected": [
+    "export = x;\ndefault_1;\n"
+   ]
+  },
+  {
+   "id": "decl-export-equals-bound",
+   "source": "export = x;\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "export = x;\ndefault_1;\n"
+   ]
+  },
+  {
+   "id": "decl-variable-statement-unbound",
+   "source": "var x;\n$decl_0;",
+   "expected": [
+    "var x;\n_a;\n"
+   ]
+  },
+  {
+   "id": "decl-variable-statement-bound",
+   "source": "var x;\n$decl_0;",
+   "bind": true,
+   "expected": [
+    "var x;\n_a;\n"
+   ]
+  },
+  {
+   "id": "helper-name-unique-two-writes",
+   "source": "var __assign;\n$helper___assign(x);\n$helper___extends(y);",
+   "external_helpers": true,
+   "writes": 2,
+   "expected": [
+    "var __assign;\n__assign_1(x);\n__extends(y);\n",
+    "var __assign;\n__assign_1(x);\n__extends(y);\n"
+   ]
+  },
+  {
+   "id": "helper-name-external-two-writes",
+   "source": "$helper___assign(x);",
+   "helpers_module": true,
+   "writes": 2,
+   "expected": [
+    "tslib_1.__assign(x);\n",
+    "tslib_1.__assign(x);\n"
+   ]
+  },
+  {
+   "id": "helper-name-unique-three-writes",
+   "source": "$helper___assign(x);",
+   "external_helpers": true,
+   "writes": 3,
+   "expected": [
+    "__assign(x);\n",
+    "__assign(x);\n",
+    "__assign(x);\n"
+   ]
+  },
+  {
+   "id": "helper-start-on-new-line-module",
+   "source": "$nlhelper___assign(x);",
+   "helpers_module": true,
+   "expected": [
+    "tslib_1.\n    __assign(x);\n"
+   ]
+  },
+  {
+   "id": "helper-start-on-new-line-unique",
+   "source": "var __assign;\n$nlhelper___assign(x);",
+   "external_helpers": true,
+   "expected": [
+    "var __assign;\n__assign_1(x);\n"
+   ]
+  },
+  {
+   "id": "helper-start-on-new-line-plain",
+   "source": "$nlhelper___assign(x);",
+   "expected": [
+    "__assign(x);\n"
+   ]
+  },
+  {
+   "id": "helper-start-on-new-line-call-member",
+   "source": "$nlhelper___assign.call(x);",
+   "helpers_module": true,
+   "expected": [
+    "tslib_1.\n    __assign.call(x);\n"
+   ]
+  },
+  {
+   "id": "text-source-escaping",
+   "source": "var a = $strtext_caf\u00e9, b = $strascii_caf\u00e9, c = $strtext_\ud835\udc65x, d = $strascii_\ud835\udc65x;",
+   "expected": [
+    "var a = \"caf\\u00E9\", b = \"caf\u00e9\", c = \"\\uD835\\uDC65x\", d = \"\ud835\udc65x\";\n"
+   ]
+  },
+  {
+   "id": "text-source-never-ascii-option",
+   "source": "var a = $strtext_caf\u00e9, b = $strascii_caf\u00e9;",
+   "never_ascii_escape": true,
+   "expected": [
+    "var a = \"caf\u00e9\", b = \"caf\u00e9\";\n"
+   ]
+  },
+  {
+   "id": "text-source-jsx-attribute",
+   "source": "var x = <a b='$strjsx_say \"hi\" & bye' c=\"$strjsx_caf\u00e9\" d=\"$strasciijsx_caf\u00e9\" e='$strjsx_it&apos;s' />;",
+   "jsx": true,
+   "expected": [
+    "var x = <a b=\"say \\\"hi\\\" & bye\" c=\"caf\\u00E9\" d=\"caf\u00e9\" e=\"it&apos;s\"/>;\n"
+   ]
+  },
+  {
+   "id": "text-source-jsx-attribute-never-ascii",
+   "source": "var x = <a c=\"$strjsx_caf\u00e9\" />;",
+   "jsx": true,
+   "never_ascii_escape": true,
+   "expected": [
+    "var x = <a c=\"caf\u00e9\"/>;\n"
+   ]
+  },
+  {
+   "id": "text-source-jsx-namespaced-name",
+   "source": "var x = <a ns:attr=\"$strns\" xlink:href=\"$strns\" />;",
+   "jsx": true,
+   "expected": [
+    "var x = <a ns:attr=\"ns:attr\" xlink:href=\"xlink:href\"/>;\n"
+   ]
+  },
+  {
+   "id": "text-source-jsx-plain-name",
+   "source": "var x = <a b=\"$strns\" />;",
+   "jsx": true,
+   "expected": [
+    "var x = <a b=\"b\"/>;\n"
+   ]
+  },
+  {
+   "id": "text-source-outside-jsx",
+   "source": "var a = \"$strjsx_say \\\"hi\\\"\";",
+   "jsx": true,
+   "expected": [
+    "var a = \"say \\\"hi\\\"\";\n"
+   ]
+  },
+  {
+   "id": "snippet-tab-stops",
+   "source": ";\nfunction f() {\n    ;\n    ;\n}\nif (x) ;\nfor (;;) ;\nwhile (x) ;",
+   "tab_stops": true,
+   "expected": [
+    "$0\nfunction f() {\n$1\n$2\n}\nif (x)\n    ;\nfor (;;)\n    ;\nwhile (x)\n    ;\n"
+   ]
+  },
+  {
+   "id": "snippet-tab-stops-block",
+   "source": "{ ; }\nlabel: ;\n;",
+   "tab_stops": true,
+   "expected": [
+    "{\n$0\n}\nlabel: $1\n$2\n"
    ]
   }
  ]

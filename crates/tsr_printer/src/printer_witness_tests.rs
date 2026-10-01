@@ -16,12 +16,16 @@ use crate::emit_helpers::{
 use crate::generated_identifier_flags as g;
 use crate::printer_emit_tests::parse_type_script;
 use crate::{
-    emit_flags as ef, AutoGenerateOptions, EmitContext, EmitHelper, Printer, PrinterOptions,
+    emit_flags as ef, AutoGenerateOptions, EmitContext, EmitHelper, EmitTextWriter, Printer,
+    PrinterOptions, SnippetElement, SnippetKind, TextWriter,
 };
 use serde_json::Value;
+use std::cell::Cell;
+use std::collections::HashMap;
+use std::ops::ControlFlow;
 use tsr_ast::{
-    AstBuilder, Factory, FactoryMethods, JsString, NodeId, NodeVisitor, RuntimeFactory,
-    SyntaxKind as K,
+    AstBuilder, AstView, ChildVisitor, Factory, FactoryMethods, JsString, NodeId, NodeListId,
+    NodeSlice, NodeVisitor, RuntimeFactory, SymbolId, SyntaxKind as K,
 };
 use tsr_core::NewLineKind;
 use tsr_jsstring::SourceText;
@@ -69,6 +73,7 @@ fn js(text: &str) -> JsString {
 fn rewrite_identifier(
     ec: &mut EmitContext,
     factory: &mut dyn Factory,
+    marks: &Marks,
     node: NodeId,
     text: &str,
 ) -> Option<NodeId> {
@@ -118,12 +123,73 @@ fn rewrite_identifier(
         let name = ec.new_unique_name(factory, name);
         return Some(ec.new_string_literal_from_node(factory, name));
     }
+    if let Some(index) = text.strip_prefix("$decl_") {
+        let index: usize = index.parse().expect("statement index");
+        return Some(ec.new_generated_name_for_node(factory, marks.statements[index]));
+    }
+    if let Some(name) = unique("$nlhelper_") {
+        let name = ec.new_unscoped_helper_name(factory, name.as_bytes());
+        ec.add_emit_flags(name, ef::START_ON_NEW_LINE);
+        return Some(name);
+    }
+    if let Some(text) = unique("$strtext_") {
+        let identifier = factory.new_identifier(text);
+        return Some(ec.new_string_literal_from_node(factory, identifier));
+    }
+    if let Some(text) = unique("$strascii_") {
+        let identifier = factory.new_identifier(text);
+        let literal = ec.new_string_literal_from_node(factory, identifier);
+        ec.add_emit_flags(literal, ef::NO_ASCII_ESCAPING);
+        return Some(literal);
+    }
+    if text == "$lastpee" {
+        return Some(
+            marks
+                .last_pee
+                .get()
+                .expect("a partially emitted expression"),
+        );
+    }
+    if text == "$lastpae" {
+        return Some(marks.last_pae.get().expect("a property access"));
+    }
     None
+}
+
+/// The string-literal markers of a JSX attribute's value.
+fn rewrite_string_literal(
+    ec: &mut EmitContext,
+    factory: &mut dyn Factory,
+    text: &[u8],
+) -> Option<NodeId> {
+    let (rest, ascii) = if let Some(rest) = text.strip_prefix(b"$strjsx_") {
+        (rest, false)
+    } else {
+        (text.strip_prefix(b"$strasciijsx_")?, true)
+    };
+    let identifier = factory.new_identifier(JsString::from_bytes(rest));
+    let literal = ec.new_string_literal_from_node(factory, identifier);
+    if ascii {
+        ec.add_emit_flags(literal, ef::NO_ASCII_ESCAPING);
+    }
+    Some(literal)
+}
+
+/// What the producer's visitor closes over besides the case: the original
+/// statements `$decl_<i>` names, the last partially emitted expression and
+/// property access it produced, and the next tab stop.
+struct Marks {
+    statements: Vec<NodeId>,
+    last_pee: Cell<Option<NodeId>>,
+    last_pae: Cell<Option<NodeId>>,
+    tab_stops: bool,
+    tab_stop: Cell<i64>,
 }
 
 fn visit(
     ec: &EmitContext,
     pee: &str,
+    marks: &Marks,
     visitor: &mut NodeVisitor<'_>,
     node: Option<NodeId>,
 ) -> Option<NodeId> {
@@ -133,7 +199,42 @@ fn visit(
     match read.kind().known() {
         Some(K::Identifier) => {
             let text = String::from_utf8(read.as_identifier()?.text().to_vec()).expect("text");
-            return rewrite_identifier(&mut ec, visitor, id, &text).or(node);
+            return rewrite_identifier(&mut ec, visitor, marks, id, &text).or(node);
+        }
+        Some(K::StringLiteral) => {
+            let text = read.data_source().as_string_literal()?.text().to_vec();
+            return rewrite_string_literal(&mut ec, visitor, &text).or(node);
+        }
+        Some(K::JsxAttribute) => {
+            let attribute = read.data_source().as_jsx_attribute()?;
+            let (name, initializer) = (attribute.name(), attribute.initializer());
+            let is_marker = initializer.is_some_and(|initializer| {
+                visitor
+                    .factory()
+                    .node(initializer)
+                    .data_source()
+                    .as_string_literal()
+                    .is_some_and(|literal| literal.text() == b"$strns")
+            });
+            if is_marker {
+                let name_node = name.expect("attribute name");
+                let literal = ec.new_string_literal_from_node(visitor, name_node);
+                return Some(visitor.update_jsx_attribute(id, name, Some(literal)));
+            }
+        }
+        Some(K::EmptyStatement) => {
+            if marks.tab_stops {
+                let order = marks.tab_stop.get();
+                ec.set_snippet_element(
+                    id,
+                    SnippetElement {
+                        kind: SnippetKind::TabStop,
+                        order,
+                    },
+                );
+                marks.tab_stop.set(order + 1);
+            }
+            return node;
         }
         Some(K::PrivateIdentifier) => {
             let text = read.data_source().as_private_identifier()?.text().to_vec();
@@ -159,6 +260,7 @@ fn visit(
                 );
             }
             visitor.set_node_range(pee_node, range);
+            marks.last_pee.set(Some(pee_node));
             return Some(pee_node);
         }
         Some(K::FunctionDeclaration) => {
@@ -178,7 +280,11 @@ fn visit(
         }
         _ => {}
     }
-    visitor.visit_each_child(node)
+    let visited = visitor.visit_each_child(node)?;
+    if visitor.factory().node(visited).kind() == K::PropertyAccessExpression {
+        marks.last_pae.set(Some(visited));
+    }
+    Some(visited)
 }
 
 fn run(case: &Value) -> Vec<Vec<u8>> {
@@ -188,14 +294,37 @@ fn run(case: &Value) -> Vec<Vec<u8>> {
         &tsr_arena::Counters::new(),
         ec.factory_hooks(),
     );
-    let parsed = parse_type_script(case["source"].as_str().expect("source").as_bytes(), false);
+    let flag = |name: &str| case[name].as_bool() == Some(true);
+    let parsed = parse_type_script(
+        case["source"].as_str().expect("source").as_bytes(),
+        flag("jsx"),
+    );
     let original = parsed.root();
-    factory.retain_file(parsed.publish_unbound());
+    let file = parsed.publish_unbound();
+    let bound = flag("bind").then(|| tsr_binder::bind_source_file(&file, original).expect("bind"));
+    factory.retain_file(file);
+    let statements = {
+        let view = factory.view();
+        let source = view.node(original).expect("source file");
+        let statements = source.statements(view).expect("statements");
+        view.node_slice(statements)
+            .expect("statements")
+            .iter()
+            .flatten()
+            .collect()
+    };
+    let marks = Marks {
+        statements,
+        last_pee: Cell::new(None),
+        last_pae: Cell::new(None),
+        tab_stops: flag("tab_stops"),
+        tab_stop: Cell::new(0),
+    };
     let pee = case["pee"].as_str().unwrap_or("").to_owned();
     let hooks = ec.visitor_hooks();
     let visit_context = ec.clone();
     let visitor = move |visitor: &mut NodeVisitor<'_>, node: Option<NodeId>| {
-        visit(&visit_context, &pee, visitor, node)
+        visit(&visit_context, &pee, &marks, visitor, node)
     };
     let file = hooks
         .new_node_visitor(Some(&visitor), &mut factory)
@@ -226,16 +355,40 @@ fn run(case: &Value) -> Vec<Vec<u8>> {
             }
         }
     }
+    let bound_view = bound.as_ref().map(tsr_ast::BoundFile::view);
     let mut printer = Printer::new(
         PrinterOptions {
             new_line: NewLineKind::LF,
-            no_emit_helpers: case["no_emit_helpers"].as_bool() == Some(true),
-            remove_comments: case["remove_comments"].as_bool() == Some(true),
+            no_emit_helpers: flag("no_emit_helpers"),
+            remove_comments: flag("remove_comments"),
+            never_ascii_escape: flag("never_ascii_escape"),
             ..PrinterOptions::default()
         },
         &ec,
     );
+    printer.bindings = bound_view
+        .as_ref()
+        .map(|view| view as &dyn crate::PrinterBindings);
     let writes = case["writes"].as_u64().unwrap_or(1).max(1);
+    if flag("listener") {
+        // `EmitSourceFile` with the notifications recorded by the writer.
+        let mut writer = ListeningWriter {
+            inner: TextWriter::new(b"\n", 0),
+            before: HashMap::new(),
+            after: HashMap::new(),
+        };
+        let mut output = Vec::new();
+        for _ in 0..writes {
+            output.push(
+                match printer.write(factory.view(), file, Some(file), &mut writer, None) {
+                    Ok(()) => writer.text().to_vec(),
+                    Err(error) => format!("printer error: {error}").into_bytes(),
+                },
+            );
+        }
+        output.push(positions(factory.view(), file, &writer).into_bytes());
+        return output;
+    }
     (0..writes)
         .map(|_| {
             printer
@@ -245,11 +398,150 @@ fn run(case: &Value) -> Vec<Vec<u8>> {
         .collect()
 }
 
+/// A text writer that records where each emit notification for a node of
+/// the tree came, as the producer's `OnBeforeEmitNode`/`OnAfterEmitNode`
+/// handlers do.
+struct ListeningWriter {
+    inner: TextWriter,
+    before: HashMap<NodeId, usize>,
+    after: HashMap<NodeId, usize>,
+}
+
+/// The children of a node in `ForEachChild` order.
+struct Children<'a>(AstView<'a>, Vec<NodeId>);
+
+impl ChildVisitor for Children<'_> {
+    fn visit_node(&mut self, node: NodeId) -> ControlFlow<()> {
+        self.1.push(node);
+        ControlFlow::Continue(())
+    }
+    fn visit_list(&mut self, nodes: NodeListId) -> ControlFlow<()> {
+        let slice = self.0.list(nodes).expect("list").nodes();
+        self.visit_node_slice(slice)
+    }
+    fn visit_node_slice(&mut self, nodes: NodeSlice) -> ControlFlow<()> {
+        self.1
+            .extend(self.0.node_slice(nodes).expect("nodes").iter().flatten());
+        ControlFlow::Continue(())
+    }
+}
+
+/// The producer's `a1Positions`: each node of the printed tree in pre-order
+/// with the writer positions its notifications recorded.
+fn positions(view: AstView<'_>, root: NodeId, writer: &ListeningWriter) -> String {
+    let mut lines = Vec::new();
+    let mut pending = vec![root];
+    while let Some(node) = pending.pop() {
+        let read = view.node(node).expect("node");
+        let at = |map: &HashMap<NodeId, usize>| {
+            map.get(&node)
+                .map_or_else(|| "-".to_owned(), ToString::to_string)
+        };
+        lines.push(format!(
+            "{:?} {} {}",
+            read.kind().known().expect("known kind"),
+            at(&writer.before),
+            at(&writer.after)
+        ));
+        let mut children = Children(view, Vec::new());
+        let _ = read.for_each_child(&mut children);
+        pending.extend(children.1.into_iter().rev());
+    }
+    lines.join("\n")
+}
+
+impl EmitTextWriter for ListeningWriter {
+    fn write(&mut self, s: &[u8]) {
+        self.inner.write(s);
+    }
+    fn write_trailing_semicolon(&mut self, text: &[u8]) {
+        self.inner.write_trailing_semicolon(text);
+    }
+    fn write_comment(&mut self, text: &[u8]) {
+        self.inner.write_comment(text);
+    }
+    fn write_keyword(&mut self, text: &[u8]) {
+        self.inner.write_keyword(text);
+    }
+    fn write_operator(&mut self, text: &[u8]) {
+        self.inner.write_operator(text);
+    }
+    fn write_punctuation(&mut self, text: &[u8]) {
+        self.inner.write_punctuation(text);
+    }
+    fn write_space(&mut self, text: &[u8]) {
+        self.inner.write_space(text);
+    }
+    fn write_string_literal(&mut self, text: &[u8]) {
+        self.inner.write_string_literal(text);
+    }
+    fn write_parameter(&mut self, text: &[u8]) {
+        self.inner.write_parameter(text);
+    }
+    fn write_property(&mut self, text: &[u8]) {
+        self.inner.write_property(text);
+    }
+    fn write_symbol(&mut self, text: &[u8], symbol: Option<SymbolId>) {
+        self.inner.write_symbol(text, symbol);
+    }
+    fn write_line(&mut self) {
+        self.inner.write_line();
+    }
+    fn write_line_force(&mut self, force: bool) {
+        self.inner.write_line_force(force);
+    }
+    fn increase_indent(&mut self) {
+        self.inner.increase_indent();
+    }
+    fn decrease_indent(&mut self) {
+        self.inner.decrease_indent();
+    }
+    fn clear(&mut self) {
+        self.inner.clear();
+    }
+    fn text(&self) -> &[u8] {
+        self.inner.text()
+    }
+    fn raw_write(&mut self, s: &[u8]) {
+        self.inner.raw_write(s);
+    }
+    fn write_literal(&mut self, s: &[u8]) {
+        self.inner.write_literal(s);
+    }
+    fn get_text_pos(&self) -> usize {
+        self.inner.get_text_pos()
+    }
+    fn get_line(&self) -> isize {
+        self.inner.get_line()
+    }
+    fn get_column(&self) -> isize {
+        self.inner.get_column()
+    }
+    fn get_indent(&self) -> isize {
+        self.inner.get_indent()
+    }
+    fn is_at_start_of_line(&self) -> bool {
+        self.inner.is_at_start_of_line()
+    }
+    fn has_trailing_comment(&self) -> bool {
+        self.inner.has_trailing_comment()
+    }
+    fn has_trailing_whitespace(&self) -> bool {
+        self.inner.has_trailing_whitespace()
+    }
+    fn on_before_emit_node(&mut self, node: NodeId) {
+        self.before.insert(node, self.inner.get_text_pos());
+    }
+    fn on_after_emit_node(&mut self, node: NodeId) {
+        self.after.insert(node, self.inner.get_text_pos());
+    }
+}
+
 #[test]
 fn generated_names_helpers_and_no_asi_parentheses_print_as_pinned() {
     let document: Value = serde_json::from_str(FIXTURE).expect("fixture");
     let cases = document["cases"].as_array().expect("cases");
-    assert!(cases.len() >= 20);
+    assert!(cases.len() >= 132);
     let mut failures = Vec::new();
     for case in cases {
         let id = case["id"].as_str().expect("id");

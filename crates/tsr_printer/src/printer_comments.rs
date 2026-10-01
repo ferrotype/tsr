@@ -267,7 +267,7 @@ impl Session<'_, '_> {
     /// `node`'s comments: none for a node `parenthesizeExpressionForNoAsi`
     /// updated, as an update copies neither.
     fn comment_identity(&self, node: NodeId) -> Option<NodeId> {
-        (!self.is_no_asi_updated(node)).then_some(node)
+        self.open_spine_occurrence(node).is_none().then_some(node)
     }
 
     /// The comment-relevant parts of a node of the tree.
@@ -1119,7 +1119,21 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.enterNode
     pub(crate) fn enter_node(&mut self, node: NodeId) -> Result<PrinterState, Error> {
-        self.writer.on_before_emit_node(node);
+        let updated = self.open_spine_occurrence(node).is_some();
+        self.enter_node_as(node, updated)
+    }
+
+    /// `enterNode` of `node`, or of the update `parenthesizeExpressionForNoAsi`
+    /// makes of it. An update is a node the caller never sees, so the emit
+    /// notifications do not name `node` for it.
+    pub(crate) fn enter_node_as(
+        &mut self,
+        node: NodeId,
+        updated: bool,
+    ) -> Result<PrinterState, Error> {
+        if !updated {
+            self.writer.on_before_emit_node(node);
+        }
         let comment_state = self.emit_comments_before_node(node)?;
         let source_map_state = self.emit_source_maps_before_node(node)?;
         Ok(PrinterState {
@@ -1130,16 +1144,29 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.exitNode
     pub(crate) fn exit_node(&mut self, node: NodeId, state: PrinterState) -> Result<(), Error> {
+        let updated = self.open_spine_occurrence(node).is_some();
+        self.exit_node_as(node, state, updated)
+    }
+
+    /// `exitNode` of `node`, or of the update of it; see `enter_node_as`.
+    pub(crate) fn exit_node_as(
+        &mut self,
+        node: NodeId,
+        state: PrinterState,
+        updated: bool,
+    ) -> Result<(), Error> {
         if state.source_map_state.is_some() {
             let kind = self.node(node)?.kind();
             self.emit_source_maps_after_node(kind, state.source_map_state);
         }
         if state.comment_state.is_some() {
             let kind = self.node(node)?.kind();
-            let identity = self.comment_identity(node);
+            let identity = (!updated).then_some(node);
             self.emit_comments_after_node(identity, kind, state.comment_state)?;
         }
-        self.writer.on_after_emit_node(node);
+        if !updated {
+            self.writer.on_after_emit_node(node);
+        }
         Ok(())
     }
 

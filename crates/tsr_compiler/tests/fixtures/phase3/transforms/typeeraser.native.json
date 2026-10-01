@@ -1555,6 +1555,43 @@
    },
    "name": "probe.ts",
    "source": "class C {\n    declare readonly x: number;\n    y = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "function f(x) {\r\n    return (// c\r\n    x)\r\n        + 1;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "no-asi-parentheses-keep-line-break",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e206628783a20616e7929207b0a2020202072657475726e20282f2f20630a20202020202020207820617320616e792920617320616e790a20202020202020202b20313b0a7d0a"
+    },
+    "id": "no-asi-parentheses-keep-line-break",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "function f(x: any) {\n    return (// c\n        x as any) as any\n        + 1;\n}\n"
   }
  ],
  "go": "go1.27.1",

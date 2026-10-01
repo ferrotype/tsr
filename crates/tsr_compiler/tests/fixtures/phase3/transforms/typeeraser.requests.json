@@ -399,6 +399,16 @@
      "typeeraser"
     ]
    ]
+  },
+  {
+   "id": "no-asi-parentheses-keep-line-break",
+   "name": "probe.ts",
+   "source": "function f(x: any) {\n    return (// c\n        x as any) as any\n        + 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
   }
  ]
 }

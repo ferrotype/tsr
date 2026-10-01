@@ -30,13 +30,42 @@ pub(crate) struct NoAsiParens {
 }
 
 /// One rewrite of `parenthesizeExpressionForNoAsi` while it prints.
+///
+/// Upstream rebuilds the left spine of the expression, so a node of the spine
+/// prints as its update only where the spine reaches it: the left operand of
+/// the spine node above it. The same node elsewhere in the expression prints
+/// as itself. The rewrite therefore follows the spine as it prints: each spine
+/// node reached as the first operand an emitter prints is opened at its
+/// expression frame (`Session::expression_depth`), and a query about an
+/// operand asks whether that operand is the left one of an open spine node.
 #[derive(Debug)]
 pub(crate) struct NoAsiRewrite {
-    /// The left spine above the parentheses, outermost first.
-    updated: Vec<NodeId>,
+    /// The left spine, outermost first: the nodes upstream updates, then the
+    /// partially emitted expression the parentheses stand in for.
+    spine: Vec<NodeId>,
     parens: NoAsiParens,
-    /// Cleared while the parentheses print their own expression.
-    active: bool,
+    /// The expression frames of the spine nodes whose emission is in
+    /// progress, outermost first: `spine[i]` is open at `frames[i]`. Nested
+    /// partially emitted expressions open at their outermost one's frame.
+    frames: Vec<usize>,
+    /// The next expression emitted is the left operand of the innermost open
+    /// spine node, or the rewritten expression itself before any is open.
+    armed: bool,
+}
+
+/// An occurrence of a node in the expression being printed: the node, and
+/// where a rewrite's spine reaches it, the rewrite and the spine index.
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct Operand {
+    pub(super) node: NodeId,
+    spine: Option<(usize, usize)>,
+}
+
+impl Operand {
+    /// An occurrence no rewrite reaches.
+    pub(super) fn plain(node: NodeId) -> Self {
+        Self { node, spine: None }
+    }
 }
 
 impl Session<'_, '_> {
@@ -796,25 +825,25 @@ impl Session<'_, '_> {
             kind: postfix.operator(),
         })?;
         self.emit_expression(operand, op::LEFT_HAND_SIDE)?;
-        let end = self.operand_span(operand)?.end;
+        let end = self.operand_span(self.left_operand(operand))?.end;
         self.emit_token(operator, end, WriteKind::Operator, node)?;
         self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitShortCircuitExpression
-    fn emit_short_circuit_expression(&mut self, node: NodeId) -> Result<(), Error> {
+    fn emit_short_circuit_expression(&mut self, node: Operand) -> Result<(), Error> {
         // port: tsc/internal/printer/utilities.go:isBinaryOperation
         let skipped = self.skip_partially_emitted_expressions_rewritten(node)?;
         let is_coalesce = match skipped {
-            Some(skipped) if self.node(skipped)?.kind() == K::BinaryExpression => {
-                let (_, operator, _) = self.binary_parts(skipped)?;
+            Some(skipped) if self.node(skipped.node)?.kind() == K::BinaryExpression => {
+                let (_, operator, _) = self.binary_parts(skipped.node)?;
                 self.node(operator)?.kind() == K::QuestionQuestionToken
             }
             _ => false,
         };
         self.emit_expression(
-            node,
+            node.node,
             if is_coalesce {
                 op::COALESCE
             } else {
@@ -851,6 +880,7 @@ impl Session<'_, '_> {
         let span = |session: &Self, id: NodeId| -> Result<Span, Error> {
             Ok(Span::of(&session.node(id)?))
         };
+        let condition = self.left_operand(condition);
         let before_question = self.get_lines_between_nodes(
             node,
             self.operand_span(condition)?,
@@ -991,10 +1021,13 @@ impl Session<'_, '_> {
                                 source_map_range: TextRange::new(-1, -1),
                             },
                         };
+                        let mut spine = updated;
+                        spine.push(node);
                         return Ok(Some(NoAsiRewrite {
-                            updated,
+                            spine,
                             parens,
-                            active: true,
+                            frames: Vec::new(),
+                            armed: true,
                         }));
                     }
                     read.expression()
@@ -1037,37 +1070,102 @@ impl Session<'_, '_> {
         result
     }
 
-    /// The parentheses a rewrite in progress puts in place of `node`.
-    pub(super) fn no_asi_parens(&self, node: NodeId) -> Option<(usize, NoAsiParens)> {
+    /// The occurrence of `node` that `emitExpression` is about to print: a
+    /// spine occurrence when a rewrite expects its next left operand and
+    /// `node` is that spine's next node. Every rewrite's expectation ends
+    /// here, as only the first expression an emitter prints is its left
+    /// operand.
+    pub(super) fn take_spine_occurrence(&mut self, node: NodeId) -> Operand {
+        let mut operand = Operand::plain(node);
+        for (index, rewrite) in self.no_asi.iter_mut().enumerate() {
+            let armed = std::mem::replace(&mut rewrite.armed, false);
+            let depth = rewrite.frames.len();
+            if armed && rewrite.spine.get(depth) == Some(&node) {
+                operand.spine = Some((index, depth));
+            }
+        }
+        operand
+    }
+
+    /// Opens a spine occurrence that prints as an update at the current
+    /// expression frame: its left operand is the next spine node.
+    pub(super) fn open_spine(&mut self, operand: Operand) {
+        if let Some((index, _)) = operand.spine {
+            let frame = self.expression_depth;
+            let rewrite = &mut self.no_asi[index];
+            rewrite.frames.push(frame);
+            rewrite.armed = true;
+        }
+    }
+
+    /// Closes the spine occurrence `open_spine` opened.
+    pub(super) fn close_spine(&mut self, operand: Operand) {
+        if let Some((index, _)) = operand.spine {
+            let rewrite = &mut self.no_asi[index];
+            rewrite.frames.pop();
+            rewrite.armed = false;
+        }
+    }
+
+    /// The occurrence of the node the current expression frame prints, when
+    /// it is an open spine node: the nodes upstream prints as updates.
+    pub(super) fn open_spine_occurrence(&self, node: NodeId) -> Option<Operand> {
         self.no_asi
             .iter()
             .enumerate()
             .rev()
-            .find(|(_, rewrite)| rewrite.active && rewrite.parens.pee == node)
-            .map(|(index, rewrite)| (index, rewrite.parens))
+            .find_map(|(index, rewrite)| {
+                let depth = rewrite.frames.len().checked_sub(1)?;
+                (rewrite.frames[depth] == self.expression_depth && rewrite.spine[depth] == node)
+                    .then_some(Operand {
+                        node,
+                        spine: Some((index, depth)),
+                    })
+            })
     }
 
-    /// Whether `node` prints as the update upstream makes of it.
-    pub(super) fn is_no_asi_updated(&self, node: NodeId) -> bool {
-        self.no_asi
+    /// `node` as the left operand of the node the current expression frame
+    /// prints.
+    pub(super) fn left_operand(&self, node: NodeId) -> Operand {
+        let parent = self
+            .no_asi
             .iter()
-            .any(|rewrite| rewrite.updated.contains(&node))
+            .enumerate()
+            .rev()
+            .find_map(|(index, rewrite)| {
+                let depth = rewrite.frames.len().checked_sub(1)?;
+                (rewrite.frames[depth] == self.expression_depth).then_some(Operand {
+                    node: rewrite.spine[depth],
+                    spine: Some((index, depth)),
+                })
+            });
+        match parent {
+            Some(parent) => self.operand_left(parent, node),
+            None => Operand::plain(node),
+        }
+    }
+
+    /// `child` as the left operand of the occurrence `parent`.
+    pub(super) fn operand_left(&self, parent: Operand, child: NodeId) -> Operand {
+        let spine = parent.spine.and_then(|(index, depth)| {
+            (self.no_asi[index].spine.get(depth + 1) == Some(&child)).then_some((index, depth + 1))
+        });
+        Operand { node: child, spine }
+    }
+
+    /// The parentheses a rewrite puts in place of this occurrence.
+    pub(super) fn no_asi_parens(&self, operand: Operand) -> Option<NoAsiParens> {
+        let (index, depth) = operand.spine?;
+        let rewrite = &self.no_asi[index];
+        (depth + 1 == rewrite.spine.len()).then_some(rewrite.parens)
     }
 
     /// `emitParenthesizedExpression` of the parentheses a rewrite creates. With
     /// a parenthesized parse node they copy the partially emitted expression's
     /// emit metadata and take the parse node's range, and their tokens read
     /// that parse node's comments; otherwise they are synthesized.
-    pub(super) fn emit_no_asi_parens(
-        &mut self,
-        index: usize,
-        parens: NoAsiParens,
-    ) -> Result<(), Error> {
-        let span = Span {
-            node: None,
-            pos: parens.range.pos(),
-            end: parens.range.end(),
-        };
+    pub(super) fn emit_no_asi_parens(&mut self, parens: NoAsiParens) -> Result<(), Error> {
+        let span = Span::created(parens.range.pos(), parens.range.end());
         let target = CommentTarget {
             node: None,
             kind: K::ParenthesizedExpression.into(),
@@ -1076,12 +1174,7 @@ impl Session<'_, '_> {
             source_map_range: parens.source_map_range,
         };
         let state = self.enter_created_node(&target)?;
-        // Inside the parentheses the partially emitted expression is itself.
-        self.no_asi[index].active = false;
-        let result =
-            self.emit_parenthesized_expression_parts(parens.context, span, parens.expression);
-        self.no_asi[index].active = true;
-        result?;
+        self.emit_parenthesized_expression_parts(parens.context, span, parens.expression)?;
         self.exit_created_node(&target, state)
     }
 
@@ -1089,32 +1182,32 @@ impl Session<'_, '_> {
     /// it reaches the parentheses a rewrite created.
     pub(super) fn skip_partially_emitted_expressions_rewritten(
         &self,
-        mut node: NodeId,
-    ) -> Result<Option<NodeId>, Error> {
+        mut operand: Operand,
+    ) -> Result<Option<Operand>, Error> {
         loop {
-            if self.no_asi_parens(node).is_some() {
+            if self.no_asi_parens(operand).is_some() {
                 return Ok(None);
             }
-            let read = self.node(node)?;
+            let read = self.node(operand.node)?;
             if read.kind() != K::PartiallyEmittedExpression {
-                return Ok(Some(node));
+                return Ok(Some(operand));
             }
-            node = read
+            let expression = read
                 .expression()
                 .ok_or(Error::MissingNode("partially emitted expression"))?;
+            operand = self.operand_left(operand, expression);
         }
     }
 
     /// The range of an operand of the rewritten tree.
-    pub(super) fn operand_span(&self, node: NodeId) -> Result<Span, Error> {
-        if let Some((_, parens)) = self.no_asi_parens(node) {
+    pub(super) fn operand_span(&self, operand: Operand) -> Result<Span, Error> {
+        if let Some(parens) = self.no_asi_parens(operand) {
             return Ok(Span {
-                node: None,
-                pos: parens.range.pos(),
-                end: parens.range.end(),
+                synthesized_parens_of: parens.context.is_none().then_some(parens.pee),
+                ..Span::created(parens.range.pos(), parens.range.end())
             });
         }
-        Ok(Span::of(&self.node(node)?))
+        Ok(Span::of(&self.node(operand.node)?))
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitYieldExpression
@@ -1276,46 +1369,59 @@ impl Session<'_, '_> {
     // port: tsc/internal/printer/printer.go:Printer.emitPartiallyEmittedExpression
     pub(super) fn emit_partially_emitted_expression(&mut self, node: NodeId) -> Result<(), Error> {
         let mut stack = Vec::new();
-        let mut current = node;
+        let mut current = self
+            .open_spine_occurrence(node)
+            .unwrap_or(Operand::plain(node));
+        // The nested spine nodes opened at this frame, so that the inner
+        // expression is the next spine node's left operand.
+        let mut opened = Vec::new();
         loop {
-            let state = self.enter_node(current)?;
-            let read = self.node(current)?;
+            let state = self.enter_node_as(current.node, current.spine.is_some())?;
+            let read = self.node(current.node)?;
             let expression = read
                 .expression()
                 .ok_or(Error::MissingNode("partially emitted expression"))?;
+            let expression = self.operand_left(current, expression);
             let expression_pos = self.operand_span(expression)?.pos;
-            if self.emit_flags(current) & ef::NO_LEADING_COMMENTS == 0
+            if self.emit_flags(current.node) & ef::NO_LEADING_COMMENTS == 0
                 && i64::from(read.pos()) != expression_pos
             {
                 self.emit_trailing_comments_of_position(expression_pos, false, false);
             }
             stack.push((current, state));
             if self.no_asi_parens(expression).is_some()
-                || self.node(expression)?.kind() != K::PartiallyEmittedExpression
+                || self.node(expression.node)?.kind() != K::PartiallyEmittedExpression
             {
                 break;
             }
+            self.open_spine(expression);
+            opened.push(expression);
             current = expression;
         }
         let inner = self
-            .node(current)?
+            .node(current.node)?
             .expression()
             .ok_or(Error::MissingNode("partially emitted expression"))?;
         self.emit_expression(inner, op::LOWEST)?;
         // unwind stack
-        while let Some((entry_node, entry_state)) = stack.pop() {
-            let read = self.node(current)?;
+        while let Some((entry, entry_state)) = stack.pop() {
+            let read = self.node(current.node)?;
             let expression = read
                 .expression()
                 .ok_or(Error::MissingNode("partially emitted expression"))?;
-            let expression_end = self.operand_span(expression)?.end;
-            if self.emit_flags(current) & ef::NO_TRAILING_COMMENTS == 0
+            let expression_end = self
+                .operand_span(self.operand_left(current, expression))?
+                .end;
+            if self.emit_flags(current.node) & ef::NO_TRAILING_COMMENTS == 0
                 && i64::from(read.end()) != expression_end
             {
                 self.emit_leading_comments_of_position(expression_end);
             }
-            self.exit_node(current, entry_state)?;
-            current = entry_node;
+            self.exit_node_as(current.node, entry_state, current.spine.is_some())?;
+            current = entry;
+        }
+        while let Some(expression) = opened.pop() {
+            self.close_spine(expression);
         }
         Ok(())
     }
