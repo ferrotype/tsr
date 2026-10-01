@@ -33,17 +33,21 @@ fn declarations() -> CompilerOptions {
 }
 
 /// A file whose declaration emit serializes inferred types (a variable's,
-/// a property's, an accessor's), keeps and rewrites annotated ones and
-/// elides implementations. Its functions annotate their return types: the
-/// checker keeps state from each declaration emit of an inferred function
-/// return type (`t7_findings.rs`), which is not the transform's.
+/// a property's, an accessor's, a function's and a generic function's
+/// return type), keeps and rewrites annotated ones, declares an expando
+/// function's namespace and elides implementations. A function's return
+/// type and an expando namespace are serialized in scopes the checker makes
+/// for the request; repeated emits reuse them and leave the checker as the
+/// first emit left it.
 fn declared_file(index: usize) -> String {
     let mut text = String::new();
     for i in 0..12 {
         text.push_str(&format!(
             "export interface I{i} {{ a: number; b: string[]; c?: I{i} }}\n\
              export const v{i} = {{ a: {i}, b: [\"x\"], nested: {{ deep: [{i}, {i}] }} }};\n\
-             export function f{i}(p: I{i}, q: number): {{ p: I{i}; size: number }} {{ return {{ p, size: p.a + q }}; }}\n\
+             export function f{i}(p: I{i}, q: number) {{ return {{ p, size: p.a + q }}; }}\n\
+             export function g{i}<T extends I{i}>(t: T, u: T[]) {{ return [t, ...u]; }}\n\
+             export function e{i}(): void {{}}\ne{i}.tag = {i};\n\
              export class C{i} {{ private hidden = {i}; constructor(public shown: I{i}) {{}} get both() {{ return [this.hidden, this.shown]; }} }}\n\
              export type T{i} = {{ [K in keyof I{i}]: I{i}[K] extends number ? K : never }};\n"
         ));
@@ -197,4 +201,33 @@ fn deep_type_nesting_declares_through_the_growth_guards() {
         support::occurrences(&namespaces, "type T = "),
         namespace_depth
     );
+}
+
+/// Depth of the nested binding patterns declared.
+const PATTERN_DEPTH: usize = 600;
+
+/// A declared object destructuring `PATTERN_DEPTH` patterns deep: the
+/// declaration transform's binding walks (`hasAnyBindingInitializers`,
+/// `getBindingNameVisible`, its binding-name visitor) recurse once per
+/// nested pattern, and the checker answers the innermost binding element's
+/// visibility by asking for each enclosing pattern's declaration in turn
+/// (`isDeclarationVisible`), about 4 KiB of stack per level in a debug
+/// build, so this takes twice the T3 contract's depth to exceed the segment
+/// an outer guard grows into. Emitted single-threaded on a 256 KiB thread
+/// and concurrently on the work group's reserved stacks with the same
+/// output; the whole depth is declared.
+#[test]
+fn deep_binding_patterns_declare_through_the_growth_guards() {
+    let _serial = serial();
+    let n = PATTERN_DEPTH;
+    let text = format!(
+        "declare const s: any;\nexport const {{ {}a, ...r{} }} = s;\n",
+        "a: { ".repeat(n),
+        " }".repeat(n)
+    );
+    let observed = support::emit_deep(
+        &files(&[("/lib.d.ts", LIB), ("/a.ts", &text)]),
+        &declarations(),
+    );
+    assert_eq!(support::occurrences(observed.text("/a.d.ts"), "a: { "), n);
 }
