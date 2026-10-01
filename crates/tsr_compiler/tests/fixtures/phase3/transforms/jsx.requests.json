@@ -1,0 +1,34 @@
+{
+ "cases": [
+  {
+   "id": "no-jsx-file",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\nexport const a = 1;\nexport function f() { return a; }\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "no-jsx-automatic",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\nexport const a = 1;\nexport class C { m() { return [a]; } }\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "no-jsx-script",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\nvar x = { y: 1 };\nfunction f() { return x.y; }\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  }
+ ]
+}
