@@ -1297,6 +1297,7 @@ dependencies = [
  "tsr_parser",
  "tsr_printer",
  "tsr_scanner",
+ "tsr_tsoptions",
  "tsr_tspath",
 ]
 

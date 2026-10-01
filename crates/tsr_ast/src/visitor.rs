@@ -18,6 +18,13 @@ pub enum ChildSlot {
 /// Exclusive list and source-file operations needed by transformations. Source
 /// metadata creation belongs to a complete builder, not a lazy JSDoc transaction.
 pub trait RuntimeFactory: Factory {
+    /// The builder's storage view, through which a transformation applies the
+    /// `ast` predicates that take an [`AstView`] to factory nodes and to the
+    /// nodes of the files the builder retains. `None` for a factory without
+    /// one.
+    fn ast_view(&self) -> Option<AstView<'_>> {
+        None
+    }
     fn read_list(&self, id: NodeListId) -> NodeListRead<'_>;
     fn read_nodes(&self, nodes: NodeSlice) -> NodeSliceRead<'_>;
     fn alloc_nodes(&mut self, nodes: Vec<Option<NodeId>>) -> NodeSlice;
