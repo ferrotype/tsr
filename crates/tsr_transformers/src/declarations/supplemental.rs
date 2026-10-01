@@ -15,7 +15,10 @@ pub struct SupplementalReferencesTransformer<'a> {
 }
 
 impl<'a> SupplementalReferencesTransformer<'a> {
-    /// `source_file` is read from `output`, which retains it.
+    /// `source_file` is read from `output`, which retains it. A program
+    /// parses each file into its own arena, so its mapped files name their
+    /// supplemental files by file name where the pin keeps pointers; the host
+    /// finds them.
     // port: tsc/internal/transformers/declarations/supplementalreferences.go:NewSupplementalReferencesTransformer
     pub fn new(
         host: &'a dyn DeclarationEmitHost,
@@ -24,13 +27,20 @@ impl<'a> SupplementalReferencesTransformer<'a> {
         declaration_file_path: JsString,
         force_declaration_paths: bool,
     ) -> Result<Self, tsr_arena::Error> {
-        let supplemental_files = output
-            .read_source_file(source_file)?
+        let state = output.read_source_file(source_file)?;
+        let mut supplemental_files: Vec<NodeId> = state
             .supplemental_source_files()?
             .iter()
             .flatten()
             .copied()
             .collect();
+        if supplemental_files.is_empty() {
+            supplemental_files = state
+                .supplemental_file_names()
+                .iter()
+                .filter_map(|name| host.get_source_file(name.as_bytes()))
+                .collect();
+        }
         Ok(Self {
             host,
             supplemental_files,

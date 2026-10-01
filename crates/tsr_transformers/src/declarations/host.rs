@@ -16,6 +16,9 @@ pub trait DeclarationEmitHost {
         origin: NodeId,
         reference: &FileReference,
     ) -> Option<NodeId>;
+    /// The program's file named `file_name`: how a mapped file's supplemental
+    /// files, which it names, are found.
+    fn get_source_file(&self, file_name: &[u8]) -> Option<NodeId>;
     fn get_output_paths_for(&self, file: NodeId, force_dts_paths: bool) -> OutputPaths;
     fn source_file_may_be_emitted(&self, file: NodeId, force_dts_emit: bool) -> bool;
 }

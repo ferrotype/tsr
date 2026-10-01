@@ -73,6 +73,10 @@ impl DeclarationEmitHost for ProgramDeclarationHost<'_> {
             .map(ProgramFile::source)
     }
 
+    fn get_source_file(&self, file_name: &[u8]) -> Option<NodeId> {
+        self.program.source_file(file_name).map(ProgramFile::source)
+    }
+
     fn get_output_paths_for(&self, file: NodeId, force_dts_paths: bool) -> OutputPaths {
         let common = self
             .common_source_directory()

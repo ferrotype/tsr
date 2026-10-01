@@ -368,6 +368,10 @@ impl DeclarationEmitHost for EmitHost<'_> {
         .map(ProgramFile::source)
     }
 
+    fn get_source_file(&self, file_name: &[u8]) -> Option<NodeId> {
+        self.program.source_file(file_name).map(ProgramFile::source)
+    }
+
     fn get_output_paths_for(&self, file: NodeId, force_dts_paths: bool) -> OutputPaths {
         EmitHost::get_output_paths_for(self, program_file(self.program, file), force_dts_paths)
             .expect("the program's files are readable")
