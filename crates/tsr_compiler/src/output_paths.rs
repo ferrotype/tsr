@@ -64,9 +64,8 @@ pub(crate) fn common_directory(program: &Program, files: &[JsString]) -> Vec<u8>
         None,
     )
 }
-/// port: tsc/internal/compiler/emitter.go:sourceFileMayBeEmitted
 pub(crate) fn may_emit(file: &ProgramFile, program: &Program) -> Result<bool, Error> {
-    Ok(may_emit_with_force_dts(file, program, false)?)
+    Ok(may_emit_with_force(file, program, false, false)?)
 }
 
 pub(crate) fn may_emit_with_force_dts(
@@ -74,9 +73,24 @@ pub(crate) fn may_emit_with_force_dts(
     program: &Program,
     force_dts_emit: bool,
 ) -> Result<bool, tsr_arena::Error> {
+    may_emit_with_force(file, program, force_dts_emit, false)
+}
+
+/// port: tsc/internal/compiler/emitter.go:sourceFileMayBeEmitted
+pub(crate) fn may_emit_with_force(
+    file: &ProgramFile,
+    program: &Program,
+    force_dts_emit: bool,
+    force_js_emit: bool,
+) -> Result<bool, tsr_arena::Error> {
     let source = file.bound().view().source_file()?;
     let options = program.options();
-    if options.no_emit_for_js_files.is_true() && source.is_js() || source.is_declaration_file {
+    // Js files are emitted only if option is enabled
+    if !force_js_emit && options.no_emit_for_js_files.is_true() && source.is_js() {
+        return Ok(false);
+    }
+    // Declaration files are not emitted
+    if source.is_declaration_file {
         return Ok(false);
     }
     if !source.content_mapper().is_empty() && !force_dts_emit && !options.emit_declarations() {
@@ -85,7 +99,8 @@ pub(crate) fn may_emit_with_force_dts(
     if program.is_external_library(source.parse_options().path.as_bytes()) {
         return Ok(false);
     }
-    if force_dts_emit {
+    // forcing dts emit => file needs to be emitted
+    if force_dts_emit || force_js_emit {
         return Ok(true);
     }
     // Source files from referenced projects are not emitted. Only a source

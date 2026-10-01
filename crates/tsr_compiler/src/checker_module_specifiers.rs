@@ -11,6 +11,17 @@ fn contains(bytes: &[u8], part: &[u8]) -> bool {
     bytes.windows(part.len()).any(|window| window == part)
 }
 impl ProgramCheckerHost {
+    /// `Program.GetSymlinkCache`: computed on first use and kept.
+    pub(crate) fn known_symlinks(&self) -> Result<&KnownSymlinks, Error> {
+        match self
+            .known_symlinks
+            .get_or_init(|| self.compute_known_symlinks())
+        {
+            Ok(value) => Ok(value),
+            Err(error) => Err(error.clone()),
+        }
+    }
+
     // port: tsc/internal/compiler/program.go:Program.GetSymlinkCache
     fn compute_known_symlinks(&self) -> Result<KnownSymlinks, Error> {
         let program = self.program();
@@ -152,13 +163,7 @@ impl ProgramCheckerHost {
             }
         }
         let mut filter_ignored = targets.iter().any(|name| !ignored(name));
-        let symlinks = match self
-            .known_symlinks
-            .get_or_init(|| self.compute_known_symlinks())
-        {
-            Ok(value) => value,
-            Err(error) => return Err(error.clone()),
-        };
+        let symlinks = self.known_symlinks()?;
         let mut result = vec![];
         for directory in path::ancestors(&path::directory(&path::absolute(target, cwd))) {
             let key = path::to_path(&directory, cwd, case_sensitive);

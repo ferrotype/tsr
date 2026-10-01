@@ -648,7 +648,7 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
     initial_options(&mut v, options);
     let mut blocked = std::collections::BTreeSet::new();
     verify_project_references(program, &mut v, &mut blocked);
-    let emitted = source_files_to_emit(program)?;
+    let emitted = source_files_to_emit(program, None, false, false)?;
     let names: Vec<_> = emitted
         .iter()
         .map(|file| {
@@ -816,13 +816,19 @@ pub fn verify_compiler_options(program: &Program) -> Result<OptionVerification, 
     })
 }
 
-/// The program's files that emit output.
+/// The files of `target_source_files`, or of the program, that emit output.
 /// port: tsc/internal/compiler/program.go:Program.getSourceFilesToEmit
 /// port: tsc/internal/compiler/emitter.go:getSourceFilesToEmit
-fn source_files_to_emit(program: &Program) -> Result<Vec<&Arc<crate::ProgramFile>>, Error> {
+pub(crate) fn source_files_to_emit<'p>(
+    program: &'p Program,
+    target_source_files: Option<&'p [Arc<crate::ProgramFile>]>,
+    force_dts_emit: bool,
+    force_js_emit: bool,
+) -> Result<Vec<&'p Arc<crate::ProgramFile>>, Error> {
+    let target_source_files = target_source_files.unwrap_or_else(|| program.files());
     let mut emitted = Vec::new();
-    for file in program.files() {
-        if crate::output_paths::may_emit(file, program)? {
+    for file in target_source_files {
+        if crate::output_paths::may_emit_with_force(file, program, force_dts_emit, force_js_emit)? {
             emitted.push(file);
         }
     }

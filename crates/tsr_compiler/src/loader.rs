@@ -24,6 +24,10 @@ pub enum Error {
     Ast(tsr_arena::Error),
     Bind(tsr_ast::BindError),
     Unsupported(&'static str),
+    /// A script transformation's failure other than an unported transformer.
+    Transform(tsr_transformers::Error),
+    /// A printer failure other than an unported construct.
+    Printer(tsr_printer::Error),
 }
 impl From<tsr_checker::Error> for Error {
     fn from(error: tsr_checker::Error) -> Self {

@@ -979,6 +979,7 @@ dependencies = [
  "tsr_printer",
  "tsr_project",
  "tsr_scanner",
+ "tsr_sourcemap",
  "tsr_transformers",
  "tsr_tsoptions",
  "tsr_tspath",
