@@ -1,0 +1,1094 @@
+{
+ "cases": [
+  {
+   "id": "esdecorator-nil-esnext-define",
+   "name": "probe.ts",
+   "source": "// @target: esnext\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { @dec m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-nil-experimental",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @experimentalDecorators: true\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { @dec m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-esnext-no-define",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { @dec m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-undecorated",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { m() { return this; } static x = 1; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-basic",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-basic-es2015",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { static x = 1; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-multiple",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec @dec(1) @dec() class C {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-export-before",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nexport @dec class C {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-export-after",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec export class C {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-export-default-named",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nexport default @dec class C {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-export-default-anonymous",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nexport default @dec class {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-comment",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n/** doc */\n@dec class C {\n  // inner\n  m() {}\n}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-access-decorators",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@o.a @o[k] @(o.b.c) @o.d() class C {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-paren-decorators",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@(dec) @(\"s\".length) @(this.x) class C {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-extends",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends Base {}\ndeclare class Base {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-extends-anonymous",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends (class {}) {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-extends-function",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends (function () {} as any) {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-extends-arrow",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends ((() => Object) as any)() {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-extends-null",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends null { @dec m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-static-this",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { static x = 1; static y = this.x; static { this.x; } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-static-private",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { static #p = 1; static get p() { return C.#p; } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-static-private-accessor",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { @dec static accessor #a = 1; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-class-static-block-only",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { static { x = 1; } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-expr-variable",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nconst C = @dec class {};\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-expr-named",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nconst D = @dec class C {};\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-expr-call-argument",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nx(@dec class {});\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-expr-member-decorated",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nconst C = class { @dec m() {} };\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-expr-member-decorated-call",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nx(class { @dec m() {} });\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ne-property-assignment",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nconst v = { a: @dec class {} };\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ne-binding-element",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nconst { a = @dec class {} } = o;\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ne-parameter",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nfunction f(p = @dec class {}) { return p; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ne-assignment",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nlet y; y = @dec class {};\ny ||= @dec class {};\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ne-export-default-expression",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nexport default (@dec class {});\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ne-shorthand-destructuring",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nlet a1; ({ a1 = @dec class {} } = o);\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ne-array-destructuring",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nlet a1; [a1 = @dec class {}] = arr;\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ne-property-destructuring",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nlet a1; ({ p: a1 = @dec class {} } = o);\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ne-class-field",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass Outer { static f = @dec class {}; g = @dec class {}; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-expr-static-block-ne",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nconst C = @dec class { static x = 1; static { x = this; } };\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-method",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-method-static",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec static m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-method-both",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec m() {} @dec static s() {} @dec(1) n() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-method-async-generator",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec async m() {} @dec *g() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-getter-setter",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec get x() { return 1; } @dec set x(v) {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-getter-setter-static",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec static get x() { return 1; } @dec static set x(v) {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-field",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec x = 1; @dec y; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-field-static",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec static x = 1; @dec static y; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-field-static-class-decorator",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { @dec static x = 1; static y = 2; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-field-mixed-undecorated",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec m() {} a = 1; b = 2; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-field-mixed-static",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec static m() {} static a = 1; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-accessor",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec accessor x = 1; @dec static accessor y; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-accessor-undecorated",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { accessor x = 1; @dec m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-member-names",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec \"a b\"() {} @dec \"ab\"() {} @dec 1() {} @dec [\"c\"]() {} @dec [2]() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-member-computed",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec [k()]() {} @dec [x] = 1; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-member-computed-undecorated",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { [k()] = 1; @dec m() {} [x + 1]() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-member-computed-pending",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec a = 1; [k()] = 2; @dec [x()]() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-member-computed-static-block",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec m() {} static { x = 1; } [k()] = 1; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-member-multiple-decorators",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec @dec(1) @o.d m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-member-comments",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C {\n  /** doc */\n  @dec m() {}\n  // field\n  @dec x = 1;\n}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-private-method",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec #m() {} m2() { this.#m(); } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-private-method-static",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec static #m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-private-method-async",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec async #m() { await 1; } @dec *#g() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-private-getter-setter",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec get #x() { return 1; } @dec set #x(v) {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-private-field",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec #x = 1; @dec static #y; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-private-accessor",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec accessor #x = 1; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-private-accessor-static",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec static accessor #x = 1; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-private-accessor-class-decorated",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { @dec accessor #x = 1; static #y = 2; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ctor-existing",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { constructor() { x = 1; } @dec m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ctor-super",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C extends Base { constructor() { x = 0; super(); x = 1; } @dec m() {} }\ndeclare class Base {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ctor-super-try",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C extends Base { constructor() { try { super(); x = 1; } catch (e) { x = e; } finally { x = 2; } } @dec m() {} }\ndeclare class Base {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ctor-prologue",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { constructor() { \"use strict\"; x = 1; } @dec m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ctor-synthetic-derived",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C extends Base { @dec m() {} }\ndeclare class Base {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ctor-field-piggyback",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { constructor() {} @dec m() {} y = 1; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ctor-param-decorated-class",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { constructor(p = @dec class {}) {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-super-property",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends Base { static a = super.x; static b = super[k]; }\ndeclare class Base { static x: any; static m(): any; static t: any; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-super-call",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends Base { static a = super.m(1, 2); static b = super.t`s`; }\ndeclare class Base { static x: any; static m(): any; static t: any; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-super-assign",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends Base { static { super.x = 1; x = super.x = 2; super[k] = 3; } }\ndeclare class Base { static x: any; static m(): any; static t: any; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-super-compound",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends Base { static { super.x += 1; x = (super[k()] *= 2); super[\"y\"] -= 1; } }\ndeclare class Base { static x: any; static m(): any; static t: any; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-super-increment",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends Base { static { super.x++; ++super.x; x = super.x--; x = --super[k()]; (super.x++); } }\ndeclare class Base { static x: any; static m(): any; static t: any; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-super-comma-for",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends Base { static { for (super.x++, x = 0; x; super.x++, x--) {} super.x++, super.x++; } }\ndeclare class Base { static x: any; static m(): any; static t: any; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-super-destructuring",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends Base { static { [super.x, ...super[k]] = arr; ({ a: super.x, b: { c: super.y } = o, ...super.z } = o); } }\ndeclare class Base { static x: any; static m(): any; static t: any; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-super-no-class-decorator",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C extends Base { @dec static a = super.x; @dec m() { return super.m(); } }\ndeclare class Base { static x: any; static m(): any; static t: any; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-this-in-decorator",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass Outer { m() { return class { @dec(this) x = 1; @dec(() => this) y; }; } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-this-in-computed-name",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass Outer { m() { return class { @dec [this.k]() {} }; } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-this-static-field-class-decorated",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { @dec static a = this; static b = () => this; static c = function () { return this; }; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-nested-in-method",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass Outer { m() { @dec class Inner {} return Inner; } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-nested-object-method",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nconst v = { m() { return @dec class {}; }, get g() { return class { @dec x; }; } };\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-nested-class-in-member",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class Outer { @dec m() { return @dec class Inner { @dec n() {} }; } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-nested-function",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nfunction f() { return @dec class {}; }\nconst g = function () { return class { @dec m() {} }; };\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-declare-field-panic",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec x; declare y: number; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-static-block-pending-static",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec static m() {} static { x = 1; } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-static-field-pending-no-initializer",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec static m() {} static y; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-member-computed-parenthesized",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec a = 1; [(k(), x)]() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ctor-without-class-info",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass D { constructor() { const c = @dec class {}; } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-ctor-overload",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { constructor(); constructor(p?: any) { x = p; } @dec m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-super-array-destructuring",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends Base { static { [, super.x, [super.y], ...[super[k]]] = arr; } }\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-super-static-method-untouched",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends Base { static m() { return super.m() + this.x; } }\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-super-decorator-binding",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C extends Base { @(super.d) x = 1; @super.d y = 2; }\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-this-in-function-decorator",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass Outer { m() { return class { @dec(function () { return this; }) x = 1; }; } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-nested-function-depth",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nfunction f() { function g() { return @dec class {}; } return g; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-private-static-method-class-decorated",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C { @dec static #m() {} static n() { return C.#m(); } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-export-abstract",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nexport @dec abstract class C {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-es2015-members",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec m() {} @dec x = 1; @dec static accessor y = 2; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-es2015-private",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec #m() {} @dec accessor #a = 1; @dec get #g() { return 1; } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-es2015-class-super",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends Base { static a = super.x; static { super.x++; } }\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-es2015-ctor",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C extends Base { constructor() { super(); } @dec m() {} y = 1; }\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-es2015-expression-ne",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nconst C = @dec class { static x = this; };\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-es2015-export-default",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nexport default @dec class { @dec m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-esnext-members",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\nclass C { @dec x = 1; @dec static accessor y; @dec m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "esdecorator-esnext-class-super",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\n@dec class C extends Base { static { super.x = 1; } }\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  }
+ ]
+}
