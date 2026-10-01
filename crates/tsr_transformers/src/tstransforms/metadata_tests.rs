@@ -166,7 +166,7 @@ fn transform(text: &str, target: ScriptTarget, legacy: bool, kinds: &[Kind]) -> 
         },
         &context,
     )
-    .write(factory.view(), file, Some(file), &mut writer)
+    .write(factory.view(), file, Some(file), &mut writer, None)
     .expect("printed");
     String::from_utf8(writer.text().to_vec()).expect("UTF-8")
 }

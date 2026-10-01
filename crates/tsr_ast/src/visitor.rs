@@ -42,12 +42,6 @@ pub trait RuntimeFactory: Factory {
     fn set_list_modifier_flags(&mut self, id: NodeListId, flags: u32) {
         self.mutable_list(id).set_modifier_flags(flags);
     }
-    /// A syntax view over this factory's nodes, parsed and synthesized, for
-    /// the `ast` predicates a transformer shares with the checker. `None` for
-    /// a factory that has none.
-    fn ast_view(&self) -> Option<AstView<'_>> {
-        None
-    }
     fn clone_source(&mut self, original: NodeId) -> NodeId;
     fn update_source(
         &mut self,
@@ -55,12 +49,6 @@ pub trait RuntimeFactory: Factory {
         statements: Option<NodeListId>,
         eof: Option<NodeId>,
     ) -> NodeId;
-    /// The parsed view of the factory's storage, for the AST predicates a
-    /// transformer asks of the nodes it visits. `None` for a factory with no
-    /// complete storage (a lazy JSDoc transaction).
-    fn ast_view(&self) -> Option<AstView<'_>> {
-        None
-    }
 
     // port: tsc/internal/ast/ast.go:NodeList.Clone
     fn clone_list_header(&mut self, original: NodeListId) -> NodeListId {
@@ -192,9 +180,6 @@ impl RuntimeFactory for AstBuilder {
         eof: Option<NodeId>,
     ) -> NodeId {
         self.update_source_file(original, statements, eof)
-    }
-    fn ast_view(&self) -> Option<AstView<'_>> {
-        Some(self.view())
     }
 }
 impl RuntimeFactory for AstTransaction<'_, '_> {
