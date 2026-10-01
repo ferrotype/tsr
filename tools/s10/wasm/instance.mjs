@@ -70,6 +70,25 @@ export function createInstance(createBindings, module) {
         }
         return object.use(raw => raw.type_at_position(path, position));
       },
+      emit(request = {}) {
+        // Byte paths travel as JSON byte arrays; Rust validates every field.
+        if (request === null || typeof request !== "object" || Array.isArray(request)) {
+          throw new TypeError("emit request must be an object");
+        }
+        const { files, ...rest } = request;
+        if (files !== undefined && files !== null &&
+            (!Array.isArray(files) || !files.every(file => file instanceof Uint8Array))) {
+          throw new TypeError("emit files must be an array of byte paths");
+        }
+        const json = JSON.stringify(files == null ? rest : { ...rest, files: files.map(file => Array.from(file)) });
+        if (json === undefined) throw new TypeError("emit request must be JSON");
+        const result = JSON.parse(new TextDecoder().decode(object.use(raw => raw.emit(json))));
+        for (const file of result.files) {
+          file.name = Uint8Array.from(file.name);
+          file.text = Uint8Array.from(file.text);
+        }
+        return result;
+      },
       retire: () => object.use(raw => raw.retire()),
       dispose: () => object.dispose(),
     });

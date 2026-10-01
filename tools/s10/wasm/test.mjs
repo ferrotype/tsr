@@ -67,6 +67,28 @@ if (mode !== "parser") {
   assert.throws(() => serialHost.compile(cycle), TypeError);
   serialHost.addDirectory(bytes("/still-live"));
   serialHost.dispose();
+  const decode = value => new TextDecoder().decode(value);
+  const emitHost = checker.createHost(bytes("/"));
+  emitHost.addFile(bytes("/src/a.ts"), bytes("export const value: number = 1;\n"), true);
+  const emitting = emitHost.compile({ declaration: true, module: 99, target: 9 });
+  const emitted = emitting.emit();
+  assert.equal(emitted.emit_skipped, false);
+  assert.deepEqual(emitted.diagnostics, []);
+  assert.deepEqual(emitted.files.map(file => decode(file.name)), ["/src/a.js", "/src/a.d.ts"]);
+  assert.equal(decode(emitted.files[0].text), "export const value = 1;\n");
+  assert.equal(decode(emitted.files[1].text), "export declare const value: number;\n");
+  const declarations = emitting.emit({ files: [bytes("/src/a.ts")], emitOnly: 2 });
+  assert.deepEqual(declarations.files.map(file => decode(file.name)), ["/src/a.d.ts"]);
+  for (const request of [{ emitOnly: 3 }, { forceEmit: 1 }, { unknown: true }, { files: [bytes("/missing.ts")] }]) {
+    assert.throws(() => emitting.emit(request), WasmApiError);
+    assert.equal(checker.state, "live");
+  }
+  assert.throws(() => emitting.emit({ files: ["/src/a.ts"] }), TypeError);
+  assert.equal(decode(emitting.emit().files[0].text), "export const value = 1;\n");
+  emitting.retire();
+  assert.throws(() => emitting.emit(), WasmApiError);
+  assert.equal(checker.state, "live");
+  emitting.dispose();
   session.retire();
   assert.throws(() => session.diagnostics(), WasmApiError);
   assert.equal(checker.state, "live");
