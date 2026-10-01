@@ -29,6 +29,11 @@ tsr_printer = { version = "0.1.0", path = "../../../crates/tsr_printer" }
 tsr_nodebuilder = { version = "0.1.0", path = "../../../crates/tsr_nodebuilder" }
 tsr_module = { version = "0.1.0", path = "../../../crates/tsr_module" }
 tsr_scanner = { version = "0.1.0", path = "../../../crates/tsr_scanner" }
+# The shared executor serves the harness's in-process content mappers.
+tsr_contentmapper = { version = "0.1.0", path = "../../../crates/tsr_contentmapper" }
+tsr_contentmappertest = { path = "../../../crates/tsr_contentmappertest" }
+tsr_ipc = { version = "0.1.0", path = "../../../crates/tsr_ipc" }
+tsr_locale = { version = "0.1.0", path = "../../../crates/tsr_locale" }
 
 [lints]
 workspace = true

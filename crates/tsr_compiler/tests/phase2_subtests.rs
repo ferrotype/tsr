@@ -146,6 +146,63 @@ fn union_ordering_on_a_checked_program() {
     assert!(observed["unions"].as_u64().unwrap() >= 3, "{observed}");
 }
 
+/// The negative witness of the union-ordering sub-test: the production check
+/// over a real checker, sorting with a comparator that reverses the stored
+/// order, reports every one of its eleven checks per union.
+#[test]
+fn union_ordering_reports_a_reversed_comparator_on_every_check() {
+    let program = program(
+        &[(
+            "/a.ts",
+            "declare let a: string | number | undefined;\n\
+             declare let b: \"x\" | \"y\" | 1 | true;\n",
+        )],
+        options(),
+    );
+    let owner = checker(&program);
+    let mut op = owner.operation().unwrap();
+    op.semantic_diagnostics(program.file(b"/a.ts").unwrap().source())
+        .unwrap();
+    let observed = subtests::union_ordering_checkers_by(&[&op], &mut |op, a, b| {
+        op.compare_type_order(Some(b), Some(a))
+    });
+    assert_eq!(observed["state"], "executed");
+    let unions = observed["unions"].as_u64().unwrap();
+    assert!(unions >= 2, "{observed}");
+    assert_eq!(observed["inconsistent"], unions * 11, "{observed}");
+    assert_eq!(subtests::union_ordering(&op)["inconsistent"], 0);
+}
+
+/// The negative witness of the parent-pointer sub-test: the production walk
+/// over a real program, reading one identifier's parent as the source file,
+/// stops there and names the node.
+#[test]
+fn parent_walk_reports_a_wrong_parent_with_its_node() {
+    let program = program(&[("/a.ts", "export const value = [1, 2];\n")], options());
+    let file = program.file(b"/a.ts").unwrap();
+    let root = file.source();
+    let observed = subtests::parent_pointers_with(&program, &|view, node| {
+        let read = view.node(node)?;
+        Ok(if read.kind() == tsr_ast::SyntaxKind::Identifier {
+            Some(root)
+        } else {
+            read.parent()
+        })
+    });
+    assert_eq!(
+        observed["failure"],
+        "parent node does not match traversed parent: KindIdentifier"
+    );
+    assert_eq!(
+        observed["node"],
+        serde_json::json!({"kind":"KindIdentifier","file":"/a.ts","pos":12,"end":18})
+    );
+    assert_eq!(
+        subtests::parent_pointers(&program)["failure"],
+        serde_json::Value::Null
+    );
+}
+
 #[test]
 fn parent_walk_includes_user_declarations_and_skips_default_libraries() {
     let program = program(

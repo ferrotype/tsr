@@ -301,6 +301,86 @@ pub fn render(
     Ok(json!({"state":"content","text_hex":hex}))
 }
 
+/// The content-mapped files' baseline: each file's original and transformed
+/// text, then their diagnostics through the pretty writer with its colors
+/// removed, which renders each against the text its span maps to. `None`
+/// when the program has no content-mapped files.
+/// Harness port: tsc/internal/testutil/tsbaseline/contentmapper_baseline.go:getContentMapperBaseline.
+#[allow(dead_code)]
+pub fn content_mapper(program: &Program, diagnostics: &[Diagnostic]) -> Result<Option<Vec<u8>>> {
+    let mut mapped = Vec::new();
+    let mut out = Vec::new();
+    for file in program.files() {
+        let source = file.bound().view().source_file()?;
+        let Some(mapper) = program.content_mapper(&source) else {
+            continue;
+        };
+        mapped.push(file.source());
+        let extensions: Vec<&[u8]> = mapper
+            .extensions
+            .iter()
+            .map(tsr_jsstring::JsString::as_bytes)
+            .collect();
+        out.extend_from_slice(b"//// [");
+        out.extend_from_slice(&remove_prefixes(source.file_name()));
+        out.extend_from_slice(
+            format!("] (ScriptKind: {}, ContentMapper: [", source.script_kind).as_bytes(),
+        );
+        out.extend_from_slice(&extensions.join(b" ".as_slice()));
+        out.extend_from_slice(b"])\n--- Original ---\n");
+        trailing_new_line(&mut out, source.original_text());
+        out.extend_from_slice(b"--- Transformed ---\n");
+        trailing_new_line(&mut out, source.text().as_bytes());
+        out.push(b'\n');
+    }
+    if mapped.is_empty() {
+        return Ok(None);
+    }
+    let file_diagnostics: Vec<&Diagnostic> = diagnostics
+        .iter()
+        .filter(|d| d.file.is_some_and(|file| mapped.contains(&file)))
+        .collect();
+    out.extend_from_slice(b"=== Diagnostics ===\n\n");
+    if file_diagnostics.is_empty() {
+        out.extend_from_slice(b"<no content>\n");
+        return Ok(Some(out));
+    }
+    let mut writer = DiagnosticWriter::new(program, FormattingOptions::default());
+    let rendered = writer.format(&file_diagnostics, true)?;
+    out.extend_from_slice(&remove_prefixes(&without_ansi_escapes(&rendered)));
+    Ok(Some(out))
+}
+
+#[allow(dead_code)]
+fn trailing_new_line(out: &mut Vec<u8>, text: &[u8]) {
+    out.extend_from_slice(text);
+    if !text.is_empty() && !text.ends_with(b"\n") {
+        out.push(b'\n');
+    }
+}
+
+/// The pin's `\x1b\[[0-9;]*m` removed.
+#[allow(dead_code)]
+fn without_ansi_escapes(bytes: &[u8]) -> Vec<u8> {
+    let mut out = Vec::with_capacity(bytes.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i..].starts_with(b"\x1b[") {
+            let digits = bytes[i + 2..]
+                .iter()
+                .take_while(|&&b| b.is_ascii_digit() || b == b';')
+                .count();
+            if bytes.get(i + 2 + digits) == Some(&b'm') {
+                i += digits + 3;
+                continue;
+            }
+        }
+        out.push(bytes[i]);
+        i += 1;
+    }
+    out
+}
+
 pub fn hex(bytes: &[u8]) -> String {
     const DIGITS: &[u8; 16] = b"0123456789abcdef";
     bytes

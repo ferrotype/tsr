@@ -114,6 +114,10 @@ def run(output):
         if 'source' in p and (p['name'], p['version'], p['source'], p.get('checksum')) not in locked:
             raise ValueError('external dependency changed during packaging: ' + p['name'])
     target = output / 'build'
+    # Extracted archives keep the packaged files' modification times, which
+    # can predate an earlier run's artifacts, so Cargo would reuse stale
+    # builds of changed packages. Every verification builds from scratch.
+    shutil.rmtree(target, ignore_errors=True)
     command(['cargo', 'build', '--locked', '--offline', '--workspace', '--all-features', '--target-dir', str(target),
              '--message-format=json'], isolated, 'native.log')
     executable = consumer_executable(output / 'native.log', consumer / 'Cargo.toml')

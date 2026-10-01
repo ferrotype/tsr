@@ -97,16 +97,22 @@ impl Context {
             && self.environment == other.environment
     }
     pub fn capture(root: &Path, pin: &str) -> Result<Self> {
-        Self::capture_sources(root, pin, &default_sources())
+        Self::capture_sources(root, pin, &default_sources(), &[])
     }
     fn capture_run(root: &Path, pin: &str, spec: &RunSpec) -> Result<Self> {
-        Self::capture_sources(root, pin, &spec.sources)
+        Self::capture_sources(root, pin, &spec.sources, &spec.exclude)
     }
-    fn capture_sources(root: &Path, pin: &str, sources: &[String]) -> Result<Self> {
+    fn capture_sources(
+        root: &Path,
+        pin: &str,
+        sources: &[String],
+        exclude: &[String],
+    ) -> Result<Self> {
         Self::capture_sources_with_identity(
             root,
             pin,
             sources,
+            exclude,
             &current_host(),
             &current_toolchain()?,
         )
@@ -115,6 +121,7 @@ impl Context {
         root: &Path,
         pin: &str,
         sources: &[String],
+        exclude: &[String],
         host: &str,
         toolchain: &str,
     ) -> Result<Self> {
@@ -124,7 +131,13 @@ impl Context {
             .to_string();
         // Git's glob pathspecs include tracked deletions and nonignored additions.
         // Positive declarations omit docs/policy by default, but can opt them in.
-        let patterns: Vec<String> = sources.iter().map(|p| format!(":(top,glob){p}")).collect();
+        // Exclusions take paths back out of the positive set, for example test-only
+        // suites that a run's executables never build.
+        let patterns: Vec<String> = sources
+            .iter()
+            .map(|p| format!(":(top,glob){p}"))
+            .chain(exclude.iter().map(|p| format!(":(top,glob,exclude){p}")))
+            .collect();
         let mut args = vec![
             "ls-files",
             "--cached",
@@ -324,6 +337,10 @@ pub struct RunSpec {
     inputs: Vec<String>,
     #[serde(default = "default_sources")]
     sources: Vec<String>,
+    // Omitted from the serialized spec when empty, so declaring no exclusions
+    // leaves a run's spec digest unchanged.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    exclude: Vec<String>,
     target: String,
     config: String,
     #[serde(default)]
@@ -361,6 +378,7 @@ pub fn specs(root: &Path) -> Result<BTreeMap<String, RunSpec>> {
             || s.inputs.is_empty()
             || s.sources.is_empty()
             || s.sources.iter().any(|p| !valid_source_pattern(p))
+            || s.exclude.iter().any(|p| !valid_source_pattern(p))
         {
             return Err(format!("invalid run declaration: {id}"));
         }
@@ -490,11 +508,13 @@ where
     }
     deserializer.deserialize_map(Visitor(std::marker::PhantomData))
 }
-fn report_metrics(root: &Path, spec: &RunSpec, stdout: &str) -> Result<BTreeMap<String, Metric>> {
-    let report: ProducerReport = serde_json::from_str(stdout)
+/// The metrics a producer reported, and its per-test results for the caller to
+/// check against a cases manifest.
+fn producer_metrics(stdout: &str) -> Result<(BTreeMap<String, Metric>, ProducerReport)> {
+    let mut report: ProducerReport = serde_json::from_str(stdout)
         .map_err(|e| format!("producer must write one JSON report: {e}"))?;
     let mut metrics = BTreeMap::new();
-    for (name, value) in report.metrics {
+    for (name, value) in std::mem::take(&mut report.metrics) {
         if !valid_id(&name) {
             return Err(format!("invalid metric name: {name}"));
         }
@@ -507,6 +527,34 @@ fn report_metrics(root: &Path, spec: &RunSpec, stdout: &str) -> Result<BTreeMap<
         };
         metrics.insert(name, metric);
     }
+    Ok((metrics, report))
+}
+/// The producer metrics of one recorded artifact of `run`, named by its evidence
+/// id (the artifact's SHA-256). A recorded fact does not go stale: it certifies
+/// what the run reported when `xtask run` recorded it, so only the artifact's
+/// identity and success are checked here, never today's sources.
+pub fn recorded_metrics(root: &Path, run: &str, id: &str) -> Result<BTreeMap<String, Metric>> {
+    if !valid_id(run)
+        || id.len() != 64
+        || !id.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
+    {
+        return Err(format!("invalid recorded evidence reference: {run} {id}"));
+    }
+    let bytes = read(&root.join(format!("status/evidence/{id}.json")))?;
+    if hash(&bytes) != id {
+        return Err("artifact checksum mismatch".into());
+    }
+    let r: Record = serde_json::from_slice(&bytes).map_err(|e| e.to_string())?;
+    if r.schema_version != 1 || r.run_id != run {
+        return Err("record identity/version mismatch".into());
+    }
+    if r.exit_code != 0 || !r.valid_capture || r.stdout_sha256 != hash(r.stdout.as_bytes()) {
+        return Err("failed producer/capture".into());
+    }
+    Ok(producer_metrics(&r.stdout)?.0)
+}
+fn report_metrics(root: &Path, spec: &RunSpec, stdout: &str) -> Result<BTreeMap<String, Metric>> {
+    let (mut metrics, report) = producer_metrics(stdout)?;
     if let Some(path) = &spec.cases {
         let cases: Vec<String> =
             serde_json::from_slice(&read(&root.join(path))?).map_err(|e| e.to_string())?;
@@ -684,6 +732,7 @@ fn load_in_environment(
                 root,
                 &context.upstream_pin,
                 &spec.sources,
+                &spec.exclude,
                 &context.host,
                 &context.toolchain,
             )?;

@@ -114,7 +114,11 @@ def native_inputs():
 
 def rust_inputs():
     import phase2_corpus
+    # The example includes the order program from the C2 test support, which the
+    # corpus source set leaves to the contract receipts.
+    program = "crates/tsr_compiler/tests/support/c2_order_program.rs"
     return phase2_corpus.sources() | native_inputs() | {
+        program: digest((ROOT / program).read_bytes()),
         "data/phase2/c2-order-traces.json": digest((ROOT / "data/phase2/c2-order-traces.json").read_bytes()),
         "scripts/s07_benchmark.py": digest((ROOT / "scripts/s07_benchmark.py").read_bytes()),
     }

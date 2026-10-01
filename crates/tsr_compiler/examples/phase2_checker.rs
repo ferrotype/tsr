@@ -57,7 +57,13 @@ impl executor::Hooks for Phase2 {
         cache: &mut FileCache,
         counters: &tsr_arena::Counters,
     ) -> Result<Arc<Program>, tsr_compiler::Error> {
-        let program = Program::load(options, cache, counters).map(Arc::new)?;
+        let program = Program::load_with_content_mapper_project(
+            options,
+            executor::content_mapper_project(),
+            cache,
+            counters,
+        )
+        .map(Arc::new)?;
         self.program = Some(program.clone());
         Ok(program)
     }

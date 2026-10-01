@@ -25,7 +25,7 @@ class Wiring(unittest.TestCase):
             self.assertIn(str(path.relative_to(ROOT)), spec["inputs"])
         self.assertIn("data/phase2/native-provenance-concurrent.json", spec["inputs"])
         self.assertIn("C6", blockers.CHECKPOINT_CLAIMS)
-        self.assertEqual(producers.CHECKPOINTS[-1], "C6")
+        self.assertIn("C6", producers.CHECKPOINTS)
         document = audit.load(ROOT / "data/phase2/c6-audit.json")
         self.assertEqual(document["checkpoint"], "C6")
         self.assertEqual(audit.problems(document, allow_open=True), [])
@@ -58,8 +58,13 @@ class NativeModes(unittest.TestCase):
         claims = json.loads((ROOT / "data/phase2/c6-claims.json").read_text())
         modes = claims["native_modes"]
         self.assertEqual(modes["differences"], [])
-        self.assertEqual(modes["concurrent"]["capture_observation_sha256"], provenance["observation_sha256"])
-        self.assertEqual(modes["single"]["capture_observation_sha256"], single["observation_sha256"])
+        # The claims bind the captures of the recorded C6 exit. C7.8.0's ledger
+        # move retook both with identical row digests (raw type ids differ), so
+        # the claims are C6's history, as the C1 to C5 baselines became C6's.
+        self.assertEqual(modes["concurrent"]["capture_observation_sha256"],
+                         "1d913ba6ad26682def61fb26b09b19c1d8f218ef4702803335188e788b51c848")
+        self.assertEqual(modes["single"]["capture_observation_sha256"],
+                         "2859fdb25a721980db34b2a182bdb630193d06463b599fdd4a155caeb64d7edb")
         self.assertEqual(claims["rows"], [])
 
     def test_a_single_threaded_report_is_not_a_concurrent_capture(self):

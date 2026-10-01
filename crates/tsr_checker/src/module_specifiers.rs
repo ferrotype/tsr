@@ -372,6 +372,7 @@ impl Generation<'_> {
     }
 }
 
+// port: tsc/internal/modulespecifiers/specifiers.go:ContainsNodeModules
 pub(super) fn contains_node_modules(path: &[u8]) -> bool {
     path.windows(14).any(|part| part == b"/node_modules/")
 }

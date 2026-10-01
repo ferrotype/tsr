@@ -48,7 +48,7 @@ pub(crate) fn load(
     Ok(result)
 }
 /// port: tsc/internal/ast/utilities.go:GetImpliedNodeFormatForFile
-fn implied_node_format_for_file(path: &[u8], package_json_type: &[u8]) -> ModuleKind {
+pub(crate) fn implied_node_format_for_file(path: &[u8], package_json_type: &[u8]) -> ModuleKind {
     if has_suffix(path, &[b".d.mts", b".mts", b".mjs"]) {
         ModuleKind::ESNEXT
     } else if has_suffix(path, &[b".d.cts", b".cts", b".cjs"]) {

@@ -14,6 +14,7 @@ pub use checker_pool::{
     CheckerAssociationPlan, CheckerAssociationPolicy, CompilerCheckerPool,
 };
 mod checker_module_specifiers;
+mod content_mapped;
 mod declaration_diagnostics;
 pub mod diagnostic_writer;
 mod include_reason;

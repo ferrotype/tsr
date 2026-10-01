@@ -361,7 +361,12 @@ fn record_source_file(
     let lib_refs =
         structured::references(&state.lib_reference_directives()?, positions, structured);
     let original_positions = PositionMap::new(state.original_text());
-    let spans = structured::spans(state.span_map(), positions, &original_positions, structured);
+    let spans = structured::spans(
+        state.span_map().map(tsr_ast::span_map::SpanMap::segments),
+        positions,
+        &original_positions,
+        structured,
+    );
     let supplemental = state
         .supplemental_source_files()?
         .iter()
@@ -371,17 +376,34 @@ fn record_source_file(
             )
         })
         .collect::<Result<Vec<_>, _>>()?;
-    let supplements = structured::strings(
-        supplemental.iter().map(tsr_ast::SourceFileRead::file_name),
-        structured,
-    );
+    // A program parses each file into its own arena, so its mapped files are
+    // linked by file name where one arena links them by node; the pin encodes
+    // the linked files' names either way.
+    let supplements = if supplemental.is_empty() {
+        structured::strings(
+            state
+                .supplemental_file_names()
+                .iter()
+                .map(tsr_ast::JsString::as_bytes),
+            structured,
+        )
+    } else {
+        structured::strings(
+            supplemental.iter().map(tsr_ast::SourceFileRead::file_name),
+            structured,
+        )
+    };
     let canonical = state
         .canonical_source_file()
         .map(|id| view.source_file(id))
         .transpose()?;
-    let canonical = canonical.map_or(structured::NONE, |file| {
-        strings.add(file.file_name(), NodeKind::default(), 0, 0)
-    });
+    let canonical = canonical
+        .as_ref()
+        .map(tsr_ast::SourceFileRead::file_name)
+        .or_else(|| state.canonical_file_name().map(tsr_ast::JsString::as_bytes))
+        .map_or(structured::NONE, |name| {
+            strings.add(name, NodeKind::default(), 0, 0)
+        });
     let mapper = if state.content_mapper().is_empty() {
         structured::NONE
     } else {

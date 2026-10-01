@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "run_id": "config",
+  "recorded_at": 1790814794,
+  "context": {
+    "revision": "bcab181d8e7c6af7a8d8c77b42a09e8214197e63",
+    "source_sha256": "461547d9cf0e163c0ecca15f3b92b17d14938c217d08fc53db8936b9c0ef86a9",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "c6cb9baa4f2287b616efd305fffaae43f41309175be4fbd9c3bbd42ba97ab399",
+  "inputs": {
+    ".gitmodules": "7f9e8e0a446a547c56d8444637b3ee73064ce52055bc3c983c05eb13f4331bdd",
+    "data/phase1/config-cases.json": "d24cecbd82ebadacadf5fbfef829d5bfef339c0d56cf38e088f7ba3ab1db6df9",
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/upstream.json": "f10e50133daec561a20b528a0577dea937ce3163aa826ba212826957c86910fc"
+  },
+  "command": [
+    "python3",
+    "scripts/phase1_producers.py",
+    "config"
+  ],
+  "target": "host",
+  "config": "Phase 1 exact 309 config/options output identities (142 matchFiles + 87 tsconfigParsing + 53 parseCommandLine + 27 parseBuildOptions), complete invocation mapping and separately required supplementary direct package/config/resolution cases; approved divergences retain raw observations",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "Phase 1 producer failed: harness invalid: coverage report differs from current complete inputs\n",
+  "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_sha256": "870eb8d04d046c7e7fb70593e9c7a1ebcc0bc7047853f98ad4e1b0a5ff092823",
+  "valid_capture": false
+}

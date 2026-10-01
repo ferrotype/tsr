@@ -67,13 +67,21 @@ SOURCE_PATTERNS = ("tools/phase2/**/*.rs", "tools/s08/p5/**/*", "rust-toolchain.
                    "xtask/**/*", "tools/s03/**/*", "scripts/generate_locale_tables.py")
 
 
+def test_only(path):
+    """A crate's integration suites and fixtures (`crates/<crate>/tests/**`): no
+    corpus executable builds them, so they stay with the contract receipts that
+    run them (docs/PHASE2-C7-plan.md decision 8)."""
+    parts = path.split("/")
+    return len(parts) > 3 and parts[0] == "crates" and parts[2] == "tests"
+
+
 def sources():
     result = p4.sources()
     for pattern in SOURCE_PATTERNS:
         for path in ROOT.glob(pattern):
             if path.is_file() and not ({"target", "__pycache__"} & set(path.relative_to(ROOT).parts)) and path.name != ".DS_Store":
                 result[str(path.relative_to(ROOT))] = digest(path.read_bytes())
-    return dict(sorted(result.items()))
+    return dict(sorted((path, value) for path, value in result.items() if not test_only(path)))
 
 
 def loading_requests():
@@ -292,7 +300,21 @@ def pre_emit_view(request, row):
             if (errors.get("class") != "unsupported" or type(counts) is not list or len(counts) != 2
                     or counts[0] == counts[1]):
                 raise ValueError("malformed pre/post-emit count failure")
-    view = {key: value for key, value in errors.items() if key not in ("pre_diagnostics", "counts")}
+    if "render_diagnostics" in errors:
+        # The rendered selection without content-mapped files' diagnostics.
+        p5.diagnostics(errors["render_diagnostics"])
+    if "content_mapper" in errors:
+        # The content-mapped files' own baseline, which the C7 contracts
+        # compare with the pin's reference; the native capture has none.
+        mapped = errors["content_mapper"]
+        if ("render_diagnostics" not in errors or not isinstance(mapped, dict) or set(mapped) != {"text_hex"}
+                or not isinstance(mapped["text_hex"], str)):
+            raise ValueError("malformed content-mapper baseline")
+    view = {key: value for key, value in errors.items()
+            if key not in ("pre_diagnostics", "counts", "render_diagnostics", "content_mapper")}
+    if "render_diagnostics" in errors:
+        # The baseline renders the selection, so its content answers to it.
+        view["diagnostics"] = errors["render_diagnostics"]
     return dict(row, error_baseline=dict(view, emit="not_executed"))
 
 

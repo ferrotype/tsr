@@ -305,6 +305,39 @@ fn scan_markers(root: &Path) -> Vec<String> {
 
 // ---------------------------------------------------------------- checks
 
+/// `recorded.<run>.<evidence id>.<metric>`: a metric of one recorded artifact.
+fn recorded_reference(key: &str) -> Option<(&str, &str, &str)> {
+    let mut parts = key.strip_prefix("recorded.")?.splitn(3, '.');
+    Some((parts.next()?, parts.next()?, parts.next()?))
+}
+
+/// Recorded conditions read the committed artifact they name, so an item can
+/// close on the run recorded at its checkpoint's exit after later sources stale
+/// that run. A missing, altered or failed artifact leaves the metric unknown.
+fn insert_recorded_metrics(root: &Path, sprints: &[Sprint], metrics: &mut Metrics) {
+    let mut artifacts: BTreeMap<(String, String), Option<Metrics>> = BTreeMap::new();
+    for sprint in sprints {
+        for check in sprint
+            .exit
+            .iter()
+            .chain(sprint.item.iter().flat_map(|item| &item.done_when))
+        {
+            let Some(key) = check.split_whitespace().next() else {
+                continue;
+            };
+            let Some((run, id, metric)) = recorded_reference(key) else {
+                continue;
+            };
+            let recorded = artifacts
+                .entry((run.to_owned(), id.to_owned()))
+                .or_insert_with(|| evidence::recorded_metrics(root, run, id).ok());
+            if let Some(value) = recorded.as_ref().and_then(|m| m.get(metric)) {
+                metrics.insert(key.to_owned(), value.clone());
+            }
+        }
+    }
+}
+
 fn parse_number(s: &str) -> Option<f64> {
     s.parse::<f64>().ok().filter(|n| n.is_finite())
 }
@@ -593,6 +626,11 @@ fn build_report_in_context(root: &Path, archived: Option<&ViewMetadata>) -> Repo
             }
         }
     }
+    // A marker is unknown only when it names no inventory function; one that
+    // names a function in a harness or other uncounted file is valid but not
+    // counted.
+    let inventory_keys: std::collections::HashSet<&str> =
+        inventory.values().flatten().map(String::as_str).collect();
     let mut fn_ported = 0.0;
     let mut per_pkg_ported: BTreeMap<String, f64> = BTreeMap::new();
     let mut ported_keys: std::collections::HashSet<String> = std::collections::HashSet::new();
@@ -609,7 +647,7 @@ fn build_report_in_context(root: &Path, archived: Option<&ViewMetadata>) -> Repo
                     .unwrap_or_default();
                 *per_pkg_ported.entry(pkg).or_insert(0.0) += 1.0;
             }
-        } else {
+        } else if !inventory_keys.contains(m.as_str()) {
             unknown.push(m.clone());
         }
     }
@@ -704,9 +742,11 @@ fn build_report_in_context(root: &Path, archived: Option<&ViewMetadata>) -> Repo
     );
 
     // Sprints (evaluated after all other metrics exist).
+    let sprint_files = read_sprints(root);
+    insert_recorded_metrics(root, &sprint_files, &mut metrics);
     let mut sprints = Vec::new();
     let mut sprint_ids = std::collections::BTreeSet::new();
-    for s in read_sprints(root) {
+    for s in sprint_files {
         if !sprint_ids.insert(s.id.clone()) {
             errors.push(format!("duplicate sprint ID {}", s.id));
         }
@@ -739,11 +779,18 @@ fn build_report_in_context(root: &Path, archived: Option<&ViewMetadata>) -> Repo
                 if it.required && r != Some(true) {
                     done = false;
                 }
-                let label = if it.r#ref.is_empty() {
+                let mut label = if it.r#ref.is_empty() {
                     it.title.clone()
                 } else {
                     format!("{} ({} {})", it.title, it.kind, it.r#ref)
                 };
+                for (run, id, _) in it
+                    .done_when
+                    .iter()
+                    .filter_map(|c| recorded_reference(c.split_whitespace().next()?))
+                {
+                    label.push_str(&format!("; recorded {run} run status/evidence/{id}.json"));
+                }
                 (
                     it.id.clone(),
                     format!("{label}{}", if it.required { "" } else { " [optional]" }),
@@ -1136,8 +1183,60 @@ fn record_history(root: &Path, r: &Report) {
     fs::write(&p, text).unwrap_or_else(|e| die(&format!("history.jsonl: {e}")));
 }
 
+/// The Phase 2 pass-rate dashboard from the C7 record
+/// (`data/phase2/c7-report.json`, written by `scripts/phase2_report.py`);
+/// empty until the record exists.
+fn render_phase2_dashboard(root: &Path) -> String {
+    let Ok(text) = fs::read_to_string(root.join("data/phase2/c7-report.json")) else {
+        return String::new();
+    };
+    let Ok(record) = serde_json::from_str::<serde_json::Value>(&text) else {
+        return String::new();
+    };
+    let dashboard = &record["dashboard"];
+    let rate = |counts: &serde_json::Value| {
+        let rows = counts["rows"].as_f64().unwrap_or(0.0);
+        if rows == 0.0 {
+            0.0
+        } else {
+            counts["matched"].as_f64().unwrap_or(0.0) / rows
+        }
+    };
+    let mut rows = String::new();
+    for group in ["checkpoint", "suite"] {
+        let Some(values) = dashboard["single"]["rates"][group].as_object() else {
+            continue;
+        };
+        for (value, counts) in values {
+            let single = rate(counts);
+            let concurrent = rate(&dashboard["concurrent"]["rates"][group][value]);
+            rows.push_str(&format!(
+                "<tr><td>{}</td><td>{}</td><td class=\"num\">{}</td><td><div class=\"bar\"><div style=\"width:{:.1}%\"></div></div></td><td class=\"num\">{}</td><td class=\"num\">{}</td></tr>\n",
+                escape_html(group),
+                escape_html(value),
+                counts["rows"].as_u64().unwrap_or(0),
+                single * 100.0,
+                pct(single),
+                pct(concurrent)
+            ));
+        }
+    }
+    format!(
+        r#"  <h2>Phase 2 checker parity</h2>
+  <p>Rows matching the pinned checker in every domain, from the C7 record ({single} of {executed} single-threaded, {concurrent} concurrent; {residuals} residuals). <a href="PHASE2-C7.md">Full dashboard</a></p>
+  <table><thead><tr><th>Group</th><th>Value</th><th class="num">Rows</th><th>Single-threaded</th><th class="num"></th><th class="num">Concurrent</th></tr></thead><tbody>
+{rows}</tbody></table>
+"#,
+        single = dashboard["single"]["all_domains_match"],
+        concurrent = dashboard["concurrent"]["all_domains_match"],
+        executed = dashboard["single"]["executed"],
+        residuals = record["residuals"]["count"],
+    )
+}
+
 fn render_dashboard(root: &Path, r: &Report) -> String {
     let m = &r.metrics;
+    let phase2 = render_phase2_dashboard(root);
     let history = fs::read_to_string(root.join("status/history.jsonl")).unwrap_or_default();
     let points: Vec<(String, f64, f64)> = history
         .lines()
@@ -1306,7 +1405,7 @@ fn render_dashboard(root: &Path, r: &Report) -> String {
   <h2>By phase</h2>
   <table><thead><tr><th>Phase</th><th class="num">Files</th><th class="num">Lines</th><th>Verified</th><th class="num"></th></tr></thead><tbody>
 {phase_rows}</tbody></table>
-  <h2>Experiments</h2>
+{phase2}  <h2>Experiments</h2>
   <table><thead><tr><th></th><th>Title</th><th>Threshold</th><th>Measured</th><th>Result</th></tr></thead><tbody>
 {exp_rows}</tbody></table>
   <h2>Evidence</h2>
@@ -1475,6 +1574,16 @@ fn main() -> ExitCode {
             } else {
                 ExitCode::from(1)
             }
+        }
+        // The live evidence state of every declared run, for producers that
+        // gate on other runs; never read from previously generated views.
+        Some("evidence-states") => {
+            let pin = read_ledger(&root).pin;
+            let loaded = evidence::Context::capture(&root, &pin)
+                .and_then(|context| evidence::load(&root, &context))
+                .unwrap_or_else(|e| die(&e));
+            println!("{}", serde_json::to_string(&loaded.states).unwrap());
+            ExitCode::SUCCESS
         }
         Some("run") => {
             let id = args

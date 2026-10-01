@@ -213,7 +213,9 @@ impl Files {
                             features: 0,
                         });
                     }
-                    Ok(tsr_ast::span_map::new(&segments))
+                    Ok(std::sync::Arc::new(tsr_ast::span_map::SpanMap::new(
+                        &segments,
+                    )))
                 })
                 .transpose()?;
             parsed

@@ -108,8 +108,20 @@ impl Diagnostic {
             return Ok(self.message_args.clone());
         }
         let state = view.source_file(file)?;
-        let Some(segment) = alias_for_virtual_span(state.span_map(), self.loc) else {
-            return Ok(self.message_args.clone());
+        Ok(self.display_message_args_in(&state))
+    }
+
+    /// `display_message_args` over the diagnostic's file already read, for a
+    /// caller that holds it (the diagnostic writer).
+    pub fn display_message_args_in(&self, state: &crate::SourceFileState) -> Vec<JsString> {
+        if !self.source.is_empty() {
+            return self.message_args.clone();
+        }
+        let Some(segment) = state
+            .span_map()
+            .and_then(|map| map.alias_for_virtual_span(self.loc))
+        else {
+            return self.message_args.clone();
         };
         let virtual_text = state.text().as_bytes();
         let original_text = state.original_text();
@@ -125,7 +137,7 @@ impl Diagnostic {
             segment.original_end,
             original_text.len(),
         ) {
-            return Ok(self.message_args.clone());
+            return self.message_args.clone();
         }
         let span = |text: &[u8], start: i32, end: i32| -> Vec<u8> {
             text[usize::try_from(start).unwrap_or(0)..usize::try_from(end).unwrap_or(0)].to_vec()
@@ -140,7 +152,7 @@ impl Diagnostic {
             let result = result.get_or_insert_with(|| self.message_args.clone());
             result[index] = JsString::from_bytes(original_name.as_slice());
         }
-        Ok(result.unwrap_or_else(|| self.message_args.clone()))
+        result.unwrap_or_else(|| self.message_args.clone())
     }
 
     /// port: tsc/internal/ast/diagnostic.go:Diagnostic.Localize
@@ -176,28 +188,6 @@ impl Diagnostic {
             }
         })
     }
-}
-
-/// Go's `SpanMap.AliasForVirtualSpan`: the alias segment spanning exactly
-/// `loc`, if any.
-fn alias_for_virtual_span(
-    segments: Option<&[crate::SpanSegment]>,
-    loc: TextRange,
-) -> Option<crate::SpanSegment> {
-    /// Go's `spanmap.KindAlias`.
-    const KIND_ALIAS: i32 = 2;
-    let segments = segments?;
-    // Go converts the position to a TextPos (int32).
-    #[allow(clippy::cast_possible_truncation)]
-    let (index, inside) = crate::span_map::segment_at(segments, loc.pos() as i32);
-    if !inside {
-        return None;
-    }
-    let segment = segments[index?];
-    (segment.kind == KIND_ALIAS
-        && loc.pos() == i64::from(segment.virtual_start)
-        && loc.end() == i64::from(segment.virtual_end))
-    .then_some(segment)
 }
 
 /// Go's `DiagnosticsCollection`, with the file buckets keyed by path.

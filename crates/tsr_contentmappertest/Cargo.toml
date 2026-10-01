@@ -1,0 +1,24 @@
+[package]
+name = "tsr_contentmappertest"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "The in-process content mappers the tsr compiler tests and corpus runs serve"
+repository.workspace = true
+
+[dependencies]
+tsr_ast = { path = "../tsr_ast" }
+tsr_contentmapper = { path = "../tsr_contentmapper" }
+tsr_core = { path = "../tsr_core" }
+tsr_ipc = { path = "../tsr_ipc" }
+tsr_json = { path = "../tsr_json" }
+tsr_jsstring = { path = "../tsr_jsstring" }
+
+[dev-dependencies]
+tsr_locale = { path = "../tsr_locale" }
+tsr_tsoptions = { path = "../tsr_tsoptions" }
+
+[lints]
+workspace = true

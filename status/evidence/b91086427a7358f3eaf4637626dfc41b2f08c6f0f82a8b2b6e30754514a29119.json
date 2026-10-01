@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "run_id": "workspace",
+  "recorded_at": 1790812992,
+  "context": {
+    "revision": "bcab181d8e7c6af7a8d8c77b42a09e8214197e63",
+    "source_sha256": "fbc94176246aad77eca917c900767b74092a461527a5bc56eefc133180768775",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "7125adc570becdc7573f60a7251592e083fa608a5aaf3ac246b965c55f373e5a",
+  "inputs": {
+    "Cargo.lock": "3a609511f95775b89991333bca3f4f5691c434d9e59148d1cf0f639d714e3926",
+    "Cargo.toml": "a5f5465c15803dc17d08a5d021423183c976ac979988f708edc20a006f7447fd"
+  },
+  "command": [
+    "python3",
+    "scripts/tracking-bootstrap.py",
+    "workspace"
+  ],
+  "target": "host",
+  "config": "debug",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\": {\"build\": true}}\n",
+  "stderr": "    Checking tsr_jsstring v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_jsstring)\n    Checking tsr_locale v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_locale)\n    Checking phase1_harness v0.1.0 (/Users/cristian/git/ts-rust/tools/phase1/harness)\n   Compiling tsr_node v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_node)\n    Checking phase1_mutants v0.1.0 (/Users/cristian/git/ts-rust/tools/phase1/mutation/switch)\n    Checking phase1_mutation_splicer v0.1.0 (/Users/cristian/git/ts-rust/tools/phase1/mutation/splicer)\n    Checking xtask v0.1.0 (/Users/cristian/git/ts-rust/xtask)\n    Checking tsr_core v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_core)\n    Checking tsr_jsnum v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_jsnum)\n    Checking tsr_arena v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_arena)\n    Checking tsr_glob v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_glob)\n    Checking tsr_semver v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_semver)\n    Checking tsr_json v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_json)\n    Checking tsr_tspath v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_tspath)\n    Checking tsr_vfs v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_vfs)\n    Checking tsr_diagnostics v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_diagnostics)\n    Checking tsr_jsonrpc v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_jsonrpc)\n    Checking tsr_ipc v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_ipc)\n    Checking tsr_bundled v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_bundled)\n    Checking tsr_testhost v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_testhost)\n    Checking tsr_ast v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_ast)\n    Checking tsr_scanner v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_scanner)\n    Checking tsr_nodebuilder v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_nodebuilder)\n    Checking tsr_pseudochecker v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_pseudochecker)\n    Checking tsr_encoder v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_encoder)\n    Checking tsr_parser v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_parser)\n    Checking tsr_astnav v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_astnav)\n    Checking tsr_printer v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_printer)\n    Checking tsr_format v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_format)\n    Checking tsr_transformers v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_transformers)\n    Checking tsr_tsoptions v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_tsoptions)\n    Checking tsr_binder v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_binder)\n    Checking s08_relater_prototype v0.1.0 (/Users/cristian/git/ts-rust/tools/s08/relater-prototype)\n    Checking tsr_bench v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_bench)\n    Checking tsr_module v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_module)\n    Checking tsr_contentmapper v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_contentmapper)\n    Checking phase1_mutation_driver v0.1.0 (/Users/cristian/git/ts-rust/tools/phase1/mutation/driver)\n    Checking tsr_contentmappertest v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_contentmappertest)\n    Checking tsr_checker v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_checker)\n    Checking phase1_leaves v0.1.0 (/Users/cristian/git/ts-rust/tools/phase1/leaves)\n    Checking tsr_compiler v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_compiler)\n    Checking tsr_project v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_project)\n    Checking tsr_api v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_api)\n    Checking s09_format_harness v0.1.0 (/Users/cristian/git/ts-rust/tools/s09/format-harness)\n    Checking tsr_embed v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_embed)\n    Checking phase1_filesystem v0.1.0 (/Users/cristian/git/ts-rust/tools/phase1/filesystem)\n    Checking phase1_syntax v0.1.0 (/Users/cristian/git/ts-rust/tools/phase1/syntax)\n    Checking phase1_config v0.1.0 (/Users/cristian/git/ts-rust/tools/phase1/config)\n    Checking s10_corpus v0.1.0 (/Users/cristian/git/ts-rust/tools/s10/corpus-adapter)\n    Checking tsr_wasm v0.1.0 (/Users/cristian/git/ts-rust/crates/tsr_wasm)\n    Checking s10_wasm_corpus v0.1.0 (/Users/cristian/git/ts-rust/tools/s10/wasm-corpus)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 17.33s\n",
+  "stdout_sha256": "37e4617d57653056a89a491698ab3b31399dcfdde0e1ff39b61e6770337a4965",
+  "stderr_sha256": "2bb1fab9f0e4df6b1734367585d8f61e5a67c6322c3298d5d58585c9f0356e33",
+  "valid_capture": true
+}

@@ -2,8 +2,9 @@
 use crate::{Error, Program, ProgramFile};
 use tsr_core::{JsxEmit, ScriptKind};
 pub(crate) use tsr_tsoptions::output_paths::{build_info_file, computed_common};
-fn declaration_extension(file: &[u8]) -> Vec<u8> {
-    tsr_tsoptions::output_paths::declaration_extension(file, &[])
+/// port: tsc/internal/outputpaths/outputpaths.go:ChangeToDeclarationExtension
+fn declaration_extension(file: &[u8], program: &Program) -> Vec<u8> {
+    tsr_tsoptions::output_paths::declaration_extension(file, &program.content_mapper_extensions())
 }
 use tsr_jsstring::JsString;
 use tsr_tspath as path;
@@ -176,7 +177,7 @@ pub(crate) fn output_names(
         } else {
             source_in_new_directory(name, directory.as_bytes(), program, common)
         };
-        result[2] = declaration_extension(&output);
+        result[2] = declaration_extension(&output, program);
         if options.declaration_maps_enabled() {
             result[3] = [&result[2], b".map".as_slice()].concat();
         }
@@ -198,7 +199,7 @@ pub(crate) fn module_specifier_output_name(
             common,
             program.current_directory(),
             program.use_case_sensitive_file_names(),
-            &[],
+            &program.content_mapper_extensions(),
         );
     }
     let options = program.options();

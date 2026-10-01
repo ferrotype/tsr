@@ -218,9 +218,13 @@ fn source_of_project_reference_mode_skips_checking_referenced_sources() {
 }
 
 #[test]
-fn parsed_enabled_mappers_are_rejected_and_disabled_diagnostics_are_retained() {
-    let text = br#"{"compilerOptions":{"noLib":true},"files":["main.ts"],"contentMappers":[{"package":"mapper","extensions":[".custom"]}]}"#;
-    let (config, host) = parsed(text, true);
+fn enabled_mappers_without_a_project_stub_their_files_and_disabled_diagnostics_are_retained() {
+    // Without the host's mapper project nothing executes: a mapped file
+    // fails to transform (`ErrProjectUnavailable`) and loads as an empty,
+    // still content-mapped stub.
+    let text = br#"{"compilerOptions":{"noLib":true},"files":["main.ts","widget.custom"],"contentMappers":[{"package":"mapper","extensions":[".custom"]}]}"#;
+    let files: &[(&[u8], &[u8])] = &[(b"/src/widget.custom", b"export const widget = 1;")];
+    let (config, host) = parsed_with(text, true, files);
     assert!(config.errors.is_empty(), "{:?}", config.errors);
     let mapper = &config.content_mappers.as_ref().unwrap()[0];
     assert_eq!(
@@ -228,11 +232,13 @@ fn parsed_enabled_mappers_are_rejected_and_disabled_diagnostics_are_retained() {
         b"must-never-execute"
     );
     let counters = Counters::new();
-    assert!(matches!(
-        load(config, host, &counters),
-        Err(Error::Unsupported("content-mapper execution"))
-    ));
-    assert_eq!(counters.snapshot(), Counts::default());
+    let program = load(config, host, &counters).unwrap();
+    assert!(program.content_mapper_project().is_none());
+    let widget = program.file(b"/src/widget.custom").unwrap();
+    let source = widget.bound().view().source_file().unwrap();
+    assert!(program.content_mapper(&source).is_some());
+    assert!(source.is_content_mapper_failure_stub());
+    assert!(source.text().is_empty());
 
     let (config, host) = parsed(text, false);
     assert!(config.content_mappers.is_none());

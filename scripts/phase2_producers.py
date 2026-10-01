@@ -112,6 +112,11 @@ CHECKPOINT_AUTHORITIES = {
               for name in ("claims", "audit", "baseline", "assignments")},
            "assignment_comparison": ROOT / "data/phase2/c6-assignment-comparison.json",
            "concurrent": phase2_native_concurrent.PROVENANCE},
+    # C7 owns no rows and has no baseline: its completion is the P2B exit on
+    # the final inputs, read through its own authorities (docs/PHASE2-C7-plan.md,
+    # C7.7).
+    "C7": {"claims": ROOT / "data/phase2/c7-claims.json", "audit": ROOT / "data/phase2/c7-audit.json",
+           "baseline": ROOT / "data/phase2/c7-baseline.json.gz"},
 }
 WITNESSES = {
     "c1-contracts": {
@@ -184,6 +189,17 @@ WITNESSES["c6-contracts"] = {
                 "tools/s08/p4", "tools/s08/p5", "tools/s07/config", "tools/s07/program", "tools/phase2/subtests.rs",
                 "upstream/tsc/testdata/tests/cases/compiler/binderBinaryExpressionStress.ts"],
 }
+WITNESSES["c7-contracts"] = {
+    "commands": [["cargo", "test", "-p", "tsr_compiler", "--features", "recursion-probe",
+                  "--test", "c7_contracts", "--locked", *release] for release in ([], ["--release"])],
+    "test_source": "crates/tsr_compiler/tests/c7_contracts.rs", "minimum_tests": 6,
+    "test_modules": {},
+    # The frozen rows and their native observations, the pin's content-mapper
+    # baselines the contracts compare, and the corpus driver they run.
+    "sources": [*WITNESSES["c1-contracts"]["sources"], "crates/tsr_compiler/tests/fixtures/c7", "data/upstream.json",
+                "upstream/tsc/testdata/baselines/reference/compiler/contentMapper*.contentmapper",
+                "tools/s08/p4", "tools/s08/p5", "tools/s07/config", "tools/s07/program", "tools/phase2/subtests.rs"],
+}
 PRODUCTION_PATTERNS = tuple(path for path in WITNESSES["c1-contracts"]["sources"]
                             if path != "scripts/phase2_producers.py")
 
@@ -202,6 +218,14 @@ def source_inputs(paths):
                     continue
                 found[str(path.relative_to(ROOT))] = digest(path.read_bytes())
     return found
+
+
+def production_inputs():
+    """The production and configuration identity the captures must carry: the
+    contract sources without the crates' test-only suites, which the contract
+    receipts bind instead (docs/PHASE2-C7-plan.md decision 8)."""
+    return {path: value for path, value in source_inputs(PRODUCTION_PATTERNS).items()
+            if not phase2_corpus.test_only(path)}
 
 
 def witness_tests(spec):
@@ -259,6 +283,12 @@ def observe(identity, output=RECEIPTS):
     path = Path(output) / f"{identity}.json"
     path.write_bytes(json.dumps(record, indent=1, sort_keys=True).encode() + b"\n")
     print(json.dumps({"receipt": str(path), "exit_codes": [run["exit_code"] for run in runs]}))
+    # The receipt keeps a failing run for diagnosis, but the observation fails:
+    # a refreshed receipt must never hide a failing suite.
+    failed = [" ".join(run["command"]) for run in runs
+              if run["exit_code"] != 0 or not successful_test_output(run["stdout"], tests)]
+    if failed:
+        raise ValueError(f"{identity} failed or ran other tests than its inventory: " + "; ".join(failed))
     return record
 
 
@@ -346,7 +376,7 @@ def _c1_claim_metrics(comparison, claims, blockers=None):
     return metrics
 
 
-CHECKPOINTS = ("C2", "C3", "C4", "C5", "C6")
+CHECKPOINTS = ("C2", "C3", "C4", "C5", "C6", "C7")
 
 
 def newest_checkpoint(loaded):
@@ -481,7 +511,7 @@ def measurement_identity(directory, comparison, rust, *, context=None):
     else:
         context.require_directories(context.native_directory, rust)
         corpus, replay = context.metadata, context.replayed
-    required = source_inputs(PRODUCTION_PATTERNS)
+    required = production_inputs()
     if (result.get("smoke") or not result.get("source_stable")
             or result.get("pin") != comparison["pin"] or capture.get("pin") != comparison["pin"]
             or replay["summary"]["partial"] or replay["summary"]["harness_errors"]
@@ -575,7 +605,51 @@ def assignments_current(record_path, comparison_path, executed):
             and comparison.get("synthetic_equal") == comparison.get("synthetic") == len(record.get("synthetic", [])))
 
 
-def concurrent_metrics(native, rust, native_concurrent, rust_concurrent, document, comparison, claims, authorities):
+def two_mode_state(native, rust, native_concurrent, rust_concurrent, executed, committed):
+    """The concurrent mode's native capture and Rust run, and their comparison
+    with the single-threaded run: the state the run-level and C6 metrics share."""
+    state = {"native_verified_concurrent": False, "harness_valid_concurrent": False,
+             "report": None, "modes": None, "concurrent": None}
+    try:
+        _, report, _ = phase2_native_concurrent.load_capture(native_concurrent)
+        phase2_native_concurrent.current(report)
+        verified = strict_json_loads((Path(native_concurrent) / "verified.json").read_bytes())
+        review = quietly(phase2_native_concurrent.review, native_concurrent, False)
+        state["report"] = report
+        state["native_verified_concurrent"] = (verified["observation_sha256"] == report["observation_sha256"]
+                                               and review == strict_json_loads(Path(committed).read_bytes())
+                                               and not review["reference_disagreements"]
+                                               and not review["input_mismatches"]
+                                               and review["states"] == {"executed": executed})
+    except (OSError, ValueError, KeyError) as error:
+        print("concurrent native capture unavailable: " + str(error), file=sys.stderr)
+        return state
+    try:
+        context = quietly(phase2_compare.load_context, native_concurrent, rust_concurrent)
+        replayed, capture = context.replayed, context.metadata
+        _, current_requests, _ = quietly(phase2_corpus.requests, native_concurrent, mode="concurrent")
+        state["harness_valid_concurrent"] = (
+            capture.get("mode") == "concurrent" and not replayed["summary"]["partial"]
+            and replayed["summary"]["harness_errors"] == 0 and replayed["source_stable"]
+            and replayed["summary"]["observed"] == executed
+            and capture["native"]["observation_sha256"] == report["observation_sha256"]
+            and capture["requests_sha256"] == digest(phase2_corpus.p4.canonical(current_requests) + b"\n"))
+    except (OSError, ValueError, KeyError) as error:
+        print("concurrent Rust capture unavailable: " + str(error), file=sys.stderr)
+        return state
+    if not state["harness_valid_concurrent"]:
+        return state
+    try:
+        state["modes"] = quietly(phase2_compare.modes, native, rust, native_concurrent, rust_concurrent, write=False)
+        state["concurrent"] = quietly(phase2_compare.report, native_concurrent, rust_concurrent, write=False,
+                                      context=context)
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        print("mode comparison unavailable: " + str(error), file=sys.stderr)
+    return state
+
+
+def concurrent_metrics(native, rust, native_concurrent, rust_concurrent, document, comparison, claims, authorities,
+                       *, state=None):
     """C6: the concurrent mode's native capture and Rust run, the two modes'
     outcome parity and the assignment witnesses."""
     metrics = {"native_verified_concurrent": False, "harness_valid_concurrent": False,
@@ -586,50 +660,147 @@ def concurrent_metrics(native, rust, native_concurrent, rust_concurrent, documen
                                                         authorities["assignment_comparison"], executed)
     except (OSError, ValueError, KeyError, TypeError) as error:
         print("C6 assignments unavailable: " + str(error), file=sys.stderr)
-    try:
-        _, report, _ = phase2_native_concurrent.load_capture(native_concurrent)
-        phase2_native_concurrent.current(report)
-        verified = strict_json_loads((Path(native_concurrent) / "verified.json").read_bytes())
-        review = quietly(phase2_native_concurrent.review, native_concurrent, False)
-        committed = strict_json_loads(authorities["concurrent"].read_bytes())
-        metrics["native_verified_concurrent"] = (verified["observation_sha256"] == report["observation_sha256"]
-                                                 and review == committed and not review["reference_disagreements"]
-                                                 and not review["input_mismatches"]
-                                                 and review["states"] == {"executed": executed})
-    except (OSError, ValueError, KeyError) as error:
-        print("concurrent native capture unavailable: " + str(error), file=sys.stderr)
+    if state is None:
+        state = two_mode_state(native, rust, native_concurrent, rust_concurrent, executed, authorities["concurrent"])
+    for name in ("native_verified_concurrent", "harness_valid_concurrent"):
+        metrics[name] = state[name]
+    modes, report = state["modes"], state["report"]
+    if modes is None or state["concurrent"] is None:
         return metrics
-    try:
-        context = quietly(phase2_compare.load_context, native_concurrent, rust_concurrent)
-        replayed, capture = context.replayed, context.metadata
-        _, current_requests, _ = quietly(phase2_corpus.requests, native_concurrent, mode="concurrent")
-        metrics["harness_valid_concurrent"] = (
-            capture.get("mode") == "concurrent" and not replayed["summary"]["partial"]
-            and replayed["summary"]["harness_errors"] == 0 and replayed["source_stable"]
-            and replayed["summary"]["observed"] == executed
-            and capture["native"]["observation_sha256"] == report["observation_sha256"]
-            and capture["requests_sha256"] == digest(phase2_corpus.p4.canonical(current_requests) + b"\n"))
-    except (OSError, ValueError, KeyError) as error:
-        print("concurrent Rust capture unavailable: " + str(error), file=sys.stderr)
-        return metrics
-    if not metrics["harness_valid_concurrent"]:
-        return metrics
-    try:
-        modes = quietly(phase2_compare.modes, native, rust, native_concurrent, rust_concurrent, write=False)
-        native_modes = (claims or {}).get("native_modes", {})
-        metrics["c6_mode_parity"] = (
-            modes["outcome_differences"] == 0 and modes["single"]["harness_errors"] == 0
-            and modes["single"]["rust_capture_sha256"] == comparison["rust_capture_sha256"]
-            and native_modes.get("differences") == []
-            and native_modes.get("single", {}).get("capture_observation_sha256") == comparison["native_observation_sha256"]
-            and native_modes.get("concurrent", {}).get("capture_observation_sha256") == report["observation_sha256"])
-        concurrent = quietly(phase2_compare.report, native_concurrent, rust_concurrent, write=False, context=context)
-        single_failed = {row["id"] for row in comparison["rows"] if "failed" in row.get("outcomes", {}).values()}
-        metrics["c6_failures_concurrent"] = sum("failed" in row.get("outcomes", {}).values()
-                                                and row["id"] not in single_failed for row in concurrent["rows"])
-    except (OSError, ValueError, KeyError, TypeError) as error:
-        print("C6 mode comparison unavailable: " + str(error), file=sys.stderr)
+    native_modes = (claims or {}).get("native_modes", {})
+    metrics["c6_mode_parity"] = (
+        modes["outcome_differences"] == 0 and modes["single"]["harness_errors"] == 0
+        and modes["single"]["rust_capture_sha256"] == comparison["rust_capture_sha256"]
+        and native_modes.get("differences") == []
+        and native_modes.get("single", {}).get("capture_observation_sha256") == comparison["native_observation_sha256"]
+        and native_modes.get("concurrent", {}).get("capture_observation_sha256") == report["observation_sha256"])
+    single_failed = {row["id"] for row in comparison["rows"] if "failed" in row.get("outcomes", {}).values()}
+    metrics["c6_failures_concurrent"] = sum("failed" in row.get("outcomes", {}).values()
+                                            and row["id"] not in single_failed for row in state["concurrent"]["rows"])
     return metrics
+
+
+RUN_LEVEL = ("native_verified_concurrent", "harness_valid_concurrent", "mode_parity", "assignments", "services",
+             "content_mappers")
+
+
+def run_level_metrics(state, comparison, inventory, *, context=None):
+    """The properties of the final inputs, computed on every run whatever the
+    current checkpoint (C7.7): the ledger's verify checks bind them, while the
+    checkpoint-scoped names stay what they were when their checkpoints closed.
+    Mode parity compares the two runs' outcomes, each against its own verified
+    native capture, as C6's did without its claims' native-mode binding."""
+    metrics = {name: state.get(name, False) for name in RUN_LEVEL[:2]}
+    metrics.update({name: False for name in RUN_LEVEL[2:]})
+    modes = state["modes"]
+    if modes is not None and state["concurrent"] is not None:
+        metrics["mode_parity"] = (state["native_verified_concurrent"] and state["harness_valid_concurrent"]
+                                  and modes["outcome_differences"] == 0 and modes["single"]["harness_errors"] == 0
+                                  and modes["single"]["rust_capture_sha256"] == comparison["rust_capture_sha256"])
+    authorities = CHECKPOINT_AUTHORITIES["C6"]
+    try:
+        metrics["assignments"] = assignments_current(authorities["assignments"], authorities["assignment_comparison"],
+                                                     len(inventory))
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        print("assignments unavailable: " + str(error), file=sys.stderr)
+    try:
+        metrics["services"] = services_current(CHECKPOINT_AUTHORITIES["C5"]["services"], comparison, context=context)
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        print("services replay unavailable: " + str(error), file=sys.stderr)
+    # C7.8: the content-mapper rows match in every domain in both modes, and
+    # the contracts receipt is current.
+    mapped = {row["id"] for row in inventory if row["content_mapper"]}
+    if mapped and state["concurrent"] is not None:
+        matched = [row["id"] for rows in (comparison["rows"], state["concurrent"]["rows"]) for row in rows
+                   if row["id"] in mapped and "outcomes" in row
+                   and all(value in MATCHED for value in row["outcomes"].values())]
+        metrics["content_mappers"] = receipt_current("c7-contracts") is True and len(matched) == 2 * len(mapped)
+    return metrics
+
+
+# The checker runs recorded at the exits of the checkpoints that closed while
+# current (docs/PHASE2-C7-plan.md, section 2); sprints/P2B.toml names the same
+# artifacts. C3 and C4 close on the final run instead (decision 2).
+RECORDED_COMPLETIONS = {
+    "C1": ("96b7c65f5f42d1eb95e5137360a15c95d7dcac7e47c2654bd3c822a4a675b1b6", "c1_complete"),
+    "C2": ("74c7960a279872c3aed1b15cb25de880040a9abfd47c0291f692d3cddcf56ce2", "c2_complete"),
+    "C5": ("815eeb4348732ebf902eb8b90d4774ef7bb7294c3c2dcb0f98be3aad8794affd", "c5_complete"),
+    "C6": ("afc6eeb4063234e68657f25ab972a9d65eddb10f253e4b53ddfc4c7d4077bd82", "c6_complete"),
+}
+# The PLAN's Phase 2 gate as sprints/P2B.toml's exit states it for the checker run.
+P2B_EXIT = (("harness_valid", True), ("errors_parity", 1), ("types_parity", 1), ("symbols_parity", 1),
+            ("display_parity", 1), ("trace_parity", 1), ("ordering", 1), ("parent_pointers", 1),
+            ("unsupported_required", 0))
+# C7.6's prerequisite producers: every declared run but `checker`, which the
+# tracker marks as an incomplete attempt while its producer runs.
+PREREQUISITE_RUNS = ("binder", "bindworkload", "checkerbench", "checkertext", "clippy", "config", "deny",
+                     "e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8", "fmt", "foundations", "gen", "oracle",
+                     "program", "relater", "scanner", "selftest", "syntax", "testhost", "workspace")
+
+
+def recorded_metric(evidence_id, metric, run="checker", root=ROOT):
+    """A metric of one recorded evidence artifact, read as `xtask check` reads a
+    `recorded.` condition: the artifact must match its id and record a success."""
+    path = Path(root) / "status/evidence" / f"{evidence_id}.json"
+    if not path.is_file():
+        return None
+    raw = path.read_bytes()
+    record = strict_json_loads(raw)
+    if (digest(raw) != evidence_id or record.get("schema_version") != 1 or record.get("run_id") != run
+            or record.get("exit_code") != 0 or record.get("valid_capture") is not True
+            or digest(record["stdout"].encode()) != record.get("stdout_sha256")):
+        return None
+    return strict_json_loads(record["stdout"].encode()).get("metrics", {}).get(metric)
+
+
+def evidence_states():
+    """The live evidence state of every declared run, never a generated view."""
+    completed = subprocess.run(["cargo", "xtask", "evidence-states"], cwd=ROOT, stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE, check=False)
+    if completed.returncode:
+        raise ValueError("evidence states unavailable: " + completed.stderr.decode(errors="replace")[-2000:])
+    return strict_json_loads(completed.stdout)
+
+
+def c7_optional(name, function):
+    """A C7 authority's check; one not built yet, or failing, reads false."""
+    try:
+        return function()
+    except (ImportError, OSError, ValueError, KeyError, TypeError) as error:
+        print(f"C7 {name} unavailable: " + str(error), file=sys.stderr)
+        return None
+
+
+def c7_metrics(metrics, audit_ok, states, state, comparison, *, root=ROOT):
+    """C7's metrics and its completion: the P2B exit on the final inputs, the
+    run-level two-mode metrics, every P2B-Cn item closed, and C7's own seven."""
+    out = {"c7_audit_complete": audit_ok is True,
+           "c7_content_mappers": metrics.get("content_mappers") is True and audit_ok is True,
+           "c7_evidence_current": (states is not None and set(states) == {*PREREQUISITE_RUNS, "checker"}
+                                   and all(states[run] == "current" for run in PREREQUISITE_RUNS))}
+    import phase2_informational
+    out["c7_informational_listed"] = c7_optional("informational", phase2_informational.current) is True
+    residuals = c7_optional("residuals", lambda: __import__("phase2_residuals").verified_count(
+        comparison, state["concurrent"]))
+    if isinstance(residuals, int):
+        out["c7_residuals"] = residuals
+    out["c7_dispositions"] = c7_optional("dispositions", lambda: __import__("phase2_dispositions").complete()) is True
+    out["c7_divergences_valid"] = c7_optional("divergences", lambda: __import__("phase2_divergences").valid(
+        comparison, state["concurrent"])) is True
+    out["c7_report"] = c7_optional("report", lambda: __import__("phase2_report").current(
+        comparison, state["concurrent"])) is True
+    exit_ok = all(metrics.get(name) is value if isinstance(value, bool) else metrics.get(name) == value
+                  for name, value in P2B_EXIT)
+    recorded = all(recorded_metric(evidence_id, metric, root=root) is True
+                   for evidence_id, metric in RECORDED_COMPLETIONS.values())
+    prerequisites = all(metrics.get(name) is True for name in ("inventory_frozen", "native_verified", "harness_valid",
+                                                                "result_recorded", "blockers_named"))
+    out["c7_complete"] = (prerequisites and exit_ok and recorded and out.get("c7_residuals") == 0
+                          and all(metrics.get(name) is True for name in RUN_LEVEL)
+                          and all(out[name] is True for name in (
+                              "c7_informational_listed", "c7_dispositions", "c7_divergences_valid",
+                              "c7_evidence_current", "c7_report", "c7_content_mappers")))
+    return out
 
 
 def checker(native=NATIVE, rust=RUST, native_concurrent=NATIVE_CONCURRENT, rust_concurrent=RUST_CONCURRENT):
@@ -693,6 +864,10 @@ def checker(native=NATIVE, rust=RUST, native_concurrent=NATIVE_CONCURRENT, rust_
     regression = [row for row in rows if row["s08"] == "acceptance"]
     metrics["regression_parity"] = (sum(all(o in MATCHED for o in row["outcomes"].values()) for row in regression)
                                     / len(regression)) if regression else None
+    executed_rows = phase2_inventory.executed()
+    state = two_mode_state(native, rust, native_concurrent, rust_concurrent, document["counts"]["executed"],
+                           CHECKPOINT_AUTHORITIES["C6"]["concurrent"])
+    metrics.update(run_level_metrics(state, comparison, executed_rows, context=context))
     try:
         claims = strict_json_loads(CLAIMS.read_bytes()) if CLAIMS.is_file() else None
         audit_ok = phase2_audit.complete(phase2_audit.load(AUDIT)) if AUDIT.is_file() else None
@@ -742,8 +917,13 @@ def checker(native=NATIVE, rust=RUST, native_concurrent=NATIVE_CONCURRENT, rust_
                         if "measurement" in authorities and checkpoint == current else None)
             services = (services_current(authorities["services"], comparison, context=context)
                         if "services" in authorities and checkpoint == current else None)
+            if checkpoint == "C7":
+                if checkpoint == current:
+                    metrics.update(c7_metrics(metrics, audit_ok, c7_optional("evidence states", evidence_states),
+                                              state, comparison))
+                continue
             extra = (concurrent_metrics(native, rust, native_concurrent, rust_concurrent, document, comparison,
-                                        claims, authorities)
+                                        claims, authorities, state=state)
                      if "concurrent" in authorities and checkpoint == current else None)
             metrics.update(checkpoint_metrics(
                 checkpoint, comparison, claims, audit_ok, baseline, receipt_current(prefix + "-contracts"),

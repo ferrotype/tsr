@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "run_id": "e2",
+  "recorded_at": 1790820140,
+  "context": {
+    "revision": "84604bcec41a32f37d87cb487665426670bf8904",
+    "source_sha256": "73974ce309100fa3960117cc617286a0a5e4c1bf46c73906b6eb9e9aa20d2c93",
+    "upstream_pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "environment": {
+      "CARGO_BUILD_TARGET": "",
+      "CARGO_ENCODED_RUSTFLAGS": "",
+      "CARGO_HOME": "/Users/cristian/.cargo",
+      "CGO_ENABLED": "",
+      "GOARCH": "",
+      "GOFLAGS": "",
+      "GOOS": "",
+      "RUSTC_WRAPPER": "",
+      "RUSTFLAGS": "",
+      "RUSTUP_HOME": "/Users/cristian/.rustup",
+      "RUSTUP_TOOLCHAIN": "1.97.1-aarch64-apple-darwin",
+      "S04_CACHE_HOME": "",
+      "S04_RUSTUP_HOME": ""
+    },
+    "host": "macos-aarch64",
+    "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n"
+  },
+  "spec_sha256": "a419cd0eeda12b26254c05d95e83f88dfec3543b1d4e388fe3f6e6a2b8f7182c",
+  "inputs": {
+    ".gitmodules": "7f9e8e0a446a547c56d8444637b3ee73064ce52055bc3c983c05eb13f4331bdd",
+    "data/divergences.toml": "b493505fbca126117391592d28305a7e76649e365d424cfac526cb44ed180019",
+    "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
+    "data/s07/operations.json": "8af89c56915bdb83116faf0e46b8cba5cb4b86690303087d94ee72612a901609",
+    "data/s07/subset-review.json": "2c8cfed49d87506eb30f7c68192b8ec8fa4c3a840301cb6001c3cc97fdd8b8ca",
+    "data/s07/subset-rule.json": "84e61edcea27508526e75af223e938f12fdf30f05a5c805f44ab1cf44d7f7a76",
+    "data/s07/subset.json": "8539ce8af2f0cd5245554114e8d257805fe266e46fcabbb4ac220d5bcd2c4f2a",
+    "data/s08/baseline-requests.json": "b348aed7bd34fa8fdfe2c579204ed0340ed6887c7fd0e58f77f791d97ca11f89",
+    "data/s08/e2-obligations.json": "8c2084134d4152e86ba65c8404d859920ac398261d1ffe7884924d79629ba0d4",
+    "data/upstream.json": "f10e50133daec561a20b528a0577dea937ce3163aa826ba212826957c86910fc"
+  },
+  "command": [
+    "python3",
+    "scripts/s08_e2.py",
+    "producer"
+  ],
+  "target": "host",
+  "config": "S07 reviewed source-only denominator remains separately available; when target/s08/e2/corpus exists, replay complete current S08 E2 capture and obligations: exact type/symbol/error bytes and query schedule, post-walk public TypeToString, frozen comparator signs/permutations and foreign-owner rejection, native 512 KiB deep fixtures plus debug/release recursion/reentry tests; exact owner-approved divergence witnesses; informational cases never enter acceptance ratios; missing capture leaves correctness metrics unavailable; no implicit full corpus run",
+  "host": "macos-aarch64",
+  "toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)\nbinary: rustc\ncommit-hash: 8bab26f4f68e0e26f0bb7960be334d5b520ea452\ncommit-date: 2026-07-14\nhost: aarch64-apple-darwin\nrelease: 1.97.1\nLLVM version: 22.1.6\n",
+  "exit_code": 0,
+  "stdout": "{\"metrics\":{\"comparators\":true,\"divergences_approved\":true,\"eligible_variants\":10728,\"errors_parity\":1.0,\"frozen_subset\":true,\"recursion_fixtures\":true,\"type_to_string_parity\":1.0,\"types_parity\":1.0}}\n",
+  "stderr": "+ git ls-tree -r --name-only 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/cases/compiler/ tsc/testdata/tests/cases/conformance/ tsc/internal/bundled/libs/\n+ go version\ngo version go1.27.1 darwin/arm64\n+ git archive 1f70213d4922b434345f639b441681e470c7cfc1 tsc/go.mod tsc/go.sum tsc/internal tsc/testdata/tests/cases/compiler tsc/testdata/tests/cases/conformance\n+ git archive 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/lib\n+ go test -trimpath -mod=readonly -gcflags=github.com/microsoft/TypeScript/tsc/internal/repo=-trimpath=/Users/cristian/git/ts-rust/target/s06-oracle/export-4mxdgkd4/s07-unmatched-prefix ./internal/testrunner -run ^TestS07SubsetExport$ -count=1 -timeout=15m\n+ git ls-tree -r --name-only 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/cases/compiler/ tsc/testdata/tests/cases/conformance/ tsc/internal/bundled/libs/\n+ git ls-tree -r --name-only 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/lib\n+ git ls-tree -r 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/baselines/reference/\n+ /Users/cristian/.pyenv/versions/3.11.12/bin/python3 scripts/s07_program.py --requests /Users/cristian/git/ts-rust/target/s07-subset/review/loading-requests.candidate.json --output /Users/cristian/git/ts-rust/target/s07-subset/review/loading-observations.candidate.json\n+ go version\ngo version go1.27.1 darwin/arm64\n+ git archive 1f70213d4922b434345f639b441681e470c7cfc1 tsc/go.mod tsc/go.sum tsc/internal tsc/testdata/tests/cases/compiler tsc/testdata/tests/cases/conformance\n+ go test -trimpath -mod=readonly -gcflags=github.com/microsoft/TypeScript/tsc/internal/repo=-trimpath=/Users/cristian/git/ts-rust/target/s06-oracle/export-zl0_hwa_/s07-unmatched-prefix ./internal/compiler -run ^TestS07Programs$ -count=1\nsource package compiler\nsource package tsoptions\nsource package module\nsource package packagejson\nsource package tspath\nsource package core\nsource package bundled\nsource package collections\nsource package vfs/vfsmatch\nsource package vfs/internal\nsource package json\nsource package semver\nsource package ast\n+ git ls-tree -r --name-only 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/cases/compiler/ tsc/testdata/tests/cases/conformance/ tsc/internal/bundled/libs/\n+ git ls-tree -r --name-only 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/tests/lib\n+ git ls-tree -r 1f70213d4922b434345f639b441681e470c7cfc1 tsc/testdata/baselines/reference/\nE2 verified capture: {\"capture_sha256\":\"8a98e6f142bc60e34a766bd741e2ea18f5ffb101d4af2021f8675de42c3438d6\",\"divergences_sha256\":\"b493505fbca126117391592d28305a7e76649e365d424cfac526cb44ed180019\",\"obligations_sha256\":\"31823e0a5dc5b5489fbca314cf9e781d365175be331c2e1e72d0384b5cb48109\"}\n",
+  "stdout_sha256": "81566f70516d7049d8afba3047ae4d4aa469107d6e99c7732d43c686dbc03776",
+  "stderr_sha256": "05af14391c335de6abbdb757f2f0945ea0e0241177ca3c17e2a119f758560952",
+  "valid_capture": true
+}

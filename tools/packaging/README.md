@@ -1,6 +1,6 @@
 # Rust package preparation
 
-The publication policy currently includes 31 public libraries and 20 private
+The publication policy currently includes 34 public libraries and 25 private
 packages, all named explicitly in [packages.json](packages.json). The workspace
 defaults to `publish = false`. This policy and the dependency order below track
 the current source tree; they are not a record of registry releases. The Node
@@ -76,7 +76,7 @@ and exports stay unchanged. Old captures retain their own archived ABI wrappers.
 
 The project branding is **tsr**; `tsr_embed` is the application entry point.
 A `tsr` facade that re-exports the public embedding surface remains a separate follow-up; neither
-`tsr` nor `tsrust` is added to this 30-package release set. All package READMEs
+`tsr` nor `tsrust` is added to this 34-package release set. All package READMEs
 state the Rust 1.96 minimum, and package metadata includes search keywords and
 the compiler category.
 
@@ -86,12 +86,12 @@ Generate release archives after this update so their immutable manifests contain
 the final URL. Historical pull-request and Actions links in `docs/` retain their
 original addresses and resolve through GitHub redirects.
 
-Do not schedule the first release as 30 immediate uploads. crates.io's recorded
+Do not schedule the first release as 34 immediate uploads. crates.io's recorded
 [default limiter](https://github.com/rust-lang/crates.io/blob/5723cfaf552efd5e870d25c71f2bb5193b21a958/src/rate_limiter.rs)
 allows five new crates in a burst and replenishes one slot per ten minutes.
-Updates have a separate default allowance. If 24 of these names are still new
-and the new-crate bucket starts full, the theoretical refill wait is 190 minutes
-(3 h 10 min), plus publication, index visibility and validation time. Server
+Updates have a separate default allowance. If 27 of these names are still new
+and the new-crate bucket starts full, the theoretical refill wait is 220 minutes
+(3 h 40 min), plus publication, index visibility and validation time. Server
 configuration and account overrides can change that allowance; check the actual
 response rather than treating this estimate as a guaranteed schedule. Recheck
 name ownership and availability before release.
@@ -113,30 +113,33 @@ build and optional dependencies. It is for a later, explicitly authorized releas
 5. `tsr_locale`
 6. `tsr_jsnum`
 7. `tsr_json`
-8. `tsr_diagnostics`
-9. `tsr_ast`
-10. `tsr_scanner`
-11. `tsr_encoder`
-12. `tsr_parser`
-13. `tsr_binder`
-14. `tsr_semver`
-15. `tsr_tspath`
-16. `tsr_vfs`
-17. `tsr_bundled`
-18. `tsr_tsoptions`
-19. `tsr_module`
-20. `tsr_nodebuilder`
-21. `tsr_printer`
-22. `tsr_pseudochecker`
-23. `tsr_checker`
-24. `tsr_astnav`
-25. `tsr_format`
-26. `tsr_transformers`
-27. `tsr_compiler`
-28. `tsr_project`
-29. `tsr_api`
-30. `tsr_embed`
-31. `tsr_wasm`
+8. `tsr_jsonrpc`
+9. `tsr_ipc`
+10. `tsr_diagnostics`
+11. `tsr_ast`
+12. `tsr_scanner`
+13. `tsr_encoder`
+14. `tsr_parser`
+15. `tsr_binder`
+16. `tsr_semver`
+17. `tsr_tspath`
+18. `tsr_vfs`
+19. `tsr_bundled`
+20. `tsr_tsoptions`
+21. `tsr_contentmapper`
+22. `tsr_module`
+23. `tsr_nodebuilder`
+24. `tsr_printer`
+25. `tsr_pseudochecker`
+26. `tsr_checker`
+27. `tsr_astnav`
+28. `tsr_format`
+29. `tsr_transformers`
+30. `tsr_compiler`
+31. `tsr_project`
+32. `tsr_api`
+33. `tsr_embed`
+34. `tsr_wasm`
 
 ## Package policy
 
@@ -156,14 +159,18 @@ build and optional dependencies. It is for a later, explicitly authorized releas
 | `tsr_bundled` | Prepared | Rust library and its public dependency closure |
 | `tsr_checker` | Prepared | Rust library and its public dependency closure |
 | `tsr_compiler` | Prepared | Rust library and its public dependency closure |
+| `tsr_contentmapper` | Prepared | Rust library and its public dependency closure |
+| `tsr_contentmappertest` | Private | Repository-only benchmark, experiment, test or capture tool |
 | `tsr_core` | Prepared | Rust library and its public dependency closure |
 | `tsr_diagnostics` | Prepared | Rust library and its public dependency closure |
 | `tsr_embed` | Prepared | Rust library and its public dependency closure |
 | `tsr_encoder` | Prepared | Rust library and its public dependency closure |
 | `tsr_format` | Prepared | Rust library and its public dependency closure |
 | `tsr_glob` | Prepared | Rust library and its public dependency closure |
+| `tsr_ipc` | Prepared | Rust library and its public dependency closure |
 | `tsr_jsnum` | Prepared | Rust library and its public dependency closure |
 | `tsr_json` | Prepared | Rust library and its public dependency closure |
+| `tsr_jsonrpc` | Prepared | Rust library and its public dependency closure |
 | `tsr_jsstring` | Prepared | Rust library and its public dependency closure |
 | `tsr_locale` | Prepared | Rust library and its public dependency closure |
 | `tsr_module` | Prepared | Rust library and its public dependency closure |

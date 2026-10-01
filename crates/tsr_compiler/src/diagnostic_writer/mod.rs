@@ -111,6 +111,8 @@ impl<'a> DiagnosticWriter<'a> {
         let source = self.source(id)?;
         let name = if let Some(canonical) = source.canonical_source_file() {
             self.source(canonical)?.parse_options().file_name.clone()
+        } else if let Some(canonical) = source.canonical_file_name() {
+            canonical.clone()
         } else {
             source.parse_options().file_name.clone()
         };
@@ -277,6 +279,16 @@ pub fn localized(d: &Diagnostic) -> Result<Vec<u8>> {
 /// Localize an existing message using the same request locale as its writer.
 /// External message text remains byte-exact and is never translated.
 pub fn localized_with_locale(d: &Diagnostic, locale: &tsr_locale::Locale) -> Result<Vec<u8>> {
+    localized_with_args(d, &d.message_args, locale)
+}
+
+/// `localized_with_locale` over the arguments to display, which differ from
+/// the stored ones where a content mapper aliases a name.
+fn localized_with_args(
+    d: &Diagnostic,
+    args: &[JsString],
+    locale: &tsr_locale::Locale,
+) -> Result<Vec<u8>> {
     if d.message.is_none() && !d.message_text.is_empty() {
         return Ok(d.message_text.as_bytes().to_vec());
     }
@@ -288,11 +300,7 @@ pub fn localized_with_locale(d: &Diagnostic, locale: &tsr_locale::Locale) -> Res
                 .and_then(tsr_diagnostics::by_key)
         })
         .ok_or(Error::Unsupported("unknown diagnostic localization key"))?;
-    let args: Vec<_> = d
-        .message_args
-        .iter()
-        .map(tsr_jsstring::JsString::as_bytes)
-        .collect();
+    let args: Vec<_> = args.iter().map(JsString::as_bytes).collect();
     let template = tsr_diagnostics::localized_messages(locale)
         .and_then(|table| table.get(message.key))
         .map_or(message.text.as_bytes(), |text| text.as_bytes());

@@ -149,14 +149,16 @@ def compare_errors(native, rust):
     for label, left, right in (
         first,
         ("post_diagnostics", native["error_post_diagnostics"], errors["diagnostics"]),
-        ("render_diagnostics", native["error_diagnostics"], errors["diagnostics"]),
+        # The harness leaves content-mapped files' diagnostics out of the
+        # rendered baseline; a Rust run reports that selection when it differs.
+        ("render_diagnostics", native["error_diagnostics"], errors.get("render_diagnostics", errors["diagnostics"])),
         ("inputs", native["error_render_inputs"], errors["inputs"]),
         ("pretty", native["error_pretty"], errors["pretty"]),
         ("bytes", native["errors"], errors["baseline"]),
     ):
         if left != right:
             differences.append(label)
-    code = first_code(native["error_diagnostics"], errors["diagnostics"]) if differences else None
+    code = first_code(native["error_diagnostics"], errors.get("render_diagnostics", errors["diagnostics"])) if differences else None
     if code is None and "pre_diagnostics" in differences:
         code = first_code(native["error_pre_diagnostics"], errors["pre_diagnostics"])
     return outcome("different" if differences else "match", differences=differences, first_code=code)

@@ -1028,9 +1028,10 @@ impl CheckerState {
         let parameter = data.type_parameter();
         let name = data.name_type();
         let annotation = read.type_node();
+        // port: tsc/internal/checker/grammarchecks.go:Checker.checkGrammarMappedType
         if let Some(&member) = self.source_list(node, data.members())?.first() {
-            self.error_at(
-                Some(member),
+            self.grammar_error_node(
+                member,
                 tsr_diagnostics::A_mapped_type_may_not_declare_properties_or_methods,
                 vec![],
             )?;
@@ -1064,6 +1065,7 @@ impl CheckerState {
     }
 }
 
+// port: tsc/internal/checker/checker.go:getModifiedReadonlyState
 fn modified_readonly(original: bool, modifiers: u32) -> bool {
     if modifiers & INCLUDE_READONLY != 0 {
         true

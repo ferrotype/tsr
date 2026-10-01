@@ -70,6 +70,12 @@ impl Snapshot {
         result
             .program
             .clone_from(&program.option_verification().diagnostics);
+        result
+            .program
+            .extend(program.content_mapper_diagnostics.iter().cloned());
+        result
+            .program
+            .extend(program.content_mapper_option_diagnostics.iter().cloned());
         result.program.extend(result.globals.iter().cloned());
         validate_owners(&result.program, &file_name)?;
         tsr_core::sort_like_go(&mut result.program, &mut |a, b| {
@@ -224,26 +230,28 @@ impl Program {
         Ok(compact_and_merge_related_infos(sorted, &file_name))
     }
     /// Unnecessary-code reports on content-mapped files survive only when their
-    /// span maps back to original text; that span translation is not ported.
+    /// span maps back to original text.
     /// port: tsc/internal/compiler/program.go:filterAndSortDiagnostics
-    pub(crate) fn filter_and_sort_diagnostics(
+    pub fn filter_and_sort_diagnostics(
         &self,
         diagnostics: &[Diagnostic],
     ) -> Result<Vec<Diagnostic>, Error> {
+        let mut kept = Vec::with_capacity(diagnostics.len());
         for diagnostic in diagnostics {
-            let Some(file) = diagnostic.file else {
-                continue;
-            };
-            if diagnostic.reports_unnecessary
-                && diagnostic.source.is_empty()
-                && source_state(self, file)?.span_map().is_some()
+            if let Some(file) = diagnostic
+                .file
+                .filter(|_| diagnostic.reports_unnecessary && diagnostic.source.is_empty())
             {
-                return Err(Error::Unsupported(
-                    "filterAndSortDiagnostics content-map span fidelity",
-                ));
+                if let Some(map) = source_state(self, file)?.span_map() {
+                    let (_, fidelity) = map.virtual_to_original_span(diagnostic.loc);
+                    if fidelity.is_none() {
+                        continue;
+                    }
+                }
             }
+            kept.push(diagnostic.clone());
         }
-        self.sort_and_deduplicate_diagnostics(diagnostics)
+        self.sort_and_deduplicate_diagnostics(&kept)
     }
     /// Source Program.GetProgramDiagnostics: direct verifier diagnostics plus
     /// only the include processor's global diagnostics. Checker work is absent.

@@ -28,6 +28,7 @@ impl Fixture {
             command: vec!["python3".into(), "producer.py".into()],
             inputs: vec!["input.dat".into()],
             sources: vec!["source.txt".into(), "producer.py".into()],
+            exclude: Vec::new(),
             target: "host".into(),
             config: "debug".into(),
             cases: None,
@@ -330,6 +331,29 @@ fn source_globs_track_additions_deletions_and_selected_dependencies() {
     f.commit();
     fs::remove_file(f.0.join("crates/one/src/lib.rs")).unwrap();
     f.rejected();
+}
+
+#[test]
+fn excluded_source_globs_leave_test_suites_out_of_the_fingerprint() {
+    let f = Fixture::new();
+    fs::create_dir_all(f.0.join("crates/one/src")).unwrap();
+    fs::create_dir_all(f.0.join("crates/one/tests/fixtures")).unwrap();
+    f.write("crates/one/src/lib.rs", "one");
+    f.write("crates/one/tests/suite.rs", "suite");
+    let mut spec = f.spec();
+    spec.sources.push("crates/**".into());
+    spec.exclude.push("crates/*/tests/**".into());
+    f.set_spec(&spec);
+    f.success();
+    f.write("crates/one/tests/suite.rs", "suite changed");
+    f.write("crates/one/tests/fixtures/new.json", "{}");
+    assert_eq!(f.loaded().states["probe"], "current");
+    f.write("crates/one/src/lib.rs", "production code changed");
+    f.rejected();
+    // Declaring no exclusions keeps the spec digest of every existing run.
+    let mut plain = f.spec();
+    plain.exclude.clear();
+    assert!(!serde_json::to_string(&plain).unwrap().contains("exclude"));
 }
 
 #[test]

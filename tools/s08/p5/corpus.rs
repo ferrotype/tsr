@@ -101,10 +101,12 @@ pub fn observe_with(
                 };
                 // Sorting/merging runs on actual typed diagnostics while the Program
                 // and checker operation still own all referenced source identities.
-                // Error rendering is baseline decoration, outside the interval.
+                // Error rendering is baseline decoration, outside the interval. The
+                // harness's collections drop unmapped unnecessary-code reports on
+                // content-mapped files (`filterAndSortDiagnostics`).
                 hooks.pause();
                 let sorted = diagnostic_values
-                    .map(|values| program.sort_and_deduplicate_diagnostics(values))
+                    .map(|values| program.filter_and_sort_diagnostics(values))
                     .transpose();
                 let errors = match &sorted {
                     Err(error) => executor::failure(error, "diagnostic_aggregation"),
@@ -175,31 +177,77 @@ fn error_baseline(
     pre: Option<Value>,
 ) -> Value {
     let diagnostics = executor::diagnostics::phase(program, values)["diagnostics"].take();
-    let rendered = (|| -> Result<Value, Box<dyn std::error::Error>> {
-        // Mapper execution is a named Program boundary. Do not
-        // let oracle-selected files silently supply this filter.
-        for file in program.files() {
-            if !file
-                .bound()
-                .view()
-                .source_file()?
-                .content_mapper()
-                .is_empty()
-            {
-                return Err("P5 native content-mapped error selection".into());
-            }
-        }
+    // The harness baselines content-mapped files' diagnostics separately, so
+    // the error baseline leaves those files and their diagnostics out
+    // (`compilerTest.verifyDiagnostics`, `contentMappedFileNames`).
+    let mapped: std::collections::BTreeSet<Vec<u8>> = program
+        .files()
+        .iter()
+        .filter_map(|file| {
+            let source = file.bound().view().source_file().ok()?;
+            program
+                .content_mapper(&source)
+                .map(|_| source.file_name().to_vec())
+        })
+        .collect();
+    let file_name = |id: tsr_ast::NodeId| {
+        program.files().iter().find_map(|file| {
+            (file.source() == id).then(|| {
+                file.bound()
+                    .view()
+                    .source_file()
+                    .ok()
+                    .map(|s| s.file_name().to_vec())
+            })?
+        })
+    };
+    let rendered_values: Vec<tsr_ast::Diagnostic> = values
+        .iter()
+        .filter(|d| {
+            d.file
+                .and_then(file_name)
+                .is_none_or(|name| !mapped.contains(&name))
+        })
+        .cloned()
+        .collect();
+    let unit_is_mapped =
+        |name: &[u8]| mapped.contains(&tsr_tspath::absolute(name, program.current_directory()));
+    let rendered_inputs: Vec<Value> = request["error_inputs"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|input| unhex(&input["name_hex"]).is_ok_and(|name| !unit_is_mapped(&name)))
+        .cloned()
+        .collect();
+    type Rendered = (Value, Option<Vec<u8>>);
+    let rendered = (|| -> Result<Rendered, Box<dyn std::error::Error>> {
         let contents = input_files(request, "error_inputs")?;
         let inputs: Vec<_> = contents
             .iter()
+            .filter(|(name, _)| !unit_is_mapped(name))
             .map(|(name, content)| errors::InputFile { name, content })
             .collect();
-        errors::render(program, &inputs, values, program.options().pretty.is_true())
+        let baseline = errors::render(
+            program,
+            &inputs,
+            &rendered_values,
+            program.options().pretty.is_true(),
+        )?;
+        // The content-mapped files' own baseline (`verifyContentMapper`).
+        Ok((baseline, errors::content_mapper(program, values)?))
     })();
     let mut result = match rendered {
-        Ok(baseline) => {
-            json!({"state":"executed","diagnostics":diagnostics,"baseline":baseline,"emit":emit,
-            "pretty":program.options().pretty.is_true(),"inputs":request["error_inputs"]})
+        Ok((baseline, content_mapper)) => {
+            let mut result = json!({"state":"executed","diagnostics":diagnostics,"baseline":baseline,
+            "emit":emit,"pretty":program.options().pretty.is_true(),"inputs":rendered_inputs});
+            if !mapped.is_empty() {
+                result["render_diagnostics"] =
+                    executor::diagnostics::phase(program, &rendered_values)["diagnostics"].take();
+            }
+            if let Some(text) = content_mapper {
+                result["content_mapper"] = json!({"text_hex":errors::hex(&text)});
+            }
+            result
         }
         Err(error) => {
             json!({"state":"failed","class":"error_baseline","reason":error.to_string(),"diagnostics":diagnostics,"emit":emit})

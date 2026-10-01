@@ -97,7 +97,37 @@ KNOWN_ARCH = {"386", "amd64", "arm", "arm64", "loong64", "mips", "mips64", "mips
 # Files whose parity phase is not their package's. The compiler checker pool is
 # Phase 2's (docs/PHASE2-plan.md decision 4, docs/PHASE2-C6-plan.md decision 1);
 # the rest of internal/compiler stays Phase 4's.
-FILE_PHASES = {"tsc/internal/compiler/checkerpool.go": 2}
+#
+# Content-mapper execution is pulled forward to Phase 2 (docs/PHASE2-C7-plan.md
+# decision 1): the files the corpus's `runExternalCode` rows execute through the
+# harness's in-process spawner, by static reach from the harness and compiler
+# entry points and the seven mappers those rows name. The process transports,
+# the synchronous conn and the other test mappers stay in their packages' phases.
+CONTENT_MAPPER_FILES = (
+    "tsc/internal/contentmapper/contentmapper.go",
+    "tsc/internal/contentmapper/host.go",
+    "tsc/internal/contentmapper/hostimpl.go",
+    "tsc/internal/contentmapper/transform.go",
+    "tsc/internal/ipc/conn.go",
+    "tsc/internal/ipc/conn_async.go",
+    "tsc/internal/ipc/protocol.go",
+    "tsc/internal/ipc/protocol_jsonrpc.go",
+    "tsc/internal/ipc/timing.go",
+    "tsc/internal/jsonrpc/baseproto.go",
+    "tsc/internal/jsonrpc/jsonrpc.go",
+    "tsc/internal/spanmap/spanmap.go",
+    "tsc/internal/testutil/contentmappertest/failing.go",
+    "tsc/internal/testutil/contentmappertest/lisp.go",
+    "tsc/internal/testutil/contentmappertest/protocol.go",
+    "tsc/internal/testutil/contentmappertest/registry.go",
+    "tsc/internal/testutil/contentmappertest/spawner.go",
+    "tsc/internal/testutil/contentmappertest/supplemental.go",
+    "tsc/internal/testutil/contentmappertest/supplemental_diagnostics.go",
+    "tsc/internal/testutil/contentmappertest/supplemental_globals.go",
+    "tsc/internal/testutil/contentmappertest/supplemental_module.go",
+    "tsc/internal/testutil/contentmappertest/transforming.go",
+)
+FILE_PHASES = {"tsc/internal/compiler/checkerpool.go": 2} | dict.fromkeys(CONTENT_MAPPER_FILES, 2)
 
 
 def crate_for(pkg):

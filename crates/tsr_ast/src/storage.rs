@@ -459,6 +459,21 @@ impl ParsedFile {
     pub fn root(&self) -> NodeId {
         self.view().file_info().root.expect("completed parse root")
     }
+    /// The root source file's metadata, which a content mapper completes with
+    /// its mapping and its diagnostics, without changing syntax edges or
+    /// revoking their completed validation.
+    pub fn root_source_file_mut(&mut self) -> Result<&mut crate::SourceFileState, Error> {
+        let root = self.root();
+        self.builder.source_file_mut(root)
+    }
+    /// Allocates a content mapper's diagnostic directives for the root source
+    /// file's metadata; an auxiliary record changes no syntax edge.
+    pub fn diagnostic_directives(
+        &mut self,
+        values: Vec<crate::MappedDiagnosticDirective>,
+    ) -> Result<crate::DiagnosticDirectiveSlice, Error> {
+        self.builder.source_diagnostic_directives(values)
+    }
     /// Supply the host's content hash without changing syntax edges or revoking
     /// their completed validation. Fails for a non-source-file fragment root.
     pub fn set_source_hash(&mut self, hash: crate::SourceHash) -> Result<(), Error> {

@@ -36,6 +36,7 @@ pub(crate) struct IterationTypes {
     pub(crate) next_type: Option<TypeId>,
 }
 impl IterationTypes {
+    // port: tsc/internal/checker/checker.go:IterationTypes.getType
     pub(crate) fn get(self, kind: IterationKind) -> Option<TypeId> {
         match kind {
             IterationKind::Yield => self.yield_type,
@@ -43,6 +44,7 @@ impl IterationTypes {
             IterationKind::Next => self.next_type,
         }
     }
+    // port: tsc/internal/checker/checker.go:IterationTypes.hasTypes
     pub(crate) fn has_types(self) -> bool {
         self.yield_type.is_some() || self.return_type.is_some() || self.next_type.is_some()
     }

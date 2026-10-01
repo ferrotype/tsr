@@ -83,6 +83,7 @@ tsr_checker = { version = "0.1.0", path = "../tsr_checker" }
 tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
 tsr_diagnostics = { version = "0.1.0", path = "../tsr_diagnostics" }
 tsr_locale = { version = "0.1.0", path = "../tsr_locale" }
+tsr_contentmapper = { version = "0.1.0", path = "../tsr_contentmapper" }
 
 [lints]
 workspace = true
@@ -94,6 +95,9 @@ serde = { version = "1", features = ["derive"] }
 tsr_nodebuilder = { version = "0.1.0", path = "../tsr_nodebuilder" }
 tsr_astnav = { version = "0.1.0", path = "../tsr_astnav" }
 tsr_project = { version = "0.1.0", path = "../tsr_project" }
+# The harness's in-process content mappers, which the corpus examples serve.
+tsr_contentmappertest = { path = "../tsr_contentmappertest" }
+tsr_ipc = { version = "0.1.0", path = "../tsr_ipc" }
 serde_json = "1"
 sha2 = "0.10"
 mimalloc = "=0.1.48"

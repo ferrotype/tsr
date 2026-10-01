@@ -134,6 +134,18 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
+      "name": "tsr_contentmapper",
+      "manifest": "crates/tsr_contentmapper/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_contentmappertest",
+      "manifest": "crates/tsr_contentmappertest/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
       "name": "tsr_core",
       "manifest": "crates/tsr_core/Cargo.toml",
       "publish": true,
@@ -176,6 +188,12 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
+      "name": "tsr_ipc",
+      "manifest": "crates/tsr_ipc/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
       "name": "tsr_jsnum",
       "manifest": "crates/tsr_jsnum/Cargo.toml",
       "publish": true,
@@ -184,6 +202,12 @@
     {
       "name": "tsr_json",
       "manifest": "crates/tsr_json/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_jsonrpc",
+      "manifest": "crates/tsr_jsonrpc/Cargo.toml",
       "publish": true,
       "reason": "Rust library and its public dependency closure"
     },

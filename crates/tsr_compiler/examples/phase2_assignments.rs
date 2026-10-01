@@ -4,9 +4,9 @@
 //!
 //! A `program` line carries a corpus row's request (the frozen loading request
 //! and the native harness inputs the config parse reads); the program loads as
-//! the corpus loads it, in the concurrent mode (the program's own
-//! single-threaded setting unknown), and the plan is the pool's for its
-//! checker count. A
+//! the corpus loads it, with the harness's content mappers, in the concurrent
+//! mode (the program's own single-threaded setting unknown), and the plan is
+//! the pool's for its checker count. A
 //! `synthetic` line carries per-file inputs and a checker count, and the plan
 //! is computed from them directly. Output is one JSON line per input line.
 #[path = "../../../tools/s08/p4/config.rs"]
@@ -83,6 +83,55 @@ fn synthetic(line: &Value) -> Value {
     json!({"id": line["id"], "state": "computed", "plan": plan_json(&plan)})
 }
 
+/// The harness's content-mapper host and project for one program
+/// (`harnessutil.CompileFilesEx`), as the corpus executor opens them: only
+/// when the options trust external code and the config declares mappers.
+/// Dropping it closes the project, then the host.
+struct Mappers {
+    host: Option<tsr_contentmapper::HostImpl>,
+    project: Option<Arc<dyn tsr_contentmapper::Project>>,
+}
+
+impl Mappers {
+    fn open(config: &tsr_tsoptions::ParsedCommandLine) -> Self {
+        let mappers = config.content_mappers.as_deref().unwrap_or_default();
+        if !config.options.run_external_code.is_true() || mappers.is_empty() {
+            return Self {
+                host: None,
+                project: None,
+            };
+        }
+        let host = tsr_contentmapper::new_host(
+            &tsr_ipc::Context::background(),
+            tsr_contentmappertest::new_spawner(),
+            tsr_locale::Locale::default(),
+        );
+        let project = tsr_contentmapper::Host::project(
+            &host,
+            tsr_contentmapper::ProjectSpec {
+                config_file_name: config.config_name(),
+                mappers: Arc::from(mappers.to_vec()),
+                compiler_options: Arc::new(config.options.clone()),
+            },
+        );
+        Self {
+            host: Some(host),
+            project,
+        }
+    }
+}
+
+impl Drop for Mappers {
+    fn drop(&mut self) {
+        if let Some(project) = self.project.take() {
+            let _ = project.close();
+        }
+        if let Some(host) = self.host.take() {
+            let _ = tsr_contentmapper::Host::close(&host);
+        }
+    }
+}
+
 fn program(line: &Value) -> Value {
     let request = &line["request"];
     let parsed = match config::parse(request) {
@@ -95,7 +144,13 @@ fn program(line: &Value) -> Value {
     // the compiler option decides (harnessutil.createProgram).
     let options = observation::program_options(&request["loading"], parsed);
     let counters = tsr_arena::Counters::new();
-    let program = match Program::load(options, &mut FileCache::new(), &counters) {
+    let mappers = Mappers::open(&options.config);
+    let program = match Program::load_with_content_mapper_project(
+        options,
+        mappers.project.clone(),
+        &mut FileCache::new(),
+        &counters,
+    ) {
         Ok(program) => Arc::new(program),
         Err(tsr_compiler::Error::Unsupported(reason)) => {
             return json!({"id": line["id"], "state": "unsupported", "reason": reason});
