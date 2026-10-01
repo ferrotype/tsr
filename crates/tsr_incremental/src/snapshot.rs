@@ -60,10 +60,16 @@ impl FileInfo {
 /// `hash_with_text` (testing).
 // port: tsc/internal/execute/incremental/snapshot.go:ComputeHash
 pub fn compute_hash(text: &[u8], hash_with_text: bool) -> JsString {
+    const HEX: &[u8; 16] = b"0123456789abcdef";
     let hash_bytes = xxhash_rust::xxh3::xxh3_128(text).to_be_bytes();
-    let mut hash = Vec::with_capacity(hash_bytes.len() * 2 + 1 + text.len());
+    let digits = hash_bytes.len() * 2;
+    let mut hash = Vec::with_capacity(if hash_with_text {
+        digits + 1 + text.len()
+    } else {
+        digits
+    });
     for byte in hash_bytes {
-        hash.extend_from_slice(format!("{byte:02x}").as_bytes());
+        hash.extend_from_slice(&[HEX[usize::from(byte >> 4)], HEX[usize::from(byte & 0xf)]]);
     }
     if hash_with_text {
         hash.push(b'-');
@@ -251,6 +257,55 @@ pub struct ProgramDiagnostics {
     pub(crate) diagnostics: Vec<Diagnostic>,
 }
 
+impl ProgramDiagnostics {
+    /// The diagnostics with their files, chains' and related information's
+    /// files as `program` holds them. Each program parses its files into
+    /// owners of its own, so a program that parsed an unchanged file again
+    /// holds it as another node, found by the file's path; the pin's programs
+    /// share an unchanged `SourceFile`. A file `program` lacks keeps its node.
+    pub(crate) fn diagnostics_for(&self, program: &Arc<Program>) -> Result<Vec<Diagnostic>, Error> {
+        if Arc::ptr_eq(&self.program, program) {
+            return Ok(self.diagnostics.clone());
+        }
+        self.diagnostics
+            .iter()
+            .map(|diagnostic| rebind_diagnostic(diagnostic, &self.program, program))
+            .collect()
+    }
+}
+
+fn rebind_diagnostic(
+    diagnostic: &Diagnostic,
+    from: &Program,
+    to: &Program,
+) -> Result<Diagnostic, Error> {
+    let rebind_all = |diagnostics: &[Arc<Diagnostic>]| {
+        diagnostics
+            .iter()
+            .map(|diagnostic| rebind_diagnostic(diagnostic, from, to).map(Arc::new))
+            .collect::<Result<Vec<_>, Error>>()
+    };
+    let mut rebound = diagnostic.clone();
+    rebound.file = diagnostic
+        .file
+        .map(|file| rebind_file(file, from, to))
+        .transpose()?;
+    rebound.message_chain = rebind_all(&diagnostic.message_chain)?;
+    rebound.related_information = rebind_all(&diagnostic.related_information)?;
+    Ok(rebound)
+}
+
+fn rebind_file(file: NodeId, from: &Program, to: &Program) -> Result<NodeId, Error> {
+    if to.file_of_node(file).is_some() {
+        return Ok(file);
+    }
+    let Some(source) = from.file_of_node(file) else {
+        return Ok(file);
+    };
+    let path = crate::program::source_path(source)?;
+    Ok(to.file(path.as_bytes()).map_or(file, ProgramFile::source))
+}
+
 impl std::fmt::Debug for ProgramDiagnostics {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("ProgramDiagnostics")
@@ -299,7 +354,7 @@ impl DiagnosticsOrBuildInfoDiagnosticsWithFileName {
     ) -> Result<Vec<Diagnostic>, Error> {
         let mut diagnostics = lock(&self.diagnostics);
         if let Some(diagnostics) = diagnostics.as_ref() {
-            return Ok(diagnostics.diagnostics.clone());
+            return diagnostics.diagnostics_for(p);
         }
         // Convert and cache the diagnostics
         let mut converted = Vec::with_capacity(self.build_info_diagnostics.len());

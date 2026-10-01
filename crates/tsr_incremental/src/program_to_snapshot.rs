@@ -6,7 +6,8 @@ use crate::program::Program;
 use crate::reference_map::ReferenceSet;
 use crate::snapshot::{
     get_file_emit_kind, get_pending_emit_kind_with_options, lock, BuildInfoDiagnosticWithFileName,
-    DiagnosticsOrBuildInfoDiagnosticsWithFileName, FileEmitKind, FileInfo, Path, Snapshot,
+    DiagnosticsOrBuildInfoDiagnosticsWithFileName, FileEmitKind, FileInfo, Path,
+    ProgramDiagnostics, Snapshot,
 };
 use std::collections::BTreeSet;
 use std::sync::atomic::Ordering;
@@ -603,6 +604,13 @@ pub(crate) fn repopulate_diagnostics_of_file(
         else {
             return Ok(diags.clone());
         };
+        // The repopulated list is recorded as `p`'s, so the files it still
+        // names as the old program held them must become `p`'s.
+        let repopulated = ProgramDiagnostics {
+            diagnostics: repopulated,
+            ..program_diagnostics
+        }
+        .diagnostics_for(p)?;
         return Ok(Arc::new(
             DiagnosticsOrBuildInfoDiagnosticsWithFileName::from_diagnostics(p, repopulated),
         ));
