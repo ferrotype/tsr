@@ -457,6 +457,7 @@ dependencies = [
  "tsr_parser",
  "tsr_printer",
  "tsr_scanner",
+ "tsr_sourcemap",
  "tsr_transformers",
  "tsr_tsoptions",
  "tsr_tspath",
@@ -636,6 +637,8 @@ dependencies = [
  "tsr_jsstring",
  "tsr_nodebuilder",
  "tsr_scanner",
+ "tsr_sourcemap",
+ "tsr_tspath",
 ]
 
 [[package]]
@@ -668,17 +671,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "tsr_sourcemap"
+version = "0.1.0"
+dependencies = [
+ "hashbrown",
+ "tsr_arena",
+ "tsr_core",
+ "tsr_json",
+ "tsr_jsstring",
+ "tsr_tspath",
+]
+
+[[package]]
 name = "tsr_transformers"
 version = "0.1.0"
 dependencies = [
+ "stacker",
  "tsr_arena",
  "tsr_ast",
  "tsr_core",
  "tsr_diagnostics",
  "tsr_jsnum",
+ "tsr_jsstring",
  "tsr_nodebuilder",
  "tsr_printer",
  "tsr_scanner",
+ "tsr_tsoptions",
  "tsr_tspath",
 ]
 
