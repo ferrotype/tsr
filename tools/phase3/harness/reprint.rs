@@ -66,6 +66,8 @@ fn print(
 }
 
 /// `{"state":"executed","files":[...]}` over the program's non-library files.
+/// Each file records its script kind and language variant as the pin's
+/// `ScriptKind` and `LanguageVariant` integers, which the native row records.
 pub fn observe(program: &Program, texts: bool, last_panic: &dyn Fn() -> Option<String>) -> Value {
     let mut files = Vec::new();
     for file in program.files() {
@@ -84,6 +86,8 @@ pub fn observe(program: &Program, texts: bool, last_panic: &dyn Fn() -> Option<S
         files.push(json!({
             "name_hex": hex(options.file_name.as_bytes()),
             "source_sha256": sha256(source.text().as_bytes()),
+            "script_kind": source.script_kind.0,
+            "language_variant": source.language_variant.0,
             "comments": print(view, file.source(), false, texts, last_panic),
             "no_comments": print(view, file.source(), true, texts, last_panic),
         }));

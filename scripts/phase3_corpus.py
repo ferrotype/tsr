@@ -49,6 +49,10 @@ MODES = ("single", "concurrent")
 EMIT_DOMAINS = ("emit", "output", "sourcemap", "sourcemap_record")
 ROW_FIELDS = {"version", "id", "acceptance_tier", "mode", "load", "reprint", *EMIT_DOMAINS}
 PRINT_STATES = ("printed", "refused", "failed")
+# A reprinted file: its name and source digest, the pin's `ScriptKind` and
+# `LanguageVariant` integers (the native row records the same two), and the
+# two printings.
+REPRINT_FILE_FIELDS = {"name_hex", "source_sha256", "script_kind", "language_variant", "comments", "no_comments"}
 # What decides a Rust row: the production crates and the S08 executor
 # (p4.sources), the Phase 3 harness modules and the build configuration.
 # Requests and the native capture are bound by digest in capture.json.
@@ -186,9 +190,11 @@ def validate_reprint(request, row):
         raise ValueError("reprint lists more files than the program's non-library files")
     names = set()
     for item in value["files"]:
-        if not isinstance(item, dict) or set(item) != {"name_hex", "source_sha256", "comments", "no_comments"}:
+        if not isinstance(item, dict) or set(item) != REPRINT_FILE_FIELDS:
             raise ValueError("malformed reprint file")
         bytes.fromhex(item["name_hex"])
+        if any(type(item[key]) is not int or item[key] < 0 for key in ("script_kind", "language_variant")):
+            raise ValueError("malformed reprint file kind")
         if item["name_hex"] in names:
             raise ValueError("reprint file listed twice")
         names.add(item["name_hex"])
@@ -389,9 +395,12 @@ def load_capture(output):
     return metadata, request_rows, rows, stderrs
 
 
-def replay(output):
+def replay(output, *, write=True, capture=None):
+    """Recompute the capture's summary from its raw rows; `write` keeps it as
+    replayed.json in the capture (a producer replays without writing).
+    `capture` is the directory's `load_capture` result when already loaded."""
     output = Path(output).resolve()
-    metadata, request_rows, rows, stderrs = load_capture(output)
+    metadata, request_rows, rows, stderrs = capture or load_capture(output)
     harness, attributed = [], []
     reprint_states = Counter()
     for request, row, stderr in zip(request_rows, rows, stderrs, strict=True):
@@ -416,7 +425,8 @@ def replay(output):
     result = {"version": 1, "summary": summary, "harness_errors": harness, "production_failures": attributed,
               "selection": selected, "capture_sha256": digest(p4.canonical(metadata) + b"\n"),
               "source_stable": sources() == metadata["build"]["sources"]}
-    p4.atomic(output / "replayed.json", result)
+    if write:
+        p4.atomic(output / "replayed.json", result)
     return result
 
 

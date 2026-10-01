@@ -15,11 +15,27 @@ committed transpile observation. Metrics:
 * transpile_native_verified -- data/phase3/transpile-native.json was observed
   by the current oracle and scripts, every configuration executed, and its
   runs compose exactly the inventory's transpile reference baselines;
-* harness_valid, result_recorded, blockers_named -- false until the Rust emit
-  harness, its first recorded run and the blocker register exist (T0's
-  remaining work); the parity metrics of docs/PHASE3-plan.md section 5 follow
-  them and are not emitted before then.
+* harness_valid, harness_valid_concurrent -- that mode's Rust capture
+  (target/phase3/rust-<mode>, scripts/phase3_corpus.py) is complete (not a
+  sample, every executed variant observed), current with the sources it was
+  built from and with the requests the inventory and native capture give now,
+  bound to that mode's verified native capture, and has no harness error in
+  its replay or its comparison;
+* result_recorded -- the single-mode comparison's acceptance summary equals the
+  committed data/phase3/first-comparison.json;
+* reprint_parity -- rows whose reprint domain matches, over the executed
+  denominator;
+* unsupported_required -- executed variants with an unsupported domain;
+* mode_parity -- both modes' native captures verified and Rust captures
+  harness-valid, and zero outcome differences between the two runs, each
+  compared with its own mode's native capture
+  (`scripts/phase3_compare.py modes`);
+* blockers_named -- data/phase3/blockers.json equals the register rebuilt from
+  the single-mode comparison (scripts/phase3_blockers.py) and names every row
+  that cannot pass with an owning checkpoint.
 
+The ratios and counts are emitted only over a harness-valid single-mode run;
+the other parity metrics of docs/PHASE3-plan.md section 5 come with T1 to T8.
 No threshold is introduced. A missing or stale capture leaves its metric false.
 """
 from __future__ import annotations
@@ -34,12 +50,18 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from s04_common import strict_json_loads  # noqa: E402
 from s08_oracle import ROOT, canonical, digest  # noqa: E402
+import s08_p4 as p4  # noqa: E402
+import phase3_blockers  # noqa: E402
+import phase3_compare  # noqa: E402
+import phase3_corpus  # noqa: E402
 import phase3_inventory  # noqa: E402
 import phase3_native  # noqa: E402
 
 NATIVE = {mode: ROOT / f"target/phase3/native-{mode}" for mode in phase3_native.MODES}
+RUST = {mode: ROOT / f"target/phase3/rust-{mode}" for mode in phase3_native.MODES}
 TRANSPILE = phase3_native.DATA / "transpile-native.json"
 METRIC = {"single": "native_verified", "concurrent": "native_verified_concurrent"}
+HARNESS_METRIC = {"single": "harness_valid", "concurrent": "harness_valid_concurrent"}
 
 
 def quietly(function, *args, **kwargs):
@@ -81,11 +103,46 @@ def transpile_verified(document):
     return composed == owed and sources == cases and not observed["reference_disagreements"]
 
 
-def emit(native=None):
+def capture_valid(mode, metadata, replayed, comparison, native_report, native_report_sha256, requests_sha256,
+                  executed):
+    """Whether one mode's Rust capture can stand for the denominator: complete,
+    current with its sources and requests, bound to that mode's native capture,
+    and free of harness errors."""
+    return (metadata["mode"] == mode and native_report["mode"] == mode
+            and not metadata["partial"] and not replayed["summary"]["partial"]
+            and replayed["summary"]["observed"] == executed and replayed["summary"]["harness_errors"] == 0
+            and replayed["source_stable"] is True and comparison["rust"]["source_stable"] is True
+            and metadata["native"]["observation_sha256"] == native_report["observation_sha256"]
+            and metadata["native"]["report_sha256"] == native_report_sha256
+            and metadata["requests_sha256"] == requests_sha256
+            and comparison["summary"]["valid"] and comparison["summary"]["rows"] == executed)
+
+
+def harness(mode, native_dir, rust_dir, executed):
+    """One mode's Rust capture: (valid, native, capture, comparison), where
+    `native` and `capture` are the loaded captures and `comparison` the report
+    of the capture against its mode's native capture."""
+    native = phase3_compare.load_native(native_dir)
+    capture = phase3_corpus.load_capture(rust_dir)
+    replayed = quietly(phase3_corpus.replay, rust_dir, write=False, capture=capture)
+    _, current_requests = quietly(phase3_corpus.requests, native_dir, mode=mode)
+    comparison = phase3_compare.report(native_dir, rust_dir, native=native, capture=capture)
+    valid = capture_valid(mode, capture[0], replayed, comparison, native[1],
+                          digest((native[0] / "report.json").read_bytes()),
+                          digest(p4.canonical(current_requests) + b"\n"), executed)
+    return valid, native, capture, comparison
+
+
+def matched_ratio(rows, domain):
+    return sum(row["outcomes"][domain] in phase3_compare.MATCHED for row in rows) / len(rows) if rows else None
+
+
+def emit(native=None, rust=None):
     native = native or NATIVE
+    rust = rust or RUST
     metrics = {"inventory_frozen": False, "native_verified": False, "native_verified_concurrent": False,
-               "transpile_native_verified": False, "harness_valid": False, "result_recorded": False,
-               "blockers_named": False}
+               "transpile_native_verified": False, "harness_valid": False, "harness_valid_concurrent": False,
+               "result_recorded": False, "blockers_named": False, "mode_parity": False}
     try:
         document = phase3_inventory.read()
         metrics["inventory_frozen"] = (phase3_inventory.INVENTORY.read_bytes()
@@ -103,6 +160,49 @@ def emit(native=None):
         metrics["transpile_native_verified"] = transpile_verified(document)
     except (OSError, ValueError, KeyError) as error:
         print("transpile observation unavailable: " + str(error), file=sys.stderr)
+    executed = document["counts"]["executed"]
+    states = {}
+    for mode, name in HARNESS_METRIC.items():
+        if not metrics[METRIC[mode]]:
+            print(f"{mode} Rust capture not assessed: its native capture is not verified", file=sys.stderr)
+            continue
+        try:
+            states[mode] = harness(mode, native[mode], rust[mode], executed)
+            metrics[name] = states[mode][0]
+        except (OSError, ValueError, KeyError) as error:
+            print(f"{mode} Rust capture unavailable: " + str(error), file=sys.stderr)
+    if not metrics["harness_valid"]:
+        print("the single-mode Rust capture is partial, stale or invalid; acceptance metrics withheld", file=sys.stderr)
+        return {"metrics": metrics}
+    _, _, capture, comparison = states["single"]
+    summary = phase3_compare.acceptance_summary(comparison)
+    try:
+        recorded = strict_json_loads(phase3_compare.RECORD.read_bytes()) if phase3_compare.RECORD.exists() else None
+        metrics["result_recorded"] = recorded == summary
+    except (OSError, ValueError) as error:
+        print("recorded comparison unavailable: " + str(error), file=sys.stderr)
+    rows = comparison["rows"]
+    metrics["reprint_parity"] = matched_ratio(rows, "reprint")
+    metrics["unsupported_required"] = sum(any(o == "unsupported" for o in row["outcomes"].values()) for row in rows)
+    try:
+        register = phase3_blockers.build(native["single"], rust["single"], comparison=comparison, capture=capture)
+        committed = (strict_json_loads(phase3_blockers.REGISTER.read_bytes())
+                     if phase3_blockers.REGISTER.exists() else None)
+        metrics["blockers_named"] = register == committed and phase3_blockers.complete(register, comparison)
+    except (OSError, ValueError, KeyError) as error:
+        print("blocker register unavailable: " + str(error), file=sys.stderr)
+    if metrics["harness_valid_concurrent"]:
+        try:
+            loaded = {mode: (states[mode][1], states[mode][2]) for mode in HARNESS_METRIC}
+            modes = phase3_compare.modes(native["single"], rust["single"], native["concurrent"], rust["concurrent"],
+                                         write=False, loaded=loaded)
+            metrics["mode_parity"] = (metrics["native_verified"] and metrics["native_verified_concurrent"]
+                                      and modes["outcome_differences"] == 0
+                                      and modes["single"]["rust_capture_sha256"] == comparison["rust"]["capture_sha256"])
+        except (OSError, ValueError, KeyError) as error:
+            print("mode comparison unavailable: " + str(error), file=sys.stderr)
+    print("emit evidence: " + canonical({"native": comparison["native"]["observation_sha256"],
+                                         "rust": comparison["rust"]["capture_sha256"]}).decode(), file=sys.stderr)
     return {"metrics": metrics}
 
 
@@ -111,8 +211,11 @@ def main():
     parser.add_argument("command", choices=("emit",))
     parser.add_argument("--native-single", type=Path, default=NATIVE["single"])
     parser.add_argument("--native-concurrent", type=Path, default=NATIVE["concurrent"])
+    parser.add_argument("--rust-single", type=Path, default=RUST["single"])
+    parser.add_argument("--rust-concurrent", type=Path, default=RUST["concurrent"])
     args = parser.parse_args()
-    print(json.dumps(emit({"single": args.native_single, "concurrent": args.native_concurrent}), sort_keys=True))
+    print(json.dumps(emit({"single": args.native_single, "concurrent": args.native_concurrent},
+                          {"single": args.rust_single, "concurrent": args.rust_concurrent}), sort_keys=True))
 
 
 if __name__ == "__main__":

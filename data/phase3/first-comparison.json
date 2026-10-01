@@ -1,0 +1,135 @@
+{
+ "buckets": {
+  "failed": [],
+  "reprint_by_extension": {},
+  "reprint_by_kind": {},
+  "reprint_by_refusal": {},
+  "reprint_refusals_matching_a_pinned_panic": {
+   "unhandled statement: KindJSImportDeclaration": {
+    "count": 58,
+    "examples": [
+     "compiler/importAttributeTypeOnlyImports.ts#configuration=0",
+     "compiler/importAttributeTypesJsImports.ts#configuration=0",
+     "compiler/jsDeclarationEmitDoesNotReuseUnrelatedJSDocImport.ts#configuration=0"
+    ],
+    "rows": 29
+   }
+  },
+  "unsupported": [
+   {
+    "count": 13432,
+    "domain": "emit_diagnostics",
+    "examples": [
+     "compiler/2dArrays.ts#configuration=0",
+     "compiler/ArrowFunctionExpression1.ts#configuration=0",
+     "compiler/ClassDeclaration10.ts#configuration=0"
+    ],
+    "reason": "Program.Emit is Phase 3 T8",
+    "rows": 13432
+   },
+   {
+    "count": 13432,
+    "domain": "sourcemap",
+    "examples": [
+     "compiler/2dArrays.ts#configuration=0",
+     "compiler/ArrowFunctionExpression1.ts#configuration=0",
+     "compiler/ClassDeclaration10.ts#configuration=0"
+    ],
+    "reason": "Program.Emit is Phase 3 T8",
+    "rows": 13432
+   },
+   {
+    "count": 13432,
+    "domain": "sourcemap_record",
+    "examples": [
+     "compiler/2dArrays.ts#configuration=0",
+     "compiler/ArrowFunctionExpression1.ts#configuration=0",
+     "compiler/ClassDeclaration10.ts#configuration=0"
+    ],
+    "reason": "Program.Emit is Phase 3 T8",
+    "rows": 13432
+   },
+   {
+    "count": 13363,
+    "domain": "output",
+    "examples": [
+     "compiler/2dArrays.ts#configuration=0",
+     "compiler/ArrowFunctionExpression1.ts#configuration=0",
+     "compiler/ClassDeclaration10.ts#configuration=0"
+    ],
+    "reason": "Program.Emit is Phase 3 T8",
+    "rows": 13363
+   }
+  ]
+ },
+ "harness_errors": [],
+ "inventory_sha256": "24f0c89fd5a3be1806355ff44d540f8873e932182810ebd689bcea677bccf1b9",
+ "native": {
+  "mode": "single",
+  "observation_sha256": "e99a8dccabc3a497b14beec8e147a2b28cd8298e103d9acca0dfa41173dfae60",
+  "report_sha256": "6798c857c737c3101ba89491803c13d057e30bb44c08e7060cac19075644c336"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "rust": {
+  "capture_sha256": "1f4d46cf89396041e16df504d7e1441974aa02ecdc6d788f8472983bbb358300",
+  "requests_sha256": "76550e269076fbaa34128a8faf686ba745f58b81253474089eb268517838cb5a",
+  "selection": {
+   "cases": [],
+   "limit": null,
+   "sample": false
+  },
+  "source_stable": true
+ },
+ "summary": {
+  "all_domains_met": 0,
+  "domains": {
+   "emit_diagnostics": {
+    "different": 0,
+    "disabled": 0,
+    "failed": 0,
+    "match": 0,
+    "unexecuted": 0,
+    "unsupported": 13432
+   },
+   "output": {
+    "different": 0,
+    "disabled": 69,
+    "failed": 0,
+    "match": 0,
+    "unexecuted": 0,
+    "unsupported": 13363
+   },
+   "reprint": {
+    "different": 0,
+    "disabled": 0,
+    "failed": 0,
+    "match": 13432,
+    "unexecuted": 0,
+    "unsupported": 0
+   },
+   "sourcemap": {
+    "different": 0,
+    "disabled": 0,
+    "failed": 0,
+    "match": 0,
+    "unexecuted": 0,
+    "unsupported": 13432
+   },
+   "sourcemap_record": {
+    "different": 0,
+    "disabled": 0,
+    "failed": 0,
+    "match": 0,
+    "unexecuted": 0,
+    "unsupported": 13432
+   }
+  },
+  "harness_errors": 0,
+  "mode": "single",
+  "partial": false,
+  "rows": 13432,
+  "unsupported_rows": 13432,
+  "valid": true
+ },
+ "version": 2
+}

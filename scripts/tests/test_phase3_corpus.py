@@ -106,6 +106,18 @@ class RowContract(Rows):
         rust["reprint"]["files"][0]["comments"]["location"] = "crates/tsr_printer/src/printer.rs:1:1"
         corpus.validate_row(request, rust)
 
+    def test_reprinted_files_carry_their_script_kind_and_language_variant(self):
+        for key in ("script_kind", "language_variant"):
+            request, rust, _ = self.triple(PRINTED)
+            del rust["reprint"]["files"][0][key]
+            with self.assertRaisesRegex(ValueError, "malformed reprint file"):
+                corpus.validate_row(request, rust)
+            for value in (True, -1, "3", None):
+                request, rust, _ = self.triple(PRINTED)
+                rust["reprint"]["files"][0][key] = value
+                with self.assertRaisesRegex(ValueError, "malformed reprint file kind"):
+                    corpus.validate_row(request, rust)
+
     def test_reprint_lists_each_non_library_file_once(self):
         request, rust, _ = self.triple(MAPPED)
         rust["reprint"]["files"][1] = copy.deepcopy(rust["reprint"]["files"][0])
@@ -200,6 +212,45 @@ class Comparison(Rows):
             rust["reprint"]["files"][0]["no_comments"] = {"state": "refused", "reason": "printer does not support X yet"}
         result = self.outcomes(PRINTED, refused)["reprint"]
         self.assertEqual((result["category"], result["kind"], result["mode"]), ("different", "rust_refused", "no_comments"))
+
+    def test_a_refusal_matches_only_the_pinned_panic_message(self):
+        """Mutation check: a refusal with another reason where the pin panics
+        must not match."""
+        request, rust, native = self.triple(REFUSED)
+        pinned = native["reprint"][0]["comments"]
+        self.assertEqual(pinned, {"state": "panic", "message": "unhandled statement: KindJSImportDeclaration"})
+        self.assertTrue(compare.print_agrees(pinned, rust["reprint"]["files"][0]["comments"]))
+
+        def other_reason(rust, native):
+            rust["reprint"]["files"][0]["comments"]["reason"] = "unhandled statement: KindImportDeclaration"
+        result = self.outcomes(REFUSED, other_reason)["reprint"]
+        self.assertEqual((result["category"], result["kind"], result["mode"]), ("different", "refusal_reason", "comments"))
+        self.assertEqual(result["native"], pinned)
+
+        def other_panic(rust, native):
+            native["reprint"][0]["no_comments"]["message"] = "runtime error: index out of range"
+        result = self.outcomes(REFUSED, other_panic)["reprint"]
+        self.assertEqual((result["category"], result["kind"], result["mode"]), ("different", "refusal_reason", "no_comments"))
+
+        request, rust, native = self.triple(REFUSED)
+        other_reason(rust, native)
+        self.assertEqual([(reason, confirmed) for reason, confirmed, _, _ in compare.refusals(native, rust)],
+                         [("unhandled statement: KindImportDeclaration", False),
+                          ("unhandled statement: KindJSImportDeclaration", True)])
+
+    def test_file_kinds_must_be_the_pins(self):
+        self.assertEqual(self.triple(REFUSED)[2]["reprint"][0]["script_kind"], 1)
+        for key, value in (("script_kind", 3), ("language_variant", 0)):
+            def kind(rust, native, key=key, value=value):
+                rust["reprint"]["files"][0][key] = value
+            result = self.outcomes(REFUSED, kind)["reprint"]
+            self.assertEqual((result["category"], result["kind"], result["file"]), ("different", "file_kind", "/foo.js"))
+            self.assertEqual(result["native"], {"script_kind": 1, "language_variant": 1})
+
+        def second_file(rust, native):
+            native["reprint"][1]["language_variant"] = 1
+        result = self.outcomes(MAPPED, second_file)["reprint"]
+        self.assertEqual((result["kind"], result["extension"]), ("file_kind", ".vue"))
 
     def test_text_differences_name_the_first_differing_file(self):
         def text(rust, native):

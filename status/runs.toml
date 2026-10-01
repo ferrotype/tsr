@@ -225,13 +225,17 @@ target = "host"
 config = "Phase 2 C0 checker acceptance contract: 13,432 executed compiler/conformance variants (runner-enumerated, not skipped), native contract verified from two shardings against every committed reference, one categorized Rust run (errors, types, symbols, display, trace, union ordering, parent pointers) with harness defects separate from compiler gaps, named blockers; single-threaded mode; no threshold"
 
 # Phase 3 T0 (docs/PHASE3-plan.md): replays the recorded native emit captures
-# of both test-program modes (target/phase3/native-single, native-concurrent)
+# of both test-program modes (target/phase3/native-single, native-concurrent),
+# the Rust captures of both modes (target/phase3/rust-single, rust-concurrent)
 # and the committed transpile observation. It never runs a corpus; a missing or
 # stale capture leaves its metric false. The owner records it on the designated
 # host with `cargo xtask run emit`.
 [emit]
 command = ["python3", "scripts/phase3_producers.py", "emit"]
-inputs = ["data/phase3/inventory.json", "data/phase3/native-provenance-single.json", "data/phase3/native-provenance-concurrent.json", "data/phase3/transpile-native.json", "data/phase2/inventory.json", "data/s07/subset.json", "data/upstream.json", ".gitmodules", "data/s04/toolchains.toml"]
-sources = ["scripts/phase3_*.py", "scripts/s08_baselines.py", "scripts/s08_oracle.py", "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py", "tools/phase3/**", "tools/s08/oracle/diagnostics_observer.go", "upstream", "scripts/tests/test_phase3*.py", "scripts/tests/fixtures/phase3/**"]
+inputs = ["data/phase3/inventory.json", "data/phase3/native-provenance-single.json", "data/phase3/native-provenance-concurrent.json", "data/phase3/transpile-native.json", "data/phase3/first-comparison.json", "data/phase3/blockers.json", "data/phase2/inventory.json", "data/s07/subset.json", "data/upstream.json", ".gitmodules", "data/s04/toolchains.toml"]
+sources = ["scripts/phase3_*.py", "scripts/s08_baselines.py", "scripts/s08_oracle.py", "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py", "tools/phase3/**", "tools/s08/oracle/diagnostics_observer.go", "upstream", "scripts/tests/test_phase3*.py", "scripts/tests/fixtures/phase3/**", "crates/**", "Cargo.*", ".cargo/**", "rust-toolchain*", "tools/**/Cargo.toml", "tools/s08/p4/**", "tools/s08/relater-prototype/**", "tools/s03/**", "tools/s07/program/*.rs", "tools/s07/config/host.rs", "xtask/**", "scripts/generate_locale_tables.py", "scripts/s08_p4.py", "scripts/s07_program.py", "scripts/s07_subset.py", "scripts/phase2_corpus.py", "scripts/phase2_inventory.py"]
+# The Rust capture binds the production crates but not their test-only suites
+# (scripts/phase3_corpus.py SOURCE_PATTERNS, as the [checker] producer's).
+exclude = ["crates/*/tests/**"]
 target = "host"
-config = "Phase 3 T0 emit acceptance contract: 13,432 executed compiler/conformance variants with the output, sourcemap and sourcemap-record baselines the pinned runner composes, the emitted files and the pinned printer's reprint of every non-library source file, verified from two shardings against every committed reference in both test-program modes; the transpile runner's 28 configurations; Rust harness, first run and blockers pending; no threshold"
+config = "Phase 3 T0 emit acceptance contract: 13,432 executed compiler/conformance variants with the output, sourcemap and sourcemap-record baselines the pinned runner composes, the emitted files and the pinned printer's reprint of every non-library source file, verified from two shardings against every committed reference in both test-program modes; the transpile runner's 28 configurations; the Rust emit harness's runs in both modes (target/phase3/rust-single, rust-concurrent), the recorded first comparison and the blocker register; no threshold"

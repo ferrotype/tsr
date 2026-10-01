@@ -126,12 +126,14 @@
         "sha256": "94a3f59b78ee6cca864b92f0555945abec50d83ebc01b164cea75e277d22307e",
         "state": "printed"
        },
+       "language_variant": 0,
        "name_hex": "2f2e7372632f32644172726179732e7473",
        "no_comments": {
         "bytes": 230,
         "sha256": "94a3f59b78ee6cca864b92f0555945abec50d83ebc01b164cea75e277d22307e",
         "state": "printed"
        },
+       "script_kind": 3,
        "source_sha256": "c92ce8f049c50461916a2e0b832e2d37edf45a3c8d44aadfda43e462616beb9f"
       }
      ],
@@ -272,12 +274,14 @@
         "sha256": "b9a604979c9b2929d86fca2e07b2af1d125ab5e9de226bda1ed91caa417724d3",
         "state": "printed"
        },
+       "language_variant": 0,
        "name_hex": "2f2e7372632f6d697373696e6752657175697265644465636c6172652e642e7473",
        "no_comments": {
         "bytes": 11,
         "sha256": "b9a604979c9b2929d86fca2e07b2af1d125ab5e9de226bda1ed91caa417724d3",
         "state": "printed"
        },
+       "script_kind": 3,
        "source_sha256": "f677d6b770cd4f5e28fad6423f762295f2f04eb84b23df1ea9b37af3d07b6a36"
       }
      ],
@@ -420,11 +424,13 @@
         "reason": "unhandled statement: KindJSImportDeclaration",
         "state": "refused"
        },
+       "language_variant": 1,
        "name_hex": "2f666f6f2e6a73",
        "no_comments": {
         "reason": "unhandled statement: KindJSImportDeclaration",
         "state": "refused"
        },
+       "script_kind": 1,
        "source_sha256": "5a342695cc88571e395b2dc4bf7e570fdbabfa57d7a6236b7e3371863e7e4507"
       }
      ],
@@ -611,12 +617,14 @@
         "sha256": "08e10200c2292c65d8d2f386ed8a5c816631edce1b9035787b8966a94c2f131b",
         "state": "printed"
        },
+       "language_variant": 0,
        "name_hex": "2f636f6d706f6e656e742e7675652e302e7473",
        "no_comments": {
         "bytes": 45,
         "sha256": "08e10200c2292c65d8d2f386ed8a5c816631edce1b9035787b8966a94c2f131b",
         "state": "printed"
        },
+       "script_kind": 3,
        "source_sha256": "a3e8624a88ecff0c23fe4a91c8ccc87350550fa10dcb2f5bfbc774cc839e1dee"
       },
       {
@@ -625,12 +633,14 @@
         "sha256": "96909e1dce85ca534fd8881f6c8369a8a87e06df5a4bf81ef44a72db195b0704",
         "state": "printed"
        },
+       "language_variant": 0,
        "name_hex": "2f636f6d706f6e656e742e767565",
        "no_comments": {
         "bytes": 18,
         "sha256": "96909e1dce85ca534fd8881f6c8369a8a87e06df5a4bf81ef44a72db195b0704",
         "state": "printed"
        },
+       "script_kind": 3,
        "source_sha256": "56332e0a55734bc2b73df56a2df8635ed5c5b24b6d7a456b41de7cab9a2f3814"
       }
      ],
