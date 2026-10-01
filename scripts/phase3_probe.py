@@ -16,7 +16,9 @@ A requests file is authored by hand:
 
 `source` uses the compiler-test format (`// @target: es2015`, `// @filename:`),
 with one configuration per case. `["script"]` is the pin's own chain for the
-file. `names` lists the transformer names.
+file; `["declarations"]` is its declaration emit (the declaration transformers
+and the declaration printer options), recorded with the transform's
+diagnostics. `names` lists the transformer names.
 
     capture --requests FILE --output FILE    # run the oracle, write the native fixture
     check   --requests FILE --native FILE    # run it again and require the same fixture
@@ -152,6 +154,10 @@ def run(cases):
                 entry = {"chain": chain["chain"]}
                 if chain["state"] == "printed":
                     entry.update(text(chain["text_hex"]))
+                    if "diagnostics" in chain:
+                        entry["diagnostics"] = [{"code": d["code"], "pos": d["pos"], "end": d["end"],
+                                                 "message": bytes.fromhex(d["message_hex"]).decode()}
+                                                for d in chain["diagnostics"]]
                 else:
                     entry["panic"] = chain["message"]
                 chains.append(entry)

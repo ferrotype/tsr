@@ -16,6 +16,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/microsoft/TypeScript/tsc/internal/ast"
 	"github.com/microsoft/TypeScript/tsc/internal/compiler"
 	"github.com/microsoft/TypeScript/tsc/internal/testutil/harnessutil"
 	"github.com/microsoft/TypeScript/tsc/internal/tspath"
@@ -36,7 +37,18 @@ func phase3ProbeChain(t *testing.T, program *compiler.Program, name string, chai
 			result["message"] = fmt.Sprint(value)
 		}
 	}()
-	text := compiler.Phase3Transform(t.Context(), program, program.GetSourceFile(name), chain)
+	var text string
+	if len(chain) == 1 && chain[0] == "declarations" {
+		var diagnostics []*ast.Diagnostic
+		text, diagnostics = compiler.Phase3Declarations(t.Context(), program, program.GetSourceFile(name))
+		reported := []map[string]any{}
+		for _, d := range diagnostics {
+			reported = append(reported, map[string]any{"code": d.Code(), "pos": d.Pos(), "end": d.End(), "message_hex": hex.EncodeToString([]byte(d.String()))})
+		}
+		result["diagnostics"] = reported
+	} else {
+		text = compiler.Phase3Transform(t.Context(), program, program.GetSourceFile(name), chain)
+	}
 	result["state"] = "printed"
 	result["text_hex"] = hex.EncodeToString([]byte(text))
 	return result

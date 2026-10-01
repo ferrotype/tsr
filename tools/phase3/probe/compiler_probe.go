@@ -4,7 +4,8 @@ package compiler
 // script transformers over one source file of a program, with the options
 // getScriptTransformers builds, and prints the result with emitJSFile's
 // printer options and no source map. The chain "script" is the pin's own
-// chain for the file. Nothing here changes what the pin computes.
+// chain for the file; "declarations" is its declaration emit. Nothing here
+// changes what the pin computes.
 import (
 	"context"
 	"sort"
@@ -12,6 +13,7 @@ import (
 	"github.com/microsoft/TypeScript/tsc/internal/ast"
 	"github.com/microsoft/TypeScript/tsc/internal/binder"
 	"github.com/microsoft/TypeScript/tsc/internal/core"
+	"github.com/microsoft/TypeScript/tsc/internal/outputpaths"
 	"github.com/microsoft/TypeScript/tsc/internal/printer"
 	"github.com/microsoft/TypeScript/tsc/internal/transformers"
 	"github.com/microsoft/TypeScript/tsc/internal/transformers/estransforms"
@@ -44,12 +46,38 @@ func phase3Transformers() map[string]transformers.TransformerFactory {
 }
 
 func Phase3TransformerNames() []string {
-	names := []string{"script"}
+	names := []string{"script", "declarations"}
 	for name := range phase3Transformers() {
 		names = append(names, name)
 	}
 	sort.Strings(names)
 	return names
+}
+
+// Phase3Declarations runs the pin's declaration transformers over one source
+// file, as emitDeclarationFile does, and prints the result with its printer
+// options and no declaration map. The declaration path is the one the emitter
+// would compute with declaration emit forced.
+func Phase3Declarations(ctx context.Context, program *Program, sourceFile *ast.SourceFile) (string, []*ast.Diagnostic) {
+	host, done := newEmitHost(ctx, program, sourceFile)
+	defer done()
+	emitContext, putEmitContext := printer.GetEmitContext()
+	defer putEmitContext()
+	options := host.Options()
+	paths := outputpaths.GetOutputPathsFor(sourceFile, options, host, outputpaths.ForceEmitPaths{Dts: true})
+	e := &emitter{host: host, emitOnly: EmitAll, sourceFile: sourceFile}
+	sourceFile, diagnostics := e.runDeclarationTransformers(emitContext, sourceFile, paths.DeclarationFilePath(), "")
+	printerOptions := printer.PrinterOptions{
+		RemoveComments:              options.RemoveComments.IsTrue(),
+		NewLine:                     options.NewLine,
+		NoEmitHelpers:               true,
+		Target:                      options.GetEmitScriptTarget(),
+		OnlyPrintJSDocStyle:         true,
+		OmitBraceSourceMapPositions: true,
+	}
+	writer := printer.NewTextWriter(options.NewLine.GetNewLineCharacter(), 0)
+	printer.NewPrinter(printerOptions, printer.PrintHandlers{}, emitContext).Write(sourceFile.AsNode(), sourceFile, writer, nil)
+	return writer.String(), diagnostics
 }
 
 func Phase3Transform(ctx context.Context, program *Program, sourceFile *ast.SourceFile, chain []string) string {
