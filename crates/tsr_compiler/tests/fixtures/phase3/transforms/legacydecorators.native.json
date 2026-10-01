@@ -1,0 +1,2846 @@
+{
+ "cases": [
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nlet C = class C {\r\n    m() { return 1; }\r\n};\r\nC = __decorate([\r\n    dec\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-basic",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c6173732043207b0a202020206d2829207b2072657475726e20313b207d0a7d0a"
+    },
+    "id": "class-basic",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    m() { return 1; }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nlet C = class C {\r\n};\r\nC = __decorate([\r\n    dec,\r\n    p(1)\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-multiple",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a40702831290a636c6173732043207b7d0a"
+    },
+    "id": "class-multiple",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\n@p(1)\nclass C {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nlet C = class C {\r\n};\r\nC = __decorate([\r\n    ns.dec(),\r\n    ns.other\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-call-property-access",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c61726520636f6e7374206e733a20616e793b0a406e732e64656328290a406e732e6f746865720a636c6173732043207b7d0a"
+    },
+    "id": "class-call-property-access",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\ndeclare const ns: any;\n@ns.dec()\n@ns.other\nclass C {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nlet C = class C {\r\n};\r\nC = __decorate([\r\n    dec\r\n], C);\r\nexport { C };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-export",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a6578706f727420636c6173732043207b7d0a"
+    },
+    "id": "class-export",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport class C {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nlet C = class C {\r\n};\r\nC = __decorate([\r\n    dec\r\n], C);\r\nexport default C;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-export-default-named",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a6578706f72742064656661756c7420636c6173732043207b7d0a"
+    },
+    "id": "class-export-default-named",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport default class C {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nlet default_1 = class {\r\n};\r\ndefault_1 = __decorate([\r\n    dec\r\n], default_1);\r\nexport default default_1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-export-default-anonymous",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a6578706f72742064656661756c7420636c617373207b7d0a"
+    },
+    "id": "class-export-default-anonymous",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport default class {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nclass Base {\r\n}\r\nlet D = class D extends Base {\r\n    constructor() { super(); }\r\n};\r\nD = __decorate([\r\n    dec\r\n], D);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-heritage",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732042617365207b7d0a406465630a636c617373204420657874656e64732042617365207b0a20202020636f6e7374727563746f722829207b20737570657228293b207d0a7d0a"
+    },
+    "id": "class-heritage",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass Base {}\n@dec\nclass D extends Base {\n    constructor() { super(); }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\n/** leading doc */\r\nlet C = class C {\r\n    // inside\r\n    /* member */ m() { }\r\n};\r\n__decorate([\r\n    dec\r\n], C.prototype, \"m\", null);\r\nC = __decorate([\r\n    dec // trailing\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-comments",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a2f2a2a206c656164696e6720646f63202a2f0a40646563202f2f20747261696c696e670a636c6173732043207b0a202020202f2f20696e736964650a202020202f2a206d656d626572202a2f2040646563206d2829207b7d0a7d0a"
+    },
+    "id": "class-comments",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n/** leading doc */\n@dec // trailing\nclass C {\n    // inside\n    /* member */ @dec m() {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nlet C = class C {\r\n};\r\nC = __decorate([\r\n    dec\r\n], C);\r\nexport { C };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-other-modifiers",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a6578706f727420616273747261637420636c6173732043207b7d0a"
+    },
+    "id": "class-other-modifiers",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2017\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport abstract class C {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nlet C = class C {\r\n    static s = 1;\r\n    i = 2;\r\n};\r\n__decorate([\r\n    dec\r\n], C.prototype, \"i\", void 0);\r\n__decorate([\r\n    dec\r\n], C, \"s\", void 0);\r\nC = __decorate([\r\n    dec\r\n], C);\r\nexport { C };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-esnext",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a6578706f727420636c6173732043207b0a2020202040646563207374617469632073203d20313b0a20202020406465632069203d20323b0a7d0a"
+    },
+    "id": "class-esnext",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 99
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: esnext\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport class C {\n    @dec static s = 1;\n    @dec i = 2;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar C_1;\r\nlet C = C_1 = class C {\r\n    static x() { return C_1.y; }\r\n    static y = 1;\r\n};\r\nC = C_1 = __decorate([\r\n    dec\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alias-static-method",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c6173732043207b0a2020202073746174696320782829207b2072657475726e20432e793b207d0a202020207374617469632079203d20313b0a7d0a"
+    },
+    "id": "alias-static-method",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    static x() { return C.y; }\n    static y = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar C_1;\r\nlet C = class C {\r\n    static { C_1 = this; }\r\n    static x() { return C_1.y; }\r\n    static y = 1;\r\n};\r\nC = C_1 = __decorate([\r\n    dec\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alias-es2022-static-property",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c6173732043207b0a2020202073746174696320782829207b2072657475726e20432e793b207d0a202020207374617469632079203d20313b0a7d0a"
+    },
+    "id": "alias-es2022-static-property",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2022\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    static x() { return C.y; }\n    static y = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar C_1;\r\nlet C = class C {\r\n    static { C_1 = this; }\r\n    static { console.log(C_1); }\r\n};\r\nC = C_1 = __decorate([\r\n    dec\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alias-es2022-static-block",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c6173732043207b0a20202020737461746963207b20636f6e736f6c652e6c6f672843293b207d0a7d0a"
+    },
+    "id": "alias-es2022-static-block",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2022\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    static { console.log(C); }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar C_1;\r\nlet C = C_1 = class C {\r\n    m() { return C_1; }\r\n};\r\nC = C_1 = __decorate([\r\n    dec\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alias-es2022-no-static",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c6173732043207b0a202020206d2829207b2072657475726e20433b207d0a7d0a"
+    },
+    "id": "alias-es2022-no-static",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2022\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    m() { return C; }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar C_1;\r\nlet C = C_1 = class C {\r\n    static x() { return C_1.y; }\r\n    static y = 1;\r\n};\r\nC = C_1 = __decorate([\r\n    dec\r\n], C);\r\nexport { C };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alias-export",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a6578706f727420636c6173732043207b0a2020202073746174696320782829207b2072657475726e20432e793b207d0a202020207374617469632079203d20313b0a7d0a"
+    },
+    "id": "alias-export",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport class C {\n    static x() { return C.y; }\n    static y = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar C_1;\r\nlet C = C_1 = class C {\r\n    static x() { return C_1.y; }\r\n    static y = 1;\r\n};\r\nC = C_1 = __decorate([\r\n    dec\r\n], C);\r\nexport default C;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alias-export-default",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a6578706f72742064656661756c7420636c6173732043207b0a2020202073746174696320782829207b2072657475726e20432e793b207d0a202020207374617469632079203d20313b0a7d0a"
+    },
+    "id": "alias-export-default",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport default class C {\n    static x() { return C.y; }\n    static y = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar C_1;\r\nlet C = C_1 = class C {\r\n    p = C_1;\r\n};\r\nC = C_1 = __decorate([\r\n    dec\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alias-property-initializer",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c6173732043207b0a2020202070203d20433b0a7d0a"
+    },
+    "id": "alias-property-initializer",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    p = C;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar C_1;\r\nlet C = C_1 = class C {\r\n    m() { return C_1; }\r\n};\r\n__decorate([\r\n    p(C_1)\r\n], C.prototype, \"m\", null);\r\nC = C_1 = __decorate([\r\n    dec(C)\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alias-decorator-argument",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465632843290a636c6173732043207b0a202020204070284329206d2829207b2072657475726e20433b207d0a7d0a"
+    },
+    "id": "alias-decorator-argument",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec(C)\nclass C {\n    @p(C) m() { return C; }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __param = (this && this.__param) || function (paramIndex, decorator) {\r\n    return function (target, key) { decorator(target, key, paramIndex); }\r\n};\r\nvar C_1;\r\nlet C = C_1 = class C {\r\n    constructor(a) { C_1; }\r\n};\r\nC = C_1 = __decorate([\r\n    dec,\r\n    __param(0, p(C))\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alias-ctor-param-decorator",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c6173732043207b0a20202020636f6e7374727563746f7228407028432920613a20616e7929207b20433b207d0a7d0a"
+    },
+    "id": "alias-ctor-param-decorator",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    constructor(@p(C) a: any) { C; }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar C_1;\r\nlet C = C_1 = class C extends mixin(C_1) {\r\n    m() { return C_1; }\r\n};\r\nC = C_1 = __decorate([\r\n    dec\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alias-heritage",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e206d6978696e28783a20616e79293a20616e793b0a406465630a636c617373204320657874656e6473206d6978696e284329207b0a202020206d2829207b2072657475726e20433b207d0a7d0a"
+    },
+    "id": "alias-heritage",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\ndeclare function mixin(x: any): any;\n@dec\nclass C extends mixin(C) {\n    m() { return C; }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar C_1;\r\nlet C = C_1 = class C {\r\n    m() { return this.C; }\r\n    C_1 = 1;\r\n};\r\nC = C_1 = __decorate([\r\n    dec\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "no-alias-property-name",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c6173732043207b0a202020206d2829207b2072657475726e20746869732e433b207d0a2020202043203d20313b0a7d0a"
+    },
+    "id": "no-alias-property-name",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    m() { return this.C; }\n    C = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nlet C = class C {\r\n    m(C) { return C; }\r\n};\r\nC = __decorate([\r\n    dec\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "no-alias-shadowed",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c6173732043207b0a202020206d28433a20616e7929207b2072657475726e20433b207d0a7d0a"
+    },
+    "id": "no-alias-shadowed",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    m(C: any) { return C; }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar C_1;\r\nlet C = C_1 = class C {\r\n    m() { return C_1.prototype.m; }\r\n};\r\nC = C_1 = __decorate([\r\n    dec\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alias-property-access-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c6173732043207b0a202020206d2829207b2072657475726e20432e70726f746f747970652e6d3b207d0a7d0a"
+    },
+    "id": "alias-property-access-expression",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    m() { return C.prototype.m; }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nfunction f() {\r\n    var C_1;\r\n    let C = C_1 = class C {\r\n        static m() { return C_1; }\r\n    };\r\n    C = C_1 = __decorate([\r\n        dec\r\n    ], C);\r\n    return C;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alias-nested-function",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a66756e6374696f6e20662829207b0a20202020406465630a20202020636c6173732043207b0a2020202020202020737461746963206d2829207b2072657475726e20433b207d0a202020207d0a2020202072657475726e20433b0a7d0a"
+    },
+    "id": "alias-nested-function",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nfunction f() {\n    @dec\n    class C {\n        static m() { return C; }\n    }\n    return C;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar Outer_1, Inner_1;\r\nlet Outer = Outer_1 = class Outer {\r\n    static m() {\r\n        let Inner = Inner_1 = class Inner {\r\n            static n() { return Inner_1 || Outer_1; }\r\n        };\r\n        Inner = Inner_1 = __decorate([\r\n            dec\r\n        ], Inner);\r\n        return Inner;\r\n    }\r\n};\r\nOuter = Outer_1 = __decorate([\r\n    dec\r\n], Outer);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alias-nested-classes",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c617373204f75746572207b0a20202020737461746963206d2829207b0a2020202020202020406465630a2020202020202020636c61737320496e6e6572207b0a202020202020202020202020737461746963206e2829207b2072657475726e20496e6e6572207c7c204f757465723b207d0a20202020202020207d0a202020202020202072657475726e20496e6e65723b0a202020207d0a7d0a"
+    },
+    "id": "alias-nested-classes",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass Outer {\n    static m() {\n        @dec\n        class Inner {\n            static n() { return Inner || Outer; }\n        }\n        return Inner;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar C_2;\r\nvar C_1 = 0;\r\nlet C = C_2 = class C {\r\n    static m() { return C_2; }\r\n};\r\nC = C_2 = __decorate([\r\n    dec\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alias-name-collision",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a76617220435f31203d20303b0a406465630a636c6173732043207b0a20202020737461746963206d2829207b2072657475726e20433b207d0a7d0a"
+    },
+    "id": "alias-name-collision",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nvar C_1 = 0;\n@dec\nclass C {\n    static m() { return C; }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nclass C {\r\n    m() { }\r\n    n() { }\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, \"m\", null);\r\n__decorate([\r\n    dec,\r\n    p(1)\r\n], C.prototype, \"n\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "method",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a2020202040646563206d2829207b7d0a2020202040646563204070283129206e2829207b7d0a7d0a"
+    },
+    "id": "method",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec m() {}\n    @dec @p(1) n() {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nclass C {\r\n    static s() { }\r\n    i() { }\r\n    static t = 1;\r\n    j = 2;\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, \"i\", null);\r\n__decorate([\r\n    dec\r\n], C.prototype, \"j\", void 0);\r\n__decorate([\r\n    dec\r\n], C, \"s\", null);\r\n__decorate([\r\n    dec\r\n], C, \"t\", void 0);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "static-and-instance-order",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a20202020406465632073746174696320732829207b7d0a202020204064656320692829207b7d0a2020202040646563207374617469632074203d20313b0a2020202040646563206a203d20323b0a7d0a"
+    },
+    "id": "static-and-instance-order",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec static s() {}\n    @dec i() {}\n    @dec static t = 1;\n    @dec j = 2;\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nclass C {\r\n    p;\r\n    q = 1;\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, \"p\", void 0);\r\n__decorate([\r\n    dec\r\n], C.prototype, \"q\", void 0);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "property",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a202020204064656320703a206e756d6265723b0a20202020406465632071203d20313b0a7d0a"
+    },
+    "id": "property",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec p: number;\n    @dec q = 1;\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nclass C {\r\n    p;\r\n    static q = 1;\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, \"p\", void 0);\r\n__decorate([\r\n    dec\r\n], C, \"q\", void 0);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "property-esnext",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a202020204064656320703a206e756d6265723b0a2020202040646563207374617469632071203d20313b0a7d0a"
+    },
+    "id": "property-esnext",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 99
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: esnext\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec p: number;\n    @dec static q = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nclass C {\r\n    get a() { return 1; }\r\n    set a(v) { }\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, \"a\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessor-pair-getter",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a20202020406465632067657420612829207b2072657475726e20313b207d0a202020207365742061287629207b7d0a7d0a"
+    },
+    "id": "accessor-pair-getter",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec get a() { return 1; }\n    set a(v) {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nclass C {\r\n    get a() { return 1; }\r\n    set a(v) { }\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, \"a\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessor-pair-setter",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a2020202067657420612829207b2072657475726e20313b207d0a2020202040646563207365742061287629207b7d0a7d0a"
+    },
+    "id": "accessor-pair-setter",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    get a() { return 1; }\n    @dec set a(v) {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __param = (this && this.__param) || function (paramIndex, decorator) {\r\n    return function (target, key) { decorator(target, key, paramIndex); }\r\n};\r\nclass C {\r\n    get a() { return 1; }\r\n    set a(v) { }\r\n}\r\n__decorate([\r\n    dec,\r\n    __param(0, p)\r\n], C.prototype, \"a\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessor-setter-parameter",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a20202020406465632067657420612829207b2072657475726e20313b207d0a202020207365742061284070207629207b7d0a7d0a"
+    },
+    "id": "accessor-setter-parameter",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec get a() { return 1; }\n    set a(@p v) {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nclass C {\r\n    static get a() { return 1; }\r\n    static set a(v) { }\r\n}\r\n__decorate([\r\n    dec\r\n], C, \"a\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessor-static",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a2020202040646563207374617469632067657420612829207b2072657475726e20313b207d0a20202020737461746963207365742061287629207b7d0a7d0a"
+    },
+    "id": "accessor-static",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec static get a() { return 1; }\n    static set a(v) {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nclass C {\r\n    accessor x = 1;\r\n    static accessor y = 2;\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, \"x\", null);\r\n__decorate([\r\n    dec\r\n], C, \"y\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "auto-accessor",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a2020202040646563206163636573736f722078203d20313b0a202020204064656320737461746963206163636573736f722079203d20323b0a7d0a"
+    },
+    "id": "auto-accessor",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2022\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec accessor x = 1;\n    @dec static accessor y = 2;\n}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __param = (this && this.__param) || function (paramIndex, decorator) {\r\n    return function (target, key) { decorator(target, key, paramIndex); }\r\n};\r\nclass C {\r\n    m(a, b, c) { }\r\n}\r\n__decorate([\r\n    __param(1, p),\r\n    __param(2, p(1)),\r\n    __param(2, dec)\r\n], C.prototype, \"m\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parameters",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a202020206d28612c20407020622c2040702831292040646563206329207b7d0a7d0a"
+    },
+    "id": "parameters",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    m(a, @p b, @p(1) @dec c) {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __param = (this && this.__param) || function (paramIndex, decorator) {\r\n    return function (target, key) { decorator(target, key, paramIndex); }\r\n};\r\nclass C {\r\n    m(a) { }\r\n}\r\n__decorate([\r\n    __param(0, p)\r\n], C.prototype, \"m\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parameters-this",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a202020206d28746869733a20432c20407020613a206e756d62657229207b7d0a7d0a"
+    },
+    "id": "parameters-this",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    m(this: C, @p a: number) {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __param = (this && this.__param) || function (paramIndex, decorator) {\r\n    return function (target, key) { decorator(target, key, paramIndex); }\r\n};\r\nclass C {\r\n    m(a = 1, ...b) { }\r\n}\r\n__decorate([\r\n    __param(0, p),\r\n    __param(1, p)\r\n], C.prototype, \"m\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parameters-default-and-rest",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a202020206d2840702061203d20312c204070202e2e2e623a20616e795b5d29207b7d0a7d0a"
+    },
+    "id": "parameters-default-and-rest",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    m(@p a = 1, @p ...b: any[]) {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __param = (this && this.__param) || function (paramIndex, decorator) {\r\n    return function (target, key) { decorator(target, key, paramIndex); }\r\n};\r\nlet C = class C {\r\n    constructor(a, b) { }\r\n};\r\nC = __decorate([\r\n    __param(0, p)\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "ctor-parameters",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a20202020636f6e7374727563746f7228407020613a20616e792c20623a20616e7929207b7d0a7d0a"
+    },
+    "id": "ctor-parameters",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    constructor(@p a: any, b: any) {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __param = (this && this.__param) || function (paramIndex, decorator) {\r\n    return function (target, key) { decorator(target, key, paramIndex); }\r\n};\r\nlet C = class C {\r\n    constructor(x = 1, private y) { }\r\n};\r\nC = __decorate([\r\n    __param(0, p)\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "ctor-parameter-property",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a20202020636f6e7374727563746f72284070207075626c69632078203d20312c207072697661746520793f3a206e756d62657229207b7d0a7d0a"
+    },
+    "id": "ctor-parameter-property",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    constructor(@p public x = 1, private y?: number) {}\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __param = (this && this.__param) || function (paramIndex, decorator) {\r\n    return function (target, key) { decorator(target, key, paramIndex); }\r\n};\r\nlet C = class C {\r\n    constructor(a) { }\r\n    m(x) { }\r\n};\r\n__decorate([\r\n    dec,\r\n    __param(0, p)\r\n], C.prototype, \"m\", null);\r\nC = __decorate([\r\n    dec,\r\n    __param(0, p)\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-and-ctor-parameters",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c6173732043207b0a20202020636f6e7374727563746f7228407020613a20616e7929207b7d0a2020202040646563206d284070207829207b7d0a7d0a"
+    },
+    "id": "class-and-ctor-parameters",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    constructor(@p a: any) {}\n    @dec m(@p x) {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nclass C {\r\n    [\"a\"]() { }\r\n    [1] = 1;\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, \"a\", null);\r\n__decorate([\r\n    dec\r\n], C.prototype, 1, void 0);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-literal",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a2020202040646563205b2261225d2829207b7d0a2020202040646563205b315d203d20313b0a7d0a"
+    },
+    "id": "computed-literal",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec [\"a\"]() {}\n    @dec [1] = 1;\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar _a, _b;\r\nclass C {\r\n    [_a = key()]() { }\r\n    static [_b = key()] = 1;\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, _a, null);\r\n__decorate([\r\n    dec\r\n], C, _b, void 0);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e206b657928293a20737472696e673b0a636c6173732043207b0a2020202040646563205b6b657928295d2829207b7d0a202020204064656320737461746963205b6b657928295d203d20313b0a7d0a"
+    },
+    "id": "computed-expression",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\ndeclare function key(): string;\nclass C {\n    @dec [key()]() {}\n    @dec static [key()] = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar _a;\r\nclass C {\r\n    [_a = k]() { }\r\n    [k + 1]() { }\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, _a, null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-identifier",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c61726520636f6e7374206b3a20737472696e673b0a636c6173732043207b0a2020202040646563205b6b5d2829207b7d0a202020205b6b202b20315d2829207b7d0a7d0a"
+    },
+    "id": "computed-identifier",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\ndeclare const k: string;\nclass C {\n    @dec [k]() {}\n    [k + 1]() {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar _a;\r\nclass C {\r\n    [_a = Symbol.iterator]() { }\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, _a, null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-symbol",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a2020202040646563205b53796d626f6c2e6974657261746f725d2829207b7d0a7d0a"
+    },
+    "id": "computed-symbol",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec [Symbol.iterator]() {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nclass C {\r\n    \"quoted\"() { }\r\n    42 = 1;\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, \"quoted\", null);\r\n__decorate([\r\n    dec\r\n], C.prototype, 42, void 0);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "literal-names",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a2020202040646563202271756f746564222829207b7d0a2020202040646563203432203d20313b0a7d0a"
+    },
+    "id": "literal-names",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec \"quoted\"() {}\n    @dec 42 = 1;\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "class C {\r\n    #m() { }\r\n    #p = 1;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-name",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a202020204064656320236d2829207b7d0a2020202040646563202370203d20313b0a7d0a"
+    },
+    "id": "private-name",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2022\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec #m() {}\n    @dec #p = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nclass C {\r\n    static #x = 1;\r\n    m() { }\r\n    static s() { }\r\n    static {\r\n        __decorate([\r\n            dec(#x in C)\r\n        ], C.prototype, \"m\", null);\r\n        __decorate([\r\n            dec\r\n        ], C, \"s\", null);\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-in-decorator",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a20202020737461746963202378203d20313b0a202020204064656328237820696e204329206d2829207b7d0a20202020406465632073746174696320732829207b7d0a7d0a"
+    },
+    "id": "private-in-decorator",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2022\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    static #x = 1;\n    @dec(#x in C) m() {}\n    @dec static s() {}\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __param = (this && this.__param) || function (paramIndex, decorator) {\r\n    return function (target, key) { decorator(target, key, paramIndex); }\r\n};\r\nclass C {\r\n    static #x = 1;\r\n    m(a) { }\r\n    static {\r\n        __decorate([\r\n            __param(0, p(#x in C))\r\n        ], C.prototype, \"m\", null);\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-in-parameter-decorator",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a20202020737461746963202378203d20313b0a202020206d28407028237820696e204329206129207b7d0a7d0a"
+    },
+    "id": "private-in-parameter-decorator",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2022\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    static #x = 1;\n    m(@p(#x in C) a) {}\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nclass C {\r\n    q;\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, \"p\", void 0);\r\n__decorate([\r\n    dec\r\n], C.prototype, \"q\", void 0);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "declare-property",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a2020202040646563206465636c61726520703a206e756d6265723b0a202020204064656320713a206e756d6265723b0a7d0a"
+    },
+    "id": "declare-property",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec declare p: number;\n    @dec q: number;\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nclass C {\r\n    p;\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, \"p\", void 0);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "abstract-property",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a616273747261637420636c6173732043207b0a202020204064656320616273747261637420703a206e756d6265723b0a2020202040646563206162737472616374206d28293a20766f69643b0a7d0a"
+    },
+    "id": "abstract-property",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nabstract class C {\n    @dec abstract p: number;\n    @dec abstract m(): void;\n}\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "const X = class {\r\n    m() { }\r\n    p = 1;\r\n    constructor(a) { }\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636f6e73742058203d20636c617373207b0a2020202040646563206d2829207b7d0a20202020406465632070203d20313b0a20202020636f6e7374727563746f72284070206129207b7d0a7d3b0a"
+    },
+    "id": "class-expression",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nconst X = class {\n    @dec m() {}\n    @dec p = 1;\n    constructor(@p a) {}\n};\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "const X = class Y {\r\n    static m() { return Y; }\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-expression-named",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636f6e73742058203d20636c6173732059207b0a202020204064656320737461746963206d2829207b2072657475726e20593b207d0a7d3b0a"
+    },
+    "id": "class-expression-named",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nconst X = class Y {\n    @dec static m() { return Y; }\n};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nexport default class default_1 {\r\n    m() { }\r\n}\r\n__decorate([\r\n    dec\r\n], default_1.prototype, \"m\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "export-default-anonymous-members",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a6578706f72742064656661756c7420636c617373207b0a2020202040646563206d2829207b7d0a7d0a"
+    },
+    "id": "export-default-anonymous-members",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nexport default class {\n    @dec m() {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nexport class C {\r\n    m() { }\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, \"m\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "export-members",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a6578706f727420636c6173732043207b0a2020202040646563206d2829207b7d0a7d0a"
+    },
+    "id": "export-members",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nexport class C {\n    @dec m() {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "class C {\r\n    m() { }\r\n}\r\nfunction f() { return 1; }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "undecorated",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a202020206d2829207b7d0a7d0a66756e6374696f6e20662829207b2072657475726e20313b207d0a"
+    },
+    "id": "undecorated",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    m() {}\n}\nfunction f() { return 1; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\n{\r\n    class C {\r\n        m() { }\r\n    }\r\n    __decorate([\r\n        dec\r\n    ], C.prototype, \"m\", null);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "decorated-in-block",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a7b0a20202020636c6173732043207b0a202020202020202040646563206d2829207b7d0a202020207d0a7d0a"
+    },
+    "id": "decorated-in-block",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n{\n    class C {\n        @dec m() {}\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nclass A {\r\n    m() {\r\n        let B = class B {\r\n        };\r\n        B = __decorate([\r\n            dec\r\n        ], B);\r\n        return B;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "undecorated-outer",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732041207b0a202020206d2829207b0a2020202020202020406465630a2020202020202020636c6173732042207b7d0a202020202020202072657475726e20423b0a202020207d0a7d0a"
+    },
+    "id": "undecorated-outer",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass A {\n    m() {\n        @dec\n        class B {}\n        return B;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar C_1;\r\nlet C = C_1 = class C {\r\n    static m() {\r\n        class D {\r\n            n() { return C_1; }\r\n        }\r\n        const E = class {\r\n            n() { return C_1; }\r\n        };\r\n        return [D, E];\r\n    }\r\n};\r\nC = C_1 = __decorate([\r\n    dec\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alias-inner-undecorated",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c6173732043207b0a20202020737461746963206d2829207b0a2020202020202020636c6173732044207b206e2829207b2072657475726e20433b207d207d0a2020202020202020636f6e73742045203d20636c617373207b206e2829207b2072657475726e20433b207d207d3b0a202020202020202072657475726e205b442c20455d3b0a202020207d0a7d0a"
+    },
+    "id": "alias-inner-undecorated",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    static m() {\n        class D { n() { return C; } }\n        const E = class { n() { return C; } };\n        return [D, E];\n    }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __param = (this && this.__param) || function (paramIndex, decorator) {\r\n    return function (target, key) { decorator(target, key, paramIndex); }\r\n};\r\nclass C {\r\n    async m(a) { }\r\n}\r\n__decorate([\r\n    dec,\r\n    __param(0, p)\r\n], C.prototype, \"m\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "es2017-target",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a2020202040646563206173796e63206d284070206129207b7d0a7d0a"
+    },
+    "id": "es2017-target",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2017\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec async m(@p a) {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __param = (this && this.__param) || function (paramIndex, decorator) {\r\n    return function (target, key) { decorator(target, key, paramIndex); }\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare function p(...args: any[]): any;\r\nclass C {\r\n    m(this: C, a, b) { }\r\n}\r\n__decorate([\r\n    __param(0, p),\r\n    __param(1, p)\r\n], C.prototype, \"m\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "solo-this-parameter",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a202020206d28746869733a20432c20407020613a206e756d6265722c20407020623a20737472696e67293a20766f6964207b7d0a7d0a"
+    },
+    "id": "solo-this-parameter",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    m(this: C, @p a: number, @p b: string): void {}\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare function p(...args: any[]): any;\r\nclass C {\r\n    @dec\r\n    m(): void;\r\n    m(a?: any) { }\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, \"m\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "solo-overloads",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a2020202040646563206d28293a20766f69643b0a2020202040646563206d28613f3a20616e7929207b7d0a7d0a"
+    },
+    "id": "solo-overloads",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec m(): void;\n    @dec m(a?: any) {}\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "legacydecorators"
+       ],
+       "text": "declare function dec(...args: any[]): any;\r\ndeclare function p(...args: any[]): any;\r\ndeclare class C {\r\n    @dec\r\n    p: number;\r\n    @dec\r\n    m(): void;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "solo-ambient-class",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c61726520636c6173732043207b0a202020204064656320703a206e756d6265723b0a2020202040646563206d28293a20766f69643b0a7d0a"
+    },
+    "id": "solo-ambient-class",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\ndeclare class C {\n    @dec p: number;\n    @dec m(): void;\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare function p(...args: any[]): any;\r\nabstract class C {\r\n    @dec\r\n    abstract get a(): number;\r\n    @dec\r\n    abstract m(): void;\r\n}\r\n__decorate([\r\n    dec\r\n], C.prototype, \"p\", void 0);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "solo-abstract-members",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a616273747261637420636c6173732043207b0a202020204064656320616273747261637420676574206128293a206e756d6265723b0a2020202040646563206162737472616374206d28293a20766f69643b0a202020204064656320616273747261637420703a206e756d6265723b0a7d0a"
+    },
+    "id": "solo-abstract-members",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nabstract class C {\n    @dec abstract get a(): number;\n    @dec abstract m(): void;\n    @dec abstract p: number;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __param = (this && this.__param) || function (paramIndex, decorator) {\r\n    return function (target, key) { decorator(target, key, paramIndex); }\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare function p(...args: any[]): any;\r\nlet C = class C implements I {\r\n    m(a) { return null as any; }\r\n};\r\n__decorate([\r\n    dec,\r\n    __param(0, p)\r\n], C.prototype, \"m\", null);\r\nC = __decorate([\r\n    dec\r\n], C);\r\nexport { C };\r\ninterface I {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "solo-class-type-parameters",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a6578706f727420636c61737320433c543e20696d706c656d656e74732049207b0a2020202040646563206d3c553e28407020613a2054293a2055207b2072657475726e206e756c6c20617320616e793b207d0a7d0a696e746572666163652049207b7d0a"
+    },
+    "id": "solo-class-type-parameters",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport class C<T> implements I {\n    @dec m<U>(@p a: T): U { return null as any; }\n}\ninterface I {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata",
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nclass C {\r\n    m(a, b) { return true; }\r\n}\r\n__decorate([\r\n    dec,\r\n    __metadata(\"design:type\", Function),\r\n    __metadata(\"design:paramtypes\", [String, Number]),\r\n    __metadata(\"design:returntype\", Boolean)\r\n], C.prototype, \"m\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "metadata-method",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a2020202040646563206d28613a20737472696e672c20623a206e756d626572293a20626f6f6c65616e207b2072657475726e20747275653b207d0a7d0a"
+    },
+    "id": "metadata-method",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec m(a: string, b: number): boolean { return true; }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata",
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar __param = (this && this.__param) || function (paramIndex, decorator) {\r\n    return function (target, key) { decorator(target, key, paramIndex); }\r\n};\r\nlet C = class C {\r\n    constructor(a, b) { }\r\n};\r\nC = __decorate([\r\n    dec,\r\n    __param(0, p),\r\n    __metadata(\"design:paramtypes\", [String, Number])\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "metadata-ctor",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c6173732043207b0a20202020636f6e7374727563746f7228407020613a20737472696e672c20623a206e756d62657229207b7d0a7d0a"
+    },
+    "id": "metadata-ctor",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    constructor(@p a: string, b: number) {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata",
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar __param = (this && this.__param) || function (paramIndex, decorator) {\r\n    return function (target, key) { decorator(target, key, paramIndex); }\r\n};\r\nclass C {\r\n    m(x) { }\r\n}\r\n__decorate([\r\n    dec,\r\n    p(1),\r\n    __param(0, p),\r\n    __metadata(\"design:type\", Function),\r\n    __metadata(\"design:paramtypes\", [String]),\r\n    __metadata(\"design:returntype\", void 0)\r\n], C.prototype, \"m\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "metadata-order",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a2020202040646563204070283129206d28407020783a20737472696e67293a20766f6964207b7d0a7d0a"
+    },
+    "id": "metadata-order",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec @p(1) m(@p x: string): void {}\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata",
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nclass C {\r\n    p;\r\n    static s;\r\n}\r\n__decorate([\r\n    dec,\r\n    __metadata(\"design:type\", String)\r\n], C.prototype, \"p\", void 0);\r\n__decorate([\r\n    dec,\r\n    __metadata(\"design:type\", Number)\r\n], C, \"s\", void 0);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "metadata-property",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a202020204064656320703a20737472696e673b0a20202020406465632073746174696320733a206e756d6265723b0a7d0a"
+    },
+    "id": "metadata-property",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec p: string;\n    @dec static s: number;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata",
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nclass C {\r\n    get a() { return \"\"; }\r\n    set a(v) { }\r\n}\r\n__decorate([\r\n    dec,\r\n    __metadata(\"design:type\", String),\r\n    __metadata(\"design:paramtypes\", [String])\r\n], C.prototype, \"a\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "metadata-accessor",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6465636c6172652066756e6374696f6e2070282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a202020204064656320676574206128293a20737472696e67207b2072657475726e2022223b207d0a20202020736574206128763a20737472696e6729207b7d0a7d0a"
+    },
+    "id": "metadata-accessor",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec get a(): string { return \"\"; }\n    set a(v: string) {}\n}\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}
