@@ -732,9 +732,18 @@
   {
    "id": "package-json",
    "name": "index.ts",
-   "source": "// @filename: /tsconfig.json\n{ \"compilerOptions\": { \"incremental\": true, \"module\": \"node16\", \"strict\": true } }\n// @filename: /package.json\n{ \"name\": \"app\", \"type\": \"module\" }\n// @filename: /index.ts\nimport { x } from \"pkg\";\nimport \"nope\";\nexport const z = x + 1;\n// @filename: /other.ts\nimport y from \"untyped\";\nexport const u = y;\n// @filename: /node_modules/pkg/package.json\n{ \"name\": \"pkg\", \"version\": \"1.0.0\", \"types\": \"index.d.ts\" }\n// @filename: /node_modules/pkg/index.d.ts\nexport declare const x: number;\n// @filename: /node_modules/untyped/package.json\n{ \"name\": \"untyped\", \"version\": \"1.0.0\" }\n// @filename: /node_modules/untyped/index.js\nmodule.exports = 1;\n",
+   "source": "// @filename: /tsconfig.json\n{ \"compilerOptions\": { \"incremental\": true, \"module\": \"node16\", \"strict\": true } }\n// @filename: /package.json\n{ \"name\": \"app\", \"type\": \"module\" }\n// @filename: /index.ts\nimport { x } from \"pkg\";\nimport \"nope\";\nexport const z = x + 1;\n// @filename: /other.ts\nimport y from \"untyped\";\nexport const u = y;\n// @filename: /node_modules/pkg/package.json\n{ \"name\": \"pkg\", \"version\": \"1.0.0\", \"types\": \"index.d.ts\" }\n// @filename: /node_modules/pkg/index.d.ts\nexport declare const x: number;\n// @filename: /node_modules/untyped/package.json\n{ \"name\": \"untyped\", \"version\": \"1.0.0\" }\n// @filename: /node_modules/untyped/index.js\nmodule.exports = 1;\n// @filename: /node_modules/untyped/sub.d.ts\nexport declare const sub: number;\n",
    "steps": [
     {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/index.ts": "import { x } from \"pkg\";\nimport \"nope\";\nimport \"untyped/sub\";\nexport const z = x + 3;\n"
+     },
      "actions": [
       "diagnostics",
       "emit"
@@ -757,6 +766,16 @@
    "source": "// @filename: /tsconfig.json\n{ \"compilerOptions\": { \"incremental\": true, \"module\": \"node16\" } }\n// @filename: /package.json\n{ \"name\": \"app\" }\n// @filename: /cjs.ts\nimport { e } from \"esm-only\";\nexport const c = e;\n// @filename: /other.ts\nexport const o = 1;\n// @filename: /node_modules/esm-only/package.json\n{ \"name\": \"esm-only\", \"version\": \"1.0.0\", \"type\": \"module\", \"exports\": \"./index.js\" }\n// @filename: /node_modules/esm-only/index.d.ts\nexport declare const e: number;\n",
    "steps": [
     {
+     "actions": [
+      "diagnostics",
+      "emit"
+     ]
+    },
+    {
+     "edits": {
+      "/other.ts": "export const o = 3;\n",
+      "/package.json": "{ \"name\": \"app\", \"type\": \"commonjs\" }"
+     },
      "actions": [
       "diagnostics",
       "emit"
