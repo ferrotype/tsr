@@ -21,7 +21,7 @@ use tsr_printer::{
 };
 
 /// A resolver no test here asks anything.
-struct Unasked;
+pub(crate) struct Unasked;
 impl ReferenceResolver for Unasked {
     fn get_referenced_export_container(
         &mut self,
