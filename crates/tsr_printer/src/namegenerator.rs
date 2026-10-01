@@ -41,9 +41,15 @@ const TEMP_FLAGS_I: TempFlags = 0x1000_0000;
 
 /// `NameGenerator.IsFileLevelUniqueNameInCurrentFile`: the printer's
 /// `isFileLevelUniqueNameInCurrentFile`.
-pub type IsFileLevelUniqueNameFn<'a> = Rc<dyn Fn(&[u8], bool) -> Result<bool, Error> + 'a>;
-/// `NameGenerator.GetTextOfNode`: the printer's `getTextOfNode`.
-pub type GetTextOfNodeFn<'a> = Rc<dyn Fn(NodeId) -> Result<JsString, Error> + 'a>;
+/// It receives the host the generator was called with.
+pub type IsFileLevelUniqueNameFn<'a> =
+    Rc<dyn Fn(&dyn NameGeneratorHost, &[u8], bool) -> Result<bool, Error> + 'a>;
+/// `NameGenerator.GetTextOfNode`: the printer's `getTextOfNode`. It receives
+/// the generator and its host, because the printer's `getTextOfNode` generates
+/// the text of a generated name with this same generator.
+pub type GetTextOfNodeFn<'a> = Rc<
+    dyn Fn(&mut NameGenerator<'a>, &dyn NameGeneratorHost, NodeId) -> Result<JsString, Error> + 'a,
+>;
 
 /// The reads a pinned `*ast.Node` provides to the generator: syntax, and the
 /// binder's `Locals` and `NextContainer` with the flags of the local symbols.
@@ -111,8 +117,13 @@ impl<'a> NameGenerator<'a> {
     }
 
     /// Calls the `GetTextOfNode` field.
-    fn text_of_node(&self, node: NodeId) -> Result<JsString, Error> {
-        (self.get_text_of_node.as_ref().expect(NIL))(node)
+    fn text_of_node(
+        &mut self,
+        host: &dyn NameGeneratorHost,
+        node: NodeId,
+    ) -> Result<JsString, Error> {
+        let get_text_of_node = self.get_text_of_node.clone().expect(NIL);
+        get_text_of_node(self, host, node)
     }
 
     // port: tsc/internal/printer/namegenerator.go:NameGenerator.PushScope
@@ -250,7 +261,7 @@ impl<'a> NameGenerator<'a> {
                 return Ok(auto_generated_name);
             }
         }
-        self.text_of_node(name)
+        self.text_of_node(host, name)
     }
 
     // port: tsc/internal/printer/namegenerator.go:NameGenerator.generateNameForNodeCached
@@ -298,8 +309,9 @@ impl<'a> NameGenerator<'a> {
         let no_affixes = !private_name && prefix.is_empty() && suffix.is_empty();
         match read.kind().known() {
             Some(K::Identifier | K::PrivateIdentifier) => {
-                let text = self.text_of_node(node)?;
+                let text = self.text_of_node(host, node)?;
                 self.make_unique_name(
+                    host,
                     text.as_bytes(),
                     None, /*checkFn*/
                     flags.is_optimistic(),
@@ -339,26 +351,27 @@ impl<'a> NameGenerator<'a> {
                         b"", /*suffix*/
                     );
                 }
-                self.generate_name_for_export_default()
+                self.generate_name_for_export_default(host)
             }
             Some(K::ExportAssignment) => {
                 assert!(
                     no_affixes,
                     "Generated name for an export assignment cannot be private and may have neither a prefix nor suffix"
                 );
-                self.generate_name_for_export_default()
+                self.generate_name_for_export_default(host)
             }
             Some(K::ClassExpression) => {
                 assert!(
                     no_affixes,
                     "Generated name for a class expression cannot be private and may have neither a prefix nor suffix"
                 );
-                self.generate_name_for_class_expression()
+                self.generate_name_for_class_expression(host)
             }
             Some(K::MethodDeclaration | K::GetAccessor | K::SetAccessor) => {
                 self.generate_name_for_method_or_accessor(host, node, private_name, prefix, suffix)
             }
             Some(K::ComputedPropertyName) => self.make_temp_variable_name(
+                host,
                 TEMP_FLAGS_AUTO,
                 true, /*reservedInNestedScopes*/
                 private_name,
@@ -366,6 +379,7 @@ impl<'a> NameGenerator<'a> {
                 suffix,
             ),
             _ => self.make_temp_variable_name(
+                host,
                 TEMP_FLAGS_AUTO,
                 false, /*reservedInNestedScopes*/
                 private_name,
@@ -381,12 +395,13 @@ impl<'a> NameGenerator<'a> {
         host: &dyn NameGeneratorHost,
         node: NodeId, /* ModuleDeclaration | EnumDeclaration */
     ) -> Result<JsString, Error> {
-        let name = self.text_of_node(host.view().node(node)?.name().expect(NIL))?;
+        let name = self.text_of_node(host, host.view().node(node)?.name().expect(NIL))?;
         // Use module/enum name itself if it is unique, otherwise make a unique variation
         if is_unique_local_name(host, name.as_bytes(), node)? {
             Ok(name)
         } else {
             self.make_unique_name(
+                host,
                 name.as_bytes(),
                 None,  /*checkFn*/
                 false, /*optimistic*/
@@ -412,6 +427,7 @@ impl<'a> NameGenerator<'a> {
             base_name = make_identifier_from_module_name(&view.node_text(expr)?);
         }
         self.make_unique_name(
+            host,
             base_name.as_bytes(),
             None,  /*checkFn*/
             false, /*optimistic*/
@@ -423,9 +439,12 @@ impl<'a> NameGenerator<'a> {
     }
 
     // port: tsc/internal/printer/namegenerator.go:NameGenerator.generateNameForExportDefault
-    fn generate_name_for_export_default(&mut self) -> Result<JsString, Error> {
+    fn generate_name_for_export_default(
+        &mut self,
+        host: &dyn NameGeneratorHost,
+    ) -> Result<JsString, Error> {
         self.make_unique_name(
-            b"default", None,  /*checkFn*/
+            host, b"default", None,  /*checkFn*/
             false, /*optimistic*/
             false, /*scoped*/
             false, /*privateName*/
@@ -435,9 +454,12 @@ impl<'a> NameGenerator<'a> {
     }
 
     // port: tsc/internal/printer/namegenerator.go:NameGenerator.generateNameForClassExpression
-    fn generate_name_for_class_expression(&mut self) -> Result<JsString, Error> {
+    fn generate_name_for_class_expression(
+        &mut self,
+        host: &dyn NameGeneratorHost,
+    ) -> Result<JsString, Error> {
         self.make_unique_name(
-            b"class", None,  /*checkFn*/
+            host, b"class", None,  /*checkFn*/
             false, /*optimistic*/
             false, /*scoped*/
             false, /*privateName*/
@@ -467,6 +489,7 @@ impl<'a> NameGenerator<'a> {
             );
         }
         self.make_temp_variable_name(
+            host,
             TEMP_FLAGS_AUTO,
             false, /*reservedInNestedScopes*/
             private_name,
@@ -486,6 +509,7 @@ impl<'a> NameGenerator<'a> {
                 g::AUTO => {
                     let private_name = is_private_identifier(&host.view().node(name)?);
                     return self.make_temp_variable_name(
+                        host,
                         TEMP_FLAGS_AUTO,
                         auto_generate.flags.is_reserved_in_nested_scopes(),
                         private_name,
@@ -499,6 +523,7 @@ impl<'a> NameGenerator<'a> {
                         "Debug failure. False expression."
                     );
                     return self.make_temp_variable_name(
+                        host,
                         TEMP_FLAGS_I,
                         auto_generate.flags.is_reserved_in_nested_scopes(),
                         false, /*privateName*/
@@ -516,6 +541,7 @@ impl<'a> NameGenerator<'a> {
                     };
                     let private_name = is_private_identifier(&view.node(name)?);
                     return self.make_unique_name(
+                        host,
                         &text,
                         check_fn.as_ref(),
                         auto_generate.flags.is_optimistic(),
@@ -528,7 +554,7 @@ impl<'a> NameGenerator<'a> {
                 _ => {}
             }
         }
-        self.text_of_node(name)
+        self.text_of_node(host, name)
     }
 
     /// Return the next available name in the pattern _a ... _z, _0, _1, ...
@@ -538,6 +564,7 @@ impl<'a> NameGenerator<'a> {
     // port: tsc/internal/printer/namegenerator.go:NameGenerator.makeTempVariableName
     fn make_temp_variable_name(
         &mut self,
+        host: &dyn NameGeneratorHost,
         flags: TempFlags,
         reserved_in_nested_scopes: bool,
         private_name: bool,
@@ -560,7 +587,7 @@ impl<'a> NameGenerator<'a> {
 
         if flags != 0 && temp_flags & flags == 0 {
             let full_name = format_generated_name(private_name, prefix, b"_i", suffix);
-            if self.is_unique_name(full_name.as_bytes(), private_name)? {
+            if self.is_unique_name(host, full_name.as_bytes(), private_name)? {
                 temp_flags |= flags;
                 self.reserve_name(
                     &full_name,
@@ -589,7 +616,7 @@ impl<'a> NameGenerator<'a> {
                     format!("_{}", count - 26).into_bytes()
                 };
                 let full_name = format_generated_name(private_name, prefix, &name, suffix);
-                if self.is_unique_name(full_name.as_bytes(), private_name)? {
+                if self.is_unique_name(host, full_name.as_bytes(), private_name)? {
                     self.reserve_name(
                         &full_name,
                         private_name,
@@ -618,6 +645,7 @@ impl<'a> NameGenerator<'a> {
     #[allow(clippy::too_many_arguments, clippy::fn_params_excessive_bools)]
     fn make_unique_name(
         &mut self,
+        host: &dyn NameGeneratorHost,
         base_name: &[u8],
         check_fn: Option<&IsFileLevelUniqueNameFn<'a>>,
         optimistic: bool,
@@ -629,7 +657,7 @@ impl<'a> NameGenerator<'a> {
         let mut base_name = remove_leading_hash(base_name).to_vec();
         if optimistic {
             let full_name = format_generated_name(private_name, prefix, &base_name, suffix);
-            if self.check_unique_name(full_name.as_bytes(), private_name, check_fn)? {
+            if self.check_unique_name(host, full_name.as_bytes(), private_name, check_fn)? {
                 self.reserve_name(&full_name, private_name, scoped, false /*temp*/);
                 return Ok(full_name);
             }
@@ -645,7 +673,7 @@ impl<'a> NameGenerator<'a> {
             let mut numbered = base_name.clone();
             numbered.extend_from_slice(i.to_string().as_bytes());
             let full_name = format_generated_name(private_name, prefix, &numbered, suffix);
-            if self.check_unique_name(full_name.as_bytes(), private_name, check_fn)? {
+            if self.check_unique_name(host, full_name.as_bytes(), private_name, check_fn)? {
                 self.reserve_name(&full_name, private_name, scoped, false /*temp*/);
                 return Ok(full_name);
             }
@@ -656,10 +684,12 @@ impl<'a> NameGenerator<'a> {
     // port: tsc/internal/printer/namegenerator.go:NameGenerator.MakeFileLevelOptimisticUniqueName
     pub fn make_file_level_optimistic_unique_name(
         &mut self,
+        host: &dyn NameGeneratorHost,
         name: &[u8],
     ) -> Result<JsString, Error> {
         let check_fn = self.is_file_level_unique_name_in_current_file.clone();
         self.make_unique_name(
+            host,
             name,
             check_fn.as_ref(),
             true,  /*optimistic*/
@@ -673,22 +703,28 @@ impl<'a> NameGenerator<'a> {
     // port: tsc/internal/printer/namegenerator.go:NameGenerator.checkUniqueName
     fn check_unique_name(
         &mut self,
+        host: &dyn NameGeneratorHost,
         name: &[u8],
         private_name: bool,
         check_fn: Option<&IsFileLevelUniqueNameFn<'a>>,
     ) -> Result<bool, Error> {
         if let Some(check_fn) = check_fn {
-            check_fn(name, private_name)
+            check_fn(host, name, private_name)
         } else {
-            self.is_unique_name(name, private_name)
+            self.is_unique_name(host, name, private_name)
         }
     }
 
     // port: tsc/internal/printer/namegenerator.go:NameGenerator.isUniqueName
-    fn is_unique_name(&mut self, name: &[u8], private_name: bool) -> Result<bool, Error> {
+    fn is_unique_name(
+        &mut self,
+        host: &dyn NameGeneratorHost,
+        name: &[u8],
+        private_name: bool,
+    ) -> Result<bool, Error> {
         let file_level_unique = match &self.is_file_level_unique_name_in_current_file {
             None => true,
-            Some(is_file_level_unique_name) => is_file_level_unique_name(name, private_name)?,
+            Some(is_file_level_unique_name) => is_file_level_unique_name(host, name, private_name)?,
         };
         Ok(file_level_unique && !self.is_reserved_name(name, private_name))
     }

@@ -113,7 +113,7 @@ impl Fixture {
     fn generator_with_text(&self) -> NameGenerator<'_> {
         let mut generator = self.generator();
         let view = self.view();
-        generator.get_text_of_node = Some(Rc::new(move |node| {
+        generator.get_text_of_node = Some(Rc::new(move |_, _, node| {
             Ok(JsString::from_bytes(view.node_text(node)?.to_vec()))
         }));
         generator

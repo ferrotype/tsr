@@ -46,9 +46,11 @@ impl Session<'_, '_> {
             return Ok(());
         }
         let parent_read = self.node(parent)?;
-        let skipped = tsr_ast::skip_partially_emitted_expressions(self.view, callee)?;
+        let skipped = self.skip_partially_emitted_expressions_rewritten(callee)?;
         if parent_read.kind() == K::CallExpression
-            && self.is_new_expression_without_arguments(skipped)?
+            && skipped.map_or(Ok(false), |skipped| {
+                self.is_new_expression_without_arguments(skipped)
+            })?
         {
             // Parenthesize `new C` inside of a CallExpression so it is treated as `(new C)()` and not `new C()`
             return self.emit_expression(callee, op::PARENTHESES);
@@ -121,7 +123,7 @@ impl Session<'_, '_> {
     /// The writes of `emitParenthesizedExpression` between entering and
     /// leaving the node; `node` is `None` for the parentheses upstream creates
     /// around an arrow function's object-literal body.
-    fn emit_parenthesized_expression_parts(
+    pub(super) fn emit_parenthesized_expression_parts(
         &mut self,
         node: Option<NodeId>,
         span: Span,
@@ -174,13 +176,15 @@ impl Session<'_, '_> {
         guard(|| {
             let state = self.enter_created_node(&target)?;
             self.emit_parenthesized_expression_parts(None, span, expression)?;
-            self.exit_created_node(&target, state);
+            self.exit_created_node(&target, state)?;
             Ok(())
         })
     }
 
     fn binary_operator(&self, node: NodeId) -> Result<Option<NodeKind>, Error> {
-        let node = tsr_ast::skip_partially_emitted_expressions(self.view, node)?;
+        let Some(node) = self.skip_partially_emitted_expressions_rewritten(node)? else {
+            return Ok(None);
+        };
         if self.node(node)?.kind() != K::BinaryExpression {
             return Ok(None);
         }
@@ -193,7 +197,9 @@ impl Session<'_, '_> {
         let mut pending = vec![node];
         let mut literal = None;
         while let Some(node) = pending.pop() {
-            let node = tsr_ast::skip_partially_emitted_expressions(self.view, node)?;
+            let Some(node) = self.skip_partially_emitted_expressions_rewritten(node)? else {
+                return Ok(None);
+            };
             let kind = self.node(node)?.kind();
             if tsr_ast::is_literal_kind(kind) {
                 if literal.is_some_and(|previous| previous != kind) {
@@ -271,7 +277,9 @@ impl Session<'_, '_> {
             self.binary_operand_precedences(left, operator, right)?;
         let outer = self.node(operator)?.kind();
         for (operand, precedence) in [(left, &mut left_prec), (right, &mut right_prec)] {
-            let skipped = tsr_ast::skip_partially_emitted_expressions(self.view, operand)?;
+            let Some(skipped) = self.skip_partially_emitted_expressions_rewritten(operand)? else {
+                continue;
+            };
             if tsr_ast::utilities::node_is_synthesized(&self.node(skipped)?) {
                 if let Some(inner) = self.binary_operator(skipped)? {
                     // port: tsc/internal/printer/utilities.go:mixingBinaryOperatorsRequiresParentheses
@@ -293,7 +301,7 @@ impl Session<'_, '_> {
         self.emit_expression(left, left_prec)?;
         let before = self.get_lines_between_nodes(
             node,
-            Span::of(&self.node(left)?),
+            self.operand_span(left)?,
             Span::of(&self.node(operator)?),
         )?;
         let after = self.get_lines_between_nodes(

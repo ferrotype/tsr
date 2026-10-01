@@ -11,8 +11,8 @@
 use crate::printer_emit_tests::{check_emit, parse_type_script};
 use crate::{EmitContext, Printer, PrinterOptions};
 use tsr_ast::{
-    node_flags, AstBuilder, FactoryMethods, JsString, NodeId, NodeListId, SourceFileParseOptions,
-    SyntaxKind as K,
+    node_flags, AstBuilder, FactoryMethods, JsString, NodeId, NodeListId, NodeVisitor,
+    SourceFileParseOptions, SyntaxKind as K,
 };
 use tsr_core::{NewLineKind, TextRange};
 use tsr_jsstring::SourceText;
@@ -1020,46 +1020,112 @@ fn test_parenthesize_conditional_type4() {
     );
 }
 
-// The four tests below need functionality other units port: the name
-// generator and the factory's temp variables, the emit context's node visitor
-// over a parsed file, and the type eraser. Their inputs and expected outputs
-// are kept verbatim from printer_test.go for the unit that wires them.
-
 /// `TestNameGeneration`: two `NewTempVariable` declarations, one at file level
 /// and one in a function body, each named `_a` in its own scope.
 #[test]
-#[ignore = "needs the NameGenerator and EmitContext.Factory.NewTempVariable"]
 fn test_name_generation() {
-    const EXPECTED: &str = "var _a;\nfunction f() {\n    var _a;\n}";
-    unimplemented!("{EXPECTED}");
+    let mut ec = EmitContext::new();
+    let mut ast = AstBuilder::with_hooks(
+        SourceText::from_loaded_bytes(&b""[..]),
+        &tsr_arena::Counters::new(),
+        ec.factory_hooks(),
+    );
+    let temp_declaration = |ast: &mut AstBuilder, ec: &mut EmitContext| {
+        let temp = ec.new_temp_variable(ast);
+        let declaration = ast.new_variable_declaration(Some(temp), None, None, None);
+        let nodes = ast.node_slice(vec![Some(declaration)]).expect("list slice");
+        let declarations = ast.new_list(TextRange::new(-1, -1), nodes).expect("list");
+        let list = ast.new_variable_declaration_list(Some(declarations), node_flags::NONE);
+        ast.new_variable_statement(None, Some(list))
+    };
+    let outer = temp_declaration(&mut ast, &mut ec);
+    let name = ast.new_identifier(JsString::from_bytes(&b"f"[..]));
+    let parameters = ast.node_slice(vec![]).expect("list slice");
+    let parameters = ast
+        .new_list(TextRange::new(-1, -1), parameters)
+        .expect("list");
+    let inner = temp_declaration(&mut ast, &mut ec);
+    let body = ast.node_slice(vec![Some(inner)]).expect("list slice");
+    let body = ast.new_list(TextRange::new(-1, -1), body).expect("list");
+    let body = ast.new_block(Some(body), true);
+    let function = ast.new_function_declaration(
+        None,
+        None,
+        Some(name),
+        None,
+        Some(parameters),
+        None,
+        None,
+        Some(body),
+    );
+    let statements = ast
+        .node_slice(vec![Some(outer), Some(function)])
+        .expect("list slice");
+    let statements = ast
+        .new_list(TextRange::new(-1, -1), statements)
+        .expect("list");
+    let eof = ast.new_token(K::EndOfFile.into());
+    let file = ast.new_source_file(
+        SourceFileParseOptions {
+            file_name: JsString::from_bytes(&b"/file.ts"[..]),
+            path: JsString::from_bytes(&b"/file.ts"[..]),
+            ..Default::default()
+        },
+        SourceText::from_loaded_bytes(&b""[..]),
+        Some(statements),
+        Some(eof),
+    );
+    if let Err(failure) = check_emit(
+        &ec,
+        ast.view(),
+        file,
+        false,
+        "var _a;\nfunction f() {\n    var _a;\n}",
+    ) {
+        panic!("{failure}");
+    }
+}
+
+/// Parses `input`, replaces every `a!` with `a` through the emit context's
+/// node visitor, and checks the printed file.
+fn check_non_null_removed(input: &str, expected: &str) {
+    let emit_context = EmitContext::new();
+    let mut factory = AstBuilder::with_hooks(
+        SourceText::default(),
+        &tsr_arena::Counters::new(),
+        emit_context.factory_hooks(),
+    );
+    let parsed = parse_type_script(input.as_bytes(), false);
+    let root = parsed.root();
+    factory.retain_file(parsed.publish_unbound());
+    let hooks = emit_context.visitor_hooks();
+    let visit = |visitor: &mut NodeVisitor<'_>, node: Option<NodeId>| -> Option<NodeId> {
+        let id = node?;
+        let read = visitor.factory().node(id);
+        if read.kind() == K::NonNullExpression {
+            read.expression()
+        } else {
+            visitor.visit_each_child(node)
+        }
+    };
+    let file = hooks
+        .new_node_visitor(Some(&visit), &mut factory)
+        .visit_source_file(root);
+    if let Err(failure) = check_emit(&emit_context, factory.view(), file, false, expected) {
+        panic!("{failure}");
+    }
 }
 
 /// `TestNoTrailingCommaAfterTransform`: a visitor replaces `a!` with `a`.
 #[test]
-#[ignore = "needs EmitContext.NewNodeVisitor over a parsed file"]
 fn test_no_trailing_comma_after_transform() {
-    const INPUT: &str = "[a!]";
-    const EXPECTED: &str = "[a];";
-    unimplemented!("{INPUT} -> {EXPECTED}");
+    check_non_null_removed("[a!]", "[a];");
 }
 
 /// `TestTrailingCommaAfterTransform`: a visitor replaces `a!` with `a`.
 #[test]
-#[ignore = "needs EmitContext.NewNodeVisitor over a parsed file"]
 fn test_trailing_comma_after_transform() {
-    const INPUT: &str = "[a!,]";
-    const EXPECTED: &str = "[a,];";
-    unimplemented!("{INPUT} -> {EXPECTED}");
-}
-
-/// `TestPartiallyEmittedExpression`: the type eraser over nested `as`
-/// expressions keeps the property accesses' line breaks.
-#[test]
-#[ignore = "needs tstransforms.NewTypeEraserTransformer"]
-fn test_partially_emitted_expression() {
-    const INPUT: &str = "return ((container.parent\n    .left as PropertyAccessExpression)\n    .expression as PropertyAccessExpression)\n    .expression;";
-    const EXPECTED: &str = "return container.parent\n    .left\n    .expression\n    .expression;";
-    unimplemented!("{INPUT} -> {EXPECTED}");
+    check_non_null_removed("[a!,]", "[a,];");
 }
 
 #[test]

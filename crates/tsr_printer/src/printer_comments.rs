@@ -11,7 +11,7 @@
 //! first answer "no map" before any generator call; the generator calls
 //! themselves return [`Error::Unsupported`] until they are wired.
 
-use super::{position_is_synthesized, Session};
+use super::{position_is_synthesized, Session, ViewFactory};
 use crate::utilities::{is_jsdoc_like_text, is_pinned_comment, is_recognized_triple_slash_comment};
 use crate::{emit_flags as ef, EmitFlags, EmitTextWriter, Error, SynthesizedComment};
 use tsr_ast::{NodeId, NodeKind, SyntaxKind as K};
@@ -267,19 +267,24 @@ impl Session<'_, '_> {
 
     /// `EmitContext.ParseNode`: the most original node when it is a parse-tree
     /// node.
-    pub(crate) fn parse_node(&self, node: NodeId) -> Result<Option<NodeId>, Error> {
-        let original = self.printer.emit_context.most_original(node);
-        if tsr_ast::utilities_positions::is_parse_tree_node(&self.node(original)?) {
-            return Ok(Some(original));
-        }
-        Ok(None)
+    pub(crate) fn parse_node(&self, node: NodeId) -> Option<NodeId> {
+        self.printer
+            .emit_context
+            .parse_node(&ViewFactory(self.view), node)
+    }
+
+    /// The node whose synthetic comments and erased type node print with
+    /// `node`'s comments: none for a node `parenthesizeExpressionForNoAsi`
+    /// updated, as an update copies neither.
+    fn comment_identity(&self, node: NodeId) -> Option<NodeId> {
+        (!self.is_no_asi_updated(node)).then_some(node)
     }
 
     /// The comment-relevant parts of a node of the tree.
     pub(crate) fn comment_target(&self, node: NodeId) -> Result<CommentTarget, Error> {
         let read = self.node(node)?;
         Ok(CommentTarget {
-            node: Some(node),
+            node: self.comment_identity(node),
             kind: read.kind(),
             emit_flags: self.emit_flags(node),
             comment_range: self
@@ -456,9 +461,9 @@ impl Session<'_, '_> {
         node: Option<NodeId>,
         kind: NodeKind,
         state: Option<CommentState>,
-    ) {
+    ) -> Result<(), Error> {
         let Some(state) = state else {
-            return;
+            return Ok(());
         };
         let emit_flags = state.emit_flags;
         let comment_range = state.comment_range;
@@ -479,9 +484,21 @@ impl Session<'_, '_> {
             container_end,
             declaration_list_container_end,
         );
-        // Upstream then emits the trailing comments of an erased type
-        // annotation (`EmitContext.GetTypeNode`). The emit context records no
-        // type nodes yet, so there is none to read.
+
+        // Preserve comments from erased type annotation
+        if let Some(type_node) = node.and_then(|node| self.printer.emit_context.get_type_node(node))
+        {
+            let type_range = self.node(type_node)?.range();
+            self.emit_trailing_comments_of_node(
+                kind,
+                emit_flags,
+                type_range,
+                container_pos,
+                container_end,
+                declaration_list_container_end,
+            );
+        }
+        Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitCommentsBeforeToken
@@ -512,7 +529,7 @@ impl Session<'_, '_> {
             return Ok((None, pos));
         };
         let context_read = self.node(context)?;
-        let is_similar_node = match self.parse_node(context)? {
+        let is_similar_node = match self.parse_node(context) {
             Some(node) => self.node(node)?.kind() == context_read.kind(),
             None => false,
         };
@@ -1067,7 +1084,7 @@ impl Session<'_, '_> {
             }
         }
         if has_leading_comment_ranges {
-            if let Some(parse_node) = self.parse_node(node)? {
+            if let Some(parse_node) = self.parse_node(node) {
                 let parent = self.node(parse_node)?.parent();
                 if let Some(parent) = parent {
                     if self.node(parent)?.kind() == K::ParenthesizedExpression {
@@ -1181,7 +1198,8 @@ impl Session<'_, '_> {
         Self::emit_source_maps_after_node(state.source_map_state);
         if state.comment_state.is_some() {
             let kind = self.node(node)?.kind();
-            self.emit_comments_after_node(Some(node), kind, state.comment_state);
+            let identity = self.comment_identity(node);
+            self.emit_comments_after_node(identity, kind, state.comment_state)?;
         }
         self.writer.on_after_emit_node(node);
         Ok(())
@@ -1206,9 +1224,13 @@ impl Session<'_, '_> {
     }
 
     /// `exitNode` for a node the printer creates itself.
-    pub(crate) fn exit_created_node(&mut self, target: &CommentTarget, state: PrinterState) {
+    pub(crate) fn exit_created_node(
+        &mut self,
+        target: &CommentTarget,
+        state: PrinterState,
+    ) -> Result<(), Error> {
         Self::emit_source_maps_after_node(state.source_map_state);
-        self.emit_comments_after_node(target.node, target.kind, state.comment_state);
+        self.emit_comments_after_node(target.node, target.kind, state.comment_state)
     }
 
     // port: tsc/internal/printer/printer.go:Printer.enterTokenNode
@@ -1237,7 +1259,8 @@ impl Session<'_, '_> {
         Self::emit_source_maps_after_node(state.source_map_state);
         if state.comment_state.is_some() {
             let kind = self.node(node)?.kind();
-            self.emit_comments_after_node(Some(node), kind, state.comment_state);
+            let identity = self.comment_identity(node);
+            self.emit_comments_after_node(identity, kind, state.comment_state)?;
         }
         self.writer.on_after_emit_token(node);
         Ok(())

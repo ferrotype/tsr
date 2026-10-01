@@ -10,9 +10,10 @@
 //! What is ported: the two text writers, the semicolon-deferring writer, emit
 //! flags and list formats, literal text, type-node precedence, and the printer's
 //! emission of whole source files with their comments, shebang, prologue,
-//! triple-slash directives and preserved source lines. Source maps, emit
-//! helpers and auto-generated names are named boundaries: the printer returns
-//! [`Error::Unsupported`] instead of guessing.
+//! triple-slash directives and preserved source lines, with the emit helpers
+//! recorded on the emit context and the names the name generator makes for
+//! generated identifiers. Source maps are a named boundary: the printer
+//! returns [`Error::Unsupported`] instead of guessing.
 //!
 //! Output is bytes. Upstream strings may hold arbitrary bytes and the text
 //! contract (`docs/design/text.md`) forbids lossy conversion, so writers accept
@@ -56,8 +57,7 @@ pub use namegenerator::{
     format_generated_name, GetTextOfNodeFn, IsFileLevelUniqueNameFn, NameGenerator,
     NameGeneratorHost,
 };
-pub(crate) use printer::Session;
-pub use printer::{Printer, PrinterOptions, WriteKind};
+pub use printer::{Printer, PrinterBindings, PrinterOptions, WriteKind};
 pub use semicolon_writer::TrailingSemicolonDeferringWriter;
 pub use single_line_string_writer::SingleLineStringWriter;
 pub use text_writer::{get_default_indent_size, TextWriter};
@@ -137,6 +137,8 @@ mod printer_emit_tests;
 mod printer_parenthesize_tests;
 #[cfg(test)]
 mod printer_tests;
+#[cfg(test)]
+mod printer_witness_tests;
 #[cfg(test)]
 mod tests;
 #[cfg(test)]

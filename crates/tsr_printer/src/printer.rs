@@ -8,11 +8,16 @@
 //! file, the comment containers, the writer) on the printer itself and saves
 //! and restores it around `Write`.
 //!
-//! Named boundaries, each returning [`Error::Unsupported`] where it is reached:
-//! source-map emission (`Write` takes no generator here), the helper table
-//! behind `emitHelpers` and `getUniqueHelperName`, generated names
-//! (`NameGenerator`), and the nodes upstream creates while printing in
-//! `parenthesizeExpressionForNoAsi`.
+//! Named boundary, returning [`Error::Unsupported`] where it is reached:
+//! source-map emission (`Write` takes no generator here).
+//!
+//! Upstream creates a few nodes while printing: the unique helper names of
+//! `getUniqueHelperName`, the `tslib_1.__helper` access of
+//! `emitIdentifierReference`, and the parentheses and updated left spine of
+//! `parenthesizeExpressionForNoAsi`. The printer reads a fixed tree, so those
+//! nodes are printed from their parts (the created-node paths below) with the
+//! emit metadata upstream gives them: their own emit flags, comment and
+//! source-map ranges, and no synthetic comments.
 
 #[path = "printer_comments.rs"]
 mod comments;
@@ -20,22 +25,31 @@ mod comments;
 mod expressions;
 #[path = "printer_statements.rs"]
 mod statements;
+#[path = "printer_text.rs"]
+mod text;
 
-use comments::{token_emit_flags as tef, CommentSeparator, DetachedCommentsInfo, SourceMapSource};
+use comments::{
+    token_emit_flags as tef, CommentSeparator, CommentTarget, DetachedCommentsInfo, SourceMapSource,
+};
 
 use crate::emit_flags as ef;
 use crate::list_format as lf;
 use crate::literal_text::{with_flag, LiteralTextFlags};
 use crate::{
-    get_type_node_precedence, EmitContext, EmitTextWriter, Error, ListFormat, TextWriter,
-    TrailingSemicolonDeferringWriter, TypePrecedence,
+    get_type_node_precedence, EmitContext, EmitTextWriter, Error, ListFormat, NameGenerator,
+    NameGeneratorHost, SnippetElement, SnippetKind, TextWriter, TrailingSemicolonDeferringWriter,
+    TypePrecedence,
 };
+use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
+use std::rc::Rc;
+use text::{NodeText, NodeTextOwner};
 use tsr_arena::SymbolId;
 use tsr_ast::operator_precedence as op;
 use tsr_ast::{
-    node_flags, token_flags, AstView, JsString, NodeId, NodeKind, NodeListId, NodeRead,
-    SourceFileRead, SyntaxKind as K,
+    node_flags, token_flags, AstView, Factory, JsString, NodeBinding, NodeData, NodeId, NodeKind,
+    NodeListId, NodeMut, NodeRead, SourceFileRead, SymbolFlags, SymbolTableId, SymbolTableRead,
+    SyntaxKind as K,
 };
 use tsr_core::{NewLineKind, ScriptTarget, TextRange};
 use tsr_jsstring::LiteralEscapeFlags;
@@ -48,7 +62,7 @@ pub struct PrinterOptions {
     pub remove_comments: bool,
     pub new_line: NewLineKind,
     pub omit_trailing_semicolon: bool,
-    /// Read by `emitHelpers`, which is a boundary until the helper table lands.
+    /// Skips the unscoped emit helpers.
     pub no_emit_helpers: bool,
     pub target: ScriptTarget,
     pub omit_brace_source_map_positions: bool,
@@ -72,22 +86,29 @@ pub enum WriteKind {
     Literal,
 }
 
-/// `SnippetKind`.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum SnippetKind {
-    #[allow(
-        dead_code,
-        reason = "set through the emit context's snippet table, which is not recorded yet"
-    )]
-    TabStop,
+/// The binder's reads behind a generated name for a namespace or enum
+/// (`isUniqueLocalName`): a node's `Locals` and `NextContainer` and the flags
+/// of its local symbols. Upstream reads them from the bound nodes; a printer
+/// without bindings reads every node as unbound, as upstream reads a
+/// synthesized node.
+pub trait PrinterBindings {
+    /// The bound fields of `node`, or `None` for an unbound node.
+    fn binding(&self, node: NodeId) -> Result<Option<NodeBinding>, tsr_arena::Error>;
+    fn table(&self, table: SymbolTableId) -> Result<SymbolTableRead<'_>, tsr_arena::Error>;
+    fn symbol_flags(&self, symbol: SymbolId) -> Result<SymbolFlags, tsr_arena::Error>;
 }
 
-/// `SnippetElement`: a language-service placeholder an empty statement stands
-/// for.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) struct SnippetElement {
-    pub(crate) kind: SnippetKind,
-    pub(crate) order: i64,
+/// One bound source file's binder state.
+impl PrinterBindings for tsr_ast::BoundView<'_> {
+    fn binding(&self, node: NodeId) -> Result<Option<NodeBinding>, tsr_arena::Error> {
+        self.node_binding(node)
+    }
+    fn table(&self, table: SymbolTableId) -> Result<SymbolTableRead<'_>, tsr_arena::Error> {
+        self.result().tables().get(table)
+    }
+    fn symbol_flags(&self, symbol: SymbolId) -> Result<SymbolFlags, tsr_arena::Error> {
+        Ok(self.symbol(symbol)?.flags())
+    }
 }
 
 pub struct Printer<'c> {
@@ -95,7 +116,82 @@ pub struct Printer<'c> {
     pub(crate) emit_context: &'c EmitContext,
     /// Identifiers to report through `write_symbol` (`Printer.IdToSymbol`).
     pub id_to_symbol: Option<HashMap<NodeId, SymbolId>>,
+    /// Binder reads for generated names; see [`PrinterBindings`].
+    pub bindings: Option<&'c dyn PrinterBindings>,
     own_writer: Option<TextWriter>,
+    /// `nameGenerator`. Upstream keeps it on the printer, so names generated
+    /// by one `Write` stay reserved in the next.
+    name_generator: RefCell<NameGenerator<'static>>,
+}
+
+/// The emit context's `Factory` reads for a printer, which reads a fixed
+/// tree: the emit context's lookups that take a factory only read nodes.
+struct ViewFactory<'a>(AstView<'a>);
+
+const FIXED_TREE: &str = "the printer reads a fixed tree";
+
+impl Factory for ViewFactory<'_> {
+    fn node(&self, id: NodeId) -> NodeRead<'_> {
+        self.0
+            .node(id)
+            .expect("runtime error: invalid memory address or nil pointer dereference")
+    }
+    fn node_count(&self) -> i64 {
+        unreachable!("{FIXED_TREE}")
+    }
+    fn text_count(&self) -> i64 {
+        unreachable!("{FIXED_TREE}")
+    }
+    fn node_mut(&mut self, _id: NodeId) -> NodeMut<'_> {
+        unreachable!("{FIXED_TREE}")
+    }
+    fn new_node(&mut self, _kind: NodeKind, _data: NodeData) -> NodeId {
+        unreachable!("{FIXED_TREE}")
+    }
+    fn increment_text_count(&mut self) {
+        unreachable!("{FIXED_TREE}")
+    }
+    fn set_node_flags(&mut self, _id: NodeId, _flags: u32) {
+        unreachable!("{FIXED_TREE}")
+    }
+    fn finish_update(&mut self, _updated: NodeId, _original: NodeId) -> NodeId {
+        unreachable!("{FIXED_TREE}")
+    }
+    fn finish_clone(&mut self, _updated: NodeId, _original: NodeId) -> NodeId {
+        unreachable!("{FIXED_TREE}")
+    }
+}
+
+/// The name generator's host for one write: the printed view and the
+/// printer's bindings.
+struct PrintHost<'a, 'b> {
+    factory: ViewFactory<'a>,
+    bindings: Option<&'b dyn PrinterBindings>,
+}
+
+impl NameGeneratorHost for PrintHost<'_, '_> {
+    fn factory(&self) -> &dyn Factory {
+        &self.factory
+    }
+    fn view(&self) -> AstView<'_> {
+        self.factory.0
+    }
+    fn binding(&self, node: NodeId) -> Result<Option<NodeBinding>, tsr_arena::Error> {
+        match self.bindings {
+            Some(bindings) => bindings.binding(node),
+            None => Ok(None),
+        }
+    }
+    fn table(&self, table: SymbolTableId) -> Result<SymbolTableRead<'_>, tsr_arena::Error> {
+        self.bindings
+            .ok_or(tsr_arena::Error::InvalidGraph)?
+            .table(table)
+    }
+    fn symbol_flags(&self, symbol: SymbolId) -> Result<SymbolFlags, tsr_arena::Error> {
+        self.bindings
+            .ok_or(tsr_arena::Error::InvalidGraph)?
+            .symbol_flags(symbol)
+    }
 }
 
 fn new_line_character(kind: NewLineKind) -> &'static [u8] {
@@ -107,15 +203,18 @@ fn new_line_character(kind: NewLineKind) -> &'static [u8] {
 }
 
 impl<'c> Printer<'c> {
-    /// Handlers (name generation, emit notifications) are not taken: no caller in
-    /// the supported set installs any.
+    /// Handlers are not taken: `HasGlobalName` is set by no caller at the pin,
+    /// and the emit notifications are the writer's. The name generator's
+    /// callbacks are installed by each write.
     // port: tsc/internal/printer/printer.go:NewPrinter
     pub fn new(options: PrinterOptions, emit_context: &'c EmitContext) -> Self {
         Self {
             options,
             emit_context,
             id_to_symbol: None,
+            bindings: None,
             own_writer: None,
+            name_generator: RefCell::new(NameGenerator::new(Some(emit_context.clone()))),
         }
     }
 
@@ -168,11 +267,20 @@ impl<'c> Printer<'c> {
         } else {
             writer
         };
+        let current_source_file = Rc::new(Cell::new(None));
+        NodeTextOwner {
+            emit_context: self.emit_context.clone(),
+            target: self.options.target,
+            current_source: Rc::clone(&current_source_file),
+        }
+        .install(&mut self.name_generator.borrow_mut());
         let mut session = Session {
             printer: self,
             view,
             writer,
             current_source: None,
+            current_source_file,
+            no_asi: Vec::new(),
             unique_helper_names: None,
             external_helpers_module_name: None,
             next_list_element_pos: 0,
@@ -199,10 +307,14 @@ pub(crate) struct Session<'a, 'c> {
     pub(crate) view: AstView<'a>,
     writer: &'a mut dyn EmitTextWriter,
     pub(crate) current_source: Option<(NodeId, SourceFileRead<'a>)>,
-    /// `uniqueHelperNames`; present for a file flagged `ExternalHelpers`.
-    unique_helper_names: Option<HashMap<JsString, NodeId>>,
-    /// `externalHelpersModuleName`. The emit context records no helper module
-    /// names yet (`GetExternalHelpersModuleName`), so it is never set.
+    /// `currentSourceFile` as the name generator's callbacks read it.
+    current_source_file: Rc<Cell<Option<NodeId>>>,
+    /// The spines `parenthesizeExpressionForNoAsi` rewrote that are printing.
+    no_asi: Vec<statements::NoAsiRewrite>,
+    /// `uniqueHelperNames`, present for a file flagged `ExternalHelpers`: the
+    /// generated text of each helper's unique name.
+    unique_helper_names: Option<HashMap<JsString, JsString>>,
+    /// `externalHelpersModuleName`.
     external_helpers_module_name: Option<NodeId>,
     next_list_element_pos: i64,
     write_kind: WriteKind,
@@ -292,7 +404,7 @@ fn guard<R>(work: impl FnOnce() -> R) -> R {
     stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, work)
 }
 
-impl<'a> Session<'a, '_> {
+impl<'a, 'c> Session<'a, 'c> {
     pub(crate) fn node(&self, id: NodeId) -> Result<NodeRead<'a>, Error> {
         Ok(self.view.node(id)?)
     }
@@ -342,15 +454,14 @@ impl<'a> Session<'a, '_> {
     // Top-level setup
     //
 
-    /// The emit context records no helper module names yet, so
-    /// `externalHelpersModuleName` stays nil; source maps are disabled, so
-    /// `setSourceMapSource` returns at its guard.
+    /// Source maps are disabled, so `setSourceMapSource` returns at its guard.
     // port: tsc/internal/printer/printer.go:Printer.setSourceFile
     fn set_source_file(&mut self, source_file: Option<NodeId>) -> Result<(), Error> {
-        self.current_source = match source_file {
+        let current_source = match source_file {
             Some(file) => Some((file, self.view.source_file(file)?)),
             None => None,
         };
+        self.replace_current_source(current_source);
         self.unique_helper_names = None;
         self.external_helpers_module_name = None;
         if let Some(file) = source_file {
@@ -358,9 +469,41 @@ impl<'a> Session<'a, '_> {
             if self.emit_flags(original) & ef::EXTERNAL_HELPERS != 0 {
                 self.unique_helper_names = Some(HashMap::new());
             }
+            self.external_helpers_module_name = self
+                .printer
+                .emit_context
+                .get_external_helpers_module_name(&ViewFactory(self.view), file);
             self.set_source_map_source(file)?;
         }
         Ok(())
+    }
+
+    /// Sets `currentSourceFile`, for the printer and the name generator's
+    /// callbacks, and returns the previous one.
+    pub(crate) fn replace_current_source(
+        &mut self,
+        current_source: Option<(NodeId, SourceFileRead<'a>)>,
+    ) -> Option<(NodeId, SourceFileRead<'a>)> {
+        self.current_source_file
+            .set(current_source.as_ref().map(|(file, _)| *file));
+        std::mem::replace(&mut self.current_source, current_source)
+    }
+
+    /// The name generator's host for this write.
+    fn host(&self) -> PrintHost<'a, 'c> {
+        PrintHost {
+            factory: ViewFactory(self.view),
+            bindings: self.printer.bindings,
+        }
+    }
+
+    /// The text reads of `getTextOfNode` over the printer's current state.
+    fn node_text(&self) -> NodeText<'c> {
+        NodeText {
+            emit_context: self.printer.emit_context,
+            target: self.printer.options.target,
+            current_source: self.current_source.as_ref().map(|(file, _)| *file),
+        }
     }
 
     /// Boundary: past its guard this registers the file with the source-map
@@ -1289,11 +1432,9 @@ impl<'a> Session<'a, '_> {
     // Snippet elements
     //
 
-    /// `EmitContext.SnippetElement`. The emit context has no snippet table yet
-    /// (the language service sets it), so no node carries one.
-    #[allow(clippy::unused_self, reason = "the emit context's snippet table")]
-    fn snippet_element(&self, _node: NodeId) -> Option<SnippetElement> {
-        None
+    /// `EmitContext.SnippetElement`: the language service's snippet table.
+    fn snippet_element(&self, node: NodeId) -> Option<SnippetElement> {
+        self.printer.emit_context.snippet_element(node)
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitSnippetNode
@@ -1412,79 +1553,46 @@ impl<'a> Session<'a, '_> {
     // Names
     //
 
-    /// Identifier and literal text. A generated name's text comes from the
-    /// `NameGenerator` (boundary); the emit context records no string-literal
-    /// text sources yet.
-    // port: tsc/internal/printer/printer.go:Printer.getTextOfNode
+    /// `getTextOfNode` with the printer's name generator.
     fn get_text_of_node(&self, node: NodeId, include_trivia: bool) -> Result<Vec<u8>, Error> {
-        let read = self.node(node)?;
-        if tsr_ast::utilities::is_member_name(&read)
-            && self.printer.emit_context.has_auto_generate_info(node)
-        {
-            return Err(Error::Unsupported("NameGenerator.GenerateName"));
-        }
-        let can_use_source_file = self.current_source.is_some()
-            && read.parent().is_some()
-            && !tsr_ast::utilities::node_is_synthesized(&read);
-        match read.kind().known() {
-            Some(K::Identifier | K::PrivateIdentifier) => {
-                if !can_use_source_file || !self.node_belongs_to_current_source(node)? {
-                    return Ok(match read.kind().known() {
-                        Some(K::Identifier) => read
-                            .data_source()
-                            .as_identifier()
-                            .ok_or(Error::MissingNode("identifier payload"))?
-                            .text()
-                            .to_vec(),
-                        _ => read
-                            .data_source()
-                            .as_private_identifier()
-                            .ok_or(Error::MissingNode("private identifier payload"))?
-                            .text()
-                            .to_vec(),
-                    });
-                }
-                let text = self.source_text().expect("checked above");
-                Ok(tsr_scanner::get_text_of_node_from_source_text(
-                    self.view,
-                    text,
-                    Some(node),
-                    include_trivia,
-                )?
-                .as_bytes()
-                .to_vec())
-            }
-            Some(K::JsxNamespacedName) => Err(Error::Unsupported("JsxNamespacedName text")),
-            Some(
-                K::StringLiteral
-                | K::NumericLiteral
-                | K::BigIntLiteral
-                | K::NoSubstitutionTemplateLiteral
-                | K::TemplateHead
-                | K::TemplateMiddle
-                | K::TemplateTail,
-            ) => self.get_literal_text_of_node(node, LiteralEscapeFlags::NONE),
-            _ => Err(Error::UnexpectedKind {
-                context: "getTextOfNode",
-                kind: read.kind(),
-            }),
-        }
+        let host = self.host();
+        let mut generator = self.printer.name_generator.borrow_mut();
+        self.node_text()
+            .get_text_of_node(&mut generator, &host, node, include_trivia)
     }
 
-    /// `GetSourceFileOfNode(node) == MostOriginal(currentSourceFile)`.
-    fn node_belongs_to_current_source(&self, node: NodeId) -> Result<bool, Error> {
-        let Some((file, _)) = &self.current_source else {
-            return Ok(false);
-        };
-        let original = self.printer.emit_context.most_original(*file);
-        Ok(tsr_ast::utilities::get_source_file_of_node(self.view, Some(node))? == Some(original))
+    /// `getLiteralTextOfNode` with no source file, which reads the current one.
+    pub(crate) fn get_literal_text_of_node(
+        &self,
+        node: NodeId,
+        flags: LiteralTextFlags,
+    ) -> Result<Vec<u8>, Error> {
+        let host = self.host();
+        let mut generator = self.printer.name_generator.borrow_mut();
+        self.node_text()
+            .get_literal_text_of_node(&mut generator, &host, node, None, flags)
+    }
+
+    /// `getTextOfNode` of a clone of `node`: a clone has no parent, so a name
+    /// that is not generated prints its own text, and a generated one shares
+    /// the original's generated name.
+    fn get_text_of_clone(&self, node: NodeId) -> Result<Vec<u8>, Error> {
+        if self.printer.emit_context.has_auto_generate_info(node) {
+            return self.get_text_of_node(node, false);
+        }
+        Ok(self.view.node_text(node)?.to_vec())
+    }
+
+    /// `MakeFileLevelOptimisticUniqueName` of the printer's name generator
+    /// (upstream's `makeFileLevelOptimisticUniqueName` closure).
+    fn make_file_level_optimistic_unique_name(&self, name: &[u8]) -> Result<JsString, Error> {
+        let host = self.host();
+        let mut generator = self.printer.name_generator.borrow_mut();
+        generator.make_file_level_optimistic_unique_name(&host, name)
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitIdentifierText
     fn emit_identifier_text(&mut self, node: NodeId) -> Result<(), Error> {
-        if self.printer.emit_context.has_auto_generate_info(node) {
-            return Err(Error::Unsupported("NameGenerator.GenerateName"));
-        }
         let text = self.get_text_of_node(node, false)?;
         let symbol = self
             .printer
@@ -1507,23 +1615,89 @@ impl<'a> Session<'a, '_> {
         Ok(())
     }
 
+    /// The text of the unique name upstream creates for a helper
+    /// (`NewUniqueNameEx` with `FileLevel | Optimistic`) and generates at once;
+    /// a later use clones that name, which shares its generated text.
+    // port: tsc/internal/printer/printer.go:Printer.getUniqueHelperName
+    fn get_unique_helper_name(&mut self, name: &[u8]) -> Result<JsString, Error> {
+        let names = self
+            .unique_helper_names
+            .as_ref()
+            .expect("assignment to entry in nil map");
+        if let Some(helper_name) = names.get(name) {
+            return Ok(helper_name.clone());
+        }
+        // A unique name's generated text: `makeUniqueName` with the file-level
+        // check, optimistic, unscoped and public, with no affixes.
+        let helper_name = self.make_file_level_optimistic_unique_name(name)?;
+        self.unique_helper_names
+            .as_mut()
+            .expect("assignment to entry in nil map")
+            .insert(JsString::from_bytes(name), helper_name.clone());
+        Ok(helper_name)
+    }
+
+    /// A node the printer creates with `node`'s comment and source-map ranges
+    /// (`AssignCommentAndSourceMapRanges`): no emit flags of its own.
+    fn assigned_target(&self, node: NodeId, kind: K) -> Result<CommentTarget, Error> {
+        Ok(CommentTarget {
+            node: None,
+            kind: kind.into(),
+            emit_flags: ef::NONE,
+            comment_range: self.comment_range_of(node)?,
+        })
+    }
+
+    /// A clone of `node`: its emit flags and ranges, copied, and no synthetic
+    /// comments.
+    fn clone_target(&self, node: NodeId) -> Result<CommentTarget, Error> {
+        Ok(CommentTarget {
+            node: None,
+            kind: self.node(node)?.kind(),
+            emit_flags: self.emit_flags(node),
+            comment_range: self.comment_range_of(node)?,
+        })
+    }
+
+    /// `EmitContext.CommentRange`.
+    fn comment_range_of(&self, node: NodeId) -> Result<TextRange, Error> {
+        match self.printer.emit_context.comment_range(node) {
+            Some(range) => Ok(range),
+            None => Ok(self.node(node)?.range()),
+        }
+    }
+
+    /// `enterNode`, `emitIdentifierText` and `exitNode` of an identifier the
+    /// printer creates, whose text is `text`.
+    fn emit_created_identifier(
+        &mut self,
+        target: &CommentTarget,
+        text: &[u8],
+    ) -> Result<(), Error> {
+        let state = self.enter_created_node(target)?;
+        self.write(text);
+        self.exit_created_node(target, state)?;
+        Ok(())
+    }
+
     /// A helper name (`__helper`) is substituted with `tslib_1.__helper` when the
     /// file imports its helpers, or with a unique name in a module whose own
-    /// declarations may conflict. Both substitutions are boundaries: the emit
-    /// context records no helper module name yet, and unique helper names come
-    /// from the helper table and the name generator.
+    /// declarations may conflict.
     // port: tsc/internal/printer/printer.go:Printer.emitIdentifierReference
     fn emit_identifier_reference(&mut self, node: NodeId) -> Result<(), Error> {
         if (self.external_helpers_module_name.is_some() || self.unique_helper_names.is_some())
             && self.emit_flags(node) & ef::HELPER_NAME != 0
         {
-            if self.external_helpers_module_name.is_some() {
-                return Err(Error::Unsupported(
-                    "external helpers module name substitution",
-                ));
+            if let Some(module_name) = self.external_helpers_module_name {
+                // Substitute `__helper` with `tslib_1.__helper`
+                return self.emit_external_helper_access(module_name, node);
             }
             if self.unique_helper_names.is_some() {
-                return Err(Error::Unsupported("getUniqueHelperName"));
+                // Substitute `__helper` with `__helper_1` if there is a conflict in an ES module.
+                let text = self.view.node_text(node)?.to_vec();
+                let helper_name = self.get_unique_helper_name(&text)?;
+                let target = self.assigned_target(node, K::Identifier)?;
+                return self.emit_created_identifier(&target, helper_name.as_bytes());
             }
         }
         let state = self.enter_node(node)?;
@@ -1532,12 +1706,56 @@ impl<'a> Session<'a, '_> {
         Ok(())
     }
 
+    /// `emitPropertyAccessExpression` of the access `emitIdentifierReference`
+    /// creates: `NewPropertyAccessExpression` of a clone of the helpers module
+    /// name and a clone of the helper's name, with the helper name's comment
+    /// and source-map ranges. The access and the dot token are synthesized, so
+    /// no line break comes before the dot and no comment attaches to it.
+    fn emit_external_helper_access(
+        &mut self,
+        module_name: NodeId,
+        node: NodeId,
+    ) -> Result<(), Error> {
+        let helper = self.assigned_target(node, K::PropertyAccessExpression)?;
+        let state = self.enter_created_node(&helper)?;
+        // `emitExpression` of the module name's clone, an identifier reference.
+        let module_clone = self.clone_target(module_name)?;
+        if module_clone.emit_flags & ef::HELPER_NAME != 0 {
+            // Upstream substitutes the clone again, without end.
+            return Err(Error::Unsupported(
+                "a helpers module name flagged as a helper name",
+            ));
+        }
+        let module_text = self.get_text_of_clone(module_name)?;
+        self.emit_created_identifier(&module_clone, &module_text)?;
+        let expression_end = i64::from(self.node(module_name)?.end());
+        self.emit_token_ex(
+            K::DotToken,
+            expression_end,
+            WriteKind::Punctuation,
+            None,
+            tef::NONE,
+        )?;
+        let lines_after_dot = i64::from(self.should_emit_on_new_line(Some(node), lf::NONE));
+        self.write_line_repeat(lines_after_dot);
+        self.increase_indent_if(lines_after_dot > 0);
+        // `emitMemberName` of the helper name's clone.
+        let name_clone = self.clone_target(node)?;
+        let name_text = self.get_text_of_clone(node)?;
+        self.emit_created_identifier(&name_clone, &name_text)?;
+        self.decrease_indent_if(lines_after_dot > 0);
+        self.exit_created_node(&helper, state)?;
+        Ok(())
+    }
+
     // port: tsc/internal/printer/printer.go:Printer.emitBindingIdentifier
     fn emit_binding_identifier(&mut self, node: NodeId) -> Result<(), Error> {
         if self.unique_helper_names.is_some() && self.emit_flags(node) & ef::HELPER_NAME != 0 {
-            // Substituting `__helper` with `__helper_1` in an ES module needs the
-            // helper table's unique names.
-            return Err(Error::Unsupported("getUniqueHelperName"));
+            // Substitute `__helper` with `__helper_1` if there is a conflict in an ES module.
+            let text = self.view.node_text(node)?.to_vec();
+            let helper_name = self.get_unique_helper_name(&text)?;
+            let target = self.assigned_target(node, K::Identifier)?;
+            return self.emit_created_identifier(&target, helper_name.as_bytes());
         }
         let state = self.enter_node(node)?;
         self.emit_identifier_text(node)?;
@@ -3244,7 +3462,10 @@ impl<'a> Session<'a, '_> {
     /// `ast.GetExpressionPrecedence` of the expression under any partially
     /// emitted wrappers.
     fn expression_precedence(&self, node: NodeId) -> Result<i32, Error> {
-        let skipped = tsr_ast::skip_partially_emitted_expressions(self.view, node)?;
+        let Some(skipped) = self.skip_partially_emitted_expressions_rewritten(node)? else {
+            // The parentheses `parenthesizeExpressionForNoAsi` created.
+            return Ok(op::PRIMARY);
+        };
         Ok(tsr_ast::get_expression_precedence(
             self.view,
             &self.node(skipped)?,
@@ -3259,11 +3480,18 @@ impl<'a> Session<'a, '_> {
     }
 
     fn emit_expression_worker(&mut self, node: NodeId, precedence: i32) -> Result<(), Error> {
-        let kind = self.known_kind(node)?;
         let parens = self.expression_precedence(node)? < precedence;
         if parens {
             self.write_punctuation(b"(");
         }
+        if let Some((index, created)) = self.no_asi_parens(node) {
+            self.emit_no_asi_parens(index, created)?;
+            if parens {
+                self.write_punctuation(b")");
+            }
+            return Ok(());
+        }
+        let kind = self.known_kind(node)?;
         match kind {
             K::TrueKeyword | K::FalseKeyword | K::NullKeyword => {
                 self.emit_token_node(Some(node))?;
@@ -3371,6 +3599,10 @@ impl<'a> Session<'a, '_> {
     /// member name, as in `1..toString`.
     // port: tsc/internal/printer/printer.go:Printer.mayNeedDotDotForPropertyAccess
     fn may_need_dot_dot_for_property_access(&self, expression: NodeId) -> Result<bool, Error> {
+        let Some(expression) = self.skip_partially_emitted_expressions_rewritten(expression)?
+        else {
+            return Ok(false);
+        };
         let read = self.node(expression)?;
         if read.kind() != K::NumericLiteral {
             return Ok(false);
@@ -3413,14 +3645,14 @@ impl<'a> Session<'a, '_> {
             op::MEMBER
         };
         self.emit_expression(expression, precedence)?;
-        let expression_read = self.node(expression)?;
+        let expression_span = self.operand_span(expression)?;
         let name_read = self.node(name)?;
         // Upstream synthesizes a dot token spanning the gap when none was parsed.
         let token = match question_dot {
             Some(token) => Span::of(&self.node(token)?),
             None => Span {
                 node: None,
-                pos: i64::from(expression_read.end()),
+                pos: expression_span.end,
                 end: i64::from(name_read.pos()),
             },
         };
@@ -3428,8 +3660,7 @@ impl<'a> Session<'a, '_> {
             Some(token) => self.known_kind(token)?,
             None => K::DotToken,
         };
-        let lines_before_dot =
-            self.get_lines_between_nodes(node, Span::of(&expression_read), token)?;
+        let lines_before_dot = self.get_lines_between_nodes(node, expression_span, token)?;
         self.write_line_repeat(lines_before_dot);
         self.increase_indent_if(lines_before_dot > 0);
         let should_emit_dot_dot = token_kind != K::QuestionDotToken
@@ -3444,7 +3675,7 @@ impl<'a> Session<'a, '_> {
         } else {
             self.emit_token(
                 K::DotToken,
-                i64::from(expression_read.end()),
+                expression_span.end,
                 WriteKind::Punctuation,
                 node,
             )?;
@@ -3488,7 +3719,7 @@ impl<'a> Session<'a, '_> {
             K::OpenBracketToken,
             greatest_end(
                 -1,
-                &[Some(i64::from(self.node(expression)?.end())), question_end],
+                &[Some(self.operand_span(expression)?.end), question_end],
             ),
             WriteKind::Punctuation,
             node,
@@ -3910,18 +4141,22 @@ impl<'a> Session<'a, '_> {
         node.is_some_and(|node| self.emit_flags(node) & ef::REUSE_TEMP_VARIABLE_SCOPE != 0)
     }
 
-    /// Boundary: the scope stack is the `NameGenerator`'s, ported separately.
-    /// Until the printer owns one there is no scope to push; every generated
-    /// name is refused where it is generated or printed.
     // port: tsc/internal/printer/printer.go:Printer.pushNameGenerationScope
     fn push_name_generation_scope(&mut self, node: Option<NodeId>) {
-        let _reuse_temp_variable_scope = self.should_reuse_temp_variable_scope(node);
+        let reuse_temp_variable_scope = self.should_reuse_temp_variable_scope(node);
+        self.printer
+            .name_generator
+            .borrow_mut()
+            .push_scope(reuse_temp_variable_scope);
     }
 
-    /// Boundary: see `push_name_generation_scope`.
     // port: tsc/internal/printer/printer.go:Printer.popNameGenerationScope
     fn pop_name_generation_scope(&mut self, node: Option<NodeId>) {
-        let _reuse_temp_variable_scope = self.should_reuse_temp_variable_scope(node);
+        let reuse_temp_variable_scope = self.should_reuse_temp_variable_scope(node);
+        self.printer
+            .name_generator
+            .borrow_mut()
+            .pop_scope(reuse_temp_variable_scope);
     }
 
     // port: tsc/internal/printer/printer.go:Printer.generateAllNames
@@ -4110,14 +4345,13 @@ impl<'a> Session<'a, '_> {
     }
 
     /// Generates the text for a generated identifier or private identifier.
-    /// A name that is not generated produces its own text, which is discarded;
-    /// a generated one needs the `NameGenerator` (boundary).
     // port: tsc/internal/printer/printer.go:Printer.generateName
     fn generate_name(&mut self, name: NodeId) -> Result<(), Error> {
-        if self.printer.emit_context.has_auto_generate_info(name) {
-            return Err(Error::Unsupported("NameGenerator.GenerateName"));
-        }
-        self.get_text_of_node(name, false)?;
+        let host = self.host();
+        self.printer
+            .name_generator
+            .borrow_mut()
+            .generate_name(&host, name)?;
         Ok(())
     }
 

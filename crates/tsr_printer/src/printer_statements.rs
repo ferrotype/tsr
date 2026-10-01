@@ -3,9 +3,40 @@
 //! module apply: every emit function is the upstream function of the same name
 //! and keeps its order of writes.
 
-use super::{greatest_end, guard, tef, CommentSeparator, Session, Span, WriteKind};
-use crate::{emit_flags as ef, list_format as lf, Error, ListFormat, TypePrecedence};
+use super::comments::CommentTarget;
+use super::{greatest_end, guard, tef, CommentSeparator, Session, Span, ViewFactory, WriteKind};
+use crate::{
+    compare_emit_helpers, emit_flags as ef, list_format as lf, Error, ListFormat, TypePrecedence,
+};
 use tsr_ast::{operator_precedence as op, NodeId, NodeListId, SyntaxKind as K};
+use tsr_core::TextRange;
+
+/// The parentheses `parenthesizeExpressionForNoAsi` creates in place of the
+/// partially emitted expression `pee`.
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct NoAsiParens {
+    pee: NodeId,
+    /// What the parentheses hold: the partially emitted expression's
+    /// expression, or the partially emitted expression itself.
+    expression: NodeId,
+    /// `parens.Loc`.
+    range: TextRange,
+    /// The parenthesized parse node the parentheses restore: their tokens'
+    /// comment context. `None` for synthesized parentheses.
+    context: Option<NodeId>,
+    emit_flags: crate::EmitFlags,
+    comment_range: TextRange,
+}
+
+/// One rewrite of `parenthesizeExpressionForNoAsi` while it prints.
+#[derive(Debug)]
+pub(crate) struct NoAsiRewrite {
+    /// The left spine above the parentheses, outermost first.
+    updated: Vec<NodeId>,
+    parens: NoAsiParens,
+    /// Cleared while the parentheses print their own expression.
+    active: bool,
+}
 
 impl Session<'_, '_> {
     fn end_of(&self, node: Option<NodeId>) -> Result<Option<i64>, Error> {
@@ -764,7 +795,7 @@ impl Session<'_, '_> {
             kind: postfix.operator(),
         })?;
         self.emit_expression(operand, op::LEFT_HAND_SIDE)?;
-        let end = i64::from(self.node(operand)?.end());
+        let end = self.operand_span(operand)?.end;
         self.emit_token(operator, end, WriteKind::Operator, node)?;
         self.exit_node(node, state)?;
         Ok(())
@@ -773,12 +804,13 @@ impl Session<'_, '_> {
     // port: tsc/internal/printer/printer.go:Printer.emitShortCircuitExpression
     fn emit_short_circuit_expression(&mut self, node: NodeId) -> Result<(), Error> {
         // port: tsc/internal/printer/utilities.go:isBinaryOperation
-        let skipped = tsr_ast::skip_partially_emitted_expressions(self.view, node)?;
-        let is_coalesce = if self.node(skipped)?.kind() == K::BinaryExpression {
-            let (_, operator, _) = self.binary_parts(skipped)?;
-            self.node(operator)?.kind() == K::QuestionQuestionToken
-        } else {
-            false
+        let skipped = self.skip_partially_emitted_expressions_rewritten(node)?;
+        let is_coalesce = match skipped {
+            Some(skipped) if self.node(skipped)?.kind() == K::BinaryExpression => {
+                let (_, operator, _) = self.binary_parts(skipped)?;
+                self.node(operator)?.kind() == K::QuestionQuestionToken
+            }
+            _ => false,
         };
         self.emit_expression(
             node,
@@ -818,8 +850,11 @@ impl Session<'_, '_> {
         let span = |session: &Self, id: NodeId| -> Result<Span, Error> {
             Ok(Span::of(&session.node(id)?))
         };
-        let before_question =
-            self.get_lines_between_nodes(node, span(self, condition)?, span(self, question)?)?;
+        let before_question = self.get_lines_between_nodes(
+            node,
+            self.operand_span(condition)?,
+            span(self, question)?,
+        )?;
         let after_question =
             self.get_lines_between_nodes(node, span(self, question)?, span(self, when_true)?)?;
         let before_colon =
@@ -894,25 +929,66 @@ impl Session<'_, '_> {
     /// line break between it and its parent (`return`, `throw`, `yield`).
     ///
     /// Upstream rebuilds the expression's left spine with the factory down to
-    /// the partially emitted expression that needs the parentheses. Each
+    /// the partially emitted expression that needs the parentheses: each
     /// `Update*` returns the node itself while its child is unchanged, and a
-    /// changed child only comes from creating the parentheses, which is the
-    /// boundary here: the printer reads a fixed tree.
+    /// node with a changed child otherwise. The printer reads a fixed tree, so
+    /// this returns that rewrite, `None` for an unchanged expression: the
+    /// updated nodes, which print as the originals they copy except for the
+    /// synthetic comments and erased type node an update does not copy, and
+    /// the parentheses that stand in for the partially emitted expression.
     // port: tsc/internal/printer/printer.go:Printer.parenthesizeExpressionForNoAsi
-    fn parenthesize_expression_for_no_asi(&self, node: NodeId) -> Result<NodeId, Error> {
-        guard(|| self.parenthesize_expression_for_no_asi_worker(node))
-    }
-
-    fn parenthesize_expression_for_no_asi_worker(&self, node: NodeId) -> Result<NodeId, Error> {
-        if !self.comments_disabled {
+    fn parenthesize_expression_for_no_asi(
+        &self,
+        node: NodeId,
+    ) -> Result<Option<NoAsiRewrite>, Error> {
+        if self.comments_disabled {
+            return Ok(None);
+        }
+        let mut updated = Vec::new();
+        let mut node = node;
+        loop {
             let read = self.node(node)?;
             let data = read.data_source();
             let left = match read.kind().known() {
                 Some(K::PartiallyEmittedExpression) => {
                     if self.will_emit_leading_new_line(node)? {
-                        return Err(Error::Unsupported(
-                            "parenthesizeExpressionForNoAsi: printer-created parentheses",
-                        ));
+                        let expression = read
+                            .expression()
+                            .ok_or(Error::MissingNode("partially emitted expression"))?;
+                        let parse_node = self.parse_node(node);
+                        let parens = match parse_node {
+                            Some(parse_node)
+                                if self.node(parse_node)?.kind() == K::ParenthesizedExpression =>
+                            {
+                                // If the original node was a parenthesized expression, restore it to preserve comment and source map emit
+                                let range = self.node(parse_node)?.range();
+                                NoAsiParens {
+                                    pee: node,
+                                    expression,
+                                    range,
+                                    context: Some(parse_node),
+                                    emit_flags: self.emit_flags(node),
+                                    comment_range: self
+                                        .printer
+                                        .emit_context
+                                        .comment_range(node)
+                                        .unwrap_or(range),
+                                }
+                            }
+                            _ => NoAsiParens {
+                                pee: node,
+                                expression: node,
+                                range: TextRange::new(-1, -1),
+                                context: None,
+                                emit_flags: ef::NONE,
+                                comment_range: TextRange::new(-1, -1),
+                            },
+                        };
+                        return Ok(Some(NoAsiRewrite {
+                            updated,
+                            parens,
+                            active: true,
+                        }));
                     }
                     read.expression()
                 }
@@ -936,20 +1012,101 @@ impl Session<'_, '_> {
                 Some(K::ConditionalExpression) => data
                     .as_conditional_expression()
                     .and_then(|conditional| conditional.condition()),
-                _ => return Ok(node),
+                _ => return Ok(None),
             };
-            let left = left.ok_or(Error::MissingNode("expression operand"))?;
-            // The update is the node itself: its child came back unchanged.
-            self.parenthesize_expression_for_no_asi(left)?;
-            return Ok(node);
+            updated.push(node);
+            node = left.ok_or(Error::MissingNode("expression operand"))?;
         }
-        Ok(node)
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitExpressionNoASI
     fn emit_expression_no_asi(&mut self, node: NodeId, precedence: i32) -> Result<(), Error> {
-        let node = self.parenthesize_expression_for_no_asi(node)?;
-        self.emit_expression(node, precedence)
+        let Some(rewrite) = guard(|| self.parenthesize_expression_for_no_asi(node))? else {
+            return self.emit_expression(node, precedence);
+        };
+        self.no_asi.push(rewrite);
+        let result = self.emit_expression(node, precedence);
+        self.no_asi.pop();
+        result
+    }
+
+    /// The parentheses a rewrite in progress puts in place of `node`.
+    pub(super) fn no_asi_parens(&self, node: NodeId) -> Option<(usize, NoAsiParens)> {
+        self.no_asi
+            .iter()
+            .enumerate()
+            .rev()
+            .find(|(_, rewrite)| rewrite.active && rewrite.parens.pee == node)
+            .map(|(index, rewrite)| (index, rewrite.parens))
+    }
+
+    /// Whether `node` prints as the update upstream makes of it.
+    pub(super) fn is_no_asi_updated(&self, node: NodeId) -> bool {
+        self.no_asi
+            .iter()
+            .any(|rewrite| rewrite.updated.contains(&node))
+    }
+
+    /// `emitParenthesizedExpression` of the parentheses a rewrite creates. With
+    /// a parenthesized parse node they copy the partially emitted expression's
+    /// emit metadata and take the parse node's range, and their tokens read
+    /// that parse node's comments; otherwise they are synthesized.
+    pub(super) fn emit_no_asi_parens(
+        &mut self,
+        index: usize,
+        parens: NoAsiParens,
+    ) -> Result<(), Error> {
+        let span = Span {
+            node: None,
+            pos: parens.range.pos(),
+            end: parens.range.end(),
+        };
+        let target = CommentTarget {
+            node: None,
+            kind: K::ParenthesizedExpression.into(),
+            emit_flags: parens.emit_flags,
+            comment_range: parens.comment_range,
+        };
+        let state = self.enter_created_node(&target)?;
+        // Inside the parentheses the partially emitted expression is itself.
+        self.no_asi[index].active = false;
+        let result =
+            self.emit_parenthesized_expression_parts(parens.context, span, parens.expression);
+        self.no_asi[index].active = true;
+        result?;
+        self.exit_created_node(&target, state)
+    }
+
+    /// `SkipPartiallyEmittedExpressions` over the rewritten tree: `None` where
+    /// it reaches the parentheses a rewrite created.
+    pub(super) fn skip_partially_emitted_expressions_rewritten(
+        &self,
+        mut node: NodeId,
+    ) -> Result<Option<NodeId>, Error> {
+        loop {
+            if self.no_asi_parens(node).is_some() {
+                return Ok(None);
+            }
+            let read = self.node(node)?;
+            if read.kind() != K::PartiallyEmittedExpression {
+                return Ok(Some(node));
+            }
+            node = read
+                .expression()
+                .ok_or(Error::MissingNode("partially emitted expression"))?;
+        }
+    }
+
+    /// The range of an operand of the rewritten tree.
+    pub(super) fn operand_span(&self, node: NodeId) -> Result<Span, Error> {
+        if let Some((_, parens)) = self.no_asi_parens(node) {
+            return Ok(Span {
+                node: None,
+                pos: parens.range.pos(),
+                end: parens.range.end(),
+            });
+        }
+        Ok(Span::of(&self.node(node)?))
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitYieldExpression
@@ -1118,14 +1275,16 @@ impl Session<'_, '_> {
             let expression = read
                 .expression()
                 .ok_or(Error::MissingNode("partially emitted expression"))?;
-            let expression_pos = i64::from(self.node(expression)?.pos());
+            let expression_pos = self.operand_span(expression)?.pos;
             if self.emit_flags(current) & ef::NO_LEADING_COMMENTS == 0
                 && i64::from(read.pos()) != expression_pos
             {
                 self.emit_trailing_comments_of_position(expression_pos, false, false);
             }
             stack.push((current, state));
-            if self.node(expression)?.kind() != K::PartiallyEmittedExpression {
+            if self.no_asi_parens(expression).is_some()
+                || self.node(expression)?.kind() != K::PartiallyEmittedExpression
+            {
                 break;
             }
             current = expression;
@@ -1141,7 +1300,7 @@ impl Session<'_, '_> {
             let expression = read
                 .expression()
                 .ok_or(Error::MissingNode("partially emitted expression"))?;
-            let expression_end = i64::from(self.node(expression)?.end());
+            let expression_end = self.operand_span(expression)?.end;
             if self.emit_flags(current) & ef::NO_TRAILING_COMMENTS == 0
                 && i64::from(read.end()) != expression_end
             {
@@ -1756,8 +1915,9 @@ impl Session<'_, '_> {
     // Declarations
     //
 
-    /// The type node an emit context may attach to the name
-    /// (`EmitContext.GetTypeNode`) is not recorded by the emit context yet.
+    /// The initializer's `=` follows the name, the type annotation, and the
+    /// erased type annotation the emit context keeps for the name
+    /// (`EmitContext.GetTypeNode`).
     // port: tsc/internal/printer/printer.go:Printer.emitVariableDeclaration
     pub(super) fn emit_variable_declaration(&mut self, node: NodeId) -> Result<(), Error> {
         let state = self.enter_node(node)?;
@@ -1771,10 +1931,13 @@ impl Session<'_, '_> {
         self.emit_binding_name(name)?;
         self.emit_punctuation_node(exclamation)?;
         self.emit_type_annotation(type_node)?;
-        let name_end = self
-            .end_of(name)?
-            .ok_or(Error::MissingNode("variable name"))?;
-        let equals_pos = greatest_end(name_end, &[self.end_of(type_node)?]);
+        let name = name.ok_or(Error::MissingNode("variable name"))?;
+        let name_end = i64::from(self.node(name)?.end());
+        let erased_type = self.printer.emit_context.get_type_node(name);
+        let equals_pos = greatest_end(
+            name_end,
+            &[self.end_of(type_node)?, self.end_of(erased_type)?],
+        );
         self.emit_initializer(initializer, equals_pos, node)?;
         self.exit_node(node, state)?;
         Ok(())
@@ -3006,23 +3169,61 @@ impl Session<'_, '_> {
         Ok(())
     }
 
-    /// Boundary: the emit context records no helpers yet (`helpers.go` and
-    /// `GetEmitHelpers` land with the helper table). With none recorded
-    /// upstream writes nothing and reports that none were emitted.
-    #[allow(
-        clippy::unused_self,
-        clippy::unnecessary_wraps,
-        reason = "the helper table is a boundary"
-    )]
-    pub(super) fn emit_helpers(&mut self, _node: NodeId) -> Result<bool, Error> {
-        Ok(false)
+    /// Writes the helpers recorded on `node`, highest priority first. An
+    /// unscoped helper is skipped under `noEmitHelpers` or when the file
+    /// imports its helpers; a scoped one is always written, its unique names
+    /// made by the name generator.
+    // port: tsc/internal/printer/printer.go:Printer.emitHelpers
+    pub(super) fn emit_helpers(&mut self, node: NodeId) -> Result<bool, Error> {
+        let mut helpers_emitted = false;
+        let source_file = self.current_source.as_ref().map(|(file, _)| *file);
+        let should_skip = self.printer.options.no_emit_helpers
+            || source_file.is_some_and(|source_file| {
+                self.printer
+                    .emit_context
+                    .has_recorded_external_helpers(&ViewFactory(self.view), source_file)
+            });
+        let mut helpers = self.printer.emit_context.get_emit_helpers(node);
+        if !helpers.is_empty() {
+            helpers.sort_by(|x, y| compare_emit_helpers(x, y).cmp(&0));
+            for helper in helpers {
+                if !helper.scoped {
+                    // Skip the helper if it can be skipped and the noEmitHelpers compiler
+                    // option is set, or if it can be imported and the importHelpers compiler
+                    // option is set.
+                    if should_skip {
+                        continue;
+                    }
+                }
+                if let Some(text_callback) = helper.text_callback {
+                    let mut failure = None;
+                    let text = text_callback(&mut |name| match self
+                        .make_file_level_optimistic_unique_name(name)
+                    {
+                        Ok(name) => name.as_bytes().to_vec(),
+                        Err(error) => {
+                            failure.get_or_insert(error);
+                            Vec::new()
+                        }
+                    });
+                    if let Some(error) = failure {
+                        return Err(error);
+                    }
+                    self.write_lines(&text);
+                } else {
+                    self.write_lines(helper.text);
+                }
+                helpers_emitted = true;
+            }
+        }
+        Ok(helpers_emitted)
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitSourceFile
     pub(super) fn emit_source_file(&mut self, node: NodeId) -> Result<(), Error> {
         let file = self.view.source_file(node)?;
         let (script_kind, is_declaration_file) = (file.script_kind, file.is_declaration_file);
-        let saved_current_source_file = self.current_source.replace((node, file));
+        let saved_current_source_file = self.replace_current_source(Some((node, file)));
         let saved_comments_disabled = self.comments_disabled;
 
         self.write_line();
@@ -3061,7 +3262,7 @@ impl Session<'_, '_> {
         )?;
         self.pop_name_generation_scope(Some(node));
         self.emit_detached_comments_after_statement_list(node, statements_range, state);
-        self.current_source = saved_current_source_file;
+        self.replace_current_source(saved_current_source_file);
         self.comments_disabled = saved_comments_disabled;
         Ok(())
     }

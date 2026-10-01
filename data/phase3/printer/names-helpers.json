@@ -1,0 +1,409 @@
+{
+ "description": "Native printer output for generated names, emit helpers and the parentheses parenthesizeExpressionForNoAsi creates. Each case parses `source` as /main.ts, rewrites marker identifiers with the emit context's node visitor ($temp, $loop, $affixed, $unique_<n>, $optimistic_<n>, $filelevel_<n>, $helper_<n>, $node_<n>, $strtemp, $strunique_<n>, #unique_<n>; functions named reuse* get ReuseTempVariableScope; `pee` turns parenthesized expressions into partially emitted ones), records the helpers and flags, and prints the file `writes` times with one printer.",
+ "producer": "tools/phase3/printer_witness/a1_witness_test.go, overlaid into tsc/internal/printer and run as TestA1Witness",
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "producer_sha256": "e55c27d904d2c195bd324b2307a95fb1da2d073a1bafd5039742318d264f80a4",
+ "cases": [
+  {
+   "id": "temp-scopes",
+   "source": "var $temp, $temp;\nfunction f() { var $temp; }\nvar $temp;",
+   "expected": [
+    "var _a, _b;\nfunction f() { var _a; }\nvar _c;\n"
+   ]
+  },
+  {
+   "id": "temp-skips-file-identifiers",
+   "source": "var _a = 1, _b = 2;\nvar $temp;",
+   "expected": [
+    "var _a = 1, _b = 2;\nvar _c;\n"
+   ]
+  },
+  {
+   "id": "temp-reuse-scope",
+   "source": "var $temp;\nfunction reuse() { var $temp; }\nfunction other() { var $temp; }\nvar $temp;",
+   "expected": [
+    "var _a;\nfunction reuse() { var _b; }\nfunction other() { var _a; }\nvar _c;\n"
+   ]
+  },
+  {
+   "id": "temp-after-scope-pop",
+   "source": "function f() { $temp; }\n$temp;\nclass C { m() { $temp; } }\n$temp;",
+   "expected": [
+    "function f() { _a; }\n_a;\nclass C {\n    m() { _a; }\n}\n_b;\n"
+   ]
+  },
+  {
+   "id": "temp-private-scope",
+   "source": "class C { #unique_p; m() { this.#unique_p; } }\nclass D { #unique_p; }",
+   "expected": [
+    "class C {\n    #p_1;\n    m() { this.#p_2; }\n}\nclass D {\n    #p_1;\n}\n"
+   ]
+  },
+  {
+   "id": "loop-then-temp",
+   "source": "var $loop, $loop, $temp;",
+   "expected": [
+    "var _i, _a, _b;\n"
+   ]
+  },
+  {
+   "id": "loop-avoids-i",
+   "source": "var _i;\nfor (var $loop = 0;;) {}",
+   "expected": [
+    "var _i;\nfor (var _a = 0;;) { }\n"
+   ]
+  },
+  {
+   "id": "temp-affixed",
+   "source": "var $affixed, $affixed, $temp;",
+   "expected": [
+    "var pre_asuf, pre_bsuf, _a;\n"
+   ]
+  },
+  {
+   "id": "temp-count-past-z",
+   "source": "var $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp, $temp;",
+   "expected": [
+    "var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5;\n"
+   ]
+  },
+  {
+   "id": "unique-names",
+   "source": "var foo;\nvar $unique_foo, $unique_foo;\nfunction g() { var $unique_foo; }",
+   "expected": [
+    "var foo;\nvar foo_1, foo_2;\nfunction g() { var foo_3; }\n"
+   ]
+  },
+  {
+   "id": "unique-optimistic",
+   "source": "var $optimistic_bar, $optimistic_bar;",
+   "expected": [
+    "var bar, bar_1;\n"
+   ]
+  },
+  {
+   "id": "unique-optimistic-taken",
+   "source": "var bar;\nvar $optimistic_bar;",
+   "expected": [
+    "var bar;\nvar bar_1;\n"
+   ]
+  },
+  {
+   "id": "unique-file-level",
+   "source": "var baz;\nfunction h() { var $filelevel_baz, $filelevel_qux; }",
+   "expected": [
+    "var baz;\nfunction h() { var baz_1, qux; }\n"
+   ]
+  },
+  {
+   "id": "unique-trailing-underscore",
+   "source": "var $unique_x_, $unique_x_;",
+   "expected": [
+    "var x_1, x_2;\n"
+   ]
+  },
+  {
+   "id": "generated-name-for-identifier",
+   "source": "var $node_x, $node_x;",
+   "expected": [
+    "var $node_x_1, $node_x_2;\n"
+   ]
+  },
+  {
+   "id": "private-unique-names",
+   "source": "class C { #unique_p = 1; #unique_p = 2; m() { return this.#unique_p; } }",
+   "expected": [
+    "class C {\n    #p_1 = 1;\n    #p_2 = 2;\n    m() { return this.#p_3; }\n}\n"
+   ]
+  },
+  {
+   "id": "string-literal-text-source",
+   "source": "var $temp = $strtemp, $unique_s = $strunique_s;",
+   "expected": [
+    "var _a = \"_b\", s_1 = \"s_2\";\n"
+   ]
+  },
+  {
+   "id": "two-writes-share-generator",
+   "source": "var $unique_foo, $temp;",
+   "writes": 2,
+   "expected": [
+    "var foo_1, _a;\n",
+    "var foo_1, _a;\n"
+   ]
+  },
+  {
+   "id": "helpers-sorted",
+   "source": "f();",
+   "helpers": [
+    "awaiter",
+    "param",
+    "decorate",
+    "metadata",
+    "await",
+    "rest"
+   ],
+   "expected": [
+    "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\n};\nvar __metadata = (this && this.__metadata) || function (k, v) {\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\n};\nvar __param = (this && this.__param) || function (paramIndex, decorator) {\n    return function (target, key) { decorator(target, key, paramIndex); }\n};\nvar __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\n    return new (P || (P = Promise))(function (resolve, reject) {\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\n    });\n};\nvar __await = (this && this.__await) || function (v) { return this instanceof __await ? (this.v = v, this) : new __await(v); }\nvar __rest = (this && this.__rest) || function (s, e) {\n    var t = {};\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\n        t[p] = s[p];\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\n                t[p[i]] = s[p[i]];\n        }\n    return t;\n};\nf();\n"
+   ]
+  },
+  {
+   "id": "helpers-module-priorities",
+   "source": "f();",
+   "helpers": [
+    "importStar",
+    "createBinding",
+    "setModuleDefault",
+    "exportStar",
+    "importDefault"
+   ],
+   "expected": [
+    "var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {\n    if (k2 === undefined) k2 = k;\n    var desc = Object.getOwnPropertyDescriptor(m, k);\n    if (!desc || (\"get\" in desc ? !m.__esModule : desc.writable || desc.configurable)) {\n      desc = { enumerable: true, get: function() { return m[k]; } };\n    }\n    Object.defineProperty(o, k2, desc);\n}) : (function(o, m, k, k2) {\n    if (k2 === undefined) k2 = k;\n    o[k2] = m[k];\n}));\nvar __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {\n    Object.defineProperty(o, \"default\", { enumerable: true, value: v });\n}) : function(o, v) {\n    o[\"default\"] = v;\n});\nvar __importStar = (this && this.__importStar) || (function () {\n    var ownKeys = function(o) {\n        ownKeys = Object.getOwnPropertyNames || function (o) {\n            var ar = [];\n            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;\n            return ar;\n        };\n        return ownKeys(o);\n    };\n    return function (mod) {\n        if (mod && mod.__esModule) return mod;\n        var result = {};\n        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== \"default\") __createBinding(result, mod, k[i]);\n        __setModuleDefault(result, mod);\n        return result;\n    };\n})();\nvar __exportStar = (this && this.__exportStar) || function(m, exports) {\n    for (var p in m) if (p !== \"default\" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);\n};\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nf();\n"
+   ]
+  },
+  {
+   "id": "helpers-no-emit",
+   "source": "f();",
+   "helpers": [
+    "awaiter",
+    "asyncSuper",
+    "decorate"
+   ],
+   "no_emit_helpers": true,
+   "expected": [
+    "const _superIndex = name => super[name];\nf();\n"
+   ]
+  },
+  {
+   "id": "scoped-helper-unique-name",
+   "source": "var _superIndex;\nf();",
+   "helpers": [
+    "asyncSuper"
+   ],
+   "expected": [
+    "const _superIndex_1 = name => super[name];\nvar _superIndex;\nf();\n"
+   ]
+  },
+  {
+   "id": "advanced-scoped-helper",
+   "source": "var _superIndex, _superIndex_1;\nf();",
+   "helpers": [
+    "advancedAsyncSuper"
+   ],
+   "expected": [
+    "const _superIndex_2 = (function (geti, seti) {\n    const cache = Object.create(null);\n    return name => cache[name] || (cache[name] = { get value() { return geti(name); }, set value(v) { seti(name, v); } });\n})(name => super[name], (name, value) => super[name] = value);\nvar _superIndex, _superIndex_1;\nf();\n"
+   ]
+  },
+  {
+   "id": "helpers-in-function-body",
+   "source": "function f() { g(); }",
+   "body_helpers": [
+    "asyncSuper",
+    "awaiter"
+   ],
+   "expected": [
+    "function f() {\n    var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\n        function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\n        return new (P || (P = Promise))(function (resolve, reject) {\n            function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\n            function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\n            function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\n            step((generator = generator.apply(thisArg, _arguments || [])).next());\n        });\n    };\n    const _superIndex = name => super[name];\n    g();\n}\n"
+   ]
+  },
+  {
+   "id": "helpers-in-function-body-no-emit",
+   "source": "function f() { g(); }",
+   "body_helpers": [
+    "asyncSuper",
+    "awaiter"
+   ],
+   "no_emit_helpers": true,
+   "expected": [
+    "function f() {\n    const _superIndex = name => super[name];\n    g();\n}\n"
+   ]
+  },
+  {
+   "id": "helpers-recorded-external",
+   "source": "f();",
+   "helpers": [
+    "awaiter",
+    "asyncSuper"
+   ],
+   "helpers_module": true,
+   "expected": [
+    "const _superIndex = name => super[name];\nf();\n"
+   ]
+  },
+  {
+   "id": "helper-name-external-module",
+   "source": "$helper___assign({}, x);\n/*a*/ $helper___rest(y, []);",
+   "helpers_module": true,
+   "expected": [
+    "tslib_1.__assign({}, x);\n/*a*/ tslib_1.__rest(y, []);\n"
+   ]
+  },
+  {
+   "id": "helper-name-external-module-taken",
+   "source": "var tslib;\n$helper___assign(x);",
+   "helpers_module": true,
+   "expected": [
+    "var tslib;\ntslib_1.__assign(x);\n"
+   ]
+  },
+  {
+   "id": "helper-name-unique",
+   "source": "var __assign;\n$helper___assign(x);\n$helper___assign(y);\n$helper___extends(z);",
+   "external_helpers": true,
+   "expected": [
+    "var __assign;\n__assign_1(x);\n__assign_1(y);\n__extends(z);\n"
+   ]
+  },
+  {
+   "id": "helper-name-unique-binding",
+   "source": "var $helper___assign = 1;\n$helper___assign(x);\nvar __decorate;\nfunction $helper___decorate() {}",
+   "external_helpers": true,
+   "expected": [
+    "var __assign = 1;\n__assign(x);\nvar __decorate;\nfunction __decorate() { }\n"
+   ]
+  },
+  {
+   "id": "helper-name-plain",
+   "source": "$helper___assign(x);",
+   "expected": [
+    "__assign(x);\n"
+   ]
+  },
+  {
+   "id": "helper-name-comments",
+   "source": "/*lead*/ $helper___assign(x) /*trail*/;\n// line\n$helper___assign(y);",
+   "external_helpers": true,
+   "expected": [
+    "/*lead*/ __assign(x) /*trail*/;\n// line\n__assign(y);\n"
+   ]
+  },
+  {
+   "id": "noasi-property-access",
+   "source": "function f() {\n    return (// c\n    x).foo;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    x).foo;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-top",
+   "source": "function f() {\n    return (// c\n    x);\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    x);\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-synthetic",
+   "source": "function f() {\n    return (x).y;\n}",
+   "pee": "synthetic",
+   "expected": [
+    "function f() {\n    return (\n    // c\n    x).y;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-binary",
+   "source": "function f() {\n    return (// c\n    a).b + c;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    a).b + c;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-call",
+   "source": "function f() {\n    return (// c\n    g)(1);\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    g)(1);\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-element-access",
+   "source": "function f() {\n    return (// c\n    a)[0];\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    a)[0];\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-postfix",
+   "source": "function f() {\n    return (// c\n    a)++;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    a)++;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-conditional",
+   "source": "function f() {\n    return (// c\n    a) ? b : c;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    a) ? b : c;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-tagged-template",
+   "source": "function f() {\n    return (// c\n    t)`x`;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    t) `x`;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-as-nonnull",
+   "source": "function f() {\n    return (// c\n    a)! as any;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    a)! as any;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-satisfies",
+   "source": "function f() {\n    return (// c\n    a) satisfies T;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return ( // c\n    a) satisfies T;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-throw-yield",
+   "source": "function* f() {\n    yield (// c\n    a).b;\n    throw (// d\n    e).f;\n}",
+   "pee": "original",
+   "expected": [
+    "function* f() {\n    yield ( // c\n    a).b;\n    throw ( // d\n    e).f;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-nested-pee",
+   "source": "function f() {\n    return ((// c\n    a)).b;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return (// c\n    a).b;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-comments-removed",
+   "source": "function f() {\n    return (// c\n    x).foo;\n}",
+   "pee": "original",
+   "remove_comments": true,
+   "expected": [
+    "function f() {\n    return x.foo;\n}\n"
+   ]
+  },
+  {
+   "id": "noasi-no-newline",
+   "source": "function f() {\n    return (/* c */ x).foo;\n}",
+   "pee": "original",
+   "expected": [
+    "function f() {\n    return /* c */ x.foo;\n}\n"
+   ]
+  },
+  {
+   "id": "dot-dot-through-pee",
+   "source": "var a = (1).toFixed();",
+   "pee": "original",
+   "expected": [
+    "var a = 1..toFixed();\n"
+   ]
+  }
+ ]
+}
