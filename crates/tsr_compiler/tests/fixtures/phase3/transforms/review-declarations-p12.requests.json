@@ -1,0 +1,24 @@
+{
+ "cases": [
+  {
+   "id": "cjs-name-conflicts",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nconst foo = \"local\";\nfunction bar() {}\nObject.defineProperty(exports, \"foo\", { value: 1 });\nexports[\"bar\"] = 2;\nexports.baz = 3;\nconst baz = 4;\nexports[\"default\"] = 5;\nexports.qux = qux;\nfunction qux() {}\nexports[\"undefined\"] = 6;\nexports.Object = 7;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "cjs-nested-scope",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nfunction setup(foo) {\n  exports.foo = foo;\n  Object.defineProperty(exports, \"inner\", { value: foo });\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  }
+ ]
+}

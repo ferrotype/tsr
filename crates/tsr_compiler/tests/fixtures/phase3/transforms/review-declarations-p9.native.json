@@ -1,0 +1,272 @@
+{
+ "cases": [
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields",
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nclass A {\r\n    m() {\r\n        return __awaiter(this, void 0, void 0, function* () {\r\n            var _a;\r\n            yield 0;\r\n            class B {\r\n            }\r\n            _a = B;\r\n            B.x = _a;\r\n            (() => {\r\n                yield 1;\r\n                const y = _a;\r\n            })();\r\n            return this;\r\n        });\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rcf-nolexthis",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732041207b0a202020206173796e63206d2829207b0a2020202020202020617761697420303b0a2020202020202020636c6173732042207b0a2020202020202020202020207374617469632078203d20746869733b0a202020202020202020202020737461746963207b0a20202020202020202020202020202020617761697420313b0a20202020202020202020202020202020636f6e73742079203d20746869733b0a2020202020202020202020207d0a20202020202020207d0a202020202020202072657475726e20746869733b0a202020207d0a7d0a"
+    },
+    "id": "rcf-nolexthis",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass A {\n    async m() {\n        await 0;\n        class B {\n            static x = this;\n            static {\n                await 1;\n                const y = this;\n            }\n        }\n        return this;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "classfields",
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nvar _a;\r\nclass C {\r\n}\r\n_a = C;\r\n(() => {\r\n    const f = () => {\r\n        var arguments_1 = arguments;\r\n        return __awaiter(void 0, void 0, void 0, function* () { return (yield _a.x) + arguments_1.length; });\r\n    };\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rcf-static-args",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020737461746963207b0a2020202020202020636f6e73742066203d206173796e63202829203d3e20617761697420746869732e78202b20617267756d656e74732e6c656e6774683b0a202020207d0a7d0a"
+    },
+    "id": "rcf-static-args",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass C {\n    static {\n        const f = async () => await this.x + arguments.length;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare const k: string;\r\ndeclare const u: unique symbol;\r\ndeclare const obj: {\r\n    readonly key: unique symbol;\r\n};\r\ndeclare const lit = \"lit\";\r\nexport declare class C {\r\n    [x: string]: number;\r\n    [u]: number;\r\n    [obj.key](): void;\r\n    get [lit](): number;\r\n    set [u](v: number);\r\n    static [Symbol.iterator](): void;\r\n    [\"str\"]: number;\r\n}\r\nexport interface I {\r\n    [u]: number;\r\n    [obj.key](): void;\r\n    [Symbol.asyncIterator]: number;\r\n}\r\nexport declare const o: {\r\n    [k]: number;\r\n    [u]: number;\r\n    lit: number;\r\n};\r\nexport type T = {\r\n    [u]: number;\r\n};\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-names-mix",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e7374206b3a20737472696e673b0a6465636c61726520636f6e737420753a20756e697175652073796d626f6c3b0a6465636c61726520636f6e7374206f626a3a207b20726561646f6e6c79206b65793a20756e697175652073796d626f6c207d3b0a636f6e7374206c6974203d20226c6974223b0a6578706f727420636c6173732043207b0a20205b6b5d203d20313b0a20205b755d203d20323b0a20205b6f626a2e6b65795d2829207b7d0a2020676574205b6c69745d2829207b2072657475726e20313b207d0a2020736574205b755d28763a206e756d62657229207b7d0a2020737461746963205b53796d626f6c2e6974657261746f725d2829207b7d0a20205b22737472225d203d20333b0a20205b31202b20315d203d20343b0a7d0a6578706f727420696e746572666163652049207b0a20205b6b5d3a206e756d6265723b0a20205b755d3a206e756d6265723b0a20205b6f626a2e6b65795d28293a20766f69643b0a20205b53796d626f6c2e6173796e634974657261746f725d3a206e756d6265723b0a7d0a6578706f727420636f6e7374206f203d207b205b755d3a20312c205b6b5d3a20322c205b6c69745d3a2033207d3b0a6578706f727420747970652054203d207b205b755d3a206e756d6265723b205b6b5d3a20737472696e67207d3b0a"
+    },
+    "id": "computed-names-mix",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare const k: string;\ndeclare const u: unique symbol;\ndeclare const obj: { readonly key: unique symbol };\nconst lit = \"lit\";\nexport class C {\n  [k] = 1;\n  [u] = 2;\n  [obj.key]() {}\n  get [lit]() { return 1; }\n  set [u](v: number) {}\n  static [Symbol.iterator]() {}\n  [\"str\"] = 3;\n  [1 + 1] = 4;\n}\nexport interface I {\n  [k]: number;\n  [u]: number;\n  [obj.key](): void;\n  [Symbol.asyncIterator]: number;\n}\nexport const o = { [u]: 1, [k]: 2, [lit]: 3 };\nexport type T = { [u]: number; [k]: string };\n"
+  },
+  {
+   "diagnostics": 8,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [
+        {
+         "code": 9038,
+         "end": 131,
+         "message": "Computed property names on class or object literals cannot be inferred with --isolatedDeclarations.",
+         "pos": 128
+        },
+        {
+         "code": 9038,
+         "end": 150,
+         "message": "Computed property names on class or object literals cannot be inferred with --isolatedDeclarations.",
+         "pos": 147
+        },
+        {
+         "code": 9038,
+         "end": 206,
+         "message": "Computed property names on class or object literals cannot be inferred with --isolatedDeclarations.",
+         "pos": 197
+        },
+        {
+         "code": 9038,
+         "end": 231,
+         "message": "Computed property names on class or object literals cannot be inferred with --isolatedDeclarations.",
+         "pos": 222
+        },
+        {
+         "code": 9014,
+         "end": 279,
+         "message": "Computed properties must be number or string literals, variables or dotted expressions with --isolatedDeclarations.",
+         "pos": 270
+        },
+        {
+         "code": 9038,
+         "end": 363,
+         "message": "Computed property names on class or object literals cannot be inferred with --isolatedDeclarations.",
+         "pos": 360
+        }
+       ],
+       "text": "declare const k: string;\r\ndeclare const u: unique symbol;\r\ndeclare const obj: {\r\n    readonly key: unique symbol;\r\n};\r\nexport declare class C {\r\n    [k]: number;\r\n    [Symbol.iterator](): void;\r\n}\r\nexport interface I {\r\n    [obj.key]: number;\r\n    [Symbol.iterator]: number;\r\n}\r\nexport declare const o: {\r\n    [u]: number;\r\n};\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-names-isolated",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e7374206b3a20737472696e673b0a6465636c61726520636f6e737420753a20756e697175652073796d626f6c3b0a6465636c61726520636f6e7374206f626a3a207b20726561646f6e6c79206b65793a20756e697175652073796d626f6c207d3b0a6578706f727420636c6173732043207b0a20205b6b5d3a206e756d626572203d20313b0a20205b755d3a206e756d626572203d20323b0a20205b53796d626f6c2e6974657261746f725d28293a20766f6964207b7d0a20205b6f626a2e6b65795d3a206e756d626572203d20333b0a20205b6b202b202278225d3a206e756d626572203d20343b0a7d0a6578706f727420696e746572666163652049207b0a20205b6b202b202279225d3a206e756d6265723b0a20205b6f626a2e6b65795d3a206e756d6265723b0a20205b53796d626f6c2e6974657261746f725d3a206e756d6265723b0a7d0a6578706f727420636f6e7374206f203d207b205b755d3a2031207d3b0a"
+    },
+    "id": "computed-names-isolated",
+    "options": {
+     "declaration": true,
+     "isolatedDeclarations": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @isolatedDeclarations: true\n// @declaration: true\ndeclare const k: string;\ndeclare const u: unique symbol;\ndeclare const obj: { readonly key: unique symbol };\nexport class C {\n  [k]: number = 1;\n  [u]: number = 2;\n  [Symbol.iterator](): void {}\n  [obj.key]: number = 3;\n  [k + \"x\"]: number = 4;\n}\nexport interface I {\n  [k + \"y\"]: number;\n  [obj.key]: number;\n  [Symbol.iterator]: number;\n}\nexport const o = { [u]: 1 };\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare namespace M {\r\n    const sym: unique symbol;\r\n    const sym2: unique symbol;\r\n    export class K {\r\n        [sym]: number;\r\n        get [sym2](): number;\r\n        static [sym](): void;\r\n    }\r\n    export interface J {\r\n        [sym](): void;\r\n        [sym2]: number;\r\n    }\r\n    export {};\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "computed-names-script-private",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6d6f64756c65204d207b0a2020636f6e73742073796d3a20756e697175652073796d626f6c203d2053796d626f6c28293b0a2020636f6e73742073796d323a20756e697175652073796d626f6c203d2053796d626f6c28293b0a20206578706f727420636c617373204b207b0a202020205b73796d5d3a206e756d6265723b0a20202020676574205b73796d325d28293a206e756d626572207b2072657475726e20313b207d0a20202020737461746963205b73796d5d2829207b7d0a20207d0a20206578706f727420696e74657266616365204a207b205b73796d5d28293a20766f69643b205b73796d325d3a206e756d626572207d0a7d0a"
+    },
+    "id": "computed-names-script-private",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "module M {\n  const sym: unique symbol = Symbol();\n  const sym2: unique symbol = Symbol();\n  export class K {\n    [sym]: number;\n    get [sym2](): number { return 1; }\n    static [sym]() {}\n  }\n  export interface J { [sym](): void; [sym2]: number }\n}\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

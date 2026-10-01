@@ -1,0 +1,54 @@
+{
+ "cases": [
+  {
+   "id": "acc-sel-ts",
+   "name": "probe.ts",
+   "source": "function mk() { const s: unique symbol = Symbol(); return { [s]: 1 }; }\nexport class C {\n  p = mk();\n  static sp = mk();\n  m() { return mk(); }\n  static sm() { return mk(); }\n  get g() { return mk(); }\n  static get sg() { return mk(); }\n  set st(v) {}\n  get st() { return mk(); }\n  q(a = mk()) {}\n  static sq(a = mk()) {}\n  constructor(public pp = mk(), private qq = mk(), rr = mk()) {}\n}\nexport function f(a = mk()) { return mk(); }\nexport const arrow = (a = mk()) => mk();\nexport const { x } = { x: mk() };\nexport const [y] = [mk()];\nexport default mk();\nexport const fe = function (b = mk()) { return mk(); };\nexport const objm = { m(a = mk()) { return mk(); } };\nexport const ctor = class { constructor(z = mk()) {} };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "acc-sel-expando",
+   "name": "probe.ts",
+   "source": "function mk() { const s: unique symbol = Symbol(); return { [s]: 1 }; }\nexport function host() {}\nhost.prop = mk();\nexport const ar = () => 1;\nar.q = mk();\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "acc-sel-js",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nfunction mk() { /** @type {unique symbol} */ const s = Symbol(); return { [s]: 1 }; }\nObject.defineProperty(exports, \"dp\", { value: mk() });\nexports.ep = mk();\nexports.default = mk();\nexports[\"str-name\"] = mk();\nclass K { constructor() { this.tp = mk(); } m() { this.tq = mk(); } }\nexports.K = K;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "acc-sel-js-module-exports",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nfunction mk() { /** @type {unique symbol} */ const s = Symbol(); return { [s]: 1 }; }\nmodule.exports = mk();\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "acc-sel-script",
+   "name": "probe.ts",
+   "source": "module M {\n  function mk() { const s: unique symbol = Symbol(); return { [s]: 1 }; }\n  export var v = mk();\n  export class K { m() { return mk(); } p = mk(); }\n  export function f() { return mk(); }\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  }
+ ]
+}

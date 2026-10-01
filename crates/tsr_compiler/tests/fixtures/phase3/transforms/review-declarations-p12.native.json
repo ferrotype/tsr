@@ -1,0 +1,121 @@
+{
+ "cases": [
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare const _exported: number;\r\nexport { _exported as foo };\r\ndeclare const _exported_1: 2;\r\nexport { _exported_1 as bar };\r\ndeclare const _exported_2: 3;\r\nexport { _exported_2 as baz };\r\ndeclare const _default: 5;\r\nexport default _default;\r\nexport { qux };\r\ndeclare const _exported_3: 6;\r\nexport { _exported_3 as \"undefined\" };\r\ndeclare const _exported_4: 7;\r\nexport { _exported_4 as Object };\r\ndeclare function qux(): void;\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "cjs-name-conflicts",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "636f6e737420666f6f203d20226c6f63616c223b0a66756e6374696f6e206261722829207b7d0a4f626a6563742e646566696e6550726f7065727479286578706f7274732c2022666f6f222c207b2076616c75653a2031207d293b0a6578706f7274735b22626172225d203d20323b0a6578706f7274732e62617a203d20333b0a636f6e73742062617a203d20343b0a6578706f7274735b2264656661756c74225d203d20353b0a6578706f7274732e717578203d207175783b0a66756e6374696f6e207175782829207b7d0a6578706f7274735b22756e646566696e6564225d203d20363b0a6578706f7274732e4f626a656374203d20373b0a"
+    },
+    "id": "cjs-name-conflicts",
+    "options": {
+     "allowJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nconst foo = \"local\";\nfunction bar() {}\nObject.defineProperty(exports, \"foo\", { value: 1 });\nexports[\"bar\"] = 2;\nexports.baz = 3;\nconst baz = 4;\nexports[\"default\"] = 5;\nexports.qux = qux;\nfunction qux() {}\nexports[\"undefined\"] = 6;\nexports.Object = 7;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare const _exported: any;\r\nexport { _exported as foo };\r\nexport declare var inner: any;\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "cjs-nested-scope",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "66756e6374696f6e20736574757028666f6f29207b0a20206578706f7274732e666f6f203d20666f6f3b0a20204f626a6563742e646566696e6550726f7065727479286578706f7274732c2022696e6e6572222c207b2076616c75653a20666f6f207d293b0a7d0a"
+    },
+    "id": "cjs-nested-scope",
+    "options": {
+     "allowJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nfunction setup(foo) {\n  exports.foo = foo;\n  Object.defineProperty(exports, \"inner\", { value: foo });\n}\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

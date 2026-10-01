@@ -1,0 +1,179 @@
+{
+ "cases": [
+  {
+   "id": "rce-number-formats",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1e21, B = 0.1 + 0.2, C = 1 / 3, D = 2 ** 53 + 1, F = 1e300 * 10, G = 5e-324, H = -(-0), I = 0x10, J = 1_000, K = 123456789012345680000, L = -1e-7, M = 1e-7, N = ~0 >>> 0, O = 2 ** 31 | 0 }\nlet x = [E.A, E.B, E.C, E.D, E.F, E.G, E.H, E.I, E.J, E.K, E.L, E.M, E.N, E.O];\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "rce-string-formats",
+   "name": "probe.ts",
+   "source": "const enum S { A = '\\uD800', B = 'a\\u{1F600}b', C = `t${1}x${'y'}`, D = 'quote\"\\'', E = '\\n\\r\\t\\0', F = '*/', G = 'é' + `ü`, H = '\\u2028' }\nlet y = [S.A, S.B, S.C, S.D, S.E, S.F, S.G, S.H];\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "rce-access-forms",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1, 'b-c' = 2 }\nnamespace N { export const enum F { X = 3 } }\nlet a = [(E).A, (E.A), E?.A, N.F.X, N.F['X'], E['b-c'], E[\"A\"], (<any>E).A, (E as any).A, E!.A, E.A.toString(), { [E.A]: 1 }, `${E.A}`, -E.A, typeof E.A];\n",
+   "chains": [
+    [
+     "constenum"
+    ],
+    [
+     "typeeraser",
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "rce-comment-texts-multi",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1 }\nnamespace N { export const enum F { X = 3 } }\nlet a = E /* c1 */ . /* c2 */ A;\nlet b = N\n  .F\n  .X;\nlet c = E[/*k*/'A'];\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "rce-in-enum-initializers",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1, B = A << 2, C = E.A | E.B, D = E['C'] + 1 }\nenum R { X = E.D, Y = X + 1, Z = R.X }\nlet q = R.Z;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "rce-regular-enum-members",
+   "name": "probe.ts",
+   "source": "enum R { A, B = 'b', C = A + 1, D = 'x'.length }\ndeclare enum DR { A = 1, B }\nlet q = [R.A, R.B, R.C, R.D, DR.A, DR.B];\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "rce-bigint-expr",
+   "name": "probe.ts",
+   "source": "// @target: esnext\nconst enum E { A = 1 }\nlet x = 1n + BigInt(E.A);\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "rce-cross-namespace-merge",
+   "name": "probe.ts",
+   "source": "namespace N { export const enum E { A = 1 } }\nnamespace N { export const x = E.A; }\nnamespace M { import E = N.E; export const y = E.A; }\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "rce-assignment-targets",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1 }\nlet o: any;\n(E as any).A = 2;\no[E.A] = E.A;\nfor (const k in E) {}\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "rce-remove-comments",
+   "name": "probe.ts",
+   "source": "// @removeComments: true\nconst enum E { A = 1, B = 'x' }\nlet a = [E.A, E.B, E['A']];\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "rce-after-jsx-attr",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nconst enum E { A = 1 }\nexport const x = <div a={E.A} {...{b: E.A}}>{E.A}</div>;\n",
+   "chains": [
+    [
+     "jsx",
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "rce-after-async",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst enum E { A = 1 }\nasync function f() { return E.A + await E.A; }\n",
+   "chains": [
+    [
+     "async",
+     "constenum"
+    ],
+    [
+     "constenum",
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "rce-after-logical-and-exp",
+   "name": "probe.ts",
+   "source": "// @target: es2015\nconst enum E { A = 1 }\nlet o: any;\no[E.A] ||= E.A;\no[E.A] **= E.A;\n",
+   "chains": [
+    [
+     "logicalassignment",
+     "constenum"
+    ],
+    [
+     "exponentiation",
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "script-errs-1",
+   "name": "probe.ts",
+   "source": "module M {\n  class C {}\n  export class K {\n    static p: C;\n    static m(a: C): C { return a; }\n    static set s(v: C) {}\n    set t(v: C) {}\n    [k: string]: C | any;\n    constructor(private q: C, public r: C) {}\n    m2<T extends C>(this: C, a: T) {}\n    static m3<T extends C>() {}\n    private pm(a: C): C { return a; }\n  }\n  export interface I {\n    m<T extends C>(): void;\n    p?: C;\n    readonly [k: number]: C;\n  }\n  export type A<T extends C> = T;\n  export type F = (a: C) => C;\n  export type G = new <T extends C>(a: C) => C;\n  export type MT = { [K in keyof C]: C };\n  export type IT<T> = T extends infer U extends C ? U : C;\n  export let { x, y }: { x: C; y: C } = null as any;\n  export var arr: C[];\n  export function fp(a = new C()) {}\n  export var fe = function (a: C): C { return a; };\n  export var ar = (a: C) => a;\n  export var tq: typeof C;\n  export const ce = class extends C {};\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "script-errs-2",
+   "name": "probe.ts",
+   "source": "module M {\n  interface I {}\n  class C {}\n  export class K2 extends C implements I {}\n  export const K3 = class implements I {};\n  export interface J extends I {}\n  export class K4 { m(): I { return null as any; } }\n  export default C;\n}\nmodule N {\n  class C {}\n  export = C;\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "script-errs-3",
+   "name": "probe.ts",
+   "source": "module M {\n  class C {}\n  export enum E { A = 1 }\n  export import X = C;\n  export var v = { a: new C(), m() { return new C(); } };\n  export function g() { return { c: new C() }; }\n  export var t: [C, C?];\n  export var u: C | undefined;\n  export var q: Array<C>;\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  }
+ ]
+}

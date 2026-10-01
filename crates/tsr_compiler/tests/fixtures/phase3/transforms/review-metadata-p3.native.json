@@ -1,0 +1,1127 @@
+{
+ "cases": [
+  {
+   "diagnostics": 37,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar _a;\r\ndeclare function d(...a: any[]): any;\r\ntype S = string;\r\ntype N = 1 | 2;\r\ntype U = undefined;\r\ntype V = void;\r\ntype Nv = never;\r\ntype Nl = null;\r\ntype Bi = bigint;\r\ntype Sy = symbol;\r\ntype Ar = number[];\r\ntype Tu = [\r\n    1\r\n];\r\ntype Fn = () => void;\r\ntype Ob = {\r\n    a: 1;\r\n};\r\ntype Bo = boolean;\r\ntype Tl = `a${string}`;\r\ntype Un = string | number;\r\ntype Lit = 'a' | 'b';\r\ntype BL = true | false;\r\nenum E {\r\n    A\r\n}\r\nenum SE {\r\n    A = 'a'\r\n}\r\nconst enum CE {\r\n    A\r\n}\r\ndeclare enum DE {\r\n    A\r\n}\r\ninterface CallSig {\r\n    (): void;\r\n}\r\ninterface CtorSig {\r\n    new (): any;\r\n}\r\ndeclare var CtorSig: CtorSig;\r\nclass K {\r\n    @d\r\n    @__metadata(\"design:type\", String)\r\n    a: S;\r\n    @d\r\n    @__metadata(\"design:type\", Number)\r\n    b: N;\r\n    @d\r\n    @__metadata(\"design:type\", void 0)\r\n    c: U;\r\n    @d\r\n    @__metadata(\"design:type\", void 0)\r\n    e: V;\r\n    @d\r\n    @__metadata(\"design:type\", void 0)\r\n    f: Nv;\r\n    @d\r\n    @__metadata(\"design:type\", void 0)\r\n    g: Nl;\r\n    @d\r\n    @__metadata(\"design:type\", typeof BigInt === \"function\" ? BigInt : Object)\r\n    h: Bi;\r\n    @d\r\n    @__metadata(\"design:type\", Symbol)\r\n    i: Sy;\r\n    @d\r\n    @__metadata(\"design:type\", Array)\r\n    j: Ar;\r\n    @d\r\n    @__metadata(\"design:type\", Array)\r\n    k: Tu;\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    l: Fn;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    m: Ob;\r\n    @d\r\n    @__metadata(\"design:type\", Boolean)\r\n    n: Bo;\r\n    @d\r\n    @__metadata(\"design:type\", String)\r\n    o: Tl;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    p: Un;\r\n    @d\r\n    @__metadata(\"design:type\", String)\r\n    q: Lit;\r\n    @d\r\n    @__metadata(\"design:type\", Boolean)\r\n    r: BL;\r\n    @d\r\n    @__metadata(\"design:type\", Number)\r\n    s: E;\r\n    @d\r\n    @__metadata(\"design:type\", String)\r\n    t: SE;\r\n    @d\r\n    @__metadata(\"design:type\", Number)\r\n    u: CE;\r\n    @d\r\n    @__metadata(\"design:type\", Number)\r\n    v: DE;\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    w: CallSig;\r\n    @d\r\n    @__metadata(\"design:type\", CtorSig)\r\n    x: CtorSig;\r\n    @d\r\n    @__metadata(\"design:type\", Promise)\r\n    y: Promise<number>;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    z: PromiseLike<number>;\r\n    @d\r\n    @__metadata(\"design:type\", Date)\r\n    aa: Date;\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    ab: Function;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    ac: Object;\r\n    @d\r\n    @__metadata(\"design:type\", RegExp)\r\n    ad: RegExp;\r\n    @d\r\n    @__metadata(\"design:type\", Array)\r\n    ae: Array<number>;\r\n    @d\r\n    @__metadata(\"design:type\", Array)\r\n    af: ReadonlyArray<number>;\r\n    @d\r\n    @__metadata(\"design:type\", Number)\r\n    ag: E.A;\r\n    @d\r\n    @__metadata(\"design:type\", String)\r\n    ah: SE.A;\r\n    @d\r\n    @__metadata(\"design:type\", String)\r\n    ai: String;\r\n    @d\r\n    @__metadata(\"design:type\", Number)\r\n    aj: Number;\r\n    @d\r\n    @__metadata(\"design:type\", Boolean)\r\n    ak: Boolean;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    al: Symbol;\r\n    @d\r\n    @__metadata(\"design:type\", typeof (_a = typeof BigInt !== \"undefined\" && BigInt) === \"function\" ? _a : Object)\r\n    am: BigInt;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-alias-kinds",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a747970652053203d20737472696e673b2074797065204e203d2031207c20323b20747970652055203d20756e646566696e65643b20747970652056203d20766f69643b2074797065204e76203d206e657665723b2074797065204e6c203d206e756c6c3b0a74797065204269203d20626967696e743b2074797065205379203d2073796d626f6c3b2074797065204172203d206e756d6265725b5d3b2074797065205475203d205b315d3b207479706520466e203d202829203d3e20766f69643b2074797065204f62203d207b20613a2031207d3b0a7479706520426f203d20626f6f6c65616e3b207479706520546c203d206061247b737472696e677d603b207479706520556e203d20737472696e67207c206e756d6265723b2074797065204c6974203d20276127207c202762273b207479706520424c203d2074727565207c2066616c73653b0a656e756d2045207b2041207d20656e756d205345207b2041203d20276127207d20636f6e737420656e756d204345207b2041207d206465636c61726520656e756d204445207b2041207d0a696e746572666163652043616c6c536967207b2028293a20766f6964207d20696e746572666163652043746f72536967207b206e65772028293a20616e79207d206465636c617265207661722043746f725369673a2043746f725369673b0a636c617373204b207b0a2020406420613a20533b20406420623a204e3b20406420633a20553b20406420653a20563b20406420663a204e763b20406420673a204e6c3b20406420683a2042693b20406420693a2053793b204064206a3a2041723b204064206b3a2054753b204064206c3a20466e3b204064206d3a204f623b0a20204064206e3a20426f3b204064206f3a20546c3b20406420703a20556e3b20406420713a204c69743b20406420723a20424c3b20406420733a20453b20406420743a2053453b20406420753a2043453b20406420763a2044453b20406420773a2043616c6c5369673b20406420783a2043746f725369673b0a2020406420793a2050726f6d6973653c6e756d6265723e3b204064207a3a2050726f6d6973654c696b653c6e756d6265723e3b2040642061613a20446174653b2040642061623a2046756e6374696f6e3b2040642061633a204f626a6563743b2040642061643a205265674578703b2040642061653a2041727261793c6e756d6265723e3b0a202040642061663a20526561646f6e6c7941727261793c6e756d6265723e3b2040642061673a20452e413b2040642061683a2053452e413b2040642061693a20537472696e673b20406420616a3a204e756d6265723b20406420616b3a20426f6f6c65616e3b20406420616c3a2053796d626f6c3b20406420616d3a20426967496e743b0a7d0a"
+    },
+    "id": "rm-alias-kinds",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\ntype S = string; type N = 1 | 2; type U = undefined; type V = void; type Nv = never; type Nl = null;\ntype Bi = bigint; type Sy = symbol; type Ar = number[]; type Tu = [1]; type Fn = () => void; type Ob = { a: 1 };\ntype Bo = boolean; type Tl = `a${string}`; type Un = string | number; type Lit = 'a' | 'b'; type BL = true | false;\nenum E { A } enum SE { A = 'a' } const enum CE { A } declare enum DE { A }\ninterface CallSig { (): void } interface CtorSig { new (): any } declare var CtorSig: CtorSig;\nclass K {\n  @d a: S; @d b: N; @d c: U; @d e: V; @d f: Nv; @d g: Nl; @d h: Bi; @d i: Sy; @d j: Ar; @d k: Tu; @d l: Fn; @d m: Ob;\n  @d n: Bo; @d o: Tl; @d p: Un; @d q: Lit; @d r: BL; @d s: E; @d t: SE; @d u: CE; @d v: DE; @d w: CallSig; @d x: CtorSig;\n  @d y: Promise<number>; @d z: PromiseLike<number>; @d aa: Date; @d ab: Function; @d ac: Object; @d ad: RegExp; @d ae: Array<number>;\n  @d af: ReadonlyArray<number>; @d ag: E.A; @d ah: SE.A; @d ai: String; @d aj: Number; @d ak: Boolean; @d al: Symbol; @d am: BigInt;\n}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar _a, _b;\r\ndeclare function d(...a: any[]): any;\r\nclass K<T, U extends string> {\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    a: T;\r\n    @d\r\n    @__metadata(\"design:type\", String)\r\n    b: U;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    c: T | U;\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [typeof (_a = typeof V !== \"undefined\" && V) === \"function\" ? _a : Object, Object])\r\n    @__metadata(\"design:returntype\", typeof (_b = typeof V !== \"undefined\" && V) === \"function\" ? _b : Object)\r\n    m<V>(x: V, y: T): V { return x; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-generic-params",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a636c617373204b3c542c205520657874656e647320737472696e673e207b0a2020406420613a20543b20406420623a20553b20406420633a2054207c20553b204064206d3c563e28783a20562c20793a2054293a2056207b2072657475726e20783b207d0a7d0a"
+    },
+    "id": "rm-generic-params",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K<T, U extends string> {\n  @d a: T; @d b: U; @d c: T | U; @d m<V>(x: V, y: T): V { return x; }\n}\n"
+  },
+  {
+   "diagnostics": 12,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;\r\ndeclare function d(...a: any[]): any;\r\nclass K {\r\n    @d\r\n    @__metadata(\"design:type\", typeof (_b = typeof A !== \"undefined\" && (_a = A.B) !== void 0 && _a.C) === \"function\" ? _b : Object)\r\n    a: A.B.C;\r\n    @d\r\n    @__metadata(\"design:type\", typeof (_d = typeof A !== \"undefined\" && (_c = A.B) !== void 0 && _c.C) === \"function\" ? _d : Object)\r\n    b: A.B.C | A.B.C;\r\n    @d\r\n    @__metadata(\"design:type\", typeof (_g = typeof A !== \"undefined\" && A.B) === \"function\" ? _g : Object)\r\n    c: A.B | A.B;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    e: X | X | null;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    f: A.B.C | X;\r\n    @d\r\n    @__metadata(\"design:type\", typeof (_p = typeof X !== \"undefined\" && X) === \"function\" ? _p : Object)\r\n    g: X & X;\r\n    @d\r\n    @__metadata(\"design:type\", typeof (_t = typeof A !== \"undefined\" && (_r = A.B) !== void 0 && (_s = _r.C) !== void 0 && _s.D) === \"function\" ? _t : Object)\r\n    h: A.B.C.D;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-qualified-unresolved",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a636c617373204b207b0a2020406420613a20412e422e433b20406420623a20412e422e43207c20412e422e433b20406420633a20412e42207c20412e423b20406420653a2058207c2058207c206e756c6c3b20406420663a20412e422e43207c20583b20406420673a2058202620583b20406420683a20412e422e432e443b0a7d0a"
+    },
+    "id": "rm-qualified-unresolved",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K {\n  @d a: A.B.C; @d b: A.B.C | A.B.C; @d c: A.B | A.B; @d e: X | X | null; @d f: A.B.C | X; @d g: X & X; @d h: A.B.C.D;\n}\n"
+  },
+  {
+   "diagnostics": 8,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function d(...a: any[]): any;\r\nnamespace N {\r\n    export class C {\r\n    }\r\n    export interface I {\r\n    }\r\n    export type T = string;\r\n    export namespace M {\r\n        export class D {\r\n        }\r\n    }\r\n    export enum E {\r\n        A\r\n    }\r\n}\r\nclass K {\r\n    @d\r\n    @__metadata(\"design:type\", N.C)\r\n    a: N.C;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    b: N.I;\r\n    @d\r\n    @__metadata(\"design:type\", String)\r\n    c: N.T;\r\n    @d\r\n    @__metadata(\"design:type\", N.M.D)\r\n    e: N.M.D;\r\n    @d\r\n    @__metadata(\"design:type\", Number)\r\n    f: N.E;\r\n    @d\r\n    @__metadata(\"design:type\", Number)\r\n    g: N.E.A;\r\n    @d\r\n    @__metadata(\"design:type\", N.C)\r\n    h: N.C | N.C;\r\n    @d\r\n    @__metadata(\"design:type\", N.M.D)\r\n    i: N.M.D | N.M.D;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-namespace-refs",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a6e616d657370616365204e207b206578706f727420636c6173732043207b7d206578706f727420696e746572666163652049207b7d206578706f727420747970652054203d20737472696e673b206578706f7274206e616d657370616365204d207b206578706f727420636c6173732044207b7d207d206578706f727420656e756d2045207b2041207d207d0a636c617373204b207b20406420613a204e2e433b20406420623a204e2e493b20406420633a204e2e543b20406420653a204e2e4d2e443b20406420663a204e2e453b20406420673a204e2e452e413b20406420683a204e2e43207c204e2e433b20406420693a204e2e4d2e44207c204e2e4d2e443b207d0a"
+    },
+    "id": "rm-namespace-refs",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nnamespace N { export class C {} export interface I {} export type T = string; export namespace M { export class D {} } export enum E { A } }\nclass K { @d a: N.C; @d b: N.I; @d c: N.T; @d e: N.M.D; @d f: N.E; @d g: N.E.A; @d h: N.C | N.C; @d i: N.M.D | N.M.D; }\n"
+  },
+  {
+   "diagnostics": 10,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function d(...a: any[]): any;\r\nclass K {\r\n    @d\r\n    @__metadata(\"design:type\", Number)\r\n    a: -1;\r\n    @d\r\n    @__metadata(\"design:type\", typeof BigInt === \"function\" ? BigInt : Object)\r\n    b: -1n;\r\n    @d\r\n    @__metadata(\"design:type\", typeof BigInt === \"function\" ? BigInt : Object)\r\n    c: 1n;\r\n    @d\r\n    @__metadata(\"design:type\", void 0)\r\n    e: null;\r\n    @d\r\n    @__metadata(\"design:type\", Boolean)\r\n    f: true;\r\n    @d\r\n    @__metadata(\"design:type\", String)\r\n    g: `x`;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    h: 'a' | 1;\r\n    @d\r\n    @__metadata(\"design:type\", Number)\r\n    i: -1 | 2;\r\n    @d\r\n    @__metadata(\"design:type\", typeof BigInt === \"function\" ? BigInt : Object)\r\n    j: 1n | 2n;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    k: null | 1;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    l: undefined | 'a';\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-literal-types",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a636c617373204b207b20406420613a202d313b20406420623a202d316e3b20406420633a20316e3b20406420653a206e756c6c3b20406420663a20747275653b20406420673a206078603b20406420683a20276127207c20313b20406420693a202d31207c20323b204064206a3a20316e207c20326e3b204064206b3a206e756c6c207c20313b204064206c3a20756e646566696e6564207c202761273b207d0a"
+    },
+    "id": "rm-literal-types",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K { @d a: -1; @d b: -1n; @d c: 1n; @d e: null; @d f: true; @d g: `x`; @d h: 'a' | 1; @d i: -1 | 2; @d j: 1n | 2n; @d k: null | 1; @d l: undefined | 'a'; }\n"
+  },
+  {
+   "diagnostics": 14,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function d(...a: any[]): any;\r\ndeclare const us: unique symbol;\r\nclass K {\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    a: keyof K;\r\n    @d\r\n    @__metadata(\"design:type\", Array)\r\n    b: readonly string[];\r\n    @d\r\n    @__metadata(\"design:type\", Array)\r\n    c: readonly [\r\n        1\r\n    ];\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    e: unique symbol;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    f: K['a'];\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    g: {\r\n        [P in 'a']: 1;\r\n    };\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    h: typeof us;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    i: this;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    j: import('./probe').K;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    k: unknown;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    l: any;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    m: object;\r\n    @d\r\n    @__metadata(\"design:type\", String)\r\n    n: never | string;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    o: unknown | string;\r\n    @d\r\n    @__metadata(\"design:type\", String)\r\n    p: unknown & string;\r\n    @d\r\n    @__metadata(\"design:type\", void 0)\r\n    q: never & string;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-type-operators",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a6465636c61726520636f6e73742075733a20756e697175652073796d626f6c3b0a636c617373204b207b20406420613a206b65796f66204b3b20406420623a20726561646f6e6c7920737472696e675b5d3b20406420633a20726561646f6e6c79205b315d3b20406420653a20756e697175652073796d626f6c3b20406420663a204b5b2761275d3b20406420673a207b205b5020696e202761275d3a2031207d3b20406420683a20747970656f662075733b20406420693a20746869733b204064206a3a20696d706f727428272e2f70726f626527292e4b3b204064206b3a20756e6b6e6f776e3b204064206c3a20616e793b204064206d3a206f626a6563743b204064206e3a206e65766572207c20737472696e673b204064206f3a20756e6b6e6f776e207c20737472696e673b20406420703a20756e6b6e6f776e202620737472696e673b20406420713a206e65766572202620737472696e673b207d0a"
+    },
+    "id": "rm-type-operators",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\ndeclare const us: unique symbol;\nclass K { @d a: keyof K; @d b: readonly string[]; @d c: readonly [1]; @d e: unique symbol; @d f: K['a']; @d g: { [P in 'a']: 1 }; @d h: typeof us; @d i: this; @d j: import('./probe').K; @d k: unknown; @d l: any; @d m: object; @d n: never | string; @d o: unknown | string; @d p: unknown & string; @d q: never & string; }\n"
+  },
+  {
+   "diagnostics": 11,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function d(...a: any[]): any;\r\ntype C1<T> = T extends string ? Missing : number;\r\nclass K<T> {\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    a: T extends string ? Missing : Other;\r\n    @d\r\n    @__metadata(\"design:type\", String)\r\n    b: T extends 1 ? string : 'x';\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    c: (T extends 1 ? string : number) | string;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    e: T extends 1 ? (T extends 2 ? Missing : string) : string;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    f: T extends 1 ? Missing.X : Y.Z;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-conditional-nested",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a747970652043313c543e203d205420657874656e647320737472696e67203f204d697373696e67203a206e756d6265723b0a636c617373204b3c543e207b20406420613a205420657874656e647320737472696e67203f204d697373696e67203a204f746865723b20406420623a205420657874656e64732031203f20737472696e67203a202778273b20406420633a20285420657874656e64732031203f20737472696e67203a206e756d62657229207c20737472696e673b20406420653a205420657874656e64732031203f20285420657874656e64732032203f204d697373696e67203a20737472696e6729203a20737472696e673b20406420663a205420657874656e64732031203f204d697373696e672e58203a20592e5a3b207d0a"
+    },
+    "id": "rm-conditional-nested",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\ntype C1<T> = T extends string ? Missing : number;\nclass K<T> { @d a: T extends string ? Missing : Other; @d b: T extends 1 ? string : 'x'; @d c: (T extends 1 ? string : number) | string; @d e: T extends 1 ? (T extends 2 ? Missing : string) : string; @d f: T extends 1 ? Missing.X : Y.Z; }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar _a;\r\ndeclare function d(...a: any[]): any;\r\nclass K {\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [String, Number])\r\n    @__metadata(\"design:returntype\", void 0)\r\n    m(this: K, a: string, ...r: number[]): void { }\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [String])\r\n    @__metadata(\"design:returntype\", void 0)\r\n    n(...r: Array<string>): void { }\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [Object])\r\n    @__metadata(\"design:returntype\", void 0)\r\n    o(...r: [\r\n        number,\r\n        string\r\n    ]): void { }\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [Object])\r\n    @__metadata(\"design:returntype\", void 0)\r\n    p(...r): void { }\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [])\r\n    @__metadata(\"design:returntype\", void 0)\r\n    q(this: K): void { }\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [Array])\r\n    @__metadata(\"design:returntype\", void 0)\r\n    r(...r: string[][]): void { }\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [Object])\r\n    @__metadata(\"design:returntype\", void 0)\r\n    s(...r: readonly number[]): void { }\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [typeof (_a = typeof Missing !== \"undefined\" && Missing) === \"function\" ? _a : Object])\r\n    @__metadata(\"design:returntype\", void 0)\r\n    t(...r: Missing[]): void { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-params-this-rest",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a636c617373204b207b0a20204064206d28746869733a204b2c20613a20737472696e672c202e2e2e723a206e756d6265725b5d293a20766f6964207b7d0a20204064206e282e2e2e723a2041727261793c737472696e673e293a20766f6964207b7d0a20204064206f282e2e2e723a205b6e756d6265722c20737472696e675d293a20766f6964207b7d0a202040642070282e2e2e72293a20766f6964207b7d0a20204064207128746869733a204b293a20766f6964207b7d0a202040642072282e2e2e723a20737472696e675b5d5b5d293a20766f6964207b7d0a202040642073282e2e2e723a20726561646f6e6c79206e756d6265725b5d293a20766f6964207b7d0a202040642074282e2e2e723a204d697373696e675b5d293a20766f6964207b7d0a7d0a"
+    },
+    "id": "rm-params-this-rest",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K {\n  @d m(this: K, a: string, ...r: number[]): void {}\n  @d n(...r: Array<string>): void {}\n  @d o(...r: [number, string]): void {}\n  @d p(...r): void {}\n  @d q(this: K): void {}\n  @d r(...r: string[][]): void {}\n  @d s(...r: readonly number[]): void {}\n  @d t(...r: Missing[]): void {}\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function d(...a: any[]): any;\r\nclass K {\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [])\r\n    @__metadata(\"design:returntype\", Promise)\r\n    async a() { }\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [])\r\n    @__metadata(\"design:returntype\", Promise)\r\n    async b(): Promise<void> { }\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [])\r\n    @__metadata(\"design:returntype\", void 0)\r\n    c(): asserts this is K { }\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [Object])\r\n    @__metadata(\"design:returntype\", Boolean)\r\n    e(x): x is string { return true; }\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [Object])\r\n    @__metadata(\"design:returntype\", void 0)\r\n    f(x): asserts x { }\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [])\r\n    @__metadata(\"design:returntype\", void 0)\r\n    *g() { }\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [])\r\n    @__metadata(\"design:returntype\", void 0)\r\n    async *h() { }\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    @__metadata(\"design:paramtypes\", [])\r\n    @__metadata(\"design:returntype\", Object)\r\n    i(): this { return this; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-return-types",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a636c617373204b207b0a20204064206173796e6320612829207b7d204064206173796e63206228293a2050726f6d6973653c766f69643e207b7d204064206328293a20617373657274732074686973206973204b207b7d20406420652878293a207820697320737472696e67207b2072657475726e20747275653b207d20406420662878293a20617373657274732078207b7d204064202a672829207b7d204064206173796e63202a682829207b7d204064206928293a2074686973207b2072657475726e20746869733b207d0a7d0a"
+    },
+    "id": "rm-return-types",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K {\n  @d async a() {} @d async b(): Promise<void> {} @d c(): asserts this is K {} @d e(x): x is string { return true; } @d f(x): asserts x {} @d *g() {} @d async *h() {} @d i(): this { return this; }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function d(...a: any[]): any;\r\n@d\r\n@__metadata(\"design:paramtypes\", [Object])\r\nclass A {\r\n    constructor(a: string);\r\n    constructor(a: any) { }\r\n}\r\n@d\r\nclass B {\r\n    constructor(a: string);\r\n}\r\ndeclare class Dc {\r\n}\r\n@d\r\nclass C extends Dc {\r\n}\r\n@d\r\n@__metadata(\"design:paramtypes\", [String, Number, Object])\r\nclass D {\r\n    constructor(private a: string, \r\n    @d\r\n    public b?: number, c = 1) { }\r\n}\r\n@__metadata(\"design:paramtypes\", [String])\r\nclass E {\r\n    constructor(\r\n    @d\r\n    a: string) { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-ctor-overloads",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a406420636c6173732041207b20636f6e7374727563746f7228613a20737472696e67293b20636f6e7374727563746f7228613a20616e7929207b7d207d0a406420636c6173732042207b20636f6e7374727563746f7228613a20737472696e67293b207d0a6465636c61726520636c617373204463207b207d0a406420636c617373204320657874656e6473204463207b207d0a406420636c6173732044207b20636f6e7374727563746f72287072697661746520613a20737472696e672c204064207075626c696320623f3a206e756d6265722c2063203d203129207b7d207d0a636c6173732045207b20636f6e7374727563746f7228406420613a20737472696e6729207b7d207d0a"
+    },
+    "id": "rm-ctor-overloads",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\n@d class A { constructor(a: string); constructor(a: any) {} }\n@d class B { constructor(a: string); }\ndeclare class Dc { }\n@d class C extends Dc { }\n@d class D { constructor(private a: string, @d public b?: number, c = 1) {} }\nclass E { constructor(@d a: string) {} }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function d(...a: any[]): any;\r\nclass K {\r\n    @d\r\n    @__metadata(\"design:type\", Number)\r\n    @__metadata(\"design:paramtypes\", [Number])\r\n    get a(): string { return ''; }\r\n    set a(v: number) { }\r\n    get b(): string { return ''; }\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    @__metadata(\"design:paramtypes\", [Object])\r\n    set b(v) { }\r\n    @d\r\n    @__metadata(\"design:type\", Boolean)\r\n    @__metadata(\"design:paramtypes\", [Boolean])\r\n    set c(this: K, v: boolean) { }\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    @__metadata(\"design:paramtypes\", [])\r\n    get e() { return 1; }\r\n    @d\r\n    @__metadata(\"design:type\", Date)\r\n    @__metadata(\"design:paramtypes\", [Date])\r\n    static get f(): Date { return new Date(); }\r\n    static set f(v: Date) { }\r\n    set g(\r\n    @d\r\n    v: string) { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-accessor-pairs",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a636c617373204b207b0a2020406420676574206128293a20737472696e67207b2072657475726e2027273b207d20736574206128763a206e756d62657229207b7d0a2020676574206228293a20737472696e67207b2072657475726e2027273b207d204064207365742062287629207b7d0a2020406420736574206328746869733a204b2c20763a20626f6f6c65616e29207b7d0a202040642067657420652829207b2072657475726e20313b207d0a202040642073746174696320676574206628293a2044617465207b2072657475726e206e6577204461746528293b207d2073746174696320736574206628763a204461746529207b7d0a2020736574206728406420763a20737472696e6729207b7d0a7d0a"
+    },
+    "id": "rm-accessor-pairs",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K {\n  @d get a(): string { return ''; } set a(v: number) {}\n  get b(): string { return ''; } @d set b(v) {}\n  @d set c(this: K, v: boolean) {}\n  @d get e() { return 1; }\n  @d static get f(): Date { return new Date(); } static set f(v: Date) {}\n  set g(@d v: string) {}\n}\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function d(...a: any[]): any;\r\nfunction f() {\r\n    class Local {\r\n    }\r\n    {\r\n        class Inner {\r\n        }\r\n        class K {\r\n            @d\r\n            @__metadata(\"design:type\", Inner)\r\n            a: Inner;\r\n            @d\r\n            @__metadata(\"design:type\", Local)\r\n            b: Local;\r\n        }\r\n    }\r\n    switch (1) {\r\n        case 1:\r\n            class S {\r\n            }\r\n            class K2 {\r\n                @d\r\n                @__metadata(\"design:type\", S)\r\n                a: S;\r\n            }\r\n    }\r\n}\r\nnamespace NS {\r\n    class A {\r\n    }\r\n    class K {\r\n        @d\r\n        @__metadata(\"design:type\", A)\r\n        a: A;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-scope-blocks",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a66756e6374696f6e20662829207b0a2020636c617373204c6f63616c207b7d0a20207b20636c61737320496e6e6572207b7d20636c617373204b207b20406420613a20496e6e65723b20406420623a204c6f63616c3b207d207d0a202073776974636820283129207b206361736520313a20636c6173732053207b7d20636c617373204b32207b20406420613a20533b207d207d0a7d0a6e616d657370616365204e53207b20636c6173732041207b7d20636c617373204b207b20406420613a20413b207d207d0a"
+    },
+    "id": "rm-scope-blocks",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nfunction f() {\n  class Local {}\n  { class Inner {} class K { @d a: Inner; @d b: Local; } }\n  switch (1) { case 1: class S {} class K2 { @d a: S; } }\n}\nnamespace NS { class A {} class K { @d a: A; } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "declare function d(...a: any[]): any;\r\n@d\r\nexport abstract class A {\r\n}\r\nexport \r\n@d\r\nclass B {\r\n}\r\n@d\r\nexport default class C {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-modifier-orders",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a4064206578706f727420616273747261637420636c6173732041207b207d0a6578706f727420406420636c6173732042207b207d0a4064206578706f72742064656661756c7420636c6173732043207b207d0a"
+    },
+    "id": "rm-modifier-orders",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\n@d export abstract class A { }\nexport @d class B { }\n@d export default class C { }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "declare function d(...a: any[]): any;\r\nconst x = f(\r\n@d\r\nclass {\r\n    constructor(a: string) { }\r\n    @d\r\n    m(b: number) { }\r\n});\r\ndeclare function f(a: any): any;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-class-expression-in-call",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a636f6e73742078203d206628406420636c617373207b20636f6e7374727563746f7228613a20737472696e6729207b7d204064206d28623a206e756d62657229207b7d207d293b0a6465636c6172652066756e6374696f6e206628613a20616e79293a20616e793b0a"
+    },
+    "id": "rm-class-expression-in-call",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nconst x = f(@d class { constructor(a: string) {} @d m(b: number) {} });\ndeclare function f(a: any): any;\n"
+  },
+  {
+   "diagnostics": 9,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "export class A {\r\n}\r\nexport interface I {\r\n}\r\nexport type T = number;\r\nexport enum E {\r\n    X\r\n}\r\nexport default class Def {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nimport Def, { A, I, T, E } from './a';\r\nimport * as ns from './a';\r\nimport type { A as TA } from './a';\r\ndeclare function d(...a: any[]): any;\r\nclass K {\r\n    @d\r\n    @__metadata(\"design:type\", A)\r\n    a: A;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    b: I;\r\n    @d\r\n    @__metadata(\"design:type\", Number)\r\n    c: T;\r\n    @d\r\n    @__metadata(\"design:type\", Number)\r\n    e: E;\r\n    @d\r\n    @__metadata(\"design:type\", Def)\r\n    f: Def;\r\n    @d\r\n    @__metadata(\"design:type\", ns.A)\r\n    g: ns.A;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    h: ns.I;\r\n    @d\r\n    @__metadata(\"design:type\", Function)\r\n    i: TA;\r\n    @d\r\n    @__metadata(\"design:type\", Number)\r\n    j: ns.E;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-imported-types",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636c6173732041207b7d206578706f727420696e746572666163652049207b7d206578706f727420747970652054203d206e756d6265723b206578706f727420656e756d2045207b2058207d206578706f72742064656661756c7420636c61737320446566207b7d",
+     "/.src/probe.ts": "696d706f7274204465662c207b20412c20492c20542c2045207d2066726f6d20272e2f61273b0a696d706f7274202a206173206e732066726f6d20272e2f61273b0a696d706f72742074797065207b2041206173205441207d2066726f6d20272e2f61273b0a6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a636c617373204b207b20406420613a20413b20406420623a20493b20406420633a20543b20406420653a20453b20406420663a204465663b20406420673a206e732e413b20406420683a206e732e493b20406420693a2054413b204064206a3a206e732e453b207d0a"
+    },
+    "id": "rm-imported-types",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/a.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\n// @filename: a.ts\nexport class A {} export interface I {} export type T = number; export enum E { X } export default class Def {}\n// @filename: probe.ts\nimport Def, { A, I, T, E } from './a';\nimport * as ns from './a';\nimport type { A as TA } from './a';\ndeclare function d(...a: any[]): any;\nclass K { @d a: A; @d b: I; @d c: T; @d e: E; @d f: Def; @d g: ns.A; @d h: ns.I; @d i: TA; @d j: ns.E; }\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar _a, _b;\r\ndeclare function d(...a: any[]): any;\r\nclass K {\r\n    @d\r\n    @__metadata(\"design:type\", String)\r\n    a: ?string;\r\n    @d\r\n    @__metadata(\"design:type\", String)\r\n    b: !string;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    c: ;\r\n    @d\r\n    @__metadata(\"design:type\", typeof (_a = typeof  !== \"undefined\" && ) === \"function\" ? _a : Object)\r\n    e: ?;\r\n    @d\r\n    @__metadata(\"design:type\", typeof (_b = typeof Missing !== \"undefined\" && Missing) === \"function\" ? _b : Object)\r\n    f: ?Missing;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-jsdoc-function-type",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a636c617373204b207b20406420613a203f737472696e673b20406420623a20737472696e67213b20406420633a202a3b20406420653a203f3b20406420663a204d697373696e673f3b207d0a"
+    },
+    "id": "rm-jsdoc-function-type",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K { @d a: ?string; @d b: string!; @d c: *; @d e: ?; @d f: Missing?; }\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function d(...a: any[]): any;\r\nclass K {\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    a: string | null;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    b: string | undefined;\r\n    @d\r\n    @__metadata(\"design:type\", void 0)\r\n    c: null | undefined;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    e: string | void;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    f: number | null | undefined | never;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    g: Date | null;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-strict-unions",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a636c617373204b207b20406420613a20737472696e67207c206e756c6c3b20406420623a20737472696e67207c20756e646566696e65643b20406420633a206e756c6c207c20756e646566696e65643b20406420653a20737472696e67207c20766f69643b20406420663a206e756d626572207c206e756c6c207c20756e646566696e6564207c206e657665723b20406420673a2044617465207c206e756c6c3b207d0a"
+    },
+    "id": "rm-strict-unions",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "strict": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @strict: true\n// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K { @d a: string | null; @d b: string | undefined; @d c: null | undefined; @d e: string | void; @d f: number | null | undefined | never; @d g: Date | null; }\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function d(...a: any[]): any;\r\ntype Bi = bigint;\r\nclass K {\r\n    @d\r\n    @__metadata(\"design:type\", BigInt)\r\n    a: bigint;\r\n    @d\r\n    @__metadata(\"design:type\", BigInt)\r\n    b: Bi;\r\n    @d\r\n    @__metadata(\"design:type\", BigInt)\r\n    c: 1n;\r\n    @d\r\n    @__metadata(\"design:type\", BigInt)\r\n    e: bigint | 1n;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-symbol-and-bigint-es2020",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a74797065204269203d20626967696e743b0a636c617373204b207b20406420613a20626967696e743b20406420623a2042693b20406420633a20316e3b20406420653a20626967696e74207c20316e3b207d0a"
+    },
+    "id": "rm-symbol-and-bigint-es2020",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\n// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\ndeclare function d(...a: any[]): any;\ntype Bi = bigint;\nclass K { @d a: bigint; @d b: Bi; @d c: 1n; @d e: bigint | 1n; }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata"
+       ],
+       "text": "var __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\ndeclare function d(...a: any[]): any;\r\nclass K {\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    a;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    b = 1;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    static c;\r\n    @d\r\n    @__metadata(\"design:type\", Object)\r\n    [Symbol.iterator]: any;\r\n    @d\r\n    @__metadata(\"design:type\", Number)\r\n    'str': number;\r\n    @d\r\n    @__metadata(\"design:type\", String)\r\n    1: string;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rm-property-no-type",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e2064282e2e2e613a20616e795b5d293a20616e793b0a636c617373204b207b20406420613b2040642062203d20313b2040642073746174696320633b204064205b53796d626f6c2e6974657261746f725d3a20616e793b2040642027737472273a206e756d6265723b20406420313a20737472696e673b207d0a"
+    },
+    "id": "rm-property-no-type",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K { @d a; @d b = 1; @d static c; @d [Symbol.iterator]: any; @d 'str': number; @d 1: string; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare const v = 1;\r\nexport interface I {\r\n    a: number;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import type { v as vv } from \"./lib\";\r\nexport type { vv };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "reexport-type-import",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "6578706f727420636f6e73742076203d20313b0a6578706f727420696e746572666163652049207b20613a206e756d626572207d",
+     "/.src/probe.ts": "696d706f72742074797065207b2076206173207676207d2066726f6d20222e2f6c6962223b0a6578706f72742074797065207b207676207d3b0a"
+    },
+    "id": "reexport-type-import",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/lib.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport type { v as vv } from \"./lib\";\nexport type { vv };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare const v = 1;\r\nexport interface I {\r\n    a: number;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import { v as vv } from \"./lib\";\r\nexport { vv };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "reexport-value-import",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "6578706f727420636f6e73742076203d20313b0a6578706f727420696e746572666163652049207b20613a206e756d626572207d",
+     "/.src/probe.ts": "696d706f7274207b2076206173207676207d2066726f6d20222e2f6c6962223b0a6578706f7274207b207676207d3b0a"
+    },
+    "id": "reexport-value-import",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/lib.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport { v as vv } from \"./lib\";\nexport { vv };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare const v = 1;\r\nexport interface I {\r\n    a: number;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import type { I } from \"./lib\";\r\nexport type { I };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "reexport-type-import-noalias",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "6578706f727420636f6e73742076203d20313b0a6578706f727420696e746572666163652049207b20613a206e756d626572207d",
+     "/.src/probe.ts": "696d706f72742074797065207b2049207d2066726f6d20222e2f6c6962223b0a6578706f72742074797065207b2049207d3b0a"
+    },
+    "id": "reexport-type-import-noalias",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/lib.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport type { I } from \"./lib\";\nexport type { I };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare const v = 1;\r\nexport interface I {\r\n    a: number;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import { I } from \"./lib\";\r\nexport { I };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "reexport-import-plain-export",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "6578706f727420636f6e73742076203d20313b0a6578706f727420696e746572666163652049207b20613a206e756d626572207d",
+     "/.src/probe.ts": "696d706f7274207b2049207d2066726f6d20222e2f6c6962223b0a6578706f7274207b2049207d3b0a"
+    },
+    "id": "reexport-import-plain-export",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/lib.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport { I } from \"./lib\";\nexport { I };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare const v = 1;\r\nexport interface I {\r\n    a: number;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import { type I, v } from \"./lib\";\r\nexport { type I, v };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "reexport-type-modifier-specifier",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "6578706f727420636f6e73742076203d20313b0a6578706f727420696e746572666163652049207b20613a206e756d626572207d",
+     "/.src/probe.ts": "696d706f7274207b207479706520492c2076207d2066726f6d20222e2f6c6962223b0a6578706f7274207b207479706520492c2076207d3b0a"
+    },
+    "id": "reexport-type-modifier-specifier",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/lib.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport { type I, v } from \"./lib\";\nexport { type I, v };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare const d = 1;\r\nexport default d;\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import d from \"./lib\";\r\nexport { d };\r\nimport * as ns from \"./lib\";\r\nexport { ns };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "reexport-default-import",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "636f6e73742064203d20313b206578706f72742064656661756c7420643b",
+     "/.src/probe.ts": "696d706f727420642066726f6d20222e2f6c6962223b0a6578706f7274207b2064207d3b0a696d706f7274202a206173206e732066726f6d20222e2f6c6962223b0a6578706f7274207b206e73207d3b0a"
+    },
+    "id": "reexport-default-import",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/lib.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nconst d = 1; export default d;\n// @filename: probe.ts\nimport d from \"./lib\";\nexport { d };\nimport * as ns from \"./lib\";\nexport { ns };\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

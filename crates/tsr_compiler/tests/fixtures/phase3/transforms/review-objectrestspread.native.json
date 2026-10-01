@@ -1,0 +1,421 @@
+{
+ "cases": [
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "objectrestspread"
+       ],
+       "text": "var __rest = (this && this.__rest) || function (s, e) {\r\n    var t = {};\r\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\r\n        t[p] = s[p];\r\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\r\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\r\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\r\n                t[p[i]] = s[p[i]];\r\n        }\r\n    return t;\r\n};\r\nfunction outer(_a) {\r\n    var a = __rest(_a, []);\r\n    class C {\r\n        m(_a, x) {\r\n            var r = __rest(_a, []);\r\n            if (x === void 0) { x = 1; }\r\n        }\r\n        m() { }\r\n    }\r\n    function g(_a, y) {\r\n        var q = __rest(_a, []);\r\n        if (y === void 0) { y = 2; }\r\n    }\r\n    function g() { }\r\n    return [a, C, g];\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "overload-nested",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e206f75746572287b202e2e2e61207d29207b0a20202020636c6173732043207b206d287b202e2e2e72207d2c2078203d2031293a20766f69643b206d2829207b207d207d0a2020202066756e6374696f6e2067287b202e2e2e71207d2c2079203d2032293a20766f69643b0a2020202066756e6374696f6e20672829207b207d0a2020202072657475726e205b612c20432c20675d3b0a7d0a"
+    },
+    "id": "overload-nested",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nfunction outer({ ...a }) {\n    class C { m({ ...r }, x = 1): void; m() { } }\n    function g({ ...q }, y = 2): void;\n    function g() { }\n    return [a, C, g];\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "objectrestspread"
+       ],
+       "text": "declare const xs: any[];\r\nlet a, r;\r\nfor ((Object.assign({ a }, r)) of xs) { }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "paren-forof",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e73742078733a20616e795b5d3b0a6c657420612c20723b0a666f722028287b20612c202e2e2e72207d29206f6620787329207b207d0a"
+    },
+    "id": "paren-forof",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare const xs: any[];\nlet a, r;\nfor (({ a, ...r }) of xs) { }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "objectrestspread"
+       ],
+       "text": "var __rest = (this && this.__rest) || function (s, e) {\r\n    var t = {};\r\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\r\n        t[p] = s[p];\r\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\r\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\r\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\r\n                t[p[i]] = s[p[i]];\r\n        }\r\n    return t;\r\n};\r\ndeclare const a: any;\r\nfor (let _a of { ...a }) {\r\n    const r = __rest(_a, []);\r\n}\r\nfor (let _b of (Object.assign({}, a))) {\r\n    const r = __rest(_b, []);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "forof-objexpr",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e737420613a20616e793b0a666f722028636f6e7374207b202e2e2e72207d206f66207b202e2e2e61207d29207b207d0a666f722028636f6e7374207b202e2e2e72207d206f6620287b202e2e2e61207d2929207b207d0a"
+    },
+    "id": "forof-objexpr",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare const a: any;\nfor (const { ...r } of { ...a }) { }\nfor (const { ...r } of ({ ...a })) { }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "objectrestspread"
+       ],
+       "text": "var __rest = (this && this.__rest) || function (s, e) {\r\n    var t = {};\r\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\r\n        t[p] = s[p];\r\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\r\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\r\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\r\n                t[p[i]] = s[p[i]];\r\n        }\r\n    return t;\r\n};\r\ndeclare const o: any;\r\nlet a, r;\r\nconst f = (p) => ({ a } = p, r = __rest(p, [\"a\"]), p);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "arrow-concise-temp",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e7374206f3a20616e793b0a6c657420612c20723b0a636f6e73742066203d20287029203d3e20287b20612c202e2e2e72207d203d2070293b0a"
+    },
+    "id": "arrow-concise-temp",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare const o: any;\nlet a, r;\nconst f = (p) => ({ a, ...r } = p);\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "objectrestspread"
+       ],
+       "text": "var __rest = (this && this.__rest) || function (s, e) {\r\n    var t = {};\r\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\r\n        t[p] = s[p];\r\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\r\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\r\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\r\n                t[p[i]] = s[p[i]];\r\n        }\r\n    return t;\r\n};\r\nclass C {\r\n    constructor(_a, x, y) {\r\n        var r = __rest(_a, []);\r\n        if (x === void 0) { x = 1; }\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "param-property",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020636f6e7374727563746f72287b202e2e2e72207d2c207075626c69632078203d20312c207072697661746520726561646f6e6c7920793f3a206e756d62657229207b207d0a7d0a"
+    },
+    "id": "param-property",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nclass C {\n    constructor({ ...r }, public x = 1, private readonly y?: number) { }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "objectrestspread"
+       ],
+       "text": "var __rest = (this && this.__rest) || function (s, e) {\r\n    var t = {};\r\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\r\n        t[p] = s[p];\r\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\r\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\r\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\r\n                t[p[i]] = s[p[i]];\r\n        }\r\n    return t;\r\n};\r\ndeclare const o: any;\r\nlet a, r;\r\nfunction f(_a = ({ a } = o, r = __rest(o, [\"a\"]), o)) { var p = _a; return p; }\r\nfunction g(_a, p) {\r\n    var q = __rest(_a, []);\r\n    if (p === void 0) { p = ({ a } = o, r = __rest(o, [\"a\"]), o); }\r\n    return p;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "param-init-temp",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e7374206f3a20616e793b0a6c657420612c20723b0a66756e6374696f6e20662870203d20287b20612c202e2e2e72207d203d206f2929207b2072657475726e20703b207d0a66756e6374696f6e2067287b202e2e2e71207d2c2070203d20287b20612c202e2e2e72207d203d206f2929207b2072657475726e20703b207d0a"
+    },
+    "id": "param-init-temp",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare const o: any;\nlet a, r;\nfunction f(p = ({ a, ...r } = o)) { return p; }\nfunction g({ ...q }, p = ({ a, ...r } = o)) { return p; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "objectrestspread"
+       ],
+       "text": "var __rest = (this && this.__rest) || function (s, e) {\r\n    var t = {};\r\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\r\n        t[p] = s[p];\r\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\r\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\r\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\r\n                t[p[i]] = s[p[i]];\r\n        }\r\n    return t;\r\n};\r\ndeclare const xs: any[];\r\nlet s;\r\nfor (let _a of xs) {\r\n    const r = __rest(_a, []);\r\n    (s = __rest(r, []), r);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "forof-nonblock-expr",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e73742078733a20616e795b5d3b0a6c657420733b0a666f722028636f6e7374207b202e2e2e72207d206f662078732920287b202e2e2e73207d203d2072293b0a"
+    },
+    "id": "forof-nonblock-expr",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare const xs: any[];\nlet s;\nfor (const { ...r } of xs) ({ ...s } = r);\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "objectrestspread"
+       ],
+       "text": "var __rest = (this && this.__rest) || function (s, e) {\r\n    var t = {};\r\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\r\n        t[p] = s[p];\r\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\r\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\r\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\r\n                t[p[i]] = s[p[i]];\r\n        }\r\n    return t;\r\n};\r\nfunction outer(_a) {\r\n    var a = __rest(_a, []);\r\n    abstract class A {\r\n        abstract m(_a) {\r\n            var r = __rest(_a, []);\r\n        }\r\n    }\r\n    return A;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "strict-arrow-overload",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e206f75746572287b202e2e2e61207d29207b0a20202020616273747261637420636c6173732041207b206162737472616374206d287b202e2e2e72207d293a20766f69643b207d0a2020202072657475726e20413b0a7d0a"
+    },
+    "id": "strict-arrow-overload",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\nfunction outer({ ...a }) {\n    abstract class A { abstract m({ ...r }): void; }\n    return A;\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "objectrestspread"
+       ],
+       "text": "var __rest = (this && this.__rest) || function (s, e) {\r\n    var t = {};\r\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\r\n        t[p] = s[p];\r\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\r\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\r\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\r\n                t[p[i]] = s[p[i]];\r\n        }\r\n    return t;\r\n};\r\ntry { }\r\ncatch (_a) {\r\n    var b = __rest(_a.a, []), c = __rest(_a, [\"a\"]);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "catch-nested",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "747279207b207d20636174636820287b20613a207b202e2e2e62207d2c202e2e2e63207d29207b207d0a"
+    },
+    "id": "catch-nested",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ntry { } catch ({ a: { ...b }, ...c }) { }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "objectrestspread"
+       ],
+       "text": "var __rest = (this && this.__rest) || function (s, e) {\r\n    var t = {};\r\n    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)\r\n        t[p] = s[p];\r\n    if (s != null && typeof Object.getOwnPropertySymbols === \"function\")\r\n        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {\r\n            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))\r\n                t[p[i]] = s[p[i]];\r\n        }\r\n    return t;\r\n};\r\ndeclare const o: any;\r\nexport const f = function () { const r = __rest(o, []); return r; }, g = __rest(o, []);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "export-fn-in-init",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e7374206f3a20616e793b0a6578706f727420636f6e73742066203d2066756e6374696f6e202829207b20636f6e7374207b202e2e2e72207d203d206f3b2072657475726e20723b207d2c207b202e2e2e67207d203d206f3b0a"
+    },
+    "id": "export-fn-in-init",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare const o: any;\nexport const f = function () { const { ...r } = o; return r; }, { ...g } = o;\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

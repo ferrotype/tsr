@@ -1,0 +1,1316 @@
+{
+ "cases": [
+  {
+   "id": "oc0",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #f = () => 1;\n    m(o) { return o?.#f(); }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "oc1",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #f = () => 1;\n    m(o) { return o.#f?.(); }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "oc3",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #f = () => 1;\n    m(o) { return this.#f?.call(this); }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "reserved-constructor",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #constructor = 1;\n    m() { return this.#constructor; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "get-after-field",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #a = 1;\n    get #a() { return 1; }\n    m() { return this.#a; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-instance-accessor-mix",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    get #a() { return 1; }\n    static set #a(v) {}\n    m() { this.#a = 2; return this.#a; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-stmt-parents",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x;\n    m(o) {\n        for (#x in o) {}\n        if (#x) {}\n        return #x;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "nested-computed-private",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass A {\n    #x = 1;\n    m() {\n        class B { [this.#x] = 1; static [this.#x] = 2; }\n        return B;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "for-init-class",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nfor (let C = class { static x = 1; #y = 2; [k] = 3; }; ;) { break; }\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-arrow-super",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B {}\nclass C extends B {\n    static f = () => super.x;\n    static g = function () { return super.x; };\n    static h = { m() { return super.x; } };\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-this-computed-in-static",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static k = 'a';\n    static [this.k] = 1;\n    [this.k] = 2;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "decorated-accessor-legacy",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\n// @experimentalDecorators: true\ndeclare function dec(c: any): any;\n@dec\nclass C {\n    static accessor x = 1;\n    static y = super.z;\n    static [this.k] = 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "class-alias-in-static-arrow",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static x = 1;\n    static f = () => C.x;\n    static g() { return C; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "class-alias-shadowed",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static x = 1;\n    static f = () => { const C = 1; return C; };\n    m() { return C; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "anonymous-default-export-private",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\n// @module: esnext\nexport default class {\n    static #x = 1;\n    static f() { return this.#x; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-call-on-super",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B {}\nclass C extends B {\n    #m() {}\n    static #s() {}\n    n() { super.#m(); }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "compound-private-in-destructuring-default",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x;\n    m(o) {\n        ({ a: this.#x = class { static y = 1; } } = o);\n        [this.#x = class { static z = 1; }] = o;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-block-in-class-expression-loop",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nfor (const k of a) {\n    const C = class {\n        static { this.x = k; }\n        static #p = k;\n        [k] = 1;\n    };\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-accessor-prefix-increment",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    get #p() { return 1; }\n    set #p(v) {}\n    static get #s() { return 1; }\n    static set #s(v) {}\n    m() { const a = this.#p++; ++C.#s; return a; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "derived-param-properties",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B {}\nclass C extends B {\n    x = 1;\n    constructor(public a: number, private b: string) {\n        super();\n        this.c = 2;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "this-in-static-method-not-replaced",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static x = 1;\n    static m() { return this.x; }\n    static y = { get z() { return this; } };\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "computed-name-super",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B {}\nclass C extends B {\n    static [super.x] = 1;\n    [super.y] = 2;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "es2022-set-static-private-access",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass C {\n    static x = 1;\n    static #y = 2;\n    static z = C.#y + this.x;\n    static [f()] = 3;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "es2022-set-static-block-ordering",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass C {\n    static [a()] = 1;\n    static { b(); }\n    static [this.c()] = 2;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-es2015-true",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B { static f() { return 1; } }\nclass C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-expr-es2015-true",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B { static f() { return 1; } }\nconst D = class C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-es2015-false",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass B { static f() { return 1; } }\nclass C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-expr-es2015-false",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass B { static f() { return 1; } }\nconst D = class C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-es2017-true",
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @useDefineForClassFields: true\nclass B { static f() { return 1; } }\nclass C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-expr-es2017-true",
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @useDefineForClassFields: true\nclass B { static f() { return 1; } }\nconst D = class C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-es2017-false",
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @useDefineForClassFields: false\nclass B { static f() { return 1; } }\nclass C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-expr-es2017-false",
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @useDefineForClassFields: false\nclass B { static f() { return 1; } }\nconst D = class C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-es2020-true",
+   "name": "probe.ts",
+   "source": "// @target: es2020\n// @useDefineForClassFields: true\nclass B { static f() { return 1; } }\nclass C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-expr-es2020-true",
+   "name": "probe.ts",
+   "source": "// @target: es2020\n// @useDefineForClassFields: true\nclass B { static f() { return 1; } }\nconst D = class C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-es2020-false",
+   "name": "probe.ts",
+   "source": "// @target: es2020\n// @useDefineForClassFields: false\nclass B { static f() { return 1; } }\nclass C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-expr-es2020-false",
+   "name": "probe.ts",
+   "source": "// @target: es2020\n// @useDefineForClassFields: false\nclass B { static f() { return 1; } }\nconst D = class C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-es2021-true",
+   "name": "probe.ts",
+   "source": "// @target: es2021\n// @useDefineForClassFields: true\nclass B { static f() { return 1; } }\nclass C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-expr-es2021-true",
+   "name": "probe.ts",
+   "source": "// @target: es2021\n// @useDefineForClassFields: true\nclass B { static f() { return 1; } }\nconst D = class C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-es2021-false",
+   "name": "probe.ts",
+   "source": "// @target: es2021\n// @useDefineForClassFields: false\nclass B { static f() { return 1; } }\nclass C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-expr-es2021-false",
+   "name": "probe.ts",
+   "source": "// @target: es2021\n// @useDefineForClassFields: false\nclass B { static f() { return 1; } }\nconst D = class C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-es2022-true",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: true\nclass B { static f() { return 1; } }\nclass C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-expr-es2022-true",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: true\nclass B { static f() { return 1; } }\nconst D = class C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-es2022-false",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass B { static f() { return 1; } }\nclass C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-expr-es2022-false",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass B { static f() { return 1; } }\nconst D = class C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-esnext-true",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: true\nclass B { static f() { return 1; } }\nclass C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-expr-esnext-true",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: true\nclass B { static f() { return 1; } }\nconst D = class C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-esnext-false",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\nclass B { static f() { return 1; } }\nclass C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "sink-expr-esnext-false",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\nclass B { static f() { return 1; } }\nconst D = class C extends B {\n    // lead\n    a = 1; // trail\n    b;\n    #c = 2;\n    static #d = 3;\n    static e = this.a + C.#d;\n    accessor f = 4;\n    static accessor g = 5;\n    accessor #h = 6;\n    [k()] = 7;\n    static [j()] = 8;\n    #m() { return this.#c; }\n    get #p() { return 1; }\n    set #p(v) {}\n    static {\n        var t = super.f();\n        this.z = t + this.#d;\n    }\n    constructor(x) {\n        \"use strict\";\n        super();\n        this.#c = x;\n        this.#p++;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "super-static-misc",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B {}\nclass C extends B {\n    static {\n        ({ ...super.x } = o);\n        [...super[k]] = arr;\n        (() => super.f())();\n        (() => super.g`t`)();\n        super.h?.();\n        super.x ??= 1;\n        super[k()] &&= 2;\n        super.y **= 3;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "super-in-static-class-expression",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B {}\nconst D = class extends B {\n    static a = super.x;\n    static b = super.f(1);\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-misc-ops",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 1;\n    static #s = 2;\n    a = () => this.#x;\n    m(o) {\n        const t = typeof this.#x;\n        this.#x **= 2;\n        this.#x ??= 3;\n        o.#x &&= 4;\n        C?.#s;\n        return { g() { return o.#x; }, [this.#x]: 1 };\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "nested-shadow-private",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass A {\n    #x = 1;\n    static #y = 2;\n    m() {\n        return class B {\n            #x = 3;\n            static z = A.#y;\n            n(a) { return a.#x + #x in a; }\n        };\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "class-alias-nested-static-class",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static x = 1;\n    static D = class { m() { return C.x; } };\n    static #p = 1;\n    static f() { return C.#p; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "class-expression-self-ref-in-static",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class C {\n    static a = C;\n    static b = () => C;\n    #p = 1;\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-block-var-hoist",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static {\n        var a = 1;\n        function f() { return this; }\n        let b = () => arguments;\n        for (var i = 0; i < 1; i++) {}\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "es-decorated-class-expr",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\ndeclare function dec(c: any): any;\nconst C = @dec class D {\n    static x = this;\n    static y = super.z;\n    [this.k] = 1;\n    #p = 1;\n    static #q = 2;\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "es-decorated-class-decl-private",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\ndeclare function dec(c: any): any;\n@dec\nclass C {\n    static #q = 2;\n    #p = 1;\n    static x = C.#q;\n    m() { return C; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "legacy-decorated-private-static",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\n// @experimentalDecorators: true\ndeclare function dec(c: any): any;\n@dec\nclass C {\n    static #q = 2;\n    static x = this.#q;\n    static y = () => this;\n    m() { return C.#q; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-accessor-es2022-expr",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: true\nconst D = class {\n    accessor #x = 1;\n    static accessor #y = 2;\n    m() { return this.#x + D.#y; }\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "esnext-set-accessor-static-anon",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\nconst D = class {\n    static accessor x = 1;\n    y = 2;\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "do-while-class-expr",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\ndo {\n    const C = class { #x = 1; static #y = 2; [f()] = 3; static [g()] = 4; };\n} while (c());\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "labeled-for-class",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nouter: for (;;) {\n    const C = class { [f()] = 1; #x; };\n    break outer;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "function-in-loop-class",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nfor (;;) {\n    function g() { return class { #x = 1; [f()] = 2; }; }\n    break;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "export-class-static-private",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\n// @module: commonjs\nexport class C {\n    static #x = 1;\n    static y = C.#x;\n}\nexport default class {\n    static z = 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-class",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nnamespace N {\n    export class C { static x = 1; #y = 2; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "comments-static-block",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    /* a */ static /* b */ x /* c */ = /* d */ 1 /* e */;\n    // f\n    static {\n        // g\n        h();\n    } // i\n    /** j */ #k = 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "ctor-param-props-no-super",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    x = 1;\n    constructor(public a, readonly b = 2) {\n        \"use strict\";\n        foo();\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "derived-ctor-super-in-if",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B {}\nclass C extends B {\n    x = 1;\n    constructor() {\n        if (c) { super(); } else { super(1); }\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "derived-ctor-super-expression",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass B {}\nclass C extends B {\n    x = 1;\n    constructor() {\n        const t = super();\n        f(super());\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "computed-symbol-method-keys",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    [Symbol.iterator] = 1;\n    static [`t${a}`] = 2;\n    [1 + 2] = 3;\n    ['s'+k] () {}\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-in-static-initializer-arrow-this",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static #x = 1;\n    static f = () => this.#x;\n    static g = function () { return this.#x; };\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-computed-this",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static k = 'a';\n    accessor [this.k] = 1;\n    static accessor [C.k + 'b'] = 2;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "ts-es2015-true",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nabstract class A<T> implements I {\n    declare d: number;\n    abstract x: T;\n    y!: string;\n    z?: number = 1;\n    readonly r = 2;\n    override o = 3;\n    [key: string]: any;\n    #p: number = 4;\n    static #s?: string;\n    accessor q: number = 5;\n    constructor(public a: number, private readonly b?: string) {\n        super();\n        (this.#p as any) = 1;\n        (<any>this.#p) += 2;\n        (this.#p as number)++;\n        this.#p!++;\n        (this as any).#p = 3;\n        ((this.#p)!) = 4;\n        const v = this.#p satisfies number;\n        A.#s = <string>\"x\";\n    }\n    m(this: A<T>): T { return this.x as T; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "ts-es2015-false",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nabstract class A<T> implements I {\n    declare d: number;\n    abstract x: T;\n    y!: string;\n    z?: number = 1;\n    readonly r = 2;\n    override o = 3;\n    [key: string]: any;\n    #p: number = 4;\n    static #s?: string;\n    accessor q: number = 5;\n    constructor(public a: number, private readonly b?: string) {\n        super();\n        (this.#p as any) = 1;\n        (<any>this.#p) += 2;\n        (this.#p as number)++;\n        this.#p!++;\n        (this as any).#p = 3;\n        ((this.#p)!) = 4;\n        const v = this.#p satisfies number;\n        A.#s = <string>\"x\";\n    }\n    m(this: A<T>): T { return this.x as T; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "ts-es2022-true",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: true\nabstract class A<T> implements I {\n    declare d: number;\n    abstract x: T;\n    y!: string;\n    z?: number = 1;\n    readonly r = 2;\n    override o = 3;\n    [key: string]: any;\n    #p: number = 4;\n    static #s?: string;\n    accessor q: number = 5;\n    constructor(public a: number, private readonly b?: string) {\n        super();\n        (this.#p as any) = 1;\n        (<any>this.#p) += 2;\n        (this.#p as number)++;\n        this.#p!++;\n        (this as any).#p = 3;\n        ((this.#p)!) = 4;\n        const v = this.#p satisfies number;\n        A.#s = <string>\"x\";\n    }\n    m(this: A<T>): T { return this.x as T; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "ts-es2022-false",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nabstract class A<T> implements I {\n    declare d: number;\n    abstract x: T;\n    y!: string;\n    z?: number = 1;\n    readonly r = 2;\n    override o = 3;\n    [key: string]: any;\n    #p: number = 4;\n    static #s?: string;\n    accessor q: number = 5;\n    constructor(public a: number, private readonly b?: string) {\n        super();\n        (this.#p as any) = 1;\n        (<any>this.#p) += 2;\n        (this.#p as number)++;\n        this.#p!++;\n        (this as any).#p = 3;\n        ((this.#p)!) = 4;\n        const v = this.#p satisfies number;\n        A.#s = <string>\"x\";\n    }\n    m(this: A<T>): T { return this.x as T; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "ts-esnext-true",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: true\nabstract class A<T> implements I {\n    declare d: number;\n    abstract x: T;\n    y!: string;\n    z?: number = 1;\n    readonly r = 2;\n    override o = 3;\n    [key: string]: any;\n    #p: number = 4;\n    static #s?: string;\n    accessor q: number = 5;\n    constructor(public a: number, private readonly b?: string) {\n        super();\n        (this.#p as any) = 1;\n        (<any>this.#p) += 2;\n        (this.#p as number)++;\n        this.#p!++;\n        (this as any).#p = 3;\n        ((this.#p)!) = 4;\n        const v = this.#p satisfies number;\n        A.#s = <string>\"x\";\n    }\n    m(this: A<T>): T { return this.x as T; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "ts-esnext-false",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @useDefineForClassFields: false\nabstract class A<T> implements I {\n    declare d: number;\n    abstract x: T;\n    y!: string;\n    z?: number = 1;\n    readonly r = 2;\n    override o = 3;\n    [key: string]: any;\n    #p: number = 4;\n    static #s?: string;\n    accessor q: number = 5;\n    constructor(public a: number, private readonly b?: string) {\n        super();\n        (this.#p as any) = 1;\n        (<any>this.#p) += 2;\n        (this.#p as number)++;\n        this.#p!++;\n        (this as any).#p = 3;\n        ((this.#p)!) = 4;\n        const v = this.#p satisfies number;\n        A.#s = <string>\"x\";\n    }\n    m(this: A<T>): T { return this.x as T; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "ts-class-expr-generic",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class <T> { static x: number = 1; #y: T; static m<U>(): void {} };\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "ts-enum-in-static",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C { static e = E.A; static f = (x: number): number => x; }\nenum E { A }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "ts-ns-class-alias",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nnamespace N { export class C { static x = 1; static f = () => C.x; #p = C; } }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "ts-nonnull-private-call",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C { #m?(): void; #n() {} k() { this.#n!(); (this.#n as any)(); (<any>this).#n(); this.#n?.(); } }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "ts-param-props-derived",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass B {}\nclass C extends B {\n    x = 1;\n    constructor(public a: number) {\n        super();\n        foo();\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "default-define-es2015",
+   "name": "probe.ts",
+   "source": "// @target: es2015\nclass C { x = 1; static y = 2; #z = 3; static #w = 4; accessor a = 5; static { this.b = 6; } }\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "default-define-es2020",
+   "name": "probe.ts",
+   "source": "// @target: es2020\nclass C { x = 1; static y = 2; #z = 3; static #w = 4; accessor a = 5; static { this.b = 6; } }\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "default-define-es2022",
+   "name": "probe.ts",
+   "source": "// @target: es2022\nclass C { x = 1; static y = 2; #z = 3; static #w = 4; accessor a = 5; static { this.b = 6; } }\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "default-define-esnext",
+   "name": "probe.ts",
+   "source": "// @target: esnext\nclass C { x = 1; static y = 2; #z = 3; static #w = 4; accessor a = 5; static { this.b = 6; } }\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "decorated-expr-export-default",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\n// @module: esnext\ndeclare function dec(c: any): any;\nexport default (@dec class { static x = 1; [f()] = 2; static #p = 3; });\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "decorated-expr-call-arg",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\ndeclare function dec(c: any): any;\nf(@dec class { static x = 1; [g()] = 2; });\nconst a = 1, b = @dec class { static y = this; static z = super.q; }, c = 2;\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "decorated-expr-in-static-block",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\ndeclare function dec(c: any): any;\nclass O {\n    static {\n        const D = @dec class { static x = this; };\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "nested-class-in-static-block-this",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass O {\n    static p = 1;\n    static {\n        class I { [this.p] = 1; static q = this; m = () => this; }\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-in-static-initializer",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x;\n    static #y;\n    static t = (o) => #x in o || #y in o;\n    static { C.u = #y in C; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "alias-instance-method-static-private",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static #x = 1;\n    m() { return C.#x + C.name; }\n    static n = C.#x;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "class-in-object-method",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #x = 1;\n    m() { return { n() { return this.#x; }, get g() { return C; } }; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "ctor-overloads",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    x = 1;\n    constructor();\n    constructor(a?: number) { foo(a); }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "arguments-in-static-init",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static a = arguments;\n    static { const b = arguments; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "new-target-in-static",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    static a = new.target;\n    static { const b = new.target; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "await-yield-in-static-block",
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @useDefineForClassFields: true\nclass C {\n    static { var await_ = 1; }\n    static async *g() { yield 1; }\n    static x = async () => await 1;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-generator-async-methods-static",
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @useDefineForClassFields: true\nclass C {\n    static async #a() { await 1; }\n    static *#g() { yield 1; }\n    static async *#ag() {}\n    static m() { return [C.#a(), C.#g(), C.#ag()]; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "private-field-optional-call-chain",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #f = () => 1;\n    m(o) { return [o?.#f(), o.#f?.(), this.#f?.call(this)]; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "class-expression-in-computed",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    [(class { static x = 1; }, 'k')] = 1;\n    static [(class { #y; }, 'j')] = 2;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "deep-nested-private-access",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass A {\n    #a = 1;\n    m() {\n        class B {\n            #b = 2;\n            n(x) {\n                class Cc { o(y) { return x.#a + y.#b; } }\n                return Cc;\n            }\n        }\n        return B;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "static-accessor-in-named-class-expr",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class C {\n    static accessor x = 1;\n    static f() { return C.x; }\n};\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "public-field-named-constructor",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C {\n    'constructor' = 1;\n    ['constructor'] = 2;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "es2022-false-static-this-arrow",
+   "name": "probe.ts",
+   "source": "// @target: es2022\n// @useDefineForClassFields: false\nclass C {\n    static a = () => this;\n    static b = class { static c = this; };\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-named-private",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\n// @module: esnext\nexport default class C {\n    #x = 1;\n    static y = new C().#x;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "assignment-chains-private",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #a; #b;\n    m(o) { this.#a = this.#b = o.#a = 1; return (this.#a, this.#b); }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "te-updated-class-expr-name",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class <T> { #y: T; m(): void { return this.#y; } };\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ],
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "te-updated-class-expr-prop",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst o = { Foo: class <T> { #y: T; } };\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ],
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "te-updated-class-expr-static",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nconst D = class <T> { static #y: number = 1; static m(): number { return D.#y; } };\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ],
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "te-updated-class-decl-alias",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C<T> { static x: number = 1; static f = (): number => C.x; m(): typeof C { return C; } #p: T; }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ],
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "te-ctor-reference-in-type",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C { static x = 1; static f(): C | undefined { let c: C; return undefined; } #p = 1; }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ],
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "te-class-expr-in-loop",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nfor (const k of [1]) { const C = class <T> { #x: T; [k]: number = 1; }; }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ],
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "te-export-default-anon",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\n// @module: esnext\nexport default class <T> { #x: T; static y: number = 1; }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ],
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "te-abstract-ctor-ref",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nabstract class C { abstract m(): void; static x = 1; n() { return C.x; } #p = 1; }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ],
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "te-satisfies-computed",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: false\nclass C { [k as string] = 1; [(f() as any)] = 2; static [<any>g()] = 3; }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ],
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "te-accessor-types",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C { accessor x: number = 1; static accessor #y: string = ''; accessor [k as any]: number; }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ],
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "dup-static-instance-field",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #a = 1;\n    static #a = 2;\n    m() { return this.#a + C.#a; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "dup-method-field",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #a() {}\n    #a = 1;\n    m() { return this.#a; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "reserved-method",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #constructor() {}\n    static #constructor = 1;\n    m() { this.#constructor(); }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "dup-accessor-pairs",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    get #a() { return 1; }\n    get #a() { return 2; }\n    set #a(v) {}\n    set #a(v) {}\n    m() { this.#a = this.#a; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "dup-auto-accessor",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    accessor #a = 1;\n    #a = 2;\n    static accessor #b = 1;\n    get #b() { return 1; }\n    m() { return this.#a + C.#b; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-and-field-same-public-name",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    accessor a = 1;\n    accessor a = 2;\n    static accessor b = 1;\n    accessor b = 2;\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "invalid-in-destructuring-and-in",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C {\n    #a = 1;\n    #a = 2;\n    m(o) { [this.#a] = o; return #a in o; }\n}\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "finding-b3-private-statement-parents",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @useDefineForClassFields: true\nclass C { #x; m(o) { for (#x in o) {} if (#x) {} return #x; } }\n",
+   "chains": [
+    [
+     "classfields"
+    ]
+   ]
+  },
+  {
+   "id": "finding-b3-typeeraser-class-expression-private",
+   "name": "probe.ts",
+   "source": "// @target: es2015\nconst D = class <T> { #y: T; };\n",
+   "chains": [
+    [
+     "typeeraser",
+     "classfields"
+    ]
+   ]
+  }
+ ]
+}

@@ -1,0 +1,2145 @@
+{
+ "cases": [
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { createElement as _createElement } from \"react\";\r\nimport { jsx as _jsx } from \"react/jsx-runtime\";\r\ndeclare var p: any;\r\nexport const a = _createElement(\"div\", { ...p, key: \"k\", x: _jsx(\"i\", {}) });\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-import-order-attr",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c6172652076617220703a20616e793b0a6578706f727420636f6e73742061203d203c646976207b2e2e2e707d206b65793d226b2220783d7b3c69202f3e7d202f3e3b0a"
+    },
+    "id": "r-import-order-attr",
+    "options": {
+     "jsx": 4,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\nexport const a = <div {...p} key=\"k\" x={<i />} />;\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { jsx as _jsx } from \"react/jsx-runtime\";\r\nimport { createElement as _createElement } from \"react\";\r\ndeclare var p: any;\r\nexport const a = _createElement(\"div\", { ...p, key: \"k\" },\r\n    _jsx(\"i\", {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-import-order-child",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c6172652076617220703a20616e793b0a6578706f727420636f6e73742061203d203c646976207b2e2e2e707d206b65793d226b223e3c69202f3e3c2f6469763e3b0a"
+    },
+    "id": "r-import-order-child",
+    "options": {
+     "jsx": 4,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\nexport const a = <div {...p} key=\"k\"><i /></div>;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { Fragment as _Fragment, jsx as _jsx } from \"react/jsx-runtime\";\r\nimport { createElement as _createElement } from \"react\";\r\ndeclare var p: any;\r\nexport const a = _jsx(_Fragment, { children: _createElement(\"div\", { ...p, key: \"k\" }) });\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-import-order-frag-first",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c6172652076617220703a20616e793b0a6578706f727420636f6e73742061203d203c3e3c646976207b2e2e2e707d206b65793d226b22202f3e3c2f3e3b0a"
+    },
+    "id": "r-import-order-frag-first",
+    "options": {
+     "jsx": 4,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\nexport const a = <><div {...p} key=\"k\" /></>;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\nexport class X {\r\n    m() { return React.createElement(this, null); }\r\n    n() { return React.createElement(this.a.b, { x: \"1\" }); }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-this-tag",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6578706f727420636c6173732058207b206d2829207b2072657475726e203c74686973202f3e3b207d206e2829207b2072657475726e203c746869732e612e6220783d223122202f3e3b207d207d0a"
+    },
+    "id": "r-this-tag",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport class X { m() { return <this />; } n() { return <this.a.b x=\"1\" />; } }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\nexport const a = React.createElement(\"div\", null, \"\\uFFFD \\uFFFD &#x80000000; \\0 \\0 &a&b&c; \\uD83D\\uDE00 &amp \\uFFFD &#2147483648;\");\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-entities-edge",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6578706f727420636f6e73742061203d203c6469763e2623783131303030303b2026237837464646464646463b2026237838303030303030303b202623303b20262378303b202661266226633b20262378443833443b262378444530303b2026616d70202623323134373438333634373b202623323134373438333634383b3c2f6469763e3b0a"
+    },
+    "id": "r-entities-edge",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div>&#x110000; &#x7FFFFFFF; &#x80000000; &#0; &#x0; &a&b&c; &#xD83D;&#xDE00; &amp &#2147483647; &#2147483648;</div>;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\nexport const a = React.createElement(\"div\", { t: \"\\uFFFD|\\uDE00\\uD83D|&a&;b;\" });\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-entities-attr-edge",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6578706f727420636f6e73742061203d203c64697620743d222623783131303030303b7c262378444530303b262378443833443b7c2661263b623b22202f3e3b0a"
+    },
+    "id": "r-entities-attr-edge",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div t=\"&#x110000;|&#xDE00;&#xD83D;|&a&;b;\" />;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\nexport const a = React.createElement(\"div\", { a: 'it\"s', b: \"x\\\\ny\", c: \"multi\\nline\", d: '\\'' });\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-attr-quotes",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6578706f727420636f6e73742061203d203c64697620613d27697422732720623d22785c6e792220633d226d756c74690a6c696e652220643d272661706f733b27202f3e3b0a"
+    },
+    "id": "r-attr-quotes",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div a='it\"s' b=\"x\\ny\" c=\"multi\nline\" d='&apos;' />;\n"
+  },
+  {
+   "diagnostics": 6,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { createElement as _createElement } from \"react\";\r\nimport { jsx as _jsx } from \"react/jsx-runtime\";\r\ndeclare var p: any;\r\nexport const a = _jsx(\"div\", {}, true);\r\nexport const b = _jsx(\"div\", { \"x:key\": \"1\" });\r\nexport const c = _createElement(\"div\", { ...p, key: true });\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-key-empty-expr",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c6172652076617220703a20616e793b0a6578706f727420636f6e73742061203d203c646976206b65793d7b7d202f3e3b0a6578706f727420636f6e73742062203d203c64697620783a6b65793d223122202f3e3b0a6578706f727420636f6e73742063203d203c646976207b2e2e2e707d206b65793d7b7d202f3e3b0a"
+    },
+    "id": "r-key-empty-expr",
+    "options": {
+     "jsx": 4,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\nexport const a = <div key={} />;\nexport const b = <div x:key=\"1\" />;\nexport const c = <div {...p} key={} />;\n"
+  },
+  {
+   "diagnostics": 15,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\nexport const a = React.createElement(\"div\", null,\r\n    React.createElement(\"b\", { x: React.createElement(\"i\", null) }));\r\nexport const b = React.createElement(\"div\", null,\r\n    React.createElement(\"b\", { x: f(React.createElement(\"i\", null)) }),\r\n    React.createElement(\"u\", null));\r\nexport const c = React.createElement(\"div\", null, React.createElement(\"b\", { x: f(React.createElement(\"i\", null)) },\r\n    React.createElement(\"s\", null)));\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-child-inchild-quirk-classic",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6578706f727420636f6e73742061203d203c6469763e3c6220783d7b3c69202f3e7d202f3e3c2f6469763e3b0a6578706f727420636f6e73742062203d203c6469763e3c6220783d7b66283c69202f3e297d202f3e3c75202f3e3c2f6469763e3b0a6578706f727420636f6e73742063203d203c6469763e3c6220783d7b66283c69202f3e297d3e3c73202f3e3c2f623e3c2f6469763e3b0a"
+    },
+    "id": "r-child-inchild-quirk-classic",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div><b x={<i />} /></div>;\nexport const b = <div><b x={f(<i />)} /><u /></div>;\nexport const c = <div><b x={f(<i />)}><s /></b></div>;\n"
+  },
+  {
+   "diagnostics": 16,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { jsx as _jsx, jsxs as _jsxs } from \"react/jsx-runtime\";\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\nexport const a = _jsx(\"div\", { children: _jsx(\"b\", { x: _jsx(\"i\", {}) }) });\r\nexport const b = _jsxs(\"div\", { children: [_jsx(\"b\", { x: f(_jsx(\"i\", {})) }), _jsx(\"u\", {})] });\r\nexport const c = _jsx(\"div\", { children: _jsx(\"b\", { x: f(_jsx(\"i\", {})), children: _jsx(\"s\", {}) }) });\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-child-inchild-quirk-auto",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6578706f727420636f6e73742061203d203c6469763e3c6220783d7b3c69202f3e7d202f3e3c2f6469763e3b0a6578706f727420636f6e73742062203d203c6469763e3c6220783d7b66283c69202f3e297d202f3e3c75202f3e3c2f6469763e3b0a6578706f727420636f6e73742063203d203c6469763e3c6220783d7b66283c69202f3e297d3e3c73202f3e3c2f623e3c2f6469763e3b0a"
+    },
+    "id": "r-child-inchild-quirk-auto",
+    "options": {
+     "jsx": 4,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div><b x={<i />} /></div>;\nexport const b = <div><b x={f(<i />)} /><u /></div>;\nexport const c = <div><b x={f(<i />)}><s /></b></div>;\n"
+  },
+  {
+   "diagnostics": 10,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { Fragment as _Fragment, jsx as _jsx, jsxs as _jsxs } from \"react/jsx-runtime\";\r\ndeclare var p: any;\r\nexport const a = _jsx(\"div\", { children: _jsx(\"b\", { x: _jsx(\"i\", {}) }) });\r\nexport const b = _jsxs(\"div\", { children: [_jsx(\"b\", { x: _jsx(_Fragment, { children: _jsx(\"i\", {}) }) }), _jsx(\"u\", {})] });\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-child-inchild-attr-jsx-auto",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c6172652076617220703a20616e793b0a6578706f727420636f6e73742061203d203c6469763e3c6220783d3c69202f3e202f3e3c2f6469763e3b0a6578706f727420636f6e73742062203d203c6469763e3c6220783d3c3e3c69202f3e3c2f3e202f3e3c75202f3e3c2f6469763e3b0a"
+    },
+    "id": "r-child-inchild-attr-jsx-auto",
+    "options": {
+     "jsx": 4,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\nexport const a = <div><b x=<i /> /></div>;\nexport const b = <div><b x=<><i /></> /><u /></div>;\n"
+  },
+  {
+   "diagnostics": 7,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { Fragment as _Fragment, jsx as _jsx, jsxs as _jsxs } from \"react/jsx-runtime\";\r\ndeclare var p: any;\r\nexport const a = _jsx(\"div\", {});\r\nexport const b = _jsx(\"div\", {});\r\nexport const c = _jsx(_Fragment, {});\r\nexport const d = _jsxs(\"div\", { children: [...[]] });\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-auto-empty-children",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c6172652076617220703a20616e793b0a6578706f727420636f6e73742061203d203c6469763e7b7d3c2f6469763e3b0a6578706f727420636f6e73742062203d203c6469763e7b2f2a2063202a2f7d7b7d3c2f6469763e3b0a6578706f727420636f6e73742063203d203c3e7b7d3c2f3e3b0a6578706f727420636f6e73742064203d203c6469763e7b2e2e2e5b5d7d3c2f6469763e3b0a"
+    },
+    "id": "r-auto-empty-children",
+    "options": {
+     "jsx": 4,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\nexport const a = <div>{}</div>;\nexport const b = <div>{/* c */}{}</div>;\nexport const c = <>{}</>;\nexport const d = <div>{...[]}</div>;\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\nexport const a = React.createElement(\"div\", null,\r\n    React.createElement(React.Fragment, null, \"x\"),\r\n    React.createElement(React.Fragment, null, \"y\"));\r\nexport const b = React.createElement(\"div\", null, React.createElement(React.Fragment, null, \"z\"));\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-classic-frag-in-child",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6578706f727420636f6e73742061203d203c6469763e3c3e783c2f3e3c3e793c2f3e3c2f6469763e3b0a6578706f727420636f6e73742062203d203c6469763e7b3c3e7a3c2f3e7d3c2f6469763e3b0a"
+    },
+    "id": "r-classic-frag-in-child",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div><>x</><>y</></div>;\nexport const b = <div>{<>z</>}</div>;\n"
+  },
+  {
+   "diagnostics": 5,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { Fragment as _Fragment, jsxDEV as _jsxDEV } from \"react/jsx-dev-runtime\";\r\nimport { createElement as _createElement } from \"react\";\r\nconst _jsxFileName = \"/.src/probe.tsx\";\r\ndeclare var p: any;\r\nexport const a = _createElement(\"div\", { ...p, key: \"k\" },\r\n    _jsxDEV(\"i\", {}, void 0, false, { fileName: _jsxFileName, lineNumber: 2, columnNumber: 38 }, this));\r\nexport function g() { return _jsxDEV(_Fragment, { children: _jsxDEV(\"b\", {}, \"1\", false, { fileName: _jsxFileName, lineNumber: 3, columnNumber: 32 }, this) }, void 0, false, { fileName: _jsxFileName, lineNumber: 3, columnNumber: 30 }, this); }\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-dev-nested",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c6172652076617220703a20616e793b0a6578706f727420636f6e73742061203d203c646976207b2e2e2e707d206b65793d226b223e3c69202f3e3c2f6469763e3b0a6578706f72742066756e6374696f6e20672829207b2072657475726e203c3e3c62206b65793d223122202f3e3c2f3e3b207d0a"
+    },
+    "id": "r-dev-nested",
+    "options": {
+     "jsx": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\ndeclare var p: any;\nexport const a = <div {...p} key=\"k\"><i /></div>;\nexport function g() { return <><b key=\"1\" /></>; }\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "const _jsxFileName = \"/.src/probe.tsx\";\r\nconst a = _createElement(\"div\", { ...p, key: \"k\" },\r\n    _jsxDEV(\"i\", {}, void 0, false, { fileName: _jsxFileName, lineNumber: 1, columnNumber: 31 }, this));\r\ndeclare var p: any;\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-dev-script",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "636f6e73742061203d203c646976207b2e2e2e707d206b65793d226b223e3c69202f3e3c2f6469763e3b0a6465636c6172652076617220703a20616e793b0a"
+    },
+    "id": "r-dev-script",
+    "options": {
+     "jsx": 5,
+     "moduleDetection": 2,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\n// @moduleDetection: legacy\nconst a = <div {...p} key=\"k\"><i /></div>;\ndeclare var p: any;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { jsx as _jsx } from \"react/jsx-runtime\";\r\nconst a = _jsx(\"div\", {});\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-auto-script-cjs-ts",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "636f6e73742061203d203c646976202f3e3b0a"
+    },
+    "id": "r-auto-script-cjs-ts",
+    "options": {
+     "jsx": 4,
+     "module": 1,
+     "moduleDetection": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\n// @moduleDetection: force\n// @module: commonjs\nconst a = <div />;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "namespace N {\r\n    export namespace M {\r\n        export var React: any;\r\n        export var x = M.React.createElement(M.React.Fragment, null,\r\n            M.React.createElement(\"i\", null));\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-classic-ns-react",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6e616d657370616365204e207b206578706f7274206e616d657370616365204d207b206578706f7274207661722052656163743a20616e793b206578706f7274207661722078203d203c3e3c69202f3e3c2f3e3b207d207d0a"
+    },
+    "id": "r-classic-ns-react",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\nnamespace N { export namespace M { export var React: any; export var x = <><i /></>; } }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "namespace N {\r\n    export function h(...a: any[]) { }\r\n    export var x = h(\"i\", null);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-classic-ns-factory",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6e616d657370616365204e207b206578706f72742066756e6374696f6e2068282e2e2e613a20616e795b5d29207b7d206578706f7274207661722078203d203c69202f3e3b207d0a"
+    },
+    "id": "r-classic-ns-factory",
+    "options": {
+     "jsx": 3,
+     "jsxFactory": "h",
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @jsxFactory: h\nnamespace N { export function h(...a: any[]) {} export var x = <i />; }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "namespace N {\r\n    export var h: any;\r\n    export var x = N.h.c(\"i\", null);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-classic-ns-qualified-factory",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6e616d657370616365204e207b206578706f72742076617220683a20616e793b206578706f7274207661722078203d203c69202f3e3b207d0a"
+    },
+    "id": "r-classic-ns-qualified-factory",
+    "options": {
+     "jsx": 3,
+     "jsxFactory": "h.c",
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @jsxFactory: h.c\nnamespace N { export var h: any; export var x = <i />; }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "/** @jsx a.b.c */\r\n/** @jsxFrag d.e */\r\ndeclare var a: any, d: any;\r\nexport const x = a.b.c(d.e, null,\r\n    a.b.c(\"i\", null));\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-classic-pragma-qualified-frag",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "2f2a2a20406a737820612e622e63202a2f0a2f2a2a20406a73784672616720642e65202a2f0a6465636c6172652076617220613a20616e792c20643a20616e793b0a6578706f727420636f6e73742078203d203c3e3c69202f3e3c2f3e3b0a"
+    },
+    "id": "r-classic-pragma-qualified-frag",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n/** @jsx a.b.c */\n/** @jsxFrag d.e */\ndeclare var a: any, d: any;\nexport const x = <><i /></>;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "/** @jsx 1+2 */\r\n/** @jsxFrag  */\r\ndeclare var React: any;\r\nexport const x = React.createElement(React.Fragment, null,\r\n    React.createElement(\"i\", null));\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-classic-pragma-invalid",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "2f2a2a20406a737820312b32202a2f0a2f2a2a20406a73784672616720202a2f0a6465636c617265207661722052656163743a20616e793b0a6578706f727420636f6e73742078203d203c3e3c69202f3e3c2f3e3b0a"
+    },
+    "id": "r-classic-pragma-invalid",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n/** @jsx 1+2 */\n/** @jsxFrag  */\ndeclare var React: any;\nexport const x = <><i /></>;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "/** @jsxFrag F */\r\ndeclare var h: any, F: any;\r\nexport const x = h(F, null,\r\n    h(\"i\", null));\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-classic-frag-option-only",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "2f2a2a20406a7378467261672046202a2f0a6465636c6172652076617220683a20616e792c20463a20616e793b0a6578706f727420636f6e73742078203d203c3e3c69202f3e3c2f3e3b0a"
+    },
+    "id": "r-classic-frag-option-only",
+    "options": {
+     "jsx": 3,
+     "jsxFactory": "h",
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @jsxFactory: h\n/** @jsxFrag F */\ndeclare var h: any, F: any;\nexport const x = <><i /></>;\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any, p: any, q: any;\r\nexport const a = React.createElement(\"div\", Object.assign({ a: 1 }, p, { b: 2 }, q, { c: \"1\" }));\r\nexport const b = React.createElement(\"div\", Object.assign());\r\nexport const c = React.createElement(\"div\", Object.assign({}, p, { x: \"1\" }), \"t\");\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-spread-es2017-mixed",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e792c20703a20616e792c20713a20616e793b0a6578706f727420636f6e73742061203d203c646976207b2e2e2e7b613a20312c202e2e2e702c20623a20322c202e2e2e717d7d20633d223122207b2e2e2e7b7d7d202f3e3b0a6578706f727420636f6e73742062203d203c646976207b2e2e2e7b7d7d202f3e3b0a6578706f727420636f6e73742063203d203c646976207b2e2e2e707d20783d2231223e743c2f6469763e3b0a"
+    },
+    "id": "r-spread-es2017-mixed",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @target: es2017\ndeclare var React: any, p: any, q: any;\nexport const a = <div {...{a: 1, ...p, b: 2, ...q}} c=\"1\" {...{}} />;\nexport const b = <div {...{}} />;\nexport const c = <div {...p} x=\"1\">t</div>;\n"
+  },
+  {
+   "diagnostics": 8,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { jsx as _jsx, jsxs as _jsxs } from \"react/jsx-runtime\";\r\ndeclare var p: any;\r\nexport const a = _jsx(\"div\", Object.assign({}, p, { x: \"1\", children: \"t\" }));\r\nexport const b = _jsxs(\"div\", { x: 1, children: [_jsx(\"i\", {}), _jsx(\"b\", {})] });\r\nexport const c = _jsx(\"div\", Object.assign({}, p));\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-spread-es2017-auto",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c6172652076617220703a20616e793b0a6578706f727420636f6e73742061203d203c646976207b2e2e2e707d20783d2231223e743c2f6469763e3b0a6578706f727420636f6e73742062203d203c646976207b2e2e2e7b783a20317d7d3e3c692f3e3c622f3e3c2f6469763e3b0a6578706f727420636f6e73742063203d203c646976207b2e2e2e707d2f3e3b0a"
+    },
+    "id": "r-spread-es2017-auto",
+    "options": {
+     "jsx": 4,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\n// @target: es2017\ndeclare var p: any;\nexport const a = <div {...p} x=\"1\">t</div>;\nexport const b = <div {...{x: 1}}><i/><b/></div>;\nexport const c = <div {...p}/>;\n"
+  },
+  {
+   "diagnostics": 5,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { jsx as _jsx } from \"react/jsx-runtime\";\r\nimport { createElement as _createElement } from \"react\";\r\ndeclare var p: any;\r\nexport const a = _createElement(\"div\", Object.assign({}, p, { key: \"k\", x: \"1\" }));\r\nexport const b = _jsx(\"div\", Object.assign({}, p, { children: _jsx(\"i\", {}) }), \"k\");\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-spread-es5-auto-key",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c6172652076617220703a20616e793b0a6578706f727420636f6e73742061203d203c646976207b2e2e2e707d206b65793d226b2220783d223122202f3e3b0a6578706f727420636f6e73742062203d203c646976206b65793d226b22207b2e2e2e707d3e3c692f3e3c2f6469763e3b0a"
+    },
+    "id": "r-spread-es5-auto-key",
+    "options": {
+     "jsx": 4,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\n// @target: es2015\ndeclare var p: any;\nexport const a = <div {...p} key=\"k\" x=\"1\" />;\nexport const b = <div key=\"k\" {...p}><i/></div>;\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\nexport const a = React.createElement(\"div\", { ...{ __proto__: 1 } });\r\nexport const b = React.createElement(\"div\", { ['__proto__']: 1 });\r\nexport const c = React.createElement(\"div\", { __proto__ });\r\nexport const d = React.createElement(\"div\", { ...{ \"__proto__\": 2, x } });\r\ndeclare var __proto__: any, x: any;\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-proto-variants",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6578706f727420636f6e73742061203d203c646976207b2e2e2e7b5f5f70726f746f5f5f3a20317d7d202f3e3b0a6578706f727420636f6e73742062203d203c646976207b2e2e2e7b5b275f5f70726f746f5f5f275d3a20317d7d202f3e3b0a6578706f727420636f6e73742063203d203c646976207b2e2e2e7b5f5f70726f746f5f5f7d7d202f3e3b0a6578706f727420636f6e73742064203d203c646976207b2e2e2e7b225f5f70726f746f5f5f223a20322c20787d7d202f3e3b0a6465636c61726520766172205f5f70726f746f5f5f3a20616e792c20783a20616e793b0a"
+    },
+    "id": "r-proto-variants",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div {...{__proto__: 1}} />;\nexport const b = <div {...{['__proto__']: 1}} />;\nexport const c = <div {...{__proto__}} />;\nexport const d = <div {...{\"__proto__\": 2, x}} />;\ndeclare var __proto__: any, x: any;\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\nexport const a = React.createElement(\"div\", { __proto__: 1 });\r\nexport const b = React.createElement(\"div\", { ['__proto__']: 1 });\r\nexport const c = React.createElement(\"div\", { __proto__ });\r\ndeclare var __proto__: any;\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-proto-variants-es2017",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6578706f727420636f6e73742061203d203c646976207b2e2e2e7b5f5f70726f746f5f5f3a20317d7d202f3e3b0a6578706f727420636f6e73742062203d203c646976207b2e2e2e7b5b275f5f70726f746f5f5f275d3a20317d7d202f3e3b0a6578706f727420636f6e73742063203d203c646976207b2e2e2e7b5f5f70726f746f5f5f7d7d202f3e3b0a6465636c61726520766172205f5f70726f746f5f5f3a20616e793b0a"
+    },
+    "id": "r-proto-variants-es2017",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 4
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @target: es2017\n// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div {...{__proto__: 1}} />;\nexport const b = <div {...{['__proto__']: 1}} />;\nexport const c = <div {...{__proto__}} />;\ndeclare var __proto__: any;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\nexport const a = React.createElement(\"div\", { \\u0061b: \"1\", ä: \"2\", \"a-b-c\": \"3\" });\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-attr-name-unicode",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6578706f727420636f6e73742061203d203c646976205c7530303631623d22312220c3a43d22322220612d622d633d223322202f3e3b0a"
+    },
+    "id": "r-attr-name-unicode",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div \\u0061b=\"1\" ä=\"2\" a-b-c=\"3\" />;\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\nexport const a = React.createElement(\"div\", null, \"\\u00A0x y z\");\r\nexport const b = React.createElement(\"div\", null);\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-text-unicode-ws",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6578706f727420636f6e73742061203d203c6469763ec2a078c2a00ae3808079e280a87a3c2f6469763e3b0a6578706f727420636f6e73742062203d203c6469763e0ac2a00a3c2f6469763e3b0a"
+    },
+    "id": "r-text-unicode-ws",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div> x \n　y z</div>;\nexport const b = <div>\n \n</div>;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\nexport const a = React.createElement(\"div\", null, \"one two\");\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-text-crlf",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6578706f727420636f6e73742061203d203c6469763e0a20206f6e650a202074776f20200a3c2f6469763e3b0a"
+    },
+    "id": "r-text-crlf",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div>\r\n  one\r\n  two  \r\n</div>;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\nexport const a = React.createElement(\"div\", { x: \"1\" /* c2 */, ...p, y: /* c5 */ 2 }, /* c6 */ 3 /* c7 */);\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-comments-in-jsx",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6578706f727420636f6e73742061203d203c646976202f2a206331202a2f20783d223122202f2a206332202a2f207b2e2e2e2f2a206333202a2f707d202f2f2063340a20793d7b2f2a206335202a2f20327d3e7b2f2a206336202a2f2033202f2a206337202a2f7d3c2f6469763e3b0a"
+    },
+    "id": "r-comments-in-jsx",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div /* c1 */ x=\"1\" /* c2 */ {.../* c3 */p} // c4\n y={/* c5 */ 2}>{/* c6 */ 3 /* c7 */}</div>;\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { jsxs as _jsxs } from \"react/jsx-runtime\";\r\ndeclare var p: any;\r\nexport const a = _jsxs(\"div\", { x: \"1\", children: [/* c6 */ 3 /* c7 */, 4] });\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-auto-comments",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c6172652076617220703a20616e793b0a6578706f727420636f6e73742061203d203c646976202f2a206331202a2f20783d2231223e7b2f2a206336202a2f2033202f2a206337202a2f7d7b347d3c2f6469763e3b0a"
+    },
+    "id": "r-auto-comments",
+    "options": {
+     "jsx": 4,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\nexport const a = <div /* c1 */ x=\"1\">{/* c6 */ 3 /* c7 */}{4}</div>;\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\nexport function f2(x = React.createElement(\"i\", null)) { return x; }\r\nexport class K {\r\n    y = React.createElement(\"b\", null);\r\n    static z = React.createElement(\"u\", null);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-jsx-in-default-param-ts",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6578706f72742066756e6374696f6e2066322878203d203c69202f3e29207b2072657475726e20783b207d0a6578706f727420636c617373204b207b2079203d203c62202f3e3b20737461746963207a203d203c75202f3e3b207d0a"
+    },
+    "id": "r-jsx-in-default-param-ts",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport function f2(x = <i />) { return x; }\nexport class K { y = <b />; static z = <u />; }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { Fragment as _Fragment, jsx as _jsx } from \"solid-js/jsx-runtime\";\r\n/** @jsxImportSource solid-js */\r\nexport const a = _jsx(_Fragment, { children: _jsx(\"div\", {}) });\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-auto-import-source-pragma-overrides",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "2f2a2a20406a7378496d706f7274536f7572636520736f6c69642d6a73202a2f0a6578706f727420636f6e73742061203d203c3e3c646976202f3e3c2f3e3b0a"
+    },
+    "id": "r-auto-import-source-pragma-overrides",
+    "options": {
+     "jsx": 4,
+     "jsxImportSource": "preact",
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\n// @jsxImportSource: preact\n/** @jsxImportSource solid-js */\nexport const a = <><div /></>;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "import { createElement as _createElement } from \"preact\";\r\nexport const a = _createElement(\"div\", { ...p, key: \"k\" });\r\ndeclare var p: any;\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-auto-dev-import-source",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6578706f727420636f6e73742061203d203c646976207b2e2e2e707d206b65793d226b22202f3e3b0a6465636c6172652076617220703a20616e793b0a"
+    },
+    "id": "r-auto-dev-import-source",
+    "options": {
+     "jsx": 5,
+     "jsxImportSource": "preact",
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\n// @jsxImportSource: preact\nexport const a = <div {...p} key=\"k\" />;\ndeclare var p: any;\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\ndeclare var a: any;\r\nexport const x = React.createElement(a.b, null) - c /  > ;\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-classic-entity-member-tag",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6465636c6172652076617220613a20616e793b0a6578706f727420636f6e73742078203d203c612e622d63202f3e3b0a"
+    },
+    "id": "r-classic-entity-member-tag",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\ndeclare var a: any;\nexport const x = <a.b-c />;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx"
+       ],
+       "text": "declare var React: any;\r\ndeclare var p: any;\r\ndeclare function f(...a: any[]): any;\r\nexport const x = React.createElement(\"a:b\", { c: true });\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "r-classic-namespace-tag-entity",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a6465636c6172652076617220703a20616e793b0a6465636c6172652066756e6374696f6e2066282e2e2e613a20616e795b5d293a20616e793b0a6578706f727420636f6e73742078203d203c613a622e63202f3e3b0a"
+    },
+    "id": "r-classic-namespace-tag-entity",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const x = <a:b.c />;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare const _exported: 1;\r\nexport { _exported as \"foo-bar\" };\r\ndeclare const _exported_1: 2;\r\nexport { _exported_1 as \"0\" };\r\ndeclare const _exported_2: 3;\r\nexport { _exported_2 as \"type\" };\r\nexport declare var valid: 4;\r\ndeclare const _default: 5;\r\nexport default _default;\r\ndeclare namespace _ns {\r\n    export class K {\r\n        m(): K;\r\n    }\r\n}\r\nimport _exported_3 = _ns.K;\r\nexport { _exported_3 as \"x-y2\" };\r\nexport declare class Z {\r\n    a: number;\r\n}\r\ndeclare namespace _ns_1 {\r\n    export class Q {\r\n    }\r\n}\r\nimport _W = _ns_1.Q;\r\nexport { _W as W };\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "cjs-names",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "6578706f7274735b22666f6f2d626172225d203d20313b0a6578706f7274735b305d203d20323b0a6578706f7274735b2274797065225d203d20333b0a6578706f7274735b2276616c6964225d203d20343b0a6578706f7274732e64656661756c74203d20353b0a6578706f7274735b22782d7932225d203d20636c617373204b207b206d2829207b2072657475726e206e6577204b28293b207d207d3b0a6578706f7274732e5a203d20636c617373205a207b2061203d20313b207d3b0a6578706f7274732e5a203d20313b0a6578706f7274732e57203d20636c6173732051207b207d3b0a"
+    },
+    "id": "cjs-names",
+    "options": {
+     "allowJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexports[\"foo-bar\"] = 1;\nexports[0] = 2;\nexports[\"type\"] = 3;\nexports[\"valid\"] = 4;\nexports.default = 5;\nexports[\"x-y2\"] = class K { m() { return new K(); } };\nexports.Z = class Z { a = 1; };\nexports.Z = 1;\nexports.W = class Q { };\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export = Foo;\r\ndeclare class Foo {\r\n    clone(): Foo;\r\n}\r\ndeclare namespace Foo {\r\n    export var extra: 1;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "cjs-module-exports-selfref",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "6d6f64756c652e6578706f727473203d20636c61737320466f6f207b20636c6f6e652829207b2072657475726e206e657720466f6f28293b207d207d3b0a6d6f64756c652e6578706f7274732e6578747261203d20313b0a"
+    },
+    "id": "cjs-module-exports-selfref",
+    "options": {
+     "allowJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nmodule.exports = class Foo { clone() { return new Foo(); } };\nmodule.exports.extra = 1;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export = A;\r\nexport declare var helper: (x: any) => any;\r\ndeclare namespace _ns {\r\n    export class K2 {\r\n        m(): K2;\r\n    }\r\n}\r\nimport _K = _ns.K2;\r\nexport { _K as K };\r\ndeclare class A {\r\n    p: number;\r\n    constructor();\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "cjs-module-exports-members-class",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "636c6173732041207b20636f6e7374727563746f722829207b20746869732e70203d20313b207d207d0a6d6f64756c652e6578706f727473203d20413b0a6d6f64756c652e6578706f7274732e68656c706572203d2066756e6374696f6e20287829207b2072657475726e20783b207d3b0a6d6f64756c652e6578706f7274732e4b203d20636c617373204b32207b206d2829207b2072657475726e206e6577204b3228293b207d207d3b0a"
+    },
+    "id": "cjs-module-exports-members-class",
+    "options": {
+     "allowJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nclass A { constructor() { this.p = 1; } }\nmodule.exports = A;\nmodule.exports.helper = function (x) { return x; };\nmodule.exports.K = class K2 { m() { return new K2(); } };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare enum E {\r\n    A = Infinity,\r\n    B = -Infinity,\r\n    C = NaN,\r\n    D = -5,\r\n    E2 = 0,\r\n    F = 1e+21,\r\n    G = 0.1,\r\n    H = \"s\",\r\n    I = 9007199254740992\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-numbers",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f727420656e756d2045207b2041203d20312f302c2042203d202d312f302c2043203d20302f302c2044203d202d352c204532203d202d302c2046203d20316532312c2047203d20302e312c2048203d202273222c2049203d2032202a2a203533207d0a"
+    },
+    "id": "enum-numbers",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "export enum E { A = 1/0, B = -1/0, C = 0/0, D = -5, E2 = -0, F = 1e21, G = 0.1, H = \"s\", I = 2 ** 53 }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare namespace d.e {\r\n    namespace f {\r\n        const z = 1;\r\n    }\r\n}\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-dotted",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d65737061636520612e622e63207b206578706f727420636f6e73742078203d20313b20636f6e73742079203d20323b206578706f727420747970652054203d20747970656f6620793b207d0a6578706f7274206e616d65737061636520642e65207b206578706f7274206e616d6573706163652066207b206578706f727420636f6e7374207a203d20313b207d207d0a6578706f7274207b7d3b0a"
+    },
+    "id": "namespace-dotted",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace a.b.c { export const x = 1; const y = 2; export type T = typeof y; }\nexport namespace d.e { export namespace f { export const z = 1; } }\nexport {};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare function f(): void;\r\nexport declare namespace f {\r\n    var _a: number;\r\n    export { _a as default };\r\n    export var _b: number;\r\n    export { _b as class };\r\n    export var str: number;\r\n    export var _c: number;\r\n    export { _c as x };\r\n    export { x as y };\r\n}\r\ndeclare const x = 0;\r\nexport declare function g(): void;\r\nexport declare namespace g {\r\n    var y: () => number;\r\n    var z: () => number;\r\n}\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "expando-keywords",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f72742066756e6374696f6e20662829207b7d0a662e64656661756c74203d20313b0a662e636c617373203d20323b0a665b22737472225d203d20333b0a636f6e73742078203d20303b0a662e78203d20343b0a662e79203d20783b0a6578706f727420636f6e73742067203d2066756e6374696f6e2829207b7d3b0a672e79203d202829203d3e20313b0a672e7a203d20672e793b0a"
+    },
+    "id": "expando-keywords",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "export function f() {}\nf.default = 1;\nf.class = 2;\nf[\"str\"] = 3;\nconst x = 0;\nf.x = 4;\nf.y = x;\nexport const g = function() {};\ng.y = () => 1;\ng.z = g.y;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare class Base {\r\n}\r\ndeclare const default_base: {\r\n    new (...a: any[]): {\r\n        m: number;\r\n    };\r\n} & typeof Base;\r\nexport default class extends default_base {\r\n}\r\ndeclare const Named_base: {\r\n    new (...a: any[]): {\r\n        m: number;\r\n    };\r\n} & typeof Base;\r\nexport declare class Named extends Named_base implements I {\r\n}\r\ninterface I {\r\n}\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-extends-mixin-default",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e204d6978696e3c5420657874656e6473206e657720282e2e2e613a20616e795b5d29203d3e207b7d3e28623a205429207b2072657475726e20636c61737320657874656e64732062207b206d203d2031207d207d0a636c6173732042617365207b7d0a6578706f72742064656661756c7420636c61737320657874656e6473204d6978696e284261736529207b7d0a6578706f727420636c617373204e616d656420657874656e6473204d6978696e28426173652920696d706c656d656e74732049207b7d0a696e746572666163652049207b7d0a"
+    },
+    "id": "class-extends-mixin-default",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "function Mixin<T extends new (...a: any[]) => {}>(b: T) { return class extends b { m = 1 } }\nclass Base {}\nexport default class extends Mixin(Base) {}\nexport class Named extends Mixin(Base) implements I {}\ninterface I {}\n"
+  },
+  {
+   "diagnostics": 6,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare class A {\r\n    set x(this: A, v: number);\r\n    get y(this: A): number;\r\n    private set z(value);\r\n    private get w();\r\n    static set s(v: any);\r\n}\r\nexport declare class B {\r\n    set p(v: any);\r\n}\r\nexport interface C {\r\n    get g(): number;\r\n    set g(v: number);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessors-this",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f727420636c6173732041207b20736574207828746869733a20412c20763a206e756d62657229207b7d20676574207928746869733a204129207b2072657475726e2031207d207072697661746520736574207a28763a206e756d62657229207b7d20707269766174652067657420772829207b2072657475726e2031207d20737461746963207365742073287629207b7d207d0a6578706f727420636c6173732042207b207365742070287629207b7d207d0a6578706f727420696e746572666163652043207b20676574206728293a206e756d6265723b20736574206728763a206e756d626572293b207d0a"
+    },
+    "id": "accessors-this",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "export class A { set x(this: A, v: number) {} get y(this: A) { return 1 } private set z(v: number) {} private get w() { return 1 } static set s(v) {} }\nexport class B { set p(v) {} }\nexport interface C { get g(): number; set g(v: number); }\n"
+  },
+  {
+   "diagnostics": 9,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [
+        {
+         "code": 9017,
+         "end": 128,
+         "message": "Only const arrays can be inferred with --isolatedDeclarations.",
+         "pos": 119
+        },
+        {
+         "code": 9015,
+         "end": 153,
+         "message": "Objects that contain spread assignments can't be inferred with --isolatedDeclarations.",
+         "pos": 149
+        },
+        {
+         "code": 9016,
+         "end": 156,
+         "message": "Objects that contain shorthand properties can't be inferred with --isolatedDeclarations.",
+         "pos": 155
+        },
+        {
+         "code": 9007,
+         "end": 177,
+         "message": "Function must have an explicit return type annotation with --isolatedDeclarations.",
+         "pos": 176
+        },
+        {
+         "code": 9038,
+         "end": 208,
+         "message": "Computed property names on class or object literals cannot be inferred with --isolatedDeclarations.",
+         "pos": 205
+        },
+        {
+         "code": 9022,
+         "end": 278,
+         "message": "Inference from class expressions is not supported with --isolatedDeclarations.",
+         "pos": 273
+        },
+        {
+         "code": 9017,
+         "end": 308,
+         "message": "Only const arrays can be inferred with --isolatedDeclarations.",
+         "pos": 302
+        },
+        {
+         "code": 9010,
+         "end": 322,
+         "message": "Variable must have an explicit type annotation with --isolatedDeclarations.",
+         "pos": 321
+        },
+        {
+         "code": 9037,
+         "end": 352,
+         "message": "Default exports can't be inferred with --isolatedDeclarations.",
+         "pos": 347
+        }
+       ],
+       "text": "declare const k: string;\r\nexport declare const a: number[];\r\nexport declare const o: {\r\n    q: number;\r\n};\r\nexport declare function f(x?: number): void;\r\nexport declare class C {\r\n    [k]: number;\r\n    m(): number;\r\n    get g(): number;\r\n}\r\nexport declare const h: {\r\n    new (): {};\r\n};\r\nexport declare const arr: number[];\r\nexport declare let n: number;\r\ndeclare const _default: number;\r\nexport default _default;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "isolated-errors-mix",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e737420623a206e756d6265725b5d3b0a6465636c61726520636f6e737420733a206f626a6563743b0a6465636c61726520636f6e737420713a206e756d6265723b0a6465636c61726520636f6e7374206b3a20737472696e673b0a6578706f727420636f6e73742061203d205b312c202e2e2e625d3b0a6578706f727420636f6e7374206f203d207b202e2e2e732c2071207d3b0a6578706f72742066756e6374696f6e20662878203d203129207b7d0a6578706f727420636c6173732043207b205b6b5d203d20313b206d2829207b2072657475726e20313b207d2067657420672829207b2072657475726e20313b207d207d0a6578706f727420636f6e73742068203d20636c617373207b7d3b0a6578706f727420636f6e737420617272203d205b312c20325d3b0a6578706f7274206c6574206e203d2071202b20313b0a6578706f72742064656661756c742071202b20323b0a"
+    },
+    "id": "isolated-errors-mix",
+    "options": {
+     "declaration": true,
+     "isolatedDeclarations": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @isolatedDeclarations: true\n// @declaration: true\ndeclare const b: number[];\ndeclare const s: object;\ndeclare const q: number;\ndeclare const k: string;\nexport const a = [1, ...b];\nexport const o = { ...s, q };\nexport function f(x = 1) {}\nexport class C { [k] = 1; m() { return 1; } get g() { return 1; } }\nexport const h = class {};\nexport const arr = [1, 2];\nexport let n = q + 1;\nexport default q + 2;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "/**\r\n * @param {?number} a\r\n * @param {!string} b\r\n * @param {...number} c\r\n * @param {number=} d\r\n * @param {*} e\r\n * @param {?} f\r\n * @returns {Array.<string>}\r\n */\r\nexport declare function fn(a: number | null, b: string, d?: number | undefined, e: any, f: any | null, ...c: number[]): Array<string>;\r\n/** @type {{a: number, b?: string}} */\r\nexport declare const obj: {\r\n    a: number;\r\n    b?: string;\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "jsdoc-types-js",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "2f2a2a0a202a2040706172616d207b3f6e756d6265727d20610a202a2040706172616d207b21737472696e677d20620a202a2040706172616d207b2e2e2e6e756d6265727d20630a202a2040706172616d207b6e756d6265723d7d20640a202a2040706172616d207b2a7d20650a202a2040706172616d207b3f7d20660a202a204072657475726e73207b41727261792e3c737472696e673e7d0a202a2f0a6578706f72742066756e6374696f6e20666e28612c20622c20642c20652c20662c202e2e2e6329207b2072657475726e205b5d3b207d0a2f2a2a204074797065207b7b613a206e756d6265722c20623f3a20737472696e677d7d202a2f0a6578706f727420636f6e7374206f626a203d207b20613a2031207d3b0a"
+    },
+    "id": "jsdoc-types-js",
+    "options": {
+     "allowJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\n/**\n * @param {?number} a\n * @param {!string} b\n * @param {...number} c\n * @param {number=} d\n * @param {*} e\n * @param {?} f\n * @returns {Array.<string>}\n */\nexport function fn(a, b, d, e, f, ...c) { return []; }\n/** @type {{a: number, b?: string}} */\nexport const obj = { a: 1 };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [
+        {
+         "code": 4094,
+         "end": 14,
+         "message": "Property 'p' of exported anonymous class type may not be private or protected.",
+         "pos": 13
+        },
+        {
+         "code": 4094,
+         "end": 14,
+         "message": "Property 'q' of exported anonymous class type may not be private or protected.",
+         "pos": 13
+        },
+        {
+         "code": 4094,
+         "end": 78,
+         "message": "Property 'r' of exported anonymous class type may not be private or protected.",
+         "pos": 76
+        }
+       ],
+       "text": "export declare const x: {\r\n    new (): {\r\n        p: number;\r\n        q: number;\r\n    };\r\n};\r\nexport declare function mk(): {\r\n    new (): {\r\n        r: number;\r\n    };\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "private-in-anon-class",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f727420636f6e73742078203d20636c617373207b20707269766174652070203d20313b2070726f7465637465642071203d20323b207d3b0a6578706f72742066756e6374696f6e206d6b2829207b2072657475726e20636c617373207b20707269766174652072203d20313b207d3b207d0a"
+    },
+    "id": "private-in-anon-class",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "export const x = class { private p = 1; protected q = 2; };\nexport function mk() { return class { private r = 1; }; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare class Observable<T> {\r\n    v: T;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare module \"./a\" {\r\n    interface Observable<T> {\r\n        map(): number;\r\n    }\r\n}\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/map.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import { Observable } from \"./a\";\r\nimport \"./map\";\r\nexport declare const o: Observable<number>;\r\nexport declare const m: () => number;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "augmentation-nonlocal",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636c617373204f627365727661626c653c543e207b2076213a2054207d",
+     "/.src/map.ts": "696d706f7274207b204f627365727661626c65207d2066726f6d20222e2f61223b0a6465636c617265206d6f64756c6520222e2f6122207b20696e74657266616365204f627365727661626c653c543e207b206d617028293a206e756d626572207d207d",
+     "/.src/probe.ts": "696d706f7274207b204f627365727661626c65207d2066726f6d20222e2f61223b0a696d706f727420222e2f6d6170223b0a6578706f727420636f6e7374206f203d206e6577204f627365727661626c653c6e756d6265723e28293b0a6578706f727420636f6e7374206d203d206f2e6d61703b0a"
+    },
+    "id": "augmentation-nonlocal",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/a.ts",
+     "/.src/map.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport class Observable<T> { v!: T }\n// @filename: map.ts\nimport { Observable } from \"./a\";\ndeclare module \"./a\" { interface Observable<T> { map(): number } }\n// @filename: probe.ts\nimport { Observable } from \"./a\";\nimport \"./map\";\nexport const o = new Observable<number>();\nexport const m = o.map;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "interface Hidden {\r\n    a: number;\r\n}\r\nexport type T<U extends Hidden> = {\r\n    x: Hidden;\r\n    y: U;\r\n};\r\nexport type Fn = (h: Hidden) => Hidden;\r\nexport interface I extends Hidden {\r\n}\r\nexport declare class K<V extends Hidden> implements Hidden {\r\n    a: number;\r\n    m<W extends Hidden>(w: W): Hidden;\r\n}\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "type-alias-private",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "696e746572666163652048696464656e207b20613a206e756d626572207d0a6578706f7274207479706520543c5520657874656e64732048696464656e3e203d207b20783a2048696464656e3b20793a2055207d3b0a6578706f7274207479706520466e203d2028683a2048696464656e29203d3e2048696464656e3b0a6578706f727420696e74657266616365204920657874656e64732048696464656e207b7d0a6578706f727420636c617373204b3c5620657874656e64732048696464656e3e20696d706c656d656e74732048696464656e207b2061203d20313b206d3c5720657874656e64732048696464656e3e28773a2057293a2048696464656e207b2072657475726e20773b207d207d0a"
+    },
+    "id": "type-alias-private",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "interface Hidden { a: number }\nexport type T<U extends Hidden> = { x: Hidden; y: U };\nexport type Fn = (h: Hidden) => Hidden;\nexport interface I extends Hidden {}\nexport class K<V extends Hidden> implements Hidden { a = 1; m<W extends Hidden>(w: W): Hidden { return w; } }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare class Base {\r\n    get g(): number;\r\n    m(): void;\r\n}\r\nexport declare class D extends Base {\r\n    n: number;\r\n    constructor();\r\n}\r\nexport declare class E extends null {\r\n    x: number;\r\n    constructor();\r\n}\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "js-this-base-redundant",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "636c6173732042617365207b2067657420672829207b2072657475726e20313b207d206d2829207b7d207d0a6578706f727420636c617373204420657874656e64732042617365207b0a2020636f6e7374727563746f722829207b20737570657228293b20746869732e67203d20323b20746869732e6d203d202829203d3e207b7d3b20746869732e6e203d20333b207d0a7d0a6578706f727420636c617373204520657874656e6473206e756c6c207b20636f6e7374727563746f722829207b20746869732e78203d20313b207d207d0a"
+    },
+    "id": "js-this-base-redundant",
+    "options": {
+     "allowJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nclass Base { get g() { return 1; } m() {} }\nexport class D extends Base {\n  constructor() { super(); this.g = 2; this.m = () => {}; this.n = 3; }\n}\nexport class E extends null { constructor() { this.x = 1; } }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export type Hidden = {\r\n    a: number;\r\n};\r\nexport type Exported = {\r\n    h: Hidden;\r\n};\r\n/** @typedef {{ a: number }} Hidden */\r\n/** @typedef {{ h: Hidden }} Exported */\r\n/** @type {Exported} */\r\nexport declare const v: Exported;\r\nexport type Props = {\r\n    /**\r\n     * - the name\r\n     */\r\n    name: string;\r\n    /**\r\n     * the age\r\n     */\r\n    age?: number;\r\n};\r\n/**\r\n * @typedef {Object} Props\r\n * @property {string} name - the name\r\n * @property {number} [age] the age\r\n */\r\n/** @param {Props} p */\r\nexport declare function use(p: Props): void;\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "js-typedef-alias-private",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "2f2a2a204074797065646566207b7b20613a206e756d626572207d7d2048696464656e202a2f0a2f2a2a204074797065646566207b7b20683a2048696464656e207d7d204578706f72746564202a2f0a2f2a2a204074797065207b4578706f727465647d202a2f0a6578706f727420636f6e73742076203d207b20683a207b20613a2031207d207d3b0a2f2a2a0a202a204074797065646566207b4f626a6563747d2050726f70730a202a204070726f7065727479207b737472696e677d206e616d65202d20746865206e616d650a202a204070726f7065727479207b6e756d6265727d205b6167655d20746865206167650a202a2f0a2f2a2a2040706172616d207b50726f70737d2070202a2f0a6578706f72742066756e6374696f6e20757365287029207b7d0a"
+    },
+    "id": "js-typedef-alias-private",
+    "options": {
+     "allowJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\n/** @typedef {{ a: number }} Hidden */\n/** @typedef {{ h: Hidden }} Exported */\n/** @type {Exported} */\nexport const v = { h: { a: 1 } };\n/**\n * @typedef {Object} Props\n * @property {string} name - the name\n * @property {number} [age] the age\n */\n/** @param {Props} p */\nexport function use(p) {}\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

@@ -1,0 +1,54 @@
+{
+ "cases": [
+  {
+   "id": "this-default-export",
+   "name": "probe.ts",
+   "source": "export default { m() { return this; } };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "this-cjs",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nmodule.exports = { m() { return this; } };\nexports.x = { n() { return this; } };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "this-cjs2",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexports.x = { n() { return this; } };\nexports[\"y-z\"] = { n() { return this; } };\nObject.defineProperty(exports, \"w\", { value: { n() { return this; } } });\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "this-misc",
+   "name": "probe.ts",
+   "source": "export const a = { m() { return this; } }, b = { n() { return this; } };\nexport class C { p = { q() { return this; } }; static s = { r() { return this; } }; }\nexport function f() { return { m() { return this; } }; }\nexport const [d] = [{ m() { return this; } }];\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "unique-symbol-inaccessible",
+   "name": "probe.ts",
+   "source": "function mk() { const s: unique symbol = Symbol(); return { [s]: 1, s }; }\nexport const v = mk();\nexport class K { p = mk(); }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  }
+ ]
+}

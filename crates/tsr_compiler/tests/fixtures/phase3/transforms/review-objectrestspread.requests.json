@@ -1,0 +1,104 @@
+{
+ "cases": [
+  {
+   "id": "overload-nested",
+   "name": "probe.ts",
+   "source": "// @target: es2017\nfunction outer({ ...a }) {\n    class C { m({ ...r }, x = 1): void; m() { } }\n    function g({ ...q }, y = 2): void;\n    function g() { }\n    return [a, C, g];\n}\n",
+   "chains": [
+    [
+     "objectrestspread"
+    ]
+   ]
+  },
+  {
+   "id": "paren-forof",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare const xs: any[];\nlet a, r;\nfor (({ a, ...r }) of xs) { }\n",
+   "chains": [
+    [
+     "objectrestspread"
+    ]
+   ]
+  },
+  {
+   "id": "forof-objexpr",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare const a: any;\nfor (const { ...r } of { ...a }) { }\nfor (const { ...r } of ({ ...a })) { }\n",
+   "chains": [
+    [
+     "objectrestspread"
+    ]
+   ]
+  },
+  {
+   "id": "arrow-concise-temp",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare const o: any;\nlet a, r;\nconst f = (p) => ({ a, ...r } = p);\n",
+   "chains": [
+    [
+     "objectrestspread"
+    ]
+   ]
+  },
+  {
+   "id": "param-property",
+   "name": "probe.ts",
+   "source": "// @target: es2017\nclass C {\n    constructor({ ...r }, public x = 1, private readonly y?: number) { }\n}\n",
+   "chains": [
+    [
+     "objectrestspread"
+    ]
+   ]
+  },
+  {
+   "id": "param-init-temp",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare const o: any;\nlet a, r;\nfunction f(p = ({ a, ...r } = o)) { return p; }\nfunction g({ ...q }, p = ({ a, ...r } = o)) { return p; }\n",
+   "chains": [
+    [
+     "objectrestspread"
+    ]
+   ]
+  },
+  {
+   "id": "forof-nonblock-expr",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare const xs: any[];\nlet s;\nfor (const { ...r } of xs) ({ ...s } = r);\n",
+   "chains": [
+    [
+     "objectrestspread"
+    ]
+   ]
+  },
+  {
+   "id": "strict-arrow-overload",
+   "name": "probe.ts",
+   "source": "// @target: es2017\nfunction outer({ ...a }) {\n    abstract class A { abstract m({ ...r }): void; }\n    return A;\n}\n",
+   "chains": [
+    [
+     "objectrestspread"
+    ]
+   ]
+  },
+  {
+   "id": "catch-nested",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ntry { } catch ({ a: { ...b }, ...c }) { }\n",
+   "chains": [
+    [
+     "objectrestspread"
+    ]
+   ]
+  },
+  {
+   "id": "export-fn-in-init",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare const o: any;\nexport const f = function () { const { ...r } = o; return r; }, { ...g } = o;\n",
+   "chains": [
+    [
+     "objectrestspread"
+    ]
+   ]
+  }
+ ]
+}

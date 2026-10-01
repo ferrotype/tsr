@@ -1,0 +1,915 @@
+{
+ "cases": [
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\nvar __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    let _classSuper = Base;\r\n    var C = class extends _classSuper {\r\n        static { _classThis = this; }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(_classSuper[Symbol.metadata] ?? null) : void 0;\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            C = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        static a = (() => {\r\n            var _a, _b;\r\n            return Reflect.set(_classSuper, \"x\", (_b = Reflect.get(_classSuper, \"x\", _classThis), _a = _b++, _b), _classThis), _a;\r\n        })();\r\n        static b = (() => {\r\n            var _a, _b;\r\n            return Reflect.set(_classSuper, _a = k(), _b = Reflect.get(_classSuper, _a, _classThis) + 1, _classThis), _b;\r\n        })();\r\n        static c = (() => {\r\n            var _a, _b;\r\n            return Reflect.set(_classSuper, \"x\", (_b = Reflect.get(_classSuper, \"x\", _classThis), _a = _b++, _b), _classThis), _a;\r\n        })();\r\n        static d = (() => {\r\n            var _a;\r\n            return Reflect.set(_classSuper, 0, _a = Reflect.get(_classSuper, 0, _classThis) + 1, _classThis), _a;\r\n        })();\r\n        static {\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return C = _classThis;\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-static-field-super-temps",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a4064656320636c617373204320657874656e64732042617365207b207374617469632061203d2073757065722e782b2b3b207374617469632062203d2073757065725b6b28295d202b3d20313b207374617469632063203d202873757065722e78292b2b3b207374617469632064203d2073757065725b305d202b3d20313b207d0a"
+    },
+    "id": "r-static-field-super-temps",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C extends Base { static a = super.x++; static b = super[k()] += 1; static c = (super.x)++; static d = super[0] += 1; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nvar __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    let _instanceExtraInitializers = [];\r\n    let _member_decorators;\r\n    let _member_decorators_1;\r\n    let _member_initializers = [];\r\n    let _member_extraInitializers = [];\r\n    return class C {\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            _member_decorators = [dec];\r\n            _member_decorators_1 = [dec];\r\n            __esDecorate(this, null, _member_decorators, { kind: \"method\", name: `t`, static: false, private: false, access: { has: obj => `t` in obj, get: obj => obj[`t`] }, metadata: _metadata }, null, _instanceExtraInitializers);\r\n            __esDecorate(null, null, _member_decorators_1, { kind: \"field\", name: `u`, static: false, private: false, access: { has: obj => `u` in obj, get: obj => obj[`u`], set: (obj, value) => { obj[`u`] = value; } }, metadata: _metadata }, _member_initializers, _member_extraInitializers);\r\n            if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        [`t`]() { }\r\n        [`u`] = (__runInitializers(this, _instanceExtraInitializers), __runInitializers(this, _member_initializers, 1));\r\n        constructor() {\r\n            __runInitializers(this, _member_extraInitializers);\r\n        }\r\n    };\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-template-computed",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a636c6173732043207b2040646563205b6074605d2829207b7d2040646563205b6075605d203d20313b207d0a"
+    },
+    "id": "r-template-computed",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C { @dec [`t`]() {} @dec [`u`] = 1; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nvar __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\nvar __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nexport default (() => {\r\n    let _instanceExtraInitializers = [];\r\n    let _m_decorators;\r\n    return class {\r\n        static { __setFunctionName(this, \"default\"); }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            _m_decorators = [dec];\r\n            __esDecorate(this, null, _m_decorators, { kind: \"method\", name: \"m\", static: false, private: false, access: { has: obj => \"m\" in obj, get: obj => obj.m }, metadata: _metadata }, null, _instanceExtraInitializers);\r\n            if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        m() { }\r\n        constructor() {\r\n            __runInitializers(this, _instanceExtraInitializers);\r\n        }\r\n    };\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-export-default-member-only",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a6578706f72742064656661756c7420636c617373207b2040646563206d2829207b7d207d0a"
+    },
+    "id": "r-export-default-member-only",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nexport default class { @dec m() {} }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nvar __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    let _instanceExtraInitializers = [];\r\n    let _m_decorators;\r\n    return class C {\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            _m_decorators = [dec];\r\n            __esDecorate(this, null, _m_decorators, { kind: \"method\", name: \"m\", static: false, private: false, access: { has: obj => \"m\" in obj, get: obj => obj.m }, metadata: _metadata }, null, _instanceExtraInitializers);\r\n            if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        m() { }\r\n        static y = 1;\r\n        constructor() {\r\n            __runInitializers(this, _instanceExtraInitializers);\r\n        }\r\n    };\r\n})();\r\nexport { C };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-export-member-only",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a6578706f727420636c6173732043207b2040646563206d2829207b7d207374617469632079203d20313b207d0a"
+    },
+    "id": "r-export-member-only",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nexport class C { @dec m() {} static y = 1; }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "declare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nclass C {\r\n    constructor(p) { }\r\n}\r\nx(class {\r\n    constructor(p) { }\r\n});\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-ctor-param-decorated",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a636c6173732043207b20636f6e7374727563746f72284064656320703a20616e7929207b7d207d0a7828636c617373207b20636f6e7374727563746f72284064656320703a20616e7929207b7d207d293b0a"
+    },
+    "id": "r-ctor-param-decorated",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C { constructor(@dec p: any) {} }\nx(class { constructor(@dec p: any) {} });\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nvar __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\nvar __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\nvar __propKey = (this && this.__propKey) || function (x) {\r\n    return typeof x === \"symbol\" ? x : \"\".concat(x);\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    var _a;\r\n    let _instanceExtraInitializers = [];\r\n    let _member_decorators;\r\n    return class C {\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            __esDecorate(this, null, _member_decorators, { kind: \"method\", name: _a, static: false, private: false, access: { has: obj => _a in obj, get: obj => obj[_a] }, metadata: _metadata }, null, _instanceExtraInitializers);\r\n            if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        [(_member_decorators = [dec], _a = __propKey(((() => {\r\n            let _classDecorators = [dec];\r\n            let _classDescriptor;\r\n            let _classExtraInitializers = [];\r\n            let _classThis;\r\n            var class_1 = class {\r\n                static { _classThis = this; }\r\n                static { __setFunctionName(_classThis, \"\"); }\r\n                static {\r\n                    const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n                    __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n                    class_1 = _classThis = _classDescriptor.value;\r\n                    if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n                    __runInitializers(_classThis, _classExtraInitializers);\r\n                }\r\n            };\r\n            return class_1 = _classThis;\r\n        })(), k)))]() { }\r\n        constructor() {\r\n            __runInitializers(this, _instanceExtraInitializers);\r\n        }\r\n    };\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-computed-name-class",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a636c6173732043207b2040646563205b284064656320636c617373207b7d2c206b295d2829207b7d207d0a"
+    },
+    "id": "r-computed-name-class",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C { @dec [(@dec class {}, k)]() {} }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nvar __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\nvar __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    let _instanceExtraInitializers = [];\r\n    let _é_decorators;\r\n    let _ab_decorators;\r\n    let _private_é_decorators;\r\n    let _private_é_descriptor;\r\n    let _member_decorators;\r\n    let _member_initializers = [];\r\n    let _member_extraInitializers = [];\r\n    return class C {\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            _é_decorators = [dec];\r\n            _ab_decorators = [dec];\r\n            _private_é_decorators = [dec];\r\n            _member_decorators = [dec];\r\n            __esDecorate(this, null, _é_decorators, { kind: \"method\", name: \"é\", static: false, private: false, access: { has: obj => \"é\" in obj, get: obj => obj[\"é\"] }, metadata: _metadata }, null, _instanceExtraInitializers);\r\n            __esDecorate(this, null, _ab_decorators, { kind: \"method\", name: \"\\u0061b\", static: false, private: false, access: { has: obj => \"\\u0061b\" in obj, get: obj => obj[\"\\u0061b\"] }, metadata: _metadata }, null, _instanceExtraInitializers);\r\n            __esDecorate(this, _private_é_descriptor = { value: __setFunctionName(function () { }, \"#\\u00E9\") }, _private_é_decorators, { kind: \"method\", name: \"#\\u00E9\", static: false, private: true, access: { has: obj => #é in obj, get: obj => obj.#é }, metadata: _metadata }, null, _instanceExtraInitializers);\r\n            __esDecorate(null, null, _member_decorators, { kind: \"field\", name: \"1a\", static: false, private: false, access: { has: obj => \"1a\" in obj, get: obj => obj[\"1a\"], set: (obj, value) => { obj[\"1a\"] = value; } }, metadata: _metadata }, _member_initializers, _member_extraInitializers);\r\n            if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        \"é\"() { }\r\n        \"\\u0061b\"() { }\r\n        get #é() { return _private_é_descriptor.value; }\r\n        \"1a\" = (__runInitializers(this, _instanceExtraInitializers), __runInitializers(this, _member_initializers, 1));\r\n        constructor() {\r\n            __runInitializers(this, _member_extraInitializers);\r\n        }\r\n    };\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-unicode-names",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a636c6173732043207b20406465632022c3a9222829207b7d204064656320225c753030363162222829207b7d20406465632023c3a92829207b7d20406465632022316122203d20313b207d0a"
+    },
+    "id": "r-unicode-names",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C { @dec \"é\"() {} @dec \"\\u0061b\"() {} @dec #é() {} @dec \"1a\" = 1; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\nvar __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nvar __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nfor (let c = (() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    var class_1 = class {\r\n        static { _classThis = this; }\r\n        static { __setFunctionName(_classThis, \"c\"); }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            class_1 = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return class_1 = _classThis;\r\n})(); x;) { }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-for-init-class",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a666f7220286c65742063203d204064656320636c617373207b7d3b20783b29207b7d0a"
+    },
+    "id": "r-for-init-class",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nfor (let c = @dec class {}; x;) {}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nvar __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    var _a, _b, _c, _d;\r\n    let _instanceExtraInitializers = [];\r\n    let _m_decorators;\r\n    let _n_decorators;\r\n    let _p_decorators;\r\n    let _q_decorators;\r\n    return class C {\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            _m_decorators = [(_a = (o)).a.bind(_a)];\r\n            _n_decorators = [(_b = (o as any)).b.bind(_b)];\r\n            _p_decorators = [(_c = o.a).b.bind(_c)];\r\n            _q_decorators = [(_d = o).a.bind(_d)];\r\n            __esDecorate(this, null, _m_decorators, { kind: \"method\", name: \"m\", static: false, private: false, access: { has: obj => \"m\" in obj, get: obj => obj.m }, metadata: _metadata }, null, _instanceExtraInitializers);\r\n            __esDecorate(this, null, _n_decorators, { kind: \"method\", name: \"n\", static: false, private: false, access: { has: obj => \"n\" in obj, get: obj => obj.n }, metadata: _metadata }, null, _instanceExtraInitializers);\r\n            __esDecorate(this, null, _p_decorators, { kind: \"method\", name: \"p\", static: false, private: false, access: { has: obj => \"p\" in obj, get: obj => obj.p }, metadata: _metadata }, null, _instanceExtraInitializers);\r\n            __esDecorate(this, null, _q_decorators, { kind: \"method\", name: \"q\", static: false, private: false, access: { has: obj => \"q\" in obj, get: obj => obj.q }, metadata: _metadata }, null, _instanceExtraInitializers);\r\n            if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        m() { }\r\n        n() { }\r\n        p() { }\r\n        q() { }\r\n        constructor() {\r\n            __runInitializers(this, _instanceExtraInitializers);\r\n        }\r\n    };\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-decorator-receivers",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a636c6173732043207b2040286f292e61206d2829207b7d2040286f20617320616e79292e62206e2829207b7d20406f2e612e6220702829207b7d20406f3f2e6120712829207b7d207d0a"
+    },
+    "id": "r-decorator-receivers",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C { @(o).a m() {} @(o as any).b n() {} @o.a.b p() {} @o?.a q() {} }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\nvar __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    let _classSuper = Base;\r\n    var C = class extends _classSuper {\r\n        static { _classThis = this; }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(_classSuper[Symbol.metadata] ?? null) : void 0;\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            C = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        static f = () => Reflect.get(_classSuper, \"x\", _classThis);\r\n        static g = () => Reflect.get(_classSuper, \"m\", _classThis).call(_classThis);\r\n        static h = function () { return super.x; };\r\n        static {\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return C = _classThis;\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-static-arrow-super",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a4064656320636c617373204320657874656e64732042617365207b207374617469632066203d202829203d3e2073757065722e783b207374617469632067203d202829203d3e2073757065722e6d28293b207374617469632068203d2066756e6374696f6e202829207b2072657475726e2073757065722e783b207d3b207d0a"
+    },
+    "id": "r-static-arrow-super",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C extends Base { static f = () => super.x; static g = () => super.m(); static h = function () { return super.x; }; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nvar __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    var C = class {\r\n        static { _classThis = this; }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            C = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        static { let D = (() => {\r\n            let _outerThis = this;\r\n            let _instanceExtraInitializers = [];\r\n            let _m_decorators;\r\n            return class D {\r\n                static {\r\n                    const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n                    _m_decorators = [dec(_outerThis)];\r\n                    __esDecorate(this, null, _m_decorators, { kind: \"method\", name: \"m\", static: false, private: false, access: { has: obj => \"m\" in obj, get: obj => obj.m }, metadata: _metadata }, null, _instanceExtraInitializers);\r\n                    if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n                }\r\n                m() { }\r\n                constructor() {\r\n                    __runInitializers(this, _instanceExtraInitializers);\r\n                }\r\n            };\r\n        })(); }\r\n        static {\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return C = _classThis;\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-nested-class-in-static-block",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a4064656320636c6173732043207b20737461746963207b20636c6173732044207b2040646563287468697329206d2829207b7d207d207d207d0a"
+    },
+    "id": "r-nested-class-in-static-block",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C { static { class D { @dec(this) m() {} } } }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\nvar __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    let _classSuper = Base;\r\n    var C = class extends _classSuper {\r\n        static { _classThis = this; }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(_classSuper[Symbol.metadata] ?? null) : void 0;\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            C = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        static a = Reflect.get(_classSuper, \"m\", _classThis).call(_classThis);\r\n        static b = Reflect.get(_classSuper, k, _classThis).call(_classThis, 1);\r\n        static {\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return C = _classThis;\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-super-optional-call",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a4064656320636c617373204320657874656e64732042617365207b207374617469632061203d2073757065722e6d3f2e28293b207374617469632062203d2073757065725b6b5d3f2e2831293b207d0a"
+    },
+    "id": "r-super-optional-call",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C extends Base { static a = super.m?.(); static b = super[k]?.(1); }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nvar __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\nvar __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    let _staticExtraInitializers = [];\r\n    let _static_private_get_x_decorators;\r\n    let _static_private_get_x_descriptor;\r\n    let _static_private_set_x_decorators;\r\n    let _static_private_set_x_descriptor;\r\n    var C = class {\r\n        static { _classThis = this; }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            _static_private_get_x_decorators = [dec];\r\n            _static_private_set_x_decorators = [dec];\r\n            __esDecorate(this, _static_private_get_x_descriptor = { get: __setFunctionName(function () { return 1; }, \"#x\", \"get\") }, _static_private_get_x_decorators, { kind: \"getter\", name: \"#x\", static: true, private: true, access: { has: obj => #x in obj, get: obj => obj.#x }, metadata: _metadata }, null, _staticExtraInitializers);\r\n            __esDecorate(this, _static_private_set_x_descriptor = { set: __setFunctionName(function (v) { }, \"#x\", \"set\") }, _static_private_set_x_decorators, { kind: \"setter\", name: \"#x\", static: true, private: true, access: { has: obj => #x in obj, set: (obj, value) => { obj.#x = value; } }, metadata: _metadata }, null, _staticExtraInitializers);\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            C = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        static get #x() { return _static_private_get_x_descriptor.get.call(this); }\r\n        static set #x(value) { return _static_private_set_x_descriptor.set.call(this, value); }\r\n        static z = (__runInitializers(_classThis, _staticExtraInitializers), 1);\r\n        static {\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return C = _classThis;\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-private-static-accessor-pair",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a4064656320636c6173732043207b204064656320737461746963206765742023782829207b2072657475726e20313b207d20406465632073746174696320736574202378287629207b7d20737461746963207a203d20313b207d0a"
+    },
+    "id": "r-private-static-accessor-pair",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C { @dec static get #x() { return 1; } @dec static set #x(v) {} static z = 1; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nvar __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    let _classSuper = Base;\r\n    let _staticExtraInitializers = [];\r\n    let _static_m_decorators;\r\n    var C = class extends _classSuper {\r\n        static { _classThis = this; }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(_classSuper[Symbol.metadata] ?? null) : void 0;\r\n            _static_m_decorators = [dec];\r\n            __esDecorate(this, null, _static_m_decorators, { kind: \"method\", name: \"m\", static: true, private: false, access: { has: obj => \"m\" in obj, get: obj => obj.m }, metadata: _metadata }, null, _staticExtraInitializers);\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            C = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        static m() { }\r\n        static {\r\n            __runInitializers(_classThis, _staticExtraInitializers);\r\n        }\r\n        static { var _a; var y = (Reflect.set(_classSuper, \"x\", _a = Reflect.get(_classSuper, \"x\", _classThis) + 1, _classThis), _a); }\r\n        static {\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return C = _classThis;\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-static-block-var-and-pending",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a4064656320636c617373204320657874656e64732042617365207b204064656320737461746963206d2829207b7d20737461746963207b207661722079203d2073757065722e78202b3d20313b207d207d0a"
+    },
+    "id": "r-static-block-var-and-pending",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C extends Base { @dec static m() {} static { var y = super.x += 1; } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nvar __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    let _classSuper = Base;\r\n    let _instanceExtraInitializers = [];\r\n    let _m_decorators;\r\n    return class C extends _classSuper {\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(_classSuper[Symbol.metadata] ?? null) : void 0;\r\n            _m_decorators = [dec];\r\n            __esDecorate(this, null, _m_decorators, { kind: \"method\", name: \"m\", static: false, private: false, access: { has: obj => \"m\" in obj, get: obj => obj.m }, metadata: _metadata }, null, _instanceExtraInitializers);\r\n            if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        constructor() {\r\n            __runInitializers(this, _instanceExtraInitializers);\r\n            if (x) {\r\n                super();\r\n            }\r\n            else {\r\n                super();\r\n            }\r\n        }\r\n        m() { }\r\n    };\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-ctor-super-nested",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a636c617373204320657874656e64732042617365207b20636f6e7374727563746f722829207b20696620287829207b20737570657228293b207d20656c7365207b20737570657228293b207d207d2040646563206d2829207b7d207d0a"
+    },
+    "id": "r-ctor-super-nested",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C extends Base { constructor() { if (x) { super(); } else { super(); } } @dec m() {} }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\nvar __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nvar __propKey = (this && this.__propKey) || function (x) {\r\n    return typeof x === \"symbol\" ? x : \"\".concat(x);\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    var _a, _b;\r\n    let _static_member_decorators;\r\n    let _static_member_initializers = [];\r\n    let _static_member_extraInitializers = [];\r\n    let _member_decorators;\r\n    let _member_initializers = [];\r\n    let _member_extraInitializers = [];\r\n    return class C {\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            __esDecorate(this, null, _static_member_decorators, { kind: \"accessor\", name: _b, static: true, private: false, access: { has: obj => _b in obj, get: obj => obj[_b], set: (obj, value) => { obj[_b] = value; } }, metadata: _metadata }, _static_member_initializers, _static_member_extraInitializers);\r\n            __esDecorate(this, null, _member_decorators, { kind: \"accessor\", name: _a, static: false, private: false, access: { has: obj => _a in obj, get: obj => obj[_a], set: (obj, value) => { obj[_a] = value; } }, metadata: _metadata }, _member_initializers, _member_extraInitializers);\r\n            if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        accessor [(_member_decorators = [dec], _a = __propKey(k()))] = __runInitializers(this, _member_initializers, 1);\r\n        static accessor [(_static_member_decorators = [dec], _b = __propKey(x))] = __runInitializers(this, _static_member_initializers, 2);\r\n        constructor() {\r\n            __runInitializers(this, _member_extraInitializers);\r\n        }\r\n        static {\r\n            __runInitializers(this, _static_member_extraInitializers);\r\n        }\r\n    };\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-accessor-public-computed",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a636c6173732043207b2040646563206163636573736f72205b6b28295d203d20313b204064656320737461746963206163636573736f72205b785d203d20323b207d0a"
+    },
+    "id": "r-accessor-public-computed",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C { @dec accessor [k()] = 1; @dec static accessor [x] = 2; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\nvar __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nvar __setFunctionName = (this && this.__setFunctionName) || function (f, name, prefix) {\r\n    if (typeof name === \"symbol\") name = name.description ? \"[\".concat(name.description, \"]\") : \"\";\r\n    return Object.defineProperty(f, \"name\", { configurable: true, value: prefix ? \"\".concat(prefix, \" \", name) : name });\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet y;\r\ny ??= (() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    var class_1 = class {\r\n        static { _classThis = this; }\r\n        static { __setFunctionName(_classThis, \"y\"); }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            class_1 = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return class_1 = _classThis;\r\n})();\r\ny &&= (() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    var class_2 = class {\r\n        static { _classThis = this; }\r\n        static { __setFunctionName(_classThis, \"y\"); }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            class_2 = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return class_2 = _classThis;\r\n})();\r\ny += ((() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    var class_3 = class {\r\n        static { _classThis = this; }\r\n        static { __setFunctionName(_classThis, \"\"); }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            class_3 = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return class_3 = _classThis;\r\n})()) as any;\r\nconst z = ((() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    var class_4 = class {\r\n        static { _classThis = this; }\r\n        static { __setFunctionName(_classThis, \"z\"); }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            class_4 = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return class_4 = _classThis;\r\n})());\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-named-eval-shapes",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a6c657420793b2079203f3f3d204064656320636c617373207b7d3b20792026263d204064656320636c617373207b7d3b2079202b3d20284064656320636c617373207b7d2920617320616e793b20636f6e7374207a203d20284064656320636c617373207b7d293b0a"
+    },
+    "id": "r-named-eval-shapes",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nlet y; y ??= @dec class {}; y &&= @dec class {}; y += (@dec class {}) as any; const z = (@dec class {});\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nvar __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    let _outerThis = this;\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    let _staticExtraInitializers = [];\r\n    let _static_x_decorators;\r\n    let _static_x_initializers = [];\r\n    let _static_x_extraInitializers = [];\r\n    let _static_m_decorators;\r\n    var C = class {\r\n        static { _classThis = this; }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            _static_x_decorators = [dec(_outerThis)];\r\n            _static_m_decorators = [dec(_outerThis)];\r\n            __esDecorate(this, null, _static_m_decorators, { kind: \"method\", name: \"m\", static: true, private: false, access: { has: obj => \"m\" in obj, get: obj => obj.m }, metadata: _metadata }, null, _staticExtraInitializers);\r\n            __esDecorate(null, null, _static_x_decorators, { kind: \"field\", name: \"x\", static: true, private: false, access: { has: obj => \"x\" in obj, get: obj => obj.x, set: (obj, value) => { obj.x = value; } }, metadata: _metadata }, _static_x_initializers, _static_x_extraInitializers);\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            C = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        static x = (__runInitializers(_classThis, _staticExtraInitializers), __runInitializers(_classThis, _static_x_initializers, 1));\r\n        static m() { }\r\n        static {\r\n            __runInitializers(_classThis, _static_x_extraInitializers);\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return C = _classThis;\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-this-in-static-member-decorator",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a4064656320636c6173732043207b2040646563287468697329207374617469632078203d20313b204064656328746869732920737461746963206d2829207b7d207d0a"
+    },
+    "id": "r-this-in-static-member-decorator",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C { @dec(this) static x = 1; @dec(this) static m() {} }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\nvar __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    let _classSuper = (null as any);\r\n    let _instanceExtraInitializers = [];\r\n    let _m_decorators;\r\n    return class C extends _classSuper {\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(_classSuper[Symbol.metadata] ?? null) : void 0;\r\n            _m_decorators = [dec];\r\n            __esDecorate(this, null, _m_decorators, { kind: \"method\", name: \"m\", static: false, private: false, access: { has: obj => \"m\" in obj, get: obj => obj.m }, metadata: _metadata }, null, _instanceExtraInitializers);\r\n            if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        m() { }\r\n        constructor() {\r\n            __runInitializers(this, _instanceExtraInitializers);\r\n        }\r\n    };\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r-method-extra-init-without-ctor-derived-null",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a636c617373204320657874656e647320286e756c6c20617320616e7929207b2040646563206d2829207b7d207d0a"
+    },
+    "id": "r-method-extra-init-without-ctor-derived-null",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C extends (null as any) { @dec m() {} }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\nvar __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    var C = class {\r\n        static { _classThis = this; }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(null) : void 0;\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            C = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        static x = class {\r\n            [_classThis.k]() { }\r\n        };\r\n        static {\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return C = _classThis;\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r2-name-grandparent-this",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a4064656320636c6173732043207b207374617469632078203d20636c617373207b205b746869732e6b5d2829207b7d207d3b207d0a"
+    },
+    "id": "r2-name-grandparent-this",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C { static x = class { [this.k]() {} }; }\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\nvar __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\ndeclare function dec(...args: any[]): any;\r\ndeclare let o: any, arr: any, k: any, x: any, a: any, b: any;\r\ndeclare class Base {\r\n    static x: any;\r\n    static y: any;\r\n    static d: any;\r\n    static m(): any;\r\n}\r\nlet C = (() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    let _classSuper = Base;\r\n    var C = class extends _classSuper {\r\n        static { _classThis = this; }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(_classSuper[Symbol.metadata] ?? null) : void 0;\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            C = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        static x = class {\r\n            [Reflect.get(_classSuper, \"y\", _classThis)]() { }\r\n        };\r\n        static { class D {\r\n            [_classThis.k] = 1;\r\n        } }\r\n        static {\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return C = _classThis;\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "r2-name-grandparent-super",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b206465636c617265206c6574206f3a20616e792c206172723a20616e792c206b3a20616e792c20783a20616e792c20613a20616e792c20623a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b2073746174696320793a20616e793b2073746174696320643a20616e793b20737461746963206d28293a20616e793b207d0a4064656320636c617373204320657874656e64732042617365207b207374617469632078203d20636c617373207b205b73757065722e795d2829207b7d207d3b20737461746963207b20636c6173732044207b205b746869732e6b5d203d20313b207d207d207d0a"
+    },
+    "id": "r2-name-grandparent-super",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C extends Base { static x = class { [super.y]() {} }; static { class D { [this.k] = 1; } } }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\nvar __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\ndeclare function dec(...a: any[]): any;\r\ndeclare let k: any;\r\ndeclare class Base {\r\n    static x: any;\r\n}\r\nlet C = (() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    let _classSuper = Base;\r\n    var C = class extends _classSuper {\r\n        static { _classThis = this; }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(_classSuper[Symbol.metadata] ?? null) : void 0;\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            C = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        static a = (() => {\r\n            var _a, _b;\r\n            return Reflect.set(_classSuper, \"x\", (_b = Reflect.get(_classSuper, \"x\", _classThis), _a = _b++, _b), _classThis), _a;\r\n        })();\r\n        static b = (() => {\r\n            var _a, _b;\r\n            return Reflect.set(_classSuper, _a = k(), _b = Reflect.get(_classSuper, _a, _classThis) + 1, _classThis), _b;\r\n        })();\r\n        static {\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return C = _classThis;\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "finding-b4-static-field-super-temps",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e613a20616e795b5d293a20616e793b206465636c617265206c6574206b3a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320783a20616e793b207d0a4064656320636c617373204320657874656e64732042617365207b207374617469632061203d2073757065722e782b2b3b207374617469632062203d2073757065725b6b28295d202b3d20313b207d0a"
+    },
+    "id": "finding-b4-static-field-super-temps",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...a: any[]): any; declare let k: any;\ndeclare class Base { static x: any; }\n@dec class C extends Base { static a = super.x++; static b = super[k()] += 1; }\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esdecorator"
+       ],
+       "text": "var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {\r\n    function accept(f) { if (f !== void 0 && typeof f !== \"function\") throw new TypeError(\"Function expected\"); return f; }\r\n    var kind = contextIn.kind, key = kind === \"getter\" ? \"get\" : kind === \"setter\" ? \"set\" : \"value\";\r\n    var target = !descriptorIn && ctor ? contextIn[\"static\"] ? ctor : ctor.prototype : null;\r\n    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});\r\n    var _, done = false;\r\n    for (var i = decorators.length - 1; i >= 0; i--) {\r\n        var context = {};\r\n        for (var p in contextIn) context[p] = p === \"access\" ? {} : contextIn[p];\r\n        for (var p in contextIn.access) context.access[p] = contextIn.access[p];\r\n        context.addInitializer = function (f) { if (done) throw new TypeError(\"Cannot add initializers after decoration has completed\"); extraInitializers.push(accept(f || null)); };\r\n        var result = (0, decorators[i])(kind === \"accessor\" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);\r\n        if (kind === \"accessor\") {\r\n            if (result === void 0) continue;\r\n            if (result === null || typeof result !== \"object\") throw new TypeError(\"Object expected\");\r\n            if (_ = accept(result.get)) descriptor.get = _;\r\n            if (_ = accept(result.set)) descriptor.set = _;\r\n            if (_ = accept(result.init)) initializers.unshift(_);\r\n        }\r\n        else if (_ = accept(result)) {\r\n            if (kind === \"field\") initializers.unshift(_);\r\n            else descriptor[key] = _;\r\n        }\r\n    }\r\n    if (target) Object.defineProperty(target, contextIn.name, descriptor);\r\n    done = true;\r\n};\r\nvar __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {\r\n    var useValue = arguments.length > 2;\r\n    for (var i = 0; i < initializers.length; i++) {\r\n        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);\r\n    }\r\n    return useValue ? value : void 0;\r\n};\r\ndeclare function dec(...a: any[]): any;\r\ndeclare class Base {\r\n    static y: any;\r\n}\r\nlet C = (() => {\r\n    let _classDecorators = [dec];\r\n    let _classDescriptor;\r\n    let _classExtraInitializers = [];\r\n    let _classThis;\r\n    let _classSuper = Base;\r\n    var C = class extends _classSuper {\r\n        static { _classThis = this; }\r\n        static {\r\n            const _metadata = typeof Symbol === \"function\" && Symbol.metadata ? Object.create(_classSuper[Symbol.metadata] ?? null) : void 0;\r\n            __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: \"class\", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);\r\n            C = _classThis = _classDescriptor.value;\r\n            if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });\r\n        }\r\n        static x = class {\r\n            [Reflect.get(_classSuper, \"y\", _classThis)]() { }\r\n        };\r\n        static { class D {\r\n            [_classThis.k] = 1;\r\n        } }\r\n        static {\r\n            __runInitializers(_classThis, _classExtraInitializers);\r\n        }\r\n    };\r\n    return C = _classThis;\r\n})();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "finding-b4-computed-name-grandparent",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e613a20616e795b5d293a20616e793b0a6465636c61726520636c6173732042617365207b2073746174696320793a20616e793b207d0a4064656320636c617373204320657874656e64732042617365207b207374617469632078203d20636c617373207b205b73757065722e795d2829207b7d207d3b20737461746963207b20636c6173732044207b205b746869732e6b5d203d20313b207d207d207d0a"
+    },
+    "id": "finding-b4-computed-name-grandparent",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 9
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...a: any[]): any;\ndeclare class Base { static y: any; }\n@dec class C extends Base { static x = class { [super.y]() {} }; static { class D { [this.k] = 1; } } }\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

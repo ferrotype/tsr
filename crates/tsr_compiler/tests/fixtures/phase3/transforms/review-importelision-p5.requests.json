@@ -1,0 +1,308 @@
+{
+ "cases": [
+  {
+   "id": "rie-export-type-star",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport class C {} export interface I {} export const v = 1; export type T = 1; export default class D {} export namespace NS { export const x = 1; } export namespace TN { export interface J {} }\n// @filename: probe.ts\nexport type * from './a';\nexport type * as ns from './a';\nexport type { C } from './a';\nexport { type C as C2, v } from './a';\nexport { type I } from './a';\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-import-type-forms",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport class C {} export interface I {} export const v = 1; export type T = 1; export default class D {} export namespace NS { export const x = 1; } export namespace TN { export interface J {} }\n// @filename: probe.ts\nimport type D from './a';\nimport type { C } from './a';\nimport { type C as C3, v } from './a';\nimport type * as ns from './a';\nimport D2, { type I } from './a';\nexport const z = [v, D2];\nlet q: C | C3 | I | typeof ns | D;\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-namespace-import-equals",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport class C {} export interface I {} export const v = 1; export type T = 1; export default class D {} export namespace NS { export const x = 1; } export namespace TN { export interface J {} }\n// @filename: probe.ts\nimport * as m from './a';\nnamespace N {\n  import x = m.NS;\n  import y = m.TN;\n  export import z = m.NS.x;\n  export import w = m.TN.J;\n  import u = m.NS.x;\n  export const k = u;\n}\nexport { N };\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-script-import-equals",
+   "name": "probe.ts",
+   "source": "namespace M { export const a = 1; export interface I {} export namespace E {} export namespace F { export var q = 1; } }\nimport a = M.a;\nimport i = M.I;\nimport e = M.E;\nimport f = M.F;\nnamespace Inner { import g = M.a; import h = M.F; }\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-export-local-kinds",
+   "name": "probe.ts",
+   "source": "const v = 1; interface I {} type T = 1; class C {} enum E { A } const enum CE { A } namespace NS { export const a = 1; } namespace TNS { export interface X {} } declare const dv: number; declare class DC {} function fn() {}\nexport { v, I, T, C, E, CE, NS, TNS, dv, DC, fn };\nexport { v as default };\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-export-default-forms",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport class C {} export interface I {} export const v = 1; export type T = 1; export default class D {} export namespace NS { export const x = 1; } export namespace TN { export interface J {} }\n// @filename: probe.ts\nimport { C, I, v, T } from './a';\nimport * as ns from './a';\nexport default C;\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-export-default-forms-2",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport class C {} export interface I {} export const v = 1; export type T = 1; export default class D {} export namespace NS { export const x = 1; } export namespace TN { export interface J {} }\n// @filename: probe.ts\nimport { I } from './a';\nexport default I;\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-export-default-forms-3",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport class C {} export interface I {} export const v = 1; export type T = 1; export default class D {} export namespace NS { export const x = 1; } export namespace TN { export interface J {} }\n// @filename: probe.ts\nimport * as ns from './a';\nexport = ns;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-export-equals-type",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport class C {} export interface I {} export const v = 1; export type T = 1; export default class D {} export namespace NS { export const x = 1; } export namespace TN { export interface J {} }\n// @filename: probe.ts\nimport { T } from './a';\nexport = T;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-import-used-in-decorator-meta",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @filename: a.ts\nexport class C {} export interface I {} export const v = 1; export type T = 1; export default class D {} export namespace NS { export const x = 1; } export namespace TN { export interface J {} }\n// @filename: probe.ts\nimport { C, I } from './a';\ndeclare function d(...a: any[]): any;\nexport class K { @d m(x: C, y: I): void {} }\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-import-used-in-jsx-factory",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @filename: r.ts\nexport const React: any = 1; export const h: any = 1;\n// @filename: probe.tsx\nimport { React, h } from './r';\nexport const x = <div />;\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "jsx",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-import-used-in-jsx-pragma",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @filename: r.ts\nexport const React: any = 1; export const h: any = 1;\n// @filename: probe.tsx\n/** @jsx h */\nimport { React, h } from './r';\nexport const x = <div />;\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "jsx",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-reexport-of-import",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport class C {} export interface I {} export const v = 1; export type T = 1; export default class D {} export namespace NS { export const x = 1; } export namespace TN { export interface J {} }\n// @filename: probe.ts\nimport { C, I, v } from './a';\nimport D from './a';\nexport { C, I, v as vv, D };\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-shadowed-import",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport class C {} export interface I {} export const v = 1; export type T = 1; export default class D {} export namespace NS { export const x = 1; } export namespace TN { export interface J {} }\n// @filename: probe.ts\nimport { v } from './a';\nfunction g(v: number) { return v; }\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-import-in-typeof",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport class C {} export interface I {} export const v = 1; export type T = 1; export default class D {} export namespace NS { export const x = 1; } export namespace TN { export interface J {} }\n// @filename: probe.ts\nimport { v, C } from './a';\nlet t: typeof v;\nlet u: typeof C;\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-enum-const-usage",
+   "name": "probe.ts",
+   "source": "// @filename: e.ts\nexport const enum CE { A = 1 } export enum RE { A = 1 }\n// @filename: probe.ts\nimport { CE, RE } from './e';\nexport const a = CE.A, b = RE.A;\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-preserve-const-enums",
+   "name": "probe.ts",
+   "source": "// @preserveConstEnums: true\n// @filename: e.ts\nexport const enum CE { A = 1 }\n// @filename: probe.ts\nimport { CE } from './e';\nexport const a = CE.A;\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "rie-isolated-const-enum",
+   "name": "probe.ts",
+   "source": "// @isolatedModules: true\n// @filename: e.ts\nexport const enum CE { A = 1 }\n// @filename: probe.ts\nimport { CE } from './e';\nexport const a = CE.A;\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "acc-errors-members",
+   "name": "probe.ts",
+   "source": "// @filename: probe.ts\ndeclare namespace Mod { interface Hidden { a: number } }\ninterface H { a: number }\nexport class C {\n  constructor(p: H, private q: H, public r: H) {}\n  m(a: H): H { return a; }\n  static s(a: H): H { return a; }\n  set x(v: H) {}\n  get y(): H { return null!; }\n  static get z(): H { return null!; }\n  [k: string]: H | any;\n  p2: H = null!;\n  static p3: H = null!;\n}\nexport interface I {\n  (a: H): H;\n  new (a: H): H;\n  [k: string]: H;\n  m(a: H): H;\n  p: H;\n  <T extends H>(t: T): void;\n}\nexport function f<T extends H>(a: H, ...b: H[]): H { return a; }\nexport const v: H = null!;\nexport let { a1 }: { a1: H } = null!;\nexport type TA<T extends H = H> = { k: T };\nexport type Fn = new <T extends H>(x: H) => H;\nexport type Mp = { [K in keyof H]: H };\nexport type Cond<T> = T extends infer U extends H ? U : never;\nexport const lit: { inner: H } = null!;\nexport class D implements H { a = 1; }\nexport interface E extends H {}\nexport class F extends (class {} as new () => H) {}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "acc-errors-module",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\ndeclare module \"ext\" { export interface X { a: number } }\n// @filename: probe.ts\nimport { X } from \"ext\";\ntype L = X;\ninterface Local { x: X }\nexport function f(): Local { return null!; }\nexport const g = (p: Local) => p;\nexport class K { m(): Local { return null!; } }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "acc-errors-js-defineprop",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nclass Hidden { constructor() { this.a = 1; } }\n/** @type {Hidden} */\nconst h = new Hidden();\nObject.defineProperty(exports, \"x\", { value: h });\nexports.y = h;\nmodule.exports.z = new Hidden();\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "acc-errors-importequals",
+   "name": "probe.ts",
+   "source": "namespace A { namespace B { export const x = 1; } export import C = B; }\nexport import D = A.C;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "strip-internal-params2",
+   "name": "probe.ts",
+   "source": "// @stripInternal: true\nexport class C {\n  constructor(a: number, /** @internal */ public b: number, /* @internal */ c: string,\n    /** @internal */\n    public d: number) {}\n  /** @internal */ m() {}\n  /** @internal */ static s = 1;\n}\n/** @internal */ export const hidden = 1;\nexport enum E { A, /** @internal */ B, C }\nexport namespace N { /** @internal */ export const x = 1; export const y = 2; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "suppress-diag-contexts",
+   "name": "probe.ts",
+   "source": "// @filename: probe.ts\ndeclare namespace Mod { interface Hidden { a: number } }\ninterface H { a: number }\nexport const obj: { a: H; b: { c: H } } = null!;\nexport function g(p: { q: H }): { r: H } { return null!; }\nexport type T = { s: H };\nexport let m: { [K in \"a\"]: H };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  }
+ ]
+}

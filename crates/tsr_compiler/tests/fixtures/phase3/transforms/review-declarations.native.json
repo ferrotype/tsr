@@ -1,0 +1,301 @@
+{
+ "cases": [
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare const v = 1;\r\nexport interface I {\r\n    a: number;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import { v as vv } from \"./lib\";\r\nexport { vv };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "b9-reexport-named-import-alias",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "6578706f727420636f6e73742076203d20313b0a6578706f727420696e746572666163652049207b20613a206e756d626572207d",
+     "/.src/probe.ts": "696d706f7274207b2076206173207676207d2066726f6d20222e2f6c6962223b0a6578706f7274207b207676207d3b0a"
+    },
+    "id": "b9-reexport-named-import-alias",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/lib.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport { v as vv } from \"./lib\";\nexport { vv };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare const v = 1;\r\nexport interface I {\r\n    a: number;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import type { I } from \"./lib\";\r\nexport type { I };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "b9-reexport-import-type",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "6578706f727420636f6e73742076203d20313b0a6578706f727420696e746572666163652049207b20613a206e756d626572207d",
+     "/.src/probe.ts": "696d706f72742074797065207b2049207d2066726f6d20222e2f6c6962223b0a6578706f72742074797065207b2049207d3b0a"
+    },
+    "id": "b9-reexport-import-type",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/lib.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport type { I } from \"./lib\";\nexport type { I };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare const d = 1;\r\nexport default d;\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import d from \"./lib\";\r\nexport { d };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "b9-reexport-default-import",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "636f6e73742064203d20313b206578706f72742064656661756c7420643b",
+     "/.src/probe.ts": "696d706f727420642066726f6d20222e2f6c6962223b0a6578706f7274207b2064207d3b0a"
+    },
+    "id": "b9-reexport-default-import",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/lib.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nconst d = 1; export default d;\n// @filename: probe.ts\nimport d from \"./lib\";\nexport { d };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare const v = 1;\r\nexport interface I {\r\n    a: number;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import * as ns from \"./lib\";\r\nexport { ns };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "b9-reexport-namespace-import",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "6578706f727420636f6e73742076203d20313b0a6578706f727420696e746572666163652049207b20613a206e756d626572207d",
+     "/.src/probe.ts": "696d706f7274202a206173206e732066726f6d20222e2f6c6962223b0a6578706f7274207b206e73207d3b0a"
+    },
+    "id": "b9-reexport-namespace-import",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/lib.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport * as ns from \"./lib\";\nexport { ns };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare const v = 1;\r\nexport interface I {\r\n    a: number;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import lib = require(\"./lib\");\r\nexport { lib };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "b9-reexport-import-equals-commonjs",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "6578706f727420636f6e73742076203d20313b0a6578706f727420696e746572666163652049207b20613a206e756d626572207d",
+     "/.src/probe.ts": "696d706f7274206c6962203d207265717569726528222e2f6c696222293b0a6578706f7274207b206c6962207d3b0a"
+    },
+    "id": "b9-reexport-import-equals-commonjs",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport lib = require(\"./lib\");\nexport { lib };\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

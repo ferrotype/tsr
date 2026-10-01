@@ -1,0 +1,34 @@
+{
+ "cases": [
+  {
+   "id": "watched-cache-1",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexports.K = class K { m() { return { a: new K() }; } };\nexports.v = new exports.K().m();\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "watched-cache-2",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexports.K = class K { m() { return { a: new K(), f() { return 1; } }; } };\nconst inst = new exports.K();\nexports.w = inst.m();\nexports.x = () => inst.m();\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "watched-cache-3",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexports.J = class J { static make() { return [new J()]; } m() { return (a) => new J(); } };\nexports.y = exports.J.make();\nexports.z = new exports.J().m();\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  }
+ ]
+}

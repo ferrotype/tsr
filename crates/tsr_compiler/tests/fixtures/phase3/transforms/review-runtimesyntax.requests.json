@@ -1,0 +1,48 @@
+{
+ "cases": [
+  {
+   "id": "bigint-name",
+   "name": "probe.ts",
+   "source": "enum E { 1n = 2, B }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "shorthand-enum",
+   "name": "probe.ts",
+   "source": "enum E { A = 1, B = ({ A }).A }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "ctor-import-in-ns",
+   "name": "probe.ts",
+   "source": "namespace A { export var x = 1; }\nnamespace N {\n    export class C {\n        constructor(public p: number) {\n            import q = A;\n            let r = q.x;\n        }\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "export-in-block-ns",
+   "name": "probe.ts",
+   "source": "// @module: esnext\nnamespace N {\n    {\n        export { };\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  }
+ ]
+}

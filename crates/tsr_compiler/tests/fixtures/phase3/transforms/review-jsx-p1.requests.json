@@ -1,0 +1,524 @@
+{
+ "cases": [
+  {
+   "id": "r-import-order-attr",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\nexport const a = <div {...p} key=\"k\" x={<i />} />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-import-order-child",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\nexport const a = <div {...p} key=\"k\"><i /></div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-import-order-frag-first",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\nexport const a = <><div {...p} key=\"k\" /></>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-this-tag",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport class X { m() { return <this />; } n() { return <this.a.b x=\"1\" />; } }\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-entities-edge",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div>&#x110000; &#x7FFFFFFF; &#x80000000; &#0; &#x0; &a&b&c; &#xD83D;&#xDE00; &amp &#2147483647; &#2147483648;</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-entities-attr-edge",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div t=\"&#x110000;|&#xDE00;&#xD83D;|&a&;b;\" />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-attr-quotes",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div a='it\"s' b=\"x\\ny\" c=\"multi\nline\" d='&apos;' />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-key-empty-expr",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\nexport const a = <div key={} />;\nexport const b = <div x:key=\"1\" />;\nexport const c = <div {...p} key={} />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-child-inchild-quirk-classic",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div><b x={<i />} /></div>;\nexport const b = <div><b x={f(<i />)} /><u /></div>;\nexport const c = <div><b x={f(<i />)}><s /></b></div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-child-inchild-quirk-auto",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div><b x={<i />} /></div>;\nexport const b = <div><b x={f(<i />)} /><u /></div>;\nexport const c = <div><b x={f(<i />)}><s /></b></div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-child-inchild-attr-jsx-auto",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\nexport const a = <div><b x=<i /> /></div>;\nexport const b = <div><b x=<><i /></> /><u /></div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-auto-empty-children",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\nexport const a = <div>{}</div>;\nexport const b = <div>{/* c */}{}</div>;\nexport const c = <>{}</>;\nexport const d = <div>{...[]}</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-classic-frag-in-child",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div><>x</><>y</></div>;\nexport const b = <div>{<>z</>}</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-dev-nested",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\ndeclare var p: any;\nexport const a = <div {...p} key=\"k\"><i /></div>;\nexport function g() { return <><b key=\"1\" /></>; }\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-dev-script",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\n// @moduleDetection: legacy\nconst a = <div {...p} key=\"k\"><i /></div>;\ndeclare var p: any;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-auto-script-cjs-ts",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\n// @moduleDetection: force\n// @module: commonjs\nconst a = <div />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-classic-ns-react",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\nnamespace N { export namespace M { export var React: any; export var x = <><i /></>; } }\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-classic-ns-factory",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @jsxFactory: h\nnamespace N { export function h(...a: any[]) {} export var x = <i />; }\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-classic-ns-qualified-factory",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @jsxFactory: h.c\nnamespace N { export var h: any; export var x = <i />; }\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-classic-pragma-qualified-frag",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n/** @jsx a.b.c */\n/** @jsxFrag d.e */\ndeclare var a: any, d: any;\nexport const x = <><i /></>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-classic-pragma-invalid",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n/** @jsx 1+2 */\n/** @jsxFrag  */\ndeclare var React: any;\nexport const x = <><i /></>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-classic-frag-option-only",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @jsxFactory: h\n/** @jsxFrag F */\ndeclare var h: any, F: any;\nexport const x = <><i /></>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-spread-es2017-mixed",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @target: es2017\ndeclare var React: any, p: any, q: any;\nexport const a = <div {...{a: 1, ...p, b: 2, ...q}} c=\"1\" {...{}} />;\nexport const b = <div {...{}} />;\nexport const c = <div {...p} x=\"1\">t</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-spread-es2017-auto",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\n// @target: es2017\ndeclare var p: any;\nexport const a = <div {...p} x=\"1\">t</div>;\nexport const b = <div {...{x: 1}}><i/><b/></div>;\nexport const c = <div {...p}/>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-spread-es5-auto-key",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\n// @target: es2015\ndeclare var p: any;\nexport const a = <div {...p} key=\"k\" x=\"1\" />;\nexport const b = <div key=\"k\" {...p}><i/></div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-proto-variants",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div {...{__proto__: 1}} />;\nexport const b = <div {...{['__proto__']: 1}} />;\nexport const c = <div {...{__proto__}} />;\nexport const d = <div {...{\"__proto__\": 2, x}} />;\ndeclare var __proto__: any, x: any;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-proto-variants-es2017",
+   "name": "probe.tsx",
+   "source": "// @target: es2017\n// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div {...{__proto__: 1}} />;\nexport const b = <div {...{['__proto__']: 1}} />;\nexport const c = <div {...{__proto__}} />;\ndeclare var __proto__: any;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-attr-name-unicode",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div \\u0061b=\"1\" ä=\"2\" a-b-c=\"3\" />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-text-unicode-ws",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div> x \n　y z</div>;\nexport const b = <div>\n \n</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-text-crlf",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div>\r\n  one\r\n  two  \r\n</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-comments-in-jsx",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const a = <div /* c1 */ x=\"1\" /* c2 */ {.../* c3 */p} // c4\n y={/* c5 */ 2}>{/* c6 */ 3 /* c7 */}</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-auto-comments",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare var p: any;\nexport const a = <div /* c1 */ x=\"1\">{/* c6 */ 3 /* c7 */}{4}</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-jsx-in-default-param-ts",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport function f2(x = <i />) { return x; }\nexport class K { y = <b />; static z = <u />; }\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-auto-import-source-pragma-overrides",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\n// @jsxImportSource: preact\n/** @jsxImportSource solid-js */\nexport const a = <><div /></>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-auto-dev-import-source",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsxdev\n// @jsxImportSource: preact\nexport const a = <div {...p} key=\"k\" />;\ndeclare var p: any;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-classic-entity-member-tag",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\ndeclare var a: any;\nexport const x = <a.b-c />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "r-classic-namespace-tag-entity",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var p: any;\ndeclare function f(...a: any[]): any;\nexport const x = <a:b.c />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "cjs-names",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexports[\"foo-bar\"] = 1;\nexports[0] = 2;\nexports[\"type\"] = 3;\nexports[\"valid\"] = 4;\nexports.default = 5;\nexports[\"x-y2\"] = class K { m() { return new K(); } };\nexports.Z = class Z { a = 1; };\nexports.Z = 1;\nexports.W = class Q { };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "cjs-module-exports-selfref",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nmodule.exports = class Foo { clone() { return new Foo(); } };\nmodule.exports.extra = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "cjs-module-exports-members-class",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nclass A { constructor() { this.p = 1; } }\nmodule.exports = A;\nmodule.exports.helper = function (x) { return x; };\nmodule.exports.K = class K2 { m() { return new K2(); } };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "enum-numbers",
+   "name": "probe.ts",
+   "source": "export enum E { A = 1/0, B = -1/0, C = 0/0, D = -5, E2 = -0, F = 1e21, G = 0.1, H = \"s\", I = 2 ** 53 }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-dotted",
+   "name": "probe.ts",
+   "source": "namespace a.b.c { export const x = 1; const y = 2; export type T = typeof y; }\nexport namespace d.e { export namespace f { export const z = 1; } }\nexport {};\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "expando-keywords",
+   "name": "probe.ts",
+   "source": "export function f() {}\nf.default = 1;\nf.class = 2;\nf[\"str\"] = 3;\nconst x = 0;\nf.x = 4;\nf.y = x;\nexport const g = function() {};\ng.y = () => 1;\ng.z = g.y;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-extends-mixin-default",
+   "name": "probe.ts",
+   "source": "function Mixin<T extends new (...a: any[]) => {}>(b: T) { return class extends b { m = 1 } }\nclass Base {}\nexport default class extends Mixin(Base) {}\nexport class Named extends Mixin(Base) implements I {}\ninterface I {}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "accessors-this",
+   "name": "probe.ts",
+   "source": "export class A { set x(this: A, v: number) {} get y(this: A) { return 1 } private set z(v: number) {} private get w() { return 1 } static set s(v) {} }\nexport class B { set p(v) {} }\nexport interface C { get g(): number; set g(v: number); }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-errors-mix",
+   "name": "probe.ts",
+   "source": "// @isolatedDeclarations: true\n// @declaration: true\ndeclare const b: number[];\ndeclare const s: object;\ndeclare const q: number;\ndeclare const k: string;\nexport const a = [1, ...b];\nexport const o = { ...s, q };\nexport function f(x = 1) {}\nexport class C { [k] = 1; m() { return 1; } get g() { return 1; } }\nexport const h = class {};\nexport const arr = [1, 2];\nexport let n = q + 1;\nexport default q + 2;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "jsdoc-types-js",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\n/**\n * @param {?number} a\n * @param {!string} b\n * @param {...number} c\n * @param {number=} d\n * @param {*} e\n * @param {?} f\n * @returns {Array.<string>}\n */\nexport function fn(a, b, d, e, f, ...c) { return []; }\n/** @type {{a: number, b?: string}} */\nexport const obj = { a: 1 };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "private-in-anon-class",
+   "name": "probe.ts",
+   "source": "export const x = class { private p = 1; protected q = 2; };\nexport function mk() { return class { private r = 1; }; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "augmentation-nonlocal",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport class Observable<T> { v!: T }\n// @filename: map.ts\nimport { Observable } from \"./a\";\ndeclare module \"./a\" { interface Observable<T> { map(): number } }\n// @filename: probe.ts\nimport { Observable } from \"./a\";\nimport \"./map\";\nexport const o = new Observable<number>();\nexport const m = o.map;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "type-alias-private",
+   "name": "probe.ts",
+   "source": "interface Hidden { a: number }\nexport type T<U extends Hidden> = { x: Hidden; y: U };\nexport type Fn = (h: Hidden) => Hidden;\nexport interface I extends Hidden {}\nexport class K<V extends Hidden> implements Hidden { a = 1; m<W extends Hidden>(w: W): Hidden { return w; } }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-this-base-redundant",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nclass Base { get g() { return 1; } m() {} }\nexport class D extends Base {\n  constructor() { super(); this.g = 2; this.m = () => {}; this.n = 3; }\n}\nexport class E extends null { constructor() { this.x = 1; } }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-typedef-alias-private",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\n/** @typedef {{ a: number }} Hidden */\n/** @typedef {{ h: Hidden }} Exported */\n/** @type {Exported} */\nexport const v = { h: { a: 1 } };\n/**\n * @typedef {Object} Props\n * @property {string} name - the name\n * @property {number} [age] the age\n */\n/** @param {Props} p */\nexport function use(p) {}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  }
+ ]
+}

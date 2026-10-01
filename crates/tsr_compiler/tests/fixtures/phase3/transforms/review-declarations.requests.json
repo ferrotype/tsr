@@ -1,0 +1,54 @@
+{
+ "cases": [
+  {
+   "id": "b9-reexport-named-import-alias",
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport { v as vv } from \"./lib\";\nexport { vv };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "b9-reexport-import-type",
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport type { I } from \"./lib\";\nexport type { I };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "b9-reexport-default-import",
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nconst d = 1; export default d;\n// @filename: probe.ts\nimport d from \"./lib\";\nexport { d };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "b9-reexport-namespace-import",
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport * as ns from \"./lib\";\nexport { ns };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "b9-reexport-import-equals-commonjs",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport lib = require(\"./lib\");\nexport { lib };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  }
+ ]
+}

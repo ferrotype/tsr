@@ -1,0 +1,223 @@
+{
+ "cases": [
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "commonjs"
+       ],
+       "text": "Object.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.z = void 0;\r\nexports.z = 1;\r\n"
+      },
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.z = void 0;\r\nexports.z = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "commonjs"
+       ],
+       "text": "Object.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.y = exports.x = void 0;\r\nexports.x = 1;\r\nexports.x++;\r\nfunction g() { return exports.x; }\r\nlet y = 0;\r\nexports.y = y;\r\n(exports.y = y = { y: 2 }.y);\r\nconst a_1 = require(\"./a\");\r\nfunction h() { return a_1.z; }\r\n"
+      },
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.y = exports.x = void 0;\r\nexports.x = 1;\r\nexports.x++;\r\nfunction g() { return exports.x; }\r\nlet y = 0;\r\nexports.y = y;\r\n(exports.y = y = { y: 2 }.y);\r\nconst a_1 = require(\"./a\");\r\nfunction h() { return a_1.z; }\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "bound-exports",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e7374207a203d20313b0a",
+     "/.src/main.ts": "6578706f7274206c65742078203d20313b0a782b2b3b0a66756e6374696f6e20672829207b2072657475726e20783b207d0a6c65742079203d20303b0a6578706f7274207b2079207d3b0a287b2079207d203d207b20793a2032207d293b0a696d706f7274207b207a207d2066726f6d20222e2f61223b0a66756e6374696f6e20682829207b2072657475726e207a3b207d"
+    },
+    "id": "bound-exports",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "verbatimModuleSyntax": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @verbatimModuleSyntax: true\n// @filename: main.ts\nexport let x = 1;\nx++;\nfunction g() { return x; }\nlet y = 0;\nexport { y };\n({ y } = { y: 2 });\nimport { z } from \"./a\";\nfunction h() { return z; }\n// @filename: a.ts\nexport const z = 1;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "commonjs"
+       ],
+       "text": "Object.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.z = void 0;\r\nexports.z = 1;\r\nexports.default = 2;\r\n"
+      },
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.z = void 0;\r\nexports.z = 1;\r\nexports.default = 2;\r\n"
+      }
+     ],
+     "name": "/.src/a.js"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "commonjs"
+       ],
+       "text": "var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {\r\n    if (k2 === undefined) k2 = k;\r\n    var desc = Object.getOwnPropertyDescriptor(m, k);\r\n    if (!desc || (\"get\" in desc ? !m.__esModule : desc.writable || desc.configurable)) {\r\n      desc = { enumerable: true, get: function() { return m[k]; } };\r\n    }\r\n    Object.defineProperty(o, k2, desc);\r\n}) : (function(o, m, k, k2) {\r\n    if (k2 === undefined) k2 = k;\r\n    o[k2] = m[k];\r\n}));\r\nvar __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {\r\n    Object.defineProperty(o, \"default\", { enumerable: true, value: v });\r\n}) : function(o, v) {\r\n    o[\"default\"] = v;\r\n});\r\nvar __importStar = (this && this.__importStar) || (function () {\r\n    var ownKeys = function(o) {\r\n        ownKeys = Object.getOwnPropertyNames || function (o) {\r\n            var ar = [];\r\n            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;\r\n            return ar;\r\n        };\r\n        return ownKeys(o);\r\n    };\r\n    return function (mod) {\r\n        if (mod && mod.__esModule) return mod;\r\n        var result = {};\r\n        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== \"default\") __createBinding(result, mod, k[i]);\r\n        __setModuleDefault(result, mod);\r\n        return result;\r\n    };\r\n})();\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.x = void 0;\r\nexports.f = f;\r\nconst a_js_1 = __importStar(require(\"./a.js\"));\r\nexports.x = 1;\r\nexports.x++;\r\nfunction f() { return a_js_1.default + a_js_1.z; }\r\n"
+      },
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nvar __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {\r\n    if (k2 === undefined) k2 = k;\r\n    var desc = Object.getOwnPropertyDescriptor(m, k);\r\n    if (!desc || (\"get\" in desc ? !m.__esModule : desc.writable || desc.configurable)) {\r\n      desc = { enumerable: true, get: function() { return m[k]; } };\r\n    }\r\n    Object.defineProperty(o, k2, desc);\r\n}) : (function(o, m, k, k2) {\r\n    if (k2 === undefined) k2 = k;\r\n    o[k2] = m[k];\r\n}));\r\nvar __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {\r\n    Object.defineProperty(o, \"default\", { enumerable: true, value: v });\r\n}) : function(o, v) {\r\n    o[\"default\"] = v;\r\n});\r\nvar __importStar = (this && this.__importStar) || (function () {\r\n    var ownKeys = function(o) {\r\n        ownKeys = Object.getOwnPropertyNames || function (o) {\r\n            var ar = [];\r\n            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;\r\n            return ar;\r\n        };\r\n        return ownKeys(o);\r\n    };\r\n    return function (mod) {\r\n        if (mod && mod.__esModule) return mod;\r\n        var result = {};\r\n        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== \"default\") __createBinding(result, mod, k[i]);\r\n        __setModuleDefault(result, mod);\r\n        return result;\r\n    };\r\n})();\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.x = void 0;\r\nexports.f = f;\r\nconst a_js_1 = __importStar(require(\"./a.js\"));\r\nexports.x = 1;\r\nexports.x++;\r\nfunction f() { return a_js_1.default + a_js_1.z; }\r\n"
+      }
+     ],
+     "name": "/.src/main.js"
+    }
+   ],
+   "id": "bound-js",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.js": "6578706f727420636f6e7374207a203d20313b0a6578706f72742064656661756c7420323b0a",
+     "/.src/main.js": "696d706f727420642c207b207a207d2066726f6d20222e2f612e6a73223b0a6578706f7274206c65742078203d20313b0a782b2b3b0a6578706f72742066756e6374696f6e20662829207b2072657475726e2064202b207a3b207d"
+    },
+    "id": "bound-js",
+    "options": {
+     "allowJs": true,
+     "isolatedModules": true,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.js",
+     "/.src/a.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.js",
+   "source": "// @module: commonjs\n// @isolatedModules: true\n// @allowJs: true\n// @filename: main.js\nimport d, { z } from \"./a.js\";\nexport let x = 1;\nx++;\nexport function f() { return d + z; }\n// @filename: a.js\nexport const z = 1;\nexport default 2;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "commonjs"
+       ],
+       "text": "Object.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.y = void 0;\r\nexports.y = 1;\r\n"
+      }
+     ],
+     "name": "/.src/b.js"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "commonjs"
+       ],
+       "text": "Object.defineProperty(exports, \"__esModule\", { value: true });\r\nconst b_js_1 = require(\"./b.js\");\r\nconst c = require(\"./c.js\", b_js_1.y);\r\n"
+      }
+     ],
+     "name": "/.src/main.js"
+    }
+   ],
+   "id": "shim-rest-only",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/b.js": "6578706f727420636f6e73742079203d20313b0a",
+     "/.src/main.js": "696d706f7274207b2079207d2066726f6d20222e2f622e6a73223b0a636f6e73742063203d207265717569726528222e2f632e6a73222c2079293b"
+    },
+    "id": "shim-rest-only",
+    "options": {
+     "allowJs": true,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.js",
+     "/.src/b.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.js",
+   "source": "// @module: commonjs\n// @rewriteRelativeImportExtensions: true\n// @allowJs: true\n// @filename: main.js\nimport { y } from \"./b.js\";\nconst c = require(\"./c.js\", y);\n// @filename: b.js\nexport const y = 1;\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}
