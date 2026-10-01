@@ -113,6 +113,34 @@ impl ReferenceResolverHooks for ReferenceHooks<'_> {
     ) -> Result<Hook<Option<SymbolId>>, tsr_arena::Error> {
         Ok(Hook::Value(Some(self.host.state.get_merged_symbol(symbol))))
     }
+    // `GetParentOfSymbol: r.checker.getParentOfSymbol`
+    fn get_parent_of_symbol(
+        &mut self,
+        symbol: SymbolId,
+    ) -> Result<Hook<Option<SymbolId>>, tsr_arena::Error> {
+        let state = self.host.state;
+        self.host.capture((|| {
+            let Some(parent) = state.symbol(symbol)?.parent() else {
+                return Ok(Hook::Value(None));
+            };
+            let parent = late_bound_symbol(state, parent)?;
+            Ok(Hook::Value(Some(state.get_merged_symbol(parent))))
+        })())
+    }
+    // `GetSymbolOfDeclaration: r.checker.getSymbolOfDeclaration`
+    fn get_symbol_of_declaration(
+        &mut self,
+        node: NodeId,
+    ) -> Result<Hook<Option<SymbolId>>, tsr_arena::Error> {
+        let state = self.host.state;
+        self.host.capture((|| {
+            let Some(symbol) = state.raw_declaration_symbol(node)? else {
+                return Ok(Hook::Value(None));
+            };
+            let symbol = late_bound_symbol(state, symbol)?;
+            Ok(Hook::Value(Some(state.get_merged_symbol(symbol))))
+        })())
+    }
     fn get_export_symbol_of_value_symbol_if_exported(
         &mut self,
         symbol: SymbolId,
@@ -123,6 +151,25 @@ impl ReferenceResolverHooks for ReferenceHooks<'_> {
                 .get_export_symbol_of_value_symbol_if_exported(symbol)
                 .map(|symbol| Hook::Value(Some(symbol))),
         )
+    }
+}
+
+/// `getLateBoundSymbol` for the hooks, which hold the checker immutably. A
+/// symbol other than a computed class member is its own late-bound symbol, and
+/// a computed member answers from the late-bound link; one whose binding has
+/// not run yet fails the query rather than binding members from inside it.
+fn late_bound_symbol(state: &CheckerState, symbol: SymbolId) -> Result<SymbolId, Error> {
+    let data = state.symbol(symbol)?;
+    if data.flags() & sf::CLASS_MEMBER == 0
+        || data.name_bytes() != tsr_ast::internal_symbol_names::COMPUTED
+    {
+        return Ok(symbol);
+    }
+    match state.late_members.symbols.try_get(symbol) {
+        Some(Some(late)) => Ok(*late),
+        _ => Err(Error::MissingLink(
+            "late-bound symbol in a reference resolver hook",
+        )),
     }
 }
 

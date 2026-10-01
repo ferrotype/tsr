@@ -1,0 +1,3450 @@
+{
+ "cases": [
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var a = 1;\r\nfunction f(b) { return a + b; }\r\nclass C {\r\n    m() { return this; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "no-typescript",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "7661722061203d20313b0a66756e6374696f6e2066286229207b2072657475726e2061202b20623b207d0a636c6173732043207b206d2829207b2072657475726e20746869733b207d207d0a"
+    },
+    "id": "no-typescript",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "var a = 1;\nfunction f(b) { return a + b; }\nclass C { m() { return this; } }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "class C {\r\n    a;\r\n    b;\r\n    c;\r\n    d;\r\n    e;\r\n    constructor(a, b, c, d, e = 1) {\r\n        this.a = a;\r\n        this.b = b;\r\n        this.c = c;\r\n        this.d = d;\r\n        this.e = e;\r\n        this.a;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parameter-properties",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020636f6e7374727563746f72287075626c696320613a206e756d6265722c207072697661746520623a20737472696e672c2070726f74656374656420632c20726561646f6e6c7920642c207075626c696320726561646f6e6c792065203d203129207b0a2020202020202020746869732e613b0a202020207d0a7d0a"
+    },
+    "id": "parameter-properties",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class C {\n    constructor(public a: number, private b: string, protected c, readonly d, public readonly e = 1) {\n        this.a;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "class B {\r\n    x = 1;\r\n}\r\nclass C extends B {\r\n    x;\r\n    constructor(x) {\r\n        super();\r\n        this.x = x;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parameter-property-override",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b2078203d20313b207d0a636c617373204320657874656e64732042207b0a20202020636f6e7374727563746f72286f7665727269646520783a206e756d62657229207b0a2020202020202020737570657228293b0a202020207d0a7d0a"
+    },
+    "id": "parameter-property-override",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class B { x = 1; }\nclass C extends B {\n    constructor(override x: number) {\n        super();\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "class C {\r\n    a;\r\n    constructor(a) {\r\n        \"use strict\";\r\n        'other';\r\n        this.a = a;\r\n        let b = a;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parameter-property-prologue",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020636f6e7374727563746f72287075626c696320613a206e756d62657229207b0a20202020202020202275736520737472696374223b0a2020202020202020276f74686572273b0a20202020202020206c65742062203d20613b0a202020207d0a7d0a"
+    },
+    "id": "parameter-property-prologue",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class C {\n    constructor(public a: number) {\n        \"use strict\";\n        'other';\n        let b = a;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "class B {\r\n    constructor(...args) { }\r\n}\r\nclass C extends B {\r\n    a;\r\n    constructor(a, b) {\r\n        var before = 1;\r\n        super(a);\r\n        this.a = a;\r\n        var after = 2;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parameter-property-super-first",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b20636f6e7374727563746f72282e2e2e617267733a20616e795b5d29207b7d207d0a636c617373204320657874656e64732042207b0a20202020636f6e7374727563746f72287075626c696320613a206e756d6265722c20623a206e756d62657229207b0a2020202020202020766172206265666f7265203d20313b0a202020202020202073757065722861293b0a2020202020202020766172206166746572203d20323b0a202020207d0a7d0a"
+    },
+    "id": "parameter-property-super-first",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class B { constructor(...args: any[]) {} }\nclass C extends B {\n    constructor(public a: number, b: number) {\n        var before = 1;\n        super(a);\n        var after = 2;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "class B {\r\n}\r\nclass C extends B {\r\n    a;\r\n    constructor(a) {\r\n        let x = 0;\r\n        try {\r\n            x = 1;\r\n            super();\r\n            this.a = a;\r\n            x = 2;\r\n        }\r\n        catch (e) {\r\n            x = 3;\r\n        }\r\n        finally {\r\n            x = 4;\r\n        }\r\n        x = 5;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parameter-property-super-in-try",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b7d0a636c617373204320657874656e64732042207b0a20202020636f6e7374727563746f72287075626c696320613a206e756d62657229207b0a20202020202020206c65742078203d20303b0a2020202020202020747279207b0a20202020202020202020202078203d20313b0a202020202020202020202020737570657228293b0a20202020202020202020202078203d20323b0a20202020202020207d20636174636820286529207b0a20202020202020202020202078203d20333b0a20202020202020207d2066696e616c6c79207b0a20202020202020202020202078203d20343b0a20202020202020207d0a202020202020202078203d20353b0a202020207d0a7d0a"
+    },
+    "id": "parameter-property-super-in-try",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class B {}\nclass C extends B {\n    constructor(public a: number) {\n        let x = 0;\n        try {\n            x = 1;\n            super();\n            x = 2;\n        } catch (e) {\n            x = 3;\n        } finally {\n            x = 4;\n        }\n        x = 5;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "class B {\r\n}\r\nclass C extends B {\r\n    a;\r\n    constructor(a) {\r\n        try {\r\n            try {\r\n                super();\r\n                this.a = a;\r\n            }\r\n            finally { }\r\n        }\r\n        catch { }\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parameter-property-super-nested-try",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b7d0a636c617373204320657874656e64732042207b0a20202020636f6e7374727563746f72287072697661746520613a20737472696e6729207b0a2020202020202020747279207b0a202020202020202020202020747279207b0a20202020202020202020202020202020737570657228293b0a2020202020202020202020207d2066696e616c6c79207b7d0a20202020202020207d206361746368207b7d0a202020207d0a7d0a"
+    },
+    "id": "parameter-property-super-nested-try",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class B {}\nclass C extends B {\n    constructor(private a: string) {\n        try {\n            try {\n                super();\n            } finally {}\n        } catch {}\n    }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "class C {\r\n    c;\r\n    constructor({ a }, [b], c) {\r\n        this.c = c;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parameter-property-binding-pattern",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020636f6e7374727563746f72287075626c6963207b2061207d3a20616e792c207075626c6963205b625d3a20616e792c207075626c696320633a206e756d62657229207b7d0a7d0a"
+    },
+    "id": "parameter-property-binding-pattern",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class C {\n    constructor(public { a }: any, public [b]: any, public c: number) {}\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "const D = class {\r\n    a;\r\n    c;\r\n    constructor(a, b, c = 2) {\r\n        this.a = a;\r\n        this.c = c;\r\n    }\r\n    m() { }\r\n};\r\nlet e = class Named {\r\n    x;\r\n    constructor(x) {\r\n        this.x = x;\r\n    }\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parameter-property-class-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e73742044203d20636c617373207b0a20202020636f6e7374727563746f72287075626c696320613a206e756d6265722c20623a206e756d6265722c20707269766174652063203d203229207b7d0a202020206d2829207b7d0a7d3b0a6c65742065203d20636c617373204e616d6564207b20636f6e7374727563746f7228726561646f6e6c79207829207b7d207d3b0a"
+    },
+    "id": "parameter-property-class-expression",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "const D = class {\n    constructor(public a: number, b: number, private c = 2) {}\n    m() {}\n};\nlet e = class Named { constructor(readonly x) {} };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "class C {\r\n    constructor(a, b = a) {\r\n        let c = a + b;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "constructor-no-parameter-properties",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020636f6e7374727563746f7228613a206e756d6265722c2062203d206129207b0a20202020202020206c65742063203d2061202b20623b0a202020207d0a7d0a"
+    },
+    "id": "constructor-no-parameter-properties",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class C {\n    constructor(a: number, b = a) {\n        let c = a + b;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "class C {\r\n    a;\r\n    b;\r\n    constructor(a = 1, b, ...rest) {\r\n        this.a = a;\r\n        this.b = b;\r\n        b;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parameter-property-default-and-rest",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020636f6e7374727563746f72287075626c69632061203d20312c207075626c696320623f3a206e756d6265722c202e2e2e726573743a206e756d6265725b5d29207b0a2020202020202020623b0a202020207d0a7d0a"
+    },
+    "id": "parameter-property-default-and-rest",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class C {\n    constructor(public a = 1, public b?: number, ...rest: number[]) {\n        b;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "class C {\r\n    a;\r\n    b;\r\n    // ctor\r\n    constructor(/* a */ a /* after a */, /** b */ b) {\r\n        this.a = a;\r\n        this.b = b;\r\n        // body\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parameter-property-comments",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020202f2f2063746f720a20202020636f6e7374727563746f72282f2a2061202a2f207075626c696320613a206e756d626572202f2a2061667465722061202a2f2c202f2a2a2062202a2f207072697661746520623a20737472696e6729207b0a20202020202020202f2f20626f64790a202020207d0a7d0a"
+    },
+    "id": "parameter-property-comments",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class C {\n    // ctor\n    constructor(/* a */ public a: number /* after a */, /** b */ private b: string) {\n        // body\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var E;\r\n(function (E) {\r\n    E[E[\"A\"] = 0] = \"A\";\r\n    E[E[\"B\"] = 1] = \"B\";\r\n    E[E[\"C\"] = 2] = \"C\";\r\n})(E || (E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-auto",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "656e756d2045207b20412c20422c2043207d0a"
+    },
+    "id": "enum-auto",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "enum E { A, B, C }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var E;\r\n(function (E) {\r\n    E[E[\"A\"] = 1] = \"A\";\r\n    E[E[\"B\"] = 2] = \"B\";\r\n    E[E[\"C\"] = 10] = \"C\";\r\n    E[E[\"D\"] = 20] = \"D\";\r\n    E[E[\"E\"] = -21] = \"E\";\r\n    E[E[\"F\"] = 8] = \"F\";\r\n    E[E[\"G\"] = -1] = \"G\";\r\n    E[E[\"H\"] = 0] = \"H\";\r\n    E[E[\"I\"] = 0.5] = \"I\";\r\n})(E || (E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-initializers",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "656e756d2045207b2041203d20312c20422c2043203d2031302c2044203d2043202a20322c2045203d207e442c2046203d2031203c3c20332c2047203d202d312c2048203d202d302c2049203d20302e35207d0a"
+    },
+    "id": "enum-initializers",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "enum E { A = 1, B, C = 10, D = C * 2, E = ~D, F = 1 << 3, G = -1, H = -0, I = 0.5 }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var S;\r\n(function (S) {\r\n    S[\"A\"] = \"a\";\r\n    S[\"B\"] = \"b\";\r\n    S[\"C\"] = \"c\";\r\n    S[\"D\"] = \"ad\";\r\n})(S || (S = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-string-members",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "656e756d2053207b2041203d202261222c2042203d202762272c2043203d206063602c2044203d2041202b20226422207d0a"
+    },
+    "id": "enum-string-members",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "enum S { A = \"a\", B = 'b', C = `c`, D = A + \"d\" }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var E;\r\n(function (E) {\r\n    E[E[\"A\"] = f()] = \"A\";\r\n    E[E[\"B\"] = g().length] = \"B\";\r\n    E[E[\"C\"] = E.A | 1] = \"C\";\r\n})(E || (E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-computed-nonconstant",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e206628293a206e756d6265723b0a6465636c6172652066756e6374696f6e206728293a20737472696e673b0a656e756d2045207b2041203d206628292c2042203d206728292e6c656e6774682c2043203d2041207c2031207d0a"
+    },
+    "id": "enum-computed-nonconstant",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare function f(): number;\ndeclare function g(): string;\nenum E { A = f(), B = g().length, C = A | 1 }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var E;\r\n(function (E) {\r\n    E[\"A\"] = `${s}`;\r\n    E[\"B\"] = `x${s}y`;\r\n    E[\"C\"] = \"lit\";\r\n})(E || (E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-syntactically-string",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e737420733a20737472696e673b0a656e756d2045207b2041203d2060247b737d602c2042203d206078247b737d79602c2043203d20226c697422207d0a"
+    },
+    "id": "enum-syntactically-string",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare const s: string;\nenum E { A = `${s}`, B = `x${s}y`, C = \"lit\" }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var E;\r\n(function (E) {\r\n    E[E[\"A\"] = f()] = \"A\";\r\n    E[E[\"B\"] = void 0] = \"B\";\r\n    E[E[\"C\"] = void 0] = \"C\";\r\n})(E || (E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-missing-initializer-after-nonconstant",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e206628293a206e756d6265723b0a656e756d2045207b2041203d206628292c20422c2043207d0a"
+    },
+    "id": "enum-missing-initializer-after-nonconstant",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare function f(): number;\nenum E { A = f(), B, C }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var E;\r\n(function (E) {\r\n    E[E[\"a\"] = 0] = \"a\";\r\n    E[E[\"b\"] = 1] = \"b\";\r\n    E[E[\"c d\"] = 2] = \"c d\";\r\n    E[E[\"e\"] = 3] = \"e\";\r\n    E[E[1] = 2] = 1;\r\n    E[E[] = 3] = ;\r\n    E[E[`g`] = 3] = `g`;\r\n})(E || (E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-member-names",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "656e756d2045207b20612c202262222c2027632064272c205b2265225d2c2031203d20322c2023662c205b6067605d203d2033207d0a"
+    },
+    "id": "enum-member-names",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "enum E { a, \"b\", 'c d', [\"e\"], 1 = 2, #f, [`g`] = 3 }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var F;\r\n(function (F) {\r\n    F[F[\"I\"] = Infinity] = \"I\";\r\n    F[F[\"J\"] = -Infinity] = \"J\";\r\n    F[F[\"N\"] = NaN] = \"N\";\r\n    F[F[\"K\"] = -Infinity] = \"K\";\r\n    F[F[\"L\"] = Infinity] = \"L\";\r\n})(F || (F = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-infinity-nan",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "656e756d2046207b2049203d2031202f20302c204a203d202d31202f20302c204e203d2030202f20302c204b203d202d2831202f2030292c204c203d203165333030202a2031653130207d0a"
+    },
+    "id": "enum-infinity-nan",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "enum F { I = 1 / 0, J = -1 / 0, N = 0 / 0, K = -(1 / 0), L = 1e300 * 1e10 }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var L;\r\n(function (L) {\r\n    L[L[\"A\"] = 1e+21] = \"A\";\r\n    L[L[\"B\"] = 1.5e-7] = \"B\";\r\n    L[L[\"C\"] = 9007199254740992] = \"C\";\r\n    L[L[\"D\"] = 16] = \"D\";\r\n    L[L[\"E\"] = 1000] = \"E\";\r\n})(L || (L = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-large-numbers",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "656e756d204c207b2041203d20316532312c2042203d20312e35652d372c2043203d2032202a2a2035332c2044203d20307831302c2045203d20315f303030207d0a"
+    },
+    "id": "enum-large-numbers",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "enum L { A = 1e21, B = 1.5e-7, C = 2 ** 53, D = 0x10, E = 1_000 }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var E;\r\n(function (E) {\r\n    E[E[\"A\"] = 1] = \"A\";\r\n    E[E[\"B\"] = 2] = \"B\";\r\n    E[E[\"C\"] = E.A + f()] = \"C\";\r\n    E[E[\"D\"] = E.A | f()] = \"D\";\r\n    E[E[\"F\"] = 2] = \"F\";\r\n})(E || (E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-self-references",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e206628293a206e756d6265723b0a656e756d2045207b0a2020202041203d20312c0a2020202042203d2041202b20312c0a2020202043203d20452e41202b206628292c0a2020202044203d2041207c206628292c0a2020202046203d20455b2242225d2c0a7d0a"
+    },
+    "id": "enum-self-references",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare function f(): number;\nenum E {\n    A = 1,\n    B = A + 1,\n    C = E.A + f(),\n    D = A | f(),\n    F = E[\"B\"],\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var E;\r\n(function (E) {\r\n    E[E[\"A\"] = 0] = \"A\";\r\n    E[E[\"B\"] = 1] = \"B\";\r\n})(E || (E = {}));\r\n(function (E) {\r\n    E[E[\"C\"] = 2] = \"C\";\r\n    E[E[\"D\"] = 3] = \"D\";\r\n})(E || (E = {}));\r\nlet e = E.A + E.D;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-merged",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "656e756d2045207b20412c2042207d0a656e756d2045207b2043203d20322c2044203d2043202b2031207d0a6c65742065203d20452e41202b20452e443b0a"
+    },
+    "id": "enum-merged",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "enum E { A, B }\nenum E { C = 2, D = C + 1 }\nlet e = E.A + E.D;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "export var E;\r\n(function (E) {\r\n    E[E[\"A\"] = 0] = \"A\";\r\n    E[\"B\"] = \"b\";\r\n})(E || (E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-exported-esnext",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f727420656e756d2045207b20412c2042203d20226222207d0a6578706f727420636f6e737420656e756d204345207b2058207d0a636f6e737420656e756d205045207b2059207d0a"
+    },
+    "id": "enum-exported-esnext",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\nexport enum E { A, B = \"b\" }\nexport const enum CE { X }\nconst enum PE { Y }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "function f() {\r\n    let Local;\r\n    (function (Local) {\r\n        Local[Local[\"A\"] = 0] = \"A\";\r\n        Local[Local[\"B\"] = 1] = \"B\";\r\n    })(Local || (Local = {}));\r\n    return Local.B;\r\n}\r\nlet g = () => { let L2; (function (L2) {\r\n    L2[L2[\"X\"] = 1] = \"X\";\r\n})(L2 || (L2 = {})); return L2.X; };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-in-function",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e20662829207b0a20202020656e756d204c6f63616c207b20412c2042207d0a2020202072657475726e204c6f63616c2e423b0a7d0a6c65742067203d202829203d3e207b20656e756d204c32207b2058203d2031207d2072657475726e204c322e583b207d3b0a"
+    },
+    "id": "enum-in-function",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "function f() {\n    enum Local { A, B }\n    return Local.B;\n}\nlet g = () => { enum L2 { X = 1 } return L2.X; };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "{\r\n    let E;\r\n    (function (E) {\r\n        E[E[\"A\"] = 0] = \"A\";\r\n    })(E || (E = {}));\r\n    (function (E) {\r\n        E[E[\"B\"] = 1] = \"B\";\r\n    })(E || (E = {}));\r\n}\r\nif (true) {\r\n    let F;\r\n    (function (F) {\r\n        F[F[\"A\"] = 0] = \"A\";\r\n    })(F || (F = {}));\r\n}\r\nswitch (0) {\r\n    case 0:\r\n        let G;\r\n        (function (G) {\r\n            G[G[\"A\"] = 0] = \"A\";\r\n        })(G || (G = {}));\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-in-block",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "7b0a20202020656e756d2045207b2041207d0a20202020656e756d2045207b2042203d2031207d0a7d0a696620287472756529207b20656e756d2046207b2041207d207d0a73776974636820283029207b206361736520303a20656e756d2047207b2041207d207d0a"
+    },
+    "id": "enum-in-block",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "{\n    enum E { A }\n    enum E { B = 1 }\n}\nif (true) { enum F { A } }\nswitch (0) { case 0: enum G { A } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "let x = CE.A;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "const-enum-not-preserved",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e737420656e756d204345207b2041203d20312c2042203d2032207d0a6c65742078203d2043452e413b0a6e616d657370616365204e207b206578706f727420636f6e737420656e756d20496e6e6572207b2058207d207d0a"
+    },
+    "id": "const-enum-not-preserved",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "const enum CE { A = 1, B = 2 }\nlet x = CE.A;\nnamespace N { export const enum Inner { X } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var CE;\r\n(function (CE) {\r\n    CE[CE[\"A\"] = 1] = \"A\";\r\n    CE[CE[\"B\"] = 2] = \"B\";\r\n    CE[\"S\"] = \"s\";\r\n})(CE || (CE = {}));\r\nlet x = CE.B;\r\nvar N;\r\n(function (N) {\r\n    let Inner;\r\n    (function (Inner) {\r\n        Inner[Inner[\"X\"] = 0] = \"X\";\r\n    })(Inner = N.Inner || (N.Inner = {}));\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "const-enum-preserved",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e737420656e756d204345207b2041203d20312c2042203d2041202b20312c2053203d20227322207d0a6c65742078203d2043452e423b0a6e616d657370616365204e207b206578706f727420636f6e737420656e756d20496e6e6572207b2058207d207d0a"
+    },
+    "id": "const-enum-preserved",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "preserveConstEnums": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @preserveConstEnums: true\nconst enum CE { A = 1, B = A + 1, S = \"s\" }\nlet x = CE.B;\nnamespace N { export const enum Inner { X } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "/** Leading comment */\r\nvar E;\r\n(function (E) {\r\n    // member A\r\n    E[E[\"A\"] = 1] = \"A\";\r\n    /* B */ E[E[\"B\"] = 2] = \"B\";\r\n})(E || (E = {})); // trailing comment\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-comments",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "2f2a2a204c656164696e6720636f6d6d656e74202a2f0a656e756d2045207b0a202020202f2f206d656d62657220410a2020202041203d20312c202f2f20747261696c696e6720410a202020202f2a2042202a2f20420a7d202f2f20747261696c696e6720636f6d6d656e740a"
+    },
+    "id": "enum-comments",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "/** Leading comment */\nenum E {\n    // member A\n    A = 1, // trailing A\n    /* B */ B\n} // trailing comment\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var E;\r\n(function (E) {\r\n    E[E[\"A\"] = 1] = \"A\";\r\n})(E || (E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-remove-comments",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "2f2a2a204c656164696e6720636f6d6d656e74202a2f0a656e756d2045207b0a2020202041203d20312c202f2f20747261696c696e670a7d202f2f20747261696c696e670a"
+    },
+    "id": "enum-remove-comments",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "removeComments": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @removeComments: true\n/** Leading comment */\nenum E {\n    A = 1, // trailing\n} // trailing\n"
+  },
+  {
+   "diagnostics": 6,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var E = 1;\r\n(function (E) {\r\n    E[E[\"A\"] = 0] = \"A\";\r\n})(E || (E = {}));\r\nfunction F() { }\r\n(function (F) {\r\n    F[F[\"B\"] = 0] = \"B\";\r\n})(F || (F = {}));\r\nclass G {\r\n}\r\n(function (G) {\r\n    G[G[\"C\"] = 0] = \"C\";\r\n})(G || (G = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-declared-after-var",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "7661722045203d20313b0a656e756d2045207b2041207d0a66756e6374696f6e20462829207b7d0a656e756d2046207b2042207d0a636c6173732047207b7d0a656e756d2047207b2043207d0a"
+    },
+    "id": "enum-declared-after-var",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "var E = 1;\nenum E { A }\nfunction F() {}\nenum F { B }\nclass G {}\nenum G { C }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    let E;\r\n    (function (E) {\r\n        E[E[\"A\"] = 0] = \"A\";\r\n        E[E[\"B\"] = 2] = \"B\";\r\n    })(E = N.E || (N.E = {}));\r\n    N.x = E.A;\r\n    let y = E[\"B\"];\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-referenced-from-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206578706f727420656e756d2045207b20412c2042203d2041202b2032207d0a202020206578706f7274206c65742078203d20452e413b0a202020206c65742079203d20455b2242225d3b0a7d0a"
+    },
+    "id": "enum-referenced-from-namespace",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    export enum E { A, B = A + 2 }\n    export let x = E.A;\n    let y = E[\"B\"];\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    N.k = 3;\r\n    let E;\r\n    (function (E) {\r\n        E[E[\"A\"] = 3] = \"A\";\r\n        E[E[\"B\"] = 6] = \"B\";\r\n        E[E[\"C\"] = 6] = \"C\";\r\n    })(E = N.E || (N.E = {}));\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-member-references-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206578706f727420636f6e7374206b203d20333b0a202020206578706f727420656e756d2045207b2041203d206b2c2042203d206b202a20322c2043203d206b202b2041207d0a7d0a"
+    },
+    "id": "enum-member-references-namespace",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    export const k = 3;\n    export enum E { A = k, B = k * 2, C = k + A }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "export {};\r\nvar E;\r\n(function (E) {\r\n    E[E[\"A\"] = f()] = \"A\";\r\n    E[E[\"B\"] = E.A + 1] = \"B\";\r\n})(E || (E = {}));\r\nexport var X;\r\n(function (X) {\r\n    X[\"Y\"] = \"y\";\r\n    X[\"Z\"] = \"y\";\r\n})(X || (X = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-with-isolated-modules",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274207b7d3b0a6465636c6172652066756e6374696f6e206628293a206e756d6265723b0a656e756d2045207b2041203d206628292c2042203d2041202b2031207d0a6578706f727420656e756d2058207b2059203d202279222c205a203d2059207d0a"
+    },
+    "id": "enum-with-isolated-modules",
+    "options": {
+     "isolatedModules": true,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @isolatedModules: true\n// @module: commonjs\nexport {};\ndeclare function f(): number;\nenum E { A = f(), B = A + 1 }\nexport enum X { Y = \"y\", Z = Y }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    N.a = 1;\r\n    var b = 2;\r\n    function f() { return N.a + b; }\r\n    N.f = f;\r\n    class C {\r\n    }\r\n    N.C = C;\r\n    function g() { }\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-basic",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206578706f7274207661722061203d20313b0a202020207661722062203d20323b0a202020206578706f72742066756e6374696f6e20662829207b2072657475726e2061202b20623b207d0a202020206578706f727420636c6173732043207b7d0a2020202066756e6374696f6e20672829207b7d0a7d0a"
+    },
+    "id": "namespace-basic",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    export var a = 1;\n    var b = 2;\n    export function f() { return a + b; }\n    export class C {}\n    function g() {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    N.a = 1;\r\n})(N || (N = {}));\r\n(function (N) {\r\n    N.b = N.a;\r\n    var a2 = N.a;\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-merged",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206578706f7274207661722061203d20313b0a7d0a6e616d657370616365204e207b0a202020206578706f7274207661722062203d20613b0a20202020766172206132203d20613b0a7d0a"
+    },
+    "id": "namespace-merged",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    export var a = 1;\n}\nnamespace N {\n    export var b = a;\n    var a2 = a;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var A;\r\n(function (A) {\r\n    var B;\r\n    (function (B) {\r\n        var C;\r\n        (function (C) {\r\n            C.x = 1;\r\n            function foo() { }\r\n            // TODO, blah\r\n        })(C = B.C || (B.C = {}));\r\n    })(B = A.B || (A.B = {}));\r\n})(A || (A = {}));\r\nlet y = A.B.C.x;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-dotted",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d65737061636520412e422e43207b0a202020206578706f7274207661722078203d20313b0a2020202066756e6374696f6e20666f6f2829207b7d0a202020202f2f20544f444f2c20626c61680a7d0a6c65742079203d20412e422e432e783b0a"
+    },
+    "id": "namespace-dotted",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace A.B.C {\n    export var x = 1;\n    function foo() {}\n    // TODO, blah\n}\nlet y = A.B.C.x;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "export var A;\r\n(function (A) {\r\n    var B;\r\n    (function (B) {\r\n        B.x = 1;\r\n    })(B = A.B || (A.B = {}));\r\n})(A || (A = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-dotted-exported-esnext",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274206e616d65737061636520412e42207b0a202020206578706f727420636f6e73742078203d20313b0a7d0a"
+    },
+    "id": "namespace-dotted-exported-esnext",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\nexport namespace A.B {\n    export const x = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var Outer;\r\n(function (Outer) {\r\n    let Inner;\r\n    (function (Inner) {\r\n        Inner.x = 1;\r\n        function f() { return Inner.x; }\r\n        Inner.f = f;\r\n    })(Inner = Outer.Inner || (Outer.Inner = {}));\r\n    let Private;\r\n    (function (Private) {\r\n        Private.y = Inner.x;\r\n    })(Private || (Private = {}));\r\n    Outer.z = Inner.f();\r\n})(Outer || (Outer = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-nested",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204f75746572207b0a202020206578706f7274206e616d65737061636520496e6e6572207b0a20202020202020206578706f7274207661722078203d20313b0a20202020202020206578706f72742066756e6374696f6e20662829207b2072657475726e20783b207d0a202020207d0a202020206e616d6573706163652050726976617465207b0a20202020202020206578706f7274207661722079203d20496e6e65722e783b0a202020207d0a202020206578706f727420766172207a203d20496e6e65722e6628293b0a7d0a"
+    },
+    "id": "namespace-nested",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace Outer {\n    export namespace Inner {\n        export var x = 1;\n        export function f() { return x; }\n    }\n    namespace Private {\n        export var y = Inner.x;\n    }\n    export var z = Inner.f();\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    N.a = 1, N.c = N.a + 1;\r\n    N.d = 2;\r\n    N.e = N.d;\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-exported-variables",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206578706f7274207661722061203d20312c20622c2063203d2061202b20313b0a202020206578706f7274206c65742064203d20323b0a202020206578706f727420636f6e73742065203d20643b0a202020206578706f72742076617220663b0a202020206578706f7274206c657420673a206e756d6265723b0a7d0a"
+    },
+    "id": "namespace-exported-variables",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    export var a = 1, b, c = a + 1;\n    export let d = 2;\n    export const e = d;\n    export var f;\n    export let g: number;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    var _a, _b;\r\n    N.a = o.a, N.c = o.b.c, N.rest = __rest(o, [\"a\", \"b\"]);\r\n    N.d = o[0], _a = o[2], N.e = _a === void 0 ? 1 : _a, N.f = o.slice(3);\r\n    _b = o.g, N.g = _b === void 0 ? N.d : _b;\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-exported-destructuring",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e7374206f3a20616e793b0a6e616d657370616365204e207b0a202020206578706f727420766172207b20612c20623a207b2063207d2c202e2e2e72657374207d203d206f3b0a202020206578706f727420636f6e7374205b642c202c2065203d20312c202e2e2e665d203d206f3b0a202020206578706f7274206c6574207b2067203d2064207d203d206f3b0a7d0a"
+    },
+    "id": "namespace-exported-destructuring",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare const o: any;\nnamespace N {\n    export var { a, b: { c }, ...rest } = o;\n    export const [d, , e = 1, ...f] = o;\n    export let { g = d } = o;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    N.a = 1;\r\n    function f(x = N.a) { return N.a + x; }\r\n    N.f = f;\r\n    class C {\r\n        m() { return N.a; }\r\n        static s = N.a;\r\n    }\r\n    N.C = C;\r\n    N.a++;\r\n    N.a = 2;\r\n    let o = { a: N.a, b: N.a, [N.a]: N.a };\r\n    label: for (;;) {\r\n        break label;\r\n    }\r\n    let p = o.a;\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-identifier-references",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206578706f7274207661722061203d20313b0a202020206578706f72742066756e6374696f6e20662878203d206129207b2072657475726e2061202b20783b207d0a202020206578706f727420636c6173732043207b206d2829207b2072657475726e20613b207d207374617469632073203d20613b207d0a20202020612b2b3b0a2020202061203d20323b0a202020206c6574206f203d207b20612c20623a20612c205b615d3a2061207d3b0a202020206c6162656c3a20666f7220283b3b29207b20627265616b206c6162656c3b207d0a202020206c65742070203d206f2e613b0a7d0a"
+    },
+    "id": "namespace-identifier-references",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    export var a = 1;\n    export function f(x = a) { return a + x; }\n    export class C { m() { return a; } static s = a; }\n    a++;\n    a = 2;\n    let o = { a, b: a, [a]: a };\n    label: for (;;) { break label; }\n    let p = o.a;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    N.a = 1;\r\n    N.b = 2;\r\n    var c = 3;\r\n    let o1 = { a: N.a, c };\r\n    ({ a: N.a = 5, b: N.b } = obj);\r\n    ({ c = 6 } = obj);\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-shorthand-assignment",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c6574206f626a3a20616e793b0a6e616d657370616365204e207b0a202020206578706f7274207661722061203d20313b0a202020206578706f7274207661722062203d20323b0a202020207661722063203d20333b0a202020206c6574206f31203d207b20612c2063207d3b0a20202020287b2061203d20352c2062207d203d206f626a293b0a20202020287b2063203d2036207d203d206f626a293b0a7d0a"
+    },
+    "id": "namespace-shorthand-assignment",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare let obj: any;\nnamespace N {\n    export var a = 1;\n    export var b = 2;\n    var c = 3;\n    let o1 = { a, c };\n    ({ a = 5, b } = obj);\n    ({ c = 6 } = obj);\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    class C {\r\n        x;\r\n        constructor(x) {\r\n            this.x = x;\r\n        }\r\n    }\r\n    N.C = C;\r\n    class D extends C {\r\n    }\r\n    N.D = D;\r\n    class Hidden {\r\n    }\r\n    N.c = new C(1);\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-with-classes",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206578706f727420636c6173732043207b0a2020202020202020636f6e7374727563746f72287075626c696320783a206e756d62657229207b7d0a202020207d0a202020206578706f727420616273747261637420636c617373204420657874656e64732043207b7d0a20202020636c6173732048696464656e207b7d0a202020206578706f727420636f6e73742063203d206e657720432831293b0a7d0a"
+    },
+    "id": "namespace-with-classes",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    export class C {\n        constructor(public x: number) {}\n    }\n    export abstract class D extends C {}\n    class Hidden {}\n    export const c = new C(1);\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    let E;\r\n    (function (E) {\r\n        E[E[\"A\"] = 0] = \"A\";\r\n    })(E = N.E || (N.E = {}));\r\n    let Local;\r\n    (function (Local) {\r\n        Local[Local[\"B\"] = 0] = \"B\";\r\n    })(Local || (Local = {}));\r\n    (function (E) {\r\n        E[E[\"C\"] = 3] = \"C\";\r\n    })(E = N.E || (N.E = {}));\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-with-enums",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206578706f727420656e756d2045207b2041207d0a20202020656e756d204c6f63616c207b2042203d20452e41207d0a202020206578706f727420656e756d2045207b2043203d2033207d0a7d0a"
+    },
+    "id": "namespace-with-enums",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    export enum E { A }\n    enum Local { B = E.A }\n    export enum E { C = 3 }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    function* gen() { yield 1; }\r\n    N.gen = gen;\r\n    async function af() { }\r\n    N.af = af;\r\n    function f(x) { }\r\n    N.f = f;\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-function-generator",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206578706f72742066756e6374696f6e2a2067656e2829207b207969656c6420313b207d0a202020206578706f7274206173796e632066756e6374696f6e2061662829207b7d0a202020206578706f72742066756e6374696f6e206628293a20766f69643b0a202020206578706f72742066756e6374696f6e206628783f3a206e756d62657229207b7d0a7d0a"
+    },
+    "id": "namespace-function-generator",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    export function* gen() { yield 1; }\n    export async function af() {}\n    export function f(): void;\n    export function f(x?: number) {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "class C {\r\n}\r\n(function (C) {\r\n    C.x = 1;\r\n})(C || (C = {}));\r\nfunction F() { }\r\n(function (F) {\r\n    F.y = 2;\r\n})(F || (F = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-class-merge",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b7d0a6e616d6573706163652043207b0a202020206578706f7274207661722078203d20313b0a7d0a66756e6374696f6e20462829207b7d0a6e616d6573706163652046207b0a202020206578706f727420636f6e73742079203d20323b0a7d0a"
+    },
+    "id": "namespace-class-merge",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class C {}\nnamespace C {\n    export var x = 1;\n}\nfunction F() {}\nnamespace F {\n    export const y = 2;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var Mixed;\r\n(function (Mixed) {\r\n    Mixed.v = 1;\r\n})(Mixed || (Mixed = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-non-instantiated",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365205479706573207b0a202020206578706f727420696e746572666163652049207b7d0a202020206578706f727420747970652054203d206e756d6265723b0a7d0a6e616d65737061636520456d707479207b7d0a6e616d657370616365204d69786564207b0a202020206578706f727420696e746572666163652049207b7d0a202020206578706f7274207661722076203d20313b0a7d0a"
+    },
+    "id": "namespace-non-instantiated",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace Types {\n    export interface I {}\n    export type T = number;\n}\nnamespace Empty {}\nnamespace Mixed {\n    export interface I {}\n    export var v = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var ConstOnly;\r\n(function (ConstOnly) {\r\n    let E;\r\n    (function (E) {\r\n        E[E[\"A\"] = 1] = \"A\";\r\n    })(E = ConstOnly.E || (ConstOnly.E = {}));\r\n})(ConstOnly || (ConstOnly = {}));\r\nvar ConstOnly2;\r\n(function (ConstOnly2) {\r\n    let E;\r\n    (function (E) {\r\n        E[E[\"A\"] = 1] = \"A\";\r\n    })(E || (E = {}));\r\n})(ConstOnly2 || (ConstOnly2 = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-const-enum-only-preserved",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d65737061636520436f6e73744f6e6c79207b0a202020206578706f727420636f6e737420656e756d2045207b2041203d2031207d0a7d0a6e616d65737061636520436f6e73744f6e6c7932207b0a20202020636f6e737420656e756d2045207b2041203d2031207d0a7d0a"
+    },
+    "id": "namespace-const-enum-only-preserved",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "preserveConstEnums": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @preserveConstEnums: true\nnamespace ConstOnly {\n    export const enum E { A = 1 }\n}\nnamespace ConstOnly2 {\n    const enum E { A = 1 }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "function f() {\r\n    let N;\r\n    (function (N) {\r\n        N.x = 1;\r\n    })(N || (N = {}));\r\n    return N.x;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-in-function",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e20662829207b0a202020206e616d657370616365204e207b206578706f7274207661722078203d20313b207d0a2020202072657475726e204e2e783b0a7d0a"
+    },
+    "id": "namespace-in-function",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "function f() {\n    namespace N { export var x = 1; }\n    return N.x;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    N.a = 1;\r\n    {\r\n        var b = N.a;\r\n        function g() { return N.a; }\r\n    }\r\n    if (N.a) {\r\n        let c = N.a;\r\n    }\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-block-scope",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206578706f7274207661722061203d20313b0a202020207b0a20202020202020207661722062203d20613b0a202020202020202066756e6374696f6e20672829207b2072657475726e20613b207d0a202020207d0a20202020696620286129207b0a20202020202020206c65742063203d20613b0a202020207d0a7d0a"
+    },
+    "id": "namespace-block-scope",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    export var a = 1;\n    {\n        var b = a;\n        function g() { return a; }\n    }\n    if (a) {\n        let c = a;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "/** doc N */\r\nvar N;\r\n(function (N) {\r\n    // inner comment\r\n    N.a = 1; // trailing a\r\n    /** doc f */\r\n    function f() { }\r\n    N.f = f;\r\n})(N || (N = {})); // after N\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-comments",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "2f2a2a20646f63204e202a2f0a6e616d657370616365204e207b0a202020202f2f20696e6e657220636f6d6d656e740a202020206578706f7274207661722061203d20313b202f2f20747261696c696e6720610a202020202f2a2a20646f632066202a2f0a202020206578706f72742066756e6374696f6e20662829207b7d0a7d202f2f206166746572204e0a"
+    },
+    "id": "namespace-comments",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "/** doc N */\nnamespace N {\n    // inner comment\n    export var a = 1; // trailing a\n    /** doc f */\n    export function f() {}\n} // after N\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "export var N;\r\n(function (N) {\r\n    N.x = 1;\r\n})(N || (N = {}));\r\n(function (N) {\r\n    N.y = N.x;\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-exported-module-esnext",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274206e616d657370616365204e207b0a202020206578706f7274207661722078203d20313b0a7d0a6578706f7274206e616d657370616365204e207b0a202020206578706f7274207661722079203d20783b0a7d0a"
+    },
+    "id": "namespace-exported-module-esnext",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\nexport namespace N {\n    export var x = 1;\n}\nexport namespace N {\n    export var y = x;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    N.x = 1;\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    N.y = N.x + 1;\r\n    let o = { x: N.x };\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/b.ts"
+    }
+   ],
+   "id": "namespace-across-files",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6e616d657370616365204e207b0a202020206578706f7274207661722078203d20313b0a7d",
+     "/.src/b.ts": "6e616d657370616365204e207b0a202020206578706f7274207661722079203d2078202b20313b0a202020206c6574206f203d207b2078207d3b0a7d0a"
+    },
+    "id": "namespace-across-files",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/a.ts",
+     "/.src/b.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nnamespace N {\n    export var x = 1;\n}\n// @filename: b.ts\nnamespace N {\n    export var y = x + 1;\n    let o = { x };\n}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    var a = 1;\r\n    export * from \"./m\";\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "export const b = 1;\r\n"
+      }
+     ],
+     "name": "/.src/m.ts"
+    }
+   ],
+   "id": "namespace-imports-exports-illegal",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/m.ts": "6578706f727420636f6e73742062203d20313b0a",
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206578706f7274207b2061207d3b0a202020207661722061203d20313b0a20202020696d706f7274207b2062207d2066726f6d20222e2f6d223b0a202020206578706f7274202a2066726f6d20222e2f6d223b0a7d"
+    },
+    "id": "namespace-imports-exports-illegal",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/m.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: probe.ts\nnamespace N {\n    export { a };\n    var a = 1;\n    import { b } from \"./m\";\n    export * from \"./m\";\n}\n// @filename: m.ts\nexport const b = 1;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var M;\r\n(function (M) {\r\n    M.y = 1;\r\n})(M || (M = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-string-name",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206d6f64756c652022616d6269656e7422207b206578706f72742076617220783a206e756d6265723b207d0a6d6f64756c65204d207b206578706f7274207661722079203d20313b207d0a"
+    },
+    "id": "namespace-string-name",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare module \"ambient\" { export var x: number; }\nmodule M { export var y = 1; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var A;\r\n(function (A) {\r\n    var B;\r\n    (function (B) {\r\n        B.x = 1;\r\n        let C;\r\n        (function (C) {\r\n            C.y = 2;\r\n        })(C = B.C || (B.C = {}));\r\n    })(B = A.B || (A.B = {}));\r\n})(A || (A = {}));\r\nvar X = A.B;\r\nvar Y = A.B.C;\r\nvar Z = A;\r\nlet v = X.x + Y.y + Z.B.x;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "import-equals-alias",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d65737061636520412e42207b206578706f7274207661722078203d20313b206578706f7274206e616d6573706163652043207b206578706f7274207661722079203d20323b207d207d0a696d706f72742058203d20412e423b0a696d706f72742059203d20412e422e433b0a696d706f7274205a203d20413b0a6c65742076203d20582e78202b20592e79202b205a2e422e783b0a"
+    },
+    "id": "import-equals-alias",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace A.B { export var x = 1; export namespace C { export var y = 2; } }\nimport X = A.B;\nimport Y = A.B.C;\nimport Z = A;\nlet v = X.x + Y.y + Z.B.x;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var A;\r\n(function (A) {\r\n    A.x = 1;\r\n    let I;\r\n    (function (I) {\r\n        I.z = 3;\r\n    })(I = A.I || (A.I = {}));\r\n})(A || (A = {}));\r\nvar N;\r\n(function (N) {\r\n    var a = A;\r\n    N.b = A.I;\r\n    N.c = A;\r\n    let u = a.x + N.b.z + N.c.x;\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "import-equals-in-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d6573706163652041207b206578706f7274207661722078203d20313b206578706f7274206e616d6573706163652049207b206578706f727420766172207a203d20333b207d207d0a6e616d657370616365204e207b0a20202020696d706f72742061203d20413b0a202020206578706f727420696d706f72742062203d20412e493b0a202020206578706f727420696d706f72742063203d20413b0a202020206c65742075203d20612e78202b20622e7a202b20632e783b0a7d0a"
+    },
+    "id": "import-equals-in-namespace",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace A { export var x = 1; export namespace I { export var z = 3; } }\nnamespace N {\n    import a = A;\n    export import b = A.I;\n    export import c = A;\n    let u = a.x + b.z + c.x;\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var A;\r\n(function (A) {\r\n    A.x = 1;\r\n})(A || (A = {}));\r\nvar N;\r\n(function (N) {\r\n    {\r\n        let u = a.x;\r\n    }\r\n    function f() {\r\n        return b.x;\r\n    }\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "import-equals-in-namespace-block",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d6573706163652041207b206578706f7274207661722078203d20313b207d0a6e616d657370616365204e207b0a202020207b0a2020202020202020696d706f72742061203d20413b0a20202020202020206c65742075203d20612e783b0a202020207d0a2020202066756e6374696f6e20662829207b0a2020202020202020696d706f72742062203d20413b0a202020202020202072657475726e20622e783b0a202020207d0a7d0a"
+    },
+    "id": "import-equals-in-namespace-block",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace A { export var x = 1; }\nnamespace N {\n    {\n        import a = A;\n        let u = a.x;\n    }\n    function f() {\n        import b = A;\n        return b.x;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var A;\r\n(function (A) {\r\n    A.x = 1;\r\n})(A || (A = {}));\r\nexport var X = A;\r\nvar Y = A;\r\nexport let y = X.x + Y.x;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "import-equals-exported-top",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d6573706163652041207b206578706f7274207661722078203d20313b207d0a6578706f727420696d706f72742058203d20413b0a696d706f72742059203d20413b0a6578706f7274206c65742079203d20582e78202b20592e783b0a"
+    },
+    "id": "import-equals-exported-top",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\nnamespace A { export var x = 1; }\nexport import X = A;\nimport Y = A;\nexport let y = X.x + Y.x;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "export const v = 1;\r\n"
+      }
+     ],
+     "name": "/.src/m.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "import m = require(\"./m\");\r\nexport import n = require(\"./m\");\r\nlet x = m.v + n.v;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "import-equals-external",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/m.ts": "6578706f727420636f6e73742076203d20313b",
+     "/.src/probe.ts": "696d706f7274206d203d207265717569726528222e2f6d22293b0a6578706f727420696d706f7274206e203d207265717569726528222e2f6d22293b0a6c65742078203d206d2e76202b206e2e763b0a"
+    },
+    "id": "import-equals-external",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: m.ts\nexport const v = 1;\n// @filename: probe.ts\nimport m = require(\"./m\");\nexport import n = require(\"./m\");\nlet x = m.v + n.v;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "export {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "import-equals-external-in-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/m.ts": "6578706f727420636f6e73742076203d20313b",
+     "/.src/probe.ts": "6578706f7274207b7d3b0a6e616d657370616365204e207b0a20202020696d706f7274206d203d207265717569726528222e2f6d22293b0a7d0a"
+    },
+    "id": "import-equals-external-in-namespace",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: m.ts\nexport const v = 1;\n// @filename: probe.ts\nexport {};\nnamespace N {\n    import m = require(\"./m\");\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var A;\r\n(function (A) {\r\n    A.x = 1;\r\n})(A || (A = {}));\r\n// before alias\r\nvar X = A; // after alias\r\nlet v = X.x;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "import-equals-comments",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d6573706163652041207b206578706f7274207661722078203d20313b207d0a2f2f206265666f726520616c6961730a696d706f7274202f2a20696e6e6572202a2f2058203d202f2a20726566202a2f20413b202f2f20616674657220616c6961730a6c65742076203d20582e783b0a"
+    },
+    "id": "import-equals-comments",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace A { export var x = 1; }\n// before alias\nimport /* inner */ X = /* ref */ A; // after alias\nlet v = X.x;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "export class C {\r\n    a;\r\n    constructor(a) {\r\n        this.a = a;\r\n    }\r\n}\r\nexport function f() { }\r\nexport var v = 1;\r\nexport default class {\r\n    p;\r\n    constructor(p) {\r\n        this.p = p;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "export-modifiers-esnext",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f727420636c6173732043207b20636f6e7374727563746f72287075626c696320613a206e756d62657229207b7d207d0a6578706f72742066756e6374696f6e20662829207b7d0a6578706f7274207661722076203d20313b0a6578706f72742064656661756c7420636c617373207b20636f6e7374727563746f72287072697661746520703a20737472696e6729207b7d207d0a"
+    },
+    "id": "export-modifiers-esnext",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\nexport class C { constructor(public a: number) {} }\nexport function f() {}\nexport var v = 1;\nexport default class { constructor(private p: string) {} }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "export default class default_1 {\r\n    @dec\r\n    m() { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "export-default-class-decorated",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6578706f72742064656661756c7420636c617373207b0a2020202040646563206d2829207b7d0a7d0a"
+    },
+    "id": "export-default-class-decorated",
+    "options": {
+     "experimentalDecorators": true,
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @module: esnext\ndeclare function dec(...args: any[]): any;\nexport default class {\n    @dec m() {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "export default class default_1 {\r\n    @dec\r\n    m() { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "export-default-class-decorated-standard",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6578706f72742064656661756c7420636c617373207b0a2020202040646563206d2829207b7d0a7d0a"
+    },
+    "id": "export-default-class-decorated-standard",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\ndeclare function dec(...args: any[]): any;\nexport default class {\n    @dec m() {}\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    class B {\r\n    }\r\n    N.B = B;\r\n    class C extends B {\r\n        x;\r\n        constructor(x = new B()) {\r\n            super();\r\n            this.x = x;\r\n        }\r\n    }\r\n    N.C = C;\r\n    N.D = class extends B {\r\n    };\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "class-heritage-in-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206578706f727420636c6173732042207b7d0a202020206578706f727420636c617373204320657874656e64732042207b0a2020202020202020636f6e7374727563746f72287075626c69632078203d206e65772042282929207b20737570657228293b207d0a202020207d0a202020206578706f727420636f6e73742044203d20636c61737320657874656e64732042207b7d3b0a7d0a"
+    },
+    "id": "class-heritage-in-namespace",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    export class B {}\n    export class C extends B {\n        constructor(public x = new B()) { super(); }\n    }\n    export const D = class extends B {};\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "export var N;\r\n(function (N) {\r\n    N.x = 1;\r\n})(N || (N = {}));\r\nexport var E;\r\n(function (E) {\r\n    E[E[\"A\"] = 0] = \"A\";\r\n})(E || (E = {}));\r\nexport class C {\r\n    a;\r\n    constructor(a) {\r\n        this.a = a;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "module-commonjs-file",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274206e616d657370616365204e207b206578706f7274207661722078203d20313b207d0a6578706f727420656e756d2045207b2041207d0a6578706f727420636c6173732043207b20636f6e7374727563746f72287075626c696320613a206e756d62657229207b7d207d0a"
+    },
+    "id": "module-commonjs-file",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\nexport namespace N { export var x = 1; }\nexport enum E { A }\nexport class C { constructor(public a: number) {} }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "export var N;\r\n(function (N) {\r\n    N.x = 1;\r\n})(N || (N = {}));\r\nvar E;\r\n(function (E) {\r\n    E[E[\"A\"] = 0] = \"A\";\r\n})(E || (E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "module-preserve",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274206e616d657370616365204e207b206578706f727420636f6e73742078203d20313b207d0a656e756d2045207b2041207d0a"
+    },
+    "id": "module-preserve",
+    "options": {
+     "module": 200,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: preserve\nexport namespace N { export const x = 1; }\nenum E { A }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    N.x = 1;\r\n})(N || (N = {}));\r\nvar E;\r\n(function (E) {\r\n    E[E[\"A\"] = N.x] = \"A\";\r\n})(E || (E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "module-es2015-script",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b206578706f7274207661722078203d20313b207d0a656e756d2045207b2041203d204e2e78207d0a"
+    },
+    "id": "module-es2015-script",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\nnamespace N { export var x = 1; }\nenum E { A = N.x }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    N.x = 1;\r\n})(N || (N = {}));\r\nvar E;\r\n(function (E) {\r\n    E[E[\"A\"] = 1] = \"A\";\r\n})(E || (E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "target-es5-ish",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b206578706f7274206c65742078203d20313b206578706f727420636f6e737420656e756d204345207b2041207d207d0a656e756d2045207b2041203d2031207d0a"
+    },
+    "id": "target-es5-ish",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\nnamespace N { export let x = 1; export const enum CE { A } }\nenum E { A = 1 }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "export var N;\r\n(function (N) {\r\n    N.a = 1;\r\n    function f() { return N.a; }\r\n    N.f = f;\r\n    let o = { a: N.a };\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "isolated-modules-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274206e616d657370616365204e207b0a202020206578706f7274207661722061203d20313b0a202020206578706f72742066756e6374696f6e20662829207b2072657475726e20613b207d0a202020206c6574206f203d207b2061207d3b0a7d0a"
+    },
+    "id": "isolated-modules-namespace",
+    "options": {
+     "isolatedModules": true,
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @isolatedModules: true\n// @module: esnext\nexport namespace N {\n    export var a = 1;\n    export function f() { return a; }\n    let o = { a };\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    N.a = 1;\r\n    let b = N.a;\r\n})(N || (N = {}));\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "isolated-modules-binder-only",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b206578706f727420636f6e73742061203d20313b206c65742062203d20613b207d0a6578706f7274207b7d3b0a"
+    },
+    "id": "isolated-modules-binder-only",
+    "options": {
+     "isolatedModules": true,
+     "module": 99,
+     "newLine": 1,
+     "noCheck": true,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @isolatedModules: true\n// @module: esnext\n// @noCheck: true\nnamespace N { export const a = 1; let b = a; }\nexport {};\n"
+  },
+  {
+   "diagnostics": 5,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    {\r\n        export var x = 1;\r\n        export function f() { return N.x; }\r\n        export class C {\r\n        }\r\n        let E;\r\n        (function (E) {\r\n            E[E[\"A\"] = 0] = \"A\";\r\n        })(E || (E = {}));\r\n        let Inner;\r\n        (function (Inner) {\r\n            Inner.y = 2;\r\n        })(Inner || (Inner = {}));\r\n    }\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-export-in-block",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020207b0a20202020202020206578706f7274207661722078203d20313b0a20202020202020206578706f72742066756e6374696f6e20662829207b2072657475726e20783b207d0a20202020202020206578706f727420636c6173732043207b7d0a20202020202020206578706f727420656e756d2045207b2041207d0a20202020202020206578706f7274206e616d65737061636520496e6e6572207b206578706f7274207661722079203d20323b207d0a202020207d0a7d0a"
+    },
+    "id": "namespace-export-in-block",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    {\n        export var x = 1;\n        export function f() { return x; }\n        export class C {}\n        export enum E { A }\n        export namespace Inner { export var y = 2; }\n    }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "runtimesyntax"
+       ],
+       "text": "(function (\"m\") {\r\n})(\"m\" || (\"m\" = {}));\r\n;\r\nvar keep = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alone-module-without-body",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206d6f64756c6520226d223b0a6e616d65737061636520412e423b0a766172206b656570203d20313b0a"
+    },
+    "id": "alone-module-without-body",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare module \"m\";\nnamespace A.B;\nvar keep = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "runtimesyntax"
+       ],
+       "text": "var D;\r\n(function (D) {\r\n})(D || (D = {}));\r\nvar DE;\r\n(function (DE) {\r\n    DE[DE[\"A\"] = void 0] = \"A\";\r\n})(DE || (DE = {}));\r\nlet u = D.x;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alone-ambient-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206e616d6573706163652044207b206578706f72742076617220783a206e756d6265723b207d0a6465636c61726520656e756d204445207b2041207d0a6c65742075203d20442e783b0a"
+    },
+    "id": "alone-ambient-namespace",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare namespace D { export var x: number; }\ndeclare enum DE { A }\nlet u = D.x;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    class C {\r\n        a;\r\n        @dec\r\n        m() { }\r\n        constructor(\r\n        @dec\r\n        a) {\r\n            this.a = a;\r\n        }\r\n    }\r\n    N.C = C;\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-decorated-class-experimental",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6e616d657370616365204e207b0a202020206578706f727420636c6173732043207b0a202020202020202040646563206d2829207b7d0a2020202020202020636f6e7374727563746f722840646563207075626c696320613a206e756d62657229207b7d0a202020207d0a7d0a"
+    },
+    "id": "namespace-decorated-class-experimental",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\ndeclare function dec(...args: any[]): any;\nnamespace N {\n    export class C {\n        @dec m() {}\n        constructor(@dec public a: number) {}\n    }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    function f() {\r\n        let Inner;\r\n        (function (Inner) {\r\n            Inner[Inner[\"A\"] = 0] = \"A\";\r\n            Inner[Inner[\"B\"] = 0] = \"B\";\r\n        })(Inner || (Inner = {}));\r\n        let Deep;\r\n        (function (Deep) {\r\n            Deep.d = 1;\r\n        })(Deep || (Deep = {}));\r\n        return Inner.B + Deep.d;\r\n    }\r\n    N.f = f;\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-enum-in-function-block",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206578706f72742066756e6374696f6e20662829207b0a2020202020202020656e756d20496e6e6572207b20412c2042203d2041207d0a20202020202020206e616d6573706163652044656570207b206578706f7274207661722064203d20313b207d0a202020202020202072657475726e20496e6e65722e42202b20446565702e643b0a202020207d0a7d0a"
+    },
+    "id": "namespace-enum-in-function-block",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    export function f() {\n        enum Inner { A, B = A }\n        namespace Deep { export var d = 1; }\n        return Inner.B + Deep.d;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    N.a = 1;\r\n    N.b = { a: N.a, get a2() { return N.a; } };\r\n    class K {\r\n        a = N.a;\r\n        [N.a] = 1;\r\n    }\r\n    a: while (N.a) {\r\n        continue a;\r\n    }\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-label-and-property-names",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206578706f7274207661722061203d20313b0a202020206578706f7274207661722062203d207b20613a20612c206765742061322829207b2072657475726e20613b207d207d3b0a20202020636c617373204b207b2061203d20613b205b615d203d20313b207d0a20202020613a207768696c6520286129207b20636f6e74696e756520613b207d0a7d0a"
+    },
+    "id": "namespace-label-and-property-names",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    export var a = 1;\n    export var b = { a: a, get a2() { return a; } };\n    class K { a = a; [a] = 1; }\n    a: while (a) { continue a; }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    N.x = 1;\r\n})(N || (N = {}));\r\nvar E;\r\n(function (E) {\r\n    E[E[\"A\"] = 0] = \"A\";\r\n    E[E[\"B\"] = 0] = \"B\";\r\n})(E || (E = {}));\r\nclass C {\r\n    a;\r\n    b;\r\n    constructor(a, b) {\r\n        this.a = a;\r\n        this.b = b;\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alone-namespace-and-enum",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b206578706f7274207661722078203d20313b207d0a656e756d2045207b20412c2042203d2041207d0a636c6173732043207b20636f6e7374727563746f72287075626c696320612c2070726976617465206229207b7d207d0a"
+    },
+    "id": "alone-namespace-and-enum",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N { export var x = 1; }\nenum E { A, B = A }\nclass C { constructor(public a, private b) {} }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "runtimesyntax"
+       ],
+       "text": "var Mixed;\r\n(function (Mixed) {\r\n    Mixed.v = 1;\r\n})(Mixed || (Mixed = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alone-non-instantiated-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365205479706573207b206578706f727420696e746572666163652049207b7d207d0a6e616d657370616365204d69786564207b206578706f7274207661722076203d20313b207d0a"
+    },
+    "id": "alone-non-instantiated-namespace",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace Types { export interface I {} }\nnamespace Mixed { export var v = 1; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "runtimesyntax"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "alone-const-enum-only-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204f6e6c79436f6e7374207b206578706f727420636f6e737420656e756d2045207b2041207d207d0a636f6e737420656e756d204345207b2042207d0a"
+    },
+    "id": "alone-const-enum-only-namespace",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace OnlyConst { export const enum E { A } }\nconst enum CE { B }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "export var N;\r\n(function (N) {\r\n    N.x = 1;\r\n})(N || (N = {}));\r\nexport var E;\r\n(function (E) {\r\n    E[E[\"A\"] = 0] = \"A\";\r\n})(E || (E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.mts"
+    }
+   ],
+   "id": "module-node16",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.mts": "6578706f7274206e616d657370616365204e207b206578706f7274207661722078203d20313b207d0a6578706f727420656e756d2045207b2041207d0a"
+    },
+    "id": "module-node16",
+    "options": {
+     "module": 100,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.mts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: node16\n// @filename: probe.mts\nexport namespace N { export var x = 1; }\nexport enum E { A }\n"
+  },
+  {
+   "diagnostics": 8,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var { E } = o;\r\n(function (E) {\r\n    E[E[\"A\"] = 0] = \"A\";\r\n})(E || (E = {}));\r\nvar [F, { G }] = o;\r\n(function (F) {\r\n    F[F[\"B\"] = 0] = \"B\";\r\n})(F || (F = {}));\r\n(function (G) {\r\n    G[G[\"C\"] = 0] = \"C\";\r\n})(G || (G = {}));\r\nlet { H: [I] } = o;\r\n(function (I) {\r\n    I[I[\"D\"] = 0] = \"D\";\r\n})(I || (I = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-after-binding-pattern",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e7374206f3a20616e793b0a766172207b2045207d203d206f3b0a656e756d2045207b2041207d0a766172205b462c207b2047207d5d203d206f3b0a656e756d2046207b2042207d0a656e756d2047207b2043207d0a6c6574207b20483a205b495d207d203d206f3b0a656e756d2049207b2044207d0a"
+    },
+    "id": "enum-after-binding-pattern",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare const o: any;\nvar { E } = o;\nenum E { A }\nvar [F, { G }] = o;\nenum F { B }\nenum G { C }\nlet { H: [I] } = o;\nenum I { D }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    class default_1 {\r\n        a;\r\n        constructor(a) {\r\n            this.a = a;\r\n        }\r\n    }\r\n    N.default_1 = default_1;\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-export-default-class",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206578706f72742064656661756c7420636c617373207b0a2020202020202020636f6e7374727563746f72287075626c696320613a206e756d62657229207b7d0a202020207d0a7d0a"
+    },
+    "id": "namespace-export-default-class",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\nnamespace N {\n    export default class {\n        constructor(public a: number) {}\n    }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N) {\r\n    var _a;\r\n    N.a = o[0], _a = o[2], N.b = _a === void 0 ? 1 : _a;\r\n    N.e = o.d.e;\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-binding-pattern-exports",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e7374206f3a20616e793b0a6e616d657370616365204e207b0a202020206578706f727420766172205b612c202c2062203d20315d203d206f2c20633b0a202020206578706f7274206c6574207b20643a207b2065207d207d203d206f3b0a202020206578706f72742076617220663b0a7d0a"
+    },
+    "id": "namespace-binding-pattern-exports",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare const o: any;\nnamespace N {\n    export var [a, , b = 1] = o, c;\n    export let { d: { e } } = o;\n    export var f;\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "switch (k) {\r\n    case 1:\r\n        let E;\r\n        (function (E) {\r\n            E[E[\"A\"] = 0] = \"A\";\r\n        })(E || (E = {}));\r\n        (function (E) {\r\n            E[E[\"B\"] = 2] = \"B\";\r\n        })(E || (E = {}));\r\n        break;\r\n    default:\r\n        let N;\r\n        (function (N) {\r\n            N.x = 1;\r\n        })(N || (N = {}));\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enum-in-case-block",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e7374206b3a206e756d6265723b0a73776974636820286b29207b0a202020206361736520313a0a2020202020202020656e756d2045207b2041207d0a2020202020202020656e756d2045207b2042203d2032207d0a2020202020202020627265616b3b0a2020202064656661756c743a0a20202020202020206e616d657370616365204e207b206578706f7274207661722078203d20313b207d0a7d0a"
+    },
+    "id": "enum-in-case-block",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare const k: number;\nswitch (k) {\n    case 1:\n        enum E { A }\n        enum E { B = 2 }\n        break;\n    default:\n        namespace N { export var x = 1; }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "runtimesyntax"
+       ],
+       "text": "var N;\r\n(function (N_2) {\r\n    var N_1 = 1;\r\n    N_2.x = N_1;\r\n    let N;\r\n    (function (N) {\r\n        N.y = N_2.x;\r\n    })(N = N_2.N || (N_2.N = {}));\r\n})(N || (N = {}));\r\nvar E;\r\n(function (E) {\r\n    E[E[\"A\"] = 0] = \"A\";\r\n    E[E[\"E\"] = 0] = \"E\";\r\n})(E || (E = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-generated-name-collision",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a20202020766172204e5f31203d20313b0a202020206578706f7274207661722078203d204e5f313b0a202020206578706f7274206e616d657370616365204e207b206578706f7274207661722079203d20783b207d0a7d0a656e756d2045207b20412c2045203d2041207d0a"
+    },
+    "id": "namespace-generated-name-collision",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    var N_1 = 1;\n    export var x = N_1;\n    export namespace N { export var y = x; }\n}\nenum E { A, E = A }\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}
