@@ -1,0 +1,143 @@
+//! The script transforms' projection of `printer.EmitResolver` and of
+//! `binder.ReferenceResolver`, which it embeds. Declaration emit uses
+//! [`crate::emit_resolver::DeclarationEmitResolver`]; these traits are
+//! object-safe so a transformer holds a resolver without naming the checker.
+use crate::emit_resolver::{ConstantValue, EnumMemberValue};
+use tsr_ast::{JsString, NodeId};
+
+/// A resolver failure, opaque to the transforms: they record it and stop.
+/// The emitter that supplied the resolver recovers its own error type.
+#[derive(Debug)]
+pub struct EmitResolverError(Box<dyn std::error::Error + Send + Sync + 'static>);
+
+impl EmitResolverError {
+    pub fn new(error: impl std::error::Error + Send + Sync + 'static) -> Self {
+        Self(Box::new(error))
+    }
+
+    pub fn downcast_ref<T: std::error::Error + 'static>(&self) -> Option<&T> {
+        self.0.downcast_ref()
+    }
+
+    pub fn into_inner(self) -> Box<dyn std::error::Error + Send + Sync + 'static> {
+        self.0
+    }
+}
+
+impl std::fmt::Display for EmitResolverError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl std::error::Error for EmitResolverError {}
+
+impl From<tsr_arena::Error> for EmitResolverError {
+    fn from(error: tsr_arena::Error) -> Self {
+        Self::new(error)
+    }
+}
+
+pub type ResolverResult<T> = Result<T, EmitResolverError>;
+
+/// Indicates how to serialize the name for a TypeReferenceNode when emitting
+/// decorator metadata.
+// Source: tsc/internal/printer/emitresolver.go:TypeReferenceSerializationKind
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[repr(i32)]
+pub enum TypeReferenceSerializationKind {
+    /// The TypeReferenceNode could not be resolved.
+    /// The type name should be emitted using a safe fallback.
+    Unknown,
+    /// The TypeReferenceNode resolves to a type with a constructor
+    /// function that can be reached at runtime (e.g. a `class`
+    /// declaration or a `var` declaration for the static side
+    /// of a type, such as the global `Promise` type in lib.d.ts).
+    TypeWithConstructSignatureAndValue,
+    /// The TypeReferenceNode resolves to a Void-like, Nullable, or Never type.
+    VoidNullableOrNeverType,
+    /// The TypeReferenceNode resolves to a Number-like type.
+    NumberLikeType,
+    /// The TypeReferenceNode resolves to a BigInt-like type.
+    BigIntLikeType,
+    /// The TypeReferenceNode resolves to a String-like type.
+    StringLikeType,
+    /// The TypeReferenceNode resolves to a Boolean-like type.
+    BooleanType,
+    /// The TypeReferenceNode resolves to an Array-like type.
+    ArrayLikeType,
+    /// The TypeReferenceNode resolves to the ESSymbol type.
+    ESSymbolType,
+    /// The TypeReferenceNode resolved to the global Promise constructor symbol.
+    Promise,
+    /// The TypeReferenceNode resolves to a Function type or a type with call signatures.
+    TypeWithCallSignature,
+    /// The TypeReferenceNode resolves to any other type.
+    ObjectType,
+}
+
+/// `binder.ReferenceResolver`. A nil result is `None`.
+pub trait ReferenceResolver {
+    /// The SourceFile, ModuleDeclaration or EnumDeclaration that contains the
+    /// export an identifier refers to.
+    fn get_referenced_export_container(
+        &mut self,
+        node: NodeId,
+        prefix_locals: bool,
+    ) -> ResolverResult<Option<NodeId>>;
+    fn get_referenced_import_declaration(&mut self, node: NodeId)
+        -> ResolverResult<Option<NodeId>>;
+    fn get_referenced_value_declaration(&mut self, node: NodeId) -> ResolverResult<Option<NodeId>>;
+    fn get_referenced_value_declarations(&mut self, node: NodeId) -> ResolverResult<Vec<NodeId>>;
+    fn get_element_access_expression_name(
+        &mut self,
+        expression: NodeId,
+    ) -> ResolverResult<JsString>;
+    fn get_referenced_member_value_declaration(
+        &mut self,
+        node: NodeId,
+    ) -> ResolverResult<Option<NodeId>>;
+}
+
+/// `printer.EmitResolver`, without its declaration-emit projections.
+pub trait EmitResolver: ReferenceResolver {
+    fn is_referenced_alias_declaration(&mut self, node: NodeId) -> ResolverResult<bool>;
+    fn is_value_alias_declaration(&mut self, node: NodeId) -> ResolverResult<bool>;
+    fn is_top_level_value_import_equals_with_entity_name(
+        &mut self,
+        node: NodeId,
+    ) -> ResolverResult<bool>;
+    fn mark_linked_references_recursively(&mut self, file: NodeId) -> ResolverResult<()>;
+    /// The source file a declaration's module specifier resolves to.
+    fn get_external_module_file_from_declaration(
+        &mut self,
+        node: NodeId,
+    ) -> ResolverResult<Option<NodeId>>;
+    /// `flags` and the result are `ast.ModifierFlags`.
+    fn get_effective_declaration_flags(&mut self, node: NodeId, flags: u32) -> ResolverResult<u32>;
+
+    // decorator metadata
+    fn get_type_reference_serialization_kind(
+        &mut self,
+        name: NodeId,
+        serial_scope: Option<NodeId>,
+    ) -> ResolverResult<TypeReferenceSerializationKind>;
+
+    // const enum inlining
+    /// Upstream returns `any`: nil, a string or a number.
+    fn get_constant_value(&mut self, node: NodeId) -> ResolverResult<Option<ConstantValue>>;
+    fn get_enum_member_value(&mut self, node: NodeId) -> ResolverResult<EnumMemberValue>;
+
+    // JSX Emit
+    fn get_jsx_factory_entity(&mut self, location: NodeId) -> ResolverResult<Option<NodeId>>;
+    fn get_jsx_fragment_factory_entity(
+        &mut self,
+        location: NodeId,
+    ) -> ResolverResult<Option<NodeId>>;
+    /// Overrides the reference resolver's answer for a generated identifier.
+    fn set_referenced_import_declaration(
+        &mut self,
+        node: NodeId,
+        reference: NodeId,
+    ) -> ResolverResult<()>;
+}

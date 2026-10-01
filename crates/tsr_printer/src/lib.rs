@@ -31,6 +31,7 @@ pub mod list_format;
 mod literal_text;
 mod namegenerator;
 mod printer;
+pub mod script_resolver;
 mod semicolon_writer;
 mod single_line_string_writer;
 mod text_writer;
