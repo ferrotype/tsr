@@ -381,7 +381,7 @@
     },
     "tsc/internal/compiler/program.go:Program.GetSourceFileFromReference": {
      "rust": [
-      "crates/tsr_compiler/src/declaration_host.rs:108"
+      "crates/tsr_compiler/src/declaration_host.rs:112"
      ],
      "status": "mapped"
     },
@@ -6520,19 +6520,19 @@
    "functions": {
     "tsc/internal/transformers/declarations/supplementalreferences.go:NewSupplementalReferencesTransformer": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/supplemental.rs:19"
+      "crates/tsr_transformers/src/declarations/supplemental.rs:22"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/declarations/supplementalreferences.go:SupplementalReferencesTransformer.GetDiagnostics": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/supplemental.rs:84"
+      "crates/tsr_transformers/src/declarations/supplemental.rs:94"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/declarations/supplementalreferences.go:SupplementalReferencesTransformer.TransformSourceFile": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/supplemental.rs:43"
+      "crates/tsr_transformers/src/declarations/supplemental.rs:53"
      ],
      "status": "mapped"
     }
@@ -7028,13 +7028,13 @@
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformImportDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/statements.rs:484"
+      "crates/tsr_transformers/src/declarations/statements.rs:504"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformImportEqualsDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/statements.rs:436"
+      "crates/tsr_transformers/src/declarations/statements.rs:456"
      ],
      "status": "mapped"
     },

@@ -3,10 +3,10 @@
   "T8": 1
  },
  "comparison": {
-  "all_domains_met": 0,
+  "all_domains_met": 13426,
   "native_observation_sha256": "e99a8dccabc3a497b14beec8e147a2b28cd8298e103d9acca0dfa41173dfae60",
   "rows": 13432,
-  "rust_capture_sha256": "1f4d46cf89396041e16df504d7e1441974aa02ecdc6d788f8472983bbb358300"
+  "rust_capture_sha256": "87be81c31571e53c2531b4effa10250055fc96ec6fb3e80c098cb8da3ac7e369"
  },
  "cross_phase": [
   {
@@ -27,46 +27,43 @@
  ],
  "entries": [
   {
-   "cause": "Program.Emit is Phase 3 T8",
+   "cause": "emit_diagnostics differs: emitted_files",
    "cross_phase": false,
    "domains": {
-    "emit_diagnostics": 13432,
-    "output": 13363,
-    "sourcemap": 13432,
-    "sourcemap_record": 13432
+    "emit_diagnostics": 6
    },
    "evidence": [
     {
-     "case": "cases/00000",
-     "observation": "unsupported: Program.Emit is Phase 3 T8",
-     "variant": "compiler/2dArrays.ts#configuration=0"
+     "case": "cases/03417",
+     "observation": "different: emit_diagnostics differs: emitted_files",
+     "variant": "compiler/incrementalConcurrentSafeAliasFollowing.ts#configuration=0"
     },
     {
-     "case": "cases/00001",
-     "observation": "unsupported: Program.Emit is Phase 3 T8",
-     "variant": "compiler/ArrowFunctionExpression1.ts#configuration=0"
+     "case": "cases/03418",
+     "observation": "different: emit_diagnostics differs: emitted_files",
+     "variant": "compiler/incrementalConfig.ts#configuration=0"
     },
     {
-     "case": "cases/00002",
-     "observation": "unsupported: Program.Emit is Phase 3 T8",
-     "variant": "compiler/ClassDeclaration10.ts#configuration=0"
+     "case": "cases/03420",
+     "observation": "different: emit_diagnostics differs: emitted_files",
+     "variant": "compiler/incrementalTsBuildInfoFile.ts#configuration=0"
     },
     {
-     "case": "cases/00003",
-     "observation": "unsupported: Program.Emit is Phase 3 T8",
-     "variant": "compiler/ClassDeclaration11.ts#configuration=0"
+     "case": "cases/03907",
+     "observation": "different: emit_diagnostics differs: emitted_files",
+     "variant": "compiler/jsEmitIntersectionProperty.ts#configuration=0"
     },
     {
-     "case": "cases/00004",
-     "observation": "unsupported: Program.Emit is Phase 3 T8",
-     "variant": "compiler/ClassDeclaration13.ts#configuration=0"
+     "case": "cases/04802",
+     "observation": "different: emit_diagnostics differs: emitted_files",
+     "variant": "compiler/noEmitAndIncremental.ts#configuration=0"
     }
    ],
    "id": "B01",
-   "kind": "unsupported",
+   "kind": "different",
    "owner": "T8",
-   "variants": 13432,
-   "variants_sha256": "c5e4a7e36e7e8fbd463619103f2cb7362c83138b0cb3be2e8036b9306b909461"
+   "variants": 6,
+   "variants_sha256": "211fdd037aec921836309b09b9a32766937d9fbf97a791cc97d7a37af73067b1"
   }
  ],
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",

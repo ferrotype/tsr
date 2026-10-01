@@ -1,5 +1,18 @@
 {
  "buckets": {
+  "different": [
+   {
+    "count": 6,
+    "domain": "emit_diagnostics",
+    "examples": [
+     "compiler/incrementalConcurrentSafeAliasFollowing.ts#configuration=0",
+     "compiler/incrementalConfig.ts#configuration=0",
+     "compiler/incrementalTsBuildInfoFile.ts#configuration=0"
+    ],
+    "kind": "emitted_files",
+    "rows": 6
+   }
+  ],
   "failed": [],
   "reprint_by_extension": {},
   "reprint_by_kind": {},
@@ -15,52 +28,7 @@
     "rows": 29
    }
   },
-  "unsupported": [
-   {
-    "count": 13432,
-    "domain": "emit_diagnostics",
-    "examples": [
-     "compiler/2dArrays.ts#configuration=0",
-     "compiler/ArrowFunctionExpression1.ts#configuration=0",
-     "compiler/ClassDeclaration10.ts#configuration=0"
-    ],
-    "reason": "Program.Emit is Phase 3 T8",
-    "rows": 13432
-   },
-   {
-    "count": 13432,
-    "domain": "sourcemap",
-    "examples": [
-     "compiler/2dArrays.ts#configuration=0",
-     "compiler/ArrowFunctionExpression1.ts#configuration=0",
-     "compiler/ClassDeclaration10.ts#configuration=0"
-    ],
-    "reason": "Program.Emit is Phase 3 T8",
-    "rows": 13432
-   },
-   {
-    "count": 13432,
-    "domain": "sourcemap_record",
-    "examples": [
-     "compiler/2dArrays.ts#configuration=0",
-     "compiler/ArrowFunctionExpression1.ts#configuration=0",
-     "compiler/ClassDeclaration10.ts#configuration=0"
-    ],
-    "reason": "Program.Emit is Phase 3 T8",
-    "rows": 13432
-   },
-   {
-    "count": 13363,
-    "domain": "output",
-    "examples": [
-     "compiler/2dArrays.ts#configuration=0",
-     "compiler/ArrowFunctionExpression1.ts#configuration=0",
-     "compiler/ClassDeclaration10.ts#configuration=0"
-    ],
-    "reason": "Program.Emit is Phase 3 T8",
-    "rows": 13363
-   }
-  ]
+  "unsupported": []
  },
  "harness_errors": [],
  "inventory_sha256": "24f0c89fd5a3be1806355ff44d540f8873e932182810ebd689bcea677bccf1b9",
@@ -71,8 +39,8 @@
  },
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
  "rust": {
-  "capture_sha256": "1f4d46cf89396041e16df504d7e1441974aa02ecdc6d788f8472983bbb358300",
-  "requests_sha256": "76550e269076fbaa34128a8faf686ba745f58b81253474089eb268517838cb5a",
+  "capture_sha256": "87be81c31571e53c2531b4effa10250055fc96ec6fb3e80c098cb8da3ac7e369",
+  "requests_sha256": "4eb7ee0045073b791e304ab19a923101d4de7ada49648e2ada4ed83f1db46b76",
   "selection": {
    "cases": [],
    "limit": null,
@@ -81,23 +49,32 @@
   "source_stable": true
  },
  "summary": {
-  "all_domains_met": 0,
+  "all_domains_met": 13426,
+  "declaration_required": 1707,
   "domains": {
-   "emit_diagnostics": {
+   "declaration": {
     "different": 0,
     "disabled": 0,
     "failed": 0,
-    "match": 0,
+    "match": 13432,
     "unexecuted": 0,
-    "unsupported": 13432
+    "unsupported": 0
+   },
+   "emit_diagnostics": {
+    "different": 6,
+    "disabled": 0,
+    "failed": 0,
+    "match": 13426,
+    "unexecuted": 0,
+    "unsupported": 0
    },
    "output": {
     "different": 0,
     "disabled": 69,
     "failed": 0,
-    "match": 0,
+    "match": 13363,
     "unexecuted": 0,
-    "unsupported": 13363
+    "unsupported": 0
    },
    "reprint": {
     "different": 0,
@@ -111,25 +88,25 @@
     "different": 0,
     "disabled": 0,
     "failed": 0,
-    "match": 0,
+    "match": 13432,
     "unexecuted": 0,
-    "unsupported": 13432
+    "unsupported": 0
    },
    "sourcemap_record": {
     "different": 0,
     "disabled": 0,
     "failed": 0,
-    "match": 0,
+    "match": 13432,
     "unexecuted": 0,
-    "unsupported": 13432
+    "unsupported": 0
    }
   },
   "harness_errors": 0,
   "mode": "single",
   "partial": false,
   "rows": 13432,
-  "unsupported_rows": 13432,
+  "unsupported_rows": 0,
   "valid": true
  },
- "version": 2
+ "version": 3
 }
