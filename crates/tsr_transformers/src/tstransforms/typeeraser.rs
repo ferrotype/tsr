@@ -2,6 +2,7 @@
 //! syntax of a file (type annotations, type-only declarations and imports,
 //! accessibility modifiers, overloads, assertions) and leaves the runtime
 //! constructs for the later transforms.
+use super::runtimesyntax::get_innermost_module_declaration_from_dotted_module;
 use crate::extract_modifiers;
 use crate::transformer::{Failure, TransformOptions, Transformer};
 use std::cell::Cell;
@@ -18,7 +19,7 @@ use tsr_ast::utilities_middle::has_decorators;
 use tsr_ast::{
     is_binary_expression, is_identifier, is_instantiated_module, is_satisfies_expression,
     modifier_flags, node_is_missing, subtree_flags, AstView, FactoryMethods, NodeId, NodeSlice,
-    NodeVisitor, RuntimeFactory, SyntaxKind as K,
+    NodeVisitor, SyntaxKind as K,
 };
 use tsr_core::{CompilerOptions, TextRange};
 use tsr_printer::EmitContext;
@@ -82,23 +83,6 @@ struct PopNode<'t> {
 impl Drop for PopNode<'_> {
     fn drop(&mut self) {
         self.tx.pop_node(self.grandparent_node);
-    }
-}
-
-/// `getInnermostModuleDeclarationFromDottedModule` of `runtimesyntax.go`,
-/// whose port and marker belong to the runtime-syntax transformer.
-// TODO(runtimesyntax): tstransforms.getInnermostModuleDeclarationFromDottedModule
-fn innermost_module_declaration_from_dotted_module(
-    factory: &dyn RuntimeFactory,
-    mut module_declaration: NodeId,
-) -> NodeId {
-    loop {
-        match factory.node(module_declaration).body() {
-            Some(body) if factory.node(body).kind() == K::ModuleDeclaration => {
-                module_declaration = body;
-            }
-            _ => return module_declaration,
-        }
     }
 }
 
@@ -281,7 +265,7 @@ impl TypeEraserTransformer {
                     )?
                     || visitor
                         .factory()
-                        .node(innermost_module_declaration_from_dotted_module(
+                        .node(get_innermost_module_declaration_from_dotted_module(
                             visitor.factory(),
                             id,
                         ))

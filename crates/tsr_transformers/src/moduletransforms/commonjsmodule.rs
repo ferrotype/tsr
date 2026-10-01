@@ -164,22 +164,6 @@ fn is_import_call(f: &dyn RuntimeFactory, node: NodeId) -> Result<bool, Error> {
     )?)
 }
 
-/// `ast.ShouldTransformImportCall` (whose file name parameter is unused). Its
-/// marked port is private to `tsr_compiler`, which this crate cannot reach.
-// TODO(ast/utilities.go): ShouldTransformImportCall
-fn ast_should_transform_import_call(
-    options: &CompilerOptions,
-    implied_node_format_for_emit: ModuleKind,
-) -> bool {
-    let module_kind = options.emit_module_kind();
-    if ModuleKind::NODE16 <= module_kind && module_kind <= ModuleKind::NODE_NEXT
-        || module_kind == ModuleKind::PRESERVE
-    {
-        return false;
-    }
-    implied_node_format_for_emit < ModuleKind::ES2015
-}
-
 /// The visitor `core.IfElse(resultIsDiscarded, tx.discardedValueVisitor,
 /// tx.Visitor())` picks.
 fn discarded_or_main(result_is_discarded: bool) -> Visitor {
@@ -3138,7 +3122,7 @@ impl CommonJsModuleTransformer<'_> {
             .file_name()
             .to_vec();
         let format = (self.get_emit_module_format_of_file)(&file_name)?;
-        Ok(ast_should_transform_import_call(
+        Ok(tsr_ast::utilities_modules::should_transform_import_call(
             &self.compiler_options,
             format,
         ))

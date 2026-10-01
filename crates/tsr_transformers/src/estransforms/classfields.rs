@@ -5698,7 +5698,7 @@ fn is_static_property_declaration_or_class_static_block(
 
 /// Whether a class has a static block that is a class-this assignment.
 // port: tsc/internal/transformers/estransforms/classfields.go:classHasClassThisAssignment
-fn class_has_class_this_assignment(
+pub(crate) fn class_has_class_this_assignment(
     emit_context: &EmitContext,
     factory: &dyn RuntimeFactory,
     node: NodeId,
@@ -5820,7 +5820,7 @@ fn flatten_comma_list_worker(
 /// The assignment `name`'s expression caches its value in, as the binary
 /// expression node.
 // port: tsc/internal/transformers/estransforms/classfields.go:findComputedPropertyNameCacheAssignment
-fn find_computed_property_name_cache_assignment(
+pub(crate) fn find_computed_property_name_cache_assignment(
     _emit_context: &EmitContext,
     factory: &dyn RuntimeFactory,
     name: NodeId,
@@ -5846,7 +5846,7 @@ fn find_computed_property_name_cache_assignment(
 }
 
 // port: tsc/internal/transformers/estransforms/classfields.go:expandPreOrPostfixIncrementOrDecrementExpression
-fn expand_pre_or_postfix_increment_or_decrement_expression(
+pub(crate) fn expand_pre_or_postfix_increment_or_decrement_expression(
     factory: &mut dyn RuntimeFactory,
     emit_context: &EmitContext,
     node: NodeId,

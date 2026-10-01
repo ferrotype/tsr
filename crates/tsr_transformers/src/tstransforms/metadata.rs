@@ -1,8 +1,7 @@
 //! `transformers/tstransforms/metadata.go`: the `__metadata` decorators that
 //! `emitDecoratorMetadata` adds to legacy-decorated classes and members.
-use super::typeserializer::{
-    list_nodes, new_node_list, view, MetadataSerializer, MetadataSerializerContext,
-};
+use super::legacydecorators::get_decorators_of_parameters;
+use super::typeserializer::{new_node_list, view, MetadataSerializer, MetadataSerializerContext};
 use crate::transformer::{Error, Failure, SharedEmitResolver, TransformOptions, Transformer};
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
@@ -141,24 +140,6 @@ fn function_parts(factory: &dyn RuntimeFactory, node: NodeId) -> FunctionParts {
         full_signature,
         body,
     }
-}
-
-/// Whether any parameter of a method or set accessor (after a `this`
-/// parameter) is decorated: `len(getDecoratorsOfParameters(node)) != 0`.
-// TODO(legacydecorators): tstransforms.getDecoratorsOfParameters, ported with
-// the legacy decorators transformer; this is its length.
-fn has_decorators_of_parameters(factory: &dyn RuntimeFactory, node: NodeId) -> Result<bool, Error> {
-    let view = view(factory)?;
-    let parameters = list_nodes(view, view.node(node)?.parameter_list())?;
-    let first_parameter_is_this =
-        !parameters.is_empty() && tsr_ast::utilities_class::is_this_parameter(view, parameters[0])?;
-    let first_parameter_offset = usize::from(first_parameter_is_this);
-    for &p in &parameters[first_parameter_offset..] {
-        if tsr_ast::utilities_middle::has_decorators(view, &view.node(p)?)? {
-            return Ok(true);
-        }
-    }
-    Ok(false)
 }
 
 impl<'a> MetadataTransformer<'a> {
@@ -358,7 +339,7 @@ impl<'a> MetadataTransformer<'a> {
             let view = view(v.factory())?;
             tsr_ast::utilities_middle::has_decorators(view, &view.node(node)?)?
         };
-        if !has_decorators && !has_decorators_of_parameters(v.factory(), node)? {
+        if !has_decorators && get_decorators_of_parameters(v.factory(), Some(node))?.is_empty() {
             return Ok(v.visit_each_child(Some(node)));
         }
 
@@ -398,7 +379,7 @@ impl<'a> MetadataTransformer<'a> {
             let view = view(v.factory())?;
             tsr_ast::utilities_middle::has_decorators(view, &view.node(node)?)?
         };
-        if !has_decorators && !has_decorators_of_parameters(v.factory(), node)? {
+        if !has_decorators && get_decorators_of_parameters(v.factory(), Some(node))?.is_empty() {
             return Ok(v.visit_each_child(Some(node)));
         }
 

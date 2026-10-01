@@ -120,11 +120,13 @@ pub(crate) fn emit_syntax(
         false
     };
     if import_call {
-        return Ok(if should_transform_import_call(options, emit) {
-            ModuleKind::COMMON_JS
-        } else {
-            ModuleKind::ESNEXT
-        });
+        return Ok(
+            if tsr_ast::utilities_modules::should_transform_import_call(options, emit) {
+                ModuleKind::COMMON_JS
+            } else {
+                ModuleKind::ESNEXT
+            },
+        );
     }
     Ok(if emit == ModuleKind::COMMON_JS {
         ModuleKind::COMMON_JS
@@ -133,20 +135,6 @@ pub(crate) fn emit_syntax(
     } else {
         ModuleKind::NONE
     })
-}
-/// The pin's file name parameter is unused.
-/// port: tsc/internal/ast/utilities.go:ShouldTransformImportCall
-fn should_transform_import_call(
-    options: &CompilerOptions,
-    implied_node_format_for_emit: ModuleKind,
-) -> bool {
-    let module = options.emit_module_kind();
-    if (ModuleKind::NODE16..=ModuleKind::NODE_NEXT).contains(&module)
-        || module == ModuleKind::PRESERVE
-    {
-        return false;
-    }
-    implied_node_format_for_emit < ModuleKind::ES2015
 }
 /// port: tsc/internal/ast/parseoptions.go:GetExternalModuleIndicatorOptions
 pub(crate) fn indicator(

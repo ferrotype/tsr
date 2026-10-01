@@ -29,6 +29,10 @@
 //! may be any of them. The lexical scope stack is a vector whose last entry
 //! is upstream's `top` (an entry's `next` is the one before it). The state
 //! cells are never borrowed across a visit.
+use super::classfields::{
+    class_has_class_this_assignment, expand_pre_or_postfix_increment_or_decrement_expression,
+    find_computed_property_name_cache_assignment,
+};
 use super::classthis::is_class_this_assignment_block;
 use super::namedevaluation::{
     class_has_declared_or_explicitly_assigned_name,
@@ -2904,8 +2908,11 @@ impl EsDecoratorTransformer {
             if Self::kind(visitor, prop_name) == K::ComputedPropertyName {
                 let prop_expression = visitor.factory().node(prop_name).expression().expect(NIL);
                 if !is_simple_inlineable_expression(visitor.factory(), prop_expression) {
-                    let cache_assignment =
-                        self.find_computed_property_name_cache_assignment(visitor, prop_name);
+                    let cache_assignment = find_computed_property_name_cache_assignment(
+                        &self.emit_context,
+                        visitor.factory(),
+                        prop_name,
+                    );
                     if let Some(cache_assignment) = cache_assignment {
                         let expression =
                             self.visit_node(visitor, Visit::Main, Some(prop_expression));
@@ -3522,7 +3529,7 @@ impl EsDecoratorTransformer {
                     }
 
                     expression = expand_pre_or_postfix_increment_or_decrement_expression(
-                        &ec, factory, node, expression, temp,
+                        factory, &ec, node, expression, temp,
                     );
 
                     expression = ec.new_reflect_set_call(
@@ -4581,113 +4588,6 @@ impl EsDecoratorTransformer {
         let null = Self::new_null(factory);
         factory.new_binary_expression(None, Some(element_access), None, Some(operator), Some(null))
     }
-
-    // TODO(classfields.go): findComputedPropertyNameCacheAssignment
-    fn find_computed_property_name_cache_assignment(
-        &self,
-        visitor: &NodeVisitor<'_>,
-        name: NodeId,
-    ) -> Option<NodeId> {
-        let mut node = visitor.factory().node(name).expression().expect(NIL);
-        loop {
-            node = self
-                .q(visitor.factory(), |view| {
-                    tsr_ast::utilities::skip_outer_expressions(view, node, 0).map(Some)
-                })
-                .unwrap_or(node);
-            let comma_right = {
-                let read = visitor.factory().node(node);
-                read.as_binary_expression().and_then(|binary| {
-                    let operator = binary.operator_token().expect(NIL);
-                    (Self::kind(visitor, operator) == K::CommaToken)
-                        .then(|| binary.right().expect(NIL))
-                })
-            };
-            if let Some(right) = comma_right {
-                node = right;
-                continue;
-            }
-            if self.is_assignment_expression(visitor, node, true /*excludeCompoundAssignment*/) {
-                let left = visitor
-                    .factory()
-                    .node(node)
-                    .as_binary_expression()
-                    .expect("BinaryExpression payload")
-                    .left()
-                    .expect(NIL);
-                if Self::kind(visitor, left) == K::Identifier {
-                    return Some(node);
-                }
-            }
-            break;
-        }
-        None
-    }
-}
-
-// TODO(classfields.go): classHasClassThisAssignment
-fn class_has_class_this_assignment(
-    emit_context: &EmitContext,
-    factory: &dyn RuntimeFactory,
-    node: NodeId,
-) -> bool {
-    for member in list_nodes(factory, factory.node(node).member_list()) {
-        if is_class_this_assignment_block(emit_context, factory, member) {
-            return true;
-        }
-    }
-    false
-}
-
-// TODO(classfields.go): expandPreOrPostfixIncrementOrDecrementExpression
-fn expand_pre_or_postfix_increment_or_decrement_expression(
-    emit_context: &EmitContext,
-    factory: &mut dyn RuntimeFactory,
-    node: NodeId,
-    expression: NodeId,
-    result_variable: Option<NodeId>,
-) -> NodeId {
-    let mut ec = emit_context.clone();
-    let (is_prefix, operator, operand, loc) = {
-        let read = factory.node(node);
-        let loc = read.range();
-        if let Some(data) = read.as_prefix_unary_expression() {
-            (true, data.operator(), data.operand().expect(NIL), loc)
-        } else {
-            let data = read
-                .as_postfix_unary_expression()
-                .expect("PostfixUnaryExpression payload");
-            (false, data.operator(), data.operand().expect(NIL), loc)
-        }
-    };
-
-    let temp = ec.new_temp_variable(factory);
-    ec.add_variable_declaration(factory, temp);
-    let mut expression = ec.new_assignment_expression(factory, temp, expression);
-    let operand_loc = factory.node(operand).range();
-    factory.set_node_range(expression, operand_loc);
-
-    let mut operation = if is_prefix {
-        factory.new_prefix_unary_expression(operator, Some(temp))
-    } else {
-        factory.new_postfix_unary_expression(Some(temp), operator)
-    };
-    factory.set_node_range(operation, loc);
-
-    if let Some(result_variable) = result_variable {
-        operation = ec.new_assignment_expression(factory, result_variable, operation);
-        factory.set_node_range(operation, loc);
-    }
-
-    expression = ec.new_comma_expression(factory, expression, operation);
-    factory.set_node_range(expression, loc);
-
-    if !is_prefix {
-        expression = ec.new_comma_expression(factory, expression, temp);
-        factory.set_node_range(expression, loc);
-    }
-
-    expression
 }
 
 // port: tsc/internal/transformers/estransforms/esdecorator.go:injectClassThisAssignmentIfMissing

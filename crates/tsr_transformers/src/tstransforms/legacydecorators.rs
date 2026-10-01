@@ -377,7 +377,7 @@ fn get_all_decorators_of_method(
 /// offset of the parameter (a `this` parameter excluded); empty when no
 /// parameter is decorated.
 // port: tsc/internal/transformers/tstransforms/legacydecorators.go:getDecoratorsOfParameters
-fn get_decorators_of_parameters(
+pub(crate) fn get_decorators_of_parameters(
     factory: &dyn RuntimeFactory,
     node: Option<NodeId>,
 ) -> Result<Vec<Vec<NodeId>>, Error> {
