@@ -1,0 +1,104 @@
+{
+ "cases": [
+  {
+   "id": "optionalcatch-03",
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } catch (e) { }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-07",
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } catch ({ message }) { }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-08",
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } finally { }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-09",
+   "name": "probe.ts",
+   "source": "// @target: es2018\nlet x = 1;\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-16",
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } catch (e: any) { }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-17",
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } catch ([x]) { }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-18",
+   "name": "probe.ts",
+   "source": "// @target: es2018\nfunction f() { try { } catch (e) { return e; } }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-19",
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { try { } catch (e) { } } catch (e2) { }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-20",
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { } catch (e) { } finally { let y = 1; }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "optionalcatch-21",
+   "name": "probe.ts",
+   "source": "// @target: es2018\nconst x = () => { try { } catch (e) { } };\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  }
+ ]
+}

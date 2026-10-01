@@ -1,0 +1,611 @@
+{
+ "cases": [
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "let x = Math.pow(2, 3);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "exponentiation-01",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c65742078203d2032202a2a20333b0a"
+    },
+    "id": "exponentiation-01",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\nlet x = 2 ** 3;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "let a = 2;\r\na = Math.pow(a, 3);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "exponentiation-02",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c65742061203d20323b0a61202a2a3d20333b0a"
+    },
+    "id": "exponentiation-02",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\nlet a = 2;\na **= 3;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "declare let a: number, b: number, c: number;\r\ndeclare let o: any;\r\ndeclare function k(): string;\r\nlet x = Math.pow(a, Math.pow(b, c));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "exponentiation-06",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a206e756d6265722c20623a206e756d6265722c20633a206e756d6265723b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20737472696e673b0a6c65742078203d2061202a2a2062202a2a20633b0a"
+    },
+    "id": "exponentiation-06",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nlet x = a ** b ** c;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "declare let a: number, b: number, c: number;\r\ndeclare let o: any;\r\ndeclare function k(): string;\r\nlet x = Math.pow((Math.pow(a, b)), c);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "exponentiation-07",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a206e756d6265722c20623a206e756d6265722c20633a206e756d6265723b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20737472696e673b0a6c65742078203d202861202a2a206229202a2a20633b0a"
+    },
+    "id": "exponentiation-07",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nlet x = (a ** b) ** c;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "declare let a: number, b: number, c: number;\r\ndeclare let o: any;\r\ndeclare function k(): string;\r\nlet x = -(Math.pow(a, b)) + Math.pow((-a), b);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "exponentiation-08",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a206e756d6265722c20623a206e756d6265722c20633a206e756d6265723b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20737472696e673b0a6c65742078203d202d2861202a2a206229202b20282d6129202a2a20623b0a"
+    },
+    "id": "exponentiation-08",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nlet x = -(a ** b) + (-a) ** b;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "declare let a: number, b: number, c: number;\r\ndeclare let o: any;\r\ndeclare function k(): string;\r\nk(Math.pow(a, b), c);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "exponentiation-09",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a206e756d6265722c20623a206e756d6265722c20633a206e756d6265723b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20737472696e673b0a6b2861202a2a20622c2063293b0a"
+    },
+    "id": "exponentiation-09",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nk(a ** b, c);\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "declare let a: number, b: number, c: number;\r\ndeclare let o: any;\r\ndeclare function k(): string;\r\nlet x = a + Math.pow(b, c);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "exponentiation-10",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a206e756d6265722c20623a206e756d6265722c20633a206e756d6265723b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20737472696e673b0a6c65742078203d2061202b2062202a2a20633b0a"
+    },
+    "id": "exponentiation-10",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nlet x = a + b ** c;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "declare let a: number, b: number, c: number;\r\ndeclare let o: any;\r\ndeclare function k(): string;\r\nlet y = a + b;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "exponentiation-11",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a206e756d6265722c20623a206e756d6265722c20633a206e756d6265723b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20737472696e673b0a6c65742079203d2061202b20623b0a"
+    },
+    "id": "exponentiation-11",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nlet y = a + b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "declare let a: number, b: number, c: number;\r\ndeclare let o: any;\r\ndeclare function k(): string;\r\n(o.p) = Math.pow((o.p), 2);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "exponentiation-13",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a206e756d6265722c20623a206e756d6265722c20633a206e756d6265723b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20737472696e673b0a286f2e7029202a2a3d20323b0a"
+    },
+    "id": "exponentiation-13",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\n(o.p) **= 2;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "declare let a: number, b: number, c: number;\r\ndeclare let o: any;\r\ndeclare function k(): string;\r\nlet x = /*c*/ Math.pow(/*c*/ a, /*d*/ b);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "exponentiation-16",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a206e756d6265722c20623a206e756d6265722c20633a206e756d6265723b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20737472696e673b0a6c65742078203d202f2a632a2f2061202a2a202f2a642a2f20623b0a"
+    },
+    "id": "exponentiation-16",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nlet x = /*c*/ a ** /*d*/ b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "declare let a: number, b: number, c: number;\r\ndeclare let o: any;\r\ndeclare function k(): string;\r\nlet x = 1, y = 2, z = 3;\r\nx = Math.pow(x, y = Math.pow(y, z));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "exponentiation-17",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a206e756d6265722c20623a206e756d6265722c20633a206e756d6265723b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20737472696e673b0a6c65742078203d20312c2079203d20322c207a203d20333b0a78202a2a3d2079202a2a3d207a3b0a"
+    },
+    "id": "exponentiation-17",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nlet x = 1, y = 2, z = 3;\nx **= y **= z;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "declare let a: number, b: number, c: number;\r\ndeclare let o: any;\r\ndeclare function k(): string;\r\nlet s = `${Math.pow(a, b)}`;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "exponentiation-18",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a206e756d6265722c20623a206e756d6265722c20633a206e756d6265723b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20737472696e673b0a6c65742073203d2060247b61202a2a20627d603b0a"
+    },
+    "id": "exponentiation-18",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nlet s = `${a ** b}`;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "declare let a: number, b: number, c: number;\r\ndeclare let o: any;\r\ndeclare function k(): string;\r\nlet x = Math.pow((a, b), c);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "exponentiation-23",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a206e756d6265722c20623a206e756d6265722c20633a206e756d6265723b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20737472696e673b0a6c65742078203d2028612c206229202a2a20633b0a"
+    },
+    "id": "exponentiation-23",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nlet x = (a, b) ** c;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "declare let a: number, b: number, c: number;\r\ndeclare let o: any;\r\ndeclare function k(): string;\r\nMath.pow(o?.p, 2);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "exponentiation-24",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a206e756d6265722c20623a206e756d6265722c20633a206e756d6265723b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20737472696e673b0a6f3f2e70202a2a20323b0a"
+    },
+    "id": "exponentiation-24",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\no?.p ** 2;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "declare let a: number, b: number, c: number;\r\ndeclare let o: any;\r\ndeclare function k(): string;\r\nlet n = { [Math.pow(a, b)]: 1 };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "exponentiation-25",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a206e756d6265722c20623a206e756d6265722c20633a206e756d6265723b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20737472696e673b0a6c6574206e203d207b205b61202a2a20625d3a2031207d3b0a"
+    },
+    "id": "exponentiation-25",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nlet n = { [a ** b]: 1 };\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

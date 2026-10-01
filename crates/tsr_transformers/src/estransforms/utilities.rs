@@ -11,17 +11,41 @@
 //! printer's `RestoreOuterExpressions`, which needs the concrete builder, are
 //! re-expressed here over `Factory` reads; they carry no port marker.
 use crate::extract_modifiers;
+use crate::transformer::Error;
 use std::cell::{Cell, RefCell};
 use tsr_ast::{
     is_assignment_operator, is_left_hand_side_expression_kind, modifier_flags, node_flags,
     utilities::{node_is_synthesized, range_is_synthesized},
-    Factory, FactoryMethods, JsString, NodeId, NodeListId, NodeVisitor, RuntimeFactory,
+    AstView, Factory, FactoryMethods, JsString, NodeId, NodeListId, NodeVisitor, RuntimeFactory,
     SyntaxKind as K,
 };
 use tsr_core::{collections::OrderedSet, TextRange};
 use tsr_printer::{AutoGenerateOptions, EmitContext, EmitVisitorHooks};
 
 pub(crate) const NIL: &str = "runtime error: invalid memory address or nil pointer dereference";
+
+pub(super) use crate::utilities::is_simple_copiable_expression;
+
+/// The storage view of the visitor's factory, which the AST predicates read;
+/// a factory without one (a lazy JSDoc transaction) cannot be transformed.
+pub(crate) fn view(factory: &dyn RuntimeFactory) -> Result<AstView<'_>, Error> {
+    factory.ast_view().ok_or(Error::Unsupported(
+        "a transform over a factory without AST storage",
+    ))
+}
+
+/// `node.SubtreeFacts()`.
+pub(crate) fn subtree_facts(factory: &dyn RuntimeFactory, node: NodeId) -> Result<u32, Error> {
+    Ok(view(factory)?.subtree_facts(node))
+}
+
+/// `ast.SkipParentheses`.
+pub(crate) fn skip_parentheses(
+    factory: &dyn RuntimeFactory,
+    node: NodeId,
+) -> Result<NodeId, Error> {
+    Ok(tsr_ast::skip_parentheses(view(factory)?, node)?)
+}
 
 /// Go's `list.Nodes` of an optional list: a nil list has no nodes. A nil
 /// element is a nil dereference at its use, so it is rejected here.

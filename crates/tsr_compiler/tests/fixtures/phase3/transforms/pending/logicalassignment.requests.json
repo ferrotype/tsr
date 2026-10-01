@@ -1,0 +1,84 @@
+{
+ "cases": [
+  {
+   "id": "logicalassignment-05",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk().p &&= 2;\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "logicalassignment-07",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no[k()] ||= 4;\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "logicalassignment-08",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk()[k()] &&= 5;\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "logicalassignment-14",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f(p: any) {\n    p.q.r ??= {};\n    return p[k()] ||= [];\n}\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "logicalassignment-15",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nconst g = (p: any) => p.x.y ??= 1;\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "logicalassignment-17",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no.a.b.c ||= k();\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "logicalassignment-24",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no?.p.q ||= 1;\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "logicalassignment-26",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no[`t${a}`] ??= 1;\no[`t`] ??= 2;\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ]
+   ]
+  }
+ ]
+}

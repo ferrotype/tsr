@@ -1,0 +1,74 @@
+{
+ "cases": [
+  {
+   "id": "taggedtemplate-03",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`ok`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-15",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet s = `\\x41`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-26",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`a${b}c`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-27",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\n\\x41\\u0041\\u{41}`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-28",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet s = `\\u0041`;\nk`${s}`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-29",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nexport const x = k`fine`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-30",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f() { return k`ok${a}`; }\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  }
+ ]
+}

@@ -1,0 +1,104 @@
+{
+ "cases": [
+  {
+   "id": "exponentiation-03",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\no.p **= 2;\n",
+   "chains": [
+    [
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "exponentiation-04",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\no[k()] **= 2;\n",
+   "chains": [
+    [
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "exponentiation-05",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\no.a.b **= 2 ** 3;\n",
+   "chains": [
+    [
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "exponentiation-12",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nfunction g(p: any) {\n    p.x **= 2;\n    return p.y[k()] **= a ** 2;\n}\n",
+   "chains": [
+    [
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "exponentiation-14",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\no[0] **= 2;\no[\"s\"] **= 2;\n",
+   "chains": [
+    [
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "exponentiation-15",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nconst f = (p: any) => p.x **= 2;\n",
+   "chains": [
+    [
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "exponentiation-19",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nexport const z = a ** b;\nexport function h() { o.q **= 3; }\n",
+   "chains": [
+    [
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "exponentiation-20",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nfor (let i = 0; i < 2 ** 3; i++) {\n    o[i] **= 2;\n}\n",
+   "chains": [
+    [
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "exponentiation-21",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\nclass C {\n    m() { this.v **= 2; }\n    v = a ** 2;\n}\n",
+   "chains": [
+    [
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "exponentiation-22",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare let a: number, b: number, c: number; declare let o: any; declare function k(): string;\no.a[k()].b **= c;\n",
+   "chains": [
+    [
+     "exponentiation"
+    ]
+   ]
+  }
+ ]
+}

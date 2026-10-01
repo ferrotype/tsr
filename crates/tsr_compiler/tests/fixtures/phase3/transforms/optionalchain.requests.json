@@ -1,0 +1,324 @@
+{
+ "cases": [
+  {
+   "id": "optionalchain-01",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-02",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.[b];\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-03",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-04",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b.c;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-07",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-14",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a?.b)();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-15",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a?.b).c;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-17",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a?.[b])();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-18",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n((a?.b))();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-19",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete a?.b;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-20",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete a?.b.c;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-21",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete (a?.b);\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-22",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete a.b;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-23",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = a?.b ?? c;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-25",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b!;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-32",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b(c?.d);\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-33",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk(a?.b, ...c);\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-34",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.[0];\na?.[\"s\"];\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-35",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = `${a?.b}`;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-37",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b.c();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-41",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b<string>();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-44",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na /*x*/ ?. /*y*/ b;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-45",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = !a?.b;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-46",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no.p = a?.b;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-48",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete ((a?.b));\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-49",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nnew (a?.b)();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-52",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(o.p)(a?.b);\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-53",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete o[a?.b];\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-55",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = [a?.b, b?.[0]];\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-56",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = { p: a?.b };\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-57",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f(p: any) { if (p?.q) { return p?.(1); } }\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "optionalchain-58",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = a?.b + 1;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  }
+ ]
+}
