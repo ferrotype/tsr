@@ -1,13 +1,43 @@
 //! The output-name calculation needed by option diagnostics. No files are emitted.
 use crate::{Error, Program, ProgramFile};
-use tsr_core::{JsxEmit, ScriptKind};
-pub(crate) use tsr_tsoptions::output_paths::{build_info_file, computed_common};
-/// port: tsc/internal/outputpaths/outputpaths.go:ChangeToDeclarationExtension
-fn declaration_extension(file: &[u8], program: &Program) -> Vec<u8> {
-    tsr_tsoptions::output_paths::declaration_extension(file, &program.content_mapper_extensions())
-}
+use tsr_core::ScriptKind;
 use tsr_jsstring::JsString;
+pub(crate) use tsr_tsoptions::output_paths::{build_info_file, computed_common};
+use tsr_tsoptions::output_paths::{
+    get_common_source_directory, get_output_declaration_file_name_worker,
+    get_output_js_file_name_worker, get_output_paths_for, get_source_file_path_in_new_dir_worker,
+    ForceEmitPaths, OutputPathsHost,
+};
 use tsr_tspath as path;
+
+/// The program as `OutputPathsHost` (Go's `emitHost` over a `Program`), with
+/// the common source directory the caller already computed.
+struct ProgramOutputPathsHost<'a> {
+    program: &'a Program,
+    common_source_directory: JsString,
+}
+impl<'a> ProgramOutputPathsHost<'a> {
+    fn new(program: &'a Program, common_source_directory: &[u8]) -> Self {
+        Self {
+            program,
+            common_source_directory: JsString::from_bytes(common_source_directory),
+        }
+    }
+}
+impl OutputPathsHost for ProgramOutputPathsHost<'_> {
+    fn common_source_directory(&mut self) -> JsString {
+        self.common_source_directory.clone()
+    }
+    fn content_mapper_extensions(&self) -> Vec<JsString> {
+        self.program.content_mapper_extensions()
+    }
+    fn get_current_directory(&self) -> &[u8] {
+        self.program.current_directory()
+    }
+    fn use_case_sensitive_file_names(&self) -> bool {
+        self.program.use_case_sensitive_file_names()
+    }
+}
 
 fn separator(mut directory: Vec<u8>) -> Vec<u8> {
     if !directory.is_empty() && !matches!(directory.last(), Some(b'/' | b'\\')) {
@@ -23,34 +53,16 @@ pub(crate) fn computed_common_directory(files: &[JsString], program: &Program) -
         program.use_case_sensitive_file_names(),
     ))
 }
-/// Path-only half of GetCommonSourceDirectory; option verification supplies the
+/// Path-only `GetCommonSourceDirectory`; option verification supplies the
 /// source membership diagnostics, in the source function's call order.
 pub(crate) fn common_directory(program: &Program, files: &[JsString]) -> Vec<u8> {
-    let options = program.options();
-    separator(if !options.root_dir.is_empty() {
-        options.root_dir.as_bytes().to_vec()
-    } else if !options.config_file_path.is_empty() {
-        path::directory(options.config_file_path.as_bytes())
-    } else {
-        computed_common(
-            files,
-            program.current_directory(),
-            program.use_case_sensitive_file_names(),
-        )
-    })
-}
-/// port: tsc/internal/outputpaths/outputpaths.go:GetSourceFilePathInNewDirWorker
-pub(crate) fn source_in_new_directory(
-    file: &[u8],
-    new_dir: &[u8],
-    program: &Program,
-    common: &[u8],
-) -> Vec<u8> {
-    let absolute = path::absolute(file, program.current_directory());
-    let rest =
-        path::trim_file_path_prefix(&absolute, common, program.use_case_sensitive_file_names())
-            .unwrap_or(&absolute);
-    path::combine(new_dir, &[rest])
+    get_common_source_directory(
+        program.options(),
+        || files.to_vec(),
+        program.current_directory(),
+        program.use_case_sensitive_file_names(),
+        None,
+    )
 }
 /// port: tsc/internal/compiler/emitter.go:sourceFileMayBeEmitted
 pub(crate) fn may_emit(file: &ProgramFile, program: &Program) -> Result<bool, Error> {
@@ -92,11 +104,12 @@ pub(crate) fn may_emit_with_force_dts(
     }
     if !options.root_dir.is_empty() || !options.config_file_path.is_empty() {
         let common = path::absolute(&common_directory(program, &[]), program.current_directory());
-        let output = source_in_new_directory(
+        let output = get_source_file_path_in_new_dir_worker(
             source.parse_options().file_name.as_bytes(),
             options.out_dir.as_bytes(),
-            program,
+            program.current_directory(),
             &common,
+            program.use_case_sensitive_file_names(),
         );
         if path::compare_paths(
             source.parse_options().file_name.as_bytes(),
@@ -111,117 +124,39 @@ pub(crate) fn may_emit_with_force_dts(
     }
     Ok(true)
 }
-fn extension_is(file: &[u8], extension: &[u8]) -> bool {
-    file.len() > extension.len() && file.ends_with(extension)
-}
-/// port: tsc/internal/outputpaths/outputpaths.go:GetOutputExtension
-fn output_extension(file: &[u8], jsx: JsxEmit) -> &'static [u8] {
-    if extension_is(file, b".json") {
-        b".json"
-    } else if jsx == JsxEmit::PRESERVE
-        && (extension_is(file, b".jsx") || extension_is(file, b".tsx"))
-    {
-        b".jsx"
-    } else if extension_is(file, b".mts") || extension_is(file, b".mjs") {
-        b".mjs"
-    } else if extension_is(file, b".cts") || extension_is(file, b".cjs") {
-        b".cjs"
-    } else {
-        b".js"
-    }
-}
-/// port: tsc/internal/outputpaths/outputpaths.go:GetOutputPathsFor
+/// `GetOutputPathsFor` without forced paths, as the four output names in
+/// `OutputPaths` order: JavaScript, source map, declaration, declaration map.
 pub(crate) fn output_names(
     file: &ProgramFile,
     program: &Program,
     common: &[u8],
 ) -> Result<[Vec<u8>; 4], Error> {
     let source = file.bound().view().source_file()?;
-    let options = program.options();
-    let name = source.parse_options().file_name.as_bytes();
-    let own = if options.out_dir.is_empty() {
-        name.to_vec()
-    } else {
-        source_in_new_directory(name, options.out_dir.as_bytes(), program, common)
-    };
-    let own = [
-        path::remove_file_extension(&own),
-        output_extension(name, options.jsx),
-    ]
-    .concat();
-    let json = source.script_kind == ScriptKind::JSON;
-    let json_same = json
-        && path::compare_paths(
-            name,
-            &own,
-            program.current_directory(),
-            program.use_case_sensitive_file_names(),
-        )
-        .is_eq();
-    let mut result = [Vec::new(), Vec::new(), Vec::new(), Vec::new()];
-    if source.content_mapper().is_empty() && !options.emit_declaration_only.is_true() && !json_same
-    {
-        result[0] = own;
-        if !json && options.source_map.is_true() && !options.inline_source_map.is_true() {
-            result[1] = [&result[0], b".map".as_slice()].concat();
-        }
-    }
-    if options.emit_declarations() && !json {
-        let directory = if options.declaration_dir.is_empty() {
-            &options.out_dir
-        } else {
-            &options.declaration_dir
-        };
-        let output = if directory.is_empty() {
-            name.to_vec()
-        } else {
-            source_in_new_directory(name, directory.as_bytes(), program, common)
-        };
-        result[2] = declaration_extension(&output, program);
-        if options.declaration_maps_enabled() {
-            result[3] = [&result[2], b".map".as_slice()].concat();
-        }
-    }
-    Ok(result)
+    let paths = get_output_paths_for(
+        &source,
+        program.options(),
+        &mut ProgramOutputPathsHost::new(program, common),
+        ForceEmitPaths::default(),
+    );
+    Ok([
+        paths.js_file_path().to_vec(),
+        paths.source_map_file_path().to_vec(),
+        paths.declaration_file_path().to_vec(),
+        paths.declaration_map_path().to_vec(),
+    ])
 }
 /// Unconditional workers used by import-map inversion, regardless of emit flags.
-// port: tsc/internal/outputpaths/outputpaths.go:GetOutputJSFileNameWorker
 pub(crate) fn module_specifier_output_name(
     file: &[u8],
     program: &Program,
     common: &[u8],
     declaration: bool,
 ) -> Vec<u8> {
+    let mut host = ProgramOutputPathsHost::new(program, common);
     if declaration {
-        return tsr_tsoptions::output_paths::output_declaration_file_name(
-            file,
-            program.options(),
-            common,
-            program.current_directory(),
-            program.use_case_sensitive_file_names(),
-            &program.content_mapper_extensions(),
-        );
+        return get_output_declaration_file_name_worker(file, program.options(), &mut host);
     }
-    let options = program.options();
-    let directory = &options.out_dir;
-    let output = if directory.is_empty() {
-        file.to_vec()
-    } else {
-        path::resolve(
-            directory.as_bytes(),
-            &[&path::relative_from_directory(
-                common,
-                file,
-                program.current_directory(),
-                program.use_case_sensitive_file_names(),
-            )],
-        )
-    };
-    [
-        path::remove_file_extension(&output),
-        output_extension(file, options.jsx),
-    ]
-    .concat()
+    get_output_js_file_name_worker(file, program.options(), &mut host)
 }
 
 impl Program {

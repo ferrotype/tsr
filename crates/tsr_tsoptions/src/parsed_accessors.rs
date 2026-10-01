@@ -175,38 +175,37 @@ struct OutputMaps {
     outputs: BTreeMap<JsString, std::sync::Arc<SourceOutputNames>>,
 }
 impl ParsedCommandLine {
+    /// The membership check runs once the directory function returns, with the
+    /// file list and root it was given: `GetCommonSourceDirectory` ignores the
+    /// check's result and only appends a separator after it, so the deferral is
+    /// not observable.
     /// port: tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.CommonSourceDirectory
     pub fn common_source_directory(&mut self) -> &[u8] {
         if self.caches.common_directory.is_none() {
-            let files: Vec<_> = self
-                .root_file_names
-                .iter()
-                .filter(|file| {
-                    !(path::is_declaration_file_name(file.as_bytes())
-                        || self.options.no_emit_for_js_files.is_true()
-                            && path::has_js_file_extension(file.as_bytes()))
-                })
-                .cloned()
-                .collect();
-            let root = if !self.options.root_dir.is_empty() {
-                Some(self.options.root_dir.as_bytes().to_vec())
-            } else if !self.options.config_file_path.is_empty() {
-                Some(path::directory(self.options.config_file_path.as_bytes()))
-            } else {
-                None
+            let files = || {
+                self.root_file_names
+                    .iter()
+                    .filter(|file| {
+                        !(self.options.no_emit_for_js_files.is_true()
+                            && path::has_js_file_extension(file.as_bytes())
+                            || path::is_declaration_file_name(file.as_bytes()))
+                    })
+                    .cloned()
+                    .collect()
             };
-            let mut directory = if let Some(root) = root {
+            let mut check: Option<(Vec<JsString>, Vec<u8>)> = None;
+            let directory = crate::output_paths::get_common_source_directory(
+                &self.options,
+                files,
+                self.current_directory(),
+                self.use_case_sensitive_file_names(),
+                Some(&mut |files: &[JsString], root: &[u8]| {
+                    check = Some((files.to_vec(), root.to_vec()));
+                    true
+                }),
+            );
+            if let Some((files, root)) = check {
                 self.check_source_files_belong_to_path(&files, &root);
-                root
-            } else {
-                crate::output_paths::computed_common(
-                    &files,
-                    self.current_directory(),
-                    self.use_case_sensitive_file_names(),
-                )
-            };
-            if !directory.is_empty() && !matches!(directory.last(), Some(b'/' | b'\\')) {
-                directory.push(b'/');
             }
             self.caches.common_directory = Some(JsString::from_bytes(directory));
         }
@@ -248,29 +247,20 @@ impl ParsedCommandLine {
             return;
         }
         let mut maps = OutputMaps::default();
-        // CommonSourceDirectory is lazy even here: only an output directory
-        // causes the native output worker to ask for it.
-        let needs_common =
-            !self.options.out_dir.is_empty() || !self.options.declaration_dir.is_empty();
-        let mut common = None;
-        let extensions = self.content_mapper_extensions();
+        // The parsed command line is the output-path host; CommonSourceDirectory
+        // stays lazy: only an output directory makes the worker ask for it.
+        let options = self.options.clone();
         for index in 0..self.root_file_names.len() {
             let source = self.root_file_names[index].clone();
             let output = if path::is_declaration_file_name(source.as_bytes())
-                || path::file_extension_is(source.as_bytes(), b".json")
+                || path::file_extension_is(source.as_bytes(), path::EXTENSION_JSON)
             {
                 Vec::new()
             } else {
-                if needs_common && common.is_none() {
-                    common = Some(self.common_source_directory().to_vec());
-                }
-                crate::output_paths::output_declaration_file_name(
+                crate::output_paths::get_output_declaration_file_name_worker(
                     source.as_bytes(),
-                    &self.options,
-                    common.as_deref().unwrap_or_default(),
-                    self.current_directory(),
-                    self.use_case_sensitive_file_names(),
-                    &extensions,
+                    &options,
+                    self,
                 )
             };
             let names = std::sync::Arc::new(SourceOutputNames {
@@ -344,5 +334,25 @@ impl ParsedCaches {
             globs: self.globs.clone(),
             ..Self::default()
         }
+    }
+}
+
+/// Go's `var _ outputpaths.OutputPathsHost = (*ParsedCommandLine)(nil)`.
+impl crate::output_paths::OutputPathsHost for ParsedCommandLine {
+    fn common_source_directory(&mut self) -> JsString {
+        ParsedCommandLine::common_source_directory(self);
+        self.caches
+            .common_directory
+            .clone()
+            .expect("initialized common source directory")
+    }
+    fn content_mapper_extensions(&self) -> Vec<JsString> {
+        ParsedCommandLine::content_mapper_extensions(self)
+    }
+    fn get_current_directory(&self) -> &[u8] {
+        self.current_directory()
+    }
+    fn use_case_sensitive_file_names(&self) -> bool {
+        ParsedCommandLine::use_case_sensitive_file_names(self)
     }
 }
