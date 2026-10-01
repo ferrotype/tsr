@@ -223,3 +223,15 @@ sources = ["crates/**", "Cargo.*", ".cargo/**", "rust-toolchain*", "scripts/phas
 exclude = ["crates/*/tests/**"]
 target = "host"
 config = "Phase 2 C0 checker acceptance contract: 13,432 executed compiler/conformance variants (runner-enumerated, not skipped), native contract verified from two shardings against every committed reference, one categorized Rust run (errors, types, symbols, display, trace, union ordering, parent pointers) with harness defects separate from compiler gaps, named blockers; single-threaded mode; no threshold"
+
+# Phase 3 T0 (docs/PHASE3-plan.md): replays the recorded native emit captures
+# of both test-program modes (target/phase3/native-single, native-concurrent)
+# and the committed transpile observation. It never runs a corpus; a missing or
+# stale capture leaves its metric false. The owner records it on the designated
+# host with `cargo xtask run emit`.
+[emit]
+command = ["python3", "scripts/phase3_producers.py", "emit"]
+inputs = ["data/phase3/inventory.json", "data/phase3/native-provenance-single.json", "data/phase3/native-provenance-concurrent.json", "data/phase3/transpile-native.json", "data/phase2/inventory.json", "data/s07/subset.json", "data/upstream.json", ".gitmodules", "data/s04/toolchains.toml"]
+sources = ["scripts/phase3_*.py", "scripts/s08_baselines.py", "scripts/s08_oracle.py", "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py", "tools/phase3/**", "tools/s08/oracle/diagnostics_observer.go", "upstream", "scripts/tests/test_phase3*.py", "scripts/tests/fixtures/phase3/**"]
+target = "host"
+config = "Phase 3 T0 emit acceptance contract: 13,432 executed compiler/conformance variants with the output, sourcemap and sourcemap-record baselines the pinned runner composes, the emitted files and the pinned printer's reprint of every non-library source file, verified from two shardings against every committed reference in both test-program modes; the transpile runner's 28 configurations; Rust harness, first run and blockers pending; no threshold"
