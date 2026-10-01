@@ -1,5 +1,5 @@
 //! Expression forms retained in generated parameter and computed-property names.
-use super::{greatest_end, Session, Span, WriteKind};
+use super::{comments::CommentTarget, guard, Session, Span, WriteKind};
 use crate::{emit_flags as ef, list_format as lf, Error};
 use tsr_ast::{operator_precedence as op, NodeId, NodeKind, SyntaxKind as K};
 
@@ -36,25 +36,24 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitCallee
     pub(super) fn emit_callee(&mut self, callee: NodeId, parent: NodeId) -> Result<(), Error> {
-        if self.emit_flags(parent) & ef::INDIRECT_CALL != 0 {
+        if self.should_emit_indirect_call(parent) {
             self.write_punctuation(b"(");
-            self.writer.write_literal(b"0");
+            self.write_literal(b"0");
             self.write_punctuation(b",");
             self.write_space();
             self.emit_expression(callee, op::COMMA)?;
             self.write_punctuation(b")");
             return Ok(());
         }
+        let parent_read = self.node(parent)?;
         let skipped = tsr_ast::skip_partially_emitted_expressions(self.view, callee)?;
-        let read = self.node(skipped)?;
-        let needs_parens = read.kind() == K::NewExpression
-            && read
-                .data_source()
-                .as_new_expression()
-                .is_some_and(|n| n.arguments().is_none());
-        let precedence = if needs_parens {
-            op::PARENTHESES
-        } else if tsr_ast::utilities::is_optional_chain(&self.node(parent)?) {
+        if parent_read.kind() == K::CallExpression
+            && self.is_new_expression_without_arguments(skipped)?
+        {
+            // Parenthesize `new C` inside of a CallExpression so it is treated as `(new C)()` and not `new C()`
+            return self.emit_expression(callee, op::PARENTHESES);
+        }
+        let precedence = if tsr_ast::utilities::is_optional_chain(&parent_read) {
             op::OPTIONAL_CHAIN
         } else {
             op::MEMBER
@@ -62,9 +61,15 @@ impl Session<'_, '_> {
         self.emit_expression(callee, precedence)
     }
 
+    // port: tsc/internal/printer/utilities.go:isNewExpressionWithoutArguments
+    fn is_new_expression_without_arguments(&self, node: NodeId) -> Result<bool, Error> {
+        let read = self.node(node)?;
+        Ok(read.kind() == K::NewExpression && read.argument_list().is_none())
+    }
+
     // port: tsc/internal/printer/printer.go:Printer.emitCallExpression
     pub(super) fn emit_call_expression(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let call = read
             .data_source()
@@ -85,7 +90,7 @@ impl Session<'_, '_> {
             arguments,
             lf::CALL_EXPRESSION_ARGUMENTS,
         )?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -101,40 +106,77 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitParenthesizedExpression
     pub(super) fn emit_parenthesized_expression(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let expression = read
             .data_source()
             .as_parenthesized_expression()
             .and_then(|n| n.expression())
             .ok_or(Error::MissingNode("parenthesized expression"))?;
-        self.emit_token(
-            K::OpenParenToken,
-            i64::from(read.pos()),
-            WriteKind::Punctuation,
-            node,
-        );
-        let leading = if self.printer.options.preserve_source_newlines {
-            self.get_leading_line_terminator_count(Some(node), Some(expression), lf::NONE)?
-        } else {
-            0
-        };
-        self.write_lines_and_indent(leading, false);
-        self.emit_expression(expression, op::COMMA)?;
-        if self.printer.options.preserve_source_newlines {
-            let trailing =
-                self.get_closing_line_terminator_count(Some(node), Some(expression), lf::NONE)?;
-            self.write_line_repeat(trailing);
-        }
-        self.decrease_indent_if(leading > 0);
-        self.emit_token(
-            K::CloseParenToken,
-            greatest_end(-1, &[Some(i64::from(self.node(expression)?.end()))]),
-            WriteKind::Punctuation,
-            node,
-        );
-        self.exit_node(node);
+        self.emit_parenthesized_expression_parts(Some(node), Span::of(&read), expression)?;
+        self.exit_node(node, state)?;
         Ok(())
+    }
+
+    /// The writes of `emitParenthesizedExpression` between entering and
+    /// leaving the node; `node` is `None` for the parentheses upstream creates
+    /// around an arrow function's object-literal body.
+    fn emit_parenthesized_expression_parts(
+        &mut self,
+        node: Option<NodeId>,
+        span: Span,
+        expression: NodeId,
+    ) -> Result<(), Error> {
+        // Upstream closes at the open paren's end only for a nil expression,
+        // which this tree cannot hold.
+        self.emit_token_ex(
+            K::OpenParenToken,
+            span.pos,
+            WriteKind::Punctuation,
+            node,
+            super::tef::NONE,
+        )?;
+        let indented = self.write_line_separators_and_indent_before(expression, span)?;
+        self.emit_expression(expression, op::COMMA)?;
+        self.write_line_separators_after(expression, span)?;
+        self.decrease_indent_if(indented);
+        let close_paren_pos = i64::from(self.node(expression)?.end());
+        self.emit_token_ex(
+            K::CloseParenToken,
+            close_paren_pos,
+            WriteKind::Punctuation,
+            node,
+            super::tef::NONE,
+        )?;
+        Ok(())
+    }
+
+    /// `emitExpression` of the `ParenthesizedExpression` upstream's
+    /// `emitConciseBody` creates around an object-literal body, with the body's
+    /// range. It is never part of the tree: it has no identity, no emit flags,
+    /// and its parse node is nil, so its tokens carry no comments.
+    pub(super) fn emit_created_parenthesized_expression(
+        &mut self,
+        expression: NodeId,
+    ) -> Result<(), Error> {
+        let read = self.node(expression)?;
+        let span = Span {
+            node: None,
+            pos: i64::from(read.pos()),
+            end: i64::from(read.end()),
+        };
+        let target = CommentTarget {
+            node: None,
+            kind: K::ParenthesizedExpression.into(),
+            emit_flags: ef::NONE,
+            comment_range: span.range(),
+        };
+        guard(|| {
+            let state = self.enter_created_node(&target)?;
+            self.emit_parenthesized_expression_parts(None, span, expression)?;
+            self.exit_created_node(&target, state);
+            Ok(())
+        })
     }
 
     fn binary_operator(&self, node: NodeId) -> Result<Option<NodeKind>, Error> {
@@ -224,7 +266,6 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitBinaryExpression
     pub(super) fn emit_binary_expression(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
         let (left, operator, right) = self.binary_parts(node)?;
         let (mut left_prec, mut right_prec) =
             self.binary_operand_precedences(left, operator, right)?;
@@ -248,6 +289,7 @@ impl Session<'_, '_> {
                 }
             }
         }
+        let state = self.enter_node(node)?;
         self.emit_expression(left, left_prec)?;
         let before = self.get_lines_between_nodes(
             node,
@@ -260,12 +302,13 @@ impl Session<'_, '_> {
             Span::of(&self.node(right)?),
         )?;
         self.write_lines_and_indent(before, outer != K::CommaToken);
-        self.emit_token_node(Some(operator))?;
+        self.emit_token_node_ex(Some(operator), super::tef::NO_SOURCE_MAPS)?;
+        // Binary operators should have a space before the comment starts
         self.write_lines_and_indent(after, true);
         self.emit_expression(right, right_prec)?;
         self.decrease_indent_if(after > 0);
         self.decrease_indent_if(before > 0);
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 }

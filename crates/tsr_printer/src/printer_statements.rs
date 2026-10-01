@@ -1,12 +1,10 @@
-//! Statements, declarations, class members, JSX and the expressions type
-//! display never produces. The same conventions as the parent module apply:
-//! every emit function is the upstream function of the same name and keeps its
-//! order of writes. Name generation only matters for auto-generated
-//! identifiers, which this port refuses where it meets them, so the name
-//! generation scopes upstream opens around bodies and members are not kept.
+//! Statements, declarations, class members, JSX, whole source files and the
+//! expressions type display never produces. The same conventions as the parent
+//! module apply: every emit function is the upstream function of the same name
+//! and keeps its order of writes.
 
-use super::{greatest_end, Session, Span, WriteKind};
-use crate::{list_format as lf, Error, ListFormat, TypePrecedence};
+use super::{greatest_end, guard, tef, CommentSeparator, Session, Span, WriteKind};
+use crate::{emit_flags as ef, list_format as lf, Error, ListFormat, TypePrecedence};
 use tsr_ast::{operator_precedence as op, NodeId, NodeListId, SyntaxKind as K};
 
 impl Session<'_, '_> {
@@ -37,9 +35,9 @@ impl Session<'_, '_> {
                 expected: "Identifier",
             });
         }
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         self.emit_identifier_text(node)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -80,14 +78,14 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitDecorator
     pub(super) fn emit_decorator(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let expression = self
             .node(node)?
             .expression()
             .ok_or(Error::MissingNode("decorator expression"))?;
         self.write_punctuation(b"@");
         self.emit_expression(expression, op::LEFT_HAND_SIDE)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -151,6 +149,7 @@ impl Session<'_, '_> {
         parameters: Option<NodeListId>,
     ) -> Result<(), Error> {
         if self.can_emit_simple_arrow_head(parent, parameters)? {
+            self.generate_all_names(parameters)?;
             self.emit_list(
                 Self::emit_parameter_declaration_node,
                 parent,
@@ -184,19 +183,20 @@ impl Session<'_, '_> {
         {
             return Ok(false);
         }
-        let statements = match block.statements() {
-            Some(list) => self.list_nodes(list)?,
-            None => Vec::new(),
-        };
+        let statement_list = block.statements();
+        let statements = self.list_nodes_of(statement_list)?;
+        let body_span = Span::of(&read);
         if self.get_leading_line_terminator_count(
-            Some(body),
+            Some(body_span),
             statements.first().copied(),
             lf::PRESERVE_LINES,
         )? > 0
             || self.get_closing_line_terminator_count(
-                Some(body),
+                Some(body_span),
                 statements.last().copied(),
                 lf::PRESERVE_LINES,
+                self.list_range(statement_list)?
+                    .ok_or(Error::MissingNode("block statements"))?,
             )? > 0
         {
             return Ok(false);
@@ -234,10 +234,10 @@ impl Session<'_, '_> {
     }
 
     /// The body block gets the emit notifications only, not the comment
-    /// pipeline. Detached comments and emit helpers are not emitted.
+    /// pipeline: otherwise trailing comments of a method hoisted into an
+    /// expression would leak into it.
     // port: tsc/internal/printer/printer.go:Printer.emitFunctionBody
     fn emit_function_body(&mut self, body: NodeId) -> Result<(), Error> {
-        self.writer.on_before_emit_node(body);
         let read = self.node(body)?;
         let Some(block) = read.data_source().as_block() else {
             // Upstream converts the body to a block without a check. A decoded
@@ -247,11 +247,24 @@ impl Session<'_, '_> {
                 expected: "Block",
             });
         };
+        // The emit context's tables are shared by its clones.
+        self.printer
+            .emit_context
+            .clone()
+            .add_emit_flags(body, ef::NO_SOURCE_MAP);
+        self.writer.on_before_emit_node(body);
+        self.generate_names(Some(body))?;
         let statements = block.statements();
+        let statements_range = self
+            .list_range(statements)?
+            .ok_or(Error::MissingNode("function body statements"))?;
         self.write_punctuation(b"{");
         self.increase_indent();
+        let detached_state =
+            self.emit_detached_comments_before_statement_list(body, statements_range)?;
         let statement_offset = self.emit_prologue_directives(statements)?;
         let pos = self.writer.get_text_pos();
+        self.emit_helpers(body)?;
         if self.should_emit_block_function_body_on_single_line(body)?
             && statement_offset == 0
             && pos == self.writer.get_text_pos()
@@ -276,9 +289,15 @@ impl Session<'_, '_> {
                 -1,
             )?;
         }
+        self.emit_detached_comments_after_statement_list(body, statements_range, detached_state);
         self.decrease_indent();
-        let end = self.list_end(statements, "function body statements")?;
-        self.emit_token(K::CloseBraceToken, end, WriteKind::Punctuation, body);
+        self.emit_token_ex(
+            K::CloseBraceToken,
+            statements_range.end(),
+            WriteKind::Punctuation,
+            Some(body),
+            tef::NO_COMMENTS,
+        )?;
         self.writer.on_after_emit_node(body);
         Ok(())
     }
@@ -299,8 +318,10 @@ impl Session<'_, '_> {
         let body = self.node(node)?.body();
         let indented = self.should_emit_indented(node);
         self.increase_indent_if(indented);
+        self.push_name_generation_scope(Some(node));
         self.emit_signature(node)?;
         self.emit_function_body_node(body)?;
+        self.pop_name_generation_scope(Some(node));
         self.decrease_indent_if(indented);
         Ok(())
     }
@@ -311,7 +332,7 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitPropertyDeclaration
     fn emit_property_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let (modifiers, name, postfix, type_node, initializer) = (
             read.modifiers(),
@@ -330,13 +351,13 @@ impl Session<'_, '_> {
         let equals_pos = greatest_end(name_end, &[self.end_of(type_node)?, self.end_of(postfix)?]);
         self.emit_initializer(initializer, equals_pos, node)?;
         self.write_trailing_semicolon();
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitMethodDeclaration
     fn emit_method_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let asterisk = read
             .data_source()
@@ -349,13 +370,13 @@ impl Session<'_, '_> {
         self.emit_property_name(name)?;
         self.emit_token_node(postfix)?;
         self.emit_signature_and_body(node)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitClassStaticBlockDeclaration
     fn emit_class_static_block_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         // `node.Body` is the payload's own field: Node.Body is nil for this
         // payload at the pin, which does not embed BodyBase.
         let body = self
@@ -365,35 +386,37 @@ impl Session<'_, '_> {
             .ok_or(Error::MissingNode("class static block payload"))?
             .body();
         self.write_keyword(b"static");
+        self.push_name_generation_scope(Some(node));
         self.emit_function_body_node(body)?;
-        self.exit_node(node);
+        self.pop_name_generation_scope(Some(node));
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitConstructor
     fn emit_constructor(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let modifiers = self.node(node)?.modifiers();
         self.emit_modifier_list(node, modifiers, false)?;
         self.write_keyword(b"constructor");
         self.emit_signature_and_body(node)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitSemicolonClassElement
-    fn emit_semicolon_class_element(&mut self, node: NodeId) {
-        self.enter_node(node);
+    fn emit_semicolon_class_element(&mut self, node: NodeId) -> Result<(), Error> {
+        let state = self.enter_node(node)?;
         self.write_trailing_semicolon();
-        self.exit_node(node);
+        self.exit_node(node, state)
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitNotEmittedStatement
     // port: tsc/internal/printer/printer.go:Printer.emitNotEmittedTypeElement
     // port: tsc/internal/printer/printer.go:Printer.emitOmittedExpression
-    pub(super) fn emit_nothing(&mut self, node: NodeId) {
-        self.enter_node(node);
-        self.exit_node(node);
+    pub(super) fn emit_nothing(&mut self, node: NodeId) -> Result<(), Error> {
+        let state = self.enter_node(node)?;
+        self.exit_node(node, state)
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitClassElement
@@ -403,16 +426,11 @@ impl Session<'_, '_> {
             K::MethodDeclaration => self.emit_method_declaration(node),
             K::ClassStaticBlockDeclaration => self.emit_class_static_block_declaration(node),
             K::Constructor => self.emit_constructor(node),
-            K::GetAccessor | K::SetAccessor => self.emit_accessor_declaration(node),
+            K::GetAccessor => self.emit_get_accessor_declaration(node),
+            K::SetAccessor => self.emit_set_accessor_declaration(node),
             K::IndexSignature => self.emit_index_signature(node),
-            K::SemicolonClassElement => {
-                self.emit_semicolon_class_element(node);
-                Ok(())
-            }
-            K::NotEmittedStatement => {
-                self.emit_nothing(node);
-                Ok(())
-            }
+            K::SemicolonClassElement => self.emit_semicolon_class_element(node),
+            K::NotEmittedStatement => self.emit_nothing(node),
             K::JSTypeAliasDeclaration => self.emit_type_alias_declaration(node),
             kind => Err(Error::UnexpectedKind {
                 context: "unexpected ClassElement",
@@ -428,7 +446,8 @@ impl Session<'_, '_> {
             K::ShorthandPropertyAssignment => self.emit_shorthand_property_assignment(node),
             K::SpreadAssignment => self.emit_spread_assignment(node),
             K::MethodDeclaration => self.emit_method_declaration(node),
-            K::GetAccessor | K::SetAccessor => self.emit_accessor_declaration(node),
+            K::GetAccessor => self.emit_get_accessor_declaration(node),
+            K::SetAccessor => self.emit_set_accessor_declaration(node),
             kind => Err(Error::UnexpectedKind {
                 context: "unhandled ObjectLiteralElement",
                 kind: kind.into(),
@@ -493,7 +512,7 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitArrayLiteralExpression
     pub(super) fn emit_array_literal_expression(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let multi_line = read
             .data_source()
@@ -511,13 +530,13 @@ impl Session<'_, '_> {
             read.element_list(),
             lf::ARRAY_LITERAL_EXPRESSION_ELEMENTS | prefer,
         )?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitObjectLiteralExpression
     pub(super) fn emit_object_literal_expression(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let multi_line = read
             .data_source()
@@ -527,6 +546,8 @@ impl Session<'_, '_> {
         let properties = read.property_list();
         let indented = self.should_emit_indented(node);
         self.increase_indent_if(indented);
+        self.push_name_generation_scope(Some(node));
+        self.generate_all_member_names(properties)?;
         let mut format = lf::OBJECT_LITERAL_EXPRESSION_PROPERTIES;
         if multi_line {
             format |= lf::PREFER_NEW_LINE;
@@ -535,14 +556,15 @@ impl Session<'_, '_> {
             format |= lf::ALLOW_TRAILING_COMMA;
         }
         self.emit_list(Self::emit_object_literal_element, node, properties, format)?;
+        self.pop_name_generation_scope(Some(node));
         self.decrease_indent_if(indented);
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitNewExpression
     pub(super) fn emit_new_expression(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let expression = read
             .expression()
@@ -552,7 +574,7 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Keyword,
             node,
-        );
+        )?;
         self.write_space();
         let skipped = tsr_ast::skip_partially_emitted_expressions(self.view, expression)?;
         // `C()` under `new` is parenthesized, so it reads `new (C())` and not
@@ -570,7 +592,7 @@ impl Session<'_, '_> {
             read.argument_list(),
             lf::NEW_EXPRESSION_ARGUMENTS,
         )?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -588,7 +610,7 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitTaggedTemplateExpression
     pub(super) fn emit_tagged_template_expression(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let tagged = read
             .data_source()
@@ -603,13 +625,13 @@ impl Session<'_, '_> {
         self.emit_type_arguments(node, type_arguments)?;
         self.write_space();
         self.emit_template_literal(template)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitTypeAssertionExpression
     pub(super) fn emit_type_assertion_expression(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let (type_node, expression) = (
             read.type_node()
@@ -621,13 +643,13 @@ impl Session<'_, '_> {
         self.emit_type_node_outside_extends(type_node)?;
         self.write_punctuation(b">");
         self.emit_expression(expression, op::UPDATE)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitFunctionExpression
     pub(super) fn emit_function_expression(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let asterisk = read
             .data_source()
@@ -635,6 +657,7 @@ impl Session<'_, '_> {
             .ok_or(Error::MissingNode("function expression payload"))?
             .asterisk_token();
         let (modifiers, name) = (read.modifiers(), read.name());
+        self.generate_name_if_needed(name)?;
         self.emit_modifier_list(node, modifiers, false)?;
         self.write_keyword(b"function");
         self.emit_token_node(asterisk)?;
@@ -644,13 +667,13 @@ impl Session<'_, '_> {
             self.emit_identifier_name(name)?;
         }
         self.emit_signature_and_body(node)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     /// Upstream wraps an object-literal body in a parenthesized expression it
-    /// creates on the spot, with the body's range. That node is never part of
-    /// the tree, so only what printing it writes is reproduced.
+    /// creates on the spot, with the body's range, so that the parentheses
+    /// follow any leading comments of a partially emitted body.
     // port: tsc/internal/printer/printer.go:Printer.emitConciseBody
     fn emit_concise_body(&mut self, node: NodeId) -> Result<(), Error> {
         let read = self.node(node)?;
@@ -659,22 +682,7 @@ impl Session<'_, '_> {
         }
         let leftmost = tsr_ast::get_leftmost_expression(self.view, node, false)?;
         if self.node(leftmost)?.kind() == K::ObjectLiteralExpression {
-            self.write_punctuation(b"(");
-            let leading = if self.printer.options.preserve_source_newlines {
-                self.get_leading_line_terminator_count(None, Some(node), lf::NONE)?
-            } else {
-                0
-            };
-            self.write_lines_and_indent(leading, false);
-            self.emit_expression(node, op::COMMA)?;
-            if self.printer.options.preserve_source_newlines {
-                let trailing =
-                    self.get_closing_line_terminator_count(None, Some(node), lf::NONE)?;
-                self.write_line_repeat(trailing);
-            }
-            self.decrease_indent_if(leading > 0);
-            self.write_punctuation(b")");
-            return Ok(());
+            return self.emit_created_parenthesized_expression(node);
         }
         if tsr_ast::utilities::is_expression_kind(read.kind()) {
             return self.emit_expression(node, op::YIELD);
@@ -687,7 +695,7 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitArrowFunction
     pub(super) fn emit_arrow_function(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let arrow = read
             .data_source()
@@ -705,6 +713,7 @@ impl Session<'_, '_> {
         self.emit_modifier_list(node, modifiers, false)?;
         let indented = self.should_emit_indented(node);
         self.increase_indent_if(indented);
+        self.push_name_generation_scope(Some(node));
         self.emit_type_parameters(node, type_parameters)?;
         self.emit_parameters_for_arrow(node, parameters)?;
         self.emit_type_annotation(type_node)?;
@@ -712,8 +721,9 @@ impl Session<'_, '_> {
         self.emit_token_node(arrow)?;
         self.write_space();
         self.emit_concise_body(body)?;
+        self.pop_name_generation_scope(Some(node));
         self.decrease_indent_if(indented);
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -726,21 +736,21 @@ impl Session<'_, '_> {
         node: NodeId,
         keyword: K,
     ) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let expression = read
             .expression()
             .ok_or(Error::MissingNode("unary operand"))?;
-        self.emit_token(keyword, i64::from(read.pos()), WriteKind::Keyword, node);
+        self.emit_token(keyword, i64::from(read.pos()), WriteKind::Keyword, node)?;
         self.write_space();
         self.emit_expression(expression, op::UNARY)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitPostfixUnaryExpression
     pub(super) fn emit_postfix_unary_expression(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let postfix = read
             .data_source()
@@ -755,8 +765,8 @@ impl Session<'_, '_> {
         })?;
         self.emit_expression(operand, op::LEFT_HAND_SIDE)?;
         let end = i64::from(self.node(operand)?.end());
-        self.emit_token(operator, end, WriteKind::Operator, node);
-        self.exit_node(node);
+        self.emit_token(operator, end, WriteKind::Operator, node)?;
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -782,7 +792,7 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitConditionalExpression
     pub(super) fn emit_conditional_expression(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let conditional = read
             .data_source()
@@ -829,13 +839,13 @@ impl Session<'_, '_> {
         self.emit_expression(when_false, op::YIELD)?;
         self.decrease_indent_if(after_colon > 0);
         self.decrease_indent_if(before_colon > 0);
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitTemplateSpan
     pub(super) fn emit_template_span(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let span = read
             .data_source()
@@ -848,13 +858,18 @@ impl Session<'_, '_> {
         );
         self.emit_expression(expression, op::COMMA)?;
         self.emit_template_middle_tail(literal)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
+    }
+
+    // port: tsc/internal/printer/printer.go:Printer.emitTemplateSpanNode
+    fn emit_template_span_node(&mut self, node: NodeId) -> Result<(), Error> {
+        self.emit_template_span(node)
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitTemplateExpression
     pub(super) fn emit_template_expression(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let template = read
             .data_source()
@@ -866,26 +881,80 @@ impl Session<'_, '_> {
         );
         self.emit_template_head(head)?;
         self.emit_list(
-            Self::emit_template_span,
+            Self::emit_template_span_node,
             node,
             spans,
             lf::TEMPLATE_EXPRESSION_SPANS,
         )?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
-    /// Upstream parenthesizes an operand whose leading comment would put a
-    /// line break after `return`, `throw` or `yield`. No comment is emitted
-    /// here, so the operand is printed as it is.
+    /// Wraps an expression in parentheses when a leading comment would put a
+    /// line break between it and its parent (`return`, `throw`, `yield`).
+    ///
+    /// Upstream rebuilds the expression's left spine with the factory down to
+    /// the partially emitted expression that needs the parentheses. Each
+    /// `Update*` returns the node itself while its child is unchanged, and a
+    /// changed child only comes from creating the parentheses, which is the
+    /// boundary here: the printer reads a fixed tree.
+    // port: tsc/internal/printer/printer.go:Printer.parenthesizeExpressionForNoAsi
+    fn parenthesize_expression_for_no_asi(&self, node: NodeId) -> Result<NodeId, Error> {
+        guard(|| self.parenthesize_expression_for_no_asi_worker(node))
+    }
+
+    fn parenthesize_expression_for_no_asi_worker(&self, node: NodeId) -> Result<NodeId, Error> {
+        if !self.comments_disabled {
+            let read = self.node(node)?;
+            let data = read.data_source();
+            let left = match read.kind().known() {
+                Some(K::PartiallyEmittedExpression) => {
+                    if self.will_emit_leading_new_line(node)? {
+                        return Err(Error::Unsupported(
+                            "parenthesizeExpressionForNoAsi: printer-created parentheses",
+                        ));
+                    }
+                    read.expression()
+                }
+                Some(
+                    K::PropertyAccessExpression
+                    | K::ElementAccessExpression
+                    | K::CallExpression
+                    | K::AsExpression
+                    | K::SatisfiesExpression
+                    | K::NonNullExpression,
+                ) => read.expression(),
+                Some(K::TaggedTemplateExpression) => data
+                    .as_tagged_template_expression()
+                    .and_then(|tagged| tagged.tag()),
+                Some(K::PostfixUnaryExpression) => data
+                    .as_postfix_unary_expression()
+                    .and_then(|postfix| postfix.operand()),
+                Some(K::BinaryExpression) => {
+                    data.as_binary_expression().and_then(|binary| binary.left())
+                }
+                Some(K::ConditionalExpression) => data
+                    .as_conditional_expression()
+                    .and_then(|conditional| conditional.condition()),
+                _ => return Ok(node),
+            };
+            let left = left.ok_or(Error::MissingNode("expression operand"))?;
+            // The update is the node itself: its child came back unchanged.
+            self.parenthesize_expression_for_no_asi(left)?;
+            return Ok(node);
+        }
+        Ok(node)
+    }
+
     // port: tsc/internal/printer/printer.go:Printer.emitExpressionNoASI
     fn emit_expression_no_asi(&mut self, node: NodeId, precedence: i32) -> Result<(), Error> {
+        let node = self.parenthesize_expression_for_no_asi(node)?;
         self.emit_expression(node, precedence)
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitYieldExpression
     pub(super) fn emit_yield_expression(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let asterisk = read
             .data_source()
@@ -898,19 +967,19 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Keyword,
             node,
-        );
+        )?;
         self.emit_punctuation_node(asterisk)?;
         if let Some(expression) = expression {
             self.write_space();
             self.emit_expression_no_asi(expression, op::DISALLOW_COMMA)?;
         }
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitSpreadElement
     pub(super) fn emit_spread_element(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let expression = read
             .expression()
@@ -920,9 +989,9 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Punctuation,
             node,
-        );
+        )?;
         self.emit_expression(expression, op::DISALLOW_COMMA)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -930,8 +999,9 @@ impl Session<'_, '_> {
     // port: tsc/internal/printer/printer.go:Printer.emitClassExpression
     // port: tsc/internal/printer/printer.go:Printer.emitClassDeclaration
     pub(super) fn emit_class(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
+        self.generate_name_if_needed(read.name())?;
         let heritage = match read.kind().known() {
             Some(K::ClassExpression) => read
                 .data_source()
@@ -949,7 +1019,7 @@ impl Session<'_, '_> {
             read.member_list(),
         );
         let pos = self.emit_modifier_list(node, modifiers, true)?;
-        self.emit_token(K::ClassKeyword, pos, WriteKind::Keyword, node);
+        self.emit_token(K::ClassKeyword, pos, WriteKind::Keyword, node)?;
         if let Some(name) = name {
             self.write_space();
             self.emit_identifier_name(name)?;
@@ -958,17 +1028,20 @@ impl Session<'_, '_> {
         self.increase_indent_if(indented);
         self.emit_type_parameters(node, type_parameters)?;
         self.emit_list(
-            Self::emit_heritage_clause,
+            Self::emit_heritage_clause_node,
             node,
             heritage,
             lf::CLASS_HERITAGE_CLAUSES,
         )?;
         self.write_space();
         self.write_punctuation(b"{");
+        self.push_name_generation_scope(Some(node));
+        self.generate_all_member_names(members)?;
         self.emit_list(Self::emit_class_element, node, members, lf::CLASS_MEMBERS)?;
+        self.pop_name_generation_scope(Some(node));
         self.write_punctuation(b"}");
         self.decrease_indent_if(indented);
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -979,7 +1052,7 @@ impl Session<'_, '_> {
         node: NodeId,
         keyword: &'static [u8],
     ) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let (expression, type_node) = (
             read.expression().ok_or(Error::MissingNode("as operand"))?,
@@ -990,26 +1063,26 @@ impl Session<'_, '_> {
         self.write_keyword(keyword);
         self.write_space();
         self.emit_type_node_outside_extends(type_node)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitNonNullExpression
     pub(super) fn emit_non_null_expression(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let expression = self
             .node(node)?
             .expression()
             .ok_or(Error::MissingNode("non-null operand"))?;
         self.emit_expression(expression, op::MEMBER)?;
         self.write_operator(b"!");
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitMetaProperty
     pub(super) fn emit_meta_property(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let keyword = read
             .data_source()
@@ -1023,37 +1096,59 @@ impl Session<'_, '_> {
         let name = read
             .name()
             .ok_or(Error::MissingNode("meta property name"))?;
-        self.emit_token(keyword, i64::from(read.pos()), WriteKind::Punctuation, node);
+        self.emit_token(keyword, i64::from(read.pos()), WriteKind::Punctuation, node)?;
         self.write_punctuation(b".");
         self.emit_identifier_name(name)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     /// Nested partially emitted expressions are entered outermost first and
-    /// left innermost first. Upstream leaves them through a variable that still
-    /// names the innermost one on the first pass, which is reproduced. The
-    /// comments it would emit between are not.
+    /// left innermost first, without reprinting parentheses. Upstream leaves
+    /// them through a variable that still names the innermost one on the first
+    /// pass, so each exit reads the flags, range and comments of the node
+    /// entered after it; that is reproduced.
     // port: tsc/internal/printer/printer.go:Printer.emitPartiallyEmittedExpression
     pub(super) fn emit_partially_emitted_expression(&mut self, node: NodeId) -> Result<(), Error> {
         let mut stack = Vec::new();
         let mut current = node;
-        let inner = loop {
-            self.enter_node(current);
-            stack.push(current);
-            let expression = self
-                .node(current)?
+        loop {
+            let state = self.enter_node(current)?;
+            let read = self.node(current)?;
+            let expression = read
                 .expression()
                 .ok_or(Error::MissingNode("partially emitted expression"))?;
+            let expression_pos = i64::from(self.node(expression)?.pos());
+            if self.emit_flags(current) & ef::NO_LEADING_COMMENTS == 0
+                && i64::from(read.pos()) != expression_pos
+            {
+                self.emit_trailing_comments_of_position(expression_pos, false, false);
+            }
+            stack.push((current, state));
             if self.node(expression)?.kind() != K::PartiallyEmittedExpression {
-                break expression;
+                break;
             }
             current = expression;
-        };
+        }
+        let inner = self
+            .node(current)?
+            .expression()
+            .ok_or(Error::MissingNode("partially emitted expression"))?;
         self.emit_expression(inner, op::LOWEST)?;
-        while let Some(entry) = stack.pop() {
-            self.exit_node(current);
-            current = entry;
+        // unwind stack
+        while let Some((entry_node, entry_state)) = stack.pop() {
+            let read = self.node(current)?;
+            let expression = read
+                .expression()
+                .ok_or(Error::MissingNode("partially emitted expression"))?;
+            let expression_end = i64::from(self.node(expression)?.end());
+            if self.emit_flags(current) & ef::NO_TRAILING_COMMENTS == 0
+                && i64::from(read.end()) != expression_end
+            {
+                self.emit_leading_comments_of_position(expression_end);
+            }
+            self.exit_node(current, entry_state)?;
+            current = entry_node;
         }
         Ok(())
     }
@@ -1077,8 +1172,9 @@ impl Session<'_, '_> {
     // port: tsc/internal/printer/printer.go:Printer.emitBlock
     // port: tsc/internal/printer/printer.go:Printer.emitModuleBlock
     pub(super) fn emit_block(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
+        self.generate_names(Some(node))?;
         // A module block has no multi-line mark of its own.
         let multi_line = read
             .data_source()
@@ -1090,7 +1186,7 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Punctuation,
             node,
-        );
+        )?;
         let format = if !multi_line && self.is_empty_block(node, statements)?
             || self.should_emit_on_single_line(node)
         {
@@ -1100,14 +1196,24 @@ impl Session<'_, '_> {
         };
         self.emit_list(Self::emit_statement, node, statements, format)?;
         let end = self.list_end(statements, "block statements")?;
-        self.emit_token(K::CloseBraceToken, end, WriteKind::Punctuation, node);
-        self.exit_node(node);
+        self.emit_token_ex(
+            K::CloseBraceToken,
+            end,
+            WriteKind::Punctuation,
+            Some(node),
+            if format & lf::MULTI_LINE != 0 {
+                tef::INDENT_LEADING_COMMENTS
+            } else {
+                tef::NONE
+            },
+        )?;
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitVariableStatement
     fn emit_variable_statement(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let declaration_list = read
             .data_source()
@@ -1118,21 +1224,25 @@ impl Session<'_, '_> {
         self.emit_modifier_list(node, read.modifiers(), false)?;
         self.emit_variable_declaration_list(declaration_list)?;
         self.write_trailing_semicolon();
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     /// Most trailing semicolons may be dropped by a writer that omits them. An
     /// embedded empty statement is significant and may not.
     // port: tsc/internal/printer/printer.go:Printer.emitEmptyStatement
-    fn emit_empty_statement(&mut self, node: NodeId, is_embedded_statement: bool) {
-        self.enter_node(node);
+    fn emit_empty_statement(
+        &mut self,
+        node: NodeId,
+        is_embedded_statement: bool,
+    ) -> Result<(), Error> {
+        let state = self.enter_node(node)?;
         if is_embedded_statement {
             self.write_punctuation(b";");
         } else {
             self.write_trailing_semicolon();
         }
-        self.exit_node(node);
+        self.exit_node(node, state)
     }
 
     fn is_json_source(&self) -> bool {
@@ -1158,7 +1268,7 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitExpressionStatement
     fn emit_expression_statement(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let expression = self
             .node(node)?
             .expression()
@@ -1185,14 +1295,14 @@ impl Session<'_, '_> {
         {
             self.write_trailing_semicolon();
         }
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitIIFEWithParenthesizedCallee
     fn emit_iife_with_parenthesized_callee(&mut self, node: NodeId) -> Result<(), Error> {
         let call = tsr_ast::skip_partially_emitted_expressions(self.view, node)?;
-        self.enter_node(call);
+        let state = self.enter_node(call)?;
         let read = self.node(call)?;
         let data = read
             .data_source()
@@ -1215,7 +1325,7 @@ impl Session<'_, '_> {
             arguments,
             lf::CALL_EXPRESSION_ARGUMENTS,
         )?;
-        self.exit_node(call);
+        self.exit_node(call, state)?;
         Ok(())
     }
 
@@ -1251,7 +1361,11 @@ impl Session<'_, '_> {
         if kind == K::Block
             || self.should_emit_on_single_line(parent)
             || self.printer.options.preserve_source_newlines
-                && self.get_leading_line_terminator_count(Some(parent), Some(node), lf::NONE)? == 0
+                && self.get_leading_line_terminator_count(
+                    Some(Span::of(&self.node(parent)?)),
+                    Some(node),
+                    lf::NONE,
+                )? == 0
         {
             self.write_space();
             return self.emit_statement(node);
@@ -1259,7 +1373,7 @@ impl Session<'_, '_> {
         self.write_line();
         self.increase_indent();
         if kind == K::EmptyStatement {
-            self.emit_empty_statement(node, true);
+            self.emit_empty_statement(node, true)?;
         } else {
             self.emit_statement(node)?;
         }
@@ -1276,18 +1390,18 @@ impl Session<'_, '_> {
         keyword_pos: i64,
         expression: NodeId,
     ) -> Result<(), Error> {
-        let pos = self.emit_token(keyword, keyword_pos, WriteKind::Keyword, node);
+        let pos = self.emit_token(keyword, keyword_pos, WriteKind::Keyword, node)?;
         self.write_space();
-        self.emit_token(K::OpenParenToken, pos, WriteKind::Punctuation, node);
+        self.emit_token(K::OpenParenToken, pos, WriteKind::Punctuation, node)?;
         self.emit_expression(expression, op::LOWEST)?;
         let end = i64::from(self.node(expression)?.end());
-        self.emit_token(K::CloseParenToken, end, WriteKind::Punctuation, node);
+        self.emit_token(K::CloseParenToken, end, WriteKind::Punctuation, node)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitIfStatement
     fn emit_if_statement(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let statement = read
             .data_source()
@@ -1312,7 +1426,7 @@ impl Session<'_, '_> {
         if let Some(else_statement) = else_statement {
             self.write_line_or_space(node, then_statement, else_statement)?;
             let then_end = i64::from(self.node(then_statement)?.end());
-            self.emit_token(K::ElseKeyword, then_end, WriteKind::Keyword, node);
+            self.emit_token(K::ElseKeyword, then_end, WriteKind::Keyword, node)?;
             if self.node(else_statement)?.kind() == K::IfStatement {
                 self.write_space();
                 self.emit_if_statement(else_statement)?;
@@ -1320,13 +1434,13 @@ impl Session<'_, '_> {
                 self.emit_embedded_statement(node, else_statement)?;
             }
         }
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitDoStatement
     fn emit_do_statement(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let (statement, expression) = (
             read.statement().ok_or(Error::MissingNode("do body"))?,
@@ -1338,7 +1452,7 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Keyword,
             node,
-        );
+        )?;
         self.emit_embedded_statement(node, statement)?;
         if self.node(statement)?.kind() == K::Block
             && !self.printer.options.preserve_source_newlines
@@ -1356,14 +1470,14 @@ impl Session<'_, '_> {
             expression,
         )?;
         self.write_trailing_semicolon();
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitWhileStatement
     // port: tsc/internal/printer/printer.go:Printer.emitWithStatement
     fn emit_while_or_with_statement(&mut self, node: NodeId, keyword: K) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let (statement, expression) = (
             read.statement()
@@ -1378,7 +1492,7 @@ impl Session<'_, '_> {
             expression,
         )?;
         self.emit_embedded_statement(node, statement)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -1393,7 +1507,7 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitForStatement
     fn emit_for_statement(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let data = read
             .data_source()
@@ -1410,35 +1524,35 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Keyword,
             node,
-        );
+        )?;
         self.write_space();
-        pos = self.emit_token(K::OpenParenToken, pos, WriteKind::Punctuation, node);
+        pos = self.emit_token(K::OpenParenToken, pos, WriteKind::Punctuation, node)?;
         if let Some(initializer) = initializer {
             self.emit_for_initializer(initializer)?;
             pos = i64::from(self.node(initializer)?.end());
         }
-        pos = self.emit_token(K::SemicolonToken, pos, WriteKind::Punctuation, node);
+        pos = self.emit_token(K::SemicolonToken, pos, WriteKind::Punctuation, node)?;
         if let Some(condition) = condition {
             self.write_space();
             self.emit_expression(condition, op::LOWEST)?;
             pos = i64::from(self.node(condition)?.end());
         }
-        pos = self.emit_token(K::SemicolonToken, pos, WriteKind::Punctuation, node);
+        pos = self.emit_token(K::SemicolonToken, pos, WriteKind::Punctuation, node)?;
         if let Some(incrementor) = incrementor {
             self.write_space();
             self.emit_expression(incrementor, op::LOWEST)?;
             pos = i64::from(self.node(incrementor)?.end());
         }
-        self.emit_token(K::CloseParenToken, pos, WriteKind::Punctuation, node);
+        self.emit_token(K::CloseParenToken, pos, WriteKind::Punctuation, node)?;
         self.emit_embedded_statement(node, statement)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitForInStatement
     // port: tsc/internal/printer/printer.go:Printer.emitForOfStatement
     fn emit_for_in_or_of_statement(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let is_of = read.kind() == K::ForOfStatement;
         let data = read
@@ -1458,7 +1572,7 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Keyword,
             node,
-        );
+        )?;
         self.write_space();
         if is_of {
             if let Some(await_modifier) = await_modifier {
@@ -1466,7 +1580,7 @@ impl Session<'_, '_> {
                 self.write_space();
             }
         }
-        self.emit_token(K::OpenParenToken, pos, WriteKind::Punctuation, node);
+        self.emit_token(K::OpenParenToken, pos, WriteKind::Punctuation, node)?;
         self.emit_for_initializer(initializer)?;
         self.write_space();
         let initializer_end = i64::from(self.node(initializer)?.end());
@@ -1475,7 +1589,7 @@ impl Session<'_, '_> {
             initializer_end,
             WriteKind::Keyword,
             node,
-        );
+        )?;
         self.write_space();
         self.emit_expression(expression, op::LOWEST)?;
         let expression_end = i64::from(self.node(expression)?.end());
@@ -1484,31 +1598,31 @@ impl Session<'_, '_> {
             expression_end,
             WriteKind::Punctuation,
             node,
-        );
+        )?;
         self.emit_embedded_statement(node, statement)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitContinueStatement
     // port: tsc/internal/printer/printer.go:Printer.emitBreakStatement
     fn emit_break_or_continue_statement(&mut self, node: NodeId, keyword: K) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let label = read.label();
-        self.emit_token(keyword, i64::from(read.pos()), WriteKind::Keyword, node);
+        self.emit_token(keyword, i64::from(read.pos()), WriteKind::Keyword, node)?;
         if let Some(label) = label {
             self.write_space();
             self.emit_label_identifier(label)?;
         }
         self.write_trailing_semicolon();
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitReturnStatement
     fn emit_return_statement(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let expression = read.expression();
         self.emit_token(
@@ -1516,19 +1630,19 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Keyword,
             node,
-        );
+        )?;
         if let Some(expression) = expression {
             self.write_space();
             self.emit_expression_no_asi(expression, op::LOWEST)?;
         }
         self.write_trailing_semicolon();
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitSwitchStatement
     fn emit_switch_statement(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let case_block = read
             .data_source()
@@ -1547,7 +1661,7 @@ impl Session<'_, '_> {
         )?;
         self.write_space();
         self.emit_case_block(case_block)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -1555,7 +1669,7 @@ impl Session<'_, '_> {
     /// statement, to keep the output close to Strada's.
     // port: tsc/internal/printer/printer.go:Printer.emitLabeledStatement
     fn emit_labeled_statement(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let (label, statement) = (
             read.label().ok_or(Error::MissingNode("label"))?,
@@ -1564,16 +1678,16 @@ impl Session<'_, '_> {
         );
         self.emit_label_identifier(label)?;
         let label_end = i64::from(self.node(label)?.end());
-        self.emit_token(K::ColonToken, label_end, WriteKind::Punctuation, node);
+        self.emit_token(K::ColonToken, label_end, WriteKind::Punctuation, node)?;
         self.write_space();
         self.emit_statement(statement)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitThrowStatement
     fn emit_throw_statement(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let expression = read
             .expression()
@@ -1583,17 +1697,17 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Keyword,
             node,
-        );
+        )?;
         self.write_space();
         self.emit_expression_no_asi(expression, op::LOWEST)?;
         self.write_trailing_semicolon();
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitTryStatement
     fn emit_try_statement(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let data = read
             .data_source()
@@ -1609,7 +1723,7 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Keyword,
             node,
-        );
+        )?;
         self.write_space();
         self.emit_block(try_block)?;
         if let Some(catch_clause) = catch_clause {
@@ -1620,21 +1734,21 @@ impl Session<'_, '_> {
             let previous = catch_clause.unwrap_or(try_block);
             self.write_line_or_space(node, previous, finally_block)?;
             let previous_end = i64::from(self.node(previous)?.end());
-            self.emit_token(K::FinallyKeyword, previous_end, WriteKind::Keyword, node);
+            self.emit_token(K::FinallyKeyword, previous_end, WriteKind::Keyword, node)?;
             self.write_space();
             self.emit_block(finally_block)?;
         }
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitDebuggerStatement
     fn emit_debugger_statement(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let pos = i64::from(self.node(node)?.pos());
-        self.emit_token(K::DebuggerKeyword, pos, WriteKind::Keyword, node);
+        self.emit_token(K::DebuggerKeyword, pos, WriteKind::Keyword, node)?;
         self.write_trailing_semicolon();
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -1642,10 +1756,11 @@ impl Session<'_, '_> {
     // Declarations
     //
 
-    /// The type node an emit context may attach to the name is not kept here.
+    /// The type node an emit context may attach to the name
+    /// (`EmitContext.GetTypeNode`) is not recorded by the emit context yet.
     // port: tsc/internal/printer/printer.go:Printer.emitVariableDeclaration
     pub(super) fn emit_variable_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let exclamation = read
             .data_source()
@@ -1661,13 +1776,18 @@ impl Session<'_, '_> {
             .ok_or(Error::MissingNode("variable name"))?;
         let equals_pos = greatest_end(name_end, &[self.end_of(type_node)?]);
         self.emit_initializer(initializer, equals_pos, node)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
+    }
+
+    // port: tsc/internal/printer/printer.go:Printer.emitVariableDeclarationNode
+    fn emit_variable_declaration_node(&mut self, node: NodeId) -> Result<(), Error> {
+        self.emit_variable_declaration(node)
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitVariableDeclarationList
     pub(super) fn emit_variable_declaration_list(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let declarations = self
             .node(node)?
             .data_source()
@@ -1689,18 +1809,18 @@ impl Session<'_, '_> {
         }
         self.write_space();
         self.emit_list(
-            Self::emit_variable_declaration,
+            Self::emit_variable_declaration_node,
             node,
             declarations,
             lf::VARIABLE_DECLARATION_LIST,
         )?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitFunctionDeclaration
     fn emit_function_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let asterisk = read
             .data_source()
@@ -1708,6 +1828,7 @@ impl Session<'_, '_> {
             .ok_or(Error::MissingNode("function payload"))?
             .asterisk_token();
         let (modifiers, name) = (read.modifiers(), read.name());
+        self.generate_name_if_needed(name)?;
         self.emit_modifier_list(node, modifiers, false)?;
         self.write_keyword(b"function");
         self.emit_token_node(asterisk)?;
@@ -1716,13 +1837,13 @@ impl Session<'_, '_> {
             self.emit_identifier_name(name)?;
         }
         self.emit_signature_and_body(node)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitInterfaceDeclaration
     fn emit_interface_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let heritage = read
             .data_source()
@@ -1741,27 +1862,30 @@ impl Session<'_, '_> {
         self.emit_binding_identifier(name)?;
         self.emit_type_parameters(node, type_parameters)?;
         self.emit_list(
-            Self::emit_heritage_clause,
+            Self::emit_heritage_clause_node,
             node,
             heritage,
             lf::HERITAGE_CLAUSES,
         )?;
         self.write_space();
         self.write_punctuation(b"{");
+        self.push_name_generation_scope(Some(node));
+        self.generate_all_member_names(members)?;
         self.emit_list(
             Self::emit_type_element,
             node,
             members,
             lf::INTERFACE_MEMBERS,
         )?;
+        self.pop_name_generation_scope(Some(node));
         self.write_punctuation(b"}");
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitTypeAliasDeclaration
     fn emit_type_alias_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let (modifiers, name, type_parameters, type_node) = (
             read.modifiers(),
@@ -1779,13 +1903,13 @@ impl Session<'_, '_> {
         self.write_space();
         self.emit_type_node_outside_extends(type_node)?;
         self.write_trailing_semicolon();
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitEnumMember
     pub(super) fn emit_enum_member(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let (name, initializer) = (read.name(), read.initializer());
         self.emit_property_name(name)?;
@@ -1793,13 +1917,18 @@ impl Session<'_, '_> {
             .end_of(name)?
             .ok_or(Error::MissingNode("member name"))?;
         self.emit_initializer(initializer, name_end, node)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
+    }
+
+    // port: tsc/internal/printer/printer.go:Printer.emitEnumMemberNode
+    fn emit_enum_member_node(&mut self, node: NodeId) -> Result<(), Error> {
+        self.emit_enum_member(node)
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitEnumDeclaration
     fn emit_enum_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let (modifiers, name, members) = (
             read.modifiers(),
@@ -1812,15 +1941,15 @@ impl Session<'_, '_> {
         self.emit_binding_identifier(name)?;
         self.write_space();
         self.write_punctuation(b"{");
-        self.emit_list(Self::emit_enum_member, node, members, lf::ENUM_MEMBERS)?;
+        self.emit_list(Self::emit_enum_member_node, node, members, lf::ENUM_MEMBERS)?;
         self.write_punctuation(b"}");
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitModuleDeclaration
     fn emit_module_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let data = read
             .data_source()
@@ -1860,13 +1989,13 @@ impl Session<'_, '_> {
                 self.emit_block(body)?;
             }
         }
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitCaseBlock
     pub(super) fn emit_case_block(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let clauses = read
             .data_source()
@@ -1878,22 +2007,28 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Punctuation,
             node,
-        );
+        )?;
         self.emit_list(
-            Self::emit_case_or_default_clause,
+            Self::emit_case_or_default_clause_node,
             node,
             clauses,
             lf::CASE_BLOCK_CLAUSES,
         )?;
         let end = self.list_end(clauses, "case clauses")?;
-        self.emit_token(K::CloseBraceToken, end, WriteKind::Punctuation, node);
-        self.exit_node(node);
+        self.emit_token_ex(
+            K::CloseBraceToken,
+            end,
+            WriteKind::Punctuation,
+            Some(node),
+            tef::INDENT_LEADING_COMMENTS,
+        )?;
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitImportEqualsDeclaration
     fn emit_import_equals_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let data = read
             .data_source()
@@ -1908,16 +2043,16 @@ impl Session<'_, '_> {
         let modifiers = read.modifiers();
         self.emit_modifier_list(node, modifiers, false)?;
         let keyword_pos = greatest_end(i64::from(read.pos()), &[self.modifiers_end(modifiers)?]);
-        let pos = self.emit_token(K::ImportKeyword, keyword_pos, WriteKind::Keyword, node);
+        let pos = self.emit_token(K::ImportKeyword, keyword_pos, WriteKind::Keyword, node)?;
         self.write_space();
         if is_type_only {
-            self.emit_token(K::TypeKeyword, pos, WriteKind::Keyword, node);
+            self.emit_token(K::TypeKeyword, pos, WriteKind::Keyword, node)?;
             self.write_space();
         }
         self.emit_binding_identifier(name)?;
         self.write_space();
         let name_end = i64::from(self.node(name)?.end());
-        self.emit_token(K::EqualsToken, name_end, WriteKind::Punctuation, node);
+        self.emit_token(K::EqualsToken, name_end, WriteKind::Punctuation, node)?;
         self.write_space();
         // port: tsc/internal/printer/printer.go:Printer.emitModuleReference
         match self.known_kind(module_reference)? {
@@ -1932,7 +2067,7 @@ impl Session<'_, '_> {
             }
         }
         self.write_trailing_semicolon();
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -1946,7 +2081,7 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitExternalModuleReference
     pub(super) fn emit_external_module_reference(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let expression = self
             .node(node)?
             .expression()
@@ -1955,13 +2090,13 @@ impl Session<'_, '_> {
         self.write_punctuation(b"(");
         self.emit_expression(expression, op::DISALLOW_COMMA)?;
         self.write_punctuation(b")");
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitImportDeclaration
     fn emit_import_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let attributes = read
             .data_source()
@@ -1976,13 +2111,13 @@ impl Session<'_, '_> {
         );
         self.emit_modifier_list(node, modifiers, false)?;
         let keyword_pos = greatest_end(i64::from(read.pos()), &[self.modifiers_end(modifiers)?]);
-        self.emit_token(K::ImportKeyword, keyword_pos, WriteKind::Keyword, node);
+        self.emit_token(K::ImportKeyword, keyword_pos, WriteKind::Keyword, node)?;
         self.write_space();
         if let Some(import_clause) = import_clause {
             self.emit_import_clause(import_clause)?;
             self.write_space();
             let clause_end = i64::from(self.node(import_clause)?.end());
-            self.emit_token(K::FromKeyword, clause_end, WriteKind::Keyword, node);
+            self.emit_token(K::FromKeyword, clause_end, WriteKind::Keyword, node)?;
             self.write_space();
         }
         self.emit_expression(module_specifier, op::LOWEST)?;
@@ -1991,13 +2126,13 @@ impl Session<'_, '_> {
             self.emit_import_attributes(attributes)?;
         }
         self.write_trailing_semicolon();
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitImportClause
     pub(super) fn emit_import_clause(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let data = read
             .data_source()
@@ -2010,14 +2145,14 @@ impl Session<'_, '_> {
                 context: "import phase modifier",
                 kind: phase_modifier,
             })?;
-            self.emit_token(keyword, i64::from(read.pos()), WriteKind::Keyword, node);
+            self.emit_token(keyword, i64::from(read.pos()), WriteKind::Keyword, node)?;
             self.write_space();
         }
         if let Some(name) = name {
             self.emit_binding_identifier(name)?;
             if named_bindings.is_some() {
                 let name_end = i64::from(self.node(name)?.end());
-                self.emit_token(K::CommaToken, name_end, WriteKind::Punctuation, node);
+                self.emit_token(K::CommaToken, name_end, WriteKind::Punctuation, node)?;
                 self.write_space();
             }
         }
@@ -2034,14 +2169,14 @@ impl Session<'_, '_> {
                 }
             }
         }
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitNamespaceImport
     // port: tsc/internal/printer/printer.go:Printer.emitNamespaceExport
     pub(super) fn emit_namespace_import(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let name = read.name().ok_or(Error::MissingNode("namespace name"))?;
         let pos = self.emit_token(
@@ -2049,40 +2184,45 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Punctuation,
             node,
-        );
+        )?;
         self.write_space();
-        self.emit_token(K::AsKeyword, pos, WriteKind::Keyword, node);
+        self.emit_token(K::AsKeyword, pos, WriteKind::Keyword, node)?;
         self.write_space();
         if read.kind() == K::NamespaceImport {
             self.emit_binding_identifier(name)?;
         } else {
             self.emit_module_export_name(Some(name))?;
         }
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitNamedImports
     // port: tsc/internal/printer/printer.go:Printer.emitNamedExports
     pub(super) fn emit_named_imports_or_exports(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
-        let elements = self.node(node)?.element_list();
+        let state = self.enter_node(node)?;
+        let read = self.node(node)?;
+        let elements = read.element_list();
         self.write_punctuation(b"{");
         self.emit_list(
-            Self::emit_import_or_export_specifier,
+            if read.kind() == K::NamedImports {
+                Self::emit_import_specifier_node
+            } else {
+                Self::emit_export_specifier_node
+            },
             node,
             elements,
             lf::NAMED_IMPORTS_OR_EXPORTS_ELEMENTS,
         )?;
         self.write_punctuation(b"}");
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitImportSpecifier
     // port: tsc/internal/printer/printer.go:Printer.emitExportSpecifier
     pub(super) fn emit_import_or_export_specifier(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let is_import = read.kind() == K::ImportSpecifier;
         let (property_name, name) = (
@@ -2097,7 +2237,7 @@ impl Session<'_, '_> {
             self.emit_module_export_name(Some(property_name))?;
             self.write_space();
             let end = i64::from(self.node(property_name)?.end());
-            self.emit_token(K::AsKeyword, end, WriteKind::Keyword, node);
+            self.emit_token(K::AsKeyword, end, WriteKind::Keyword, node)?;
             self.write_space();
         }
         if is_import {
@@ -2105,13 +2245,37 @@ impl Session<'_, '_> {
         } else {
             self.emit_module_export_name(Some(name))?;
         }
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
+    }
+
+    // port: tsc/internal/printer/printer.go:Printer.emitImportSpecifierNode
+    fn emit_import_specifier_node(&mut self, node: NodeId) -> Result<(), Error> {
+        let kind = self.node(node)?.kind();
+        if kind != K::ImportSpecifier {
+            return Err(Error::InterfaceConversion {
+                found: kind,
+                expected: "ImportSpecifier",
+            });
+        }
+        self.emit_import_or_export_specifier(node)
+    }
+
+    // port: tsc/internal/printer/printer.go:Printer.emitExportSpecifierNode
+    fn emit_export_specifier_node(&mut self, node: NodeId) -> Result<(), Error> {
+        let kind = self.node(node)?.kind();
+        if kind != K::ExportSpecifier {
+            return Err(Error::InterfaceConversion {
+                found: kind,
+                expected: "ExportSpecifier",
+            });
+        }
+        self.emit_import_or_export_specifier(node)
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitExportAssignment
     fn emit_export_assignment(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let is_export_equals = read
             .data_source()
@@ -2126,12 +2290,12 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Keyword,
             node,
-        );
+        )?;
         self.write_space();
         if is_export_equals {
-            self.emit_token(K::EqualsToken, next, WriteKind::Operator, node);
+            self.emit_token(K::EqualsToken, next, WriteKind::Operator, node)?;
         } else {
-            self.emit_token(K::DefaultKeyword, next, WriteKind::Keyword, node);
+            self.emit_token(K::DefaultKeyword, next, WriteKind::Keyword, node)?;
         }
         self.write_space();
         let mut precedence = op::ASSIGNMENT;
@@ -2146,13 +2310,13 @@ impl Session<'_, '_> {
         }
         self.emit_expression(expression, precedence)?;
         self.write_trailing_semicolon();
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitExportDeclaration
     fn emit_export_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let data = read
             .data_source()
@@ -2167,10 +2331,10 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Keyword,
             node,
-        );
+        )?;
         self.write_space();
         if is_type_only {
-            pos = self.emit_token(K::TypeKeyword, pos, WriteKind::Keyword, node);
+            pos = self.emit_token(K::TypeKeyword, pos, WriteKind::Keyword, node)?;
             self.write_space();
         }
         match export_clause {
@@ -2185,12 +2349,12 @@ impl Session<'_, '_> {
                     })
                 }
             },
-            None => pos = self.emit_token(K::AsteriskToken, pos, WriteKind::Punctuation, node),
+            None => pos = self.emit_token(K::AsteriskToken, pos, WriteKind::Punctuation, node)?,
         }
         if let Some(module_specifier) = module_specifier {
             self.write_space();
             let from_pos = greatest_end(pos, &[self.end_of(export_clause)?]);
-            self.emit_token(K::FromKeyword, from_pos, WriteKind::Keyword, node);
+            self.emit_token(K::FromKeyword, from_pos, WriteKind::Keyword, node)?;
             self.write_space();
             self.emit_expression(module_specifier, op::LOWEST)?;
         }
@@ -2199,13 +2363,13 @@ impl Session<'_, '_> {
             self.emit_import_attributes(attributes)?;
         }
         self.write_trailing_semicolon();
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitImportAttributes
     pub(super) fn emit_import_attributes(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let data = read
             .data_source()
@@ -2216,21 +2380,21 @@ impl Session<'_, '_> {
             context: "import attributes keyword",
             kind: token,
         })?;
-        self.emit_token(token, i64::from(read.pos()), WriteKind::Keyword, node);
+        self.emit_token(token, i64::from(read.pos()), WriteKind::Keyword, node)?;
         self.write_space();
         self.emit_list(
-            Self::emit_import_attribute,
+            Self::emit_import_attribute_node,
             node,
             attributes,
             lf::IMPORT_ATTRIBUTES,
         )?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitNamespaceExportDeclaration
     fn emit_namespace_export_declaration(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let name = read.name().ok_or(Error::MissingNode("namespace name"))?;
         let mut pos = self.emit_token(
@@ -2238,33 +2402,30 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Keyword,
             node,
-        );
+        )?;
         self.write_space();
-        pos = self.emit_token(K::AsKeyword, pos, WriteKind::Keyword, node);
+        pos = self.emit_token(K::AsKeyword, pos, WriteKind::Keyword, node)?;
         self.write_space();
-        self.emit_token(K::NamespaceKeyword, pos, WriteKind::Keyword, node);
+        self.emit_token(K::NamespaceKeyword, pos, WriteKind::Keyword, node)?;
         self.write_space();
         self.emit_binding_identifier(name)?;
         self.write_trailing_semicolon();
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
-    /// Snippet elements are an editor feature no caller here sets.
     // port: tsc/internal/printer/printer.go:Printer.emitStatement
     pub(super) fn emit_statement(&mut self, node: NodeId) -> Result<(), Error> {
-        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
-            self.emit_statement_worker(node)
-        })
+        guard(|| self.emit_statement_worker(node))
     }
 
     fn emit_statement_worker(&mut self, node: NodeId) -> Result<(), Error> {
+        if let Some(snippet) = self.snippet_element(node) {
+            return self.emit_snippet_node(node, snippet);
+        }
         match self.known_kind(node)? {
             K::Block => self.emit_block(node),
-            K::EmptyStatement => {
-                self.emit_empty_statement(node, false);
-                Ok(())
-            }
+            K::EmptyStatement => self.emit_empty_statement(node, false),
             K::VariableStatement => self.emit_variable_statement(node),
             K::ExpressionStatement => self.emit_expression_statement(node),
             K::IfStatement => self.emit_if_statement(node),
@@ -2281,10 +2442,7 @@ impl Session<'_, '_> {
             K::ThrowStatement => self.emit_throw_statement(node),
             K::TryStatement => self.emit_try_statement(node),
             K::DebuggerStatement => self.emit_debugger_statement(node),
-            K::NotEmittedStatement => {
-                self.emit_nothing(node);
-                Ok(())
-            }
+            K::NotEmittedStatement => self.emit_nothing(node),
             K::FunctionDeclaration => self.emit_function_declaration(node),
             K::ClassDeclaration => self.emit_class(node),
             K::InterfaceDeclaration => self.emit_interface_declaration(node),
@@ -2313,7 +2471,7 @@ impl Session<'_, '_> {
     // port: tsc/internal/printer/printer.go:Printer.emitJsxElement
     // port: tsc/internal/printer/printer.go:Printer.emitJsxFragment
     pub(super) fn emit_jsx_element_or_fragment(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let data = read.data_source();
         let (opening, children, closing) = if let Some(element) = data.as_jsx_element() {
@@ -2339,7 +2497,7 @@ impl Session<'_, '_> {
         if read.kind() == K::JsxElement {
             self.emit_jsx_opening_element(opening)?;
         } else {
-            self.emit_jsx_fragment_tag(opening, b"<");
+            self.emit_jsx_fragment_tag(opening, b"<")?;
         }
         self.emit_list(
             Self::emit_jsx_child,
@@ -2350,15 +2508,15 @@ impl Session<'_, '_> {
         if read.kind() == K::JsxElement {
             self.emit_jsx_closing_element(closing)?;
         } else {
-            self.emit_jsx_fragment_tag(closing, b"</");
+            self.emit_jsx_fragment_tag(closing, b"</")?;
         }
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitJsxSelfClosingElement
     pub(super) fn emit_jsx_self_closing_element(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let (tag_name, type_arguments, attributes) = (
             read.tag_name().ok_or(Error::MissingNode("JSX tag name"))?,
@@ -2372,13 +2530,13 @@ impl Session<'_, '_> {
         self.write_space();
         self.emit_jsx_attributes(attributes)?;
         self.write_punctuation(b"/>");
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitJsxOpeningElement
     pub(super) fn emit_jsx_opening_element(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let (tag_name, type_arguments, attributes) = (
             read.tag_name().ok_or(Error::MissingNode("JSX tag name"))?,
@@ -2387,33 +2545,24 @@ impl Session<'_, '_> {
                 .ok_or(Error::MissingNode("JSX attributes"))?,
         );
         self.write_punctuation(b"<");
-        let psn = self.printer.options.preserve_source_newlines;
-        let leading = if psn {
-            self.get_leading_line_terminator_count(Some(node), Some(tag_name), lf::NONE)?
-        } else {
-            0
-        };
-        self.write_lines_and_indent(leading, false);
+        let span = Span::of(&read);
+        let indented = self.write_line_separators_and_indent_before(tag_name, span)?;
         self.emit_jsx_tag_name(tag_name)?;
         self.emit_type_arguments(node, type_arguments)?;
         if self.list_len(self.node(attributes)?.property_list())? > 0 {
             self.write_space();
         }
         self.emit_jsx_attributes(attributes)?;
-        if psn {
-            let trailing =
-                self.get_closing_line_terminator_count(Some(node), Some(attributes), lf::NONE)?;
-            self.write_line_repeat(trailing);
-        }
-        self.decrease_indent_if(leading > 0);
+        self.write_line_separators_after(attributes, span)?;
+        self.decrease_indent_if(indented);
         self.write_punctuation(b">");
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitJsxClosingElement
     pub(super) fn emit_jsx_closing_element(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let tag_name = self
             .node(node)?
             .tag_name()
@@ -2421,36 +2570,40 @@ impl Session<'_, '_> {
         self.write_punctuation(b"</");
         self.emit_jsx_tag_name(tag_name)?;
         self.write_punctuation(b">");
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitJsxOpeningFragment
     // port: tsc/internal/printer/printer.go:Printer.emitJsxClosingFragment
-    pub(super) fn emit_jsx_fragment_tag(&mut self, node: NodeId, open: &'static [u8]) {
-        self.enter_node(node);
+    pub(super) fn emit_jsx_fragment_tag(
+        &mut self,
+        node: NodeId,
+        open: &'static [u8],
+    ) -> Result<(), Error> {
+        let state = self.enter_node(node)?;
         self.write_punctuation(open);
         self.write_punctuation(b">");
-        self.exit_node(node);
+        self.exit_node(node, state)
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitJsxText
     pub(super) fn emit_jsx_text(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let text = read
             .data_source()
             .as_jsx_text()
             .ok_or(Error::MissingNode("JSX text payload"))?
             .text();
-        self.writer.write_literal(text);
-        self.exit_node(node);
+        self.write_literal(text);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitJsxAttributes
     pub(super) fn emit_jsx_attributes(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let properties = self.node(node)?.property_list();
         self.emit_list(
             Self::emit_jsx_attribute_like,
@@ -2458,13 +2611,13 @@ impl Session<'_, '_> {
             properties,
             lf::JSX_ELEMENT_ATTRIBUTES,
         )?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitJsxAttribute
     pub(super) fn emit_jsx_attribute(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let (name, initializer) = (
             read.name()
@@ -2493,13 +2646,13 @@ impl Session<'_, '_> {
                 _ => self.emit_expression(initializer, op::LOWEST)?,
             }
         }
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitJsxSpreadAttribute
     pub(super) fn emit_jsx_spread_attribute(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let expression = self
             .node(node)?
             .expression()
@@ -2507,7 +2660,7 @@ impl Session<'_, '_> {
         self.write_punctuation(b"{...");
         self.emit_expression(expression, op::LOWEST)?;
         self.write_punctuation(b"}");
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -2523,18 +2676,22 @@ impl Session<'_, '_> {
         }
     }
 
-    /// An empty expression is kept only for the comments inside it, which are
-    /// not emitted here, so an empty one writes nothing.
+    /// An empty expression is kept when it holds comments.
     // port: tsc/internal/printer/printer.go:Printer.emitJsxExpression
     pub(super) fn emit_jsx_expression(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let dot_dot_dot = read
             .data_source()
             .as_jsx_expression()
             .ok_or(Error::MissingNode("JSX expression payload"))?
             .dot_dot_dot_token();
-        if let Some(expression) = read.expression() {
+        let expression = read.expression();
+        if expression.is_some()
+            || !self.comments_disabled
+                && !tsr_ast::utilities::node_is_synthesized(&read)
+                && self.has_comments_at_position(i64::from(read.pos()))
+        {
             let indented = self.current_source.is_some()
                 && !tsr_ast::utilities::node_is_synthesized(&read)
                 && self.get_lines_between_positions(i64::from(read.pos()), i64::from(read.end()))
@@ -2545,23 +2702,23 @@ impl Session<'_, '_> {
                 i64::from(read.pos()),
                 WriteKind::Punctuation,
                 node,
-            );
+            )?;
             self.emit_token_node(dot_dot_dot)?;
-            self.emit_expression(expression, op::DISALLOW_COMMA)?;
-            let close_pos = greatest_end(
-                end,
-                &[self.end_of(Some(expression))?, self.end_of(dot_dot_dot)?],
-            );
-            self.emit_token(K::CloseBraceToken, close_pos, WriteKind::Punctuation, node);
+            if let Some(expression) = expression {
+                self.emit_expression(expression, op::DISALLOW_COMMA)?;
+            }
+            let close_pos =
+                greatest_end(end, &[self.end_of(expression)?, self.end_of(dot_dot_dot)?]);
+            self.emit_token(K::CloseBraceToken, close_pos, WriteKind::Punctuation, node)?;
             self.decrease_indent_if(indented);
         }
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitJsxNamespacedName
     pub(super) fn emit_jsx_namespaced_name(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let namespace = read
             .data_source()
@@ -2573,7 +2730,7 @@ impl Session<'_, '_> {
         self.emit_identifier_name(namespace)?;
         self.write_punctuation(b":");
         self.emit_identifier_name(name)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -2637,7 +2794,7 @@ impl Session<'_, '_> {
             self.write_space();
             format &= !(lf::MULTI_LINE | lf::INDENTED);
         } else {
-            self.emit_token(K::ColonToken, colon_pos, WriteKind::Punctuation, node);
+            self.emit_token(K::ColonToken, colon_pos, WriteKind::Punctuation, node)?;
         }
         self.emit_list(Self::emit_statement, node, statements, format)
     }
@@ -2645,7 +2802,7 @@ impl Session<'_, '_> {
     // port: tsc/internal/printer/printer.go:Printer.emitCaseClause
     // port: tsc/internal/printer/printer.go:Printer.emitDefaultClause
     pub(super) fn emit_case_or_default_clause(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let data = read
             .data_source()
@@ -2659,7 +2816,7 @@ impl Session<'_, '_> {
                 i64::from(read.pos()),
                 WriteKind::Keyword,
                 node,
-            );
+            )?;
             self.write_space();
             self.emit_expression(expression, op::LOWEST)?;
             i64::from(self.node(expression)?.end())
@@ -2669,16 +2826,27 @@ impl Session<'_, '_> {
                 i64::from(read.pos()),
                 WriteKind::Keyword,
                 node,
-            )
+            )?
         };
         self.emit_case_or_default_clause_statements(node, statements, colon_pos)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
+    }
+
+    // port: tsc/internal/printer/printer.go:Printer.emitCaseOrDefaultClauseNode
+    fn emit_case_or_default_clause_node(&mut self, node: NodeId) -> Result<(), Error> {
+        match self.known_kind(node)? {
+            K::CaseClause | K::DefaultClause => self.emit_case_or_default_clause(node),
+            kind => Err(Error::UnexpectedKind {
+                context: "unhandled CaseOrDefaultClause",
+                kind: kind.into(),
+            }),
+        }
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitHeritageClause
     pub(super) fn emit_heritage_clause(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let data = read
             .data_source()
@@ -2690,7 +2858,7 @@ impl Session<'_, '_> {
             kind: token,
         })?;
         self.write_space();
-        self.emit_token(token, i64::from(read.pos()), WriteKind::Keyword, node);
+        self.emit_token(token, i64::from(read.pos()), WriteKind::Keyword, node)?;
         self.write_space();
         self.emit_list(
             Self::emit_heritage_clause_element,
@@ -2698,7 +2866,7 @@ impl Session<'_, '_> {
             types,
             lf::HERITAGE_CLAUSE_TYPES,
         )?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -2714,9 +2882,14 @@ impl Session<'_, '_> {
         }
     }
 
+    // port: tsc/internal/printer/printer.go:Printer.emitHeritageClauseNode
+    fn emit_heritage_clause_node(&mut self, node: NodeId) -> Result<(), Error> {
+        self.emit_heritage_clause(node)
+    }
+
     // port: tsc/internal/printer/printer.go:Printer.emitCatchClause
     pub(super) fn emit_catch_clause(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let data = read
             .data_source()
@@ -2731,7 +2904,7 @@ impl Session<'_, '_> {
             i64::from(read.pos()),
             WriteKind::Keyword,
             node,
-        );
+        )?;
         self.write_space();
         if let Some(declaration) = variable_declaration {
             self.emit_token(
@@ -2739,14 +2912,14 @@ impl Session<'_, '_> {
                 open_paren_pos,
                 WriteKind::Punctuation,
                 node,
-            );
+            )?;
             self.emit_variable_declaration(declaration)?;
             let end = i64::from(self.node(declaration)?.end());
-            self.emit_token(K::CloseParenToken, end, WriteKind::Punctuation, node);
+            self.emit_token(K::CloseParenToken, end, WriteKind::Punctuation, node)?;
             self.write_space();
         }
         self.emit_block(block)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
@@ -2754,10 +2927,9 @@ impl Session<'_, '_> {
     // Property assignments
     //
 
-    /// The comment upstream emits before the initializer is not emitted.
     // port: tsc/internal/printer/printer.go:Printer.emitPropertyAssignment
     pub(super) fn emit_property_assignment(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let (name, initializer) = (
             read.name(),
@@ -2767,14 +2939,21 @@ impl Session<'_, '_> {
         self.emit_property_name(name)?;
         self.write_punctuation(b":");
         self.write_space();
+        // A comment after the colon, as in `{ id: /*comment1*/ () => void }`,
+        // is a trailing comment of the colon rather than a leading comment of
+        // the initializer.
+        if self.emit_flags(initializer) & ef::NO_LEADING_COMMENTS == 0 {
+            let comment_range = self.comment_target(initializer)?.comment_range;
+            self.emit_trailing_comments(comment_range.pos(), CommentSeparator::After);
+        }
         self.emit_expression(initializer, op::DISALLOW_COMMA)?;
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitShorthandPropertyAssignment
     pub(super) fn emit_shorthand_property_assignment(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         let initializer = read
             .data_source()
@@ -2788,13 +2967,13 @@ impl Session<'_, '_> {
             self.write_space();
             self.emit_expression(initializer, op::DISALLOW_COMMA)?;
         }
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
     }
 
     // port: tsc/internal/printer/printer.go:Printer.emitSpreadAssignment
     pub(super) fn emit_spread_assignment(&mut self, node: NodeId) -> Result<(), Error> {
-        self.enter_node(node);
+        let state = self.enter_node(node)?;
         let read = self.node(node)?;
         if let Some(expression) = read.expression() {
             self.emit_token(
@@ -2802,10 +2981,129 @@ impl Session<'_, '_> {
                 i64::from(read.pos()),
                 WriteKind::Punctuation,
                 node,
-            );
+            )?;
             self.emit_expression(expression, op::DISALLOW_COMMA)?;
         }
-        self.exit_node(node);
+        self.exit_node(node, state)?;
         Ok(())
+    }
+
+    //
+    // Top-level nodes
+    //
+
+    // port: tsc/internal/printer/printer.go:Printer.emitShebangIfNeeded
+    fn emit_shebang_if_needed(&mut self, node: NodeId) -> Result<(), Error> {
+        if tsr_ast::utilities::node_is_synthesized(&self.node(node)?) {
+            return Ok(());
+        }
+        let file = self.view.source_file(node)?;
+        let shebang = tsr_scanner::get_shebang(file.text().as_bytes());
+        if !shebang.is_empty() {
+            self.write_comment(shebang);
+            self.write_line();
+        }
+        Ok(())
+    }
+
+    /// Boundary: the emit context records no helpers yet (`helpers.go` and
+    /// `GetEmitHelpers` land with the helper table). With none recorded
+    /// upstream writes nothing and reports that none were emitted.
+    #[allow(
+        clippy::unused_self,
+        clippy::unnecessary_wraps,
+        reason = "the helper table is a boundary"
+    )]
+    pub(super) fn emit_helpers(&mut self, _node: NodeId) -> Result<bool, Error> {
+        Ok(false)
+    }
+
+    // port: tsc/internal/printer/printer.go:Printer.emitSourceFile
+    pub(super) fn emit_source_file(&mut self, node: NodeId) -> Result<(), Error> {
+        let file = self.view.source_file(node)?;
+        let (script_kind, is_declaration_file) = (file.script_kind, file.is_declaration_file);
+        let saved_current_source_file = self.current_source.replace((node, file));
+        let saved_comments_disabled = self.comments_disabled;
+
+        self.write_line();
+
+        let statements = self.node(node)?.statement_list();
+        let statements_range = self
+            .list_range(statements)?
+            .ok_or(Error::MissingNode("source file statements"))?;
+        self.push_name_generation_scope(Some(node));
+        self.generate_all_names(statements)?;
+
+        let mut index = 0;
+        let state;
+        if script_kind == tsr_core::ScriptKind::JSON {
+            state = self.emit_detached_comments_before_statement_list(node, statements_range)?;
+        } else {
+            self.emit_shebang_if_needed(node)?;
+            index = self.emit_prologue_directives(statements)?;
+            if !self.writer.is_at_start_of_line() {
+                self.write_line();
+            }
+            state = self.emit_detached_comments_before_statement_list(node, statements_range)?;
+            self.emit_helpers(node)?;
+            if is_declaration_file {
+                self.emit_triple_slash_directives(node)?;
+            }
+        }
+
+        self.emit_list_range(
+            Self::emit_statement,
+            node,
+            statements,
+            lf::MULTI_LINE,
+            index,
+            -1,
+        )?;
+        self.pop_name_generation_scope(Some(node));
+        self.emit_detached_comments_after_statement_list(node, statements_range, state);
+        self.current_source = saved_current_source_file;
+        self.comments_disabled = saved_comments_disabled;
+        Ok(())
+    }
+
+    // port: tsc/internal/printer/printer.go:Printer.emitTripleSlashDirectives
+    fn emit_triple_slash_directives(&mut self, node: NodeId) -> Result<(), Error> {
+        let file = self.view.source_file(node)?;
+        let referenced_files = file.referenced_files()?.to_vec();
+        let type_reference_directives = file.type_reference_directives()?.to_vec();
+        let lib_reference_directives = file.lib_reference_directives()?.to_vec();
+        self.emit_directive(b"path", &referenced_files);
+        self.emit_directive(b"types", &type_reference_directives);
+        self.emit_directive(b"lib", &lib_reference_directives);
+        Ok(())
+    }
+
+    // port: tsc/internal/printer/printer.go:Printer.emitDirective
+    fn emit_directive(&mut self, kind: &[u8], refs: &[tsr_ast::FileReference]) {
+        for reference in refs {
+            let mut text = Vec::new();
+            text.extend_from_slice(b"/// <reference ");
+            text.extend_from_slice(kind);
+            text.extend_from_slice(b"=\"");
+            text.extend_from_slice(reference.file_name.as_bytes());
+            text.extend_from_slice(b"\" ");
+            if reference.resolution_mode != i64::from(tsr_core::ModuleKind::NONE.0) {
+                text.extend_from_slice(b"resolution-mode=\"");
+                text.extend_from_slice(
+                    if reference.resolution_mode == i64::from(tsr_core::ModuleKind::ESNEXT.0) {
+                        b"import"
+                    } else {
+                        b"require"
+                    },
+                );
+                text.extend_from_slice(b"\" ");
+            }
+            if reference.preserve {
+                text.extend_from_slice(b"preserve=\"true\" ");
+            }
+            text.extend_from_slice(b"/>");
+            self.write_comment(&text);
+            self.write_line();
+        }
     }
 }
