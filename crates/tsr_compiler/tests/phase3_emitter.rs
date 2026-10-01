@@ -7,19 +7,13 @@
 //! `EmittedFiles` (in order), the emit diagnostics, the number of source maps
 //! and every written file by name and digest.
 //!
-//! Every script chain of the pin runs transformers the port does not have yet
-//! (the runtime-syntax transform and a module transform always, the class
-//! fields and decorator transforms in every downlevel chain). So:
-//!
-//! - `CheckedProgram::emit` must reproduce every row the pin emitted nothing
-//!   for (`noEmit`, `noEmitOnError` with errors, declaration-only inputs,
-//!   blocked outputs), and any other row must match or fail with the upstream
-//!   name of an unported transformer, or `declaration emit`;
-//! - the rows marked `seam` are also emitted through the emitter with the
-//!   ported transformers of the emitter's chain in its order, which the pin's
-//!   missing transformers leave unchanged on their inputs (scripts with no
-//!   enum, namespace, module syntax, parameter property, class field or
-//!   decorator), and must match in both test-program modes;
+//! - `CheckedProgram::emit` must reproduce every row;
+//! - the rows marked `seam` are also emitted through the emitter with a
+//!   caller-supplied chain, the transformers of the emitter's chain that were
+//!   ported first, in its order (the others leave these rows' inputs
+//!   unchanged: scripts with no enum, namespace, module syntax, parameter
+//!   property, class field or decorator), and must match in both
+//!   test-program modes;
 //! - three declaration rows emit their JavaScript half through the same chain
 //!   with `EmitOnly::Js`, which runs `emitJSFile` as `EmitAll` does.
 //!
@@ -43,20 +37,6 @@ use tsr_compiler::{
 };
 use tsr_core::{LanguageVariant, ScriptTarget};
 use tsr_transformers::{TransformOptions, Transformer};
-
-/// The upstream names of the transformers the port does not have yet, as
-/// their stubs refuse, and the declaration emit the emitter does not wire.
-const UNPORTED: &[&str] = &[
-    "tstransforms.NewRuntimeSyntaxTransformer",
-    "tstransforms.NewLegacyDecoratorsTransformer",
-    "estransforms.newUsingDeclarationTransformer",
-    "estransforms.newESDecoratorTransformer",
-    "estransforms.newClassFieldsTransformer",
-    "estransforms.newObjectRestSpreadTransformer",
-    "moduletransforms.NewESModuleTransformer",
-    "moduletransforms.NewCommonJSModuleTransformer",
-    "declaration emit",
-];
 
 fn fixture() -> Value {
     let path =
@@ -391,11 +371,11 @@ fn differences(row: &Value, result: &EmitResult, written: &[(Vec<u8>, Vec<u8>)])
 
 /// `CheckedProgram::emit` on every row.
 #[test]
-fn program_emit_matches_the_pin_or_names_the_unported_transformer() {
+fn program_emit_matches_the_pin() {
     let document = fixture();
     let mut failures = Vec::new();
-    let (mut matched, mut unported) = (0usize, 0usize);
-    for row in document["rows"].as_array().expect("rows") {
+    let rows = document["rows"].as_array().expect("rows");
+    for row in rows {
         let id = row["id"].as_str().expect("id");
         let observed = match emit(row, "single", false) {
             Ok(observed) => observed,
@@ -404,42 +384,25 @@ fn program_emit_matches_the_pin_or_names_the_unported_transformer() {
                 continue;
             }
         };
-        let pinned_emitted = !row["emitted_files_hex"]
-            .as_array()
-            .expect("emitted files")
-            .is_empty();
         match &observed.result {
             Ok(Some(result)) => {
                 let found = differences(row, result, &observed.written);
-                if found.is_empty() {
-                    matched += 1;
-                } else {
+                if !found.is_empty() {
                     failures.push(format!("{id}:\n{}", found.join("\n")));
                 }
             }
             Ok(None) => failures.push(format!("{id}: no emit result")),
-            Err(error)
-                if pinned_emitted
-                    && UNPORTED
-                        .iter()
-                        .any(|name| error.strip_prefix("unsupported: ") == Some(*name)) =>
-            {
-                unported += 1;
-            }
             Err(error) => failures.push(format!("{id}: failed: {error}")),
         }
     }
-    eprintln!("{matched} rows matched, {unported} need an unported transformer");
     assert!(
         failures.is_empty(),
-        "{} rows differ ({matched} matched, {unported} need an unported transformer):\n\n{}",
+        "{} of {} rows differ:\n\n{}",
         failures.len(),
+        rows.len(),
         failures.join("\n\n")
     );
-    assert!(
-        matched >= 10,
-        "only {matched} rows emitted through Program.Emit"
-    );
+    assert!(rows.len() >= 57, "only {} rows in the fixture", rows.len());
 }
 
 /// The emitter with the ported transformers on the `seam` rows, in both

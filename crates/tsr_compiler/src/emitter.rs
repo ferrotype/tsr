@@ -2,9 +2,6 @@
 //! over one file, and the per-file emitter that transforms, prints and writes
 //! its JavaScript, declaration and source-map outputs.
 //!
-//! The declaration transformers (`declarations.NewDeclarationTransformer` and
-//! `NewSupplementalReferencesTransformer`) are not wired yet: a file with a
-//! declaration output fails with `Error::Unsupported("declaration emit")`.
 use crate::emit_host::EmitHost;
 use crate::program_diagnostics::source_names;
 use crate::program_emit::{
@@ -28,6 +25,7 @@ use tsr_jsstring::SourceText;
 use tsr_printer::script_resolver::{ReferenceResolver, ResolverResult};
 use tsr_printer::EmitContext;
 use tsr_printer::{EmitTextWriter, Printer, PrinterOptions, SourceMapSource, TextWriter};
+use tsr_transformers::declarations::{DeclarationOptions, SupplementalReferencesTransformer};
 use tsr_transformers::{
     estransforms, inliners, jsxtransforms, moduletransforms, tstransforms, Failure,
     SharedEmitResolver, SharedReferenceResolver, TransformOptions, Transformer,
@@ -483,20 +481,46 @@ impl Emitter<'_, '_> {
         Ok(file)
     }
 
-    /// The declaration transform and the supplemental references transform
-    /// over `source_file`, with their diagnostics. Not wired yet.
-    // TODO(transformers/declarations/transform.go): NewDeclarationTransformer
-    // TODO(transformers/declarations/supplementalreferences.go): NewSupplementalReferencesTransformer
-    #[allow(clippy::unused_self)]
+    /// The declaration transformer and the supplemental references
+    /// transformer over `source_file`, with their diagnostics in that order.
+    /// The declaration map path is a constructor argument upstream's
+    /// transformer never reads.
+    // port: tsc/internal/compiler/emitter.go:emitter.getDeclarationTransformers
+    // port: tsc/internal/compiler/emitter.go:emitter.runDeclarationTransformers
     fn run_declaration_transformers(
         &self,
-        _emit_context: &EmitContext,
-        _output: &mut AstBuilder,
-        _source_file: &ProgramFile,
-        _declaration_file_path: &[u8],
-        _declaration_map_path: &[u8],
+        emit_context: &EmitContext,
+        output: &mut AstBuilder,
+        source_file: &ProgramFile,
+        declaration_file_path: &[u8],
     ) -> Result<(NodeId, Vec<Diagnostic>), Error> {
-        Err(Error::Unsupported("declaration emit"))
+        let path = source_file.bound().view().source_file()?.path().to_vec();
+        let _span = push_emit_trace(self.tr, "transformNodes", Some(("path", &path)), false);
+        let options = self.host.options();
+        let force_dts_emit = self.emit_only == EmitOnly::BuilderSignature
+            || self.force_emit && self.emit_only == EmitOnly::Dts;
+        let declaration_options = DeclarationOptions {
+            isolated_declarations: options.isolated_declarations.is_true(),
+            strip_internal: options.strip_internal.is_true(),
+            declaration_file_path: JsString::from_bytes(declaration_file_path),
+        };
+        let supplemental = SupplementalReferencesTransformer::new(
+            self.host,
+            output,
+            source_file.source(),
+            JsString::from_bytes(declaration_file_path),
+            force_dts_emit,
+        )?;
+        let transformed = self.host.transform_declarations(
+            output,
+            &mut emit_context.clone(),
+            source_file.source(),
+            &declaration_options,
+        )?;
+        let root = supplemental.transform_source_file(output, transformed.root)?;
+        let mut diags = transformed.diagnostics;
+        diags.extend(supplemental.get_diagnostics());
+        Ok((root, diags))
     }
 
     // port: tsc/internal/compiler/emitter.go:emitter.emitJSFile
@@ -605,13 +629,15 @@ impl Emitter<'_, '_> {
             &counters,
             emit_context.factory_hooks(),
         );
-        output.retain_completed(source_file.bound());
+        // The transform may read any file its resolver answers with.
+        for file in self.host.source_files() {
+            output.retain_completed(file.bound());
+        }
         let (transformed, diags) = self.run_declaration_transformers(
             &emit_context,
             &mut output,
             source_file,
             declaration_file_path,
-            declaration_map_path,
         )?;
 
         for elem in &diags {
@@ -649,7 +675,9 @@ impl Emitter<'_, '_> {
         };
 
         // create a printer to print the nodes
+        let bindings = source_file.bound().view();
         let mut printer = Printer::new(printer_options, &emit_context);
+        printer.bindings = Some(&bindings);
         if let Some(span_map) = content_mapped_source
             .span_map()
             .filter(|_| emit_declaration_map)

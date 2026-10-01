@@ -1,6 +1,7 @@
-//! The program as the declaration transformers' emit host (the pin's
-//! `emitHost` as a `declarations.DeclarationEmitHost`). Files are named by
-//! the root node of their parsed source.
+//! The program as the declaration transformers' emit host where no checker
+//! host is at hand: declaration diagnostics and the transform's probes. The
+//! emitter's host is [`crate::EmitHost`]; both answer from the same program
+//! operations. Files are named by the root node of their parsed source.
 use crate::{output_paths, Program, ProgramFile};
 use std::sync::OnceLock;
 use tsr_ast::{FileReference, NodeId};
@@ -23,25 +24,15 @@ impl<'a> ProgramDeclarationHost<'a> {
     }
 
     fn program_file(&self, file: NodeId) -> &'a ProgramFile {
-        self.program
-            .files()
-            .iter()
-            .find(|candidate| candidate.source() == file)
-            .expect("a declaration emit host file is one of the program's")
+        program_file(self.program, file)
     }
 
-    // TODO(program.go): CommonSourceDirectory
+    /// `Program.CommonSourceDirectory`, computed once.
     fn common_source_directory(&self) -> Result<&[u8], tsr_arena::Error> {
-        match self.common_source_directory.get_or_init(|| {
-            let mut files = Vec::new();
-            for file in self.program.files() {
-                if output_paths::may_emit_with_force_dts(file, self.program, false)? {
-                    let source = file.bound().view().source_file()?;
-                    files.push(source.parse_options().file_name.clone());
-                }
-            }
-            Ok(output_paths::common_directory(self.program, &files))
-        }) {
+        match self
+            .common_source_directory
+            .get_or_init(|| output_paths::common_source_directory(self.program))
+        {
             Ok(directory) => Ok(directory),
             Err(error) => Err(*error),
         }
@@ -73,7 +64,6 @@ impl DeclarationEmitHost for ProgramDeclarationHost<'_> {
         self.program.use_case_sensitive_file_names()
     }
 
-    // TODO(emitHost.go): GetSourceFileFromReference
     fn get_source_file_from_reference(
         &self,
         origin: NodeId,
@@ -83,7 +73,6 @@ impl DeclarationEmitHost for ProgramDeclarationHost<'_> {
             .map(ProgramFile::source)
     }
 
-    // TODO(emitHost.go): GetOutputPathsFor
     fn get_output_paths_for(&self, file: NodeId, force_dts_paths: bool) -> OutputPaths {
         let common = self
             .common_source_directory()
@@ -101,15 +90,23 @@ impl DeclarationEmitHost for ProgramDeclarationHost<'_> {
         .expect("the program's files are readable")
     }
 
-    // TODO(emitHost.go): SourceFileMayBeEmitted
     fn source_file_may_be_emitted(&self, file: NodeId, force_dts_emit: bool) -> bool {
         output_paths::may_emit_with_force_dts(self.program_file(file), self.program, force_dts_emit)
             .expect("the program's files are readable")
     }
 }
 
+/// The program file whose parsed source is `file`.
+pub(crate) fn program_file(program: &Program, file: NodeId) -> &ProgramFile {
+    program
+        .files()
+        .iter()
+        .find(|candidate| candidate.source() == file)
+        .expect("a declaration emit host file is one of the program's")
+}
+
 // port: tsc/internal/compiler/program.go:Program.GetSourceFileFromReference
-fn get_source_file_from_reference<'a>(
+pub(crate) fn get_source_file_from_reference<'a>(
     program: &'a Program,
     origin: &ProgramFile,
     reference: &FileReference,
@@ -170,7 +167,7 @@ fn get_source_file_from_reference<'a>(
     None
 }
 
-// TODO(program.go): GetSourceFileForResolvedModule
+/// `Program.GetSourceFileForResolvedModule`.
 fn source_file_for_resolved_module<'a>(
     program: &'a Program,
     file_name: &[u8],

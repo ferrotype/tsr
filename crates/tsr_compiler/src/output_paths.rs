@@ -64,6 +64,19 @@ pub(crate) fn common_directory(program: &Program, files: &[JsString]) -> Vec<u8>
         None,
     )
 }
+/// `Program.CommonSourceDirectory` for the files the program may emit; its
+/// callers compute it once.
+pub(crate) fn common_source_directory(program: &Program) -> Result<Vec<u8>, tsr_arena::Error> {
+    let mut files = Vec::new();
+    for file in program.files() {
+        if may_emit_with_force_dts(file, program, false)? {
+            let source = file.bound().view().source_file()?;
+            files.push(source.parse_options().file_name.clone());
+        }
+    }
+    Ok(common_directory(program, &files))
+}
+
 pub(crate) fn may_emit(file: &ProgramFile, program: &Program) -> Result<bool, Error> {
     Ok(may_emit_with_force(file, program, false, false)?)
 }

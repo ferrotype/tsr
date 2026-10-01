@@ -2,21 +2,25 @@
 //! program and the emit resolver of the checker that checks the file.
 //!
 //! The pin's host also serves the declaration transformer and the printer's
-//! module-specifier queries. Three operations are not offered: their program
-//! counterpart has no Rust port yet (`GetSourceFileFromReference`, T7's), or
-//! the program does not retain what they read (`GetRedirectTargets` reads the
-//! loader's `redirectTargetsMap` in load order, `ResolveModuleName` the
-//! program's module resolver).
+//! module-specifier queries. Two operations are not offered: the program
+//! does not retain what they read (`GetRedirectTargets` reads the loader's
+//! `redirectTargetsMap` in load order, `ResolveModuleName` the program's
+//! module resolver).
+use crate::declaration_host::{get_source_file_from_reference, program_file};
 use crate::{output_paths, CheckedProgram, Error, Program, ProgramCheckerHost, ProgramFile};
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
-use tsr_ast::NodeId;
-use tsr_checker::{CheckerHost, CheckerRequest, ProjectReferenceSource};
+use tsr_ast::{AstBuilder, FileReference, NodeId};
+use tsr_checker::{CheckerHost, CheckerRequest, Operation, ProjectReferenceSource};
 use tsr_core::{CompilerOptions, ModuleKind, ResolutionMode};
 use tsr_jsstring::JsString;
 use tsr_module::symlinks::KnownSymlinks;
 use tsr_module::ResolvedModule;
+use tsr_printer::EmitContext;
+use tsr_transformers::declarations::{
+    transform_declarations, DeclarationEmitHost, DeclarationOptions, DeclarationTransform,
+};
 use tsr_transformers::SharedEmitResolver;
 use tsr_tsoptions::output_paths::{
     get_output_paths_for, ForceEmitPaths, OutputPaths, OutputPathsHost,
@@ -27,8 +31,36 @@ pub struct EmitHost<'a> {
     program: &'a Program,
     checker_host: &'a ProgramCheckerHost,
     emit_resolver: SharedEmitResolver<'a>,
+    /// The same checker as the declaration transformer's resolver, whose
+    /// type the script transforms' handle erases.
+    declaration_resolver: Rc<RefCell<dyn DeclarationResolver + 'a>>,
     /// `Program.CommonSourceDirectory`, which the program computes once.
     common_source_directory: JsString,
+}
+
+/// The declaration transformer over the checker behind an emit host.
+trait DeclarationResolver {
+    fn transform_declarations(
+        &mut self,
+        host: &dyn DeclarationEmitHost,
+        output: &mut AstBuilder,
+        emit: &mut EmitContext,
+        source: NodeId,
+        options: &DeclarationOptions,
+    ) -> Result<DeclarationTransform, tsr_checker::Error>;
+}
+
+impl DeclarationResolver for &mut Operation<'_> {
+    fn transform_declarations(
+        &mut self,
+        host: &dyn DeclarationEmitHost,
+        output: &mut AstBuilder,
+        emit: &mut EmitContext,
+        source: NodeId,
+        options: &DeclarationOptions,
+    ) -> Result<DeclarationTransform, tsr_checker::Error> {
+        transform_declarations(&mut **self, host, output, emit, source, options)
+    }
 }
 
 /// Runs `task` with the emit host of `file`: the checker that checks the
@@ -45,10 +77,12 @@ pub(crate) fn new_emit_host<R>(
     let common_source_directory = JsString::from_bytes(checker_host.common_source_directory()?);
     let mut result = None;
     checked.with_type_checker_for_file(request, file.source(), &mut |operation| {
+        let resolver = Rc::new(RefCell::new(operation));
         let host = EmitHost {
             program: checked.program(),
             checker_host,
-            emit_resolver: Rc::new(RefCell::new(operation)),
+            emit_resolver: resolver.clone(),
+            declaration_resolver: resolver,
             common_source_directory: common_source_directory.clone(),
         };
         result = Some(task(&host));
@@ -173,6 +207,31 @@ impl<'a> EmitHost<'a> {
             .map_err(|error| Error::Transform(error.into()))
     }
 
+    /// `declarations.NewDeclarationTransformer(host, ...)` and its
+    /// `TransformSourceFile` over `source`, with the host's checker as the
+    /// transformer's resolver.
+    pub(crate) fn transform_declarations(
+        &self,
+        output: &mut AstBuilder,
+        emit: &mut EmitContext,
+        source: NodeId,
+        options: &DeclarationOptions,
+    ) -> Result<DeclarationTransform, Error> {
+        Ok(self
+            .declaration_resolver
+            .borrow_mut()
+            .transform_declarations(self, output, emit, source, options)?)
+    }
+
+    // port: tsc/internal/compiler/emitHost.go:emitHost.GetSourceFileFromReference
+    pub fn get_source_file_from_reference(
+        &self,
+        origin: &ProgramFile,
+        reference: &FileReference,
+    ) -> Option<&'a ProgramFile> {
+        get_source_file_from_reference(self.program, origin, reference)
+    }
+
     // port: tsc/internal/compiler/emitHost.go:emitHost.GetOutputPathsFor
     pub fn get_output_paths_for(
         &self,
@@ -282,5 +341,40 @@ impl OutputPathsHost for EmitOutputPathsHost<'_, '_> {
     }
     fn use_case_sensitive_file_names(&self) -> bool {
         self.0.use_case_sensitive_file_names()
+    }
+}
+
+/// The host as the declaration transformers' host, which the pin's
+/// `emitHost` is. Files are named by the root node of their parsed source.
+impl DeclarationEmitHost for EmitHost<'_> {
+    fn get_current_directory(&self) -> &[u8] {
+        EmitHost::get_current_directory(self)
+    }
+
+    fn use_case_sensitive_file_names(&self) -> bool {
+        EmitHost::use_case_sensitive_file_names(self)
+    }
+
+    fn get_source_file_from_reference(
+        &self,
+        origin: NodeId,
+        reference: &FileReference,
+    ) -> Option<NodeId> {
+        EmitHost::get_source_file_from_reference(
+            self,
+            program_file(self.program, origin),
+            reference,
+        )
+        .map(ProgramFile::source)
+    }
+
+    fn get_output_paths_for(&self, file: NodeId, force_dts_paths: bool) -> OutputPaths {
+        EmitHost::get_output_paths_for(self, program_file(self.program, file), force_dts_paths)
+            .expect("the program's files are readable")
+    }
+
+    fn source_file_may_be_emitted(&self, file: NodeId, force_dts_emit: bool) -> bool {
+        EmitHost::source_file_may_be_emitted(self, program_file(self.program, file), force_dts_emit)
+            .expect("the program's files are readable")
     }
 }
