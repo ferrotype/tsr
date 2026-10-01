@@ -2352,7 +2352,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitBreakStatement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:1881"
+      "crates/tsr_printer/src/printer_statements.rs:1886"
      ],
      "status": "mapped"
     },
@@ -2376,31 +2376,31 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitCaseBlock": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2273"
+      "crates/tsr_printer/src/printer_statements.rs:2278"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitCaseClause": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3079"
+      "crates/tsr_printer/src/printer_statements.rs:3089"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitCaseOrDefaultClauseNode": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3113"
+      "crates/tsr_printer/src/printer_statements.rs:3123"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitCaseOrDefaultClauseStatements": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3048"
+      "crates/tsr_printer/src/printer_statements.rs:3058"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitCatchClause": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3167"
+      "crates/tsr_printer/src/printer_statements.rs:3177"
      ],
      "status": "mapped"
     },
@@ -2508,13 +2508,13 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitContinueStatement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:1880"
+      "crates/tsr_printer/src/printer_statements.rs:1885"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitDebuggerStatement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2018"
+      "crates/tsr_printer/src/printer_statements.rs:2023"
      ],
      "status": "mapped"
     },
@@ -2526,7 +2526,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitDefaultClause": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3080"
+      "crates/tsr_printer/src/printer_statements.rs:3090"
      ],
      "status": "mapped"
     },
@@ -2562,13 +2562,13 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitDirective": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3396"
+      "crates/tsr_printer/src/printer_statements.rs:3406"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitDoStatement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:1714"
+      "crates/tsr_printer/src/printer_statements.rs:1719"
      ],
      "status": "mapped"
     },
@@ -2598,43 +2598,43 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitEnumDeclaration": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2206"
+      "crates/tsr_printer/src/printer_statements.rs:2211"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitEnumMember": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2187"
+      "crates/tsr_printer/src/printer_statements.rs:2192"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitEnumMemberNode": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2201"
+      "crates/tsr_printer/src/printer_statements.rs:2206"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitExportAssignment": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2553"
+      "crates/tsr_printer/src/printer_statements.rs:2558"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitExportDeclaration": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2594"
+      "crates/tsr_printer/src/printer_statements.rs:2599"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitExportSpecifier": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2500"
+      "crates/tsr_printer/src/printer_statements.rs:2505"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitExportSpecifierNode": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2541"
+      "crates/tsr_printer/src/printer_statements.rs:2546"
      ],
      "status": "mapped"
     },
@@ -2664,31 +2664,31 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitExternalModuleReference": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2359"
+      "crates/tsr_printer/src/printer_statements.rs:2364"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitForInStatement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:1825"
+      "crates/tsr_printer/src/printer_statements.rs:1830"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitForInitializer": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:1772"
+      "crates/tsr_printer/src/printer_statements.rs:1777"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitForOfStatement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:1826"
+      "crates/tsr_printer/src/printer_statements.rs:1831"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitForStatement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:1781"
+      "crates/tsr_printer/src/printer_statements.rs:1786"
      ],
      "status": "mapped"
     },
@@ -2706,7 +2706,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitFunctionDeclaration": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2098"
+      "crates/tsr_printer/src/printer_statements.rs:2103"
      ],
      "status": "mapped"
     },
@@ -2730,25 +2730,25 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitHelpers": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3290"
+      "crates/tsr_printer/src/printer_statements.rs:3300"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitHeritageClause": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3124"
+      "crates/tsr_printer/src/printer_statements.rs:3134"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitHeritageClauseElement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3150"
+      "crates/tsr_printer/src/printer_statements.rs:3160"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitHeritageClauseNode": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3162"
+      "crates/tsr_printer/src/printer_statements.rs:3172"
      ],
      "status": "mapped"
     },
@@ -2808,37 +2808,37 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitImportAttributes": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2647"
+      "crates/tsr_printer/src/printer_statements.rs:2652"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitImportClause": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2410"
+      "crates/tsr_printer/src/printer_statements.rs:2415"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitImportDeclaration": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2374"
+      "crates/tsr_printer/src/printer_statements.rs:2379"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitImportEqualsDeclaration": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2306"
+      "crates/tsr_printer/src/printer_statements.rs:2311"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitImportSpecifier": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2499"
+      "crates/tsr_printer/src/printer_statements.rs:2504"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitImportSpecifierNode": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2529"
+      "crates/tsr_printer/src/printer_statements.rs:2534"
      ],
      "status": "mapped"
     },
@@ -2886,7 +2886,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitInterfaceDeclaration": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2121"
+      "crates/tsr_printer/src/printer_statements.rs:2126"
      ],
      "status": "mapped"
     },
@@ -2940,109 +2940,109 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxAttribute": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2895"
+      "crates/tsr_printer/src/printer_statements.rs:2900"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxAttributeLike": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2944"
+      "crates/tsr_printer/src/printer_statements.rs:2949"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxAttributeName": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2904"
+      "crates/tsr_printer/src/printer_statements.rs:2909"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxAttributeValue": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2917"
+      "crates/tsr_printer/src/printer_statements.rs:2922"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxAttributes": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2881"
+      "crates/tsr_printer/src/printer_statements.rs:2886"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxChild": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3014"
+      "crates/tsr_printer/src/printer_statements.rs:3019"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxClosingElement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2840"
+      "crates/tsr_printer/src/printer_statements.rs:2845"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxClosingFragment": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2855"
+      "crates/tsr_printer/src/printer_statements.rs:2860"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxElement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2748"
+      "crates/tsr_printer/src/printer_statements.rs:2753"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxExpression": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2957"
+      "crates/tsr_printer/src/printer_statements.rs:2962"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxFragment": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2749"
+      "crates/tsr_printer/src/printer_statements.rs:2754"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxNamespacedName": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2996"
+      "crates/tsr_printer/src/printer_statements.rs:3001"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxOpeningElement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2814"
+      "crates/tsr_printer/src/printer_statements.rs:2819"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxOpeningFragment": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2854"
+      "crates/tsr_printer/src/printer_statements.rs:2859"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxSelfClosingElement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2794"
+      "crates/tsr_printer/src/printer_statements.rs:2799"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxSpreadAttribute": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2930"
+      "crates/tsr_printer/src/printer_statements.rs:2935"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxTagName": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3028"
+      "crates/tsr_printer/src/printer_statements.rs:3038"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitJsxText": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2867"
+      "crates/tsr_printer/src/printer_statements.rs:2872"
      ],
      "status": "mapped"
     },
@@ -3078,7 +3078,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitLabeledStatement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:1943"
+      "crates/tsr_printer/src/printer_statements.rs:1948"
      ],
      "status": "mapped"
     },
@@ -3198,7 +3198,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitModuleDeclaration": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2227"
+      "crates/tsr_printer/src/printer_statements.rs:2232"
      ],
      "status": "mapped"
     },
@@ -3216,31 +3216,31 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitModuleReference": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2334"
+      "crates/tsr_printer/src/printer_statements.rs:2339"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitNamedExportBindings": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2618"
+      "crates/tsr_printer/src/printer_statements.rs:2623"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitNamedExports": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2478"
+      "crates/tsr_printer/src/printer_statements.rs:2483"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitNamedImportBindings": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2436"
+      "crates/tsr_printer/src/printer_statements.rs:2441"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitNamedImports": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2477"
+      "crates/tsr_printer/src/printer_statements.rs:2482"
      ],
      "status": "mapped"
     },
@@ -3252,19 +3252,19 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitNamespaceExport": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2454"
+      "crates/tsr_printer/src/printer_statements.rs:2459"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitNamespaceExportDeclaration": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2672"
+      "crates/tsr_printer/src/printer_statements.rs:2677"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitNamespaceImport": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2453"
+      "crates/tsr_printer/src/printer_statements.rs:2458"
      ],
      "status": "mapped"
     },
@@ -3438,7 +3438,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitPropertyAssignment": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3207"
+      "crates/tsr_printer/src/printer_statements.rs:3217"
      ],
      "status": "mapped"
     },
@@ -3492,7 +3492,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitReturnStatement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:1896"
+      "crates/tsr_printer/src/printer_statements.rs:1901"
      ],
      "status": "mapped"
     },
@@ -3522,7 +3522,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitShebangIfNeeded": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3272"
+      "crates/tsr_printer/src/printer_statements.rs:3282"
      ],
      "status": "mapped"
     },
@@ -3534,7 +3534,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitShorthandPropertyAssignment": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3231"
+      "crates/tsr_printer/src/printer_statements.rs:3241"
      ],
      "status": "mapped"
     },
@@ -3552,7 +3552,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitSourceFile": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3336"
+      "crates/tsr_printer/src/printer_statements.rs:3346"
      ],
      "status": "mapped"
     },
@@ -3588,7 +3588,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitSpreadAssignment": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3251"
+      "crates/tsr_printer/src/printer_statements.rs:3261"
      ],
      "status": "mapped"
     },
@@ -3600,7 +3600,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitStatement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2694"
+      "crates/tsr_printer/src/printer_statements.rs:2699"
      ],
      "status": "mapped"
     },
@@ -3612,7 +3612,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitSwitchStatement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:1916"
+      "crates/tsr_printer/src/printer_statements.rs:1921"
      ],
      "status": "mapped"
     },
@@ -3702,7 +3702,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitThrowStatement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:1961"
+      "crates/tsr_printer/src/printer_statements.rs:1966"
      ],
      "status": "mapped"
     },
@@ -3762,13 +3762,13 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitTripleSlashDirectives": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:3384"
+      "crates/tsr_printer/src/printer_statements.rs:3394"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitTryStatement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:1981"
+      "crates/tsr_printer/src/printer_statements.rs:1986"
      ],
      "status": "mapped"
     },
@@ -3786,7 +3786,7 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitTypeAliasDeclaration": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2163"
+      "crates/tsr_printer/src/printer_statements.rs:2168"
      ],
      "status": "mapped"
     },
@@ -3918,19 +3918,19 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitVariableDeclaration": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2035"
+      "crates/tsr_printer/src/printer_statements.rs:2040"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitVariableDeclarationList": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2065"
+      "crates/tsr_printer/src/printer_statements.rs:2070"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitVariableDeclarationNode": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:2060"
+      "crates/tsr_printer/src/printer_statements.rs:2065"
      ],
      "status": "mapped"
     },
@@ -3948,19 +3948,19 @@
     },
     "tsc/internal/printer/printer.go:Printer.emitWhileClause": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:1737"
+      "crates/tsr_printer/src/printer_statements.rs:1742"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitWhileStatement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:1750"
+      "crates/tsr_printer/src/printer_statements.rs:1755"
      ],
      "status": "mapped"
     },
     "tsc/internal/printer/printer.go:Printer.emitWithStatement": {
      "rust": [
-      "crates/tsr_printer/src/printer_statements.rs:1751"
+      "crates/tsr_printer/src/printer_statements.rs:1756"
      ],
      "status": "mapped"
     },
@@ -6666,7 +6666,7 @@
     },
     "tsc/internal/transformers/declarations/tracker.go:SymbolTrackerSharedState.addDiagnostic": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:1151"
+      "crates/tsr_transformers/src/declarations/transform.rs:1156"
      ],
      "status": "mapped"
     },
@@ -6698,7 +6698,7 @@
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.appendCjsExports": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:558"
+      "crates/tsr_transformers/src/declarations/transform.rs:563"
      ],
      "status": "mapped"
     },
@@ -6710,7 +6710,7 @@
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.checkEntityNameVisibility": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:970"
+      "crates/tsr_transformers/src/declarations/transform.rs:975"
      ],
      "status": "mapped"
     },
@@ -6722,7 +6722,7 @@
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.collectFileReferences": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:521"
+      "crates/tsr_transformers/src/declarations/transform.rs:526"
      ],
      "status": "mapped"
     },
@@ -6782,13 +6782,13 @@
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.getLeadingCommentRangesOfNode": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:1136"
+      "crates/tsr_transformers/src/declarations/transform.rs:1141"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.getLibReferences": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:805"
+      "crates/tsr_transformers/src/declarations/transform.rs:810"
      ],
      "status": "mapped"
     },
@@ -6806,19 +6806,19 @@
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.getReferencedFiles": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:748"
+      "crates/tsr_transformers/src/declarations/transform.rs:753"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.getTypeReferences": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:811"
+      "crates/tsr_transformers/src/declarations/transform.rs:816"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.isInternalDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:1073"
+      "crates/tsr_transformers/src/declarations/transform.rs:1078"
      ],
      "status": "mapped"
     },
@@ -6830,13 +6830,13 @@
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.preserveJsDoc": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:1004"
+      "crates/tsr_transformers/src/declarations/transform.rs:1009"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.preservePartialJsDoc": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:1011"
+      "crates/tsr_transformers/src/declarations/transform.rs:1016"
      ],
      "status": "mapped"
     },
@@ -6854,13 +6854,13 @@
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.removeAllComments": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:1060"
+      "crates/tsr_transformers/src/declarations/transform.rs:1065"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.rewriteModuleSpecifier": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:992"
+      "crates/tsr_transformers/src/declarations/transform.rs:997"
      ],
      "status": "mapped"
     },
@@ -6878,7 +6878,7 @@
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.shouldStripInternal": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:1066"
+      "crates/tsr_transformers/src/declarations/transform.rs:1071"
      ],
      "status": "mapped"
     },
@@ -6896,7 +6896,7 @@
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformAndReplaceLatePaintedStatements": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:671"
+      "crates/tsr_transformers/src/declarations/transform.rs:676"
      ],
      "status": "mapped"
     },
@@ -7148,13 +7148,13 @@
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformSourceFile": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:575"
+      "crates/tsr_transformers/src/declarations/transform.rs:580"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformTopLevelDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:882"
+      "crates/tsr_transformers/src/declarations/transform.rs:887"
      ],
      "status": "mapped"
     },
@@ -7232,7 +7232,7 @@
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.visitDeclarationStatements": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:817"
+      "crates/tsr_transformers/src/declarations/transform.rs:822"
      ],
      "status": "mapped"
     },
@@ -7250,7 +7250,7 @@
     },
     "tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.visitSourceFile": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:491"
+      "crates/tsr_transformers/src/declarations/transform.rs:496"
      ],
      "status": "mapped"
     },
@@ -7280,7 +7280,7 @@
     },
     "tsc/internal/transformers/declarations/transform.go:createEmptyExports": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:663"
+      "crates/tsr_transformers/src/declarations/transform.rs:668"
      ],
      "status": "mapped"
     },
@@ -7292,7 +7292,7 @@
     },
     "tsc/internal/transformers/declarations/transform.go:flattenSyntaxLists": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:550"
+      "crates/tsr_transformers/src/declarations/transform.rs:555"
      ],
      "status": "mapped"
     },
@@ -7310,7 +7310,7 @@
     },
     "tsc/internal/transformers/declarations/transform.go:hasInternalAnnotation": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:1243"
+      "crates/tsr_transformers/src/declarations/transform.rs:1248"
      ],
      "status": "mapped"
     },
@@ -7334,7 +7334,7 @@
     },
     "tsc/internal/transformers/declarations/transform.go:nodeOrSyntaxListChildren": {
      "rust": [
-      "crates/tsr_transformers/src/declarations/transform.rs:537"
+      "crates/tsr_transformers/src/declarations/transform.rs:542"
      ],
      "status": "mapped"
     },
@@ -7912,67 +7912,67 @@
    "functions": {
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.accessPrivateIdentifier": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5151"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5164"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.addInstanceMethodStatements": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4562"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4575"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.addPendingExpressions": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4743"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4756"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.addPrivateIdentifierAutoAccessorToEnvironment": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4956"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4969"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.addPrivateIdentifierGetAccessorToEnvironment": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4862"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4875"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.addPrivateIdentifierMethodToEnvironment": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4833"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4846"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.addPrivateIdentifierPropertyDeclarationToEnvironment": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4750"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4763"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.addPrivateIdentifierSetAccessorToEnvironment": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4909"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4922"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.addPrivateIdentifierToEnvironment": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4988"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5001"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.addPropertyOrClassStaticBlockStatements": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4257"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4270"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.classContainsConstructorReference": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:2885"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:2898"
      ],
      "status": "mapped"
     },
@@ -7990,25 +7990,25 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.createAccessorPropertyGetRedirector": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5523"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5536"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.createAccessorPropertySetRedirector": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5563"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5576"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.createBrandCheckWeakSetForPrivateMethods": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:3828"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:3841"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.createCallBinding": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5488"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5501"
      ],
      "status": "mapped"
     },
@@ -8020,19 +8020,19 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.createHoistedVariableForClass": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5084"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5097"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.createHoistedVariableForClassFromNode": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5107"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5120"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.createHoistedVariableForPrivateName": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5128"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5141"
      ],
      "status": "mapped"
     },
@@ -8056,7 +8056,7 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.endClassLexicalEnvironment": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4686"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4699"
      ],
      "status": "mapped"
     },
@@ -8068,19 +8068,19 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.generateInitializedPropertyExpressionsOrClassStaticBlock": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4335"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4348"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.getClassFacts": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:2899"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:2912"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.getClassLexicalEnvironment": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4707"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4720"
      ],
      "status": "mapped"
     },
@@ -8092,13 +8092,13 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.getPrivateIdentifier": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5046"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5059"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.getPrivateIdentifierEnvironment": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4733"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4746"
      ],
      "status": "mapped"
     },
@@ -8110,19 +8110,19 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.getProperties": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5450"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5463"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.getPropertyNameExpressionIfNeeded": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4617"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4630"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.getStaticPropertiesAndClassStaticBlock": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5470"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5483"
      ],
      "status": "mapped"
     },
@@ -8140,13 +8140,13 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.isReservedPrivateName": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5432"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5445"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.memberContainsConstructorReference": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:2833"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:2846"
      ],
      "status": "mapped"
     },
@@ -8200,7 +8200,7 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.setPrivateIdentifier": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5028"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5041"
      ],
      "status": "mapped"
     },
@@ -8224,7 +8224,7 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.startClassLexicalEnvironment": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4677"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4690"
      ],
      "status": "mapped"
     },
@@ -8236,7 +8236,7 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.transformClassMembers": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:3636"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:3649"
      ],
      "status": "mapped"
     },
@@ -8248,19 +8248,19 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.transformConstructor": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:3848"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:3861"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.transformConstructorBody": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4036"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4049"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.transformConstructorBodyWorker": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:3930"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:3943"
      ],
      "status": "mapped"
     },
@@ -8284,19 +8284,19 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.transformProperty": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4366"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4379"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.transformPropertyOrClassStaticBlock": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4279"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4292"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.transformPropertyWorker": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4397"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4410"
      ],
      "status": "mapped"
     },
@@ -8332,37 +8332,37 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitArrayAssignmentElement": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5264"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5277"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitAssignmentElement": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5211"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5224"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitAssignmentPattern": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5381"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5394"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitAssignmentProperty": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5284"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5297"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitAssignmentRestElement": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5250"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5263"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitAssignmentRestProperty": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5347"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5360"
      ],
      "status": "mapped"
     },
@@ -8392,13 +8392,13 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitClassDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:3136"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:3149"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitClassDeclarationInNewClassLexicalEnvironment": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:3145"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:3158"
      ],
      "status": "mapped"
     },
@@ -8410,19 +8410,19 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitClassExpression": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:3315"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:3328"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitClassExpressionInNewClassLexicalEnvironment": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:3346"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:3359"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitClassStaticBlockDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:3574"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:3587"
      ],
      "status": "mapped"
     },
@@ -8476,7 +8476,7 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitExpressionWithTypeArgumentsInHeritageClause": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:3007"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:3020"
      ],
      "status": "mapped"
     },
@@ -8512,13 +8512,13 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitInNewClassLexicalEnvironment": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:3040"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:3053"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitInvalidSuperProperty": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:4588"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:4601"
      ],
      "status": "mapped"
     },
@@ -8536,7 +8536,7 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitObjectAssignmentElement": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5361"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5374"
      ],
      "status": "mapped"
     },
@@ -8596,7 +8596,7 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitShorthandAssignmentProperty": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5322"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5335"
      ],
      "status": "mapped"
     },
@@ -8614,7 +8614,7 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.visitThisExpression": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:3591"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:3604"
      ],
      "status": "mapped"
     },
@@ -8632,73 +8632,73 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:classFieldsTransformer.wrapPrivateIdentifierForDestructuringTarget": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5172"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5185"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:classHasClassThisAssignment": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5700"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5713"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:createMemberAccessForPropertyName": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5732"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5745"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:createPrivateInstanceFieldInitializer": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5662"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5675"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:createPrivateInstanceMethodInitializer": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5678"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5691"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:createPrivateStaticFieldInitializer": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5643"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5656"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:expandPreOrPostfixIncrementOrDecrementExpression": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5848"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5861"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:findComputedPropertyNameCacheAssignment": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5822"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5835"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:flattenCommaList": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5787"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5800"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:flattenCommaListWorker": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5796"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5809"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:isNonStaticMethodOrAccessorWithPrivateName": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5714"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5727"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/classfields.go:isStaticPropertyDeclarationOrClassStaticBlock": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5689"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5702"
      ],
      "status": "mapped"
     },
@@ -8710,7 +8710,7 @@
     },
     "tsc/internal/transformers/estransforms/classfields.go:shouldBeCapturedInTempVariable": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/classfields.rs:5767"
+      "crates/tsr_transformers/src/estransforms/classfields.rs:5780"
      ],
      "status": "mapped"
     }
@@ -9926,25 +9926,25 @@
    "functions": {
     "tsc/internal/transformers/estransforms/optionalchain.go:flattenChain": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/optionalchain.rs:501"
+      "crates/tsr_transformers/src/estransforms/optionalchain.rs:514"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/optionalchain.go:isCallChain": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/optionalchain.rs:521"
+      "crates/tsr_transformers/src/estransforms/optionalchain.rs:534"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/optionalchain.go:isNonNullChain": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/optionalchain.rs:495"
+      "crates/tsr_transformers/src/estransforms/optionalchain.rs:508"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/estransforms/optionalchain.go:newOptionalChainTransformer": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/optionalchain.rs:527"
+      "crates/tsr_transformers/src/estransforms/optionalchain.rs:540"
      ],
      "status": "mapped"
     },
@@ -9974,7 +9974,7 @@
     },
     "tsc/internal/transformers/estransforms/optionalchain.go:optionalChainTransformer.visitOptionalExpression": {
      "rust": [
-      "crates/tsr_transformers/src/estransforms/optionalchain.rs:298"
+      "crates/tsr_transformers/src/estransforms/optionalchain.rs:311"
      ],
      "status": "mapped"
     },
@@ -10358,55 +10358,55 @@
    "functions": {
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.combinePropertiesIntoNewExpression": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:920"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:927"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.convertJsxChildrenToChildrenPropAssignment": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:688"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:695"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.convertJsxChildrenToChildrenPropObject": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:664"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:671"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.createJsxFactoryExpression": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1343"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1350"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.createJsxFactoryExpressionFromEntityName": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1301"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1308"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.createJsxFragmentFactoryExpression": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1361"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1368"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.createJsxPseudoFactoryExpression": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1326"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1333"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.createReactNamespace": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1245"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1252"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.getAttributeName": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1007"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1014"
      ],
      "status": "mapped"
     },
@@ -10442,19 +10442,19 @@
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.getTagName": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:732"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:739"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.insertStatementAfterCustomPrologue": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:422"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:429"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.isAnyPrologueDirective": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:416"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:423"
      ],
      "status": "mapped"
     },
@@ -10466,49 +10466,49 @@
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.shouldUseCreateElement": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:411"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:418"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.transformJsxAttributeInitializer": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1023"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1030"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.transformJsxAttributeToObjectLiteralElement": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:987"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:994"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.transformJsxAttributesToExpression": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:843"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:850"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.transformJsxAttributesToObjectProps": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:826"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:833"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.transformJsxAttributesToProps": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:939"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:946"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.transformJsxChildToExpression": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:675"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:682"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.transformJsxSpreadAttributesToProps": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:961"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:968"
      ],
      "status": "mapped"
     },
@@ -10520,67 +10520,67 @@
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.visitJsxElement": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:605"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:612"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.visitJsxExpression": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1505"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1512"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.visitJsxFragment": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:642"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:649"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.visitJsxOpeningFragmentCreateElement": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1455"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1462"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.visitJsxOpeningFragmentJSX": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1212"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1219"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.visitJsxOpeningLikeElementCreateElement": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1407"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1414"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.visitJsxOpeningLikeElementJSX": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:781"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:788"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.visitJsxOpeningLikeElementOrFragmentJSX": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1072"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1079"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.visitJsxSelfClosingElement": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:627"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:634"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.visitJsxText": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1490"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1497"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.visitSourceFile": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:434"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:441"
      ],
      "status": "mapped"
     },
@@ -10592,55 +10592,55 @@
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:addLineOfJsxText": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1642"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1649"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:decodeEntities": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1714"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1721"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:decodeEntity": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1758"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1765"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:fixupWhitespaceAndDecodeEntities": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1666"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1673"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:getSortedSpecifiers": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1613"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1620"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:hasKeyAfterPropsSpread": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1534"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1541"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:hasProto": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1620"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1627"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:insertStatementAfterPrologue": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1567"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1574"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/jsxtransforms/jsx.go:sortImportSpecifiers": {
      "rust": [
-      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1587"
+      "crates/tsr_transformers/src/jsxtransforms/jsx.rs:1594"
      ],
      "status": "mapped"
     }
@@ -11606,55 +11606,55 @@
     },
     "tsc/internal/transformers/tstransforms/legacydecorators.go:LegacyDecoratorsTransformer.generateClassElementDecorationExpression": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1258"
+      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1270"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/legacydecorators.go:LegacyDecoratorsTransformer.generateClassElementDecorationExpressions": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1236"
+      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1248"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/legacydecorators.go:LegacyDecoratorsTransformer.generateConstructorDecorationExpression": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1135"
+      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1147"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/legacydecorators.go:LegacyDecoratorsTransformer.getClassAliasIfNeeded": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1089"
+      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1101"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/legacydecorators.go:LegacyDecoratorsTransformer.getClassElementDecorationStatements": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1218"
+      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1230"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/legacydecorators.go:LegacyDecoratorsTransformer.getClassMemberPrefix": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1372"
+      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1384"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/legacydecorators.go:LegacyDecoratorsTransformer.getClassPrototype": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1388"
+      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1400"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/legacydecorators.go:LegacyDecoratorsTransformer.getConstructorDecorationStatement": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1119"
+      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1131"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/legacydecorators.go:LegacyDecoratorsTransformer.getExpressionForPropertyName": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1404"
+      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1416"
      ],
      "status": "mapped"
     },
@@ -11666,7 +11666,7 @@
     },
     "tsc/internal/transformers/tstransforms/legacydecorators.go:LegacyDecoratorsTransformer.isSyntheticMetadataDecorator": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1302"
+      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1314"
      ],
      "status": "mapped"
     },
@@ -11684,7 +11684,7 @@
     },
     "tsc/internal/transformers/tstransforms/legacydecorators.go:LegacyDecoratorsTransformer.transformAllDecoratorsOfDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1311"
+      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1323"
      ],
      "status": "mapped"
     },
@@ -11702,19 +11702,19 @@
     },
     "tsc/internal/transformers/tstransforms/legacydecorators.go:LegacyDecoratorsTransformer.transformDecorators": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1362"
+      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1374"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/legacydecorators.go:LegacyDecoratorsTransformer.transformDecoratorsOfClassElements": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1190"
+      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1202"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/legacydecorators.go:LegacyDecoratorsTransformer.transformDecoratorsOfParameters": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1339"
+      "crates/tsr_transformers/src/tstransforms/legacydecorators.rs:1351"
      ],
      "status": "mapped"
     },
@@ -12031,85 +12031,85 @@
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.addVarForDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:624"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:635"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.createExportAssignment": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1914"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1925"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.createExportStatement": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1934"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1945"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.createExportStatementForDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1876"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1887"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.createNamespaceExportExpression": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1293"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1304"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.getEnumQualifiedElement": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:522"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:533"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.getExportQualifiedReferenceToDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:595"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:606"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.getExpressionForPropertyName": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:463"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:474"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.getNamespaceContainerName": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:544"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:555"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.getNamespaceQualifiedElement": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:572"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:583"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.getNamespaceQualifiedProperty": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:552"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:563"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.getParameterProperties": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1359"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1370"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.isExportOfNamespace": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:451"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:462"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.isFirstDeclarationInScope": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:433"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:444"
      ],
      "status": "mapped"
     },
@@ -12139,43 +12139,43 @@
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.recordDeclarationInScope": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:372"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:383"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.shouldEmitEnumDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1960"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1971"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.shouldEmitModuleDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1970"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1981"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.transformConstructorBodyWorker": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1653"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1664"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.transformEnumBody": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:845"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:856"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.transformEnumMember": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:883"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:894"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.transformModuleBody": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1031"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1042"
      ],
      "status": "mapped"
     },
@@ -12187,73 +12187,73 @@
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.visitClassDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1423"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1434"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.visitClassExpression": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1483"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1494"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.visitConstructorBody": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1550"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1561"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.visitConstructorDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1518"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1529"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.visitEnumDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:807"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:818"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.visitExpressionIdentifier": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1825"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1836"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.visitFunctionDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1315"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1326"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.visitIdentifier": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1812"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1823"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.visitImportEqualsDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1132"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1143"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.visitModuleDeclaration": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:990"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1001"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.visitShorthandPropertyAssignment": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1753"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1764"
      ],
      "status": "mapped"
     },
     "tsc/internal/transformers/tstransforms/runtimesyntax.go:RuntimeSyntaxTransformer.visitVariableStatement": {
      "rust": [
-      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1195"
+      "crates/tsr_transformers/src/tstransforms/runtimesyntax.rs:1206"
      ],
      "status": "mapped"
     },

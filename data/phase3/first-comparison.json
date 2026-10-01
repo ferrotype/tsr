@@ -39,7 +39,7 @@
  },
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
  "rust": {
-  "capture_sha256": "87be81c31571e53c2531b4effa10250055fc96ec6fb3e80c098cb8da3ac7e369",
+  "capture_sha256": "c9c30e7addcb9f1f1eba034757cadbde318ac0d7d1e75f22cb0613a548261c4c",
   "requests_sha256": "4eb7ee0045073b791e304ab19a923101d4de7ada49648e2ada4ed83f1db46b76",
   "selection": {
    "cases": [],

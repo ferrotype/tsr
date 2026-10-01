@@ -4,8 +4,7 @@ T1 to T8 of the [Phase 3 plan](PHASE3-plan.md), implemented on branch
 `phase3`. Upstream remains Corsa `1f70213d4922b434345f639b441681e470c7cfc1`.
 [PHASE3-T0.md](PHASE3-T0.md) is the T0 record; this record covers the emit
 itself. Nothing here is a recorded run: `cargo xtask run emit` and the
-green-up are the owner's (decision 12), and the contract witnesses with their
-receipts are not part of this record.
+green-up are the owner's (decision 12).
 
 ## Result against Go
 
@@ -98,6 +97,51 @@ Function audit (`python3 scripts/phase3_audit.py check --complete`): 1,942
 functions in scope (the 73 Phase 3 files and the `Emit` family of
 `program.go`), 1,928 `mapped`, 14 `equivalent` with a site, no `gap`.
 
+## Contracts
+
+`crates/tsr_compiler/tests/t1_contracts.rs` to `t8_contracts.rs`, with
+receipts under `data/phase3/receipts/` written by
+`python3 scripts/phase3_receipts.py observe tN-contracts`
+(`receipt_current("tN-contracts")` for a producer). Each contract was
+mutation checked.
+
+| Witness | Contracts |
+| --- | --- |
+| `t1-contracts` | the printer prints deep inputs on a small stack (binary and `**` chains, parentheses, JSX, `else if`, conditional types); generated names restart in each file |
+| `t2-contracts` | each output maps only its own source, in input order; deep inputs with maps |
+| `t3-contracts` | a file's transform arena and side tables are released with its emit and the source is unchanged; deep inputs through the TypeScript transforms |
+| `t4-contracts` | module helpers belong to the file that needs them; deep imported, const-enum and ambient chains |
+| `t5-contracts` | downlevel helpers belong to the file that needs them; deep downlevel inputs |
+| `t6-contracts` | JSX runtime imports belong to the files that use them; deep JSX in every mode |
+| `t7-contracts` | the declaration transform is released per file; deep type nesting |
+| `t8-contracts` | a panic in one file's emit retires the generation and fails the group; cancellation before emit; determinism across runs, loads and modes; results own no arena; bounded workers |
+
+None of the named contracts needed a production change in the emitter. The
+deep inputs did: 14 growth guards of the checker's `stacker::maybe_grow`
+pattern, in the printer (`emitJsxChild`, `emitIfStatement`), the transformers
+(JSX, optional chain, declarations, runtime syntax, legacy decorators, class
+fields) and the checker (`resolveEntityName`, `getWidenedTypeWithContext`,
+`isConstContext`, `getContextualType`).
+
+Open findings, each kept as an ignored test in
+`crates/tsr_compiler/tests/phase3_findings.rs`:
+
+- Deep destructuring patterns and nested `using` blocks still overflow the
+  stack (`recordDeclarationInScope`, two helpers of `destructuring.rs`,
+  `usingDeclarationTransformer.visit`).
+- The checker's live heap grows across repeated declaration emits of
+  functions with inferred return types (12 to 140 KB per emit) while the
+  type, symbol and signature counts stay constant; not root-caused, likely in
+  the node builder's output path.
+- `AstBuilder::factory_view` walks a node's parent chain on every
+  imported-node read, so a transform is quadratic in nesting depth:
+  `binderBinaryExpressionStress` takes about 60 seconds per mode in a debug
+  build. The printer's `getTextOfNode` and several transforms are quadratic
+  in the pin's own algorithm.
+- With `noEmitOnError`, an emit after cancellation returns
+  `Err(Checker(PreviouslyCanceled))` where the pin panics with "Checker was
+  previously cancelled".
+
 ## Deviations and decisions taken in the port
 
 1. The ledger move of `compiler/emitter.go` and `compiler/emitHost.go`
@@ -142,9 +186,9 @@ Each follows the pin and each can change a recorded `checker` result, so the
 ## Not done
 
 - The six `incremental` rows above.
-- The `transpile_parity` metric in the `emit` producer, the `tN_complete`
-  facts, the checkpoint contract witnesses `t1-contracts` to `t8-contracts`
-  and their receipts, the residual and disposition files, the bounded emit
+- The `transpile_parity` metric and the contract receipts in the `emit`
+  producer (`status/runs.toml` does not list the receipts as inputs yet), the
+  `tN_complete` facts, the residual and disposition files, the bounded emit
   timing capture (decision 10).
 - The green-up: the ledger move, the S07 `operations.json` anchors and the
   re-freeze of the subset review, STATUS regeneration, the recorded `checker`
@@ -160,14 +204,18 @@ Each follows the pin and each can change a recorded `checker` result, so the
 
 A full Rust run takes about 190 seconds per mode on this host (16 jobs,
 harness build cached), the comparison about 6 seconds, the producer about one
-minute. The native captures are T0's. The probe suite takes about 13 minutes
+minute. `compiler/intersectionConstructorReductionCrash` checks for about 45
+seconds on its own in the debug harness (the row checks a pre-emit and a
+post-emit program) and can cross the default 60-second deadline under 16
+jobs, which fails every domain of the row; the single-mode run of this record
+used `--timeout 120`. The native captures are T0's. The probe suite takes about 13 minutes
 for the transformer chains and 90 seconds for the declaration chains.
 
 ## Reproduction
 
 ```sh
 export PATH="$(mise where go)/bin:$PATH"
-python3 scripts/phase3_corpus.py run --native target/phase3/native-single --output target/phase3/rust-single --mode single
+python3 scripts/phase3_corpus.py run --native target/phase3/native-single --output target/phase3/rust-single --mode single --timeout 120
 python3 scripts/phase3_corpus.py run --native target/phase3/native-concurrent --output target/phase3/rust-concurrent --mode concurrent
 python3 scripts/phase3_compare.py report --native target/phase3/native-single --rust target/phase3/rust-single
 python3 scripts/phase3_compare.py modes --rust target/phase3/rust-single --rust-concurrent target/phase3/rust-concurrent
