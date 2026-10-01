@@ -76,7 +76,7 @@ const LIB_DIRECTORY: &[u8] = b"/lib";
 /// the checker will type inferred declarations as `any` without these
 /// defined. Late bound symbol names, in particular, are impossible to define
 /// without `Symbol` at least partially defined.
-pub const BAREBONES_LIB_CONTENT: &str = "interface Boolean {}
+const BAREBONES_LIB_CONTENT: &str = "interface Boolean {}
 interface Function {}
 interface CallableFunction {}
 interface NewableFunction {}
