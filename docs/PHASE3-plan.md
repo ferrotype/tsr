@@ -1,9 +1,9 @@
 # Phase 3: emit
 
-Status: **proposed for owner review**, 2026-10-01. The detailed
-implementation plan for [PLAN Phase 3](../PLAN.md#phase-3-emit). Its
-checkpoints carry their own work items, witnesses and exit checks; after this
-review, production implementation starts at T0.
+Status: **accepted by the owner, 2026-10-01** (the decisions of section 8).
+The detailed implementation plan for [PLAN Phase 3](../PLAN.md#phase-3-emit).
+Its checkpoints carry their own work items, witnesses and exit checks;
+production implementation starts at T0.
 
 Planning reference: branch `phase2-c7` at `8a456baf` (the C7 exit is being
 recorded on it; [PHASE2-C7.md](PHASE2-C7.md) is its record). Upstream remains
@@ -600,56 +600,63 @@ edited. `cargo xtask run emit` and `status --record` remain the owner's.
 | A resolver query the transforms need that Phase 2 did not port | Any transform row | A named joint blocker owned by Phase 2 maintenance, with the pinned caller; not a Phase 3 reimplementation |
 | Staleness | Every recorded run reads `stale` while Phase 3 changes shared crates | Accepted mid-phase (decision 12); T8's green-up |
 
-## 8. Review decisions
+## 8. Owner decisions (2026-10-01)
 
-Please confirm or change these before T0 starts:
+The owner reviewed the twelve proposals on 2026-10-01: 1, 3, 4, 5 and 6
+confirmed as written, 2 left to the implementer ("your call", recorded below
+as proposed), and the rest confirmed with the plan ("lgtm"). Each entry keeps
+its proposal and records the outcome.
 
 1. **The ledger move.** `compiler/emitter.go` and `compiler/emitHost.go` move
    from Phase 4 to Phase 3 in `PORTS.toml`; `program.go` stays Phase 4's
    while Phase 3 ports its `Emit` family as marked operations. The move
    changes `data/upstream.json` and is coordinated with C7.6's green-up.
-   Confirm.
+   **Confirmed.**
 2. **Crates.** New `tsr_sourcemap` and `tsr_transpile`; the declaration
    transform stays in `tsr_transformers` (PLAN's crate map names a separate
    `tsr_declarations`); output paths stay split between
    `tsr_tsoptions::output_paths` and `tsr_compiler::output_paths` with no
    `tsr_outputpaths` crate. The record notes both deviations from the crate
-   map. New crates register in `tools/packaging/packages.json`. Confirm.
+   map. New crates register in `tools/packaging/packages.json`.
+   **The owner left this to the implementer; it stands as proposed.**
 3. **Names.** Checkpoints T0 to T8, sprints `P3A` and `P3B`, producer `emit`,
-   data under `data/phase3/`. Confirm.
+   data under `data/phase3/`. **Confirmed.**
 4. **Native captures.** Emit captured natively in both test-program modes on
    this host (as C6's were), plus the transpile runner; `phase3_native.py`
    with its own driver beside `phase2_native.py`, which is not edited.
-   Confirm, and say whether the Linux host also captures.
+   **Confirmed for this host.** No Linux capture was asked for; if one is
+   wanted later, it joins as a second provenance file, as C7.6 planned for
+   the assignments.
 5. **Baseline authority.** The rendered `.js`, `.js.map` and `.sourcemap.txt`
    texts, composed as the pin's writers compose them (including the
    declaration re-compilation's `DtsFileErrors` and the `noCheck` repeat),
    compared whole, with per-file outputs beside them for attribution; the
    writers are ported as harness code, as S08 ported the error writer.
-   Confirm.
+   **Confirmed** ("yes emit": the emitted texts, composed as the pin's
+   writers compose them, are the authority).
 6. **The runner's limits.** The 8 `skippedEmitTests` variants and the 61
    declaration-only-root variants are `disabled` for `output` with the pin's
    reasons and stay informational; the `sourcemap` sub-tests still grade
-   them. Confirm.
+   them. **Confirmed.**
 7. **The reprint witness.** A new native capture of `EmitSourceFile` over
    every corpus file, with and without comments, as a standing `emit` input
-   and a `reprint_parity` metric. Confirm.
+   and a `reprint_parity` metric. **Confirmed.**
 8. **Recursion.** The checker's growth guard on the reserved stacks for the
    printer and the transforms; trampolines only where T1's stress fixtures
-   fail. Confirm.
+   fail. **Confirmed.**
 9. **Entry points.** T8 exposes `emit` on `tsr_embed::Session` and the
    WebAssembly checker entry with an in-memory write callback, without an
-   acceptance claim; Phase 7 grades them. Confirm, or defer the exposure to
-   Phase 7.
+   acceptance claim; Phase 7 grades them. **Confirmed as proposed:** T8
+   exposes them.
 10. **Performance.** One bounded emit timing capture at T8, recorded beside
-    Go's, no threshold. Confirm.
+    Go's, no threshold. **Confirmed.**
 11. **Tracing.** The emit phase's trace pushes go through C6's `TraceSink`
-    now; the file writer stays Phase 4's. Confirm.
+    now; the file writer stays Phase 4's. **Confirmed.**
 12. **Evidence.** Phase 3 changes stale the recorded `checker` run and the
     captures that bind the edited inputs; no re-recording per fix; T8's
     green-up re-records `checker` and `emit` in both modes, and the
-    recordings are the owner's. Confirm.
+    recordings are the owner's. **Confirmed.**
 
-After review, T0 starts on this plan; the T0 record (`docs/PHASE3-T0.md`)
-carries the measured cost, the frozen inventory and the first categorized run,
-and each later checkpoint keeps its record beside it, as Phase 2's did.
+T0 starts on this plan; the T0 record (`docs/PHASE3-T0.md`) carries the
+measured cost, the frozen inventory and the first categorized run, and each
+later checkpoint keeps its record beside it, as Phase 2's did.
