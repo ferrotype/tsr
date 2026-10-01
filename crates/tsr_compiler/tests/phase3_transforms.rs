@@ -78,24 +78,20 @@ fn transform(
 ) -> Result<Vec<u8>, String> {
     let counters = tsr_arena::Counters::new();
     let context = EmitContext::new();
-    let mut output = AstBuilder::with_hooks(SourceText::default(), &counters, context.factory_hooks());
+    let mut output =
+        AstBuilder::with_hooks(SourceText::default(), &counters, context.factory_hooks());
     // A transform may read any file its resolver answers with.
     for file in program.files() {
         output.retain_completed(file.bound());
     }
     let failure = Failure::default();
     let resolver: tsr_transformers::SharedEmitResolver<'_> = Rc::new(RefCell::new(op));
-    let opts = emitter::script_transform_options(
-        &context,
-        program,
-        resolver,
-        source,
-        &counters,
-        failure,
-    )
-    .map_err(|error| format!("{error:?}"))?;
+    let opts =
+        emitter::script_transform_options(&context, program, resolver, source, &counters, failure)
+            .map_err(|error| format!("{error:?}"))?;
     let chosen: Vec<Transformer<'_>> = if chain == ["script"] {
-        emitter::get_script_transformers(program, &opts, source).map_err(|error| format!("{error:?}"))?
+        emitter::get_script_transformers(program, &opts, source)
+            .map_err(|error| format!("{error:?}"))?
     } else {
         let mut chosen = Vec::new();
         for name in chain {
@@ -122,7 +118,8 @@ fn transform(
 
 fn load(case: &Value) -> Result<CheckedProgram, String> {
     let request = json!({"id": case["id"], "loading": case["loading"], "mode": "single"});
-    executor::load_fresh_checked(&request, &mut FileCache::new()).map_err(|failure| failure.to_string())
+    executor::load_fresh_checked(&request, &mut FileCache::new())
+        .map_err(|failure| failure.to_string())
 }
 
 fn expected(chain: &Value) -> Option<Vec<u8>> {
@@ -159,7 +156,9 @@ fn ported_transformers_print_what_the_pinned_ones_print() {
             let program = checked.program().clone();
             for file in case["files"].as_array().expect("files") {
                 let name = file["name"].as_str().expect("file name");
-                let Some(source) = program.source_file(name.as_bytes()).map(tsr_compiler::ProgramFile::source)
+                let Some(source) = program
+                    .source_file(name.as_bytes())
+                    .map(tsr_compiler::ProgramFile::source)
                 else {
                     failures.push(format!("{fixture}/{id}: the program has no file {name}"));
                     continue;
