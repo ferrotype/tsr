@@ -172,11 +172,11 @@ Every criterion is required. Missing or stale evidence leaves the experiment pen
 |---|---|---|---|---|
 | E1: Parser parity | encoder_parity | `run.e1.parity >= 0.999` encoder-identical cases / frozen eligible cases | 1 | pass |
 | E1: Parser parity | frozen_denominator | `run.e1.frozen_denominator == true` manifest and options match the committed denominator; no skipped cases | true | pass |
-| E2: Checker slice | types_parity | `run.e2.types_parity == 1` matching .types outcomes / E2 acceptance variants | missing | pending |
-| E2: Checker slice | errors_parity | `run.e2.errors_parity == 1` matching .errors.txt outcomes / E2 acceptance variants | missing | pending |
-| E2: Checker slice | comparators | `run.e2.comparators == true` comparator consistency and residual ID-sensitive fixtures pass | missing | pending |
-| E2: Checker slice | frozen_subset | `run.e2.frozen_subset == true` the complete source inventory and owner-approved E2 acceptance/informational partition match the committed S07-3 review; no missing required variants | missing | pending |
-| E2: Checker slice | divergences_approved | `run.e2.divergences_approved == true` every baseline difference the comparison accepts is covered by an owner-approved entry in data/divergences.toml (ADR 0004) | missing | pending |
+| E2: Checker slice | types_parity | `run.e2.types_parity == 1` matching .types outcomes / E2 acceptance variants | 1 | pass |
+| E2: Checker slice | errors_parity | `run.e2.errors_parity == 1` matching .errors.txt outcomes / E2 acceptance variants | 1 | pass |
+| E2: Checker slice | comparators | `run.e2.comparators == true` comparator consistency and residual ID-sensitive fixtures pass | true | pass |
+| E2: Checker slice | frozen_subset | `run.e2.frozen_subset == true` the complete source inventory and owner-approved E2 acceptance/informational partition match the committed S07-3 review; no missing required variants | true | pass |
+| E2: Checker slice | divergences_approved | `run.e2.divergences_approved == true` every baseline difference the comparison accepts is covered by an owner-approved entry in data/divergences.toml (ADR 0004) | true | pass |
 | E2: Checker slice | checker_throughput | `run.checkerbench.throughput_ratio > 0` measured Rust/Go checker throughput on the frozen query workload; positive finite measurement, not a speed target | missing | pending |
 | E2: Checker slice | checker_allocated_bytes | `run.checkerbench.allocated_bytes_ratio >= 0` measured Rust/Go bytes allocated during the fixed checker query phase, with raw samples and a positive Go denominator | missing | pending |
 | E2: Checker slice | checker_retained_bytes | `run.checkerbench.retained_bytes_ratio >= 0` measured Rust/Go retained bytes with the declared checker/result roots alive after the fixed query phase, with raw samples and a positive Go denominator | missing | pending |
@@ -255,7 +255,7 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | config | current | [result](status/evidence/0fb63fb86153798321bf3c8f180f308ae3d256b570f44674daa374cc2b913e98.json) |
 | deny | current | [result](status/evidence/72c4d97f68bd72bf754ad95b4c0e60839e90f4ffbc1f1631414168e72515bc53.json) |
 | e1 | current | [result](status/evidence/fa04fa35cdea22271db1cc0ba5fce27ea6ef1849c7ef87d4c2be545cb02b2d33.json) |
-| e2 | stale: source, pin, command or inputs changed | [result](status/evidence/ea315699ea5079faf35a9d33257f266a4c20c5d8d7aebab5187cd5041b49e0b0.json) |
+| e2 | current | [result](status/evidence/c45d96f8fc59809960601a6e96898f681673c9e6f7d464bd7b26c105344f8207.json) |
 | e3 | stale: source, pin, command or inputs changed | [result](status/evidence/e360fcedd982cc66cf6b3e9bbd5eefc299699b4fe1cc50d064741d4f1ead151d.json) |
 | e4 | current | [result](status/evidence/ef53414340964b1ab516570735a6f08d570da0826a720511214e9a120f7cb88a.json) |
 | e5 | stale: source, pin, command or inputs changed | [result](status/evidence/0bf06ff8e9e2bcc77da389d9bc86c167c2ffe777ad666f3f6258f3a519963f92.json) |
@@ -269,7 +269,7 @@ E8: Separate Rust consumer feasibility and Node parse latency measured separatel
 | program | current | [result](status/evidence/346f5f30348560618f28330069e354073ec6a8c1eac2a12649c4cce343b8b1c0.json) |
 | relater | current | [result](status/evidence/7ab76757a6e066650b8936cb601463200f393937b1ede6fd2b8490a4d29715b9.json) |
 | scanner | current | [result](status/evidence/7138b51c05061e0dcb219102eb39aeb044b2c7534824aa37548baf25e0462b50.json) |
-| selftest | stale: source, pin, command or inputs changed | [result](status/evidence/7224bde89cfbe084917862fd97fa1159dd4f1e4cfca10175a2e8fdf22478c40a.json) |
+| selftest | current | [result](status/evidence/d6216feddae07b0599508a1f51e5069eb4047ff65252172b2c6f22788cd3cf72.json) |
 | syntax | current | [result](status/evidence/83732deb9d80e111549b3fc05f6b0e5596051ed8b9c6fca7421b332830563a4b.json) |
 | testhost | current | [result](status/evidence/1b100bc4c2a8d80cdc3e7a088372589e53a0d70194c446d72f18654de15c7e10.json) |
 | workspace | current | [result](status/evidence/b91086427a7358f3eaf4637626dfc41b2f08c6f0f82a8b2b6e30754514a29119.json) |
@@ -353,7 +353,7 @@ Exit checks:
 - [x] `run.fmt.clean == true`
 - [x] `run.clippy.clean == true`
 - [x] `run.deny.clean == true`
-- [ ] `run.selftest.pass == true` (unknown metric)
+- [ ] `run.selftest.pass == true`
 - [ ] `run.e3.ast_runtime == true` (unknown metric)
 - [ ] `run.e3.miri == true` (unknown metric)
 - [ ] `run.e3.address_sanitizer == true` (unknown metric)
@@ -444,7 +444,7 @@ Exit checks:
 - [x] `run.fmt.clean == true`
 - [x] `run.clippy.clean == true`
 - [x] `run.deny.clean == true`
-- [ ] `run.selftest.pass == true` (unknown metric)
+- [ ] `run.selftest.pass == true`
 
 Items:
 
@@ -578,7 +578,7 @@ Exit checks:
 - [x] `run.binder.depth == true`
 - [ ] `run.bindworkload.parity == 1` (unknown metric)
 - [x] `run.program.subset_loads == true`
-- [ ] `exp.E2.frozen_subset.pass == 1`
+- [x] `exp.E2.frozen_subset.pass == 1`
 - [ ] `exp.E3.shared_bound_file.pass == 1`
 - [ ] `exp.E3.retained_snapshot_edit.pass == 1`
 - [ ] `exp.E5.peak_rss.pass == 1`
@@ -592,7 +592,7 @@ Items:
 
 - [x] S07-1 tsr_binder with file-owned symbols and flow nodes (ADR 0007); bind parity over the corpus against the oracle's symbol dump
 - [x] S07-2 tsr_core, tsr_tsoptions, tsr_module and tsr_vfs slices; the in-memory program host; pinned lib loading through tsr_bundled; unsupported operations fail explicitly and are listed in the slice manifest
-- [ ] S07-3 Frozen spike subset (PLAN.md, section 13, item 16): the checked-in rule, manifest, options, exclusions and the dependency operations E2, E7 and E8 need
+- [x] S07-3 Frozen spike subset (PLAN.md, section 13, item 16): the checked-in rule, manifest, options, exclusions and the dependency operations E2, E7 and E8 need
 - [ ] S07-4 Parse-and-bind benchmark on the pinned VS Code workload, Rust against Go, at 1 and 8 threads, with peak RSS and bytes allocated
 - [ ] S07-5 Program and snapshot owners in the E3 harness: a bound file shared by two programs; an edit while an old snapshot answers
 - [x] S07-6 Function-level traceability for the binder package
@@ -608,18 +608,18 @@ Exit checks:
 - [ ] `exp.E3.independent_checker_merges.pass == 1`
 - [x] `exp.E4.pass == 1`
 - [ ] `exp.E5.pass == 1`
-- [ ] `run.e2.type_to_string_parity == 1` (unknown metric)
-- [ ] `run.e2.recursion_fixtures == true` (unknown metric)
+- [x] `run.e2.type_to_string_parity == 1`
+- [x] `run.e2.recursion_fixtures == true`
 - [x] `run.clippy.clean == true`
 
 Items:
 
 - [ ] S08-1 Checker-owned symbols, types and signatures with &mut self mutation (ADRs 0007 and 0008); checker-local declaration merges over shared files
-- [ ] S08-2 Type construction, relations and narrowing for the slice; .types and .errors.txt parity on the subset
-- [ ] S08-3 Comparators ported line by line (ADR 0010); the union-ordering sub-test; the residual id-sensitive fixtures
-- [ ] S08-4 Printer and node-builder slices for typeToString
-- [ ] S08-5 Deep recursion (ADR 0011) and reentrancy fixtures: reserved stacks, growth guards and the pushTypeResolution guard
-- [ ] S08-6 Baseline divergence allow-list (ADR 0004, data/divergences.toml): every difference the comparison accepts has an owner-approved entry
+- [x] S08-2 Type construction, relations and narrowing for the slice; .types and .errors.txt parity on the subset
+- [x] S08-3 Comparators ported line by line (ADR 0010); the union-ordering sub-test; the residual id-sensitive fixtures
+- [x] S08-4 Printer and node-builder slices for typeToString
+- [x] S08-5 Deep recursion (ADR 0011) and reentrancy fixtures: reserved stacks, growth guards and the pushTypeResolution guard
+- [x] S08-6 Baseline divergence allow-list (ADR 0004, data/divergences.toml): every difference the comparison accepts has an owner-approved entry
 - [ ] S08-7 Per-type footprint on the subset, Rust against Go
 - [x] S08-8 E4 integration through production literal-type construction and original-source versus regenerated literal printing, including WTF-8 and malformed input
 - [ ] S08-9 Measure checker throughput, bytes allocated and retained bytes against the pinned Go checker on a fixed query workload; retain raw samples and configuration with the evidence, separate from parse-and-bind results
