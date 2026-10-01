@@ -90,10 +90,21 @@ impl EmitResolver for Kinds {
     fn get_enum_member_value(&mut self, _: NodeId) -> ResolverResult<EnumMemberValue> {
         unreachable!()
     }
-    fn get_jsx_factory_entity(&mut self, _: NodeId) -> ResolverResult<Option<NodeId>> {
+    fn get_jsx_factory_entity(&mut self, _: NodeId) -> ResolverResult<Option<Vec<JsString>>> {
         unreachable!()
     }
-    fn get_jsx_fragment_factory_entity(&mut self, _: NodeId) -> ResolverResult<Option<NodeId>> {
+    fn get_jsx_fragment_factory_entity(
+        &mut self,
+        _: NodeId,
+    ) -> ResolverResult<Option<Vec<JsString>>> {
+        unreachable!()
+    }
+    fn get_referenced_export_container_of_name(
+        &mut self,
+        _: &[u8],
+        _: Option<NodeId>,
+        _: bool,
+    ) -> ResolverResult<Option<NodeId>> {
         unreachable!()
     }
     fn set_referenced_import_declaration(&mut self, _: NodeId, _: NodeId) -> ResolverResult<()> {

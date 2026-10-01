@@ -2437,6 +2437,29 @@ impl CheckerState {
         Ok(None)
     }
 
+    /// The identifier texts, left to right, of an entity built by
+    /// `parseIsolatedEntityName` in the checker's factory.
+    pub(crate) fn entity_name_parts(&self, entity: NodeId) -> Result<Vec<JsString>, Error> {
+        let view = self.factory.view();
+        let mut parts = Vec::new();
+        let mut node = entity;
+        loop {
+            let read = view.node(node)?;
+            let qualified = read
+                .as_qualified_name()
+                .map(|data| (data.left(), data.right()));
+            let Some((left, right)) = qualified else {
+                parts.push(view.node_text(node)?.into_js_string());
+                break;
+            };
+            let right = right.ok_or(Error::MissingLink("qualified name right"))?;
+            parts.push(view.node_text(right)?.into_js_string());
+            node = left.ok_or(Error::MissingLink("qualified name left"))?;
+        }
+        parts.reverse();
+        Ok(parts)
+    }
+
     /// `getFirstIdentifier(entity).Text()` of an entity built by
     /// `parseIsolatedEntityName`.
     fn first_identifier_text(&self, entity: NodeId) -> Result<JsString, Error> {

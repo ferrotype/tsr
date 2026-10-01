@@ -40,6 +40,9 @@ impl From<tsr_arena::Error> for EmitResolverError {
 
 pub type ResolverResult<T> = Result<T, EmitResolverError>;
 
+/// The identifier texts of an entity name, left to right; never empty.
+pub type EntityName = Vec<JsString>;
+
 /// Indicates how to serialize the name for a TypeReferenceNode when emitting
 /// decorator metadata.
 // Source: tsc/internal/printer/emitresolver.go:TypeReferenceSerializationKind
@@ -77,6 +80,13 @@ pub enum TypeReferenceSerializationKind {
 }
 
 /// `binder.ReferenceResolver`. A nil result is `None`.
+///
+/// A node of the transform's own factory is never a parse-tree node, and the
+/// checker behind a resolver cannot read it. An implementation answers such a
+/// node as upstream's `!ast.IsParseTreeNode(node)` guard does, without reading
+/// it. The one transform that makes a factory node look like a parse-tree node
+/// to the resolver has its own entry
+/// (`EmitResolver::get_referenced_export_container_of_name`).
 pub trait ReferenceResolver {
     /// The SourceFile, ModuleDeclaration or EnumDeclaration that contains the
     /// export an identifier refers to.
@@ -133,10 +143,25 @@ pub trait EmitResolver: ReferenceResolver {
     fn get_enum_member_value(&mut self, node: NodeId) -> ResolverResult<EnumMemberValue>;
 
     // JSX Emit
-    fn get_jsx_factory_entity(&mut self, location: NodeId) -> ResolverResult<Option<NodeId>>;
+    /// Upstream returns the entity name node. The checker parses it from an
+    /// option or a pragma into its own storage, which no output factory
+    /// retains, and the transform reads only its identifiers' texts: the
+    /// resolver hands over those, left to right (`A.B.C` is `[A, B, C]`).
+    fn get_jsx_factory_entity(&mut self, location: NodeId) -> ResolverResult<Option<EntityName>>;
     fn get_jsx_fragment_factory_entity(
         &mut self,
         location: NodeId,
+    ) -> ResolverResult<Option<EntityName>>;
+    /// `GetReferencedExportContainer` for an identifier named `name` that the
+    /// transform created, cleared `Synthesized` on and parented to the
+    /// parse-tree node `parent` (`createReactNamespace`). The resolver cannot
+    /// read the transform's node, so it resolves an identifier of its own with
+    /// that name and parent.
+    fn get_referenced_export_container_of_name(
+        &mut self,
+        name: &[u8],
+        parent: Option<NodeId>,
+        prefix_locals: bool,
     ) -> ResolverResult<Option<NodeId>>;
     /// Overrides the reference resolver's answer for a generated identifier.
     fn set_referenced_import_declaration(
@@ -223,14 +248,22 @@ impl<T: EmitResolver + ?Sized> EmitResolver for &mut T {
     fn get_enum_member_value(&mut self, node: NodeId) -> ResolverResult<EnumMemberValue> {
         (**self).get_enum_member_value(node)
     }
-    fn get_jsx_factory_entity(&mut self, location: NodeId) -> ResolverResult<Option<NodeId>> {
+    fn get_jsx_factory_entity(&mut self, location: NodeId) -> ResolverResult<Option<EntityName>> {
         (**self).get_jsx_factory_entity(location)
     }
     fn get_jsx_fragment_factory_entity(
         &mut self,
         location: NodeId,
-    ) -> ResolverResult<Option<NodeId>> {
+    ) -> ResolverResult<Option<EntityName>> {
         (**self).get_jsx_fragment_factory_entity(location)
+    }
+    fn get_referenced_export_container_of_name(
+        &mut self,
+        name: &[u8],
+        parent: Option<NodeId>,
+        prefix_locals: bool,
+    ) -> ResolverResult<Option<NodeId>> {
+        (**self).get_referenced_export_container_of_name(name, parent, prefix_locals)
     }
     fn set_referenced_import_declaration(
         &mut self,

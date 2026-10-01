@@ -229,6 +229,306 @@
      "jsx"
     ]
    ]
+  },
+  {
+   "id": "classic-intrinsic",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div />;\nexport const b = <div></div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-component-attrs",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var Foo: any;\nexport const a = <Foo x=\"1\" y={2} z />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-children",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div>hello <b>world</b> {1 + 2}</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-nested-multiline",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = (\n  <ul>\n    <li>one</li>\n    <li>two</li>\n  </ul>\n);\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-fragment",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <><span /><span /></>;\nexport const b = <></>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-jsxfactory-option",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @jsxFactory: h\n// @jsxFragmentFactory: Frag\ndeclare function h(...a: any[]): any;\ndeclare var Frag: any;\nexport const a = <div id=\"x\">t</div>;\nexport const b = <><i /></>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-jsxfactory-qualified",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @jsxFactory: preact.h\ndeclare var preact: any;\nexport const a = <div />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-pragma-jsx",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n/** @jsx h */\ndeclare function h(...a: any[]): any;\nexport const a = <div>x</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-pragma-jsxfrag",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n/** @jsx h */\n/** @jsxFrag Fragment */\ndeclare function h(...a: any[]): any;\ndeclare var Fragment: any;\nexport const a = <><b /></>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-react-namespace",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @reactNamespace: MyReact\ndeclare var MyReact: any;\nexport const a = <div />;\nexport const b = <>x</>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-namespace-container",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\nnamespace M {\n  export var React: any;\n  export var x = <div />;\n}\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-spread-es2018",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @target: es2018\ndeclare var React: any;\ndeclare var p: any;\nexport const a = <div a=\"1\" {...p} b={2} {...{c: 3, ...p}} />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-spread-es2017",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @target: es2017\ndeclare var React: any;\ndeclare var p: any;\ndeclare var q: any;\nexport const a = <div a=\"1\" {...p} b={2} />;\nexport const b = <div {...p} />;\nexport const c = <div {...p} {...q} />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-spread-es2017-inline",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @target: es2017\ndeclare var React: any;\ndeclare var p: any;\nexport const a = <div {...{x: 1, ...p, y: 2}} z=\"3\" />;\nexport const b = <div {...{__proto__: null, x: 1}} />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-proto-es2018",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @target: es2018\ndeclare var React: any;\nexport const a = <div {...{__proto__: null, x: 1}} />;\nexport const b = <div {...{'__proto__': p, y: 1}} />;\ndeclare var p: any;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-attr-names",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div data-foo=\"1\" aria-label='x' class=\"c\" />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-namespaced",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <svg:rect xlink:href=\"#a\" />;\nexport const b = <a:b>t</a:b>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-tag-property-access",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var a: any;\nexport const x = <a.b.c />;\nexport class C { render() { return <this.Foo />; } Foo: any; }\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-entities-text",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div>&amp; &lt;b&gt; &#123; &#x41; &nbsp;&copy; &bogus; &#; &#x; &&amp; &#99999999999; &#X41;</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-entities-attr",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div title=\"a &amp; b &quot;c&quot;\" alt='it&apos;s' x=\"&#xD800;\" />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-whitespace",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport const a = <div>\n    leading\n      middle   words  \n\n    trailing   </div>;\nexport const b = <div>   </div>;\nexport const c = <div>\n\n</div>;\nexport const d = <div>  one line  </div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-expression-children",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var arr: any[];\nexport const a = <div>{}</div>;\nexport const b = <div>{/* c */}</div>;\nexport const c = <div>{...arr}</div>;\nexport const d = <div>{arr.map(x => <i>{x}</i>)}</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-attr-jsx-initializer",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\ndeclare var A: any;\nexport const a = <A x=<b /> y=<>f</> />;\nexport const b = <A x={<b>q</b>} />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "classic-nested-in-function",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nexport function f(items: string[]) {\n  const n = 1;\n  return items.map(i => <li key={i}>{i}{n}</li>);\n}\nexport const plain = 1 + 2;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "automatic-runtime-classic-pragma",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\n/** @jsxRuntime classic */\ndeclare var React: any;\nexport const a = <div>x</div>;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "declaration-file",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @filename: probe.tsx\nexport const a = <div />;\ndeclare var React: any;\n// @filename: types.d.ts\ndeclare const x: number;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "ambient-auto",
+   "name": "probe.tsx",
+   "source": "// @jsx: react-jsx\ndeclare const a = <div />;\nexport const n = 1;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "type-only-classic",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\nexport let t: { [<b />]: number };\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "overload-classic",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\nexport function f(x = <i />): void;\nexport function f(x: any): void { }\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "type-and-value-classic",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare const React: any;\nexport let t: { [<b />]: number } = <i />;\n",
+   "chains": [
+    [
+     "jsx"
+    ]
+   ]
   }
  ]
 }

@@ -12,7 +12,7 @@ use tsr_ast::{modifier_flags as mf, symbol_flags as sf, SyntaxKind as K};
 use tsr_printer::emit_resolver::{ConstantValue, DeclarationEmitResolver, EnumMemberValue};
 pub use tsr_printer::script_resolver::TypeReferenceSerializationKind;
 use tsr_printer::script_resolver::{
-    EmitResolver, EmitResolverError, ReferenceResolver, ResolverResult,
+    EmitResolver, EmitResolverError, EntityName, ReferenceResolver, ResolverResult,
 };
 
 fn required<T>(value: Option<T>, name: &'static str) -> Result<T, Error> {
@@ -537,6 +537,19 @@ fn answer<T>(result: Result<T, Error>) -> ResolverResult<T> {
     result.map_err(EmitResolverError::new)
 }
 
+impl Operation<'_> {
+    /// Whether `node` belongs to storage this checker does not retain: a node
+    /// of a transform's factory, which is never a parse-tree node. Upstream's
+    /// `!ast.IsParseTreeNode(node)` guards answer for it; the checker cannot
+    /// read it.
+    fn is_transform_node(&self, node: NodeId) -> bool {
+        matches!(
+            self.state().node(node),
+            Err(Error::Arena(tsr_arena::Error::WrongOwner))
+        )
+    }
+}
+
 /// `binder.ReferenceResolver` as the checker's emit resolver answers it.
 impl ReferenceResolver for Operation<'_> {
     fn get_referenced_export_container(
@@ -544,27 +557,42 @@ impl ReferenceResolver for Operation<'_> {
         node: NodeId,
         prefix_locals: bool,
     ) -> ResolverResult<Option<NodeId>> {
+        if self.is_transform_node(node) {
+            return Ok(None);
+        }
         answer(self.referenced_export_container(node, prefix_locals))
     }
     fn get_referenced_import_declaration(
         &mut self,
         node: NodeId,
     ) -> ResolverResult<Option<NodeId>> {
+        if self.is_transform_node(node) {
+            return Ok(self.state().emit.import_refs.get(&node).copied());
+        }
         answer(self.referenced_import_declaration(node))
     }
     fn get_referenced_value_declaration(&mut self, node: NodeId) -> ResolverResult<Option<NodeId>> {
+        if self.is_transform_node(node) {
+            return Ok(None);
+        }
         answer(self.referenced_value_declaration(node))
     }
     fn get_referenced_value_declarations(
         &mut self,
         node: NodeId,
     ) -> ResolverResult<Option<Vec<NodeId>>> {
+        if self.is_transform_node(node) {
+            return Ok(None);
+        }
         answer(self.referenced_value_declarations(node))
     }
     fn get_element_access_expression_name(
         &mut self,
         expression: NodeId,
     ) -> ResolverResult<tsr_ast::JsString> {
+        if self.is_transform_node(expression) {
+            return Ok(tsr_ast::JsString::default());
+        }
         answer(DeclarationEmitResolver::element_access_expression_name(
             self, expression,
         ))
@@ -573,6 +601,9 @@ impl ReferenceResolver for Operation<'_> {
         &mut self,
         node: NodeId,
     ) -> ResolverResult<Option<NodeId>> {
+        if self.is_transform_node(node) {
+            return Ok(None);
+        }
         answer(DeclarationEmitResolver::referenced_member_value_declaration(self, node))
     }
 }
@@ -580,15 +611,26 @@ impl ReferenceResolver for Operation<'_> {
 /// The script transforms' half of `printer.EmitResolver`.
 impl EmitResolver for Operation<'_> {
     fn is_referenced_alias_declaration(&mut self, node: NodeId) -> ResolverResult<bool> {
+        if self.is_transform_node(node) {
+            return Ok(true);
+        }
         answer(Operation::is_referenced_alias_declaration(self, node))
     }
     fn is_value_alias_declaration(&mut self, node: NodeId) -> ResolverResult<bool> {
+        if self.is_transform_node(node) {
+            return Ok(true);
+        }
         answer(Operation::is_value_alias_declaration(self, node))
     }
     fn is_top_level_value_import_equals_with_entity_name(
         &mut self,
         node: NodeId,
     ) -> ResolverResult<bool> {
+        if self.is_transform_node(node) {
+            // `!canCollectSymbolAliasAccessibilityData` answers true before
+            // the parse-tree guard answers false.
+            return answer(self.state().can_collect_alias_data().map(|can| !can));
+        }
         answer(Operation::is_top_level_value_import_equals_with_entity_name(self, node))
     }
     fn mark_linked_references_recursively(&mut self, file: NodeId) -> ResolverResult<()> {
@@ -598,6 +640,9 @@ impl EmitResolver for Operation<'_> {
         &mut self,
         node: NodeId,
     ) -> ResolverResult<Option<NodeId>> {
+        if self.is_transform_node(node) {
+            return Ok(None);
+        }
         answer(DeclarationEmitResolver::external_module_file_from_declaration(self, node))
     }
     fn get_effective_declaration_flags(&mut self, node: NodeId, flags: u32) -> ResolverResult<u32> {
@@ -616,16 +661,42 @@ impl EmitResolver for Operation<'_> {
         answer(self.constant_value(node))
     }
     fn get_enum_member_value(&mut self, node: NodeId) -> ResolverResult<EnumMemberValue> {
+        if self.is_transform_node(node) {
+            return Ok(EnumMemberValue::default());
+        }
         answer(DeclarationEmitResolver::enum_member_value(self, node))
     }
-    fn get_jsx_factory_entity(&mut self, location: NodeId) -> ResolverResult<Option<NodeId>> {
-        answer(self.jsx_factory_entity(location))
+    fn get_jsx_factory_entity(&mut self, location: NodeId) -> ResolverResult<Option<EntityName>> {
+        answer(self.jsx_factory_entity(location).and_then(|entity| {
+            entity
+                .map(|entity| self.state().entity_name_parts(entity))
+                .transpose()
+        }))
     }
     fn get_jsx_fragment_factory_entity(
         &mut self,
         location: NodeId,
+    ) -> ResolverResult<Option<EntityName>> {
+        answer(
+            self.jsx_fragment_factory_entity(location)
+                .and_then(|entity| {
+                    entity
+                        .map(|entity| self.state().entity_name_parts(entity))
+                        .transpose()
+                }),
+        )
+    }
+    fn get_referenced_export_container_of_name(
+        &mut self,
+        name: &[u8],
+        parent: Option<NodeId>,
+        prefix_locals: bool,
     ) -> ResolverResult<Option<NodeId>> {
-        answer(self.jsx_fragment_factory_entity(location))
+        answer(self.state_mut().emit_referenced_export_container_of_name(
+            tsr_ast::JsString::from_bytes(name),
+            parent,
+            prefix_locals,
+        ))
     }
     fn set_referenced_import_declaration(
         &mut self,

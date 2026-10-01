@@ -11,14 +11,13 @@
 use crate::transformer::{SharedEmitResolver, TransformOptions, Transformer};
 use crate::Failure;
 use std::cell::{Cell, RefCell};
-use std::ops::ControlFlow;
 use std::rc::Rc;
 use std::sync::Arc;
 use tsr_ast::utilities_middle::{
     get_pragma_argument, get_pragma_from_source_file, is_whitespace_only_jsx_text,
 };
 use tsr_ast::{
-    node_flags, token_flags, ChildVisitor, Factory, FactoryMethods, JsString, NodeData, NodeId,
+    node_flags, subtree_flags, token_flags, Factory, FactoryMethods, JsString, NodeData, NodeId,
     NodeKind, NodeListId, NodeSlice, NodeVisitor, RuntimeFactory, SyntaxKind as K,
 };
 use tsr_core::{CompilerOptions, JsxEmit, LanguageVariant, ScriptTarget, TextRange};
@@ -164,55 +163,14 @@ fn namespaced_name_text(factory: &dyn RuntimeFactory, node: NodeId) -> JsString 
     JsString::from_bytes(text)
 }
 
-/// `node.SubtreeFacts()&ast.SubtreeContainsJsx != 0`: every JSX kind
-/// contributes the fact and no exclusion removes it, so it holds exactly when
-/// the subtree has a JSX node.
-// TODO(ast_view): ast.Node.SubtreeFacts, through the factory's syntax view.
+/// `node.SubtreeFacts()&ast.SubtreeContainsJsx != 0`. The facts are the
+/// builder's: an erasable child (a type annotation, an ambient or bodiless
+/// declaration) contributes no JSX fact, so JSX there is left as written.
 fn subtree_contains_jsx(factory: &dyn RuntimeFactory, node: NodeId) -> bool {
-    struct Finder<'f> {
-        factory: &'f dyn RuntimeFactory,
-    }
-    impl ChildVisitor for Finder<'_> {
-        fn visit_node(&mut self, node: NodeId) -> ControlFlow<()> {
-            if subtree_contains_jsx(self.factory, node) {
-                ControlFlow::Break(())
-            } else {
-                ControlFlow::Continue(())
-            }
-        }
-        fn visit_list(&mut self, list: NodeListId) -> ControlFlow<()> {
-            self.visit_node_slice(self.factory.read_list(list).nodes())
-        }
-        fn visit_node_slice(&mut self, nodes: NodeSlice) -> ControlFlow<()> {
-            let nodes: Vec<NodeId> = self.factory.read_nodes(nodes).iter().flatten().collect();
-            for node in nodes {
-                self.visit_node(node)?;
-            }
-            ControlFlow::Continue(())
-        }
-    }
-    let read = factory.node(node);
-    if matches!(
-        read.kind().known(),
-        Some(
-            K::JsxElement
-                | K::JsxAttributes
-                | K::JsxNamespacedName
-                | K::JsxOpeningElement
-                | K::JsxSelfClosingElement
-                | K::JsxFragment
-                | K::JsxOpeningFragment
-                | K::JsxClosingFragment
-                | K::JsxAttribute
-                | K::JsxSpreadAttribute
-                | K::JsxClosingElement
-                | K::JsxExpression
-                | K::JsxText
-        )
-    ) {
-        return true;
-    }
-    read.for_each_child(&mut Finder { factory }).is_break()
+    let view = factory
+        .ast_view()
+        .expect("the transform factory has an AstView");
+    view.subtree_facts(node) & subtree_flags::JSX != 0
 }
 
 /// `ast.GetSemanticJsxChildren`.
@@ -1312,10 +1270,16 @@ impl JsxTransformer<'_> {
         // If the identifier refers to an exported member of a namespace, substitute with
         // a qualified namespace property access (e.g., `React` -> `M.React`).
         // See also: RuntimeSyntaxTransformer.visitExpressionIdentifier in runtimesyntax.go
+        // The resolver cannot read this factory's node: it resolves an
+        // identifier of its own with the same name and parse-tree parent.
         let container = self
             .emit_resolver
             .borrow_mut()
-            .get_referenced_export_container(react, false /*prefixLocals*/);
+            .get_referenced_export_container_of_name(
+                react_namespace,
+                parse_parent,
+                false, /*prefixLocals*/
+            );
         if let Some(container) = self.failure.ok(container).flatten() {
             if kind(visitor.factory(), container) == K::ModuleDeclaration {
                 let container_name = self
@@ -1334,34 +1298,28 @@ impl JsxTransformer<'_> {
     }
 
     // port: tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.createJsxFactoryExpressionFromEntityName
+    /// `e` is the entity name's identifier texts, left to right (see
+    /// `EmitResolver::get_jsx_factory_entity`). Upstream recurses into the
+    /// left of each qualified name first, so the namespace identifier is
+    /// created first and each right identifier just before its access.
     fn create_jsx_factory_expression_from_entity_name(
         &self,
         visitor: &mut NodeVisitor<'_>,
-        e: NodeId,
+        e: &[JsString],
         parent: NodeId,
     ) -> NodeId {
-        let qualified = visitor
-            .factory()
-            .node(e)
-            .as_qualified_name()
-            .map(|data| (data.left(), data.right()));
-        if let Some((left, right)) = qualified {
-            let left = self.create_jsx_factory_expression_from_entity_name(
-                visitor,
-                left.expect(NIL),
-                parent,
-            );
-            let right_text = identifier_text(visitor.factory(), right.expect(NIL));
-            let right = visitor.new_identifier(right_text);
-            return visitor.new_property_access_expression(
-                Some(left),
+        let (first, rest) = e.split_first().expect(NIL);
+        let mut expression = self.create_react_namespace(visitor, first.as_bytes(), parent);
+        for right in rest {
+            let right = visitor.new_identifier(right.clone());
+            expression = visitor.new_property_access_expression(
+                Some(expression),
                 None,
                 Some(right),
                 node_flags::NONE,
             );
         }
-        let text = identifier_text(visitor.factory(), e);
-        self.create_react_namespace(visitor, text.as_bytes(), parent)
+        expression
     }
 
     // port: tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.createJsxPseudoFactoryExpression
@@ -1369,7 +1327,7 @@ impl JsxTransformer<'_> {
         &self,
         visitor: &mut NodeVisitor<'_>,
         parent: NodeId,
-        e: Option<NodeId>,
+        e: Option<&[JsString]>,
         target: &[u8],
     ) -> NodeId {
         if let Some(e) = e {
@@ -1392,7 +1350,7 @@ impl JsxTransformer<'_> {
             .borrow_mut()
             .get_jsx_factory_entity(self.current_source_file());
         let e = self.failure.ok(e).flatten();
-        self.create_jsx_pseudo_factory_expression(visitor, parent, e, b"createElement")
+        self.create_jsx_pseudo_factory_expression(visitor, parent, e.as_deref(), b"createElement")
     }
 
     // port: tsc/internal/transformers/jsxtransforms/jsx.go:JSXTransformer.createJsxFragmentFactoryExpression
@@ -1406,7 +1364,7 @@ impl JsxTransformer<'_> {
             .borrow_mut()
             .get_jsx_fragment_factory_entity(self.current_source_file());
         let e = self.failure.ok(e).flatten();
-        self.create_jsx_pseudo_factory_expression(visitor, parent, e, b"Fragment")
+        self.create_jsx_pseudo_factory_expression(visitor, parent, e.as_deref(), b"Fragment")
     }
 
     /// The children loop shared by the two `createElement` visitors: each

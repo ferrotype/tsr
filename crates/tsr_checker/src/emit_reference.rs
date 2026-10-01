@@ -284,6 +284,33 @@ impl CheckerState {
         Ok(self.flow_property_name(node)?.unwrap_or_default())
     }
 
+    /// `GetReferencedExportContainer` of an identifier `name` that is not in
+    /// the parse tree but whose parent is the parse-tree node `parent`: the
+    /// JSX transform's namespace identifier (`createReactNamespace` clears
+    /// `Synthesized` and wires the parent so the scope chain can be walked).
+    /// The lookup identifier is built in the checker's factory, as below.
+    pub(crate) fn emit_referenced_export_container_of_name(
+        &mut self,
+        name: JsString,
+        parent: Option<NodeId>,
+        prefix_locals: bool,
+    ) -> Result<Option<NodeId>, Error> {
+        if let Some(parent) = parent {
+            self.node(parent)?;
+            if parent.arena() != self.factory.id().arena() {
+                self.retain_flow_source(parent)?;
+            }
+        }
+        let node = self.factory.new_identifier(name);
+        let flags = self.factory.view().node(node)?.flags() & !tsr_ast::node_flags::SYNTHESIZED;
+        self.factory.set_node_flags(node, flags);
+        self.factory.set_node_parent(node, parent);
+        match self.emit_reference_query(node, ReferenceQuery::ExportContainer { prefix_locals })? {
+            ReferenceAnswer::Node(node) => Ok(node),
+            ReferenceAnswer::Nodes(_) => Err(Error::MissingLink("export container answer")),
+        }
+    }
+
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.getNameExpressionPreferringIdentifier
     // Lookup-only syntax uses the checker factory because the caller's output
     // factory is not a member of the checker's retained owner set.
