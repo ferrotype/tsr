@@ -17,6 +17,7 @@ mod checker_module_specifiers;
 mod content_mapped;
 mod declaration_diagnostics;
 pub mod diagnostic_writer;
+pub mod emitter;
 mod include_reason;
 mod output_paths;
 mod plain_js_errors;

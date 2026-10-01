@@ -94,8 +94,9 @@ impl Failure {
 pub type SharedEmitResolver<'a> = Rc<RefCell<dyn EmitResolver + 'a>>;
 pub type SharedReferenceResolver<'a> = Rc<RefCell<dyn ReferenceResolver + 'a>>;
 
-/// `GetEmitModuleFormatOfFile` of the emit host, by source file.
-pub type EmitModuleFormatOfFile<'a> = Rc<dyn Fn(NodeId) -> ModuleKind + 'a>;
+/// `GetEmitModuleFormatOfFile` of the emit host, by file name (upstream's
+/// `ast.HasFileName`): a transformed file is a new node with its source's name.
+pub type EmitModuleFormatOfFile<'a> = Rc<dyn Fn(&[u8]) -> Result<ModuleKind, Error> + 'a>;
 
 /// `TransformOptions`, with the failure slot the transformers of one file share.
 #[derive(Clone)]

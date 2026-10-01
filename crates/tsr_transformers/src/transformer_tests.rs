@@ -138,7 +138,7 @@ fn options<'a>(context: &EmitContext) -> TransformOptions<'a> {
         compiler_options: Arc::new(CompilerOptions::default()),
         resolver: Rc::new(RefCell::new(Unasked)),
         emit_resolver: Rc::new(RefCell::new(Unasked)),
-        get_emit_module_format_of_file: Rc::new(|_| ModuleKind::NONE),
+        get_emit_module_format_of_file: Rc::new(|_| Ok(ModuleKind::NONE)),
         failure: Failure::default(),
     }
 }
