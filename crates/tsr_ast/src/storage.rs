@@ -16,6 +16,12 @@ use tsr_jsstring::SourceText;
 #[cfg(test)]
 mod parent_tests;
 
+#[cfg(test)]
+std::thread_local! {
+    /// Counts actual logical-source traversal steps, not successful lookups.
+    pub(crate) static SOURCE_LOOKUP_STEPS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
 /// Exclusive syntax construction. Hooks exist only during this exclusive phase.
 pub struct AstBuilder {
     pub(crate) storage: StorageBuilder<StoredNode>,
@@ -25,6 +31,11 @@ pub struct AstBuilder {
     // Unrestricted syntax mutation can only invalidate this proof, never restore it.
     construction_edges_valid: bool,
 }
+
+/// A shared index of completed syntax retained by a set of transform builders.
+/// Construct once per program emit, then attach without copying its owner map.
+#[derive(Clone, Debug, Default)]
+pub struct AstDependencies(pub(crate) tsr_arena::StorageImports<StoredNode>);
 impl std::fmt::Debug for AstBuilder {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.storage.fmt(f)
@@ -83,6 +94,10 @@ impl AstBuilder {
     /// Importing a mapped member retains its complete bundle and dependencies.
     pub fn retain_file(&mut self, file: AstFile) {
         self.storage.retain_file(file.0);
+        self.construction_edges_valid = false;
+    }
+    pub fn retain_dependencies(&mut self, files: &AstDependencies) {
+        self.storage.retain_imports(&files.0);
         self.construction_edges_valid = false;
     }
     pub fn node_mut(&mut self, id: NodeId) -> Result<NodeMut<'_>, Error> {
@@ -710,6 +725,8 @@ impl<'a> AstView<'a> {
         let mut slow = Some(id);
         let mut fast = Some(id);
         loop {
+            #[cfg(test)]
+            SOURCE_LOOKUP_STEPS.with(|steps| steps.set(steps.get() + 1));
             let current = slow.ok_or(Error::InvalidGraph)?;
             let node = AstView(self.0, None).node(current)?;
             if node.kind() == crate::SyntaxKind::SourceFile {

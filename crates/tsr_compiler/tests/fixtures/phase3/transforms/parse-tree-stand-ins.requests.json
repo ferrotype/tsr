@@ -1,0 +1,90 @@
+{
+ "cases": [
+  {
+   "id": "metadata-self-reference-alias",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\n@dec\nclass C {\n    static m() { return C; }\n    @dec p: C;\n}\n",
+   "chains": [
+    [
+     "metadata",
+     "typeeraser",
+     "legacydecorators"
+    ],
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "metadata-self-reference-only",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\n@dec\nclass C {\n    @dec p: C;\n    @dec m(a: C): C { return a; }\n}\n",
+   "chains": [
+    [
+     "metadata",
+     "typeeraser",
+     "legacydecorators"
+    ],
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "metadata-namespace-export",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nnamespace N {\n    export class A {}\n    export class B {\n        @dec p: A;\n    }\n}\n",
+   "chains": [
+    [
+     "metadata",
+     "typeeraser",
+     "runtimesyntax",
+     "legacydecorators"
+    ],
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "metadata-imported-type-commonjs",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @module: commonjs\n// @filename: lib.ts\nexport class A {}\nexport default class D {}\n// @filename: probe.ts\nimport D, { A } from \"./lib\";\ndeclare function dec(...args: any[]): any;\nexport class B {\n    @dec p: A;\n    @dec q: D;\n}\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "jsx-react-import-commonjs",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @module: commonjs\n// @target: es2015\n// @filename: react.d.ts\ndeclare const React: any;\nexport default React;\n// @filename: probe.tsx\nimport React from \"./react\";\nexport const x = <div a={1}>t</div>;\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "jsx-react-namespace-import-commonjs",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @module: commonjs\n// @target: es2015\n// @filename: react.d.ts\nexport declare function createElement(...a: any[]): any;\n// @filename: probe.tsx\nimport * as React from \"./react\";\nexport const x = <div a={1}>t</div>;\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "jsx-react-in-namespace",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @target: es2015\nnamespace M {\n    export declare const React: any;\n    export const x = <div/>;\n}\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  }
+ ]
+}

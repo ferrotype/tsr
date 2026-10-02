@@ -96,7 +96,7 @@ fn deep_type_display_grows_and_factory_panic_retires_the_operation() {
                     );
                     let mut writer = TextWriter::new(b"", 0);
                     Printer::new(PrinterOptions::default(), &builder.emit)
-                        .write(builder.ast.view(), node, None, &mut writer)
+                        .write(builder.ast.view(), node, None, &mut writer, None)
                         .unwrap();
                     assert_eq!(writer.text(), expected.as_bytes());
                 }
@@ -124,7 +124,7 @@ fn deep_type_display_grows_and_factory_panic_retires_the_operation() {
                     );
                     let mut writer = TextWriter::new(b"", 0);
                     Printer::new(PrinterOptions::default(), &builder.emit)
-                        .write(builder.ast.view(), name, None, &mut writer)
+                        .write(builder.ast.view(), name, None, &mut writer, None)
                         .unwrap();
                     assert_eq!(writer.text(), vec!["n"; DEPTH].join(".").as_bytes());
                 }

@@ -1,0 +1,175 @@
+{
+ "cases": [
+  {
+   "id": "rfa-using-head",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare var y: any, o: any;\nasync function f() { for await (using x of y) { } for await (await using z of y) ; }\n",
+   "chains": [
+    [
+     "forawait"
+    ]
+   ]
+  },
+  {
+   "id": "rfa-binding-defaults-await",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare var y: any, o: any;\nasync function* g() { for await (const [a = await 1, { b = yield 2 }] of y) { yield a; } }\nasync function f() { for await (const { a = await 1 } of y) ; }\n",
+   "chains": [
+    [
+     "forawait"
+    ]
+   ]
+  },
+  {
+   "id": "rfa-expression-targets",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare var y: any, o: any;\nasync function f() { for await (o.x of y) ; for await (o[0] of y) ; for await ([o.a, ...o.b] of y) ; for await ({ a: o.c } of y) ; }\n",
+   "chains": [
+    [
+     "forawait"
+    ]
+   ]
+  },
+  {
+   "id": "rfa-expression-kinds",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare var y: any, o: any;\nasync function f() { for await (const x of (y)) ; for await (const x of y.z) ; for await (const x of await y) ; for await (const x of [y]) ; for await (const x of this) ; }\n",
+   "chains": [
+    [
+     "forawait"
+    ]
+   ]
+  },
+  {
+   "id": "rfa-in-static-block",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare var y: any, o: any;\nclass K { static { (async () => { for await (const x of y) ; })(); } }\n",
+   "chains": [
+    [
+     "forawait"
+    ]
+   ]
+  },
+  {
+   "id": "rfa-generator-await-forms",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare var y: any, o: any;\nasync function* g() { await (yield); yield await 1; yield* (await y); return await 2; return; }\nasync function* h() { yield; yield yield 1; const f = () => { return 1; }; const k = async () => { return await 1; }; }\n",
+   "chains": [
+    [
+     "forawait"
+    ]
+   ]
+  },
+  {
+   "id": "rfa-nested-labels-and-loops",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare var y: any, o: any;\nasync function f() { a: b: for await (const x of y) { c: for await (const z of x) { continue a; break c; } } while (1) { for await (const q of y) { break; } } for (;;) { d: for await (const r of y) ; } }\n",
+   "chains": [
+    [
+     "forawait"
+    ]
+   ]
+  },
+  {
+   "id": "rfa-object-method-forms",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare var y: any, o: any;\nconst obj = { async *m() { yield 1; }, async *[Symbol.asyncIterator]() { for await (const x of y) yield x; }, get g() { return async function* () { yield 2; }; } };\n",
+   "chains": [
+    [
+     "forawait"
+    ]
+   ]
+  },
+  {
+   "id": "rfa-generator-in-param-default",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare var y: any, o: any;\nasync function* g(a = async function* () { yield 1; }, b = async () => { for await (const x of y) ; }) { yield a; }\n",
+   "chains": [
+    [
+     "forawait"
+    ]
+   ]
+  },
+  {
+   "id": "rfa-super-in-generator-nested",
+   "name": "probe.ts",
+   "source": "// @target: es2017\nclass B { m() { return 1; } static s() {} x: any; }\nclass C extends B {\n  async *g(k: any) { yield super.m(); yield super[k]; const f = () => super.x; super.x = 1; }\n  static async *h() { yield super.s(); }\n}\n",
+   "chains": [
+    [
+     "forawait"
+    ]
+   ]
+  },
+  {
+   "id": "rfa-with-async-chain",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare var y: any, o: any;\nasync function f() { for await (const x of y) { await x; } }\nconst g = async () => { for await (const x of y) ; };\nasync function* h() { for await (const x of y) yield await x; }\n",
+   "chains": [
+    [
+     "forawait",
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "refs-outdir",
+   "name": "probe.ts",
+   "source": "// @outDir: out\n// @declarationDir: types\n// @filename: src/a.ts\nexport const a = 1;\n// @filename: src/sub/b.d.ts\ndeclare const b: number;\n// @filename: src/probe.ts\n/// <reference path=\"a.ts\" preserve=\"true\" />\n/// <reference path=\"sub/b.d.ts\" preserve=\"true\" />\n/// <reference path=\"missing.ts\" preserve=\"true\" />\n/// <reference path=\"a.ts\" />\n/// <reference types=\"node\" preserve=\"true\" />\n/// <reference lib=\"es2015\" preserve=\"true\" />\n/// <reference lib=\"dom\" />\nexport const k = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "refs-js",
+   "name": "probe.ts",
+   "source": "// @allowJs: true\n// @outDir: out\n// @filename: lib.js\nvar g = 1;\n// @filename: probe.ts\n/// <reference path=\"lib.js\" preserve=\"true\" />\n/// <reference path=\"./lib\" preserve=\"true\" />\nexport const k = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "refs-outfile-none",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nvar ga = 1;\n// @filename: probe.ts\n/// <reference path=\"a\" preserve=\"true\" />\nvar k = ga;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "expando-deferred-latemark",
+   "name": "probe.ts",
+   "source": "function f() {}\nf.a = 1;\nf.b = () => \"s\";\nconst g = () => 1;\ng.c = 2;\nexport const ref = f;\nexport const ref2: typeof g = g;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-default-class-this",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexport default class {\n  constructor() { this.a = 1; this.b = { c: 2 }; }\n  m() { return this.a; }\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-class-expr-extends",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nclass Base { constructor() { this.x = 1; } }\nmodule.exports = class Derived extends Base { constructor() { super(); this.y = 2; this.x = 3; } };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  }
+ ]
+}

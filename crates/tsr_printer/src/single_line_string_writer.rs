@@ -17,6 +17,7 @@ pub struct SingleLineStringWriter {
 }
 
 impl SingleLineStringWriter {
+    // port: tsc/internal/printer/singlelinestringwriter.go:GetSingleLineStringWriter
     pub fn new() -> Self {
         Self::default()
     }

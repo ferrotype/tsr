@@ -9,8 +9,21 @@ use tsr_printer::emit_resolver::SymbolAccessibilityResult;
 pub(crate) struct EmitState {
     pub(crate) visible: LinkStore<NodeId, Option<bool>>,
     pub(crate) aliases_marked: LinkStore<NodeId, bool>,
+    pub(crate) transient: EmitTransient,
+    /// A stand-in is determined entirely by its spelling and parse-tree parent.
+    /// Reuse it across emits of this immutable program, rather than allocating
+    /// a new checker node and symbol-link entry for each temporary transform ID.
+    pub(crate) identifiers: crate::types::Map<(Option<NodeId>, tsr_ast::JsString), NodeId>,
+}
+
+#[derive(Default)]
+pub(crate) struct EmitTransient {
     /// `jsxLinks.importRef`: the import a transformed JSX reference points at.
     pub(crate) import_refs: crate::types::Map<NodeId, NodeId>,
+    /// For an identifier of a transform's factory that upstream's resolver
+    /// takes for a parse-tree node, the identifier of this checker's factory
+    /// that stands in for it: same name, same parse-tree parent.
+    pub(crate) parse_tree_stand_ins: crate::types::Map<NodeId, NodeId>,
 }
 
 impl CheckerState {
@@ -45,7 +58,11 @@ impl CheckerState {
         if let Some(Some(value)) = self.emit.visible.try_get(node) {
             return Ok(*value);
         }
-        let value = self.determine_declaration_visible(node)?;
+        // A binding element asks for its pattern's declaration, once per
+        // nested pattern.
+        let value = stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.determine_declaration_visible(node)
+        })?;
         *self.emit.visible.get_or_default(node) = Some(value);
         Ok(value)
     }
@@ -247,12 +264,9 @@ impl CheckerState {
             let name = self.node_text(node)?.into_js_string();
             self.resolve_name(Some(node), name.as_bytes(), meaning, None, false)?
         } else if self.node(parent)?.kind() == K::ExportSpecifier {
-            // The normal alias resolver also marks type-only aliases. Resolve its
-            // result here, because this native call requests dontResolveAlias=false.
-            match self.target_of_alias_declaration(parent)? {
-                Some(s) if self.symbol(s)?.flags() & sf::ALIAS != 0 => Some(self.resolve_alias(s)?),
-                other => other,
-            }
+            // The meaning includes Alias: the name of a local `export { x }`
+            // resolves to the import that declares `x`, which becomes visible.
+            self.target_of_export_specifier(parent, meaning, false)?
         } else {
             None
         };

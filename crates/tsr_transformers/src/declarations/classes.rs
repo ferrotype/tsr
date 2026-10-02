@@ -1,254 +1,303 @@
-use super::transform::{Transformer, BUILDER_FLAGS, INTERNAL_FLAGS};
+//! The class transforms of `transform.go`.
+use super::{
+    transform::{
+        Transformer, DECLARATION_EMIT_INTERNAL_NODE_BUILDER_FLAGS,
+        DECLARATION_EMIT_NODE_BUILDER_FLAGS, NIL,
+    },
+    util,
+};
 use tsr_ast::{
-    modifier_flags as mf, Factory, FactoryMethods, JsString, NodeId, NodeListId, SyntaxKind as K,
+    modifier_flags as mf, node_flags as nf, FactoryMethods, JsString, NodeId, NodeListId,
+    SyntaxKind as K,
 };
 use tsr_printer::emit_resolver::DeclarationEmitResolver;
 
 impl<R: DeclarationEmitResolver> Transformer<'_, R> {
-    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformClassDeclaration
-    pub fn class_declaration(&mut self, node: NodeId) -> Result<NodeId, R::Error> {
-        let old_enclosing = self.enclosing;
-        self.enclosing = node;
-        self.tracker.error_name = self.node(node).name();
-        self.tracker.fallback.push(Some(node));
-        let result = self.class_worker(node);
-        self.tracker.fallback.pop();
-        self.enclosing = old_enclosing;
-        result
+    /// `ast.IsInJSFile(node)`.
+    pub fn is_in_js_file(&self, node: NodeId) -> bool {
+        tsr_ast::utilities::is_in_js_file(Some(&self.node(node)))
     }
-    fn class_worker(&mut self, node: NodeId) -> Result<NodeId, R::Error> {
-        let data = self
-            .node(node)
-            .data_source()
-            .as_class_declaration()
-            .unwrap()
-            .to_owned();
-        let modifiers = self.modifiers(node)?;
-        let parameters = self.type_parameters(node)?;
-        let extra = if self.output.read_source_file(self.source)?.is_js() {
-            self.collect_this_property_assignments(node)?
-        } else {
-            Vec::new()
-        };
-        let members = self.class_members(node, extra)?;
-        for clause in self.list_nodes(data.heritage_clauses) {
-            let clause_data = self
-                .node(clause)
-                .data_source()
-                .as_heritage_clause()
-                .unwrap()
-                .to_owned();
-            if clause_data.token != K::ExtendsKeyword {
-                continue;
-            }
-            let Some(base) = self.list_nodes(clause_data.types).first().copied() else {
-                continue;
-            };
-            if self.node(base).kind() != K::ExpressionWithTypeArguments {
-                continue;
-            }
-            let expression = Self::required(self.node(base).expression())?;
-            if tsr_ast::is_entity_name_expression(self.output.view(), expression)?
-                || self.node(expression).kind() == K::NullKeyword
-            {
-                continue;
-            }
-            self.inference_fallback(expression)?;
-            let mut name = data
-                .name
-                .filter(|name| {
-                    self.node(*name).kind() == K::Identifier
-                        && !self.node(*name).as_identifier().unwrap().text().is_empty()
-                })
-                .map(|name| self.node(name).as_identifier().unwrap().text().to_vec())
-                .unwrap_or_else(|| b"default".to_vec());
-            name.extend_from_slice(b"_base");
-            let new_id = self.unique_name(JsString::from_bytes(name));
-            self.tracker.selector = super::tracker::Selector::fixed(super::diagnostics::SymbolAccessibilityDiagnostic {
-                diagnostic_message: tsr_diagnostics::X_extends_clause_of_exported_class_0_has_or_is_using_private_name_1,
-                error_node: Some(base), type_name: data.name,
-            });
-            let ty = self.resolver.create_type_of_expression(
-                self.output,
-                self.emit,
-                expression,
-                node,
-                BUILDER_FLAGS,
-                INTERNAL_FLAGS,
-                &mut self.tracker,
-            )?;
-            self.flush_reports()?;
-            let statement = self.const_variable(new_id, ty, None);
-            let arguments = self.visit_list_result(self.node(base).type_argument_list())?;
-            let base =
-                self.output
-                    .update_expression_with_type_arguments(base, Some(new_id), arguments);
-            let bases = self.new_list(vec![base]);
-            let clause =
-                self.output
-                    .update_heritage_clause(clause, K::ExtendsKeyword.into(), Some(bases));
-            let retained = self.visit_list_result(data.heritage_clauses)?;
-            let mut clauses = vec![clause];
-            clauses.extend(self.list_nodes(retained));
-            let heritage = self.new_list(clauses);
-            let class = self.output.update_class_declaration(
-                node,
-                modifiers,
-                data.name,
-                parameters,
-                Some(heritage),
-                Some(members),
-            );
-            return Ok(self.syntax_list(vec![statement, class]));
-        }
-        let heritage = self.visit_list_result(data.heritage_clauses)?;
-        Ok(self.output.update_class_declaration(
-            node,
-            modifiers,
-            data.name,
-            parameters,
-            heritage,
-            Some(members),
-        ))
-    }
-    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformClassExpressionToDeclaration
-    pub fn class_expression_declaration(
-        &mut self,
+    fn class_type_parameters_and_heritage(
+        &self,
         node: NodeId,
-        name: NodeId,
-        modifiers: Option<tsr_ast::NodeListId>,
-    ) -> Result<NodeId, R::Error> {
-        let enclosing = self.enclosing;
-        self.enclosing = node;
-        let in_class = self.in_class_expression_declaration;
-        self.in_class_expression_declaration = true;
-        let result: Result<NodeId, R::Error> = (|| {
-            let extra = if self.output.read_source_file(self.source)?.is_js() {
-                self.collect_this_property_assignments(node)?
-            } else {
-                Vec::new()
-            };
-            let data = self
-                .node(node)
-                .data_source()
-                .as_class_expression()
-                .unwrap()
-                .to_owned();
-            let members = self.class_members(node, extra)?;
-            let parameters = self.type_parameters(node)?;
-            let heritage = self.visit_list_result(data.heritage_clauses)?;
-            Ok(self.output.new_class_declaration(
-                modifiers,
-                Some(name),
-                parameters,
-                heritage,
-                Some(members),
-            ))
-        })();
-        self.enclosing = enclosing;
-        self.in_class_expression_declaration = in_class;
-        result
+    ) -> (Option<NodeListId>, Option<NodeListId>) {
+        let read = self.node(node);
+        match read.kind().known() {
+            Some(K::ClassDeclaration) => {
+                let data = read.as_class_declaration().expect("class payload");
+                (data.type_parameters(), data.heritage_clauses())
+            }
+            Some(K::ClassExpression) => {
+                let data = read
+                    .as_class_expression()
+                    .expect("class expression payload");
+                (data.type_parameters(), data.heritage_clauses())
+            }
+            _ => panic!("{NIL}"),
+        }
     }
+
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.buildClassMembers
-    fn class_members(&mut self, node: NodeId, extra: Vec<NodeId>) -> Result<NodeListId, R::Error> {
-        let members = self.node(node).member_list();
-        let original = self.list_nodes(members);
-        let constructor = original.iter().copied().find(|member| {
-            self.node(*member).kind() == K::Constructor && self.node(*member).body().is_some()
-        });
-        let mut properties = Vec::new();
-        if let Some(constructor) = constructor {
-            let old = self.tracker.selector.clone();
-            for parameter in self.list_nodes(self.node(constructor).parameter_list()) {
-                if tsr_ast::utilities::get_combined_modifier_flags(self.output.view(), parameter)?
-                    & mf::PARAMETER_PROPERTY_MODIFIER
-                    == 0
-                    || self.strip_internal(parameter)?
+    fn build_class_members(
+        &mut self,
+        class_node: NodeId,
+        extra_members: Vec<NodeId>,
+    ) -> Result<NodeListId, R::Error> {
+        let ctor =
+            tsr_ast::utilities_class::get_first_constructor_with_body(self.view(), class_node)?;
+        let mut parameter_properties = Vec::new();
+        if let Some(ctor) = ctor {
+            let old_diag = self.tracker.selector.clone();
+            for param in self.list_nodes(self.node(ctor).parameter_list()) {
+                if !self.has_syntactic_modifier(param, mf::PARAMETER_PROPERTY_MODIFIER)?
+                    || self.should_strip_internal(Some(param))?
                 {
                     continue;
                 }
-                self.select_context(parameter, false)?;
-                let name = Self::required(self.node(parameter).name())?;
-                if self.node(name).kind() == K::Identifier {
-                    let modifiers = self.modifiers(parameter)?;
-                    let question = self.node(parameter).question_token(self.output.view())?;
-                    let ty = self.ensure_type(parameter, false)?;
-                    let initializer = self.ensure_initializer(parameter)?;
-                    properties.push(self.output.new_property_declaration(
+                self.set_diagnostic_context_for_node(param)?;
+                let name = self.node(param).name().expect(NIL);
+                if self.kind(name) == K::Identifier {
+                    let modifiers = self.ensure_modifiers(param)?;
+                    let question_token = self.node(param).question_token(self.view())?;
+                    let ty = self.ensure_type(param, false)?;
+                    let initializer = self.ensure_no_initializer(param)?;
+                    let updated = self.output.new_property_declaration(
                         modifiers,
                         Some(name),
-                        question,
+                        question_token,
                         ty,
                         initializer,
-                    ));
+                    );
+                    self.preserve_js_doc(updated, param);
+                    parameter_properties.push(updated);
                 } else {
-                    self.parameter_properties(name, parameter, &mut properties)?;
+                    // Pattern - this is currently an error, but we emit declarations for it somewhat correctly
+                    let elements = self.walk_binding_pattern(name, param)?;
+                    parameter_properties.extend(elements);
                 }
             }
-            self.tracker.selector = old;
+            self.tracker.selector = old_diag;
         }
-        let mut result = Vec::new();
-        if original.iter().any(|member| {
-            self.node(*member)
+
+        // When the class has at least one private identifier, create a unique constant identifier to retain the nominal typing behavior
+        // Prevents other classes with the same public members from being used in place of the current class
+        let members = self.node(class_node).member_list();
+        let private_identifier = if self.list_nodes(members).into_iter().any(|member| {
+            self.node(member)
                 .name()
-                .is_some_and(|name| self.node(name).kind() == K::PrivateIdentifier)
+                .is_some_and(|name| self.kind(name) == K::PrivateIdentifier)
         }) {
             let name = self
                 .output
                 .new_private_identifier(JsString::from_bytes(b"#private".as_slice()));
-            result.push(
+            Some(
                 self.output
                     .new_property_declaration(None, Some(name), None, None, None),
-            );
-        }
-        let indexes = self.resolver.create_late_bound_index_signatures(
+            )
+        } else {
+            None
+        };
+
+        let late_indexes = self.resolver.create_late_bound_index_signatures(
             self.output,
             self.emit,
-            node,
-            self.enclosing,
-            BUILDER_FLAGS,
-            INTERNAL_FLAGS,
+            class_node,
+            self.enclosing_declaration,
+            DECLARATION_EMIT_NODE_BUILDER_FLAGS,
+            DECLARATION_EMIT_INTERNAL_NODE_BUILDER_FLAGS,
             &mut self.tracker,
         )?;
-        self.flush_reports()?;
-        result.extend(indexes);
-        result.extend(properties);
-        result.extend(extra);
-        let visited = self.visit_list_result(members)?;
-        result.extend(self.list_nodes(visited));
-        Ok(self.new_list(result))
+        self.apply_tracker_reports()?;
+
+        let mut member_nodes = Vec::new();
+        member_nodes.extend(private_identifier);
+        member_nodes.extend(late_indexes);
+        member_nodes.extend(parameter_properties);
+        member_nodes.extend(extra_members);
+        let visit_result = self.visit_nodes(members)?;
+        member_nodes.extend(self.list_nodes(visit_result));
+        Ok(self.new_node_list(member_nodes))
     }
-    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.walkBindingPattern
-    fn parameter_properties(
-        &mut self,
-        pattern: NodeId,
-        parameter: NodeId,
-        out: &mut Vec<NodeId>,
-    ) -> Result<(), R::Error> {
-        for element in self.list_nodes(self.node(pattern).element_list()) {
-            if self.node(element).kind() == K::OmittedExpression {
-                continue;
-            }
-            let Some(name) = self.node(element).name() else {
-                continue;
-            };
-            if matches!(
-                self.node(name).kind().known(),
-                Some(K::ArrayBindingPattern | K::ObjectBindingPattern)
-            ) {
-                self.parameter_properties(name, parameter, out)?;
-            } else {
-                let modifiers = self.modifiers(parameter)?;
-                let ty = self.ensure_type(element, false)?;
-                out.push(self.output.new_property_declaration(
+
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformClassDeclaration
+    pub fn transform_class_declaration(&mut self, input: NodeId) -> Result<NodeId, R::Error> {
+        let previous_enclosing_declaration = self.enclosing_declaration;
+        self.enclosing_declaration = input;
+        self.tracker.error_name = self.node(input).name();
+        self.tracker.push_error_fallback_node(Some(input));
+        let result = self.transform_class_declaration_worker(input);
+        self.tracker.pop_error_fallback_node();
+        self.enclosing_declaration = previous_enclosing_declaration;
+        result
+    }
+    fn transform_class_declaration_worker(&mut self, input: NodeId) -> Result<NodeId, R::Error> {
+        let name = self.node(input).name();
+        let (type_parameters, heritage_clauses) = self.class_type_parameters_and_heritage(input);
+        let modifiers = self.ensure_modifiers(input)?;
+        let type_parameters = self.ensure_type_params(input, type_parameters)?;
+
+        // Collect this.x property assignments from constructors and static blocks in JS files
+        let extra_members = if self.is_in_js_file(input) {
+            self.collect_this_property_assignments(input)?
+        } else {
+            Vec::new()
+        };
+
+        let members = self.build_class_members(input, extra_members)?;
+
+        let extends_clause = util::get_effective_base_type_node(self.view(), input)?;
+
+        if let Some(extends_clause) = extends_clause {
+            let expression = self.node(extends_clause).expression().expect(NIL);
+            if !tsr_ast::is_entity_name_expression(self.view(), expression)?
+                && self.kind(expression) != K::NullKeyword
+            {
+                self.report_inference_fallback(expression)?; // Add an isolated declarations error on this extends clause
+                let mut old_id = b"default".to_vec();
+                if let Some(name) = name {
+                    if tsr_ast::node_is_present(Some(&self.node(name)))
+                        && self.kind(name) == K::Identifier
+                    {
+                        let text = self.node_text(name)?;
+                        if !text.is_empty() {
+                            old_id = text.as_bytes().to_vec();
+                        }
+                    }
+                }
+                old_id.extend_from_slice(b"_base");
+                let new_id = self.new_unique_name(&old_id);
+                self.set_fixed_diagnostic_context(
+                    tsr_diagnostics::X_extends_clause_of_exported_class_0_has_or_is_using_private_name_1,
+                    extends_clause,
+                    name,
+                );
+
+                let ty = self.resolver.create_type_of_expression(
+                    self.output,
+                    self.emit,
+                    expression,
+                    input,
+                    DECLARATION_EMIT_NODE_BUILDER_FLAGS,
+                    DECLARATION_EMIT_INTERNAL_NODE_BUILDER_FLAGS,
+                    &mut self.tracker,
+                )?;
+                self.apply_tracker_reports()?;
+                let mods = self.declare_modifier_list(true);
+                let statement =
+                    self.new_single_variable_statement(mods, new_id, ty, None, nf::CONST);
+                let parent = self.parent(extends_clause).expect(NIL);
+                let token = self
+                    .node(parent)
+                    .as_heritage_clause()
+                    .expect("heritage clause payload")
+                    .token();
+                let type_arguments = self.node(extends_clause).type_argument_list();
+                let type_arguments = self.visit_nodes(type_arguments)?;
+                let element = self.output.update_expression_with_type_arguments(
+                    extends_clause,
+                    Some(new_id),
+                    type_arguments,
+                );
+                let types = self.new_node_list(vec![element]);
+                let new_heritage_clause =
+                    self.output
+                        .update_heritage_clause(parent, token, Some(types));
+                let retained_heritage_clauses = self.visit_nodes(heritage_clauses)?; // should just be `implements`
+                let mut heritage_list = vec![new_heritage_clause];
+                heritage_list.extend(self.list_nodes(retained_heritage_clauses));
+                let heritage_clauses = self.new_node_list(heritage_list);
+
+                let class = self.output.update_class_declaration(
+                    input,
                     modifiers,
-                    Some(name),
-                    None,
-                    ty,
-                    None,
-                ));
+                    name,
+                    type_parameters,
+                    Some(heritage_clauses),
+                    Some(members),
+                );
+                return Ok(self.new_syntax_list(vec![statement, class]));
             }
         }
-        Ok(())
+
+        let heritage_clauses = self.visit_nodes(heritage_clauses)?;
+        Ok(self.output.update_class_declaration(
+            input,
+            modifiers,
+            name,
+            type_parameters,
+            heritage_clauses,
+            Some(members),
+        ))
+    }
+
+    // transformClassExpressionToDeclaration converts a class expression into a class declaration
+    // for use in CJS export declarations (e.g., exports.K = class K {} or module.exports = class Thing {}).
+    // This delegates to the shared buildClassMembers helper to stay in sync with transformClassDeclaration.
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformClassExpressionToDeclaration
+    pub fn transform_class_expression_to_declaration(
+        &mut self,
+        class_expr: NodeId,
+        class_name: NodeId,
+        modifiers: Option<NodeListId>,
+    ) -> Result<NodeId, R::Error> {
+        let previous_enclosing_declaration = self.enclosing_declaration;
+        self.enclosing_declaration = class_expr;
+        let previous_in_class_expression_declaration = self.in_class_expression_declaration;
+        self.in_class_expression_declaration = true;
+        let result = self
+            .transform_class_expression_to_declaration_worker(class_expr, class_name, modifiers);
+        self.enclosing_declaration = previous_enclosing_declaration;
+        self.in_class_expression_declaration = previous_in_class_expression_declaration;
+        result
+    }
+    fn transform_class_expression_to_declaration_worker(
+        &mut self,
+        class_expr: NodeId,
+        class_name: NodeId,
+        modifiers: Option<NodeListId>,
+    ) -> Result<NodeId, R::Error> {
+        let extra_members = if self.is_in_js_file(class_expr) {
+            self.collect_this_property_assignments(class_expr)?
+        } else {
+            Vec::new()
+        };
+        let members = self.build_class_members(class_expr, extra_members)?;
+        let (type_parameters, heritage_clauses) =
+            self.class_type_parameters_and_heritage(class_expr);
+        let type_parameters = self.ensure_type_params(class_expr, type_parameters)?;
+        let heritage_clauses = self.visit_nodes(heritage_clauses)?;
+        Ok(self.output.new_class_declaration(
+            modifiers,
+            Some(class_name),
+            type_parameters,
+            heritage_clauses,
+            Some(members),
+        ))
+    }
+
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.walkBindingPattern
+    fn walk_binding_pattern(
+        &mut self,
+        pattern: NodeId,
+        param: NodeId,
+    ) -> Result<Vec<NodeId>, R::Error> {
+        let mut elems = Vec::new();
+        for elem in self.list_nodes(self.node(pattern).element_list()) {
+            if self.kind(elem) == K::OmittedExpression {
+                continue;
+            }
+            let name = self.node(elem).name();
+            if let Some(name) = name.filter(|name| self.is_binding_pattern(*name)) {
+                elems.extend(self.walk_binding_pattern(name, param)?);
+                continue;
+            }
+            let modifiers = self.ensure_modifiers(param)?;
+            let ty = self.ensure_type(elem, false)?;
+            elems.push(self.output.new_property_declaration(
+                modifiers, name, None, /*questionOrExclamationToken*/
+                ty, None, /*initializer*/
+            ));
+        }
+        Ok(elems)
     }
 }

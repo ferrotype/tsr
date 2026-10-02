@@ -1,436 +1,604 @@
-use super::{tracker::Selector, transform::Transformer, util};
-use std::collections::{HashMap, HashSet};
+//! The CommonJS export collection of `transform.go`: `module.exports =`,
+//! `exports.x =` and `Object.defineProperty(exports, ...)` become declaration
+//! statements before the source file's statements are visited.
+use super::transform::{Transformer, NIL};
+use std::ops::ControlFlow;
 use tsr_ast::{
-    modifier_flags as mf, node_flags as nf, Factory, FactoryMethods, JsString, NodeId, NodeListId,
-    RuntimeFactory, SyntaxKind as K,
+    modifier_flags as mf, node_flags as nf, AstView, ChildVisitor, Factory, FactoryMethods,
+    JSDeclarationKind, JsString, NodeId, NodeListId, NodeSlice, RuntimeFactory, SyntaxKind as K,
 };
 use tsr_printer::emit_resolver::DeclarationEmitResolver;
 
-#[derive(Default)]
-pub(super) struct CommonJsState {
-    pub assignment: Option<NodeId>,
-    pub assignment_name: Option<NodeId>,
-    pub members: Vec<NodeId>,
-    pub witnessed: HashSet<JsString>,
-    pub expando_hosts: HashMap<NodeId, Option<NodeId>>,
-    pub expando_members: HashMap<NodeId, Vec<NodeId>>,
-    pub deferred_expando: HashMap<NodeId, Vec<NodeId>>,
+/// One step of an expression-visitor walk: entering a node, or restoring
+/// the diagnostic context its visit installed.
+enum Frame {
+    Enter(NodeId),
+    Exit(super::transform::DiagnosticContext),
 }
-pub(super) struct Context {
-    selector: Selector,
-    error_name: Option<NodeId>,
-    suppress: bool,
-}
+
 impl<R: DeclarationEmitResolver> Transformer<'_, R> {
-    pub(super) fn save_expression_context(&mut self, node: NodeId) -> Result<Context, R::Error> {
-        let context = Context {
-            selector: self.tracker.selector.clone(),
-            error_name: self.tracker.error_name,
-            suppress: self.suppress_context,
-        };
-        if util::can_produce_diagnostics(&self.node(node)) && !self.suppress_context {
-            self.select_context(node, false)?;
-        }
-        if matches!(
-            self.node(node).kind().known(),
-            Some(K::TypeLiteral | K::MappedType)
-        ) && !self.node(node).parent().is_some_and(|p| {
-            matches!(
-                self.node(p).kind().known(),
-                Some(K::TypeAliasDeclaration | K::JSTypeAliasDeclaration)
-            )
-        }) {
-            self.suppress_context = true;
-        }
-        Ok(context)
-    }
-    pub(super) fn restore_expression_context(&mut self, context: Context) {
-        self.tracker.selector = context.selector;
-        self.tracker.error_name = context.error_name;
-        self.suppress_context = context.suppress;
-    }
-    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.visitCJSExportAssignments
-    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.visitNestedExpression
-    pub fn collect_nested_exports(
+    /// The pin's `cjsExportAssignmentVisitor.VisitNode(root)` and
+    /// `expressionVisitor.VisitNode(root)`: every node of the tree, in visit
+    /// order, inside the diagnostic context its own visit installs. The
+    /// visitors return each node unchanged, so only their effects remain.
+    pub fn walk_expressions(
         &mut self,
-        source: NodeId,
-        assignments: bool,
+        root: NodeId,
+        visit: fn(&mut Self, NodeId) -> Result<(), R::Error>,
     ) -> Result<(), R::Error> {
-        enum Frame {
-            Enter(NodeId),
-            Exit(Context),
-        }
-        let common_js = self
-            .output
-            .read_source_file(source)?
-            .common_js_module_indicator()
-            .is_some();
-        let mut frames = vec![Frame::Enter(source)];
+        let mut frames = vec![Frame::Enter(root)];
         while let Some(frame) = frames.pop() {
-            let Frame::Enter(node) = frame else {
-                if let Frame::Exit(context) = frame {
-                    self.restore_expression_context(context);
-                }
-                continue;
-            };
-            let context = self.save_expression_context(node)?;
-            let kind = tsr_ast::get_assignment_declaration_kind(self.output.view(), node)?;
-            if assignments {
-                if common_js && kind == tsr_ast::JSDeclarationKind::ModuleExports {
-                    let right =
-                        Self::required(self.node(node).as_binary_expression().unwrap().right())?;
-                    let input = Self::required(self.node(node).parent())?;
-                    let result = self.export_assignment_from(input, node, right, true)?;
-                    self.cjs.assignment = Some(result);
-                    self.has_scope_marker = true;
-                    self.external_indicator = true;
-                }
-            } else {
-                match kind {
-                    tsr_ast::JSDeclarationKind::Property => self.expando_assignment(node)?,
-                    tsr_ast::JSDeclarationKind::ExportsProperty if common_js => {
-                        let left =
-                            Self::required(self.node(node).as_binary_expression().unwrap().left())?;
-                        let name = Self::required(tsr_ast::get_element_or_property_access_name(
-                            self.output.view(),
-                            left,
-                        )?)?;
-                        let name = self.preferred_export_name(name)?;
-                        if let Some(result) = self.common_js_export(node, name)? {
-                            self.cjs.members.push(result);
-                        }
-                    }
-                    tsr_ast::JSDeclarationKind::ObjectDefinePropertyExports if common_js => {
-                        let args = self.list_nodes(self.node(node).argument_list());
-                        let name = *args.get(1).ok_or(tsr_arena::Error::InvalidGraph)?;
-                        let name = self.preferred_export_name(name)?;
-                        if let Some(result) = self.common_js_export(node, name)? {
-                            self.cjs.members.push(result);
-                        }
-                    }
-                    _ => {}
+            match frame {
+                Frame::Exit(context) => self.cleanup_diagnostic_context(context),
+                Frame::Enter(node) => {
+                    let (_, context) = self.setup_diagnostic_context(node)?;
+                    visit(self, node)?;
+                    frames.push(Frame::Exit(context));
+                    let children = self.children_of(node)?;
+                    frames.extend(children.into_iter().rev().map(Frame::Enter));
                 }
             }
-            frames.push(Frame::Exit(context));
-            frames.extend(
-                self.assignment_children(node)?
-                    .into_iter()
-                    .rev()
-                    .map(Frame::Enter),
-            );
         }
         Ok(())
     }
-    // The preferred output name retains its original parent for the native
-    // reference lookup. Its lookup itself runs through the checker-owned proxy.
-    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.getNameExpressionPreferringIdentifier
-    fn preferred_export_name(&mut self, mut name: NodeId) -> Result<NodeId, R::Error> {
-        if self.node(name).kind() == K::NumericLiteral {
-            let text = self.output.view().node_text(name)?.into_js_string();
-            name = self.output.new_string_literal(text, 0);
+
+    /// The children `VisitEachChild` visits, in order.
+    pub fn children_of(&self, node: NodeId) -> Result<Vec<NodeId>, R::Error> {
+        let mut visitor = Children {
+            view: self.view(),
+            nodes: Vec::new(),
+            error: None,
+        };
+        let _ = self.node(node).for_each_child(&mut visitor);
+        if let Some(error) = visitor.error {
+            return Err(error.into());
+        }
+        Ok(visitor.nodes)
+    }
+
+    fn has_common_js_module_indicator(&self) -> Result<bool, R::Error> {
+        Ok(self
+            .output
+            .read_source_file(self.current_source_file)?
+            .common_js_module_indicator()
+            .is_some())
+    }
+
+    /// The switch of the pin's `visitCJSExportAssignments`; `walk_expressions`
+    /// is its recursion.
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.visitCJSExportAssignments
+    pub fn visit_cjs_export_assignments(&mut self, expression: NodeId) -> Result<(), R::Error> {
+        if tsr_ast::get_assignment_declaration_kind(self.view(), expression)?
+            == JSDeclarationKind::ModuleExports
+            && self.has_common_js_module_indicator()?
+        {
+            let parent = self.parent(expression).expect(NIL);
+            let right = self
+                .node(expression)
+                .as_binary_expression()
+                .expect("binary expression payload")
+                .right()
+                .expect(NIL);
+            let result = self.transform_export_assignment(
+                parent, expression, right, true, /*isExportEquals*/
+            )?;
+            self.cjs_export_assignment = Some(result);
+            self.result_has_scope_marker = true;
+            self.result_has_external_module_indicator = true;
+        }
+        Ok(())
+    }
+
+    /// The switch of the pin's `visitNestedExpression`; `walk_expressions`
+    /// is its recursion.
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.visitNestedExpression
+    pub fn visit_nested_expression(&mut self, expression: NodeId) -> Result<(), R::Error> {
+        match tsr_ast::get_assignment_declaration_kind(self.view(), expression)? {
+            JSDeclarationKind::Property => self.transform_expando_assignment(expression)?,
+            JSDeclarationKind::ExportsProperty if self.has_common_js_module_indicator()? => {
+                let left = self
+                    .node(expression)
+                    .as_binary_expression()
+                    .expect("binary expression payload")
+                    .left()
+                    .expect(NIL);
+                let name =
+                    tsr_ast::get_element_or_property_access_name(self.view(), left)?.expect(NIL);
+                let name = self.get_name_expression_preferring_identifier(name)?;
+                if let Some(result) = self.transform_common_js_export(expression, name)? {
+                    self.cjs_export_members.push(result);
+                }
+            }
+            JSDeclarationKind::ObjectDefinePropertyExports
+                if self.has_common_js_module_indicator()? =>
+            {
+                let arguments = self.list_nodes(self.node(expression).argument_list());
+                let name = *arguments
+                    .get(1)
+                    .expect("runtime error: index out of range [1] with length 1");
+                let name = self.get_name_expression_preferring_identifier(name)?;
+                if let Some(result) = self.transform_common_js_export(expression, name)? {
+                    self.cjs_export_members.push(result);
+                }
+            }
+            _ => {}
+        }
+        Ok(())
+    }
+
+    /// The pin's `getNameExpressionPreferringIdentifier`. Its port marker sits
+    /// on the checker half of the bridge (`emit_referenced_name_declaration`),
+    /// which answers the reference lookup for the identifier made here.
+    pub fn get_name_expression_preferring_identifier(
+        &mut self,
+        mut name_expr: NodeId,
+    ) -> Result<NodeId, R::Error> {
+        if self.kind(name_expr) == K::NumericLiteral {
+            // Numeric property names are string properties in JS; convert to string literal
+            let text = self.node_text(name_expr)?;
+            name_expr = self.output.new_string_literal(text, 0);
         }
         if matches!(
-            self.node(name).kind().known(),
-            Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
+            self.kind(name_expr),
+            K::StringLiteral | K::NoSubstitutionTemplateLiteral
         ) {
-            let text = self.output.view().node_text(name)?.into_js_string();
+            let text = self.node_text(name_expr)?;
             if tsr_scanner::is_identifier_text(text.as_bytes(), tsr_core::LanguageVariant::STANDARD)
             {
-                let keyword = tsr_scanner::string_to_token(text.as_bytes());
-                if matches!(keyword, K::Unknown | K::DefaultKeyword) {
-                    let parent = self.node(name).parent();
-                    let result = self.output.new_identifier(text);
+                let result = self.output.new_identifier(text.clone()); // prefer non-string literal names where possible
+                let kw_kind = tsr_scanner::string_to_token(text.as_bytes());
+                // keep keywords as strings, except `default`, which has special reformulations in the transformer
+                if kw_kind == K::Unknown || kw_kind == K::DefaultKeyword {
+                    // fake this into a parse tree node so the reference resolver resolves the node via `resolveName`
+                    let parent = self.parent(name_expr);
                     self.output.set_node_parent(result, parent);
-                    self.output
-                        .set_node_flags(result, self.node(result).flags() & !nf::SYNTHESIZED);
+                    let flags = self.node(result).flags() & !nf::SYNTHESIZED;
+                    self.output.set_node_flags(result, flags);
+                    // intentionally leave Loc unset so the string isn't used as the text source of the identifier
                     return Ok(result);
                 }
             }
         }
-        Ok(name)
+        Ok(name_expr)
     }
-    pub fn modifier_list(&mut self, flags: u32) -> Option<NodeListId> {
-        let nodes =
-            tsr_ast::utilities_middle::create_modifiers_from_modifier_flags(flags, |kind| {
-                Some(self.output.new_modifier(kind))
-            })?;
-        let nodes = self.output.alloc_nodes(nodes);
-        Some(self.output.new_modifier_list(nodes))
-    }
-    pub fn named_export(&mut self, local: Option<NodeId>, name: NodeId) -> NodeId {
-        let specifier = self.output.new_export_specifier(false, local, Some(name));
-        let list = self.new_list(vec![specifier]);
-        let named = self.output.new_named_exports(Some(list));
-        self.output
-            .new_export_declaration(None, false, Some(named), None, None)
-    }
+
     // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformBinaryExpressionToExportDeclaration
-    pub fn binary_export(&mut self, node: NodeId, name: NodeId) -> Result<NodeId, R::Error> {
-        let right = Self::required(self.node(node).as_binary_expression().unwrap().right())?;
-        self.entity_visible(right)?;
-        let property = if self.node(name).kind() == K::Identifier
-            && self.output.view().node_text(right)?.as_bytes()
-                == self.output.view().node_text(name)?.as_bytes()
-        {
-            None
-        } else {
-            Some(right)
-        };
-        Ok(self.named_export(property, name))
-    }
-    fn common_js_export(&mut self, node: NodeId, name: NodeId) -> Result<Option<NodeId>, R::Error> {
-        let result = self.common_js_export_worker(node, name)?;
-        let Some(result) = result else {
-            return Ok(None);
-        };
-        let Some(name) = self.cjs.assignment_name else {
-            return Ok(Some(result));
-        };
-        let mut members = Vec::new();
-        self.append_flat(result, &mut members);
-        for member in &mut members {
-            *member = self.strip_declare(*member)?;
-        }
-        let list = self.new_list(members);
-        let block = self.output.new_module_block(Some(list));
-        let modifiers = self.declare_modifiers();
-        Ok(Some(self.output.new_module_declaration(
-            modifiers,
-            K::NamespaceKeyword.into(),
-            Some(name),
-            None,
-            Some(block),
-        )))
-    }
-    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformCommonJSExportWorker
-    fn common_js_export_worker(
+    pub fn transform_binary_expression_to_export_declaration(
         &mut self,
-        node: NodeId,
+        input: NodeId,
+        name: NodeId,
+    ) -> Result<NodeId, R::Error> {
+        let mut property_name = self
+            .node(input)
+            .as_binary_expression()
+            .expect("binary expression payload")
+            .right();
+
+        // track alias target so referenced declarations are included in the output
+        let result = self
+            .resolver
+            .entity_name_visible(property_name.expect(NIL), self.enclosing_declaration)?;
+        self.handle_symbol_accessibility_error(result)?;
+
+        if self.kind(name) == K::Identifier
+            && self.node_text(property_name.expect(NIL))? == self.node_text(name)?
+        {
+            property_name = None;
+        }
+
+        Ok(self.new_named_export_declaration(property_name, name))
+    }
+
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformCommonJSExport
+    fn transform_common_js_export(
+        &mut self,
+        input: NodeId,
         name: NodeId,
     ) -> Result<Option<NodeId>, R::Error> {
-        let name_text = if matches!(
-            self.node(name).kind().known(),
-            Some(K::Identifier | K::StringLiteral)
-        ) {
-            self.output.view().node_text(name)?.into_js_string()
-        } else {
-            JsString::default()
-        };
-        if !name_text.is_empty() && self.cjs.witnessed.contains(&name_text) {
+        let Some(res) = self.transform_common_js_export_worker(input, name)? else {
             return Ok(None);
-        }
-        self.cjs.witnessed.insert(name_text.clone());
-        self.external_indicator = true;
-        self.has_scope_marker = true;
-        if self.node(node).kind() == K::BinaryExpression {
-            let right = Self::required(self.node(node).as_binary_expression().unwrap().right())?;
-            let parent = self.node(node).parent();
-            let alias = self.node(right).kind() == K::Identifier
-                && if let Some(symbol) = self.resolver.bound_symbol_of_declaration(node)? {
-                    self.resolver.symbol_declarations(symbol)?.len() == 1
-                } else {
-                    false
-                };
-            if alias
-                && parent.is_some_and(|p| {
-                    self.node(p).kind() == K::ExpressionStatement
-                        && self
-                            .node(p)
-                            .parent()
-                            .is_some_and(|p| self.node(p).kind() == K::SourceFile)
-                })
-            {
-                return self.binary_export(node, name).map(Some);
-            }
-            let right = util::unwrap_parenthesized_expression(self.output.view(), right)?;
-            if self.node(right).kind() == K::ClassExpression {
-                return self.common_js_class(node, name, right).map(Some);
-            }
-        }
-        let is_default =
-            self.node(name).kind() == K::Identifier && name_text.as_bytes() == b"default";
-        if self.node(name).kind() == K::Identifier && !is_default {
-            let referenced = if name.arena() == self.output.id().arena() {
-                match self.node(name).parent() {
-                    Some(parent) => self
-                        .resolver
-                        .referenced_name_declaration(name_text, parent)?,
-                    None => None,
+        };
+        Ok(Some(self.wrap_in_cjs_export_namespace(res)))
+    }
+
+    /// The pin's `GetReferencedValueDeclaration(name)` for an export name: a
+    /// name made by `getNameExpressionPreferringIdentifier` is answered from
+    /// its text and its parse-tree parent.
+    fn referenced_value_declaration_of_name(
+        &mut self,
+        name: NodeId,
+    ) -> Result<Option<NodeId>, R::Error> {
+        if name.arena() == self.output.id().arena() {
+            return match self.parent(name) {
+                Some(parent) => {
+                    let text = self.node_text(name)?;
+                    self.resolver.referenced_name_declaration(text, parent)
                 }
-            } else {
-                self.resolver.referenced_value_declaration(name)?
+                None => Ok(None),
             };
-            if referenced.is_none() || referenced == Some(node) {
-                self.tracker.fallback.push(Some(node));
-                let result = self.ensure_type(node, false);
-                self.tracker.fallback.pop();
-                let ty = result?;
-                let declaration = self
+        }
+        self.resolver.referenced_value_declaration(name)
+    }
+
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.transformCommonJSExportWorker
+    #[allow(
+        clippy::too_many_lines,
+        reason = "Keep the pinned branch order of transformCommonJSExportWorker in one function"
+    )]
+    fn transform_common_js_export_worker(
+        &mut self,
+        input: NodeId,
+        name: NodeId,
+    ) -> Result<Option<NodeId>, R::Error> {
+        let mut name_text = JsString::default();
+        if matches!(self.kind(name), K::Identifier | K::StringLiteral) {
+            name_text = self.node_text(name)?;
+        }
+        if self.witnessed_cjs_exports.contains(&name_text) && !name_text.is_empty() {
+            return Ok(None); // Already emitted this export name
+        }
+        self.witnessed_cjs_exports.insert(name_text);
+        self.result_has_external_module_indicator = true;
+        self.result_has_scope_marker = true;
+        // only transform cjs exports to shorthand at the top-level of a source file, otherwise we uniformly emit nested exports with a type annotation
+        if self.is_common_js_alias_export(input)? {
+            let parent = self.parent(input).expect(NIL);
+            if self.kind(parent) == K::ExpressionStatement
+                && self.parent_kind(parent) == K::SourceFile
+            {
+                // export { name }
+                // export { source as name }
+                return self
+                    .transform_binary_expression_to_export_declaration(input, name)
+                    .map(Some);
+            }
+        }
+
+        // Check if the RHS is a class expression - emit as a class declaration instead of a typed variable
+        if self.kind(input) == K::BinaryExpression {
+            let right = self
+                .node(input)
+                .as_binary_expression()
+                .expect("binary expression payload")
+                .right()
+                .expect(NIL);
+            let rhs = super::util::unwrap_parenthesized_expression(self.view(), right)?;
+            if self.kind(rhs) == K::ClassExpression {
+                let class_expr_name = self.node(rhs).name();
+                let class_expr_text = match class_expr_name {
+                    Some(class_expr_name) => self.node_text(class_expr_name)?,
+                    None => JsString::default(),
+                };
+                let has_expr_name = class_expr_name.is_some() && !class_expr_text.is_empty();
+
+                if has_expr_name {
+                    // Set up TrackSymbol watch to detect if the class expression's own
+                    // symbol is referenced during member type serialization.
+                    self.tracker.watched_class_symbol =
+                        self.resolver.bound_symbol_of_declaration(rhs)?;
+                    self.tracker.class_symbol_tracked = false;
+                    let result = self.transform_named_class_expression_export(
+                        input,
+                        name,
+                        rhs,
+                        &class_expr_text,
+                    );
+                    self.tracker.watched_class_symbol = None;
+                    self.tracker.class_symbol_tracked = false;
+                    return result.map(Some);
+                }
+                let mut mods = vec![self.new_modifier(K::ExportKeyword)];
+                if self.needs_declare {
+                    mods.push(self.new_modifier(K::DeclareKeyword));
+                }
+                let class_name = if self.kind(name) == K::Identifier {
+                    name
+                } else {
+                    self.new_unique_name(b"_class")
+                };
+                let mods = self.new_modifier_list(mods);
+                let class_decl =
+                    self.transform_class_expression_to_declaration(rhs, class_name, Some(mods))?;
+                self.preserve_js_doc(class_decl, input);
+                if self.kind(name) != K::Identifier {
+                    // Non-identifier name: emit class declaration + named export
+                    let export_decl = self.new_named_export_declaration(Some(class_name), name);
+                    self.remove_all_comments(export_decl);
+                    return Ok(Some(self.new_syntax_list(vec![class_decl, export_decl])));
+                }
+                return Ok(Some(class_decl));
+            }
+        }
+
+        if self.kind(name) == K::Identifier {
+            if self.node_text(name)?.as_bytes() == b"default" {
+                // const _default: Type; export default _default;
+                let new_id = self.new_unique_name(b"_default");
+                self.set_fixed_diagnostic_context(
+                    tsr_diagnostics::Default_export_of_the_module_has_or_is_using_private_name_0,
+                    input,
+                    None,
+                );
+                self.tracker.push_error_fallback_node(Some(input));
+                let type_ = self.ensure_type(input, false)?;
+                let var_decl =
+                    self.output
+                        .new_variable_declaration(Some(new_id), None, type_, None);
+                self.tracker.pop_error_fallback_node();
+                let mod_list = self.declare_modifier_list(false);
+                let declarations = self.new_node_list(vec![var_decl]);
+                let declaration_list = self
                     .output
-                    .new_variable_declaration(Some(name), None, ty, None);
-                let declarations = self.new_list(vec![declaration]);
-                let list = self
+                    .new_variable_declaration_list(Some(declarations), nf::CONST);
+                let statement = self
                     .output
-                    .new_variable_declaration_list(Some(declarations), 0);
-                let modifiers = self
-                    .modifier_list(mf::EXPORT | if self.needs_declare { mf::AMBIENT } else { 0 });
+                    .new_variable_statement(mod_list, Some(declaration_list));
+
+                let modifiers = self.node(input).modifiers();
+                let assignment =
+                    self.output
+                        .new_export_assignment(modifiers, false, None, Some(new_id));
+                // Remove comments from the export declaration and copy them onto the synthetic _default declaration
+                self.preserve_js_doc(statement, input);
+                self.remove_all_comments(assignment);
+                return Ok(Some(self.new_syntax_list(vec![statement, assignment])));
+            }
+            let referenced = self.referenced_value_declaration_of_name(name)?;
+            if referenced == Some(input)
+                || self.referenced_value_declaration_of_name(name)?.is_none()
+            {
+                // only inline to a export var if the `name` lookup points at this assignment or nothing - if it points at something else, we must use a temp name
+                // export var name: Type
+                self.tracker.push_error_fallback_node(Some(input));
+                let type_ = self.ensure_type(input, false)?;
+                let var_decl = self
+                    .output
+                    .new_variable_declaration(Some(name), None, type_, None);
+                self.tracker.pop_error_fallback_node();
+                let mut mods = vec![self.new_modifier(K::ExportKeyword)];
+                if self.needs_declare {
+                    mods.push(self.new_modifier(K::DeclareKeyword));
+                }
+                let mod_list = self.new_modifier_list(mods);
+                let declarations = self.new_node_list(vec![var_decl]);
+                let declaration_list = self
+                    .output
+                    .new_variable_declaration_list(Some(declarations), nf::NONE);
                 return Ok(Some(
-                    self.output.new_variable_statement(modifiers, Some(list)),
+                    self.output
+                        .new_variable_statement(Some(mod_list), Some(declaration_list)),
                 ));
             }
         }
-        let local = self.unique_name(JsString::from_bytes(if is_default {
-            b"_default".as_slice()
-        } else {
-            b"_exported".as_slice()
-        }));
-        self.tracker.selector =
-            Selector::fixed(super::diagnostics::SymbolAccessibilityDiagnostic {
-                diagnostic_message:
-                    tsr_diagnostics::Default_export_of_the_module_has_or_is_using_private_name_0,
-                error_node: Some(node),
-                type_name: None,
-            });
-        self.tracker.fallback.push(Some(node));
-        let result = self.ensure_type(node, false);
-        self.tracker.fallback.pop();
-        let ty = result?;
-        let declaration = self.const_variable(local, ty, None);
-        let assignment = if is_default {
-            self.output
-                .new_export_assignment(self.node(node).modifiers(), false, None, Some(local))
-        } else {
-            self.named_export(Some(local), name)
-        };
-        self.emit
-            .assign_comment_range(self.output, declaration, node);
-        self.emit
-            .add_emit_flags(assignment, tsr_printer::emit_flags::NO_COMMENTS);
-        Ok(Some(self.syntax_list(vec![declaration, assignment])))
+        // const _exported: Type; export {_exported as "name"};
+        let new_id = self.new_unique_name(b"_exported");
+        self.set_fixed_diagnostic_context(
+            tsr_diagnostics::Default_export_of_the_module_has_or_is_using_private_name_0,
+            input,
+            None,
+        );
+        self.tracker.push_error_fallback_node(Some(input));
+        let type_ = self.ensure_type(input, false)?;
+        let var_decl = self
+            .output
+            .new_variable_declaration(Some(new_id), None, type_, None);
+        self.tracker.pop_error_fallback_node();
+        let mod_list = self.declare_modifier_list(false);
+        let declarations = self.new_node_list(vec![var_decl]);
+        let declaration_list = self
+            .output
+            .new_variable_declaration_list(Some(declarations), nf::CONST);
+        let statement = self
+            .output
+            .new_variable_statement(mod_list, Some(declaration_list));
+
+        let assignment = self.new_named_export_declaration(Some(new_id), name);
+        // Remove comments from the export declaration and copy them onto the synthetic _default declaration
+        self.preserve_js_doc(statement, input);
+        self.remove_all_comments(assignment);
+        Ok(Some(self.new_syntax_list(vec![statement, assignment])))
     }
-    fn common_js_class(
+
+    /// The named class expression arm of `transformCommonJSExportWorker`, run
+    /// while the tracker watches the class symbol.
+    fn transform_named_class_expression_export(
         &mut self,
-        node: NodeId,
+        input: NodeId,
         name: NodeId,
-        class: NodeId,
+        rhs: NodeId,
+        class_expr_text: &JsString,
     ) -> Result<NodeId, R::Error> {
-        let original_name = self.node(class).name();
-        let name_text = original_name
-            .map(|name| {
-                self.output
-                    .view()
-                    .node_text(name)
-                    .map(tsr_ast::NodeText::into_js_string)
-            })
-            .transpose()?
-            .filter(|name| !name.is_empty());
-        if let Some(text) = name_text {
-            self.tracker.watched_class = self.resolver.bound_symbol_of_declaration(class)?;
-            self.tracker.class_tracked = false;
-            let result = (|| {
-                let class_name = self.output.new_identifier(text.clone());
-                let modifiers = self.modifier_list(mf::EXPORT);
-                let declaration =
-                    self.class_expression_declaration(class, class_name, modifiers)?;
-                self.emit
-                    .assign_comment_range(self.output, declaration, node);
-                if self.node(name).kind() != K::Identifier
-                    || self.output.view().node_text(name)?.as_bytes() != text.as_bytes()
-                    || self.tracker.class_tracked
-                {
-                    let namespace = self.unique_name(JsString::from_bytes(b"_ns".as_slice()));
-                    let modifiers = self.declare_modifiers();
-                    let statements = self.new_list(vec![declaration]);
-                    let body = self.output.new_module_block(Some(statements));
-                    let namespace_declaration = self.output.new_module_declaration(
-                        modifiers,
-                        K::NamespaceKeyword.into(),
-                        Some(namespace),
-                        None,
-                        Some(body),
-                    );
-                    let alias_base = if self.node(name).kind() == K::Identifier {
-                        let mut bytes = vec![b'_'];
-                        bytes.extend_from_slice(self.output.view().node_text(name)?.as_bytes());
-                        if tsr_scanner::is_identifier_text(
-                            &bytes,
-                            tsr_core::LanguageVariant::STANDARD,
-                        ) {
-                            bytes
-                        } else {
-                            b"_exported".to_vec()
-                        }
-                    } else {
-                        b"_exported".to_vec()
-                    };
-                    let alias = self.unique_name(JsString::from_bytes(alias_base));
-                    let qualified = self
-                        .output
-                        .new_qualified_name(Some(namespace), Some(class_name));
-                    let import = self.output.new_import_equals_declaration(
-                        None,
-                        false,
-                        Some(alias),
-                        Some(qualified),
-                    );
-                    let export = self.named_export(Some(alias), name);
-                    self.emit
-                        .add_emit_flags(export, tsr_printer::emit_flags::NO_COMMENTS);
-                    Ok(self.syntax_list(vec![namespace_declaration, import, export]))
-                } else {
-                    let data = self
-                        .node(declaration)
-                        .data_source()
-                        .as_class_declaration()
-                        .unwrap()
-                        .to_owned();
-                    let modifiers = self.modifier_list(
-                        mf::EXPORT | if self.needs_declare { mf::AMBIENT } else { 0 },
-                    );
-                    Ok(self.output.update_class_declaration(
-                        declaration,
-                        modifiers,
-                        data.name,
-                        data.type_parameters,
-                        data.heritage_clauses,
-                        data.members,
-                    ))
+        // Serialize class members using the class expression name, which
+        // triggers TrackSymbol for any self-referential member types.
+        let class_name = self.output.new_identifier(class_expr_text.clone());
+        let class_mods = vec![self.new_modifier(K::ExportKeyword)];
+        let class_mods = self.new_modifier_list(class_mods);
+        let class_decl =
+            self.transform_class_expression_to_declaration(rhs, class_name, Some(class_mods))?;
+        self.preserve_js_doc(class_decl, input);
+
+        // Determine if namespace isolation is needed:
+        // - The class expression name differs from the export name, OR
+        // - The class's own symbol was used in a member's serialized type
+        let names_differ =
+            self.kind(name) != K::Identifier || *class_expr_text != self.node_text(name)?;
+        let needs_isolation = names_differ || self.tracker.class_symbol_tracked;
+
+        if needs_isolation {
+            let ns_name = self.new_unique_name(b"_ns");
+            let ns_mods = self.declare_modifier_list(false);
+            let statements = self.new_node_list(vec![class_decl]);
+            let body = self.output.new_module_block(Some(statements));
+            let ns_decl = self.output.new_module_declaration(
+                ns_mods,
+                K::NamespaceKeyword.into(),
+                Some(ns_name),
+                None,
+                Some(body),
+            );
+
+            let mut alias_base = b"_exported".to_vec();
+            let name_text = self.node_text(name)?;
+            let mut underscored = b"_".to_vec();
+            underscored.extend_from_slice(name_text.as_bytes());
+            if self.kind(name) == K::Identifier
+                && tsr_scanner::is_identifier_text(
+                    &underscored,
+                    tsr_core::LanguageVariant::STANDARD,
+                )
+            {
+                alias_base = underscored;
+            }
+            let import_alias = self.new_unique_name(&alias_base);
+            let qualified_name = self
+                .output
+                .new_qualified_name(Some(ns_name), Some(class_name));
+            let import_decl = self.output.new_import_equals_declaration(
+                None,
+                false,
+                Some(import_alias),
+                Some(qualified_name),
+            );
+
+            let export_decl = self.new_named_export_declaration(Some(import_alias), name);
+            self.remove_all_comments(export_decl);
+
+            return Ok(self.new_syntax_list(vec![ns_decl, import_decl, export_decl]));
+        }
+
+        // No isolation needed: names match and no self-references.
+        // Update modifiers to include declare if needed.
+        let mut mods = vec![self.new_modifier(K::ExportKeyword)];
+        if self.needs_declare {
+            mods.push(self.new_modifier(K::DeclareKeyword));
+        }
+        let mods = self.new_modifier_list(mods);
+        let (class_name, type_parameters, heritage_clauses, members) = {
+            let read = self.node(class_decl);
+            let data = read.as_class_declaration().expect("class payload");
+            (
+                read.name(),
+                data.type_parameters(),
+                data.heritage_clauses(),
+                data.members(),
+            )
+        };
+        Ok(self.output.update_class_declaration(
+            class_decl,
+            Some(mods),
+            class_name,
+            type_parameters,
+            heritage_clauses,
+            members,
+        ))
+    }
+
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.wrapInCJSExportNamespace
+    fn wrap_in_cjs_export_namespace(&mut self, content: NodeId) -> NodeId {
+        let Some(ns_name) = self.cjs_export_assignment_name else {
+            return content;
+        };
+        // Reuse the same name node so unique names resolve consistently with the class/export
+        let members = self.node_or_syntax_list_children(content);
+        let ns_mods = self.declare_modifier_list(false);
+        let mut stripped = Vec::with_capacity(members.len());
+        for member in members {
+            if let Some(member) = self.strip_declare_modifiers(Some(member)) {
+                stripped.push(member);
+            }
+        }
+        let statements = self.new_node_list(stripped);
+        let body = self.output.new_module_block(Some(statements));
+        self.output.new_module_declaration(
+            ns_mods,
+            K::NamespaceKeyword.into(),
+            Some(ns_name),
+            None,
+            Some(body),
+        )
+    }
+
+    // port: tsc/internal/transformers/declarations/transform.go:isCommonJSAliasExport
+    fn is_common_js_alias_export(&mut self, node: NodeId) -> Result<bool, R::Error> {
+        if self.kind(node) == K::BinaryExpression {
+            let right = self
+                .node(node)
+                .as_binary_expression()
+                .expect("binary expression payload")
+                .right()
+                .expect(NIL);
+            if self.kind(right) == K::Identifier {
+                if let Some(symbol) = self.resolver.bound_symbol_of_declaration(node)? {
+                    if self.resolver.symbol_declarations(symbol)?.len() == 1 {
+                        return Ok(true);
+                    }
                 }
-            })();
-            self.tracker.watched_class = None;
-            self.tracker.class_tracked = false;
-            result
-        } else {
-            let identifier = self.node(name).kind() == K::Identifier;
-            let class_name = if identifier {
-                name
-            } else {
-                self.unique_name(JsString::from_bytes(b"_class".as_slice()))
-            };
-            let modifiers =
-                self.modifier_list(mf::EXPORT | if self.needs_declare { mf::AMBIENT } else { 0 });
-            let declaration = self.class_expression_declaration(class, class_name, modifiers)?;
-            self.emit
-                .assign_comment_range(self.output, declaration, node);
-            if identifier {
-                Ok(declaration)
-            } else {
-                let export = self.named_export(Some(class_name), name);
-                self.emit
-                    .add_emit_flags(export, tsr_printer::emit_flags::NO_COMMENTS);
-                Ok(self.syntax_list(vec![declaration, export]))
+            }
+        }
+        Ok(false)
+    }
+
+    // port: tsc/internal/transformers/declarations/transform.go:DeclarationTransformer.stripDeclareModifiers
+    fn strip_declare_modifiers(&mut self, node: Option<NodeId>) -> Option<NodeId> {
+        let node = node?;
+        if let Some(mods) = self.node(node).modifiers() {
+            let flags = self.output.read_list(mods).modifier_flags();
+            if flags & mf::AMBIENT != 0 {
+                let filtered: Vec<_> = self
+                    .list_nodes(Some(mods))
+                    .into_iter()
+                    .filter(|modifier| is_not_declare_modifier(&self.node(*modifier)))
+                    .collect();
+                let list = self.new_modifier_list(filtered);
+                Factory::node_mut(&mut *self.output, node).set_modifiers(Some(list));
+            }
+        }
+        Some(node) // no need to recur into children, only strip at top-level
+    }
+
+    /// `[export]`-style modifier list from flags
+    /// (`NewModifierList(CreateModifiersFromModifierFlags(flags, NewModifier))`).
+    pub fn modifier_list_from_flags(&mut self, flags: u32) -> NodeListId {
+        let modifiers = self.create_modifiers_from_modifier_flags(flags);
+        self.new_modifier_list(modifiers)
+    }
+}
+
+// port: tsc/internal/transformers/declarations/transform.go:isNotDeclareModifier
+fn is_not_declare_modifier(modifier: &impl tsr_ast::NodeAccess) -> bool {
+    modifier.kind() != K::DeclareKeyword
+}
+
+/// Collects the children of one node, as `VisitEachChild` visits them.
+struct Children<'a> {
+    view: AstView<'a>,
+    nodes: Vec<NodeId>,
+    error: Option<tsr_arena::Error>,
+}
+impl ChildVisitor for Children<'_> {
+    fn visit_node(&mut self, node: NodeId) -> ControlFlow<()> {
+        self.nodes.push(node);
+        ControlFlow::Continue(())
+    }
+    fn visit_list(&mut self, list: NodeListId) -> ControlFlow<()> {
+        match self.view.list(list) {
+            Ok(list) => self.visit_node_slice(list.nodes()),
+            Err(error) => {
+                self.error = Some(error);
+                ControlFlow::Break(())
             }
         }
     }
-    fn strip_declare(&mut self, node: NodeId) -> Result<NodeId, R::Error> {
-        let Some(modifiers) = self.node(node).modifiers() else {
-            return Ok(node);
-        };
-        let flags = self.output.read_list(modifiers).modifier_flags();
-        if flags & mf::AMBIENT == 0 {
-            return Ok(node);
+    fn visit_node_slice(&mut self, nodes: NodeSlice) -> ControlFlow<()> {
+        match self.view.node_slice(nodes) {
+            Ok(nodes) => {
+                self.nodes.extend(nodes.iter().flatten());
+                ControlFlow::Continue(())
+            }
+            Err(error) => {
+                self.error = Some(error);
+                ControlFlow::Break(())
+            }
         }
-        let modifiers = self.modifier_list(flags & !mf::AMBIENT);
-        self.replace_top_level_modifiers(node, modifiers)
     }
 }

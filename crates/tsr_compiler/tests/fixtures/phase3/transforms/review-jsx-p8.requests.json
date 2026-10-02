@@ -1,0 +1,300 @@
+{
+ "cases": [
+  {
+   "id": "rj-chain-pragma-frag",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n/** @jsx h.x */\n/** @jsxFrag F.y */\ndeclare var h: any, F: any;\ninterface I {}\nexport const a = <><b x={1 as any} /></>;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "jsx"
+    ],
+    [
+     "importelision",
+     "jsx"
+    ],
+    [
+     "typeeraser",
+     "importelision",
+     "jsx"
+    ],
+    [
+     "usestrict",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "rj-chain-options",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @jsxFactory: h\n// @jsxFragmentFactory: Frag\ndeclare var h: any, Frag: any;\ntype T = 1;\nexport const a = <><i /></>;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "jsx"
+    ],
+    [
+     "importelision",
+     "jsx"
+    ],
+    [
+     "typeeraser",
+     "importelision",
+     "jsx"
+    ],
+    [
+     "usestrict",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "rj-chain-pragma-no-frag",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n/** @jsx h */\ndeclare var h: any;\nlet t: number = 1;\nexport const a = <><i /></>;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "jsx"
+    ],
+    [
+     "importelision",
+     "jsx"
+    ],
+    [
+     "typeeraser",
+     "importelision",
+     "jsx"
+    ],
+    [
+     "usestrict",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "rj-chain-react-namespace",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @reactNamespace: R\ndeclare var R: any;\nlet t: number = 1;\nexport const a = <><i /></>;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "jsx"
+    ],
+    [
+     "importelision",
+     "jsx"
+    ],
+    [
+     "typeeraser",
+     "importelision",
+     "jsx"
+    ],
+    [
+     "usestrict",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "rj-chain-namespace-container",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\nnamespace M { export var React: any; let q: number = 1; export var x = <><i /></>; }\nnamespace P { export var h: any; }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "jsx"
+    ],
+    [
+     "importelision",
+     "jsx"
+    ],
+    [
+     "typeeraser",
+     "importelision",
+     "jsx"
+    ],
+    [
+     "usestrict",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "rj-chain-namespace-container-pragma",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n/** @jsx h */\nnamespace M { export var h: any; let q: number = 1; export var x = <><i /></>; }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "jsx"
+    ],
+    [
+     "importelision",
+     "jsx"
+    ],
+    [
+     "typeeraser",
+     "importelision",
+     "jsx"
+    ],
+    [
+     "usestrict",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "rj-chain-invalid-pragma",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n/** @jsx 1 */\n/** @jsxFrag 2 */\ndeclare var React: any;\nlet q: number = 1;\nexport const x = <><i /></>;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "jsx"
+    ],
+    [
+     "importelision",
+     "jsx"
+    ],
+    [
+     "typeeraser",
+     "importelision",
+     "jsx"
+    ],
+    [
+     "usestrict",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "rj-chain-import-react",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @filename: r.ts\nexport const React: any = 1;\n// @filename: probe.tsx\nimport { React } from './r';\nlet q: number = 1;\nexport const x = <><i /></>;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "jsx"
+    ],
+    [
+     "importelision",
+     "jsx"
+    ],
+    [
+     "typeeraser",
+     "importelision",
+     "jsx"
+    ],
+    [
+     "usestrict",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "rj-chain-import-react-ns",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @filename: r.ts\nexport const createElement: any = 1;\nexport const Fragment: any = 1;\n// @filename: probe.tsx\nimport * as React from './r';\nlet q: number = 1;\nexport const x = <><i /></>;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "jsx"
+    ],
+    [
+     "importelision",
+     "jsx"
+    ],
+    [
+     "typeeraser",
+     "importelision",
+     "jsx"
+    ],
+    [
+     "usestrict",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "cjs-fn-members-conflict",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nconst f = 1;\n/** the main */\nmodule.exports = function f(a) { return a; };\n/** extra doc */\nmodule.exports.x = 1;\nmodule.exports.y = function () {};\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "cjs-multiple-module-exports",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nmodule.exports = 1;\nmodule.exports = \"s\";\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "cjs-chained",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexports.x = exports.y = 1;\n/** doc for z */\nexports.z = function (a) { return a; };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "esm-js-default-expando",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexport default function f() {}\nf.x = 1;\n/** @type {(a: number) => string} */\nexport const g = (a) => String(a);\ng.y = 2;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "generator-expando",
+   "name": "probe.ts",
+   "source": "export function* gen() { yield 1; }\ngen.x = 1;\nexport const agen = async function* () { yield 1; };\nagen.y = 2;\nexport async function af() {}\naf.z = 3;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "cjs-anon-expression",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nmodule.exports = { a: 1, b() { return 2; }, c: class {} };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "cjs-module-exports-identifier-fn",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nfunction helper(a) { return a; }\nhelper.extra = 1;\nmodule.exports = helper;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "cjs-module-exports-nonmodule-ident",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nvar thing = { a: 1 };\nmodule.exports = thing;\nmodule.exports.b = 2;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  }
+ ]
+}

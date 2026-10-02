@@ -1,0 +1,1324 @@
+{
+ "cases": [
+  {
+   "id": "var-literals",
+   "name": "probe.ts",
+   "source": "export const a = 1;\nexport let b = \"x\";\nexport var c = [1, 2];\nexport const big = 10n;\nexport const neg = -1;\nexport const t = true;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "var-script-global",
+   "name": "probe.ts",
+   "source": "const x = 1;\nlet y: number;\nvar z = { a: 1, b: \"s\" };\ndeclare var g: number;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "var-multiple",
+   "name": "probe.ts",
+   "source": "export let a = 1, b = \"\";\nlet hidden = 2, c = 3;\nexport { c };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "var-destructure-init",
+   "name": "probe.ts",
+   "source": "export const { a, b: [c, d = 1] } = { a: 1, b: [2, 3] as [number, number] };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "var-destructure-plain",
+   "name": "probe.ts",
+   "source": "declare const src: { p: number; q: { r: string } };\nexport const { p, q: { r } } = src;\nexport let [x, , y] = [1, 2, 3];\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "var-arrow-and-class-expr",
+   "name": "probe.ts",
+   "source": "export const f = (a: number) => a;\nexport const C = class { a = 1; m() { return this.a; } };\nexport const g = function* () { yield 1; };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "var-object-literal",
+   "name": "probe.ts",
+   "source": "export const o = {\n  a: 1,\n  b: \"s\",\n  m(x: number) { return x; },\n  get g() { return 1; },\n  set g(v) {},\n  nested: { deep: [1, \"a\"] as const },\n};\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "var-unique-symbol",
+   "name": "probe.ts",
+   "source": "export const s: unique symbol = Symbol();\nexport const sym = Symbol();\nexport class C { [s]() {} static [sym] = 1; }\nexport interface I { [s]: number; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "var-using",
+   "name": "probe.ts",
+   "source": "// @target: esnext\n// @lib: esnext\ndeclare const d: Disposable;\nusing u = d;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "var-readonly-literals",
+   "name": "probe.ts",
+   "source": "export const s = \"lit\";\nexport let l = \"widened\";\nexport const tpl = `t`;\nexport const neg = -5;\nexport const paren = (1);\nexport const obj = { k: \"v\" } as const;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "function-basic",
+   "name": "probe.ts",
+   "source": "export function f(a: number, b?: string): number { return a; }\nexport function g(x: number) { return x + 1; }\nexport async function h() { return 1; }\nexport async function* gen() { yield 1; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "function-overloads",
+   "name": "probe.ts",
+   "source": "export function h(a: string): string;\nexport function h(a: number): number;\nexport function h(a: any) { return a; }\nfunction hidden(): void;\nfunction hidden(a?: any) {}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "function-params",
+   "name": "probe.ts",
+   "source": "// @strict: true\nexport function f(a = 1, b?: number, ...rest: string[]) {}\nexport function g(a: string = \"\", b: number) {}\nexport function h({ a, b: [c] }: { a: number; b: [string] }, [d, e]: number[]) {}\nexport function t(this: Window, x: number) {}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "function-type-params",
+   "name": "probe.ts",
+   "source": "export function id<T>(x: T): T { return x; }\nexport function k<T extends string = \"a\", U = T[]>(t: T, u: U) { return [t, u] as const; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "function-script",
+   "name": "probe.ts",
+   "source": "function f() {}\nfunction g(a: number) { return a > 0 ? \"y\" : 1; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-members",
+   "name": "probe.ts",
+   "source": "export class C {\n  a = 1;\n  b?: string;\n  c!: number;\n  readonly d = \"lit\";\n  static e = 2;\n  protected p = 3;\n  private q = 4;\n  public r: boolean = true;\n  constructor(public x: number, private y: string, protected readonly z?: boolean) {}\n  m(a: number) { return a; }\n  private pm(a: number): void {}\n  protected static sm<T>(t: T) { return t; }\n  ;\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-private-names",
+   "name": "probe.ts",
+   "source": "export class C {\n  #x = 1;\n  #m() {}\n  get #g() { return 1; }\n  static #s = 2;\n  y = 2;\n}\nexport class D { z = 1; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-accessors",
+   "name": "probe.ts",
+   "source": "export class A {\n  get a() { return 1; }\n  set a(v) {}\n  get b(): string { return \"\"; }\n  set c(v: number) {}\n  private get d() { return 1; }\n  private set d(v: number) {}\n  static get e() { return true; }\n  get f(this: A) { return 1; }\n  set f(this: A, v: number) {}\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-extends-expression",
+   "name": "probe.ts",
+   "source": "function mixin<T extends new (...a: any[]) => {}>(b: T) { return class extends b { mixed = 1; }; }\nclass Base { base = 1; }\nexport class D extends mixin(Base) {}\nexport default class extends mixin(Base) {}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-extends-null-and-implements",
+   "name": "probe.ts",
+   "source": "interface I { a: number; }\nexport class N extends null {}\nexport class Impl implements I { a = 1; }\nexport abstract class Abs { abstract m(): void; abstract p: number; protected abstract get q(): string; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-heritage-filter",
+   "name": "probe.ts",
+   "source": "declare function base(): any;\nexport interface I { a: number }\nexport class C implements I, base() { a = 1; }\nexport class X implements {}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-override-decorators",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\ndeclare function dec(...a: any[]): any;\nclass B { m() {} }\n@dec\nexport class D extends B {\n  @dec override m() {}\n  @dec prop = 1;\n  method(@dec p: number) {}\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-static-block",
+   "name": "probe.ts",
+   "source": "export class S {\n  static x: number;\n  static { S.x = 1; }\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-param-property-pattern",
+   "name": "probe.ts",
+   "source": "export class P {\n  constructor(public { a, b }: { a: number; b: string }, readonly [c]: [boolean]) {}\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-private-method-overloads",
+   "name": "probe.ts",
+   "source": "export class Q {\n  private m(): void;\n  private m(a: string): void;\n  private m(a?: any) {}\n  private static s<T extends string = \"a\">(x: T) { return x; }\n  private g<T>(this: Q, t: T) {}\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-this-type",
+   "name": "probe.ts",
+   "source": "export class C {\n  m() { return this; }\n  n(): this { return this; }\n  static create() { return new C(); }\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-generic-constraints",
+   "name": "probe.ts",
+   "source": "export interface Box<T> { v: T }\nexport class G<T extends object, U extends keyof T = keyof T> implements Box<T> {\n  v!: T;\n  get<K extends U>(k: K): T[K] { return this.v[k]; }\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-index-and-late-bound",
+   "name": "probe.ts",
+   "source": "const key = \"k\";\nexport class C {\n  [x: string]: any;\n  [key] = 1;\n  static [Symbol.iterator]() {}\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-expression-default-export",
+   "name": "probe.ts",
+   "source": "export default (class Foo { a = 1; });\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "interface-members",
+   "name": "probe.ts",
+   "source": "export interface I<T> extends Array<T> {\n  (a: number): string;\n  new (b: string): I<T>;\n  [k: number]: T;\n  readonly p?: number;\n  m?<U>(u: U): void;\n  get acc(): number;\n  set acc(v: number);\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "type-alias-kinds",
+   "name": "probe.ts",
+   "source": "export type U = string | number;\nexport type M<T> = { readonly [K in keyof T]?: T[K] };\nexport type C<T> = T extends (infer R)[] ? R : never;\nexport type Tpl = `a${string}b`;\nexport type Fn = <T>(a: T) => T;\nexport type Ctor = abstract new () => object;\nexport type L = { a: number; b(): void };\nexport type Idx = U[\"length\" & keyof U];\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "type-tuples",
+   "name": "probe.ts",
+   "source": "export type T = [a: string, b?: number, ...rest: boolean[]];\nexport type Multi = [\n  string,\n  number\n];\nexport type RO = readonly [1, 2];\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "type-mapped-no-template",
+   "name": "probe.ts",
+   "source": "export type M<T> = { [K in keyof T] };\nexport type N<T> = { [K in keyof T as `get${K & string}`]: () => T[K] };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "type-function-binding-param",
+   "name": "probe.ts",
+   "source": "export type F = ({ a, b }: { a: number; b: string }) => void;\nexport type G = new ([x]: [number]) => void;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "type-query-late-paint",
+   "name": "probe.ts",
+   "source": "const o = { a: 1 };\nfunction helper() { return 1; }\nexport type T = typeof o;\nexport type R = ReturnType<typeof helper>;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "type-conditional-infer-scope",
+   "name": "probe.ts",
+   "source": "export type Unpack<T> = T extends Promise<infer U> ? { value: U } : T;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "type-import-type",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport interface X { a: number }\n// @filename: probe.ts\nexport type T = import(\"./a\").X;\nexport let v: typeof import(\"./a\");\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "type-private-qualified",
+   "name": "probe.ts",
+   "source": "export class C {\n  #x = 1;\n  y: typeof this.#x = 1;\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "enum-kinds",
+   "name": "probe.ts",
+   "source": "export enum E { A, B = 5, C, D = \"d\", F = B * 2, G = -1, H = 1 / 0, I = -1 / 0, J = 0 / 0, K = 1.5, L = -0.25 }\nexport const enum CE { X = 1, Y = X << 2 }\nexport declare enum DE { P = 3 }\nenum Hidden { Q }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "enum-computed",
+   "name": "probe.ts",
+   "source": "const base = 10;\nexport enum E { A = base, B = \"x\".length, [\"C\"] = 3 }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-basic",
+   "name": "probe.ts",
+   "source": "export namespace N {\n  export const a = 1;\n  export function f() { return a; }\n  export namespace Inner { export type T = number; }\n}\nnamespace A.B.C { export let x = 1; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-scope-marker",
+   "name": "probe.ts",
+   "source": "export namespace N {\n  interface I { p: number }\n  export function f(): I { return null as any; }\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-import-alias-chain",
+   "name": "probe.ts",
+   "source": "module A {\n  export module Q { export const q = 1; }\n  import B = Q;\n  import C = B;\n  export import D = C;\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-ambient",
+   "name": "probe.ts",
+   "source": "declare namespace D {\n  export const a: number;\n  function f(): void;\n}\ndeclare module \"foo\" {\n  export const x: number;\n  const y: string;\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-global-augmentation",
+   "name": "probe.ts",
+   "source": "export {};\ndeclare global {\n  interface Window { custom: number }\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-merge",
+   "name": "probe.ts",
+   "source": "export class C {}\nexport namespace C { export const s = 1; }\nexport function F() {}\nexport namespace F { export const t = 2; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-export-default-inside",
+   "name": "probe.ts",
+   "source": "declare module \"m\" {\n  export default function f(): void;\n  export const z: number;\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "imports-elision",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport interface A { a: number }\nexport interface B { b: number }\nexport const value = 1;\nexport default interface Def { d: number }\n// @filename: probe.ts\nimport Def, { A, B, value } from \"./a\";\nimport * as ns from \"./a\";\nimport \"./a\";\nimport type { A as TA } from \"./a\";\nexport let x: A;\nexport let d: Def;\nexport let y: ns.B;\nexport const v = value;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "imports-unused-namespace",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport interface A { a: number }\n// @filename: probe.ts\nimport * as ns from \"./a\";\nimport def from \"./a\";\nexport const k = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "imports-default-only",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport default interface Def { d: number }\n// @filename: probe.ts\nimport Def from \"./a\";\nimport Unused from \"./a\";\nexport let d: Def;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "import-equals-require",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: a.ts\nexport interface A { a: number }\n// @filename: probe.ts\nimport a = require(\"./a\");\nimport unused = require(\"./a\");\nexport let x: a.A;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "import-defer",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: a.ts\nexport interface A { a: number }\nexport const v = 1;\n// @filename: probe.ts\nimport defer * as ns from \"./a\";\nexport type T = typeof ns;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "import-augmentation",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport interface X { a: number }\n// @filename: probe.ts\nimport { X } from \"./a\";\ndeclare module \"./a\" {\n  interface X { b: number }\n}\nexport const k = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-declarations",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport const a = 1;\nexport default 2;\n// @filename: probe.ts\nconst local = 1;\nexport { local as renamed };\nexport * from \"./a\";\nexport * as ns from \"./a\";\nexport { default } from \"./a\";\nexport type { a as T } from \"./a\";\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-identifier",
+   "name": "probe.ts",
+   "source": "const x = { a: 1 };\nexport default x;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-expression",
+   "name": "probe.ts",
+   "source": "export default 1 + 2;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-literal",
+   "name": "probe.ts",
+   "source": "export default \"str\";\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-function",
+   "name": "probe.ts",
+   "source": "export default function () { return 1; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-arrow",
+   "name": "probe.ts",
+   "source": "export default (a: number) => a;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-class",
+   "name": "probe.ts",
+   "source": "export default class { m() {} }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-interface",
+   "name": "probe.ts",
+   "source": "export default interface I { a: number }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-equals-identifier",
+   "name": "probe.ts",
+   "source": "const x = { a: 1 };\nexport = x;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-equals-class",
+   "name": "probe.ts",
+   "source": "export = class Foo { a = 1; };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-equals-function",
+   "name": "probe.ts",
+   "source": "export = function named(a: number) { return a; };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-equals-expression",
+   "name": "probe.ts",
+   "source": "export = [1, 2];\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-equals-namespace",
+   "name": "probe.ts",
+   "source": "namespace N { export const a = 1; }\nexport = N;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "inferred-import-needed",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nexport interface T { t: number }\nexport function make(): T { return { t: 1 }; }\n// @filename: probe.ts\nimport { make } from \"./a\";\nexport const v = make();\nexport function w() { return make(); }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "inferred-nested-module-path",
+   "name": "probe.ts",
+   "source": "// @filename: lib/deep/mod.ts\nexport class K { k = 1 }\nexport const mk = () => new K();\n// @filename: probe.ts\nimport { mk } from \"./lib/deep/mod\";\nexport const k = mk();\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "private-name-errors-script",
+   "name": "probe.ts",
+   "source": "module M {\n  class C {}\n  interface I {}\n  export var x: C;\n  export function f(): C { return null as any; }\n  export function g(p: I) {}\n  export class D extends C {}\n  export class E implements I {}\n  export type T = C;\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "private-name-errors-typeparams",
+   "name": "probe.ts",
+   "source": "module M {\n  class C {}\n  export function f<T extends C>() {}\n  export class K<T extends C> { m<U extends C>() {} p: C; constructor(a: C) {} }\n  export interface II { [k: string]: C; (a: C): C; new (a: C): C; mm(a: C): C; }\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "private-name-errors-accessors",
+   "name": "probe.ts",
+   "source": "module M {\n  class C {}\n  export class K {\n    get a(): C { return null as any; }\n    set a(v: C) {}\n    static get s(): C { return null as any; }\n  }\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "private-name-errors-import-equals",
+   "name": "probe.ts",
+   "source": "module M {\n  module Hidden { export class C {} }\n  export import Alias = Hidden.C;\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "private-name-default-export",
+   "name": "probe.ts",
+   "source": "module M {\n  class C {}\n  export var inst = new C();\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "inaccessible-this",
+   "name": "probe.ts",
+   "source": "export const o = { m() { return this; } };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-functions",
+   "name": "probe.ts",
+   "source": "// @isolatedDeclarations: true\n// @declaration: true\nexport function f() { return 1; }\nexport function g(a = 1) { return a; }\nexport const arrow = () => 1;\nexport const fe = function () { return \"\"; };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-variables",
+   "name": "probe.ts",
+   "source": "// @isolatedDeclarations: true\n// @declaration: true\ndeclare function foo(): number;\nexport const a = foo();\nexport const arr = [1, 2];\nexport const obj = { a: 1, m() { return 1; }, get g() { return 1; }, ...{ s: 1 } };\nexport const ok = 1;\nexport let s = \"str\";\nexport const tpl = `a${ok}`;\nexport const neg = -foo();\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-classes",
+   "name": "probe.ts",
+   "source": "// @isolatedDeclarations: true\n// @declaration: true\ndeclare function base(): new () => {};\nexport class C extends base() {\n  p = 1;\n  q = foo();\n  m() { return 1; }\n  get a() { return 1; }\n  set a(v) {}\n  constructor(public x = 1) { super(); }\n  [Symbol.iterator]() {}\n  [\"lit\"] = 2;\n}\ndeclare function foo(): number;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-computed",
+   "name": "probe.ts",
+   "source": "// @isolatedDeclarations: true\n// @declaration: true\ndeclare const k: string;\nexport const o = { [k]: 1 };\nexport interface I { [k]: number; [Math.random()]: string }\nexport type T = { [k]: number };\nexport class C { [k] = 1; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-enum",
+   "name": "probe.ts",
+   "source": "// @isolatedDeclarations: true\n// @declaration: true\nconst ext = 1;\nexport enum E { A = 1, B = A, C = ext, D = \"d\".length }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-expando",
+   "name": "probe.ts",
+   "source": "// @isolatedDeclarations: true\n// @declaration: true\nexport function f() {}\nf.a = 1;\nf.b = \"s\";\nexport const g = () => 1;\ng.x = 2;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-default-and-assign",
+   "name": "probe.ts",
+   "source": "// @isolatedDeclarations: true\n// @declaration: true\ndeclare function foo(): number;\nexport default foo();\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-augmentation-import",
+   "name": "probe.ts",
+   "source": "// @isolatedDeclarations: true\n// @declaration: true\n// @filename: a.ts\nexport interface X { a: number }\n// @filename: probe.ts\nimport { X } from \"./a\";\ndeclare module \"./a\" { interface X { b: number } }\nexport const k = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-params-binding",
+   "name": "probe.ts",
+   "source": "// @isolatedDeclarations: true\n// @declaration: true\nexport function f({ a } = { a: 1 }, [b] = [2]) {}\nexport function g(x?: number, y = x) {}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-satisfies-as",
+   "name": "probe.ts",
+   "source": "// @isolatedDeclarations: true\n// @declaration: true\nexport const a = 1 as number;\nexport const b = { x: 1 } satisfies object;\nexport const c = <const>[\"a\"];\nexport const d = (1 + 1) as const;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "strip-internal",
+   "name": "probe.ts",
+   "source": "// @stripInternal: true\n/** @internal */ export function f() {}\nexport function g() {}\n/** @internal */\nexport interface I {}\nexport class C {\n  /** @internal */ hidden = 1;\n  shown = 2;\n  constructor(/** @internal */ public a: number, public b: string, /* @internal */ public c: boolean) {}\n}\nexport enum E { A, /** @internal */ B, C }\nexport namespace N { /** @internal */ export const x = 1; export const y = 2; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "strip-internal-off",
+   "name": "probe.ts",
+   "source": "/** @internal */ export function f() {}\nexport class C { /** @internal */ hidden = 1; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "strip-internal-statements",
+   "name": "probe.ts",
+   "source": "// @stripInternal: true\n// @filename: a.ts\nexport const z = 1;\n// @filename: probe.ts\n/** @internal */\nimport x = N.y;\nnamespace N { export const y = 1; }\n/** @internal */ export * from \"./a\";\nexport const k: typeof x = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "comments-jsdoc",
+   "name": "probe.ts",
+   "source": "/** Function doc */\nexport function f() {}\n// line comment\nexport const a = 1;\n/* block */ export const b = 2;\n/**\n * Class doc\n */\nexport class C {\n  /** member doc */\n  m() {}\n  // not kept\n  p = 1;\n}\n/** enum doc */\nexport enum E {\n  /** member */ A,\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "comments-removed",
+   "name": "probe.ts",
+   "source": "// @removeComments: true\n/** Function doc */\nexport function f() {}\n/** @internal keep? */\nexport const a = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "comments-export-default",
+   "name": "probe.ts",
+   "source": "/** default doc */\nexport default { a: 1 };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "comments-reference-directives",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\ndeclare const fromA: number;\n// @filename: probe.ts\n/// <reference path=\"a.ts\" />\n/// <reference lib=\"es2015\" preserve=\"true\" />\n/// <reference types=\"node\" preserve=\"true\" />\nexport const k = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "comments-reference-preserved",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\ndeclare const fromA: number;\n// @filename: probe.ts\n/// <reference path=\"a.ts\" preserve=\"true\" />\n/// <reference lib=\"es2017\" />\nexport const k = fromA;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "expando-function",
+   "name": "probe.ts",
+   "source": "export function f() {}\nf.a = 1;\nf.b = \"s\";\nf[\"c\"] = true;\nf[\"not ident\"] = 2;\nf.default = 3;\nf.while = 4;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "expando-arrow-and-alias",
+   "name": "probe.ts",
+   "source": "const v = 1;\nexport const g = () => 1;\ng.x = 2;\ng.v = v;\nexport function h() {}\nh.self = h;\nh.num = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "expando-default-export",
+   "name": "probe.ts",
+   "source": "export default function f() {}\nf.a = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "expando-not-visible",
+   "name": "probe.ts",
+   "source": "function f() {}\nf.a = 1;\nexport const ref: typeof f = f;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "expando-overloads",
+   "name": "probe.ts",
+   "source": "export function f(): void;\nexport function f(a?: any) {}\nf.p = 1;\ndeclare function d(): void;\nd.q = 2;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "expando-local-name-conflict",
+   "name": "probe.ts",
+   "source": "const a = \"shadow\";\nexport function f() {}\nf.a = 1;\nf.b = a;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "expando-typed-var",
+   "name": "probe.ts",
+   "source": "export const t: { (): void; x?: number } = () => {};\nt.x = 1;\nexport const nf = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-commonjs-exports",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexports.a = 1;\nexports.f = function (x) { return x; };\nexports[\"not-ident\"] = \"s\";\nexports.default = 2;\nconst local = 3;\nexports.local = local;\nObject.defineProperty(exports, \"defined\", { value: 4 });\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-module-exports-object",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nmodule.exports = { a: 1, b() { return \"\"; } };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-module-exports-class",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nmodule.exports = class Thing {\n  constructor() { this.x = 1; }\n  m() { return this.x; }\n};\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-module-exports-function",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nmodule.exports = function (a) { return a; };\nmodule.exports.extra = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-module-exports-multiple",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nif (Math.random()) { module.exports = 1; } else { module.exports = \"s\"; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-exports-class-expressions",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexports.K = class K { m() { return new K(); } };\nexports.Other = class Named { a = 1; };\nexports.Anon = class { b = 2; };\nexports[\"x-y\"] = class { c = 3; };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-require",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: dep.js\nexports.a = 1;\nexports.b = 2;\n// @filename: probe.js\nconst dep = require(\"./dep\");\nconst { a, b: c } = require(\"./dep\");\nexports.out = dep.a + a + c;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-jsdoc-types",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\n/** @type {*} */\nexport var all;\n/** @type {?number} */\nexport var nullable;\n/** @type {!number} */\nexport var nonnull;\n/** @param {...number} rest\n * @param {string=} opt */\nexport function f(opt, ...rest) {}\n/** @typedef {{a: number}} T */\n/** @typedef {Object} U\n * @property {string} p\n * @property {number} [q] */\n/** @type {T} */\nexport var t;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-class-this-assignments",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexport class C {\n  constructor() {\n    this.a = 1;\n    this[\"b\"] = \"s\";\n    /** doc */\n    this.c = [];\n    this.constructor = null;\n  }\n  m() { this.d = true; this.a = 2; }\n  static s() { this.st = 1; }\n  static { this.blk = 2; }\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-class-extends-this-assign",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nclass Base { constructor() { this.p = 1; } get acc() { return 1; } }\nexport class D extends Base {\n  constructor() { super(); this.p = 2; this.acc = 3; this.own = 4; }\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-expando",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexport function f() {}\nf.a = 1;\nexport const g = () => 1;\ng.b = \"s\";\nconst h = function () {};\nh.c = 1;\nexport { h };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-typedef-implicit-export",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\n/** @typedef {number | string} Id */\n/** @param {Id} id */\nexport function use(id) { return id; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-function-full-signature",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\n/** @type {(a: number) => string} */\nexport const f = (a) => String(a);\n/** @type {(a: number) => number} */\nexport function g(a) { return a; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-script-globals",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nvar g = 1;\nfunction fn(a) { return a; }\nclass K {}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-define-property-cjs",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nObject.defineProperty(exports, \"x\", { value: 1, writable: false });\nObject.defineProperty(exports, \"y\", { get() { return \"s\"; } });\nmodule.exports.z = 2;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-import-tag",
+   "name": "probe.ts",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: a.ts\nexport interface X { a: number }\nexport interface Y { b: number }\n// @filename: probe.js\n/** @import { X, Y } from \"./a\" */\n/** @param {X} x */\nexport function f(x) { return x; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-semicolon-and-ctor-type",
+   "name": "probe.ts",
+   "source": "export class C { a = 1;; m() {}; }\nexport type K = abstract new () => object;\nexport type F = new <T>(x: T) => T;\nexport interface I { [k: string] }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-accessor-this",
+   "name": "probe.ts",
+   "source": "export class A {\n  get x(this: A) { return 1; }\n  set x(this: A, v: number) {}\n  set y(this: A) {}\n  // @ts-ignore\n  set z() {}\n}\nexport interface I { get a(): number; set a(v: number); }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-module-exports-full-signature",
+   "name": "probe.ts",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\n/** @type {(a: number) => string} */\nmodule.exports = (a) => String(a);\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-commonjs-dupes-nested",
+   "name": "probe.ts",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexports.a = 1;\nexports.a = 2;\nfunction init() { exports.b = 3; }\nexports[\"class\"] = 4;\nexports[\"valid\"] = 5;\nvar shadow = 1;\nexports.shadow = \"x\";\nexports[0] = 6;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-commonjs-alias-nested",
+   "name": "probe.ts",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nconst v = 1;\nexports.v = v;\nif (v) { exports.w = v; }\nfunction fn() {}\nexports.fn = fn;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-shorthand-ambient",
+   "name": "probe.ts",
+   "source": "declare module \"short\";\ndeclare module \"withbody\" { export const a: number; }\nexport declare namespace E { }\nexport {};\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "strip-internal-params",
+   "name": "probe.ts",
+   "source": "// @stripInternal: true\nexport class P {\n  constructor(a: number, /** @internal */ public b: number, public c: string) {}\n  m(x: number, /** @internal */ y: number) {}\n}\nexport enum E { /** @internal */ A = 1, B }\nexport interface I { /** @internal */ x: number; y: number }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-this-assign-dynamic",
+   "name": "probe.ts",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nconst key = \"z\";\nexport class C {\n  constructor(k) {\n    this[\"a b\"] = 1;\n    this[k] = 2;\n    this[key] = 3;\n    this[\"constructor\"] = 4;\n    this[1] = 5;\n  }\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-reparsed-modifiers",
+   "name": "probe.ts",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexport class C {\n  /** @private */ p = 1;\n  /** @protected */ q = 2;\n  /** @readonly */ r = 3;\n  /** @public */ s = 4;\n  /** @private */ m() {}\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-class-extends-null-this",
+   "name": "probe.ts",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexport class N extends null {\n  m() { this.a = 1; }\n}\nexport class E extends Object {\n  m() { this.b = 2; }\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "private-name-in-type-literal",
+   "name": "probe.ts",
+   "source": "module M {\n  class C {}\n  export var v: { a: C; b: { c: C } };\n  export type T = { a: C };\n  export function f(p: { m(): C }) {}\n  export let m: { [K in \"k\"]: C };\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-class-members",
+   "name": "probe.ts",
+   "source": "// @isolatedDeclarations: true\n// @declaration: true\nexport class K {\n  a = 1;\n  b = [1];\n  get g() { return 1; }\n  set s(v) {}\n  m() { return 1; }\n  constructor(public p = 1) {}\n  static q = \"s\" as const;\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-equals-in-module",
+   "name": "probe.ts",
+   "source": "declare module \"m\" {\n  const x: number;\n  export = x;\n}\ndeclare module \"n\" {\n  function f(): void;\n  export default f;\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-module-exports-with-members",
+   "name": "probe.ts",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nmodule.exports = function f() {};\nexports.K = class K {};\nexports.v = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-require-array-pattern",
+   "name": "probe.ts",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: dep.js\nmodule.exports = [1, 2];\n// @filename: probe.js\nconst [first] = require(\"./dep\");\nconst { length } = require(\"./dep\"), other = 1;\nexports.first = first;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "var-declare-and-let-noinit",
+   "name": "probe.ts",
+   "source": "export declare let a: number;\nexport let b;\nexport var c: string | undefined, d = 1 as const;\nexport const e = undefined;\nexport const n = null;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "class-abstract-and-overloads",
+   "name": "probe.ts",
+   "source": "export abstract class A {\n  abstract a: number;\n  protected abstract m(): void;\n  o(x: string): void;\n  o(x: number): void;\n  o(x: any) {}\n  constructor();\n  constructor(a?: number) {}\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  }
+ ]
+}

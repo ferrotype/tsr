@@ -1,7 +1,7 @@
 use crate::{
-    modifier_flags, AstBuilder, AstTransaction, ChildRole, Factory, FactoryMethods, NodeData,
-    NodeId, NodeKind, NodeList, NodeListId, NodeListRead, NodeRead, NodeSlice, NodeSliceRead,
-    SyntaxKind, VisitContext, VisitorMethods,
+    modifier_flags, AstBuilder, AstTransaction, AstView, ChildRole, Factory, FactoryMethods,
+    NodeData, NodeId, NodeKind, NodeList, NodeListId, NodeListRead, NodeRead, NodeSlice,
+    NodeSliceRead, SyntaxKind, VisitContext, VisitorMethods,
 };
 use tsr_core::TextRange;
 
@@ -18,6 +18,13 @@ pub enum ChildSlot {
 /// Exclusive list and source-file operations needed by transformations. Source
 /// metadata creation belongs to a complete builder, not a lazy JSDoc transaction.
 pub trait RuntimeFactory: Factory {
+    /// The builder's storage view, through which a transformation applies the
+    /// `ast` predicates that take an [`AstView`] to factory nodes and to the
+    /// nodes of the files the builder retains. `None` for a factory without
+    /// one.
+    fn ast_view(&self) -> Option<AstView<'_>> {
+        None
+    }
     fn read_list(&self, id: NodeListId) -> NodeListRead<'_>;
     fn read_nodes(&self, nodes: NodeSlice) -> NodeSliceRead<'_>;
     fn alloc_nodes(&mut self, nodes: Vec<Option<NodeId>>) -> NodeSlice;
@@ -82,6 +89,16 @@ pub trait RuntimeFactory: Factory {
         }
         flags
     }
+    /// The builder behind this factory, for transform helpers that read
+    /// through its `AstView` (subtree facts, the binding-pattern utilities) or
+    /// take the builder itself. `None` for a factory that is not a builder.
+    fn ast_builder(&self) -> Option<&AstBuilder> {
+        None
+    }
+    /// See [`RuntimeFactory::ast_builder`].
+    fn ast_builder_mut(&mut self) -> Option<&mut AstBuilder> {
+        None
+    }
 }
 
 fn override_parent_with_factory<F: RuntimeFactory + ?Sized>(
@@ -118,10 +135,19 @@ fn override_parent_with_factory<F: RuntimeFactory + ?Sized>(
 }
 
 impl RuntimeFactory for AstBuilder {
+    fn ast_view(&self) -> Option<AstView<'_>> {
+        Some(self.view())
+    }
     fn override_parent_in_immediate_children(&mut self, node: NodeId, scratch: &mut Vec<NodeId>) {
         if !scratch.is_empty() || !self.override_core_parents(node) {
             override_parent_with_factory(self, node, scratch);
         }
+    }
+    fn ast_builder(&self) -> Option<&AstBuilder> {
+        Some(self)
+    }
+    fn ast_builder_mut(&mut self) -> Option<&mut AstBuilder> {
+        Some(self)
     }
     fn read_list(&self, id: NodeListId) -> NodeListRead<'_> {
         self.view().list(id).expect("factory list")
@@ -652,6 +678,9 @@ impl<T: RuntimeFactory + ?Sized> RuntimeFactory for crate::BorrowedFactory<'_, T
     ) -> NodeId {
         self.0.update_source(original, statements, eof)
     }
+    fn ast_view(&self) -> Option<AstView<'_>> {
+        self.0.ast_view()
+    }
     fn clone_list_header(&mut self, original: NodeListId) -> NodeListId {
         self.0.clone_list_header(original)
     }
@@ -666,5 +695,11 @@ impl<T: RuntimeFactory + ?Sized> RuntimeFactory for crate::BorrowedFactory<'_, T
     }
     fn modifiers_to_flags(&self, nodes: NodeSlice) -> u32 {
         self.0.modifiers_to_flags(nodes)
+    }
+    fn ast_builder(&self) -> Option<&AstBuilder> {
+        self.0.ast_builder()
+    }
+    fn ast_builder_mut(&mut self) -> Option<&mut AstBuilder> {
+        self.0.ast_builder_mut()
     }
 }

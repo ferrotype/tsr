@@ -1,0 +1,285 @@
+{
+ "cases": [
+  {
+   "id": "roc-nonnull-mixes",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na?.b!.c;\na?.b!();\n(a?.b)!();\n(a?.b!).c;\na!?.b;\na?.b!?.c();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ],
+    [
+     "typeeraser",
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "roc-super-and-this",
+   "name": "probe.ts",
+   "source": "// @target: es2019\nclass B { m() {} }\nclass C extends B { n() { super.m?.(); super['m']?.(1); this?.n(); (super.m)?.(); return (this.x?.y)(); } x: any; }\n",
+   "chains": [
+    [
+     "optionalchain"
+    ],
+    [
+     "typeeraser",
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "roc-deep-call-chains",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na?.b.c.d();\na?.b()?.c().d?.();\na.b?.c.d?.e()[f()]?.(1, ...b);\n(a?.b.c)(1);\n((a?.b))();\n(a?.[b])?.();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "roc-delete-forms",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\ndelete a?.b;\ndelete a?.b.c;\ndelete a?.[b]?.c;\ndelete (a?.b);\ndelete ((a?.b).c);\ndelete a?.b();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "roc-in-various-positions",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\nfor (const x of a?.b) {}\n`${a?.b}`;\nnew (a?.b)();\nf(a?.b, ...a?.c);\n({ [a?.b]: 1 });\nlet { x = a?.b } = o;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "roc-comments-and-parens",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na /*1*/ ?. /*2*/ b /*3*/ ( /*4*/ );\n(/*p*/ a?.b /*q*/)();\na?.b/*c*/.c;\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "roc-call-capture-generated-name",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\n(a.b?.c)();\n(f().b?.c)();\n(a[f()]?.c)();\n(a?.b.c)();\n(a?.b[c])();\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "roc-nested-optional-args",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na?.(b?.c, b?.(c?.d))?.e;\na?.[b?.c]?.[c?.d];\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "roc-private-names",
+   "name": "probe.ts",
+   "source": "// @target: es2019\nclass K { #p: any; m(o: K) { return o?.#p?.x; } n() { return this?.#p(); } }\n",
+   "chains": [
+    [
+     "optionalchain"
+    ]
+   ]
+  },
+  {
+   "id": "rnc-chains",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na ?? b ?? c;\n(a ?? b) ?? c;\na ?? (b ?? c);\nf() ?? f() ?? f();\na.b ?? c;\na[b] ?? c;\nthis ?? a;\n(a) ?? b;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "rnc-with-other",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na?.b ?? c;\na ??= b ?? c;\nlet x = (a ?? b) || c;\n",
+   "chains": [
+    [
+     "nullishcoalescing",
+     "optionalchain"
+    ],
+    [
+     "optionalchain",
+     "nullishcoalescing"
+    ],
+    [
+     "logicalassignment",
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "rla-forms",
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na.b.c ||= 1;\na[f()] ??= c;\na[0] &&= 1;\na['x'] ||= 1;\na[`t`] ||= 1;\n(a.b) ||= (c);\na ||= b ||= c;\nthis.x ??= 1;\na[b][c] ??= 2;\nf().x ||= 3;\n(a as any).b ||= 4;\na!.b ||= 5;\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ],
+    [
+     "typeeraser",
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "rla-super-private",
+   "name": "probe.ts",
+   "source": "// @target: es2020\nclass B { x: any; }\nclass C extends B { #p: any; static #q: any; m(k: any) { super.x ||= 1; super[k] &&= 2; this.#p ??= 3; C.#q ||= 4; } }\n",
+   "chains": [
+    [
+     "logicalassignment"
+    ]
+   ]
+  },
+  {
+   "id": "rex-forms",
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na.b.c **= 2;\na[f()][c] **= 3;\na **= b ** c ** 2;\n(-1) ** 2;\n(a ** b) ** c;\na.b **= a.c **= 2;\nlet x = a?.b ** 2;\nf(a ** 2, ...[b ** 3]);\na[0] **= 1;\n",
+   "chains": [
+    [
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "rocatch-nested",
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { try { } catch { } } catch { try { } catch { } finally { } }\nfunction g() { try { } catch { } }\n",
+   "chains": [
+    [
+     "optionalcatch"
+    ]
+   ]
+  },
+  {
+   "id": "rus-forms",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n'use strict';\n'use strict';\nexport {};\n",
+   "chains": [
+    [
+     "usestrict"
+    ]
+   ]
+  },
+  {
+   "id": "rus-forms-2",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n\"use\\x20strict\";\nexport const a = 1;\n",
+   "chains": [
+    [
+     "usestrict"
+    ]
+   ]
+  },
+  {
+   "id": "rus-script-alwaysstrict",
+   "name": "probe.ts",
+   "source": "var a = 1;\n",
+   "chains": [
+    [
+     "usestrict"
+    ]
+   ]
+  },
+  {
+   "id": "rus-js-module",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @module: esnext\n// @filename: probe.js\nexport const a = 1;\n",
+   "chains": [
+    [
+     "usestrict"
+    ]
+   ]
+  },
+  {
+   "id": "rus-esnext-noemitstrict",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @strict: false\nexport const a = 1;\n",
+   "chains": [
+    [
+     "usestrict"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-imported",
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nconst d = 1; export default d; export const v = 2;\n// @filename: probe.ts\nimport d from \"./lib\";\nexport default d;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-equals-imported",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: lib.ts\nexport const v = 2;\n// @filename: probe.ts\nimport * as lib from \"./lib\";\nexport = lib;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "import-equals-reexport",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: lib.ts\nexport const v = 2;\n// @filename: probe.ts\nimport lib = require(\"./lib\");\nexport { lib };\nnamespace N { export const q = 1; }\nimport Q = N.q;\nexport { Q };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "reexport-import-used-in-type",
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport interface I { a: number }\n// @filename: probe.ts\nimport { I } from \"./lib\";\nexport const x: I = { a: 1 };\nexport { I as J };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "cjs-require-reexport",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: lib.js\nexports.v = 1;\n// @filename: probe.js\nconst lib = require(\"./lib\");\nmodule.exports = lib;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "cjs-require-alias-export",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: lib.js\nexports.v = 1;\n// @filename: probe.js\nconst { v } = require(\"./lib\");\nexports.w = v;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  }
+ ]
+}

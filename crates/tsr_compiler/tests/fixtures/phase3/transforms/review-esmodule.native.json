@@ -1,0 +1,472 @@
+{
+ "cases": [
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "var __rewriteRelativeImportExtension = (this && this.__rewriteRelativeImportExtension) || function (path, preserveJsx) {\r\n    if (typeof path === \"string\" && /^\\.\\.?\\//.test(path)) {\r\n        return path.replace(/\\.(tsx)$|((?:\\.d)?)((?:\\.[^./]+?)?)\\.([cm]?)ts$/i, function (m, tsx, d, ext, cm) {\r\n            return tsx ? preserveJsx ? \".jsx\" : \".js\" : d && (!ext || !cm) ? m : (d + ext + \".\" + cm.toLowerCase() + \"js\");\r\n        });\r\n    }\r\n    return path;\r\n};\r\nfunction f(x: string) { return import(__rewriteRelativeImportExtension(x)); }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "x01-cjs-isolated-script-helpers",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e206628783a20737472696e6729207b2072657475726e20696d706f72742878293b207d0a"
+    },
+    "id": "x01-cjs-isolated-script-helpers",
+    "options": {
+     "importHelpers": true,
+     "isolatedModules": true,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @isolatedModules: true\n// @importHelpers: true\n// @rewriteRelativeImportExtensions: true\nfunction f(x: string) { return import(x); }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "import { createRequire as _createRequire } from \"module\";\r\nconst __require = _createRequire(import.meta.url);\r\nconst x = __require();\r\nexport { x };\r\n"
+      }
+     ],
+     "name": "/.src/probe.mts"
+    }
+   ],
+   "id": "x02-nonliteral-require",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.mts": "696d706f72742078203d207265717569726528666f6f293b0a6578706f7274207b2078207d3b0a"
+    },
+    "id": "x02-nonliteral-require",
+    "options": {
+     "module": 199,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.mts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: probe.mts\nimport x = require(foo);\nexport { x };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "module.exports = import(\"./a.js\");\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "x03-preserve-export-equals-visit",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420636f6e73742061203d20313b0a",
+     "/.src/probe.ts": "6578706f7274203d20696d706f727428222e2f612e747322293b"
+    },
+    "id": "x03-preserve-export-equals-visit",
+    "options": {
+     "module": 200,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: preserve\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nexport = import(\"./a.ts\");\n// @filename: a.ts\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export {};\r\n"
+      }
+     ],
+     "name": "/.src/a.cts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "\"use strict\";\r\nimport { __rewriteRelativeImportExtension } from \"tslib\";\r\nimport { createRequire as _createRequire } from \"module\";\r\nconst __require = _createRequire(import.meta.url);\r\nconst x = __require(\"./a.cjs\");\r\nexport function f(y: string) { return import(__rewriteRelativeImportExtension(y)); }\r\nexport { x };\r\n"
+      }
+     ],
+     "name": "/.src/probe.mts"
+    }
+   ],
+   "id": "x04-nodenext-helpers-and-require",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.cts": "6578706f7274203d20313b0a",
+     "/.src/probe.mts": "2275736520737472696374223b0a696d706f72742078203d207265717569726528222e2f612e63747322293b0a6578706f72742066756e6374696f6e206628793a20737472696e6729207b2072657475726e20696d706f72742879293b207d0a6578706f7274207b2078207d3b"
+    },
+    "id": "x04-nodenext-helpers-and-require",
+    "options": {
+     "importHelpers": true,
+     "module": 199,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.mts",
+     "/.src/a.cts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @importHelpers: true\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.mts\n\"use strict\";\nimport x = require(\"./a.cts\");\nexport function f(y: string) { return import(y); }\nexport { x };\n// @filename: a.cts\nexport = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "namespace N {\r\n    export const y = 1;\r\n}\r\nexport { x };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "x05-es2015-namespace-import-equals",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b206578706f727420636f6e73742079203d20313b207d0a696d706f72742078203d204e2e793b0a6578706f7274207b2078207d3b0a"
+    },
+    "id": "x05-es2015-namespace-import-equals",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: es2015\nnamespace N { export const y = 1; }\nimport x = N.y;\nexport { x };\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "import { createRequire as _createRequire } from \"module\";\r\nconst __require = _createRequire(import.meta.url);\r\nexport {};\r\ndeclare module \"m\" {\r\n    const x = __require(\"./a.cjs\");\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.mts"
+    }
+   ],
+   "id": "x06-nested-declare-module",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.mts": "6578706f7274207b7d3b0a6465636c617265206d6f64756c6520226d22207b20696d706f72742078203d207265717569726528222e2f612e636a7322293b207d0a"
+    },
+    "id": "x06-nested-declare-module",
+    "options": {
+     "module": 199,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.mts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: probe.mts\nexport {};\ndeclare module \"m\" { import x = require(\"./a.cjs\"); }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "var __rewriteRelativeImportExtension = (this && this.__rewriteRelativeImportExtension) || function (path, preserveJsx) {\r\n    if (typeof path === \"string\" && /^\\.\\.?\\//.test(path)) {\r\n        return path.replace(/\\.(tsx)$|((?:\\.d)?)((?:\\.[^./]+?)?)\\.([cm]?)ts$/i, function (m, tsx, d, ext, cm) {\r\n            return tsx ? preserveJsx ? \".jsx\" : \".js\" : d && (!ext || !cm) ? m : (d + ext + \".\" + cm.toLowerCase() + \"js\");\r\n        });\r\n    }\r\n    return path;\r\n};\r\nexport const a = require(__rewriteRelativeImportExtension(require(\"./b.ts\")));\r\nexport const b = import(__rewriteRelativeImportExtension(import(\"./c.ts\")), require(\"./d.js\"));\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "x07-js-require-in-nested",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "6578706f727420636f6e73742061203d2072657175697265287265717569726528222e2f622e74732229293b0a6578706f727420636f6e73742062203d20696d706f727428696d706f727428222e2f632e747322292c207265717569726528222e2f642e74732229293b0a"
+    },
+    "id": "x07-js-require-in-nested",
+    "options": {
+     "allowJs": true,
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @allowJs: true\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.js\nexport const a = require(require(\"./b.ts\"));\nexport const b = import(import(\"./c.ts\"), require(\"./d.ts\"));\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "panic": "runtime error: invalid memory address or nil pointer dereference"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "x08-cjs-module-helpers-prologue",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "2275736520737472696374223b0a6578706f72742066756e6374696f6e206628783a20737472696e6729207b2072657475726e20696d706f72742878293b207d0a"
+    },
+    "id": "x08-cjs-module-helpers-prologue",
+    "options": {
+     "importHelpers": true,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @importHelpers: true\n// @rewriteRelativeImportExtensions: true\n\"use strict\";\nexport function f(x: string) { return import(x); }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export type A = number;\r\n"
+      }
+     ],
+     "name": "/.src/a.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export * as T from \"./a\";\r\nexport { A } from \"./a\";\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "x09-export-star-as-esnext-type-only",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.ts": "6578706f727420747970652041203d206e756d6265723b0a",
+     "/.src/probe.ts": "6578706f72742074797065202a20617320542066726f6d20222e2f61223b0a6578706f72742074797065207b2041207d2066726f6d20222e2f61223b"
+    },
+    "id": "x09-export-star-as-esnext-type-only",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts",
+     "/.src/a.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: probe.ts\nexport type * as T from \"./a\";\nexport type { A } from \"./a\";\n// @filename: a.ts\nexport type A = number;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "esmodule"
+       ],
+       "text": "export const a = require?.(\"./a.js\");\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "x10-optional-call-import",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "6578706f727420636f6e73742061203d20726571756972653f2e28222e2f612e747322293b0a"
+    },
+    "id": "x10-optional-call-import",
+    "options": {
+     "allowJs": true,
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "rewriteRelativeImportExtensions": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @allowJs: true\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.js\nexport const a = require?.(\"./a.ts\");\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

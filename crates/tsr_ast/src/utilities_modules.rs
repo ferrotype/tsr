@@ -519,3 +519,18 @@ fn get_import_type_node_literal(view: AstView<'_>, node: NodeId) -> Result<Optio
         .expect(NIL);
     Ok((view.node(literal)?.kind() == K::StringLiteral).then_some(literal))
 }
+
+/// The pin's file name parameter is unused.
+// port: tsc/internal/ast/utilities.go:ShouldTransformImportCall
+pub fn should_transform_import_call(
+    options: &CompilerOptions,
+    implied_node_format_for_emit: ModuleKind,
+) -> bool {
+    let module_kind = options.emit_module_kind();
+    if (ModuleKind::NODE16..=ModuleKind::NODE_NEXT).contains(&module_kind)
+        || module_kind == ModuleKind::PRESERVE
+    {
+        return false;
+    }
+    implied_node_format_for_emit < ModuleKind::ES2015
+}

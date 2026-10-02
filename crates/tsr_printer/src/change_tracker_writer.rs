@@ -152,94 +152,120 @@ impl ChangeTrackerWriter {
 }
 
 impl EmitTextWriter for ChangeTrackerWriter {
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.Write
     fn write(&mut self, s: &[u8]) {
         self.inner.write(s);
         self.set_last_non_trivia_position(s, false);
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.WriteTrailingSemicolon
     fn write_trailing_semicolon(&mut self, text: &[u8]) {
         self.inner.write_trailing_semicolon(text);
         self.set_last_non_trivia_position(text, false);
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.WriteComment
     fn write_comment(&mut self, text: &[u8]) {
         self.inner.write_comment(text);
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.WriteKeyword
     fn write_keyword(&mut self, text: &[u8]) {
         self.inner.write_keyword(text);
         self.set_last_non_trivia_position(text, false);
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.WriteOperator
     fn write_operator(&mut self, text: &[u8]) {
         self.inner.write_operator(text);
         self.set_last_non_trivia_position(text, false);
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.WritePunctuation
     fn write_punctuation(&mut self, text: &[u8]) {
         self.inner.write_punctuation(text);
         self.set_last_non_trivia_position(text, false);
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.WriteSpace
     fn write_space(&mut self, text: &[u8]) {
         self.inner.write_space(text);
         self.set_last_non_trivia_position(text, false);
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.WriteStringLiteral
     fn write_string_literal(&mut self, text: &[u8]) {
         self.inner.write_string_literal(text);
         self.set_last_non_trivia_position(text, false);
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.WriteParameter
     fn write_parameter(&mut self, text: &[u8]) {
         self.inner.write_parameter(text);
         self.set_last_non_trivia_position(text, false);
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.WriteProperty
     fn write_property(&mut self, text: &[u8]) {
         self.inner.write_property(text);
         self.set_last_non_trivia_position(text, false);
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.WriteSymbol
     fn write_symbol(&mut self, text: &[u8], symbol: Option<SymbolId>) {
         self.inner.write_symbol(text, symbol);
         self.set_last_non_trivia_position(text, false);
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.WriteLine
     fn write_line(&mut self) {
         self.inner.write_line();
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.WriteLineForce
     fn write_line_force(&mut self, force: bool) {
         self.inner.write_line_force(force);
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.IncreaseIndent
     fn increase_indent(&mut self) {
         self.inner.increase_indent();
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.DecreaseIndent
     fn decrease_indent(&mut self) {
         self.inner.decrease_indent();
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.Clear
     fn clear(&mut self) {
         self.inner.clear();
         self.last_non_trivia_position = 0;
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.String
     fn text(&self) -> &[u8] {
         self.inner.text()
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.RawWrite
     fn raw_write(&mut self, s: &[u8]) {
         self.inner.raw_write(s);
         self.set_last_non_trivia_position(s, false);
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.WriteLiteral
     fn write_literal(&mut self, s: &[u8]) {
         self.inner.write_literal(s);
         self.set_last_non_trivia_position(s, true);
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.GetTextPos
     fn get_text_pos(&self) -> usize {
         self.inner.get_text_pos()
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.GetLine
     fn get_line(&self) -> isize {
         self.inner.get_line()
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.GetColumn
     fn get_column(&self) -> isize {
         self.inner.get_column()
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.GetIndent
     fn get_indent(&self) -> isize {
         self.inner.get_indent()
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.IsAtStartOfLine
     fn is_at_start_of_line(&self) -> bool {
         self.inner.is_at_start_of_line()
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.HasTrailingComment
     fn has_trailing_comment(&self) -> bool {
         self.inner.has_trailing_comment()
     }
+    // port: tsc/internal/printer/changetrackerwriter.go:ChangeTrackerWriter.HasTrailingWhitespace
     fn has_trailing_whitespace(&self) -> bool {
         self.inner.has_trailing_whitespace()
     }
@@ -292,7 +318,7 @@ pub fn print_and_position_node(
         },
         emit_context,
     );
-    printer.write(builder.view(), node, None, &mut writer)?;
+    printer.write(builder.view(), node, None, &mut writer, None)?;
     let mut text = writer.text().to_vec();
     if !new_line.is_empty() && text.ends_with(new_line) {
         text.truncate(text.len() - new_line.len());

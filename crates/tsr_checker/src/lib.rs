@@ -96,6 +96,7 @@ mod emit_checks;
 mod emit_reference;
 mod emit_resolver;
 mod emit_resolver_js;
+mod emit_scope;
 mod emit_scopes;
 mod emit_visibility;
 mod enum_eval;

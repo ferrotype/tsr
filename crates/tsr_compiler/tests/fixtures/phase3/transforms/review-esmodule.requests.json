@@ -1,0 +1,104 @@
+{
+ "cases": [
+  {
+   "id": "x01-cjs-isolated-script-helpers",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @isolatedModules: true\n// @importHelpers: true\n// @rewriteRelativeImportExtensions: true\nfunction f(x: string) { return import(x); }\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "x02-nonliteral-require",
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: probe.mts\nimport x = require(foo);\nexport { x };\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "x03-preserve-export-equals-visit",
+   "name": "probe.ts",
+   "source": "// @module: preserve\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.ts\nexport = import(\"./a.ts\");\n// @filename: a.ts\nexport const a = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "x04-nodenext-helpers-and-require",
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @importHelpers: true\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.mts\n\"use strict\";\nimport x = require(\"./a.cts\");\nexport function f(y: string) { return import(y); }\nexport { x };\n// @filename: a.cts\nexport = 1;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "x05-es2015-namespace-import-equals",
+   "name": "probe.ts",
+   "source": "// @module: es2015\nnamespace N { export const y = 1; }\nimport x = N.y;\nexport { x };\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "x06-nested-declare-module",
+   "name": "probe.ts",
+   "source": "// @module: nodenext\n// @filename: probe.mts\nexport {};\ndeclare module \"m\" { import x = require(\"./a.cjs\"); }\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "x07-js-require-in-nested",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @allowJs: true\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.js\nexport const a = require(require(\"./b.ts\"));\nexport const b = import(import(\"./c.ts\"), require(\"./d.ts\"));\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "x08-cjs-module-helpers-prologue",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @importHelpers: true\n// @rewriteRelativeImportExtensions: true\n\"use strict\";\nexport function f(x: string) { return import(x); }\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "x09-export-star-as-esnext-type-only",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: probe.ts\nexport type * as T from \"./a\";\nexport type { A } from \"./a\";\n// @filename: a.ts\nexport type A = number;\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  },
+  {
+   "id": "x10-optional-call-import",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @allowJs: true\n// @rewriteRelativeImportExtensions: true\n// @filename: probe.js\nexport const a = require?.(\"./a.ts\");\n",
+   "chains": [
+    [
+     "esmodule"
+    ]
+   ]
+  }
+ ]
+}

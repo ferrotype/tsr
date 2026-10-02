@@ -1,0 +1,458 @@
+{
+ "cases": [
+  {
+   "id": "taggedtemplate-03",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`ok`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-15",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet s = `\\x41`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-26",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`a${b}c`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-27",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\n\\x41\\u0041\\u{41}`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-28",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet s = `\\u0041`;\nk`${s}`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-29",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nexport const x = k`fine`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-30",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f() { return k`ok${a}`; }\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-01",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\u`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-02",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\u{`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-04",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`a${b}\\x`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-05",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\u${b}c`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-06",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`a${b}\\xg${c}d`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-07",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\u${b}`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-08",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`${b}\\u`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-09",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nexport const x = k`\\u`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-10",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nexport const x = k`\\u`;\nexport const y = k`\\x${a}`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-11",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no.p`\\u`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-12",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\u`.length;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-13",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`a\r\nb\\u`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-14",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`a\rb\\u`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-16",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f() {\n    return k`\\u${k`\\x`}`;\n}\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-17",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`${k`\\u`}`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-18",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\01`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-19",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\u{110000}`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-20",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nimport \"./m\";\nk`\\u`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-21",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk<string>`\\u`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-22",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\unicode and \\u{55}`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-23",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nconst g = () => k`\\u`;\nexport {};\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-24",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`a${b}c${c}\\u`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "taggedtemplate-25",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk `\\u`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "tt-cooked-and-raw-mixed",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`ok\\n\\t${a}mid\\x41${b}\\u`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "tt-empty-middle-raw",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\u${a}${b}${c}`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "tt-escaped-delimiters",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\`\\${a}\\\\\\u`;\nk`line\\\ncontinued\\x`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "tt-non-ascii",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`é中\\u${a}😀`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "tt-invalid-escape-kinds",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\8`;\nk`\\9`;\nk`\\x4`;\nk`\\u{g}`;\nk`\\u12`;\nk`\\0\\1`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "tt-tag-is-tagged-template",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`\\u``\\x`;\nk`ok``\\u${a}`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "tt-module-cache-multiple",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nexport const x = k`\\u`, y = k`\\x${a}`;\nfunction f() { return k`\\u{`; }\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "tt-module-cache-name-collision",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nvar templateObject = 1, templateObject_1 = 2;\nexport const x = k`\\u`;\nexport const y = k`\\u`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "tt-module-commonjs",
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @module: commonjs\n// @filename: probe.ts\ndeclare function k(...a: any[]): any;\nimport * as m from \"./m\";\nk`\\u${m}`;\nexport = k`\\x`;\n// @filename: m.ts\nexport const v = 1;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "tt-module-esnext",
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @module: esnext\n// @filename: probe.ts\ndeclare function k(...a: any[]): any;\nimport { v } from \"./m\";\nexport default k`\\u${v}`;\n// @filename: m.ts\nexport const v = 1;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "tt-module-detection-force",
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @moduleDetection: force\ndeclare function k(...a: any[]): any;\nk`\\u`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "tt-js-commonjs-require",
+   "name": "main.js",
+   "source": "// @target: es2017\n// @allowJs: true\n// @filename: main.js\nconst m = require(\"./m\");\nfunction k() {}\nk`\\u${m}`;\nmodule.exports = k`\\x`;\n// @filename: m.js\nmodule.exports = 1;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "tt-js-esm",
+   "name": "main.js",
+   "source": "// @target: es2017\n// @allowJs: true\n// @filename: main.js\nimport m from \"./m.js\";\nfunction k() {}\nk`\\u${m}`;\n// @filename: m.js\nexport default 1;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "tt-crlf-raw-pieces",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`a\r\n${b}\r\n\\u\r${c}\r`;\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ]
+   ]
+  },
+  {
+   "id": "tt-in-class-and-arrow",
+   "name": "probe.ts",
+   "source": "// @target: es2017\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nexport class C { static s = k`\\u`; m() { return () => o.p`\\x${this}`; } }\n",
+   "chains": [
+    [
+     "taggedtemplate"
+    ],
+    [
+     "typeeraser",
+     "taggedtemplate"
+    ]
+   ]
+  }
+ ]
+}

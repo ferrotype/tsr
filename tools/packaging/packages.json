@@ -314,6 +314,12 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
+      "name": "tsr_sourcemap",
+      "manifest": "crates/tsr_sourcemap/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
       "name": "tsr_testhost",
       "manifest": "crates/tsr_testhost/Cargo.toml",
       "publish": false,
@@ -322,6 +328,12 @@
     {
       "name": "tsr_transformers",
       "manifest": "crates/tsr_transformers/Cargo.toml",
+      "publish": true,
+      "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_transpile",
+      "manifest": "crates/tsr_transpile/Cargo.toml",
       "publish": true,
       "reason": "Rust library and its public dependency closure"
     },

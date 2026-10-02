@@ -1,0 +1,3932 @@
+{
+ "cases": [
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import x = require(\"other\");\r\nx;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importequals-1",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f72742078203d207265717569726528226f7468657222293b20783b0a"
+    },
+    "id": "go-importequals-1",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x = require(\"other\"); x;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importequals-2",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f72742078203d207265717569726528226f7468657222293b0a"
+    },
+    "id": "go-importequals-2",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x = require(\"other\");\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import \"m\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importdeclaration-1",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f727420226d223b0a"
+    },
+    "id": "go-importdeclaration-1",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport \"m\";\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import * as x from \"other\";\r\nx;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importdeclaration-2",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274202a20617320782066726f6d20226f74686572223b20783b0a"
+    },
+    "id": "go-importdeclaration-2",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport * as x from \"other\"; x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import x from \"other\";\r\nx;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importdeclaration-3",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f727420782066726f6d20226f74686572223b20783b0a"
+    },
+    "id": "go-importdeclaration-3",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x from \"other\"; x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import { x } from \"other\";\r\nx;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importdeclaration-4",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274207b2078207d2066726f6d20226f74686572223b20783b0a"
+    },
+    "id": "go-importdeclaration-4",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { x } from \"other\"; x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importdeclaration-5",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274202a20617320782066726f6d20226f74686572223b0a"
+    },
+    "id": "go-importdeclaration-5",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport * as x from \"other\";\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importdeclaration-6",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f727420782066726f6d20226f74686572223b0a"
+    },
+    "id": "go-importdeclaration-6",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x from \"other\";\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importdeclaration-7",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274207b2078207d2066726f6d20226f74686572223b0a"
+    },
+    "id": "go-importdeclaration-7",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { x } from \"other\";\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export let x;\r\n"
+      }
+     ],
+     "name": "/.src/node_modules/other/index.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export * from \"other\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-1",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274202a2066726f6d20226f74686572223b",
+     "/.src/node_modules/other/index.ts": "6578706f7274206c657420783b0a"
+    },
+    "id": "go-exportdeclaration-1",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/node_modules/other/index.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export let x;\r\n"
+      }
+     ],
+     "name": "/.src/node_modules/other/index.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export * as x from \"other\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-2",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274202a20617320782066726f6d20226f74686572223b",
+     "/.src/node_modules/other/index.ts": "6578706f7274206c657420783b0a"
+    },
+    "id": "go-exportdeclaration-2",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/node_modules/other/index.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * as x from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export let x;\r\n"
+      }
+     ],
+     "name": "/.src/node_modules/other/index.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export * from \"other\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-3",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274202a2066726f6d20226f74686572223b",
+     "/.src/node_modules/other/index.ts": "6578706f7274206c657420783b0a"
+    },
+    "id": "go-exportdeclaration-3",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/node_modules/other/index.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export let x;\r\n"
+      }
+     ],
+     "name": "/.src/node_modules/other/index.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export * as x from \"other\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-4",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274202a20617320782066726f6d20226f74686572223b",
+     "/.src/node_modules/other/index.ts": "6578706f7274206c657420783b0a"
+    },
+    "id": "go-exportdeclaration-4",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/node_modules/other/index.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * as x from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export let x;\r\n"
+      }
+     ],
+     "name": "/.src/node_modules/other/index.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export { x } from \"other\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-5",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274207b2078207d2066726f6d20226f74686572223b",
+     "/.src/node_modules/other/index.ts": "6578706f7274206c657420783b0a"
+    },
+    "id": "go-exportdeclaration-5",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/node_modules/other/index.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x } from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export type x = any;\r\n"
+      }
+     ],
+     "name": "/.src/node_modules/other/index.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-6",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274207b2078207d2066726f6d20226f74686572223b",
+     "/.src/node_modules/other/index.ts": "6578706f727420747970652078203d20616e793b0a"
+    },
+    "id": "go-exportdeclaration-6",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/node_modules/other/index.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x } from \"other\";\n// @filename: node_modules/other/index.ts\nexport type x = any;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export { x };\r\nlet x;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-7",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274207b2078207d3b206c657420783b0a"
+    },
+    "id": "go-exportdeclaration-7",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x }; let x;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export type x = any;\r\n"
+      }
+     ],
+     "name": "/.src/node_modules/other/index.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-9",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274207b2078207d2066726f6d20226f74686572223b206578706f7274207b2078207d3b",
+     "/.src/node_modules/other/index.ts": "6578706f727420747970652078203d20616e793b0a"
+    },
+    "id": "go-exportdeclaration-9",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/node_modules/other/index.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { x } from \"other\"; export { x };\n// @filename: node_modules/other/index.ts\nexport type x = any;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "let x;\r\nexport default x;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportassignment-1",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6c657420783b206578706f72742064656661756c7420783b0a"
+    },
+    "id": "go-exportassignment-1",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nlet x; export default x;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "namespace N {\r\n    export const v = 1;\r\n}\r\nimport y = N.v;\r\ny;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-equals-entity-module-used",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6e616d657370616365204e207b206578706f727420636f6e73742076203d20313b207d0a696d706f72742079203d204e2e763b0a793b0a6578706f7274207b7d3b0a"
+    },
+    "id": "ie-equals-entity-module-used",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nimport y = N.v;\ny;\nexport {};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "namespace N {\r\n    export const v = 1;\r\n}\r\nexport const k = 1;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-equals-entity-module-unused",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6e616d657370616365204e207b206578706f727420636f6e73742076203d20313b207d0a696d706f72742079203d204e2e763b0a6578706f727420636f6e7374206b203d20313b0a"
+    },
+    "id": "ie-equals-entity-module-unused",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nimport y = N.v;\nexport const k = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "namespace N {\r\n    export const v = 1;\r\n}\r\nimport y = N.v;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-equals-entity-script-unused",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6e616d657370616365204e207b206578706f727420636f6e73742076203d20313b207d0a696d706f72742079203d204e2e763b0a"
+    },
+    "id": "ie-equals-entity-script-unused",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nimport y = N.v;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "namespace N { }\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-equals-entity-script-uninstantiated",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6e616d657370616365204e207b207d0a696d706f72742079203d204e3b0a"
+    },
+    "id": "ie-equals-entity-script-uninstantiated",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { }\nimport y = N;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "namespace N {\r\n    export const v = 1;\r\n}\r\nnamespace M { }\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-equals-entity-script-nested-unused",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6e616d657370616365204e207b206578706f727420636f6e73742076203d20313b207d0a6e616d657370616365204d207b20696d706f72742079203d204e2e763b207d0a"
+    },
+    "id": "ie-equals-entity-script-nested-unused",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nnamespace M { import y = N.v; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "namespace N {\r\n    export const v = 1;\r\n}\r\nnamespace M {\r\n    import y = N.v;\r\n    export const z = y;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-equals-entity-nested-used",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6e616d657370616365204e207b206578706f727420636f6e73742076203d20313b207d0a6e616d657370616365204d207b20696d706f72742079203d204e2e763b206578706f727420636f6e7374207a203d20793b207d0a"
+    },
+    "id": "ie-equals-entity-nested-used",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nnamespace M { import y = N.v; export const z = y; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "namespace N {\r\n    export const v = 1;\r\n}\r\nexport import y = N.v;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-equals-export-import",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6e616d657370616365204e207b206578706f727420636f6e73742076203d20313b207d0a6578706f727420696d706f72742079203d204e2e763b0a"
+    },
+    "id": "ie-equals-export-import",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nexport import y = N.v;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "namespace N {\r\n    export const v = 1;\r\n}\r\nnamespace M {\r\n    export import y = N.v;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-equals-namespace-export-import",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6e616d657370616365204e207b206578706f727420636f6e73742076203d20313b207d0a6e616d657370616365204d207b206578706f727420696d706f72742079203d204e2e763b207d0a"
+    },
+    "id": "ie-equals-namespace-export-import",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nnamespace M { export import y = N.v; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "namespace N {\r\n    export const v = 1;\r\n}\r\nnamespace A.B {\r\n    import y = N.v;\r\n    y;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-equals-dotted-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6e616d657370616365204e207b206578706f727420636f6e73742076203d20313b207d0a6e616d65737061636520412e42207b20696d706f72742079203d204e2e763b20793b207d0a"
+    },
+    "id": "ie-equals-dotted-namespace",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nnamespace A.B { import y = N.v; y; }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import x = require(\"./other\");\r\nx.a;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-equals-require-used-relative",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f72742078203d207265717569726528222e2f6f7468657222293b0a782e613b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-equals-require-used-relative",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x = require(\"./other\");\nx.a;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import x = require(\"./other\");\r\nexport = x;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-export-equals-commonjs",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f72742078203d207265717569726528222e2f6f7468657222293b0a6578706f7274203d20783b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-export-equals-commonjs",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport x = require(\"./other\");\nexport = x;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import { a } from \"./other\";\r\na;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-import-default-named-partial",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f727420642c207b20612c2062207d2066726f6d20222e2f6f74686572223b0a613b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-import-default-named-partial",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport d, { a, b } from \"./other\";\na;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import d from \"./other\";\r\nd;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-import-default-only-used",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f727420642c207b2061207d2066726f6d20222e2f6f74686572223b0a643b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-import-default-only-used",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport d, { a } from \"./other\";\nd;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import * as ns from \"./other\";\r\nns;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-import-default-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f727420642c202a206173206e732066726f6d20222e2f6f74686572223b0a6e733b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-import-default-namespace",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport d, * as ns from \"./other\";\nns;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import { a } from \"./other\" with { type: \"json\" };\r\na;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-import-attributes",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274207b2061207d2066726f6d20222e2f6f74686572222077697468207b20747970653a20226a736f6e22207d3b0a613b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-import-attributes",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: esnext\n// @filename: main.ts\nimport { a } from \"./other\" with { type: \"json\" };\na;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import \"./other\" with { type: \"json\" };\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-import-side-effect-attributes",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f727420222e2f6f74686572222077697468207b20747970653a20226a736f6e22207d3b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-import-side-effect-attributes",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: esnext\n// @filename: main.ts\nimport \"./other\" with { type: \"json\" };\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import { b } from \"./other\";\r\nb;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-import-type-modifier",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274207b207479706520612c2062207d2066726f6d20222e2f6f74686572223b0a623b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-import-type-modifier",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { type a, b } from \"./other\";\nb;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export const k = 1;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-import-type-only-clause",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f72742074797065207b2061207d2066726f6d20222e2f6f74686572223b0a6578706f727420636f6e7374206b203d20313b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-import-type-only-clause",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport type { a } from \"./other\";\nexport const k = 1;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-import-empty-named",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274207b7d2066726f6d20222e2f6f74686572223b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-import-empty-named",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport {} from \"./other\";\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import { a } from \"./other\";\r\nexport { a };\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-import-reexported",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274207b2061207d2066726f6d20222e2f6f74686572223b0a6578706f7274207b2061207d3b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-import-reexported",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { a } from \"./other\";\nexport { a };\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-import-interface-reexported",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274207b2054207d2066726f6d20222e2f6f74686572223b0a6578706f7274207b2054207d3b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-import-interface-reexported",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { T } from \"./other\";\nexport { T };\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "const k = 1;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-export-empty",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274207b7d3b0a636f6e7374206b203d20313b0a"
+    },
+    "id": "ie-export-empty",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport {};\nconst k = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export * from \"./other\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-export-star",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274202a2066726f6d20222e2f6f74686572223b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-export-star",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * from \"./other\";\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export * as ns from \"./other\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-export-star-as",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274202a206173206e732066726f6d20222e2f6f74686572223b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-export-star-as",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * as ns from \"./other\";\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export { a } from \"./other\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-export-from-partial",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274207b20612c2054207d2066726f6d20222e2f6f74686572223b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-export-from-partial",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { a, T } from \"./other\";\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-export-from-interface-only",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274207b20542c20542061732055207d2066726f6d20222e2f6f74686572223b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-export-from-interface-only",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { T, T as U } from \"./other\";\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export { a } from \"./other\" with { type: \"json\" };\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-export-from-attributes",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274207b2061207d2066726f6d20222e2f6f74686572222077697468207b20747970653a20226a736f6e22207d3b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-export-from-attributes",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: esnext\n// @filename: main.ts\nexport { a } from \"./other\" with { type: \"json\" };\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export { q } from \"./missing\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-export-from-unresolved",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274207b2071207d2066726f6d20222e2f6d697373696e67223b0a"
+    },
+    "id": "ie-export-from-unresolved",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { q } from \"./missing\";\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "const a = 1;\r\nexport { a as b, a as default };\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-export-local-renames",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "636f6e73742061203d20313b0a6578706f7274207b206120617320622c20612061732064656661756c74207d3b0a"
+    },
+    "id": "ie-export-local-renames",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nconst a = 1;\nexport { a as b, a as default };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1 + 2;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-export-default-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f72742064656661756c742031202b20323b0a"
+    },
+    "id": "ie-export-default-expression",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport default 1 + 2;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-export-default-interface-import",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274207b2054207d2066726f6d20222e2f6f74686572223b0a6578706f72742064656661756c7420543b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-export-default-interface-import",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { T } from \"./other\";\nexport default T;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import * as ns from \"./other\";\r\nexport default ns;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-export-default-namespace-import",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274202a206173206e732066726f6d20222e2f6f74686572223b0a6578706f72742064656661756c74206e733b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-export-default-namespace-import",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport * as ns from \"./other\";\nexport default ns;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default function f() { return 1; }\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-export-default-function",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f72742064656661756c742066756e6374696f6e20662829207b2072657475726e20313b207d0a"
+    },
+    "id": "ie-export-default-function",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport default function f() { return 1; }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "declare module \"m\" {\r\n    export { a, T };\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    }
+   ],
+   "id": "ie-ambient-module",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6465636c617265206d6f64756c6520226d22207b0a20202020696d706f7274207b20612c2054207d2066726f6d20222e2f6f74686572223b0a202020206578706f7274207b20612c2054207d3b0a7d0a6578706f7274207b7d3b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-ambient-module",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\ndeclare module \"m\" {\n    import { a, T } from \"./other\";\n    export { a, T };\n}\nexport {};\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/other.js"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import x from \"./other.js\";\r\nimport { a } from \"./other.js\";\r\nexport { a as c };\r\n"
+      }
+     ],
+     "name": "/.src/main.js"
+    }
+   ],
+   "id": "ie-js-file-unused-import",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.js": "696d706f727420782066726f6d20222e2f6f746865722e6a73223b0a696d706f7274207b2061207d2066726f6d20222e2f6f746865722e6a73223b0a6578706f7274207b20612061732063207d3b",
+     "/.src/other.js": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20313b0a"
+    },
+    "id": "ie-js-file-unused-import",
+    "options": {
+     "allowJs": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.js",
+     "/.src/other.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.js",
+   "source": "// @allowJs: true\n// @filename: main.js\nimport x from \"./other.js\";\nimport { a } from \"./other.js\";\nexport { a as c };\n// @filename: other.js\nexport default 1;\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "import x = require(\"other\");\r\nx;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importequals-1-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f72742078203d207265717569726528226f7468657222293b20783b0a"
+    },
+    "id": "go-importequals-1-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x = require(\"other\"); x;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importequals-2-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f72742078203d207265717569726528226f7468657222293b0a"
+    },
+    "id": "go-importequals-2-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x = require(\"other\");\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "import \"m\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importdeclaration-1-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f727420226d223b0a"
+    },
+    "id": "go-importdeclaration-1-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport \"m\";\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "import * as x from \"other\";\r\nx;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importdeclaration-2-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274202a20617320782066726f6d20226f74686572223b20783b0a"
+    },
+    "id": "go-importdeclaration-2-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport * as x from \"other\"; x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "import x from \"other\";\r\nx;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importdeclaration-3-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f727420782066726f6d20226f74686572223b20783b0a"
+    },
+    "id": "go-importdeclaration-3-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x from \"other\"; x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "import { x } from \"other\";\r\nx;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importdeclaration-4-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274207b2078207d2066726f6d20226f74686572223b20783b0a"
+    },
+    "id": "go-importdeclaration-4-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { x } from \"other\"; x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importdeclaration-5-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274202a20617320782066726f6d20226f74686572223b0a"
+    },
+    "id": "go-importdeclaration-5-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport * as x from \"other\";\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importdeclaration-6-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f727420782066726f6d20226f74686572223b0a"
+    },
+    "id": "go-importdeclaration-6-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x from \"other\";\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-importdeclaration-7-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274207b2078207d2066726f6d20226f74686572223b0a"
+    },
+    "id": "go-importdeclaration-7-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { x } from \"other\";\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "export let x;\r\n"
+      }
+     ],
+     "name": "/.src/node_modules/other/index.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "export * from \"other\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-1-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274202a2066726f6d20226f74686572223b",
+     "/.src/node_modules/other/index.ts": "6578706f7274206c657420783b0a"
+    },
+    "id": "go-exportdeclaration-1-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/node_modules/other/index.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "export let x;\r\n"
+      }
+     ],
+     "name": "/.src/node_modules/other/index.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "export * as x from \"other\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-2-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274202a20617320782066726f6d20226f74686572223b",
+     "/.src/node_modules/other/index.ts": "6578706f7274206c657420783b0a"
+    },
+    "id": "go-exportdeclaration-2-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/node_modules/other/index.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * as x from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "export let x;\r\n"
+      }
+     ],
+     "name": "/.src/node_modules/other/index.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "export * from \"other\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-3-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274202a2066726f6d20226f74686572223b",
+     "/.src/node_modules/other/index.ts": "6578706f7274206c657420783b0a"
+    },
+    "id": "go-exportdeclaration-3-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/node_modules/other/index.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "export let x;\r\n"
+      }
+     ],
+     "name": "/.src/node_modules/other/index.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "export * as x from \"other\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-4-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274202a20617320782066726f6d20226f74686572223b",
+     "/.src/node_modules/other/index.ts": "6578706f7274206c657420783b0a"
+    },
+    "id": "go-exportdeclaration-4-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/node_modules/other/index.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * as x from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "export let x;\r\n"
+      }
+     ],
+     "name": "/.src/node_modules/other/index.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "export { x } from \"other\";\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-5-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274207b2078207d2066726f6d20226f74686572223b",
+     "/.src/node_modules/other/index.ts": "6578706f7274206c657420783b0a"
+    },
+    "id": "go-exportdeclaration-5-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/node_modules/other/index.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x } from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/node_modules/other/index.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-6-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274207b2078207d2066726f6d20226f74686572223b",
+     "/.src/node_modules/other/index.ts": "6578706f727420747970652078203d20616e793b0a"
+    },
+    "id": "go-exportdeclaration-6-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/node_modules/other/index.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x } from \"other\";\n// @filename: node_modules/other/index.ts\nexport type x = any;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "export { x };\r\nlet x;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-7-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274207b2078207d3b206c657420783b0a"
+    },
+    "id": "go-exportdeclaration-7-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x }; let x;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-8",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6578706f7274207b2078207d3b20747970652078203d20616e793b0a"
+    },
+    "id": "go-exportdeclaration-8",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x }; type x = any;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/node_modules/other/index.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportdeclaration-9-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274207b2078207d2066726f6d20226f74686572223b206578706f7274207b2078207d3b",
+     "/.src/node_modules/other/index.ts": "6578706f727420747970652078203d20616e793b0a"
+    },
+    "id": "go-exportdeclaration-9-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/node_modules/other/index.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { x } from \"other\"; export { x };\n// @filename: node_modules/other/index.ts\nexport type x = any;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "let x;\r\nexport default x;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportassignment-1-with-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6c657420783b206578706f72742064656661756c7420783b0a"
+    },
+    "id": "go-exportassignment-1-with-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nlet x; export default x;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "go-exportassignment-2",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "747970652078203d20616e793b206578706f72742064656661756c7420783b0a"
+    },
+    "id": "go-exportassignment-2",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\ntype x = any; export default x;\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx",
+        "importelision"
+       ],
+       "text": "import { Fragment as _Fragment, jsx as _jsx } from \"react/jsx-runtime\";\r\nexport const e = _jsx(\"div\", { children: 1 });\r\nexport const f = _jsx(_Fragment, { children: _jsx(\"span\", {}, \"k\") });\r\n"
+      }
+     ],
+     "name": "/.src/main.tsx"
+    }
+   ],
+   "id": "ie-jsx-synthesized-import",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.tsx": "6578706f727420636f6e73742065203d203c6469763e7b317d3c2f6469763e3b0a6578706f727420636f6e73742066203d203c3e3c7370616e206b65793d226b22202f3e3c2f3e3b0a"
+    },
+    "id": "ie-jsx-synthesized-import",
+    "options": {
+     "jsx": 4,
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.tsx",
+   "source": "// @jsx: react-jsx\n// @module: esnext\n// @filename: main.tsx\nexport const e = <div>{1}</div>;\nexport const f = <><span key=\"k\" /></>;\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx",
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx",
+        "importelision"
+       ],
+       "text": "import { jsxDEV as _jsxDEV } from \"react/jsx-dev-runtime\";\r\nconst _jsxFileName = \"/.src/main.tsx\";\r\nimport { a } from \"./other\";\r\nlet t: T;\r\nexport const e = _jsxDEV(\"div\", { children: a }, void 0, false, { fileName: _jsxFileName, lineNumber: 4, columnNumber: 18 }, this);\r\n"
+      }
+     ],
+     "name": "/.src/main.tsx"
+    }
+   ],
+   "id": "ie-jsx-synthesized-import-with-user-imports",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.tsx": "696d706f7274207b20612c2054207d2066726f6d20222e2f6f74686572223b0a696d706f727420642066726f6d20222e2f6f74686572223b0a6c657420743a20543b0a6578706f727420636f6e73742065203d203c6469763e7b617d3c2f6469763e3b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-jsx-synthesized-import-with-user-imports",
+    "options": {
+     "jsx": 5,
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.tsx",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.tsx",
+   "source": "// @jsx: react-jsxdev\n// @module: esnext\n// @filename: main.tsx\nimport { a, T } from \"./other\";\nimport d from \"./other\";\nlet t: T;\nexport const e = <div>{a}</div>;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx",
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx",
+        "importelision"
+       ],
+       "text": "import { jsx as _jsx } from \"preact/jsx-runtime\";\r\nexport const e = _jsx(\"div\", { a: 1 }, \"k\");\r\n"
+      }
+     ],
+     "name": "/.src/main.tsx"
+    }
+   ],
+   "id": "ie-jsx-synthesized-import-source",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.tsx": "696d706f72742074797065207b2054207d2066726f6d20222e2f6f74686572223b0a6578706f727420636f6e73742065203d203c646976207b2e2e2e7b20613a2031207d7d206b65793d226b22202f3e3b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-jsx-synthesized-import-source",
+    "options": {
+     "jsx": 4,
+     "jsxImportSource": "preact",
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.tsx",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.tsx",
+   "source": "// @jsx: react-jsx\n// @jsxImportSource: preact\n// @module: esnext\n// @filename: main.tsx\nimport type { T } from \"./other\";\nexport const e = <div {...{ a: 1 }} key=\"k\" />;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import defer * as ns from \"./other\";\r\nns.a;\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "importelision"
+       ],
+       "text": "import defer * as ns from \"./other\";\r\nns.a;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-import-defer-namespace-used",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274206465666572202a206173206e732066726f6d20222e2f6f74686572223b0a6e732e613b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-import-defer-namespace-used",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: esnext\n// @filename: main.ts\nimport defer * as ns from \"./other\";\nns.a;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export const k = 1;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-import-defer-namespace-unused",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274206465666572202a206173206e732066726f6d20222e2f6f74686572223b0a6578706f727420636f6e7374206b203d20313b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-import-defer-namespace-unused",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: esnext\n// @filename: main.ts\nimport defer * as ns from \"./other\";\nexport const k = 1;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "let t: ns.T;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-import-defer-type-only-use",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274206465666572202a206173206e732066726f6d20222e2f6f74686572223b0a6c657420743a206e732e543b0a6578706f7274207b7d3b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-import-defer-type-only-use",
+    "options": {
+     "module": 200,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: preserve\n// @filename: main.ts\nimport defer * as ns from \"./other\";\nlet t: ns.T;\nexport {};\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision",
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "importelision",
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision",
+        "importelision"
+       ],
+       "text": "import { a, b } from \"./other\";\r\nimport * as ns from \"./other\";\r\nexport { a as c };\r\nlet t: T = b;\r\nexport default ns;\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "importelision",
+        "importelision"
+       ],
+       "text": "import { a, b } from \"./other\";\r\nimport * as ns from \"./other\";\r\nexport { a as c };\r\nlet t = b;\r\nexport default ns;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-two-pass-partial",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f727420642c207b20612c20622c2054207d2066726f6d20222e2f6f74686572223b0a696d706f7274202a206173206e732066726f6d20222e2f6f74686572223b0a696d706f72742078203d207265717569726528222e2f6f7468657222293b0a6578706f7274207b206120617320632c2054207d3b0a6c657420743a2054203d20623b0a6578706f72742064656661756c74206e733b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-two-pass-partial",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport d, { a, b, T } from \"./other\";\nimport * as ns from \"./other\";\nimport x = require(\"./other\");\nexport { a as c, T };\nlet t: T = b;\nexport default ns;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision",
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision",
+        "importelision"
+       ],
+       "text": "export const k = 1;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-two-pass-elided",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f727420642c207b2061207d2066726f6d20222e2f6f74686572223b0a6578706f7274207b2054207d2066726f6d20222e2f6f74686572223b0a696d706f72742078203d207265717569726528222e2f6f7468657222293b0a6578706f727420636f6e7374206b203d20313b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-two-pass-elided",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport d, { a } from \"./other\";\nexport { T } from \"./other\";\nimport x = require(\"./other\");\nexport const k = 1;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision",
+        "importelision"
+       ],
+       "text": "namespace N {\r\n    export const v = 1;\r\n}\r\nimport y = N.v;\r\nnamespace M {\r\n    import z = N.v;\r\n    export const w = z;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-two-pass-namespace-equals",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6e616d657370616365204e207b206578706f727420636f6e73742076203d20313b207d0a696d706f72742079203d204e2e763b0a6e616d657370616365204d207b20696d706f7274207a203d204e2e763b206578706f727420636f6e73742077203d207a3b207d0a"
+    },
+    "id": "ie-two-pass-namespace-equals",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nimport y = N.v;\nnamespace M { import z = N.v; export const w = z; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "panic": "ImportElisionTransformer should not be used with VerbatimModuleSyntax"
+      }
+     ],
+     "name": "/.src/other.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "panic": "ImportElisionTransformer should not be used with VerbatimModuleSyntax"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-verbatim-module-syntax-panics",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696d706f7274207b2061207d2066726f6d20222e2f6f74686572223b0a613b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-verbatim-module-syntax-panics",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "verbatimModuleSyntax": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @verbatimModuleSyntax: true\n// @module: esnext\n// @filename: main.ts\nimport { a } from \"./other\";\na;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "interface I {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-export-equals-interface",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "696e746572666163652049207b7d0a6578706f7274203d20493b0a"
+    },
+    "id": "ie-export-equals-interface",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\ninterface I {}\nexport = I;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "const v = 1;\r\nexport = v;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "ie-export-equals-value",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "636f6e73742076203d20313b0a6578706f7274203d20763b0a"
+    },
+    "id": "ie-export-equals-value",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nconst v = 1;\nexport = v;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/other.js"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "import * as ns from \"./other.js\";\r\nimport d, { a } from \"./other.js\";\r\nexport { a as c };\r\nexport default 1;\r\n"
+      }
+     ],
+     "name": "/.src/main.js"
+    }
+   ],
+   "id": "ie-js-namespace-and-equals",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.js": "696d706f7274202a206173206e732066726f6d20222e2f6f746865722e6a73223b0a696d706f727420642c207b2061207d2066726f6d20222e2f6f746865722e6a73223b0a6578706f7274207b20612061732063207d3b0a6578706f72742064656661756c7420313b",
+     "/.src/other.js": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20313b0a"
+    },
+    "id": "ie-js-namespace-and-equals",
+    "options": {
+     "allowJs": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.js",
+     "/.src/other.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.js",
+   "source": "// @allowJs: true\n// @filename: main.js\nimport * as ns from \"./other.js\";\nimport d, { a } from \"./other.js\";\nexport { a as c };\nexport default 1;\n// @filename: other.js\nexport default 1;\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "namespace N {\r\n    export const q = 1;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "importelision"
+       ],
+       "text": "export default 1;\r\nexport const a = 1, b = 2;\r\nexport interface T {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/other.ts"
+    }
+   ],
+   "id": "ie-namespace-export-unused",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/main.ts": "6e616d657370616365204e207b0a20202020696d706f7274207b2061207d2066726f6d20222e2f6f74686572223b0a202020206578706f727420636f6e73742071203d20313b0a7d0a6578706f7274207b7d3b",
+     "/.src/other.ts": "6578706f72742064656661756c7420313b0a6578706f727420636f6e73742061203d20312c2062203d20323b0a6578706f727420696e746572666163652054207b7d0a"
+    },
+    "id": "ie-namespace-export-unused",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/main.ts",
+     "/.src/other.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N {\n    import { a } from \"./other\";\n    export const q = 1;\n}\nexport {};\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

@@ -49,6 +49,7 @@ fn main() {
         current_directory: JsString::from_bytes(b"/".as_slice()),
         default_library_path: JsString::from_bytes(b"/lib".as_slice()),
         skip_module_resolution: false,
+        single_threaded: Tristate::UNKNOWN,
     };
     let mut cache = FileCache::new();
     let counters = Counters::new();
@@ -67,6 +68,22 @@ A query borrows its operation scope. Use `retain_type`, `retain_symbol` or
 program alive. `retire()` prevents subsequent queries, including through retained
 results. See the [embedding guide](https://github.com/ferrotype/tsr/blob/main/docs/S10.md)
 for lifetime and host details.
+
+## Emit in memory
+
+`Session::emit` runs the compiler's emit with an in-memory write callback and
+returns every written file's name and bytes, in the compiler's emitted-files
+order, with the skip flag and the emit diagnostics. Nothing is written through
+the host. `EmitOptions` selects target files of the session's program, the
+outputs (`EmitOnly`) and forced emit. This entry point carries no acceptance
+claim yet.
+
+```rust,ignore
+let output = session.emit(&tsr_embed::EmitOptions::default()).unwrap();
+for file in &output.files {
+    println!("{}: {} bytes", String::from_utf8_lossy(file.name.as_bytes()), file.text.len());
+}
+```
 
 ## Parser only
 

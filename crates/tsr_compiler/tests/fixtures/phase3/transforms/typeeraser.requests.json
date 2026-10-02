@@ -1,0 +1,414 @@
+{
+ "cases": [
+  {
+   "id": "no-typescript",
+   "name": "probe.ts",
+   "source": "var a = 1;\nfunction f(b) { return a + b; }\nclass C { m() { return this; } }\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "ambient-statements",
+   "name": "probe.ts",
+   "source": "declare var a: number;\ndeclare let b;\ndeclare function f(): void;\ndeclare class D {}\ndeclare enum E { A }\ndeclare namespace N { var x; }\ndeclare module \"m\" {}\nexport declare const c: number;\nvar keep = 1;\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "modifier-keywords",
+   "name": "probe.ts",
+   "source": "abstract class A {\n    public a = 1;\n    private b = 2;\n    protected c = 3;\n    readonly d = 4;\n    static readonly e = 5;\n    public static override f = 6;\n    protected abstract g(): void;\n}\nclass B extends A {\n    override g() {}\n    public override get h() { return 1; }\n}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "type-nodes",
+   "name": "probe.ts",
+   "source": "let a: number[] = [];\nlet b: [string, number?, ...boolean[]] = [\"\"];\nlet c: { x: string; [k: string]: any } = { x: \"\" };\nlet d: unknown, e: never, f: void, g: symbol, h: any, i: boolean;\nlet j: new () => object = null;\nlet k: (x: number) => string = null;\nlet l: typeof a = a;\nlet m: Array<string> | null = null;\nlet n: A & B;\nlet o: T extends string ? 1 : 2;\nlet p: (string);\nlet q: keyof T;\nlet r: T[\"x\"];\nlet s: { [P in keyof T]: T[P] };\nlet t: \"lit\" = \"lit\";\nfunction isS(x: any): x is string { return true; }\nclass Th { m(): this { return this; } }\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "index-signature",
+   "name": "probe.ts",
+   "source": "class C {\n    [key: string]: number;\n    static [key: number]: string;\n    x = 1;\n}\ninterface I { [k: string]: any }\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "variance-modifiers",
+   "name": "probe.ts",
+   "source": "class C<in T, out U, in out V> {}\ninterface I<in T> { x: T }\nconst r = (a as any) in b;\nconst s = \"k\" in b;\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "variance-modifiers-misplaced",
+   "name": "probe.ts",
+   "source": "class C {\n    in x = 1;\n    out y = 2;\n}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "type-only-declarations",
+   "name": "probe.ts",
+   "source": "type T = string;\nexport type U = number;\ninterface I { x: number }\nexport interface J extends I {}\n/** leading */\ntype V = T;\nvar keep = 1;\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-export-declaration",
+   "name": "probe.ts",
+   "source": "export as namespace N;\nexport const x = 1;\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "module-declarations",
+   "name": "probe.ts",
+   "source": "namespace Empty {}\nnamespace TypesOnly { export interface I {} export type T = number; }\nnamespace Inst { export const x = 1; }\nnamespace A.B.C { export function f(x: number) { return x; } }\nmodule M { var y: string; }\nnamespace ConstOnly { const enum E { A } }\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "module-string-name",
+   "name": "probe.ts",
+   "source": "module \"m\" { export var x = 1; }\nvar keep = 1;\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "module-const-enum-preserved",
+   "name": "probe.ts",
+   "source": "// @preserveConstEnums: true\nnamespace ConstOnly { const enum E { A = 1 } }\nnamespace TypesOnly { export interface I {} }\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "module-no-body",
+   "name": "probe.ts",
+   "source": "namespace A.B;\nvar keep: number = 1;\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "expression-with-type-arguments",
+   "name": "probe.ts",
+   "source": "class B<T> {}\nclass C extends B<string> {}\nconst f = Array<string>;\nconst g = (Map<string, number>);\ninterface I extends B<number> {}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "property-declarations",
+   "name": "probe.ts",
+   "source": "abstract class C {\n    declare x: number;\n    abstract y: string;\n    public z: number = 1;\n    static w?: string;\n    v!: number;\n    readonly u = \"u\";\n}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "property-decorated-experimental",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\ndeclare function dec(...args: any[]): any;\nabstract class C {\n    @dec declare x: number;\n    @dec abstract y: string;\n    @dec z: number = 1;\n    declare w: number;\n}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "property-decorated-standard",
+   "name": "probe.ts",
+   "source": "declare function dec(...args: any[]): any;\nabstract class C {\n    @dec declare x: number;\n    @dec abstract y: string;\n    @dec z: number = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "constructors-and-methods",
+   "name": "probe.ts",
+   "source": "class C {\n    constructor();\n    constructor(x?: number);\n    public constructor(x?: number) {}\n    m(): void;\n    m(x: string): void;\n    protected m<T>(x?: T): T | void { return x; }\n    static *gen<T>(): Generator<T> {}\n    async am(): Promise<void> {}\n}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "accessors",
+   "name": "probe.ts",
+   "source": "abstract class C {\n    abstract get a(): number;\n    abstract set a(v: number);\n    get b(): number;\n    set b(v: number);\n    public get c<T>(): T { return null; }\n    public set c(v: number) {}\n    static get d(): string { return \"\"; }\n}\nconst o = { get e(): number { return 1; }, set e(v: number) {} };\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "variable-declarations",
+   "name": "probe.ts",
+   "source": "var a: number = 1, b = 2, c: string;\nlet [d, e]: number[] = [1, 2];\nconst { f }: { f: number } = { f: 1 };\nfor (let i: number = 0; i < 1; i++) {}\nfor (const k of [] as string[]) {}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "heritage-clauses",
+   "name": "probe.ts",
+   "source": "interface I {}\ninterface J {}\nclass B {}\nclass C extends B implements I, J {}\nclass D implements I {}\nconst E = class extends B implements I {};\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "classes",
+   "name": "probe.ts",
+   "source": "class C<T, U extends T = T> { x: T; }\nexport default class<T> { y: T; }\nconst D = class E<T> { z: T; };\nexport class F<T> {}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "functions",
+   "name": "probe.ts",
+   "source": "function f(): void;\nfunction f(x: number): void;\nfunction f<T>(x?: T): T | void { return x; }\nexport function g(a: number, ...rest: string[]): number { return a; }\nexport function h(): void;\nexport function h() {}\nconst fe = function named<T>(this: Window, x: T): T { return x; };\nconst af = async <T,>(x: T): Promise<T> => x;\nconst af2 = (x: number): number => x;\nfunction* gen<T>(): Generator<T> {}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "parameters",
+   "name": "probe.ts",
+   "source": "class C {\n    constructor(public a: number, private readonly b?: string, protected c = 1, readonly d?: boolean, override e?: any, f?: number) {}\n}\nfunction g(this: any, x?: number, ...y: number[]) {}\nconst h = function (this: void, { a, b }: { a: number; b: string } = null) {};\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "parameters-decorated",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\ndeclare function dec(...args: any[]): any;\nclass C {\n    constructor(@dec public a: number, @dec @dec private b: string, @dec c: number, public d: number) {}\n    m(@dec x: number, @dec() y?: string) {}\n}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "calls-and-templates",
+   "name": "probe.ts",
+   "source": "declare function f<T>(x?: T): T;\ndeclare const o: any;\nf<string>(\"\");\nf<number>();\no?.m<string>();\no.m?.<number>(1);\nnew Map<string, number>();\nnew Set<string>;\nf<string>`tpl ${1}`;\nf`plain`;\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "assertions",
+   "name": "probe.ts",
+   "source": "declare const x: any;\nx!;\nx!.y!.z;\n<string>x;\nx as number;\nx satisfies unknown;\n(x as any).y;\n(<any>x).y;\n(x satisfies any).y;\n((x as any)).y;\n(x!).y;\n(x as any as string).length;\nconst n = (x as number) + 1;\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "parenthesized-without-assertion",
+   "name": "probe.ts",
+   "source": "declare function f<T>(): T;\nconst a = (f<number>());\nconst b = ((1 + 2));\nconst c = (function (x: number) { return x; });\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "jsx-elements",
+   "name": "probe.tsx",
+   "source": "// @jsx: preserve\n// @filename: probe.tsx\ndeclare namespace JSX { interface IntrinsicElements { [k: string]: any } }\ndeclare function Comp<T>(props: { x?: T }): any;\nconst a = <Comp<string> x=\"1\" />;\nconst b = <Comp<number>></Comp>;\nconst c = <div>{1 as number}</div>;\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "import-equals",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: m.ts\nexport const v = 1;\nexport type T = number;\n// @filename: probe.ts\nimport a = require(\"./m\");\nimport type b = require(\"./m\");\nnamespace N { export const x = 1; }\nimport c = N.x;\nimport type d = N;\nexport import e = N;\na; c;\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "import-declarations",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: m.ts\nexport const v = 1;\nexport type T = number;\nexport default 1;\n// @filename: probe.ts\nimport \"./m\";\nimport def from \"./m\";\nimport * as ns from \"./m\";\nimport { v } from \"./m\";\nimport type { T } from \"./m\";\nimport type def2 from \"./m\";\nimport type * as ns2 from \"./m\";\nimport { type T as T2 } from \"./m\";\nimport { type T as T3, v as v2 } from \"./m\";\nimport def3, { type T as T4 } from \"./m\";\nimport {} from \"./m\";\ndef; ns; v; v2; def3;\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "import-declarations-vms",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @verbatimModuleSyntax: true\n// @filename: m.ts\nexport const v = 1;\nexport type T = number;\n// @filename: probe.ts\nimport { type T } from \"./m\";\nimport { type T as T2, v } from \"./m\";\nimport type { T as T3 } from \"./m\";\nimport {} from \"./m\";\nexport { type T as T4 } from \"./m\";\nexport {};\nv;\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "export-declarations",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: m.ts\nexport const v = 1;\nexport type T = number;\n// @filename: probe.ts\nexport * from \"./m\";\nexport * as ns from \"./m\";\nexport { v } from \"./m\";\nexport type * from \"./m\";\nexport type * as ns2 from \"./m\";\nexport type { T } from \"./m\";\nexport { type T as T2 } from \"./m\";\nexport { type T as T3, v as v2 } from \"./m\";\nconst local = 1;\ntype LT = number;\nexport { local, type LT };\nexport {};\nexport {} from \"./m\";\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "enums",
+   "name": "probe.ts",
+   "source": "const enum CE { A = 1, B = A << 1 }\nenum E { A = <any>1, B = (2 as number), C }\nexport const enum ECE { X }\nenum Plain { P }\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "in-function-bodies",
+   "name": "probe.ts",
+   "source": "function outer() {\n    interface Local {}\n    type L = number;\n    let x: L = 1;\n    declare var y: number;\n    class K implements Local { private p: number; }\n    return <L>x;\n}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "js-file",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @checkJs: true\n// @outDir: out\n// @filename: probe.js\n/** @typedef {number} Num */\n/** @import { T } from \"./m\" */\n/** @type {Num} */\nconst a = /** @type {number} */ (1);\nconst b = /** @type {any} */ (a).x;\nfunction f(/** @type {string} */ s) { return s; }\n// @filename: m.ts\nexport type T = number;\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "comments-around-erased",
+   "name": "probe.ts",
+   "source": "// leading\ninterface I {} // trailing\n/* before */ type T = number; /* after */\nfunction f(): void; // overload\nfunction f() {}\nlet x = /* c */ (1 as number) /* d */;\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "statement-ambient-inside-namespace",
+   "name": "probe.ts",
+   "source": "namespace N {\n    declare const a: number;\n    export declare function f(): void;\n    export const b = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "const-modifier-misplaced",
+   "name": "probe.ts",
+   "source": "class C {\n    const x = 1;\n}\nfunction f<const T>(x: T) { return x; }\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "declare-keyword-on-member",
+   "name": "probe.ts",
+   "source": "class C {\n    declare readonly x: number;\n    y = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "no-asi-parentheses-keep-line-break",
+   "name": "probe.ts",
+   "source": "function f(x: any) {\n    return (// c\n        x as any) as any\n        + 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser"
+    ]
+   ]
+  }
+ ]
+}

@@ -1,0 +1,234 @@
+{
+ "cases": [
+  {
+   "id": "r-static-field-super-temps",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C extends Base { static a = super.x++; static b = super[k()] += 1; static c = (super.x)++; static d = super[0] += 1; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-template-computed",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C { @dec [`t`]() {} @dec [`u`] = 1; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-export-default-member-only",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nexport default class { @dec m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-export-member-only",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nexport class C { @dec m() {} static y = 1; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-ctor-param-decorated",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C { constructor(@dec p: any) {} }\nx(class { constructor(@dec p: any) {} });\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-computed-name-class",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C { @dec [(@dec class {}, k)]() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-unicode-names",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C { @dec \"é\"() {} @dec \"\\u0061b\"() {} @dec #é() {} @dec \"1a\" = 1; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-for-init-class",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nfor (let c = @dec class {}; x;) {}\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-decorator-receivers",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C { @(o).a m() {} @(o as any).b n() {} @o.a.b p() {} @o?.a q() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-static-arrow-super",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C extends Base { static f = () => super.x; static g = () => super.m(); static h = function () { return super.x; }; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-nested-class-in-static-block",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C { static { class D { @dec(this) m() {} } } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-super-optional-call",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C extends Base { static a = super.m?.(); static b = super[k]?.(1); }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-private-static-accessor-pair",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C { @dec static get #x() { return 1; } @dec static set #x(v) {} static z = 1; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-static-block-var-and-pending",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C extends Base { @dec static m() {} static { var y = super.x += 1; } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-ctor-super-nested",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C extends Base { constructor() { if (x) { super(); } else { super(); } } @dec m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-accessor-public-computed",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C { @dec accessor [k()] = 1; @dec static accessor [x] = 2; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-named-eval-shapes",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nlet y; y ??= @dec class {}; y &&= @dec class {}; y += (@dec class {}) as any; const z = (@dec class {});\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-this-in-static-member-decorator",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C { @dec(this) static x = 1; @dec(this) static m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r-method-extra-init-without-ctor-derived-null",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\nclass C extends (null as any) { @dec m() {} }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r2-name-grandparent-this",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C { static x = class { [this.k]() {} }; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "r2-name-grandparent-super",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...args: any[]): any; declare let o: any, arr: any, k: any, x: any, a: any, b: any;\ndeclare class Base { static x: any; static y: any; static d: any; static m(): any; }\n@dec class C extends Base { static x = class { [super.y]() {} }; static { class D { [this.k] = 1; } } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "finding-b4-static-field-super-temps",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...a: any[]): any; declare let k: any;\ndeclare class Base { static x: any; }\n@dec class C extends Base { static a = super.x++; static b = super[k()] += 1; }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  },
+  {
+   "id": "finding-b4-computed-name-grandparent",
+   "name": "probe.ts",
+   "source": "// @target: es2022\ndeclare function dec(...a: any[]): any;\ndeclare class Base { static y: any; }\n@dec class C extends Base { static x = class { [super.y]() {} }; static { class D { [this.k] = 1; } } }\n",
+   "chains": [
+    [
+     "esdecorator"
+    ]
+   ]
+  }
+ ]
+}

@@ -38,5 +38,9 @@ serde_json = { version = "1", features = ["preserve_order"], optional = true }
 [dev-dependencies]
 serde_json = { version = "1", features = ["preserve_order"] }
 
+[[test]]
+name = "emit"
+required-features = ["checker"]
+
 [lints]
 workspace = true

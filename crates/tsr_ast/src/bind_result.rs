@@ -1032,6 +1032,13 @@ impl BoundFile {
 pub struct CompletedFile {
     bound: BoundFile,
 }
+impl crate::AstDependencies {
+    pub fn new<'a>(files: impl IntoIterator<Item = &'a CompletedFile>) -> Self {
+        Self(tsr_arena::StorageImports::new(
+            files.into_iter().map(|file| file.bound.file.0.clone()),
+        ))
+    }
+}
 impl CompletedFile {
     /// The shared form of this file (`BoundFile::shared`).
     pub fn shared(&self) -> Option<SharedBoundFile> {

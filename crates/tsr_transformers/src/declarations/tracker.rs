@@ -1,30 +1,26 @@
-use super::diagnostics::{accessibility_diagnostic, SymbolAccessibilityDiagnostic};
+use super::diagnostics::{
+    throw_diagnostic, Failure, GetSymbolAccessibilityDiagnostic, SymbolAccessibilityDiagnostic,
+};
 use tsr_ast::{AstView, JsString, NodeId, SymbolFlags, SymbolId};
 use tsr_printer::emit_resolver::{
     DeclarationSymbolTracker, DeclarationTrackerEvent, SymbolAccessibility as A,
     SymbolAccessibilityResult,
 };
 
-/// Selector inputs are fixed by the declaration context; only these two native
-/// accessibility dimensions vary during node serialization. Precomputing keeps
-/// TrackSymbol's synchronous boolean independent of a second checker borrow.
-/// Native selectors are lazy closures: a context may contain syntax only valid
-/// for a diagnostic that is never requested. Preserve failures until selected.
+/// The installed `getSymbolAccessibilityDiagnostic`. The pin's closure reads
+/// syntax when an inaccessible symbol is reported, which happens inside a
+/// node-builder call that holds the checker; here the closure is called, when
+/// it is installed, for the only two result dimensions it reads
+/// (`CannotBeNamed`, and whether a module name is present), and its answers
+/// are kept. A failure, or the pin's panic, is kept too and raised only if
+/// that answer is selected.
 #[derive(Clone)]
 pub(super) struct Selector {
-    variants: [Result<Option<SymbolAccessibilityDiagnostic>, tsr_arena::Error>; 4],
-}
-impl Default for Selector {
-    fn default() -> Self {
-        Self {
-            variants: [Ok(None); 4],
-        }
-    }
+    variants: [Result<Option<SymbolAccessibilityDiagnostic>, Failure>; 4],
 }
 impl Selector {
-    pub fn new(view: AstView<'_>, node: NodeId, name_context: bool) -> Self {
-        let mut variants = std::array::from_fn(|_| Ok(None));
-        for (index, variant) in variants.iter_mut().enumerate() {
+    pub fn new(view: AstView<'_>, getter: GetSymbolAccessibilityDiagnostic) -> Self {
+        let variants = std::array::from_fn(|index| {
             let mut result = SymbolAccessibilityResult::accessible();
             result.accessibility = if index & 2 == 0 {
                 A::NotAccessible
@@ -34,64 +30,108 @@ impl Selector {
             if index & 1 != 0 {
                 result.error_module_name = JsString::from_bytes(b"module".as_slice());
             }
-            *variant = accessibility_diagnostic(view, node, name_context, &result);
-        }
+            getter.evaluate(view, &result)
+        });
         Self { variants }
+    }
+    /// `throwDiagnostic`, the source file's context.
+    pub fn throw() -> Self {
+        Self {
+            variants: std::array::from_fn(|_| Err(throw_diagnostic())),
+        }
     }
     pub fn fixed(info: SymbolAccessibilityDiagnostic) -> Self {
         Self {
-            variants: [Ok(Some(info)); 4],
+            variants: std::array::from_fn(|_| Ok(Some(info))),
         }
     }
     fn select(
         &self,
         result: &SymbolAccessibilityResult,
-    ) -> Result<Option<SymbolAccessibilityDiagnostic>, tsr_arena::Error> {
+    ) -> Result<Option<SymbolAccessibilityDiagnostic>, Failure> {
         let index = usize::from(result.accessibility == A::CannotBeNamed) * 2
             + usize::from(!result.error_module_name.is_empty());
-        self.variants[index]
+        self.variants[index].clone()
+    }
+}
+impl Default for Selector {
+    fn default() -> Self {
+        Self::throw()
     }
 }
 
+/// A report made while a resolver call held the tracker. The transformer
+/// applies them in order once the call returns, so fallback-stack pushes and
+/// pops interleave with the reports exactly as they were made.
 pub(super) enum Pending {
-    SelectorError(tsr_arena::Error),
+    SelectorFailure(Failure),
     Accessibility(SymbolAccessibilityDiagnostic, SymbolAccessibilityResult),
     Report(DeclarationTrackerEvent),
 }
 
+/// `SymbolTrackerImpl` with the shared state's accessibility context
+/// (`getSymbolAccessibilityDiagnostic`, `errorNameNode`,
+/// `lateMarkedStatements`). The reports that write diagnostics are the
+/// transformer's (`reports.rs`), applied from `pending`.
 #[derive(Default)]
 pub(super) struct Tracker {
     pub selector: Selector,
     pub error_name: Option<NodeId>,
     pub late_marked: Vec<NodeId>,
     pub pending: Vec<Pending>,
-    pub fallback: Vec<Option<NodeId>>,
-    pub watched_class: Option<SymbolId>,
-    pub class_tracked: bool,
+    pub fallback_stack: Vec<Option<NodeId>>,
+    pub watched_class_symbol: Option<SymbolId>,
+    pub class_symbol_tracked: bool,
 }
 impl Tracker {
+    // port: tsc/internal/transformers/declarations/tracker.go:NewSymbolTracker
+    pub fn new() -> Self {
+        Self::default()
+    }
+    // port: tsc/internal/transformers/declarations/tracker.go:SymbolTrackerImpl.PushErrorFallbackNode
+    pub fn push_error_fallback_node(&mut self, node: Option<NodeId>) {
+        self.fallback_stack.push(node);
+    }
+    // port: tsc/internal/transformers/declarations/tracker.go:SymbolTrackerImpl.PopErrorFallbackNode
+    pub fn pop_error_fallback_node(&mut self) {
+        let len = self
+            .fallback_stack
+            .len()
+            .checked_sub(1)
+            .expect("runtime error: slice bounds out of range [:-1]");
+        self.fallback_stack.truncate(len);
+    }
+    // port: tsc/internal/transformers/declarations/tracker.go:SymbolTrackerImpl.errorFallbackNode
+    pub fn error_fallback_node(&self) -> Option<NodeId> {
+        self.fallback_stack.last().copied().flatten()
+    }
+    // port: tsc/internal/transformers/declarations/tracker.go:SymbolTrackerImpl.errorLocation
+    pub fn error_location(&self) -> Option<NodeId> {
+        self.error_name.or_else(|| self.error_fallback_node())
+    }
     // port: tsc/internal/transformers/declarations/tracker.go:SymbolTrackerImpl.handleSymbolAccessibilityError
-    pub fn accessibility(&mut self, result: SymbolAccessibilityResult) -> bool {
-        match result.accessibility {
-            A::Accessible => {
-                for alias in result.aliases_to_make_visible {
-                    if !self.late_marked.contains(&alias) {
-                        self.late_marked.push(alias);
-                    }
+    pub fn handle_symbol_accessibility_error(&mut self, result: SymbolAccessibilityResult) -> bool {
+        if result.accessibility == A::Accessible {
+            // Add aliases back onto the possible imports list if they're not there so we can try them again with updated visibility info
+            for alias in result.aliases_to_make_visible {
+                if !self.late_marked.contains(&alias) {
+                    self.late_marked.push(alias);
                 }
             }
-            A::NotResolved => {}
-            A::NotAccessible | A::CannotBeNamed => match self.selector.select(&result) {
-                Ok(Some(selected)) => {
-                    self.pending.push(Pending::Accessibility(selected, result));
-                    return true;
-                }
-                Err(error) => {
-                    self.pending.push(Pending::SelectorError(error));
+            // The checker should issue errors on unresolvable names, skip the declaration emit error for using a private/unreachable name for those
+        } else if result.accessibility != A::NotResolved {
+            // Report error
+            match self.selector.select(&result) {
+                Ok(Some(info)) => {
+                    self.pending.push(Pending::Accessibility(info, result));
                     return true;
                 }
                 Ok(None) => {}
-            },
+                Err(failure) => {
+                    self.pending.push(Pending::SelectorFailure(failure));
+                    return true;
+                }
+            }
         }
         false
     }
@@ -101,8 +141,8 @@ impl DeclarationSymbolTracker for Tracker {
         if flags & tsr_ast::symbol_flags::TYPE_PARAMETER != 0 {
             return true;
         }
-        if self.watched_class == Some(symbol) {
-            self.class_tracked = true;
+        if self.watched_class_symbol == Some(symbol) {
+            self.class_symbol_tracked = true;
             true
         } else {
             false
@@ -116,11 +156,14 @@ impl DeclarationSymbolTracker for Tracker {
         _meaning: SymbolFlags,
         result: SymbolAccessibilityResult,
     ) -> bool {
-        if self.watched_class == Some(symbol) {
-            self.class_tracked = true;
+        // When watching for a class expression symbol, record its usage without
+        // reporting accessibility errors — the caller will handle visibility by
+        // wrapping the class in a namespace.
+        if self.watched_class_symbol == Some(symbol) {
+            self.class_symbol_tracked = true;
             return false;
         }
-        self.accessibility(result)
+        self.handle_symbol_accessibility_error(result)
     }
     fn report(&mut self, event: DeclarationTrackerEvent) {
         self.pending.push(Pending::Report(event));
@@ -152,19 +195,25 @@ mod tests {
         let call = view.node(statement)?.expression().unwrap();
         // Native installs a closure for this ordinary call but never evaluates
         // the Object.defineProperty-specific argument lookup unless it reports
-        // an accessibility error. A zero-argument Symbol call must be harmless.
+        // an accessibility error. A zero-argument Symbol call must be harmless
+        // until then; selecting it is the pin's index panic.
+        let getter =
+            super::super::diagnostics::create_get_symbol_accessibility_diagnostic_for_node(
+                view, call,
+            )?;
         let mut tracker = Tracker {
-            selector: Selector::new(view, call, false),
+            selector: Selector::new(view, getter),
             ..Default::default()
         };
-        assert!(!tracker.accessibility(SymbolAccessibilityResult::accessible()));
+        assert!(!tracker.handle_symbol_accessibility_error(SymbolAccessibilityResult::accessible()));
         assert!(tracker.pending.is_empty());
         let mut inaccessible = SymbolAccessibilityResult::accessible();
         inaccessible.accessibility = A::NotAccessible;
-        assert!(tracker.accessibility(inaccessible));
+        assert!(tracker.handle_symbol_accessibility_error(inaccessible));
         assert!(matches!(
             tracker.pending.as_slice(),
-            [Pending::SelectorError(tsr_arena::Error::InvalidGraph)]
+            [Pending::SelectorFailure(Failure::Panic(message))]
+                if message == "runtime error: index out of range [1] with length 0"
         ));
         Ok(())
     }

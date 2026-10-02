@@ -1,0 +1,1348 @@
+{
+ "cases": [
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na || (a = b);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-01",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a61207c7c3d20623b0a"
+    },
+    "id": "logicalassignment-01",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na ||= b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na && (a = b);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-02",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a612026263d20623b0a"
+    },
+    "id": "logicalassignment-02",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na &&= b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na ?? (a = b);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-03",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a61203f3f3d20623b0a"
+    },
+    "id": "logicalassignment-03",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na ??= b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\no.p || (o.p = 1);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-04",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6f2e70207c7c3d20313b0a"
+    },
+    "id": "logicalassignment-04",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no.p ||= 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\no[c] ?? (o[c] = 3);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-06",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6f5b635d203f3f3d20333b0a"
+    },
+    "id": "logicalassignment-06",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no[c] ??= 3;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\no[\"s\"] ?? (o[\"s\"] = 6);\r\no[0] || (o[0] = 7);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-09",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6f5b2273225d203f3f3d20363b0a6f5b305d207c7c3d20373b0a"
+    },
+    "id": "logicalassignment-09",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no[\"s\"] ??= 6;\no[0] ||= 7;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na || (a = b);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-10",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a286129207c7c3d202862293b0a"
+    },
+    "id": "logicalassignment-10",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a) ||= (b);\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\no.p && (o.p = (b, c));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-11",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a286f2e70292026263d2028622c2063293b0a"
+    },
+    "id": "logicalassignment-11",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(o.p) &&= (b, c);\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na || (a = b || (b = c));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-12",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a61207c7c3d2062207c7c3d20633b0a"
+    },
+    "id": "logicalassignment-12",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na ||= b ||= c;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nlet x = (a && (a = 1)) + 2;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-13",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6c65742078203d2028612026263d203129202b20323b0a"
+    },
+    "id": "logicalassignment-13",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = (a &&= 1) + 2;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na += b;\r\na = a || b;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-16",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a61202b3d20623b0a61203d2061207c7c20623b0a"
+    },
+    "id": "logicalassignment-16",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na += b;\na = a || b;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nthis.p ?? (this.p = 1);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-18",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a746869732e70203f3f3d20313b0a"
+    },
+    "id": "logicalassignment-18",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nthis.p ??= 1;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nclass C {\r\n    x: any;\r\n    m() { this.x || (this.x = 1); super.toString ?? (super.toString = k); }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-19",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a636c6173732043207b0a20202020783a20616e793b0a202020206d2829207b20746869732e78207c7c3d20313b2073757065722e746f537472696e67203f3f3d206b3b207d0a7d0a"
+    },
+    "id": "logicalassignment-19",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nclass C {\n    x: any;\n    m() { this.x ||= 1; super.toString ??= k; }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\no[a] && (o[a] = b);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-20",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6f5b615d2026263d20623b0a"
+    },
+    "id": "logicalassignment-20",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no[a] &&= b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nexport let v: any;\r\nv ?? (v = o?.p);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-21",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6578706f7274206c657420763a20616e793b0a76203f3f3d206f3f2e703b0a"
+    },
+    "id": "logicalassignment-21",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nexport let v: any;\nv ??= o?.p;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nfor (const i of [1]) {\r\n    o[i] || (o[i] = i);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-22",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a666f722028636f6e73742069206f66205b315d29207b206f5b695d207c7c3d20693b207d0a"
+    },
+    "id": "logicalassignment-22",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfor (const i of [1]) { o[i] ||= i; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na /*x*/ || (a /*x*/ = b);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-23",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a61202f2a782a2f207c7c3d202f2a792a2f20623b0a"
+    },
+    "id": "logicalassignment-23",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na /*x*/ ||= /*y*/ b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nlet n = { [a || (a = \"k\")]: 1 };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-25",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6c6574206e203d207b205b61207c7c3d20226b225d3a2031207d3b0a"
+    },
+    "id": "logicalassignment-25",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet n = { [a ||= \"k\"]: 1 };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = k()).p && (_a.p = 2);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-05",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6b28292e702026263d20323b0a"
+    },
+    "id": "logicalassignment-05",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk().p &&= 2;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\no[_a = k()] || (o[_a] = 4);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-07",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6f5b6b28295d207c7c3d20343b0a"
+    },
+    "id": "logicalassignment-07",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no[k()] ||= 4;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "var _a, _b;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = k())[_b = k()] && (_a[_b] = 5);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-08",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6b28295b6b28295d2026263d20353b0a"
+    },
+    "id": "logicalassignment-08",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk()[k()] &&= 5;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nfunction f(p: any) {\r\n    var _a, _b;\r\n    (_a = p.q).r ?? (_a.r = {});\r\n    return p[_b = k()] || (p[_b] = []);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-14",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a66756e6374696f6e206628703a20616e7929207b0a20202020702e712e72203f3f3d207b7d3b0a2020202072657475726e20705b6b28295d207c7c3d205b5d3b0a7d0a"
+    },
+    "id": "logicalassignment-14",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f(p: any) {\n    p.q.r ??= {};\n    return p[k()] ||= [];\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nconst g = (p: any) => { var _a; return (_a = p.x).y ?? (_a.y = 1); };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-15",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a636f6e73742067203d2028703a20616e7929203d3e20702e782e79203f3f3d20313b0a"
+    },
+    "id": "logicalassignment-15",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nconst g = (p: any) => p.x.y ??= 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = o.a.b).c || (_a.c = k());\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-17",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6f2e612e622e63207c7c3d206b28293b0a"
+    },
+    "id": "logicalassignment-17",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no.a.b.c ||= k();\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = o?.p).q || (_a.q = 1);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-24",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6f3f2e702e71207c7c3d20313b0a"
+    },
+    "id": "logicalassignment-24",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no?.p.q ||= 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\no[_a = `t${a}`] ?? (o[_a] = 1);\r\no[`t`] ?? (o[`t`] = 2);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "logicalassignment-26",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6f5b6074247b617d605d203f3f3d20313b0a6f5b6074605d203f3f3d20323b0a"
+    },
+    "id": "logicalassignment-26",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no[`t${a}`] ??= 1;\no[`t`] ??= 2;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "var _a, _b, _c, _d, _e, _f;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = o.p)[_b = k()] || (_a[_b] = 1);\r\n(_c = (a, o))[b] && (_c[b] = 2);\r\n(_d = new o.C())[c] ?? (_d[c] = 3);\r\no[_e = a + b] || (o[_e] = 4);\r\no[_f = a.b] ?? (o[_f] = 5);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "la-nonsimple-targets-element",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6f2e705b6b28295d207c7c3d20313b0a28612c206f295b625d2026263d20323b0a6e6577206f2e4328295b635d203f3f3d20333b0a6f5b61202b20625d207c7c3d20343b0a6f5b612e625d203f3f3d20353b0a"
+    },
+    "id": "la-nonsimple-targets-element",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no.p[k()] ||= 1;\n(a, o)[b] &&= 2;\nnew o.C()[c] ??= 3;\no[a + b] ||= 4;\no[a.b] ??= 5;\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "var _a, _b, _c;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = (a || o)).p ?? (_a.p = 1);\r\n(_b = o[0]).q && (_b.q = 2);\r\n(_c = (await o)).p || (_c.p = 3);\r\n`t`.length ?? (`t`.length = 1);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "la-nonsimple-targets-property",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a2861207c7c206f292e70203f3f3d20313b0a6f5b305d2e712026263d20323b0a286177616974206f292e70207c7c3d20333b0a6074602e6c656e677468203f3f3d20313b0a"
+    },
+    "id": "la-nonsimple-targets-property",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a || o).p ??= 1;\no[0].q &&= 2;\n(await o).p ||= 3;\n`t`.length ??= 1;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "var _a, _b, _c;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\no[_a = 1n] || (o[_a] = 1);\r\no[_b = \"s\" + \"t\"] ?? (o[_b] = 2);\r\no[this] && (o[this] = 3);\r\no[_c = -1] || (o[_c] = 4);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "la-simple-argument-kinds",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6f5b316e5d207c7c3d20313b0a6f5b227322202b202274225d203f3f3d20323b0a6f5b746869735d2026263d20333b0a6f5b2d315d207c7c3d20343b0a"
+    },
+    "id": "la-simple-argument-kinds",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no[1n] ||= 1;\no[\"s\" + \"t\"] ??= 2;\no[this] &&= 3;\no[-1] ||= 4;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "var _a, _b;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\no.p ?? (o.p = 1);\r\no[_a = k()] || (o[_a] = 2);\r\n(_b = k()).p && (_b.p = 3);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "la-parenthesized-access-targets",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a28286f2e702929203f3f3d20313b0a286f5b6b28295d29207c7c3d20323b0a286b28292e70292026263d20333b0a"
+    },
+    "id": "la-parenthesized-access-targets",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n((o.p)) ??= 1;\n(o[k()]) ||= 2;\n(k().p) &&= 3;\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nclass C extends Object {\r\n    #p: any;\r\n    m() { var _a, _b; super[_a = k()] || (super[_a] = 1); super.x && (super.x = 2); this.#p ?? (this.#p = 3); this[_b = k()] || (this[_b] = 4); }\r\n}\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "logicalassignment"
+       ],
+       "text": "class C extends Object {\r\n    #p;\r\n    m() { var _a, _b; super[_a = k()] || (super[_a] = 1); super.x && (super.x = 2); this.#p ?? (this.#p = 3); this[_b = k()] || (this[_b] = 4); }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "la-super-and-private",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a636c617373204320657874656e6473204f626a656374207b2023703a20616e793b206d2829207b2073757065725b6b28295d207c7c3d20313b2073757065722e782026263d20323b20746869732e2370203f3f3d20333b20746869735b6b28295d207c7c3d20343b207d207d0a"
+    },
+    "id": "la-super-and-private",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nclass C extends Object { #p: any; m() { super[k()] ||= 1; super.x &&= 2; this.#p ??= 3; this[k()] ||= 4; } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "logicalassignment"
+       ],
+       "text": "var _a, _b, _c, _d;\r\n(_a = o).p || (_a.p = 1);\r\n(_b = o).p ?? (_b.p = 2);\r\no.p && (o.p = 3);\r\n(_c = o)[_d = k()] ?? (_c[_d] = 4);\r\no.p || (o.p = 5);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "la-typeeraser-targets",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a286f20617320616e79292e70207c7c3d20313b0a6f212e70203f3f3d20323b0a286f2e7020617320616e79292026263d20333b0a283c616e793e6f295b6b28295d203f3f3d20343b0a6f2e7021207c7c3d20353b0a"
+    },
+    "id": "la-typeeraser-targets",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(o as any).p ||= 1;\no!.p ??= 2;\n(o.p as any) &&= 3;\n(<any>o)[k()] ??= 4;\no.p! ||= 5;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\no[_a = k()] || (o[_a] = o.p ?? (o.p = a && (a = b)));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "la-nested-in-right",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6f5b6b28295d207c7c3d206f2e70203f3f3d20612026263d20623b0a"
+    },
+    "id": "la-nested-in-right",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no[k()] ||= o.p ??= a &&= b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "var _a, _b;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nfunction f() { return () => { var _a; return o[_a = k()] ?? (o[_a] = 1); }; }\r\nclass D {\r\n    static s = (_a = o.p).q || (_a.q = 1);\r\n    x = (_b = k()).y && (_b.y = 2);\r\n}\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "logicalassignment"
+       ],
+       "text": "var _a, _b;\r\nfunction f() { return () => { var _a; return o[_a = k()] ?? (o[_a] = 1); }; }\r\nclass D {\r\n    static s = (_a = o.p).q || (_a.q = 1);\r\n    x = (_b = k()).y && (_b.y = 2);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "la-in-functions-and-classes",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a66756e6374696f6e20662829207b2072657475726e202829203d3e206f5b6b28295d203f3f3d20313b207d0a636c6173732044207b207374617469632073203d206f2e702e71207c7c3d20313b2078203d206b28292e792026263d20323b207d0a"
+    },
+    "id": "la-in-functions-and-classes",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f() { return () => o[k()] ??= 1; }\nclass D { static s = o.p.q ||= 1; x = k().y &&= 2; }\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

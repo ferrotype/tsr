@@ -2730,7 +2730,13 @@ fn jsdoc_rest_parameter_displays_reuse_the_variadic_operand() {
             },
             builder.emit_context(),
         )
-        .write(builder.view(), generated, Some(file.source()), &mut writer)
+        .write(
+            builder.view(),
+            generated,
+            Some(file.source()),
+            &mut writer,
+            None,
+        )
         .unwrap();
         assert_eq!(
             String::from_utf8_lossy(writer.text()),
@@ -2769,12 +2775,14 @@ fn declaration_transform_reads_the_jsdoc_variadic_operand() {
         &counters,
         emit.factory_hooks(),
     );
+    let host = tsr_compiler::ProgramDeclarationHost::new(&program);
     let transformed = transform_declarations(
         &mut op,
+        &host,
         &mut output,
         &mut emit,
         file.source(),
-        DeclarationOptions::default(),
+        &DeclarationOptions::default(),
     )
     .unwrap();
     let view = output.view();
@@ -2820,7 +2828,7 @@ fn declaration_transform_reads_the_jsdoc_variadic_operand() {
         },
         &emit,
     )
-    .write(view, array, Some(file.source()), &mut writer)
+    .write(view, array, Some(file.source()), &mut writer, None)
     .unwrap();
     assert_eq!(String::from_utf8_lossy(writer.text()), "number[]");
     output.complete(transformed.root).unwrap();
@@ -2961,7 +2969,13 @@ fn qualified_enum_member_declaration_phase_completes_and_displays_like_native() 
             },
             builder.emit_context(),
         )
-        .write(builder.view(), generated, Some(file.source()), &mut writer)
+        .write(
+            builder.view(),
+            generated,
+            Some(file.source()),
+            &mut writer,
+            None,
+        )
         .unwrap();
         assert_eq!(String::from_utf8_lossy(writer.text()), expected);
     }

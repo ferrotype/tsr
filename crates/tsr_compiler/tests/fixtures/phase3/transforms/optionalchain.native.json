@@ -1,0 +1,2956 @@
+{
+ "cases": [
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na === null || a === void 0 ? void 0 : a.b;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-01",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e623b0a"
+    },
+    "id": "optionalchain-01",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na === null || a === void 0 ? void 0 : a[b];\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-02",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e5b625d3b0a"
+    },
+    "id": "optionalchain-02",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.[b];\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na === null || a === void 0 ? void 0 : a();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-03",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e28293b0a"
+    },
+    "id": "optionalchain-03",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na === null || a === void 0 ? void 0 : a.b.c;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-04",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e622e633b0a"
+    },
+    "id": "optionalchain-04",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b.c;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na === null || a === void 0 ? void 0 : a.b();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-07",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e6228293b0a"
+    },
+    "id": "optionalchain-07",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(a === null || a === void 0 ? void 0 : a.b).call(a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-14",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a28613f2e622928293b0a"
+    },
+    "id": "optionalchain-14",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a?.b)();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(a === null || a === void 0 ? void 0 : a.b).c;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-15",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a28613f2e62292e633b0a"
+    },
+    "id": "optionalchain-15",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a?.b).c;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(a === null || a === void 0 ? void 0 : a[b]).call(a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-17",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a28613f2e5b625d2928293b0a"
+    },
+    "id": "optionalchain-17",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a?.[b])();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n((a === null || a === void 0 ? void 0 : a.b)).call(a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-18",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a2828613f2e62292928293b0a"
+    },
+    "id": "optionalchain-18",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n((a?.b))();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na === null || a === void 0 ? true : delete a.b;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-19",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a64656c65746520613f2e623b0a"
+    },
+    "id": "optionalchain-19",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete a?.b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na === null || a === void 0 ? true : delete a.b.c;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-20",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a64656c65746520613f2e622e633b0a"
+    },
+    "id": "optionalchain-20",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete a?.b.c;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(a === null || a === void 0 ? true : delete a.b);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-21",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a64656c6574652028613f2e62293b0a"
+    },
+    "id": "optionalchain-21",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete (a?.b);\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\ndelete a.b;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-22",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a64656c65746520612e623b0a"
+    },
+    "id": "optionalchain-22",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete a.b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nlet x = (a === null || a === void 0 ? void 0 : a.b) ?? c;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-23",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6c65742078203d20613f2e62203f3f20633b0a"
+    },
+    "id": "optionalchain-23",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = a?.b ?? c;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(a === null || a === void 0 ? void 0 : a.b)!;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-25",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e62213b0a"
+    },
+    "id": "optionalchain-25",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b!;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na === null || a === void 0 ? void 0 : a.b(c === null || c === void 0 ? void 0 : c.d);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-32",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e6228633f2e64293b0a"
+    },
+    "id": "optionalchain-32",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b(c?.d);\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nk(a === null || a === void 0 ? void 0 : a.b, ...c);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-33",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6b28613f2e622c202e2e2e63293b0a"
+    },
+    "id": "optionalchain-33",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk(a?.b, ...c);\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na === null || a === void 0 ? void 0 : a[0];\r\na === null || a === void 0 ? void 0 : a[\"s\"];\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-34",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e5b305d3b0a613f2e5b2273225d3b0a"
+    },
+    "id": "optionalchain-34",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.[0];\na?.[\"s\"];\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nlet x = `${a === null || a === void 0 ? void 0 : a.b}`;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-35",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6c65742078203d2060247b613f2e627d603b0a"
+    },
+    "id": "optionalchain-35",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = `${a?.b}`;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na === null || a === void 0 ? void 0 : a.b.c();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-37",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e622e6328293b0a"
+    },
+    "id": "optionalchain-37",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b.c();\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na === null || a === void 0 ? void 0 : a.b();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-41",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e623c737472696e673e28293b0a"
+    },
+    "id": "optionalchain-41",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b<string>();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na /*x*/ === null || a /*x*/ === void 0 ? void 0 : a /*x*/.b;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-44",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a61202f2a782a2f203f2e202f2a792a2f20623b0a"
+    },
+    "id": "optionalchain-44",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na /*x*/ ?. /*y*/ b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nlet x = !(a === null || a === void 0 ? void 0 : a.b);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-45",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6c65742078203d2021613f2e623b0a"
+    },
+    "id": "optionalchain-45",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = !a?.b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\no.p = a === null || a === void 0 ? void 0 : a.b;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-46",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6f2e70203d20613f2e623b0a"
+    },
+    "id": "optionalchain-46",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no.p = a?.b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n((a === null || a === void 0 ? true : delete a.b));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-48",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a64656c657465202828613f2e6229293b0a"
+    },
+    "id": "optionalchain-48",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete ((a?.b));\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nnew (a === null || a === void 0 ? void 0 : a.b)();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-49",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6e65772028613f2e622928293b0a"
+    },
+    "id": "optionalchain-49",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nnew (a?.b)();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(o.p)(a === null || a === void 0 ? void 0 : a.b);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-52",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a286f2e702928613f2e62293b0a"
+    },
+    "id": "optionalchain-52",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(o.p)(a?.b);\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\ndelete o[a === null || a === void 0 ? void 0 : a.b];\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-53",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a64656c657465206f5b613f2e625d3b0a"
+    },
+    "id": "optionalchain-53",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete o[a?.b];\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nlet x = [a === null || a === void 0 ? void 0 : a.b, b === null || b === void 0 ? void 0 : b[0]];\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-55",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6c65742078203d205b613f2e622c20623f2e5b305d5d3b0a"
+    },
+    "id": "optionalchain-55",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = [a?.b, b?.[0]];\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nlet x = { p: a === null || a === void 0 ? void 0 : a.b };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-56",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6c65742078203d207b20703a20613f2e62207d3b0a"
+    },
+    "id": "optionalchain-56",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = { p: a?.b };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nfunction f(p: any) { if (p === null || p === void 0 ? void 0 : p.q) {\r\n    return p === null || p === void 0 ? void 0 : p(1);\r\n} }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-57",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a66756e6374696f6e206628703a20616e7929207b2069662028703f2e7129207b2072657475726e20703f2e2831293b207d207d0a"
+    },
+    "id": "optionalchain-57",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f(p: any) { if (p?.q) { return p?.(1); } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nlet x = (a === null || a === void 0 ? void 0 : a.b) + 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-58",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6c65742078203d20613f2e62202b20313b0a"
+    },
+    "id": "optionalchain-58",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = a?.b + 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = a === null || a === void 0 ? void 0 : a.b) === null || _a === void 0 ? void 0 : _a.c;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-05",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e623f2e633b0a"
+    },
+    "id": "optionalchain-05",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b?.c;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = a.b) === null || _a === void 0 ? void 0 : _a.c;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-06",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a612e623f2e633b0a"
+    },
+    "id": "optionalchain-06",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na.b?.c;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = a.b) === null || _a === void 0 ? void 0 : _a.call(a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-08",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a612e623f2e28293b0a"
+    },
+    "id": "optionalchain-08",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na.b?.();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = a === null || a === void 0 ? void 0 : a.b) === null || _a === void 0 ? void 0 : _a.call(a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-09",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e623f2e28293b0a"
+    },
+    "id": "optionalchain-09",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b?.();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = k()) === null || _a === void 0 ? void 0 : _a.b;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-10",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6b28293f2e623b0a"
+    },
+    "id": "optionalchain-10",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk()?.b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = k()) === null || _a === void 0 ? void 0 : _a();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-11",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6b28293f2e28293b0a"
+    },
+    "id": "optionalchain-11",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk()?.();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a, _b;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_b = (_a = o.p).q) === null || _b === void 0 ? void 0 : _b.call(_a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-12",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6f2e702e713f2e28293b0a"
+    },
+    "id": "optionalchain-12",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no.p.q?.();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = o[k()]) === null || _a === void 0 ? void 0 : _a.call(o);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-13",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6f5b6b28295d3f2e28293b0a"
+    },
+    "id": "optionalchain-13",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\no[k()]?.();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n((_a = o.p) === null || _a === void 0 ? void 0 : _a.q).call(_a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-16",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a286f2e703f2e712928293b0a"
+    },
+    "id": "optionalchain-16",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(o.p?.q)();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nlet x = (_a = a === null || a === void 0 ? void 0 : a.b.c(1, 2)) === null || _a === void 0 ? void 0 : _a[k()];\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-24",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6c65742078203d20613f2e622e6328312c2032293f2e5b6b28295d3b0a"
+    },
+    "id": "optionalchain-24",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = a?.b.c(1, 2)?.[k()];\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = (a!)) === null || _a === void 0 ? void 0 : _a.b;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-26",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a286121293f2e623b0a"
+    },
+    "id": "optionalchain-26",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a!)?.b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nclass C extends Object {\r\n    m() { var _a; return (_a = super.toString) === null || _a === void 0 ? void 0 : _a.call(this); }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-27",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a636c617373204320657874656e6473204f626a656374207b0a202020206d2829207b2072657475726e2073757065722e746f537472696e673f2e28293b207d0a7d0a"
+    },
+    "id": "optionalchain-27",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nclass C extends Object {\n    m() { return super.toString?.(); }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nthis === null || this === void 0 ? void 0 : this.b;\r\n(_a = this.p) === null || _a === void 0 ? void 0 : _a.call(this);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-28",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a746869733f2e623b0a746869732e703f2e28293b0a"
+    },
+    "id": "optionalchain-28",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nthis?.b;\nthis.p?.();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nfunction f(p: any) {\r\n    var _a;\r\n    return (_a = p === null || p === void 0 ? void 0 : p.q) === null || _a === void 0 ? void 0 : _a.r(p);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-29",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a66756e6374696f6e206628703a20616e7929207b0a2020202072657475726e20703f2e713f2e722870293b0a7d0a"
+    },
+    "id": "optionalchain-29",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f(p: any) {\n    return p?.q?.r(p);\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nconst g = (p: any) => { var _a; return (_a = p.x) === null || _a === void 0 ? void 0 : _a.y; };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-30",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a636f6e73742067203d2028703a20616e7929203d3e20702e783f2e793b0a"
+    },
+    "id": "optionalchain-30",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nconst g = (p: any) => p.x?.y;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a, _b;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_b = (_a = a === null || a === void 0 ? void 0 : a.b.c.d) === null || _a === void 0 ? void 0 : _a.e[k()]) === null || _b === void 0 ? void 0 : _b.f();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-31",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e622e632e643f2e655b6b28295d3f2e6628293b0a"
+    },
+    "id": "optionalchain-31",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b.c.d?.e[k()]?.f();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nexport const e = (_a = o.p) === null || _a === void 0 ? void 0 : _a.q;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-36",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a6578706f727420636f6e73742065203d206f2e703f2e713b0a"
+    },
+    "id": "optionalchain-36",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nexport const e = o.p?.q;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(a === null || a === void 0 ? void 0 : (_a = a.b).c).call(_a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-38",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a28613f2e622e632928293b0a"
+    },
+    "id": "optionalchain-38",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a?.b.c)();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n((_a = k()) === null || _a === void 0 ? void 0 : _a.b).call(_a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-39",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a286b28293f2e622928293b0a"
+    },
+    "id": "optionalchain-39",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(k()?.b)();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a, _b;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n((_a = o.p) === null || _a === void 0 ? void 0 : (_b = _a.q).r).call(_b);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-40",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a286f2e703f2e712e722928293b0a"
+    },
+    "id": "optionalchain-40",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(o.p?.q.r)();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = (a as any)) === null || _a === void 0 ? void 0 : _a.b;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-42",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a286120617320616e79293f2e623b0a"
+    },
+    "id": "optionalchain-42",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a as any)?.b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = (<any>a)) === null || _a === void 0 ? void 0 : _a.b();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-43",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a283c616e793e61293f2e6228293b0a"
+    },
+    "id": "optionalchain-43",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(<any>a)?.b();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = o.p) === null || _a === void 0 ? true : delete _a.q;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-47",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a64656c657465206f2e703f2e713b0a"
+    },
+    "id": "optionalchain-47",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete o.p?.q;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n((_a = o.p.q) === null || _a === void 0 ? void 0 : _a.r).call(_a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-50",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a286f2e702e713f2e722928293b0a"
+    },
+    "id": "optionalchain-50",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(o.p.q?.r)();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n((_a = o.p) === null || _a === void 0 ? void 0 : _a.call(o))();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-51",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a286f2e703f2e28292928293b0a"
+    },
+    "id": "optionalchain-51",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(o.p?.())();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "panic": "Debug failure. False expression."
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "optionalchain-54",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e62212e633b0a"
+    },
+    "id": "optionalchain-54",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b!.c;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nclass C extends Object {\r\n    m() { var _a; return (_a = super.toString) === null || _a === void 0 ? void 0 : _a.call(this); }\r\n    n() { var _a; return (_a = super[\"valueOf\"]) === null || _a === void 0 ? void 0 : _a.call(this, 1); }\r\n    static s() { var _a; return (_a = super.name) === null || _a === void 0 ? void 0 : _a.length; }\r\n}\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "optionalchain"
+       ],
+       "text": "class C extends Object {\r\n    m() { var _a; return (_a = super.toString) === null || _a === void 0 ? void 0 : _a.call(this); }\r\n    n() { var _a; return (_a = super[\"valueOf\"]) === null || _a === void 0 ? void 0 : _a.call(this, 1); }\r\n    static s() { var _a; return (_a = super.name) === null || _a === void 0 ? void 0 : _a.length; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-super-call-in-method",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a636c617373204320657874656e6473204f626a656374207b0a202020206d2829207b2072657475726e2073757065722e746f537472696e673f2e28293b207d0a202020206e2829207b2072657475726e2073757065725b2276616c75654f66225d3f2e2831293b207d0a2020202073746174696320732829207b2072657475726e2073757065722e6e616d653f2e6c656e6774683b207d0a7d0a"
+    },
+    "id": "oc-super-call-in-method",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nclass C extends Object {\n    m() { return super.toString?.(); }\n    n() { return super[\"valueOf\"]?.(1); }\n    static s() { return super.name?.length; }\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a, _b, _c;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = a.b) === null || _a === void 0 ? void 0 : _a.call(a);\r\n(_b = a[0]) === null || _b === void 0 ? void 0 : _b.call(a, 1, 2);\r\n/*lead*/ (_c = a /*mid*/.b) === null || _c === void 0 ? void 0 : _c.call(a, c);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-simple-this-arg-call",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a612e623f2e28293b0a615b305d3f2e28312c2032293b0a2f2a6c6561642a2f2061202f2a6d69642a2f202e623f2e2863293b0a"
+    },
+    "id": "oc-simple-this-arg-call",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na.b?.();\na[0]?.(1, 2);\n/*lead*/ a /*mid*/ .b?.(c);\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nclass C {\r\n    p: any;\r\n    m() { var _a, _b; (_a = this.p) === null || _a === void 0 ? void 0 : _a.call(this); (_b = this[\"p\"]) === null || _b === void 0 ? void 0 : _b.call(this, 1); this === null || this === void 0 ? void 0 : this.p(); }\r\n}\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "optionalchain"
+       ],
+       "text": "class C {\r\n    p;\r\n    m() { var _a, _b; (_a = this.p) === null || _a === void 0 ? void 0 : _a.call(this); (_b = this[\"p\"]) === null || _b === void 0 ? void 0 : _b.call(this, 1); this === null || this === void 0 ? void 0 : this.p(); }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-this-property-call",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a636c6173732043207b20703a20616e793b206d2829207b20746869732e703f2e28293b20746869735b2270225d3f2e2831293b20746869733f2e7028293b207d207d0a"
+    },
+    "id": "oc-this-property-call",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nclass C { p: any; m() { this.p?.(); this[\"p\"]?.(1); this?.p(); } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "optionalchain"
+       ],
+       "text": "var _a, _b, _c;\r\na === null || a === void 0 ? void 0 : a.b;\r\na === null || a === void 0 ? void 0 : a.b();\r\n(_b = (_a = a).b) === null || _b === void 0 ? void 0 : _b.call(_a);\r\n(_c = (a)) === null || _c === void 0 ? void 0 : _c[b];\r\na === null || a === void 0 ? void 0 : a.b;\r\na === null || a === void 0 ? void 0 : a.c;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-as-any-after-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a286120617320616e79293f2e623b0a283c616e793e61293f2e6228293b0a286120617320616e79292e623f2e28293b0a286121293f2e5b625d3b0a61213f2e623b0a28612073617469736669657320616e79293f2e633b0a"
+    },
+    "id": "oc-as-any-after-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a as any)?.b;\n(<any>a)?.b();\n(a as any).b?.();\n(a!)?.[b];\na!?.b;\n(a satisfies any)?.c;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser",
+        "optionalchain"
+       ],
+       "text": "var _a, _b, _c;\r\n(_a = a.b) === null || _a === void 0 ? void 0 : _a.call(a);\r\n(_b = o.p) === null || _b === void 0 ? void 0 : _b.call(o, 1);\r\n(_c = k()) === null || _c === void 0 ? void 0 : _c();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-as-any-call-after-typeeraser",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a28612e6220617320616e79293f2e28293b0a286f2e702120617320616e79293f2e2831293b0a286b282920617320616e79293f2e28293b0a"
+    },
+    "id": "oc-as-any-call-after-typeeraser",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a.b as any)?.();\n(o.p! as any)?.(1);\n(k() as any)?.();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a, _b, _c, _d, _e;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = a.b.c) === null || _a === void 0 ? void 0 : _a.d;\r\n(_b = k().x) === null || _b === void 0 ? void 0 : _b.y;\r\n(_c = o[k()]) === null || _c === void 0 ? void 0 : _c.z;\r\n(_d = (a + b)) === null || _d === void 0 ? void 0 : _d.c;\r\n(_e = new o.C()) === null || _e === void 0 ? void 0 : _e.d;\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "optionalchain"
+       ],
+       "text": "var _a, _b, _c, _d, _e;\r\n(_a = a.b.c) === null || _a === void 0 ? void 0 : _a.d;\r\n(_b = k().x) === null || _b === void 0 ? void 0 : _b.y;\r\n(_c = o[k()]) === null || _c === void 0 ? void 0 : _c.z;\r\n(_d = (a + b)) === null || _d === void 0 ? void 0 : _d.c;\r\n(_e = new o.C()) === null || _e === void 0 ? void 0 : _e.d;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-nonsimple-captured-left",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a612e622e633f2e643b0a6b28292e783f2e793b0a6f5b6b28295d3f2e7a3b0a2861202b2062293f2e633b0a6e6577206f2e4328293f2e643b0a"
+    },
+    "id": "oc-nonsimple-captured-left",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na.b.c?.d;\nk().x?.y;\no[k()]?.z;\n(a + b)?.c;\nnew o.C()?.d;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a, _b, _c, _d, _e, _f;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_b = (_a = a.b).c) === null || _b === void 0 ? void 0 : _b.call(_a);\r\n(_d = (_c = a.b)[c]) === null || _d === void 0 ? void 0 : _d.call(_c, 1);\r\n(_f = (_e = k()).m) === null || _f === void 0 ? void 0 : _f.call(_e);\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "optionalchain"
+       ],
+       "text": "var _a, _b, _c, _d, _e, _f;\r\n(_b = (_a = a.b).c) === null || _b === void 0 ? void 0 : _b.call(_a);\r\n(_d = (_c = a.b)[c]) === null || _d === void 0 ? void 0 : _d.call(_c, 1);\r\n(_f = (_e = k()).m) === null || _f === void 0 ? void 0 : _f.call(_e);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-nonsimple-left-call",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a612e622e633f2e28293b0a612e625b635d3f2e2831293b0a6b28292e6d3f2e28293b0a"
+    },
+    "id": "oc-nonsimple-left-call",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na.b.c?.();\na.b[c]?.(1);\nk().m?.();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a, _b, _c, _d, _e, _f;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_b = ((_a = a.b).c)) === null || _b === void 0 ? void 0 : _b.call(_a);\r\n(_c = (a.b)) === null || _c === void 0 ? void 0 : _c.call(a);\r\n(_d = (a[k()])) === null || _d === void 0 ? void 0 : _d.call(a);\r\n(_e = ((a.b))) === null || _e === void 0 ? void 0 : _e.call(a);\r\n(_f = (k())) === null || _f === void 0 ? void 0 : _f();\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "optionalchain"
+       ],
+       "text": "var _a, _b, _c, _d, _e, _f;\r\n(_b = ((_a = a.b).c)) === null || _b === void 0 ? void 0 : _b.call(_a);\r\n(_c = (a.b)) === null || _c === void 0 ? void 0 : _c.call(a);\r\n(_d = (a[k()])) === null || _d === void 0 ? void 0 : _d.call(a);\r\n(_e = ((a.b))) === null || _e === void 0 ? void 0 : _e.call(a);\r\n(_f = (k())) === null || _f === void 0 ? void 0 : _f();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-parenthesized-call-capture",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a28612e622e63293f2e28293b0a28612e62293f2e28293b0a28615b6b28295d293f2e28293b0a2828612e6229293f2e28293b0a286b2829293f2e28293b0a"
+    },
+    "id": "oc-parenthesized-call-capture",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a.b.c)?.();\n(a.b)?.();\n(a[k()])?.();\n((a.b))?.();\n(k())?.();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a, _b, _c;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(a === null || a === void 0 ? void 0 : (_a = a.b.c)[k()]).call(_a);\r\n(a === null || a === void 0 ? void 0 : a[0]).call(a, 1);\r\n((_b = a.b) === null || _b === void 0 ? void 0 : (_c = _b.c).d).call(_c);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-parenthesized-chain-call-capture",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a28613f2e622e635b6b28295d2928293b0a28613f2e5b305d292831293b0a28612e623f2e632e642928293b0a"
+    },
+    "id": "oc-parenthesized-chain-call-capture",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\n(a?.b.c[k()])();\n(a?.[0])(1);\n(a.b?.c.d)();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na === null || a === void 0 ? true : delete a[k()];\r\na === null || a === void 0 ? true : delete a.b[c];\r\n((_a = a.b) === null || _a === void 0 ? true : delete _a.c);\r\n((a === null || a === void 0 ? true : delete a[0]));\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "optionalchain"
+       ],
+       "text": "var _a;\r\na === null || a === void 0 ? true : delete a[k()];\r\na === null || a === void 0 ? true : delete a.b[c];\r\n((_a = a.b) === null || _a === void 0 ? true : delete _a.c);\r\n((a === null || a === void 0 ? true : delete a[0]));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-delete-element",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a64656c65746520613f2e5b6b28295d3b0a64656c65746520613f2e625b635d3b0a64656c6574652028612e623f2e63293b0a64656c657465202828613f2e5b305d29293b0a"
+    },
+    "id": "oc-delete-element",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete a?.[k()];\ndelete a?.b[c];\ndelete (a.b?.c);\ndelete ((a?.[0]));\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na === null || a === void 0 ? void 0 : a.b();\r\na === null || a === void 0 ? void 0 : a();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-delete-call-chain",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a64656c65746520613f2e6228293b0a64656c65746520613f2e28293b0a"
+    },
+    "id": "oc-delete-call-chain",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\ndelete a?.b();\ndelete a?.();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a, _b;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_b = a === null || a === void 0 ? void 0 : a.b(c === null || c === void 0 ? void 0 : c.d, (_a = k()) === null || _a === void 0 ? void 0 : _a.e)) === null || _b === void 0 ? void 0 : _b.f(o === null || o === void 0 ? void 0 : o[a === null || a === void 0 ? void 0 : a.b]);\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "optionalchain"
+       ],
+       "text": "var _a, _b;\r\n(_b = a === null || a === void 0 ? void 0 : a.b(c === null || c === void 0 ? void 0 : c.d, (_a = k()) === null || _a === void 0 ? void 0 : _a.e)) === null || _b === void 0 ? void 0 : _b.f(o === null || o === void 0 ? void 0 : o[a === null || a === void 0 ? void 0 : a.b]);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-nested-in-arguments",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e6228633f2e642c206b28293f2e65293f2e66286f3f2e5b613f2e625d293b0a"
+    },
+    "id": "oc-nested-in-arguments",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b(c?.d, k()?.e)?.f(o?.[a?.b]);\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a, _b;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(_a = a === null || a === void 0 ? void 0 : a[b === null || b === void 0 ? void 0 : b.c]) === null || _a === void 0 ? void 0 : _a[(_b = k()) === null || _b === void 0 ? void 0 : _b.d];\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-chain-in-chain-expression",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e5b623f2e635d3f2e5b6b28293f2e645d3b0a"
+    },
+    "id": "oc-chain-in-chain-expression",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.[b?.c]?.[k()?.d];\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\n(a === null || a === void 0 ? void 0 : a.b) `x`;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-tagged-template-chain",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e626078603b0a"
+    },
+    "id": "oc-tagged-template-chain",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.b`x`;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na.b.c();\r\ndelete a.b;\r\n(a.b)();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-no-optional",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a612e622e6328293b0a64656c65746520612e623b0a28612e622928293b0a"
+    },
+    "id": "oc-no-optional",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na.b.c();\ndelete a.b;\n(a.b)();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\nfunction f() { return () => { var _a; return (_a = a === null || a === void 0 ? void 0 : a.b) === null || _a === void 0 ? void 0 : _a.call(a); }; }\r\nclass D {\r\n    x = a === null || a === void 0 ? void 0 : a.b;\r\n    static y = (_a = o === null || o === void 0 ? void 0 : o.p) === null || _a === void 0 ? void 0 : _a.call(o);\r\n}\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "optionalchain"
+       ],
+       "text": "var _a;\r\nfunction f() { return () => { var _a; return (_a = a === null || a === void 0 ? void 0 : a.b) === null || _a === void 0 ? void 0 : _a.call(a); }; }\r\nclass D {\r\n    x = a === null || a === void 0 ? void 0 : a.b;\r\n    static y = (_a = o === null || o === void 0 ? void 0 : o.p) === null || _a === void 0 ? void 0 : _a.call(o);\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-in-nested-functions",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a66756e6374696f6e20662829207b2072657475726e202829203d3e20613f2e623f2e28293b207d0a636c6173732044207b2078203d20613f2e623b207374617469632079203d206f3f2e703f2e28293b207d0a"
+    },
+    "id": "oc-in-nested-functions",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f() { return () => a?.b?.(); }\nclass D { x = a?.b; static y = o?.p?.(); }\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare let a: any, b: any, c: any;\r\ndeclare let o: any;\r\ndeclare function k(): any;\r\na === null || a === void 0 ? void 0 : a();\r\na === null || a === void 0 ? void 0 : a.b(1);\r\n(a === null || a === void 0 ? void 0 : a.b).call(a);\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "optionalchain"
+       ],
+       "text": "a === null || a === void 0 ? void 0 : a();\r\na === null || a === void 0 ? void 0 : a.b(1);\r\n(a === null || a === void 0 ? void 0 : a.b).call(a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "oc-type-arguments-call",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c617265206c657420613a20616e792c20623a20616e792c20633a20616e793b206465636c617265206c6574206f3a20616e793b206465636c6172652066756e6374696f6e206b28293a20616e793b0a613f2e3c737472696e673e28293b0a613f2e623c6e756d6265723e2831293b0a28613f2e62293c737472696e673e28293b0a"
+    },
+    "id": "oc-type-arguments-call",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\na?.<string>();\na?.b<number>(1);\n(a?.b)<string>();\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

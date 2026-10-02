@@ -1,6 +1,6 @@
 # Rust package preparation
 
-The publication policy currently includes 34 public libraries and 25 private
+The publication policy currently includes 35 public libraries and 25 private
 packages, all named explicitly in [packages.json](packages.json). The workspace
 defaults to `publish = false`. This policy and the dependency order below track
 the current source tree; they are not a record of registry releases. The Node
@@ -76,7 +76,7 @@ and exports stay unchanged. Old captures retain their own archived ABI wrappers.
 
 The project branding is **tsr**; `tsr_embed` is the application entry point.
 A `tsr` facade that re-exports the public embedding surface remains a separate follow-up; neither
-`tsr` nor `tsrust` is added to this 34-package release set. All package READMEs
+`tsr` nor `tsrust` is added to this 35-package release set. All package READMEs
 state the Rust 1.96 minimum, and package metadata includes search keywords and
 the compiler category.
 
@@ -123,23 +123,24 @@ build and optional dependencies. It is for a later, explicitly authorized releas
 15. `tsr_binder`
 16. `tsr_semver`
 17. `tsr_tspath`
-18. `tsr_vfs`
-19. `tsr_bundled`
-20. `tsr_tsoptions`
-21. `tsr_contentmapper`
-22. `tsr_module`
-23. `tsr_nodebuilder`
-24. `tsr_printer`
-25. `tsr_pseudochecker`
-26. `tsr_checker`
-27. `tsr_astnav`
-28. `tsr_format`
-29. `tsr_transformers`
-30. `tsr_compiler`
-31. `tsr_project`
-32. `tsr_api`
-33. `tsr_embed`
-34. `tsr_wasm`
+18. `tsr_sourcemap`
+19. `tsr_vfs`
+20. `tsr_bundled`
+21. `tsr_tsoptions`
+22. `tsr_contentmapper`
+23. `tsr_module`
+24. `tsr_nodebuilder`
+25. `tsr_printer`
+26. `tsr_pseudochecker`
+27. `tsr_checker`
+28. `tsr_astnav`
+29. `tsr_format`
+30. `tsr_transformers`
+31. `tsr_compiler`
+32. `tsr_project`
+33. `tsr_api`
+34. `tsr_embed`
+35. `tsr_wasm`
 
 ## Package policy
 
@@ -182,6 +183,7 @@ build and optional dependencies. It is for a later, explicitly authorized releas
 | `tsr_pseudochecker` | Prepared | Rust library and its public dependency closure |
 | `tsr_scanner` | Prepared | Rust library and its public dependency closure |
 | `tsr_semver` | Prepared | Rust library and its public dependency closure |
+| `tsr_sourcemap` | Prepared | Rust library and its public dependency closure |
 | `tsr_testhost` | Private | Repository-only benchmark, experiment, test or capture tool |
 | `tsr_transformers` | Prepared | Rust library and its public dependency closure |
 | `tsr_tsoptions` | Prepared | Rust library and its public dependency closure |

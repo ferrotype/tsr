@@ -736,6 +736,9 @@ P2B_EXIT = (("harness_valid", True), ("errors_parity", 1), ("types_parity", 1), 
 PREREQUISITE_RUNS = ("binder", "bindworkload", "checkerbench", "checkertext", "clippy", "config", "deny",
                      "e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8", "fmt", "foundations", "gen", "oracle",
                      "program", "relater", "scanner", "selftest", "syntax", "testhost", "workspace")
+# Producers of later phases, declared beside these in status/runs.toml. They
+# are no prerequisite of C7 and their state does not enter its evidence check.
+LATER_PHASE_RUNS = ("emit",)
 
 
 def recorded_metric(evidence_id, metric, run="checker", root=ROOT):
@@ -776,7 +779,8 @@ def c7_metrics(metrics, audit_ok, states, state, comparison, *, root=ROOT):
     run-level two-mode metrics, every P2B-Cn item closed, and C7's own seven."""
     out = {"c7_audit_complete": audit_ok is True,
            "c7_content_mappers": metrics.get("content_mappers") is True and audit_ok is True,
-           "c7_evidence_current": (states is not None and set(states) == {*PREREQUISITE_RUNS, "checker"}
+           "c7_evidence_current": (states is not None
+                                   and set(states) - set(LATER_PHASE_RUNS) == {*PREREQUISITE_RUNS, "checker"}
                                    and all(states[run] == "current" for run in PREREQUISITE_RUNS))}
     import phase2_informational
     out["c7_informational_listed"] = c7_optional("informational", phase2_informational.current) is True

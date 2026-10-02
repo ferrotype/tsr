@@ -16,11 +16,21 @@ pub use checker_pool::{
 mod checker_module_specifiers;
 mod content_mapped;
 mod declaration_diagnostics;
+mod declaration_host;
+pub use declaration_host::ProgramDeclarationHost;
+mod emit_host;
+pub use emit_host::EmitHost;
 pub mod diagnostic_writer;
+pub mod emitter;
 mod include_reason;
 mod output_paths;
 mod plain_js_errors;
 mod program_diagnostics;
+mod program_emit;
+pub use program_emit::{
+    combine_emit_results, get_diagnostics_of_any_program, handle_no_emit_options, EmitOnly,
+    EmitOptions, EmitResult, FileDiagnostics, SourceMapEmitResult, WriteFile, WriteFileData,
+};
 mod project_references;
 pub use project_references::CompilerConfigHost;
 mod syntactic_diagnostics;

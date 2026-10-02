@@ -1,0 +1,909 @@
+{
+ "cases": [
+  {
+   "id": "go-importequals-1",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x = require(\"other\"); x;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importequals-2",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x = require(\"other\");\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-1",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport \"m\";\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-2",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport * as x from \"other\"; x;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-3",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x from \"other\"; x;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-4",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { x } from \"other\"; x;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-5",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport * as x from \"other\";\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-6",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x from \"other\";\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-7",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { x } from \"other\";\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-1",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-2",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * as x from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-3",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-4",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * as x from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-5",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x } from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-6",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x } from \"other\";\n// @filename: node_modules/other/index.ts\nexport type x = any;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-7",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x }; let x;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-9",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { x } from \"other\"; export { x };\n// @filename: node_modules/other/index.ts\nexport type x = any;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportassignment-1",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nlet x; export default x;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-equals-entity-module-used",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nimport y = N.v;\ny;\nexport {};\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-equals-entity-module-unused",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nimport y = N.v;\nexport const k = 1;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-equals-entity-script-unused",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nimport y = N.v;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-equals-entity-script-uninstantiated",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { }\nimport y = N;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-equals-entity-script-nested-unused",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nnamespace M { import y = N.v; }\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-equals-entity-nested-used",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nnamespace M { import y = N.v; export const z = y; }\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-equals-export-import",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nexport import y = N.v;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-equals-namespace-export-import",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nnamespace M { export import y = N.v; }\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-equals-dotted-namespace",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nnamespace A.B { import y = N.v; y; }\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-equals-require-used-relative",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x = require(\"./other\");\nx.a;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-equals-commonjs",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nimport x = require(\"./other\");\nexport = x;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-default-named-partial",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport d, { a, b } from \"./other\";\na;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-default-only-used",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport d, { a } from \"./other\";\nd;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-default-namespace",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport d, * as ns from \"./other\";\nns;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-attributes",
+   "name": "main.ts",
+   "source": "// @module: esnext\n// @filename: main.ts\nimport { a } from \"./other\" with { type: \"json\" };\na;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-side-effect-attributes",
+   "name": "main.ts",
+   "source": "// @module: esnext\n// @filename: main.ts\nimport \"./other\" with { type: \"json\" };\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-type-modifier",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { type a, b } from \"./other\";\nb;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-type-only-clause",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport type { a } from \"./other\";\nexport const k = 1;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-empty-named",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport {} from \"./other\";\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-reexported",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { a } from \"./other\";\nexport { a };\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-interface-reexported",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { T } from \"./other\";\nexport { T };\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-empty",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport {};\nconst k = 1;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-star",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * from \"./other\";\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-star-as",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * as ns from \"./other\";\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-from-partial",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { a, T } from \"./other\";\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-from-interface-only",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { T, T as U } from \"./other\";\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-from-attributes",
+   "name": "main.ts",
+   "source": "// @module: esnext\n// @filename: main.ts\nexport { a } from \"./other\" with { type: \"json\" };\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-from-unresolved",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { q } from \"./missing\";\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-local-renames",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nconst a = 1;\nexport { a as b, a as default };\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-default-expression",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport default 1 + 2;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-default-interface-import",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { T } from \"./other\";\nexport default T;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-default-namespace-import",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport * as ns from \"./other\";\nexport default ns;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-default-function",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport default function f() { return 1; }\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-ambient-module",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\ndeclare module \"m\" {\n    import { a, T } from \"./other\";\n    export { a, T };\n}\nexport {};\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-js-file-unused-import",
+   "name": "main.js",
+   "source": "// @allowJs: true\n// @filename: main.js\nimport x from \"./other.js\";\nimport { a } from \"./other.js\";\nexport { a as c };\n// @filename: other.js\nexport default 1;\nexport const a = 1;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importequals-1-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x = require(\"other\"); x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importequals-2-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x = require(\"other\");\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-1-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport \"m\";\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-2-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport * as x from \"other\"; x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-3-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x from \"other\"; x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-4-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { x } from \"other\"; x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-5-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport * as x from \"other\";\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-6-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport x from \"other\";\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-importdeclaration-7-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { x } from \"other\";\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-1-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-2-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * as x from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-3-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-4-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport * as x from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-5-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x } from \"other\";\n// @filename: node_modules/other/index.ts\nexport let x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-6-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x } from \"other\";\n// @filename: node_modules/other/index.ts\nexport type x = any;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-7-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x }; let x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-8",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nexport { x }; type x = any;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportdeclaration-9-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport { x } from \"other\"; export { x };\n// @filename: node_modules/other/index.ts\nexport type x = any;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportassignment-1-with-typeeraser",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nlet x; export default x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "go-exportassignment-2",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\ntype x = any; export default x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-jsx-synthesized-import",
+   "name": "main.tsx",
+   "source": "// @jsx: react-jsx\n// @module: esnext\n// @filename: main.tsx\nexport const e = <div>{1}</div>;\nexport const f = <><span key=\"k\" /></>;\n",
+   "chains": [
+    [
+     "jsx",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-jsx-synthesized-import-with-user-imports",
+   "name": "main.tsx",
+   "source": "// @jsx: react-jsxdev\n// @module: esnext\n// @filename: main.tsx\nimport { a, T } from \"./other\";\nimport d from \"./other\";\nlet t: T;\nexport const e = <div>{a}</div>;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "jsx",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-jsx-synthesized-import-source",
+   "name": "main.tsx",
+   "source": "// @jsx: react-jsx\n// @jsxImportSource: preact\n// @module: esnext\n// @filename: main.tsx\nimport type { T } from \"./other\";\nexport const e = <div {...{ a: 1 }} key=\"k\" />;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "jsx",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-defer-namespace-used",
+   "name": "main.ts",
+   "source": "// @module: esnext\n// @filename: main.ts\nimport defer * as ns from \"./other\";\nns.a;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-defer-namespace-unused",
+   "name": "main.ts",
+   "source": "// @module: esnext\n// @filename: main.ts\nimport defer * as ns from \"./other\";\nexport const k = 1;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-import-defer-type-only-use",
+   "name": "main.ts",
+   "source": "// @module: preserve\n// @filename: main.ts\nimport defer * as ns from \"./other\";\nlet t: ns.T;\nexport {};\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-two-pass-partial",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport d, { a, b, T } from \"./other\";\nimport * as ns from \"./other\";\nimport x = require(\"./other\");\nexport { a as c, T };\nlet t: T = b;\nexport default ns;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision",
+     "importelision"
+    ],
+    [
+     "typeeraser",
+     "importelision",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-two-pass-elided",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nimport d, { a } from \"./other\";\nexport { T } from \"./other\";\nimport x = require(\"./other\");\nexport const k = 1;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-two-pass-namespace-equals",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N { export const v = 1; }\nimport y = N.v;\nnamespace M { import z = N.v; export const w = z; }\n",
+   "chains": [
+    [
+     "importelision",
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-verbatim-module-syntax-panics",
+   "name": "main.ts",
+   "source": "// @verbatimModuleSyntax: true\n// @module: esnext\n// @filename: main.ts\nimport { a } from \"./other\";\na;\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-equals-interface",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\ninterface I {}\nexport = I;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-export-equals-value",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @filename: main.ts\nconst v = 1;\nexport = v;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-js-namespace-and-equals",
+   "name": "main.js",
+   "source": "// @allowJs: true\n// @filename: main.js\nimport * as ns from \"./other.js\";\nimport d, { a } from \"./other.js\";\nexport { a as c };\nexport default 1;\n// @filename: other.js\nexport default 1;\nexport const a = 1;\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  },
+  {
+   "id": "ie-namespace-export-unused",
+   "name": "main.ts",
+   "source": "// @filename: main.ts\nnamespace N {\n    import { a } from \"./other\";\n    export const q = 1;\n}\nexport {};\n// @filename: other.ts\nexport default 1;\nexport const a = 1, b = 2;\nexport interface T {}\n",
+   "chains": [
+    [
+     "importelision"
+    ]
+   ]
+  }
+ ]
+}

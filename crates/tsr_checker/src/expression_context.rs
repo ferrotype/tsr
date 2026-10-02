@@ -32,6 +32,17 @@ impl CheckerState {
         node: NodeId,
         context_flags: u32,
     ) -> Result<Option<TypeId>, Error> {
+        // The search walks up here once per enclosing literal.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.contextual_expression_type_ex_worker(node, context_flags)
+        })
+    }
+
+    fn contextual_expression_type_ex_worker(
+        &mut self,
+        node: NodeId,
+        context_flags: u32,
+    ) -> Result<Option<TypeId>, Error> {
         let read = self.node(node)?;
         if read.flags() & nf::IN_WITH_STATEMENT != 0 {
             return Ok(None);
@@ -440,6 +451,13 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.isConstContext
     pub(crate) fn is_const_context(&mut self, node: NodeId) -> Result<bool, Error> {
+        // The check walks up here once per enclosing literal.
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.is_const_context_worker(node)
+        })
+    }
+
+    fn is_const_context_worker(&mut self, node: NodeId) -> Result<bool, Error> {
         let Some(parent) = self.node(node)?.parent() else {
             return Ok(false);
         };

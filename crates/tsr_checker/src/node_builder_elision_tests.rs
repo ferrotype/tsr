@@ -57,7 +57,7 @@ fn elision_branches_match_native_text_and_length() {
         }).collect::<Vec<_>>();
         let mut writer = TextWriter::new(b"", 0);
         Printer::new(PrinterOptions::default(), &builder.emit)
-            .write(builder.ast.view(), node, None, &mut writer)
+            .write(builder.ast.view(), node, None, &mut writer, None)
             .unwrap();
         observed.push(json!({"id":case["id"],"text":String::from_utf8(writer.text().to_vec()).unwrap(),"added_length":builder.approximate_length-length,"comments":comments}));
     }
@@ -152,7 +152,7 @@ fn property_elision_matches_native_members_comments_and_length() {
         }
         let mut writer = TextWriter::new(b"", 0);
         Printer::new(PrinterOptions::default(), &builder.emit)
-            .write(builder.ast.view(), node, None, &mut writer)
+            .write(builder.ast.view(), node, None, &mut writer, None)
             .unwrap();
         observed.push(json!({"id":q["id"],"observation":{"text":String::from_utf8(writer.text().to_vec()).unwrap(),"kind":kind,"members":members,"added_length":builder.approximate_length-length,"restored_flags":builder.flags==flags}}));
     }

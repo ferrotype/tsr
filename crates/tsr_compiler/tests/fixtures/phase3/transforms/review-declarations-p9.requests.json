@@ -1,0 +1,56 @@
+{
+ "cases": [
+  {
+   "id": "rcf-nolexthis",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass A {\n    async m() {\n        await 0;\n        class B {\n            static x = this;\n            static {\n                await 1;\n                const y = this;\n            }\n        }\n        return this;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields",
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "rcf-static-args",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass C {\n    static {\n        const f = async () => await this.x + arguments.length;\n    }\n}\n",
+   "chains": [
+    [
+     "classfields",
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "computed-names-mix",
+   "name": "probe.ts",
+   "source": "declare const k: string;\ndeclare const u: unique symbol;\ndeclare const obj: { readonly key: unique symbol };\nconst lit = \"lit\";\nexport class C {\n  [k] = 1;\n  [u] = 2;\n  [obj.key]() {}\n  get [lit]() { return 1; }\n  set [u](v: number) {}\n  static [Symbol.iterator]() {}\n  [\"str\"] = 3;\n  [1 + 1] = 4;\n}\nexport interface I {\n  [k]: number;\n  [u]: number;\n  [obj.key](): void;\n  [Symbol.asyncIterator]: number;\n}\nexport const o = { [u]: 1, [k]: 2, [lit]: 3 };\nexport type T = { [u]: number; [k]: string };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "computed-names-isolated",
+   "name": "probe.ts",
+   "source": "// @isolatedDeclarations: true\n// @declaration: true\ndeclare const k: string;\ndeclare const u: unique symbol;\ndeclare const obj: { readonly key: unique symbol };\nexport class C {\n  [k]: number = 1;\n  [u]: number = 2;\n  [Symbol.iterator](): void {}\n  [obj.key]: number = 3;\n  [k + \"x\"]: number = 4;\n}\nexport interface I {\n  [k + \"y\"]: number;\n  [obj.key]: number;\n  [Symbol.iterator]: number;\n}\nexport const o = { [u]: 1 };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "computed-names-script-private",
+   "name": "probe.ts",
+   "source": "module M {\n  const sym: unique symbol = Symbol();\n  const sym2: unique symbol = Symbol();\n  export class K {\n    [sym]: number;\n    get [sym2](): number { return 1; }\n    static [sym]() {}\n  }\n  export interface J { [sym](): void; [sym2]: number }\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  }
+ ]
+}

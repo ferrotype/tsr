@@ -29,6 +29,9 @@ pub struct CheckedProgram {
     program: Arc<Program>,
     pool: Arc<dyn CheckerPool>,
     compiler_pool: Option<Arc<CompilerCheckerPool>>,
+    /// The program's trace session (`p.opts.Tracing`), which `Program.Emit`
+    /// pushes its events to; the compiler's pool traces its checkers with it.
+    tracing: Option<Arc<dyn TraceSink>>,
 }
 
 impl CheckedProgram {
@@ -42,12 +45,13 @@ impl CheckedProgram {
         let pool = Arc::new(CompilerCheckerPool::with_tracing(
             program.clone(),
             counters,
-            tracing,
+            tracing.clone(),
         ));
         Self {
             program,
             pool: pool.clone(),
             compiler_pool: Some(pool),
+            tracing,
         }
     }
 
@@ -58,11 +62,17 @@ impl CheckedProgram {
             program,
             pool,
             compiler_pool: None,
+            tracing: None,
         }
     }
 
     pub fn program(&self) -> &Arc<Program> {
         &self.program
+    }
+
+    /// The program's trace session, if it traces.
+    pub fn tracing(&self) -> Option<&Arc<dyn TraceSink>> {
+        self.tracing.as_ref()
     }
 
     // port: tsc/internal/compiler/program.go:Program.GetCheckerPool

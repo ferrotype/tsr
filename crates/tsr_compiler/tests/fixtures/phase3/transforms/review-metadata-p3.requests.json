@@ -1,0 +1,254 @@
+{
+ "cases": [
+  {
+   "id": "rm-alias-kinds",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\ntype S = string; type N = 1 | 2; type U = undefined; type V = void; type Nv = never; type Nl = null;\ntype Bi = bigint; type Sy = symbol; type Ar = number[]; type Tu = [1]; type Fn = () => void; type Ob = { a: 1 };\ntype Bo = boolean; type Tl = `a${string}`; type Un = string | number; type Lit = 'a' | 'b'; type BL = true | false;\nenum E { A } enum SE { A = 'a' } const enum CE { A } declare enum DE { A }\ninterface CallSig { (): void } interface CtorSig { new (): any } declare var CtorSig: CtorSig;\nclass K {\n  @d a: S; @d b: N; @d c: U; @d e: V; @d f: Nv; @d g: Nl; @d h: Bi; @d i: Sy; @d j: Ar; @d k: Tu; @d l: Fn; @d m: Ob;\n  @d n: Bo; @d o: Tl; @d p: Un; @d q: Lit; @d r: BL; @d s: E; @d t: SE; @d u: CE; @d v: DE; @d w: CallSig; @d x: CtorSig;\n  @d y: Promise<number>; @d z: PromiseLike<number>; @d aa: Date; @d ab: Function; @d ac: Object; @d ad: RegExp; @d ae: Array<number>;\n  @d af: ReadonlyArray<number>; @d ag: E.A; @d ah: SE.A; @d ai: String; @d aj: Number; @d ak: Boolean; @d al: Symbol; @d am: BigInt;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-generic-params",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K<T, U extends string> {\n  @d a: T; @d b: U; @d c: T | U; @d m<V>(x: V, y: T): V { return x; }\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-qualified-unresolved",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K {\n  @d a: A.B.C; @d b: A.B.C | A.B.C; @d c: A.B | A.B; @d e: X | X | null; @d f: A.B.C | X; @d g: X & X; @d h: A.B.C.D;\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-namespace-refs",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nnamespace N { export class C {} export interface I {} export type T = string; export namespace M { export class D {} } export enum E { A } }\nclass K { @d a: N.C; @d b: N.I; @d c: N.T; @d e: N.M.D; @d f: N.E; @d g: N.E.A; @d h: N.C | N.C; @d i: N.M.D | N.M.D; }\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-literal-types",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K { @d a: -1; @d b: -1n; @d c: 1n; @d e: null; @d f: true; @d g: `x`; @d h: 'a' | 1; @d i: -1 | 2; @d j: 1n | 2n; @d k: null | 1; @d l: undefined | 'a'; }\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-type-operators",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\ndeclare const us: unique symbol;\nclass K { @d a: keyof K; @d b: readonly string[]; @d c: readonly [1]; @d e: unique symbol; @d f: K['a']; @d g: { [P in 'a']: 1 }; @d h: typeof us; @d i: this; @d j: import('./probe').K; @d k: unknown; @d l: any; @d m: object; @d n: never | string; @d o: unknown | string; @d p: unknown & string; @d q: never & string; }\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-conditional-nested",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\ntype C1<T> = T extends string ? Missing : number;\nclass K<T> { @d a: T extends string ? Missing : Other; @d b: T extends 1 ? string : 'x'; @d c: (T extends 1 ? string : number) | string; @d e: T extends 1 ? (T extends 2 ? Missing : string) : string; @d f: T extends 1 ? Missing.X : Y.Z; }\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-params-this-rest",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K {\n  @d m(this: K, a: string, ...r: number[]): void {}\n  @d n(...r: Array<string>): void {}\n  @d o(...r: [number, string]): void {}\n  @d p(...r): void {}\n  @d q(this: K): void {}\n  @d r(...r: string[][]): void {}\n  @d s(...r: readonly number[]): void {}\n  @d t(...r: Missing[]): void {}\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-return-types",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K {\n  @d async a() {} @d async b(): Promise<void> {} @d c(): asserts this is K {} @d e(x): x is string { return true; } @d f(x): asserts x {} @d *g() {} @d async *h() {} @d i(): this { return this; }\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-ctor-overloads",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\n@d class A { constructor(a: string); constructor(a: any) {} }\n@d class B { constructor(a: string); }\ndeclare class Dc { }\n@d class C extends Dc { }\n@d class D { constructor(private a: string, @d public b?: number, c = 1) {} }\nclass E { constructor(@d a: string) {} }\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-accessor-pairs",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K {\n  @d get a(): string { return ''; } set a(v: number) {}\n  get b(): string { return ''; } @d set b(v) {}\n  @d set c(this: K, v: boolean) {}\n  @d get e() { return 1; }\n  @d static get f(): Date { return new Date(); } static set f(v: Date) {}\n  set g(@d v: string) {}\n}\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-scope-blocks",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nfunction f() {\n  class Local {}\n  { class Inner {} class K { @d a: Inner; @d b: Local; } }\n  switch (1) { case 1: class S {} class K2 { @d a: S; } }\n}\nnamespace NS { class A {} class K { @d a: A; } }\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-modifier-orders",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\n@d export abstract class A { }\nexport @d class B { }\n@d export default class C { }\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-class-expression-in-call",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nconst x = f(@d class { constructor(a: string) {} @d m(b: number) {} });\ndeclare function f(a: any): any;\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-imported-types",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\n// @filename: a.ts\nexport class A {} export interface I {} export type T = number; export enum E { X } export default class Def {}\n// @filename: probe.ts\nimport Def, { A, I, T, E } from './a';\nimport * as ns from './a';\nimport type { A as TA } from './a';\ndeclare function d(...a: any[]): any;\nclass K { @d a: A; @d b: I; @d c: T; @d e: E; @d f: Def; @d g: ns.A; @d h: ns.I; @d i: TA; @d j: ns.E; }\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-jsdoc-function-type",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K { @d a: ?string; @d b: string!; @d c: *; @d e: ?; @d f: Missing?; }\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-strict-unions",
+   "name": "probe.ts",
+   "source": "// @strict: true\n// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K { @d a: string | null; @d b: string | undefined; @d c: null | undefined; @d e: string | void; @d f: number | null | undefined | never; @d g: Date | null; }\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-symbol-and-bigint-es2020",
+   "name": "probe.ts",
+   "source": "// @target: es2020\n// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\ndeclare function d(...a: any[]): any;\ntype Bi = bigint;\nclass K { @d a: bigint; @d b: Bi; @d c: 1n; @d e: bigint | 1n; }\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "rm-property-no-type",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2017\ndeclare function d(...a: any[]): any;\nclass K { @d a; @d b = 1; @d static c; @d [Symbol.iterator]: any; @d 'str': number; @d 1: string; }\n",
+   "chains": [
+    [
+     "metadata"
+    ]
+   ]
+  },
+  {
+   "id": "reexport-type-import",
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport type { v as vv } from \"./lib\";\nexport type { vv };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "reexport-value-import",
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport { v as vv } from \"./lib\";\nexport { vv };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "reexport-type-import-noalias",
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport type { I } from \"./lib\";\nexport type { I };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "reexport-import-plain-export",
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport { I } from \"./lib\";\nexport { I };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "reexport-type-modifier-specifier",
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport const v = 1;\nexport interface I { a: number }\n// @filename: probe.ts\nimport { type I, v } from \"./lib\";\nexport { type I, v };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "reexport-default-import",
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nconst d = 1; export default d;\n// @filename: probe.ts\nimport d from \"./lib\";\nexport { d };\nimport * as ns from \"./lib\";\nexport { ns };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  }
+ ]
+}

@@ -192,7 +192,13 @@ impl Walker<'_, '_, '_> {
                     },
                     builder.emit_context(),
                 )
-                .write(builder.view(), generated, Some(source), &mut writer)?;
+                .write(
+                    builder.view(),
+                    generated,
+                    Some(source),
+                    &mut writer,
+                    None,
+                )?;
                 writer.text().to_vec()
             } else {
                 vec![]

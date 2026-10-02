@@ -88,7 +88,14 @@ fn selector_codes_and_locations_match_native_declaration_contexts(
                         result.error_module_name =
                             tsr_ast::JsString::from_bytes(b"module".as_slice());
                     }
-                    let diagnostic = accessibility_diagnostic(view, node, name_context, &result)?;
+                    let getter = if name_context {
+                        create_get_symbol_accessibility_diagnostic_for_node_name(view, node)?
+                    } else {
+                        create_get_symbol_accessibility_diagnostic_for_node(view, node)?
+                    };
+                    let diagnostic = getter
+                        .evaluate(view, &result)
+                        .map_err(|failure| format!("{failure:?}"))?;
                     actual.push(json!({
                         "node":node_ref(view,Some(node))?,"name_context":name_context,"variant":variant,
                         "code":diagnostic.map(|record|record.diagnostic_message.code),

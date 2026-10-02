@@ -1,0 +1,634 @@
+{
+  "cases": [
+    {
+      "id": "no-facts",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nconst a = 1;\nfunction f(x, y = 2) { return [...x, y]; }\nf(...[a]);\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "spread-only",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const a: any;\nconst o = { ...a };\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "spread-after-props",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const b: any;\nconst o = { a: 1, ...b };\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "spread-chunks",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const a: any, c: any;\nconst o = { ...a, b: 1, ...c, d: 2, e };\nvar e;\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "spread-first-literal",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const y: any;\nconst o = { ...{ x: 1 }, y, ...{ z: 2 } };\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "spread-nested-property",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const b: any, c: any;\nconst o = { a: { ...b }, ...c };\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "nested-spread-only-inner",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const b: any;\nconst o = { a: { ...b, c: 1 }, d: [ { ...b } ] };\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "spread-methods-accessors",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any;\nconst p = { m() { return 1; }, get g() { return 2; }, set s(v) { }, ...o, s, [o.k]: 3 };\nvar s;\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "spread-computed-and-shorthand",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const k: string, o: any;\nconst x = 1;\nconst p = { [k]: 1, x, ...o, 'q': 2, 3: 4 };\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "spread-statement-paren",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const a: any;\n({ ...a });\n(({ ...a }));\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "spread-side-effects",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nvar k = { a: 1, b: 2 };\nvar o = { a: 3, ...k, b: k.a++ };\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "var-rest",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any;\nconst { a, ...rest } = o;\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "var-rest-nested",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any;\nlet { a: { b, ...c }, ...d } = o;\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "var-rest-only-nested",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any;\nvar { a: { b, ...c } } = o;\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "var-rest-in-array",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const arr: any;\nconst [{ ...x }, y] = arr;\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "var-rest-defaults",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any;\nconst { a = 1, b: { c = 2 } = {}, ...r } = o;\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "var-rest-computed",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any, k: string;\nconst { [k]: v, [k + 'x']: w, ...r } = o;\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "var-multiple-declarations",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any, d: any;\nconst { ...a } = o, b = { ...a }, [c] = d, e = 1;\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "export-var-rest",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any;\nexport const { a, ...r } = o;\nexport let { b: [c], ...d } = o, e = 1;\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "export-var-no-rest",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any;\nexport const { a } = o, b = { ...o };\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "param-rest",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nfunction f({ a, ...r }) { return r; }\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "param-rest-initializer",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nfunction f({ a, ...r } = {}) { return r; }\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "param-following-kinds",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare function g(): any;\nfunction f(x, { a, ...r }, y = 1, [z], { w }, {} = g(), [] = [], {}, [], v, ...rest) { return [x, r, y, z, w, v, rest]; }\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "param-following-patterns-with-init",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nfunction f({ ...a }, [b, c] = [1, 2], { d, e: [h] } = { d: 1, e: [2] }) { return [a, b, c, d, h]; }\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "param-rest-then-rest-param",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nfunction f({ ...a }, ...rest) { return [a, rest]; }\nfunction g({ ...a }, ...[b, c]) { return [a, b, c]; }\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "param-default-with-spread",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nfunction f(x = { ...y }) { return x; }\nvar y;\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "param-rest-defaults-computed",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const k: string, g: any;\nfunction f({ [k]: v, a = g(), ...r }) { return [v, a, r]; }\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "param-rest-nested-array",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nfunction f([{ ...a }], b = 1) { return [a, b]; }\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "arrow-expression-body",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nconst f = ({ a, ...r }) => r;\nconst g = async ({ ...r }) => await r;\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "arrow-block-prologue",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nconst f = ({ ...r }, b = 2) => {\n    \"use strict\";\n    'another';\n    return [r, b];\n};\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "arrow-no-rest-body-spread",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nconst f = (a) => ({ ...a });\nconst g = (a) => { const { ...b } = a; return b; };\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "function-expression",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nconst f = function named({ ...r }, x = 1) { return [r, x]; };\nconst g = function* ({ ...r }) { yield r; };\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "class-members",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nclass C {\n    constructor({ ...r }, x = 1) { this.r = r; }\n    m({ a, ...r }) { return r; }\n    set s({ ...r }) { }\n    get g() { const { ...r } = this; return r; }\n    static async *sm({ ...r }) { yield r; }\n    r: any;\n}\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "class-property-spread",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const a: any;\nclass C {\n    p = { ...a };\n    static q = { ...a, b: 1 };\n}\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "object-literal-methods",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nconst o = {\n    m({ ...r }) { return r; },\n    get g() { return { ...this }; },\n    set s({ ...r }) { },\n};\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "overload-no-body",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nfunction f({ ...a }): void;\nfunction f(x) { }\ndeclare function g({ ...a }, b = 1): void;\nabstract class A { abstract m({ ...r }, x = 1): void; }\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "function-body-hoisted-temp",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nfunction f(o) {\n    let a, r;\n    return ({ a, ...r } = o());\n}\nfunction g({ ...p }) {\n    let a, r;\n    ({ a, ...r } = p.x());\n    return r;\n}\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "catch-rest",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ntry { } catch ({ message, ...rest }) { console.log(rest); }\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "catch-variants",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ntry { } catch { }\ntry { } catch (e) { const { ...r } = e; }\ntry { } catch ({ a }) { }\ntry { } catch ([{ ...x }]) { x; }\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "catch-rest-empty-block",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ntry { } catch ({ ...rest }) { }\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "for-of-rest-block",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const xs: any[];\nfor (const { a, ...r } of xs) {\n    console.log(a, r);\n    const { ...s } = r;\n}\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "for-of-rest-statement",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const xs: any[];\nfor (let { ...r } of xs) console.log(r);\nfor (var { ...r } of xs) ;\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "for-of-assignment-pattern",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const xs: any[];\nlet a, r;\nfor ({ a, ...r } of xs) { }\nfor ([{ ...r }] of xs) { }\nfor ({ x: { ...r } } of xs) { }\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "for-of-no-rest",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const xs: any[];\nfor (const { a } of xs) { const o = { ...a }; }\nfor (const x of [{ ...xs }]) { }\nlet y;\nfor (y of xs) { y = { ...y }; }\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "for-await-rest",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const xs: any[];\nasync function g() {\n    for await (const { ...r } of xs) { r; }\n}\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "for-of-nested-expression",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const xs: any[];\nfor (const { ...r } of xs.map(x => ({ ...x }))) {\n    for (const { ...s } of r) { }\n}\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "for-in-rest",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any;\nfor (const { ...r } in o) { }\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "assignment-statement",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any;\nlet a, r;\n({ a, ...r } = o);\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "assignment-value",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any;\nlet a, r, x;\nx = ({ a, ...r } = o);\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "assignment-comma",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any, p: any;\nlet a, b;\n({ ...a } = o), ({ ...b } = p);\nlet c = (({ ...a } = o), ({ ...b } = p));\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "assignment-nested",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any;\nlet r, s;\n({ x: { ...r } } = o);\n[{ ...s }] = o;\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "assignment-computed",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any, k: () => string;\nlet v, r;\n({ [k()]: v, ...r } = o);\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "assignment-defaults",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any;\nlet a, r;\n({ a = 1, ...r } = o);\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "binary-not-destructuring",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const a: any;\nlet x, y;\nx = { ...a };\ny = x || { ...a };\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "comma-with-spreads",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const a: any, f: any;\nf({ ...a }), f({ ...a, b: 1 });\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "nested-functions-contexts",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nfunction outer({ ...a }, b = 1) {\n    function inner(c, d = 2) { return { ...c, d }; }\n    const arrow = (e = 3) => e;\n    return [a, b, inner, arrow];\n}\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "top-level-temp",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare function f(): any;\nlet a, r;\n({ a, ...r } = f());\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "arrow-paren-body-spread",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any;\nconst f = ({ ...a }) => ({ ...a, ...o });\n",
+      "chains": [
+        [
+          "objectrestspread"
+        ]
+      ]
+    },
+    {
+      "id": "script-spread-and-rest",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const o: any;\nconst p = { a: 1, ...o };\nconst { a, ...r } = p;\nexport { r };\n",
+      "chains": [
+        [
+          "script"
+        ]
+      ]
+    },
+    {
+      "id": "script-params-and-catch",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nexport function f({ a, ...r }: any, b = 1) { try { } catch ({ ...e }) { } return [a, r, b]; }\n",
+      "chains": [
+        [
+          "script"
+        ]
+      ]
+    },
+    {
+      "id": "script-for-of-and-assignment",
+      "name": "probe.ts",
+      "source": "// @target: es2017\ndeclare const xs: any[];\nlet a: any, r: any;\nfor (const { ...s } of xs) { ({ a, ...r } = s); }\nexport {};\n",
+      "chains": [
+        [
+          "script"
+        ]
+      ]
+    },
+    {
+      "id": "script-es2015-module",
+      "name": "probe.ts",
+      "source": "// @target: es2017\n// @module: es2015\ndeclare const o: any;\nexport const { a, ...r } = o;\nexport const c = { ...o };\n",
+      "chains": [
+        [
+          "script"
+        ]
+      ]
+    },
+    {
+      "id": "script-async-rest",
+      "name": "probe.ts",
+      "source": "// @target: es2017\nexport const f = async ({ ...r }: any) => { for await (const { ...s } of r) { } };\n",
+      "chains": [
+        [
+          "script"
+        ]
+      ]
+    }
+  ]
+}

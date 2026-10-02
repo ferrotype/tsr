@@ -1,0 +1,665 @@
+{
+ "cases": [
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "constenum"
+       ],
+       "text": "const enum E {\r\n    A = 1e21,\r\n    B = 0.1 + 0.2,\r\n    C = 1 / 3,\r\n    D = 2 ** 53 + 1,\r\n    F = 1e300 * 10,\r\n    G = 5e-324,\r\n    H = -(-0),\r\n    I = 0x10,\r\n    J = 1000,\r\n    K = 123456789012345680000,\r\n    L = -1e-7,\r\n    M = 1e-7,\r\n    N = ~0 >>> 0,\r\n    O = 2 ** 31 | 0\r\n}\r\nlet x = [1e+21 /* E.A */, 0.30000000000000004 /* E.B */, 0.3333333333333333 /* E.C */, 9007199254740992 /* E.D */, 1e+301 /* E.F */, 5e-324 /* E.G */, 0 /* E.H */, 16 /* E.I */, 1000 /* E.J */, 123456789012345680000 /* E.K */, -1e-7 /* E.L */, 1e-7 /* E.M */, 4294967295 /* E.N */, -2147483648 /* E.O */];\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rce-number-formats",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e737420656e756d2045207b2041203d20316532312c2042203d20302e31202b20302e322c2043203d2031202f20332c2044203d2032202a2a203533202b20312c2046203d203165333030202a2031302c2047203d2035652d3332342c2048203d202d282d30292c2049203d20307831302c204a203d20315f3030302c204b203d203132333435363738393031323334353638303030302c204c203d202d31652d372c204d203d2031652d372c204e203d207e30203e3e3e20302c204f203d2032202a2a203331207c2030207d0a6c65742078203d205b452e412c20452e422c20452e432c20452e442c20452e462c20452e472c20452e482c20452e492c20452e4a2c20452e4b2c20452e4c2c20452e4d2c20452e4e2c20452e4f5d3b0a"
+    },
+    "id": "rce-number-formats",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "const enum E { A = 1e21, B = 0.1 + 0.2, C = 1 / 3, D = 2 ** 53 + 1, F = 1e300 * 10, G = 5e-324, H = -(-0), I = 0x10, J = 1_000, K = 123456789012345680000, L = -1e-7, M = 1e-7, N = ~0 >>> 0, O = 2 ** 31 | 0 }\nlet x = [E.A, E.B, E.C, E.D, E.F, E.G, E.H, E.I, E.J, E.K, E.L, E.M, E.N, E.O];\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "constenum"
+       ],
+       "text": "const enum S {\r\n    A = '\\uD800',\r\n    B = 'a\\u{1F600}b',\r\n    C = `t${1}x${'y'}`,\r\n    D = 'quote\"\\'',\r\n    E = '\\n\\r\\t\\0',\r\n    F = '*/',\r\n    G = 'é' + `ü`,\r\n    H = '\\u2028'\r\n}\r\nlet y = [\"\\uD800\" /* S.A */, \"a\\uD83D\\uDE00b\" /* S.B */, \"t1xy\" /* S.C */, \"quote\\\"'\" /* S.D */, \"\\n\\r\\t\\0\" /* S.E */, \"*/\" /* S.F */, \"\\u00E9\\u00FC\" /* S.G */, \"\\u2028\" /* S.H */];\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rce-string-formats",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e737420656e756d2053207b2041203d20275c7544383030272c2042203d2027615c757b31463630307d62272c2043203d206074247b317d78247b2779277d602c2044203d202771756f7465225c27272c2045203d20275c6e5c725c745c30272c2046203d20272a2f272c2047203d2027c3a927202b2060c3bc602c2048203d20275c753230323827207d0a6c65742079203d205b532e412c20532e422c20532e432c20532e442c20532e452c20532e462c20532e472c20532e485d3b0a"
+    },
+    "id": "rce-string-formats",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "const enum S { A = '\\uD800', B = 'a\\u{1F600}b', C = `t${1}x${'y'}`, D = 'quote\"\\'', E = '\\n\\r\\t\\0', F = '*/', G = 'é' + `ü`, H = '\\u2028' }\nlet y = [S.A, S.B, S.C, S.D, S.E, S.F, S.G, S.H];\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "constenum"
+       ],
+       "text": "const enum E {\r\n    A = 1,\r\n    'b-c' = 2\r\n}\r\nnamespace N {\r\n    export const enum F {\r\n        X = 3\r\n    }\r\n}\r\nlet a = [1 /* (E).A */, (1 /* E.A */), 1 /* E?.A */, 3 /* N.F.X */, 3 /* N.F['X'] */, 2 /* E['b-c'] */, 1 /* E[\"A\"] */, (<any>E).A, (E as any).A, 1 /* E!.A */, 1 /* E.A */.toString(), { [1 /* E.A */]: 1 }, `${1 /* E.A */}`, -1 /* E.A */, typeof 1 /* E.A */];\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "constenum"
+       ],
+       "text": "const enum E {\r\n    A = 1,\r\n    'b-c' = 2\r\n}\r\nlet a = [1 /* (E).A */, (1 /* E.A */), 1 /* E?.A */, 3 /* N.F.X */, 3 /* N.F['X'] */, 2 /* E['b-c'] */, 1 /* E[\"A\"] */, E.A, E.A, 1 /* E!.A */, 1 /* E.A */.toString(), { [1 /* E.A */]: 1 }, `${1 /* E.A */}`, -1 /* E.A */, typeof 1 /* E.A */];\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rce-access-forms",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e737420656e756d2045207b2041203d20312c2027622d6327203d2032207d0a6e616d657370616365204e207b206578706f727420636f6e737420656e756d2046207b2058203d2033207d207d0a6c65742061203d205b2845292e412c2028452e41292c20453f2e412c204e2e462e582c204e2e465b2758275d2c20455b27622d63275d2c20455b2241225d2c20283c616e793e45292e412c20284520617320616e79292e412c2045212e412c20452e412e746f537472696e6728292c207b205b452e415d3a2031207d2c2060247b452e417d602c202d452e412c20747970656f6620452e415d3b0a"
+    },
+    "id": "rce-access-forms",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "const enum E { A = 1, 'b-c' = 2 }\nnamespace N { export const enum F { X = 3 } }\nlet a = [(E).A, (E.A), E?.A, N.F.X, N.F['X'], E['b-c'], E[\"A\"], (<any>E).A, (E as any).A, E!.A, E.A.toString(), { [E.A]: 1 }, `${E.A}`, -E.A, typeof E.A];\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "constenum"
+       ],
+       "text": "const enum E {\r\n    A = 1\r\n}\r\nnamespace N {\r\n    export const enum F {\r\n        X = 3\r\n    }\r\n}\r\nlet a = 1 /* E /* c1 *_/ . /* c2 *_/ A */;\r\nlet b = 3 /* N\r\n  .F\r\n  .X */;\r\nlet c = 1 /* E[/*k*_/'A'] */;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rce-comment-texts-multi",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e737420656e756d2045207b2041203d2031207d0a6e616d657370616365204e207b206578706f727420636f6e737420656e756d2046207b2058203d2033207d207d0a6c65742061203d2045202f2a206331202a2f202e202f2a206332202a2f20413b0a6c65742062203d204e0a20202e460a20202e583b0a6c65742063203d20455b2f2a6b2a2f2741275d3b0a"
+    },
+    "id": "rce-comment-texts-multi",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "const enum E { A = 1 }\nnamespace N { export const enum F { X = 3 } }\nlet a = E /* c1 */ . /* c2 */ A;\nlet b = N\n  .F\n  .X;\nlet c = E[/*k*/'A'];\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "constenum"
+       ],
+       "text": "const enum E {\r\n    A = 1,\r\n    B = A << 2,\r\n    C = 1 /* E.A */ | 4 /* E.B */,\r\n    D = 5 /* E['C'] */ + 1\r\n}\r\nenum R {\r\n    X = 6 /* E.D */,\r\n    Y = X + 1,\r\n    Z = R.X\r\n}\r\nlet q = R.Z;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rce-in-enum-initializers",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e737420656e756d2045207b2041203d20312c2042203d2041203c3c20322c2043203d20452e41207c20452e422c2044203d20455b2743275d202b2031207d0a656e756d2052207b2058203d20452e442c2059203d2058202b20312c205a203d20522e58207d0a6c65742071203d20522e5a3b0a"
+    },
+    "id": "rce-in-enum-initializers",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "const enum E { A = 1, B = A << 2, C = E.A | E.B, D = E['C'] + 1 }\nenum R { X = E.D, Y = X + 1, Z = R.X }\nlet q = R.Z;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "constenum"
+       ],
+       "text": "enum R {\r\n    A,\r\n    B = 'b',\r\n    C = A + 1,\r\n    D = 'x'.length\r\n}\r\ndeclare enum DR {\r\n    A = 1,\r\n    B\r\n}\r\nlet q = [R.A, R.B, R.C, R.D, DR.A, DR.B];\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rce-regular-enum-members",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "656e756d2052207b20412c2042203d202762272c2043203d2041202b20312c2044203d202778272e6c656e677468207d0a6465636c61726520656e756d204452207b2041203d20312c2042207d0a6c65742071203d205b522e412c20522e422c20522e432c20522e442c2044522e412c2044522e425d3b0a"
+    },
+    "id": "rce-regular-enum-members",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "enum R { A, B = 'b', C = A + 1, D = 'x'.length }\ndeclare enum DR { A = 1, B }\nlet q = [R.A, R.B, R.C, R.D, DR.A, DR.B];\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "constenum"
+       ],
+       "text": "const enum E {\r\n    A = 1\r\n}\r\nlet x = 1n + BigInt(1 /* E.A */);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rce-bigint-expr",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e737420656e756d2045207b2041203d2031207d0a6c65742078203d20316e202b20426967496e7428452e41293b0a"
+    },
+    "id": "rce-bigint-expr",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 99
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: esnext\nconst enum E { A = 1 }\nlet x = 1n + BigInt(E.A);\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "constenum"
+       ],
+       "text": "namespace N {\r\n    export const enum E {\r\n        A = 1\r\n    }\r\n}\r\nnamespace N {\r\n    export const x = 1 /* E.A */;\r\n}\r\nnamespace M {\r\n    import E = N.E;\r\n    export const y = 1 /* E.A */;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rce-cross-namespace-merge",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b206578706f727420636f6e737420656e756d2045207b2041203d2031207d207d0a6e616d657370616365204e207b206578706f727420636f6e73742078203d20452e413b207d0a6e616d657370616365204d207b20696d706f72742045203d204e2e453b206578706f727420636f6e73742079203d20452e413b207d0a"
+    },
+    "id": "rce-cross-namespace-merge",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N { export const enum E { A = 1 } }\nnamespace N { export const x = E.A; }\nnamespace M { import E = N.E; export const y = E.A; }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "constenum"
+       ],
+       "text": "const enum E {\r\n    A = 1\r\n}\r\nlet o: any;\r\n(E as any).A = 2;\r\no[1 /* E.A */] = 1 /* E.A */;\r\nfor (const k in E) { }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rce-assignment-targets",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e737420656e756d2045207b2041203d2031207d0a6c6574206f3a20616e793b0a284520617320616e79292e41203d20323b0a6f5b452e415d203d20452e413b0a666f722028636f6e7374206b20696e204529207b7d0a"
+    },
+    "id": "rce-assignment-targets",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "const enum E { A = 1 }\nlet o: any;\n(E as any).A = 2;\no[E.A] = E.A;\nfor (const k in E) {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "constenum"
+       ],
+       "text": "const enum E {\r\n    A = 1,\r\n    B = 'x'\r\n}\r\nlet a = [1, \"x\", 1];\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rce-remove-comments",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e737420656e756d2045207b2041203d20312c2042203d20277827207d0a6c65742061203d205b452e412c20452e422c20455b2741275d5d3b0a"
+    },
+    "id": "rce-remove-comments",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "removeComments": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @removeComments: true\nconst enum E { A = 1, B = 'x' }\nlet a = [E.A, E.B, E['A']];\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "jsx",
+        "constenum"
+       ],
+       "text": "declare var React: any;\r\nconst enum E {\r\n    A = 1\r\n}\r\nexport const x = React.createElement(\"div\", { a: 1 /* E.A */, b: 1 /* E.A */ }, 1 /* E.A */);\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "rce-after-jsx-attr",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265207661722052656163743a20616e793b0a636f6e737420656e756d2045207b2041203d2031207d0a6578706f727420636f6e73742078203d203c64697620613d7b452e417d207b2e2e2e7b623a20452e417d7d3e7b452e417d3c2f6469763e3b0a"
+    },
+    "id": "rce-after-jsx-attr",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nconst enum E { A = 1 }\nexport const x = <div a={E.A} {...{b: E.A}}>{E.A}</div>;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "async",
+        "constenum"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nconst enum E {\r\n    A = 1\r\n}\r\nfunction f() {\r\n    return __awaiter(this, void 0, void 0, function* () { return 1 /* E.A */ + (yield 1 /* E.A */); });\r\n}\r\n"
+      },
+      {
+       "chain": [
+        "constenum",
+        "async"
+       ],
+       "text": "var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\r\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\r\n    return new (P || (P = Promise))(function (resolve, reject) {\r\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\r\n        function rejected(value) { try { step(generator[\"throw\"](value)); } catch (e) { reject(e); } }\r\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\r\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\r\n    });\r\n};\r\nconst enum E {\r\n    A = 1\r\n}\r\nfunction f() {\r\n    return __awaiter(this, void 0, void 0, function* () { return 1 /* E.A */ + (yield 1 /* E.A */); });\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rce-after-async",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e737420656e756d2045207b2041203d2031207d0a6173796e632066756e6374696f6e20662829207b2072657475726e20452e41202b20617761697420452e413b207d0a"
+    },
+    "id": "rce-after-async",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst enum E { A = 1 }\nasync function f() { return E.A + await E.A; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment",
+        "constenum"
+       ],
+       "text": "var _a;\r\nconst enum E {\r\n    A = 1\r\n}\r\nlet o: any;\r\no[_a = 1 /* E.A */] || (o[_a] = 1 /* E.A */);\r\no[1 /* E.A */] **= 1 /* E.A */;\r\n"
+      },
+      {
+       "chain": [
+        "exponentiation",
+        "constenum"
+       ],
+       "text": "var _a, _b;\r\nconst enum E {\r\n    A = 1\r\n}\r\nlet o: any;\r\no[1 /* E.A */] ||= 1 /* E.A */;\r\n(_a = o)[_b = 1 /* E.A */] = Math.pow(_a[_b], 1 /* E.A */);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rce-after-logical-and-exp",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e737420656e756d2045207b2041203d2031207d0a6c6574206f3a20616e793b0a6f5b452e415d207c7c3d20452e413b0a6f5b452e415d202a2a3d20452e413b0a"
+    },
+    "id": "rce-after-logical-and-exp",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\nconst enum E { A = 1 }\nlet o: any;\no[E.A] ||= E.A;\no[E.A] **= E.A;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare namespace M {\r\n    class C {\r\n    }\r\n    export class K {\r\n        private q;\r\n        r: C;\r\n        static p: C;\r\n        static m(a: C): C;\r\n        static set s(v: C);\r\n        set t(v: C);\r\n        [k: string]: C | any;\r\n        constructor(q: C, r: C);\r\n        m2<T extends C>(this: C, a: T): void;\r\n        static m3<T extends C>(): void;\r\n        private pm;\r\n    }\r\n    export interface I {\r\n        m<T extends C>(): void;\r\n        p?: C;\r\n        readonly [k: number]: C;\r\n    }\r\n    export type A<T extends C> = T;\r\n    export type F = (a: C) => C;\r\n    export type G = new <T extends C>(a: C) => C;\r\n    export type MT = {\r\n        [K in keyof C]: C;\r\n    };\r\n    export type IT<T> = T extends infer U extends C ? U : C;\r\n    export let { x, y }: {\r\n        x: C;\r\n        y: C;\r\n    };\r\n    export var arr: C[];\r\n    export function fp(a?: C): void;\r\n    export var fe: (a: C) => C;\r\n    export var ar: (a: C) => C;\r\n    export var tq: typeof C;\r\n    export const ce: {\r\n        new (): {};\r\n    };\r\n    export {};\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "script-errs-1",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6d6f64756c65204d207b0a2020636c6173732043207b7d0a20206578706f727420636c617373204b207b0a2020202073746174696320703a20433b0a20202020737461746963206d28613a2043293a2043207b2072657475726e20613b207d0a2020202073746174696320736574207328763a204329207b7d0a20202020736574207428763a204329207b7d0a202020205b6b3a20737472696e675d3a2043207c20616e793b0a20202020636f6e7374727563746f72287072697661746520713a20432c207075626c696320723a204329207b7d0a202020206d323c5420657874656e647320433e28746869733a20432c20613a205429207b7d0a20202020737461746963206d333c5420657874656e647320433e2829207b7d0a202020207072697661746520706d28613a2043293a2043207b2072657475726e20613b207d0a20207d0a20206578706f727420696e746572666163652049207b0a202020206d3c5420657874656e647320433e28293a20766f69643b0a20202020703f3a20433b0a20202020726561646f6e6c79205b6b3a206e756d6265725d3a20433b0a20207d0a20206578706f7274207479706520413c5420657874656e647320433e203d20543b0a20206578706f727420747970652046203d2028613a204329203d3e20433b0a20206578706f727420747970652047203d206e6577203c5420657874656e647320433e28613a204329203d3e20433b0a20206578706f72742074797065204d54203d207b205b4b20696e206b65796f6620435d3a2043207d3b0a20206578706f727420747970652049543c543e203d205420657874656e647320696e666572205520657874656e64732043203f2055203a20433b0a20206578706f7274206c6574207b20782c2079207d3a207b20783a20433b20793a2043207d203d206e756c6c20617320616e793b0a20206578706f727420766172206172723a20435b5d3b0a20206578706f72742066756e6374696f6e2066702861203d206e65772043282929207b7d0a20206578706f727420766172206665203d2066756e6374696f6e2028613a2043293a2043207b2072657475726e20613b207d3b0a20206578706f727420766172206172203d2028613a204329203d3e20613b0a20206578706f7274207661722074713a20747970656f6620433b0a20206578706f727420636f6e7374206365203d20636c61737320657874656e64732043207b7d3b0a7d0a"
+    },
+    "id": "script-errs-1",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "module M {\n  class C {}\n  export class K {\n    static p: C;\n    static m(a: C): C { return a; }\n    static set s(v: C) {}\n    set t(v: C) {}\n    [k: string]: C | any;\n    constructor(private q: C, public r: C) {}\n    m2<T extends C>(this: C, a: T) {}\n    static m3<T extends C>() {}\n    private pm(a: C): C { return a; }\n  }\n  export interface I {\n    m<T extends C>(): void;\n    p?: C;\n    readonly [k: number]: C;\n  }\n  export type A<T extends C> = T;\n  export type F = (a: C) => C;\n  export type G = new <T extends C>(a: C) => C;\n  export type MT = { [K in keyof C]: C };\n  export type IT<T> = T extends infer U extends C ? U : C;\n  export let { x, y }: { x: C; y: C } = null as any;\n  export var arr: C[];\n  export function fp(a = new C()) {}\n  export var fe = function (a: C): C { return a; };\n  export var ar = (a: C) => a;\n  export var tq: typeof C;\n  export const ce = class extends C {};\n}\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare namespace M {\r\n    interface I {\r\n    }\r\n    class C {\r\n    }\r\n    export class K2 extends C implements I {\r\n    }\r\n    export const K3: {\r\n        new (): {};\r\n    };\r\n    export interface J extends I {\r\n    }\r\n    export class K4 {\r\n        m(): I;\r\n    }\r\n    export default C;\r\n}\r\ndeclare namespace N {\r\n    class C {\r\n    }\r\n    export = C;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "script-errs-2",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6d6f64756c65204d207b0a2020696e746572666163652049207b7d0a2020636c6173732043207b7d0a20206578706f727420636c617373204b3220657874656e6473204320696d706c656d656e74732049207b7d0a20206578706f727420636f6e7374204b33203d20636c61737320696d706c656d656e74732049207b7d3b0a20206578706f727420696e74657266616365204a20657874656e64732049207b7d0a20206578706f727420636c617373204b34207b206d28293a2049207b2072657475726e206e756c6c20617320616e793b207d207d0a20206578706f72742064656661756c7420433b0a7d0a6d6f64756c65204e207b0a2020636c6173732043207b7d0a20206578706f7274203d20433b0a7d0a"
+    },
+    "id": "script-errs-2",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "module M {\n  interface I {}\n  class C {}\n  export class K2 extends C implements I {}\n  export const K3 = class implements I {};\n  export interface J extends I {}\n  export class K4 { m(): I { return null as any; } }\n  export default C;\n}\nmodule N {\n  class C {}\n  export = C;\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare namespace M {\r\n    class C {\r\n    }\r\n    export enum E {\r\n        A = 1\r\n    }\r\n    export import X = C;\r\n    export var v: {\r\n        a: C;\r\n        m(): C;\r\n    };\r\n    export function g(): {\r\n        c: C;\r\n    };\r\n    export var t: [C, C?];\r\n    export var u: C | undefined;\r\n    export var q: Array<C>;\r\n    export {};\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "script-errs-3",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6d6f64756c65204d207b0a2020636c6173732043207b7d0a20206578706f727420656e756d2045207b2041203d2031207d0a20206578706f727420696d706f72742058203d20433b0a20206578706f7274207661722076203d207b20613a206e6577204328292c206d2829207b2072657475726e206e6577204328293b207d207d3b0a20206578706f72742066756e6374696f6e20672829207b2072657475726e207b20633a206e657720432829207d3b207d0a20206578706f72742076617220743a205b432c20433f5d3b0a20206578706f72742076617220753a2043207c20756e646566696e65643b0a20206578706f72742076617220713a2041727261793c433e3b0a7d0a"
+    },
+    "id": "script-errs-3",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "module M {\n  class C {}\n  export enum E { A = 1 }\n  export import X = C;\n  export var v = { a: new C(), m() { return new C(); } };\n  export function g() { return { c: new C() }; }\n  export var t: [C, C?];\n  export var u: C | undefined;\n  export var q: Array<C>;\n}\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

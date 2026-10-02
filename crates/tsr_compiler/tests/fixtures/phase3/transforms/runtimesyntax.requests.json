@@ -1,0 +1,1027 @@
+{
+ "cases": [
+  {
+   "id": "no-typescript",
+   "name": "probe.ts",
+   "source": "var a = 1;\nfunction f(b) { return a + b; }\nclass C { m() { return this; } }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "parameter-properties",
+   "name": "probe.ts",
+   "source": "class C {\n    constructor(public a: number, private b: string, protected c, readonly d, public readonly e = 1) {\n        this.a;\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "parameter-property-override",
+   "name": "probe.ts",
+   "source": "class B { x = 1; }\nclass C extends B {\n    constructor(override x: number) {\n        super();\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "parameter-property-prologue",
+   "name": "probe.ts",
+   "source": "class C {\n    constructor(public a: number) {\n        \"use strict\";\n        'other';\n        let b = a;\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "parameter-property-super-first",
+   "name": "probe.ts",
+   "source": "class B { constructor(...args: any[]) {} }\nclass C extends B {\n    constructor(public a: number, b: number) {\n        var before = 1;\n        super(a);\n        var after = 2;\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "parameter-property-super-in-try",
+   "name": "probe.ts",
+   "source": "class B {}\nclass C extends B {\n    constructor(public a: number) {\n        let x = 0;\n        try {\n            x = 1;\n            super();\n            x = 2;\n        } catch (e) {\n            x = 3;\n        } finally {\n            x = 4;\n        }\n        x = 5;\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "parameter-property-super-nested-try",
+   "name": "probe.ts",
+   "source": "class B {}\nclass C extends B {\n    constructor(private a: string) {\n        try {\n            try {\n                super();\n            } finally {}\n        } catch {}\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "parameter-property-binding-pattern",
+   "name": "probe.ts",
+   "source": "class C {\n    constructor(public { a }: any, public [b]: any, public c: number) {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "parameter-property-class-expression",
+   "name": "probe.ts",
+   "source": "const D = class {\n    constructor(public a: number, b: number, private c = 2) {}\n    m() {}\n};\nlet e = class Named { constructor(readonly x) {} };\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "constructor-no-parameter-properties",
+   "name": "probe.ts",
+   "source": "class C {\n    constructor(a: number, b = a) {\n        let c = a + b;\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "parameter-property-default-and-rest",
+   "name": "probe.ts",
+   "source": "class C {\n    constructor(public a = 1, public b?: number, ...rest: number[]) {\n        b;\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "parameter-property-comments",
+   "name": "probe.ts",
+   "source": "class C {\n    // ctor\n    constructor(/* a */ public a: number /* after a */, /** b */ private b: string) {\n        // body\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-auto",
+   "name": "probe.ts",
+   "source": "enum E { A, B, C }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-initializers",
+   "name": "probe.ts",
+   "source": "enum E { A = 1, B, C = 10, D = C * 2, E = ~D, F = 1 << 3, G = -1, H = -0, I = 0.5 }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-string-members",
+   "name": "probe.ts",
+   "source": "enum S { A = \"a\", B = 'b', C = `c`, D = A + \"d\" }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-computed-nonconstant",
+   "name": "probe.ts",
+   "source": "declare function f(): number;\ndeclare function g(): string;\nenum E { A = f(), B = g().length, C = A | 1 }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-syntactically-string",
+   "name": "probe.ts",
+   "source": "declare const s: string;\nenum E { A = `${s}`, B = `x${s}y`, C = \"lit\" }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-missing-initializer-after-nonconstant",
+   "name": "probe.ts",
+   "source": "declare function f(): number;\nenum E { A = f(), B, C }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-member-names",
+   "name": "probe.ts",
+   "source": "enum E { a, \"b\", 'c d', [\"e\"], 1 = 2, #f, [`g`] = 3 }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-infinity-nan",
+   "name": "probe.ts",
+   "source": "enum F { I = 1 / 0, J = -1 / 0, N = 0 / 0, K = -(1 / 0), L = 1e300 * 1e10 }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-large-numbers",
+   "name": "probe.ts",
+   "source": "enum L { A = 1e21, B = 1.5e-7, C = 2 ** 53, D = 0x10, E = 1_000 }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-self-references",
+   "name": "probe.ts",
+   "source": "declare function f(): number;\nenum E {\n    A = 1,\n    B = A + 1,\n    C = E.A + f(),\n    D = A | f(),\n    F = E[\"B\"],\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-merged",
+   "name": "probe.ts",
+   "source": "enum E { A, B }\nenum E { C = 2, D = C + 1 }\nlet e = E.A + E.D;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-exported-esnext",
+   "name": "probe.ts",
+   "source": "// @module: esnext\nexport enum E { A, B = \"b\" }\nexport const enum CE { X }\nconst enum PE { Y }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-in-function",
+   "name": "probe.ts",
+   "source": "function f() {\n    enum Local { A, B }\n    return Local.B;\n}\nlet g = () => { enum L2 { X = 1 } return L2.X; };\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-in-block",
+   "name": "probe.ts",
+   "source": "{\n    enum E { A }\n    enum E { B = 1 }\n}\nif (true) { enum F { A } }\nswitch (0) { case 0: enum G { A } }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "const-enum-not-preserved",
+   "name": "probe.ts",
+   "source": "const enum CE { A = 1, B = 2 }\nlet x = CE.A;\nnamespace N { export const enum Inner { X } }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "const-enum-preserved",
+   "name": "probe.ts",
+   "source": "// @preserveConstEnums: true\nconst enum CE { A = 1, B = A + 1, S = \"s\" }\nlet x = CE.B;\nnamespace N { export const enum Inner { X } }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-comments",
+   "name": "probe.ts",
+   "source": "/** Leading comment */\nenum E {\n    // member A\n    A = 1, // trailing A\n    /* B */ B\n} // trailing comment\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-remove-comments",
+   "name": "probe.ts",
+   "source": "// @removeComments: true\n/** Leading comment */\nenum E {\n    A = 1, // trailing\n} // trailing\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-declared-after-var",
+   "name": "probe.ts",
+   "source": "var E = 1;\nenum E { A }\nfunction F() {}\nenum F { B }\nclass G {}\nenum G { C }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-referenced-from-namespace",
+   "name": "probe.ts",
+   "source": "namespace N {\n    export enum E { A, B = A + 2 }\n    export let x = E.A;\n    let y = E[\"B\"];\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-member-references-namespace",
+   "name": "probe.ts",
+   "source": "namespace N {\n    export const k = 3;\n    export enum E { A = k, B = k * 2, C = k + A }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-with-isolated-modules",
+   "name": "probe.ts",
+   "source": "// @isolatedModules: true\n// @module: commonjs\nexport {};\ndeclare function f(): number;\nenum E { A = f(), B = A + 1 }\nexport enum X { Y = \"y\", Z = Y }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-basic",
+   "name": "probe.ts",
+   "source": "namespace N {\n    export var a = 1;\n    var b = 2;\n    export function f() { return a + b; }\n    export class C {}\n    function g() {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-merged",
+   "name": "probe.ts",
+   "source": "namespace N {\n    export var a = 1;\n}\nnamespace N {\n    export var b = a;\n    var a2 = a;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-dotted",
+   "name": "probe.ts",
+   "source": "namespace A.B.C {\n    export var x = 1;\n    function foo() {}\n    // TODO, blah\n}\nlet y = A.B.C.x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-dotted-exported-esnext",
+   "name": "probe.ts",
+   "source": "// @module: esnext\nexport namespace A.B {\n    export const x = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-nested",
+   "name": "probe.ts",
+   "source": "namespace Outer {\n    export namespace Inner {\n        export var x = 1;\n        export function f() { return x; }\n    }\n    namespace Private {\n        export var y = Inner.x;\n    }\n    export var z = Inner.f();\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-exported-variables",
+   "name": "probe.ts",
+   "source": "namespace N {\n    export var a = 1, b, c = a + 1;\n    export let d = 2;\n    export const e = d;\n    export var f;\n    export let g: number;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-exported-destructuring",
+   "name": "probe.ts",
+   "source": "declare const o: any;\nnamespace N {\n    export var { a, b: { c }, ...rest } = o;\n    export const [d, , e = 1, ...f] = o;\n    export let { g = d } = o;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-identifier-references",
+   "name": "probe.ts",
+   "source": "namespace N {\n    export var a = 1;\n    export function f(x = a) { return a + x; }\n    export class C { m() { return a; } static s = a; }\n    a++;\n    a = 2;\n    let o = { a, b: a, [a]: a };\n    label: for (;;) { break label; }\n    let p = o.a;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-shorthand-assignment",
+   "name": "probe.ts",
+   "source": "declare let obj: any;\nnamespace N {\n    export var a = 1;\n    export var b = 2;\n    var c = 3;\n    let o1 = { a, c };\n    ({ a = 5, b } = obj);\n    ({ c = 6 } = obj);\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-with-classes",
+   "name": "probe.ts",
+   "source": "namespace N {\n    export class C {\n        constructor(public x: number) {}\n    }\n    export abstract class D extends C {}\n    class Hidden {}\n    export const c = new C(1);\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-with-enums",
+   "name": "probe.ts",
+   "source": "namespace N {\n    export enum E { A }\n    enum Local { B = E.A }\n    export enum E { C = 3 }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-function-generator",
+   "name": "probe.ts",
+   "source": "namespace N {\n    export function* gen() { yield 1; }\n    export async function af() {}\n    export function f(): void;\n    export function f(x?: number) {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-class-merge",
+   "name": "probe.ts",
+   "source": "class C {}\nnamespace C {\n    export var x = 1;\n}\nfunction F() {}\nnamespace F {\n    export const y = 2;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-non-instantiated",
+   "name": "probe.ts",
+   "source": "namespace Types {\n    export interface I {}\n    export type T = number;\n}\nnamespace Empty {}\nnamespace Mixed {\n    export interface I {}\n    export var v = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-const-enum-only-preserved",
+   "name": "probe.ts",
+   "source": "// @preserveConstEnums: true\nnamespace ConstOnly {\n    export const enum E { A = 1 }\n}\nnamespace ConstOnly2 {\n    const enum E { A = 1 }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-in-function",
+   "name": "probe.ts",
+   "source": "function f() {\n    namespace N { export var x = 1; }\n    return N.x;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-block-scope",
+   "name": "probe.ts",
+   "source": "namespace N {\n    export var a = 1;\n    {\n        var b = a;\n        function g() { return a; }\n    }\n    if (a) {\n        let c = a;\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-comments",
+   "name": "probe.ts",
+   "source": "/** doc N */\nnamespace N {\n    // inner comment\n    export var a = 1; // trailing a\n    /** doc f */\n    export function f() {}\n} // after N\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-exported-module-esnext",
+   "name": "probe.ts",
+   "source": "// @module: esnext\nexport namespace N {\n    export var x = 1;\n}\nexport namespace N {\n    export var y = x;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-across-files",
+   "name": "probe.ts",
+   "source": "// @filename: a.ts\nnamespace N {\n    export var x = 1;\n}\n// @filename: b.ts\nnamespace N {\n    export var y = x + 1;\n    let o = { x };\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-imports-exports-illegal",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: probe.ts\nnamespace N {\n    export { a };\n    var a = 1;\n    import { b } from \"./m\";\n    export * from \"./m\";\n}\n// @filename: m.ts\nexport const b = 1;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-string-name",
+   "name": "probe.ts",
+   "source": "declare module \"ambient\" { export var x: number; }\nmodule M { export var y = 1; }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "import-equals-alias",
+   "name": "probe.ts",
+   "source": "namespace A.B { export var x = 1; export namespace C { export var y = 2; } }\nimport X = A.B;\nimport Y = A.B.C;\nimport Z = A;\nlet v = X.x + Y.y + Z.B.x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "import-equals-in-namespace",
+   "name": "probe.ts",
+   "source": "namespace A { export var x = 1; export namespace I { export var z = 3; } }\nnamespace N {\n    import a = A;\n    export import b = A.I;\n    export import c = A;\n    let u = a.x + b.z + c.x;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "import-equals-in-namespace-block",
+   "name": "probe.ts",
+   "source": "namespace A { export var x = 1; }\nnamespace N {\n    {\n        import a = A;\n        let u = a.x;\n    }\n    function f() {\n        import b = A;\n        return b.x;\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "import-equals-exported-top",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\nnamespace A { export var x = 1; }\nexport import X = A;\nimport Y = A;\nexport let y = X.x + Y.x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "import-equals-external",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: m.ts\nexport const v = 1;\n// @filename: probe.ts\nimport m = require(\"./m\");\nexport import n = require(\"./m\");\nlet x = m.v + n.v;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "import-equals-external-in-namespace",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: m.ts\nexport const v = 1;\n// @filename: probe.ts\nexport {};\nnamespace N {\n    import m = require(\"./m\");\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "import-equals-comments",
+   "name": "probe.ts",
+   "source": "namespace A { export var x = 1; }\n// before alias\nimport /* inner */ X = /* ref */ A; // after alias\nlet v = X.x;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "export-modifiers-esnext",
+   "name": "probe.ts",
+   "source": "// @module: esnext\nexport class C { constructor(public a: number) {} }\nexport function f() {}\nexport var v = 1;\nexport default class { constructor(private p: string) {} }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-class-decorated",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @module: esnext\ndeclare function dec(...args: any[]): any;\nexport default class {\n    @dec m() {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-class-decorated-standard",
+   "name": "probe.ts",
+   "source": "// @module: esnext\ndeclare function dec(...args: any[]): any;\nexport default class {\n    @dec m() {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "class-heritage-in-namespace",
+   "name": "probe.ts",
+   "source": "namespace N {\n    export class B {}\n    export class C extends B {\n        constructor(public x = new B()) { super(); }\n    }\n    export const D = class extends B {};\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "module-commonjs-file",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\nexport namespace N { export var x = 1; }\nexport enum E { A }\nexport class C { constructor(public a: number) {} }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "module-preserve",
+   "name": "probe.ts",
+   "source": "// @module: preserve\nexport namespace N { export const x = 1; }\nenum E { A }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "module-es2015-script",
+   "name": "probe.ts",
+   "source": "// @module: es2015\nnamespace N { export var x = 1; }\nenum E { A = N.x }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "target-es5-ish",
+   "name": "probe.ts",
+   "source": "// @target: es2015\nnamespace N { export let x = 1; export const enum CE { A } }\nenum E { A = 1 }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-modules-namespace",
+   "name": "probe.ts",
+   "source": "// @isolatedModules: true\n// @module: esnext\nexport namespace N {\n    export var a = 1;\n    export function f() { return a; }\n    let o = { a };\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-modules-binder-only",
+   "name": "probe.ts",
+   "source": "// @isolatedModules: true\n// @module: esnext\n// @noCheck: true\nnamespace N { export const a = 1; let b = a; }\nexport {};\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-export-in-block",
+   "name": "probe.ts",
+   "source": "namespace N {\n    {\n        export var x = 1;\n        export function f() { return x; }\n        export class C {}\n        export enum E { A }\n        export namespace Inner { export var y = 2; }\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "alone-module-without-body",
+   "name": "probe.ts",
+   "source": "declare module \"m\";\nnamespace A.B;\nvar keep = 1;\n",
+   "chains": [
+    [
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "alone-ambient-namespace",
+   "name": "probe.ts",
+   "source": "declare namespace D { export var x: number; }\ndeclare enum DE { A }\nlet u = D.x;\n",
+   "chains": [
+    [
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-decorated-class-experimental",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\ndeclare function dec(...args: any[]): any;\nnamespace N {\n    export class C {\n        @dec m() {}\n        constructor(@dec public a: number) {}\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-enum-in-function-block",
+   "name": "probe.ts",
+   "source": "namespace N {\n    export function f() {\n        enum Inner { A, B = A }\n        namespace Deep { export var d = 1; }\n        return Inner.B + Deep.d;\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-label-and-property-names",
+   "name": "probe.ts",
+   "source": "namespace N {\n    export var a = 1;\n    export var b = { a: a, get a2() { return a; } };\n    class K { a = a; [a] = 1; }\n    a: while (a) { continue a; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "alone-namespace-and-enum",
+   "name": "probe.ts",
+   "source": "namespace N { export var x = 1; }\nenum E { A, B = A }\nclass C { constructor(public a, private b) {} }\n",
+   "chains": [
+    [
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "alone-non-instantiated-namespace",
+   "name": "probe.ts",
+   "source": "namespace Types { export interface I {} }\nnamespace Mixed { export var v = 1; }\n",
+   "chains": [
+    [
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "alone-const-enum-only-namespace",
+   "name": "probe.ts",
+   "source": "namespace OnlyConst { export const enum E { A } }\nconst enum CE { B }\n",
+   "chains": [
+    [
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "module-node16",
+   "name": "probe.ts",
+   "source": "// @module: node16\n// @filename: probe.mts\nexport namespace N { export var x = 1; }\nexport enum E { A }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-after-binding-pattern",
+   "name": "probe.ts",
+   "source": "declare const o: any;\nvar { E } = o;\nenum E { A }\nvar [F, { G }] = o;\nenum F { B }\nenum G { C }\nlet { H: [I] } = o;\nenum I { D }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-export-default-class",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\nnamespace N {\n    export default class {\n        constructor(public a: number) {}\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-binding-pattern-exports",
+   "name": "probe.ts",
+   "source": "declare const o: any;\nnamespace N {\n    export var [a, , b = 1] = o, c;\n    export let { d: { e } } = o;\n    export var f;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "enum-in-case-block",
+   "name": "probe.ts",
+   "source": "declare const k: number;\nswitch (k) {\n    case 1:\n        enum E { A }\n        enum E { B = 2 }\n        break;\n    default:\n        namespace N { export var x = 1; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-generated-name-collision",
+   "name": "probe.ts",
+   "source": "namespace N {\n    var N_1 = 1;\n    export var x = N_1;\n    export namespace N { export var y = x; }\n}\nenum E { A, E = A }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "runtimesyntax"
+    ]
+   ]
+  },
+  {
+   "id": "script-commonjs-exported-namespace-enum",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\nexport namespace N { export var x = 1; export function f() { return x; } }\nexport enum E { A, B = A }\nexport class C { constructor(public a: number) {} }\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-commonjs-merged-exported-namespace",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\nexport namespace N { export var x = 1; }\nexport namespace N { export var y = x; }\nexport enum E { A }\nexport enum E { B = 2 }\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-esnext-target-es2015",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @target: es2015\nexport namespace N { export const a = 1; let o = { a }; }\nenum E { A = 1, B = A << 1 }\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-commonjs-import-equals",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: m.ts\nexport const v = 1;\n// @filename: probe.ts\nimport m = require(\"./m\");\nnamespace A { export var x = m.v; }\nexport import X = A;\nimport Y = A;\nexport let y = X.x + Y.x;\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-commonjs-dotted-namespace",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\nexport namespace A.B.C { export var x = 1; }\nnamespace Local.Inner { export const enum K { V = 1 } export var k = K.V; }\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-isolated-modules",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @isolatedModules: true\nexport namespace N { export var a = 1; }\nexport enum E { A = N.a }\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  }
+ ]
+}

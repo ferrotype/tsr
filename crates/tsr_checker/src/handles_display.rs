@@ -405,7 +405,7 @@ mod tests {
             },
             builder.emit_context(),
         )
-        .write(builder.view(), node, None, &mut writer)
+        .write(builder.view(), node, None, &mut writer, None)
         .unwrap();
         writer.text().to_vec()
     }

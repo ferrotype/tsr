@@ -1,0 +1,426 @@
+{
+ "cases": [
+  {
+   "id": "basic-number",
+   "name": "probe.ts",
+   "source": "const enum E { A, B = 5 }\nlet x = E.A + E.B;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "string-member",
+   "name": "probe.ts",
+   "source": "const enum S { X = \"x\", Y = 'y' }\nlet s = S.X + S.Y;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "element-access",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1, B = 2 }\nlet a = E[\"B\"];\nlet b = E['A'];\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "template-key",
+   "name": "probe.ts",
+   "source": "const enum E { A = 7 }\nlet a = E[`A`];\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "negative",
+   "name": "probe.ts",
+   "source": "const enum N { A = -1, B = -2.5 }\nlet n = N.A * N.B;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "infinity",
+   "name": "probe.ts",
+   "source": "const enum F { I = 1 / 0 }\nlet f = F.I;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "neg-infinity",
+   "name": "probe.ts",
+   "source": "const enum F { I = -1 / 0 }\nlet f = F.I;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "nan",
+   "name": "probe.ts",
+   "source": "const enum F { N = 0 / 0 }\nlet f = F.N;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "neg-zero",
+   "name": "probe.ts",
+   "source": "const enum Z { A = -0 }\nlet z = Z.A;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "fraction-large",
+   "name": "probe.ts",
+   "source": "const enum L { A = 1.5, B = 1e21, C = 0.000001, D = 1e-7, E = 2 ** 53 }\nlet l = [L.A, L.B, L.C, L.D, L.E];\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "remove-comments",
+   "name": "probe.ts",
+   "source": "// @removeComments: true\nconst enum E { A = 1, S = \"s\" }\nlet x = E.A + E.S;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "comment-close-in-name",
+   "name": "probe.ts",
+   "source": "const enum E { \"a*/b\" = 1 }\nlet x = E[\"a*/b\"];\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "comment-close-trivia",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1 }\nlet x = E /* c */ . A;\nlet y = E/**/./* d */A;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "regular-enum",
+   "name": "probe.ts",
+   "source": "enum R { A, B = \"b\" }\nlet r = R.A + R.B;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "not-enum",
+   "name": "probe.ts",
+   "source": "const o = { x: 1 };\nlet k = \"A\";\nconst enum E { A }\nlet v = o.x + o[\"x\"] + E[k as \"A\"];\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "nested-expressions",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1, B = 2 }\ndeclare function f(...args: any[]): void;\nf(E.A, [E.B], { k: E.A }, () => E.B, `${E.A}`);\nclass C { m(p = E.B) { return E.A; } }\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "namespace",
+   "name": "probe.ts",
+   "source": "namespace NS { export const enum E { A = 2 } export const v = E.A; }\nlet x = NS.E.A;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "declare-const-enum",
+   "name": "probe.ts",
+   "source": "declare const enum D { A = 3, B = \"b\" }\nlet d = D.A + D.B;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "computed-members",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1, B = A << 2, C = B | 1, D = E.C + 1, F = \"x\".length }\nlet x = [E.A, E.B, E.C, E.D];\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "self-reference-initializer",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1, B = E.A + 1, C = E[\"B\"] * 2 }\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "isolated-modules",
+   "name": "probe.ts",
+   "source": "// @isolatedModules: true\nconst enum E { A = 1 }\nlet x = E.A;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "verbatim-module-syntax",
+   "name": "probe.ts",
+   "source": "// @verbatimModuleSyntax: true\n// @module: esnext\nexport const enum E { A = 1 }\nlet x = E.A;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "preserve-const-enums",
+   "name": "probe.ts",
+   "source": "// @preserveConstEnums: true\nconst enum E { A = 1, B = \"b\" }\nlet x = E.A + E.B;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "string-escapes",
+   "name": "probe.ts",
+   "source": "const enum S { A = \"a\\\"b\\n\\u00e9\", B = `t${1}` }\nlet s = S.A + S.B;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "type-positions",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1, B = 2 }\ntype T = E.A;\nlet t: typeof E = E;\nlet u: E.B = E.B;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "optional-chain",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1 }\nlet x = E?.A;\nlet y = (E).A;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "assignment-and-unary",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1 }\nlet x = -E.A;\nlet y = typeof E.A;\nlet z = void E.A;\nlet w = E.A.toString();\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "bigint-member",
+   "name": "probe.ts",
+   "source": "// @target: esnext\nconst enum B { A = 1 }\nlet b = B.A;\nlet big = 1n;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "cross-file",
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: a.ts\nexport const enum E { A = 1, B = \"b\" }\nexport const enum F { X = E.A + 1 }\n// @filename: b.ts\nimport { E, F } from \"./a\";\nimport * as ns from \"./a\";\nlet x = E.A + E.B + F.X + ns.E.A + ns.F[\"X\"];\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "cross-file-reexport",
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: a.ts\nexport const enum E { A = 10 }\n// @filename: b.ts\nexport { E } from \"./a\";\nexport { E as G } from \"./a\";\n// @filename: c.ts\nimport { E, G } from \"./b\";\nlet x = E.A + G.A;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "cross-file-declare",
+   "name": "probe.ts",
+   "source": "// @filename: decl.d.ts\ndeclare const enum D { A = 4 }\n// @filename: use.ts\nlet x = D.A;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "enum-merge",
+   "name": "probe.ts",
+   "source": "const enum M { A = 1 }\nconst enum M { B = 2 }\nlet x = M.A + M.B;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "unicode-and-long-text",
+   "name": "probe.ts",
+   "source": "const enum E { \"éè\" = 1, Long = 123456789 }\nlet x = E[\"éè\"] + E.Long;\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "bigint-initializer",
+   "name": "probe.ts",
+   "source": "// @target: esnext\nconst enum B { A = 1n, C = -2n, Z = 0n }\nlet b = [B.A, B.C, B.Z];\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "ce-two-pass",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1, S = \"s\", N = -2 }\nlet x = [E.A, E[\"S\"], E.N, (E).A];\n",
+   "chains": [
+    [
+     "constenum",
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "ce-after-typeeraser",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1, B = \"b\" }\nlet x: number = E.A!;\nlet y = (E as any).A;\nlet z = <number>E.A + (E.B satisfies string).length;\nfunction f(p: E = E.A): E { return E.B as any; }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "constenum"
+    ],
+    [
+     "constenum",
+     "typeeraser"
+    ]
+   ]
+  },
+  {
+   "id": "ce-after-optionalchain",
+   "name": "probe.ts",
+   "source": "// @target: es2019\nconst enum E { A = 1 }\ndeclare let o: any;\nlet x = o?.[E.A] ?? E.A;\nlet y = E?.A;\n",
+   "chains": [
+    [
+     "optionalchain",
+     "constenum"
+    ],
+    [
+     "nullishcoalescing",
+     "optionalchain",
+     "constenum"
+    ]
+   ]
+  },
+  {
+   "id": "ce-in-jsx",
+   "name": "probe.tsx",
+   "source": "// @jsx: react\ndeclare var React: any;\nconst enum E { A = 1, S = \"s\" }\nexport const a = <div x={E.A} {...{ [E.S]: E.A }}>{E.S}</div>;\n",
+   "chains": [
+    [
+     "jsx",
+     "constenum"
+    ],
+    [
+     "constenum",
+     "jsx"
+    ]
+   ]
+  },
+  {
+   "id": "ce-in-exponentiation",
+   "name": "probe.ts",
+   "source": "// @target: es2015\nconst enum E { A = 2 }\ndeclare let o: any;\no[E.A] **= E.A;\nlet x = E.A ** E.A;\n",
+   "chains": [
+    [
+     "exponentiation",
+     "constenum"
+    ],
+    [
+     "constenum",
+     "exponentiation"
+    ]
+   ]
+  },
+  {
+   "id": "ce-comment-texts",
+   "name": "probe.ts",
+   "source": "const enum E { A = 1 }\nlet x = E[/* c */\"A\"];\nlet y = E\n    .A;\nlet z = E[`A`];\n",
+   "chains": [
+    [
+     "constenum"
+    ]
+   ]
+  }
+ ]
+}

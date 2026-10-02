@@ -100,8 +100,7 @@ impl CheckerState {
                             let before = match location {
                                 Some(location) => {
                                     declaration != location
-                                        && self
-                                            .enum_declaration_before_use(declaration, location)?
+                                        && self.name_declared_before_use(declaration, location)?
                                 }
                                 None => true,
                             };
@@ -181,7 +180,7 @@ impl CheckerState {
             return Ok(EnumEvaluation::default());
         }
         let declaration = declaration.expect("enum member declaration was checked");
-        if !self.enum_declaration_before_use(declaration, location)? {
+        if !self.name_declared_before_use(declaration, location)? {
             self.error_at(Some(expression), messages::A_member_initializer_in_a_enum_declaration_cannot_reference_members_declared_after_it_including_members_defined_in_other_enums, vec![])?;
             return Ok(EnumEvaluation {
                 value: Some(EnumValue::Number(Number::new(0.0))),
@@ -200,32 +199,6 @@ impl CheckerState {
             self.ast(node)?,
             Some(node),
         )?)
-    }
-
-    /// The evaluator calls this with an EnumMember or a constant variable as
-    /// both location and declaration. General deferred-use checking is separate.
-    // port: tsc/internal/checker/checker.go:Checker.isBlockScopedNameDeclaredBeforeUse
-    fn enum_declaration_before_use(
-        &self,
-        declaration: NodeId,
-        usage: NodeId,
-    ) -> Result<bool, Error> {
-        if self.enum_source_file(declaration)? != self.enum_source_file(usage)? {
-            return Ok(true);
-        }
-        if self.node(declaration)?.pos() > self.node(usage)?.pos() {
-            return Ok(false);
-        }
-        if self.node(declaration)?.kind() == K::VariableDeclaration {
-            let mut ancestor = Some(usage);
-            while let Some(node) = ancestor {
-                if node == declaration {
-                    return Ok(false);
-                }
-                ancestor = self.node(node)?.parent();
-            }
-        }
-        Ok(true)
     }
 }
 

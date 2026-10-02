@@ -1,0 +1,415 @@
+{
+ "cases": [
+  {
+   "id": "ra-super-computed-in-object-method",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { m(...a: any[]): any { return 1; } x: any; }\nclass C extends B {\n    async n() {\n        await 0;\n        const o = { [super.x]() { return 1; }, [super.m()]: 2, get [super['k']]() { return 3; } };\n        return o;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-super-computed-in-class",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { m(...a: any[]): any { return 1; } x: any; }\nclass C extends B {\n    async n() {\n        await 0;\n        class K { [super.x] = 1; static [super['y']]() {} }\n        return K;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-super-optional-call",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { m(...a: any[]): any { return 1; } x: any; }\nclass C extends B {\n    async n() {\n        await 0;\n        super.m?.(1);\n        super['m']?.(2);\n        return super.x?.y;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-super-tagged-new-delete",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { m(...a: any[]): any { return 1; } x: any; }\nclass C extends B {\n    async n() {\n        await 0;\n        super.m`t${1}`;\n        new super.x();\n        delete super.x;\n        typeof super.x;\n        return void super['x'];\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-super-compound-and-logical",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { m(...a: any[]): any { return 1; } x: any; }\nclass C extends B {\n    async n(k: any) {\n        await 0;\n        super.x += 1;\n        super[k] ||= 2;\n        super.x ??= 3;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-super-in-for-head",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { m(...a: any[]): any { return 1; } x: any; }\nclass C extends B {\n    async n(arr: any) {\n        for (super.x of arr) { await 0; }\n        for (super['y'] in arr) { }\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-super-name-collision",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nvar _super = 1, _superIndex = 2, _arguments = 3;\nclass B { m() { return 1; } }\nclass C extends B {\n    async n(k: any) {\n        await 0;\n        return super.m() + super[k] + arguments.length;\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-var-collisions-mixed",
+   "name": "probe.ts",
+   "source": "// @target: es2016\ndeclare var o: any;\nasync function f(a: any, { b }: any, [c]: any) {\n    var a = 1, z = 2, w;\n    var b;\n    var { c: [c] } = o, q = 4;\n    for (var a of o) { }\n    for (var [b, , c] of o) { }\n    for (var a = 1, b; ;) { break; }\n    for (var { b: a } in o) { }\n    await 0;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-var-collision-arrow",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst f = async (a: any) => { var a = 1; if (a) { var a; } await 0; return a; };\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-catch-shadow-patterns",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(e: any, g: any) {\n    try { } catch ({ e, x: [g] }) { var e = 1; var g = 2; }\n    try { } catch { var e = 3; }\n    await 0;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-this-in-param-default",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(a = this) { return await a; }\nconst g = async (a = this) => await a;\nclass K { m = async (a = this) => await a; static s = async () => await this; }\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-async-arrow-in-param-default",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f(a = async () => arguments) { return await a; }\nfunction g(b = async () => arguments[0]) { return b; }\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-await-in-class-in-async",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nasync function f() {\n    class K { [await 0]() { } static x = await 1; }\n    return K;\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-nonsimple-method-arguments-arrow",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass K {\n    async m(a = 1, ...r: any[]) { return () => arguments; }\n    async n([a]: any) { await a; return arguments; }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-async-in-namespace",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nnamespace N { export async function f() { await 0; } export const g = async () => this; }\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-arrow-param-forms",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst a = async ([x]: any, y = 1) => x + y + await 0;\nconst b = async (x: any, [y]: any, ...z: any[]) => await x;\nconst c = async (...z: any[]) => await z;\nconst d = async ({ x }: any = {}, y: any) => await x;\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-lexical-arguments-nested-mix",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nfunction outer() {\n    const a = async () => { const b = async () => arguments[0]; return await b(); };\n    const c = () => arguments;\n    const d = async function () { return () => arguments; };\n    return [a, c, d];\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-arguments-in-loop-label-shorthand",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nfunction outer() {\n    return async () => { const o = { arguments }; arguments: while (1) { continue arguments; } return o; };\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-super-arrow-in-arrow",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { m(...a: any[]): any { return 1; } x: any; }\nclass C extends B {\n    n() {\n        return async () => { const f = async () => super.x; await f(); return super['y']; };\n    }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-super-in-async-object-method-element",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nconst o = { __proto__: {}, async m(k: any) { super[k] = await 1; return super.m(); } };\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-await-in-param-arrow-nested-top",
+   "name": "probe.ts",
+   "source": "// @target: es2017\n// @module: esnext\nexport const a = async () => await 0;\nawait 1;\nfor await (const x of []) {}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-async-expression-statement-forms",
+   "name": "probe.ts",
+   "source": "// @target: es2016\n(async function () { await 0; })();\n(async () => { await 0; })();\nexport default async function () { await 0; }\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-async-method-no-await-super",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass B { m(...a: any[]): any { return 1; } x: any; }\nclass C extends B {\n    async n() { return super.x; }\n    async o() { return super['y']; }\n    async p() { super.x = 1; }\n}\n",
+   "chains": [
+    [
+     "async"
+    ]
+   ]
+  },
+  {
+   "id": "ra-script-chain",
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: commonjs\nclass B { m() { return 1; } }\nexport class C extends B {\n    async n(k: string) { await 0; return super.m() + super[k]; }\n}\nexport const f = async (a = 1, ...r: number[]) => await a;\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "cjs-exports-expando",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexports.f = function() {};\nexports.f.prop = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "cjs-module-exports-expando",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nmodule.exports.g = function() {};\nmodule.exports.g.prop = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "cjs-nested-module-exports",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nif (typeof x === \"undefined\") { module.exports = 1; }\nfunction inner() { exports.q = 2; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-wrapped",
+   "name": "probe.ts",
+   "source": "export default (function () { return 1; } as any as () => number);\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-paren-class",
+   "name": "probe.ts",
+   "source": "export default (class { a = 1; });\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-equals-named-fn",
+   "name": "probe.ts",
+   "source": "const f = 1;\nexport = function f(x: number) { return x; };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-arrow-template-fullsig",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\n/** @type {<T>(x: T) => T} */\nexport const id = (x) => x;\n/**\n * @template T\n * @param {T} x\n * @returns {T}\n */\nexport function id2(x) { return x; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "js-class-expando",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nclass C {}\nC.staticProp = 1;\nC.method = function () { return 2; };\nmodule.exports = C;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "script-expando",
+   "name": "probe.ts",
+   "source": "function g() {}\ng.x = 1;\nconst h = () => 2;\nh.y = \"s\";\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-expando",
+   "name": "probe.ts",
+   "source": "export namespace N {\n  export function f() {}\n  f.a = 1;\n  export const g = () => 1;\n  g.b = 2;\n  function hidden() {}\n  hidden.c = 3;\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "export-as-namespace",
+   "name": "user.ts",
+   "source": "// @filename: probe.d.ts\nexport as namespace Lib;\nexport declare const v: number;\n// @filename: user.ts\nexport * from \"./probe\";\nexport * as ns from \"./probe\";\nimport type { v as vv } from \"./probe\";\nexport type { vv };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "namespace-export-import",
+   "name": "probe.ts",
+   "source": "export namespace A { export namespace B { export const x = 1; } }\nexport namespace C {\n  import Q = A.B;\n  export import R = A.B;\n  export const y: typeof Q.x = 1;\n}\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "late-paint-chain",
+   "name": "probe.ts",
+   "source": "namespace M {\n  export namespace Q { export interface I { a: number } }\n  import B = Q;\n  import C = B;\n  export import D = C;\n  export const v: C.I = { a: 1 };\n}\nexport = M;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "ambient-module-export-equals",
+   "name": "probe.ts",
+   "source": "declare module \"m\" {\n  class K { a: number }\n  export = K;\n}\ndeclare module \"n\" {\n  const x: number;\n  export default x;\n  function helper(): void;\n}\nexport {};\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "import-type-nonliteral",
+   "name": "probe.ts",
+   "source": "// @filename: other.ts\nexport type T = number;\nexport const v = 1;\n// @filename: probe.ts\nexport type A = typeof import(\"./other\");\nexport type B = import(\"./other\").T;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "jsdoc-optional-props",
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\n/**\n * @typedef {Object} Opts\n * @property {string=} a optional\n * @property {number} [b=3] defaulted\n * @property {{c: number}} nested\n */\n/** @param {Opts} o @returns {Opts} */\nexport function f(o) { return o; }\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "finding-b11-classfields-async-nolexthis",
+   "name": "probe.ts",
+   "source": "// @target: es2016\nclass A { async m() { await 0; class B { static x = this; static { await 1; const y = this; } } return this; } }\n",
+   "chains": [
+    [
+     "classfields",
+     "async"
+    ]
+   ]
+  }
+ ]
+}

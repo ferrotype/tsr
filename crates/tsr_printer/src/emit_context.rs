@@ -10,6 +10,18 @@ use std::sync::{
 };
 use tsr_ast::{node_flags, Factory, FactoryHooks, FactoryMethods, JsString, NodeAccess, NodeId};
 
+mod emit_node;
+#[cfg(test)]
+mod emit_tests;
+mod environment;
+mod factory_helpers;
+
+pub use emit_node::{
+    get_emit_context, HasGlobalName, PooledEmitContext, SnippetElement, SnippetKind,
+};
+pub use environment::EmitVisitorHooks;
+pub use factory_helpers::{AssignedNameOptions, NameOptions, PrivateIdentifierKind};
+
 /// Native `GeneratedIdentifierFlags` (`generatedidentifierflags.go`).
 pub mod generated_identifier_flags {
     pub type Flags = u32;
@@ -69,6 +81,14 @@ struct SideTables {
     leading_comments: HashMap<NodeId, Vec<SynthesizedComment>, tsr_arena::hash::FastState>,
     trailing_comments: HashMap<NodeId, Vec<SynthesizedComment>, tsr_arena::hash::FastState>,
     auto_generate: HashMap<NodeId, AutoGenerateInfo, tsr_arena::hash::FastState>,
+    // The rest of upstream's `emitNode`, and the context's other side tables.
+    emit_nodes: HashMap<NodeId, emit_node::EmitNode, tsr_arena::hash::FastState>,
+    text_source: HashMap<NodeId, NodeId, tsr_arena::hash::FastState>,
+    assigned_name: HashMap<NodeId, NodeId, tsr_arena::hash::FastState>,
+    class_this: HashMap<NodeId, NodeId, tsr_arena::hash::FastState>,
+    var_scope_stack: Vec<environment::VarScope>,
+    let_scope_stack: Vec<environment::VarScope>,
+    emit_helpers: Vec<&'static crate::emit_helpers::EmitHelper>,
 }
 impl SideTables {
     fn set_original(&mut self, node: NodeId, original: NodeId) {
@@ -78,11 +98,8 @@ impl SideTables {
         }
         assert_ne!(node, original, "original node must differ from its update");
         self.original.insert(node, original);
-        if let Some(flags) = self.emit_flags.get(&original).copied() {
-            self.emit_flags.insert(node, flags);
-        }
-        if let Some(range) = self.comment_ranges.get(&original).copied() {
-            self.comment_ranges.insert(node, range);
+        if self.has_emit_node(original) {
+            self.copy_from(node, original);
         }
     }
 }
@@ -94,6 +111,7 @@ pub struct EmitContext {
 }
 
 impl EmitContext {
+    // port: tsc/internal/printer/emitcontext.go:NewEmitContext
     pub fn new() -> Self {
         Self::default()
     }
@@ -103,6 +121,7 @@ impl EmitContext {
 
     /// The builder and context form one pair. Moving both is supported; giving
     /// hooks from a different context would separate the metadata from its AST.
+    // port: tsc/internal/printer/factory.go:NewNodeFactory
     pub fn factory_hooks(&self) -> Arc<dyn FactoryHooks> {
         Arc::new(EmitHooks(Arc::clone(&self.tables)))
     }
@@ -124,6 +143,7 @@ impl EmitContext {
                 .auto_generate
                 .iter()
                 .any(|(&key, info)| retained(key) && info.node.is_some_and(|node| !retained(node)))
+            || !tables.node_references_retained(&mut retained)
         {
             return Err(crate::Error::MissingNode(
                 "retained emit metadata dependency",
@@ -135,6 +155,7 @@ impl EmitContext {
         tables.leading_comments.retain(|&key, _| retained(key));
         tables.trailing_comments.retain(|&key, _| retained(key));
         tables.auto_generate.retain(|&key, _| retained(key));
+        tables.retain_node_tables(&mut retained);
         Ok(())
     }
 
@@ -181,6 +202,7 @@ impl EmitContext {
                 .map(|comments| comments.capacity() * size_of::<SynthesizedComment>())
                 .sum::<usize>()
             + tables.auto_generate.allocation_size()
+            + tables.node_table_bytes()
     }
 
     pub fn metadata_entries(&self) -> usize {
@@ -191,6 +213,7 @@ impl EmitContext {
             + tables.leading_comments.len()
             + tables.trailing_comments.len()
             + tables.auto_generate.len()
+            + tables.node_table_entries()
     }
 
     // port: tsc/internal/printer/emitcontext.go:EmitContext.EmitFlags
@@ -336,7 +359,7 @@ impl EmitContext {
         name
     }
     // port: tsc/internal/printer/emitcontext.go:EmitContext.getNodeForGeneratedNameWorker
-    fn generated_name_root(
+    pub(crate) fn generated_name_root(
         &self,
         factory: &dyn Factory,
         mut node: NodeId,
@@ -399,7 +422,7 @@ impl EmitContext {
         )
     }
     // port: tsc/internal/printer/factory.go:NodeFactory.newGeneratedIdentifier
-    fn new_generated_identifier(
+    pub(crate) fn new_generated_identifier(
         &mut self,
         factory: &mut dyn Factory,
         kind: generated_identifier_flags::Flags,
@@ -408,15 +431,7 @@ impl EmitContext {
         options: AutoGenerateOptions,
     ) -> NodeId {
         use generated_identifier_flags as g;
-        static NEXT_ID: AtomicU32 = AtomicU32::new(0);
-        // Exhaustion must not alias a retained generated name. Unlike a source
-        // integer, this counter is an internal identity and cannot wrap safely.
-        let id = AutoGenerateId(
-            NEXT_ID
-                .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
-                .expect("generated-name identity space exhausted")
-                + 1,
-        );
+        let id = next_auto_generate_id();
         let text = if text.is_empty() {
             let base = match source {
                 None => JsString::from_bytes(format!("(auto@{})", id.get()).into_bytes()),
@@ -457,7 +472,7 @@ impl EmitContext {
             text
         };
         let node = factory.new_identifier(text);
-        self.tables().auto_generate.insert(
+        self.set_auto_generate_info(
             node,
             AutoGenerateInfo {
                 id,
@@ -469,6 +484,25 @@ impl EmitContext {
         );
         node
     }
+    /// `c.autoGenerate[name] = autoGenerate`, shared by the identifier and
+    /// private-identifier constructors.
+    pub(crate) fn set_auto_generate_info(&mut self, node: NodeId, info: AutoGenerateInfo) {
+        self.tables().auto_generate.insert(node, info);
+    }
+}
+
+/// `AutoGenerateId(nextAutoGenerateId.Add(1))`: one process-wide counter for
+/// generated identifiers and generated private identifiers.
+pub(crate) fn next_auto_generate_id() -> AutoGenerateId {
+    static NEXT_ID: AtomicU32 = AtomicU32::new(0);
+    // Exhaustion must not alias a retained generated name. Unlike a source
+    // integer, this counter is an internal identity and cannot wrap safely.
+    AutoGenerateId(
+        NEXT_ID
+            .try_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+            .expect("generated-name identity space exhausted")
+            + 1,
+    )
 }
 
 struct EmitHooks(Arc<Mutex<SideTables>>);

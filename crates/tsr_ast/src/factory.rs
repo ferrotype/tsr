@@ -68,14 +68,30 @@ impl AstBuilder {
     /// Factory copies observe completed binding writes on retained source
     /// owners. Ordinary builder views and mutable construction remain parsed.
     /// This borrows the publication cell without initializing it or retaining
-    /// another owner; only imported nodes need logical-source resolution.
+    /// another owner. Exclusive binding already identifies a core node's
+    /// binding; only compatibility and lazy nodes need parent-chain resolution.
     pub(crate) fn factory_view(&self, id: NodeId) -> Result<AstView<'_>, Error> {
         let parsed = self.view();
         if id.arena() == self.id().arena() {
             return Ok(parsed);
         }
-        if parsed.for_node_owner(id)?.0.id() == self.id() {
+        let owner = parsed.for_node_owner(id)?;
+        if owner.0.id() == self.id() {
             return Ok(parsed);
+        }
+        if let Some(root) = owner.file_info().root {
+            if owner.node(root)?.kind() == crate::SyntaxKind::SourceFile {
+                if let Some(binding) = owner.source_file(root)?.state_ref().binding.result() {
+                    if binding.reads_core_directly(id) {
+                        // The exclusive binder wrote these core records in
+                        // place. Selecting their published binding also keeps
+                        // SourceFile metadata visible, without walking parents
+                        // on every transform read. Lazy records and owners
+                        // bound after publication still take the checked path.
+                        return Ok(AstView(owner.0, Some(binding)));
+                    }
+                }
+            }
         }
         let source = match parsed.owning_source(id) {
             Ok(source) => source,

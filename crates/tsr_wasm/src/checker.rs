@@ -3,7 +3,7 @@ use std::sync::Arc;
 use tsr_arena::Counters;
 use tsr_ast::Diagnostic;
 use tsr_compiler::diagnostic_writer::DiagnosticWriter;
-use tsr_embed::{FileCache, ProgramOptions, Session};
+use tsr_embed::{EmitOnly, EmitOptions, FileCache, ProgramOptions, Session};
 use tsr_jsstring::JsString;
 use wasm_bindgen::prelude::*;
 
@@ -116,6 +116,71 @@ impl WasmSession {
         serde_json::to_vec(&rows?).map_err(error)
     }
 
+    /// Emit through `tsr_embed::Session::emit`, whose write callback keeps
+    /// every output in memory: nothing reaches a file system. `request` is a
+    /// JSON object whose keys are all optional: `files`, byte-array file
+    /// names resolved as `Program.GetSourceFile` resolves them (absent or
+    /// null for every file); `emitOnly`, the pin's API values (0 everything,
+    /// 1 JavaScript, 2 declarations); `forceEmit`, a boolean. The result is
+    /// JSON bytes: `emit_skipped`, `diagnostics` (rows as `diagnostics`
+    /// returns them, in the emit's order) and `files`, each `name` and
+    /// `text` a byte array, in `EmittedFiles` order. No acceptance claim:
+    /// Phase 7 grades this entry point.
+    pub fn emit(&self, request: &str) -> Result<Vec<u8>, JsValue> {
+        let request = EmitRequest::parse(request).map_err(error)?;
+        let program = self.session.program();
+        let files = request
+            .files
+            .as_ref()
+            .map(|names| {
+                names
+                    .iter()
+                    .map(|name| {
+                        program
+                            .source_file(name)
+                            .ok_or_else(|| error("file not in program"))
+                    })
+                    .collect::<Result<Vec<_>, _>>()
+            })
+            .transpose()?;
+        let output = self
+            .session
+            .emit(&EmitOptions {
+                target_source_files: files.as_deref(),
+                emit_only: request.emit_only,
+                force_emit: request.force_emit,
+            })
+            .map_err(error)?;
+        let sources = DiagnosticWriter::new(
+            program,
+            tsr_compiler::diagnostic_writer::FormattingOptions::default(),
+        );
+        let rows: Result<Vec<_>, _> = output
+            .diagnostics
+            .iter()
+            .map(|value| diagnostic(&sources, value))
+            .collect();
+        // Written field by field so output bytes go straight to the response
+        // instead of through one JSON value per byte.
+        let mut response = br#"{"emit_skipped":"#.to_vec();
+        serde_json::to_writer(&mut response, &output.emit_skipped).map_err(error)?;
+        response.extend_from_slice(br#","diagnostics":"#);
+        serde_json::to_writer(&mut response, &rows?).map_err(error)?;
+        response.extend_from_slice(br#","files":["#);
+        for (index, file) in output.files.iter().enumerate() {
+            if index > 0 {
+                response.push(b',');
+            }
+            response.extend_from_slice(br#"{"name":"#);
+            serde_json::to_writer(&mut response, file.name.as_bytes()).map_err(error)?;
+            response.extend_from_slice(br#","text":"#);
+            serde_json::to_writer(&mut response, file.text.as_slice()).map_err(error)?;
+            response.push(b'}');
+        }
+        response.extend_from_slice(b"]}");
+        Ok(response)
+    }
+
     /// Query at a UTF-16 source offset, matching JavaScript-facing positions.
     /// The returned display is owned WTF-8 bytes, not a borrowed wasm view.
     pub fn type_at_position(&self, path: &[u8], position: u32) -> Result<Vec<u8>, JsValue> {
@@ -148,6 +213,57 @@ impl WasmSession {
             )
             .map(|text| text.as_bytes().to_vec())
             .map_err(error)
+    }
+}
+
+/// A decoded `WasmSession::emit` request.
+struct EmitRequest {
+    files: Option<Vec<Vec<u8>>>,
+    emit_only: EmitOnly,
+    force_emit: bool,
+}
+
+impl EmitRequest {
+    /// Absent and null fields take their defaults; an unknown field, a value
+    /// of the wrong type and an `emitOnly` outside the pin's API range
+    /// (`getEmitOnly`) are errors.
+    fn parse(request: &str) -> Result<Self, String> {
+        let request: serde_json::Value =
+            serde_json::from_str(request).map_err(|value| value.to_string())?;
+        let serde_json::Value::Object(fields) = request else {
+            return Err("emit request must be a JSON object".to_owned());
+        };
+        let mut parsed = Self {
+            files: None,
+            emit_only: EmitOnly::All,
+            force_emit: false,
+        };
+        for (key, value) in fields {
+            match key.as_str() {
+                "files" => {
+                    parsed.files = serde_json::from_value(value)
+                        .map_err(|value| format!("files must be byte arrays: {value}"))?;
+                }
+                "emitOnly" => {
+                    parsed.emit_only = match value.as_u64() {
+                        None if value.is_null() => EmitOnly::All,
+                        Some(0) => EmitOnly::All,
+                        Some(1) => EmitOnly::Js,
+                        Some(2) => EmitOnly::Dts,
+                        _ => return Err(format!("invalid emitOnly value: {value}")),
+                    };
+                }
+                "forceEmit" => {
+                    parsed.force_emit = match value {
+                        serde_json::Value::Null => false,
+                        serde_json::Value::Bool(value) => value,
+                        value => return Err(format!("forceEmit must be a boolean: {value}")),
+                    };
+                }
+                _ => return Err(format!("unknown emit request field: {key}")),
+            }
+        }
+        Ok(parsed)
     }
 }
 

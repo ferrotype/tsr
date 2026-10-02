@@ -125,7 +125,9 @@ class Wiring(unittest.TestCase):
         for witness in producers.WITNESSES:
             self.assertIn(f"data/phase2/receipts/{witness}.json", spec["inputs"])
         declared = set(tomllib.loads((ROOT / "status/runs.toml").read_text()))
-        self.assertEqual(declared, {*producers.PREREQUISITE_RUNS, "checker"})
+        # A later phase's producer is declared beside these and is no C7 prerequisite.
+        self.assertEqual(declared - set(producers.LATER_PHASE_RUNS), {*producers.PREREQUISITE_RUNS, "checker"})
+        self.assertEqual(set(producers.LATER_PHASE_RUNS) - declared, set())
 
     def test_the_sprint_items_close_on_the_runs_the_producer_reads(self):
         sprint = tomllib.loads((ROOT / "sprints/P2B.toml").read_text())
@@ -221,6 +223,11 @@ class Completion(unittest.TestCase):
         self.assertIs(metrics["c7_complete"], False)
         undeclared = dict(self.STATES, extra="current")
         self.assertIs(self.complete(states=undeclared)["c7_evidence_current"], False)
+        # A later phase's producer is neither a prerequisite nor an undeclared run,
+        # whatever its state.
+        for state in ("missing", "current", "stale: source, pin, command or inputs changed"):
+            later = dict(self.STATES, emit=state)
+            self.assertIs(self.complete(states=later)["c7_evidence_current"], True)
 
     def test_the_p2b_exit_and_the_run_level_metrics_gate_completion(self):
         for name in ("errors_parity", "unsupported_required", "mode_parity", "content_mappers", "blockers_named"):

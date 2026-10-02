@@ -1,0 +1,870 @@
+{
+ "cases": [
+  {
+   "id": "class-basic",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    m() { return 1; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "class-multiple",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\n@p(1)\nclass C {}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "class-call-property-access",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\ndeclare const ns: any;\n@ns.dec()\n@ns.other\nclass C {}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "class-export",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport class C {}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "class-export-default-named",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport default class C {}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "class-export-default-anonymous",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport default class {}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "class-heritage",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass Base {}\n@dec\nclass D extends Base {\n    constructor() { super(); }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "class-comments",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n/** leading doc */\n@dec // trailing\nclass C {\n    // inside\n    /* member */ @dec m() {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "class-other-modifiers",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2017\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport abstract class C {}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "class-esnext",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: esnext\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport class C {\n    @dec static s = 1;\n    @dec i = 2;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "alias-static-method",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    static x() { return C.y; }\n    static y = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "alias-es2022-static-property",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2022\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    static x() { return C.y; }\n    static y = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "alias-es2022-static-block",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2022\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    static { console.log(C); }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "alias-es2022-no-static",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2022\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    m() { return C; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "alias-export",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport class C {\n    static x() { return C.y; }\n    static y = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "alias-export-default",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport default class C {\n    static x() { return C.y; }\n    static y = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "alias-property-initializer",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    p = C;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "alias-decorator-argument",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec(C)\nclass C {\n    @p(C) m() { return C; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "alias-ctor-param-decorator",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    constructor(@p(C) a: any) { C; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "alias-heritage",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\ndeclare function mixin(x: any): any;\n@dec\nclass C extends mixin(C) {\n    m() { return C; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "no-alias-property-name",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    m() { return this.C; }\n    C = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "no-alias-shadowed",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    m(C: any) { return C; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "alias-property-access-expression",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    m() { return C.prototype.m; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "alias-nested-function",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nfunction f() {\n    @dec\n    class C {\n        static m() { return C; }\n    }\n    return C;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "alias-nested-classes",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass Outer {\n    static m() {\n        @dec\n        class Inner {\n            static n() { return Inner || Outer; }\n        }\n        return Inner;\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "alias-name-collision",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nvar C_1 = 0;\n@dec\nclass C {\n    static m() { return C; }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "method",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec m() {}\n    @dec @p(1) n() {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "static-and-instance-order",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec static s() {}\n    @dec i() {}\n    @dec static t = 1;\n    @dec j = 2;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "property",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec p: number;\n    @dec q = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "property-esnext",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: esnext\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec p: number;\n    @dec static q = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-pair-getter",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec get a() { return 1; }\n    set a(v) {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-pair-setter",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    get a() { return 1; }\n    @dec set a(v) {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-setter-parameter",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec get a() { return 1; }\n    set a(@p v) {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "accessor-static",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec static get a() { return 1; }\n    static set a(v) {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "auto-accessor",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2022\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec accessor x = 1;\n    @dec static accessor y = 2;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "parameters",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    m(a, @p b, @p(1) @dec c) {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "parameters-this",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    m(this: C, @p a: number) {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "parameters-default-and-rest",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    m(@p a = 1, @p ...b: any[]) {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "ctor-parameters",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    constructor(@p a: any, b: any) {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "ctor-parameter-property",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    constructor(@p public x = 1, private y?: number) {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "class-and-ctor-parameters",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    constructor(@p a: any) {}\n    @dec m(@p x) {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "computed-literal",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec [\"a\"]() {}\n    @dec [1] = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "computed-expression",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\ndeclare function key(): string;\nclass C {\n    @dec [key()]() {}\n    @dec static [key()] = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "computed-identifier",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\ndeclare const k: string;\nclass C {\n    @dec [k]() {}\n    [k + 1]() {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "computed-symbol",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec [Symbol.iterator]() {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "literal-names",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec \"quoted\"() {}\n    @dec 42 = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "private-name",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2022\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec #m() {}\n    @dec #p = 1;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "private-in-decorator",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2022\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    static #x = 1;\n    @dec(#x in C) m() {}\n    @dec static s() {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "private-in-parameter-decorator",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2022\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    static #x = 1;\n    m(@p(#x in C) a) {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "declare-property",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec declare p: number;\n    @dec q: number;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "abstract-property",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nabstract class C {\n    @dec abstract p: number;\n    @dec abstract m(): void;\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "class-expression",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nconst X = class {\n    @dec m() {}\n    @dec p = 1;\n    constructor(@p a) {}\n};\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "class-expression-named",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nconst X = class Y {\n    @dec static m() { return Y; }\n};\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "export-default-anonymous-members",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nexport default class {\n    @dec m() {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "export-members",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nexport class C {\n    @dec m() {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "undecorated",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    m() {}\n}\nfunction f() { return 1; }\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "decorated-in-block",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n{\n    class C {\n        @dec m() {}\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "undecorated-outer",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass A {\n    m() {\n        @dec\n        class B {}\n        return B;\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "alias-inner-undecorated",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    static m() {\n        class D { n() { return C; } }\n        const E = class { n() { return C; } };\n        return [D, E];\n    }\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "es2017-target",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2017\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec async m(@p a) {}\n}\n",
+   "chains": [
+    [
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "solo-this-parameter",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    m(this: C, @p a: number, @p b: string): void {}\n}\n",
+   "chains": [
+    [
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "solo-overloads",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec m(): void;\n    @dec m(a?: any) {}\n}\n",
+   "chains": [
+    [
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "solo-ambient-class",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\ndeclare class C {\n    @dec p: number;\n    @dec m(): void;\n}\n",
+   "chains": [
+    [
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "solo-abstract-members",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nabstract class C {\n    @dec abstract get a(): number;\n    @dec abstract m(): void;\n    @dec abstract p: number;\n}\n",
+   "chains": [
+    [
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "solo-class-type-parameters",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport class C<T> implements I {\n    @dec m<U>(@p a: T): U { return null as any; }\n}\ninterface I {}\n",
+   "chains": [
+    [
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "metadata-method",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec m(a: string, b: number): boolean { return true; }\n}\n",
+   "chains": [
+    [
+     "metadata",
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "metadata-ctor",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    constructor(@p a: string, b: number) {}\n}\n",
+   "chains": [
+    [
+     "metadata",
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "metadata-order",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec @p(1) m(@p x: string): void {}\n}\n",
+   "chains": [
+    [
+     "metadata",
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "metadata-property",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec p: string;\n    @dec static s: number;\n}\n",
+   "chains": [
+    [
+     "metadata",
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "metadata-accessor",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    @dec get a(): string { return \"\"; }\n    set a(v: string) {}\n}\n",
+   "chains": [
+    [
+     "metadata",
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "script-alias-commonjs",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\n// @module: commonjs\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport class C {\n    static x() { return C.y; }\n    static y = 1;\n}\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-default-commonjs",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\n// @module: commonjs\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport default class {\n    @dec m() {}\n}\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-alias-esnext",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\n// @module: esnext\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport default class C {\n    static x() { return C; }\n}\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-parameter-property",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\n// @module: esnext\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nclass C {\n    constructor(@p public x: number) {}\n}\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-classfields-alias",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\n// @module: esnext\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    static y = C;\n}\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "script-namespace",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @target: es2015\n// @module: esnext\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\nnamespace N {\n    @dec\n    export class C {\n        static m() { return C; }\n    }\n}\n",
+   "chains": [
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "metadata-self-reference",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    @dec p: C;\n    @dec m(x: C): C { return x; }\n}\n",
+   "chains": [
+    [
+     "metadata",
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "metadata-self-reference-es2022",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2022\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nclass C {\n    @dec static p: C;\n    static q = C;\n}\n",
+   "chains": [
+    [
+     "metadata",
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  },
+  {
+   "id": "metadata-export-default",
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\ndeclare function p(...args: any[]): any;\n@dec\nexport default class C {\n    constructor(@p a: Date) {}\n    @dec m(): C { return this; }\n}\n",
+   "chains": [
+    [
+     "metadata",
+     "typeeraser",
+     "legacydecorators"
+    ]
+   ]
+  }
+ ]
+}

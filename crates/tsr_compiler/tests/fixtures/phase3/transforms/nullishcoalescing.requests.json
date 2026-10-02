@@ -1,0 +1,359 @@
+{
+ "cases": [
+  {
+   "id": "nullishcoalescing-01",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = a ?? b;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-06",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = a ?? (b ?? c);\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-07",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = 1 ?? a;\nlet y = \"s\" ?? a;\nlet z = null ?? a;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-08",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = this ?? a;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-10",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = a || b;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-14",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = /*l*/ a /*m*/ ?? /*r*/ b;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-15",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = (a ?? b) || c;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-19",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = `${a ?? b}`;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-23",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = a ?? b ? 1 : 2;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-27",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = a ?? (() => b);\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-28",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = a ?? { p: b ?? c };\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-29",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = [a ?? 1, b ?? 2];\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-30",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = a ?? 'z';\nlet y = `t` ?? a;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-02",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = o.p ?? b;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-03",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = k() ?? 1;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-04",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = a ?? b ?? c;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-05",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = (a ?? b) ?? c;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-09",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = (a) ?? b;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-11",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f(p: any) {\n    return p.q ?? k();\n}\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-12",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nconst g = (p: any) => p[0] ?? 2;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-13",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk(a ?? b, o.p ?? c);\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-16",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = o?.p ?? b;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-17",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nclass C {\n    p = a ?? b;\n    m() { return this.p ?? super.toString; }\n}\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-18",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nexport const e = o.q.r ?? \"d\";\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-20",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nif (a ?? b) { o.p = k() ?? c; }\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-21",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = void 0 ?? a;\nlet y = undefined ?? a;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-22",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = (k(), a) ?? b;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-24",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = o[k()] ?? (o[k()] ?? 1);\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-25",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = true ?? a;\nlet y = 1n ?? a;\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nullishcoalescing-26",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f(p: any, q: any) { return p ?? q ?? 0; }\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nc-typeeraser-operands",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = (a as any) ?? b;\nlet y = a! ?? b;\nlet z = <any>a ?? (b as any);\nlet w = (o.p satisfies any) ?? c;\n",
+   "chains": [
+    [
+     "typeeraser",
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nc-super-private-await",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nclass C extends Object { #p: any; m() { return super.x ?? this.#p ?? this ?? 1; } async n() { return (await a) ?? b; } }\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ],
+    [
+     "typeeraser",
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nc-parameter-and-static-temps",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nfunction f(p = o.q ?? 1) { return () => k() ?? p; }\nclass D { static s = k() ?? 1; x = o.p ?? 2; }\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nc-in-optional-chain-and-template",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nk`${o.p ?? a}`;\no?.[a ?? b];\nnew (k() ?? o)();\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  },
+  {
+   "id": "nc-right-not-copied",
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare let a: any, b: any, c: any; declare let o: any; declare function k(): any;\nlet x = a ?? k() ?? o.p;\nlet y = (a ?? b) ?? (c ?? k());\n",
+   "chains": [
+    [
+     "nullishcoalescing"
+    ]
+   ]
+  }
+ ]
+}

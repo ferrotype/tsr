@@ -1,0 +1,44 @@
+{
+ "cases": [
+  {
+   "id": "typedef-module-exports-object",
+   "name": "a.js",
+   "source": "// @module: commonjs\n// @declaration: true\n// @checkJs: true\n// @outDir: ./out\n// @filename: a.js\n/**\n * @typedef {{x: string}} Foo\n */\nmodule.exports = { a: 1, b: \"hello\" };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "typedef-module-exports-function",
+   "name": "index.js",
+   "source": "// @module: commonjs\n// @declaration: true\n// @checkJs: true\n// @outDir: ./out\n// @filename: index.js\n/**\n * @typedef {{opt: string}} Options\n */\n/** @param {Options} options */\nfunction loader(options) {}\nmodule.exports = loader;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "typedef-esm",
+   "name": "a.js",
+   "source": "// @declaration: true\n// @checkJs: true\n// @outDir: ./out\n// @filename: a.js\n/**\n * @typedef {{x: string}} Foo\n */\nexport const a = 1;\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  },
+  {
+   "id": "typedef-dotted-module-exports",
+   "name": "a.js",
+   "source": "// @module: commonjs\n// @declaration: true\n// @checkJs: true\n// @outDir: ./out\n// @filename: a.js\n/**\n * @typedef {{x: string}} N.Foo\n */\nmodule.exports = { a: 1 };\n",
+   "chains": [
+    [
+     "declarations"
+    ]
+   ]
+  }
+ ]
+}

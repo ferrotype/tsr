@@ -1,0 +1,363 @@
+{
+ "cases": [
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata",
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar C_1;\r\nlet C = C_1 = class C {\r\n    static m() { return C_1; }\r\n    p;\r\n};\r\n__decorate([\r\n    dec,\r\n    __metadata(\"design:type\", C_1)\r\n], C.prototype, \"p\", void 0);\r\nC = C_1 = __decorate([\r\n    dec\r\n], C);\r\n"
+      },
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nvar __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar C_1;\r\nlet C = C_1 = class C {\r\n    static m() { return C_1; }\r\n};\r\n__decorate([\r\n    dec,\r\n    __metadata(\"design:type\", C_1)\r\n], C.prototype, \"p\", void 0);\r\nC = C_1 = __decorate([\r\n    dec\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "metadata-self-reference-alias",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c6173732043207b0a20202020737461746963206d2829207b2072657475726e20433b207d0a202020204064656320703a20433b0a7d0a"
+    },
+    "id": "metadata-self-reference-alias",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\n@dec\nclass C {\n    static m() { return C; }\n    @dec p: C;\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata",
+        "typeeraser",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar C_1;\r\nlet C = C_1 = class C {\r\n    p;\r\n    m(a) { return a; }\r\n};\r\n__decorate([\r\n    dec,\r\n    __metadata(\"design:type\", C_1)\r\n], C.prototype, \"p\", void 0);\r\n__decorate([\r\n    dec,\r\n    __metadata(\"design:type\", Function),\r\n    __metadata(\"design:paramtypes\", [C_1]),\r\n    __metadata(\"design:returntype\", C_1)\r\n], C.prototype, \"m\", null);\r\nC = C_1 = __decorate([\r\n    dec\r\n], C);\r\n"
+      },
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nvar __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar C_1;\r\nlet C = C_1 = class C {\r\n    m(a) { return a; }\r\n};\r\n__decorate([\r\n    dec,\r\n    __metadata(\"design:type\", C_1)\r\n], C.prototype, \"p\", void 0);\r\n__decorate([\r\n    dec,\r\n    __metadata(\"design:type\", Function),\r\n    __metadata(\"design:paramtypes\", [C_1]),\r\n    __metadata(\"design:returntype\", C_1)\r\n], C.prototype, \"m\", null);\r\nC = C_1 = __decorate([\r\n    dec\r\n], C);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "metadata-self-reference-only",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a406465630a636c6173732043207b0a202020204064656320703a20433b0a2020202040646563206d28613a2043293a2043207b2072657475726e20613b207d0a7d0a"
+    },
+    "id": "metadata-self-reference-only",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\n@dec\nclass C {\n    @dec p: C;\n    @dec m(a: C): C { return a; }\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "metadata",
+        "typeeraser",
+        "runtimesyntax",
+        "legacydecorators"
+       ],
+       "text": "var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar N;\r\n(function (N) {\r\n    class A {\r\n    }\r\n    N.A = A;\r\n    class B {\r\n        p;\r\n    }\r\n    __decorate([\r\n        dec,\r\n        __metadata(\"design:type\", A)\r\n    ], B.prototype, \"p\", void 0);\r\n    N.B = B;\r\n})(N || (N = {}));\r\n"
+      },
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nvar __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nvar N;\r\n(function (N) {\r\n    class A {\r\n    }\r\n    N.A = A;\r\n    class B {\r\n    }\r\n    __decorate([\r\n        dec,\r\n        __metadata(\"design:type\", A)\r\n    ], B.prototype, \"p\", void 0);\r\n    N.B = B;\r\n})(N || (N = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "metadata-namespace-export",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6e616d657370616365204e207b0a202020206578706f727420636c6173732041207b7d0a202020206578706f727420636c6173732042207b0a20202020202020204064656320703a20413b0a202020207d0a7d0a"
+    },
+    "id": "metadata-namespace-export",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\ndeclare function dec(...args: any[]): any;\nnamespace N {\n    export class A {}\n    export class B {\n        @dec p: A;\n    }\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.A = void 0;\r\nclass A {\r\n}\r\nexports.A = A;\r\nclass D {\r\n}\r\nexports.default = D;\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nvar __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {\r\n    if (k2 === undefined) k2 = k;\r\n    var desc = Object.getOwnPropertyDescriptor(m, k);\r\n    if (!desc || (\"get\" in desc ? !m.__esModule : desc.writable || desc.configurable)) {\r\n      desc = { enumerable: true, get: function() { return m[k]; } };\r\n    }\r\n    Object.defineProperty(o, k2, desc);\r\n}) : (function(o, m, k, k2) {\r\n    if (k2 === undefined) k2 = k;\r\n    o[k2] = m[k];\r\n}));\r\nvar __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {\r\n    Object.defineProperty(o, \"default\", { enumerable: true, value: v });\r\n}) : function(o, v) {\r\n    o[\"default\"] = v;\r\n});\r\nvar __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {\r\n    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;\r\n    if (typeof Reflect === \"object\" && typeof Reflect.decorate === \"function\") r = Reflect.decorate(decorators, target, key, desc);\r\n    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;\r\n    return c > 3 && r && Object.defineProperty(target, key, r), r;\r\n};\r\nvar __importStar = (this && this.__importStar) || (function () {\r\n    var ownKeys = function(o) {\r\n        ownKeys = Object.getOwnPropertyNames || function (o) {\r\n            var ar = [];\r\n            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;\r\n            return ar;\r\n        };\r\n        return ownKeys(o);\r\n    };\r\n    return function (mod) {\r\n        if (mod && mod.__esModule) return mod;\r\n        var result = {};\r\n        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== \"default\") __createBinding(result, mod, k[i]);\r\n        __setModuleDefault(result, mod);\r\n        return result;\r\n    };\r\n})();\r\nvar __metadata = (this && this.__metadata) || function (k, v) {\r\n    if (typeof Reflect === \"object\" && typeof Reflect.metadata === \"function\") return Reflect.metadata(k, v);\r\n};\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.B = void 0;\r\nconst lib_1 = __importStar(require(\"./lib\"));\r\nclass B {\r\n}\r\nexports.B = B;\r\n__decorate([\r\n    dec,\r\n    __metadata(\"design:type\", lib_1.A)\r\n], B.prototype, \"p\", void 0);\r\n__decorate([\r\n    dec,\r\n    __metadata(\"design:type\", lib_1.default)\r\n], B.prototype, \"q\", void 0);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "metadata-imported-type-commonjs",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "6578706f727420636c6173732041207b7d0a6578706f72742064656661756c7420636c6173732044207b7d",
+     "/.src/probe.ts": "696d706f727420442c207b2041207d2066726f6d20222e2f6c6962223b0a6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a6578706f727420636c6173732042207b0a202020204064656320703a20413b0a202020204064656320713a20443b0a7d0a"
+    },
+    "id": "metadata-imported-type-commonjs",
+    "options": {
+     "emitDecoratorMetadata": true,
+     "experimentalDecorators": true,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/lib.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\n// @emitDecoratorMetadata: true\n// @target: es2015\n// @module: commonjs\n// @filename: lib.ts\nexport class A {}\nexport default class D {}\n// @filename: probe.ts\nimport D, { A } from \"./lib\";\ndeclare function dec(...args: any[]): any;\nexport class B {\n    @dec p: A;\n    @dec q: D;\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nvar __importDefault = (this && this.__importDefault) || function (mod) {\r\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\r\n};\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.x = void 0;\r\nconst react_1 = __importDefault(require(\"./react\"));\r\nexports.x = react_1.default.createElement(\"div\", { a: 1 }, \"t\");\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jsx-react-import-commonjs",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "696d706f72742052656163742066726f6d20222e2f7265616374223b0a6578706f727420636f6e73742078203d203c64697620613d7b317d3e743c2f6469763e3b0a",
+     "/.src/react.d.ts": "6465636c61726520636f6e73742052656163743a20616e793b0a6578706f72742064656661756c742052656163743b"
+    },
+    "id": "jsx-react-import-commonjs",
+    "options": {
+     "jsx": 3,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/react.d.ts",
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @module: commonjs\n// @target: es2015\n// @filename: react.d.ts\ndeclare const React: any;\nexport default React;\n// @filename: probe.tsx\nimport React from \"./react\";\nexport const x = <div a={1}>t</div>;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nvar __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {\r\n    if (k2 === undefined) k2 = k;\r\n    var desc = Object.getOwnPropertyDescriptor(m, k);\r\n    if (!desc || (\"get\" in desc ? !m.__esModule : desc.writable || desc.configurable)) {\r\n      desc = { enumerable: true, get: function() { return m[k]; } };\r\n    }\r\n    Object.defineProperty(o, k2, desc);\r\n}) : (function(o, m, k, k2) {\r\n    if (k2 === undefined) k2 = k;\r\n    o[k2] = m[k];\r\n}));\r\nvar __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {\r\n    Object.defineProperty(o, \"default\", { enumerable: true, value: v });\r\n}) : function(o, v) {\r\n    o[\"default\"] = v;\r\n});\r\nvar __importStar = (this && this.__importStar) || (function () {\r\n    var ownKeys = function(o) {\r\n        ownKeys = Object.getOwnPropertyNames || function (o) {\r\n            var ar = [];\r\n            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;\r\n            return ar;\r\n        };\r\n        return ownKeys(o);\r\n    };\r\n    return function (mod) {\r\n        if (mod && mod.__esModule) return mod;\r\n        var result = {};\r\n        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== \"default\") __createBinding(result, mod, k[i]);\r\n        __setModuleDefault(result, mod);\r\n        return result;\r\n    };\r\n})();\r\nObject.defineProperty(exports, \"__esModule\", { value: true });\r\nexports.x = void 0;\r\nconst React = __importStar(require(\"./react\"));\r\nexports.x = React.createElement(\"div\", { a: 1 }, \"t\");\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jsx-react-namespace-import-commonjs",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "696d706f7274202a2061732052656163742066726f6d20222e2f7265616374223b0a6578706f727420636f6e73742078203d203c64697620613d7b317d3e743c2f6469763e3b0a",
+     "/.src/react.d.ts": "6578706f7274206465636c6172652066756e6374696f6e20637265617465456c656d656e74282e2e2e613a20616e795b5d293a20616e793b"
+    },
+    "id": "jsx-react-namespace-import-commonjs",
+    "options": {
+     "jsx": 3,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/react.d.ts",
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @module: commonjs\n// @target: es2015\n// @filename: react.d.ts\nexport declare function createElement(...a: any[]): any;\n// @filename: probe.tsx\nimport * as React from \"./react\";\nexport const x = <div a={1}>t</div>;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "script"
+       ],
+       "text": "\"use strict\";\r\nvar M;\r\n(function (M) {\r\n    M.x = M.React.createElement(\"div\", null);\r\n})(M || (M = {}));\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jsx-react-in-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6e616d657370616365204d207b0a202020206578706f7274206465636c61726520636f6e73742052656163743a20616e793b0a202020206578706f727420636f6e73742078203d203c6469762f3e3b0a7d0a"
+    },
+    "id": "jsx-react-in-namespace",
+    "options": {
+     "jsx": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: react\n// @target: es2015\nnamespace M {\n    export declare const React: any;\n    export const x = <div/>;\n}\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

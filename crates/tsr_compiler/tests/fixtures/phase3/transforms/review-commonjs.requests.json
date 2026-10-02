@@ -1,0 +1,40 @@
+{
+ "cases": [
+  {
+   "id": "bound-exports",
+   "name": "main.ts",
+   "source": "// @module: commonjs\n// @verbatimModuleSyntax: true\n// @filename: main.ts\nexport let x = 1;\nx++;\nfunction g() { return x; }\nlet y = 0;\nexport { y };\n({ y } = { y: 2 });\nimport { z } from \"./a\";\nfunction h() { return z; }\n// @filename: a.ts\nexport const z = 1;\n",
+   "chains": [
+    [
+     "commonjs"
+    ],
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "bound-js",
+   "name": "main.js",
+   "source": "// @module: commonjs\n// @isolatedModules: true\n// @allowJs: true\n// @filename: main.js\nimport d, { z } from \"./a.js\";\nexport let x = 1;\nx++;\nexport function f() { return d + z; }\n// @filename: a.js\nexport const z = 1;\nexport default 2;\n",
+   "chains": [
+    [
+     "commonjs"
+    ],
+    [
+     "script"
+    ]
+   ]
+  },
+  {
+   "id": "shim-rest-only",
+   "name": "main.js",
+   "source": "// @module: commonjs\n// @rewriteRelativeImportExtensions: true\n// @allowJs: true\n// @filename: main.js\nimport { y } from \"./b.js\";\nconst c = require(\"./c.js\", y);\n// @filename: b.js\nexport const y = 1;\n",
+   "chains": [
+    [
+     "commonjs"
+    ]
+   ]
+  }
+ ]
+}

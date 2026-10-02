@@ -1,0 +1,1519 @@
+{
+ "cases": [
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nlet x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-01",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c65742078203d20313b0a"
+    },
+    "id": "usestrict-01",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\nlet x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nexport let x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-02",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274206c65742078203d20313b0a"
+    },
+    "id": "usestrict-02",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: commonjs\nexport let x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "export let x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-03",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274206c65742078203d20313b0a"
+    },
+    "id": "usestrict-03",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: es2015\nexport let x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nlet x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-04",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c65742078203d20313b0a"
+    },
+    "id": "usestrict-04",
+    "options": {
+     "module": 5,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: es2015\nlet x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "export let x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-05",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274206c65742078203d20313b0a"
+    },
+    "id": "usestrict-05",
+    "options": {
+     "module": 200,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: preserve\nexport let x = 1;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "import \"./m\";\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-06",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "696d706f727420222e2f6d223b0a"
+    },
+    "id": "usestrict-06",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: esnext\nimport \"./m\";\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nlet x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-07",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "2275736520737472696374223b0a6c65742078203d20313b0a"
+    },
+    "id": "usestrict-07",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n\"use strict\";\nlet x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\n\"use asm\";\r\nlet x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-08",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "227573652061736d223b0a6c65742078203d20313b0a"
+    },
+    "id": "usestrict-08",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n\"use asm\";\nlet x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-09",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": ""
+    },
+    "id": "usestrict-09",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\n// leading comment\r\n/* block */\r\nlet x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-10",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "2f2f206c656164696e6720636f6d6d656e740a2f2a20626c6f636b202a2f0a6c65742078203d20313b0a"
+    },
+    "id": "usestrict-10",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// leading comment\n/* block */\nlet x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nlet x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-11",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c65742078203d20313b0a"
+    },
+    "id": "usestrict-11",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 3
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2016\nlet x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "export {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-12",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274207b7d3b0a"
+    },
+    "id": "usestrict-12",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 99
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: esnext\nexport {};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nexport const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.cts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "export const b = 1;\r\n"
+      }
+     ],
+     "name": "/.src/b.mts"
+    }
+   ],
+   "id": "usestrict-13",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.cts": "6578706f727420636f6e73742061203d20313b",
+     "/.src/b.mts": "6578706f727420636f6e73742062203d20313b0a"
+    },
+    "id": "usestrict-13",
+    "options": {
+     "module": 199,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/a.cts",
+     "/.src/b.mts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: nodenext\n// @filename: a.cts\nexport const a = 1;\n// @filename: b.mts\nexport const b = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nexport const c = 1;\r\n"
+      }
+     ],
+     "name": "/.src/c.ts"
+    }
+   ],
+   "id": "usestrict-14",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/c.ts": "6578706f727420636f6e73742063203d20313b0a"
+    },
+    "id": "usestrict-14",
+    "options": {
+     "module": 100,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/c.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: node16\n// @filename: c.ts\nexport const c = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "{ \"a\": 1 }\r\n"
+      }
+     ],
+     "name": "/.src/data.json"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nimport d = require(\"./data.json\");\r\nexport const x = d;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "usestrict-15",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/data.json": "7b202261223a2031207d",
+     "/.src/main.ts": "696d706f72742064203d207265717569726528222e2f646174612e6a736f6e22293b0a6578706f727420636f6e73742078203d20643b0a"
+    },
+    "id": "usestrict-15",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "resolveJsonModule": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: commonjs\n// @resolveJsonModule: true\n// @filename: data.json\n{ \"a\": 1 }\n// @filename: main.ts\nimport d = require(\"./data.json\");\nexport const x = d;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "'use strict';\r\nexport const x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-16",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "2775736520737472696374273b0a6578706f727420636f6e73742078203d20313b0a"
+    },
+    "id": "usestrict-16",
+    "options": {
+     "module": 6,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: es2020\n'use strict';\nexport const x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "'use strict';\r\nexport const x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-17",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "2775736520737472696374273b0a6578706f727420636f6e73742078203d20313b0a"
+    },
+    "id": "usestrict-17",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: commonjs\n'use strict';\nexport const x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nfunction f() {\r\n    'use strict';\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-18",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e20662829207b202775736520737472696374273b207d0a"
+    },
+    "id": "usestrict-18",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: commonjs\nfunction f() { 'use strict'; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nlet s = 1;\r\n"
+      }
+     ],
+     "name": "/.src/s.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "export let t = 2;\r\n"
+      }
+     ],
+     "name": "/.src/t.ts"
+    }
+   ],
+   "id": "usestrict-19",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/s.ts": "6c65742073203d20313b",
+     "/.src/t.ts": "6578706f7274206c65742074203d20323b0a"
+    },
+    "id": "usestrict-19",
+    "options": {
+     "module": 7,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/s.ts",
+     "/.src/t.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: es2022\n// @filename: s.ts\nlet s = 1;\n// @filename: t.ts\nexport let t = 2;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nexports.x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/j.js"
+    }
+   ],
+   "id": "usestrict-20",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/j.js": "6578706f7274732e78203d20313b0a"
+    },
+    "id": "usestrict-20",
+    "options": {
+     "allowJs": true,
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/j.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @allowJs: true\n// @module: commonjs\n// @filename: j.js\nexports.x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nlet x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-21",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c65742078203d20313b0a"
+    },
+    "id": "usestrict-21",
+    "options": {
+     "module": 200,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: preserve\nlet x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nlet x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-22",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c65742078203d20313b0a"
+    },
+    "id": "usestrict-22",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: commonjs\nlet x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "export const m = 1;\r\n"
+      }
+     ],
+     "name": "/.src/m.ts"
+    }
+   ],
+   "id": "usestrict-23",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/m.ts": "6578706f727420636f6e7374206d203d20313b0a",
+     "/.src/package.json": "7b202274797065223a20226d6f64756c6522207d"
+    },
+    "id": "usestrict-23",
+    "options": {
+     "module": 199,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/m.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: nodenext\n// @filename: package.json\n{ \"type\": \"module\" }\n// @filename: m.ts\nexport const m = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "let x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-24",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c65742078203d20313b0a"
+    },
+    "id": "usestrict-24",
+    "options": {
+     "module": 6,
+     "moduleDetection": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: es2020\n// @moduleDetection: force\nlet x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nlet x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "usestrict-25",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c65742078203d20313b0a"
+    },
+    "id": "usestrict-25",
+    "options": {
+     "module": 1,
+     "moduleDetection": 3,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: commonjs\n// @moduleDetection: force\nlet x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\n\"foo\";\r\n\"use strict\";\r\nlet x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "us-directive-after-other-prologue",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "22666f6f223b0a2275736520737472696374223b0a6c65742078203d20313b0a"
+    },
+    "id": "us-directive-after-other-prologue",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n\"foo\";\n\"use strict\";\nlet x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\n'bar';\r\nlet x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "us-other-prologue-only",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "27626172273b0a6c65742078203d20313b0a"
+    },
+    "id": "us-other-prologue-only",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n'bar';\nlet x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "#!/usr/bin/env node\r\n\"use strict\";\r\nlet x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "us-shebang",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "23212f7573722f62696e2f656e76206e6f64650a6c65742078203d20313b0a"
+    },
+    "id": "us-shebang",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "#!/usr/bin/env node\n// @target: es2015\nlet x = 1;\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nexports.a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.cjs"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "export const b = 1;\r\n"
+      }
+     ],
+     "name": "/.src/b.mjs"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nconst c = 1;\r\n"
+      }
+     ],
+     "name": "/.src/c.js"
+    }
+   ],
+   "id": "us-js-cjs-mjs",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.cjs": "6578706f7274732e61203d20313b",
+     "/.src/b.mjs": "6578706f727420636f6e73742062203d20313b",
+     "/.src/c.js": "636f6e73742063203d20313b0a"
+    },
+    "id": "us-js-cjs-mjs",
+    "options": {
+     "allowJs": true,
+     "module": 199,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/a.cjs",
+     "/.src/b.mjs",
+     "/.src/c.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "a.cjs",
+   "source": "// @target: es2015\n// @module: nodenext\n// @allowJs: true\n// @filename: a.cjs\nexports.a = 1;\n// @filename: b.mjs\nexport const b = 1;\n// @filename: c.js\nconst c = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nexport const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.mts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nexport const b = 1;\r\n"
+      }
+     ],
+     "name": "/.src/b.cts"
+    }
+   ],
+   "id": "us-mts-commonjs",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.mts": "6578706f727420636f6e73742061203d20313b",
+     "/.src/b.cts": "6578706f727420636f6e73742062203d20313b0a"
+    },
+    "id": "us-mts-commonjs",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/a.mts",
+     "/.src/b.cts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "a.mts",
+   "source": "// @target: es2015\n// @module: commonjs\n// @filename: a.mts\nexport const a = 1;\n// @filename: b.cts\nexport const b = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nexport const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/a.cts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "export const b = 1;\r\n"
+      }
+     ],
+     "name": "/.src/b.mts"
+    }
+   ],
+   "id": "us-cts-esnext",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/a.cts": "6578706f727420636f6e73742061203d20313b",
+     "/.src/b.mts": "6578706f727420636f6e73742062203d20313b0a"
+    },
+    "id": "us-cts-esnext",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/a.cts",
+     "/.src/b.mts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "a.cts",
+   "source": "// @target: es2015\n// @module: esnext\n// @filename: a.cts\nexport const a = 1;\n// @filename: b.mts\nexport const b = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nexport const c = 1;\r\n"
+      }
+     ],
+     "name": "/.src/c.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "import { c } from \"./c.js\";\r\nexport const d = c;\r\n"
+      }
+     ],
+     "name": "/.src/d.mts"
+    }
+   ],
+   "id": "us-node18",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/c.ts": "6578706f727420636f6e73742063203d20313b",
+     "/.src/d.mts": "696d706f7274207b2063207d2066726f6d20222e2f632e6a73223b0a6578706f727420636f6e73742064203d20633b0a"
+    },
+    "id": "us-node18",
+    "options": {
+     "module": 101,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/c.ts",
+     "/.src/d.mts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "c.ts",
+   "source": "// @target: es2015\n// @module: node18\n// @filename: c.ts\nexport const c = 1;\n// @filename: d.mts\nimport { c } from \"./c.js\";\nexport const d = c;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nlet x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "us-moduledetection-legacy",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c65742078203d20313b0a"
+    },
+    "id": "us-moduledetection-legacy",
+    "options": {
+     "module": 99,
+     "moduleDetection": 2,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: esnext\n// @moduleDetection: legacy\nlet x = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "{ \"a\": 1 }\r\n"
+      }
+     ],
+     "name": "/.src/data.json"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "import d from \"./data.json\";\r\nexport const x = d;\r\n"
+      }
+     ],
+     "name": "/.src/main.ts"
+    }
+   ],
+   "id": "us-json-esnext",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/data.json": "7b202261223a2031207d",
+     "/.src/main.ts": "696d706f727420642066726f6d20222e2f646174612e6a736f6e223b0a6578706f727420636f6e73742078203d20643b0a"
+    },
+    "id": "us-json-esnext",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "resolveJsonModule": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/main.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "main.ts",
+   "source": "// @target: es2015\n// @module: esnext\n// @resolveJsonModule: true\n// @filename: data.json\n{ \"a\": 1 }\n// @filename: main.ts\nimport d from \"./data.json\";\nexport const x = d;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "/* header */\r\n\"use strict\"; // trailing\r\nexport const x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "us-comment-and-directive",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "2f2a20686561646572202a2f0a2275736520737472696374223b202f2f20747261696c696e670a6578706f727420636f6e73742078203d20313b0a"
+    },
+    "id": "us-comment-and-directive",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\n// @module: commonjs\n/* header */\n\"use strict\"; // trailing\nexport const x = 1;\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

@@ -261,7 +261,7 @@ impl CheckerState {
             &builder.emit,
         );
         let mut writer = tsr_printer::SingleLineStringWriter::new();
-        printer.write(builder.ast.view(), node, None, &mut writer)?;
+        printer.write(builder.ast.view(), node, None, &mut writer, None)?;
         Ok(JsString::from_bytes(writer.text().to_vec()))
     }
 }

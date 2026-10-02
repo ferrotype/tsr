@@ -1,0 +1,708 @@
+{
+ "cases": [
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [
+        {
+         "code": 4063,
+         "end": 352,
+         "message": "Parameter 'pp' of constructor from exported class has or is using private name 's'.",
+         "pos": 336
+        },
+        {
+         "code": 4063,
+         "end": 352,
+         "message": "Parameter 'pp' of constructor from exported class has or is using private name 's'.",
+         "pos": 336
+        },
+        {
+         "code": 4031,
+         "end": 92,
+         "message": "Public property 'p' of exported class has or is using private name 's'.",
+         "pos": 91
+        },
+        {
+         "code": 4031,
+         "end": 92,
+         "message": "Public property 'p' of exported class has or is using private name 's'.",
+         "pos": 91
+        },
+        {
+         "code": 4028,
+         "end": 112,
+         "message": "Public static property 'sp' of exported class has or is using private name 's'.",
+         "pos": 110
+        },
+        {
+         "code": 4028,
+         "end": 112,
+         "message": "Public static property 'sp' of exported class has or is using private name 's'.",
+         "pos": 110
+        },
+        {
+         "code": 4055,
+         "end": 124,
+         "message": "Return type of public method from exported class has or is using private name 's'.",
+         "pos": 123
+        },
+        {
+         "code": 4055,
+         "end": 124,
+         "message": "Return type of public method from exported class has or is using private name 's'.",
+         "pos": 123
+        },
+        {
+         "code": 4052,
+         "end": 155,
+         "message": "Return type of public static method from exported class has or is using private name 's'.",
+         "pos": 153
+        },
+        {
+         "code": 4052,
+         "end": 155,
+         "message": "Return type of public static method from exported class has or is using private name 's'.",
+         "pos": 153
+        },
+        {
+         "code": 4043,
+         "end": 182,
+         "message": "Return type of public getter 'g' from exported class has or is using private name 's'.",
+         "pos": 181
+        },
+        {
+         "code": 4043,
+         "end": 182,
+         "message": "Return type of public getter 'g' from exported class has or is using private name 's'.",
+         "pos": 181
+        },
+        {
+         "code": 4040,
+         "end": 217,
+         "message": "Return type of public static getter 'sg' from exported class has or is using private name 's'.",
+         "pos": 215
+        },
+        {
+         "code": 4040,
+         "end": 217,
+         "message": "Return type of public static getter 'sg' from exported class has or is using private name 's'.",
+         "pos": 215
+        },
+        {
+         "code": 4106,
+         "end": 247,
+         "message": "Parameter 'v' of accessor has or is using private name 's'.",
+         "pos": 246
+        },
+        {
+         "code": 4106,
+         "end": 247,
+         "message": "Parameter 'v' of accessor has or is using private name 's'.",
+         "pos": 246
+        },
+        {
+         "code": 4043,
+         "end": 260,
+         "message": "Return type of public getter 'st' from exported class has or is using private name 's'.",
+         "pos": 258
+        },
+        {
+         "code": 4043,
+         "end": 260,
+         "message": "Return type of public getter 'st' from exported class has or is using private name 's'.",
+         "pos": 258
+        },
+        {
+         "code": 4073,
+         "end": 292,
+         "message": "Parameter 'a' of public method from exported class has or is using private name 's'.",
+         "pos": 284
+        },
+        {
+         "code": 4073,
+         "end": 292,
+         "message": "Parameter 'a' of public method from exported class has or is using private name 's'.",
+         "pos": 284
+        },
+        {
+         "code": 4070,
+         "end": 317,
+         "message": "Parameter 'a' of public static method from exported class has or is using private name 's'.",
+         "pos": 309
+        },
+        {
+         "code": 4070,
+         "end": 317,
+         "message": "Parameter 'a' of public static method from exported class has or is using private name 's'.",
+         "pos": 309
+        },
+        {
+         "code": 4063,
+         "end": 352,
+         "message": "Parameter 'pp' of constructor from exported class has or is using private name 's'.",
+         "pos": 336
+        },
+        {
+         "code": 4063,
+         "end": 352,
+         "message": "Parameter 'pp' of constructor from exported class has or is using private name 's'.",
+         "pos": 336
+        },
+        {
+         "code": 4063,
+         "end": 371,
+         "message": "Parameter 'qq' of constructor from exported class has or is using private name 's'.",
+         "pos": 354
+        },
+        {
+         "code": 4063,
+         "end": 371,
+         "message": "Parameter 'qq' of constructor from exported class has or is using private name 's'.",
+         "pos": 354
+        },
+        {
+         "code": 4063,
+         "end": 382,
+         "message": "Parameter 'rr' of constructor from exported class has or is using private name 's'.",
+         "pos": 373
+        },
+        {
+         "code": 4063,
+         "end": 382,
+         "message": "Parameter 'rr' of constructor from exported class has or is using private name 's'.",
+         "pos": 373
+        },
+        {
+         "code": 4078,
+         "end": 415,
+         "message": "Parameter 'a' of exported function has or is using private name 's'.",
+         "pos": 407
+        },
+        {
+         "code": 4078,
+         "end": 415,
+         "message": "Parameter 'a' of exported function has or is using private name 's'.",
+         "pos": 407
+        },
+        {
+         "code": 4060,
+         "end": 406,
+         "message": "Return type of exported function has or is using private name 's'.",
+         "pos": 405
+        },
+        {
+         "code": 4060,
+         "end": 406,
+         "message": "Return type of exported function has or is using private name 's'.",
+         "pos": 405
+        },
+        {
+         "code": 4025,
+         "end": 452,
+         "message": "Exported variable 'arrow' has or is using private name 's'.",
+         "pos": 447
+        },
+        {
+         "code": 4025,
+         "end": 452,
+         "message": "Exported variable 'arrow' has or is using private name 's'.",
+         "pos": 447
+        },
+        {
+         "code": 4025,
+         "end": 452,
+         "message": "Exported variable 'arrow' has or is using private name 's'.",
+         "pos": 447
+        },
+        {
+         "code": 4025,
+         "end": 452,
+         "message": "Exported variable 'arrow' has or is using private name 's'.",
+         "pos": 447
+        },
+        {
+         "code": 4025,
+         "end": 493,
+         "message": "Exported variable '{ x }' has or is using private name 's'.",
+         "pos": 488
+        },
+        {
+         "code": 4025,
+         "end": 493,
+         "message": "Exported variable '{ x }' has or is using private name 's'.",
+         "pos": 488
+        },
+        {
+         "code": 4025,
+         "end": 525,
+         "message": "Exported variable '[y]' has or is using private name 's'.",
+         "pos": 522
+        },
+        {
+         "code": 4025,
+         "end": 525,
+         "message": "Exported variable '[y]' has or is using private name 's'.",
+         "pos": 522
+        },
+        {
+         "code": 4082,
+         "end": 556,
+         "message": "Default export of the module has or is using private name 's'.",
+         "pos": 536
+        },
+        {
+         "code": 4082,
+         "end": 556,
+         "message": "Default export of the module has or is using private name 's'.",
+         "pos": 536
+        },
+        {
+         "code": 4025,
+         "end": 572,
+         "message": "Exported variable 'fe' has or is using private name 's'.",
+         "pos": 570
+        },
+        {
+         "code": 4025,
+         "end": 572,
+         "message": "Exported variable 'fe' has or is using private name 's'.",
+         "pos": 570
+        },
+        {
+         "code": 4025,
+         "end": 572,
+         "message": "Exported variable 'fe' has or is using private name 's'.",
+         "pos": 570
+        },
+        {
+         "code": 4025,
+         "end": 572,
+         "message": "Exported variable 'fe' has or is using private name 's'.",
+         "pos": 570
+        },
+        {
+         "code": 4025,
+         "end": 630,
+         "message": "Exported variable 'objm' has or is using private name 's'.",
+         "pos": 626
+        },
+        {
+         "code": 4025,
+         "end": 630,
+         "message": "Exported variable 'objm' has or is using private name 's'.",
+         "pos": 626
+        },
+        {
+         "code": 4025,
+         "end": 630,
+         "message": "Exported variable 'objm' has or is using private name 's'.",
+         "pos": 626
+        },
+        {
+         "code": 4025,
+         "end": 630,
+         "message": "Exported variable 'objm' has or is using private name 's'.",
+         "pos": 626
+        },
+        {
+         "code": 4025,
+         "end": 684,
+         "message": "Exported variable 'ctor' has or is using private name 's'.",
+         "pos": 680
+        },
+        {
+         "code": 4025,
+         "end": 684,
+         "message": "Exported variable 'ctor' has or is using private name 's'.",
+         "pos": 680
+        }
+       ],
+       "text": "export declare class C {\r\n    pp: {\r\n        [s]: number;\r\n    };\r\n    private qq;\r\n    p: {\r\n        [s]: number;\r\n    };\r\n    static sp: {\r\n        [s]: number;\r\n    };\r\n    m(): {\r\n        [s]: number;\r\n    };\r\n    static sm(): {\r\n        [s]: number;\r\n    };\r\n    get g(): {\r\n        [s]: number;\r\n    };\r\n    static get sg(): {\r\n        [s]: number;\r\n    };\r\n    set st(v: {\r\n        [s]: number;\r\n    });\r\n    get st(): {\r\n        [s]: number;\r\n    };\r\n    q(a?: {\r\n        [s]: number;\r\n    }): void;\r\n    static sq(a?: {\r\n        [s]: number;\r\n    }): void;\r\n    constructor(pp?: {\r\n        [s]: number;\r\n    }, qq?: {\r\n        [s]: number;\r\n    }, rr?: {\r\n        [s]: number;\r\n    });\r\n}\r\nexport declare function f(a?: {\r\n    [s]: number;\r\n}): {\r\n    [s]: number;\r\n};\r\nexport declare const arrow: (a?: {\r\n    [s]: number;\r\n}) => {\r\n    [s]: number;\r\n};\r\nexport declare const { x }: {\r\n    x: {\r\n        [s]: number;\r\n    };\r\n};\r\nexport declare const [y]: [{\r\n    [s]: number;\r\n}];\r\ndeclare const _default: {\r\n    [s]: number;\r\n};\r\nexport default _default;\r\nexport declare const fe: (b?: {\r\n    [s]: number;\r\n}) => {\r\n    [s]: number;\r\n};\r\nexport declare const objm: {\r\n    m(a?: {\r\n        [s]: number;\r\n    }): {\r\n        [s]: number;\r\n    };\r\n};\r\nexport declare const ctor: {\r\n    new (z?: {\r\n        [s]: number;\r\n    }): {};\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "acc-sel-ts",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e206d6b2829207b20636f6e737420733a20756e697175652073796d626f6c203d2053796d626f6c28293b2072657475726e207b205b735d3a2031207d3b207d0a6578706f727420636c6173732043207b0a202070203d206d6b28293b0a2020737461746963207370203d206d6b28293b0a20206d2829207b2072657475726e206d6b28293b207d0a202073746174696320736d2829207b2072657475726e206d6b28293b207d0a202067657420672829207b2072657475726e206d6b28293b207d0a2020737461746963206765742073672829207b2072657475726e206d6b28293b207d0a2020736574207374287629207b7d0a20206765742073742829207b2072657475726e206d6b28293b207d0a2020712861203d206d6b282929207b7d0a20207374617469632073712861203d206d6b282929207b7d0a2020636f6e7374727563746f72287075626c6963207070203d206d6b28292c2070726976617465207171203d206d6b28292c207272203d206d6b282929207b7d0a7d0a6578706f72742066756e6374696f6e20662861203d206d6b282929207b2072657475726e206d6b28293b207d0a6578706f727420636f6e7374206172726f77203d202861203d206d6b282929203d3e206d6b28293b0a6578706f727420636f6e7374207b2078207d203d207b20783a206d6b2829207d3b0a6578706f727420636f6e7374205b795d203d205b6d6b28295d3b0a6578706f72742064656661756c74206d6b28293b0a6578706f727420636f6e7374206665203d2066756e6374696f6e202862203d206d6b282929207b2072657475726e206d6b28293b207d3b0a6578706f727420636f6e7374206f626a6d203d207b206d2861203d206d6b282929207b2072657475726e206d6b28293b207d207d3b0a6578706f727420636f6e73742063746f72203d20636c617373207b20636f6e7374727563746f72287a203d206d6b282929207b7d207d3b0a"
+    },
+    "id": "acc-sel-ts",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "function mk() { const s: unique symbol = Symbol(); return { [s]: 1 }; }\nexport class C {\n  p = mk();\n  static sp = mk();\n  m() { return mk(); }\n  static sm() { return mk(); }\n  get g() { return mk(); }\n  static get sg() { return mk(); }\n  set st(v) {}\n  get st() { return mk(); }\n  q(a = mk()) {}\n  static sq(a = mk()) {}\n  constructor(public pp = mk(), private qq = mk(), rr = mk()) {}\n}\nexport function f(a = mk()) { return mk(); }\nexport const arrow = (a = mk()) => mk();\nexport const { x } = { x: mk() };\nexport const [y] = [mk()];\nexport default mk();\nexport const fe = function (b = mk()) { return mk(); };\nexport const objm = { m(a = mk()) { return mk(); } };\nexport const ctor = class { constructor(z = mk()) {} };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [
+        {
+         "code": 4033,
+         "end": 114,
+         "message": "Property 'prop' of exported interface has or is using private name 's'.",
+         "pos": 98
+        },
+        {
+         "code": 4033,
+         "end": 114,
+         "message": "Property 'prop' of exported interface has or is using private name 's'.",
+         "pos": 98
+        },
+        {
+         "code": 4033,
+         "end": 154,
+         "message": "Property 'q' of exported interface has or is using private name 's'.",
+         "pos": 143
+        },
+        {
+         "code": 4033,
+         "end": 154,
+         "message": "Property 'q' of exported interface has or is using private name 's'.",
+         "pos": 143
+        }
+       ],
+       "text": "export declare function host(): void;\r\nexport declare namespace host {\r\n    var prop: {\r\n        [s]: number;\r\n    };\r\n}\r\nexport declare function ar(): number;\r\nexport declare namespace ar {\r\n    var q: {\r\n        [s]: number;\r\n    };\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "acc-sel-expando",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e206d6b2829207b20636f6e737420733a20756e697175652073796d626f6c203d2053796d626f6c28293b2072657475726e207b205b735d3a2031207d3b207d0a6578706f72742066756e6374696f6e20686f73742829207b7d0a686f73742e70726f70203d206d6b28293b0a6578706f727420636f6e7374206172203d202829203d3e20313b0a61722e71203d206d6b28293b0a"
+    },
+    "id": "acc-sel-expando",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "function mk() { const s: unique symbol = Symbol(); return { [s]: 1 }; }\nexport function host() {}\nhost.prop = mk();\nexport const ar = () => 1;\nar.q = mk();\n"
+  },
+  {
+   "diagnostics": 7,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [
+        {
+         "code": 4025,
+         "end": 121,
+         "message": "Exported variable '\"dp\"' has or is using private name 's'.",
+         "pos": 117
+        },
+        {
+         "code": 4025,
+         "end": 121,
+         "message": "Exported variable '\"dp\"' has or is using private name 's'.",
+         "pos": 117
+        },
+        {
+         "code": 4033,
+         "end": 158,
+         "message": "Property 'ep' of exported interface has or is using private name 's'.",
+         "pos": 141
+        },
+        {
+         "code": 4033,
+         "end": 158,
+         "message": "Property 'ep' of exported interface has or is using private name 's'.",
+         "pos": 141
+        },
+        {
+         "code": 4033,
+         "end": 182,
+         "message": "Property 'default' of exported interface has or is using private name 's'.",
+         "pos": 160
+        },
+        {
+         "code": 4033,
+         "end": 182,
+         "message": "Property 'default' of exported interface has or is using private name 's'.",
+         "pos": 160
+        },
+        {
+         "code": 4033,
+         "end": 210,
+         "message": "Property '\"str-name\"' of exported interface has or is using private name 's'.",
+         "pos": 184
+        },
+        {
+         "code": 4033,
+         "end": 210,
+         "message": "Property '\"str-name\"' of exported interface has or is using private name 's'.",
+         "pos": 184
+        },
+        {
+         "code": 4033,
+         "end": 252,
+         "message": "Property 'tp' of exported interface has or is using private name 's'.",
+         "pos": 238
+        },
+        {
+         "code": 4033,
+         "end": 252,
+         "message": "Property 'tp' of exported interface has or is using private name 's'.",
+         "pos": 238
+        },
+        {
+         "code": 4033,
+         "end": 276,
+         "message": "Property 'tq' of exported interface has or is using private name 's'.",
+         "pos": 262
+        },
+        {
+         "code": 4033,
+         "end": 276,
+         "message": "Property 'tq' of exported interface has or is using private name 's'.",
+         "pos": 262
+        }
+       ],
+       "text": "export declare var dp: {\r\n    [s]: number;\r\n};\r\nexport declare var ep: {\r\n    [s]: number;\r\n};\r\ndeclare const _default: {\r\n    [s]: number;\r\n};\r\nexport default _default;\r\ndeclare const _exported: {\r\n    [s]: number;\r\n};\r\nexport { _exported as \"str-name\" };\r\nexport { K };\r\ndeclare class K {\r\n    tp: {\r\n        [s]: number;\r\n    };\r\n    tq: {\r\n        [s]: number;\r\n    } | undefined;\r\n    constructor();\r\n    m(): void;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "acc-sel-js",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "66756e6374696f6e206d6b2829207b202f2a2a204074797065207b756e697175652073796d626f6c7d202a2f20636f6e73742073203d2053796d626f6c28293b2072657475726e207b205b735d3a2031207d3b207d0a4f626a6563742e646566696e6550726f7065727479286578706f7274732c20226470222c207b2076616c75653a206d6b2829207d293b0a6578706f7274732e6570203d206d6b28293b0a6578706f7274732e64656661756c74203d206d6b28293b0a6578706f7274735b227374722d6e616d65225d203d206d6b28293b0a636c617373204b207b20636f6e7374727563746f722829207b20746869732e7470203d206d6b28293b207d206d2829207b20746869732e7471203d206d6b28293b207d207d0a6578706f7274732e4b203d204b3b0a"
+    },
+    "id": "acc-sel-js",
+    "options": {
+     "allowJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nfunction mk() { /** @type {unique symbol} */ const s = Symbol(); return { [s]: 1 }; }\nObject.defineProperty(exports, \"dp\", { value: mk() });\nexports.ep = mk();\nexports.default = mk();\nexports[\"str-name\"] = mk();\nclass K { constructor() { this.tp = mk(); } m() { this.tq = mk(); } }\nexports.K = K;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [
+        {
+         "code": 4033,
+         "end": 107,
+         "message": "Property 's' of exported interface has or is using private name ''.",
+         "pos": 86
+        },
+        {
+         "code": 4033,
+         "end": 107,
+         "message": "Property 's' of exported interface has or is using private name ''.",
+         "pos": 86
+        }
+       ],
+       "text": "declare const _exports: {\r\n    [s]: number;\r\n};\r\nexport = _exports;\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "acc-sel-js-module-exports",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "66756e6374696f6e206d6b2829207b202f2a2a204074797065207b756e697175652073796d626f6c7d202a2f20636f6e73742073203d2053796d626f6c28293b2072657475726e207b205b735d3a2031207d3b207d0a6d6f64756c652e6578706f727473203d206d6b28293b0a"
+    },
+    "id": "acc-sel-js-module-exports",
+    "options": {
+     "allowJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nfunction mk() { /** @type {unique symbol} */ const s = Symbol(); return { [s]: 1 }; }\nmodule.exports = mk();\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [
+        {
+         "code": 4025,
+         "end": 99,
+         "message": "Exported variable 'v' has or is using private name 's'.",
+         "pos": 98
+        },
+        {
+         "code": 4025,
+         "end": 99,
+         "message": "Exported variable 'v' has or is using private name 's'.",
+         "pos": 98
+        },
+        {
+         "code": 4055,
+         "end": 128,
+         "message": "Return type of public method from exported class has or is using private name 's'.",
+         "pos": 127
+        },
+        {
+         "code": 4055,
+         "end": 128,
+         "message": "Return type of public method from exported class has or is using private name 's'.",
+         "pos": 127
+        },
+        {
+         "code": 4031,
+         "end": 149,
+         "message": "Public property 'p' of exported class has or is using private name 's'.",
+         "pos": 148
+        },
+        {
+         "code": 4031,
+         "end": 149,
+         "message": "Public property 'p' of exported class has or is using private name 's'.",
+         "pos": 148
+        },
+        {
+         "code": 4060,
+         "end": 179,
+         "message": "Return type of exported function has or is using private name 's'.",
+         "pos": 178
+        },
+        {
+         "code": 4060,
+         "end": 179,
+         "message": "Return type of exported function has or is using private name 's'.",
+         "pos": 178
+        }
+       ],
+       "text": "declare namespace M {\r\n    var v: {\r\n        [s]: number;\r\n    };\r\n    class K {\r\n        m(): {\r\n            [s]: number;\r\n        };\r\n        p: {\r\n            [s]: number;\r\n        };\r\n    }\r\n    function f(): {\r\n        [s]: number;\r\n    };\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "acc-sel-script",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6d6f64756c65204d207b0a202066756e6374696f6e206d6b2829207b20636f6e737420733a20756e697175652073796d626f6c203d2053796d626f6c28293b2072657475726e207b205b735d3a2031207d3b207d0a20206578706f7274207661722076203d206d6b28293b0a20206578706f727420636c617373204b207b206d2829207b2072657475726e206d6b28293b207d2070203d206d6b28293b207d0a20206578706f72742066756e6374696f6e20662829207b2072657475726e206d6b28293b207d0a7d0a"
+    },
+    "id": "acc-sel-script",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "module M {\n  function mk() { const s: unique symbol = Symbol(); return { [s]: 1 }; }\n  export var v = mk();\n  export class K { m() { return mk(); } p = mk(); }\n  export function f() { return mk(); }\n}\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

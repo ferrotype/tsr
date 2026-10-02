@@ -1,0 +1,161 @@
+{
+ "cases": [
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare namespace _ns {\r\n    export class K {\r\n        m(): {\r\n            a: K;\r\n        };\r\n    }\r\n}\r\nimport _K = _ns.K;\r\nexport { _K as K };\r\nexport declare var v: {\r\n    a: K;\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "watched-cache-1",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "6578706f7274732e4b203d20636c617373204b207b206d2829207b2072657475726e207b20613a206e6577204b2829207d3b207d207d3b0a6578706f7274732e76203d206e6577206578706f7274732e4b28292e6d28293b0a"
+    },
+    "id": "watched-cache-1",
+    "options": {
+     "allowJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexports.K = class K { m() { return { a: new K() }; } };\nexports.v = new exports.K().m();\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare namespace _ns {\r\n    export class K {\r\n        m(): {\r\n            a: K;\r\n            f(): number;\r\n        };\r\n    }\r\n}\r\nimport _K = _ns.K;\r\nexport { _K as K };\r\nexport declare var w: {\r\n    a: K;\r\n    f(): number;\r\n};\r\nexport declare var x: () => {\r\n    a: K;\r\n    f(): number;\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "watched-cache-2",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "6578706f7274732e4b203d20636c617373204b207b206d2829207b2072657475726e207b20613a206e6577204b28292c20662829207b2072657475726e20313b207d207d3b207d207d3b0a636f6e737420696e7374203d206e6577206578706f7274732e4b28293b0a6578706f7274732e77203d20696e73742e6d28293b0a6578706f7274732e78203d202829203d3e20696e73742e6d28293b0a"
+    },
+    "id": "watched-cache-2",
+    "options": {
+     "allowJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexports.K = class K { m() { return { a: new K(), f() { return 1; } }; } };\nconst inst = new exports.K();\nexports.w = inst.m();\nexports.x = () => inst.m();\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare namespace _ns {\r\n    export class J {\r\n        static make(): J[];\r\n        m(): (a: any) => J;\r\n    }\r\n}\r\nimport _J = _ns.J;\r\nexport { _J as J };\r\nexport declare var y: J[];\r\nexport declare var z: (a: any) => J;\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "watched-cache-3",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "6578706f7274732e4a203d20636c617373204a207b20737461746963206d616b652829207b2072657475726e205b6e6577204a28295d3b207d206d2829207b2072657475726e20286129203d3e206e6577204a28293b207d207d3b0a6578706f7274732e79203d206578706f7274732e4a2e6d616b6528293b0a6578706f7274732e7a203d206e6577206578706f7274732e4a28292e6d28293b0a"
+    },
+    "id": "watched-cache-3",
+    "options": {
+     "allowJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: probe.js\nexports.J = class J { static make() { return [new J()]; } m() { return (a) => new J(); } };\nexports.y = exports.J.make();\nexports.z = new exports.J().m();\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

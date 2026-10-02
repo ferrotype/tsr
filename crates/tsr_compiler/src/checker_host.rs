@@ -53,17 +53,6 @@ impl ProgramCheckerHost {
             .metadata(source.parse_options().path.as_bytes())
             .ok_or_else(|| tsr_arena::Error::InvalidGraph.into())
     }
-
-    fn emitted_file_names(&self) -> Result<Vec<tsr_jsstring::JsString>, tsr_arena::Error> {
-        let mut names = Vec::new();
-        for file in self.program.files() {
-            if output_paths::may_emit_with_force_dts(file, &self.program, false)? {
-                let source = file.bound().view().source_file()?;
-                names.push(source.parse_options().file_name.clone());
-            }
-        }
-        Ok(names)
-    }
 }
 
 impl CheckerHost for ProgramCheckerHost {
@@ -400,10 +389,9 @@ impl CheckerHost for ProgramCheckerHost {
     // port: tsc/internal/compiler/program.go:Program.CommonSourceDirectory
     fn common_source_directory(&self) -> Result<&[u8], Error> {
         match self.common_source_directory.get_or_init(|| {
-            let files = self.emitted_file_names()?;
             // Program::load already ran the corresponding option verifier,
             // including checkSourceFilesBelongToPath's membership diagnostics.
-            Ok(output_paths::common_directory(&self.program, &files))
+            output_paths::common_source_directory(&self.program)
         }) {
             Ok(directory) => Ok(directory),
             Err(error) => Err((*error).into()),

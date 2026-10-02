@@ -1,0 +1,834 @@
+{
+  "cases": [
+    {
+      "id": "ct-assign",
+      "scenario": "classThisBlock",
+      "source": "class C { static { _classThis = this; } x = 1; m() {} }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "true,false,false"
+    },
+    {
+      "id": "ct-other",
+      "scenario": "classThisBlock",
+      "source": "class C { static { _other = this; } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "false"
+    },
+    {
+      "id": "ct-unset",
+      "scenario": "classThisBlock",
+      "source": "class C { static { _plain = this; } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "false"
+    },
+    {
+      "id": "ct-not-this",
+      "scenario": "classThisBlock",
+      "source": "class C { static { _classThis = that; } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "false"
+    },
+    {
+      "id": "ct-compound",
+      "scenario": "classThisBlock",
+      "source": "class C { static { _classThis += this; } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "false"
+    },
+    {
+      "id": "ct-two-statements",
+      "scenario": "classThisBlock",
+      "source": "class C { static { _classThis = this; foo(); } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "false"
+    },
+    {
+      "id": "ct-not-expression",
+      "scenario": "classThisBlock",
+      "source": "class C { static { if (x) {} } static { var _classThis = this; } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "false,false"
+    },
+    {
+      "id": "ct-member-target",
+      "scenario": "classThisBlock",
+      "source": "class C { static { _classThis.x = this; } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "false"
+    },
+    {
+      "id": "ct-empty",
+      "scenario": "classThisBlock",
+      "source": "class C { static { } }\n(class { static { _classThis2 = this; } });",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "false\ntrue"
+    },
+    {
+      "id": "hb-declared",
+      "scenario": "helperBlock",
+      "source": "class C { static { __setFunctionName(this, \"C\"); } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "members=true explicit=true declared=true"
+    },
+    {
+      "id": "hb-anonymous",
+      "scenario": "helperBlock",
+      "source": "(class { static { __setFunctionName(this, \"x\"); } m() {} });",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "members=true,false explicit=true declared=true"
+    },
+    {
+      "id": "hb-wrong-argument",
+      "scenario": "helperBlock",
+      "source": "(class { static { __setFunctionName(this, wrong); } });",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "members=false explicit=false declared=false"
+    },
+    {
+      "id": "hb-no-flag",
+      "scenario": "helperBlock",
+      "source": "(class { static { __setFunctionName(this, \"x\", noflag); } });",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "members=false explicit=false declared=false"
+    },
+    {
+      "id": "hb-one-argument",
+      "scenario": "helperBlock",
+      "source": "(class { static { __setFunctionName(this); } });",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "members=false explicit=false declared=false"
+    },
+    {
+      "id": "hb-assigned-without-block",
+      "scenario": "helperBlock",
+      "source": "(class { static { __assigned(); } m() {} });",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "members=false,false explicit=false declared=false"
+    },
+    {
+      "id": "hb-plain",
+      "scenario": "helperBlock",
+      "source": "class D { x = 1; static y = __setFunctionName(this, \"y\"); }\n(class { static { if (a) __setFunctionName(this, \"x\"); } });",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "members=false,false explicit=false declared=true\nmembers=false explicit=false declared=false"
+    },
+    {
+      "id": "anon-kinds",
+      "scenario": "anonymous",
+      "source": "(class {});\n(class C {});\n(function () {});\n(function f() {});\n() => 1;\nx;\n(class { static { __setFunctionName(this, \"y\"); } });",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "true true\nfalse false\ntrue false\nfalse false\ntrue false\nfalse false\nfalse false"
+    },
+    {
+      "id": "anon-outer",
+      "scenario": "anonymous",
+      "source": "((class {}) as any);\n(<any>(() => {}));\n((function () {})!);\n((class {}) satisfies object);\n(((class D {})));",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "true true\ntrue false\ntrue false\ntrue true\nfalse false"
+    },
+    {
+      "id": "ne-variables",
+      "scenario": "namedEvaluation",
+      "source": "var a = class {}, b = function () {}, c = () => {}, d = 1, [e = class {}] = [], { f = class {} } = {};\nvar g = class G {};",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "KindVariableDeclaration true true\nKindVariableDeclaration true false\nKindVariableDeclaration true false\nKindVariableDeclaration false false\nKindVariableDeclaration false false\nKindBindingElement true true\nKindVariableDeclaration false false\nKindBindingElement true true\nKindVariableDeclaration false false"
+    },
+    {
+      "id": "ne-objects",
+      "scenario": "namedEvaluation",
+      "source": "({ a: class {}, __proto__: class {}, \"__proto__\": function () {}, [k]: () => {}, b, c: 1 });\n({ d = class {} } = o);",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "KindPropertyAssignment true true\nKindPropertyAssignment false false\nKindPropertyAssignment false false\nKindPropertyAssignment true false\nKindShorthandPropertyAssignment false false\nKindPropertyAssignment false false\nKindBinaryExpression false false\nKindShorthandPropertyAssignment true true"
+    },
+    {
+      "id": "ne-parameters",
+      "scenario": "namedEvaluation",
+      "source": "function f(a = class {}, { d = () => {} } = {}, c = function () {}) {}\nfunction g(...r = class {}) {}",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "KindParameter true true\nKindParameter false false\nKindBindingElement true false\nKindParameter true false\nKindParameter false false"
+    },
+    {
+      "id": "ne-binary",
+      "scenario": "namedEvaluation",
+      "source": "a = class {};\na &&= function () {};\na ||= () => {};\na ??= class {};\na += class {};\na.b = class {};\n[a] = [class {}];",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "KindBinaryExpression true true\nKindBinaryExpression true false\nKindBinaryExpression true false\nKindBinaryExpression true true\nKindBinaryExpression false false\nKindBinaryExpression false false\nKindBinaryExpression false false"
+    },
+    {
+      "id": "ne-class-members",
+      "scenario": "namedEvaluation",
+      "source": "class C { a = class {}; static b = () => {}; c; #d = function () {}; [\"e\"] = class {}; }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "KindPropertyDeclaration true true\nKindPropertyDeclaration true false\nKindPropertyDeclaration false false\nKindPropertyDeclaration true false\nKindPropertyDeclaration true true"
+    },
+    {
+      "id": "ne-exports",
+      "scenario": "namedEvaluation",
+      "source": "export default (class {});",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "KindExportAssignment true true"
+    },
+    {
+      "id": "tr-variables",
+      "scenario": "transform",
+      "source": "var a = class {}, b = function () {}, c = (() => {});\nlet [e = class {}] = [], { f = function () {} } = {};",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "a = class {\n    static { __setFunctionName(this, \"a\"); }\n}\nb = __setFunctionName(function () { }, \"b\")\nc = (__setFunctionName(() => { }, \"c\"))\ne = class {\n    static { __setFunctionName(this, \"e\"); }\n}\nf = __setFunctionName(function () { }, \"f\")"
+    },
+    {
+      "id": "tr-objects",
+      "scenario": "transform",
+      "source": "({ a: class {}, \"b\": function () {}, 1: () => {}, [2]: () => {}, [\"s\"]: class {} });\n({ d = class {} } = o);",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "a: class {\n    static { __setFunctionName(this, \"a\"); }\n}\n\"b\": __setFunctionName(function () { }, \"b\")\n1: __setFunctionName(() => { }, \"1\")\n[2]: __setFunctionName(() => { }, \"2\")\n[\"s\"]: class {\n    static { __setFunctionName(this, \"s\"); }\n}\nd = class {\n    static { __setFunctionName(this, \"d\"); }\n}"
+    },
+    {
+      "id": "tr-objects-computed",
+      "scenario": "transform",
+      "source": "({ [k]: class {}, [`t`]: () => {} });",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "[_a = __propKey(k)]: class {\n    static { __setFunctionName(this, _a); }\n}\n[`t`]: __setFunctionName(() => { }, `t`)\nhoisted: var _a;"
+    },
+    {
+      "id": "tr-parameters",
+      "scenario": "transform",
+      "source": "function f(a = class {}, b = function () {}, { c = () => {} } = {}) {}",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "a = class {\n    static { __setFunctionName(this, \"a\"); }\n}\nb = __setFunctionName(function () { }, \"b\")\nc = __setFunctionName(() => { }, \"c\")"
+    },
+    {
+      "id": "tr-binary",
+      "scenario": "transform",
+      "source": "a = class {};\na &&= function () {};\na ||= (() => 1);\na ??= class { static x = 1; };",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "a = class {\n    static { __setFunctionName(this, \"a\"); }\n}\na &&= __setFunctionName(function () { }, \"a\")\na ||= (__setFunctionName(() => 1, \"a\"))\na ??= class {\n    static { __setFunctionName(this, \"a\"); }\n    static x = 1;\n}"
+    },
+    {
+      "id": "tr-class-members",
+      "scenario": "transform",
+      "source": "class C { a = class {}; static b = () => {}; #c = function () {}; [\"d\"] = class {}; }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "a = class {\n    static { __setFunctionName(this, \"a\"); }\n};\nstatic b = __setFunctionName(() => { }, \"b\");\n#c = __setFunctionName(function () { }, \"#c\");\n[\"d\"] = class {\n    static { __setFunctionName(this, \"d\"); }\n};"
+    },
+    {
+      "id": "tr-class-members-computed",
+      "scenario": "transform",
+      "source": "class C { [k] = class {}; static [m] = () => {}; }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "[_a = __propKey(k)] = class {\n    static { __setFunctionName(this, _a); }\n};\nstatic [_a = __propKey(m)] = __setFunctionName(() => { }, _a);\nhoisted: var _a, _b;"
+    },
+    {
+      "id": "tr-export-default",
+      "scenario": "transform",
+      "source": "export default (class {});",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "export default (class {\n    static { __setFunctionName(this, \"default\"); }\n});"
+    },
+    {
+      "id": "tr-export-equals",
+      "scenario": "transform",
+      "source": "export = (function () {});",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "export = (__setFunctionName(function () { }, \"\"));"
+    },
+    {
+      "id": "tr-export-equals-ignored",
+      "scenario": "transform",
+      "source": "export = (function () {});",
+      "name": "",
+      "flag": true,
+      "this": "",
+      "mode": "",
+      "expected": "export = (function () { });"
+    },
+    {
+      "id": "tr-given-name",
+      "scenario": "transform",
+      "source": "var a = class {};\n({ [k]: function () {} });",
+      "name": "custom",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "a = class {\n    static { __setFunctionName(this, \"custom\"); }\n}\n[k]: __setFunctionName(function () { }, \"custom\")"
+    },
+    {
+      "id": "tr-explicit-class",
+      "scenario": "transform",
+      "source": "var a = class { static { __setFunctionName(this, \"a\"); } }, b = class {};",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "b = class {\n    static { __setFunctionName(this, \"b\"); }\n}"
+    },
+    {
+      "id": "tr-class-this",
+      "scenario": "transform",
+      "source": "var a = class { static { _classThis = this; } static x = 1; };",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "a = class {\n    static { _classThis = this; }\n    static { __setFunctionName(this, \"a\"); }\n    static x = 1;\n}"
+    },
+    {
+      "id": "tr-outer-expressions",
+      "scenario": "transform",
+      "source": "var a = (class {}) as any, b = <any>(function () {}), c = ((() => {}))!;",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "a = (class {\n    static { __setFunctionName(this, \"a\"); }\n}) as any\nb = <any>(__setFunctionName(function () { }, \"b\"))\nc = ((__setFunctionName(() => { }, \"c\")))!"
+    },
+    {
+      "id": "tr-unhandled",
+      "scenario": "transform",
+      "source": "x;",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "unhandled",
+      "expected": "panic: Debug failure. Unhandled case in transformNamedEvaluation"
+    },
+    {
+      "id": "fin-named",
+      "scenario": "finish",
+      "source": "(class {});\n(function () {});\n(() => {});\n((class {}) as any);",
+      "name": "N",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "(class {\n    static { __setFunctionName(this, \"N\"); }\n})\n(__setFunctionName(function () { }, \"N\"))\n(__setFunctionName(() => { }, \"N\"))\n((class {\n    static { __setFunctionName(this, \"N\"); }\n}) as any)"
+    },
+    {
+      "id": "fin-ignore-empty",
+      "scenario": "finish",
+      "source": "(class {});\n(function () {});",
+      "name": "",
+      "flag": true,
+      "this": "",
+      "mode": "",
+      "expected": "(class {\n})\n(function () { })"
+    },
+    {
+      "id": "fin-empty-not-ignored",
+      "scenario": "finish",
+      "source": "(class {});\n(() => {});",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "(class {\n    static { __setFunctionName(this, \"\"); }\n})\n(__setFunctionName(() => { }, \"\"))"
+    },
+    {
+      "id": "conv-default",
+      "scenario": "convert",
+      "source": "export default class { m() {} }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "class {\n    m() { }\n}\nname: \"default\"\nclass {\n    static { __setFunctionName(this, \"default\"); }\n    m() { }\n}"
+    },
+    {
+      "id": "conv-named",
+      "scenario": "convert",
+      "source": "export class C extends B { x = 1; }\nclass D {}",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "class C extends B {\n    x = 1;\n}\nname: \"x\"\npanic: runtime error: invalid memory address or nil pointer dereference"
+    },
+    {
+      "id": "conv-decorated",
+      "scenario": "convert",
+      "source": "@dec export default class {}\nexport default abstract class {}",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "@dec\nclass {\n}\nname: \"default\"\n@dec\nclass {\n    static { __setFunctionName(this, \"default\"); }\n}\nabstract class {\n}\nname: \"default\"\nabstract class {\n    static { __setFunctionName(this, \"default\"); }\n}"
+    },
+    {
+      "id": "conv-functions",
+      "scenario": "convert",
+      "source": "export default function () {}\nexport function f() {}",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "function name: \"default\"\nfunction name: \"x\""
+    },
+    {
+      "id": "pn-literals",
+      "scenario": "propertyName",
+      "source": "({ a: 1, \"b\": 2, 3: 3, [4]: 4, [\"c\"]: 5 });\nclass C { #p = 1; q = 2; }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "\"a\" a same=true\n\"b\" \"b\" same=true\n\"3\" 3 same=true\n\"4\" [4] same=true\n\"c\" [\"c\"] same=true\n\"#p\" #p same=true\n\"q\" q same=true"
+    },
+    {
+      "id": "pn-computed",
+      "scenario": "propertyName",
+      "source": "({ [e]: 7, [f()]: 8 });\nclass C { [g] = 2; }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "_a [_a = __propKey(e)] same=false\n_a [_a = __propKey(f())] same=false\n_a [_a = __propKey(g)] same=false\nhoisted: var _a, _b, _c;"
+    },
+    {
+      "id": "pn-template",
+      "scenario": "propertyName",
+      "source": "({ [`d`]: 6 });",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "`d` [`d`] same=true"
+    },
+    {
+      "id": "pn-given",
+      "scenario": "propertyName",
+      "source": "({ a: 1, [e]: 7 });\nclass C { #p = 1; [g] = 2; }",
+      "name": "given",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "\"given\" a same=true\n\"given\" [e] same=true\n\"given\" #p same=true\n\"given\" [g] same=true"
+    },
+    {
+      "id": "pn-bigint",
+      "scenario": "propertyName",
+      "source": "({ 1n: 1 });",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "panic: Unhandled case in Node.Expression: KindBigIntLiteral"
+    },
+    {
+      "id": "nn-and",
+      "scenario": "notNull",
+      "source": "a;\nb;",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "a !== null && b !== void 0"
+    },
+    {
+      "id": "nn-or",
+      "scenario": "notNull",
+      "source": "a.b;\nc[d];",
+      "name": "",
+      "flag": true,
+      "this": "",
+      "mode": "",
+      "expected": "a.b === null || c[d] === void 0"
+    },
+    {
+      "id": "cb-this",
+      "scenario": "createBlock",
+      "source": "",
+      "name": "C",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "static { __setFunctionName(this, \"C\"); }\nhelper=true"
+    },
+    {
+      "id": "cb-given-this",
+      "scenario": "createBlock",
+      "source": "",
+      "name": "",
+      "flag": false,
+      "this": "_classThis",
+      "mode": "",
+      "expected": "static { __setFunctionName(_classThis, \"\"); }\nhelper=true"
+    },
+    {
+      "id": "inj-expression",
+      "scenario": "inject",
+      "source": "(class { m() {} });",
+      "name": "N",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "class {\n    static { __setFunctionName(this, \"N\"); }\n    m() { }\n}\nsame=false classThis=false assigned=true"
+    },
+    {
+      "id": "inj-class-this",
+      "scenario": "inject",
+      "source": "(class { static { _classThis = this; } x = 1; });",
+      "name": "D",
+      "flag": false,
+      "this": "_classThis",
+      "mode": "",
+      "expected": "class {\n    static { _classThis = this; }\n    static { __setFunctionName(_classThis, \"D\"); }\n    x = 1;\n}\nsame=false classThis=true assigned=true"
+    },
+    {
+      "id": "inj-explicit",
+      "scenario": "inject",
+      "source": "(class { static { __setFunctionName(this, \"y\"); } });",
+      "name": "N",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "class {\n    static { __setFunctionName(this, \"y\"); }\n}\nsame=true classThis=false assigned=false"
+    },
+    {
+      "id": "inj-empty",
+      "scenario": "inject",
+      "source": "(class {});",
+      "name": "E",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "class {\n    static { __setFunctionName(this, \"E\"); }\n}\nsame=false classThis=false assigned=true"
+    },
+    {
+      "id": "inj-nested",
+      "scenario": "inject",
+      "source": "(class { static I = class {}; });",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "class {\n    static { __setFunctionName(this, \"\"); }\n    static I = class {\n    };\n}\nsame=false classThis=false assigned=true\nclass {\n    static { __setFunctionName(this, \"\"); }\n}\nsame=false classThis=false assigned=true"
+    },
+    {
+      "id": "inj-named",
+      "scenario": "inject",
+      "source": "class E {}",
+      "name": "E",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "panic: runtime error: invalid memory address or nil pointer dereference"
+    },
+    {
+      "id": "inj-default-declaration",
+      "scenario": "inject",
+      "source": "export default class { static { _classThis = this; } m() {} }",
+      "name": "default",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "export default class {\n    static { _classThis = this; }\n    static { __setFunctionName(this, \"default\"); }\n    m() { }\n}\nsame=false classThis=true assigned=true"
+    },
+    {
+      "id": "sup-props",
+      "scenario": "super",
+      "source": "class C extends B { async m() { super.x; super.y(); super.x = 1; super[\"z\"]; super[k](1, 2); this.a; f(); const g = () => super.w; function h() { super.q; } } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "captured=x,y,w,q\nelement=true assignment=true\nsame=false\n_super.x;\n_super.y.call(this);\n_super.x = 1;\n_superIndex(\"z\").value;\n_superIndex(k).value.call(this, 1, 2);\nthis.a;\nf();\nconst g = () => _super.w;\nfunction h() { super.q; }\nconst _super = Object.create(null, {\n    x: { get: () => super.x, set: v => super.x = v },\n    y: { get: () => super.y, set: v => super.y = v },\n    w: { get: () => super.w, set: v => super.w = v },\n    q: { get: () => super.q, set: v => super.q = v }\n});"
+    },
+    {
+      "id": "sup-read-only",
+      "scenario": "super",
+      "source": "class C extends B { m() { return super.a + super.b(); } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "captured=a,b\nelement=false assignment=false\nsame=false\nreturn _super.a + _super.b.call(this);\nconst _super = Object.create(null, {\n    a: { get: () => super.a },\n    b: { get: () => super.b }\n});"
+    },
+    {
+      "id": "sup-update-targets",
+      "scenario": "super",
+      "source": "class C extends B { m() { super.a++; --super[b]; !super.z; ({ x: super.c } = o); [super.d] = a; ({ ...super.e } = o); ({ f: (super.g) } = o); [...super.h] = a; ({ y } = o); } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "captured=a,z,c,d,e,g,h\nelement=true assignment=true\nsame=false\n_super.a++;\n--_superIndex(b).value;\n!_super.z;\n({ x: _super.c } = o);\n[_super.d] = a;\n({ ..._super.e } = o);\n({ f: (_super.g) } = o);\n[..._super.h] = a;\n({ y } = o);\nconst _super = Object.create(null, {\n    a: { get: () => super.a, set: v => super.a = v },\n    z: { get: () => super.z, set: v => super.z = v },\n    c: { get: () => super.c, set: v => super.c = v },\n    d: { get: () => super.d, set: v => super.d = v },\n    e: { get: () => super.e, set: v => super.e = v },\n    g: { get: () => super.g, set: v => super.g = v },\n    h: { get: () => super.h, set: v => super.h = v }\n});"
+    },
+    {
+      "id": "sup-prefix-update-only",
+      "scenario": "super",
+      "source": "class C extends B { m() { ++super.a; return -super.b; } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "captured=a,b\nelement=false assignment=true\nsame=false\n++_super.a;\nreturn -_super.b;\nconst _super = Object.create(null, {\n    a: { get: () => super.a, set: v => super.a = v },\n    b: { get: () => super.b, set: v => super.b = v }\n});"
+    },
+    {
+      "id": "sup-postfix-update-only",
+      "scenario": "super",
+      "source": "class C extends B { m() { super[k]--; } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "captured=\nelement=true assignment=true\nsame=false\n_superIndex(k).value--;\nconst _super = Object.create(null, {});"
+    },
+    {
+      "id": "sup-element-assignment",
+      "scenario": "super",
+      "source": "class C extends B { m() { super[x] = 1; return super[y]; } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "captured=\nelement=true assignment=true\nsame=false\n_superIndex(x).value = 1;\nreturn _superIndex(y).value;\nconst _super = Object.create(null, {});"
+    },
+    {
+      "id": "sup-no-assignment-target",
+      "scenario": "super",
+      "source": "class C extends B { m() { a = super.b; x++; ({ y } = o); [z] = a; } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "captured=b\nelement=false assignment=false\nsame=false\na = _super.b;\nx++;\n({ y } = o);\n[z] = a;\nconst _super = Object.create(null, {\n    b: { get: () => super.b }\n});"
+    },
+    {
+      "id": "sup-nil",
+      "scenario": "super",
+      "source": "class C extends B { m() { return super.a + super.b(); } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "nil",
+      "expected": "element=false assignment=false\nsame=false\nreturn _super.a + _super.b.call(this);"
+    },
+    {
+      "id": "sup-nil-statement",
+      "scenario": "super",
+      "source": "class C extends B { m() { return super.a; } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "nilStatement",
+      "expected": "element=false assignment=false\npanic: runtime error: invalid memory address or nil pointer dereference"
+    },
+    {
+      "id": "sup-nested-scopes",
+      "scenario": "super",
+      "source": "class C extends B { m() { class D { n() { super.x; } } const o = { p() { super.y; } }; return (class { q = super.z; }); } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "captured=x,y,z\nelement=false assignment=false\nsame=true\nclass D {\n    n() { super.x; }\n}\nconst o = { p() { super.y; } };\nreturn (class {\n    q = super.z;\n});\nconst _super = Object.create(null, {\n    x: { get: () => super.x },\n    y: { get: () => super.y },\n    z: { get: () => super.z }\n});"
+    },
+    {
+      "id": "bf-kinds",
+      "scenario": "backingField",
+      "source": "class C { accessor a = 1; static accessor b; accessor #c = 2; accessor [\"d\"] = 3; private accessor e: number = 4; }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "#a_accessor_storage = 1;\nstatic #b_accessor_storage;\n#c_accessor_storage = 2;\n#_a_accessor_storage = 3;\nprivate #e_accessor_storage = 4;"
+    },
+    {
+      "id": "bf-parts",
+      "scenario": "backingFieldParts",
+      "source": "class C { accessor a = 1; static accessor b; accessor #c = 2; private accessor e: number = 4; @dec accessor f = () => {}; }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "text=#a_accessor_storage generated=true modifiers=[] initializer=1 same=false\ntext=#b_accessor_storage generated=true modifiers=[static] initializer=none same=false\ntext=#c_accessor_storage generated=true modifiers=[] initializer=2 same=false\ntext=#e_accessor_storage generated=true modifiers=[private] initializer=4 same=false\ntext=#f_accessor_storage generated=true modifiers=[@dec] initializer=() => { } same=false"
+    },
+    {
+      "id": "sup-element-no-assignment",
+      "scenario": "super",
+      "source": "class C extends B { async m() { super[k]; super[j](1); return super[k] + super.x; } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "captured=x\nelement=true assignment=false\nsame=false\n_superIndex(k);\n_superIndex(j).call(this, 1);\nreturn _superIndex(k) + _super.x;\nconst _super = Object.create(null, {\n    x: { get: () => super.x }\n});"
+    },
+    {
+      "id": "sup-element-only-no-assignment",
+      "scenario": "super",
+      "source": "class C extends B { m() { super[k]; return super[j](1, 2); } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "captured=\nelement=true assignment=false\nsame=false\n_superIndex(k);\nreturn _superIndex(j).call(this, 1, 2);\nconst _super = Object.create(null, {});"
+    },
+    {
+      "id": "sup-element-nested-key",
+      "scenario": "super",
+      "source": "class C extends B { m() { return super[super.k] + super[super[0]](super.x); } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "captured=k,x\nelement=true assignment=false\nsame=false\nreturn _superIndex(super.k) + _superIndex(super[0]).call(this, _super.x);\nconst _super = Object.create(null, {\n    k: { get: () => super.k },\n    x: { get: () => super.x }\n});"
+    },
+    {
+      "id": "sup-function-and-accessor-stops",
+      "scenario": "super",
+      "source": "class C extends B { m() { const f = function () { return super.a; }; const o = { get g() { return super.b; }, set g(v) { super.c = v; } }; const h = () => super.d; return [f, o, h, super.e]; } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "captured=a,b,c,d,e\nelement=false assignment=true\nsame=false\nconst f = function () { return super.a; };\nconst o = { get g() { return super.b; }, set g(v) { super.c = v; } };\nconst h = () => _super.d;\nreturn [f, o, h, _super.e];\nconst _super = Object.create(null, {\n    a: { get: () => super.a, set: v => super.a = v },\n    b: { get: () => super.b, set: v => super.b = v },\n    c: { get: () => super.c, set: v => super.c = v },\n    d: { get: () => super.d, set: v => super.d = v },\n    e: { get: () => super.e, set: v => super.e = v }\n});"
+    },
+    {
+      "id": "sup-function-and-accessor-stops-element",
+      "scenario": "super",
+      "source": "class C extends B { m() { const f = function () { return super[a]; }; const o = { get g() { return super[b]; }, set g(v) { super[c] = v; } }; return [f, o, super[d]]; } }",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "captured=\nelement=true assignment=true\nsame=false\nconst f = function () { return super[a]; };\nconst o = { get g() { return super[b]; }, set g(v) { super[c] = v; } };\nreturn [f, o, _superIndex(d).value];\nconst _super = Object.create(null, {});"
+    },
+    {
+      "id": "fin-satisfies-and-instantiation",
+      "scenario": "finish",
+      "source": "((class {}) satisfies object);\n((function () {}) satisfies Function);\n(class {})<string>;\n((() => {})<number>);\n(((class {}) as any)<T>);",
+      "name": "x",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "((class {\n    static { __setFunctionName(this, \"x\"); }\n}) satisfies object)\n((__setFunctionName(function () { }, \"x\")) satisfies Function)\n(class {\n    static { __setFunctionName(this, \"x\"); }\n})<string>\n((__setFunctionName(() => { }, \"x\"))<number>)\n(((class {\n    static { __setFunctionName(this, \"x\"); }\n}) as any)<T>)"
+    },
+    {
+      "id": "fin-partially-emitted",
+      "scenario": "finish",
+      "source": "(class {});\n(function () {});\n(() => {});\n((class {}) as any);\n((function () {}) satisfies object);\n(class {})<T>;",
+      "name": "p",
+      "flag": false,
+      "this": "",
+      "mode": "partiallyEmitted",
+      "expected": "(class {\n    static { __setFunctionName(this, \"p\"); }\n})\n(__setFunctionName(function () { }, \"p\"))\n(__setFunctionName(() => { }, \"p\"))\n((class {\n    static { __setFunctionName(this, \"p\"); }\n}) as any)\n((__setFunctionName(function () { }, \"p\")) satisfies object)\n(class {\n    static { __setFunctionName(this, \"p\"); }\n})<T>"
+    },
+    {
+      "id": "fin-partially-emitted-ignore-empty",
+      "scenario": "finish",
+      "source": "(class {});\n(() => {});",
+      "name": "",
+      "flag": true,
+      "this": "",
+      "mode": "partiallyEmitted",
+      "expected": "(class {\n})\n(() => { })"
+    },
+    {
+      "id": "tr-satisfies-and-instantiation",
+      "scenario": "transform",
+      "source": "var a = (class {}) satisfies object, b = (function () {})<string>, c = ((() => {}) satisfies Function)!;\nd = (class { static x = 1; })<T>;\n({ e: (function () {}) satisfies object, [k]: (class {})<U> });",
+      "name": "",
+      "flag": false,
+      "this": "",
+      "mode": "",
+      "expected": "a = (class {\n    static { __setFunctionName(this, \"a\"); }\n}) satisfies object\nb = (__setFunctionName(function () { }, \"b\"))<string>\nc = ((__setFunctionName(() => { }, \"c\")) satisfies Function)!\nd = (class {\n    static { __setFunctionName(this, \"d\"); }\n    static x = 1;\n})<T>\ne: (__setFunctionName(function () { }, \"e\")) satisfies object\n[_a = __propKey(k)]: (class {\n    static { __setFunctionName(this, _a); }\n})<U>\nhoisted: var _a;"
+    }
+  ]
+}

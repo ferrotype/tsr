@@ -9,11 +9,11 @@
 //!
 //! What is ported: the two text writers, the semicolon-deferring writer, emit
 //! flags and list formats, literal text, type-node precedence, and the printer's
-//! emission of every type node, type member, parameter, type parameter, entity
-//! name and the expressions literal types can hold. Comments, source maps,
-//! source-newline preservation, auto-generated names and the statement and
-//! expression emitters beyond that set are named boundaries: the printer
-//! returns [`Error::Unsupported`] instead of guessing.
+//! emission of whole source files with their comments, shebang, prologue,
+//! triple-slash directives and preserved source lines, with the emit helpers
+//! recorded on the emit context, the names the name generator makes for
+//! generated identifiers, and source maps through a `tsr_sourcemap`
+//! generator.
 //!
 //! Output is bytes. Upstream strings may hold arbitrary bytes and the text
 //! contract (`docs/design/text.md`) forbids lossy conversion, so writers accept
@@ -22,29 +22,44 @@
 mod change_tracker_writer;
 mod emit_context;
 pub mod emit_flags;
+pub mod emit_helpers;
 pub mod emit_resolver;
 mod emit_text_writer;
+mod factory_names;
+mod generatedidentifierflags;
 pub mod list_format;
 mod literal_text;
+mod namegenerator;
 mod printer;
+pub mod script_resolver;
 mod semicolon_writer;
 mod single_line_string_writer;
 mod text_writer;
 mod type_precedence;
+mod utilities;
 
 pub use change_tracker_writer::{
     create_synthetic_source_file, print_and_position_node, ChangeTrackerWriter,
 };
 pub use emit_context::{
-    generated_identifier_flags, AutoGenerateId, AutoGenerateInfo, AutoGenerateOptions, EmitContext,
+    generated_identifier_flags, get_emit_context, AssignedNameOptions, AutoGenerateId,
+    AutoGenerateInfo, AutoGenerateOptions, EmitContext, EmitVisitorHooks, HasGlobalName,
+    NameOptions, PooledEmitContext, PrivateIdentifierKind, SnippetElement, SnippetKind,
     SynthesizedComment,
 };
 pub use emit_flags::EmitFlags;
+pub use emit_helpers::{compare_emit_helpers, EmitHelper, Priority};
 pub use emit_text_writer::EmitTextWriter;
+pub use generatedidentifierflags::GeneratedIdentifierFlagsExt;
 pub use list_format::ListFormat;
 pub use literal_text::LiteralTextFlags;
-pub(crate) use printer::Session;
-pub use printer::{Printer, PrinterOptions, WriteKind};
+pub use namegenerator::{
+    format_generated_name, GetTextOfNodeFn, IsFileLevelUniqueNameFn, NameGenerator,
+    NameGeneratorHost,
+};
+pub use printer::{
+    MapSourcePosition, Printer, PrinterBindings, PrinterOptions, SourceMapSource, WriteKind,
+};
 pub use semicolon_writer::TrailingSemicolonDeferringWriter;
 pub use single_line_string_writer::SingleLineStringWriter;
 pub use text_writer::{get_default_indent_size, TextWriter};
@@ -119,6 +134,16 @@ fn node_data_name(kind: tsr_ast::NodeKind) -> String {
 }
 
 #[cfg(test)]
+mod printer_emit_tests;
+#[cfg(test)]
+mod printer_parenthesize_tests;
+#[cfg(test)]
+mod printer_source_map_tests;
+#[cfg(test)]
 mod printer_tests;
 #[cfg(test)]
+mod printer_witness_tests;
+#[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod utilities_tests;

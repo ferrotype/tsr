@@ -19,7 +19,7 @@ pub fn get_default_indent_size() -> isize {
 }
 
 // port: tsc/internal/printer/textwriter.go:getIndentString
-fn indent_string(indent: isize, indent_size: isize) -> Vec<u8> {
+pub(crate) fn indent_string(indent: isize, indent_size: isize) -> Vec<u8> {
     if indent == 0 {
         return Vec::new();
     }

@@ -1,0 +1,1153 @@
+{
+ "cases": [
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "panic": "Debug failure. False expression."
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "optionalchain"
+       ],
+       "text": "var _a;\r\na === null || a === void 0 ? void 0 : a.b.c;\r\na === null || a === void 0 ? void 0 : a.b();\r\n(a === null || a === void 0 ? void 0 : a.b)();\r\n(a === null || a === void 0 ? void 0 : a.b).c;\r\na === null || a === void 0 ? void 0 : a.b;\r\n(_a = a === null || a === void 0 ? void 0 : a.b) === null || _a === void 0 ? void 0 : _a.c();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "roc-nonnull-mixes",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652076617220613a20616e792c20623a20616e792c20633a20616e792c206f3a20616e793b206465636c6172652066756e6374696f6e2066282e2e2e783a20616e795b5d293a20616e793b0a613f2e62212e633b0a613f2e622128293b0a28613f2e62292128293b0a28613f2e6221292e633b0a61213f2e623b0a613f2e62213f2e6328293b0a"
+    },
+    "id": "roc-nonnull-mixes",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na?.b!.c;\na?.b!();\n(a?.b)!();\n(a?.b!).c;\na!?.b;\na?.b!?.c();\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "class B {\r\n    m() { }\r\n}\r\nclass C extends B {\r\n    n() { var _a, _b, _c, _d; (_a = super.m) === null || _a === void 0 ? void 0 : _a.call(this); (_b = super['m']) === null || _b === void 0 ? void 0 : _b.call(this, 1); this === null || this === void 0 ? void 0 : this.n(); (_c = (super.m)) === null || _c === void 0 ? void 0 : _c.call(this); return ((_d = this.x) === null || _d === void 0 ? void 0 : _d.y).call(_d); }\r\n    x: any;\r\n}\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "optionalchain"
+       ],
+       "text": "class B {\r\n    m() { }\r\n}\r\nclass C extends B {\r\n    n() { var _a, _b, _c, _d; (_a = super.m) === null || _a === void 0 ? void 0 : _a.call(this); (_b = super['m']) === null || _b === void 0 ? void 0 : _b.call(this, 1); this === null || this === void 0 ? void 0 : this.n(); (_c = (super.m)) === null || _c === void 0 ? void 0 : _c.call(this); return ((_d = this.x) === null || _d === void 0 ? void 0 : _d.y).call(_d); }\r\n    x;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "roc-super-and-this",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b206d2829207b7d207d0a636c617373204320657874656e64732042207b206e2829207b2073757065722e6d3f2e28293b2073757065725b276d275d3f2e2831293b20746869733f2e6e28293b202873757065722e6d293f2e28293b2072657475726e2028746869732e783f2e792928293b207d20783a20616e793b207d0a"
+    },
+    "id": "roc-super-and-this",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\nclass B { m() {} }\nclass C extends B { n() { super.m?.(); super['m']?.(1); this?.n(); (super.m)?.(); return (this.x?.y)(); } x: any; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a, _b, _c, _d, _e, _f, _g, _h, _j;\r\ndeclare var a: any, b: any, c: any, o: any;\r\ndeclare function f(...x: any[]): any;\r\na === null || a === void 0 ? void 0 : a.b.c.d();\r\n(_c = (_a = a === null || a === void 0 ? void 0 : a.b()) === null || _a === void 0 ? void 0 : (_b = _a.c()).d) === null || _c === void 0 ? void 0 : _c.call(_b);\r\n(_g = (_e = (_d = a.b) === null || _d === void 0 ? void 0 : _d.c.d) === null || _e === void 0 ? void 0 : (_f = _e.e())[f()]) === null || _g === void 0 ? void 0 : _g.call(_f, 1, ...b);\r\n(a === null || a === void 0 ? void 0 : (_h = a.b).c).call(_h, 1);\r\n((a === null || a === void 0 ? void 0 : a.b)).call(a);\r\n(_j = (a === null || a === void 0 ? void 0 : a[b])) === null || _j === void 0 ? void 0 : _j.call(a);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "roc-deep-call-chains",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652076617220613a20616e792c20623a20616e792c20633a20616e792c206f3a20616e793b206465636c6172652066756e6374696f6e2066282e2e2e783a20616e795b5d293a20616e793b0a613f2e622e632e6428293b0a613f2e6228293f2e6328292e643f2e28293b0a612e623f2e632e643f2e6528295b6628295d3f2e28312c202e2e2e62293b0a28613f2e622e63292831293b0a2828613f2e62292928293b0a28613f2e5b625d293f2e28293b0a"
+    },
+    "id": "roc-deep-call-chains",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na?.b.c.d();\na?.b()?.c().d?.();\na.b?.c.d?.e()[f()]?.(1, ...b);\n(a?.b.c)(1);\n((a?.b))();\n(a?.[b])?.();\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare var a: any, b: any, c: any, o: any;\r\ndeclare function f(...x: any[]): any;\r\na === null || a === void 0 ? true : delete a.b;\r\na === null || a === void 0 ? true : delete a.b.c;\r\n(_a = a === null || a === void 0 ? void 0 : a[b]) === null || _a === void 0 ? true : delete _a.c;\r\n(a === null || a === void 0 ? true : delete a.b);\r\ndelete ((a === null || a === void 0 ? void 0 : a.b).c);\r\na === null || a === void 0 ? void 0 : a.b();\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "roc-delete-forms",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652076617220613a20616e792c20623a20616e792c20633a20616e792c206f3a20616e793b206465636c6172652066756e6374696f6e2066282e2e2e783a20616e795b5d293a20616e793b0a64656c65746520613f2e623b0a64656c65746520613f2e622e633b0a64656c65746520613f2e5b625d3f2e633b0a64656c6574652028613f2e62293b0a64656c657465202828613f2e62292e63293b0a64656c65746520613f2e6228293b0a"
+    },
+    "id": "roc-delete-forms",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\ndelete a?.b;\ndelete a?.b.c;\ndelete a?.[b]?.c;\ndelete (a?.b);\ndelete ((a?.b).c);\ndelete a?.b();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare var a: any, b: any, c: any, o: any;\r\ndeclare function f(...x: any[]): any;\r\nfor (const x of a === null || a === void 0 ? void 0 : a.b) { }\r\n`${a === null || a === void 0 ? void 0 : a.b}`;\r\nnew (a === null || a === void 0 ? void 0 : a.b)();\r\nf(a === null || a === void 0 ? void 0 : a.b, ...a === null || a === void 0 ? void 0 : a.c);\r\n({ [a === null || a === void 0 ? void 0 : a.b]: 1 });\r\nlet { x = a === null || a === void 0 ? void 0 : a.b } = o;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "roc-in-various-positions",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652076617220613a20616e792c20623a20616e792c20633a20616e792c206f3a20616e793b206465636c6172652066756e6374696f6e2066282e2e2e783a20616e795b5d293a20616e793b0a666f722028636f6e73742078206f6620613f2e6229207b7d0a60247b613f2e627d603b0a6e65772028613f2e622928293b0a6628613f2e622c202e2e2e613f2e63293b0a287b205b613f2e625d3a2031207d293b0a6c6574207b2078203d20613f2e62207d203d206f3b0a"
+    },
+    "id": "roc-in-various-positions",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\nfor (const x of a?.b) {}\n`${a?.b}`;\nnew (a?.b)();\nf(a?.b, ...a?.c);\n({ [a?.b]: 1 });\nlet { x = a?.b } = o;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "declare var a: any, b: any, c: any, o: any;\r\ndeclare function f(...x: any[]): any;\r\na /*1*/ === null || a /*1*/ === void 0 ? void 0 : a /*1*/.b /*3*/( /*4*/);\r\n( /*p*/a === null || a === void 0 ? void 0 : a.b /*q*/).call(/*p*/ a);\r\na === null || a === void 0 ? void 0 : a.b /*c*/.c;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "roc-comments-and-parens",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652076617220613a20616e792c20623a20616e792c20633a20616e792c206f3a20616e793b206465636c6172652066756e6374696f6e2066282e2e2e783a20616e795b5d293a20616e793b0a61202f2a312a2f203f2e202f2a322a2f2062202f2a332a2f2028202f2a342a2f20293b0a282f2a702a2f20613f2e62202f2a712a2f2928293b0a613f2e622f2a632a2f2e633b0a"
+    },
+    "id": "roc-comments-and-parens",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na /*1*/ ?. /*2*/ b /*3*/ ( /*4*/ );\n(/*p*/ a?.b /*q*/)();\na?.b/*c*/.c;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a, _b, _c, _d, _e;\r\ndeclare var a: any, b: any, c: any, o: any;\r\ndeclare function f(...x: any[]): any;\r\n((_a = a.b) === null || _a === void 0 ? void 0 : _a.c).call(_a);\r\n((_b = f().b) === null || _b === void 0 ? void 0 : _b.c).call(_b);\r\n((_c = a[f()]) === null || _c === void 0 ? void 0 : _c.c).call(_c);\r\n(a === null || a === void 0 ? void 0 : (_d = a.b).c).call(_d);\r\n(a === null || a === void 0 ? void 0 : (_e = a.b)[c]).call(_e);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "roc-call-capture-generated-name",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652076617220613a20616e792c20623a20616e792c20633a20616e792c206f3a20616e793b206465636c6172652066756e6374696f6e2066282e2e2e783a20616e795b5d293a20616e793b0a28612e623f2e632928293b0a286628292e623f2e632928293b0a28615b6628295d3f2e632928293b0a28613f2e622e632928293b0a28613f2e625b635d2928293b0a"
+    },
+    "id": "roc-call-capture-generated-name",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\n(a.b?.c)();\n(f().b?.c)();\n(a[f()]?.c)();\n(a?.b.c)();\n(a?.b[c])();\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "var _a, _b;\r\ndeclare var a: any, b: any, c: any, o: any;\r\ndeclare function f(...x: any[]): any;\r\n(_a = a === null || a === void 0 ? void 0 : a(b === null || b === void 0 ? void 0 : b.c, b === null || b === void 0 ? void 0 : b(c === null || c === void 0 ? void 0 : c.d))) === null || _a === void 0 ? void 0 : _a.e;\r\n(_b = a === null || a === void 0 ? void 0 : a[b === null || b === void 0 ? void 0 : b.c]) === null || _b === void 0 ? void 0 : _b[c === null || c === void 0 ? void 0 : c.d];\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "roc-nested-optional-args",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652076617220613a20616e792c20623a20616e792c20633a20616e792c206f3a20616e793b206465636c6172652066756e6374696f6e2066282e2e2e783a20616e795b5d293a20616e793b0a613f2e28623f2e632c20623f2e28633f2e6429293f2e653b0a613f2e5b623f2e635d3f2e5b633f2e645d3b0a"
+    },
+    "id": "roc-nested-optional-args",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na?.(b?.c, b?.(c?.d))?.e;\na?.[b?.c]?.[c?.d];\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalchain"
+       ],
+       "text": "class K {\r\n    #p: any;\r\n    m(o: K) { var _a; return (_a = o === null || o === void 0 ? void 0 : o.#p) === null || _a === void 0 ? void 0 : _a.x; }\r\n    n() { return this === null || this === void 0 ? void 0 : this.#p(); }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "roc-private-names",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c617373204b207b2023703a20616e793b206d286f3a204b29207b2072657475726e206f3f2e23703f2e783b207d206e2829207b2072657475726e20746869733f2e237028293b207d207d0a"
+    },
+    "id": "roc-private-names",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\nclass K { #p: any; m(o: K) { return o?.#p?.x; } n() { return this?.#p(); } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "nullishcoalescing"
+       ],
+       "text": "var _a, _b, _c, _d, _e, _f, _g;\r\ndeclare var a: any, b: any, c: any, o: any;\r\ndeclare function f(...x: any[]): any;\r\n(_a = a !== null && a !== void 0 ? a : b) !== null && _a !== void 0 ? _a : c;\r\n(_b = (a !== null && a !== void 0 ? a : b)) !== null && _b !== void 0 ? _b : c;\r\na !== null && a !== void 0 ? a : (b !== null && b !== void 0 ? b : c);\r\n(_d = (_c = f()) !== null && _c !== void 0 ? _c : f()) !== null && _d !== void 0 ? _d : f();\r\n(_e = a.b) !== null && _e !== void 0 ? _e : c;\r\n(_f = a[b]) !== null && _f !== void 0 ? _f : c;\r\nthis !== null && this !== void 0 ? this : a;\r\n(_g = (a)) !== null && _g !== void 0 ? _g : b;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rnc-chains",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652076617220613a20616e792c20623a20616e792c20633a20616e792c206f3a20616e793b206465636c6172652066756e6374696f6e2066282e2e2e783a20616e795b5d293a20616e793b0a61203f3f2062203f3f20633b0a2861203f3f206229203f3f20633b0a61203f3f202862203f3f2063293b0a662829203f3f20662829203f3f206628293b0a612e62203f3f20633b0a615b625d203f3f20633b0a74686973203f3f20613b0a286129203f3f20623b0a"
+    },
+    "id": "rnc-chains",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na ?? b ?? c;\n(a ?? b) ?? c;\na ?? (b ?? c);\nf() ?? f() ?? f();\na.b ?? c;\na[b] ?? c;\nthis ?? a;\n(a) ?? b;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "nullishcoalescing",
+        "optionalchain"
+       ],
+       "text": "var _a;\r\ndeclare var a: any, b: any, c: any, o: any;\r\ndeclare function f(...x: any[]): any;\r\n(_a = a === null || a === void 0 ? void 0 : a.b) !== null && _a !== void 0 ? _a : c;\r\na ??= b !== null && b !== void 0 ? b : c;\r\nlet x = (a !== null && a !== void 0 ? a : b) || c;\r\n"
+      },
+      {
+       "chain": [
+        "optionalchain",
+        "nullishcoalescing"
+       ],
+       "text": "var _a;\r\ndeclare var a: any, b: any, c: any, o: any;\r\ndeclare function f(...x: any[]): any;\r\n(_a = a === null || a === void 0 ? void 0 : a.b) !== null && _a !== void 0 ? _a : c;\r\na ??= b !== null && b !== void 0 ? b : c;\r\nlet x = (a !== null && a !== void 0 ? a : b) || c;\r\n"
+      },
+      {
+       "chain": [
+        "logicalassignment",
+        "nullishcoalescing"
+       ],
+       "text": "var _a;\r\ndeclare var a: any, b: any, c: any, o: any;\r\ndeclare function f(...x: any[]): any;\r\n(_a = a?.b) !== null && _a !== void 0 ? _a : c;\r\na !== null && a !== void 0 ? a : (a = b !== null && b !== void 0 ? b : c);\r\nlet x = (a !== null && a !== void 0 ? a : b) || c;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rnc-with-other",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652076617220613a20616e792c20623a20616e792c20633a20616e792c206f3a20616e793b206465636c6172652066756e6374696f6e2066282e2e2e783a20616e795b5d293a20616e793b0a613f2e62203f3f20633b0a61203f3f3d2062203f3f20633b0a6c65742078203d202861203f3f206229207c7c20633b0a"
+    },
+    "id": "rnc-with-other",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 6
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2019\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na?.b ?? c;\na ??= b ?? c;\nlet x = (a ?? b) || c;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "var _a, _b, _c, _d, _e, _f;\r\ndeclare var a: any, b: any, c: any, o: any;\r\ndeclare function f(...x: any[]): any;\r\n(_a = a.b).c || (_a.c = 1);\r\na[_b = f()] ?? (a[_b] = c);\r\na[0] && (a[0] = 1);\r\na['x'] || (a['x'] = 1);\r\na[`t`] || (a[`t`] = 1);\r\na.b || (a.b = c);\r\na || (a = b || (b = c));\r\nthis.x ?? (this.x = 1);\r\n(_c = a[b])[c] ?? (_c[c] = 2);\r\n(_d = f()).x || (_d.x = 3);\r\n(_e = (a as any)).b || (_e.b = 4);\r\n(_f = a!).b || (_f.b = 5);\r\n"
+      },
+      {
+       "chain": [
+        "typeeraser",
+        "logicalassignment"
+       ],
+       "text": "var _a, _b, _c, _d, _e, _f;\r\n(_a = a.b).c || (_a.c = 1);\r\na[_b = f()] ?? (a[_b] = c);\r\na[0] && (a[0] = 1);\r\na['x'] || (a['x'] = 1);\r\na[`t`] || (a[`t`] = 1);\r\na.b || (a.b = c);\r\na || (a = b || (b = c));\r\nthis.x ?? (this.x = 1);\r\n(_c = a[b])[c] ?? (_c[c] = 2);\r\n(_d = f()).x || (_d.x = 3);\r\n(_e = a).b || (_e.b = 4);\r\n(_f = a).b || (_f.b = 5);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rla-forms",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652076617220613a20616e792c20623a20616e792c20633a20616e792c206f3a20616e793b206465636c6172652066756e6374696f6e2066282e2e2e783a20616e795b5d293a20616e793b0a612e622e63207c7c3d20313b0a615b6628295d203f3f3d20633b0a615b305d2026263d20313b0a615b2778275d207c7c3d20313b0a615b6074605d207c7c3d20313b0a28612e6229207c7c3d202863293b0a61207c7c3d2062207c7c3d20633b0a746869732e78203f3f3d20313b0a615b625d5b635d203f3f3d20323b0a6628292e78207c7c3d20333b0a286120617320616e79292e62207c7c3d20343b0a61212e62207c7c3d20353b0a"
+    },
+    "id": "rla-forms",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na.b.c ||= 1;\na[f()] ??= c;\na[0] &&= 1;\na['x'] ||= 1;\na[`t`] ||= 1;\n(a.b) ||= (c);\na ||= b ||= c;\nthis.x ??= 1;\na[b][c] ??= 2;\nf().x ||= 3;\n(a as any).b ||= 4;\na!.b ||= 5;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "logicalassignment"
+       ],
+       "text": "class B {\r\n    x: any;\r\n}\r\nclass C extends B {\r\n    #p: any;\r\n    static #q: any;\r\n    m(k: any) { super.x || (super.x = 1); super[k] && (super[k] = 2); this.#p ?? (this.#p = 3); C.#q || (C.#q = 4); }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rla-super-private",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732042207b20783a20616e793b207d0a636c617373204320657874656e64732042207b2023703a20616e793b207374617469632023713a20616e793b206d286b3a20616e7929207b2073757065722e78207c7c3d20313b2073757065725b6b5d2026263d20323b20746869732e2370203f3f3d20333b20432e2371207c7c3d20343b207d207d0a"
+    },
+    "id": "rla-super-private",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 7
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2020\nclass B { x: any; }\nclass C extends B { #p: any; static #q: any; m(k: any) { super.x ||= 1; super[k] &&= 2; this.#p ??= 3; C.#q ||= 4; } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "exponentiation"
+       ],
+       "text": "var _a, _b, _c, _d, _e, _f, _g;\r\ndeclare var a: any, b: any, c: any, o: any;\r\ndeclare function f(...x: any[]): any;\r\n(_a = a.b).c = Math.pow(_a.c, 2);\r\n(_b = a[f()])[_c = c] = Math.pow(_b[_c], 3);\r\na = Math.pow(a, Math.pow(b, Math.pow(c, 2)));\r\nMath.pow((-1), 2);\r\nMath.pow((Math.pow(a, b)), c);\r\n(_e = a).b = Math.pow(_e.b, (_d = a).c = Math.pow(_d.c, 2));\r\nlet x = Math.pow(a?.b, 2);\r\nf(Math.pow(a, 2), ...[Math.pow(b, 3)]);\r\n(_f = a)[_g = 0] = Math.pow(_f[_g], 1);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rex-forms",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652076617220613a20616e792c20623a20616e792c20633a20616e792c206f3a20616e793b206465636c6172652066756e6374696f6e2066282e2e2e783a20616e795b5d293a20616e793b0a612e622e63202a2a3d20323b0a615b6628295d5b635d202a2a3d20333b0a61202a2a3d2062202a2a2063202a2a20323b0a282d3129202a2a20323b0a2861202a2a206229202a2a20633b0a612e62202a2a3d20612e63202a2a3d20323b0a6c65742078203d20613f2e62202a2a20323b0a662861202a2a20322c202e2e2e5b62202a2a20335d293b0a615b305d202a2a3d20313b0a"
+    },
+    "id": "rex-forms",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 2
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2015\ndeclare var a: any, b: any, c: any, o: any; declare function f(...x: any[]): any;\na.b.c **= 2;\na[f()][c] **= 3;\na **= b ** c ** 2;\n(-1) ** 2;\n(a ** b) ** c;\na.b **= a.c **= 2;\nlet x = a?.b ** 2;\nf(a ** 2, ...[b ** 3]);\na[0] **= 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "optionalcatch"
+       ],
+       "text": "try {\r\n    try { }\r\n    catch (_a) { }\r\n}\r\ncatch (_b) {\r\n    try { }\r\n    catch (_c) { }\r\n    finally { }\r\n}\r\nfunction g() { try { }\r\ncatch (_a) { } }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rocatch-nested",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "747279207b20747279207b207d206361746368207b207d207d206361746368207b20747279207b207d206361746368207b207d2066696e616c6c79207b207d207d0a66756e6374696f6e20672829207b20747279207b207d206361746368207b207d207d0a"
+    },
+    "id": "rocatch-nested",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "target": 5
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @target: es2018\ntry { try { } catch { } } catch { try { } catch { } finally { } }\nfunction g() { try { } catch { } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "'use strict';\r\n'use strict';\r\nexport {};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rus-forms",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "2775736520737472696374273b0a2775736520737472696374273b0a6578706f7274207b7d3b0a"
+    },
+    "id": "rus-forms",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n'use strict';\n'use strict';\nexport {};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use\\x20strict\";\r\nexport const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rus-forms-2",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "227573655c783230737472696374223b0a6578706f727420636f6e73742061203d20313b0a"
+    },
+    "id": "rus-forms-2",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n\"use\\x20strict\";\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "\"use strict\";\r\nvar a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rus-script-alwaysstrict",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "7661722061203d20313b0a"
+    },
+    "id": "rus-script-alwaysstrict",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "var a = 1;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "rus-js-module",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.js": "6578706f727420636f6e73742061203d20313b0a"
+    },
+    "id": "rus-js-module",
+    "options": {
+     "allowJs": true,
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @module: esnext\n// @filename: probe.js\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "usestrict"
+       ],
+       "text": "export const a = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "rus-esnext-noemitstrict",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f727420636f6e73742061203d20313b0a"
+    },
+    "id": "rus-esnext-noemitstrict",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "strict": false
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @strict: false\nexport const a = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "declare const d = 1;\r\nexport default d;\r\nexport declare const v = 2;\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import d from \"./lib\";\r\nexport default d;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "export-default-imported",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "636f6e73742064203d20313b206578706f72742064656661756c7420643b206578706f727420636f6e73742076203d20323b",
+     "/.src/probe.ts": "696d706f727420642066726f6d20222e2f6c6962223b0a6578706f72742064656661756c7420643b0a"
+    },
+    "id": "export-default-imported",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/lib.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nconst d = 1; export default d; export const v = 2;\n// @filename: probe.ts\nimport d from \"./lib\";\nexport default d;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare const v = 2;\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import * as lib from \"./lib\";\r\nexport = lib;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "export-equals-imported",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "6578706f727420636f6e73742076203d20323b",
+     "/.src/probe.ts": "696d706f7274202a206173206c69622066726f6d20222e2f6c6962223b0a6578706f7274203d206c69623b0a"
+    },
+    "id": "export-equals-imported",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/lib.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: lib.ts\nexport const v = 2;\n// @filename: probe.ts\nimport * as lib from \"./lib\";\nexport = lib;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare const v = 2;\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import lib = require(\"./lib\");\r\nexport { lib };\r\ndeclare namespace N {\r\n    const q = 1;\r\n}\r\nimport Q = N.q;\r\nexport { Q };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "import-equals-reexport",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "6578706f727420636f6e73742076203d20323b",
+     "/.src/probe.ts": "696d706f7274206c6962203d207265717569726528222e2f6c696222293b0a6578706f7274207b206c6962207d3b0a6e616d657370616365204e207b206578706f727420636f6e73742071203d20313b207d0a696d706f72742051203d204e2e713b0a6578706f7274207b2051207d3b0a"
+    },
+    "id": "import-equals-reexport",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: lib.ts\nexport const v = 2;\n// @filename: probe.ts\nimport lib = require(\"./lib\");\nexport { lib };\nnamespace N { export const q = 1; }\nimport Q = N.q;\nexport { Q };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export interface I {\r\n    a: number;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/lib.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "import { I } from \"./lib\";\r\nexport declare const x: I;\r\nexport { I as J };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "reexport-import-used-in-type",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.ts": "6578706f727420696e746572666163652049207b20613a206e756d626572207d",
+     "/.src/probe.ts": "696d706f7274207b2049207d2066726f6d20222e2f6c6962223b0a6578706f727420636f6e737420783a2049203d207b20613a2031207d3b0a6578706f7274207b2049206173204a207d3b0a"
+    },
+    "id": "reexport-import-used-in-type",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/lib.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @filename: lib.ts\nexport interface I { a: number }\n// @filename: probe.ts\nimport { I } from \"./lib\";\nexport const x: I = { a: 1 };\nexport { I as J };\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare var v: 1;\r\n"
+      }
+     ],
+     "name": "/.src/lib.js"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export = lib;\r\nimport lib = require(\"./lib\");\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "cjs-require-reexport",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.js": "6578706f7274732e76203d20313b",
+     "/.src/probe.js": "636f6e7374206c6962203d207265717569726528222e2f6c696222293b0a6d6f64756c652e6578706f727473203d206c69623b0a"
+    },
+    "id": "cjs-require-reexport",
+    "options": {
+     "allowJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: lib.js\nexports.v = 1;\n// @filename: probe.js\nconst lib = require(\"./lib\");\nmodule.exports = lib;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export declare var v: 1;\r\n"
+      }
+     ],
+     "name": "/.src/lib.js"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "declarations"
+       ],
+       "diagnostics": [],
+       "text": "export { v as w };\r\nimport { v } from \"./lib\";\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "cjs-require-alias-export",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/lib.js": "6578706f7274732e76203d20313b",
+     "/.src/probe.js": "636f6e7374207b2076207d203d207265717569726528222e2f6c696222293b0a6578706f7274732e77203d20763b0a"
+    },
+    "id": "cjs-require-alias-export",
+    "options": {
+     "allowJs": true,
+     "declaration": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @declaration: true\n// @filename: lib.js\nexports.v = 1;\n// @filename: probe.js\nconst { v } = require(\"./lib\");\nexports.w = v;\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}

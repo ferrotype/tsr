@@ -1,0 +1,1634 @@
+{
+ "cases": [
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "var a = 1;\r\nfunction f(b) { return a + b; }\r\nclass C {\r\n    m() { return this; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "no-typescript",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "7661722061203d20313b0a66756e6374696f6e2066286229207b2072657475726e2061202b20623b207d0a636c6173732043207b206d2829207b2072657475726e20746869733b207d207d0a"
+    },
+    "id": "no-typescript",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "var a = 1;\nfunction f(b) { return a + b; }\nclass C { m() { return this; } }\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "var keep = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "ambient-statements",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652076617220613a206e756d6265723b0a6465636c617265206c657420623b0a6465636c6172652066756e6374696f6e206628293a20766f69643b0a6465636c61726520636c6173732044207b7d0a6465636c61726520656e756d2045207b2041207d0a6465636c617265206e616d657370616365204e207b2076617220783b207d0a6465636c617265206d6f64756c6520226d22207b7d0a6578706f7274206465636c61726520636f6e737420633a206e756d6265723b0a766172206b656570203d20313b0a"
+    },
+    "id": "ambient-statements",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare var a: number;\ndeclare let b;\ndeclare function f(): void;\ndeclare class D {}\ndeclare enum E { A }\ndeclare namespace N { var x; }\ndeclare module \"m\" {}\nexport declare const c: number;\nvar keep = 1;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class A {\r\n    a = 1;\r\n    b = 2;\r\n    c = 3;\r\n    d = 4;\r\n    static e = 5;\r\n    static f = 6;\r\n}\r\nclass B extends A {\r\n    g() { }\r\n    get h() { return 1; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "modifier-keywords",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "616273747261637420636c6173732041207b0a202020207075626c69632061203d20313b0a20202020707269766174652062203d20323b0a2020202070726f7465637465642063203d20333b0a20202020726561646f6e6c792064203d20343b0a2020202073746174696320726561646f6e6c792065203d20353b0a202020207075626c696320737461746963206f766572726964652066203d20363b0a2020202070726f746563746564206162737472616374206728293a20766f69643b0a7d0a636c617373204220657874656e64732041207b0a202020206f7665727269646520672829207b7d0a202020207075626c6963206f766572726964652067657420682829207b2072657475726e20313b207d0a7d0a"
+    },
+    "id": "modifier-keywords",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "abstract class A {\n    public a = 1;\n    private b = 2;\n    protected c = 3;\n    readonly d = 4;\n    static readonly e = 5;\n    public static override f = 6;\n    protected abstract g(): void;\n}\nclass B extends A {\n    override g() {}\n    public override get h() { return 1; }\n}\n"
+  },
+  {
+   "diagnostics": 9,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "let a = [];\r\nlet b = [\"\"];\r\nlet c = { x: \"\" };\r\nlet d, e, f, g, h, i;\r\nlet j = null;\r\nlet k = null;\r\nlet l = a;\r\nlet m = null;\r\nlet n;\r\nlet o;\r\nlet p;\r\nlet q;\r\nlet r;\r\nlet s;\r\nlet t = \"lit\";\r\nfunction isS(x) { return true; }\r\nclass Th {\r\n    m() { return this; }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "type-nodes",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6c657420613a206e756d6265725b5d203d205b5d3b0a6c657420623a205b737472696e672c206e756d6265723f2c202e2e2e626f6f6c65616e5b5d5d203d205b22225d3b0a6c657420633a207b20783a20737472696e673b205b6b3a20737472696e675d3a20616e79207d203d207b20783a202222207d3b0a6c657420643a20756e6b6e6f776e2c20653a206e657665722c20663a20766f69642c20673a2073796d626f6c2c20683a20616e792c20693a20626f6f6c65616e3b0a6c6574206a3a206e6577202829203d3e206f626a656374203d206e756c6c3b0a6c6574206b3a2028783a206e756d62657229203d3e20737472696e67203d206e756c6c3b0a6c6574206c3a20747970656f662061203d20613b0a6c6574206d3a2041727261793c737472696e673e207c206e756c6c203d206e756c6c3b0a6c6574206e3a2041202620423b0a6c6574206f3a205420657874656e647320737472696e67203f2031203a20323b0a6c657420703a2028737472696e67293b0a6c657420713a206b65796f6620543b0a6c657420723a20545b2278225d3b0a6c657420733a207b205b5020696e206b65796f6620545d3a20545b505d207d3b0a6c657420743a20226c697422203d20226c6974223b0a66756e6374696f6e2069735328783a20616e79293a207820697320737472696e67207b2072657475726e20747275653b207d0a636c617373205468207b206d28293a2074686973207b2072657475726e20746869733b207d207d0a"
+    },
+    "id": "type-nodes",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "let a: number[] = [];\nlet b: [string, number?, ...boolean[]] = [\"\"];\nlet c: { x: string; [k: string]: any } = { x: \"\" };\nlet d: unknown, e: never, f: void, g: symbol, h: any, i: boolean;\nlet j: new () => object = null;\nlet k: (x: number) => string = null;\nlet l: typeof a = a;\nlet m: Array<string> | null = null;\nlet n: A & B;\nlet o: T extends string ? 1 : 2;\nlet p: (string);\nlet q: keyof T;\nlet r: T[\"x\"];\nlet s: { [P in keyof T]: T[P] };\nlet t: \"lit\" = \"lit\";\nfunction isS(x: any): x is string { return true; }\nclass Th { m(): this { return this; } }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class C {\r\n    x = 1;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "index-signature",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020205b6b65793a20737472696e675d3a206e756d6265723b0a20202020737461746963205b6b65793a206e756d6265725d3a20737472696e673b0a2020202078203d20313b0a7d0a696e746572666163652049207b205b6b3a20737472696e675d3a20616e79207d0a"
+    },
+    "id": "index-signature",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class C {\n    [key: string]: number;\n    static [key: number]: string;\n    x = 1;\n}\ninterface I { [k: string]: any }\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class C {\r\n}\r\nconst r = a in b;\r\nconst s = \"k\" in b;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "variance-modifiers",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c61737320433c696e20542c206f757420552c20696e206f757420563e207b7d0a696e7465726661636520493c696e20543e207b20783a2054207d0a636f6e73742072203d20286120617320616e792920696e20623b0a636f6e73742073203d20226b2220696e20623b0a"
+    },
+    "id": "variance-modifiers",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class C<in T, out U, in out V> {}\ninterface I<in T> { x: T }\nconst r = (a as any) in b;\nconst s = \"k\" in b;\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class C {\r\n    x = 1;\r\n    y = 2;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "variance-modifiers-misplaced",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020696e2078203d20313b0a202020206f75742079203d20323b0a7d0a"
+    },
+    "id": "variance-modifiers-misplaced",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class C {\n    in x = 1;\n    out y = 2;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "var keep = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "type-only-declarations",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "747970652054203d20737472696e673b0a6578706f727420747970652055203d206e756d6265723b0a696e746572666163652049207b20783a206e756d626572207d0a6578706f727420696e74657266616365204a20657874656e64732049207b7d0a2f2a2a206c656164696e67202a2f0a747970652056203d20543b0a766172206b656570203d20313b0a"
+    },
+    "id": "type-only-declarations",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "type T = string;\nexport type U = number;\ninterface I { x: number }\nexport interface J extends I {}\n/** leading */\ntype V = T;\nvar keep = 1;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "export const x = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "namespace-export-declaration",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6578706f7274206173206e616d657370616365204e3b0a6578706f727420636f6e73742078203d20313b0a"
+    },
+    "id": "namespace-export-declaration",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "export as namespace N;\nexport const x = 1;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "namespace Inst {\r\n    export const x = 1;\r\n}\r\nnamespace A.B.C {\r\n    export function f(x) { return x; }\r\n}\r\nmodule M {\r\n    var y;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "module-declarations",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d65737061636520456d707479207b7d0a6e616d6573706163652054797065734f6e6c79207b206578706f727420696e746572666163652049207b7d206578706f727420747970652054203d206e756d6265723b207d0a6e616d65737061636520496e7374207b206578706f727420636f6e73742078203d20313b207d0a6e616d65737061636520412e422e43207b206578706f72742066756e6374696f6e206628783a206e756d62657229207b2072657475726e20783b207d207d0a6d6f64756c65204d207b2076617220793a20737472696e673b207d0a6e616d65737061636520436f6e73744f6e6c79207b20636f6e737420656e756d2045207b2041207d207d0a"
+    },
+    "id": "module-declarations",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace Empty {}\nnamespace TypesOnly { export interface I {} export type T = number; }\nnamespace Inst { export const x = 1; }\nnamespace A.B.C { export function f(x: number) { return x; } }\nmodule M { var y: string; }\nnamespace ConstOnly { const enum E { A } }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "var keep = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "module-string-name",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6d6f64756c6520226d22207b206578706f7274207661722078203d20313b207d0a766172206b656570203d20313b0a"
+    },
+    "id": "module-string-name",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "module \"m\" { export var x = 1; }\nvar keep = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "namespace ConstOnly {\r\n    const enum E {\r\n        A = 1\r\n    }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "module-const-enum-preserved",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d65737061636520436f6e73744f6e6c79207b20636f6e737420656e756d2045207b2041203d2031207d207d0a6e616d6573706163652054797065734f6e6c79207b206578706f727420696e746572666163652049207b7d207d0a"
+    },
+    "id": "module-const-enum-preserved",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "preserveConstEnums": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @preserveConstEnums: true\nnamespace ConstOnly { const enum E { A = 1 } }\nnamespace TypesOnly { export interface I {} }\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": ";\r\nvar keep = 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "module-no-body",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d65737061636520412e423b0a766172206b6565703a206e756d626572203d20313b0a"
+    },
+    "id": "module-no-body",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace A.B;\nvar keep: number = 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class B {\r\n}\r\nclass C extends B {\r\n}\r\nconst f = Array;\r\nconst g = (Map);\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "expression-with-type-arguments",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c61737320423c543e207b7d0a636c617373204320657874656e647320423c737472696e673e207b7d0a636f6e73742066203d2041727261793c737472696e673e3b0a636f6e73742067203d20284d61703c737472696e672c206e756d6265723e293b0a696e74657266616365204920657874656e647320423c6e756d6265723e207b7d0a"
+    },
+    "id": "expression-with-type-arguments",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class B<T> {}\nclass C extends B<string> {}\nconst f = Array<string>;\nconst g = (Map<string, number>);\ninterface I extends B<number> {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class C {\r\n    z = 1;\r\n    static w;\r\n    v;\r\n    u = \"u\";\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "property-declarations",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "616273747261637420636c6173732043207b0a202020206465636c61726520783a206e756d6265723b0a20202020616273747261637420793a20737472696e673b0a202020207075626c6963207a3a206e756d626572203d20313b0a2020202073746174696320773f3a20737472696e673b0a2020202076213a206e756d6265723b0a20202020726561646f6e6c792075203d202275223b0a7d0a"
+    },
+    "id": "property-declarations",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "abstract class C {\n    declare x: number;\n    abstract y: string;\n    public z: number = 1;\n    static w?: string;\n    v!: number;\n    readonly u = \"u\";\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class C {\r\n    @dec\r\n    x;\r\n    @dec\r\n    y;\r\n    @dec\r\n    z = 1;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "property-decorated-experimental",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a616273747261637420636c6173732043207b0a2020202040646563206465636c61726520783a206e756d6265723b0a202020204064656320616273747261637420793a20737472696e673b0a2020202040646563207a3a206e756d626572203d20313b0a202020206465636c61726520773a206e756d6265723b0a7d0a"
+    },
+    "id": "property-decorated-experimental",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\ndeclare function dec(...args: any[]): any;\nabstract class C {\n    @dec declare x: number;\n    @dec abstract y: string;\n    @dec z: number = 1;\n    declare w: number;\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class C {\r\n    @dec\r\n    z = 1;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "property-decorated-standard",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a616273747261637420636c6173732043207b0a2020202040646563206465636c61726520783a206e756d6265723b0a202020204064656320616273747261637420793a20737472696e673b0a2020202040646563207a3a206e756d626572203d20313b0a7d0a"
+    },
+    "id": "property-decorated-standard",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare function dec(...args: any[]): any;\nabstract class C {\n    @dec declare x: number;\n    @dec abstract y: string;\n    @dec z: number = 1;\n}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class C {\r\n    constructor(x) { }\r\n    m(x) { return x; }\r\n    static *gen() { }\r\n    async am() { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "constructors-and-methods",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020636f6e7374727563746f7228293b0a20202020636f6e7374727563746f7228783f3a206e756d626572293b0a202020207075626c696320636f6e7374727563746f7228783f3a206e756d62657229207b7d0a202020206d28293a20766f69643b0a202020206d28783a20737472696e67293a20766f69643b0a2020202070726f746563746564206d3c543e28783f3a2054293a2054207c20766f6964207b2072657475726e20783b207d0a20202020737461746963202a67656e3c543e28293a2047656e657261746f723c543e207b7d0a202020206173796e6320616d28293a2050726f6d6973653c766f69643e207b7d0a7d0a"
+    },
+    "id": "constructors-and-methods",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class C {\n    constructor();\n    constructor(x?: number);\n    public constructor(x?: number) {}\n    m(): void;\n    m(x: string): void;\n    protected m<T>(x?: T): T | void { return x; }\n    static *gen<T>(): Generator<T> {}\n    async am(): Promise<void> {}\n}\n"
+  },
+  {
+   "diagnostics": 4,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class C {\r\n    get b() { }\r\n    set b(v) { }\r\n    get c() { return null; }\r\n    set c(v) { }\r\n    static get d() { return \"\"; }\r\n}\r\nconst o = { get e() { return 1; }, set e(v) { } };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "accessors",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "616273747261637420636c6173732043207b0a20202020616273747261637420676574206128293a206e756d6265723b0a20202020616273747261637420736574206128763a206e756d626572293b0a20202020676574206228293a206e756d6265723b0a20202020736574206228763a206e756d626572293b0a202020207075626c69632067657420633c543e28293a2054207b2072657475726e206e756c6c3b207d0a202020207075626c696320736574206328763a206e756d62657229207b7d0a2020202073746174696320676574206428293a20737472696e67207b2072657475726e2022223b207d0a7d0a636f6e7374206f203d207b20676574206528293a206e756d626572207b2072657475726e20313b207d2c20736574206528763a206e756d62657229207b7d207d3b0a"
+    },
+    "id": "accessors",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "abstract class C {\n    abstract get a(): number;\n    abstract set a(v: number);\n    get b(): number;\n    set b(v: number);\n    public get c<T>(): T { return null; }\n    public set c(v: number) {}\n    static get d(): string { return \"\"; }\n}\nconst o = { get e(): number { return 1; }, set e(v: number) {} };\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "var a = 1, b = 2, c;\r\nlet [d, e] = [1, 2];\r\nconst { f } = { f: 1 };\r\nfor (let i = 0; i < 1; i++) { }\r\nfor (const k of []) { }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "variable-declarations",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "76617220613a206e756d626572203d20312c2062203d20322c20633a20737472696e673b0a6c6574205b642c20655d3a206e756d6265725b5d203d205b312c20325d3b0a636f6e7374207b2066207d3a207b20663a206e756d626572207d203d207b20663a2031207d3b0a666f7220286c657420693a206e756d626572203d20303b2069203c20313b20692b2b29207b7d0a666f722028636f6e7374206b206f66205b5d20617320737472696e675b5d29207b7d0a"
+    },
+    "id": "variable-declarations",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "var a: number = 1, b = 2, c: string;\nlet [d, e]: number[] = [1, 2];\nconst { f }: { f: number } = { f: 1 };\nfor (let i: number = 0; i < 1; i++) {}\nfor (const k of [] as string[]) {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class B {\r\n}\r\nclass C extends B {\r\n}\r\nclass D {\r\n}\r\nconst E = class extends B {\r\n};\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "heritage-clauses",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "696e746572666163652049207b7d0a696e74657266616365204a207b7d0a636c6173732042207b7d0a636c617373204320657874656e6473204220696d706c656d656e747320492c204a207b7d0a636c617373204420696d706c656d656e74732049207b7d0a636f6e73742045203d20636c61737320657874656e6473204220696d706c656d656e74732049207b7d3b0a"
+    },
+    "id": "heritage-clauses",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "interface I {}\ninterface J {}\nclass B {}\nclass C extends B implements I, J {}\nclass D implements I {}\nconst E = class extends B implements I {};\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class C {\r\n    x;\r\n}\r\nexport default class {\r\n    y;\r\n}\r\nconst D = class E {\r\n    z;\r\n};\r\nexport class F {\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "classes",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c61737320433c542c205520657874656e64732054203d20543e207b20783a20543b207d0a6578706f72742064656661756c7420636c6173733c543e207b20793a20543b207d0a636f6e73742044203d20636c61737320453c543e207b207a3a20543b207d3b0a6578706f727420636c61737320463c543e207b7d0a"
+    },
+    "id": "classes",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class C<T, U extends T = T> { x: T; }\nexport default class<T> { y: T; }\nconst D = class E<T> { z: T; };\nexport class F<T> {}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "function f(x) { return x; }\r\nexport function g(a, ...rest) { return a; }\r\nexport function h() { }\r\nconst fe = function named(x) { return x; };\r\nconst af = async (x) => x;\r\nconst af2 = (x) => x;\r\nfunction* gen() { }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "functions",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e206628293a20766f69643b0a66756e6374696f6e206628783a206e756d626572293a20766f69643b0a66756e6374696f6e20663c543e28783f3a2054293a2054207c20766f6964207b2072657475726e20783b207d0a6578706f72742066756e6374696f6e206728613a206e756d6265722c202e2e2e726573743a20737472696e675b5d293a206e756d626572207b2072657475726e20613b207d0a6578706f72742066756e6374696f6e206828293a20766f69643b0a6578706f72742066756e6374696f6e20682829207b7d0a636f6e7374206665203d2066756e6374696f6e206e616d65643c543e28746869733a2057696e646f772c20783a2054293a2054207b2072657475726e20783b207d3b0a636f6e7374206166203d206173796e63203c542c3e28783a2054293a2050726f6d6973653c543e203d3e20783b0a636f6e737420616632203d2028783a206e756d626572293a206e756d626572203d3e20783b0a66756e6374696f6e2a2067656e3c543e28293a2047656e657261746f723c543e207b7d0a"
+    },
+    "id": "functions",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "function f(): void;\nfunction f(x: number): void;\nfunction f<T>(x?: T): T | void { return x; }\nexport function g(a: number, ...rest: string[]): number { return a; }\nexport function h(): void;\nexport function h() {}\nconst fe = function named<T>(this: Window, x: T): T { return x; };\nconst af = async <T,>(x: T): Promise<T> => x;\nconst af2 = (x: number): number => x;\nfunction* gen<T>(): Generator<T> {}\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class C {\r\n    constructor(public a, private readonly b, protected c = 1, readonly d, override e, f) { }\r\n}\r\nfunction g(x, ...y) { }\r\nconst h = function ({ a, b } = null) { };\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parameters",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020636f6e7374727563746f72287075626c696320613a206e756d6265722c207072697661746520726561646f6e6c7920623f3a20737472696e672c2070726f7465637465642063203d20312c20726561646f6e6c7920643f3a20626f6f6c65616e2c206f7665727269646520653f3a20616e792c20663f3a206e756d62657229207b7d0a7d0a66756e6374696f6e206728746869733a20616e792c20783f3a206e756d6265722c202e2e2e793a206e756d6265725b5d29207b7d0a636f6e73742068203d2066756e6374696f6e2028746869733a20766f69642c207b20612c2062207d3a207b20613a206e756d6265723b20623a20737472696e67207d203d206e756c6c29207b7d3b0a"
+    },
+    "id": "parameters",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class C {\n    constructor(public a: number, private readonly b?: string, protected c = 1, readonly d?: boolean, override e?: any, f?: number) {}\n}\nfunction g(this: any, x?: number, ...y: number[]) {}\nconst h = function (this: void, { a, b }: { a: number; b: string } = null) {};\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class C {\r\n    constructor(public \r\n    @dec\r\n    a, private \r\n    @dec\r\n    @dec\r\n    b, \r\n    @dec\r\n    c, public d) { }\r\n    m(\r\n    @dec\r\n    x, \r\n    @dec()\r\n    y) { }\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parameters-decorated",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20646563282e2e2e617267733a20616e795b5d293a20616e793b0a636c6173732043207b0a20202020636f6e7374727563746f722840646563207075626c696320613a206e756d6265722c20406465632040646563207072697661746520623a20737472696e672c204064656320633a206e756d6265722c207075626c696320643a206e756d62657229207b7d0a202020206d284064656320783a206e756d6265722c2040646563282920793f3a20737472696e6729207b7d0a7d0a"
+    },
+    "id": "parameters-decorated",
+    "options": {
+     "experimentalDecorators": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @experimentalDecorators: true\ndeclare function dec(...args: any[]): any;\nclass C {\n    constructor(@dec public a: number, @dec @dec private b: string, @dec c: number, public d: number) {}\n    m(@dec x: number, @dec() y?: string) {}\n}\n"
+  },
+  {
+   "diagnostics": 3,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "f(\"\");\r\nf();\r\no?.m();\r\no.m?.(1);\r\nnew Map();\r\nnew Set;\r\nf `tpl ${1}`;\r\nf `plain`;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "calls-and-templates",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20663c543e28783f3a2054293a20543b0a6465636c61726520636f6e7374206f3a20616e793b0a663c737472696e673e282222293b0a663c6e756d6265723e28293b0a6f3f2e6d3c737472696e673e28293b0a6f2e6d3f2e3c6e756d6265723e2831293b0a6e6577204d61703c737472696e672c206e756d6265723e28293b0a6e6577205365743c737472696e673e3b0a663c737472696e673e6074706c20247b317d603b0a6660706c61696e603b0a"
+    },
+    "id": "calls-and-templates",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare function f<T>(x?: T): T;\ndeclare const o: any;\nf<string>(\"\");\nf<number>();\no?.m<string>();\no.m?.<number>(1);\nnew Map<string, number>();\nnew Set<string>;\nf<string>`tpl ${1}`;\nf`plain`;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "x;\r\nx.y.z;\r\nx;\r\nx;\r\nx;\r\nx.y;\r\nx.y;\r\nx.y;\r\nx.y;\r\n(x).y;\r\nx.length;\r\nconst n = x + 1;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "assertions",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c61726520636f6e737420783a20616e793b0a78213b0a78212e79212e7a3b0a3c737472696e673e783b0a78206173206e756d6265723b0a782073617469736669657320756e6b6e6f776e3b0a287820617320616e79292e793b0a283c616e793e78292e793b0a28782073617469736669657320616e79292e793b0a28287820617320616e7929292e793b0a287821292e793b0a287820617320616e7920617320737472696e67292e6c656e6774683b0a636f6e7374206e203d202878206173206e756d62657229202b20313b0a"
+    },
+    "id": "assertions",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare const x: any;\nx!;\nx!.y!.z;\n<string>x;\nx as number;\nx satisfies unknown;\n(x as any).y;\n(<any>x).y;\n(x satisfies any).y;\n((x as any)).y;\n(x!).y;\n(x as any as string).length;\nconst n = (x as number) + 1;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "const a = (f());\r\nconst b = ((1 + 2));\r\nconst c = (function (x) { return x; });\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "parenthesized-without-assertion",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6465636c6172652066756e6374696f6e20663c543e28293a20543b0a636f6e73742061203d2028663c6e756d6265723e2829293b0a636f6e73742062203d20282831202b203229293b0a636f6e73742063203d202866756e6374696f6e2028783a206e756d62657229207b2072657475726e20783b207d293b0a"
+    },
+    "id": "parenthesized-without-assertion",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "declare function f<T>(): T;\nconst a = (f<number>());\nconst b = ((1 + 2));\nconst c = (function (x: number) { return x; });\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "const a = <Comp x=\"1\"/>;\r\nconst b = <Comp></Comp>;\r\nconst c = <div>{1}</div>;\r\n"
+      }
+     ],
+     "name": "/.src/probe.tsx"
+    }
+   ],
+   "id": "jsx-elements",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.tsx": "6465636c617265206e616d657370616365204a5358207b20696e7465726661636520496e7472696e736963456c656d656e7473207b205b6b3a20737472696e675d3a20616e79207d207d0a6465636c6172652066756e6374696f6e20436f6d703c543e2870726f70733a207b20783f3a2054207d293a20616e793b0a636f6e73742061203d203c436f6d703c737472696e673e20783d223122202f3e3b0a636f6e73742062203d203c436f6d703c6e756d6265723e3e3c2f436f6d703e3b0a636f6e73742063203d203c6469763e7b31206173206e756d6265727d3c2f6469763e3b0a"
+    },
+    "id": "jsx-elements",
+    "options": {
+     "jsx": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.tsx"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.tsx",
+   "source": "// @jsx: preserve\n// @filename: probe.tsx\ndeclare namespace JSX { interface IntrinsicElements { [k: string]: any } }\ndeclare function Comp<T>(props: { x?: T }): any;\nconst a = <Comp<string> x=\"1\" />;\nconst b = <Comp<number>></Comp>;\nconst c = <div>{1 as number}</div>;\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "export const v = 1;\r\n"
+      }
+     ],
+     "name": "/.src/m.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "import a = require(\"./m\");\r\nnamespace N {\r\n    export const x = 1;\r\n}\r\nimport c = N.x;\r\nexport import e = N;\r\na;\r\nc;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "import-equals",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/m.ts": "6578706f727420636f6e73742076203d20313b0a6578706f727420747970652054203d206e756d6265723b",
+     "/.src/probe.ts": "696d706f72742061203d207265717569726528222e2f6d22293b0a696d706f727420747970652062203d207265717569726528222e2f6d22293b0a6e616d657370616365204e207b206578706f727420636f6e73742078203d20313b207d0a696d706f72742063203d204e2e783b0a696d706f727420747970652064203d204e3b0a6578706f727420696d706f72742065203d204e3b0a613b20633b0a"
+    },
+    "id": "import-equals",
+    "options": {
+     "module": 1,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: commonjs\n// @filename: m.ts\nexport const v = 1;\nexport type T = number;\n// @filename: probe.ts\nimport a = require(\"./m\");\nimport type b = require(\"./m\");\nnamespace N { export const x = 1; }\nimport c = N.x;\nimport type d = N;\nexport import e = N;\na; c;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "export const v = 1;\r\nexport default 1;\r\n"
+      }
+     ],
+     "name": "/.src/m.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "import \"./m\";\r\nimport def from \"./m\";\r\nimport * as ns from \"./m\";\r\nimport { v } from \"./m\";\r\nimport { v as v2 } from \"./m\";\r\nimport def3 from \"./m\";\r\nimport {} from \"./m\";\r\ndef;\r\nns;\r\nv;\r\nv2;\r\ndef3;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "import-declarations",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/m.ts": "6578706f727420636f6e73742076203d20313b0a6578706f727420747970652054203d206e756d6265723b0a6578706f72742064656661756c7420313b",
+     "/.src/probe.ts": "696d706f727420222e2f6d223b0a696d706f7274206465662066726f6d20222e2f6d223b0a696d706f7274202a206173206e732066726f6d20222e2f6d223b0a696d706f7274207b2076207d2066726f6d20222e2f6d223b0a696d706f72742074797065207b2054207d2066726f6d20222e2f6d223b0a696d706f7274207479706520646566322066726f6d20222e2f6d223b0a696d706f72742074797065202a206173206e73322066726f6d20222e2f6d223b0a696d706f7274207b20747970652054206173205432207d2066726f6d20222e2f6d223b0a696d706f7274207b207479706520542061732054332c2076206173207632207d2066726f6d20222e2f6d223b0a696d706f727420646566332c207b20747970652054206173205434207d2066726f6d20222e2f6d223b0a696d706f7274207b7d2066726f6d20222e2f6d223b0a6465663b206e733b20763b2076323b20646566333b0a"
+    },
+    "id": "import-declarations",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/m.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: m.ts\nexport const v = 1;\nexport type T = number;\nexport default 1;\n// @filename: probe.ts\nimport \"./m\";\nimport def from \"./m\";\nimport * as ns from \"./m\";\nimport { v } from \"./m\";\nimport type { T } from \"./m\";\nimport type def2 from \"./m\";\nimport type * as ns2 from \"./m\";\nimport { type T as T2 } from \"./m\";\nimport { type T as T3, v as v2 } from \"./m\";\nimport def3, { type T as T4 } from \"./m\";\nimport {} from \"./m\";\ndef; ns; v; v2; def3;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "export const v = 1;\r\n"
+      }
+     ],
+     "name": "/.src/m.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "import {} from \"./m\";\r\nimport { v } from \"./m\";\r\nimport {} from \"./m\";\r\nexport {} from \"./m\";\r\nexport {};\r\nv;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "import-declarations-vms",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/m.ts": "6578706f727420636f6e73742076203d20313b0a6578706f727420747970652054203d206e756d6265723b",
+     "/.src/probe.ts": "696d706f7274207b20747970652054207d2066726f6d20222e2f6d223b0a696d706f7274207b207479706520542061732054322c2076207d2066726f6d20222e2f6d223b0a696d706f72742074797065207b2054206173205433207d2066726f6d20222e2f6d223b0a696d706f7274207b7d2066726f6d20222e2f6d223b0a6578706f7274207b20747970652054206173205434207d2066726f6d20222e2f6d223b0a6578706f7274207b7d3b0a763b0a"
+    },
+    "id": "import-declarations-vms",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true,
+     "verbatimModuleSyntax": true
+    },
+    "roots": [
+     "/.src/m.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @verbatimModuleSyntax: true\n// @filename: m.ts\nexport const v = 1;\nexport type T = number;\n// @filename: probe.ts\nimport { type T } from \"./m\";\nimport { type T as T2, v } from \"./m\";\nimport type { T as T3 } from \"./m\";\nimport {} from \"./m\";\nexport { type T as T4 } from \"./m\";\nexport {};\nv;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "export const v = 1;\r\n"
+      }
+     ],
+     "name": "/.src/m.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "export * from \"./m\";\r\nexport * as ns from \"./m\";\r\nexport { v } from \"./m\";\r\nexport { v as v2 } from \"./m\";\r\nconst local = 1;\r\nexport { local };\r\nexport {};\r\nexport {} from \"./m\";\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "export-declarations",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/m.ts": "6578706f727420636f6e73742076203d20313b0a6578706f727420747970652054203d206e756d6265723b",
+     "/.src/probe.ts": "6578706f7274202a2066726f6d20222e2f6d223b0a6578706f7274202a206173206e732066726f6d20222e2f6d223b0a6578706f7274207b2076207d2066726f6d20222e2f6d223b0a6578706f72742074797065202a2066726f6d20222e2f6d223b0a6578706f72742074797065202a206173206e73322066726f6d20222e2f6d223b0a6578706f72742074797065207b2054207d2066726f6d20222e2f6d223b0a6578706f7274207b20747970652054206173205432207d2066726f6d20222e2f6d223b0a6578706f7274207b207479706520542061732054332c2076206173207632207d2066726f6d20222e2f6d223b0a636f6e7374206c6f63616c203d20313b0a74797065204c54203d206e756d6265723b0a6578706f7274207b206c6f63616c2c2074797065204c54207d3b0a6578706f7274207b7d3b0a6578706f7274207b7d2066726f6d20222e2f6d223b0a"
+    },
+    "id": "export-declarations",
+    "options": {
+     "module": 99,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/m.ts",
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// @module: esnext\n// @filename: m.ts\nexport const v = 1;\nexport type T = number;\n// @filename: probe.ts\nexport * from \"./m\";\nexport * as ns from \"./m\";\nexport { v } from \"./m\";\nexport type * from \"./m\";\nexport type * as ns2 from \"./m\";\nexport type { T } from \"./m\";\nexport { type T as T2 } from \"./m\";\nexport { type T as T3, v as v2 } from \"./m\";\nconst local = 1;\ntype LT = number;\nexport { local, type LT };\nexport {};\nexport {} from \"./m\";\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "const enum CE {\r\n    A = 1,\r\n    B = A << 1\r\n}\r\nenum E {\r\n    A = 1,\r\n    B = 2,\r\n    C\r\n}\r\nexport const enum ECE {\r\n    X\r\n}\r\nenum Plain {\r\n    P\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "enums",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636f6e737420656e756d204345207b2041203d20312c2042203d2041203c3c2031207d0a656e756d2045207b2041203d203c616e793e312c2042203d202832206173206e756d626572292c2043207d0a6578706f727420636f6e737420656e756d20454345207b2058207d0a656e756d20506c61696e207b2050207d0a"
+    },
+    "id": "enums",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "const enum CE { A = 1, B = A << 1 }\nenum E { A = <any>1, B = (2 as number), C }\nexport const enum ECE { X }\nenum Plain { P }\n"
+  },
+  {
+   "diagnostics": 2,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "function outer() {\r\n    let x = 1;\r\n    class K {\r\n        p;\r\n    }\r\n    return x;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "in-function-bodies",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e206f757465722829207b0a20202020696e74657266616365204c6f63616c207b7d0a2020202074797065204c203d206e756d6265723b0a202020206c657420783a204c203d20313b0a202020206465636c6172652076617220793a206e756d6265723b0a20202020636c617373204b20696d706c656d656e7473204c6f63616c207b207072697661746520703a206e756d6265723b207d0a2020202072657475726e203c4c3e783b0a7d0a"
+    },
+    "id": "in-function-bodies",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "function outer() {\n    interface Local {}\n    type L = number;\n    let x: L = 1;\n    declare var y: number;\n    class K implements Local { private p: number; }\n    return <L>x;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": ""
+      }
+     ],
+     "name": "/.src/m.ts"
+    },
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "/** @typedef {number} Num */\r\n/** @import { T } from \"./m\" */\r\n/** @type {Num} */\r\nconst a = /** @type {number} */ (1);\r\nconst b = /** @type {any} */ (a).x;\r\nfunction f(/** @type {string} */ s) { return s; }\r\n"
+      }
+     ],
+     "name": "/.src/probe.js"
+    }
+   ],
+   "id": "js-file",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/m.ts": "6578706f727420747970652054203d206e756d6265723b0a",
+     "/.src/probe.js": "2f2a2a204074797065646566207b6e756d6265727d204e756d202a2f0a2f2a2a2040696d706f7274207b2054207d2066726f6d20222e2f6d22202a2f0a2f2a2a204074797065207b4e756d7d202a2f0a636f6e73742061203d202f2a2a204074797065207b6e756d6265727d202a2f202831293b0a636f6e73742062203d202f2a2a204074797065207b616e797d202a2f202861292e783b0a66756e6374696f6e2066282f2a2a204074797065207b737472696e677d202a2f207329207b2072657475726e20733b207d"
+    },
+    "id": "js-file",
+    "options": {
+     "allowJs": true,
+     "checkJs": true,
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "outDir": "/.src/out",
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.js",
+     "/.src/m.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.js",
+   "source": "// @allowJs: true\n// @checkJs: true\n// @outDir: out\n// @filename: probe.js\n/** @typedef {number} Num */\n/** @import { T } from \"./m\" */\n/** @type {Num} */\nconst a = /** @type {number} */ (1);\nconst b = /** @type {any} */ (a).x;\nfunction f(/** @type {string} */ s) { return s; }\n// @filename: m.ts\nexport type T = number;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "function f() { }\r\nlet x = /* c */ 1 /* d */;\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "comments-around-erased",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "2f2f206c656164696e670a696e746572666163652049207b7d202f2f20747261696c696e670a2f2a206265666f7265202a2f20747970652054203d206e756d6265723b202f2a206166746572202a2f0a66756e6374696f6e206628293a20766f69643b202f2f206f7665726c6f61640a66756e6374696f6e20662829207b7d0a6c65742078203d202f2a2063202a2f202831206173206e756d62657229202f2a2064202a2f3b0a"
+    },
+    "id": "comments-around-erased",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "// leading\ninterface I {} // trailing\n/* before */ type T = number; /* after */\nfunction f(): void; // overload\nfunction f() {}\nlet x = /* c */ (1 as number) /* d */;\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "namespace N {\r\n    export const b = 1;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "statement-ambient-inside-namespace",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "6e616d657370616365204e207b0a202020206465636c61726520636f6e737420613a206e756d6265723b0a202020206578706f7274206465636c6172652066756e6374696f6e206628293a20766f69643b0a202020206578706f727420636f6e73742062203d20313b0a7d0a"
+    },
+    "id": "statement-ambient-inside-namespace",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "namespace N {\n    declare const a: number;\n    export declare function f(): void;\n    export const b = 1;\n}\n"
+  },
+  {
+   "diagnostics": 1,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class C {\r\n    x = 1;\r\n}\r\nfunction f(x) { return x; }\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "const-modifier-misplaced",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a20202020636f6e73742078203d20313b0a7d0a66756e6374696f6e20663c636f6e737420543e28783a205429207b2072657475726e20783b207d0a"
+    },
+    "id": "const-modifier-misplaced",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class C {\n    const x = 1;\n}\nfunction f<const T>(x: T) { return x; }\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "class C {\r\n    y = 1;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "declare-keyword-on-member",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "636c6173732043207b0a202020206465636c61726520726561646f6e6c7920783a206e756d6265723b0a2020202079203d20313b0a7d0a"
+    },
+    "id": "declare-keyword-on-member",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "class C {\n    declare readonly x: number;\n    y = 1;\n}\n"
+  },
+  {
+   "diagnostics": 0,
+   "files": [
+    {
+     "chains": [
+      {
+       "chain": [
+        "typeeraser"
+       ],
+       "text": "function f(x) {\r\n    return (// c\r\n    x)\r\n        + 1;\r\n}\r\n"
+      }
+     ],
+     "name": "/.src/probe.ts"
+    }
+   ],
+   "id": "no-asi-parentheses-keep-line-break",
+   "loading": {
+    "case_sensitive": true,
+    "cwd": "/.src",
+    "files": {
+     "/.src/probe.ts": "66756e6374696f6e206628783a20616e7929207b0a2020202072657475726e20282f2f20630a20202020202020207820617320616e792920617320616e790a20202020202020202b20313b0a7d0a"
+    },
+    "id": "no-asi-parentheses-keep-line-break",
+    "options": {
+     "newLine": 1,
+     "noErrorTruncation": true,
+     "skipDefaultLibCheck": true
+    },
+    "roots": [
+     "/.src/probe.ts"
+    ],
+    "skip_module_resolution": false,
+    "symlinks": {}
+   },
+   "name": "probe.ts",
+   "source": "function f(x: any) {\n    return (// c\n        x as any) as any\n        + 1;\n}\n"
+  }
+ ],
+ "go": "go1.27.1",
+ "overlay_sha256": {
+  "compiler/phase3_probe.go": "79ab5e0b07fed25e21a8912eec053737c2a92b2b1a1b6a3ce005fee5f92c837f",
+  "testrunner/phase3_probe_test.go": "e7e671638c8fae66ce4c5bd1db1946c823539be9f4c3975c71e3c3ab7f23ac79",
+  "transformers/estransforms/phase3_probe.go": "0cd0d4e137a8e84d95f675c241c62f58c7ec0ac4c094d5af148d44e07947cf84"
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "transformers": [
+  "async",
+  "classfields",
+  "commonjs",
+  "constenum",
+  "declarations",
+  "es",
+  "esdecorator",
+  "esmodule",
+  "exponentiation",
+  "forawait",
+  "impliedmodule",
+  "importelision",
+  "jsx",
+  "legacydecorators",
+  "logicalassignment",
+  "metadata",
+  "module",
+  "nullishcoalescing",
+  "objectrestspread",
+  "optionalcatch",
+  "optionalchain",
+  "runtimesyntax",
+  "script",
+  "taggedtemplate",
+  "typeeraser",
+  "usestrict",
+  "using"
+ ],
+ "version": 1
+}
