@@ -7,7 +7,7 @@ use phase4_tsctests::{
         watchmanager::{CommandLineTestingWithWatchBackend, WatchBackend},
     },
     runner::TscInput,
-    sys::{TestSys, new_test_sys},
+    sys::{new_test_sys, TestSys},
 };
 use std::sync::{Arc, Mutex, Weak};
 use tsr_arena::{Counters, Counts};
@@ -177,12 +177,10 @@ fn repeat_command(arguments: &[&str], build_info: bool) {
             assert!(observation.file.upgrade().is_none());
         }
         if build_info {
-            assert!(
-                observer
-                    .sys
-                    .fs_from_file_map()
-                    .file_exists(format!("{ROOT}out/tsconfig.tsbuildinfo").as_bytes())
-            );
+            assert!(observer
+                .sys
+                .fs_from_file_map()
+                .file_exists(format!("{ROOT}out/tsconfig.tsbuildinfo").as_bytes()));
         }
     }
     release_and_assert_empty(&observer);
