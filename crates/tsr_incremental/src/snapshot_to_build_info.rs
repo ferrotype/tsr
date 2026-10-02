@@ -122,12 +122,23 @@ impl ToBuildInfo<'_> {
         if file_id == 0 {
             let lib_file = self.loaded().default_lib_file(path.as_bytes()).cloned();
             if let Some(lib_file) = lib_file.filter(|lib_file| !lib_file.replaced) {
-                self.build_info.file_names.push(lib_file.name);
+                self.build_info
+                    .file_names
+                    .get_or_insert_with(Vec::new)
+                    .push(lib_file.name);
             } else {
                 let relative = self.relative_to_build_info(path.as_bytes());
-                self.build_info.file_names.push(relative);
+                self.build_info
+                    .file_names
+                    .get_or_insert_with(Vec::new)
+                    .push(relative);
             }
-            file_id = self.build_info.file_names.len() as BuildInfoFileId;
+            file_id = self
+                .build_info
+                .file_names
+                .as_deref()
+                .unwrap_or_default()
+                .len() as BuildInfoFileId;
             self.file_name_to_file_id.insert(path.clone(), file_id);
         }
         file_id
@@ -151,8 +162,16 @@ impl ToBuildInfo<'_> {
             .copied()
             .unwrap_or(0);
         if file_id_list_id == 0 {
-            self.build_info.file_ids_list.push(file_ids);
-            file_id_list_id = self.build_info.file_ids_list.len() as BuildInfoFileIdListId;
+            self.build_info
+                .file_ids_list
+                .get_or_insert_with(Vec::new)
+                .push(file_ids);
+            file_id_list_id = self
+                .build_info
+                .file_ids_list
+                .as_deref()
+                .unwrap_or_default()
+                .len() as BuildInfoFileIdListId;
             self.file_names_to_file_id_list_id
                 .insert(key, file_id_list_id);
         }
@@ -227,11 +246,12 @@ impl ToBuildInfo<'_> {
                     message_text: d.message_text.clone(),
                     message_key: d.message_key.clone(),
                     message_args: d.message_args.clone(),
-                    message_chain: self
-                        .to_build_info_diagnostics_from_file_name_diagnostics(&d.message_chain),
-                    related_information: self.to_build_info_diagnostics_from_file_name_diagnostics(
-                        &d.related_information,
-                    ),
+                    message_chain: d.message_chain.as_deref().map(|diagnostics| {
+                        self.to_build_info_diagnostics_from_file_name_diagnostics(diagnostics)
+                    }),
+                    related_information: d.related_information.as_deref().map(|diagnostics| {
+                        self.to_build_info_diagnostics_from_file_name_diagnostics(diagnostics)
+                    }),
                     reports_unnecessary: d.reports_unnecessary,
                     reports_deprecated: d.reports_deprecated,
                     skipped_on_no_emit: d.skipped_on_no_emit,
@@ -272,17 +292,25 @@ impl ToBuildInfo<'_> {
                 source: d.source.clone(),
                 message_text: d.message_text.clone(),
                 message_key: d.message_key.clone(),
-                message_args: d.message_args.clone(),
-                message_chain: self.to_build_info_diagnostics_from_diagnostics(
-                    owner,
-                    file_path_of_diagnostics,
-                    &d.message_chain,
-                )?,
-                related_information: self.to_build_info_diagnostics_from_diagnostics(
-                    owner,
-                    file_path_of_diagnostics,
-                    &d.related_information,
-                )?,
+                message_args: (!d.message_args.is_empty()).then(|| d.message_args.clone()),
+                message_chain: (!d.message_chain.is_empty())
+                    .then(|| {
+                        self.to_build_info_diagnostics_from_diagnostics(
+                            owner,
+                            file_path_of_diagnostics,
+                            &d.message_chain,
+                        )
+                    })
+                    .transpose()?,
+                related_information: (!d.related_information.is_empty())
+                    .then(|| {
+                        self.to_build_info_diagnostics_from_diagnostics(
+                            owner,
+                            file_path_of_diagnostics,
+                            &d.related_information,
+                        )
+                    })
+                    .transpose()?,
                 reports_unnecessary: d.reports_unnecessary,
                 reports_deprecated: d.reports_deprecated,
                 skipped_on_no_emit: d.skipped_on_no_emit,
@@ -357,15 +385,20 @@ impl ToBuildInfo<'_> {
                 .expect("every program file has its file info");
             let file_id = self.to_file_id(&path);
             //  tryAddRoot(key, fileId);
-            let file_name = self.build_info.file_names[(file_id - 1) as usize].clone();
+            let file_name = self.build_info.file_names.as_deref().unwrap_or_default()
+                [(file_id - 1) as usize]
+                .clone();
             if file_name != self.relative_to_build_info(path.as_bytes()) {
                 let lib_file = loaded.default_lib_file(path.as_bytes());
                 assert!(
-                    lib_file.is_some_and(|lib_file| !lib_file.replaced && file_name == lib_file.name),
+                    lib_file
+                        .is_some_and(|lib_file| !lib_file.replaced && file_name == lib_file.name),
                     "File name at index {} does not match expected relative path or libName: {} != {}",
                     file_id - 1,
                     String::from_utf8_lossy(file_name.as_bytes()),
-                    String::from_utf8_lossy(self.relative_to_build_info(path.as_bytes()).as_bytes())
+                    String::from_utf8_lossy(
+                        self.relative_to_build_info(path.as_bytes()).as_bytes()
+                    )
                 );
             }
             if self.snapshot.options.composite.is_true() {
@@ -378,6 +411,7 @@ impl ToBuildInfo<'_> {
                         None => {
                             self.build_info
                                 .emit_signatures
+                                .get_or_insert_with(Vec::new)
                                 .push(BuildInfoEmitSignature {
                                     file_id,
                                     ..BuildInfoEmitSignature::default()
@@ -404,6 +438,7 @@ impl ToBuildInfo<'_> {
                             }
                             self.build_info
                                 .emit_signatures
+                                .get_or_insert_with(Vec::new)
                                 .push(incremental_emit_signature);
                         }
                         Some(_) => {}
@@ -453,6 +488,7 @@ impl ToBuildInfo<'_> {
             if root != resolved {
                 self.build_info
                     .resolved_root
+                    .get_or_insert_with(Vec::new)
                     .push(BuildInfoResolvedRoot { resolved, root });
             }
         }
@@ -486,20 +522,21 @@ impl ToBuildInfo<'_> {
     fn set_referenced_map(&mut self) {
         let mut keys = self.snapshot.referenced_map.get_paths_with_references();
         keys.sort();
-        self.build_info.referenced_map = keys
-            .iter()
-            .map(|file_path| {
-                let references = self
-                    .snapshot
-                    .referenced_map
-                    .get_references(file_path)
-                    .expect("a path with references");
-                BuildInfoReferenceMapEntry {
-                    file_id: self.to_file_id(file_path),
-                    file_id_list_id: self.to_file_id_list_id(&references),
-                }
-            })
-            .collect();
+        self.build_info.referenced_map = (!keys.is_empty()).then(|| {
+            keys.iter()
+                .map(|file_path| {
+                    let references = self
+                        .snapshot
+                        .referenced_map
+                        .get_references(file_path)
+                        .expect("a path with references");
+                    BuildInfoReferenceMapEntry {
+                        file_id: self.to_file_id(file_path),
+                        file_id_list_id: self.to_file_id_list_id(&references),
+                    }
+                })
+                .collect()
+        });
     }
 
     // port: tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.setChangeFileSet
@@ -509,7 +546,8 @@ impl ToBuildInfo<'_> {
             .cloned()
             .collect();
         files.sort();
-        self.build_info.change_file_set = files.iter().map(|path| self.to_file_id(path)).collect();
+        self.build_info.change_file_set =
+            (!files.is_empty()).then(|| files.iter().map(|path| self.to_file_id(path)).collect());
     }
 
     // port: tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.setSemanticDiagnostics
@@ -524,23 +562,25 @@ impl ToBuildInfo<'_> {
                 None => {
                     if !lock(&self.snapshot.changed_files_set).contains(&path) {
                         let file_id = self.to_file_id(&path);
-                        self.build_info.semantic_diagnostics_per_file.push(
-                            BuildInfoSemanticDiagnostic {
+                        self.build_info
+                            .semantic_diagnostics_per_file
+                            .get_or_insert_with(Vec::new)
+                            .push(BuildInfoSemanticDiagnostic {
                                 file_id,
                                 diagnostics: None,
-                            },
-                        );
+                            });
                     }
                 }
                 Some(value) => {
                     let diagnostics = self.to_build_info_diagnostics_of_file(&path, &value)?;
                     if let Some(diagnostics) = diagnostics {
-                        self.build_info.semantic_diagnostics_per_file.push(
-                            BuildInfoSemanticDiagnostic {
+                        self.build_info
+                            .semantic_diagnostics_per_file
+                            .get_or_insert_with(Vec::new)
+                            .push(BuildInfoSemanticDiagnostic {
                                 file_id: 0,
                                 diagnostics: Some(diagnostics),
-                            },
-                        );
+                            });
                     }
                 }
             }
@@ -561,7 +601,8 @@ impl ToBuildInfo<'_> {
             emit_diagnostics_per_file
                 .push(self.to_build_info_diagnostics_of_file(&file_path, &value)?);
         }
-        self.build_info.emit_diagnostics_per_file = emit_diagnostics_per_file;
+        self.build_info.emit_diagnostics_per_file =
+            (!emit_diagnostics_per_file.is_empty()).then_some(emit_diagnostics_per_file);
         Ok(())
     }
 
@@ -583,6 +624,7 @@ impl ToBuildInfo<'_> {
             let file_id = self.to_file_id(&file_path);
             self.build_info
                 .affected_files_pending_emit
+                .get_or_insert_with(Vec::new)
                 .push(BuildInfoFilePendingEmit {
                     file_id,
                     emit_kind: if pending_emit == full_emit_kind {
@@ -622,19 +664,23 @@ impl ToBuildInfo<'_> {
     fn set_package_jsons(&mut self) {
         let state = self.snapshot.state().clone();
         if let Some(package_jsons) = state.package_jsons.filter(|jsons| !jsons.is_empty()) {
-            self.build_info.package_jsons = package_jsons
-                .iter()
-                .map(|path| self.relative_to_build_info(path.as_bytes()))
-                .collect();
+            self.build_info.package_jsons = Some(
+                package_jsons
+                    .iter()
+                    .map(|path| self.relative_to_build_info(path.as_bytes()))
+                    .collect(),
+            );
         }
         if let Some(missing_package_jsons) = state
             .missing_package_jsons
             .filter(|jsons| !jsons.is_empty())
         {
-            self.build_info.missing_package_jsons = missing_package_jsons
-                .iter()
-                .map(|path| self.relative_to_build_info(path.as_bytes()))
-                .collect();
+            self.build_info.missing_package_jsons = Some(
+                missing_package_jsons
+                    .iter()
+                    .map(|path| self.relative_to_build_info(path.as_bytes()))
+                    .collect(),
+            );
         }
     }
 }

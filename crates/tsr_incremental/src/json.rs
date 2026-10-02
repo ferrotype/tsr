@@ -51,16 +51,16 @@ impl<'e, 'a> Object<'e, 'a> {
         self.field(name, &value)
     }
 
-    /// A slice the pin leaves nil when empty.
-    pub(crate) fn slice_omitzero<T: Encode>(
+    /// A nullable slice or pointer tagged `omitzero`.
+    pub(crate) fn option_omitzero<T: Encode + ?Sized>(
         &mut self,
         name: &[u8],
-        value: &[T],
+        value: Option<&T>,
     ) -> Result<(), JsonError> {
-        if value.is_empty() {
-            return Ok(());
+        if let Some(value) = value {
+            self.field(name, value)?;
         }
-        self.field(name, value)
+        Ok(())
     }
 
     pub(crate) fn end(self) -> Result<(), JsonError> {

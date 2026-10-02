@@ -65,18 +65,23 @@ pub fn contains(text: &[u8], sep: &[u8]) -> bool {
     index(text, sep).is_some()
 }
 
-/// `strings.Replace(text, old, new, n)` for a non-empty `old`; a negative `n`
-/// replaces every occurrence.
+/// `strings.Replace(text, old, new, n)`; a negative `n` replaces every
+/// occurrence. An empty `old` matches at the beginning and after each Go
+/// UTF-8 sequence, including each invalid byte.
 pub fn replace(text: &[u8], old: &[u8], new: &[u8], n: isize) -> Vec<u8> {
-    assert!(
-        !old.is_empty(),
-        "replace: an empty old string is not used here"
-    );
     let mut out = Vec::with_capacity(text.len());
     let mut rest = text;
     let mut done = 0;
     while n < 0 || done < n {
-        let Some(at) = index(rest, old) else { break };
+        let at = if old.is_empty() && done > 0 {
+            if rest.is_empty() {
+                break;
+            }
+            decode_rune(rest).1
+        } else {
+            let Some(at) = index(rest, old) else { break };
+            at
+        };
         out.extend_from_slice(&rest[..at]);
         out.extend_from_slice(new);
         rest = &rest[at + old.len()..];
@@ -240,6 +245,22 @@ mod tests {
         assert_eq!(replace(b"a.b.c", b".", b"-", 1), b"a-b.c");
         assert_eq!(replace_all(b"a.b.c", b".", b"-"), b"a-b-c");
         assert_eq!(replace(b"abc", b"x", b"-", 1), b"abc");
+    }
+
+    #[test]
+    fn replace_empty_matches_go_utf8_boundaries() {
+        // strings.Replace inserts before the first rune and after each
+        // decoded rune; malformed UTF-8 advances one byte at a time.
+        let text = b"a\xff\xc3\xa9\xed\xa0\x80";
+        assert_eq!(replace(text, b"", b"-", 0), text);
+        assert_eq!(replace(text, b"", b"-", 1), b"-a\xff\xc3\xa9\xed\xa0\x80");
+        assert_eq!(replace(text, b"", b"-", 3), b"-a-\xff-\xc3\xa9\xed\xa0\x80");
+        assert_eq!(
+            replace_all(text, b"", b"-"),
+            b"-a-\xff-\xc3\xa9-\xed-\xa0-\x80-"
+        );
+        assert_eq!(replace_all(b"", b"", b"-"), b"-");
+        assert_eq!(replace_all(b"a", b"", b""), b"a");
     }
 
     #[test]

@@ -680,13 +680,15 @@ fn repopulate_diagnostic_message_chain(
                 source: c.source.clone(),
                 message_text: c.message_text.clone(),
                 message_key: c.message_key.clone(),
-                message_args: c.message_args.clone(),
+                message_args: (!c.message_args.is_empty()).then(|| c.message_args.clone()),
                 repopulate_info: c.repopulate_info.clone(),
                 ..BuildInfoDiagnosticWithFileName::default()
             };
             // Recursively handle nested chains
             for nested in &c.message_chain {
-                b.message_chain.push(ast_diag_to_build_info_diag(nested));
+                b.message_chain
+                    .get_or_insert_with(Vec::new)
+                    .push(ast_diag_to_build_info_diag(nested));
             }
             result.push(Arc::new(crate::snapshot::repopulate_diagnostic_chain(
                 &b,
@@ -723,12 +725,14 @@ pub(crate) fn ast_diag_to_build_info_diag(d: &Diagnostic) -> BuildInfoDiagnostic
         source: d.source.clone(),
         message_text: d.message_text.clone(),
         message_key: d.message_key.clone(),
-        message_args: d.message_args.clone(),
+        message_args: (!d.message_args.is_empty()).then(|| d.message_args.clone()),
         repopulate_info: d.repopulate_info.clone(),
         ..BuildInfoDiagnosticWithFileName::default()
     };
     for nested in &d.message_chain {
-        b.message_chain.push(ast_diag_to_build_info_diag(nested));
+        b.message_chain
+            .get_or_insert_with(Vec::new)
+            .push(ast_diag_to_build_info_diag(nested));
     }
     b
 }

@@ -14,8 +14,8 @@ closures, so they are recorded from the pin, not transcribed:
 
 How it runs. The pinned module (`tsc/go.mod`, `go.sum`, `internal` and the
 four reference families) is exported with `git archive <pin>` into the
-scratch tree `target/phase4/scenarios-tree/` (re-exported when the pin
-changes), so nothing under `upstream/` is ever written: the pinned baseline
+scratch tree `target/phase4/scenarios-tree/` (re-exported for each native
+build), so nothing under `upstream/` is ever written: the pinned baseline
 package writes its `local/` files beside the scratch tree's references. The
 recorder is `go test -overlay` over that tree. The patch sources live in
 `tools/phase4/recorder/`: `runner.go.diff`, `sys.go.diff` and `fs.go.diff`
@@ -350,22 +350,20 @@ def patched_sources(tree):
 # --- the scratch tree and the Go runs -------------------------------------------
 
 def prepare_tree(upstream):
-    """Export the pinned module and the four reference families once per pin."""
+    """Export a fresh pinned module and references for each native build.
+
+    A matching export marker does not establish that a cached compiler,
+    test, or reference has stayed unchanged. Never compile evidence from it.
+    """
     current = pin()
     paths = ["tsc/go.mod", "tsc/go.sum", "tsc/internal", *(f"{REFERENCES}/{family}" for family in FAMILIES)]
-    marker = TREE / "export.json"
-    identity = canonical({"pin": current, "paths": paths})
-    if not marker.exists() or marker.read_bytes() != identity:
-        if TREE.exists():
-            shutil.rmtree(TREE)
-        TREE.mkdir(parents=True)
-        archive = command(["git", "archive", current, *paths], cwd=upstream)
-        with tarfile.open(fileobj=io.BytesIO(archive)) as stream:
-            stream.extractall(TREE, filter="data")
-        marker.write_bytes(identity)
-    local = TREE / "tsc/testdata/baselines/local"
-    if local.exists():
-        shutil.rmtree(local)
+    archive = command(["git", "archive", current, *paths], cwd=upstream)
+    if TREE.exists():
+        shutil.rmtree(TREE)
+    TREE.mkdir(parents=True)
+    with tarfile.open(fileobj=io.BytesIO(archive)) as stream:
+        stream.extractall(TREE, filter="data")
+    (TREE / "export.json").write_bytes(canonical({"pin": current, "paths": paths}))
     return TREE
 
 

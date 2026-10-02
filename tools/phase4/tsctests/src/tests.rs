@@ -412,38 +412,103 @@ fn unmarshal_build_info(text: &[u8]) -> Result<BuildInfo, tsr_json::Error> {
     Ok(build_info)
 }
 
-/// `tsr_incremental::BuildInfo` keeps `fileNames`, like every slice the pin
-/// leaves nil when it is empty, as a `Vec`, so a decoded `"fileNames":[]` is
-/// the same as an absent one and the rendering omits it where the pin, which
-/// decoded an empty non-nil slice, prints it. The pin's own build infos never
-/// hold an empty non-nil `fileNames` (the committed renderings all match);
-/// the probe's synthetic case does, and the difference is exactly this line.
-const EMPTY_FILE_NAMES: &str = "\n  \"fileNames\": [],";
+#[test]
+fn file_text_edits_allow_an_empty_search_string() {
+    let path = b"/a.ts";
+    let sys = new_test_sys(
+        &TscInput {
+            files: BTreeMap::from([(path.to_vec(), InputFile::Text("aé".as_bytes().to_vec()))]),
+            ..TscInput::default()
+        },
+        false,
+    );
+    sys.replace_file_text(path, b"", b"!");
+    assert_eq!(sys.read_file_no_error(path), "!aé".as_bytes());
+    sys.replace_file_text_all(path, b"", b"-");
+    assert_eq!(sys.read_file_no_error(path), "-!-a-é-".as_bytes());
+}
 
 #[test]
 fn readable_build_info_matches_the_pin_on_synthetic_build_infos() {
-    let mut known = 0;
     for case in results("readable").as_array().unwrap() {
         let text = case["text"].as_str().unwrap().as_bytes();
         assert!(case.get("error").is_none(), "the pin rejects {case}");
         let build_info = unmarshal_build_info(text).expect("the build info decodes");
-        let mut expected = case["readable"].clone();
-        if crate::goutil::contains(text, br#""fileNames":[]"#) {
-            let rendered = expected["result"]["text"].as_str().unwrap();
-            assert!(rendered.contains(EMPTY_FILE_NAMES));
-            expected["result"]["text"] = json!(rendered.replacen(EMPTY_FILE_NAMES, "", 1));
-            known += 1;
-        }
         assert_eq!(
             attempt(|| to_readable_build_info(&build_info, text)),
-            expected,
+            case["readable"],
             "{case}"
         );
     }
-    assert_eq!(
-        known, 1,
-        "one synthetic case holds an empty non-nil fileNames"
-    );
+}
+
+/// Native `toReadableBuildInfo` copies or maps non-nil empty slices to
+/// non-nil empty slices, except referencedMap, which becomes an empty object.
+/// These cases were executed against the pin with an access-only Go overlay.
+#[test]
+fn readable_build_info_preserves_null_and_empty_collection_shapes() {
+    for field in [
+        "root",
+        "packageJsons",
+        "missingPackageJsons",
+        "contentMapperIdentities",
+        "fileNames",
+        "fileInfos",
+        "fileIdsList",
+        "referencedMap",
+        "semanticDiagnosticsPerFile",
+        "emitDiagnosticsPerFile",
+        "changeFileSet",
+        "affectedFilesPendingEmit",
+        "emitSignatures",
+        "resolvedRoot",
+        "options",
+    ] {
+        let empty = if field == "options" { "{}" } else { "[]" };
+        for value in ["null", empty] {
+            let text = format!("{{\"{field}\":{value}}}");
+            let build_info = unmarshal_build_info(text.as_bytes()).unwrap();
+            let readable_value = if field == "referencedMap" { "{}" } else { empty };
+            let member = if value == "null" || field == "contentMapperIdentities" {
+                String::new()
+            } else {
+                format!("  \"{field}\": {readable_value},\n")
+            };
+            let expected = format!("{{\n{member}  \"size\": {}\n}}", text.len());
+            assert_eq!(
+                to_readable_build_info(&build_info, text.as_bytes()),
+                expected.as_bytes(),
+                "{text}"
+            );
+        }
+    }
+}
+
+#[test]
+fn readable_build_info_preserves_nested_diagnostic_collection_shapes() {
+    for field in ["messageArgs", "messageChain", "relatedInformation"] {
+        for value in ["null", "[]"] {
+            let text = format!(
+                "{{\"fileNames\":[\"./a.ts\"],\"semanticDiagnosticsPerFile\":[[1,[{{\"{field}\":{value}}}]]]}}"
+            );
+            let build_info = unmarshal_build_info(text.as_bytes()).unwrap();
+            let diagnostic = if value == "null" {
+                json!({})
+            } else {
+                json!({field: []})
+            };
+            let rendered = to_readable_build_info(&build_info, text.as_bytes());
+            assert_eq!(
+                serde_json::from_slice::<Value>(&rendered).unwrap(),
+                json!({
+                    "fileNames": ["./a.ts"],
+                    "semanticDiagnosticsPerFile": [["./a.ts", [diagnostic]]],
+                    "size": text.len()
+                }),
+                "{text}"
+            );
+        }
+    }
 }
 
 /// The build-info sections of a committed reference: `(path, text)` for every

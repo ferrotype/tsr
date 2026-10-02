@@ -240,9 +240,9 @@ pub struct BuildInfoDiagnosticWithFileName {
     pub(crate) source: JsString,
     pub(crate) message_text: JsString,
     pub(crate) message_key: JsString,
-    pub(crate) message_args: Vec<JsString>,
-    pub(crate) message_chain: Vec<BuildInfoDiagnosticWithFileName>,
-    pub(crate) related_information: Vec<BuildInfoDiagnosticWithFileName>,
+    pub(crate) message_args: Option<Vec<JsString>>,
+    pub(crate) message_chain: Option<Vec<BuildInfoDiagnosticWithFileName>>,
+    pub(crate) related_information: Option<Vec<BuildInfoDiagnosticWithFileName>>,
     pub(crate) reports_unnecessary: bool,
     pub(crate) reports_deprecated: bool,
     pub(crate) skipped_on_no_emit: bool,
@@ -420,12 +420,18 @@ impl BuildInfoDiagnosticWithFileName {
             return repopulate_diagnostic_chain(self, p, file_for_diagnostic);
         }
 
-        let mut message_chain = Vec::with_capacity(self.message_chain.len());
-        for msg in &self.message_chain {
+        let mut message_chain =
+            Vec::with_capacity(self.message_chain.as_deref().unwrap_or_default().len());
+        for msg in self.message_chain.iter().flatten() {
             message_chain.push(Arc::new(msg.to_diagnostic(p, file_for_diagnostic)?));
         }
-        let mut related_information = Vec::with_capacity(self.related_information.len());
-        for info in &self.related_information {
+        let mut related_information = Vec::with_capacity(
+            self.related_information
+                .as_deref()
+                .unwrap_or_default()
+                .len(),
+        );
+        for info in self.related_information.iter().flatten() {
             related_information.push(Arc::new(info.to_diagnostic(p, file_for_diagnostic)?));
         }
         let mut diagnostic = Diagnostic::from_serialized(
@@ -434,7 +440,7 @@ impl BuildInfoDiagnosticWithFileName {
             self.code,
             self.category,
             self.message_key.clone(),
-            self.message_args.clone(),
+            self.message_args.clone().unwrap_or_default(),
             message_chain,
             related_information,
             self.reports_unnecessary,
@@ -454,12 +460,18 @@ impl BuildInfoDiagnosticWithFileName {
         p: &Arc<Program>,
         file: Option<NodeId>,
     ) -> Result<Diagnostic, Error> {
-        let mut message_chain = Vec::with_capacity(self.message_chain.len());
-        for msg in &self.message_chain {
+        let mut message_chain =
+            Vec::with_capacity(self.message_chain.as_deref().unwrap_or_default().len());
+        for msg in self.message_chain.iter().flatten() {
             message_chain.push(Arc::new(msg.to_diagnostic(p, file)?));
         }
-        let mut related_information = Vec::with_capacity(self.related_information.len());
-        for info in &self.related_information {
+        let mut related_information = Vec::with_capacity(
+            self.related_information
+                .as_deref()
+                .unwrap_or_default()
+                .len(),
+        );
+        for info in self.related_information.iter().flatten() {
             related_information.push(Arc::new(info.to_diagnostic(p, file)?));
         }
         Ok(Diagnostic::from_serialized(
@@ -468,7 +480,7 @@ impl BuildInfoDiagnosticWithFileName {
             self.code,
             self.category,
             self.message_key.clone(),
-            self.message_args.clone(),
+            self.message_args.clone().unwrap_or_default(),
             message_chain,
             related_information,
             self.reports_unnecessary,
@@ -524,8 +536,8 @@ fn repopulate_mode_mismatch_chain(
     let details =
         tsr_checker::create_mode_mismatch_details(&host, file_name.as_bytes(), path.as_bytes())?;
 
-    let mut next_chain = Vec::with_capacity(b.message_chain.len());
-    for msg in &b.message_chain {
+    let mut next_chain = Vec::with_capacity(b.message_chain.as_deref().unwrap_or_default().len());
+    for msg in b.message_chain.iter().flatten() {
         next_chain.push(Arc::new(msg.to_diagnostic(p, Some(file))?));
     }
 
@@ -570,8 +582,8 @@ fn repopulate_module_not_found_chain(
         package_name.as_bytes(),
     )?;
 
-    let mut next_chain = Vec::with_capacity(b.message_chain.len());
-    for msg in &b.message_chain {
+    let mut next_chain = Vec::with_capacity(b.message_chain.as_deref().unwrap_or_default().len());
+    for msg in b.message_chain.iter().flatten() {
         next_chain.push(Arc::new(msg.to_diagnostic(p, Some(file))?));
     }
 
@@ -658,7 +670,32 @@ impl std::fmt::Debug for Snapshot {
     }
 }
 
+/// Retained identity of a cached diagnostics entry. Holding this value keeps
+/// its allocation alive, so replacement cannot reuse an address and compare
+/// equal. The entry contents and cache mutation remain private.
+#[derive(Clone, Debug)]
+pub struct CachedDiagnosticsIdentity(Arc<DiagnosticsOrBuildInfoDiagnosticsWithFileName>);
+
+impl PartialEq for CachedDiagnosticsIdentity {
+    fn eq(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.0, &other.0)
+    }
+}
+impl Eq for CachedDiagnosticsIdentity {}
+
 impl Snapshot {
+    /// Observe the same identity that Go's testing hook reads from
+    /// `SemanticDiagnosticsPerFile.Load`, without exposing the mutable map.
+    pub fn cached_semantic_diagnostics_identity(
+        &self,
+        path: &Path,
+    ) -> Option<CachedDiagnosticsIdentity> {
+        lock(&self.semantic_diagnostics_per_file)
+            .get(path)
+            .cloned()
+            .map(CachedDiagnosticsIdentity)
+    }
+
     // port: tsc/internal/execute/incremental/snapshot.go:snapshot.addFileToChangeSet
     pub(crate) fn add_file_to_change_set(&self, file_path: &Path) {
         lock(&self.changed_files_set).insert(file_path.clone());
@@ -835,5 +872,38 @@ fn category_name(category: i32) -> &'static str {
         2 => "suggestion",
         3 => "message",
         _ => panic!("Unhandled diagnostic category"),
+    }
+}
+
+#[cfg(test)]
+mod cache_identity_tests {
+    use super::*;
+    #[test]
+    fn diagnostics_identity_tracks_sharing_and_retains_replaced_entry() {
+        let snapshot = Snapshot::default();
+        let path = JsString::from_bytes(b"/main.ts".as_slice());
+        assert!(snapshot
+            .cached_semantic_diagnostics_identity(&path)
+            .is_none());
+        let entry = Arc::new(DiagnosticsOrBuildInfoDiagnosticsWithFileName::default());
+        lock(&snapshot.semantic_diagnostics_per_file).insert(path.clone(), entry.clone());
+        let old = snapshot
+            .cached_semantic_diagnostics_identity(&path)
+            .unwrap();
+        assert_eq!(
+            Some(old.clone()),
+            snapshot.cached_semantic_diagnostics_identity(&path)
+        );
+        lock(&snapshot.semantic_diagnostics_per_file).insert(
+            path.clone(),
+            Arc::new(DiagnosticsOrBuildInfoDiagnosticsWithFileName::default()),
+        );
+        assert_ne!(
+            Some(old.clone()),
+            snapshot.cached_semantic_diagnostics_identity(&path)
+        );
+        assert_eq!(Arc::strong_count(&entry), 2);
+        drop(old);
+        assert_eq!(Arc::strong_count(&entry), 1);
     }
 }

@@ -1,12 +1,15 @@
 """Phase 4 X0: the recorded scenario inventory is well formed, current and complete."""
 import copy
 import gzip
+import io
 import json
 from pathlib import Path
 import shutil
 import sys
+import tarfile
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -165,6 +168,36 @@ class PatchTests(unittest.TestCase):
             scenarios.apply_patch("a\nd\n", patch)
         with self.assertRaisesRegex(ValueError, "line counts"):
             scenarios.apply_patch("a\nc\n", patch.replace("+1,3", "+1,4"))
+
+
+class NativeTreeTests(unittest.TestCase):
+    def test_native_runs_discard_modified_and_added_cached_sources(self):
+        # The export marker still names the right pin when an unpatched
+        # compiler file or an extra Go test in the cached tree was changed.
+        source = "tsc/internal/compiler/program.go"
+        reference = scenarios.REFERENCES + "/tsc/example.js"
+        contents = {source: b"pinned compiler\n", reference: b"pinned reference\n"}
+        archive = io.BytesIO()
+        with tarfile.open(fileobj=archive, mode="w") as stream:
+            for name, content in contents.items():
+                entry = tarfile.TarInfo(name)
+                entry.size = len(content)
+                stream.addfile(entry, io.BytesIO(content))
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            tree = root / "tree"
+            with mock.patch.object(scenarios, "TREE", tree), \
+                    mock.patch.object(scenarios, "pin", return_value="a" * 40), \
+                    mock.patch.object(scenarios, "command", return_value=archive.getvalue()):
+                scenarios.prepare_tree(root)
+                (tree / source).write_bytes(b"modified compiler\n")
+                (tree / reference).write_bytes(b"modified reference\n")
+                extra = tree / "tsc/internal/compiler/extra_test.go"
+                extra.write_bytes(b"unrecorded test\n")
+                scenarios.prepare_tree(root)
+                for name, content in contents.items():
+                    self.assertEqual((tree / name).read_bytes(), content)
+                self.assertFalse(extra.exists())
 
 
 if __name__ == "__main__":

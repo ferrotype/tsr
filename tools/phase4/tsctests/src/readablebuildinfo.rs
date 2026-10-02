@@ -4,10 +4,9 @@
 //!
 //! Each readable type encodes as the pin's struct does under
 //! `json.MarshalIndent(&readable, "", "  ")`: fields in declaration order, an
-//! `omitzero` field only when it is not its zero value. A slice the pin keeps
-//! nil when it is empty is omitted when empty; the three the pin can leave
-//! empty but non-nil (`root`, `fileInfos`, and a nil-checked pending-emit
-//! list) follow the build info's own `Option`s.
+//! `omitzero` field only when it is not its zero value. Nullable slices
+//! preserve the pin's nil versus non-nil empty distinction through both
+//! direct copies and `core.Map` transformations.
 use tsr_core::collections::OrderedMap;
 use tsr_incremental::{
     get_file_emit_kind, AnyValue, BuildInfo, BuildInfoDiagnostic, BuildInfoDiagnosticsOfFile,
@@ -52,13 +51,6 @@ impl<'e, 'a> Object<'e, 'a> {
         }
         self.field(name, &value)
     }
-    /// A slice the pin leaves nil when it has no entries.
-    fn slice_omitzero<T: Encode>(&mut self, name: &[u8], value: &[T]) -> Result<(), JsonError> {
-        if value.is_empty() {
-            return Ok(());
-        }
-        self.field(name, value)
-    }
     /// A pointer or a slice that may be non-nil and empty.
     fn option_omitzero<T: Encode + ?Sized>(
         &mut self,
@@ -84,24 +76,24 @@ struct ReadableBuildInfo<'b> {
     errors: bool,
     check_pending: bool,
     root: Option<Vec<ReadableBuildInfoRoot<'b>>>,
-    package_jsons: &'b [JsString],
-    missing_package_jsons: &'b [JsString],
+    package_jsons: Option<&'b [JsString]>,
+    missing_package_jsons: Option<&'b [JsString]>,
 
     // IncrementalProgram info
-    file_names: &'b [JsString],
+    file_names: Option<&'b [JsString]>,
     file_infos: Option<Vec<ReadableBuildInfoFileInfo<'b>>>,
-    file_ids_list: Vec<Vec<JsString>>,
+    file_ids_list: Option<Vec<Vec<JsString>>>,
     options: Option<&'b OrderedMap<JsString, AnyValue>>,
     referenced_map: Option<OrderedMap<JsString, Vec<JsString>>>,
-    semantic_diagnostics_per_file: Vec<ReadableBuildInfoSemanticDiagnostic>,
-    emit_diagnostics_per_file: Vec<ReadableBuildInfoDiagnosticsOfFile>,
+    semantic_diagnostics_per_file: Option<Vec<ReadableBuildInfoSemanticDiagnostic>>,
+    emit_diagnostics_per_file: Option<Vec<ReadableBuildInfoDiagnosticsOfFile>>,
     /// List of changed files in the program, not the whole set of files
-    change_file_set: Vec<JsString>,
+    change_file_set: Option<Vec<JsString>>,
     affected_files_pending_emit: Option<Vec<ReadableBuildInfoFilePendingEmit<'b>>>,
     /// Because this is only output file in the program, we dont need fileId to deduplicate name
     latest_changed_dts_file: &'b JsString,
-    emit_signatures: Vec<ReadableBuildInfoEmitSignature<'b>>,
-    resolved_root: Vec<ReadableBuildInfoResolvedRoot>,
+    emit_signatures: Option<Vec<ReadableBuildInfoEmitSignature<'b>>>,
+    resolved_root: Option<Vec<ReadableBuildInfoResolvedRoot>>,
     /// Size of the build info file
     size: i64,
 
@@ -116,19 +108,22 @@ impl Encode for ReadableBuildInfo<'_> {
         object.bool_omitzero(b"errors", self.errors)?;
         object.bool_omitzero(b"checkPending", self.check_pending)?;
         object.option_omitzero(b"root", self.root.as_deref())?;
-        object.slice_omitzero(b"packageJsons", self.package_jsons)?;
-        object.slice_omitzero(b"missingPackageJsons", self.missing_package_jsons)?;
-        object.slice_omitzero(b"fileNames", self.file_names)?;
+        object.option_omitzero(b"packageJsons", self.package_jsons)?;
+        object.option_omitzero(b"missingPackageJsons", self.missing_package_jsons)?;
+        object.option_omitzero(b"fileNames", self.file_names)?;
         object.option_omitzero(b"fileInfos", self.file_infos.as_deref())?;
-        object.slice_omitzero(b"fileIdsList", &self.file_ids_list)?;
+        object.option_omitzero(b"fileIdsList", self.file_ids_list.as_deref())?;
         object.option_omitzero(b"options", self.options)?;
         object.option_omitzero(b"referencedMap", self.referenced_map.as_ref())?;
-        object.slice_omitzero(
+        object.option_omitzero(
             b"semanticDiagnosticsPerFile",
-            &self.semantic_diagnostics_per_file,
+            self.semantic_diagnostics_per_file.as_deref(),
         )?;
-        object.slice_omitzero(b"emitDiagnosticsPerFile", &self.emit_diagnostics_per_file)?;
-        object.slice_omitzero(b"changeFileSet", &self.change_file_set)?;
+        object.option_omitzero(
+            b"emitDiagnosticsPerFile",
+            self.emit_diagnostics_per_file.as_deref(),
+        )?;
+        object.option_omitzero(b"changeFileSet", self.change_file_set.as_deref())?;
         object.option_omitzero(
             b"affectedFilesPendingEmit",
             self.affected_files_pending_emit.as_deref(),
@@ -137,8 +132,8 @@ impl Encode for ReadableBuildInfo<'_> {
             b"latestChangedDtsFile",
             self.latest_changed_dts_file.as_bytes(),
         )?;
-        object.slice_omitzero(b"emitSignatures", &self.emit_signatures)?;
-        object.slice_omitzero(b"resolvedRoot", &self.resolved_root)?;
+        object.option_omitzero(b"emitSignatures", self.emit_signatures.as_deref())?;
+        object.option_omitzero(b"resolvedRoot", self.resolved_root.as_deref())?;
         object.int_omitzero(b"size", self.size)?;
         object.bool_omitzero(b"semanticErrors", self.semantic_errors)?;
         object.end()
@@ -195,9 +190,9 @@ struct ReadableBuildInfoDiagnostic {
     code: i32,
     category: i32,
     message_key: JsString,
-    message_args: Vec<JsString>,
-    message_chain: Vec<ReadableBuildInfoDiagnostic>,
-    related_information: Vec<ReadableBuildInfoDiagnostic>,
+    message_args: Option<Vec<JsString>>,
+    message_chain: Option<Vec<ReadableBuildInfoDiagnostic>>,
+    related_information: Option<Vec<ReadableBuildInfoDiagnostic>>,
     reports_unnecessary: bool,
     reports_deprecated: bool,
     skipped_on_no_emit: bool,
@@ -214,9 +209,9 @@ impl Encode for ReadableBuildInfoDiagnostic {
         object.int_omitzero(b"code", i64::from(self.code))?;
         object.int_omitzero(b"category", i64::from(self.category))?;
         object.string_omitzero(b"messageKey", self.message_key.as_bytes())?;
-        object.slice_omitzero(b"messageArgs", &self.message_args)?;
-        object.slice_omitzero(b"messageChain", &self.message_chain)?;
-        object.slice_omitzero(b"relatedInformation", &self.related_information)?;
+        object.option_omitzero(b"messageArgs", self.message_args.as_deref())?;
+        object.option_omitzero(b"messageChain", self.message_chain.as_deref())?;
+        object.option_omitzero(b"relatedInformation", self.related_information.as_deref())?;
         object.bool_omitzero(b"reportsUnnecessary", self.reports_unnecessary)?;
         object.bool_omitzero(b"reportsDeprecated", self.reports_deprecated)?;
         object.bool_omitzero(b"skippedOnNoEmit", self.skipped_on_no_emit)?;
@@ -346,20 +341,20 @@ pub fn to_readable_build_info(build_info: &BuildInfo, build_info_text: &[u8]) ->
         errors: build_info.errors,
         check_pending: build_info.check_pending,
         root: None,
-        package_jsons: &build_info.package_jsons,
-        missing_package_jsons: &build_info.missing_package_jsons,
-        file_names: &build_info.file_names,
+        package_jsons: build_info.package_jsons.as_deref(),
+        missing_package_jsons: build_info.missing_package_jsons.as_deref(),
+        file_names: build_info.file_names.as_deref(),
         file_infos: None,
-        file_ids_list: Vec::new(),
+        file_ids_list: None,
         options: build_info.options.as_ref(),
         referenced_map: None,
-        semantic_diagnostics_per_file: Vec::new(),
-        emit_diagnostics_per_file: Vec::new(),
-        change_file_set: Vec::new(),
+        semantic_diagnostics_per_file: None,
+        emit_diagnostics_per_file: None,
+        change_file_set: None,
         affected_files_pending_emit: None,
         latest_changed_dts_file: &build_info.latest_changed_dts_file,
-        emit_signatures: Vec::new(),
-        resolved_root: Vec::new(),
+        emit_signatures: None,
+        resolved_root: None,
         size: build_info_text.len() as i64,
         semantic_errors: build_info.semantic_errors,
     };
@@ -384,12 +379,12 @@ pub fn to_readable_build_info(build_info: &BuildInfo, build_info_text: &[u8]) ->
 impl ReadableBuildInfo<'_> {
     // port: tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.toFilePath
     fn to_file_path(&self, file_id: BuildInfoFileId) -> JsString {
-        self.build_info.file_names[(file_id - 1) as usize].clone()
+        self.build_info.file_names.as_deref().unwrap_or_default()[(file_id - 1) as usize].clone()
     }
 
     // port: tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.toFilePathSet
     fn to_file_path_set(&self, file_id_list_id: BuildInfoFileIdListId) -> Vec<JsString> {
-        self.file_ids_list[(file_id_list_id - 1) as usize].clone()
+        self.file_ids_list.as_deref().unwrap_or_default()[(file_id_list_id - 1) as usize].clone()
     }
 
     // port: tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.toReadableBuildInfoDiagnostic
@@ -414,9 +409,14 @@ impl ReadableBuildInfo<'_> {
                     category: d.category,
                     message_key: d.message_key.clone(),
                     message_args: d.message_args.clone(),
-                    message_chain: self.to_readable_build_info_diagnostic(&d.message_chain),
-                    related_information: self
-                        .to_readable_build_info_diagnostic(&d.related_information),
+                    message_chain: d
+                        .message_chain
+                        .as_deref()
+                        .map(|diagnostics| self.to_readable_build_info_diagnostic(diagnostics)),
+                    related_information: d
+                        .related_information
+                        .as_deref()
+                        .map(|diagnostics| self.to_readable_build_info_diagnostic(diagnostics)),
                     reports_unnecessary: d.reports_unnecessary,
                     reports_deprecated: d.reports_deprecated,
                     skipped_on_no_emit: d.skipped_on_no_emit,
@@ -486,19 +486,19 @@ impl ReadableBuildInfo<'_> {
 
     // port: tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setFileIdsList
     fn set_file_ids_list(&mut self) {
-        self.file_ids_list = self
-            .build_info
-            .file_ids_list
-            .iter()
-            .map(|ids| ids.iter().map(|&id| self.to_file_path(id)).collect())
-            .collect();
+        self.file_ids_list = self.build_info.file_ids_list.as_ref().map(|entries| {
+            entries
+                .iter()
+                .map(|ids| ids.iter().map(|&id| self.to_file_path(id)).collect())
+                .collect()
+        });
     }
 
     // port: tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setReferencedMap
     fn set_referenced_map(&mut self) {
-        if !self.build_info.referenced_map.is_empty() {
+        if let Some(entries) = &self.build_info.referenced_map {
             let mut referenced_map = OrderedMap::default();
-            for entry in &self.build_info.referenced_map {
+            for entry in entries {
                 referenced_map.insert(
                     self.to_file_path(entry.file_id),
                     self.to_file_path_set(entry.file_id_list_id),
@@ -513,9 +513,8 @@ impl ReadableBuildInfo<'_> {
         self.change_file_set = self
             .build_info
             .change_file_set
-            .iter()
-            .map(|&id| self.to_file_path(id))
-            .collect();
+            .as_ref()
+            .map(|entries| entries.iter().map(|&id| self.to_file_path(id)).collect());
     }
 
     // port: tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setSemanticDiagnostics
@@ -523,51 +522,59 @@ impl ReadableBuildInfo<'_> {
         self.semantic_diagnostics_per_file = self
             .build_info
             .semantic_diagnostics_per_file
-            .iter()
-            .map(|diagnostics: &BuildInfoSemanticDiagnostic| {
-                if diagnostics.file_id != 0 {
-                    return ReadableBuildInfoSemanticDiagnostic {
-                        file: self.to_file_path(diagnostics.file_id),
-                        diagnostics: None,
-                    };
-                }
-                let of_file = diagnostics
-                    .diagnostics
-                    .as_ref()
-                    .expect("a semantic-diagnostics entry without a file id has diagnostics");
-                ReadableBuildInfoSemanticDiagnostic {
-                    file: JsString::default(),
-                    diagnostics: Some(self.to_readable_build_info_diagnostics_of_file(of_file)),
-                }
-            })
-            .collect();
+            .as_ref()
+            .map(|entries| {
+                entries
+                    .iter()
+                    .map(|diagnostics: &BuildInfoSemanticDiagnostic| {
+                        if diagnostics.file_id != 0 {
+                            return ReadableBuildInfoSemanticDiagnostic {
+                                file: self.to_file_path(diagnostics.file_id),
+                                diagnostics: None,
+                            };
+                        }
+                        let of_file = diagnostics.diagnostics.as_ref().expect(
+                            "a semantic-diagnostics entry without a file id has diagnostics",
+                        );
+                        ReadableBuildInfoSemanticDiagnostic {
+                            file: JsString::default(),
+                            diagnostics: Some(
+                                self.to_readable_build_info_diagnostics_of_file(of_file),
+                            ),
+                        }
+                    })
+                    .collect()
+            });
     }
 
     // port: tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setEmitDiagnostics
     fn set_emit_diagnostics(&mut self) {
-        self.emit_diagnostics_per_file = self
-            .build_info
-            .emit_diagnostics_per_file
-            .iter()
-            .map(|diagnostics| {
-                // The pin dereferences a nil entry.
-                let diagnostics = diagnostics
-                    .as_ref()
-                    .expect("runtime error: invalid memory address or nil pointer dereference");
-                self.to_readable_build_info_diagnostics_of_file(diagnostics)
-            })
-            .collect();
+        self.emit_diagnostics_per_file =
+            self.build_info
+                .emit_diagnostics_per_file
+                .as_ref()
+                .map(|entries| {
+                    entries
+                        .iter()
+                        .map(|diagnostics| {
+                            // The pin dereferences a nil entry.
+                            let diagnostics = diagnostics.as_ref().expect(
+                                "runtime error: invalid memory address or nil pointer dereference",
+                            );
+                            self.to_readable_build_info_diagnostics_of_file(diagnostics)
+                        })
+                        .collect()
+                });
     }
 
     // port: tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setAffectedFilesPendingEmit
     fn set_affected_files_pending_emit(&mut self) {
-        if self.build_info.affected_files_pending_emit.is_empty() {
+        let Some(pending_emits) = &self.build_info.affected_files_pending_emit else {
             return;
-        }
+        };
         let full_emit_kind = get_file_emit_kind(&self.build_info.get_compiler_options(b""));
         self.affected_files_pending_emit = Some(
-            self.build_info
-                .affected_files_pending_emit
+            pending_emits
                 .iter()
                 .map(|pending_emit| {
                     let emit_kind = if pending_emit.emit_kind == FileEmitKind::NONE {
@@ -588,30 +595,31 @@ impl ReadableBuildInfo<'_> {
     // port: tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setEmitSignatures
     fn set_emit_signatures(&mut self) {
         let build_info = self.build_info;
-        self.emit_signatures = build_info
-            .emit_signatures
-            .iter()
-            .map(|signature| ReadableBuildInfoEmitSignature {
-                file: self.to_file_path(signature.file_id),
-                signature: &signature.signature,
-                differs_only_in_dts_map: signature.differs_only_in_dts_map,
-                differs_in_options: signature.differs_in_options,
-                original: signature,
-            })
-            .collect();
+        self.emit_signatures = build_info.emit_signatures.as_ref().map(|entries| {
+            entries
+                .iter()
+                .map(|signature| ReadableBuildInfoEmitSignature {
+                    file: self.to_file_path(signature.file_id),
+                    signature: &signature.signature,
+                    differs_only_in_dts_map: signature.differs_only_in_dts_map,
+                    differs_in_options: signature.differs_in_options,
+                    original: signature,
+                })
+                .collect()
+        });
     }
 
     // port: tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setResolvedRoot
     fn set_resolved_root(&mut self) {
-        self.resolved_root = self
-            .build_info
-            .resolved_root
-            .iter()
-            .map(|original| ReadableBuildInfoResolvedRoot {
-                resolved: self.to_file_path(original.resolved),
-                root: self.to_file_path(original.root),
-            })
-            .collect();
+        self.resolved_root = self.build_info.resolved_root.as_ref().map(|entries| {
+            entries
+                .iter()
+                .map(|original| ReadableBuildInfoResolvedRoot {
+                    resolved: self.to_file_path(original.resolved),
+                    root: self.to_file_path(original.root),
+                })
+                .collect()
+        });
     }
 }
 
