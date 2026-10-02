@@ -1,5 +1,5 @@
 {
-  "accounted_operations": 3616,
+  "accounted_operations": 3611,
   "complete": false,
   "exempt_by_category": {
     "equivalent_rust": 83,
@@ -13,6 +13,61 @@
   "gap_problems": [],
   "later_step_unresolved": 0,
   "pending": [
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/ast/diagnostic.go:Diagnostic.displayMessageArgs",
+      "rust_home": [
+        "crates/tsr_ast/src/diagnostic.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/ast/utilities.go:GetImpliedNodeFormatForFile",
+      "rust_home": [
+        "crates/tsr_ast/src/clone.rs",
+        "crates/tsr_ast/src/runtime_id.rs",
+        "crates/tsr_ast/src/subtree_facts.rs",
+        "crates/tsr_ast/src/utilities.rs",
+        "crates/tsr_ast/src/utilities_middle.rs",
+        "crates/tsr_ast/src/utilities_tail.rs",
+        "crates/tsr_ast/src/visitor.rs",
+        "crates/tsr_parser/src/expressions.rs",
+        "crates/tsr_parser/src/js_syntax.rs",
+        "crates/tsr_parser/src/jsx.rs",
+        "crates/tsr_parser/src/predicates.rs",
+        "crates/tsr_parser/src/references.rs",
+        "crates/tsr_parser/src/reparser.rs",
+        "crates/tsr_parser/src/source_text.rs",
+        "crates/tsr_checker/src/meta_properties.rs",
+        "crates/tsr_checker/src/external_aliases.rs",
+        "crates/tsr_checker/src/unused_identifiers.rs",
+        "crates/tsr_checker/src/external_resolution.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension",
+      "rust_home": [
+        "crates/tsr_compiler/src/loader.rs",
+        "crates/tsr_compiler/src/metadata.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.parseSourceFile",
+      "rust_home": [
+        "crates/tsr_compiler/src/loader.rs",
+        "crates/tsr_compiler/src/metadata.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/filesparser.go:parseTask.load",
+      "rust_home": [
+        "crates/tsr_compiler/src/cache.rs",
+        "crates/tsr_compiler/src/loader.rs"
+      ]
+    },
     {
       "disposition": "covered",
       "operation": "tsc/internal/compiler/program.go:NewProgram",
@@ -30,5 +85,5 @@
   "step": "syntax",
   "total_operations": 3617,
   "version": 2,
-  "witnessed_operations": 1592
+  "witnessed_operations": 1587
 }

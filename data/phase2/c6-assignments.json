@@ -3,34 +3,34 @@
  "build": {
   "binaries": {
    "assignments.test": {
-    "binary_sha256": "a528b7bc3143abeb3fa7344f861be25b03f3fde323f25afcb5889279a8e285db",
+    "binary_sha256": "73d0f58204606246da8cd583d8ddbbaac81f1ea61460c360ebfc7b587ba99e75",
     "command": [
      "go",
      "test",
      "-c",
      "-o",
-     "/Users/cristian/git/ts-rust/target/phase2/assignments-c7/build/assignments.test",
+     "/Users/cristian/git/ts-rust/target/phase2/assignments-greenup/build/assignments.test",
      "-trimpath",
      "-mod=readonly",
-     "-gcflags=github.com/microsoft/TypeScript/tsc/internal/repo=-trimpath=/Users/cristian/git/ts-rust/target/phase2/assignments-c7/build/unmatched-prefix",
+     "-gcflags=github.com/microsoft/TypeScript/tsc/internal/repo=-trimpath=/Users/cristian/git/ts-rust/target/phase2/assignments-greenup/build/unmatched-prefix",
      "-overlay",
-     "/Users/cristian/git/ts-rust/target/phase2/assignments-c7/build/overlay.json",
+     "/Users/cristian/git/ts-rust/target/phase2/assignments-greenup/build/overlay.json",
      "./internal/compiler"
     ]
    },
    "oracle.test": {
-    "binary_sha256": "58957f21771b45995f1ac058f1f356aba4913e92b03d012fe49d31a26592b133",
+    "binary_sha256": "52def9e74a6a8bfa279655d0491f0728214eb2ccc0b9f7604103924b33313fb2",
     "command": [
      "go",
      "test",
      "-c",
      "-o",
-     "/Users/cristian/git/ts-rust/target/phase2/assignments-c7/build/oracle.test",
+     "/Users/cristian/git/ts-rust/target/phase2/assignments-greenup/build/oracle.test",
      "-trimpath",
      "-mod=readonly",
-     "-gcflags=github.com/microsoft/TypeScript/tsc/internal/repo=-trimpath=/Users/cristian/git/ts-rust/target/phase2/assignments-c7/build/unmatched-prefix",
+     "-gcflags=github.com/microsoft/TypeScript/tsc/internal/repo=-trimpath=/Users/cristian/git/ts-rust/target/phase2/assignments-greenup/build/unmatched-prefix",
      "-overlay",
-     "/Users/cristian/git/ts-rust/target/phase2/assignments-c7/build/overlay.json",
+     "/Users/cristian/git/ts-rust/target/phase2/assignments-greenup/build/overlay.json",
      "./internal/testrunner"
     ]
    }
@@ -61,10 +61,10 @@
  "goos": "darwin",
  "host": "macOS-26.6.1-arm64-arm-64bit",
  "inputs": {
-  "data/phase2/inventory.json": "c09721d36d361eb8646b2321ec3478da0fbdbf12253c086e7b1c34e966aea9b9",
+  "data/phase2/inventory.json": "b4fd51ab64806ba66a3288288dc3f2f43d46c4311702f294d1d8c3b2f12150b5",
   "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
   "data/s07/subset.json": "8539ce8af2f0cd5245554114e8d257805fe266e46fcabbb4ac220d5bcd2c4f2a",
-  "data/upstream.json": "f10e50133daec561a20b528a0577dea937ce3163aa826ba212826957c86910fc",
+  "data/upstream.json": "a6c68d3fd90882498e08f6a9aa4832b571fe0ba013a4e8c04e91729c7fffe683",
   "scripts/phase2_assignments.py": "bba79c2c9d02b218c8e78e21c29e836634b79def13b7b5c91436d9b521904f84",
   "scripts/phase2_inventory.py": "93e7367a713dcffa883ce4e9e67ac58da7c52de8281e4092f4c3e46547e0e95a",
   "scripts/phase2_native.py": "01f096c396230aa953e584e9e11f8cb54c43807a8482b3a0dcc003f56338a393",

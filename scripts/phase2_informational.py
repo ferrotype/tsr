@@ -130,11 +130,33 @@ def current(root=ROOT):
         raise ValueError("the inventory is stale; rerun freeze and review")
     if INFORMATIONAL.read_bytes() != render(informational(json.loads(inventory), root)):
         raise ValueError("the skip list differs from the inventory; rerun informational")
+    accepted = {digest(inventory)} | prior_inventories(json.loads(inventory), root)
     for path in sorted((root / "data/phase2").glob("c*-claims.json")):
         claimed = json.loads(path.read_bytes()).get("inventory_sha256")
-        if claimed is not None and claimed != digest(inventory):
+        if claimed is not None and claimed not in accepted:
             raise ValueError(f"{path.name} was made over another inventory")
     return True
+
+
+def prior_inventories(document, root=ROOT):
+    """The digests of earlier inventory files that differ from `document` only
+    in their input digests (data/phase2/inventory-history.json): each entry's
+    inputs, rendered into the current inventory, must reproduce its digest."""
+    path = root / "data/phase2/inventory-history.json"
+    if not path.is_file():
+        return set()
+    history = json.loads(path.read_bytes())
+    accepted = set()
+    for entry in history["refreezes"]:
+        if render_prior(document, entry["inputs"]) != entry["sha256"]:
+            raise ValueError(f"inventory history entry {entry['sha256'][:12]} differs from the current inventory "
+                             "in more than its inputs")
+        accepted.add(entry["sha256"])
+    return accepted
+
+
+def render_prior(document, inputs):
+    return digest(render(dict(document, inputs=inputs)))
 
 
 def main():

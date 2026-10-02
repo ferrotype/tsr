@@ -1,5 +1,5 @@
 {
-  "accounted_operations": 401,
+  "accounted_operations": 400,
   "complete": false,
   "exempt_by_category": {
     "go_test_harness": 17,
@@ -18,6 +18,14 @@
   "pending": [
     {
       "disposition": "implemented_untested",
+      "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetOutputFileNames",
+      "rust_home": [
+        "crates/tsr_tsoptions/src/config_specs.rs",
+        "crates/tsr_tsoptions/src/lib.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
       "operation": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames",
       "rust_home": [
         "crates/tsr_tsoptions/src/config_specs.rs",
@@ -31,5 +39,5 @@
   "step": "config",
   "total_operations": 402,
   "version": 2,
-  "witnessed_operations": 68
+  "witnessed_operations": 67
 }

@@ -18,6 +18,8 @@ import phase3_compare as compare  # noqa: E402
 import phase3_corpus as corpus  # noqa: E402
 import phase3_native as native  # noqa: E402
 import phase3_producers as producers  # noqa: E402
+import phase3_report as report  # noqa: E402
+import phase3_residuals as residuals  # noqa: E402
 import s08_p4 as p4  # noqa: E402
 from s08_oracle import canonical, digest  # noqa: E402
 
@@ -357,6 +359,129 @@ class Register(Fixture):
                                                        "sourcemap": 1, "sourcemap_record": 1}))
         self.assertEqual(register["cross_phase"][1]["state"], "observed")
         self.assertTrue(blockers.complete(register, compare.report(native_dir, rust_dir)))
+
+
+def closure_comparison(mode, rows):
+    return {"native": {"observation_sha256": mode + "-native"}, "rust": {"capture_sha256": mode + "-rust"},
+            "rows": rows}
+
+
+class Closure(unittest.TestCase):
+    """T8's closure: the residual list and the checkpoints' recorded facts."""
+
+    METRICS = {"reprint_parity": 1, "output_parity": 1, "declaration_parity": 1, "sourcemap_parity": 1,
+               "sourcemap_record_parity": 1, "emit_diagnostics_parity": 1, "transpile_parity": 1,
+               "harness_valid": True, "harness_valid_concurrent": True, "mode_parity": True,
+               "unsupported_required": 0, "residuals": 0, "dispositions": True, "report": True,
+               "evidence_current": True}
+
+    @staticmethod
+    def audit(**open_counts):
+        groups = {f"T{n}": {"counts": {"gap": 0, "pending_c3": 0, "duplicate": 0}} for n in range(1, 9)}
+        for checkpoint, kind in open_counts.items():
+            groups[checkpoint]["counts"][kind] = 1
+        return {"groups": groups}
+
+    RECEIPTS = {f"t{n}-contracts": True for n in range(1, 9)}
+
+    def test_a_residual_is_a_domain_that_does_not_match(self):
+        row = {"id": "a", "declaration_required": False,
+               "outcomes": {"output": "match", "sourcemap": "disabled", "declaration": "different", "reprint": "match"}}
+        self.assertEqual(residuals.residual_domains(row), {})
+        row["declaration_required"] = True
+        self.assertEqual(residuals.residual_domains(row), {"declaration": "different"})
+        row["outcomes"]["output"] = "failed"
+        self.assertEqual(residuals.residual_domains(row), {"declaration": "different", "output": "failed"})
+
+    def test_the_list_names_each_row_once_with_both_modes(self):
+        good = {"id": "a", "declaration_required": False, "outcomes": {"output": "match"}}
+        bad = {"id": "b", "declaration_required": False, "outcomes": {"output": "different"}}
+        failed = dict(bad, outcomes={"output": "failed"})
+        document = residuals.document({"single": closure_comparison("single", [good, bad]),
+                                       "concurrent": closure_comparison("concurrent", [good, failed])})
+        self.assertEqual(document["count"], 1)
+        self.assertEqual(document["rows"], [{"id": "b", "modes": {"concurrent": {"output": "failed"},
+                                                                  "single": {"output": "different"}}}])
+        self.assertEqual(document["comparisons"]["single"], {"native": "single-native", "rust": "single-rust"})
+        with self.assertRaisesRegex(ValueError, "both modes"):
+            residuals.document({"single": closure_comparison("single", [good])})
+
+    def test_every_checkpoint_closes_on_complete_evidence(self):
+        done = producers.checkpoint_metrics(self.METRICS, self.audit(), self.RECEIPTS)
+        self.assertEqual(done, {f"t{n}_complete": True for n in range(1, 9)})
+
+    def test_an_open_function_or_stale_receipt_holds_only_its_checkpoint(self):
+        done = producers.checkpoint_metrics(self.METRICS, self.audit(T3="gap", T6="pending_c3"),
+                                            dict(self.RECEIPTS, **{"t5-contracts": False, "t2-contracts": None}))
+        self.assertEqual({name for name, value in done.items() if not value},
+                         {"t2_complete", "t3_complete", "t5_complete", "t6_complete"})
+        self.assertEqual(producers.checkpoint_metrics(self.METRICS, None, self.RECEIPTS),
+                         {f"t{n}_complete": False for n in range(1, 9)})
+
+    def test_each_checkpoint_needs_its_own_parity_and_t8_the_p3b_exit(self):
+        cases = {"reprint_parity": {"t1_complete", "t8_complete"},
+                 "output_parity": {"t4_complete", "t5_complete", "t6_complete", "t8_complete"},
+                 "declaration_parity": {"t7_complete", "t8_complete"},
+                 "transpile_parity": {"t8_complete"}, "sourcemap_parity": {"t8_complete"}}
+        for name, failing in cases.items():
+            with self.subTest(metric=name):
+                done = producers.checkpoint_metrics(dict(self.METRICS, **{name: 0.99}), self.audit(), self.RECEIPTS)
+                self.assertEqual({key for key, value in done.items() if not value}, failing)
+        for name, value in (("residuals", 1), ("mode_parity", False), ("dispositions", False), ("report", False),
+                            ("evidence_current", False), ("unsupported_required", 2), ("harness_valid_concurrent", False)):
+            with self.subTest(metric=name):
+                done = producers.checkpoint_metrics(dict(self.METRICS, **{name: value}), self.audit(), self.RECEIPTS)
+                self.assertEqual({key for key, value in done.items() if not value}, {"t8_complete"})
+
+
+class Report(unittest.TestCase):
+    """T8's record: the per-area dashboard and its staleness."""
+
+    @staticmethod
+    def entry(identity, suite, sourcemap="absent", **settings):
+        return {"id": identity, "suite": suite, "sourcemap": sourcemap, "settings": settings}
+
+    def test_rows_group_by_area_and_folded_settings(self):
+        conformance = self.entry("conformance/es6/classes/a.ts#configuration=0", "conformance", Target="ES6",
+                                 module="CommonJS", declaration="true")
+        self.assertEqual(report.groups(conformance),
+                         {"suite": "conformance", "area": "es6", "target": "es2015", "module": "commonjs",
+                          "jsx": "unset", "declaration": "true", "sourcemap": "absent"})
+        compiler = self.entry("compiler/b.ts#configuration=1", "compiler", "reference", jsx="Preserve")
+        self.assertEqual({key: report.groups(compiler)[key] for key in ("area", "target", "jsx", "sourcemap")},
+                         {"area": "(compiler)", "target": "unset", "jsx": "preserve", "sourcemap": "reference"})
+
+    def test_a_row_counts_as_matched_only_without_a_residual_domain(self):
+        inventory = {"a": self.entry("a", "compiler", target="es5"), "b": self.entry("b", "compiler", target="es5"),
+                     "c": self.entry("c", "compiler", target="es2015")}
+        rows = [{"id": "a", "declaration_required": False, "outcomes": {"output": "match", "declaration": "different"}},
+                {"id": "b", "declaration_required": True, "outcomes": {"output": "match", "declaration": "different"}},
+                {"id": "c", "declaration_required": False, "outcomes": {"output": "disabled"}}]
+        summary = {"rows": 3, "all_domains_met": 2, "declaration_required": 1, "domains": {}}
+        board = report.dashboard({"rows": rows, "summary": summary}, inventory)
+        self.assertEqual(board["rates"]["target"], {"es2015": {"rows": 1, "matched": 1},
+                                                    "es5": {"rows": 2, "matched": 1}})
+        self.assertEqual(board["rates"]["suite"], {"compiler": {"rows": 3, "matched": 2}})
+
+    def test_the_committed_record_and_page_must_equal_the_rebuild(self):
+        record = {"captured": 1}
+        with tempfile.TemporaryDirectory() as directory, \
+                mock.patch.object(report, "RECORD", Path(directory) / "report.json"), \
+                mock.patch.object(report, "PAGE", Path(directory) / "report.md"), \
+                mock.patch.object(report, "build_record", return_value=record), \
+                mock.patch.object(report, "render", side_effect=lambda value: json.dumps(value) + "\n"):
+            self.assertFalse(report.current({}, {}))
+            report.RECORD.write_text(report.text(record))
+            report.PAGE.write_text(json.dumps(record) + "\n")
+            self.assertTrue(report.current({}, {}))
+            report.PAGE.write_text(json.dumps(record) + "\nedited\n")
+            self.assertFalse(report.current({}, {}))
+
+    def test_the_record_needs_both_modes_and_a_transpile_run(self):
+        with self.assertRaisesRegex(ValueError, "both modes"):
+            report.build_record({"single": {}}, {"matched": 1})
+        with self.assertRaisesRegex(ValueError, "transpile"):
+            report.build_record({"single": {}, "concurrent": {}}, None)
 
 
 if __name__ == "__main__":

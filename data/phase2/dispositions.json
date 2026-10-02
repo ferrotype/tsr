@@ -134,7 +134,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.createNameResolver",
-   "rust": "crates/tsr_checker/src/name_resolution.rs:483"
+   "rust": "crates/tsr_checker/src/name_resolution.rs:504"
   },
   {
    "audit": "C3",
@@ -230,7 +230,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getSuggestedLibForNonExistentName",
-   "rust": "crates/tsr_checker/src/name_resolution.rs:794"
+   "rust": "crates/tsr_checker/src/name_resolution.rs:815"
   },
   {
    "audit": "C3",
@@ -269,7 +269,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.isBlockScopedNameDeclaredBeforeUse",
-   "rust": "crates/tsr_checker/src/enum_eval.rs:207"
+   "rust": "crates/tsr_checker/src/name_scopes.rs:106"
   },
   {
    "disposition": "mapped",
@@ -316,7 +316,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getSymbol",
-   "rust": "crates/tsr_checker/src/name_resolution.rs:455"
+   "rust": "crates/tsr_checker/src/name_resolution.rs:476"
   },
   {
    "disposition": "mapped",
@@ -1055,7 +1055,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:isContainedByNamespace",
-   "rust": "crates/tsr_checker/src/module_aliases.rs:639"
+   "rust": "crates/tsr_checker/src/module_aliases.rs:654"
   },
   {
    "disposition": "mapped",
@@ -2849,17 +2849,17 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.isConstContext",
-   "rust": "crates/tsr_checker/src/expression_context.rs:441"
+   "rust": "crates/tsr_checker/src/expression_context.rs:452"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.isInlineImportAttributes",
-   "rust": "crates/tsr_checker/src/expression_context.rs:535"
+   "rust": "crates/tsr_checker/src/expression_context.rs:553"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.isValidConstAssertionArgument",
-   "rust": "crates/tsr_checker/src/expression_context.rs:383"
+   "rust": "crates/tsr_checker/src/expression_context.rs:394"
   },
   {
    "disposition": "mapped",
@@ -2904,7 +2904,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.checkExpressionForMutableLocation",
-   "rust": "crates/tsr_checker/src/expression_context.rs:474"
+   "rust": "crates/tsr_checker/src/expression_context.rs:492"
   },
   {
    "disposition": "mapped",
@@ -2921,7 +2921,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getReferencedValueOrAliasSymbol",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:426"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:416"
   },
   {
    "disposition": "mapped",
@@ -3158,7 +3158,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getLateBoundSymbol",
-   "rust": "crates/tsr_checker/src/late_members.rs:399"
+   "rust": "crates/tsr_checker/src/late_members.rs:405"
   },
   {
    "disposition": "mapped",
@@ -3382,7 +3382,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:resolutionExtensionIsTSOrJson",
-   "rust": "crates/tsr_checker/src/external_resolution.rs:801"
+   "rust": "crates/tsr_checker/src/external_resolution.rs:803"
   },
   {
    "audit": "C2",
@@ -3394,7 +3394,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getSuggestedImportExtension",
-   "rust": "crates/tsr_checker/src/external_resolution.rs:542"
+   "rust": "crates/tsr_checker/src/external_resolution.rs:544"
   },
   {
    "audit": "C3",
@@ -3406,12 +3406,12 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.createModuleNotFoundChain",
-   "rust": "crates/tsr_checker/src/external_resolution.rs:1084"
+   "rust": "crates/tsr_checker/src/external_resolution.rs:1168"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.createModeMismatchDetails",
-   "rust": "crates/tsr_checker/src/external_resolution.rs:980"
+   "rust": "crates/tsr_checker/src/external_resolution.rs:982"
   },
   {
    "disposition": "mapped",
@@ -3515,12 +3515,12 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.lateBindMember",
-   "rust": "crates/tsr_checker/src/late_members.rs:294"
+   "rust": "crates/tsr_checker/src/late_members.rs:300"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.lateBindIndexSignature",
-   "rust": "crates/tsr_checker/src/late_members.rs:259"
+   "rust": "crates/tsr_checker/src/late_members.rs:265"
   },
   {
    "audit": "C3",
@@ -3532,7 +3532,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.addDeclarationToLateBoundSymbol",
-   "rust": "crates/tsr_checker/src/late_members.rs:361"
+   "rust": "crates/tsr_checker/src/late_members.rs:367"
   },
   {
    "disposition": "mapped",
@@ -4154,7 +4154,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getWidenedTypeOfObjectLiteral",
-   "rust": "crates/tsr_checker/src/widening.rs:188"
+   "rust": "crates/tsr_checker/src/widening.rs:200"
   },
   {
    "audit": "C2",
@@ -4166,22 +4166,22 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:WideningContext.getChildContext",
-   "rust": "crates/tsr_checker/src/widening.rs:105"
+   "rust": "crates/tsr_checker/src/widening.rs:117"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getPropertiesOfContext",
-   "rust": "crates/tsr_checker/src/widening.rs:146"
+   "rust": "crates/tsr_checker/src/widening.rs:158"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getSiblingsOfContext",
-   "rust": "crates/tsr_checker/src/widening.rs:120"
+   "rust": "crates/tsr_checker/src/widening.rs:132"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getUndefinedProperty",
-   "rust": "crates/tsr_checker/src/widening.rs:175"
+   "rust": "crates/tsr_checker/src/widening.rs:187"
   },
   {
    "disposition": "mapped",
@@ -4201,7 +4201,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getTypeOfAlias",
-   "rust": "crates/tsr_checker/src/module_aliases.rs:587"
+   "rust": "crates/tsr_checker/src/module_aliases.rs:602"
   },
   {
    "audit": "C7",
@@ -4730,7 +4730,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:isLateBindableAST",
-   "rust": "crates/tsr_checker/src/late_members.rs:193"
+   "rust": "crates/tsr_checker/src/late_members.rs:196"
   },
   {
    "disposition": "mapped",
@@ -5479,7 +5479,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getESSymbolLikeTypeForNode",
-   "rust": "crates/tsr_checker/src/late_members.rs:514"
+   "rust": "crates/tsr_checker/src/late_members.rs:520"
   },
   {
    "disposition": "mapped",
@@ -5853,7 +5853,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.evaluateEnumMember",
-   "rust": "crates/tsr_checker/src/enum_eval.rs:166"
+   "rust": "crates/tsr_checker/src/enum_eval.rs:165"
   },
   {
    "audit": "C1",
@@ -6461,7 +6461,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getWidenedUniqueESSymbolType",
-   "rust": "crates/tsr_checker/src/expression_context.rs:504"
+   "rust": "crates/tsr_checker/src/expression_context.rs:522"
   },
   {
    "audit": "C2",
@@ -6822,12 +6822,12 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:isInvalidComputedPropertyName",
-   "rust": "crates/tsr_checker/src/late_members.rs:441"
+   "rust": "crates/tsr_checker/src/late_members.rs:447"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.checkComputedPropertyName",
-   "rust": "crates/tsr_checker/src/late_members.rs:478"
+   "rust": "crates/tsr_checker/src/late_members.rs:484"
   },
   {
    "disposition": "mapped",
@@ -7264,7 +7264,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.markJsxAliasReferenced",
-   "rust": "crates/tsr_checker/src/jsx.rs:2577"
+   "rust": "crates/tsr_checker/src/jsx.rs:2600"
   },
   {
    "disposition": "mapped",
@@ -7592,12 +7592,12 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getContextualTypeForArgument",
-   "rust": "crates/tsr_checker/src/expression_context.rs:262"
+   "rust": "crates/tsr_checker/src/expression_context.rs:273"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getContextualTypeForArgumentAtIndex",
-   "rust": "crates/tsr_checker/src/expression_context.rs:275"
+   "rust": "crates/tsr_checker/src/expression_context.rs:286"
   },
   {
    "disposition": "mapped",
@@ -7650,7 +7650,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getContextualImportAttributeType",
-   "rust": "crates/tsr_checker/src/expression_context.rs:523"
+   "rust": "crates/tsr_checker/src/expression_context.rs:541"
   },
   {
    "disposition": "mapped",
@@ -7839,7 +7839,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getApparentTypeOfContextualType",
-   "rust": "crates/tsr_checker/src/expression_context.rs:318"
+   "rust": "crates/tsr_checker/src/expression_context.rs:329"
   },
   {
    "audit": "C7",
@@ -8244,12 +8244,12 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFactoryEntity",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:37"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:23"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.GetJsxFragmentFactoryEntity",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:43"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:29"
   },
   {
    "disposition": "mapped",
@@ -8274,32 +8274,32 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.isDeclarationVisible",
-   "rust": "crates/tsr_checker/src/emit_visibility.rs:37"
+   "rust": "crates/tsr_checker/src/emit_visibility.rs:50"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.determineIfDeclarationIsVisible",
-   "rust": "crates/tsr_checker/src/emit_visibility.rs:53"
+   "rust": "crates/tsr_checker/src/emit_visibility.rs:70"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.PrecalculateDeclarationEmitVisibility",
-   "rust": "crates/tsr_checker/src/emit_visibility.rs:189"
+   "rust": "crates/tsr_checker/src/emit_visibility.rs:206"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:isCommonJSModuleExports",
-   "rust": "crates/tsr_checker/src/emit_visibility.rs:160"
+   "rust": "crates/tsr_checker/src/emit_visibility.rs:177"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.aliasMarkingVisitorWorker",
-   "rust": "crates/tsr_checker/src/emit_visibility.rs:190"
+   "rust": "crates/tsr_checker/src/emit_visibility.rs:207"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.markLinkedAliases",
-   "rust": "crates/tsr_checker/src/emit_visibility.rs:237"
+   "rust": "crates/tsr_checker/src/emit_visibility.rs:254"
   },
   {
    "disposition": "mapped",
@@ -8326,7 +8326,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.hasVisibleDeclarations",
-   "rust": "crates/tsr_checker/src/emit_visibility.rs:317"
+   "rust": "crates/tsr_checker/src/emit_visibility.rs:331"
   },
   {
    "disposition": "mapped",
@@ -8341,7 +8341,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.IsDefinitelyReferenceToGlobalSymbolObject",
-   "rust": "crates/tsr_checker/src/emit_reference.rs:340"
+   "rust": "crates/tsr_checker/src/emit_reference.rs:425"
   },
   {
    "disposition": "mapped",
@@ -8416,32 +8416,32 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.IsReferencedAliasDeclaration",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:51"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:37"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.IsValueAliasDeclaration",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:89"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:75"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.isValueAliasDeclarationWorker",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:453"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:443"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.isAliasResolvedToValue",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:513"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:503"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.IsTopLevelValueImportEqualsWithEntityName",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:98"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:84"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.MarkLinkedReferencesRecursively",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:137"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:123"
   },
   {
    "disposition": "mapped",
@@ -8451,37 +8451,37 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.getReferenceResolver",
-   "rust": "crates/tsr_checker/src/emit_reference.rs:166"
+   "rust": "crates/tsr_checker/src/emit_reference.rs:213"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedExportContainer",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:212"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:198"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.SetReferencedImportDeclaration",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:228"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:214"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedImportDeclaration",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:238"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:228"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedValueDeclaration",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:255"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:245"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedValueDeclarationUnsafe",
-   "rust": "crates/tsr_checker/src/emit_reference.rs:167"
+   "rust": "crates/tsr_checker/src/emit_reference.rs:214"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedValueDeclarations",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:264"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:254"
   },
   {
    "disposition": "mapped",
@@ -8491,12 +8491,12 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.GetElementAccessExpressionName",
-   "rust": "crates/tsr_checker/src/emit_reference.rs:273"
+   "rust": "crates/tsr_checker/src/emit_reference.rs:320"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.GetReferencedMemberValueDeclaration",
-   "rust": "crates/tsr_checker/src/emit_reference.rs:174"
+   "rust": "crates/tsr_checker/src/emit_reference.rs:221"
   },
   {
    "disposition": "mapped",
@@ -8536,12 +8536,12 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.GetConstantValue",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:166"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:152"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.GetTypeReferenceSerializationKind",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:279"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:269"
   },
   {
    "disposition": "mapped",
@@ -8556,7 +8556,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/emitresolver.go:EmitResolver.IsThisPropertyAssignmentDeclarationRedundant",
-   "rust": "crates/tsr_checker/src/emit_reference.rs:306"
+   "rust": "crates/tsr_checker/src/emit_reference.rs:391"
   },
   {
    "disposition": "mapped",
@@ -9883,17 +9883,17 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarJsxElement",
-   "rust": "crates/tsr_checker/src/jsx.rs:2648"
+   "rust": "crates/tsr_checker/src/jsx.rs:2671"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarJsxName",
-   "rust": "crates/tsr_checker/src/jsx.rs:2684"
+   "rust": "crates/tsr_checker/src/jsx.rs:2707"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/grammarchecks.go:Checker.checkGrammarJsxExpression",
-   "rust": "crates/tsr_checker/src/jsx.rs:2716"
+   "rust": "crates/tsr_checker/src/jsx.rs:2739"
   },
   {
    "disposition": "mapped",
@@ -10834,12 +10834,12 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/jsx.go:Checker.parseIsolatedEntityName",
-   "rust": "crates/tsr_checker/src/jsx.rs:2448"
+   "rust": "crates/tsr_checker/src/jsx.rs:2471"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/jsx.go:markAsSynthetic",
-   "rust": "crates/tsr_checker/src/jsx.rs:2449"
+   "rust": "crates/tsr_checker/src/jsx.rs:2472"
   },
   {
    "disposition": "mapped",
@@ -10849,7 +10849,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/jsx.go:Checker.getJSXRuntimeImportSpecifier",
-   "rust": "crates/tsr_checker/src/jsx.rs:2539"
+   "rust": "crates/tsr_checker/src/jsx.rs:2562"
   },
   {
    "disposition": "mapped",
@@ -11518,7 +11518,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.createAccessFromSymbolChain",
-   "rust": "crates/tsr_checker/src/node_builder_names.rs:1466"
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:1467"
   },
   {
    "disposition": "mapped",
@@ -13687,7 +13687,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/services.go:Checker.GetConstantValue",
-   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:167"
+   "rust": "crates/tsr_checker/src/emit_resolver_js.rs:153"
   },
   {
    "disposition": "mapped",
@@ -15834,7 +15834,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/utilities.go:getAnyImportSyntax",
-   "rust": "crates/tsr_checker/src/emit_visibility.rs:298"
+   "rust": "crates/tsr_checker/src/emit_visibility.rs:312"
   },
   {
    "disposition": "mapped",
@@ -15921,12 +15921,12 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/utilities.go:CreateModuleNotFoundChain",
-   "rust": "crates/tsr_checker/src/external_resolution.rs:1085"
+   "rust": "crates/tsr_checker/src/external_resolution.rs:1055"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/utilities.go:CreateModeMismatchDetails",
-   "rust": "crates/tsr_checker/src/external_resolution.rs:981"
+   "rust": "crates/tsr_checker/src/external_resolution.rs:1119"
   },
   {
    "audit": "C3",
@@ -16235,17 +16235,17 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:host.Timings",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:953"
-  },
-  {
-   "disposition": "mapped",
-   "id": "tsc/internal/contentmapper/hostimpl.go:host.SetLocale",
    "rust": "crates/tsr_contentmapper/src/host_impl.rs:958"
   },
   {
    "disposition": "mapped",
+   "id": "tsc/internal/contentmapper/hostimpl.go:host.SetLocale",
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:963"
+  },
+  {
+   "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:host.Project",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:984"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:989"
   },
   {
    "disposition": "mapped",
@@ -16270,127 +16270,127 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:host.Acquire",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1046"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1051"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:host.Transform",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1066"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1071"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:host.transformLocked",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:832"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:833"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:host.Close",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1084"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1089"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:host.connFor",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:874"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:879"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:host.connForLocked",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:884"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:889"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:projectLease.retainLocked",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:996"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1001"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:retainedProject.Close",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1398"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1403"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:projectLease.Refresh",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1231"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1236"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:projectLease.Identities",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1273"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1278"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:projectLease.Identity",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1295"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1300"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:projectLease.WatchedFiles",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1316"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1321"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:projectLease.Diagnostics",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1349"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1354"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:projectLease.Transform",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1365"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1370"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:projectLease.Close",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1397"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1402"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:projectLease.release",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1163"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1168"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:host.release",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:926"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:931"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:handshake",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1424"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1429"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:decodeTransformResult",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1472"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1477"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:decodeMappedOutput",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1552"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1557"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:normalizeDiagnosticDirectives",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1590"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1595"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:normalizeMappings",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1687"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1692"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:newPositionNormalizer",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1721"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1726"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:positionNormalizer.normalizeTextPos",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1749"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1754"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/contentmapper/hostimpl.go:positionNormalizer.normalize",
-   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1759"
+   "rust": "crates/tsr_contentmapper/src/host_impl.rs:1764"
   },
   {
    "disposition": "mapped",
@@ -16430,67 +16430,67 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/ipc/conn_async.go:NewAsyncConn",
-   "rust": "crates/tsr_ipc/src/conn_async.rs:41"
+   "rust": "crates/tsr_ipc/src/conn_async.rs:72"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/ipc/conn_async.go:NewAsyncConnWithProtocol",
-   "rust": "crates/tsr_ipc/src/conn_async.rs:47"
+   "rust": "crates/tsr_ipc/src/conn_async.rs:78"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/ipc/conn_async.go:AsyncConn.SetCollectTiming",
-   "rust": "crates/tsr_ipc/src/conn_async.rs:66"
+   "rust": "crates/tsr_ipc/src/conn_async.rs:97"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/ipc/conn_async.go:AsyncConn.Run",
-   "rust": "crates/tsr_ipc/src/conn_async.rs:270"
+   "rust": "crates/tsr_ipc/src/conn_async.rs:307"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/ipc/conn_async.go:AsyncConn.closePendingCalls",
-   "rust": "crates/tsr_ipc/src/conn_async.rs:88"
+   "rust": "crates/tsr_ipc/src/conn_async.rs:125"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/ipc/conn_async.go:AsyncConn.recordRequestError",
-   "rust": "crates/tsr_ipc/src/conn_async.rs:95"
-  },
-  {
-   "disposition": "mapped",
-   "id": "tsc/internal/ipc/conn_async.go:AsyncConn.recordTerminalErrorLocked",
-   "rust": "crates/tsr_ipc/src/conn_async.rs:106"
-  },
-  {
-   "disposition": "mapped",
-   "id": "tsc/internal/ipc/conn_async.go:AsyncConn.closePendingCallsLocked",
-   "rust": "crates/tsr_ipc/src/conn_async.rs:126"
-  },
-  {
-   "disposition": "mapped",
-   "id": "tsc/internal/ipc/conn_async.go:AsyncConn.handleResponse",
    "rust": "crates/tsr_ipc/src/conn_async.rs:132"
   },
   {
    "disposition": "mapped",
+   "id": "tsc/internal/ipc/conn_async.go:AsyncConn.recordTerminalErrorLocked",
+   "rust": "crates/tsr_ipc/src/conn_async.rs:143"
+  },
+  {
+   "disposition": "mapped",
+   "id": "tsc/internal/ipc/conn_async.go:AsyncConn.closePendingCallsLocked",
+   "rust": "crates/tsr_ipc/src/conn_async.rs:163"
+  },
+  {
+   "disposition": "mapped",
+   "id": "tsc/internal/ipc/conn_async.go:AsyncConn.handleResponse",
+   "rust": "crates/tsr_ipc/src/conn_async.rs:169"
+  },
+  {
+   "disposition": "mapped",
    "id": "tsc/internal/ipc/conn_async.go:AsyncConn.handleRequest",
-   "rust": "crates/tsr_ipc/src/conn_async.rs:168"
+   "rust": "crates/tsr_ipc/src/conn_async.rs:205"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/ipc/conn_async.go:AsyncConn.handleNotification",
-   "rust": "crates/tsr_ipc/src/conn_async.rs:231"
+   "rust": "crates/tsr_ipc/src/conn_async.rs:268"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/ipc/conn_async.go:AsyncConn.Call",
-   "rust": "crates/tsr_ipc/src/conn_async.rs:313"
+   "rust": "crates/tsr_ipc/src/conn_async.rs:347"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/ipc/conn_async.go:AsyncConn.Notify",
-   "rust": "crates/tsr_ipc/src/conn_async.rs:369"
+   "rust": "crates/tsr_ipc/src/conn_async.rs:403"
   },
   {
    "disposition": "mapped",
@@ -16660,7 +16660,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/modulespecifiers/compare.go:CountPathComponents",
-   "rust": "crates/tsr_checker/src/node_builder_names.rs:1667"
+   "rust": "crates/tsr_checker/src/node_builder_names.rs:1668"
   },
   {
    "audit": "C7",
@@ -16769,7 +16769,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/modulespecifiers/specifiers.go:GetEachFileNameOfModule",
-   "rust": "crates/tsr_compiler/src/checker_module_specifiers.rs:106"
+   "rust": "crates/tsr_compiler/src/checker_module_specifiers.rs:117"
   },
   {
    "disposition": "mapped",

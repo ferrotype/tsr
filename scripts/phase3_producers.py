@@ -40,9 +40,29 @@ committed transpile observation. Metrics:
   the single-mode comparison (scripts/phase3_blockers.py) and names every row
   that cannot pass with an owning checkpoint.
 
-The ratios and counts are emitted only over a harness-valid single-mode run;
-`transpile_parity` and the closure metrics of docs/PHASE3-plan.md section 5
-come with T8's closure.
+T8's closure (docs/PHASE3-plan.md sections 4 and 5):
+
+* transpile_parity -- the transpile runner's matched baselines over the
+  native baselines and any run the pin did not make, from the Rust run at
+  target/phase3/transpile-rust (scripts/phase3_transpile.py run), current with
+  the source closure, compared with the recorded native observation;
+* residuals -- the count of data/phase3/residuals.json, emitted only when it
+  equals the list rebuilt from both modes' comparisons
+  (scripts/phase3_residuals.py);
+* dispositions -- data/phase3/audit.json is current, valid and complete: every
+  function of the Phase 3 files `mapped`, `equivalent` or `later`, none `gap`;
+* report -- data/phase3/report.json and docs/PHASE3-report.md, the per-area
+  dashboard and the consumption report, equal a rebuild over both modes'
+  comparisons and the transpile run (scripts/phase3_report.py);
+* evidence_current -- the `checker` run, Phase 2's gate, is recorded on the
+  current sources;
+* t1_complete .. t8_complete -- each checkpoint's exit as recorded facts: its
+  audit group complete, its contract receipt (data/phase3/receipts/tN-contracts)
+  current, and its exit's parity: T1 reprint, T4 to T6 output, T7 declaration;
+  T8 is the P3B exit itself with the closure metrics above, the report
+  included.
+
+The ratios and counts are emitted only over a harness-valid single-mode run.
 No threshold is introduced. A missing or stale capture leaves its metric false.
 """
 from __future__ import annotations
@@ -52,21 +72,28 @@ import contextlib
 import io
 import json
 from pathlib import Path
+import subprocess
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from s04_common import strict_json_loads  # noqa: E402
 from s08_oracle import ROOT, canonical, digest  # noqa: E402
 import s08_p4 as p4  # noqa: E402
+import phase3_audit  # noqa: E402
 import phase3_blockers  # noqa: E402
 import phase3_compare  # noqa: E402
 import phase3_corpus  # noqa: E402
 import phase3_inventory  # noqa: E402
 import phase3_native  # noqa: E402
+import phase3_receipts  # noqa: E402
+import phase3_report  # noqa: E402
+import phase3_residuals  # noqa: E402
+import phase3_transpile  # noqa: E402
 
 NATIVE = {mode: ROOT / f"target/phase3/native-{mode}" for mode in phase3_native.MODES}
 RUST = {mode: ROOT / f"target/phase3/rust-{mode}" for mode in phase3_native.MODES}
 TRANSPILE = phase3_native.DATA / "transpile-native.json"
+TRANSPILE_RUST = ROOT / "target/phase3/transpile-rust"
 METRIC = {"single": "native_verified", "concurrent": "native_verified_concurrent"}
 HARNESS_METRIC = {"single": "harness_valid", "concurrent": "harness_valid_concurrent"}
 
@@ -138,6 +165,57 @@ def harness(mode, native_dir, rust_dir, executed):
                           digest((native[0] / "report.json").read_bytes()),
                           digest(p4.canonical(current_requests) + b"\n"), executed)
     return valid, native, capture, comparison
+
+
+def evidence_states():
+    """The live evidence state of every declared run, never a generated view."""
+    completed = subprocess.run(["cargo", "xtask", "evidence-states"], cwd=ROOT, stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE, check=False)
+    if completed.returncode:
+        raise ValueError("evidence states unavailable: " + completed.stderr.decode(errors="replace")[-2000:])
+    return strict_json_loads(completed.stdout)
+
+
+def transpile_parity(rust=None, document=None):
+    """Matched transpile baselines over the native baselines and any extra run,
+    or None when the Rust run is missing or stale. `document` takes an already
+    made comparison of that run."""
+    rust = Path(rust or TRANSPILE_RUST)
+    document = document or phase3_report.transpile_comparison(rust)
+    if document is None:
+        print(f"transpile Rust run at {rust} is missing or stale", file=sys.stderr)
+        return None
+    return document["matched"] / (document["baselines"] + len(document["extra_runs"]))
+
+
+# Each checkpoint's exit parity (docs/PHASE3-plan.md section 4): T1 the reprint
+# witness, T4 to T6 their rows in `output`, T7 the declaration rows.
+CHECKPOINT_PARITY = {"T1": ("reprint_parity",), "T2": (), "T3": (), "T4": ("output_parity",),
+                     "T5": ("output_parity",), "T6": ("output_parity",), "T7": ("declaration_parity",)}
+# T8 is the P3B exit (sprints/P3B.toml) over this run's metrics.
+P3B_EMIT_EXIT = ("output_parity", "declaration_parity", "sourcemap_parity", "sourcemap_record_parity",
+                 "emit_diagnostics_parity", "transpile_parity", "reprint_parity")
+
+
+def checkpoint_metrics(metrics, audit, receipts):
+    """`tN_complete` for T1 to T8 from this run's metrics, the committed audit
+    (None when stale or invalid) and the contract receipts' states."""
+    out = {}
+    for number in range(1, 9):
+        checkpoint = f"T{number}"
+        group = audit["groups"][checkpoint]["counts"] if audit else None
+        group_complete = bool(group) and not any(group[kind] for kind in phase3_audit.OPEN) and not group["duplicate"]
+        done = group_complete and receipts.get(f"t{number}-contracts") is True
+        if checkpoint == "T8":
+            done = (done and metrics.get("harness_valid") is True and metrics.get("harness_valid_concurrent") is True
+                    and all(metrics.get(name) == 1 for name in P3B_EMIT_EXIT)
+                    and metrics.get("mode_parity") is True and metrics.get("unsupported_required") == 0
+                    and metrics.get("residuals") == 0 and metrics.get("dispositions") is True
+                    and metrics.get("report") is True and metrics.get("evidence_current") is True)
+        else:
+            done = done and all(metrics.get(name) == 1 for name in CHECKPOINT_PARITY[checkpoint])
+        out[f"t{number}_complete"] = done
+    return out
 
 
 def matched_ratio(rows, domain):
@@ -221,6 +299,51 @@ def emit(native=None, rust=None):
                                       and modes["single"]["rust_capture_sha256"] == comparison["rust"]["capture_sha256"])
         except (OSError, ValueError, KeyError) as error:
             print("mode comparison unavailable: " + str(error), file=sys.stderr)
+    transpile = None
+    if metrics["transpile_native_verified"]:
+        try:
+            transpile = phase3_report.transpile_comparison(TRANSPILE_RUST)
+            parity_value = transpile_parity(TRANSPILE_RUST, transpile)
+            if parity_value is not None:
+                metrics["transpile_parity"] = parity_value
+        except (OSError, ValueError, KeyError) as error:
+            print("transpile comparison unavailable: " + str(error), file=sys.stderr)
+    if metrics["harness_valid_concurrent"]:
+        comparisons = {"single": comparison, "concurrent": states["concurrent"][3]}
+        try:
+            rebuilt = phase3_residuals.document(comparisons)
+            if phase3_residuals.committed() == rebuilt:
+                metrics["residuals"] = rebuilt["count"]
+            else:
+                print("data/phase3/residuals.json is missing or differs from the rebuilt list", file=sys.stderr)
+        except (OSError, ValueError, KeyError) as error:
+            print("residual list unavailable: " + str(error), file=sys.stderr)
+        try:
+            metrics["report"] = phase3_report.current(comparisons, transpile)
+        except (OSError, ValueError, KeyError) as error:
+            metrics["report"] = False
+            print("phase 3 report unavailable: " + str(error), file=sys.stderr)
+    audit = None
+    try:
+        problems = phase3_audit.check(complete=True)
+        metrics["dispositions"] = not problems
+        for problem in problems:
+            print("phase3 audit: " + problem, file=sys.stderr)
+        if not [problem for problem in problems if not problem.startswith("the audit is not complete")]:
+            audit = phase3_audit.build_document()
+    except (OSError, ValueError, KeyError) as error:
+        print("phase3 audit unavailable: " + str(error), file=sys.stderr)
+    receipts = {}
+    for identity in sorted(phase3_receipts.WITNESSES):
+        try:
+            receipts[identity] = phase3_receipts.receipt_current(identity)
+        except (OSError, ValueError, KeyError) as error:
+            print(f"receipt {identity} unavailable: " + str(error), file=sys.stderr)
+    try:
+        metrics["evidence_current"] = evidence_states().get("checker") == "current"
+    except (OSError, ValueError) as error:
+        print(str(error), file=sys.stderr)
+    metrics.update(checkpoint_metrics(metrics, audit, receipts))
     print("emit evidence: " + canonical({"native": comparison["native"]["observation_sha256"],
                                          "rust": comparison["rust"]["capture_sha256"]}).decode(), file=sys.stderr)
     return {"metrics": metrics}
