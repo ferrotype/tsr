@@ -1,4 +1,7 @@
-use crate::*;
+use crate::{
+    d, lock, Arc, BuildTask, Diagnostic, Error, HashMap, JsString, Mutex, Node, Orchestrator,
+    Ordering, ParsedCommandLine, WorkGroup,
+};
 use std::collections::HashSet;
 use tsr_core::collections::OrderedMap;
 use tsr_tsoptions::{ConfigValue, ExtendedConfigCache};
@@ -75,7 +78,9 @@ impl Orchestrator {
                             let task = BuildTask::new(name.clone(), result.command_line, time);
                             task.initial_cycle.store(initial, Ordering::Release);
                             if let Some(previous) = previous {
-                                lock(&task.state).info = lock(&previous.state).info.clone();
+                                lock(&task.state)
+                                    .info
+                                    .clone_from(&lock(&previous.state).info);
                             }
                             Arc::new(task)
                         })

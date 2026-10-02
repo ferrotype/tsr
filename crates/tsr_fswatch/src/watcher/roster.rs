@@ -512,19 +512,17 @@ fn multiple(same: bool, batch: bool, file: bool) {
         } else {
             assert!(
                 e1.iter().any(|e| e.path == bytes(&p2))
-                    || r1
+                    || !r1
                         .wait(|l| l.events.iter().any(|e| e.path == bytes(&p2)))
                         .events
-                        .len()
-                        > 0
+                        .is_empty()
             );
             assert!(
                 e2.iter().any(|e| e.path == bytes(&p1))
-                    || r2
+                    || !r2
                         .wait(|l| l.events.iter().any(|e| e.path == bytes(&p1)))
                         .events
-                        .len()
-                        > 0
+                        .is_empty()
             );
         }
     });
@@ -748,7 +746,7 @@ fn denied(recursive: bool) {
     run(|w, t| {
         let denied = t.0.join("denied");
         mkdir(&denied);
-        fs::set_permissions(&denied, fs::Permissions::from_mode(0)).unwrap();
+        fs::set_permissions(&denied, fs::Permissions::from_mode(0o0)).unwrap();
         struct Restore(PathBuf);
         impl Drop for Restore {
             fn drop(&mut self) {

@@ -96,6 +96,7 @@ pub(crate) fn close_event_fd(fd: i32) {
         drop(unsafe { OwnedFd::from_raw_fd(fd) });
     }
 }
+// port: tsc/internal/fswatch/fanotify_linux.go:maybeWrapUnsupportedFilesystem
 pub(crate) fn unsupported(error: rustix::io::Errno) -> Error {
     if error == rustix::io::Errno::OPNOTSUPP || error == rustix::io::Errno::NODEV {
         Error::TaggedFilesystemUnsupported {

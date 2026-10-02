@@ -3,6 +3,7 @@ use crate::{Error, WatchDirectoryRequest};
 /// Retry only unsupported filesystems, preserving the primary owner's batch
 /// fast path. Secondary requests use the public inotify owner, so its directory
 /// table, native backend, and debounce worker are shared with direct watches.
+// port: tsc/internal/fswatch/watcher.go:fallbackWatcher.WatchDirectories
 pub(crate) fn watch_directories<T>(
     requests: &[WatchDirectoryRequest],
     mut primary: impl FnMut(&[WatchDirectoryRequest]) -> Result<Vec<T>, Error>,

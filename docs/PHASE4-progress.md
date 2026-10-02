@@ -53,27 +53,21 @@ The private ext4 loop image supplied that requirement without skipping tests.
 
 ## Remaining before closure
 
-1. Finish the final review and ordinary checks (including warnings denied).
-   Review build host cache scope: Rust currently caches all source kinds,
-   whereas the pinned build host only shares declaration/JSON sources; source
-   loading also uses a mutex. Do not treat this as a proven equivalent.
-2. Close the remaining function-audit dispositions: the current valid audit
-   contains 256 pending rows (639 mapped, 85 equivalent, 27 later). The native
-   test roster has 169 ported and five justified not-applicable rows, none
-   pending. Forty additional reviewed build mapping candidates are retained in
-   `target/phase4/checkpoint/build-equivalents-to-review.json`.
-3. Run a single stable full scenario capture and five determinism repetitions.
+The build-cache review and function audit are complete (follow-up below).
+Phase 4 still needs these acceptance and infrastructure steps:
+
+1. Run a single stable full scenario capture and five determinism repetitions.
    Refresh the comparison, blocker register and generated inventories.
-4. Validate `scripts/phase4_native.py` build provenance and run its release
+2. Validate `scripts/phase4_native.py` build provenance and run its release
    smoke/interop witnesses. The six-family development interop observation used
    earlier copied binaries; it is not the final build's receipt.
-5. Re-run all four live modes on stable built images. Add authenticated witness
+3. Re-run all four live modes on stable built images. Add authenticated witness
    consumption to the producer; currently the new runners are development
    tools and do not emit the remaining X7 gate metrics.
-6. Run ThreadSanitizer; add scheduled Linux instrumentation and native Linux
+4. Run ThreadSanitizer; add scheduled Linux instrumentation and native Linux
    witnesses; check the release ELF's glibc 2.28 requirements. No smoke,
    sanitizer or glibc-floor result is claimed by this checkpoint.
-7. Refresh the required checker/emit and other stale producers on final sources,
+5. Refresh the required checker/emit and other stale producers on final sources,
    update the Phase 4 record and PR, and pass P4B. Thresholds stay unchanged.
 
 Native build entry point:
@@ -98,3 +92,57 @@ three harness refusal/panic tests, 15 watch-manager tests, 30 build/watch/owners
 integration tests, the complete-transcript regression selection, and 31 Python
 capture/comparison tests passed. All-targets compilation and formatting passed.
 No full corpus, benchmark or acceptance producer was rerun.
+
+## Build-cache and function-audit follow-up — 2026-10-02
+
+The build orchestrator now gives each project its own file cache. Only
+declaration and JSON files share a build-cycle owner, keyed by the complete
+parse options (and the inferred script kind). A brief map lock selects a
+per-file entry; filesystem reads, parsing and binding occur under that entry's
+lock. Ordinary source files no longer share owners between projects, and an
+unrelated project load no longer waits for a whole program load to finish.
+Missing, failed and panicking loads do not publish a value and can be retried.
+Reset releases the build-cycle cache after the project workers have joined;
+retained programs and escaped files keep their owners independently.
+
+Every one of the 256 previously pending function rows was checked against the
+pin and its Rust implementation. `phase4_audit.py check --complete` now reports
+734 mapped, 246 reviewed equivalents and 27 previously assigned later-phase
+operations: **zero pending, gaps or duplicate markers** out of 1,007. A reviewed
+equivalent records its concrete Rust site and why no separate Go-shaped helper
+is required. This is implementation disposition, not a claim that the X7
+runtime acceptance has passed. The native unit-test roster remains 169 ported
+and five justified not-applicable rows, with zero pending.
+
+The review also closed actual implementation gaps:
+
+- `Program::reuse_program` reruns mapped-file transforms and replaces canonical
+  and supplemental owners together after checking paths and graph structure.
+  Transform failures, collisions, changed imports and synthetic imports retain
+  the full-load fallback. Compiler watch's existing mapped-file full-load
+  policy stays consistent with the pin.
+- Watch debug output includes event previews and subscription changes/failures.
+- A failed Linux event worker retires its native descriptor before another
+  subscription can be admitted. Inotify failures retain their watched directory
+  and underlying error, as fanotify failures already did.
+- Native directory traversal skips inode-zero records. Implicit event sequence
+  increment wraps independently of the monotonic explicit-sequence updates.
+
+Configured Phase 4 content mappers cannot carry plugin `ContributionID` values.
+The watch/audit comments name the Phase 5 requirement to exclude contributed
+mapper manifests once that representation is introduced; no unreachable field
+or expanded exception was added here.
+
+Focused validation: four source-cache tests, all 11 build unit tests (including
+the real two-project load-concurrency regression), five program-reuse tests and
+17 watch-manager tests pass. Linux's 19 handler/lifecycle and 19 event/directory
+tests pass; macOS's ten directory and nine event tests pass. This Linux run was
+unprivileged and did not exercise live fanotify subscriptions; the earlier ext4
+run above remains historical. The 21 audit/roster script tests pass. Scoped
+warnings-denied Clippy checks pass for compiler, build, command/watch and native
+watcher libraries/tests (compiler tests enable their required features). The
+cleanup added no lint allowances; option-metadata generation now emits digit
+separators, with native observations unchanged. Six help/init/color tests,
+three statistics tests and the controlled-clock emit regression also pass.
+No full scenario capture, benchmark, sanitizer or acceptance producer ran in
+this follow-up. Workspace formatting and diff checks pass.

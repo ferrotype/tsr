@@ -36,10 +36,10 @@ pub fn print_version(sys: &dyn System, locale: &Locale) {
 // port: tsc/internal/execute/tsc/help.go:PrintHelp
 pub fn print_help(sys: &dyn System, locale: &Locale, command_line: &ParsedCommandLine) {
     let options = get_options_for_help(command_line);
-    let output = if !command_line.options.all.is_false_or_unknown() {
-        print_all_help(sys, locale, &options)
-    } else {
+    let output = if command_line.options.all.is_false_or_unknown() {
         print_easy_help(sys, locale, &options)
+    } else {
+        print_all_help(sys, locale, &options)
     };
     write_all(&*sys.writer(), &output);
 }

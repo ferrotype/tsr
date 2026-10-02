@@ -15,6 +15,7 @@ pub(crate) struct Debounce {
     thread: Mutex<Option<JoinHandle<()>>>,
 }
 impl Debounce {
+    // port: tsc/internal/fswatch/debounce.go:newDebounce
     pub(crate) fn new() -> Arc<Self> {
         let shared = Arc::new((Mutex::new(State::default()), Condvar::new()));
         let worker = shared.clone();
@@ -64,9 +65,11 @@ impl Debounce {
             thread: Mutex::new(Some(thread)),
         })
     }
+    // port: tsc/internal/fswatch/debounce.go:debounce.add
     pub(crate) fn add(&self, watch: &Arc<DirWatch>) {
         lock(&self.shared.0).watches.push(Arc::downgrade(watch));
     }
+    // port: tsc/internal/fswatch/debounce.go:debounce.trigger
     pub(crate) fn trigger(&self) {
         let mut s = lock(&self.shared.0);
         s.signalled = true;

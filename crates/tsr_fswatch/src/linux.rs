@@ -35,7 +35,7 @@ struct Subscription {
     watch: Arc<DirWatch>,
 }
 struct State {
-    fd: Arc<OwnedFd>,
+    fd: Option<Arc<OwnedFd>>,
     mode: Mode,
     mask: u64,
     no_rename: bool,
@@ -65,12 +65,15 @@ const FAN_BASE: u64 = libc::FAN_CREATE
     | libc::FAN_ONDIR
     | libc::FAN_EVENT_ON_CHILD;
 const FAN_ADD: u32 = libc::FAN_MARK_ADD | libc::FAN_MARK_ONLYDIR | libc::FAN_MARK_DONT_FOLLOW;
+// port: tsc/internal/fswatch/fanotify_linux.go:fanotifyAvailable
 pub(crate) fn fanotify_available() -> bool {
     ffi::init().is_ok()
 }
+// port: tsc/internal/fswatch/inotify_linux.go:newInotifyBackend
 pub(crate) fn inotify() -> Result<Arc<dyn Backend>, Error> {
     LinuxBackend::new(Mode::Inotify, false).map(|b| b as Arc<dyn Backend>)
 }
+// port: tsc/internal/fswatch/fanotify_linux.go:newFanotifyBackend
 pub(crate) fn fanotify() -> Result<Arc<dyn Backend>, Error> {
     LinuxBackend::new(Mode::Fanotify, false).map(|b| b as Arc<dyn Backend>)
 }
@@ -86,7 +89,7 @@ impl LinuxBackend {
         });
         let (reader, writer) = pipe_with(PipeFlags::NONBLOCK | PipeFlags::CLOEXEC)?;
         let state = Arc::new(Mutex::new(State {
-            fd: fd.clone(),
+            fd: Some(fd.clone()),
             mode,
             mask: 0,
             no_rename,
@@ -102,14 +105,7 @@ impl LinuxBackend {
                 }
                 .into(),
             )
-            .spawn(move || {
-                if let Err(error) = run(work.clone(), fd, reader) {
-                    let watches = lock(&work).watches.clone();
-                    for watch in watches {
-                        watch.notify_error(Error::WatchTerminated.context(error.to_string()));
-                    }
-                }
-            })?;
+            .spawn(move || run_worker(work, fd, reader))?;
         Ok(Arc::new(Self {
             state,
             wake: Mutex::new(Some(writer)),
@@ -161,6 +157,25 @@ impl Drop for LinuxBackend {
         self.shutdown();
     }
 }
+fn run_worker(state: Arc<Mutex<State>>, fd: Arc<OwnedFd>, wake: OwnedFd) {
+    let result = run(state.clone(), fd, wake);
+    let watches = {
+        let mut state = lock(&state);
+        // Retire the descriptor even while public Watch values retain the owner.
+        // Further subscriptions must not succeed against a stopped read worker.
+        state.fd.take();
+        if result.is_err() {
+            state.watches.clone()
+        } else {
+            Vec::new()
+        }
+    };
+    if let Err(error) = result {
+        for watch in watches {
+            watch.notify_error(Error::WatchTerminated.context(error.to_string()));
+        }
+    }
+}
 fn run(state: Arc<Mutex<State>>, fd: Arc<OwnedFd>, wake: OwnedFd) -> Result<(), Error> {
     let mut buffer = [0u8; 8192];
     loop {
@@ -206,6 +221,13 @@ fn touched(watches: &mut Vec<Arc<DirWatch>>, watch: &Arc<DirWatch>) {
 }
 impl State {
     fn subscribe(&mut self, watch: &Arc<DirWatch>) -> Result<(), Error> {
+        let fd = self
+            .fd
+            .as_ref()
+            .ok_or_else(|| {
+                self.subscription_error(watch, &watch.dir, rustix::io::Errno::BADF.into())
+            })?
+            .clone();
         if self.mode == Mode::Fanotify && self.mask == 0 {
             self.mask = if self.no_rename {
                 FAN_BASE | libc::FAN_MOVED_FROM | libc::FAN_MOVED_TO
@@ -213,10 +235,10 @@ impl State {
                 FAN_BASE | libc::FAN_RENAME
             };
             if !self.no_rename {
-                match ffi::mark(&self.fd, &watch.physical_dir, FAN_ADD, self.mask) {
+                match ffi::mark(&fd, &watch.physical_dir, FAN_ADD, self.mask) {
                     Ok(()) => loop {
                         match ffi::mark(
-                            &self.fd,
+                            &fd,
                             &watch.physical_dir,
                             libc::FAN_MARK_REMOVE | libc::FAN_MARK_ONLYDIR,
                             self.mask,
@@ -247,16 +269,16 @@ impl State {
         })
     }
     fn subscription_error(&self, watch: &Arc<DirWatch>, path: &[u8], error: Error) -> Error {
-        if self.mode == Mode::Fanotify {
-            Error::DirectoryWatch {
-                directory: watch.dir.clone(),
-                source: Box::new(error.context_prefix(format!(
-                    "fanotify_mark on '{}' failed",
-                    String::from_utf8_lossy(path)
-                ))),
-            }
-        } else {
-            error
+        let operation = match self.mode {
+            Mode::Inotify => "inotify_add_watch",
+            Mode::Fanotify => "fanotify_mark",
+        };
+        Error::DirectoryWatch {
+            directory: watch.dir.clone(),
+            source: Box::new(error.context_prefix(format!(
+                "{operation} on '{}' failed",
+                String::from_utf8_lossy(path)
+            ))),
         }
     }
     fn add_dir(
@@ -265,19 +287,20 @@ impl State {
         path: &[u8],
         physical: &[u8],
     ) -> Result<(), Error> {
+        let fd = self.fd.as_ref().ok_or(rustix::io::Errno::BADF)?;
         let key = match self.mode {
             Mode::Inotify => Key::Inotify(ino::add_watch(
-                &*self.fd,
+                &**fd,
                 physical,
                 ino::WatchFlags::from_bits_retain(INOTIFY_MASK),
             )?),
             Mode::Fanotify => {
-                ffi::mark(&self.fd, physical, FAN_ADD, self.mask).map_err(ffi::unsupported)?;
+                ffi::mark(fd, physical, FAN_ADD, self.mask).map_err(ffi::unsupported)?;
                 match ffi::handle_key(physical) {
                     Ok(key) => Key::Fanotify(key),
                     Err(error) => {
                         let _ = ffi::mark(
-                            &self.fd,
+                            fd,
                             physical,
                             libc::FAN_MARK_REMOVE | libc::FAN_MARK_ONLYDIR,
                             self.mask,
@@ -312,10 +335,14 @@ impl State {
             if list.is_empty() {
                 match &key {
                     Key::Inotify(wd) => {
-                        let _ = ino::remove_watch(&*self.fd, *wd);
+                        if let Some(fd) = &self.fd {
+                            let _ = ino::remove_watch(&**fd, *wd);
+                        }
                     }
                     Key::Fanotify(_) if self.mask != 0 => {
-                        let _ = ffi::mark(&self.fd, &path, libc::FAN_MARK_REMOVE, self.mask);
+                        if let Some(fd) = &self.fd {
+                            let _ = ffi::mark(fd, &path, libc::FAN_MARK_REMOVE, self.mask);
+                        }
                     }
                     _ => {}
                 }
@@ -338,7 +365,9 @@ impl State {
             });
             if list.is_empty() {
                 if let Key::Inotify(wd) = key {
-                    let _ = ino::remove_watch(&*self.fd, wd);
+                    if let Some(fd) = &self.fd {
+                        let _ = ino::remove_watch(&**fd, wd);
+                    }
                 }
                 self.subscriptions.remove(&key);
             }

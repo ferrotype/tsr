@@ -10,6 +10,7 @@ const FLAGS: OFlags = OFlags::RDONLY
     .union(OFlags::NOFOLLOW);
 /// Descriptor-relative traversal: descendant symlinks are delivered as files,
 /// never followed; deleted and unreadable descendant directories are skipped.
+// port: tsc/internal/fswatch/walkdir_unix.go:walkDir
 pub(crate) fn walk_dir(
     path: &[u8],
     recursive: bool,
@@ -18,6 +19,7 @@ pub(crate) fn walk_dir(
     let fd = open(path, FLAGS, Mode::empty())?;
     visit(fd, path, recursive, callback)
 }
+// port: tsc/internal/fswatch/walkdir_unix.go:iterateDir
 fn visit(
     fd: OwnedFd,
     path: &[u8],
@@ -30,7 +32,7 @@ fn visit(
     for entry in &mut reader {
         let entry = entry?;
         let name = entry.file_name().to_bytes();
-        if name != b"." && name != b".." {
+        if include_entry(entry.ino(), name) {
             entries.push((name.to_vec(), entry.file_type()));
         }
     }
@@ -58,10 +60,21 @@ fn visit(
     }
     Ok(())
 }
+// A zero inode denotes a deleted/unused directory record at the pin.
+fn include_entry(inode: u64, name: &[u8]) -> bool {
+    inode != 0 && name != b"." && name != b".."
+}
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::os::unix::ffi::OsStrExt;
+    #[test]
+    fn deleted_directory_records_are_not_visited() {
+        assert!(!include_entry(0, b"deleted"));
+        assert!(!include_entry(1, b"."));
+        assert!(!include_entry(1, b".."));
+        assert!(include_entry(1, b"child"));
+    }
     #[test]
     // port: tsc/internal/fswatch/walkdir_test.go:TestWalkDirDoesNotFollowSymlinkedDir
     fn recursion_does_not_follow_descendant_symlinks() {
@@ -215,7 +228,7 @@ mod tests {
         let denied = temp.0.join("denied");
         std::fs::create_dir(&denied).unwrap();
         std::fs::write(denied.join("hidden"), b"x").unwrap();
-        std::fs::set_permissions(&denied, std::fs::Permissions::from_mode(0)).unwrap();
+        std::fs::set_permissions(&denied, std::fs::Permissions::from_mode(0o0)).unwrap();
         let enforced = std::fs::read_dir(&denied).is_err();
         let mut found = Vec::new();
         let result = walk_dir(temp.0.as_os_str().as_bytes(), true, &mut |path, _| {

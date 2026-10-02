@@ -17,7 +17,7 @@ fn handler(mode: Mode) -> (State, Arc<DirWatch>) {
     let (fd, _) = pipe_with(PipeFlags::CLOEXEC).unwrap();
     let watch = DirWatch::for_test(b"/watch", b"/watch", true);
     let mut state = State {
-        fd: Arc::new(fd),
+        fd: Some(Arc::new(fd)),
         mode,
         mask: 0,
         no_rename: false,
@@ -254,7 +254,7 @@ fn native_linux_backend_releases_worker_and_descriptor_after_shutdown() {
     let temp = crate::test_support::TempDir::new();
     for _ in 0..3 {
         let backend = LinuxBackend::new(Mode::Inotify, false).unwrap();
-        let fd = Arc::downgrade(&lock(&backend.state).fd);
+        let fd = Arc::downgrade(lock(&backend.state).fd.as_ref().unwrap());
         let watch = DirWatch::for_test(
             temp.0.as_os_str().as_bytes(),
             temp.0.as_os_str().as_bytes(),
@@ -276,7 +276,7 @@ fn unstarted_fanotify() -> LinuxBackend {
     let (fd, _) = pipe_with(PipeFlags::CLOEXEC).unwrap();
     LinuxBackend {
         state: Arc::new(Mutex::new(State {
-            fd: Arc::new(fd),
+            fd: Some(Arc::new(fd)),
             mode: Mode::Fanotify,
             mask: 0,
             no_rename: false,
@@ -483,4 +483,56 @@ fn overflow_does_not_revive_a_deleted_native_root() {
         assert!(touched.is_empty());
         assert_eq!(drain(&watch), (Vec::new(), None));
     }
+}
+
+#[test]
+fn inotify_subscription_failure_preserves_directory_and_cause() {
+    let (state, watch) = handler(Mode::Inotify);
+    let error = state.subscription_error(&watch, b"/watch/child", rustix::io::Errno::ACCESS.into());
+    assert_eq!(error.watch_directory(), Some(b"/watch".as_slice()));
+    assert_eq!(
+        error.raw_os_error(),
+        Some(rustix::io::Errno::ACCESS.raw_os_error())
+    );
+    assert!(error
+        .to_string()
+        .starts_with("inotify_add_watch on '/watch/child' failed: "));
+    assert!(!error.is_filesystem_unsupported());
+}
+
+#[test]
+fn failed_worker_retires_descriptor_before_accepting_more_subscriptions() {
+    let (reader, writer) = pipe_with(PipeFlags::NONBLOCK | PipeFlags::CLOEXEC).unwrap();
+    let fd = Arc::new(reader);
+    let retained = Arc::downgrade(&fd);
+    let (wake_reader, _wake_writer) = pipe_with(PipeFlags::NONBLOCK | PipeFlags::CLOEXEC).unwrap();
+    let state = Arc::new(Mutex::new(State {
+        fd: Some(fd.clone()),
+        mode: Mode::Fanotify,
+        mask: 0,
+        no_rename: false,
+        subscriptions: HashMap::new(),
+        watches: Vec::new(),
+    }));
+    let mut record = fanotify_record(libc::FAN_MODIFY, &fid_record(2, b"file"));
+    record[4] = 0; // The native reader refuses an unsupported kernel metadata version.
+    write(&writer, &record).unwrap();
+    run_worker(state.clone(), fd, wake_reader);
+    assert!(
+        retained.upgrade().is_none(),
+        "failed worker must close its native descriptor"
+    );
+    let backend = LinuxBackend {
+        state,
+        wake: Mutex::new(None),
+        worker: Mutex::new(None),
+    };
+    let watch = DirWatch::for_test(b"/watch", b"/watch", false);
+    let error = backend.add_many(&[watch]).unwrap_err();
+    assert_eq!(
+        error.raw_os_error(),
+        Some(rustix::io::Errno::BADF.raw_os_error())
+    );
+    assert_eq!(error.watch_directory(), Some(b"/watch".as_slice()));
+    assert!(lock(&backend.state).subscriptions.is_empty());
 }

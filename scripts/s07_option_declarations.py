@@ -12,21 +12,26 @@ def rust_string(text):
     return json.dumps(text,ensure_ascii=False)
 
 
+def rust_number(value):
+    # Keep generated literals readable under the workspace clippy policy.
+    return format(value, '_') if abs(value) >= 10_000 else str(value)
+
+
 def declaration(row):
     kinds={v:v[0].upper()+v[1:] for v in ['string','number','boolean','object','list','listOrElement','enum']}
     enums=[]
     for item in row['enum'] or []:
         value=item['value']
-        val=('EnumValue::String('+rust_string(value)+')') if isinstance(value,str) else f'EnumValue::Number({value})'
+        val=('EnumValue::String('+rust_string(value)+')') if isinstance(value,str) else f'EnumValue::Number({rust_number(value)})'
         enums.append('('+rust_string(item['key'])+','+val+')')
     default = row['default']
     kind, value = default['kind'], default['value']
     if kind == 'nil': default_value = 'DefaultValueDescription::Nil'
     elif kind == 'unknown': default_value = 'DefaultValueDescription::Unknown'
-    elif kind == 'message': default_value = f'DefaultValueDescription::Message({value})'
+    elif kind == 'message': default_value = f'DefaultValueDescription::Message({rust_number(value)})'
     elif kind == 'boolean': default_value = f'DefaultValueDescription::Boolean({str(value).lower()})'
     elif kind == 'string': default_value = 'DefaultValueDescription::String('+rust_string(value)+')'
-    elif kind == 'number': default_value = f'DefaultValueDescription::Number({value})'
+    elif kind == 'number': default_value = f'DefaultValueDescription::Number({rust_number(value)})'
     else: raise ValueError('unsupported option default kind: '+kind)
     properties={
         'name':rust_string(row['name']),'short_name':rust_string(row['short_name']),
@@ -34,9 +39,9 @@ def declaration(row):
         'enum_values':'&['+','.join(enums)+']',
         'deprecated_keys':'&['+','.join(map(rust_string,row['deprecated'] or []))+']',
         'element':'Some(&'+declaration(row['element'])+')' if row['element'] else 'None',
-        'extra_validation':rust_string(row['extra_validation']), 'min_value':str(row['min_value']),
-        'category':f"Some({row['category']})" if row['category'] is not None else 'None',
-        'description':f"Some({row['description']})" if row['description'] is not None else 'None',
+        'extra_validation':rust_string(row['extra_validation']), 'min_value':rust_number(row['min_value']),
+        'category':f"Some({rust_number(row['category'])})" if row['category'] is not None else 'None',
+        'description':f"Some({rust_number(row['description'])})" if row['description'] is not None else 'None',
         'default_value_description':default_value,
         'show_in_simplified_help_view':str(row['simplified']).lower(),
     }

@@ -11,6 +11,7 @@ pub(crate) struct DfidName {
     pub(crate) key: HandleKey,
     pub(crate) name: Vec<u8>,
 }
+// port: tsc/internal/fswatch/fanotify_linux.go:parseFanotifyFidRecord
 pub(crate) fn parse_record(data: &[u8], has_name: bool) -> Option<DfidName> {
     if data.len() < 20 {
         return None;
@@ -38,6 +39,7 @@ pub(crate) fn parse_record(data: &[u8], has_name: bool) -> Option<DfidName> {
         name,
     })
 }
+// port: tsc/internal/fswatch/fanotify_linux.go:parseFanotifyDfidNames
 pub(crate) fn parse_dfid_names(mut data: &[u8]) -> (Option<DfidName>, Option<DfidName>) {
     let (mut primary, mut rename) = (None, None);
     while data.len() >= 4 {

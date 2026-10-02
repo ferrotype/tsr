@@ -44,16 +44,24 @@ struct State {
     backend: Option<Arc<dyn Backend>>,
     debounce: Option<Arc<Debounce>>,
 }
+#[cfg(test)]
+type TestBackendStartup = fn() -> Result<Arc<dyn Backend>, Error>;
 struct Owner {
     kind: Kind,
     #[cfg(test)]
-    startup_for_test: Option<fn() -> Result<Arc<dyn Backend>, Error>>,
+    startup_for_test: Option<TestBackendStartup>,
     state: Mutex<State>,
 }
 /// A shared watcher owner. Retained watches keep it alive. Use `close` to
 /// explicitly close all subscriptions; ordinary Watch drops close individually.
 #[derive(Clone)]
 pub struct Watcher(Arc<Owner>);
+impl std::fmt::Display for Watcher {
+    // port: tsc/internal/fswatch/watcher.go:watcher.String
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.name())
+    }
+}
 fn new(kind: Kind) -> Watcher {
     Watcher(Arc::new(Owner {
         kind,
@@ -71,27 +79,34 @@ fn shared(kind: Kind, slot: &'static OnceLock<Mutex<Weak<Owner>>>) -> Watcher {
     *slot = Arc::downgrade(&watcher.0);
     watcher
 }
+// port: tsc/internal/fswatch/watcher.go:Inotify
 pub fn inotify() -> Watcher {
     static INSTANCE: OnceLock<Mutex<Weak<Owner>>> = OnceLock::new();
     shared(Kind::Inotify, &INSTANCE)
 }
+// port: tsc/internal/fswatch/watcher.go:Fanotify
 pub fn fanotify() -> Watcher {
     static INSTANCE: OnceLock<Mutex<Weak<Owner>>> = OnceLock::new();
     shared(Kind::Fanotify, &INSTANCE)
 }
+// port: tsc/internal/fswatch/watcher.go:FSEvents
 pub fn fsevents() -> Watcher {
     static INSTANCE: OnceLock<Mutex<Weak<Owner>>> = OnceLock::new();
     shared(Kind::Fsevents, &INSTANCE)
 }
+// port: tsc/internal/fswatch/watcher.go:Kqueue
 pub fn kqueue() -> Watcher {
     new(Kind::Kqueue)
 }
+// port: tsc/internal/fswatch/watcher.go:Windows
 pub fn windows() -> Watcher {
     new(Kind::Windows)
 }
+// port: tsc/internal/fswatch/watcher.go:AllWatchers
 pub fn all_watchers() -> Vec<Watcher> {
     vec![inotify(), fsevents(), kqueue(), windows(), fanotify()]
 }
+// port: tsc/internal/fswatch/watcher.go:Default
 pub fn default_watcher() -> Watcher {
     #[cfg(target_os = "linux")]
     {
@@ -115,6 +130,7 @@ impl Watcher {
         lock(&watcher.0.state).backend = Some(backend);
         watcher
     }
+    // port: tsc/internal/fswatch/watcher.go:watcher.Name
     pub fn name(&self) -> &'static str {
         match self.0.kind {
             Kind::Inotify => "inotify",
@@ -127,6 +143,7 @@ impl Watcher {
             Kind::Unsupported => "unsupported",
         }
     }
+    // port: tsc/internal/fswatch/watcher.go:watcher.Available
     pub fn available(&self) -> bool {
         #[cfg(test)]
         if self.0.startup_for_test.is_some() {
@@ -144,6 +161,7 @@ impl Watcher {
             _ => false,
         }
     }
+    // port: tsc/internal/fswatch/watcher.go:watcher.HasFastRecursiveBackend
     pub fn has_fast_recursive_backend(&self) -> bool {
         matches!(self.0.kind, Kind::Fsevents | Kind::Windows)
     }
@@ -170,6 +188,7 @@ impl Watcher {
     /// default_watcher().watch_directory(b"/tmp", None, WatchOptions::default());
     /// ```
     // source: tsc/internal/fswatch/watcher_test.go:TestSubscribeRejectsNilCallback
+    // port: tsc/internal/fswatch/watcher.go:watcher.WatchDirectory
     pub fn watch_directory(
         &self,
         dir: &[u8],
@@ -214,6 +233,7 @@ impl Watcher {
         }
         self.register_directories(requests)
     }
+    // port: tsc/internal/fswatch/watcher.go:watcher.WatchDirectories
     fn register_directories(
         &self,
         requests: &[WatchDirectoryRequest],
@@ -359,6 +379,7 @@ impl Watcher {
             })
             .collect())
     }
+    // port: tsc/internal/fswatch/watcher.go:watcher.WatchFile
     pub fn watch_file(&self, path: &[u8], callback: WatchCallback) -> Result<Watch, Error> {
         if !self.available() {
             return Err(Error::Unavailable);
@@ -415,6 +436,7 @@ pub struct Watch {
     closed: AtomicBool,
 }
 impl Watch {
+    // port: tsc/internal/fswatch/watcher.go:watch.Close
     pub fn close(&self) -> Result<(), Error> {
         if self.closed.swap(true, Ordering::AcqRel) {
             return Ok(());
@@ -483,6 +505,7 @@ impl DirWatch {
             debounce: Weak::new(),
         })
     }
+    // port: tsc/internal/fswatch/watcher.go:dirWatch.watch
     fn watch(
         &self,
         dir: Vec<u8>,
@@ -507,23 +530,28 @@ impl DirWatch {
         });
         id
     }
+    // port: tsc/internal/fswatch/watcher.go:dirWatch.unwatch
     fn unwatch(&self, id: u64) -> bool {
         let mut c = lock(&self.callbacks);
         c.entries.retain(|cb| cb.id != id);
         c.entries.is_empty()
     }
+    // port: tsc/internal/fswatch/watcher.go:dirWatch.displayPath
     pub(crate) fn display_path(&self, path: &[u8]) -> Vec<u8> {
         rebase_path(path, &self.physical_dir, &self.dir)
     }
+    // port: tsc/internal/fswatch/watcher.go:dirWatch.physicalPath
     pub(crate) fn physical_path(&self, path: &[u8]) -> Vec<u8> {
         rebase_path(path, &self.dir, &self.physical_dir)
     }
+    // port: tsc/internal/fswatch/watcher.go:dirWatch.notify
     pub(crate) fn notify(&self) {
         if let Some(debounce) = self.debounce.upgrade() {
             debounce.trigger();
         }
     }
     #[cfg(any(target_os = "linux", test))]
+    // port: tsc/internal/fswatch/watcher.go:dirWatch.notifyError
     pub(crate) fn notify_error(&self, error: Error) {
         let callbacks = std::mem::take(&mut lock(&self.callbacks).entries);
         for cb in callbacks {
@@ -531,6 +559,7 @@ impl DirWatch {
         }
     }
     #[cfg(any(target_os = "macos", test))]
+    // port: tsc/internal/fswatch/watcher.go:dirWatch.terminateCallbacksForDeletedRoot
     pub(crate) fn terminate_callbacks_for_deleted_root(
         &self,
         path: &[u8],
@@ -553,6 +582,7 @@ impl DirWatch {
         }
         changed
     }
+    // port: tsc/internal/fswatch/watcher.go:dirWatch.triggerCallbacks
     pub(crate) fn trigger_callbacks(&self) {
         let mut callbacks = lock(&self.callbacks);
         let ready: Vec<_> = callbacks
@@ -612,6 +642,7 @@ impl DirWatch {
         }
     }
 }
+// port: tsc/internal/fswatch/watcher.go:fileCallback
 fn file_callback(path: Vec<u8>, callback: WatchCallback) -> WatchCallback {
     Arc::new(move |events, error| {
         let filtered: Vec<_> = events
@@ -657,11 +688,13 @@ pub(crate) fn canonicalize(path: &[u8]) -> Vec<u8> {
     #[cfg(not(target_os = "macos"))]
     path.to_vec()
 }
+// port: tsc/internal/fswatch/watcher.go:physicalDirFor
 fn physical_dir_for(path: &[u8]) -> Vec<u8> {
     std::fs::canonicalize(os_path(path))
         .map(|p| canonicalize(p.as_os_str().as_bytes()))
         .unwrap_or_else(|_| path.to_vec())
 }
+// port: tsc/internal/fswatch/watcher.go:isInDirectoryOrSelf
 pub(crate) fn is_in_directory_or_self(dir: &[u8], path: &[u8]) -> bool {
     !dir.is_empty()
         && (path == dir
@@ -669,6 +702,7 @@ pub(crate) fn is_in_directory_or_self(dir: &[u8], path: &[u8]) -> bool {
                 !rest.is_empty() && (dir.ends_with(b"/") || rest.starts_with(b"/"))
             }))
 }
+// port: tsc/internal/fswatch/watcher.go:isDirectChild
 pub(crate) fn is_direct_child(dir: &[u8], path: &[u8]) -> bool {
     path.strip_prefix(dir)
         .and_then(|rest| {
@@ -680,12 +714,14 @@ pub(crate) fn is_direct_child(dir: &[u8], path: &[u8]) -> bool {
         })
         .is_some_and(|rest| !rest.is_empty() && !rest.contains(&b'/'))
 }
+// port: tsc/internal/fswatch/watcher.go:rebasePath
 pub(crate) fn rebase_path(path: &[u8], from: &[u8], to: &[u8]) -> Vec<u8> {
     if from == to || !is_in_directory_or_self(from, path) {
         return path.to_vec();
     }
     join_suffix(to, &path[from.len()..])
 }
+// port: tsc/internal/fswatch/watcher.go:joinPathSuffix
 pub(crate) fn join_suffix(root: &[u8], suffix: &[u8]) -> Vec<u8> {
     let mut path = root.to_vec();
     if !suffix.is_empty() {

@@ -1,6 +1,6 @@
 """Phase 4 X0: the function audit over the Phase 4 files left after the owner's
 decisions (docs/PHASE4-plan.md sections 2, 4 and 5). The committed audit is
-current and valid but not complete; a duplicate marker, a marker for an unknown
+current, valid and complete; a duplicate marker, a marker for an unknown
 id and a removed marker each change the result and are problems."""
 import copy
 import json
@@ -37,18 +37,14 @@ class Audit(unittest.TestCase):
         return next(identity for row in self.document["files"].values() for identity, entry in row["functions"].items()
                     if identity.startswith(prefix) and entry["status"] == "mapped" and len(entry["rust"]) == sites)
 
-    def test_the_committed_audit_is_current_valid_and_not_complete(self):
+    def test_the_committed_function_audit_is_current_valid_and_complete(self):
         self.assertEqual(self.document["problems"], [])
         self.assertEqual(audit.AUDIT.read_text(), audit.render(self.document))
         self.assertEqual(audit.check(), [])
-        # Unported checkpoints keep functions pending: X7's closure check fails
-        # and names the open functions per owning checkpoint.
-        self.assertFalse(self.document["complete"])
-        found = audit.check(complete=True)
-        self.assertEqual(len(found), 1)
-        self.assertTrue(found[0].startswith("the audit is not complete: "))
-        for checkpoint in ("X1", "X3", "X4", "X5", "X6"):
-            self.assertIn(f"pending {checkpoint}", found[0])
+        # Completing function dispositions does not certify X7 runtime evidence.
+        self.assertTrue(self.document["complete"])
+        self.assertEqual(audit.check(complete=True), [])
+        self.assertEqual(self.document["totals"]["pending"], 0)
         self.assertEqual(self.document["totals"]["gap"], 0)
         self.assertEqual(self.document["totals"]["duplicate"], 0)
 
@@ -86,13 +82,10 @@ class Audit(unittest.TestCase):
             for identity, entry in self.document["files"][go]["functions"].items():
                 if entry["status"] != "mapped":
                     self.assertIn(identity, audit.REVIEWED, identity)
-        # 96 marked and 48 reviewed at X0; a port landing on a reviewed pending
-        # function moves it to mapped.
+        # X5 closes the seeded pending functions with ports or reviewed folds.
         program = self.document["files"][PROGRAM]["counts"]
-        self.assertEqual((program["total"], program["equivalent"], program["later"]), (144, 12, 19))
-        self.assertEqual(program["mapped"] + program["pending"], 96 + 17)
-        self.assertEqual(sum(review["disposition"] == "pending" for identity, review in audit.REVIEWED.items()
-                             if identity.startswith(PROGRAM + ":")), 17)
+        self.assertEqual((program["total"], program["mapped"], program["equivalent"], program["later"]),
+                         (144, 105, 20, 19))
         writer = self.document["files"][WRITER]["counts"]
         self.assertEqual((writer["total"], writer["mapped"], writer["equivalent"]), (40, 25, 15))
         other = [self.document["files"][go]["counts"] for go in SEEDED[2:]]
@@ -182,8 +175,9 @@ class Audit(unittest.TestCase):
         self.assertEqual(sorted(document["unknown_markers"]), [
             "tsc/cmd/tsc/main.go:mian", PROGRAM + ":Program.NoSuchMethod",
             "tsc/internal/execute/tsc/help.go:printNothing", "tsc/internal/fswatch/nosuchfile.go:watch"])
-        self.assertEqual(list(document["test_file_markers"]),
-                         ["tsc/internal/execute/tsctests/tscwatch_test.go:newTscEdit"])
+        self.assertEqual(set(document["test_file_markers"]),
+                         set(self.document["test_file_markers"]) |
+                         {"tsc/internal/execute/tsctests/tscwatch_test.go:newTscEdit"})
         self.assertEqual(len(document["problems"]), 4)
         self.assertNotEqual(audit.render(document), audit.render(self.document))
 

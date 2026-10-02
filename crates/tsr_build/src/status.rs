@@ -1,4 +1,4 @@
-use crate::*;
+use crate::{d, Error, JsString, Orchestrator, SharedWriter, Time};
 
 /// The sixteen pinned `upToDateStatusType` cases, in source order.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -85,7 +85,12 @@ impl Status {
         if !o.opts.command.build_options.verbose.is_true() {
             return Ok(());
         }
-        use StatusKind::*;
+        use StatusKind::{
+            BuildErrors, ConfigFileNotFound, ForceBuild, InputFileMissing, InputFileNewer,
+            OutOfDateBuildInfoWithErrors, OutOfDateBuildInfoWithPendingEmit, OutOfDateOptions,
+            OutOfDateRoots, OutputMissing, Solution, TsVersionOutOfDate, UpToDate,
+            UpToDateWithInputFileText, UpToDateWithUpstreamTypes, UpstreamErrors,
+        };
         let mut args = vec![o.relative(config)];
         let message = match self.kind {
             ConfigFileNotFound => d::Project_0_is_out_of_date_because_config_file_does_not_exist,

@@ -180,7 +180,7 @@ fn incremental_declaration_emit_time_is_excluded_from_check_time() {
         let report = tsr_tsc::create_diagnostic_reporter(
             &sys,
             sys.writer(),
-            Default::default(),
+            tsr_locale::Locale::default(),
             &CompilerOptions {
                 quiet: Tristate::TRUE,
                 ..Default::default()

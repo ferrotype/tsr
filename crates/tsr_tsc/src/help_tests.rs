@@ -288,7 +288,7 @@ fn init_keeps_existing_file_and_reports_its_normalized_path() {
         &sys,
         &Locale::default(),
         &|diagnostic| reported.lock().unwrap().push(diagnostic.clone()),
-        &Default::default(),
+        &tsr_core::collections::OrderedMap::default(),
     );
     assert!(sys.take().is_empty());
     let diagnostics = reported.into_inner().unwrap();

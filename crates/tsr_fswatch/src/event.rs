@@ -11,6 +11,7 @@ impl EventKind {
     pub const EventDelete: Self = Self(2);
 }
 impl std::fmt::Display for EventKind {
+    // port: tsc/internal/fswatch/event.go:EventKind.String
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(match *self {
             Self::EventUpdate => "update",
@@ -39,6 +40,7 @@ struct Entry {
     included_watch_root: bool,
 }
 impl Entry {
+    // port: tsc/internal/fswatch/event.go:eventEntry.kindSince
     fn kind_since(&self, start: u64) -> Option<EventKind> {
         if self.deleted > start {
             if self.created > start && self.created < self.deleted && self.updated < self.deleted {
@@ -60,8 +62,16 @@ pub(crate) struct EventList(Mutex<State>);
 impl EventList {
     fn record(&self, path: &[u8], sequence: Option<u64>, operation: u8, root: bool) -> u64 {
         let mut state = lock(&self.0);
-        let sequence = sequence.unwrap_or_else(|| state.sequence.wrapping_add(1));
-        state.sequence = state.sequence.max(sequence);
+        let sequence = match sequence {
+            Some(sequence) => {
+                state.sequence = state.sequence.max(sequence);
+                sequence
+            }
+            None => {
+                state.sequence = state.sequence.wrapping_add(1);
+                state.sequence
+            }
+        };
         let entry = state.entries.entry(path.to_vec()).or_default();
         match operation {
             0 if entry.deleted > entry.created && entry.deleted > entry.updated => {
@@ -77,37 +87,51 @@ impl EventList {
         sequence
     }
     #[cfg(any(target_os = "linux", test))]
+    // port: tsc/internal/fswatch/event.go:eventList.create
     pub(crate) fn create(&self, p: &[u8]) {
         self.record(p, None, 0, false);
     }
     #[cfg(any(target_os = "linux", test))]
+    // port: tsc/internal/fswatch/event.go:eventList.update
     pub(crate) fn update(&self, p: &[u8]) {
         self.record(p, None, 1, false);
     }
     #[cfg(any(target_os = "linux", test))]
+    // port: tsc/internal/fswatch/event.go:eventList.remove
     pub(crate) fn remove(&self, p: &[u8]) {
         self.record(p, None, 2, false);
     }
     #[cfg(test)]
+    // port: tsc/internal/fswatch/event.go:eventList.removeAndGetSequence
     pub(crate) fn remove_and_get_sequence(&self, p: &[u8]) -> u64 {
         self.record(p, None, 2, false)
     }
     #[cfg(test)]
+    // port: tsc/internal/fswatch/event.go:eventList.createAt
     pub(crate) fn create_at(&self, p: &[u8], s: u64) {
         self.record(p, Some(s), 0, false);
     }
+    #[cfg(any(target_os = "macos", test))]
+    // port: tsc/internal/fswatch/event.go:eventList.updateAt
     pub(crate) fn update_at(&self, p: &[u8], s: u64) {
         self.record(p, Some(s), 1, false);
     }
+    #[cfg(any(target_os = "macos", test))]
+    // port: tsc/internal/fswatch/event.go:eventList.removeAt
     pub(crate) fn remove_at(&self, p: &[u8], s: u64) {
         self.record(p, Some(s), 2, false);
     }
+    #[cfg(any(target_os = "macos", test))]
+    // port: tsc/internal/fswatch/event.go:eventList.updateWatchRootAt
     pub(crate) fn update_watch_root_at(&self, p: &[u8], s: u64) {
         self.record(p, Some(s), 1, true);
     }
+    #[cfg(any(target_os = "macos", test))]
+    // port: tsc/internal/fswatch/event.go:eventList.removeWatchRootAt
     pub(crate) fn remove_watch_root_at(&self, p: &[u8], s: u64) {
         self.record(p, Some(s), 2, true);
     }
+    // port: tsc/internal/fswatch/event.go:eventList.sequence
     pub(crate) fn sequence(&self) -> u64 {
         lock(&self.0).sequence
     }
@@ -115,9 +139,11 @@ impl EventList {
         let s = lock(&self.0);
         !s.entries.is_empty() || s.error.is_some()
     }
+    // port: tsc/internal/fswatch/event.go:eventList.setError
     pub(crate) fn set_error(&self, error: Error) {
         lock(&self.0).error.get_or_insert(error);
     }
+    // port: tsc/internal/fswatch/event.go:eventList.drainForSequences
     pub(crate) fn drain_for_sequences(
         &self,
         starts: &[u64],
@@ -268,6 +294,23 @@ mod tests {
                 path: b"file.txt".to_vec()
             }
         );
+    }
+    #[test]
+    fn implicit_sequence_wraps_but_explicit_sequence_only_advances() {
+        let events = EventList::default();
+        events.create_at(b"last", u64::MAX);
+        events.create(b"wrapped");
+        assert_eq!(events.sequence(), 0);
+        events.drain_for_sequences(&[]);
+        events.update_at(b"next", 7);
+        events.update_at(b"older", 3);
+        assert_eq!(events.sequence(), 7);
+        events.remove_at(b"next", 9);
+        assert_eq!(events.sequence(), 9);
+        let (batches, _) = events.drain_for_sequences(&[7]);
+        assert_eq!(batches[0].len(), 1);
+        assert_eq!(batches[0][0].event.kind, EventKind::EventDelete);
+        assert_eq!(batches[0][0].event.path, b"next");
     }
     #[test]
     fn explicit_sequences_advance_cutoff_without_replaying_older_events() {

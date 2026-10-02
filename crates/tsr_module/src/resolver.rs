@@ -148,6 +148,7 @@ pub struct Resolver {
 impl Resolver {
     /// Retain resolution observations for a compiler program whose file graph
     /// is unchanged, while directing any later host queries to the new cycle.
+    #[must_use]
     pub fn fork_for_host(&self, host: Arc<dyn FileSystem>) -> Self {
         Self {
             config_lookup: self.config_lookup,

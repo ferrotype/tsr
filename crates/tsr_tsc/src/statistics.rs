@@ -103,7 +103,7 @@ impl Statistics {
             );
         }
         let mut mappers: Vec<_> = times.content_mapper_times.mappers.iter().collect();
-        mappers.sort_unstable_by(|(left, _), (right, _)| left.cmp(right));
+        mappers.sort_unstable_by_key(|(identity, _)| *identity);
         for (identity, mapper) in mappers {
             for (name, count, duration) in [
                 (

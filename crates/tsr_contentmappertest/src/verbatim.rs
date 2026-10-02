@@ -81,7 +81,6 @@ impl MapperHandler for DynamicVerbatim {
                         &[b"mapper.config.json"],
                     ))?],
                     option_diagnostics: diagnostics,
-                    ..OpenProjectResult::default()
                 })))
             }
             METHOD_CLOSE_PROJECT => {

@@ -137,7 +137,7 @@ impl BuildTask {
                     tsr_json::Options::default(),
                 )
                 .ok()
-                .map(|_| Arc::new(info))
+                .map(|()| Arc::new(info))
                 .map(Some)
             })
             .flatten();
@@ -195,8 +195,8 @@ impl BuildTask {
         let mut result = TaskResult::default();
         if !self.pending.load(Ordering::Acquire) {
             let state = lock(&self.state);
-            result.errors = state.errors.clone();
-            result.program = state.error_program.clone();
+            result.errors.clone_from(&state.errors);
+            result.program.clone_from(&state.error_program);
             let status = state.status.clone();
             drop(state);
             if !result.errors.is_empty() {
@@ -216,7 +216,7 @@ impl BuildTask {
             }
             return Ok(result);
         }
-        let mut status = self.up_to_date_status(o, index)?;
+        let mut status = self.up_to_date_status(o, index);
         status.report(o, self.config.as_bytes(), result.output.clone())?;
         let handled = self.handle_without_build(o, &mut result, &mut status)?;
         if handled {
@@ -234,7 +234,7 @@ impl BuildTask {
         {
             let mut state = lock(&self.state);
             state.status = Some(status);
-            state.errors = result.errors.clone();
+            state.errors.clone_from(&result.errors);
             state.error_program = (!result.errors.is_empty())
                 .then(|| result.program.clone())
                 .flatten();
@@ -310,7 +310,7 @@ impl BuildTask {
         result: &mut TaskResult,
         status: &mut Status,
     ) -> Result<bool, Error> {
-        use StatusKind::*;
+        use StatusKind::{ConfigFileNotFound, Solution, UpToDate, UpstreamErrors};
         let options = &o.opts.command.build_options;
         match status.kind {
             UpToDate => {
@@ -364,7 +364,7 @@ impl BuildTask {
                 self.update_timestamps(
                     o,
                     &[],
-                    result.output.clone(),
+                    &result.output,
                     d::Updating_output_timestamps_of_project_0,
                 )?;
                 status.kind = UpToDate;
@@ -385,42 +385,47 @@ impl BuildTask {
     }
 
     // port: tsc/internal/execute/build/buildtask.go:BuildTask.getUpToDateStatus
-    fn up_to_date_status(&self, o: &Orchestrator, index: usize) -> Result<Status, Error> {
-        use StatusKind::*;
+    fn up_to_date_status(&self, o: &Orchestrator, index: usize) -> Status {
+        use StatusKind::{
+            ConfigFileNotFound, ForceBuild, InputFileMissing, InputFileNewer,
+            OutOfDateBuildInfoWithErrors, OutOfDateBuildInfoWithPendingEmit, OutOfDateOptions,
+            OutOfDateRoots, OutputMissing, Solution, TsVersionOutOfDate, UpToDate,
+            UpToDateWithInputFileText, UpToDateWithUpstreamTypes, UpstreamErrors,
+        };
         if let Some(status) = &lock(&self.state).status {
-            return Ok(status.clone());
+            return status.clone();
         }
         let Some(config) = &self.resolved else {
-            return Ok(Status::plain(ConfigFileNotFound));
+            return Status::plain(ConfigFileNotFound);
         };
         if config.root_file_names.is_empty() && config.project_references.is_some() {
-            return Ok(Status::plain(Solution));
+            return Status::plain(Solution);
         }
         for (upstream, ref_index) in &o.tasks[index].upstream {
             let state = lock(&o.tasks[*upstream].task.state);
             if let Some(status) = &state.status {
                 if o.opts.command.build_options.stop_build_on_errors.is_true() && status.is_error()
                 {
-                    return Ok(Status {
+                    return Status {
                         input: config.project_references.as_ref().unwrap()[*ref_index]
                             .path
                             .clone(),
                         ref_has_upstream_errors: status.kind == UpstreamErrors,
                         ..Status::plain(UpstreamErrors)
-                    });
+                    };
                 }
             }
         }
         if o.opts.command.build_options.force.is_true() {
-            return Ok(Status::plain(ForceBuild));
+            return Status::plain(ForceBuild);
         }
         let build_info_path = config.build_info_file_name();
         let entry = self.load_info(o);
         let Some(info) = &entry.info else {
-            return Ok(Status::file(OutputMissing, build_info_path));
+            return Status::file(OutputMissing, build_info_path);
         };
         if !info.is_valid_version() {
-            return Ok(Status::file(TsVersionOutOfDate, info.version.clone()));
+            return Status::file(TsVersionOutOfDate, info.version.clone());
         }
         let project = self.project(o);
         let identities = tsr_incremental::content_mapper_identities(project.as_deref());
@@ -432,12 +437,12 @@ impl BuildTask {
             }
         };
         if identity_changed || lock(&self.project_error).is_some() {
-            return Ok(Status::file(OutOfDateOptions, build_info_path));
+            return Status::file(OutOfDateOptions, build_info_path);
         }
         if info.errors
             || !config.options.no_check.is_true() && (info.semantic_errors || info.check_pending)
         {
-            return Ok(Status::file(OutOfDateBuildInfoWithErrors, build_info_path));
+            return Status::file(OutOfDateBuildInfoWithErrors, build_info_path);
         }
         let directory = tsr_tspath::directory(&tsr_tspath::absolute(
             build_info_path.as_bytes(),
@@ -446,25 +451,22 @@ impl BuildTask {
         let is_incremental = BuildInfo::is_incremental(Some(info));
         if config.options.is_incremental() {
             if !is_incremental {
-                return Ok(Status::file(OutOfDateOptions, build_info_path));
+                return Status::file(OutOfDateOptions, build_info_path);
             }
             if config.options.emit_declarations() && info.emit_diagnostics_per_file.is_some()
                 || !config.options.no_check.is_true()
                     && (info.change_file_set.is_some()
                         || info.semantic_diagnostics_per_file.is_some())
             {
-                return Ok(Status::file(OutOfDateBuildInfoWithErrors, build_info_path));
+                return Status::file(OutOfDateBuildInfoWithErrors, build_info_path);
             }
             if !config.options.no_emit.is_true()
                 && (info.change_file_set.is_some() || info.affected_files_pending_emit.is_some())
             {
-                return Ok(Status::file(
-                    OutOfDateBuildInfoWithPendingEmit,
-                    build_info_path,
-                ));
+                return Status::file(OutOfDateBuildInfoWithPendingEmit, build_info_path);
             }
             if info.is_emit_pending(config, &directory) {
-                return Ok(Status::file(OutOfDateOptions, build_info_path));
+                return Status::file(OutOfDateOptions, build_info_path);
             }
         }
         let roots = info.get_build_info_root_info_reader(&directory, o.host.case_sensitive);
@@ -477,7 +479,7 @@ impl BuildTask {
         for input in &config.root_file_names {
             let time = o.host.m_time(input.as_bytes());
             if time.is_zero() {
-                return Ok(Status::file(InputFileMissing, input.clone()));
+                return Status::file(InputFileMissing, input.clone());
             }
             let path = o.path(input.as_bytes());
             if time > oldest_time {
@@ -489,8 +491,8 @@ impl BuildTask {
                 } else {
                     JsString::default()
                 };
-                if version.is_empty() || !self.same_text(o, resolved.as_bytes(), &version) {
-                    return Ok(Status::pair(InputFileNewer, input.clone(), build_info_path));
+                if version.is_empty() || !Self::same_text(o, resolved.as_bytes(), &version) {
+                    return Status::pair(InputFileNewer, input.clone(), build_info_path);
                 }
                 text_unchanged = true;
             }
@@ -502,7 +504,7 @@ impl BuildTask {
         }
         for root in roots.roots() {
             if !seen.contains(root) {
-                return Ok(Status::pair(OutOfDateRoots, root.clone(), build_info_path));
+                return Status::pair(OutOfDateRoots, root.clone(), build_info_path);
             }
         }
         if is_incremental {
@@ -531,15 +533,15 @@ impl BuildTask {
                 }
                 let time = o.host.m_time(input.as_bytes());
                 if time.is_zero() {
-                    return Ok(Status::file(InputFileMissing, input));
+                    return Status::file(InputFileMissing, input);
                 }
                 if time > oldest_time {
                     let version = BuildInfoFileInfo::get_file_info(Some(file_info))
                         .expect("build info file info")
                         .version()
                         .clone();
-                    if version.is_empty() || !self.same_text(o, input.as_bytes(), &version) {
-                        return Ok(Status::pair(InputFileNewer, input, build_info_path));
+                    if version.is_empty() || !Self::same_text(o, input.as_bytes(), &version) {
+                        return Status::pair(InputFileNewer, input, build_info_path);
                     }
                     text_unchanged = true;
                 }
@@ -549,10 +551,10 @@ impl BuildTask {
             for output in config.as_ref().clone().output_file_names() {
                 let time = o.host.m_time(output.as_bytes());
                 if time.is_zero() {
-                    return Ok(Status::file(OutputMissing, output));
+                    return Status::file(OutputMissing, output);
                 }
                 if time < newest_time {
-                    return Ok(Status::pair(InputFileNewer, newest_input, output));
+                    return Status::pair(InputFileNewer, newest_input, output);
                 }
                 if time < oldest_time {
                     oldest_output = output;
@@ -588,42 +590,31 @@ impl BuildTask {
                     continue;
                 }
             }
-            return Ok(Status::pair(
+            return Status::pair(
                 InputFileNewer,
                 config.project_references.as_ref().unwrap()[*ref_index]
                     .path
                     .clone(),
                 oldest_output,
-            ));
+            );
         }
         for input in std::iter::once(&self.config).chain(config.extended_source_files()) {
             if o.host.m_time(input.as_bytes()) > oldest_time {
-                return Ok(Status::pair(InputFileNewer, input.clone(), oldest_output));
+                return Status::pair(InputFileNewer, input.clone(), oldest_output);
             }
         }
         for package in info.get_package_jsons(&directory) {
             let time = o.host.m_time(&package);
             if time.is_zero() {
-                return Ok(Status::file(
-                    InputFileMissing,
-                    JsString::from_bytes(package),
-                ));
+                return Status::file(InputFileMissing, JsString::from_bytes(package));
             }
             if time > oldest_time {
-                return Ok(Status::pair(
-                    InputFileNewer,
-                    JsString::from_bytes(package),
-                    oldest_output,
-                ));
+                return Status::pair(InputFileNewer, JsString::from_bytes(package), oldest_output);
             }
         }
         for package in info.get_missing_package_jsons(&directory) {
             if !o.host.m_time(&package).is_zero() {
-                return Ok(Status::pair(
-                    InputFileNewer,
-                    JsString::from_bytes(package),
-                    oldest_output,
-                ));
+                return Status::pair(InputFileNewer, JsString::from_bytes(package), oldest_output);
             }
         }
         lock(&self.state).package_jsons = info
@@ -631,7 +622,7 @@ impl BuildTask {
             .chain(info.get_missing_package_jsons(&directory))
             .map(JsString::from_bytes)
             .collect();
-        Ok(Status {
+        Status {
             kind: if dts_unchanged {
                 UpToDateWithUpstreamTypes
             } else if text_unchanged {
@@ -646,9 +637,9 @@ impl BuildTask {
             build_info: build_info_path,
             has_times: true,
             ref_has_upstream_errors: false,
-        })
+        }
     }
-    fn same_text(&self, o: &Orchestrator, file: &[u8], version: &JsString) -> bool {
+    fn same_text(o: &Orchestrator, file: &[u8], version: &JsString) -> bool {
         o.host
             .fs
             .read_file(file)
@@ -815,7 +806,7 @@ impl BuildTask {
             self.update_timestamps(
                 o,
                 &emitted.emit_result.emitted_files,
-                result.output.clone(),
+                &result.output,
                 d::Updating_unchanged_output_timestamps_of_project_0,
             )?;
         }
@@ -859,7 +850,7 @@ impl BuildTask {
         &self,
         o: &Orchestrator,
         emitted: &[JsString],
-        writer: SharedWriter,
+        writer: &Arc<Buffer>,
         message: &'static d::Message,
     ) -> Result<(), Error> {
         let config = self.resolved.as_ref().unwrap();

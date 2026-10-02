@@ -59,6 +59,7 @@ pub struct EmitInput<'a> {
 
 /// port: tsc/internal/execute/tsc/emit.go:EmitFilesAndReportErrors
 pub fn emit_files_and_report_errors(input: EmitInput<'_>) -> Result<CompileAndEmitResult, Error> {
+    let times = input.times;
     if let Some(testing) = input.testing {
         testing.on_compiler_program(input.program);
     }
@@ -106,9 +107,9 @@ pub fn emit_files_and_report_errors(input: EmitInput<'_>) -> Result<CompileAndEm
             Ok(diagnostics)
         },
     )?;
-    input.times.bind_time = bind_time.get();
-    input.times.check_time = check_time.get();
-    input.times.emit_time += nested_time.get();
+    times.bind_time = bind_time.get();
+    times.check_time = check_time.get();
+    times.emit_time += nested_time.get();
     let result = if input.program_like.options().list_files_only.is_true() {
         EmitResult {
             emit_skipped: true,
@@ -123,7 +124,7 @@ pub fn emit_files_and_report_errors(input: EmitInput<'_>) -> Result<CompileAndEm
                 ..EmitOptions::default()
             },
         )?;
-        input.times.emit_time += elapsed(input.sys.now(), start);
+        times.emit_time += elapsed(input.sys.now(), start);
         result.expect("background emit cannot be canceled")
     };
     diagnostics.extend_from_slice(&result.diagnostics);
@@ -163,7 +164,7 @@ pub fn emit_and_report_statistics(input: EmitInput<'_>) -> Result<CompileAndEmit
         || input.config.options.extended_diagnostics.is_true();
     let writer = input.writer.cloned().unwrap_or_else(|| sys.writer());
     let testing = input.testing;
-    let times = &mut *input.times;
+    let times = input.times;
     let input = EmitInput {
         times: &mut *times,
         ..input
@@ -202,7 +203,7 @@ fn list_files(
         }
     }
     if let Some(testing) = testing {
-        testing.on_list_files_start(&writer);
+        testing.on_list_files_start(writer);
     }
     let _end = End(testing, writer.clone());
     let program = checked.program();
@@ -219,7 +220,7 @@ fn list_files(
     }
     if options.explain_files.is_true() {
         program.explain_files(config.locale(), &mut |text| {
-            crate::write_all(writer.as_ref(), text)
+            crate::write_all(writer.as_ref(), text);
         })?;
     } else if options.list_files.is_true() || options.list_files_only.is_true() {
         for file in program.files() {

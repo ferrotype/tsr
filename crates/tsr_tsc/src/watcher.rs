@@ -104,7 +104,7 @@ pub fn start(context: &Context, options: Options) -> Result<CommandLineResult, E
         .testing
         .as_ref()
         .and_then(|t| t.as_with_watch_backend())
-        .map(|t| t.watch_backend())
+        .map(watchmanager::CommandLineTestingWithWatchBackend::watch_backend)
     {
         manager.set_backend(backend);
     }
@@ -200,9 +200,11 @@ impl crate::Watcher for CompilerWatcher {
     }
 }
 impl CompilerWatcher {
+    /// port: tsc/internal/execute/watcher.go:Watcher.FastPathBuilds
     pub fn fast_path_builds(&self) -> usize {
         lock(&self.state).fast_path_builds
     }
+    /// port: tsc/internal/execute/watcher.go:Watcher.FullBuilds
     pub fn full_builds(&self) -> usize {
         lock(&self.state).full_builds
     }
@@ -216,6 +218,7 @@ impl State {
             project: self.project.clone(),
         })
     }
+    /// port: tsc/internal/execute/watcher.go:Watcher.comparePathsOptions
     fn compare_options(&self) -> ComparePathsOptions {
         ComparePathsOptions {
             current_directory: JsString::from_bytes(self.options.sys.get_current_directory()),
@@ -248,6 +251,7 @@ impl State {
             )
         }
     }
+    /// port: tsc/internal/execute/watcher.go:Watcher.replaceContentMapperProject
     fn replace_project(&mut self) {
         let project = self.mapper_host.as_ref().and_then(|host| {
             host.project(tsr_contentmapper::ProjectSpec {
@@ -267,6 +271,9 @@ impl State {
         }
         self.project = project;
     }
+    // CLI/config mappers have no ContributionID. Plugin-contributed mappers
+    // belong to Phase 5; when represented, exclude their manifests as Go does.
+    /// port: tsc/internal/execute/watcher.go:Watcher.contentMapperWatchedFiles
     fn mapper_watched_files(&self) -> Result<Vec<JsString>, Error> {
         let mut files: Vec<_> = self
             .options
@@ -299,6 +306,7 @@ impl State {
         files.dedup();
         Ok(files)
     }
+    /// port: tsc/internal/execute/watcher.go:Watcher.contentMapperManifestChanged
     fn mapper_manifest_changed(
         &self,
         changes: &HashMap<JsString, crate::fswatch::EventKind>,
@@ -378,7 +386,7 @@ impl State {
                                 .content_mapper()
                                 .is_empty() =>
                         {
-                            self.force_full_rebuild = true
+                            self.force_full_rebuild = true;
                         }
                         None if self.seen.contains(&path) => self.force_full_rebuild = true,
                         Some(_) => {
@@ -417,6 +425,7 @@ impl State {
         )?;
         self.build(manager)
     }
+    /// port: tsc/internal/execute/watcher.go:Watcher.isRelevantChange
     fn relevant_change(
         &self,
         changes: &HashMap<JsString, crate::fswatch::EventKind>,
@@ -452,6 +461,7 @@ impl State {
         }
         Ok(false)
     }
+    /// port: tsc/internal/execute/watcher.go:Watcher.recheckTsConfig
     fn recheck_config(&mut self, force: bool) -> Result<bool, Error> {
         if self.config_name.is_empty() {
             return Ok(false);
@@ -514,6 +524,7 @@ impl State {
         self.replace_project();
         Ok(false)
     }
+    /// port: tsc/internal/execute/watcher.go:Watcher.computeDesiredWatches
     fn desired_watches(
         &self,
         manager: &WatchManager,
@@ -567,6 +578,7 @@ impl State {
         }
         Ok(manager.resolve_desired_dirs(coverage.dirs()))
     }
+    /// port: tsc/internal/execute/watcher.go:Watcher.doBuild
     fn build(&mut self, manager: &WatchManager) -> Result<(), Error> {
         if self.config_modified {
             self.cache = FileCache::new();
@@ -715,6 +727,7 @@ impl State {
         }
         Ok(())
     }
+    /// port: tsc/internal/execute/watcher.go:Watcher.compileAndEmit
     fn publish_and_emit(
         &mut self,
         program: Arc<Program>,

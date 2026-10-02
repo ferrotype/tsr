@@ -61,7 +61,7 @@ impl ConfigWriter<'_> {
         self.lines.push(Vec::new());
     }
 
-    fn emit_option(&mut self, setting: &[u8], default_value: ConfigValue, commented: Commented) {
+    fn emit_option(&mut self, setting: &[u8], default_value: &ConfigValue, commented: Commented) {
         if let Some(index) = self
             .remaining
             .iter()
@@ -71,7 +71,7 @@ impl ConfigWriter<'_> {
         }
         let existing = self.options.get(setting);
         let comment = matches!(commented, Commented::Optional) && existing.is_none();
-        let value = existing.unwrap_or(&default_value);
+        let value = existing.unwrap_or(default_value);
         let mut line = b"    ".to_vec();
         if comment {
             line.extend(b"// ");
@@ -185,28 +185,28 @@ pub fn generate_tsconfig(options: &OrderedMap<JsString, ConfigValue>, locale: &L
     };
     let string = |text: &[u8]| ConfigValue::String(JsString::from_bytes(text));
     writer.header(d::File_Layout);
-    writer.emit_option(b"rootDir", string(b"./src"), Commented::Optional);
-    writer.emit_option(b"outDir", string(b"./dist"), Commented::Optional);
+    writer.emit_option(b"rootDir", &string(b"./src"), Commented::Optional);
+    writer.emit_option(b"outDir", &string(b"./dist"), Commented::Optional);
     writer.newline();
     writer.header(d::Environment_Settings);
     writer.header(d::See_also_https_Colon_Slash_Slashaka_ms_Slashtsconfig_Slashmodule);
     writer.emit_option(
         b"module",
-        ConfigValue::Enum(ModuleKind::NODE_NEXT.0),
+        &ConfigValue::Enum(ModuleKind::NODE_NEXT.0),
         Commented::Never,
     );
     writer.emit_option(
         b"target",
-        ConfigValue::Enum(ScriptTarget::ESNEXT.0),
+        &ConfigValue::Enum(ScriptTarget::ESNEXT.0),
         Commented::Never,
     );
     writer.emit_option(
         b"types",
-        ConfigValue::Array(Some(Vec::new())),
+        &ConfigValue::Array(Some(Vec::new())),
         Commented::Never,
     );
     if let Some(lib) = options.get(b"lib".as_slice()) {
-        writer.emit_option(b"lib", lib.clone(), Commented::Never);
+        writer.emit_option(b"lib", lib, Commented::Never);
     }
     writer.header(d::For_nodejs_Colon);
     writer.lines.push(b"    // \"lib\": [\"esnext\"],".to_vec());
@@ -215,7 +215,7 @@ pub fn generate_tsconfig(options: &OrderedMap<JsString, ConfigValue>, locale: &L
     writer.newline();
     writer.header(d::Other_Outputs);
     for name in [b"sourceMap".as_slice(), b"declaration", b"declarationMap"] {
-        writer.emit_option(name, ConfigValue::Boolean(true), Commented::Never);
+        writer.emit_option(name, &ConfigValue::Boolean(true), Commented::Never);
     }
     writer.newline();
     writer.header(d::Stricter_Typechecking_Options);
@@ -223,7 +223,7 @@ pub fn generate_tsconfig(options: &OrderedMap<JsString, ConfigValue>, locale: &L
         b"noUncheckedIndexedAccess".as_slice(),
         b"exactOptionalPropertyTypes",
     ] {
-        writer.emit_option(name, ConfigValue::Boolean(true), Commented::Never);
+        writer.emit_option(name, &ConfigValue::Boolean(true), Commented::Never);
     }
     writer.newline();
     writer.header(d::Style_Options);
@@ -235,14 +235,14 @@ pub fn generate_tsconfig(options: &OrderedMap<JsString, ConfigValue>, locale: &L
         b"noFallthroughCasesInSwitch",
         b"noPropertyAccessFromIndexSignature",
     ] {
-        writer.emit_option(name, ConfigValue::Boolean(true), Commented::Optional);
+        writer.emit_option(name, &ConfigValue::Boolean(true), Commented::Optional);
     }
     writer.newline();
     writer.header(d::Recommended_Options);
-    writer.emit_option(b"strict", ConfigValue::Boolean(true), Commented::Never);
+    writer.emit_option(b"strict", &ConfigValue::Boolean(true), Commented::Never);
     writer.emit_option(
         b"jsx",
-        ConfigValue::Enum(JsxEmit::REACT_JSX.0),
+        &ConfigValue::Enum(JsxEmit::REACT_JSX.0),
         Commented::Never,
     );
     for name in [
@@ -250,16 +250,16 @@ pub fn generate_tsconfig(options: &OrderedMap<JsString, ConfigValue>, locale: &L
         b"isolatedModules",
         b"noUncheckedSideEffectImports",
     ] {
-        writer.emit_option(name, ConfigValue::Boolean(true), Commented::Never);
+        writer.emit_option(name, &ConfigValue::Boolean(true), Commented::Never);
     }
     writer.emit_option(
         b"moduleDetection",
-        ConfigValue::Enum(ModuleDetectionKind::FORCE.0),
+        &ConfigValue::Enum(ModuleDetectionKind::FORCE.0),
         Commented::Never,
     );
     writer.emit_option(
         b"skipLibCheck",
-        ConfigValue::Boolean(true),
+        &ConfigValue::Boolean(true),
         Commented::Never,
     );
     if !writer.remaining.is_empty() {
@@ -269,8 +269,7 @@ pub fn generate_tsconfig(options: &OrderedMap<JsString, ConfigValue>, locale: &L
                 key.as_bytes(),
                 options
                     .get(key.as_bytes())
-                    .expect("remaining option exists")
-                    .clone(),
+                    .expect("remaining option exists"),
                 Commented::Never,
             );
         }

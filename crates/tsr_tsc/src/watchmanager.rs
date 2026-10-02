@@ -13,6 +13,7 @@ impl Closer for fswatch::Watch {
     }
 }
 pub type Ignore = Arc<dyn Fn(&[u8]) -> bool + Send + Sync>;
+pub type DirectoryExists = Arc<dyn Fn(&[u8]) -> bool + Send + Sync>;
 #[derive(Clone)]
 pub struct WatchDirectoryRequest {
     pub dir: Vec<u8>,
@@ -40,6 +41,7 @@ pub struct FSWatchBackend {
     pub inner: fswatch::Watcher,
 }
 impl WatchBackend for FSWatchBackend {
+    /// port: tsc/internal/execute/watchmanager/watchbackend.go:FSWatchBackend.WatchDirectory
     fn watch_directory(
         &self,
         dir: &[u8],
@@ -55,6 +57,7 @@ impl WatchBackend for FSWatchBackend {
         }])
         .map(|mut watches| watches.remove(0))
     }
+    /// port: tsc/internal/execute/watchmanager/watchbackend.go:FSWatchBackend.WatchDirectories
     fn watch_directories(
         &self,
         requests: Vec<WatchDirectoryRequest>,
@@ -78,6 +81,7 @@ impl WatchBackend for FSWatchBackend {
         })
     }
 }
+/// port: tsc/internal/execute/watchmanager/watchbackend.go:ShouldIgnoreWatchPath
 pub fn should_ignore_watch_path(path: &[u8]) -> bool {
     let path = tsr_tspath::normalize_slashes(path);
     path.ends_with(b"/.git")
@@ -85,11 +89,13 @@ pub fn should_ignore_watch_path(path: &[u8]) -> bool {
             .iter()
             .any(|pattern| path.windows(pattern.len()).any(|part| part == *pattern))
 }
+/// port: tsc/internal/execute/watchmanager/watchbackend.go:CanWatchDirectory
 pub fn can_watch_directory(dir: &[u8]) -> bool {
     let components = tsr_tspath::path_components(dir, b"");
     components.len() > 2
         && components.len() > perceived_os_root_length_for_watching(&components) + 1
 }
+/// port: tsc/internal/execute/watchmanager/watchbackend.go:PerceivedOsRootLengthForWatching
 pub fn perceived_os_root_length_for_watching(components: &[Vec<u8>]) -> usize {
     if components.len() <= 1 {
         return 1;
@@ -127,18 +133,21 @@ pub struct DirWatchSet {
     dirs: HashMap<JsString, bool>,
 }
 impl DirWatchSet {
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:NewDirWatchSet
     pub fn new(options: ComparePathsOptions) -> Self {
         Self {
             options,
             dirs: HashMap::new(),
         }
     }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:DirWatchSet.Set
     pub fn set(&mut self, dir: &[u8], recursive: bool) {
         let dir = JsString::from_bytes(
             tsr_tspath::canonical(dir, self.options.use_case_sensitive_file_names).into_owned(),
         );
         *self.dirs.entry(dir).or_default() |= recursive;
     }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:DirWatchSet.Covered
     pub fn covered(&self, dir: &[u8]) -> bool {
         let mut dir =
             tsr_tspath::canonical(dir, self.options.use_case_sensitive_file_names).into_owned();
@@ -154,6 +163,7 @@ impl DirWatchSet {
         }
         false
     }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:DirWatchSet.Dirs
     pub fn dirs(&self) -> &HashMap<JsString, bool> {
         &self.dirs
     }
@@ -179,7 +189,7 @@ struct Inner {
     changes: Mutex<Changes>,
     ready: Condvar,
     warn_writer: SharedWriter,
-    dir_exists: Arc<dyn Fn(&[u8]) -> bool + Send + Sync>,
+    dir_exists: DirectoryExists,
     debug: Mutex<Option<SharedWriter>>,
 }
 /// Hold [`Self::lock`] for a complete compile cycle. Native callbacks only
@@ -190,10 +200,8 @@ fn lock<T>(m: &Mutex<T>) -> MutexGuard<'_, T> {
     m.lock().unwrap_or_else(std::sync::PoisonError::into_inner)
 }
 impl WatchManager {
-    pub fn new(
-        warn_writer: SharedWriter,
-        dir_exists: Arc<dyn Fn(&[u8]) -> bool + Send + Sync>,
-    ) -> Self {
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:NewWatchManager
+    pub fn new(warn_writer: SharedWriter, dir_exists: DirectoryExists) -> Self {
         Self(Arc::new(Inner {
             state: Mutex::new(State::default()),
             cycle: Mutex::new(()),
@@ -204,12 +212,15 @@ impl WatchManager {
             debug: Mutex::new(None),
         }))
     }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.Lock
     pub fn lock(&self) -> MutexGuard<'_, ()> {
         lock(&self.0.cycle)
     }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.SetBackend
     pub fn set_backend(&self, backend: Arc<dyn WatchBackend>) {
         lock(&self.0.state).backend = Some(backend);
     }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.Backend
     pub fn backend(&self) -> Option<Arc<dyn WatchBackend>> {
         lock(&self.0.state).backend.clone()
     }
@@ -221,6 +232,16 @@ impl WatchManager {
             write_all(writer.as_ref(), message.as_bytes());
         }
     }
+    fn debug_path(&self, prefix: &[u8], path: &[u8], suffix: &[u8]) {
+        if let Some(writer) = lock(&self.0.debug).clone() {
+            let mut text = Vec::with_capacity(prefix.len() + path.len() + suffix.len());
+            text.extend_from_slice(prefix);
+            text.extend_from_slice(path);
+            text.extend_from_slice(suffix);
+            write_all(writer.as_ref(), &text);
+        }
+    }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.EnsureDefaultBackend
     pub fn ensure_default_backend(&self) {
         let mut state = lock(&self.0.state);
         if state.backend.is_none() {
@@ -229,6 +250,7 @@ impl WatchManager {
             state.backend = Some(Arc::new(FSWatchBackend { inner }));
         }
     }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.DrainEvents
     pub fn drain_events(&self) -> (HashMap<JsString, fswatch::EventKind>, bool) {
         let mut changes = lock(&self.0.changes);
         (
@@ -236,13 +258,16 @@ impl WatchManager {
             std::mem::take(&mut changes.overflow),
         )
     }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.ForceOverflow
     pub fn force_overflow(&self) {
         lock(&self.0.changes).overflow = true;
     }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.signalDoCycle
     fn signal_cycle(&self) {
         lock(&self.0.changes).signalled = true;
         self.0.ready.notify_one();
     }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.onWatchEvents
     fn on_events(&self, events: &[fswatch::Event], error: Option<&fswatch::Error>) {
         if let Some(error) = error {
             if error.is_overflow() {
@@ -260,6 +285,25 @@ impl WatchManager {
         if events.is_empty() {
             return;
         }
+        if let Some(writer) = lock(&self.0.debug).clone() {
+            let mut text = format!("[watch] {} event(s): ", events.len()).into_bytes();
+            for (index, event) in events.iter().enumerate() {
+                if index != 0 {
+                    text.extend_from_slice(b", ");
+                }
+                if index >= 5 {
+                    text.extend_from_slice(
+                        format!("... and {} more", events.len() - index).as_bytes(),
+                    );
+                    break;
+                }
+                text.extend_from_slice(event.kind.to_string().as_bytes());
+                text.push(b' ');
+                text.extend_from_slice(&event.path);
+            }
+            text.push(b'\n');
+            write_all(writer.as_ref(), &text);
+        }
         let mut changes = lock(&self.0.changes);
         for event in events {
             changes
@@ -270,6 +314,7 @@ impl WatchManager {
         drop(changes);
         self.0.ready.notify_one();
     }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.handleWatchTerminated
     fn terminated(&self, dir: &JsString, identity: &Arc<WatchedDir>) {
         self.debug_log(&format!(
             "[watch] watch terminated: {}\n",
@@ -295,6 +340,7 @@ impl WatchManager {
         self.force_overflow();
         self.signal_cycle();
     }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.CloseAllWatches
     pub fn close_all_watches(&self) {
         let entries = std::mem::take(&mut lock(&self.0.state).watched);
         for entry in entries.into_values() {
@@ -303,6 +349,7 @@ impl WatchManager {
             }
         }
     }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.ResolveDesiredDirs
     pub fn resolve_desired_dirs(
         &self,
         desired: &HashMap<JsString, bool>,
@@ -337,6 +384,7 @@ impl WatchManager {
         }
         resolved
     }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.ReconcileWatches
     pub fn reconcile_watches(
         &self,
         desired: &HashMap<JsString, bool>,
@@ -346,6 +394,17 @@ impl WatchManager {
             let Some(backend) = state.backend.clone() else {
                 return Ok(());
             };
+            if lock(&self.0.debug).is_some() {
+                for (dir, recursive) in desired {
+                    if !state.watched.contains_key(dir) {
+                        self.debug_path(
+                            b"[watch] watching directory ",
+                            dir.as_bytes(),
+                            format!(" (recursive={recursive})\n").as_bytes(),
+                        );
+                    }
+                }
+            }
             let removed: Vec<_> = state
                 .watched
                 .iter()
@@ -354,7 +413,23 @@ impl WatchManager {
                 .collect();
             let closed: Vec<_> = removed
                 .into_iter()
-                .filter_map(|dir| state.watched.remove(&dir))
+                .filter_map(|dir| {
+                    let entry = state.watched.remove(&dir)?;
+                    if let Some(recursive) = desired.get(&dir) {
+                        self.debug_path(
+                            b"[watch] recreating dir watch ",
+                            dir.as_bytes(),
+                            format!(" (recursive {}→{recursive})\n", entry.recursive).as_bytes(),
+                        );
+                    } else {
+                        self.debug_path(
+                            b"[watch] closing stale dir watch: ",
+                            dir.as_bytes(),
+                            b"\n",
+                        );
+                    }
+                    Some((dir, entry))
+                })
                 .collect();
             let mut additions = Vec::new();
             for (dir, &recursive) in desired {
@@ -369,7 +444,7 @@ impl WatchManager {
             }
             (backend, closed, additions)
         };
-        for entry in closed {
+        for (_, entry) in closed {
             if let Some(closer) = lock(&entry.closer).take() {
                 let _ = closer.close();
             }
@@ -430,6 +505,11 @@ impl WatchManager {
             Err(error) => {
                 let mut state = lock(&self.0.state);
                 for (dir, entry) in additions {
+                    self.debug_path(
+                        b"[watch] failed to watch directory ",
+                        dir.as_bytes(),
+                        format!(": {error}\n").as_bytes(),
+                    );
                     if state
                         .watched
                         .get(&dir)
@@ -442,6 +522,7 @@ impl WatchManager {
             }
         }
     }
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.IsPathUnderWatch
     pub fn is_path_under_watch(&self, path: &[u8], options: &ComparePathsOptions) -> bool {
         lock(&self.0.state).watched.keys().any(|dir| {
             tsr_tspath::contains_path(
@@ -454,6 +535,7 @@ impl WatchManager {
     }
     /// Drives cycles until cancellation or a cycle error, closing subscriptions
     /// on either return path.
+    /// port: tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.RunLoop
     pub fn run_loop<E>(
         &self,
         context: &tsr_ipc::Context,

@@ -21,7 +21,7 @@ pub fn start(ctx: &Context, options: Options) -> Result<CommandLineResult, Error
         .testing
         .as_ref()
         .and_then(|testing| testing.as_with_watch_backend())
-        .map(|testing| testing.watch_backend())
+        .map(tsr_tsc::watchmanager::CommandLineTestingWithWatchBackend::watch_backend)
     {
         manager.set_backend(backend);
     }
@@ -400,18 +400,18 @@ impl Orchestrator {
                         .get_package_jsons(&directory)
                         .chain(info.get_missing_package_jsons(&directory))
                     {
-                        self.add_package_watches(&mut desired, &package);
+                        Self::add_package_watches(&mut desired, &package);
                     }
                 }
             }
             for package in packages {
-                self.add_package_watches(&mut desired, package.as_bytes());
+                Self::add_package_watches(&mut desired, package.as_bytes());
             }
         }
         manager.resolve_desired_dirs(desired.dirs())
     }
     // port: tsc/internal/execute/build/orchestrator.go:Orchestrator.addPackageJsonWatchDirs
-    fn add_package_watches(&self, desired: &mut DirWatchSet, package: &[u8]) {
+    fn add_package_watches(desired: &mut DirWatchSet, package: &[u8]) {
         let directory = tsr_tspath::directory(package);
         let mut dirs = vec![directory.clone()];
         let mut current = directory.clone();

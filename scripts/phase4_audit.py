@@ -194,9 +194,11 @@ REVIEWED = {
     # program.go: the driver's reports (X1), the harness's program data (X2),
     # the statistics counters (X6).
     _P + "Program.ExplainFiles": _pending("X1", "--explainFiles output (execute/tsc/emit.go:156); plan X1."),
-    _P + "Program.GetIncludeReasons": _pending(
-        "X2", "Testing only: its one pinned caller is the harness's program baseline (execute/tsctests/sys.go:386); "
-              "plan X2 names it. The Rust program keeps the reasons in the crate-private Program.include_reasons."),
+    _P + "Program.GetIncludeReasons": _equivalent(
+        _LOADER, "pub fn include_reason_paths(&self) -> impl Iterator<Item = &JsString> {",
+        "Its only pinned consumer, tsctests/sys.go's program-include baseline, tests membership and iterates "
+        "the map's keys without reading a reason value. The borrowed key iterator exposes exactly that view; "
+        "the private map and reason records remain owned by Program."),
     _P + "Program.IsMissingPath": _pending(
         "X2", "Testing only: its one pinned caller is the harness's program baseline (execute/tsctests/sys.go:393); "
               "plan X2 names it. Program::missing_files publishes the names, not this path test."),
@@ -302,9 +304,12 @@ REVIEWED = {
     _P + "Program.IsLibFile": _later("Phase 5", f"Its one pinned caller is {_PHASE5_LS} (ls/symbols.go:616)."),
     _P + "Program.HasTSFile": _later("Phase 5", f"Its one pinned caller is {_PHASE5_LS} (ls/symbols.go:558)."),
     # host.go
-    "tsc/internal/compiler/host.go:NewCachedFSCompilerHost": _pending(
-        "X1", "The tsc and build commands' cached host (execute/tsc.go:302, 360; execute/build/orchestrator.go:764); "
-              "C7 handed it to Phase 4 (data/phase2/c7-audit.json); plan X1."),
+    "tsc/internal/compiler/host.go:NewCachedFSCompilerHost": _equivalent(
+        "crates/tsr_execute/src/compile.rs", "let cached = Arc::new(tsr_vfs::cached::CachedFs::new(sys.fs()));",
+        "The ordinary and incremental command paths wrap the System filesystem in CachedFs and pass that "
+        "same instance to the incremental host and compiler load. The build host and each full watch cycle "
+        "construct their own CachedFs too; current directory, default library, tracing and mapper project are "
+        "passed through the Rust host/load interfaces instead of one Go compilerHost struct."),
     "tsc/internal/compiler/host.go:NewCompilerHost": _equivalent(
         _LOADER, "pub fn load_with_content_mapper_project(",
         "C7's recorded disposition (data/phase2/c7-audit.json): the Rust compiler host carries no mapper project; "
@@ -446,9 +451,12 @@ REVIEWED = {
         "The pin locks a new entry before publishing it, so concurrent requests for one path wait for one parse. "
         "The Rust cache parses outside its map lock and publishes the first entry inserted, which every caller "
         "then receives."),
-    "tsc/internal/execute/tsc.go:fmtMain": _pending(
-        "X1", "No caller at the pin: CommandLine's `-f` dispatch is commented out (execute/tsc.go:58-59). The "
-              "formatting it would run is tsr_format's FormatDocument; X1 records the disposition."),
+    "tsc/internal/execute/tsc.go:fmtMain": _equivalent(
+        "crates/tsr_execute/src/command.rs", "pub fn command_line(",
+        "No caller at the pin: its sole prospective -f dispatch is commented out in execute/tsc.go:58-59. "
+        "Rust preserves that command surface: -f goes through ordinary option validation, not formatting. "
+        "The existing tsr_format::format_document is the formatting algorithm, but no unreachable file-I/O "
+        "wrapper is added or claimed as an executable command."),
     # execute/tsctests/readablebuildinfo.go: decoders with no caller (X0).
     **{f"tsc/internal/execute/tsctests/readablebuildinfo.go:{name}.UnmarshalJSON": _equivalent(
         "tools/phase4/tsctests/src/readablebuildinfo.rs", f"impl Encode for {rust} {{",
@@ -477,6 +485,235 @@ REVIEWED = {
                    "until Phase 6 supplies the server."),
     "tsc/cmd/tsc/api.go:parseAPIFlags": _later("Phase 6", "runAPI's flag parser (api.go:42); decision 12."),
 }
+
+
+# X1/X2/X3 closure review, 2026-10-02. These sites were compared with the
+# pinned implementations and callers; folded operations are not extra coverage
+# claims. The source parse-cache operations now carry markers on the shared
+# declaration/JSON cache and its project-local caller.
+REVIEWED.update({
+    'tsc/internal/execute/build/buildtask.go:BuildTask.canUpdateJsDtsOutputTimestamps': _equivalent(
+        'crates/tsr_build/src/task.rs', 'let mut files = if !config.options.no_emit.is_true() && !config.options.is_incremental()',
+        'The timestamp eligibility predicate is folded into update_timestamps; watch cache retention applies '
+        'the same predicate. '
+    ),
+    'tsc/internal/execute/build/buildtask.go:BuildTask.cleanProjectOutput': _equivalent(
+        'crates/tsr_build/src/task.rs', 'for file in outputs {',
+        'Output deletion/input collision avoidance/dry-run recording/error diagnostics are folded into clean '
+        'output iteration. '
+    ),
+    'tsc/internal/execute/build/buildtask.go:BuildTask.getContentMapperProject': _equivalent(
+        'crates/tsr_build/src/task.rs', 'fn project(&self, o: &Orchestrator)',
+        'OnceLock initializes at most one project from the session host, config name, mapper list and '
+        'options; no host, unresolved config or empty mapper list yields None. The retained project_error is '
+        'read by both compilation and up-to-date checking and is updated by watch refresh/identity failures. '
+    ),
+    'tsc/internal/execute/build/buildtask.go:BuildTask.hasConflictingBuildInfo': _equivalent(
+        'crates/tsr_build/src/task.rs', 'let conflicting = upstream_state',
+        'Build-info path collision check is inlined in upstream stale-status handling. '
+    ),
+    'tsc/internal/execute/build/buildtask.go:BuildTask.onBuildInfoEmit': _equivalent(
+        'crates/tsr_build/src/task.rs', 'let dts_time = if incremental.has_changed_dts_file()',
+        'write_file callback updates BuildInfoEntry under task state mutex, preserving previous dts_time '
+        'unless declarations changed. '
+    ),
+    'tsc/internal/execute/build/buildtask.go:BuildTask.refreshContentMapperProject': _equivalent(
+        'crates/tsr_build/src/watch.rs', '*lock(&task.project_error) = project.refresh().err().map(Arc::new);',
+        'The refresh call and persisted refresh error are folded into dynamic mapper dependency event '
+        'handling. '
+    ),
+    'tsc/internal/execute/build/buildtask.go:BuildTask.report': _equivalent(
+        'crates/tsr_build/src/lib.rs', 'let report = std::panic::catch_unwind',
+        'Each worker waits for the previous graph-order report, writes its buffer and invokes OnProgram, then '
+        'releases report_done. After workers join, graph-order reduction aggregates diagnostics, maximal exit '
+        'status, statistics, delete paths and build/pseudo counters; retained program owners keep diagnostic '
+        'sources alive through the summary. '
+    ),
+    'tsc/internal/execute/build/buildtask.go:BuildTask.resetConfig': _equivalent(
+        'crates/tsr_build/src/watch.rs', 'if normalized.contains_key(&self.path(task.config.as_bytes()))',
+        'A config-path change marks the task dirty; extended-config and mapper-manifest changes use the same '
+        'flag. Graph reconstruction bypasses dirty retained tasks, reparses the config and replaces its Arc, '
+        "implementing deletion of the pin's separate resolvedReferences entry. "
+    ),
+    'tsc/internal/execute/build/buildtask.go:BuildTask.unblockDownstream': _equivalent(
+        'crates/tsr_build/src/lib.rs', 'task.pending.store(false, Ordering::Release);',
+        'Worker completion clears pending and initial_cycle then signals done, including error/panic paths. '
+    ),
+    'tsc/internal/execute/build/buildtask.go:BuildTask.updateWatch': _equivalent(
+        'crates/tsr_build/src/watch.rs', 'fn update_watch(&self)',
+        'Watch update transfers retained eligible output timestamps from previous mtime cache for every task. '
+    ),
+    'tsc/internal/execute/build/buildtask.go:BuildTask.waitOnUpstream': _equivalent(
+        'crates/tsr_build/src/lib.rs', 'for (upstream, _) in &self.tasks[index].upstream',
+        'The worker waits upstream task completion before build/clean dispatch. '
+    ),
+    'tsc/internal/execute/build/buildtask.go:BuildTask.writeFile': _equivalent(
+        'crates/tsr_build/src/task.rs', 'let write_file = |file: &[u8], text: &[u8], data:',
+        'The shared emit callback performs actual write, build-info entry update and watch-only output '
+        'timestamp caching on successful writes. '
+    ),
+    'tsc/internal/execute/build/compilerHost.go:compilerHost.GetContentMappedSourceFiles': _equivalent(
+        'crates/tsr_compiler/src/loader.rs', 'fn content_mapped_source_files(',
+        'Build passes its project to the shared loader host operation: absent project returns '
+        'ProjectUnavailable before reading; unreadable file returns no source; transform-and-parse errors '
+        'propagate; supplemental filename collisions are checked against the filesystem. The file-loader '
+        'wrapper separately owns failure-budget diagnostics. '
+    ),
+    'tsc/internal/execute/build/compilerHost.go:compilerHost.GetResolvedProjectReference': _equivalent(
+        'crates/tsr_build/src/graph.rs', 'impl tsr_compiler::ResolvedProjectReferenceProvider for Orchestrator',
+        'Compiler load services return the exact shared Arc config retained by the build graph; no second '
+        'parse or identity substitution. '
+    ),
+    'tsc/internal/execute/build/compilerHost.go:compilerHost.Trace': _equivalent(
+        'crates/tsr_build/src/task.rs', 'tsr_tsc::report_resolution_trace(&program, &trace);',
+        'Shared loader buffers actual resolver trace; build flushes it with its per-task '
+        'writer/locale/testing trace reporter before diagnostics. '
+    ),
+    'tsc/internal/execute/build/host.go:host.ContentMapperProject': _equivalent(
+        'crates/tsr_build/src/host.rs', 'pub(crate) struct BuildHost {',
+        'Base BuildHost implements only incremental Host, so invalid mapper-project calls on the base host '
+        'are excluded by the Rust trait boundary; per-project CompilerHost exposes mapper project. '
+    ),
+    'tsc/internal/execute/build/host.go:host.DefaultLibraryPath': _equivalent(
+        'crates/tsr_build/src/host.rs', 'pub library: JsString,',
+        'Base host stores actual system library path; CompilerHost and loader read the field directly. '
+    ),
+    'tsc/internal/execute/build/host.go:host.GetContentMappedSourceFiles': _equivalent(
+        'crates/tsr_build/src/host.rs', 'impl tsr_incremental::Host for BuildHost {',
+        'Base host has no mapper parse method in its trait; only project-specific load services can invoke '
+        'mapped loading, excluding the native unreachable-project wrapper. '
+    ),
+    'tsc/internal/execute/build/host.go:host.GetCurrentDirectory': _equivalent(
+        'crates/tsr_build/src/host.rs', 'pub cwd: JsString,',
+        'Base host stores actual current directory; CompilerHost and loader read the field directly. '
+    ),
+    'tsc/internal/execute/build/host.go:host.GetResolvedProjectReference': _equivalent(
+        'crates/tsr_build/src/graph.rs', 'let result = cache.read_config_file(',
+        'Graph creation parses each normalized config path once through shared extended-config entries and '
+        'wrapped command-line options, records elapsed config time, and retains absent as well as present '
+        'results on its task. Project loads receive that exact Arc through ResolvedProjectReferenceProvider. '
+    ),
+    'tsc/internal/execute/build/host.go:host.Trace': _equivalent(
+        'crates/tsr_build/src/host.rs', 'impl tsr_incremental::Host for BuildHost {',
+        'Base-host trace call is excluded by trait boundary; tracing is installed only for project '
+        'compilation. '
+    ),
+    'tsc/internal/execute/build/host.go:host.loadOrStoreMTime': _equivalent(
+        'crates/tsr_build/src/host.rs', 'pub fn m_time(&self',
+        'mtime misses use actual stat and load_or_store; old-cache transfer is folded into update_watch '
+        'before source status evaluation; native store=false branch has no caller at pin. '
+    ),
+    'tsc/internal/execute/build/host.go:host.storeMTimeFromOldCache': _equivalent(
+        'crates/tsr_build/src/watch.rs', 'if let Some(time) = previous.get(&path)',
+        'Transfers eligible existing output timestamp from previous cache into new cycle cache. '
+    ),
+    'tsc/internal/execute/build/orchestrator.go:Orchestrator.Watch': _equivalent(
+        'crates/tsr_build/src/watch.rs', 'pub fn start(ctx: &Context, options: Options)',
+        'Build watch setup is folded into free start: initial build, backend/debug setup, locked watch/cache '
+        'reconciliation, native run loop only outside testing, retained watcher. '
+    ),
+    'tsc/internal/execute/build/orchestrator.go:Orchestrator.addWatchDir': _equivalent(
+        'crates/tsr_build/src/watch.rs', 'let add = |desired: &mut DirWatchSet, directory: &[u8]|',
+        'The local add closure checks coverage and CanWatchDirectory before insertion; package-directory '
+        'ancestry applies the same predicate. Configured Phase 4 mappers have no ContributionID; filtering '
+        'inferred-project contributions is a Phase 5 precondition when that representation is added. '
+    ),
+    'tsc/internal/execute/build/orchestrator.go:Orchestrator.buildOrCleanProject': _equivalent(
+        'crates/tsr_build/src/lib.rs', 'if options.clean.is_true() {',
+        'Worker initializes TaskResult via build/clean functions and performs dispatch and ordered report in '
+        'same worker scope. '
+    ),
+    'tsc/internal/execute/build/orchestrator.go:Orchestrator.createBuildTasks': _equivalent(
+        'crates/tsr_build/src/graph.rs', 'while !pending.is_empty() {',
+        'Graph batches parse newly discovered config paths once, reuse clean task Arc identities, reset '
+        'adjacency while constructing Node records, carry prior build-info into dirty replacements and close '
+        'discarded mapper projects. Root traversal later supplies stable postorder reporting independently of '
+        'parsing completion order. '
+    ),
+    'tsc/internal/execute/build/orchestrator.go:Orchestrator.createBuilderStatusReporter': _equivalent(
+        'crates/tsr_build/src/lib.rs', 'fn status_report(',
+        'Builder status reporter factory plus immediate diagnostic reporting are folded together; caller '
+        'explicitly supplies system or task writer. '
+    ),
+    'tsc/internal/execute/build/orchestrator.go:Orchestrator.getTask': _equivalent(
+        'crates/tsr_build/src/lib.rs', 'fn index(&self, config: &[u8])',
+        'Graph path lookup returns stable task index, with same missing-task panic, rather than pointer. '
+    ),
+    'tsc/internal/execute/build/orchestrator.go:Orchestrator.getWriter': _equivalent(
+        'crates/tsr_build/src/task.rs', 'pub output: Arc<Buffer>,',
+        'TaskResult owns its output buffer; each reporter caller explicitly selects task buffer or system '
+        'writer, eliminating nullable-task writer dispatch. '
+    ),
+    'tsc/internal/execute/build/orchestrator.go:Orchestrator.rangeTask': _equivalent(
+        'crates/tsr_build/src/lib.rs', 'let current = AtomicUsize::new(0);',
+        'build_or_clean embeds bounded atomic task queue with singleThreaded/builders/default4 policies. '
+        'Other task loops run sequentially because they only update retained graph/cache state. Scheduler '
+        'limit tests cover 1/2/4. '
+    ),
+    'tsc/internal/execute/build/orchestrator.go:Orchestrator.resetCaches': _equivalent(
+        'crates/tsr_build/src/lib.rs', 'pub fn reset_caches(&self)',
+        'reset_caches clears filesystem and shared source entries and resets config durations. '
+        'Extended-config entries are scoped to graph construction and already dropped; resolved project '
+        'configs deliberately remain on retained tasks, matching the pin. '
+    ),
+    'tsc/internal/execute/build/orchestrator.go:orchestratorResult.report': _equivalent(
+        'crates/tsr_build/src/lib.rs', 'fn report_summary(',
+        'Summary dispatch is split into report_summary, dry-delete list rendering, report_statistics, all '
+        'called after graph-order aggregation. '
+    ),
+    'tsc/internal/execute/build/parseCache.go:parseCache.delete': _equivalent(
+        'crates/tsr_build/src/graph.rs', 'previous.filter(|task| !task.dirty.load(Ordering::Acquire))',
+        'Dirty configs bypass retained graph task cache; no distinct resolved-reference parseCache remains. '
+    ),
+    'tsc/internal/execute/build/parseCache.go:parseCache.reset': _equivalent(
+        'crates/tsr_build/src/lib.rs', 'pub fn reset_caches(&self)',
+        'The source cache is cleared by reset_caches at watch-cycle boundaries; the extended-config parse '
+        'cache is lexical to graph construction, so its entries drop when graph creation completes. Resolved '
+        'project configs remain retained on graph tasks until invalidated. '
+    ),
+    'tsc/internal/execute/build/parseCache.go:parseCache.store': _equivalent(
+        'crates/tsr_build/src/watch.rs', 'config.parse_input_output_names();',
+        'Only pin caller replaces reloaded resolved configuration; Rust stores new Arc config on graph task '
+        'after root-file reload. '
+    ),
+    'tsc/internal/execute/build/uptodatestatus.go:upToDateStatus.inputOutputFileAndTime': _equivalent(
+        'crates/tsr_build/src/status.rs', 'pub has_times: bool,',
+        'Flattened Status carries times and presence bit; callers inspect bit instead of downcasting Go any. '
+    ),
+    'tsc/internal/execute/build/uptodatestatus.go:upToDateStatus.inputOutputName': _equivalent(
+        'crates/tsr_build/src/status.rs', 'pub output: JsString,',
+        'Flattened Status stores input/output fields directly; no runtime any downcast needed. '
+    ),
+    'tsc/internal/execute/build/uptodatestatus.go:upToDateStatus.oldestOutputFileName': _equivalent(
+        'crates/tsr_build/src/status.rs', 'pub output: JsString,',
+        'The pin accepts only UpToDate or pseudo-build states and extracts output from one of three payload '
+        'shapes. update_downstream matches those states before reading the flattened output field; each '
+        'corresponding constructor stores the same oldest-output filename there. There is no public '
+        'downcasting accessor that could be called with another state. '
+    ),
+    'tsc/internal/execute/build/uptodatestatus.go:upToDateStatus.upstreamErrors': _equivalent(
+        'crates/tsr_build/src/status.rs', 'pub ref_has_upstream_errors: bool,',
+        'Flattened upstream status carries reference in input and the upstream-error flag directly. '
+    ),
+    'tsc/internal/execute/tsc.go:getContentMapperProject': _equivalent(
+        'crates/tsr_execute/src/compile.rs', '    let project = mapper_host',
+        'Folded into compilation setup: no host or empty mapper list yields None; otherwise host.project '
+        'receives config name, complete mapper list and compiler options. MapperSession closes the retained '
+        'project before closing its session host on normal, error and unwind exits. '
+    ),
+    'tsc/internal/execute/tsc.go:getTraceFromSys': _equivalent(
+        'crates/tsr_execute/src/compile.rs', '        &tsc::get_trace_with_writer_from_sys(',
+        'The wrapper only forwards sys.Writer, locale and testing to GetTraceWithWriterFromSys. The combined '
+        'normal/incremental compilation path invokes that function with those three arguments directly, then '
+        'flushes the actual resolver events through it. '
+    ),
+    'tsc/internal/execute/tsc/compile.go:NewContentMapperHost': _equivalent(
+        'crates/tsr_execute/src/compile.rs', '    let mapper_host = config.options.run_external_code.is_true().then(|| {',
+        'Compilation setup creates a session host only for RunExternalCode, passing the context, System '
+        'spawner, parsed option locale and environment-controlled serialized stderr logger. Build-session and '
+        'compiler-watch setup apply the same gate and arguments and retain their host across projects/cycles. '
+    ),
+})
 
 
 _MACOS = "crates/tsr_fswatch/src/macos.rs"
@@ -586,6 +823,497 @@ REVIEWED.update({
     )},
 })
 
+
+# X4 native lifecycle and platform abstraction review, 2026-10-02.
+# Rust typed fields/ownership fold the listed Go operations at these checked sites.
+REVIEWED.update({
+    'tsc/internal/fswatch/canonicalize_darwin.go:canonicalizePath': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'return crate::macos::canonicalize(path);',
+        'The macOS arm delegates to the reviewed CoreFoundation NFC normalization, preserving the native '
+        'canonicalizePath rule.'),
+    'tsc/internal/fswatch/canonicalize_other.go:canonicalizePath': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'pub(crate) fn canonicalize(path: &[u8]) -> Vec<u8> {',
+        'The non-macOS arm returns the path bytes unchanged; allocating the returned byte vector replaces Go '
+        'string value ownership.'),
+    'tsc/internal/fswatch/watcher.go:WithIgnore': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'pub ignore: Option<Ignore>,',
+        'The typed WatchOptions.ignore field carries the caller filter directly; registration copies it into each '
+        'logical callback. There is no Go WatchOption interface object or apply call.'),
+    'tsc/internal/fswatch/watcher.go:ignoreOption.applyWatchOption': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'pub ignore: Option<Ignore>,',
+        'The typed WatchOptions.ignore field carries the caller filter directly; registration copies it into each '
+        'logical callback. There is no Go WatchOption interface object or apply call.'),
+    'tsc/internal/fswatch/watcher.go:WithRecursive': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'pub recursive: bool,',
+        'The typed WatchOptions.recursive field represents applying WithRecursive directly. Registration and '
+        'filtering read this flag, so no interface constructor/apply helper is needed.'),
+    'tsc/internal/fswatch/watcher.go:recursiveOption.applyWatchOption': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'pub recursive: bool,',
+        'The typed WatchOptions.recursive field represents applying WithRecursive directly. Registration and '
+        'filtering read this flag, so no interface constructor/apply helper is needed.'),
+    'tsc/internal/fswatch/watcher.go:watcher.unexported': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'pub struct Watcher(Arc<Owner>);',
+        'Go seals its Watcher interface with this no-op method. Rust exposes a concrete Watcher with private '
+        'fields; external implementations/construction are impossible without the method.'),
+    'tsc/internal/fswatch/watcher.go:fallbackWatcher.unexported': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'pub struct Watcher(Arc<Owner>);',
+        'Go seals its Watcher interface with this no-op method. Rust exposes a concrete Watcher with private '
+        'fields; external implementations/construction are impossible without the method.'),
+    'tsc/internal/fswatch/watcher.go:watch.unexported': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'pub struct Watch {',
+        'Go seals its Watch interface with a no-op method; Rust uses the concrete Watch with private owner, '
+        'directory and id fields.'),
+    'tsc/internal/fswatch/watcher.go:watcher.getImpl': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'if state.backend.is_none() {',
+        'Backend creation happens once under the owner state lock. Successful synchronous descriptor/worker '
+        'creation publishes the backend, while failure leaves the slot empty for retry; no Go started-channel '
+        'handshake is required.'),
+    'tsc/internal/fswatch/watcher.go:watcher.canShareRecursiveDirWatches': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'let covering = if self.0.kind == Kind::Fsevents {',
+        'The only eligible backend is FSEvents, exactly the pin. The test is inlined into registration rather than '
+        'duplicated in a predicate method.'),
+    'tsc/internal/fswatch/watcher.go:watcher.findCoveringRecursiveWatchLocked': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', '.max_by_key(|watch| watch.dir.len())',
+        'Registration selects the deepest recursive watcher covering both the logical and physical paths under the '
+        'owner mutex.'),
+    'tsc/internal/fswatch/watcher.go:watcher.findConsolidationDirLocked': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'if count >= 10 {',
+        'Registration walks ancestor directories, checks the physical hierarchy and consolidates at the native '
+        'threshold of ten existing/new roots.'),
+    'tsc/internal/fswatch/watcher.go:watcher.keyForDirWatch': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', '.find(|watch| watch.dir == root && watch.recursive == recursive)',
+        "Rust compares (directory, recursive) directly instead of constructing Go's string key with a NUL- "
+        'recursive suffix; the same pair identifies the shared watch.'),
+    'tsc/internal/fswatch/watcher.go:watcher.getOrCreateDirWatch': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'let watch = Arc::new(DirWatch {',
+        'Registration performs covering/consolidation lookup, tuple-key lookup and new directory state allocation '
+        'under one owner lock.'),
+    'tsc/internal/fswatch/watcher.go:newDirWatch': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'debounce.add(&watch);',
+        'Registration initializes paths, events, callback state and the weak debounce link in the adjacent '
+        'DirWatch literal, then registers the callback exactly once.'),
+    'tsc/internal/fswatch/watcher.go:watcher.removeDirWatch': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'state.dirs.retain(|watch| !Arc::ptr_eq(watch, &self.dir));',
+        'Final logical-watch close removes the exact Arc identity from the owner table after backend removal; Rust '
+        'need not reconstruct and recheck a string map key.'),
+    'tsc/internal/fswatch/watcher.go:dirWatch.unref': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'if self.dir.unwatch(self.id) {',
+        'Close performs the native last-callback check, backend removal and owner removal together. Retained Watch '
+        'values preserve ownership without Go explicit unref bookkeeping.'),
+    'tsc/internal/fswatch/watcher.go:validateWatchDirectory': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'if !metadata.is_dir() {',
+        'Batch registration validates that each canonicalized directory exists and is a directory before applying '
+        'any subscription; callback nil is unrepresentable in the Rust API.'),
+    'tsc/internal/fswatch/watcher.go:callback.mapEvent': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'event.path = rebase_path(&physical, &cb.physical, &cb.dir);',
+        "The per-callback event loop rebases physical paths to the subscriber's logical path before filtering; no "
+        'detached callback method is needed.'),
+    'tsc/internal/fswatch/watcher.go:callback.eventPhysicalPath': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'let physical = self.physical_path(&event.path);',
+        'Callback delivery obtains the backend watch root through its enclosing DirWatch and maps from that '
+        'logical root to its physical root. Go stores those same two roots in each callback.'),
+    'tsc/internal/fswatch/watcher.go:fallbackWatcher.Name': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'Kind::Fanotify => "fanotify",',
+        'The fallback is represented by Kind::Fanotify in the same Watcher, so the primary name is already the '
+        'common name result.'),
+    'tsc/internal/fswatch/watcher.go:fallbackWatcher.Available': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'Kind::Fanotify => crate::linux::fanotify_available(),',
+        'The fallback wrapper shares the common Watcher implementation and reports primary fanotify availability, '
+        'not secondary availability.'),
+    'tsc/internal/fswatch/watcher.go:fallbackWatcher.HasFastRecursiveBackend': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'matches!(self.0.kind, Kind::Fsevents | Kind::Windows)',
+        'The fallback uses the common Kind::Fanotify discriminator and therefore returns false, as its primary '
+        'backend does.'),
+    'tsc/internal/fswatch/watcher.go:fallbackWatcher.WatchDirectory': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'pub fn watch_directory(',
+        'The single-directory wrapper builds a one-row request and enters the same WatchDirectories fallback route '
+        'as native.'),
+    'tsc/internal/fswatch/watcher.go:fallbackWatcher.WatchFile': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'file_callback(path, callback),',
+        'The file wrapper attaches the same file filter to the parent-directory request; the fallback dispatch '
+        'occurs inside that request and returns the secondary subscription when needed.'),
+    'tsc/internal/fswatch/watcher.go:dirWatch.destroyDebounce': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'state.dirs.retain(|watch| !Arc::ptr_eq(watch, &self.dir));',
+        'Unwatch first empties logical callbacks. The debounce registry holds only Weak directory references; '
+        'later triggers cannot deliver a removed callback, and the final owner shuts down the debounce worker. '
+        'Dead weak entries are removed on delivery instead of explicit map deregistration.'),
+    'tsc/internal/fswatch/watcher.go:watcherBase.watchAdd': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'backend.add_many(&added)',
+        'Only watchAddMany is called on supported native backends; the one-element helper has no pinned caller. '
+        'Rust dispatches all additions through the batch Backend contract.'),
+    'tsc/internal/fswatch/watcher.go:watcherBase.watchAddMany': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'if let Err(error) = backend.add_many(&added) {',
+        'Registration supplies unique newly allocated directory identities to backend batch-add. Linux removes '
+        'previously added subscriptions on failure; FSEvents validates/builds replacement streams atomically. '
+        'Owner rollback removes each logical callback and newly added root.'),
+    'tsc/internal/fswatch/watcher.go:watcherBase.watchRemove': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'let _ = backend.remove(&self.dir);',
+        'Final callback close removes the native subscription while holding the owner state lock; the public Close '
+        'result deliberately ignores teardown errors, as the pin does.'),
+    'tsc/internal/fswatch/watcher.go:watcherBase.shutdown': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'fn shutdown(&self);',
+        'The native base has a no-op shutdown default. Rust requires each sealed Backend to supply shutdown, '
+        'implemented by the Linux wake/join and macOS stream teardown paths.'),
+    'tsc/internal/fswatch/watcher.go:watcherBase.init': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'state: Mutex::new(State::default()),',
+        'Owner and backend constructors initialize subscription tables and synchronization directly; Rust Backend '
+        'trait dispatch replaces the self-reference of Go watcherBase.'),
+    'tsc/internal/fswatch/watcher.go:watcherBase.notifyStarted': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'state.backend = Some(self.backend()?);',
+        'Backend construction opens required descriptors before returning; the owner publishes only after '
+        'successful construction. This synchronous return is the start barrier rather than a goroutine started '
+        'channel.'),
+    'tsc/internal/fswatch/watcher.go:watcherBase.run': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'fn backend(&self) -> Result<Arc<dyn Backend>, Error> {',
+        'The factory returns Result only after initializing the native backend, with the Linux read worker spawned '
+        'inside its constructor and FSEvents streams established on subscribe. Rust Result carries startup refusal '
+        'without a started channel.'),
+    'tsc/internal/fswatch/watcher.go:watcherBase.handleStartError': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'state.backend = Some(self.backend()?);',
+        'Synchronous startup errors propagate without publication, and registration has not installed callbacks '
+        'yet. Later Linux worker errors notify existing watches in linux.rs; native C FSEvents callbacks have '
+        'their own unwind boundary.'),
+    'tsc/internal/fswatch/watcher.go:watcherBase.handleWatcherError': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'pub(crate) fn notify_error(&self, error: Error) {',
+        'The only pinned caller is windowsSubscription.fatal (windows.go), outside Phase 4 targets. Supported '
+        'Linux terminal errors already deliver through DirWatch.notify_error; no Windows async-fatal adapter is '
+        'required.'),
+    'tsc/internal/fswatch/watcher.go:dirWatchError.Error': _equivalent(
+        'crates/tsr_fswatch/src/lib.rs', 'Self::DirectoryWatch { source, .. } => return write!(f, "{source}"),',
+        'The structured directory error delegates Display to its wrapped cause exactly as native Error().'),
+    'tsc/internal/fswatch/watcher.go:dirWatchError.Unwrap': _equivalent(
+        'crates/tsr_fswatch/src/lib.rs', 'impl std::error::Error for Error {',
+        'Error::source exposes the DirectoryWatch boxed cause; errno and tagged-error predicates recursively '
+        'traverse the same structured wrappers.'),
+    'tsc/internal/fswatch/debounce.go:debounce.loop': _equivalent(
+        'crates/tsr_fswatch/src/debounce.rs', 'loop {',
+        'The worker loops over wait, coalescing and callback delivery; it additionally exits when the owned '
+        'backend is retired.'),
+    'tsc/internal/fswatch/debounce.go:debounce.notifyIfReady': _equivalent(
+        'crates/tsr_fswatch/src/debounce.rs', 'if last.is_some_and(|last| last.elapsed() <= Duration::from_millis(500)) {',
+        'The last-delivery timestamp decides between immediate delivery after the 500ms maximum and a 50ms '
+        'coalescing wait, matching the pin.'),
+    'tsc/internal/fswatch/debounce.go:debounce.coalesceWait': _equivalent(
+        'crates/tsr_fswatch/src/debounce.rs', '.wait_timeout(state, Duration::from_millis(50))',
+        'The condvar timed wait uses a generation counter to distinguish a new trigger from timeout; another '
+        'trigger restarts the loop without firing.'),
+    'tsc/internal/fswatch/debounce.go:debounce.fireCallbacks': _equivalent(
+        'crates/tsr_fswatch/src/debounce.rs', 'for watch in watches {',
+        'The worker upgrades the directory snapshot under lock, resets the latch, drops the lock and invokes '
+        'callbacks, recording delivery time. Panic isolation does not retain the lock.'),
+    'tsc/internal/fswatch/debounce.go:debounce.waitChLocked': _equivalent(
+        'crates/tsr_fswatch/src/debounce.rs', 'while !state.stop && !state.signalled {',
+        'The predicate is initialized with the State, replacing the lazy closed/open wait channel; condvar wait is '
+        'always guarded by that predicate.'),
+    'tsc/internal/fswatch/debounce.go:debounce.latchWait': _equivalent(
+        'crates/tsr_fswatch/src/debounce.rs', 'while !state.stop && !state.signalled {',
+        'The condition variable waits until the persistent signalled predicate is set; it cannot lose a trigger '
+        'between predicate read and sleep.'),
+    'tsc/internal/fswatch/debounce.go:debounce.triggerChLocked': _equivalent(
+        'crates/tsr_fswatch/src/debounce.rs', 'generation: u64,',
+        'The generation counter replaces the renewed trigger channel identity; trigger increments it and the timed '
+        'waiter detects changes.'),
+    'tsc/internal/fswatch/debounce.go:debounce.latchReset': _equivalent(
+        'crates/tsr_fswatch/src/debounce.rs', 'state.signalled = false;',
+        'The worker resets the persistent latch under its mutex before delivering the callback snapshot.'),
+    'tsc/internal/fswatch/debounce.go:debounce.remove': _equivalent(
+        'crates/tsr_fswatch/src/debounce.rs', 'state.watches.retain(|w| w.strong_count() != 0);',
+        'Go explicitly removes callback-map entries. Rust stores only Weak directory references and prunes expired '
+        'registrations at delivery; unwatch clears live callbacks, and final close stops the worker.'),
+    'tsc/internal/fswatch/event.go:eventList.createLocked': _equivalent(
+        'crates/tsr_fswatch/src/event.rs', '0 => entry.created = sequence,',
+        'The create branch of record sets createdSeq, including the preceding rapid delete/recreate reset, under '
+        'the single EventList mutex.'),
+    'tsc/internal/fswatch/event.go:eventList.updateLocked': _equivalent(
+        'crates/tsr_fswatch/src/event.rs', '1 => entry.updated = sequence,',
+        'The update branch of record changes updatedSeq under the same mutex.'),
+    'tsc/internal/fswatch/event.go:eventList.removeLocked': _equivalent(
+        'crates/tsr_fswatch/src/event.rs', '_ => entry.deleted = sequence,',
+        'The remove branch of record changes deletedSeq under the same mutex.'),
+    'tsc/internal/fswatch/event.go:eventList.nextSeqLocked': _equivalent(
+        'crates/tsr_fswatch/src/event.rs', 'state.sequence = state.sequence.wrapping_add(1);',
+        "A missing explicit event sequence increments the u64 sequence with the pin's wrapping semantics while "
+        'holding the mutex.'),
+    'tsc/internal/fswatch/event.go:eventList.advanceSeqLocked': _equivalent(
+        'crates/tsr_fswatch/src/event.rs', 'state.sequence = state.sequence.max(sequence);',
+        'An explicit native sequence advances the stored cutoff only when larger, inlined in record.'),
+    'tsc/internal/fswatch/event.go:eventList.getOrCreate': _equivalent(
+        'crates/tsr_fswatch/src/event.rs', 'let entry = state.entries.entry(path.to_vec()).or_default();',
+        'HashMap entry lookup inserts the zeroed sequence record only when absent, directly in the locked record '
+        'path.'),
+    'tsc/internal/fswatch/event.go:eventEntry.isDeleted': _equivalent(
+        'crates/tsr_fswatch/src/event.rs', '0 if entry.deleted > entry.created && entry.deleted > entry.updated => {',
+        'The predicate is inlined at its only production caller, the rapid-recreate arm of record.'),
+    'tsc/internal/fswatch/event.go:eventList.size': _equivalent(
+        'crates/tsr_fswatch/src/event.rs', '!s.entries.is_empty() || s.error.is_some()',
+        'Production consumers only ask whether size is positive; has_pending folds that and hasError into one '
+        'locked predicate. The event-list unit case separately asserts the raw entry count.'),
+    'tsc/internal/fswatch/event.go:eventList.hasError': _equivalent(
+        'crates/tsr_fswatch/src/event.rs', '!s.entries.is_empty() || s.error.is_some()',
+        'Production callers combine nonempty events with a latched error; Rust performs both reads atomically in '
+        'has_pending.'),
+    'tsc/internal/fswatch/event.go:eventList.getError': _equivalent(
+        'crates/tsr_fswatch/src/event.rs', 'assert_eq!(lock(&e.0).error, Some(Error::Message("first".into())));',
+        'No production caller at the pin; native tests use getError as a non-consuming observation. The Rust unit '
+        'checks read the same private error slot without adding a public/test-only accessor.'),
+    'tsc/internal/fswatch/event.go:eventList.snapshotSinceLocked': _equivalent(
+        'crates/tsr_fswatch/src/event.rs', 'entry.kind_since(*start).map(|kind| PendingEvent {',
+        'The drain loop builds each callback snapshot by sequence with unchanged kind/root/path fields under the '
+        'EventList mutex.'),
+    'tsc/internal/fswatch/event.go:eventList.snapshotLocked': _equivalent(
+        'crates/tsr_fswatch/src/event.rs', 'fn drain(events: &EventList) -> (Vec<Event>, Option<Error>) {',
+        'The startSeq=0 specialization is the test drain helper; production requests all subscriber cutoff '
+        'snapshots through drain_for_sequences.'),
+    'tsc/internal/fswatch/event.go:eventList.drain': _equivalent(
+        'crates/tsr_fswatch/src/event.rs', '(output, state.error.take())',
+        'Drain-for-sequences combines event extraction and first-error take atomically and clears entries; '
+        'production uses an empty sequence slice to discard events without callbacks and a cutoff per live '
+        'callback.'),
+    'tsc/internal/fswatch/event.go:eventList.getEvents': _equivalent(
+        'crates/tsr_fswatch/src/event.rs', 'fn drain(events: &EventList) -> (Vec<Event>, Option<Error>) {',
+        'The pin has only test callers for non-consuming getEvents. Rust tests observe the same event reduction '
+        'through the production drain; production never exposes a snapshot separate from its atomic clear.'),
+    'tsc/internal/fswatch/inotify_linux.go:init#1': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'fn backend(&self) -> Result<Arc<dyn Backend>, Error> {',
+        'Compile-time platform branches dispatch the named native backend; fanotify availability probes required '
+        'kernel flags before selection instead of installing a Go package factory.'),
+    'tsc/internal/fswatch/inotify_linux.go:inotifyBackend.start': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn new(mode: Mode, no_rename: bool) -> Result<Arc<Self>, Error> {',
+        'The shared constructor opens the mode-specific descriptor and wake pipe, then spawns the poll/read '
+        'worker. Owned descriptors clean up every partial failure; construction returning is the start barrier.'),
+    'tsc/internal/fswatch/inotify_linux.go:inotifyBackend.closeFDs': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'state.fd.take();',
+        'Worker exit retires the shared native descriptor before notifying failures; later subscriptions fail. '
+        'OwnedFd releases the read descriptor and wake reader, while shutdown takes the writer once and joins '
+        'unless invoked from that worker itself.'),
+    'tsc/internal/fswatch/inotify_linux.go:inotifyBackend.shutdown': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn shutdown(&self) {',
+        'The common backend writes a wake byte once, then joins unless called on its own worker. Both mode '
+        'variants use this same shutdown operation.'),
+    'tsc/internal/fswatch/inotify_linux.go:inotifyBackend.subscribe': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn subscribe(&mut self, watch: &Arc<DirWatch>) -> Result<(), Error> {',
+        'The mode parameter selects inotify or fanotify registration; recursive descriptor-relative walks preserve '
+        'logical/physical roots. Fanotify additionally probes the rename mask once.'),
+    'tsc/internal/fswatch/inotify_linux.go:inotifyBackend.closeWatch': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn close_watch(&mut self, watch: &Arc<DirWatch>) {',
+        'The common cleanup removes only subscriptions for this directory identity, releases the native '
+        'mark/descriptor when the key has no subscribers, and continues despite teardown errors. Every supported '
+        'native caller discards the inotify closeWatch error result, as public Close does.'),
+    'tsc/internal/fswatch/inotify_linux.go:inotifyBackend.handleEvents': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn run(state: Arc<Mutex<State>>, fd: Arc<OwnedFd>, wake: OwnedFd) -> Result<(), Error> {',
+        'One poll/read worker dispatches mode-specific record decoders under the state mutex, deduplicates touched '
+        'directories, then notifies outside the lock.'),
+    'tsc/internal/fswatch/fanotify_linux.go:init#1': _equivalent(
+        'crates/tsr_fswatch/src/watcher.rs', 'fn backend(&self) -> Result<Arc<dyn Backend>, Error> {',
+        'Compile-time platform branches dispatch the named native backend; fanotify availability probes required '
+        'kernel flags before selection instead of installing a Go package factory.'),
+    'tsc/internal/fswatch/fanotify_linux.go:fanotifyBackend.start': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn new(mode: Mode, no_rename: bool) -> Result<Arc<Self>, Error> {',
+        'The shared constructor opens the mode-specific descriptor and wake pipe, then spawns the poll/read '
+        'worker. Owned descriptors clean up every partial failure; construction returning is the start barrier.'),
+    'tsc/internal/fswatch/fanotify_linux.go:fanotifyBackend.closeFDs': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'state.fd.take();',
+        'Worker exit retires the shared native descriptor before notifying failures; later subscriptions fail. '
+        'OwnedFd releases the read descriptor and wake reader, while shutdown takes the writer once and joins '
+        'unless invoked from that worker itself.'),
+    'tsc/internal/fswatch/fanotify_linux.go:fanotifyBackend.shutdown': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn shutdown(&self) {',
+        'The common backend writes a wake byte once, then joins unless called on its own worker. Both mode '
+        'variants use this same shutdown operation.'),
+    'tsc/internal/fswatch/fanotify_linux.go:fanotifyBackend.subscribe': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn subscribe(&mut self, watch: &Arc<DirWatch>) -> Result<(), Error> {',
+        'The mode parameter selects inotify or fanotify registration; recursive descriptor-relative walks preserve '
+        'logical/physical roots. Fanotify additionally probes the rename mask once.'),
+    'tsc/internal/fswatch/fanotify_linux.go:fanotifyBackend.closeWatch': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn close_watch(&mut self, watch: &Arc<DirWatch>) {',
+        'The common cleanup removes only subscriptions for this directory identity, releases the native '
+        'mark/descriptor when the key has no subscribers, and continues despite teardown errors. Every supported '
+        'native caller discards the inotify closeWatch error result, as public Close does.'),
+    'tsc/internal/fswatch/fanotify_linux.go:fanotifyBackend.handleEvents': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn run(state: Arc<Mutex<State>>, fd: Arc<OwnedFd>, wake: OwnedFd) -> Result<(), Error> {',
+        'One poll/read worker dispatches mode-specific record decoders under the state mutex, deduplicates touched '
+        'directories, then notifies outside the lock.'),
+    'tsc/internal/fswatch/inotify_linux.go:inotifyBackend.watchDir': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn add_dir(',
+        'The Mode::Inotify branch registers the physical directory and appends the logical-path subscription under '
+        'its returned kernel descriptor.'),
+    'tsc/internal/fswatch/inotify_linux.go:inotifyBackend.handleEvent': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn inotify_events(',
+        'The safe record decoder contains both the descriptor subscription dispatch and the native ordered mask '
+        'branches: create/move-to, modify, delete/move-from, recursive registration/removal and terminal root '
+        'errors.'),
+    'tsc/internal/fswatch/inotify_linux.go:inotifyBackend.handleSubscription': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn inotify_events(',
+        'The safe record decoder contains both the descriptor subscription dispatch and the native ordered mask '
+        'branches: create/move-to, modify, delete/move-from, recursive registration/removal and terminal root '
+        'errors.'),
+    'tsc/internal/fswatch/fanotify_linux.go:fanotifyBackend.markDir': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn add_dir(',
+        'The Mode::Fanotify branch marks the physical directory, reads its FID key and unmarks on key failure, '
+        'then inserts the logical-path subscription.'),
+    'tsc/internal/fswatch/fanotify_linux.go:makeFanotifyHandleKey': _equivalent(
+        'crates/tsr_fswatch/src/fanotify.rs', 'pub(crate) struct HandleKey {',
+        'Owned fsid, handle_type and opaque handle bytes with derived Eq/Hash replace the Go comparable '
+        'struct/string constructor; no opaque kernel bytes are interpreted as pointers.'),
+    'tsc/internal/fswatch/fanotify_linux.go:fanotifyBackend.handleOverflow': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn overflow(',
+        'Overflow visits active subscriptions, latches the error and deduplicates touched directory owners; dead '
+        'roots without native subscriptions are excluded.'),
+    'tsc/internal/fswatch/fanotify_linux.go:fanotifyBackend.handleRenameEvent': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'if mask & libc::FAN_RENAME != 0 {',
+        'A paired rename is split into delete-old then create-new records, preserving FAN_ONDIR. The shared per- '
+        'subscription handler performs the same descendant removal and new recursive watch registration.'),
+    'tsc/internal/fswatch/fanotify_linux.go:fanotifyBackend.handleParsedEvent': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn fanotify_event(',
+        'The shared handler combines FID-key dispatch and the native subscription logic: merged create/delete '
+        'existence check, delete-first processing, recursive tracking and modified events.'),
+    'tsc/internal/fswatch/fanotify_linux.go:fanotifyBackend.handleSubscription': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn fanotify_event(',
+        'The shared handler combines FID-key dispatch and the native subscription logic: merged create/delete '
+        'existence check, delete-first processing, recursive tracking and modified events.'),
+    'tsc/internal/fswatch/fanotify_linux.go:fanotifyBackend.dropSubsForPathLocked': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn drop_path(',
+        'A single helper takes recursive=false and removes exactly matching or matching/descendant logical paths '
+        'from every FID-key subscription list; fanotify marks have the same documented moved-out-inode limitation.'),
+    'tsc/internal/fswatch/fanotify_linux.go:fanotifyBackend.dropSubsForPathAndDescendantsLocked': _equivalent(
+        'crates/tsr_fswatch/src/linux.rs', 'fn drop_path(',
+        'A single helper takes recursive=true and removes exactly matching or matching/descendant logical paths '
+        'from every FID-key subscription list; fanotify marks have the same documented moved-out-inode limitation.'),
+    'tsc/internal/fswatch/walkdir_unix.go:readDirEntries': _equivalent(
+        'crates/tsr_fswatch/src/walkdir.rs', 'let mut reader = Dir::read_from(fd.as_fd())?;',
+        'rustix decodes native dirents; the loop copies name/type for every nonzero-inode non-dot record before '
+        'descending. DT_UNKNOWN uses no-follow metadata, and native read errors propagate.'),
+    'tsc/internal/fswatch/walkdir_dirent_darwin.go:reclenOf': _equivalent(
+        'crates/tsr_fswatch/src/walkdir.rs', 'let mut reader = Dir::read_from(fd.as_fd())?;',
+        'The selected rustix platform Dir decoder consumes the platform ABI record length; Rust never casts a '
+        'buffer into an unchecked dirent struct.'),
+    'tsc/internal/fswatch/walkdir_dirent_darwin.go:inoOf': _equivalent(
+        'crates/tsr_fswatch/src/walkdir.rs', 'if include_entry(entry.ino(), name) {',
+        "rustix DirEntry::ino provides the native inode field; the caller preserves the pin's zero-inode "
+        'exclusion.'),
+    'tsc/internal/fswatch/walkdir_dirent_linux.go:reclenOf': _equivalent(
+        'crates/tsr_fswatch/src/walkdir.rs', 'let mut reader = Dir::read_from(fd.as_fd())?;',
+        'The selected rustix platform Dir decoder consumes the platform ABI record length; Rust never casts a '
+        'buffer into an unchecked dirent struct.'),
+    'tsc/internal/fswatch/walkdir_dirent_linux.go:inoOf': _equivalent(
+        'crates/tsr_fswatch/src/walkdir.rs', 'if include_entry(entry.ino(), name) {',
+        "rustix DirEntry::ino provides the native inode field; the caller preserves the pin's zero-inode "
+        'exclusion.'),
+    'tsc/internal/fswatch/walkdir.go:walkDirGeneric': _equivalent(
+        'crates/tsr_fswatch/src/walkdir.rs', 'pub(crate) fn walk_dir(',
+        'The generic fallback has no production caller on the selected Linux/macOS targets; their build tags '
+        'select walkdir_unix.go. The Rust native traversal covers the same no-follow recursive filesystem contract '
+        'and its selected-platform tests; no unselected-platform fallback is shipped.'),
+    'tsc/internal/fswatch/walkdir.go:walkDirGenericVisit': _equivalent(
+        'crates/tsr_fswatch/src/walkdir.rs', 'fn visit(',
+        'The generic fallback has no production caller on the selected Linux/macOS targets; their build tags '
+        'select walkdir_unix.go. The Rust native traversal covers the same no-follow recursive filesystem contract '
+        'and its selected-platform tests; no unselected-platform fallback is shipped.'),
+})
+
+# X5 compiler/watch lifecycle review, 2026-10-02.
+REVIEWED.update({
+    'tsc/internal/compiler/includeprocessor.go:updateFileIncludeProcessor': _equivalent(
+        'crates/tsr_compiler/src/reuse.rs', 'map(|reason| Arc::new(reason.fresh_for_program()))',
+        'Reuse retains reason data and processing diagnostics but reconstructs every program-relative '
+        'location/diagnostic cache, including fresh include explanations and OnceLock diagnostics. The existing '
+        'position regression checks an import moved by two lines after reuse.'),
+    'tsc/internal/compiler/program.go:Program.FilesByPath': _equivalent(
+        'crates/tsr_compiler/src/loader.rs', 'pub fn file(&self, path: &[u8]) -> Option<&ProgramFile> {',
+        'Go exposes its map; Rust keeps by_path private and combines files() iteration with this checked lookup. '
+        'Watch source membership, eviction decisions, replacement and graph cloning use that same program index; '
+        'no additional map copy is needed.'),
+    'tsc/internal/compiler/program.go:Program.needsImportHelpersImportSpecifier': _equivalent(
+        'crates/tsr_compiler/src/reuse.rs', 'if options.import_helpers.is_true()',
+        'synthetic_imports folds this helper with the JSX-runtime requirement. Callers supply the redirected '
+        'options for each canonical or supplemental file; JS/declaration/isolated-module/external-module '
+        'conditions match the pin.'),
+    'tsc/internal/compiler/program.go:equalCheckJSDirectives': _equivalent(
+        'crates/tsr_compiler/src/reuse.rs', 'a.check_js_directive.as_ref().map(|d| d.enabled)',
+        'Option equality in can_replace_file distinguishes absent from false/true and ignores directive positions '
+        'just as the native helper does.'),
+    'tsc/internal/compiler/program.go:equalFileReferences': _equivalent(
+        'crates/tsr_compiler/src/reuse.rs', 'fn equal_references<',
+        'Iterator comparison combines native slice equality with the FileName, ResolutionMode and Preserve '
+        'predicate; it compares lengths and ignores source spans.'),
+    'tsc/internal/compiler/program.go:equalModuleAugmentationNames': _equivalent(
+        'crates/tsr_compiler/src/reuse.rs', 'fn equal_names(',
+        'The shared name comparison uses always_text=true for augmentation names and requires equal kinds and raw '
+        'bytes.'),
+    'tsc/internal/compiler/program.go:equalModuleSpecifiers': _equivalent(
+        'crates/tsr_compiler/src/reuse.rs', 'if !equal_names(old_view, left, new_view, right, false)?',
+        'The shared name comparison uses always_text=false for imports: kinds must match; only StringLiteral text '
+        'participates. The caller also compares usage-site resolution modes.'),
+    'tsc/internal/compiler/program.go:lazyValue.tryReuse': _equivalent(
+        'crates/tsr_compiler/src/reuse.rs', 'package_resolver: std::sync::Mutex::new(',
+        'Reuse clones the immutable resolution graph and forks the resolver cache for the new host. '
+        'GetSymlinkCache lives in each checker host and remains lazily recomputed from that graph; '
+        'packageNames/unresolvedImports consumers are already assigned to Phase5. There is no Go-style program '
+        'lazyValue wrapper to copy, and no derived value is computed eagerly by reuse.'),
+    'tsc/internal/execute/watcher.go:Watcher.DoCycle': _equivalent(
+        'crates/tsr_tsc/src/watcher.rs', 'fn cycle(&mut self, manager: &WatchManager)',
+        'The public trait method acquires the cycle and state guards, then this private method drains events, '
+        'invalidates configuration/sources, performs relevance and mapper refresh checks, and builds. Guard drop '
+        'supplies the native deferred unlock.'),
+    'tsc/internal/execute/watcher.go:Watcher.evictChangedSourceFiles': _equivalent(
+        'crates/tsr_tsc/src/watcher.rs', 'self.cache.evict(path.as_bytes());',
+        'The relevant-event loop evicts the canonical file-cache entry before classifying directory, new-root, '
+        'mapped and non-source dependency events; existing owners remain retained by old programs.'),
+    'tsc/internal/execute/watcher.go:Watcher.parseConfigFile': _equivalent(
+        'crates/tsr_tsc/src/watcher.rs', 'let result = cache.read_config_file(',
+        'Configuration parsing and read-error/status handling are folded into recheck_config; the live config host '
+        'and fresh extended-config cache retain the native reread boundary.'),
+    'tsc/internal/execute/watcher.go:Watcher.reconcileWatches': _equivalent(
+        'crates/tsr_tsc/src/watcher.rs', 'if let Err(error) = manager.reconcile_watches(&self.desired_watches(manager, &seen)?)',
+        'The build completion path composes computeDesiredWatches and manager reconciliation directly; a failed '
+        'native subscription prints its error and latches overflow for the next cycle.'),
+    'tsc/internal/execute/watcher.go:Watcher.start': _equivalent(
+        'crates/tsr_tsc/src/watcher.rs', 'pub fn start(context: &Context, options: Options)',
+        'Combined constructor/start creates the mapper session, reads previous build info, prints the starting '
+        'status, builds once and enters the native cancellation loop. Test sessions return the retained watcher; '
+        'drop releases session resources.'),
+    'tsc/internal/execute/watcher.go:Watcher.tryUpdateProgram': _equivalent(
+        'crates/tsr_tsc/src/watcher.rs', 'let reuse = self',
+        'The build fast path is folded into build: one changed ordinary source, stable root set/config, no '
+        'overflow or structural dependency change, then Program::reuse_program and incremental publication. A '
+        'retained speculative owner survives until full fallback loading to avoid duplicate parsing.'),
+    'tsc/internal/execute/watcher.go:createWatcher': _equivalent(
+        'crates/tsr_tsc/src/watcher.rs', 'let mut state = State {',
+        'Typed Options plus State and WatchManager construction replace the standalone native constructor; status '
+        'locale/options are snapshotted and the optional test backend is injected before the first build.'),
+    'tsc/internal/execute/watcher.go:equalJSXImplicitImport': _equivalent(
+        'crates/tsr_compiler/src/reuse.rs', 'fn synthetic_imports(',
+        'The native watcher equality precheck is folded into the stricter ReuseProgram guard which rejects either '
+        'version requiring a JSX runtime synthetic import, as native ReuseProgram itself does. Therefore a changed '
+        'runtime import cannot take the fast path; the existing JSX pragma watch regression exercises it.'),
+    'tsc/internal/execute/watcher.go:watchCompilerHost.GetSourceFile': _equivalent(
+        'crates/tsr_compiler/src/cache.rs', 'pub(crate) fn acquire(',
+        'The session FileCache stores weak immutable parsed/bound owners; source events evict paths and loader '
+        'acquisition checks actual bytes plus parse context before reuse. This replaces the native mutable mtime '
+        'cache under the existing ownership contract. Full/overflow/config changes clear it and fallback retains '
+        'the speculative owner.'),
+    'tsc/internal/execute/watchmanager/watchmanager.go:DirWatchSet.canonical': _equivalent(
+        'crates/tsr_tsc/src/watchmanager.rs', 'tsr_tspath::canonical(dir, self.options.use_case_sensitive_file_names).into_owned(),',
+        'Canonicalization is inlined at insertion and coverage lookup using the same case-sensitivity option; '
+        'existing case-sensitive and case-insensitive coverage/dedup regressions exercise both sites.'),
+    'tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.DoCycleCh': _equivalent(
+        'crates/tsr_tsc/src/watchmanager.rs', 'while !changes.signalled && context.err().is_none() {',
+        'A condition-variable predicate replaces the exposed Go capacity-one channel. Event callbacks set a '
+        'coalesced signalled bit; the run loop consumes it, and cancellation wakes an idle wait.'),
+    'tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.Unlock': _equivalent(
+        'crates/tsr_tsc/src/watchmanager.rs', "pub fn lock(&self) -> MutexGuard<'_, ()> {",
+        'The cycle mutex guard returned by lock releases on scope exit, including errors and unwinding. An '
+        'independent public Unlock operation would permit invalid use and is unnecessary.'),
+    'tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.createDirWatchRequest': _equivalent(
+        'crates/tsr_tsc/src/watchmanager.rs', 'let requests = additions',
+        'Request construction is folded into batch reconciliation: per-entry identity, recursive and ignore '
+        'options, and weak owner callbacks preserve termination invalidation without creating an ownership cycle.'),
+    'tsc/internal/execute/watchmanager/watchmanager.go:WatchManager.createDirWatches': _equivalent(
+        'crates/tsr_tsc/src/watchmanager.rs', 'match backend.watch_directories(requests) {',
+        'Batch creation and result installation are folded into reconcile_watches. Provisional identity entries '
+        'allow synchronous termination callbacks; successful subscriptions publish only to the same identity and '
+        'failed batches remove their provisional entries.'),
+})
 
 def inventory(root=ROOT):
     """Pinned functions in inventory order: (id, file)."""

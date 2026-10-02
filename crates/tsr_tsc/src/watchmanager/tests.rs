@@ -343,3 +343,46 @@ fn ignored_paths_and_os_root_heuristics_match_pin() {
         assert!(can_watch_directory(path), "{:?}", path);
     }
 }
+
+#[test]
+fn debug_event_preview_matches_native_limit_and_preserves_path_bytes() {
+    let (manager, _, writer) = fixture();
+    manager.set_debug_log(Some(writer.clone()));
+    let events: Vec<_> = (0..7)
+        .map(|i| fswatch::Event {
+            path: if i == 0 {
+                b"/file\xff".to_vec()
+            } else {
+                format!("/file{i}").into_bytes()
+            },
+            kind: fswatch::EventKind::EventUpdate,
+        })
+        .collect();
+    manager.on_events(&events, None);
+    assert_eq!(
+        *lock(&writer.0),
+        b"[watch] 7 event(s): update /file\xff, update /file1, update /file2, update /file3, update /file4, ... and 2 more\n"
+    );
+    assert_eq!(manager.drain_events().0.len(), 7);
+}
+
+#[test]
+fn debug_reconciliation_reports_add_change_remove_and_failed_creation() {
+    let (manager, backend, writer) = fixture();
+    manager.set_debug_log(Some(writer.clone()));
+    manager.reconcile_watches(&desired(false)).unwrap();
+    manager.reconcile_watches(&desired(true)).unwrap();
+    manager.reconcile_watches(&HashMap::new()).unwrap();
+    backend.fail.store(true, Ordering::Relaxed);
+    assert!(manager.reconcile_watches(&desired(false)).is_err());
+    assert_eq!(
+        String::from_utf8(lock(&writer.0).clone()).unwrap(),
+        concat!(
+            "[watch] watching directory /home/user/project/src (recursive=false)\n",
+            "[watch] recreating dir watch /home/user/project/src (recursive false→true)\n",
+            "[watch] closing stale dir watch: /home/user/project/src\n",
+            "[watch] watching directory /home/user/project/src (recursive=false)\n",
+            "[watch] failed to watch directory /home/user/project/src: fswatch: watcher not available on this platform\n"
+        )
+    );
+}
