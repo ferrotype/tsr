@@ -125,6 +125,8 @@ pub type FileDiagnostics<'a> = dyn Fn(Option<&ProgramFile>) -> Result<Vec<Diagno
 impl CheckedProgram {
     /// `None` is the pin's nil result: the request was canceled before the
     /// emit began.
+    /// Panics with the pinned refusal if `noEmitOnError` diagnostics try to
+    /// reuse a checker that already observed cancellation.
     // port: tsc/internal/compiler/program.go:Program.Emit
     pub fn emit(
         &self,
@@ -323,7 +325,19 @@ pub fn handle_no_emit_options(
                     .bind_diagnostics(file.map(ProgramFile::source))
             },
             &|file| program.semantic_diagnostics(request, file),
-        )?;
+        );
+        // The checker API reports terminal cancellation as a typed error so
+        // project pools can discard just that checker. Program.Emit's native
+        // contract instead panics when its diagnostic collection reuses one.
+        // Translate only that refusal, after all checker leases have returned;
+        // cancellation must not retire the whole generation as an internal
+        // panic during a checker operation would.
+        let diagnostics = match diagnostics {
+            Err(Error::Checker(tsr_checker::Error::PreviouslyCanceled)) => {
+                panic!("Checker was previously cancelled")
+            }
+            result => result?,
+        };
         if diagnostics.is_empty() {
             return Ok(None); // NoEmitOnError is enabled, but no diagnostics were found, so we can proceed with emitting
         }

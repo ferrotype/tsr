@@ -207,8 +207,8 @@ fn emit_with(checked: &CheckedProgram, request: &CheckerRequest, force_emit: boo
 /// Under `noEmitOnError` the canceled request's checks are canceled and the
 /// collection then asks the canceled checkers for their global diagnostics
 /// again (`GetDiagnosticsOfAnyProgram`), which they refuse: the pin panics
-/// there (`checkNotCanceled`, "Checker was previously cancelled") and the
-/// port returns that refusal as an error, so nothing is written. Uncanceled,
+/// there (`checkNotCanceled`, "Checker was previously cancelled"), as the
+/// emit boundary does here, so nothing is written. Uncanceled,
 /// the same programs emit, skip with the error, and skip silently. Both
 /// modes.
 #[test]
@@ -263,17 +263,50 @@ fn a_canceled_request_emits_nothing() {
             vec![2322],
             "{mode:?}"
         );
-        let (result, written) = emit_with(&load(no_emit_on_error()), &canceled, false);
-        assert!(
-            matches!(
-                result,
+        for already_canceled in [false, true] {
+            let checked = load(no_emit_on_error());
+            if already_canceled {
+                // A subsequent emit with a live token must still refuse the
+                // checker poisoned by an earlier diagnostics request.
+                checked
+                    .semantic_diagnostics(&canceled, checked.program().file(b"/a.ts"))
+                    .unwrap();
+            }
+            let recorder = Recorder::default();
+            let write = |name: &[u8], text: &[u8], _: &mut WriteFileData| {
+                recorder.write(name, text);
+                Ok(())
+            };
+            let options = EmitOptions {
+                write_file: Some(&write),
+                ..EmitOptions::default()
+            };
+            let request = if already_canceled { &live } else { &canceled };
+            let panic = catch_unwind(AssertUnwindSafe(|| checked.emit(request, &options)))
+                .expect_err("emit refuses canceled-checker reuse with the pinned panic");
+            assert_eq!(
+                support::panic_text(&*panic),
+                "Checker was previously cancelled"
+            );
+            assert!(recorder.take().is_empty(), "{mode:?}");
+            // The boundary translates the refusal after releasing operations.
+            // A canceled checker remains poisoned, without retiring unrelated
+            // checkers in the generation (the Phase 2 cancellation contract).
+            assert_eq!(
+                checked
+                    .compiler_checker_pool()
+                    .unwrap()
+                    .generation()
+                    .validate(),
+                Ok(())
+            );
+            assert!(matches!(
+                checked.global_diagnostics(),
                 Err(tsr_compiler::Error::Checker(
                     tsr_checker::Error::PreviouslyCanceled
                 ))
-            ),
-            "{mode:?}: {result:?}"
-        );
-        assert!(written.is_empty(), "{mode:?}");
+            ));
+        }
     }
 }
 
