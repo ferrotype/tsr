@@ -1,25 +1,33 @@
 {
+ "approvals_sha256": "4a501d3295df5095dac4cfba14dccec48b38e238cd9d318417b5629238f492a8",
  "buckets": {
-  "different": [],
-  "failed": [],
-  "unexecuted": [],
-  "unsupported": [
+  "different": [
    {
-    "cause": "execute.CommandLine is Phase 4 X1",
+    "cause": "files differs (initial step)",
     "examples": [
-     "tsbuild/clean/file-name-and-output-name-clashing.js",
-     "tsbuild/clean/tsx-with-dts-emit.js",
-     "tsbuild/commandLine/bad-locale.js"
+     "tsc/generateTrace/generateTrace-generates-types-file.js",
+     "tsc/generateTrace/generateTrace-with-multiple-files-and-complex-types.js"
     ],
     "families": {
-     "tsbuild": 192,
-     "tsbuildWatch": 65,
-     "tsc": 217,
-     "tscWatch": 42
+     "tsc": 2
     },
-    "rows": 516
+    "rows": 2
+   },
+   {
+    "cause": "output differs (initial step)",
+    "examples": [
+     "tsbuild/outputPaths/when-rootDir-is-specified-but-not-all-files-belong-to-rootDir-and-is-composite.js",
+     "tsbuild/outputPaths/when-rootDir-is-specified-but-not-all-files-belong-to-rootDir.js"
+    ],
+    "families": {
+     "tsbuild": 2
+    },
+    "rows": 2
    }
-  ]
+  ],
+  "failed": [],
+  "unexecuted": [],
+  "unsupported": []
  },
  "harness_errors": [],
  "inventory": {
@@ -41,8 +49,8 @@
   "scenarios": 516
  },
  "rust": {
-  "capture_sha256": "81c2ac39b39b74791b4dfc30b5fd77c79680b6d2b93d05824747c3a66397ecaa",
-  "executable_sha256": "66180f1a46746d50823af43f7e3676548d9fb7b9b554e3a3e7e9140e5eafe452",
+  "capture_sha256": "86134c5eb8abed8e67b2438c83fc0b8c653ce1709e019fe1363ea25950e5cb7f",
+  "executable_sha256": "ad6ffe003216c9df724348c028ca9711bb8a72f4309f316de6d8241f8a762e24",
   "partial": false,
   "selectors": [
    "all"
@@ -50,54 +58,59 @@
   "source_stable": true
  },
  "summary": {
+  "accepted": 514,
+  "approved_differences": 2,
   "categories": {
-   "different": 0,
+   "different": 4,
    "failed": 0,
-   "match": 0,
+   "match": 512,
    "unexecuted": 0,
-   "unsupported": 516
+   "unsupported": 0
   },
-  "different_sections": {},
+  "different_sections": {
+   "files": 2,
+   "output": 2
+  },
   "edit_steps": 1255,
-  "edit_steps_agreeing": 0,
+  "edit_steps_agreeing": 1255,
   "families": {
    "tsbuild": {
-    "different": 0,
+    "different": 2,
     "failed": 0,
-    "match": 0,
+    "match": 190,
     "unexecuted": 0,
-    "unsupported": 192
+    "unsupported": 0
    },
    "tsbuildWatch": {
     "different": 0,
     "failed": 0,
-    "match": 0,
+    "match": 65,
     "unexecuted": 0,
-    "unsupported": 65
+    "unsupported": 0
    },
    "tsc": {
-    "different": 0,
+    "different": 2,
     "failed": 0,
-    "match": 0,
+    "match": 215,
     "unexecuted": 0,
-    "unsupported": 217
+    "unsupported": 0
    },
    "tscWatch": {
     "different": 0,
     "failed": 0,
-    "match": 0,
+    "match": 42,
     "unexecuted": 0,
-    "unsupported": 42
+    "unsupported": 0
    }
   },
   "harness_errors": 0,
-  "matched": 0,
+  "matched": 512,
   "partial": false,
   "rows": 516,
   "selected": 516,
-  "stopped_rows": 516,
-  "stopped_rows_prefix_of_reference": 516,
-  "unsupported_rows": 516,
+  "stopped_rows": 0,
+  "stopped_rows_prefix_of_reference": 0,
+  "unsupported_rows": 0,
   "valid": true
  },
  "version": 1

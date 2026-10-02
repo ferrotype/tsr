@@ -1,15 +1,32 @@
 {
- "approved_exceptions": [],
+ "approved_exceptions": [
+  {
+   "approval": "P4-eager-bind-trace-order",
+   "cause": "files differs (initial step)",
+   "disposition": "approved_exception",
+   "kind": "different",
+   "scenario": "tsc/generateTrace/generateTrace-generates-types-file.js",
+   "transcript": "baselines/tsc/generateTrace/generateTrace-generates-types-file.js"
+  },
+  {
+   "approval": "P4-eager-bind-trace-order",
+   "cause": "files differs (initial step)",
+   "disposition": "approved_exception",
+   "kind": "different",
+   "scenario": "tsc/generateTrace/generateTrace-with-multiple-files-and-complex-types.js",
+   "transcript": "baselines/tsc/generateTrace/generateTrace-with-multiple-files-and-complex-types.js"
+  }
+ ],
  "by_owner": {
-  "X1": 1
+  "X3": 1
  },
  "comparison": {
-  "matched": 0,
+  "matched": 512,
   "orphan_references": [
    "tsc/commandLine/adds-color-when-FORCE_COLOR-is-set.js"
   ],
   "rows": 516,
-  "rust_capture_sha256": "81c2ac39b39b74791b4dfc30b5fd77c79680b6d2b93d05824747c3a66397ecaa"
+  "rust_capture_sha256": "86134c5eb8abed8e67b2438c83fc0b8c653ce1709e019fe1363ea25950e5cb7f"
  },
  "cross_phase": [
   {
@@ -23,46 +40,28 @@
  ],
  "entries": [
   {
-   "cause": "execute.CommandLine is Phase 4 X1",
+   "cause": "output differs (initial step)",
    "cross_phase": false,
    "evidence": [
     {
-     "observation": "unsupported: execute.CommandLine is Phase 4 X1",
-     "scenario": "tsbuild/clean/file-name-and-output-name-clashing.js",
-     "transcript": "baselines/tsbuild/clean/file-name-and-output-name-clashing.js"
+     "observation": "different: output differs (initial step)",
+     "scenario": "tsbuild/outputPaths/when-rootDir-is-specified-but-not-all-files-belong-to-rootDir-and-is-composite.js",
+     "transcript": "baselines/tsbuild/outputPaths/when-rootDir-is-specified-but-not-all-files-belong-to-rootDir-and-is-composite.js"
     },
     {
-     "observation": "unsupported: execute.CommandLine is Phase 4 X1",
-     "scenario": "tsbuild/clean/tsx-with-dts-emit.js",
-     "transcript": "baselines/tsbuild/clean/tsx-with-dts-emit.js"
-    },
-    {
-     "observation": "unsupported: execute.CommandLine is Phase 4 X1",
-     "scenario": "tsbuild/commandLine/bad-locale.js",
-     "transcript": "baselines/tsbuild/commandLine/bad-locale.js"
-    },
-    {
-     "observation": "unsupported: execute.CommandLine is Phase 4 X1",
-     "scenario": "tsbuild/commandLine/different-options-with-incremental.js",
-     "transcript": "baselines/tsbuild/commandLine/different-options-with-incremental.js"
-    },
-    {
-     "observation": "unsupported: execute.CommandLine is Phase 4 X1",
-     "scenario": "tsbuild/commandLine/different-options.js",
-     "transcript": "baselines/tsbuild/commandLine/different-options.js"
+     "observation": "different: output differs (initial step)",
+     "scenario": "tsbuild/outputPaths/when-rootDir-is-specified-but-not-all-files-belong-to-rootDir.js",
+     "transcript": "baselines/tsbuild/outputPaths/when-rootDir-is-specified-but-not-all-files-belong-to-rootDir.js"
     }
    ],
    "families": {
-    "tsbuild": 192,
-    "tsbuildWatch": 65,
-    "tsc": 217,
-    "tscWatch": 42
+    "tsbuild": 2
    },
    "id": "B01",
-   "kind": "unsupported",
-   "owner": "X1",
-   "scenarios": 516,
-   "scenarios_sha256": "2762ab52ea7502b829126117ac6401312630ba1946dc0d28e10860e508a41248"
+   "kind": "different",
+   "owner": "X3",
+   "scenarios": 2,
+   "scenarios_sha256": "19b972d88d1be270fd28b205d89cb7891994ddf3326f24093def1bd19db52b97"
   }
  ],
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
