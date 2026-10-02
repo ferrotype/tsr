@@ -602,6 +602,16 @@ pub(crate) fn repopulate_diagnostics_of_file(
         let Some(repopulated) =
             repopulate_diagnostics_list(&program_diagnostics.diagnostics, p, file)?
         else {
+            // Go's cached diagnostics retain only the source files they
+            // reference. Our cache also carries its resolving program, so
+            // sharing it unchanged would pin an entire obsolete program,
+            // even for an empty list. Move its provenance to this program.
+            if let Some(rebound) = program_diagnostics.rebind_for_reuse(p)? {
+                return Ok(Arc::new(DiagnosticsOrBuildInfoDiagnosticsWithFileName {
+                    diagnostics: Mutex::new(Some(rebound)),
+                    ..DiagnosticsOrBuildInfoDiagnosticsWithFileName::default()
+                }));
+            }
             return Ok(diags.clone());
         };
         // The repopulated list is recorded as `p`'s, so the files it still

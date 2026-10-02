@@ -107,3 +107,24 @@ fn a_rebuild_names_the_files_of_its_own_program_in_reused_diagnostics() {
     // The rebuilt program's diagnostics read the same through the first.
     assert_eq!(formatted(&first), expected);
 }
+
+#[test]
+fn reused_diagnostics_do_not_retain_previous_programs() {
+    let counters = Counters::new();
+    let mut current = build(None, &counters);
+    let expected = formatted(&current);
+    for _ in 0..3 {
+        // Cache both the errors (including cross-file related information)
+        // and the empty diagnostic lists of the other unchanged files.
+        current
+            .get_semantic_diagnostics(&CheckerRequest::default(), None)
+            .expect("all semantic diagnostics");
+        let previous = Arc::downgrade(current.program().program());
+        current = build(Some(&current), &counters);
+        assert!(
+            previous.upgrade().is_none(),
+            "reused diagnostics must not pin the obsolete loaded program"
+        );
+        assert_eq!(formatted(&current), expected);
+    }
+}

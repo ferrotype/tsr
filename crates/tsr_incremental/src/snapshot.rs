@@ -258,6 +258,36 @@ pub struct ProgramDiagnostics {
 }
 
 impl ProgramDiagnostics {
+    /// Transfer an unchanged cache entry to the next program when all of
+    /// its file references can be rebound. Otherwise keep the old owner
+    /// until affected-file invalidation removes the entry; a diagnostic may
+    /// still refer to a deleted file while the new snapshot is being built.
+    pub(crate) fn rebind_for_reuse(&self, program: &Arc<Program>) -> Result<Option<Self>, Error> {
+        if Arc::ptr_eq(&self.program, program) {
+            return Ok(None);
+        }
+        let diagnostics = self.diagnostics_for(program)?;
+        fn belongs_to(diagnostic: &Diagnostic, program: &Program) -> bool {
+            diagnostic.file.is_none_or(|file| {
+                program.file_of_node(file).is_some() || program.config_source(file).is_some()
+            }) && diagnostic
+                .message_chain
+                .iter()
+                .all(|d| belongs_to(d, program))
+                && diagnostic
+                    .related_information
+                    .iter()
+                    .all(|d| belongs_to(d, program))
+        }
+        Ok(diagnostics
+            .iter()
+            .all(|d| belongs_to(d, program))
+            .then(|| Self {
+                program: program.clone(),
+                diagnostics,
+            }))
+    }
+
     /// The diagnostics with their files, chains' and related information's
     /// files as `program` holds them. Each program parses its files into
     /// owners of its own, so a program that parsed an unchanged file again
