@@ -768,8 +768,9 @@ is still open.
    `tsr_` prefix (`tsr_incremental` exists since Phase 3 and is registered
    as published), and the command line is published under the reserved
    names, the `tsr` crate on crates.io and the `tsrust` organisation on npm,
-   not as a crate called `tsc`. The workspace's binary target is still named
-   `tsc`, as decision 11 stages it.
+   not as a crate called `tsc`. The installed command is `tsrust`: two
+   unrelated npm packages already install a command called `tsr`. The
+   workspace's binary target is still named `tsc`, as decision 11 stages it.
 6. **Profiling.** `--pprofDir` is accepted and reports that profiling is not
    available in this build; `pprof.go` moves to Phase 7, beside the
    benchmarking work, and no `tsr_pprof` crate is created now. The
