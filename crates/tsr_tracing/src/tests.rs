@@ -94,7 +94,7 @@ fn observe(fs: &dyn FileSystem) -> Vec<ObservedEvent> {
 }
 
 #[test]
-// port: tsc/internal/tracing/tracing_test.go:TestConcurrentDurationEventsUseSeparateThreadIDs
+// source: tsc/internal/tracing/tracing_test.go:TestConcurrentDurationEventsUseSeparateThreadIDs
 fn concurrent_duration_events_have_matching_ends_names_and_per_thread_nesting() {
     let fs = fs();
     let tr = start_tracing(fs.clone(), b"/trace", b"", true).unwrap();
@@ -173,7 +173,7 @@ fn concurrent_duration_events_have_matching_ends_names_and_per_thread_nesting() 
 }
 
 #[test]
-// port: tsc/internal/tracing/tracing_test.go:TestThreadIDsAreStableAcrossFirstSeenOrder
+// source: tsc/internal/tracing/tracing_test.go:TestThreadIDsAreStableAcrossFirstSeenOrder
 fn thread_ids_are_stable_across_first_seen_order_in_written_events() {
     let collect = |paths: [&str; 2]| {
         let fs = fs();

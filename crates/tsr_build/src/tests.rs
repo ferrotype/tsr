@@ -189,7 +189,7 @@ fn names(paths: &[JsString]) -> Vec<String> {
 }
 
 #[test]
-// port: tsc/internal/execute/build/graph_test.go:TestBuildOrderGenerator
+// source: tsc/internal/execute/build/graph_test.go:TestBuildOrderGenerator
 fn pinned_graph_order_diamonds_cycles_and_watch_edges() {
     // The nine graph orders in pinned build/graph_test.go.
     let dependencies: &[(&str, &[&str])] = &[
@@ -261,7 +261,7 @@ fn pinned_graph_order_diamonds_cycles_and_watch_edges() {
 }
 
 #[test]
-// port: tsc/internal/execute/build/buildtask_contentmapper_test.go:TestIsContentMapperSupplementalBuildInfoPath
+// source: tsc/internal/execute/build/buildtask_contentmapper_test.go:TestIsContentMapperSupplementalBuildInfoPath
 fn pinned_supplemental_paths_require_numeric_index_and_supported_extension() {
     for (path, expected) in [
         ("/src/app.vue.0.ts", true),

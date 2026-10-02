@@ -177,3 +177,28 @@ also passed (35 tests, including that additional regression). These use bounded
 fixtures; no full scenario, native build, live session or sanitizer execution
 ran, and no acceptance evidence was re-recorded. The integration is complete;
 the actual acceptance runs listed above remain pending.
+
+## Latest-change review and CI repairs — 2026-10-03
+
+The 59 pinned Go test references now use `source:` comments, preserving their
+test-roster provenance without claiming production port coverage. The function
+audit still has the same 1,007 dispositions and the native roster still has
+169 ported tests. The isolated S10 consumer lockfile adds the missing
+`tsr_tspath` dependency edge; no dependency versions change. The command entry
+borrows the compilation inputs to satisfy the four `tsr_execute` Clippy errors.
+
+The CLI's mimalloc change exposed two additional defects. ThreadSanitizer now
+selects `tsr/system-allocator`; replay checks both the Cargo artifact's feature
+and the actual compiler invocation. Ordinary builds keep mimalloc. Allocation
+snapshots sample cumulative released bytes before allocated bytes, avoiding
+the cross-shard underflow caused by sampling net live-byte counters during a
+cross-thread free. Concurrent samples remain estimates, and the documentation
+no longer claims that 64 reused shards can never contend.
+
+Four allocator regressions and scoped warnings-denied Clippy pass with each
+allocator. The isolated consumer resolves with its lockfile unchanged, and
+`tsr_execute` Clippy and both command-entry unit tests pass. All 163 Phase 4
+tooling tests, workspace formatting, tracker validation and the audit/roster
+checks pass. No full capture or sanitizer execution was run for these repairs.
+The full scenario comparison remains the historical result recorded in
+`first-comparison.json`; its two TS6059 differences are still open.

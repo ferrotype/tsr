@@ -102,7 +102,7 @@ mod tests {
         )
     }
     #[test]
-    // port: tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherRoutesUnsupportedDirectories
+    // source: tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherRoutesUnsupportedDirectories
     fn routes_only_filesystem_unsupported_watches() {
         let primary = Arc::new(Fake {
             failure: Some((b"/mnt/fuse".to_vec(), Error::FilesystemUnsupported)),
@@ -133,7 +133,7 @@ mod tests {
         assert!(lock(&secondary.active).is_empty());
     }
     #[test]
-    // port: tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherDoesNotFallbackForUnrelatedError
+    // source: tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherDoesNotFallbackForUnrelatedError
     fn unrelated_errors_do_not_fallback() {
         let primary = Arc::new(Fake {
             failure: Some((Vec::new(), Error::Unavailable)),
@@ -147,7 +147,7 @@ mod tests {
         assert!(lock(&secondary.active).is_empty());
     }
     #[test]
-    // port: tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherDoesNotUseSecondaryOnHappyPath
+    // source: tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherDoesNotUseSecondaryOnHappyPath
     fn supported_filesystem_does_not_initialize_secondary() {
         let primary = Arc::new(Fake::default());
         let watches = watch_directories(
@@ -160,7 +160,7 @@ mod tests {
         drop(watches);
     }
     #[test]
-    // port: tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherRollsBackRoutedWatchesOnFailure
+    // source: tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherRollsBackRoutedWatchesOnFailure
     fn rollback_closes_primary_and_routed_watches() {
         let primary = Arc::new(Fake {
             failure: Some((b"/mnt".to_vec(), Error::FilesystemUnsupported)),

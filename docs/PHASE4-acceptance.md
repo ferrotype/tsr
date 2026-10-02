@@ -33,7 +33,9 @@ capture cannot supply that build. The five runs compare raw transcripts and
 row states; this does not replace the separate baseline-parity gate.
 
 ThreadSanitizer uses the pinned nightly, `-Zsanitizer=thread`, `-Zbuild-std`
-and the system allocator. It retains actual compiler invocations, Cargo
+and the system allocator. The CLI uses `tsr/system-allocator` in this build;
+ordinary CLI builds retain mimalloc. Replay checks the feature in both Cargo
+artifacts and the actual compiler arguments. It retains compiler invocations, Cargo
 artifact mappings, test discovery and test output, and the complete scenario
 run. An empty suite, skipped required tests or a sanitizer report cannot
 certify the gate. This command does not install a nightly or replace the

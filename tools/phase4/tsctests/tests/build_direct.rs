@@ -160,7 +160,7 @@ fn output(sys: &RecordingSystem) -> String {
 }
 
 #[test]
-// port: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildLifecycle
+// source: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildLifecycle
 fn content_mapper_build_lifecycle() {
     let sys = system(
         r#"{"compilerOptions":{"composite":true},"contentMappers":[{"package":"mapper","extensions":[".vue"]}]}"#,
@@ -175,7 +175,7 @@ fn content_mapper_build_lifecycle() {
 }
 
 #[test]
-// port: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperSupplementalDiagnosticUsesOriginalFileName
+// source: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperSupplementalDiagnosticUsesOriginalFileName
 fn supplemental_diagnostic_uses_original_file_name() {
     let sys = system(
         r#"{"compilerOptions":{"noEmit":true},"contentMappers":[{"package":"mapper","extensions":[".astro"]}]}"#,
@@ -195,7 +195,7 @@ fn supplemental_diagnostic_uses_original_file_name() {
 }
 
 #[test]
-// port: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildDetectsNewPhysicalSupplementalFile
+// source: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildDetectsNewPhysicalSupplementalFile
 fn build_detects_new_physical_supplemental_file() {
     let sys = system(
         r#"{"compilerOptions":{"incremental":true},"files":["app.vue"],"contentMappers":[{"package":"mapper","extensions":[".vue"]}]}"#,
@@ -228,7 +228,7 @@ fn build_detects_new_physical_supplemental_file() {
 }
 
 #[test]
-// port: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildIdentityFailureExitStatus
+// source: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildIdentityFailureExitStatus
 fn build_identity_failure_exit_status() {
     let sys = system(
         r#"{"compilerOptions":{"composite":true},"contentMappers":[{"package":"mapper","extensions":[".vue"]}]}"#,
@@ -272,7 +272,7 @@ fn read_config(files: &[(&str, &str)]) -> tsr_tsoptions::ParsedCommandLine {
 }
 
 #[test]
-// port: tsc/internal/execute/tsc/extendedconfigcache_test.go:TestExtendedConfigCacheExtendsCircularity
+// source: tsc/internal/execute/tsc/extendedconfigcache_test.go:TestExtendedConfigCacheExtendsCircularity
 fn extended_config_cache_extends_circularity() {
     for files in [
         vec![
@@ -297,7 +297,7 @@ fn extended_config_cache_extends_circularity() {
 }
 
 #[test]
-// port: tsc/internal/execute/tsc/extendedconfigcache_test.go:TestExtendedConfigCacheNullExtendsDoesNotPanic
+// source: tsc/internal/execute/tsc/extendedconfigcache_test.go:TestExtendedConfigCacheNullExtendsDoesNotPanic
 fn extended_config_cache_null_extends_does_not_panic() {
     assert!(!read_config(&[
         ("/project/tsconfig.json", r#"{"extends":null}"#),
@@ -356,7 +356,7 @@ fn assert_process_counts(sys: &RecordingSystem, spawns: usize, closes: usize) {
 }
 
 #[test]
-// port: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperWatchLifecycle
+// source: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperWatchLifecycle
 fn content_mapper_watch_lifecycle() {
     for args in [
         vec!["--watch", "--runExternalCode"],
@@ -416,7 +416,7 @@ fn content_mapper_watch_lifecycle() {
 }
 
 #[test]
-// port: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperSupplementalCollisionWatch
+// source: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperSupplementalCollisionWatch
 fn content_mapper_supplemental_collision_watch() {
     let sys = system(
         r#"{"compilerOptions":{"noLib":true},"contentMappers":[{"package":"mapper","extensions":[".vue"]}]}"#,
@@ -479,18 +479,18 @@ fn dynamic_mapper_watch_dependency(build: bool) {
     assert_process_counts(&sys, 1, 0);
 }
 #[test]
-// port: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestDynamicContentMapperWatchDependency
+// source: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestDynamicContentMapperWatchDependency
 fn dynamic_content_mapper_watch_dependency() {
     dynamic_mapper_watch_dependency(false);
 }
 #[test]
-// port: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestDynamicContentMapperBuildWatchDependency
+// source: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestDynamicContentMapperBuildWatchDependency
 fn dynamic_content_mapper_build_watch_dependency() {
     dynamic_mapper_watch_dependency(true);
 }
 
 #[test]
-// port: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperMixedWatchBatchForcesFullRebuild
+// source: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperMixedWatchBatchForcesFullRebuild
 fn content_mapper_mixed_watch_batch_forces_full_rebuild() {
     let sys = system(
         r#"{"compilerOptions":{"noLib":true},"contentMappers":[{"package":"mapper","extensions":[".vue"]}]}"#,
@@ -555,7 +555,7 @@ fn symlinked_mapper_system() -> Arc<RecordingSystem> {
     )
 }
 #[test]
-// port: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildWatchSymlinkedManifestChange
+// source: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildWatchSymlinkedManifestChange
 fn content_mapper_build_watch_symlinked_manifest_change() {
     let sys = symlinked_mapper_system();
     let ctx = CancelOnDrop::new();
@@ -577,7 +577,7 @@ fn content_mapper_build_watch_symlinked_manifest_change() {
     assert_process_counts(&sys, 2, 1);
 }
 #[test]
-// port: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildWatchSymlinkedManifestDelete
+// source: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildWatchSymlinkedManifestDelete
 fn content_mapper_build_watch_symlinked_manifest_delete() {
     let sys = symlinked_mapper_system();
     let ctx = CancelOnDrop::new();
@@ -601,7 +601,7 @@ fn content_mapper_build_watch_symlinked_manifest_delete() {
 }
 
 #[test]
-// port: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildWatchSharedLifecycle
+// source: tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildWatchSharedLifecycle
 fn content_mapper_build_watch_shared_lifecycle() {
     let sys = system(
         r#"{"files":[],"references":[{"path":"a"},{"path":"b"}]}"#,

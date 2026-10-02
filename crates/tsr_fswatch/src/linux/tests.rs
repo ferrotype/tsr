@@ -289,7 +289,7 @@ fn unstarted_fanotify() -> LinuxBackend {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyShutdownBeforeStart
+// source: tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyShutdownBeforeStart
 fn fanotify_shutdown_before_start() {
     let backend = unstarted_fanotify();
     backend.shutdown();
@@ -299,7 +299,7 @@ fn fanotify_shutdown_before_start() {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyBackendSelection
+// source: tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyBackendSelection
 fn fanotify_backend_selection() {
     if !fanotify_available() {
         eprintln!("skip: fanotify not available");
@@ -315,7 +315,7 @@ fn fanotify_backend_selection() {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifySubscribeCleansUpAfterMarkFailure
+// source: tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifySubscribeCleansUpAfterMarkFailure
 fn fanotify_subscribe_cleans_up_after_mark_failure() {
     let directory = crate::test_support::TempDir::new();
     let path = directory.0.as_os_str().as_bytes();
@@ -331,7 +331,7 @@ fn fanotify_subscribe_cleans_up_after_mark_failure() {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyParseDfidNameRoundTrip
+// source: tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyParseDfidNameRoundTrip
 fn fanotify_handle_key_round_trip() {
     let directory = crate::test_support::TempDir::new();
     let path = directory.0.as_os_str().as_bytes();
@@ -348,7 +348,7 @@ fn fanotify_handle_key_round_trip() {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fanotify_linux_test.go:TestFanotifyCrossWatcherSameFs
+// source: tsc/internal/fswatch/fanotify_linux_test.go:TestFanotifyCrossWatcherSameFs
 fn fanotify_cross_watcher_same_filesystem() {
     if !fanotify_available() {
         eprintln!("skip: fanotify not available");
@@ -417,7 +417,7 @@ fn fanotify_cross_watcher_same_filesystem() {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyMaybeWrapUnsupportedFilesystem
+// source: tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyMaybeWrapUnsupportedFilesystem
 fn fanotify_unsupported_filesystem_keeps_tag_and_errno() {
     for errno in [rustix::io::Errno::OPNOTSUPP, rustix::io::Errno::NODEV] {
         let wrapped = ffi::unsupported(errno).context_prefix("name_to_handle_at");
@@ -433,7 +433,7 @@ fn fanotify_unsupported_filesystem_keeps_tag_and_errno() {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyMarkENODEVTagged
+// source: tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyMarkENODEVTagged
 fn fanotify_mark_enodev_is_tagged() {
     let error = ffi::unsupported(rustix::io::Errno::NODEV);
     assert!(error.is_filesystem_unsupported());
@@ -444,7 +444,7 @@ fn fanotify_mark_enodev_is_tagged() {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyUnsupportedTagSurvivesDirWatchError
+// source: tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyUnsupportedTagSurvivesDirWatchError
 fn fanotify_unsupported_tag_survives_directory_watch_error() {
     let inner = ffi::unsupported(rustix::io::Errno::OPNOTSUPP).context_prefix("name_to_handle_at");
     let backend = unstarted_fanotify();

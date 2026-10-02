@@ -102,7 +102,7 @@ fn js(value: &str) -> JsString {
 }
 
 #[test]
-// port: tsc/internal/execute/tsc/emit_test.go:TestIncrementalDeclarationEmitTimeIsExcludedFromCheckTime
+// source: tsc/internal/execute/tsc/emit_test.go:TestIncrementalDeclarationEmitTimeIsExcludedFromCheckTime
 fn incremental_declaration_emit_time_is_excluded_from_check_time() {
     let mut files = MemoryBuilder::new(b"/project", true);
     files.insert_loaded(b"/lib/lib.d.ts",b"interface Array<T> {} interface Boolean {} interface CallableFunction {} interface Function {} interface IArguments {} interface NewableFunction {} interface Number {} interface Object {} interface RegExp {} interface String {}".as_slice());

@@ -786,7 +786,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "crates/tsr_execute/src/compile.rs:282",
+     "site": "crates/tsr_execute/src/compile.rs:278",
      "test": "crates/tsr_execute/src/compile.rs::content_mapper_logger_environment_variable"
     }
    ],

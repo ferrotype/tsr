@@ -70,11 +70,11 @@ impl tsr_incremental::CompilerHost for CompilationHost {
 /// port: tsc/internal/execute/tsc.go:performIncrementalCompilation
 pub(crate) fn perform_compilation(
     ctx: &Context,
-    sys: Arc<dyn System>,
-    config: ParsedCommandLine,
-    report: DiagnosticReporter,
+    sys: &Arc<dyn System>,
+    config: &ParsedCommandLine,
+    report: &DiagnosticReporter,
     mut times: CompileTimes,
-    testing: Option<Arc<dyn CommandLineTesting>>,
+    testing: Option<&dyn CommandLineTesting>,
 ) -> Result<CommandLineResult, Error> {
     let incremental = config.options.is_incremental();
     let mapper_host = config.options.run_external_code.is_true().then(|| {
@@ -116,13 +116,13 @@ pub(crate) fn perform_compilation(
     let old_program = if incremental {
         let start = sys.now();
         let reader = tsr_incremental::new_build_info_reader(host.clone());
-        let old = tsr_incremental::read_build_info_program(&config, reader.as_ref(), host.as_ref());
+        let old = tsr_incremental::read_build_info_program(config, reader.as_ref(), host.as_ref());
         times.build_info_read_time = tsc::elapsed(sys.now(), start);
         old
     } else {
         None
     };
-    let tracing = tsc::start_tracing_if_needed(sys.as_ref(), &config, testing.as_deref());
+    let tracing = tsc::start_tracing_if_needed(sys.as_ref(), config, testing);
     let start = sys.now();
     let counters = Counters::new();
     let mut cache = FileCache::new();
@@ -144,11 +144,7 @@ pub(crate) fn perform_compilation(
     )?);
     tsc::report_resolution_trace(
         &program,
-        &tsc::get_trace_with_writer_from_sys(
-            sys.writer(),
-            config.locale().clone(),
-            testing.as_deref(),
-        ),
+        &tsc::get_trace_with_writer_from_sys(sys.writer(), config.locale().clone(), testing),
     );
     let program = Arc::new(CheckedProgram::new(program, &counters, None));
     times.parse_time = tsc::elapsed(sys.now(), start);
@@ -196,17 +192,17 @@ pub(crate) fn perform_compilation(
         program_like,
         program: &program,
         incremental: incremental_program.as_ref(),
-        config: &config,
-        report_diagnostic: &report,
+        config,
+        report_diagnostic: report,
         writer: None,
         skip_error_summary: false,
         write_file: None,
         testing_m_times_cache: None,
         times: &mut times,
-        testing: testing.as_deref(),
+        testing,
     })?;
     tsc::stop_tracing(sys.as_ref(), tracing.as_deref(), &program);
-    if let (Some(testing), Some(program)) = (&testing, &incremental_program) {
+    if let (Some(testing), Some(program)) = (testing, &incremental_program) {
         testing.on_program(program);
     }
     Ok(CommandLineResult {
@@ -279,7 +275,7 @@ mod logger_tests {
     }
 
     #[test]
-    // port: tsc/internal/execute/tsc/emit_test.go:TestContentMapperLoggerEnvironmentVariable
+    // source: tsc/internal/execute/tsc/emit_test.go:TestContentMapperLoggerEnvironmentVariable
     fn content_mapper_logger_environment_variable() {
         let mut sys = LoggingSystem {
             enabled: false,

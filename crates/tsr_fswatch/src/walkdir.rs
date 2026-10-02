@@ -76,7 +76,7 @@ mod tests {
         assert!(include_entry(1, b"child"));
     }
     #[test]
-    // port: tsc/internal/fswatch/walkdir_test.go:TestWalkDirDoesNotFollowSymlinkedDir
+    // source: tsc/internal/fswatch/walkdir_test.go:TestWalkDirDoesNotFollowSymlinkedDir
     fn recursion_does_not_follow_descendant_symlinks() {
         let temp = crate::test_support::TempDir::new();
         let dir = &temp.0;
@@ -95,7 +95,7 @@ mod tests {
             .any(|(path, is_dir)| path.ends_with(b"/link") && !*is_dir));
     }
     #[test]
-    // port: tsc/internal/fswatch/walkdir_test.go:TestWalkDirDoesNotFollowRootSymlinkedDir
+    // source: tsc/internal/fswatch/walkdir_test.go:TestWalkDirDoesNotFollowRootSymlinkedDir
     fn root_symlink_is_not_followed() {
         let temp = crate::test_support::TempDir::new();
         let target = crate::test_support::TempDir::new();
@@ -127,7 +127,7 @@ mod tests {
         assert!(!found.iter().any(|(path, _)| path.ends_with(b"/deep")));
     }
     #[test]
-    // port: tsc/internal/fswatch/walkdir_test.go:TestWalkDirMissingDir
+    // source: tsc/internal/fswatch/walkdir_test.go:TestWalkDirMissingDir
     fn missing_root_fails_before_callback() {
         let temp = crate::test_support::TempDir::new();
         assert!(walk_dir(
@@ -138,7 +138,7 @@ mod tests {
         .is_err());
     }
     #[test]
-    // port: tsc/internal/fswatch/walkdir_test.go:TestWalkDirNotADir
+    // source: tsc/internal/fswatch/walkdir_test.go:TestWalkDirNotADir
     fn non_directory_root_fails_before_callback() {
         let temp = crate::test_support::TempDir::new();
         std::fs::write(temp.0.join("file"), b"x").unwrap();
@@ -150,7 +150,7 @@ mod tests {
         .is_err());
     }
     #[test]
-    // port: tsc/internal/fswatch/walkdir_test.go:TestWalkDirEntries
+    // source: tsc/internal/fswatch/walkdir_test.go:TestWalkDirEntries
     fn recursive_walk_reports_all_files_and_directories() {
         let temp = crate::test_support::TempDir::new();
         std::fs::write(temp.0.join("a.txt"), b"a").unwrap();
@@ -182,7 +182,7 @@ mod tests {
         assert_eq!(found.len(), 4);
     }
     #[test]
-    // port: tsc/internal/fswatch/walkdir_test.go:TestWalkDirCallback
+    // source: tsc/internal/fswatch/walkdir_test.go:TestWalkDirCallback
     fn callback_distinguishes_root_subdirectories_and_files() {
         let temp = crate::test_support::TempDir::new();
         std::fs::create_dir(temp.0.join("sub")).unwrap();
@@ -208,7 +208,7 @@ mod tests {
         );
     }
     #[test]
-    // port: tsc/internal/fswatch/walkdir_test.go:TestWalkDirCallbackError
+    // source: tsc/internal/fswatch/walkdir_test.go:TestWalkDirCallbackError
     fn callback_error_stops_before_visiting_descendants() {
         let temp = crate::test_support::TempDir::new();
         std::fs::create_dir(temp.0.join("sub")).unwrap();
@@ -221,7 +221,7 @@ mod tests {
         assert_eq!(visits, 1);
     }
     #[test]
-    // port: tsc/internal/fswatch/walkdir_test.go:TestWalkDirIgnoresUnreadableSubdir
+    // source: tsc/internal/fswatch/walkdir_test.go:TestWalkDirIgnoresUnreadableSubdir
     fn unreadable_descendants_are_skipped_when_permissions_are_enforced() {
         use std::os::unix::fs::PermissionsExt;
         let temp = crate::test_support::TempDir::new();

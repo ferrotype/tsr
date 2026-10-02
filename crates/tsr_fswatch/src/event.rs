@@ -185,7 +185,7 @@ mod tests {
         (events, error)
     }
     #[test]
-    // port: tsc/internal/fswatch/eventlist_test.go:TestEventListCreateThenDelete
+    // source: tsc/internal/fswatch/eventlist_test.go:TestEventListCreateThenDelete
     fn create_then_delete_cancels_the_event_but_keeps_pending_entry() {
         let e = EventList::default();
         e.create(b"a");
@@ -194,7 +194,7 @@ mod tests {
         assert!(drain(&e).0.is_empty());
     }
     #[test]
-    // port: tsc/internal/fswatch/eventlist_test.go:TestEventListDeleteThenCreate
+    // source: tsc/internal/fswatch/eventlist_test.go:TestEventListDeleteThenCreate
     fn delete_then_create_is_an_update() {
         let e = EventList::default();
         e.remove(b"a");
@@ -208,7 +208,7 @@ mod tests {
         );
     }
     #[test]
-    // port: tsc/internal/fswatch/eventlist_test.go:TestEventListCreateDeleteCreate
+    // source: tsc/internal/fswatch/eventlist_test.go:TestEventListCreateDeleteCreate
     fn create_delete_create_is_an_update() {
         let e = EventList::default();
         e.create(b"a");
@@ -223,7 +223,7 @@ mod tests {
         );
     }
     #[test]
-    // port: tsc/internal/fswatch/eventlist_test.go:TestEventListErrorIsLatchedAndCleared
+    // source: tsc/internal/fswatch/eventlist_test.go:TestEventListErrorIsLatchedAndCleared
     fn first_error_is_latched_and_cleared_by_the_production_drain() {
         let e = EventList::default();
         assert!(lock(&e.0).error.is_none());
@@ -237,7 +237,7 @@ mod tests {
         assert!(lock(&e.0).error.is_none());
     }
     #[test]
-    // port: tsc/internal/fswatch/eventlist_test.go:TestEventListDrainIsAtomic
+    // source: tsc/internal/fswatch/eventlist_test.go:TestEventListDrainIsAtomic
     fn drain_takes_events_and_error_together_then_clears_both() {
         let e = EventList::default();
         e.create(b"a");
@@ -261,7 +261,7 @@ mod tests {
         assert_eq!(drain(&e), (Vec::new(), None));
     }
     #[test]
-    // port: tsc/internal/fswatch/eventlist_test.go:TestEventListDrainReturnsErrorWithEvents
+    // source: tsc/internal/fswatch/eventlist_test.go:TestEventListDrainReturnsErrorWithEvents
     fn drain_returns_error_alongside_events() {
         let e = EventList::default();
         e.create(b"file.txt");
@@ -277,7 +277,7 @@ mod tests {
         assert_eq!(error, Some(Error::Overflow));
     }
     #[test]
-    // port: tsc/internal/fswatch/eventlist_test.go:TestEventListDrainForSequences
+    // source: tsc/internal/fswatch/eventlist_test.go:TestEventListDrainForSequences
     fn later_subscription_sees_deletion_of_an_earlier_pending_create() {
         let e = EventList::default();
         e.create(b"file.txt");

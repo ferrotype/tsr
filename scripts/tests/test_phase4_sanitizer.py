@@ -65,10 +65,13 @@ class Receipt(unittest.TestCase):
                                                    "sha256": sanitizer.digest(payload), "test": test}
                 events.append({"reason": "compiler-artifact", "target": {"name": target["name"], "kind": [target["kind"]],
                                "src_path": "/original/checkout/" + target["source"]}, "profile": {"test": test},
-                               "executable": path, "fresh": False})
+                               "executable": path, "fresh": False,
+                               "features": [sanitizer.SYSTEM_ALLOCATOR_FEATURE] if target["package"] == "tsr" else []})
                 args = ["--crate-name", target["name"], target["source"], "--target", self.report["target"], sanitizer.FLAGS]
                 if test:
                     args.append("--test")
+                if target["package"] == "tsr":
+                    args += ["--cfg", 'feature="' + sanitizer.SYSTEM_ALLOCATOR_FEATURE + '"']
                 self.audit(identity.replace(":", "-"), args, {path: sanitizer.digest(payload)})
                 if test:
                     names = self.names(target)
@@ -217,6 +220,26 @@ class Receipt(unittest.TestCase):
                          lambda value: value["arguments"].remove(sanitizer.FLAGS))
         self.verify(pattern="lacks ThreadSanitizer")
 
+    def test_cli_cargo_artifact_must_select_system_allocator(self):
+        path = self.directory / "processes/tests-build/stdout"
+        events = sanitizer.read_events(path)
+        for event in events:
+            if event.get("target", {}).get("name") == "tsrust":
+                event["features"] = []
+        path.write_bytes(b"\n".join(sanitizer.canonical(event) for event in events) + b"\n")
+        self.bind()
+        self.verify(pattern="CLI Cargo artifact did not select the system allocator")
+
+    def test_cli_compiler_must_select_system_allocator_even_when_cargo_claims_it(self):
+        self.mutate_json("compiler-audit/test-tsr-bin-tsrust.json",
+                         lambda value: value["arguments"].remove('feature="' + sanitizer.SYSTEM_ALLOCATOR_FEATURE + '"'))
+        self.verify(pattern="CLI compiler invocation did not select the system allocator")
+
+    def test_cli_feature_in_check_cfg_is_not_an_enabled_feature(self):
+        self.mutate_json("compiler-audit/test-tsr-bin-tsrust.json",
+                         lambda value: value["arguments"].__setitem__(value["arguments"].index("--cfg"), "--check-cfg"))
+        self.verify(pattern="CLI compiler invocation did not select the system allocator")
+
     def test_absent_std_audit_fails_even_if_build_std_was_requested(self):
         (self.directory / "compiler-audit/std.json").unlink()
         self.bind()
@@ -274,6 +297,13 @@ class Receipt(unittest.TestCase):
 
 
 class EnvironmentAndFailure(unittest.TestCase):
+    def test_only_cli_test_build_selects_system_allocator_feature(self):
+        report = {"nightly": sanitizer.nightly(), "target": "x86_64-unknown-linux-gnu",
+                  "compiler": {"path": "/rustc"}, "capture_root": "/capture"}
+        test = sanitizer.cargo_command(report, True)
+        self.assertEqual(test[test.index("--features") + 1], "tsr/system-allocator")
+        self.assertNotIn("--features", sanitizer.cargo_command(report, False))
+
     def test_environment_keeps_homes_offline_and_registry_config(self):
         base = {"CARGO_HOME": "/existing/cargo", "RUSTUP_HOME": "/existing/rustup", "CARGO_NET_OFFLINE": "true",
                 "CARGO_REGISTRIES_CORPORATE_INDEX": "https://mirror.example/index", "RUSTFLAGS": "-Zsanitizer=address",

@@ -17,7 +17,7 @@ fn recorded(entry: &WatchSnapshot) -> (Vec<crate::event::PendingEvent>, Option<E
 }
 
 #[test]
-// port: tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestNormalizeNFC
+// source: tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestNormalizeNFC
 fn normalization_preserves_pinned_byte_boundaries() {
     for (input, expected) in [
         ("", ""),
@@ -53,14 +53,14 @@ fn normalization_preserves_pinned_byte_boundaries() {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestNormalizeNFCASCIIFastPath
+// source: tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestNormalizeNFCASCIIFastPath
 fn normalize_ascii_fast_path_preserves_input() {
     let path = b"/var/folders/abc/def/hello.txt";
     assert_eq!(canonicalize(path), path);
 }
 
 #[test]
-// port: tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestIsASCII
+// source: tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestIsASCII
 fn ascii_predicate_matches_pinned_byte_cases() {
     // Rust's byte-slice predicate replaces the pin's byte loop directly.
     for (input, expected) in [
@@ -78,7 +78,7 @@ fn ascii_predicate_matches_pinned_byte_cases() {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsOverflowMatchesWatch
+// source: tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsOverflowMatchesWatch
 fn overflow_and_display_use_component_boundaries_and_both_roots() {
     let entry = snapshot(b"/logical/root", b"/physical/root");
     for path in [
@@ -227,7 +227,7 @@ fn rename_checks_once_for_aliases_and_terminates_only_deleted_roots() {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsSharedStreamFallsBackToChunks
+// source: tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsSharedStreamFallsBackToChunks
 fn shared_stream_first_then_chunk_fallback_and_failure_rollback() {
     let watches: Vec<_> = (0..1025)
         .rev()
@@ -274,7 +274,7 @@ fn shared_stream_first_then_chunk_fallback_and_failure_rollback() {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestWatchesForFSEventsPaths
+// source: tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestWatchesForFSEventsPaths
 fn watches_for_paths_selects_only_exact_physical_roots() {
     let watches: Vec<_> = [b"/watch/a".as_slice(), b"/watch/b", b"/watch/c"]
         .into_iter()
@@ -405,7 +405,7 @@ fn assert_no_native_path(receiver: &NativeReceiver, path: &[u8]) {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsSharedStreamAcrossWatches
+// source: tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsSharedStreamAcrossWatches
 fn native_five_directory_subscriptions_share_one_stream() {
     let root = TempDir::new();
     let (watcher, backend) = native_watcher();
@@ -421,7 +421,7 @@ fn native_five_directory_subscriptions_share_one_stream() {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsSharedStreamRoutesEvents
+// source: tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsSharedStreamRoutesEvents
 fn native_shared_stream_routes_both_siblings_without_leaking_events() {
     use std::os::unix::ffi::OsStrExt;
     let root = TempDir::new();
@@ -464,7 +464,7 @@ fn consolidated_parent(
 }
 
 #[test]
-// port: tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsConsolidatedWatchValidatesLogicalRoot
+// source: tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsConsolidatedWatchValidatesLogicalRoot
 fn native_consolidated_watch_validates_missing_and_file_roots() {
     use std::os::unix::ffi::OsStrExt;
     let root = TempDir::new();
@@ -490,7 +490,7 @@ fn native_consolidated_watch_validates_missing_and_file_roots() {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsConsolidatedWatchTerminatesLogicalRoot
+// source: tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsConsolidatedWatchTerminatesLogicalRoot
 fn native_consolidated_watch_delivers_delete_and_terminal_error_for_logical_root() {
     use std::os::unix::ffi::OsStrExt;
     use std::time::{Duration, Instant};
@@ -526,7 +526,7 @@ fn native_consolidated_watch_delivers_delete_and_terminal_error_for_logical_root
 }
 
 #[test]
-// port: tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestFSEventsNFDOnDiskNFCSubscribe
+// source: tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestFSEventsNFDOnDiskNFCSubscribe
 fn native_nfd_directory_subscription_reports_nfc_child_paths() {
     use std::os::unix::ffi::OsStrExt;
     use std::time::{Duration, Instant};
@@ -607,7 +607,7 @@ fn native_shared_stream_routes_to_siblings_and_rolls_back_invalid_batch() {
 }
 
 #[test]
-// port: tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestFSEventsNFDOnDiskNFCWatchFile
+// source: tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestFSEventsNFDOnDiskNFCWatchFile
 fn native_nfd_file_reaches_nfc_filter_and_close_releases_watch() {
     use std::os::unix::ffi::OsStrExt;
     use std::sync::mpsc;

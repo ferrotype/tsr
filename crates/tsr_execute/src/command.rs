@@ -238,7 +238,7 @@ fn compilation(
             },
         );
     }
-    crate::compile::perform_compilation(ctx, sys, config, reporter, times, testing)
+    crate::compile::perform_compilation(ctx, &sys, &config, &reporter, times, testing.as_deref())
 }
 
 /// port: tsc/internal/execute/tsc.go:findConfigFile

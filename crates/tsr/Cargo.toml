@@ -11,6 +11,10 @@ description = "Native TypeScript compiler command line"
 name = "tsrust"
 path = "src/main.rs"
 
+[features]
+# Instrumentation must use the allocator intercepted by ThreadSanitizer.
+system-allocator = []
+
 [dependencies]
 tsr_execute = { path = "../tsr_execute" }
 tsr_tsc = { path = "../tsr_tsc" }

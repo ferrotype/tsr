@@ -39,7 +39,8 @@ FLAGS = "-Zsanitizer=thread"
 TSAN_OPTIONS = "halt_on_error=1:exitcode=66"
 JOBS = 4
 TEST_FILTERS = ("PHASE3_INCREMENTAL_CASE",)
-SYSTEM_ALLOCATOR_SHA256 = "f95a03c520bbc7bd1d2cade8ae6593ee57de79765adb75c682708a4e81b47640"
+SYSTEM_ALLOCATOR_FEATURE = "system-allocator"
+COUNTING_ALLOCATOR_SHA256 = "4fd661085728fb4f2773cc176bf9b73c6f1dbe5a219cf134fdf018b324377282"
 SOURCE_PATTERNS = ("crates/**/*", "tools/phase4/**/*", "tools/**/*.rs",
                    "tools/**/Cargo.toml", "xtask/Cargo.toml", "Cargo.toml", "Cargo.lock",
                    "rust-toolchain*", ".cargo/**/*", "scripts/phase4_sanitizer.py",
@@ -270,7 +271,8 @@ def cargo_command(report, test):
               "--config", "build.rustc-wrapper=" + json.dumps(report["capture_root"] + "/rustc-wrapper"),
               "--config", 'build.rustc-workspace-wrapper=""']
     if test:
-        prefix += ["--no-run", "--lib", "--bins", "--tests"]
+        prefix += ["--no-run", "--lib", "--bins", "--tests",
+                   "--features", "tsr/" + SYSTEM_ALLOCATOR_FEATURE]
         for package in PACKAGES:
             prefix += ["--package", package]
     else:
@@ -301,6 +303,9 @@ def built_images(directory, report, test):
                    and target.get("src_path") == str(Path(report["source_root"]) / item["source"])]
         require(len(matches) == 1, "unexpected Cargo executable target")
         item = matches[0]
+        if item["package"] == "tsr":
+            require(event.get("features") == [SYSTEM_ALLOCATOR_FEATURE],
+                    "CLI Cargo artifact did not select the system allocator")
         key = target_id(item)
         require(key not in rows, "duplicate Cargo executable target")
         image = Path(event["executable"])
@@ -403,11 +408,17 @@ def audit_images(directory, report, images):
         require(any(checksum == actual and ("--test" in row["arguments"]) is image["test"]
                     and FLAGS in row["arguments"] and "--target" in row["arguments"]
                     for row, checksum in candidates), "copied image is not the audited instrumented artifact")
+        if image["package"] == "tsr":
+            feature = 'feature="' + SYSTEM_ALLOCATOR_FEATURE + '"'
+            require(all(("--cfg", feature) in zip(row["arguments"], row["arguments"][1:])
+                        for row, _ in candidates),
+                    "CLI compiler invocation did not select the system allocator")
 
 
 def allocator_policy():
-    # Rust defaults to System. The sole selected production override forwards
-    # every operation to System; bind its complete bytes to this reviewed policy.
+    # Rust defaults to System. The CLI explicitly selects its System forwarding
+    # branch; bind the reviewed selector and forwarding implementation here, and
+    # separately verify the feature on Cargo artifacts and actual compiler calls.
     paths = []
     for pattern in ("crates/*/src/**/*.rs", "tools/phase4/tsctests/**/*.rs"):
         paths += [p.relative_to(ROOT).as_posix() for p in ROOT.glob(pattern)
@@ -416,13 +427,15 @@ def allocator_policy():
             "review changed global allocator declarations before sanitizer capture")
     allocation = ROOT / "crates/tsr/src/allocation.rs"
     text = allocation.read_text()
-    require(digest(allocation.read_bytes()) == SYSTEM_ALLOCATOR_SHA256,
+    require(digest(allocation.read_bytes()) == COUNTING_ALLOCATOR_SHA256,
             "system allocator implementation needs policy review")
     require("unsafe impl GlobalAlloc for CountingAllocator" in text
-            and all("System." + name + "(" in text for name in ("alloc", "alloc_zeroed", "dealloc", "realloc"))
+            and '#[cfg(feature = "system-allocator")]\nuse std::alloc::System as InnerAllocator;' in text
+            and all("InnerAllocator." + name + "(" in text for name in ("alloc", "alloc_zeroed", "dealloc", "realloc"))
             and "CountingAllocator" in (ROOT / "crates/tsr/src/main.rs").read_text(),
             "CLI allocator must forward to the system allocator")
     return {"default": "std::alloc::System", "tsr": "CountingAllocator forwarding to System",
+            "tsr_feature": SYSTEM_ALLOCATOR_FEATURE,
             "source_sha256": digest(allocation.read_bytes())}
 
 
