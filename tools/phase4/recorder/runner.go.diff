@@ -1,0 +1,41 @@
+--- tsc/internal/execute/tsctests/runner.go	sha256:bbecc535f8270773709f455f809e5e8b03db67367b11ecfd4a7fd7ad0b0a5f29
++++ tsc/internal/execute/tsctests/runner.go	phase4 scenario recorder
+@@ -73,6 +73,7 @@
+ 		// initial test tsc compile
+ 		baselineBuilder := &strings.Builder{}
+ 		sys := newTestSys(test, false)
++		recording := phase4BeginScenario(test, scenario, sys)
+ 		fmt.Fprint(
+ 			baselineBuilder,
+ 			"currentDirectory::",
+@@ -98,7 +99,9 @@
+ 			wg.Queue(func() {
+ 				baselineBuilder.WriteString(fmt.Sprintf("\n\nEdit [%d]:: %s\n", index, do.caption))
+ 				if do.edit != nil {
++					recording.beginEdit(sys, index, index)
+ 					do.edit(sys)
++					recording.endEdit(sys, index, index)
+ 				}
+ 				changedPaths := sys.fsDiffer.ChangedPaths()
+ 				sys.baselineFSwithDiff(baselineBuilder)
+@@ -118,9 +121,12 @@
+ 			wg.Queue(func() {
+ 				// Compute build with all the edits
+ 				nonIncrementalSys = newTestSys(test, true)
++				recording.beginShadow(test, nonIncrementalSys, index)
+ 				for i := range index + 1 {
+ 					if test.edits[i].edit != nil {
++						recording.beginEdit(nonIncrementalSys, index, i)
+ 						test.edits[i].edit(nonIncrementalSys)
++						recording.endEdit(nonIncrementalSys, index, i)
+ 					}
+ 				}
+ 				execute.CommandLine(ctx, nonIncrementalSys, commandLineArgs, nonIncrementalSys)
+@@ -139,6 +145,7 @@
+ 				unexpectedDiff.WriteString(fmt.Sprintf("Edit [%d]:: %s\n!!! Diff not found but explanation present, please review and remove the explanation !!!\n", index, do.caption))
+ 			}
+ 		}
++		recording.finish(baselineBuilder.String())
+ 		baseline.Run(t, strings.ReplaceAll(test.subScenario, " ", "-")+".js", baselineBuilder.String(), baseline.Options{Subfolder: filepath.Join(test.getBaselineSubFolder(), scenario)})
+ 		if unexpectedDiff.String() != "" {
+ 			t.Errorf("Test %s has unexpected diff %s with incremental build, please review the baseline file", test.subScenario, unexpectedDiff.String())

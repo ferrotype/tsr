@@ -1,0 +1,77 @@
+--- tsc/internal/execute/tsctests/sys.go	sha256:cb677acfda37b813a6139c92950c84dac2d1a72e8f05758145d9026630481f3c
++++ tsc/internal/execute/tsctests/sys.go	phase4 scenario recorder
+@@ -110,6 +110,7 @@
+ 	sys.fs.writtenFiles.Range(func(key string) bool {
+ 		if text, ok := sys.fsFromFileMap().ReadFile(key); ok {
+ 			files[key] = text
++			phase4NoteBuiltFile(files, commandLineArgs, key)
+ 		}
+ 		return true
+ 	})
+@@ -181,7 +182,9 @@
+ )
+ 
+ func (s *TestSys) Now() time.Time {
+-	return s.clock.Now()
++	now := s.clock.Now()
++	phase4OnNow(s, now)
++	return now
+ }
+ 
+ func (s *TestSys) SinceStart() time.Duration {
+@@ -564,18 +567,21 @@
+ }
+ 
+ func (s *TestSys) writeFileNoError(path string, content string) {
++	defer phase4Operation(s, "write", path, &content)()
+ 	if err := s.fsFromFileMap().WriteFile(path, content); err != nil {
+ 		panic(err)
+ 	}
+ }
+ 
+ func (s *TestSys) removeNoError(path string) {
++	defer phase4Operation(s, "remove", path, nil)()
+ 	if err := s.fsFromFileMap().Remove(path); err != nil {
+ 		panic(err)
+ 	}
+ }
+ 
+ func (s *TestSys) readFileNoError(path string) string {
++	defer phase4Helper(s, "readFileNoError")()
+ 	content, ok := s.fsFromFileMap().ReadFile(path)
+ 	if !ok {
+ 		panic("File not found: " + path)
+@@ -584,28 +590,33 @@
+ }
+ 
+ func (s *TestSys) renameFileNoError(oldPath string, newPath string) {
++	defer phase4Helper(s, "renameFileNoError")()
+ 	s.writeFileNoError(newPath, s.readFileNoError(oldPath))
+ 	s.removeNoError(oldPath)
+ }
+ 
+ func (s *TestSys) replaceFileText(path string, oldText string, newText string) {
++	defer phase4Helper(s, "replaceFileText")()
+ 	content := s.readFileNoError(path)
+ 	content = strings.Replace(content, oldText, newText, 1)
+ 	s.writeFileNoError(path, content)
+ }
+ 
+ func (s *TestSys) replaceFileTextAll(path string, oldText string, newText string) {
++	defer phase4Helper(s, "replaceFileTextAll")()
+ 	content := s.readFileNoError(path)
+ 	content = strings.ReplaceAll(content, oldText, newText)
+ 	s.writeFileNoError(path, content)
+ }
+ 
+ func (s *TestSys) appendFile(path string, text string) {
++	defer phase4Helper(s, "appendFile")()
+ 	content := s.readFileNoError(path)
+ 	s.writeFileNoError(path, content+text)
+ }
+ 
+ func (s *TestSys) prependFile(path string, text string) {
++	defer phase4Helper(s, "prependFile")()
+ 	content := s.readFileNoError(path)
+ 	s.writeFileNoError(path, text+content)
+ }

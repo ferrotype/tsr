@@ -1,0 +1,19 @@
+--- tsc/internal/execute/tsctests/fs.go	sha256:31c3642e5a190c48c21c9fa1f8a813e7dc5da807de514d990fc6fd1d8832e3e2
++++ tsc/internal/execute/tsctests/fs.go	phase4 scenario recorder
+@@ -2,6 +2,7 @@
+ 
+ import (
+ 	"fmt"
++	"time"
+ 
+ 	"github.com/microsoft/TypeScript/tsc/internal/collections"
+ 	"github.com/microsoft/TypeScript/tsc/internal/core"
+@@ -88,3 +89,8 @@
+ 	f.removeIgnoreLibPath(path)
+ 	return f.FS.Remove(path)
+ }
++
++func (f *testFs) Chtimes(path string, aTime time.Time, mTime time.Time) error {
++	phase4OnChtimes(f, path, aTime, mTime)
++	return f.FS.Chtimes(path, aTime, mTime)
++}
