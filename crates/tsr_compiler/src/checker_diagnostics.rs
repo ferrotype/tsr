@@ -163,14 +163,25 @@ impl Program {
         if self.options().no_emit.is_true() {
             diagnostics.retain(|diagnostic| !diagnostic.skipped_on_no_emit);
         }
-        if !self.skip_type_checking(file, false)? {
-            let source = file.bound().view().source_file()?;
-            let include = self
-                .include_diagnostics_for_file(source.parse_options().path.as_bytes())?
-                .to_vec();
-            diagnostics.extend(preceding_directives(&source, include)?.0);
-        }
+        diagnostics.extend(self.include_processor_diagnostics(file)?);
         Ok(diagnostics)
+    }
+
+    /// The include processor's diagnostics of `file`, filtered by its
+    /// comment directives; none for a file type checking skips.
+    // port: tsc/internal/compiler/program.go:Program.GetIncludeProcessorDiagnostics
+    pub fn include_processor_diagnostics(
+        &self,
+        file: &ProgramFile,
+    ) -> Result<Vec<Diagnostic>, Error> {
+        if self.skip_type_checking(file, false)? {
+            return Ok(Vec::new());
+        }
+        let source = file.bound().view().source_file()?;
+        let include = self
+            .include_diagnostics_for_file(source.parse_options().path.as_bytes())?
+            .to_vec();
+        Ok(preceding_directives(&source, include)?.0)
     }
 }
 

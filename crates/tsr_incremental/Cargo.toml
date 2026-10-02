@@ -1,0 +1,43 @@
+[package]
+name = "tsr_incremental"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = ["crates-io"]
+description = "The incremental program and its build info (tsBuildInfo) for tsr"
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme = "README.md"
+include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
+
+[dependencies]
+tsr_arena = { version = "0.1.0", path = "../tsr_arena" }
+tsr_ast = { version = "0.1.0", path = "../tsr_ast" }
+tsr_checker = { version = "0.1.0", path = "../tsr_checker" }
+tsr_compiler = { version = "0.1.0", path = "../tsr_compiler" }
+tsr_contentmapper = { version = "0.1.0", path = "../tsr_contentmapper" }
+tsr_core = { version = "0.1.0", path = "../tsr_core" }
+tsr_diagnostics = { version = "0.1.0", path = "../tsr_diagnostics" }
+tsr_json = { version = "0.1.0", path = "../tsr_json" }
+tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
+tsr_module = { version = "0.1.0", path = "../tsr_module" }
+tsr_tsoptions = { version = "0.1.0", path = "../tsr_tsoptions" }
+tsr_tspath = { version = "0.1.0", path = "../tsr_tspath" }
+tsr_vfs = { version = "0.1.0", path = "../tsr_vfs" }
+xxhash-rust = { version = "=0.8.18", features = ["xxh3"] }
+
+[dev-dependencies]
+# The build-info witness (tests/buildinfo_witness.rs) loads its programs with
+# the corpus executor (tools/s08/p4/executor.rs) and reads the native fixture.
+serde_json = "1"
+sha2 = "0.10"
+tsr_bundled = { version = "0.1.0", path = "../tsr_bundled" }
+tsr_contentmappertest = { path = "../tsr_contentmappertest" }
+tsr_ipc = { version = "0.1.0", path = "../tsr_ipc" }
+tsr_locale = { version = "0.1.0", path = "../tsr_locale" }
+tsr_parser = { version = "0.1.0", path = "../tsr_parser" }
+
+[lints]
+workspace = true

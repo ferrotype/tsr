@@ -970,6 +970,7 @@ dependencies = [
  "tsr_contentmappertest",
  "tsr_core",
  "tsr_diagnostics",
+ "tsr_incremental",
  "tsr_ipc",
  "tsr_json",
  "tsr_jsstring",
@@ -1085,6 +1086,33 @@ name = "tsr_glob"
 version = "0.1.0"
 dependencies = [
  "tsr_jsstring",
+]
+
+[[package]]
+name = "tsr_incremental"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "sha2",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_bundled",
+ "tsr_checker",
+ "tsr_compiler",
+ "tsr_contentmapper",
+ "tsr_contentmappertest",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_ipc",
+ "tsr_json",
+ "tsr_jsstring",
+ "tsr_locale",
+ "tsr_module",
+ "tsr_parser",
+ "tsr_tsoptions",
+ "tsr_tspath",
+ "tsr_vfs",
+ "xxhash-rust",
 ]
 
 [[package]]

@@ -351,3 +351,12 @@ pub fn initialization_diagnostic(label: &JsString, error: &Error) -> Diagnostic 
         .push(Arc::new(Diagnostic::compiler(message, args)));
     diagnostic
 }
+
+/// A fileless diagnostic for a project setup or mapper initialization error.
+// port: tsc/internal/compiler/fileloader.go:ContentMapperProjectDiagnostic
+pub fn content_mapper_project_diagnostic(error: &Error) -> Diagnostic {
+    if error.initialize_error().is_some() {
+        return initialization_diagnostic(&JsString::default(), error);
+    }
+    Diagnostic::compiler(project_error_message(error), Vec::new())
+}

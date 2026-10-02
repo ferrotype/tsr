@@ -10,12 +10,21 @@
 //! its files and roots. The pin's post-emit program would emit before its
 //! diagnostics are collected; a declaration file has no JavaScript output,
 //! so no transform reaches the checker first and the pre-emit collection is
-//! the post-emit one.
+//! the post-emit one. An `incremental` program is the harness's incremental
+//! program (`createProgram`, `incremental.rs`).
 use super::baselines::{DeclarationCompilationContext, Failure};
 use serde_json::{json, Value};
 use std::sync::Arc;
 use tsr_compiler as ts_compiler_error;
-use tsr_compiler::{CheckedProgram, FileCache, Program, ProgramOptions};
+use tsr_compiler::{CheckedProgram, FileCache, Program, ProgramLike, ProgramOptions};
+
+// The corpus row's emit (`emit.rs`) uses the whole of it; the baselines
+// example only the declaration program's.
+#[path = "incremental.rs"]
+#[allow(dead_code)]
+mod incremental;
+#[allow(unused_imports)]
+pub use incremental::{create_program, HarnessProgram};
 
 // The witness also loads these through the S08 executor, whose modules are
 // private to it.
@@ -123,7 +132,7 @@ pub fn loading_request(
 /// The declaration program, loaded and checked, and its harness diagnostics
 /// sorted and deduplicated.
 pub struct Compiled {
-    pub checked: CheckedProgram,
+    pub checked: Arc<CheckedProgram>,
     pub diagnostics: Vec<tsr_ast::Diagnostic>,
 }
 
@@ -187,9 +196,10 @@ pub fn compile_checked(
         &counters,
     )
     .map_err(CompileError::Load)?;
-    let checked = CheckedProgram::new(Arc::new(program), &counters, None);
-    let diagnostics =
-        harness_diagnostics(&checked, capture_suggestions).map_err(CompileError::Diagnostics)?;
+    let checked = Arc::new(CheckedProgram::new(Arc::new(program), &counters, None));
+    let created = create_program(checked.clone()).map_err(CompileError::Diagnostics)?;
+    let diagnostics = harness_diagnostics(created.program_like(), capture_suggestions)
+        .map_err(CompileError::Diagnostics)?;
     Ok(Compiled {
         checked,
         diagnostics,
@@ -201,21 +211,21 @@ pub fn compile_checked(
 /// collected the same way.
 // source: tsc/internal/testutil/harnessutil/harnessutil.go:compileFilesWithHost
 pub fn harness_diagnostics(
-    checked: &CheckedProgram,
+    program_like: &dyn ProgramLike,
     capture_suggestions: bool,
 ) -> Result<Vec<tsr_ast::Diagnostic>, ts_compiler_error::Error> {
-    let program = checked.program();
+    let program = program_like.checked_program().program();
     let request = tsr_checker::CheckerRequest::default();
-    let mut values = program.config_file_parsing_diagnostics();
-    values.extend_from_slice(program.program_diagnostics()?);
-    values.extend(program.syntactic_diagnostics(None)?);
-    values.extend(checked.semantic_diagnostics(&request, None)?);
-    values.extend(checked.global_diagnostics()?);
-    if program.options().emit_declarations() {
-        values.extend(checked.declaration_diagnostics(&request, None)?);
+    let mut values = program_like.config_file_parsing_diagnostics();
+    values.extend(program_like.program_diagnostics()?);
+    values.extend(program_like.syntactic_diagnostics(&request, None)?);
+    values.extend(program_like.semantic_diagnostics(&request, None)?);
+    values.extend(program_like.global_diagnostics(&request)?);
+    if program_like.options().emit_declarations() {
+        values.extend(program_like.declaration_diagnostics(&request, None)?);
     }
     if capture_suggestions {
-        values.extend(checked.suggestion_diagnostics(&request, None)?);
+        values.extend(program_like.suggestion_diagnostics(&request, None)?);
     }
     program.sort_and_deduplicate_diagnostics(&values)
 }

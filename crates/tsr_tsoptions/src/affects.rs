@@ -117,3 +117,83 @@ pub fn compiler_options_affect_semantic_diagnostics(
         field.affects_semantic_diagnostics
     })
 }
+
+/// The option declarations whose `AffectsBuildInfo` is set
+/// (`tsoptions/declscompiler.go`), in declaration order: the incremental
+/// program records their values in its build info. The build-info witness
+/// (`crates/tsr_incremental/tests/buildinfo_witness.rs`) checks this list
+/// against the pin's declarations.
+pub const AFFECTS_BUILD_INFO: &[&str] = &[
+    "declaration",
+    "declarationMap",
+    "emitDeclarationOnly",
+    "sourceMap",
+    "inlineSourceMap",
+    "assumeChangesOnlyAffectDirectDependencies",
+    "target",
+    "module",
+    "allowJs",
+    "checkJs",
+    "jsx",
+    "outFile",
+    "outDir",
+    "rootDir",
+    "composite",
+    "tsBuildInfoFile",
+    "removeComments",
+    "importHelpers",
+    "downlevelIteration",
+    "verbatimModuleSyntax",
+    "isolatedDeclarations",
+    "erasableSyntaxOnly",
+    "strict",
+    "noImplicitAny",
+    "strictNullChecks",
+    "strictFunctionTypes",
+    "strictBindCallApply",
+    "strictPropertyInitialization",
+    "strictBuiltinIteratorReturn",
+    "noImplicitThis",
+    "useUnknownInCatchVariables",
+    "alwaysStrict",
+    "stableTypeOrdering",
+    "noUnusedLocals",
+    "noUnusedParameters",
+    "exactOptionalPropertyTypes",
+    "noImplicitReturns",
+    "noFallthroughCasesInSwitch",
+    "noUncheckedIndexedAccess",
+    "noImplicitOverride",
+    "noPropertyAccessFromIndexSignature",
+    "allowSyntheticDefaultImports",
+    "esModuleInterop",
+    "allowUmdGlobalAccess",
+    "allowImportingTsExtensions",
+    "rewriteRelativeImportExtensions",
+    "noUncheckedSideEffectImports",
+    "sourceRoot",
+    "mapRoot",
+    "inlineSources",
+    "experimentalDecorators",
+    "emitDecoratorMetadata",
+    "jsxImportSource",
+    "reactNamespace",
+    "skipDefaultLibCheck",
+    "emitBOM",
+    "newLine",
+    "noErrorTruncation",
+    "stripInternal",
+    "noEmitHelpers",
+    "noEmitOnError",
+    "preserveConstEnums",
+    "declarationDir",
+    "skipLibCheck",
+    "allowUnusedLabels",
+    "allowUnreachableCode",
+    "useDefineForClassFields",
+];
+
+/// Whether the declaration named `declaration` has `AffectsBuildInfo`.
+pub fn affects_build_info(declaration: &str) -> bool {
+    AFFECTS_BUILD_INFO.contains(&declaration)
+}

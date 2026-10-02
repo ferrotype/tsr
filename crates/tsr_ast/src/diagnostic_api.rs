@@ -9,6 +9,11 @@ use tsr_core::TextRange;
 use tsr_diagnostics::AdHocMessage;
 use tsr_locale::Locale;
 
+/// `RepopulateModeMismatch`: the chain entry is the mode-mismatch details.
+pub const REPOPULATE_MODE_MISMATCH: i32 = 1;
+/// `RepopulateModuleNotFound`: the chain entry is the module-not-found chain.
+pub const REPOPULATE_MODULE_NOT_FOUND: i32 = 2;
+
 /// Go's `RepopulateDiagnosticInfo`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RepopulateDiagnosticInfo {
