@@ -727,15 +727,19 @@ register rebuilt from evidence, never edited. `cargo xtask run tsc` and
 
 ## 8. Owner decisions
 
-Fifteen proposals. Each stands as written unless the owner changes it.
+Fifteen proposals. On 2026-10-02 the owner confirmed eight of them as
+written (1, 2, 8, 10, 11, 13, 14 and 15), marked below; the other seven (3,
+4, 5, 6, 7, 9 and 12) are still open.
 
 1. **Names.** Checkpoints X0 to X7, sprints `P4A` and `P4B`, producer `tsc`,
    data under `data/phase4/`.
+   **Confirmed.**
 2. **The scenarios are recorded from the pin**, by an overlay over the pinned
    test package, and verified by reproduction and replay (X0). The committed
    references are the authority, so baseline parity needs no native capture.
    The alternative, transcribing the 380 declarations and their closures by
    hand, is more work and cannot be proven faithful.
+   **Confirmed.**
 3. **Ordering against Phase 3.** X1, X2, X3 and X5 cannot close before
    Phase 3's T8, and the P4B exit requires P3B. Proposed for one implementer:
    Phase 3 first; X0, X4 and the emit-free part of X1 may be taken while a
@@ -770,6 +774,7 @@ Fifteen proposals. Each stands as written unless the owner changes it.
    system allocator, over the harness suite, the race tests and the Phase 4
    crates' tests; recorded at X7 on this host and run by a scheduled CI job
    on Linux, not on every pull request.
+   **Confirmed.**
 9. **Linux evidence.** inotify and fanotify can be witnessed only on Linux.
    The `fswatch` roster, the live-watch witness and the smoke test run in
    CI's Linux job, which enforces their metrics; the recorded run on this
@@ -779,23 +784,28 @@ Fifteen proposals. Each stands as written unless the owner changes it.
     interoperability witness compare the Rust binary with the pinned Go
     binary on the same host at X7. They are observations the `tsc` producer
     takes, not committed captures.
+    **Confirmed.**
 11. **The binary.** X7 stages the release binary as `lib/tsc` and, on Linux,
     checks the ELF's versioned symbols against glibc 2.28 in CI: the first
     native binary is the place for PLAN's item 15. The run on a glibc 2.28
     image, the second Linux architecture, the size budget and cut-over stay
     Phase 7's.
+    **Confirmed.**
 12. **`--lsp` and `--api`.** The binary recognizes both; until Phases 5 and 6
     supply the servers it says the mode is not available and exits with
     `NotImplemented` (5). `runLSP`, `runAPI`, the parent-process watchdog and
     `isProcessAlive` are `later` with those owners.
 13. **Performance.** One bounded timing capture at X7 on the smoke fixture,
     beside Go's, no threshold.
+    **Confirmed.**
 14. **Evidence.** Phase 4's changes stale the recorded `checker` and `emit`
     runs and the producers that bind the option-declaration generator.
     Nothing is re-recorded per fix; X7's green-up re-records them, and the
     recordings are the owner's.
+    **Confirmed.**
 15. **The mapper child process** is ported here with `cmd/tsc/sys.go`,
     amending C7's record, which named Phase 5.
+    **Confirmed.**
 
 X0 starts on this plan once the decisions are settled; the X0 record
 (`docs/PHASE4-X0.md`) carries the measured costs, the first run and the
