@@ -50,6 +50,12 @@
       "reason": "Repository-only Phase 1 syntax test harness"
     },
     {
+      "name": "phase4_tsctests",
+      "manifest": "tools/phase4/tsctests/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only Phase 4 command-line test harness"
+    },
+    {
       "name": "s08_relater_prototype",
       "manifest": "tools/s08/relater-prototype/Cargo.toml",
       "publish": false,

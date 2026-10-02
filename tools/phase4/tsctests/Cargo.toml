@@ -1,0 +1,35 @@
+[package]
+name = "phase4_tsctests"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Phase 4 X0: the pinned tsctests harness (fake system, file-system differ, readable build info, mock watch backend, runner) over the recorded scenarios"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "phase4_tsctests"
+path = "src/main.rs"
+
+[dependencies]
+serde_json = "1"
+sha2 = "0.10"
+tsr_compiler = { path = "../../../crates/tsr_compiler" }
+tsr_contentmapper = { path = "../../../crates/tsr_contentmapper" }
+tsr_contentmappertest = { path = "../../../crates/tsr_contentmappertest" }
+tsr_core = { path = "../../../crates/tsr_core" }
+tsr_diagnostics = { path = "../../../crates/tsr_diagnostics" }
+tsr_incremental = { path = "../../../crates/tsr_incremental" }
+tsr_ipc = { path = "../../../crates/tsr_ipc" }
+tsr_json = { path = "../../../crates/tsr_json" }
+tsr_jsstring = { path = "../../../crates/tsr_jsstring" }
+tsr_locale = { path = "../../../crates/tsr_locale" }
+tsr_tsoptions = { path = "../../../crates/tsr_tsoptions" }
+tsr_tspath = { path = "../../../crates/tsr_tspath" }
+tsr_vfs = { path = "../../../crates/tsr_vfs" }
+
+[lints]
+workspace = true

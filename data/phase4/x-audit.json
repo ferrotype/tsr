@@ -3890,16 +3890,15 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 1,
-    "pending": 11,
+    "mapped": 0,
+    "pending": 12,
     "total": 12
    },
    "functions": {
     "tsc/internal/execute/tsc.go:CommandLine": {
-     "rust": [
-      "tools/phase4/tsctests/src/execute.rs:46"
-     ],
-     "status": "mapped"
+     "owner": "X1",
+     "reason": "not yet ported",
+     "status": "pending"
     },
     "tsc/internal/execute/tsc.go:findConfigFile": {
      "owner": "X1",
@@ -4445,91 +4444,91 @@
    "functions": {
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setAffectedFilesPendingEmit": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:559"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:562"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setChangeFileSet": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:508"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:511"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setEmitDiagnostics": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:543"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:546"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setEmitSignatures": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:585"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:588"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setFileIdsList": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:484"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:487"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setFileInfos": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:439"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:442"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setReferencedMap": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:494"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:497"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setResolvedRoot": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:601"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:604"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setRoot": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:463"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:466"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setSemanticDiagnostics": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:518"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:521"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.toFilePath": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:382"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:385"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.toFilePathSet": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:387"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:390"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.toReadableBuildInfoDiagnostic": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:392"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:395"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.toReadableBuildInfoDiagnosticsOfFile": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:428"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:431"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfoDiagnosticsOfFile.MarshalJSON": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:251"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:254"
      ],
      "status": "mapped"
     },
@@ -4540,7 +4539,7 @@
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfoFilePendingEmit.MarshalJSON": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:287"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:290"
      ],
      "status": "mapped"
     },
@@ -4551,7 +4550,7 @@
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfoResolvedRoot.MarshalJSON": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:325"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:328"
      ],
      "status": "mapped"
     },
@@ -4562,7 +4561,7 @@
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfoSemanticDiagnostic.MarshalJSON": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:270"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:273"
      ],
      "status": "mapped"
     },
@@ -4573,19 +4572,19 @@
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:toReadableBuildInfo": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:338"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:341"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:toReadableBuildInfoRepopulateInfo": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:615"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:618"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:toReadableFileEmitKind": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:629"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:632"
      ],
      "status": "mapped"
     }
@@ -4605,25 +4604,25 @@
    "functions": {
     "tsc/internal/execute/tsctests/runner.go:getDiffForIncremental": {
      "rust": [
-      "tools/phase4/tsctests/src/runner.rs:307"
+      "tools/phase4/tsctests/src/runner.rs:315"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/runner.go:tscInput.executeCommand": {
      "rust": [
-      "tools/phase4/tsctests/src/runner.rs:102"
+      "tools/phase4/tsctests/src/runner.rs:103"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/runner.go:tscInput.getBaselineSubFolder": {
      "rust": [
-      "tools/phase4/tsctests/src/runner.rs:257"
+      "tools/phase4/tsctests/src/runner.rs:265"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/runner.go:tscInput.run": {
      "rust": [
-      "tools/phase4/tsctests/src/runner.rs:120"
+      "tools/phase4/tsctests/src/runner.rs:121"
      ],
      "status": "mapped"
     }
@@ -4643,271 +4642,271 @@
    "functions": {
     "tsc/internal/execute/tsctests/sys.go:GetFileMapWithBuild": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:170"
+      "tools/phase4/tsctests/src/sys.rs:177"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:NewTscSystem": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:157"
+      "tools/phase4/tsctests/src/sys.rs:160"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestClock.Now": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:99"
+      "tools/phase4/tsctests/src/sys.rs:102"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestClock.SinceStart": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:127"
+      "tools/phase4/tsctests/src/sys.rs:130"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.DefaultLibraryPath": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:449"
+      "tools/phase4/tsctests/src/sys.rs:462"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.ErrorWriter": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:464"
+      "tools/phase4/tsctests/src/sys.rs:477"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.FS": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:444"
+      "tools/phase4/tsctests/src/sys.rs:457"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.GetCurrentDirectory": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:454"
+      "tools/phase4/tsctests/src/sys.rs:467"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.GetEnvironmentVariable": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:487"
+      "tools/phase4/tsctests/src/sys.rs:500"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.GetTrace": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:655"
+      "tools/phase4/tsctests/src/sys.rs:671"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.GetWidthOfTerminal": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:477"
+      "tools/phase4/tsctests/src/sys.rs:490"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.Now": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:434"
+      "tools/phase4/tsctests/src/sys.rs:447"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnBuildStatusReportEnd": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:640"
+      "tools/phase4/tsctests/src/sys.rs:656"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnBuildStatusReportStart": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:635"
+      "tools/phase4/tsctests/src/sys.rs:651"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnEmittedFiles": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:571"
+      "tools/phase4/tsctests/src/sys.rs:584"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnListFilesEnd": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:620"
+      "tools/phase4/tsctests/src/sys.rs:636"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnListFilesStart": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:615"
+      "tools/phase4/tsctests/src/sys.rs:631"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnProgram": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:670"
+      "tools/phase4/tsctests/src/sys.rs:686"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnStatisticsEnd": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:630"
+      "tools/phase4/tsctests/src/sys.rs:646"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnStatisticsStart": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:625"
+      "tools/phase4/tsctests/src/sys.rs:641"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnWatchStatusReportEnd": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:650"
+      "tools/phase4/tsctests/src/sys.rs:666"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnWatchStatusReportStart": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:645"
+      "tools/phase4/tsctests/src/sys.rs:661"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.SinceStart": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:439"
+      "tools/phase4/tsctests/src/sys.rs:452"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.Spawn": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:538"
+      "tools/phase4/tsctests/src/sys.rs:551"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.WatchBackend": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:767"
+      "tools/phase4/tsctests/src/sys.rs:784"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.WriteOutputIsTTY": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:469"
+      "tools/phase4/tsctests/src/sys.rs:482"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.Writer": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:459"
+      "tools/phase4/tsctests/src/sys.rs:472"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.appendFile": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:411"
+      "tools/phase4/tsctests/src/sys.rs:424"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.baselineFSwithDiff": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:364"
+      "tools/phase4/tsctests/src/sys.rs:377"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.baselineOutput": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:346"
+      "tools/phase4/tsctests/src/sys.rs:359"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.baselinePrograms": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:317"
+      "tools/phase4/tsctests/src/sys.rs:328"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.clearOutput": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:358"
+      "tools/phase4/tsctests/src/sys.rs:371"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.ensureLibPathExists": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:280"
+      "tools/phase4/tsctests/src/sys.rs:287"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.fsFromFileMap": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:270"
+      "tools/phase4/tsctests/src/sys.rs:277"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.getOutput": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:353"
+      "tools/phase4/tsctests/src/sys.rs:366"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.mapFs": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:275"
+      "tools/phase4/tsctests/src/sys.rs:282"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.prependFile": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:417"
+      "tools/phase4/tsctests/src/sys.rs:430"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.readFileNoError": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:383"
+      "tools/phase4/tsctests/src/sys.rs:396"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.removeNoError": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:376"
+      "tools/phase4/tsctests/src/sys.rs:389"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.renameFileNoError": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:391"
+      "tools/phase4/tsctests/src/sys.rs:404"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.replaceFileText": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:397"
+      "tools/phase4/tsctests/src/sys.rs:410"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.replaceFileTextAll": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:404"
+      "tools/phase4/tsctests/src/sys.rs:417"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.serializeState": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:334"
+      "tools/phase4/tsctests/src/sys.rs:347"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.writeFileNoError": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:369"
+      "tools/phase4/tsctests/src/sys.rs:382"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.writeHeaderToBaseline": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:299"
+      "tools/phase4/tsctests/src/sys.rs:306"
      ],
      "status": "mapped"
     },
@@ -4919,31 +4918,31 @@
     },
     "tsc/internal/execute/tsctests/sys.go:newTestSys": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:193"
+      "tools/phase4/tsctests/src/sys.rs:200"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:outputSanitizer.addOrSkipLinesForComparing": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:903"
+      "tools/phase4/tsctests/src/sys.rs:927"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:outputSanitizer.addOutputLine": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:822"
+      "tools/phase4/tsctests/src/sys.rs:839"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:outputSanitizer.sanitizeBuildStatusTimeStamp": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:835"
+      "tools/phase4/tsctests/src/sys.rs:852"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:outputSanitizer.transformLines": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:857"
+      "tools/phase4/tsctests/src/sys.rs:874"
      ],
      "status": "mapped"
     }
@@ -5355,16 +5354,15 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 1,
-    "pending": 27,
+    "mapped": 0,
+    "pending": 28,
     "total": 28
    },
    "functions": {
     "tsc/internal/fswatch/event.go:EventKind.String": {
-     "rust": [
-      "tools/phase4/tsctests/src/execute.rs:197"
-     ],
-     "status": "mapped"
+     "owner": "X4",
+     "reason": "not yet ported",
+     "status": "pending"
     },
     "tsc/internal/fswatch/event.go:eventEntry.isDeleted": {
      "owner": "X4",
@@ -6631,8 +6629,8 @@
     "equivalent": 48,
     "gap": 0,
     "later": 27,
-    "mapped": 211,
-    "pending": 87,
+    "mapped": 210,
+    "pending": 88,
     "total": 373
    },
    "files": [
@@ -6717,8 +6715,8 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 1,
-    "pending": 197,
+    "mapped": 0,
+    "pending": 198,
     "total": 198
    },
    "files": [
@@ -6810,10 +6808,10 @@
  ],
  "pending_by_checkpoint": {
   "X0": 4,
-  "X1": 63,
+  "X1": 64,
   "X2": 3,
   "X3": 90,
-  "X4": 197,
+  "X4": 198,
   "X5": 60,
   "X6": 36,
   "X7": 0
@@ -6833,7 +6831,7 @@
     "functions": 1007,
     "harness": 5,
     "lines": 21294,
-    "marked": 479,
+    "marked": 477,
     "source": 62
    },
    "before_decisions": {
@@ -6841,7 +6839,7 @@
     "functions": 1055,
     "harness": 5,
     "lines": 22479,
-    "marked": 479,
+    "marked": 477,
     "source": 65
    },
    "ledger_out_of_scope": 10,
@@ -6863,8 +6861,8 @@
   "equivalent": 48,
   "gap": 0,
   "later": 27,
-  "mapped": 479,
-  "pending": 453,
+  "mapped": 477,
+  "pending": 455,
   "total": 1007
  },
  "unknown_markers": {},
