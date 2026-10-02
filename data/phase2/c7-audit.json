@@ -381,26 +381,6 @@
    "reason": "C3 handed it to C5; Checker.SkipAlias's port is the same test, resolving an alias symbol and returning any other symbol.",
    "rust": "crates/tsr_checker/src/services.rs:1826"
   },
-  "tsc/internal/compiler/emitHost.go:emitHost.ContentMapperExtensions": {
-   "disposition": "equivalent",
-   "reason": "Rust has no separate emit host: the output-path helpers read the program's mapper extensions, which the pinned emit host forwards.",
-   "rust": "crates/tsr_compiler/src/loader.rs:200"
-  },
-  "tsc/internal/compiler/emitter.go:emitter.emitDeclarationFile": {
-   "disposition": "later",
-   "owner": "Phase 3",
-   "reason": "Declaration printing, with the mapped file's declaration-map positions and supplemental references; the Phase 2 corpus compares diagnostics and the emit schedule, not declaration output."
-  },
-  "tsc/internal/compiler/emitter.go:emitter.getDeclarationTransformers": {
-   "disposition": "later",
-   "owner": "Phase 3",
-   "reason": "Declaration printing, with the mapped file's declaration-map positions and supplemental references; the Phase 2 corpus compares diagnostics and the emit schedule, not declaration output."
-  },
-  "tsc/internal/compiler/fileloader.go:ContentMapperProjectDiagnostic": {
-   "disposition": "later",
-   "owner": "Phase 4",
-   "reason": "Only the tsc, build and watch commands report a project setup failure this way; the harness opens its project without it."
-  },
   "tsc/internal/compiler/fileloader.go:processAllProgramFiles": {
    "disposition": "equivalent",
    "reason": "Loader::new and Loader::run split the pinned function; the mapper extensions reach the supported-extension set and the resolver as in the pin.",
@@ -421,20 +401,10 @@
    "reason": "The project the pinned host returns is the one passed to load_with_content_mapper_project.",
    "rust": "crates/tsr_compiler/src/loader.rs:142"
   },
-  "tsc/internal/compiler/program.go:GetDiagnosticsOfAnyProgram": {
-   "disposition": "later",
-   "owner": "Phase 4",
-   "reason": "The tsc command's diagnostics gathering over any program kind; the corpus reads the program's diagnostics directly."
-  },
   "tsc/internal/compiler/program.go:NewProgram": {
    "disposition": "equivalent",
    "reason": "Loader::run ends as the pin's constructor does: option verification, then the mapper projects' option diagnostics.",
    "rust": "crates/tsr_compiler/src/loader.rs:880"
-  },
-  "tsc/internal/compiler/program.go:Program.GetSourceFileFromReference": {
-   "disposition": "later",
-   "owner": "Phase 3",
-   "reason": "Serves the declaration transformer's reference paths (and later the language service); getDeclarationDiagnostics does not call it."
   },
   "tsc/internal/compiler/program.go:Program.ReuseProgram": {
    "disposition": "later",
@@ -620,21 +590,6 @@
    "disposition": "later",
    "owner": "Phase 5",
    "reason": "The spawner that records mapper project calls for the project system's lifecycle tests (with the dynamic-verbatim mapper); no compiler or conformance row runs it."
-  },
-  "tsc/internal/transformers/declarations/supplementalreferences.go:NewSupplementalReferencesTransformer": {
-   "disposition": "later",
-   "owner": "Phase 3",
-   "reason": "Part of the declaration transformers the emitter runs; getDeclarationDiagnostics runs only the declaration transformer."
-  },
-  "tsc/internal/transformers/declarations/supplementalreferences.go:SupplementalReferencesTransformer.GetDiagnostics": {
-   "disposition": "later",
-   "owner": "Phase 3",
-   "reason": "Part of the declaration transformers the emitter runs; getDeclarationDiagnostics runs only the declaration transformer."
-  },
-  "tsc/internal/transformers/declarations/supplementalreferences.go:SupplementalReferencesTransformer.TransformSourceFile": {
-   "disposition": "later",
-   "owner": "Phase 3",
-   "reason": "Part of the declaration transformers the emitter runs; getDeclarationDiagnostics runs only the declaration transformer."
   }
  },
  "groups": {

@@ -93,7 +93,7 @@
         "bind_result::local_bind::helpers::tests::entity_names_preserve_name_first_failures_and_shape_independence",
         "bind_result::local_bind::helpers::tests::kind_predicates_preserve_open_kinds_and_token_payloads",
         "bind_result::local_bind::helpers::tests::left_hand_side_skips_only_partially_emitted_wrappers",
-        "bind_result::local_bind::helpers::tests::locals_container_predicate_includes_source_roles_without_inline_locals_storage",
+        "bind_result::local_bind::helpers::tests::locals_container_predicate_follows_the_pinned_payload_embedding",
         "bind_result::local_bind::helpers::tests::modifier_helpers_read_stored_flags_and_binding_root_inheritance",
         "bind_result::local_bind::helpers::tests::semantic_getters_share_kind_shape_and_nil_contracts",
         "bind_result::local_bind::helpers::tests::shared_optional_logical_and_text_helpers_preserve_selected_reads",

@@ -7,7 +7,7 @@
  "host": "macOS-26.6.1-arm64-arm-64bit",
  "inputs": {
   "data/s04/toolchains.toml": "f7f747f45b0570c179771ba0e01e37a3fc3c1ca7e98dbf042b7eabf6d9f9c0be",
-  "data/upstream.json": "f10e50133daec561a20b528a0577dea937ce3163aa826ba212826957c86910fc",
+  "data/upstream.json": "a6c68d3fd90882498e08f6a9aa4832b571fe0ba013a4e8c04e91729c7fffe683",
   "scripts/phase3_native.py": "e1b911c2c27f725c483449beb6d55f3765b6e976e6eb22e06737d4b6afdfb4f4",
   "scripts/s04.py": "552e676a31ef745c77b1c06304e2ef0153c83c3752a045347bc1a0f7c58e554a",
   "scripts/s04_common.py": "0c9ff31e34d83cbd9c500bb9462631b862a221acfb6f85e4816d1aedbb6a68d7",
@@ -19,18 +19,18 @@
   "tools/s08/oracle/diagnostics_observer.go": "03de33614987dbef8187c150b9f3fbec5505ad3add2109614cbbfaf8ead86731"
  },
  "oracle": {
-  "binary_sha256": "bb90f3009b394624ad9b0f7c3b60e1ef09bac71272c8e1ded68cfa7fadf7614f",
+  "binary_sha256": "03159ffd62735480d7033eb66164c650a33de5bf31769cb65ea173aec5d0a7d8",
   "command": [
    "go",
    "test",
    "-c",
    "-o",
-   "/Users/cristian/git/ts-rust-phase3/target/phase3/native-single/oracle/oracle.test",
+   "/Users/cristian/git/ts-rust/target/phase3/native-single/oracle/oracle.test",
    "-trimpath",
    "-mod=readonly",
-   "-gcflags=github.com/microsoft/TypeScript/tsc/internal/repo=-trimpath=/Users/cristian/git/ts-rust-phase3/target/phase3/native-single/oracle/unmatched-prefix",
+   "-gcflags=github.com/microsoft/TypeScript/tsc/internal/repo=-trimpath=/Users/cristian/git/ts-rust/target/phase3/native-single/oracle/unmatched-prefix",
    "-overlay",
-   "/Users/cristian/git/ts-rust-phase3/target/phase3/native-single/oracle/overlay.json",
+   "/Users/cristian/git/ts-rust/target/phase3/native-single/oracle/overlay.json",
    "./internal/testrunner"
   ],
   "overlay_sha256": {

@@ -127,7 +127,12 @@ CONTENT_MAPPER_FILES = (
     "tsc/internal/testutil/contentmappertest/supplemental_module.go",
     "tsc/internal/testutil/contentmappertest/transforming.go",
 )
-FILE_PHASES = {"tsc/internal/compiler/checkerpool.go": 2} | dict.fromkeys(CONTENT_MAPPER_FILES, 2)
+# The emitter and its host are Phase 3's (docs/PHASE3-plan.md decision 1): the
+# destination audit assigned every one of their operations to Phase 3, whose
+# gate cannot close without them; program.go stays Phase 4's file.
+EMITTER_FILES = ("tsc/internal/compiler/emitter.go", "tsc/internal/compiler/emitHost.go")
+FILE_PHASES = ({"tsc/internal/compiler/checkerpool.go": 2} | dict.fromkeys(CONTENT_MAPPER_FILES, 2)
+               | dict.fromkeys(EMITTER_FILES, 3))
 
 
 def crate_for(pkg):

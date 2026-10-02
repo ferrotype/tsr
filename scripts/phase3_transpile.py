@@ -20,7 +20,10 @@ and requires the comparison to stop matching.
 
 `--native` is a capture directory (its `transpile.json`) or a recorded
 document (`data/phase3/transpile-native.json`); the default is the capture
-directory `target/phase3/transpile-native`. The native document is verified
+directory `target/phase3/transpile-native`. A run records the fingerprint of
+the Rust source closure the corpus harness is bound to
+(`phase3_corpus.sources()`), so `current` holds only while every crate the
+harness links is unchanged, not only the transpile files. The native document is verified
 before use, and is never modified: every baseline must equal the committed
 reference file, every source digest the pinned test file, and a capture
 directory's rows the recorded document's. `compare` writes
@@ -178,13 +181,28 @@ def run(native, output, binary=None):
     report = {
         "version": 1, "pin": pin(), "native": provenance,
         "harness": {"binary_sha256": digest(binary.read_bytes()),
-                    "sources": {name: digest((ROOT / name).read_bytes()) for name in SOURCES}},
+                    "sources": {name: digest((ROOT / name).read_bytes()) for name in SOURCES},
+                    "closure_sha256": closure_fingerprint()},
         "requests_sha256": digest(request_bytes), "rows_sha256": digest((output / "rows.ndjson").read_bytes()),
         "rows": len(rust), "states": dict(sorted(Counter(row["state"] for row in rust).items())),
     }
     (output / "report.json").write_bytes(json.dumps(report, indent=1, sort_keys=True).encode() + b"\n")
     print(json.dumps({key: report[key] for key in ("rows", "states")}, sort_keys=True))
     return report
+
+
+def closure_fingerprint():
+    """The fingerprint of every source the Rust harness is built from."""
+    import phase3_corpus
+    return digest(canonical(phase3_corpus.sources()))
+
+
+def current(directory):
+    """Whether the Rust run in `directory` was made from the current sources."""
+    report = strict_json_loads((Path(directory) / "report.json").read_bytes())
+    harness = report["harness"]
+    return (harness.get("closure_sha256") == closure_fingerprint()
+            and harness["sources"] == {name: digest((ROOT / name).read_bytes()) for name in SOURCES})
 
 
 def load_rust(directory, native_rows):

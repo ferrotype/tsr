@@ -252,6 +252,16 @@ class SkipList(unittest.TestCase):
                          {"filename_skip": 52, "not_enumerated": 2, "option_guard_skip": 1720})
         self.assertEqual(document["counts"]["executed"], 13432)
 
+    def test_an_inventory_refreeze_holds_only_when_the_inputs_alone_changed(self):
+        document = json.loads(inventory.INVENTORY.read_bytes())
+        history = json.loads((ROOT / "data/phase2/inventory-history.json").read_bytes())
+        accepted = informational.prior_inventories(document)
+        self.assertEqual(accepted, {entry["sha256"] for entry in history["refreezes"]})
+        changed = copy.deepcopy(document)
+        changed["rows"][0]["checkpoint"] = "C4" if changed["rows"][0]["checkpoint"] != "C4" else "C2"
+        with self.assertRaisesRegex(ValueError, "more than its inputs"):
+            informational.prior_inventories(changed)
+
     def test_a_classification_the_pinned_rules_disagree_with_fails(self):
         base = inventory.read()
         executed = next(row for row in base["rows"] if row["tier"] == "executed")

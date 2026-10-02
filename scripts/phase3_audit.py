@@ -37,6 +37,8 @@ the audit is complete only without them (T8's closure).
     build               # writes data/phase3/audit.json; exits 1 on problems
     check [--complete]  # the committed audit is current and valid (and complete)
     summary             # the table by checkpoint group
+    ledger [--check]    # PORTS.toml's Phase 3 files: ported, their Rust homes
+                        # and the emit checks that verify them (T8's closure)
 """
 from __future__ import annotations
 
@@ -383,11 +385,78 @@ def check(*, complete=False, root=ROOT, path=None):
     return found
 
 
+# The Phase 3 files that declare only interfaces, with the Rust types that
+# port them: their homes cannot come from function dispositions.
+TYPE_HOMES = {
+    "tsc/internal/printer/emithost.go": ("crates/tsr_compiler/src/emit_host.rs",),
+    "tsc/internal/printer/emitresolver.go": ("crates/tsr_printer/src/emit_resolver.rs",
+                                             "crates/tsr_printer/src/script_resolver.rs"),
+    "tsc/internal/printer/sourcefilemetadataprovider.go": ("crates/tsr_compiler/src/metadata.rs",),
+    "tsc/internal/sourcemap/source.go": ("crates/tsr_sourcemap/src/source.rs",),
+}
+# The emit run's checks that verify a file, by checkpoint group: the domains
+# its exit names (docs/PHASE3-plan.md section 4).
+VERIFY = {
+    "T1": ("run.emit.reprint_parity == 1", "run.emit.output_parity == 1"),
+    "T2": ("run.emit.sourcemap_parity == 1", "run.emit.sourcemap_record_parity == 1"),
+    "T3": ("run.emit.output_parity == 1",),
+    "T4": ("run.emit.output_parity == 1",),
+    "T5": ("run.emit.output_parity == 1",),
+    "T6": ("run.emit.output_parity == 1",),
+    "T7": ("run.emit.declaration_parity == 1",),
+    "T8": ("run.emit.output_parity == 1", "run.emit.emit_diagnostics_parity == 1"),
+}
+TRANSPILE_VERIFY = ("run.emit.transpile_parity == 1",)
+
+
+def ledger_bindings(document, ledger):
+    """Each Phase 3 file's status, Rust homes and verifying checks."""
+    bindings = {}
+    for entry in ledger["file"]:
+        if entry.get("phase") != 3:
+            continue
+        go = entry["go"]
+        audited = document["files"].get(go)
+        if audited is None:
+            raise ValueError(f"Phase 3 file {go} is not in the audit")
+        homes = {site.rpartition(":")[0] for function in audited["functions"].values()
+                 if function["status"] in ("mapped", "equivalent") for site in function.get("rust", [])}
+        if go in TYPE_HOMES:
+            if audited["functions"]:
+                raise ValueError(f"{go} declares functions; its Rust homes come from their dispositions")
+            homes.update(TYPE_HOMES[go])
+        rust = sorted(homes | set(entry.get("rust", [])))
+        if not rust:
+            raise ValueError(f"Phase 3 file {go} has no Rust home")
+        verify = TRANSPILE_VERIFY if go.startswith("tsc/internal/transpile/") else VERIFY[group_of(go)]
+        bindings[go] = {"status": "ported", "rust": rust, "verify": list(verify)}
+    return bindings
+
+
+def ledger(*, check=False, root=ROOT):
+    """Rebind PORTS.toml's Phase 3 files; with `check`, fail unless current."""
+    import phase2_dispositions
+    path = root / "PORTS.toml"
+    text = path.read_text()
+    rebound = phase2_dispositions.rebind_ledger(text, ledger_bindings(build_document(root), tomllib.loads(text)))
+    if check:
+        if rebound != text:
+            raise ValueError("PORTS.toml's Phase 3 files differ from their audit bindings; rerun ledger")
+    elif rebound != text:
+        path.write_text(rebound)
+    return rebound == text
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=("build", "check", "summary"))
+    parser.add_argument("command", choices=("build", "check", "summary", "ledger"))
     parser.add_argument("--complete", action="store_true", help="check: also require no gap and no pending function")
+    parser.add_argument("--check", action="store_true", help="ledger: fail unless PORTS.toml is current")
     args = parser.parse_args()
+    if args.command == "ledger":
+        current = ledger(check=args.check)
+        print(json.dumps({"ledger_current": current}))
+        return None
     if args.command == "build":
         document = build_document()
         AUDIT.parent.mkdir(parents=True, exist_ok=True)

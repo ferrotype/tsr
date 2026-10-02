@@ -1,0 +1,16 @@
+{
+ "comparisons": {
+  "concurrent": {
+   "native": "e99a8dccabc3a497b14beec8e147a2b28cd8298e103d9acca0dfa41173dfae60",
+   "rust": "10d330fe88102a4d4c9bc7bb52457bda730ee4c659eb9794c97127f9220a54d4"
+  },
+  "single": {
+   "native": "e99a8dccabc3a497b14beec8e147a2b28cd8298e103d9acca0dfa41173dfae60",
+   "rust": "d532efe516d90e39fd122e9f130a819bfe3ce6bc272e56bd2a8fd95c414a5d1f"
+  }
+ },
+ "count": 0,
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "rows": [],
+ "version": 1
+}

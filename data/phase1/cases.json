@@ -154124,7 +154124,7 @@
         "manifest_sha256": "a32db4ff08c688c246f36c5942dff799b6b24acda4726b5ea486e515654696b3",
         "native_sha256": "6a686b577ff5e6b6c187db91a5aedfb8213edc48e1765a421215a3049a6f315b",
         "result": "killed",
-        "results_sha256": "d30ca7d83005f020024ac36a2f26022e680579938aae52d5e999f45f6487a24d"
+        "results_sha256": "d082a74f788e7a95759ef36aa1f57508b1c9d2f67f897c04572ffdc0e08ff70c"
       },
       "mutation_gate": "python3 scripts/phase1_mutation_run.py confirm --results data/phase1/mutation/results.json.gz --plan data/phase1/mutation/manifest.json",
       "not_claimed": {
@@ -200538,7 +200538,7 @@
         "manifest_sha256": "a32db4ff08c688c246f36c5942dff799b6b24acda4726b5ea486e515654696b3",
         "native_sha256": "26e6686c6955c4add1df7c5d0d598b3afbac92d9bb08b17ba7b3153215989756",
         "result": "killed",
-        "results_sha256": "d30ca7d83005f020024ac36a2f26022e680579938aae52d5e999f45f6487a24d"
+        "results_sha256": "d082a74f788e7a95759ef36aa1f57508b1c9d2f67f897c04572ffdc0e08ff70c"
       },
       "mutation_gate": "python3 scripts/phase1_mutation_run.py confirm --results data/phase1/mutation/results.json.gz --plan data/phase1/mutation/manifest.json",
       "not_claimed": {
@@ -234326,7 +234326,7 @@
         "manifest_sha256": "a32db4ff08c688c246f36c5942dff799b6b24acda4726b5ea486e515654696b3",
         "native_sha256": "56e53eda0e4d496acc6d0d992b359b3b30132b048d02ecd3445ba35ab5851239",
         "result": "killed",
-        "results_sha256": "d30ca7d83005f020024ac36a2f26022e680579938aae52d5e999f45f6487a24d"
+        "results_sha256": "d082a74f788e7a95759ef36aa1f57508b1c9d2f67f897c04572ffdc0e08ff70c"
       },
       "mutation_gate": "python3 scripts/phase1_mutation_run.py confirm --results data/phase1/mutation/results.json.gz --plan data/phase1/mutation/manifest.json",
       "not_claimed": {},
@@ -235056,27 +235056,6 @@
         },
         {
           "control": null,
-          "file": "crates/tsr_compiler/src/program_diagnostics.rs",
-          "function": "filter_and_sort_diagnostics",
-          "key": "48a424b118ac042b",
-          "markers": {
-            "tsc/internal/compiler/program.go:filterAndSortDiagnostics": 228
-          },
-          "op": "tsc/internal/compiler/program.go:filterAndSortDiagnostics",
-          "operator": "return:Ok(Vec::new())",
-          "ops": [
-            "tsc/internal/compiler/program.go:filterAndSortDiagnostics"
-          ],
-          "site_kind": "fn",
-          "site_line": 229,
-          "span": [
-            226,
-            247
-          ],
-          "span_sha256": "fc464a70dc0f31b2a3624a6028ccd9f45b59ae0dcfb787667873a5966f030822"
-        },
-        {
-          "control": null,
           "file": "crates/tsr_compiler/src/loader.rs",
           "function": "collect_files",
           "key": "4b2ee2bf2e90f4fb",
@@ -235116,27 +235095,6 @@
             1338
           ],
           "span_sha256": "1020783bdf23847cfd8c21427ca82664c7017fe42beea367aa81b96501f6e102"
-        },
-        {
-          "control": null,
-          "file": "crates/tsr_compiler/src/loader.rs",
-          "function": "is_supported_extension",
-          "key": "5a90fa5f130fbe5c",
-          "markers": {
-            "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension": 991
-          },
-          "op": "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension",
-          "operator": "return:true",
-          "ops": [
-            "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension"
-          ],
-          "site_kind": "fn",
-          "site_line": 992,
-          "span": [
-            990,
-            1000
-          ],
-          "span_sha256": "59f44e45f80e906c1a86459cc8187204b367b8ab9e4b3e7f23b5d4b3f04868e5"
         },
         {
           "control": null,
@@ -235267,27 +235225,6 @@
         {
           "control": null,
           "file": "crates/tsr_compiler/src/loader.rs",
-          "function": "load_worker",
-          "key": "a1a5997fa4d1d6a4",
-          "markers": {
-            "tsc/internal/compiler/filesparser.go:parseTask.load": 1165
-          },
-          "op": "tsc/internal/compiler/filesparser.go:parseTask.load",
-          "operator": "param:is_lib:!is_lib",
-          "ops": [
-            "tsc/internal/compiler/filesparser.go:parseTask.load"
-          ],
-          "site_kind": "fn",
-          "site_line": 1166,
-          "span": [
-            1165,
-            1299
-          ],
-          "span_sha256": "690b2ad2ba9282e04e623431e419ab1f4068f648485768a917b2f8bd2abd707e"
-        },
-        {
-          "control": null,
-          "file": "crates/tsr_compiler/src/loader.rs",
           "function": "inferred_library_name_resolve_from",
           "key": "a4ae06c83c5064da",
           "markers": {
@@ -235309,27 +235246,6 @@
         {
           "control": null,
           "file": "crates/tsr_compiler/src/loader.rs",
-          "function": "is_supported_extension",
-          "key": "a5ec82f7712bd129",
-          "markers": {
-            "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension": 991
-          },
-          "op": "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension",
-          "operator": "return:false",
-          "ops": [
-            "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension"
-          ],
-          "site_kind": "fn",
-          "site_line": 992,
-          "span": [
-            990,
-            1000
-          ],
-          "span_sha256": "59f44e45f80e906c1a86459cc8187204b367b8ab9e4b3e7f23b5d4b3f04868e5"
-        },
-        {
-          "control": null,
-          "file": "crates/tsr_compiler/src/loader.rs",
           "function": "library_name_from_lib_file_name",
           "key": "ac125c3c84cd1dbf",
           "markers": {
@@ -235347,27 +235263,6 @@
             1707
           ],
           "span_sha256": "8747477f418f9a02e52993d817536823bd182a5092c05ff66135bc00b9a64cb1"
-        },
-        {
-          "control": null,
-          "file": "crates/tsr_compiler/src/loader.rs",
-          "function": "parse_source_file",
-          "key": "b9953f031e824b1b",
-          "markers": {
-            "tsc/internal/compiler/fileloader.go:fileLoader.parseSourceFile": 1302
-          },
-          "op": "tsc/internal/compiler/fileloader.go:fileLoader.parseSourceFile",
-          "operator": "return:Ok(None)",
-          "ops": [
-            "tsc/internal/compiler/fileloader.go:fileLoader.parseSourceFile"
-          ],
-          "site_kind": "fn",
-          "site_line": 1303,
-          "span": [
-            1300,
-            1321
-          ],
-          "span_sha256": "e4a0c76aa15b35d6b2b98037265121df72d5360c61a4f673fed740882dd5f6b5"
         },
         {
           "control": null,
@@ -235476,48 +235371,6 @@
         },
         {
           "control": null,
-          "file": "crates/tsr_compiler/src/loader.rs",
-          "function": "load_worker",
-          "key": "e69fd4a2887ddb2a",
-          "markers": {
-            "tsc/internal/compiler/filesparser.go:parseTask.load": 1165
-          },
-          "op": "tsc/internal/compiler/filesparser.go:parseTask.load",
-          "operator": "return:Ok(())",
-          "ops": [
-            "tsc/internal/compiler/filesparser.go:parseTask.load"
-          ],
-          "site_kind": "fn",
-          "site_line": 1166,
-          "span": [
-            1165,
-            1299
-          ],
-          "span_sha256": "690b2ad2ba9282e04e623431e419ab1f4068f648485768a917b2f8bd2abd707e"
-        },
-        {
-          "control": null,
-          "file": "crates/tsr_compiler/src/metadata.rs",
-          "function": "implied_node_format_for_file",
-          "key": "eb6f2c02c4387ddc",
-          "markers": {
-            "tsc/internal/ast/utilities.go:GetImpliedNodeFormatForFile": 50
-          },
-          "op": "tsc/internal/ast/utilities.go:GetImpliedNodeFormatForFile",
-          "operator": "wrap_newtype:^1",
-          "ops": [
-            "tsc/internal/ast/utilities.go:GetImpliedNodeFormatForFile"
-          ],
-          "site_kind": "fn",
-          "site_line": 51,
-          "span": [
-            50,
-            65
-          ],
-          "span_sha256": "382184d7afbac4e70b935d02737cfab10ab689b6497de851b83160acfcf0ccf9"
-        },
-        {
-          "control": null,
           "file": "crates/tsr_compiler/src/metadata.rs",
           "function": "jsx_implicit_import_base",
           "key": "ec526c08043d500e",
@@ -235560,8 +235413,8 @@
         }
       ],
       "mutation_evidence": {
-        "claims_sha256": "808670a3f444199133ca9bef9481b290f704a5714a9f3d39502d546690d07fbd",
-        "go_reach_sha256": "5d2ea4461ff7369e204bf25fd56b6a729ad4b3332a07e44fae6f6300fd5e20de",
+        "claims_sha256": "6162eeb2ded2799715e45f7aded01d8ce50502afdb69352da10c2286df235604",
+        "go_reach_sha256": "a6b6508583f0f42b6534a335f02911734546b12f74ab8869a38143644c4279e9",
         "kills": [
           {
             "key": "314be4add1f15c46",
@@ -235586,24 +235439,6 @@
             "op": "tsc/internal/ast/parseoptions.go:isFileForcedToBeModuleByFormat",
             "request_sha256": "98353da6a6eebbd170e4f86c79a77ee8f51bfb820773c1e079b2da1fb00d3a97",
             "row": "conformance/async/es5/asyncArrowFunction/asyncArrowFunction9_es5.ts#configuration=1"
-          },
-          {
-            "key": "eb6f2c02c4387ddc",
-            "op": "tsc/internal/ast/utilities.go:GetImpliedNodeFormatForFile",
-            "request_sha256": "25062c87f1f2bd20f2a10f72bc4945335b568a5b7948117c529639259d2f4fb1",
-            "row": "conformance/node/nodeModulesTripleSlashReferenceModeOverride2.ts#configuration=0"
-          },
-          {
-            "key": "eb6f2c02c4387ddc",
-            "op": "tsc/internal/ast/utilities.go:GetImpliedNodeFormatForFile",
-            "request_sha256": "421b9bff9bc050f8aa9cffa3ad43b347e5389fc881a275ad11567fc81842a276",
-            "row": "conformance/node/nodeModulesTripleSlashReferenceModeOverride2.ts#configuration=1"
-          },
-          {
-            "key": "eb6f2c02c4387ddc",
-            "op": "tsc/internal/ast/utilities.go:GetImpliedNodeFormatForFile",
-            "request_sha256": "7a8b9e5d2c95c5f0cfd7535d24e059525584f20a768a0c7669b10f5fa9f81319",
-            "row": "conformance/node/nodeModulesTripleSlashReferenceModeOverride2.ts#configuration=2"
           },
           {
             "key": "ec526c08043d500e",
@@ -235730,60 +235565,6 @@
             "op": "tsc/internal/compiler/fileloader.go:fileLoader.addRootTask",
             "request_sha256": "a4d63219ebb0cc091dc066ad042192427ade09c1e426cbc5cfb8dd683f1e1981",
             "row": "compiler/emptyFile-souremap.ts#configuration=0"
-          },
-          {
-            "key": "5a90fa5f130fbe5c",
-            "op": "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension",
-            "request_sha256": "408d3b8175f186064dc293e3d3865ac072f7044a4edbbf7b55ea717e53a30182",
-            "row": "compiler/checkJsFiles6.ts#configuration=0"
-          },
-          {
-            "key": "5a90fa5f130fbe5c",
-            "op": "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension",
-            "request_sha256": "9f51486a83230d5c57e637a42955288a1e000ddea8cf32fe23e89559d9d34aa3",
-            "row": "compiler/jsFileCompilationWithoutJsExtensions.ts#configuration=0"
-          },
-          {
-            "key": "5a90fa5f130fbe5c",
-            "op": "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension",
-            "request_sha256": "9fb6795d4b0fb91d06a41faa63c2d69da91e067ba5765654bf89c6ddf1506fad",
-            "row": "conformance/parser/ecmascript5/Statements/ReturnStatements/parserReturnStatement4.js#configuration=0"
-          },
-          {
-            "key": "a5ec82f7712bd129",
-            "op": "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension",
-            "request_sha256": "f9bfdd6be43db25255e575214597c5020e39b00213028269c34a168737d53aa0",
-            "row": "compiler/decoratorMetadataNoLibIsolatedModulesTypes.ts#configuration=0"
-          },
-          {
-            "key": "a5ec82f7712bd129",
-            "op": "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension",
-            "request_sha256": "65c1969a88364c32bf3c160f6f9d7640886674c460fe7c3b21c6f9b4ac033aba",
-            "row": "compiler/noCrashOnNoLib.ts#configuration=0"
-          },
-          {
-            "key": "a5ec82f7712bd129",
-            "op": "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension",
-            "request_sha256": "c867834b6155fe5c84424fbe220c2aee68bae482399aa932d82389b8ec529cf3",
-            "row": "conformance/parser/ecmascript5/RegressionTests/parser509698.ts#configuration=0"
-          },
-          {
-            "key": "b9953f031e824b1b",
-            "op": "tsc/internal/compiler/fileloader.go:fileLoader.parseSourceFile",
-            "request_sha256": "f9bfdd6be43db25255e575214597c5020e39b00213028269c34a168737d53aa0",
-            "row": "compiler/decoratorMetadataNoLibIsolatedModulesTypes.ts#configuration=0"
-          },
-          {
-            "key": "b9953f031e824b1b",
-            "op": "tsc/internal/compiler/fileloader.go:fileLoader.parseSourceFile",
-            "request_sha256": "65c1969a88364c32bf3c160f6f9d7640886674c460fe7c3b21c6f9b4ac033aba",
-            "row": "compiler/noCrashOnNoLib.ts#configuration=0"
-          },
-          {
-            "key": "b9953f031e824b1b",
-            "op": "tsc/internal/compiler/fileloader.go:fileLoader.parseSourceFile",
-            "request_sha256": "c867834b6155fe5c84424fbe220c2aee68bae482399aa932d82389b8ec529cf3",
-            "row": "conformance/parser/ecmascript5/RegressionTests/parser509698.ts#configuration=0"
           },
           {
             "key": "8f117038f79e8982",
@@ -236038,42 +235819,6 @@
             "row": "compiler/duplicatePackage_withErrors.ts#configuration=0"
           },
           {
-            "key": "a1a5997fa4d1d6a4",
-            "op": "tsc/internal/compiler/filesparser.go:parseTask.load",
-            "request_sha256": "afd931ce0f71e9996d55ea52da1579180ad06f5cc4861c764ab2c2151b5fd1e8",
-            "row": "compiler/emptyFile-declaration.ts#configuration=0"
-          },
-          {
-            "key": "a1a5997fa4d1d6a4",
-            "op": "tsc/internal/compiler/filesparser.go:parseTask.load",
-            "request_sha256": "1b29eb3b9b106fb542f159ce76882af706cc0eb6f06ce6e3fd466a85184946b3",
-            "row": "compiler/emptyFile-declaration.ts#configuration=1"
-          },
-          {
-            "key": "a1a5997fa4d1d6a4",
-            "op": "tsc/internal/compiler/filesparser.go:parseTask.load",
-            "request_sha256": "a4d63219ebb0cc091dc066ad042192427ade09c1e426cbc5cfb8dd683f1e1981",
-            "row": "compiler/emptyFile-souremap.ts#configuration=0"
-          },
-          {
-            "key": "e69fd4a2887ddb2a",
-            "op": "tsc/internal/compiler/filesparser.go:parseTask.load",
-            "request_sha256": "afd931ce0f71e9996d55ea52da1579180ad06f5cc4861c764ab2c2151b5fd1e8",
-            "row": "compiler/emptyFile-declaration.ts#configuration=0"
-          },
-          {
-            "key": "e69fd4a2887ddb2a",
-            "op": "tsc/internal/compiler/filesparser.go:parseTask.load",
-            "request_sha256": "1b29eb3b9b106fb542f159ce76882af706cc0eb6f06ce6e3fd466a85184946b3",
-            "row": "compiler/emptyFile-declaration.ts#configuration=1"
-          },
-          {
-            "key": "e69fd4a2887ddb2a",
-            "op": "tsc/internal/compiler/filesparser.go:parseTask.load",
-            "request_sha256": "a4d63219ebb0cc091dc066ad042192427ade09c1e426cbc5cfb8dd683f1e1981",
-            "row": "compiler/emptyFile-souremap.ts#configuration=0"
-          },
-          {
             "key": "3a7544275133898e",
             "op": "tsc/internal/compiler/filesparser.go:parseTask.loadAutomaticTypeDirectives",
             "request_sha256": "a87c5bdb9db58416f9118ea53ceee1ce4b38db3038d62097a189f9ae9de5a1c7",
@@ -236108,45 +235853,24 @@
             "op": "tsc/internal/compiler/host.go:compilerHost.GetSourceFile",
             "request_sha256": "c867834b6155fe5c84424fbe220c2aee68bae482399aa932d82389b8ec529cf3",
             "row": "conformance/parser/ecmascript5/RegressionTests/parser509698.ts#configuration=0"
-          },
-          {
-            "key": "48a424b118ac042b",
-            "op": "tsc/internal/compiler/program.go:filterAndSortDiagnostics",
-            "request_sha256": "eed11f1abb989340d134ff08f0f080e66b81b8e504447fdb7007f6fff7deb735",
-            "row": "compiler/sourceMapUnclosedBlock.ts#configuration=0"
-          },
-          {
-            "key": "48a424b118ac042b",
-            "op": "tsc/internal/compiler/program.go:filterAndSortDiagnostics",
-            "request_sha256": "0c7177f6d6d4caf112ff221c4d0878de4a138aa0facef5ce030fe7f71aa88649",
-            "row": "conformance/es6/templates/templateStringUnterminated1.ts#configuration=0"
-          },
-          {
-            "key": "48a424b118ac042b",
-            "op": "tsc/internal/compiler/program.go:filterAndSortDiagnostics",
-            "request_sha256": "bb05096d42caf0560ed83fe7cdf5a8be117dce4519d0ca1f9bfa75645a785367",
-            "row": "conformance/es6/templates/templateStringUnterminated1_ES6.ts#configuration=0"
           }
         ],
         "manifest_sha256": "a32db4ff08c688c246f36c5942dff799b6b24acda4726b5ea486e515654696b3",
-        "native_sha256": "1fa876c146d231460713fa067020cd917160d9753497d701962ff9f415414c0e",
+        "native_sha256": "49cba86a5b74bb1673017e18fa911157a6b6fd83a9d67fcbfbf7a0ace6eb0808",
         "result": "killed",
-        "results_sha256": "d30ca7d83005f020024ac36a2f26022e680579938aae52d5e999f45f6487a24d"
+        "results_sha256": "d082a74f788e7a95759ef36aa1f57508b1c9d2f67f897c04572ffdc0e08ff70c"
       },
       "mutation_gate": "python3 scripts/phase1_mutation_run.py confirm --results data/phase1/mutation/results.json.gz --plan data/phase1/mutation/manifest.json",
       "not_claimed": {},
       "operations": [
         "tsc/internal/ast/ast.go:Node.ModifierNodes",
         "tsc/internal/ast/parseoptions.go:isFileForcedToBeModuleByFormat",
-        "tsc/internal/ast/utilities.go:GetImpliedNodeFormatForFile",
         "tsc/internal/ast/utilities.go:GetJSXImplicitImportBase",
         "tsc/internal/ast/utilities.go:GetJSXRuntimeImport",
         "tsc/internal/ast/utilities.go:IsExclusivelyTypeOnlyImportOrExport",
         "tsc/internal/compiler/fileloader.go:fileLoader.addAutomaticTypeDirectiveTasks",
         "tsc/internal/compiler/fileloader.go:fileLoader.addRootFileTask",
         "tsc/internal/compiler/fileloader.go:fileLoader.addRootTask",
-        "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension",
-        "tsc/internal/compiler/fileloader.go:fileLoader.parseSourceFile",
         "tsc/internal/compiler/fileloader.go:fileLoader.resolveImportsAndModuleAugmentations",
         "tsc/internal/compiler/fileloader.go:fileLoader.resolveLibrary",
         "tsc/internal/compiler/fileloader.go:fileLoader.resolveTripleslashPathReference",
@@ -236160,10 +235884,8 @@
         "tsc/internal/compiler/filesparser.go:filesParser.parse",
         "tsc/internal/compiler/filesparser.go:filesParser.start",
         "tsc/internal/compiler/filesparser.go:parseTask.addSubTask",
-        "tsc/internal/compiler/filesparser.go:parseTask.load",
         "tsc/internal/compiler/filesparser.go:parseTask.loadAutomaticTypeDirectives",
-        "tsc/internal/compiler/host.go:compilerHost.GetSourceFile",
-        "tsc/internal/compiler/program.go:filterAndSortDiagnostics"
+        "tsc/internal/compiler/host.go:compilerHost.GetSourceFile"
       ],
       "oracle": "syntax",
       "witnesses": "Mutation kills on the frozen syntax oracle. For each claimed operation, a mutant of every Rust home a traced Phase 1 oracle executes (in production or observation stages) changes a compared stage on a frozen row where the unmutated Rust equals the frozen native observation and the pinned Go operation was entered; for a replacement that allocates, the mutant also differs from its paired control in a stage where it differs from native. A whole-program (syntax) kill never credits a site that carries markers for several operations. Survivors, crashes and timeouts confer nothing and are kept in the results artifact; they are never equivalent_rust claims."
@@ -236986,27 +236708,6 @@
         },
         {
           "control": null,
-          "file": "crates/tsr_ast/src/diagnostic_api.rs",
-          "function": "display_message_args",
-          "key": "15e9a1348aebca6f",
-          "markers": {
-            "tsc/internal/ast/diagnostic.go:Diagnostic.displayMessageArgs": 102
-          },
-          "op": "tsc/internal/ast/diagnostic.go:Diagnostic.displayMessageArgs",
-          "operator": "return:Ok(Vec::new())",
-          "ops": [
-            "tsc/internal/ast/diagnostic.go:Diagnostic.displayMessageArgs"
-          ],
-          "site_kind": "fn",
-          "site_line": 103,
-          "span": [
-            100,
-            144
-          ],
-          "span_sha256": "57f852700cdcdd06d4fcaca641ee816a40eddc559c41351e7a3fb99429a5470f"
-        },
-        {
-          "control": null,
           "file": "crates/tsr_ast/src/utilities_class.rs",
           "function": "replace_modifiers",
           "key": "1690b05c16ad936b",
@@ -237130,27 +236831,6 @@
             172
           ],
           "span_sha256": "729094b50c59a95b0d93c77a12be29cc98d8471c9986668473f77dcba4c9191c"
-        },
-        {
-          "control": null,
-          "file": "crates/tsr_core/src/workgroup.rs",
-          "function": "go",
-          "key": "1a4b33d99c3a0c58",
-          "markers": {
-            "tsc/internal/core/workgroup.go:ThrottleGroup.Go": 29
-          },
-          "op": "tsc/internal/core/workgroup.go:ThrottleGroup.Go",
-          "operator": "skip_body",
-          "ops": [
-            "tsc/internal/core/workgroup.go:ThrottleGroup.Go"
-          ],
-          "site_kind": "fn",
-          "site_line": 30,
-          "span": [
-            29,
-            32
-          ],
-          "span_sha256": "02bb447a383e32a9fa482383002c7632e87ce259b056a1a75c0939b1bced239f"
         },
         {
           "control": null,
@@ -237697,27 +237377,6 @@
             141
           ],
           "span_sha256": "409ca166ca686cfa1b8ab98982d7a1b33300b5d5d69e9c34ce7f2f1571ab06a7"
-        },
-        {
-          "control": null,
-          "file": "crates/tsr_tsoptions/src/parsed_commandline_ext.rs",
-          "function": "output_file_names",
-          "key": "2f68c97788dfc9de",
-          "markers": {
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetOutputFileNames": 116
-          },
-          "op": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetOutputFileNames",
-          "operator": "return:Vec::new()",
-          "ops": [
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetOutputFileNames"
-          ],
-          "site_kind": "fn",
-          "site_line": 117,
-          "span": [
-            114,
-            162
-          ],
-          "span_sha256": "55679d12f008a23df9a6118f8267fc366aa6fbf13e9dacd46ef8f71b9f4420ad"
         },
         {
           "control": null,
@@ -242509,27 +242168,6 @@
         },
         {
           "control": null,
-          "file": "crates/tsr_core/src/workgroup.rs",
-          "function": "wait",
-          "key": "b5f66e174bbe55bb",
-          "markers": {
-            "tsc/internal/core/workgroup.go:ThrottleGroup.Wait": 34
-          },
-          "op": "tsc/internal/core/workgroup.go:ThrottleGroup.Wait",
-          "operator": "return:Ok(())",
-          "ops": [
-            "tsc/internal/core/workgroup.go:ThrottleGroup.Wait"
-          ],
-          "site_kind": "fn",
-          "site_line": 35,
-          "span": [
-            34,
-            59
-          ],
-          "span_sha256": "047aa5df801e6f5ca1c24813b0f5ced0715449e49d2a2919f270fa601161a8a4"
-        },
-        {
-          "control": null,
           "file": "crates/tsr_ast/src/utilities_positions.rs",
           "function": "is_write_access_for_reference",
           "key": "b8a893dde41a9a02",
@@ -245134,27 +244772,6 @@
         },
         {
           "control": null,
-          "file": "crates/tsr_tsoptions/src/parsed_commandline_ext.rs",
-          "function": "with_file_names",
-          "key": "fe2cb094b306417f",
-          "markers": {
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames": 176
-          },
-          "op": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames",
-          "operator": "param:file_names:None",
-          "ops": [
-            "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames"
-          ],
-          "site_kind": "fn",
-          "site_line": 178,
-          "span": [
-            174,
-            182
-          ],
-          "span_sha256": "4ace0718f6e93d3b7d373bcd74876081133cc58025e2964b968d63a4a343294d"
-        },
-        {
-          "control": null,
           "file": "crates/tsr_ast/src/source_file_tables.rs",
           "function": "walk",
           "key": "fe4a521cbce6e774",
@@ -245260,7 +244877,7 @@
         }
       ],
       "mutation_evidence": {
-        "claims_sha256": "292c6aa7eeea46d23c23841576aba0672f060f8d15b685d5fcfa7f359d803148",
+        "claims_sha256": "4b8b137ef1dea783b75637b5e8f4fd132674a59fd10b16e55a87e793ea68edf0",
         "go_reach_sha256": "059a8bfc342e722311d042016cbef736e6ff3ef7233aa04b451f616f4710e066",
         "kills": [
           {
@@ -246222,18 +245839,6 @@
             "op": "tsc/internal/ast/diagnostic.go:Diagnostic.String",
             "request_sha256": "aca4f0142d987ae776873f7ae7a1c9daa899131a732e997ffa1b7794bbe5150c",
             "row": "ast.NewExternalDiagnostic@external"
-          },
-          {
-            "key": "15e9a1348aebca6f",
-            "op": "tsc/internal/ast/diagnostic.go:Diagnostic.displayMessageArgs",
-            "request_sha256": "a35068631562357c6462afc9c609045a17d69c90f5dc93192915dc4ec349abeb",
-            "row": "ast.NewDiagnosticChain@chain"
-          },
-          {
-            "key": "15e9a1348aebca6f",
-            "op": "tsc/internal/ast/diagnostic.go:Diagnostic.displayMessageArgs",
-            "request_sha256": "d745dde92e5c1511385763403454202ee3b1945c3f2363094a0fe65cca0dcdee",
-            "row": "ast.NewDiagnosticFromSerialized@serialized"
           },
           {
             "key": "03392d4641be35f7",
@@ -251348,18 +250953,6 @@
             "row": "core.TypeAcquisition.Equals@pairs"
           },
           {
-            "key": "1a4b33d99c3a0c58",
-            "op": "tsc/internal/core/workgroup.go:ThrottleGroup.Go",
-            "request_sha256": "d43f20ebf118b9294d4a1c3dfd4361e1f2080ff3bf721a95aa87fff6b159c09a",
-            "row": "core.ThrottleGroup@cases"
-          },
-          {
-            "key": "b5f66e174bbe55bb",
-            "op": "tsc/internal/core/workgroup.go:ThrottleGroup.Wait",
-            "request_sha256": "d43f20ebf118b9294d4a1c3dfd4361e1f2080ff3bf721a95aa87fff6b159c09a",
-            "row": "core.ThrottleGroup@cases"
-          },
-          {
             "key": "38649f826bb3ea33",
             "op": "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectDeclarationPath",
             "request_sha256": "da226f224b318c3be2596dab1f4f5b49010a96fb1a21e3d296bbb5562fa71599",
@@ -251484,24 +251077,6 @@
             "op": "tsc/internal/tsoptions/parsedbuildcommandline.go:ParsedBuildCommandLine.ResolvedProjectPaths",
             "request_sha256": "015396d44448ca4bfd11fe314d25eeee265f31c149c1de32d5b760b5d7f7d0f2",
             "row": "tsoptions.ParsedBuildCommandLine.ResolvedProjectPaths@projects"
-          },
-          {
-            "key": "2f68c97788dfc9de",
-            "op": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetOutputFileNames",
-            "request_sha256": "689cf51678f75a196c3eff6c8dfa2436978a52db88fcada98fd9b81e30c51f5f",
-            "row": "tsoptions.ParsedCommandLine.GetOutputFileNames@declaration-only"
-          },
-          {
-            "key": "2f68c97788dfc9de",
-            "op": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetOutputFileNames",
-            "request_sha256": "7441578941b4b579090438e8056729a54d689478daf72447cb51653378d4a881",
-            "row": "tsoptions.ParsedCommandLine.GetOutputFileNames@globs"
-          },
-          {
-            "key": "2f68c97788dfc9de",
-            "op": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetOutputFileNames",
-            "request_sha256": "e68fda34f4044233fa2d63f63ba0b646c80cefedb0c226c4bfdbd3a9ec137103",
-            "row": "tsoptions.ParsedCommandLine.GetOutputFileNames@globs-ci"
           },
           {
             "key": "c55a44f8b630fced",
@@ -251630,24 +251205,6 @@
             "row": "tsoptions.ParsedCommandLine.WildcardDirectoryGlobs@declaration-only"
           },
           {
-            "key": "fe2cb094b306417f",
-            "op": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames",
-            "request_sha256": "49818880a1a2db4edcdb080c318f590e36d0b2aac42829b31347faf5ef0374fd",
-            "row": "tsoptions.ParsedCommandLine.WithFileNames@declaration-only"
-          },
-          {
-            "key": "fe2cb094b306417f",
-            "op": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames",
-            "request_sha256": "abaa6d2692c2e1c7ba241961b38fb25672cc457735fbeb2bb3d36e73359e5371",
-            "row": "tsoptions.ParsedCommandLine.WithFileNames@globs"
-          },
-          {
-            "key": "fe2cb094b306417f",
-            "op": "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames",
-            "request_sha256": "ee7c13cd2b1c961e3f22a686a0df8261e07382fbd6b27f211331e0176ca1d2f6",
-            "row": "tsoptions.ParsedCommandLine.WithFileNames@globs-ci"
-          },
-          {
             "key": "ff6ed523274e3f0f",
             "op": "tsc/internal/tsoptions/showconfig.go:ConvertToTSConfig",
             "request_sha256": "1b768c7638e663a1ed278137c35e4919625589f3f2cb6cbd9ee5122366acbef2",
@@ -251765,7 +251322,7 @@
         "manifest_sha256": "a32db4ff08c688c246f36c5942dff799b6b24acda4726b5ea486e515654696b3",
         "native_sha256": "94c847ba3a12ca7ceb7d0035acf485952420386fecdb358a3e2275f7b95dd652",
         "result": "killed",
-        "results_sha256": "d30ca7d83005f020024ac36a2f26022e680579938aae52d5e999f45f6487a24d"
+        "results_sha256": "d082a74f788e7a95759ef36aa1f57508b1c9d2f67f897c04572ffdc0e08ff70c"
       },
       "mutation_gate": "python3 scripts/phase1_mutation_run.py confirm --results data/phase1/mutation/results.json.gz --plan data/phase1/mutation/manifest.json",
       "not_claimed": {
@@ -251816,7 +251373,6 @@
         "tsc/internal/ast/diagnostic.go:Diagnostic.RepopulateInfo",
         "tsc/internal/ast/diagnostic.go:Diagnostic.SetRepopulateInfo",
         "tsc/internal/ast/diagnostic.go:Diagnostic.String",
-        "tsc/internal/ast/diagnostic.go:Diagnostic.displayMessageArgs",
         "tsc/internal/ast/diagnostic.go:DiagnosticsCollection.GetDiagnostics",
         "tsc/internal/ast/diagnostic.go:NewDiagnostic",
         "tsc/internal/ast/diagnostic.go:NewDiagnosticChain",
@@ -252037,8 +251593,6 @@
         "tsc/internal/core/textchange.go:ApplyBulkEdits",
         "tsc/internal/core/textchange.go:TextChange.ApplyTo",
         "tsc/internal/core/typeacquisition.go:TypeAcquisition.Equals",
-        "tsc/internal/core/workgroup.go:ThrottleGroup.Go",
-        "tsc/internal/core/workgroup.go:ThrottleGroup.Wait",
         "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectDeclarationPath",
         "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectEmit",
         "tsc/internal/tsoptions/declscompiler.go:CompilerOptionsAffectSemanticDiagnostics",
@@ -252046,13 +251600,11 @@
         "tsc/internal/tsoptions/declscompiler.go:optionsHaveChanges",
         "tsc/internal/tsoptions/enummaps.go:TargetToLibMap",
         "tsc/internal/tsoptions/parsedbuildcommandline.go:ParsedBuildCommandLine.ResolvedProjectPaths",
-        "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.GetOutputFileNames",
         "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.LiteralFileNames",
         "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.PossiblyMatchesDirectoryName",
         "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.PossiblyMatchesFileName",
         "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.ReloadFileNamesOfParsedCommandLine",
         "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WildcardDirectoryGlobs",
-        "tsc/internal/tsoptions/parsedcommandline.go:ParsedCommandLine.WithFileNames",
         "tsc/internal/tsoptions/showconfig.go:ConvertToTSConfig",
         "tsc/internal/tsoptions/showconfig.go:addImpliedOptions",
         "tsc/internal/tsoptions/showconfig.go:anyDependencyProvided",

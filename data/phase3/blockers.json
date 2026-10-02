@@ -1,12 +1,10 @@
 {
- "by_owner": {
-  "T8": 1
- },
+ "by_owner": {},
  "comparison": {
-  "all_domains_met": 13426,
+  "all_domains_met": 13432,
   "native_observation_sha256": "e99a8dccabc3a497b14beec8e147a2b28cd8298e103d9acca0dfa41173dfae60",
   "rows": 13432,
-  "rust_capture_sha256": "c9c30e7addcb9f1f1eba034757cadbde318ac0d7d1e75f22cb0613a548261c4c"
+  "rust_capture_sha256": "d532efe516d90e39fd122e9f130a819bfe3ce6bc272e56bd2a8fd95c414a5d1f"
  },
  "cross_phase": [
   {
@@ -25,47 +23,7 @@
    "variants": 0
   }
  ],
- "entries": [
-  {
-   "cause": "emit_diagnostics differs: emitted_files",
-   "cross_phase": false,
-   "domains": {
-    "emit_diagnostics": 6
-   },
-   "evidence": [
-    {
-     "case": "cases/03417",
-     "observation": "different: emit_diagnostics differs: emitted_files",
-     "variant": "compiler/incrementalConcurrentSafeAliasFollowing.ts#configuration=0"
-    },
-    {
-     "case": "cases/03418",
-     "observation": "different: emit_diagnostics differs: emitted_files",
-     "variant": "compiler/incrementalConfig.ts#configuration=0"
-    },
-    {
-     "case": "cases/03420",
-     "observation": "different: emit_diagnostics differs: emitted_files",
-     "variant": "compiler/incrementalTsBuildInfoFile.ts#configuration=0"
-    },
-    {
-     "case": "cases/03907",
-     "observation": "different: emit_diagnostics differs: emitted_files",
-     "variant": "compiler/jsEmitIntersectionProperty.ts#configuration=0"
-    },
-    {
-     "case": "cases/04802",
-     "observation": "different: emit_diagnostics differs: emitted_files",
-     "variant": "compiler/noEmitAndIncremental.ts#configuration=0"
-    }
-   ],
-   "id": "B01",
-   "kind": "different",
-   "owner": "T8",
-   "variants": 6,
-   "variants_sha256": "211fdd037aec921836309b09b9a32766937d9fbf97a791cc97d7a37af73067b1"
-  }
- ],
+ "entries": [],
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
  "scope": "Buckets of rows that cannot pass yet in the Phase 3 emit comparison, each with the execution evidence that establishes it and its owning checkpoint (docs/PHASE3-plan.md section 4). A blocker explains a difference and never reclassifies it.",
  "version": 1
