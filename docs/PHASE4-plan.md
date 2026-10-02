@@ -727,9 +727,9 @@ register rebuilt from evidence, never edited. `cargo xtask run tsc` and
 
 ## 8. Owner decisions
 
-Fifteen proposals. On 2026-10-02 the owner confirmed eight of them as
-written (1, 2, 8, 10, 11, 13, 14 and 15), marked below; the other seven (3,
-4, 5, 6, 7, 9 and 12) are still open.
+Fifteen proposals. On 2026-10-02 the owner decided thirteen of them; each
+entry keeps its proposal and records the outcome. Decisions 6 (profiling) and
+7 (dependencies) are still open.
 
 1. **Names.** Checkpoints X0 to X7, sprints `P4A` and `P4B`, producer `tsc`,
    data under `data/phase4/`.
@@ -745,11 +745,16 @@ written (1, 2, 8, 10, 11, 13, 14 and 15), marked below; the other seven (3,
    Phase 3 first; X0, X4 and the emit-free part of X1 may be taken while a
    Phase 3 checkpoint waits on review; X2, X3 and X5 after T8. The
    alternative is to start Phase 4 only after P3B closes.
+   **Settled by events:** Phase 3 is merged (#77, #78), so Phase 4 starts
+   after Phase 3's green-up with no interleaving.
 4. **Ledger moves.** `fswatch/kqueue.go` to out of scope (ADR 0002 already
    excludes it); `compiler/projectreferencedtsfakinghost.go` to Phase 5;
    `GetDiagnosticsOfAnyProgram`'s destination from Phase 3 to Phase 4;
    `pprof/pprof.go` by decision 6. One regeneration, together with Phase 3's
    decision 1 if its T0 has not run.
+   **Confirmed, without the `GetDiagnosticsOfAnyProgram` move:** Phase 3
+   ported and marked it, so it stays Phase 3's. The `pprof.go` move waits on
+   decision 6.
 5. **Crates.** New `tsr_execute` (with `execute/tsc` and `watchmanager`, as
    the ledger maps them), `tsr_incremental`, `tsr_build`, `tsr_fswatch`,
    `tsr_tracing` and the binary crate `tsc`; the harness under
@@ -759,6 +764,12 @@ written (1, 2, 8, 10, 11, 13, 14 and 15), marked below; the other seven (3,
    register in `tools/packaging/packages.json` as unpublished; whether they
    join the next lockstep release, and the name the command line is
    published under, are separate decisions.
+   **Confirmed, with the names already reserved:** the crates keep the
+   `tsr_` prefix (`tsr_incremental` exists since Phase 3 and is registered
+   as published), and the command line is published under the reserved
+   names, the `tsr` crate on crates.io and the `tsrust` organisation on npm,
+   not as a crate called `tsc`. The workspace's binary target is still named
+   `tsc`, as decision 11 stages it.
 6. **Profiling.** `--pprofDir` is accepted and reports that profiling is not
    available in this build; `pprof.go` moves to Phase 7, beside the
    benchmarking work, and no `tsr_pprof` crate is created now. The
@@ -780,6 +791,9 @@ written (1, 2, 8, 10, 11, 13, 14 and 15), marked below; the other seven (3,
    CI's Linux job, which enforces their metrics; the recorded run on this
    host covers FSEvents. If a recorded Linux run is wanted, it joins as a
    second provenance.
+   **Confirmed, with a recorded Linux run:** the owner takes it in a Linux
+   container on this host or in the cloud, and it joins as a second
+   provenance. fanotify needs a privileged container.
 10. **The live witnesses.** The smoke test, the live-watch witness and the
     interoperability witness compare the Rust binary with the pinned Go
     binary on the same host at X7. They are observations the `tsc` producer
@@ -795,6 +809,7 @@ written (1, 2, 8, 10, 11, 13, 14 and 15), marked below; the other seven (3,
     supply the servers it says the mode is not available and exits with
     `NotImplemented` (5). `runLSP`, `runAPI`, the parent-process watchdog and
     `isProcessAlive` are `later` with those owners.
+    **Confirmed.**
 13. **Performance.** One bounded timing capture at X7 on the smoke fixture,
     beside Go's, no threshold.
     **Confirmed.**
