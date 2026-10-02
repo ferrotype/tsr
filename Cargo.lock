@@ -883,6 +883,7 @@ name = "tsr"
 version = "0.1.0"
 dependencies = [
  "libc",
+ "mimalloc",
  "rustix",
  "tsr_bundled",
  "tsr_contentmapper",

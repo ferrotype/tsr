@@ -21,6 +21,8 @@ tsr_ipc = { path = "../tsr_ipc" }
 tsr_jsstring = { path = "../tsr_jsstring" }
 tsr_vfs = { path = "../tsr_vfs" }
 tsr_tspath = { path = "../tsr_tspath" }
+# ADR 0017: the allocator the benchmark binary uses; the counters above it feed --diagnostics.
+mimalloc = "=0.1.48"
 
 [target.'cfg(unix)'.dependencies]
 rustix = { version = "1.1", features = ["fs", "event", "pipe", "process", "termios"] }
