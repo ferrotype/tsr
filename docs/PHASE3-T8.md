@@ -116,8 +116,7 @@ mutation checked.
 | `t7-contracts` | the declaration transform is released per file; deep type nesting |
 | `t8-contracts` | a panic in one file's emit retires the generation and fails the group; cancellation before emit; determinism across runs, loads and modes; results own no arena; bounded workers |
 
-None of the named contracts needed a production change in the emitter. The
-deep inputs did: 14 growth guards of the checker's `stacker::maybe_grow`
+The deep inputs initially required 14 growth guards of the checker's `stacker::maybe_grow`
 pattern, in the printer (`emitJsxChild`, `emitIfStatement`), the transformers
 (JSX, optional chain, declarations, runtime syntax, legacy decorators, class
 fields) and the checker (`resolveEntityName`, `getWidenedTypeWithContext`,
@@ -140,16 +139,32 @@ symbol and locals; the T7 retention contract declares inferred and generic
 function return types and an expando function, and its arena counters and
 live heap stay where the first emit left them.
 
-Open findings:
+The follow-up fixes the two remaining Rust-specific record items:
 
-- `AstBuilder::factory_view` walks a node's parent chain on every
-  imported-node read, so a transform is quadratic in nesting depth:
-  `binderBinaryExpressionStress` takes about 60 seconds per mode in a debug
-  build. The printer's `getTextOfNode` and several transforms are quadratic
-  in the pin's own algorithm.
-- With `noEmitOnError`, an emit after cancellation returns
-  `Err(Checker(PreviouslyCanceled))` where the pin panics with "Checker was
-  previously cancelled".
+- `AstBuilder::factory_view` selects an exclusively bound core node through
+  its retained owner and completed binding, without walking parents. Slot
+  validation and bound SourceFile metadata remain observable. Lazy nodes and
+  compatibility owners still use logical-source resolution; the multi-source
+  binding tests cover that selection. The factory regression counts actual
+  parent-walk steps across a 2,048-level chain and requires zero. T3 now emits
+  `binderBinaryExpressionStress` against its pinned JavaScript baseline in
+  debug as well as release.
+- `noEmitOnError` translates `PreviouslyCanceled` to the pin's exact panic
+  (`Checker was previously cancelled`) at the emit admission boundary, after
+  releasing checker operations. The checker API retains its typed refusal:
+  cancellation poisons that checker without retiring unrelated checkers in
+  the generation. T8 checks cancellation during this emit and reuse after an
+  earlier canceled diagnostics request, in both modes, with no output writes.
+
+The scope cache also indexes the complete creation context and an
+order-independent locals fingerprint instead of scanning every scope under a
+parent. It compares candidate live tables exactly, including after temporary
+signature-table changes; collisions cannot establish equality. Regression
+checks cover reordered tables, temporary mutation/restoration and an injected
+fingerprint collision. Repeated declaration emits still keep stable storage.
+
+Remaining cost: the printer's `getTextOfNode` and several transforms and
+checker contextual-type walks are quadratic in the pinned algorithm itself.
 
 ## Deviations and decisions taken in the port
 
@@ -181,11 +196,13 @@ Open findings:
    expando function's fake namespace in each request's factory, and they go
    with the request. The checker's own storage is never freed, so it keeps
    each scope it creates and gives a later request the one created with the
-   same parent, kinds, name, symbol and locals (`emit_scopes.rs`). A signature
+   same parent, kinds, name, symbol and locals (`emit_scopes.rs`). The index
+   hashes that creation context; a fingerprint match still requires exact
+   equality of the current locals. A signature
    scope's table changes only while a nested signature is serialized and is
    restored afterwards, so it is compared as it is at the request, and the
-   node builder's name caches, the only ones that read a fake scope's table,
-   belong to the request and are cleared with each scope.
+   node builder's name-query caches belong to the request and are cleared
+   with each scope.
 
 ## Changes that reach Phase 2's checker
 

@@ -2,6 +2,7 @@
 //! bindings are separate from immutable program bindings; the factory retains
 //! every source parent before an edge to it is created.
 use crate::{CheckerState, Error};
+use std::hash::BuildHasher;
 use tsr_ast::{
     node_flags as nf, Factory, FactoryMethods, JsString, NodeBinding, NodeId, RuntimeFactory,
     SymbolId, SymbolTable, SyntaxKind as K,
@@ -11,18 +12,30 @@ use tsr_ast::{
 pub(crate) struct SyntheticScopes {
     pub(crate) bindings: crate::types::Map<NodeId, NodeBinding>,
     pub(crate) signature_kinds: crate::types::Map<NodeId, &'static str>,
-    /// Every scope by its parent and signature kind, so a request for an
-    /// identical scope gets the existing one.
-    created: crate::types::Map<(NodeId, Option<&'static str>), Vec<CreatedScope>>,
+    /// Narrow candidates by their complete creation context. Exact live-table
+    /// comparison below handles hash collisions and temporary signature locals.
+    created: crate::types::Map<ScopeKey, Vec<NodeId>>,
 }
 
-/// What a scope was created with besides its parent, signature kind and
-/// locals, which are its key and its table.
-struct CreatedScope {
-    node: NodeId,
+#[derive(PartialEq, Eq, Hash)]
+struct ScopeKey {
+    parent: NodeId,
     kind: K,
     name: Option<JsString>,
     symbol: Option<SymbolId>,
+    signature_kind: Option<&'static str>,
+    locals_len: usize,
+    locals_hash: u64,
+}
+
+/// SymbolTable iteration has no semantic order. Summing entry hashes makes
+/// equal tables share a bucket without sorting or cloning their names. The
+/// fingerprint is only an index; it never establishes table equality.
+fn locals_fingerprint(locals: &SymbolTable) -> u64 {
+    let hasher = crate::types::FastState::default();
+    locals.iter().fold(0u64, |hash, entry| {
+        hash.wrapping_add(hasher.hash_one(entry))
+    })
 }
 impl SyntheticScopes {
     #[cfg(any(test, feature = "storage-pilot"))]
@@ -40,7 +53,12 @@ impl SyntheticScopes {
         census.add(
             "query_links",
             self.created.len(),
-            self.created.allocation_size(),
+            self.created.allocation_size()
+                + self
+                    .created
+                    .values()
+                    .map(|nodes| nodes.capacity() * size_of::<NodeId>())
+                    .sum::<usize>(),
         );
         // Local names/entries are in CheckerState.tables, counted there once.
     }
@@ -87,9 +105,16 @@ impl CheckerState {
         // request's factory and go with it; this checker's storage is never
         // freed, so an identical request gets the scope it had before and
         // repeated emits add nothing.
-        if let Some(scope) =
-            self.identical_emit_scope(parent, kind, name.as_ref(), symbol, &locals, signature_kind)?
-        {
+        let key = ScopeKey {
+            parent,
+            kind,
+            name,
+            symbol,
+            signature_kind,
+            locals_len: locals.len(),
+            locals_hash: locals_fingerprint(&locals),
+        };
+        if let Some(scope) = self.identical_emit_scope(&key, &locals)? {
             return Ok(scope);
         }
         if parent.arena() != self.factory.id().arena() {
@@ -104,7 +129,7 @@ impl CheckerState {
         } else {
             let name = self
                 .factory
-                .new_identifier(name.clone().expect("validated namespace name"));
+                .new_identifier(key.name.clone().expect("validated namespace name"));
             let body = self.factory.new_module_block(Some(list));
             let node = self.factory.new_module_declaration(
                 None,
@@ -135,14 +160,9 @@ impl CheckerState {
         }
         self.synthetic_scopes
             .created
-            .entry((parent, signature_kind))
+            .entry(key)
             .or_default()
-            .push(CreatedScope {
-                node,
-                kind,
-                name,
-                symbol,
-            });
+            .push(node);
         Ok(node)
     }
 
@@ -152,24 +172,17 @@ impl CheckerState {
     /// afterwards, so it is compared as it is now.
     fn identical_emit_scope(
         &self,
-        parent: NodeId,
-        kind: K,
-        name: Option<&JsString>,
-        symbol: Option<SymbolId>,
+        key: &ScopeKey,
         locals: &SymbolTable,
-        signature_kind: Option<&'static str>,
     ) -> Result<Option<NodeId>, Error> {
-        let Some(created) = self.synthetic_scopes.created.get(&(parent, signature_kind)) else {
+        let Some(created) = self.synthetic_scopes.created.get(key) else {
             return Ok(None);
         };
-        for scope in created {
-            if scope.kind != kind || scope.name.as_ref() != name || scope.symbol != symbol {
-                continue;
-            }
+        for &scope in created {
             let table = self
                 .synthetic_scopes
                 .bindings
-                .get(&scope.node)
+                .get(&scope)
                 .and_then(|binding| binding.locals)
                 .ok_or(Error::MissingLink("emit scope locals"))?;
             let current = self.tables.get(table)?;
@@ -178,7 +191,7 @@ impl CheckerState {
                     .iter()
                     .all(|(name, symbol)| current.get(name.as_bytes()) == Some(*symbol))
             {
-                return Ok(Some(scope.node));
+                return Ok(Some(scope));
             }
         }
         Ok(None)
@@ -236,6 +249,81 @@ mod tests {
             state.table(inner_locals)?.get(name.as_bytes()),
             Some(Some(inner))
         );
+        // Temporary extension must never make a stale creation fingerprint
+        // sufficient for reuse. Compare the live table, then reuse the old
+        // scope again when its original bindings have been restored.
+        state
+            .tables
+            .get_mut(outer_locals)?
+            .insert(name.clone(), Some(inner));
+        let replacement = state.create_emit_scope(
+            parent,
+            K::Block,
+            None,
+            None,
+            SymbolTable::from_iter([(name.clone(), Some(outer))]),
+            Some("typeParams"),
+        )?;
+        assert_ne!(replacement, scope);
+        state
+            .tables
+            .get_mut(outer_locals)?
+            .insert(name.clone(), Some(outer));
+        assert_eq!(
+            state.create_emit_scope(
+                parent,
+                K::Block,
+                None,
+                None,
+                SymbolTable::from_iter([(name.clone(), Some(outer))]),
+                Some("typeParams")
+            )?,
+            scope
+        );
+
+        // Tables with opposite insertion order describe the same scope.
+        let other = JsString::from_bytes(b"U".as_slice());
+        let locals = [(name.clone(), Some(outer)), (other.clone(), None)];
+        let ordered = state.create_emit_scope(
+            parent,
+            K::Block,
+            None,
+            None,
+            SymbolTable::from_iter(locals.clone()),
+            Some("params"),
+        )?;
+        assert_eq!(
+            state.create_emit_scope(
+                parent,
+                K::Block,
+                None,
+                None,
+                locals.into_iter().rev().collect(),
+                Some("params")
+            )?,
+            ordered
+        );
+
+        // A colliding fingerprint still cannot substitute a different table.
+        let different = SymbolTable::from_iter([(other, Some(inner))]);
+        let collision = ScopeKey {
+            parent,
+            kind: K::Block,
+            name: None,
+            symbol: None,
+            signature_kind: Some("typeParams"),
+            locals_len: different.len(),
+            locals_hash: locals_fingerprint(&different),
+        };
+        state
+            .synthetic_scopes
+            .created
+            .entry(collision)
+            .or_default()
+            .push(scope);
+        let distinct =
+            state.create_emit_scope(parent, K::Block, None, None, different, Some("typeParams"))?;
+        assert_ne!(distinct, scope);
         assert!(state.checker_node_binding(parent)?.is_none());
         let foreign = tsr_arena::SymbolArena::<u8>::new(&counters);
         let foreign_symbol = SymbolId::from_parts(foreign.id(), 1)?;
