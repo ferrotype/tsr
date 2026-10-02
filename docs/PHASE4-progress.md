@@ -58,12 +58,12 @@ Phase 4 still needs these acceptance and infrastructure steps:
 
 1. Run a single stable full scenario capture and five determinism repetitions.
    Refresh the comparison, blocker register and generated inventories.
-2. Validate `scripts/phase4_native.py` build provenance and run its release
+2. Run `scripts/phase4_native.py`'s authenticated release build and
    smoke/interop witnesses. The six-family development interop observation used
    earlier copied binaries; it is not the final build's receipt.
-3. Re-run all four live modes on stable built images. Add authenticated witness
-   consumption to the producer; currently the new runners are development
-   tools and do not emit the remaining X7 gate metrics.
+3. Re-run all four live modes on stable built images. Select the completed
+   witnesses in `target/phase4/acceptance.json` and record the `tsc` producer.
+   The acceptance integration below now authenticates and replays these results.
 4. Run ThreadSanitizer; add scheduled Linux instrumentation and native Linux
    witnesses; check the release ELF's glibc 2.28 requirements. No smoke,
    sanitizer or glibc-floor result is claimed by this checkpoint.
@@ -146,3 +146,34 @@ separators, with native observations unchanged. Six help/init/color tests,
 three statistics tests and the controlled-clock emit regression also pass.
 No full scenario capture, benchmark, sanitizer or acceptance producer ran in
 this follow-up. Workspace formatting and diff checks pass.
+
+## X7 witness integration — 2026-10-02
+
+The `tsc` producer now consumes smoke, live-watch, build-state interoperability,
+five-run determinism and ThreadSanitizer evidence independently through an
+external capture index. The commands and index format are in
+[PHASE4-acceptance.md](PHASE4-acceptance.md).
+
+Native/live replay authenticates the release and Go builds, the pinned source
+export, host, copied images and exact mode/step inventories. Per-step raw
+streams and project snapshots are re-read to compute the result. The recorded
+Linux evidence can be moved here and joined without modifying its reports.
+Host-specific facts remain separate from the additional two-host coverage
+metrics. A stale scenario capture does not hide current independent witnesses.
+
+The determinism runner builds once (or reuses a verified full capture) and
+retains five complete invocations, their outcomes and raw transcripts. The
+sanitizer runner binds actual rustc invocations to copied instrumented images,
+checks rebuilt std/core, discovers and runs the Phase 4 test inventory, and
+runs the full scenario inventory. It preserves registry/toolchain homes,
+clears the incremental-test narrowing switch and fingerprints the tests'
+transitive Rust helpers. Stale or malformed proof withholds a metric; a
+complete measured failure reports false. The index/report identities are
+retained in the tracker's evidence stderr.
+
+Validation: 158 Phase 4 tooling tests passed in the combined run (28.62 s).
+The final malformed-compiler-argument regression and sanitizer/join recheck
+also passed (35 tests, including that additional regression). These use bounded
+fixtures; no full scenario, native build, live session or sanitizer execution
+ran, and no acceptance evidence was re-recorded. The integration is complete;
+the actual acceptance runs listed above remain pending.

@@ -615,6 +615,10 @@ libraries; one producer, `tsc`, with its inputs and sources declared in
 `status/runs.toml`; contract witnesses `x1-contracts` to `x5-contracts` with
 receipts as Phase 2's.
 
+The implemented X7 witness commands, external capture index and replay rules
+are documented in [PHASE4-acceptance.md](PHASE4-acceptance.md). Wiring a runner
+does not mark its metric passed; current authenticated executions are required.
+
 | Required claim | Evidence and denominator | Reuse |
 | --- | --- | --- |
 | Every command-line baseline matches | The 517 rendered transcripts against the committed references, whole text: `tsc` 218, `tsbuild` 192, `tscWatch` 42, `tsbuildWatch` 65; sections compared for attribution | The ported harness over the recorded scenarios |

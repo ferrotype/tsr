@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Phase 4 X0: the `tsc` producer (status/runs.toml `[tsc]`).
+"""Phase 4: the `tsc` producer (status/runs.toml `[tsc]`).
 
 Checks the recorded scenario inventory, re-runs its verification and replays
 the recorded Rust capture at target/phase4/rust; it never runs the harness.
@@ -32,12 +32,17 @@ Metrics:
   edit step of the inventory;
 * unit_tests -- data/phase4/unit-tests.json is current and valid
   (`phase4_unit_tests.py check`);
-* audit -- data/phase4/x-audit.json is current and valid (`phase4_audit.py check`).
+* audit -- data/phase4/x-audit.json is current and valid (`phase4_audit.py check`);
+* smoke, live_watch_parity, buildinfo_interop, determinism, thread_sanitizer
+  -- independently replayed X7 witnesses selected by --witnesses (default
+  target/phase4/acceptance.json). Native metrics are host facts; smoke_all_hosts
+  and live_watch_parity_all_hosts additionally require macOS and Linux records.
 
 The parity ratios and the count are emitted only over a harness-valid capture;
 a missing, partial or stale capture leaves harness_valid false and withholds
-them. No threshold is introduced. The metrics of the later checkpoints
-(buildinfo_codec, unit_rosters, watcher_tests, the live witnesses, residuals,
+them. A scenario capture does not gate the independent X7 witnesses. No
+threshold is introduced. The remaining checkpoint metrics
+(buildinfo_codec, unit_rosters, watcher_tests, residuals,
 dispositions, xN_complete) come with those checkpoints.
 """
 from __future__ import annotations
@@ -53,6 +58,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from s04_common import strict_json_loads  # noqa: E402
 from s08_oracle import canonical  # noqa: E402
 import phase4_audit  # noqa: E402
+import phase4_acceptance  # noqa: E402
 import phase4_blockers  # noqa: E402
 import phase4_compare  # noqa: E402
 import phase4_corpus  # noqa: E402
@@ -105,12 +111,17 @@ def ratio(numerator, denominator):
     return numerator / denominator if denominator else 0.0
 
 
-def tsc(rust=None, *, verify=verification):
+def tsc(rust=None, *, verify=verification, witnesses=None):
     rust = Path(rust or RUST)
     metrics = {"inventory_frozen": False, "inventory_verified": False,
                **dict.fromkeys(VERIFY_METRICS.values(), False),
                "harness_valid": False, "result_recorded": False, "blockers_named": False,
                "unit_tests": False, "audit": False}
+    witnesses = quietly(phase4_acceptance.collect, witnesses)
+    metrics.update(witnesses["metrics"])
+    # xtask's evidence record retains and hashes stderr too. Keep exact capture
+    # identities here, not in numeric/boolean metrics or an uncommitted sidecar.
+    print("tsc witnesses: " + canonical(witnesses).decode(), file=sys.stderr)
     for name, module in (("unit_tests", phase4_unit_tests), ("audit", phase4_audit)):
         try:
             problems = module.check()
@@ -170,8 +181,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("command", choices=("tsc",))
     parser.add_argument("--rust", type=Path, default=RUST)
+    parser.add_argument("--witnesses", type=Path, default=phase4_acceptance.DEFAULT_INDEX)
     args = parser.parse_args()
-    print(json.dumps(tsc(args.rust), sort_keys=True))
+    print(json.dumps(tsc(args.rust, witnesses=args.witnesses), sort_keys=True))
 
 
 if __name__ == "__main__":
