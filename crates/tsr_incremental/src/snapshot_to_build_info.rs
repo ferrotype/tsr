@@ -12,8 +12,9 @@ use crate::json::AnyValue;
 use crate::program::source_path;
 use crate::reference_map::ReferenceSet;
 use crate::snapshot::{
-    file_path, get_file_emit_kind, lock, BuildInfoDiagnosticWithFileName,
-    DiagnosticsOrBuildInfoDiagnosticsWithFileName, FileEmitKind, Path, Snapshot,
+    get_file_emit_kind, lock, BuildInfoDiagnosticWithFileName,
+    DiagnosticsOrBuildInfoDiagnosticsWithFileName, FileEmitKind, Path, ProgramDiagnostics,
+    Snapshot,
 };
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -184,6 +185,14 @@ impl ToBuildInfo<'_> {
         option: &tsr_tsoptions::OptionDeclaration,
         v: &ConfigValue,
     ) -> ConfigValue {
+        // Reflection preserves the native option enum type in live build info.
+        // The general option-value view exposes its numeric representation; turn
+        // it back into the typed value before retaining it across watch cycles.
+        if option.kind == OptionKind::Enum {
+            if let ConfigValue::Integer(value) = v {
+                return ConfigValue::Enum(*value as i32);
+            }
+        }
         if option.kind == OptionKind::List {
             if option.element.is_some_and(|element| element.is_file_path) {
                 if let ConfigValue::StringArray(Some(arr)) = v {
@@ -264,7 +273,7 @@ impl ToBuildInfo<'_> {
     // port: tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.toBuildInfoDiagnosticsFromDiagnostics
     fn to_build_info_diagnostics_from_diagnostics(
         &mut self,
-        owner: &Program,
+        owner: &ProgramDiagnostics,
         file_path_of_diagnostics: &Path,
         diagnostics: &[impl std::borrow::Borrow<Diagnostic>],
     ) -> Result<Vec<BuildInfoDiagnostic>, Error> {
@@ -276,7 +285,7 @@ impl ToBuildInfo<'_> {
             match d.file {
                 None => no_file = true,
                 Some(diagnostic_file) => {
-                    let diagnostic_path = file_path(owner, diagnostic_file)?;
+                    let diagnostic_path = owner.file_path(diagnostic_file)?;
                     if diagnostic_path != *file_path_of_diagnostics {
                         file = self.to_file_id(&diagnostic_path);
                     }
@@ -333,7 +342,7 @@ impl ToBuildInfo<'_> {
             return Ok(Some(BuildInfoDiagnosticsOfFile {
                 file_id: self.to_file_id(file_path),
                 diagnostics: self.to_build_info_diagnostics_from_diagnostics(
-                    &program_diagnostics.program,
+                    &program_diagnostics,
                     file_path,
                     &program_diagnostics.diagnostics,
                 )?,

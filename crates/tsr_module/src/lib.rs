@@ -4,8 +4,8 @@
 mod resolver;
 pub use resolver::{
     get_conditions, get_types_package_name, is_relative, mangle_scoped_package_name,
-    resolve_config, resolve_package_directory, Error, PackageContents, PackageId, PackageJson,
-    Probe, ResolvedModule, Resolver, ResolverOptions,
+    resolve_config, resolve_config_with_options, resolve_package_directory, Error, PackageContents,
+    PackageId, PackageJson, Probe, ResolvedModule, Resolver, ResolverOptions,
 };
 
 mod diagnostic;
@@ -26,7 +26,9 @@ mod trace;
 pub use trace::{DiagAndArgs, TraceArg};
 
 mod config_mapper;
-pub use config_mapper::resolve_content_mapper_manifest;
+pub use config_mapper::{
+    resolve_content_mapper_manifest, resolve_content_mapper_manifest_with_options,
+};
 
 mod util;
 pub use paths::ParsedPatterns;

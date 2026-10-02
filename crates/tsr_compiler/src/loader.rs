@@ -1,7 +1,13 @@
+#[path = "reuse.rs"]
+mod reuse;
+pub use reuse::ProgramReuse;
+
 use crate::include_reason::{
     IncludeExplanations, IncludeReason, IncludeReasonData, ProcessingDiagnostic, SyntheticImport,
 };
-use crate::project_references::{ProjectReferenceFileMapper, ProjectReferenceParser};
+use crate::project_references::{
+    ProjectReferenceFileMapper, ProjectReferenceParser, ResolvedProjectReferenceProvider,
+};
 use crate::{metadata, FileCache, ProgramFile, SourceFileMetaData};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -10,6 +16,7 @@ use std::{
 use tsr_arena::Counters;
 use tsr_ast::utilities_middle::new_has_file_name;
 use tsr_ast::{Diagnostic, NodeId, SourceFileParseOptions};
+use tsr_checker::{TracePhase, TraceScope, TraceSink, TraceValue};
 use tsr_core::{CompilerOptions, ModuleKind, ScriptKind, Tristate};
 use tsr_jsstring::JsString;
 use tsr_module::{ResolvedModule, ResolvedTypeReferenceDirective, Resolver};
@@ -98,6 +105,7 @@ pub struct TypeResolution {
 /// source-of-reference mode and checker construction remain explicit
 /// unsupported boundaries.
 pub struct Program {
+    tracing: Option<Arc<dyn TraceSink>>,
     pub(crate) owners: crate::resolver_host::OwnerIndex,
     pub(crate) include_reasons: BTreeMap<JsString, Vec<Arc<IncludeReason>>>,
     pub(crate) references: ProjectReferenceFileMapper,
@@ -106,6 +114,8 @@ pub struct Program {
     output_file_to_project_reference_source: BTreeMap<JsString, JsString>,
     pub(crate) redirect_paths: BTreeMap<JsString, JsString>,
     pub(crate) redirect_file_names: BTreeMap<JsString, JsString>,
+    /// Package redirects in the same postorder collection positions as Go.
+    pub(crate) redirect_order: Vec<(usize, JsString)>,
     pub(crate) package_resolver: std::sync::Mutex<Resolver>,
     pub(crate) include_explanations: IncludeExplanations,
     pub(crate) declaration_diagnostics:
@@ -142,7 +152,67 @@ pub struct Program {
     /// Mapper reports on their configured options, at the config's syntax.
     pub(crate) content_mapper_option_diagnostics: Vec<Diagnostic>,
 }
+/// Loading services supplied by the command-line host. A build reuses its
+/// graph's parsed configuration objects; ordinary compilation reads references
+/// from the filesystem. The provider is needed only while loading; the finished
+/// program retains the returned configuration owners.
+#[derive(Default)]
+pub struct ProgramHostServices<'a> {
+    pub content_mapper_project: Option<Arc<dyn tsr_contentmapper::Project>>,
+    pub tracing: Option<Arc<dyn TraceSink>>,
+    pub resolved_project_references: Option<&'a dyn ResolvedProjectReferenceProvider>,
+}
+
 impl Program {
+    pub fn tracing(&self) -> Option<&Arc<dyn TraceSink>> {
+        self.tracing.as_ref()
+    }
+
+    /// Live loading with a trace session, recording the actual eager parse and
+    /// bind schedule of the immutable completed-file architecture.
+    pub fn load_live_with_content_mapper_project_and_tracing(
+        options: ProgramOptions,
+        project: Option<Arc<dyn tsr_contentmapper::Project>>,
+        cache: &mut FileCache,
+        counters: &Counters,
+        tracing: Option<Arc<dyn TraceSink>>,
+    ) -> Result<Self, Error> {
+        Self::load_live_with_host_services(
+            options,
+            ProgramHostServices {
+                content_mapper_project: project,
+                tracing,
+                ..Default::default()
+            },
+            cache,
+            counters,
+        )
+    }
+    pub fn load_live_with_host_services(
+        options: ProgramOptions,
+        services: ProgramHostServices<'_>,
+        cache: &mut FileCache,
+        counters: &Counters,
+    ) -> Result<Self, Error> {
+        let _trace = TraceScope::new(
+            services.tracing.as_ref(),
+            TracePhase::Program,
+            "createProgram",
+            || {
+                [(
+                    "configFilePath".into(),
+                    TraceValue::Str(
+                        String::from_utf8_lossy(options.config.options.config_file_path.as_bytes())
+                            .into_owned(),
+                    ),
+                )]
+                .into_iter()
+                .collect()
+            },
+            true,
+        );
+        Loader::new_with_services(options, services, cache, counters, true, false)?.run()
+    }
     pub fn load(
         options: ProgramOptions,
         cache: &mut FileCache,
@@ -194,6 +264,17 @@ impl Program {
         counters: &Counters,
     ) -> Result<Self, Error> {
         Loader::new(options, None, cache, counters, true, false)?.run()
+    }
+    /// Live command-line loading with a mapper project. The caller freezes
+    /// filesystem edits for the load, as with `load_live`; loaded AST owners
+    /// remain immutable and mapper identities belong to this compilation.
+    pub fn load_live_with_content_mapper_project(
+        options: ProgramOptions,
+        project: Option<Arc<dyn tsr_contentmapper::Project>>,
+        cache: &mut FileCache,
+        counters: &Counters,
+    ) -> Result<Self, Error> {
+        Loader::new(options, project, cache, counters, true, false)?.run()
     }
     /// The mapper a content-mapped file came from, when the program's config
     /// still maps its name to a mapper of the same identity.
@@ -402,6 +483,19 @@ impl Program {
             self.metadata(path).unwrap_or(&empty),
         )
     }
+    /// Included paths for consistency checks. Reasons remain owned by the
+    /// program; callers cannot mutate the map or expose its private records.
+    /// Equivalent projection of compiler.Program.GetIncludeReasons for its
+    /// testing consumer, which only reads the map's keys.
+    pub fn include_reason_paths(&self) -> impl Iterator<Item = &JsString> {
+        self.include_reasons.keys()
+    }
+    /// port: tsc/internal/compiler/program.go:Program.IsMissingPath
+    pub fn is_missing_path(&self, path: &JsString) -> bool {
+        self.missing
+            .iter()
+            .any(|name| self.to_path(name.as_bytes()) == *path)
+    }
     pub fn missing_files(&self) -> &[JsString] {
         &self.missing
     }
@@ -555,6 +649,7 @@ impl Program {
     }
 }
 struct Loader<'a> {
+    tracing: Option<Arc<dyn TraceSink>>,
     config: tsr_tsoptions::ParsedCommandLine,
     pending: Vec<LoadTask>,
     roles: BTreeMap<JsString, (bool, bool)>,
@@ -623,13 +718,18 @@ fn add_project_reference_tasks(
     can_use_source: bool,
     host: &Arc<dyn FileSystem>,
     cwd: &JsString,
+    allow_live_host: bool,
+    tracing: Option<Arc<dyn TraceSink>>,
+    reference_provider: Option<&dyn ResolvedProjectReferenceProvider>,
 ) -> Result<ProjectReferenceFileMapper, Error> {
     let mut mapper = ProjectReferenceFileMapper::new(config, can_use_source);
     let references = config.resolved_project_reference_paths();
     if references.is_empty() {
         return Ok(mapper);
     }
-    ProjectReferenceParser::new(&mut mapper, host.clone(), cwd.clone())
+    ProjectReferenceParser::new(&mut mapper, host.clone(), cwd.clone(), allow_live_host)
+        .with_tracing(tracing)
+        .with_reference_provider(reference_provider)
         .parse(references, config.config_file.as_ref())?;
     if can_use_source && mapper.has_outputs() {
         return Err(Error::Unsupported(
@@ -647,8 +747,53 @@ impl<'a> Loader<'a> {
         allow_live_host: bool,
         use_source_of_project_reference: bool,
     ) -> Result<Self, Error> {
-        let content_mappers = crate::content_mapped::ContentMapperState::new(
+        Self::new_with_tracing(
+            input,
             project,
+            cache,
+            counters,
+            allow_live_host,
+            use_source_of_project_reference,
+            None,
+        )
+    }
+    fn new_with_tracing(
+        input: ProgramOptions,
+        project: Option<Arc<dyn tsr_contentmapper::Project>>,
+        cache: &'a mut FileCache,
+        counters: &'a Counters,
+        allow_live_host: bool,
+        use_source_of_project_reference: bool,
+        tracing: Option<Arc<dyn TraceSink>>,
+    ) -> Result<Self, Error> {
+        Self::new_with_services(
+            input,
+            ProgramHostServices {
+                content_mapper_project: project,
+                tracing,
+                ..Default::default()
+            },
+            cache,
+            counters,
+            allow_live_host,
+            use_source_of_project_reference,
+        )
+    }
+    fn new_with_services(
+        input: ProgramOptions,
+        services: ProgramHostServices<'_>,
+        cache: &'a mut FileCache,
+        counters: &'a Counters,
+        allow_live_host: bool,
+        use_source_of_project_reference: bool,
+    ) -> Result<Self, Error> {
+        let ProgramHostServices {
+            content_mapper_project,
+            tracing,
+            resolved_project_references,
+        } = services;
+        let content_mappers = crate::content_mapped::ContentMapperState::new(
+            content_mapper_project,
             input.config.content_mapper_extensions(),
         );
         let can_use_project_reference_source =
@@ -658,6 +803,9 @@ impl<'a> Loader<'a> {
             can_use_project_reference_source,
             &input.host,
             &input.current_directory,
+            allow_live_host,
+            tracing.clone(),
+            resolved_project_references,
         )?;
         let options = Arc::new(input.config.options.clone());
         let resolver = Resolver::with_options(
@@ -675,6 +823,7 @@ impl<'a> Loader<'a> {
             input.current_directory.as_bytes(),
         ));
         Ok(Self {
+            tracing,
             config: input.config,
             pending: Vec::new(),
             roles: BTreeMap::new(),
@@ -714,6 +863,20 @@ impl<'a> Loader<'a> {
         })
     }
     fn run(mut self) -> Result<Program, Error> {
+        let _trace = TraceScope::new(
+            self.tracing.as_ref(),
+            TracePhase::Program,
+            "processRootFiles",
+            || {
+                [(
+                    "count".into(),
+                    TraceValue::Int(self.config.root_file_names.len() as i64),
+                )]
+                .into_iter()
+                .collect()
+            },
+            false,
+        );
         let roots = std::mem::take(&mut self.config.root_file_names);
         // port: tsc/internal/compiler/fileloader.go:fileLoader.addRootFileTask
         for (index, root) in roots.iter().enumerate() {
@@ -927,11 +1090,37 @@ impl<'a> Loader<'a> {
             }
         }
         let mut program = Program {
+            tracing: self.tracing,
             include_reasons: self.include_reasons,
             references,
             output_file_to_project_reference_source: collected.output_to_source,
             redirect_paths: redirects,
             redirect_file_names,
+            redirect_order: collected
+                .redirect_order
+                .into_iter()
+                .map(|(index, path)| {
+                    (
+                        index
+                            + self
+                                .files
+                                .iter()
+                                .filter(|file| {
+                                    self.libs.contains(
+                                        file.bound()
+                                            .view()
+                                            .source_file()
+                                            .expect("retained source")
+                                            .parse_options()
+                                            .path
+                                            .as_bytes(),
+                                    )
+                                })
+                                .count(),
+                        path,
+                    )
+                })
+                .collect(),
             package_resolver: std::sync::Mutex::new(self.resolver),
             include_explanations: IncludeExplanations::default(),
             diagnostic_snapshot: crate::program_diagnostics::ProgramDiagnostics::default(),
@@ -1049,6 +1238,9 @@ impl<'a> Loader<'a> {
             seen: BTreeMap::new(),
             packages: BTreeMap::new(),
             redirects: BTreeMap::new(),
+            redirect_order: Vec::new(),
+            library_paths: &self.libs,
+            non_library_count: 0,
             output: Vec::new(),
             missing_names: &self.missing,
             missing: Vec::new(),
@@ -1067,19 +1259,18 @@ impl<'a> Loader<'a> {
         self.trace = collector.trace;
         Collected {
             redirects: collector.redirects,
+            redirect_order: collector.redirect_order,
             missing: collector.missing,
             output_to_source: collector.output_to_source,
             processing: collector.processing,
             renamed: collector.renamed,
         }
     }
-    /// A path first collected under another spelling than the one that was
-    /// parsed is parsed again under that spelling, as the pin parses every
-    /// spelling of a path. Only a file without dependencies can be: another
-    /// spelling's dependencies would resolve from another directory spelling.
-    /// A failed `/// <reference path>` counts as a dependency: its diagnostic
-    /// belongs to the replaced parse and would be dropped with it, while the
-    /// pin reports it against the kept spelling's own parse.
+    /// The pin retains the first inclusion's spelling after parsing tasks.
+    /// A case-insensitive host may have loaded the canonical path with another
+    /// spelling. Reparse the retained name, preserving path-keyed resolutions
+    /// and include-reference indices. Loader diagnostics carry source identities,
+    /// so replace those identities before releasing the earlier parse.
     fn parse_first_casings(&mut self, renamed: &[(JsString, JsString)]) -> Result<(), Error> {
         for (key, name) in renamed {
             let index = self
@@ -1097,17 +1288,6 @@ impl<'a> Loader<'a> {
                 })
                 .expect("renamed file was collected");
             let replaced = self.files[index].source();
-            let leaf = !self.children.contains_key(key)
-                && self.child_tasks.get(key).is_none_or(Vec::is_empty)
-                && !self.processing.contains_key(key)
-                && !self.resolutions.iter().any(|r| &r.file == key)
-                && !self.type_resolutions.iter().any(|r| &r.file == key)
-                && !self.diagnostics.iter().any(|d| d.file == Some(replaced));
-            if !leaf {
-                return Err(Error::Unsupported(
-                    "file-name casing variant with its own dependencies",
-                ));
-            }
             let is_lib = self.libs.contains(key);
             let meta = metadata::load(
                 &mut self.resolver,
@@ -1120,6 +1300,23 @@ impl<'a> Loader<'a> {
             let file = self
                 .parse_source_file(name.as_bytes(), key, &meta, kind)?
                 .ok_or(Error::Unsupported("file-name casing variant without text"))?;
+            // Canonical path identity is enough for resolution records, but
+            // offsets and directive indices require the same source bytes.
+            if self.files[index]
+                .bound
+                .view()
+                .source_file()?
+                .text()
+                .as_bytes()
+                != file.bound.view().source_file()?.text().as_bytes()
+            {
+                return Err(Error::Unsupported(
+                    "source changed during file-name casing selection",
+                ));
+            }
+            for diagnostic in &mut self.diagnostics {
+                replace_diagnostic_source(diagnostic, replaced, file.source());
+            }
             self.metadata.insert(key.clone(), meta);
             self.files[index] = file;
         }
@@ -1127,6 +1324,13 @@ impl<'a> Loader<'a> {
     }
     /// port: tsc/internal/compiler/fileloader.go:fileLoader.resolveAutomaticTypeDirectives
     fn load_automatic_types(&mut self) -> Result<(), Error> {
+        let _trace = TraceScope::new(
+            self.tracing.as_ref(),
+            TracePhase::Program,
+            "processTypeReferences",
+            Default::default,
+            false,
+        );
         let names = self.resolver.automatic_type_directive_names()?;
         let directory = if self.options.config_file_path.is_empty() {
             self.cwd.as_bytes().to_vec()
@@ -1149,6 +1353,25 @@ impl<'a> Loader<'a> {
                 .resolver
                 .resolve_type_reference(name.as_bytes(), &containing, ModuleKind::NONE)?
                 .clone();
+            let _trace = TraceScope::new(
+                self.tracing.as_ref(),
+                TracePhase::Program,
+                "processTypeReferenceDirective",
+                || {
+                    [
+                        (
+                            "directive".into(),
+                            TraceValue::Str(String::from_utf8_lossy(name.as_bytes()).into_owned()),
+                        ),
+                        ("hasResolved".into(), TraceValue::Bool(result.is_resolved())),
+                        // fileIncludeKindAutomaticTypeDirectiveFile
+                        ("refKind".into(), TraceValue::Int(6)),
+                    ]
+                    .into_iter()
+                    .collect()
+                },
+                false,
+            );
             self.file_traces
                 .entry(key.clone())
                 .or_default()
@@ -1288,6 +1511,20 @@ impl<'a> Loader<'a> {
         library_name: &[u8],
         resolve_from: &[u8],
     ) -> Result<(ResolvedModule, Vec<tsr_module::DiagAndArgs>), Error> {
+        let _trace = TraceScope::new(
+            self.tracing.as_ref(),
+            TracePhase::Program,
+            "resolveLibrary",
+            || {
+                [(
+                    "resolveFrom".into(),
+                    TraceValue::Str(String::from_utf8_lossy(resolve_from).into_owned()),
+                )]
+                .into_iter()
+                .collect()
+            },
+            false,
+        );
         let mut resolution = ResolvedModule::default();
         // `p.resolver.ResolveModuleName(libraryName, resolveFrom, CommonJS, nil)`:
         // the skip-statement site leaves the library unresolved, so the bundled
@@ -1406,6 +1643,20 @@ impl<'a> Loader<'a> {
             }
             return Ok(());
         }
+        let _trace = TraceScope::new(
+            self.tracing.as_ref(),
+            TracePhase::Program,
+            "findSourceFile",
+            || {
+                [(
+                    "fileName".into(),
+                    TraceValue::Str(String::from_utf8_lossy(&name).into_owned()),
+                )]
+                .into_iter()
+                .collect()
+            },
+            false,
+        );
         let pending_start = self.pending.len();
         if let Some(output) = self.references.parse_file_redirect(key.as_bytes(), &name)? {
             self.redirect_task(&key, &name, output.as_bytes(), is_lib, depth);
@@ -1435,7 +1686,7 @@ impl<'a> Loader<'a> {
             self.skip_resolution,
         )?;
         let file = match supplemental {
-            Some(parsed) => Some(bind(parsed)?),
+            Some(parsed) => Some(bind(parsed, self.tracing.as_ref())?),
             None => self.parse_source_file(&name, &key, &meta, kind)?,
         };
         let Some(file) = file else {
@@ -1451,7 +1702,11 @@ impl<'a> Loader<'a> {
                 // missing without a loader diagnostic.
                 return Ok(());
             }
-            return Err(Error::Unsupported("missing dependency include diagnostics"));
+            // A library/dependency task whose host returns no source is kept
+            // in missingFiles without inventing a diagnostic. Root/reference
+            // lookup diagnostics are attached to their include edges before
+            // parsing (filesparser.go:parseTask.load/getProcessedFiles).
+            return Ok(());
         };
         if is_lib {
             self.libs.insert(key.clone());
@@ -1551,6 +1806,20 @@ impl<'a> Loader<'a> {
         meta: &SourceFileMetaData,
         kind: ScriptKind,
     ) -> Result<Option<Arc<ProgramFile>>, Error> {
+        let _trace = TraceScope::new(
+            self.tracing.as_ref(),
+            TracePhase::Parse,
+            "createSourceFile",
+            || {
+                [(
+                    "path".into(),
+                    TraceValue::Str(String::from_utf8_lossy(name).into_owned()),
+                )]
+                .into_iter()
+                .collect()
+            },
+            true,
+        );
         let options = SourceFileParseOptions {
             file_name: JsString::from_bytes(name),
             path: key.clone(),
@@ -1592,7 +1861,7 @@ impl<'a> Loader<'a> {
         let transform_identity = self.content_mapper_transform_identity(&mapper, index);
         if self.content_mappers.unavailable(index) {
             let file = self.empty_content_mapped_file(options, identity, transform_identity)?;
-            return Ok(Some(bind(file)?));
+            return Ok(Some(bind(file, self.tracing.as_ref())?));
         }
         let files = match self.content_mapped_source_files(&options, &mapper, index)? {
             Ok(Some(files)) => files,
@@ -1617,7 +1886,7 @@ impl<'a> Loader<'a> {
                     diagnostics.push(diagnostic);
                     state.set_diagnostics(diagnostics);
                 }
-                return Ok(Some(bind(file)?));
+                return Ok(Some(bind(file, self.tracing.as_ref())?));
             }
         };
         for file in files.supplemental {
@@ -1630,7 +1899,7 @@ impl<'a> Loader<'a> {
             let key = self.to_path(name.as_bytes());
             self.content_mappers.supplementals.insert(key, file);
         }
-        Ok(Some(bind(files.canonical)?))
+        Ok(Some(bind(files.canonical, self.tracing.as_ref())?))
     }
     /// The host's transform of one content-mapped file, with the collision
     /// check on its supplemental names.
@@ -1737,6 +2006,7 @@ impl<'a> Loader<'a> {
             kind,
             options,
             self.counters,
+            self.tracing.as_ref(),
         )?))
     }
     /// A `/// <reference path>`: its absolute file name, or the diagnostic's
@@ -1772,7 +2042,28 @@ impl<'a> Loader<'a> {
     ) -> Result<(), Error> {
         let view = file.bound.view().ast();
         let state = view.source_file(file.source())?;
-        for (index, reference) in state.type_reference_directives()?.iter().enumerate() {
+        let references = state.type_reference_directives()?;
+        if references.is_empty() {
+            return Ok(());
+        }
+        let _trace = TraceScope::new(
+            self.tracing.as_ref(),
+            TracePhase::Program,
+            "resolveTypeReferenceDirectiveNamesWorker",
+            || {
+                [(
+                    "containingFileName".into(),
+                    TraceValue::Str(
+                        String::from_utf8_lossy(state.parse_options().file_name.as_bytes())
+                            .into_owned(),
+                    ),
+                )]
+                .into_iter()
+                .collect()
+            },
+            false,
+        );
+        for (index, reference) in references.iter().enumerate() {
             let mode = metadata::type_reference_mode(
                 reference.resolution_mode,
                 name,
@@ -1788,6 +2079,32 @@ impl<'a> Loader<'a> {
                     resolution.reference(),
                 )?
                 .clone();
+            let _trace = TraceScope::new(
+                self.tracing.as_ref(),
+                TracePhase::Program,
+                "processTypeReferenceDirective",
+                || {
+                    [
+                        (
+                            "directive".into(),
+                            TraceValue::Str(
+                                String::from_utf8_lossy(reference.file_name.as_bytes())
+                                    .into_owned(),
+                            ),
+                        ),
+                        ("hasResolved".into(), TraceValue::Bool(result.is_resolved())),
+                        // fileIncludeKindTypeReferenceDirective
+                        ("refKind".into(), TraceValue::Int(2)),
+                        (
+                            "refPath".into(),
+                            TraceValue::Str(String::from_utf8_lossy(key.as_bytes()).into_owned()),
+                        ),
+                    ]
+                    .into_iter()
+                    .collect()
+                },
+                false,
+            );
             self.file_traces
                 .entry(key.clone())
                 .or_default()
@@ -1833,6 +2150,23 @@ impl<'a> Loader<'a> {
     ) -> Result<(), Error> {
         let view = file.bound.view().ast();
         let state = view.source_file(file.source())?;
+        let _trace = TraceScope::new(
+            self.tracing.as_ref(),
+            TracePhase::Program,
+            "resolveModuleNamesWorker",
+            || {
+                [(
+                    "containingFileName".into(),
+                    TraceValue::Str(
+                        String::from_utf8_lossy(state.parse_options().file_name.as_bytes())
+                            .into_owned(),
+                    ),
+                )]
+                .into_iter()
+                .collect()
+            },
+            false,
+        );
         let name = resolution.name.clone();
         let runtime = if matches!(kind, ScriptKind::JS | ScriptKind::JSX | ScriptKind::TSX) {
             metadata::jsx_runtime_import(
@@ -2090,7 +2424,35 @@ impl<'a> Loader<'a> {
 /// port: tsc/internal/compiler/host.go:compilerHost.Trace
 /// Binds a file the loader parsed itself: a content-mapped file or one of
 /// its supplemental files.
-fn bind(parsed: tsr_ast::ParsedFile) -> Result<Arc<ProgramFile>, Error> {
+fn bind(
+    parsed: tsr_ast::ParsedFile,
+    tracing: Option<&Arc<dyn TraceSink>>,
+) -> Result<Arc<ProgramFile>, Error> {
+    let _trace = TraceScope::new(
+        tracing,
+        TracePhase::Bind,
+        "bindSourceFile",
+        || {
+            [(
+                "path".into(),
+                TraceValue::Str(
+                    String::from_utf8_lossy(
+                        parsed
+                            .view()
+                            .source_file(parsed.root())
+                            .expect("parsed source file")
+                            .parse_options()
+                            .path
+                            .as_bytes(),
+                    )
+                    .into_owned(),
+                ),
+            )]
+            .into_iter()
+            .collect()
+        },
+        true,
+    );
     // port: tsc/internal/compiler/program.go:Program.BindSourceFiles
     let bound = tsr_binder::bind_parsed_file(parsed)?;
     Ok(Arc::new(ProgramFile { bound }))
@@ -2234,6 +2596,7 @@ impl FileResolution {
 }
 struct Collected {
     redirects: BTreeMap<JsString, JsString>,
+    redirect_order: Vec<(usize, JsString)>,
     missing: Vec<JsString>,
     output_to_source: BTreeMap<JsString, JsString>,
     processing: Vec<ProcessingDiagnostic>,
@@ -2257,6 +2620,9 @@ struct Collector<'a> {
     seen: BTreeMap<JsString, JsString>,
     packages: BTreeMap<tsr_module::PackageId, JsString>,
     redirects: BTreeMap<JsString, JsString>,
+    redirect_order: Vec<(usize, JsString)>,
+    library_paths: &'a BTreeSet<JsString>,
+    non_library_count: usize,
     output: Vec<Arc<ProgramFile>>,
     missing_names: &'a BTreeMap<JsString, JsString>,
     missing: Vec<JsString>,
@@ -2352,6 +2718,10 @@ impl Collector<'_> {
                 if let Some(package) = self.package_ids.get(key) {
                     if let Some(first) = self.packages.get(package) {
                         self.redirects.insert(key.clone(), first.clone());
+                        self.redirect_order.push((
+                            self.non_library_count + self.redirect_order.len(),
+                            key.clone(),
+                        ));
                         return;
                     }
                 }
@@ -2385,6 +2755,10 @@ impl Collector<'_> {
             if let Some(package) = self.package_ids.get(key) {
                 if let Some(first) = self.packages.get(package) {
                     self.redirects.insert(key.clone(), first.clone());
+                    self.redirect_order.push((
+                        self.non_library_count + self.redirect_order.len(),
+                        key.clone(),
+                    ));
                     return;
                 }
                 self.packages.insert(package.clone(), key.clone());
@@ -2407,6 +2781,7 @@ impl Collector<'_> {
         if parsed != edge.name {
             self.renamed.push((key.clone(), edge.name.clone()));
         }
+        self.non_library_count += usize::from(!self.library_paths.contains(key));
         self.output.push(file);
     }
     fn emit_processing(&mut self, key: &JsString) {
@@ -2445,5 +2820,19 @@ impl Collector<'_> {
                 message,
                 args,
             });
+    }
+}
+
+/// Loader diagnostics contain positions and source IDs, never checker nodes.
+fn replace_diagnostic_source(diagnostic: &mut Diagnostic, old: NodeId, new: NodeId) {
+    if diagnostic.file == Some(old) {
+        diagnostic.file = Some(new);
+    }
+    for child in diagnostic
+        .message_chain
+        .iter_mut()
+        .chain(&mut diagnostic.related_information)
+    {
+        replace_diagnostic_source(Arc::make_mut(child), old, new);
     }
 }

@@ -63,7 +63,7 @@ fn build(old: Option<&Program>, counters: &Counters) -> Program {
     );
     let checked = Arc::new(CheckedProgram::new(loaded.clone(), counters, None));
     let host = create_host(Arc::new(ProgramCompilerHost::new(loaded)));
-    new_program(checked, old, host, None, false).expect("the incremental program")
+    new_program(checked, old, host, None, true).expect("the incremental program")
 }
 
 /// The semantic diagnostics of `/a.ts`, formatted with the program that
@@ -119,12 +119,36 @@ fn reused_diagnostics_do_not_retain_previous_programs() {
         current
             .get_semantic_diagnostics(&CheckerRequest::default(), None)
             .expect("all semantic diagnostics");
+        let identities: Vec<_> = [b"/a.ts".as_slice(), b"/lib.d.ts"]
+            .into_iter()
+            .map(|path| {
+                let path = JsString::from_bytes(path);
+                let id = current
+                    .get_testing_data()
+                    .unwrap()
+                    .semantic_diagnostics_per_file
+                    .cached_semantic_diagnostics_identity(&path)
+                    .unwrap();
+                (path, id)
+            })
+            .collect();
         let previous = Arc::downgrade(current.program().program());
         current = build(Some(&current), &counters);
         assert!(
             previous.upgrade().is_none(),
             "reused diagnostics must not pin the obsolete loaded program"
         );
+        for (path, identity) in identities {
+            assert_eq!(
+                Some(identity),
+                current
+                    .get_testing_data()
+                    .unwrap()
+                    .semantic_diagnostics_per_file
+                    .cached_semantic_diagnostics_identity(&path),
+                "unchanged nonempty and empty diagnostic caches retain their actual identity"
+            );
+        }
         assert_eq!(formatted(&current), expected);
     }
 }

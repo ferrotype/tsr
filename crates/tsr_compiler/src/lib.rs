@@ -36,7 +36,7 @@ pub use program_emit::{
     WriteFileData,
 };
 mod project_references;
-pub use project_references::CompilerConfigHost;
+pub use project_references::{CompilerConfigHost, ResolvedProjectReferenceProvider};
 mod syntactic_diagnostics;
 mod verify_options;
 pub use verify_options::{verify_compiler_options, FileIncludeDiagnostic, OptionVerification};
@@ -45,7 +45,10 @@ mod metadata;
 mod resolver_host;
 pub use cache::{FileCache, ProgramFile};
 pub use checker_host::ProgramCheckerHost;
-pub use loader::{Error, LibFile, Program, ProgramOptions, Resolution, TypeResolution};
+pub use loader::{
+    Error, LibFile, Program, ProgramHostServices, ProgramOptions, ProgramReuse, Resolution,
+    TypeResolution,
+};
 pub use resolver_host::ProgramResolverHost;
 pub use tsr_ast::SourceFileMetaData;
 /// The message catalog that `Program::explain_file_include` takes its messages from.
@@ -57,3 +60,5 @@ mod boundary_tests;
 mod ownership_tests;
 #[cfg(test)]
 mod tests;
+
+mod statistics;

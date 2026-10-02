@@ -127,18 +127,7 @@ impl TscInput {
         transcript.progress.stage = "header";
         let baseline_builder = &mut transcript.text;
         let sys = new_test_sys(self, false);
-        baseline_builder.extend_from_slice(b"currentDirectory::");
-        baseline_builder.extend_from_slice(tsc::System::get_current_directory(&*sys));
-        baseline_builder.extend_from_slice(b"\nuseCaseSensitiveFileNames::");
-        baseline_builder.extend_from_slice(
-            if tsc::System::fs(&*sys).use_case_sensitive_file_names() {
-                b"true"
-            } else {
-                b"false"
-            },
-        );
-        baseline_builder.extend_from_slice(b"\nInput::\n");
-        sys.baseline_fs_with_diff(baseline_builder);
+        write_header(&sys, baseline_builder);
         transcript.progress.stage = "initial";
         let result = self.execute_command(ctx, &sys, baseline_builder, &self.command_line_args);
         transcript.progress.commands += 1;
@@ -372,4 +361,18 @@ pub fn get_diff_for_incremental(
         ));
     }
     diff_builder
+}
+
+/// The exact pre-command transcript, independently witnessed by all baselines.
+pub(crate) fn write_header(sys: &TestSys, baseline_builder: &mut Vec<u8>) {
+    baseline_builder.extend_from_slice(b"currentDirectory::");
+    baseline_builder.extend_from_slice(tsc::System::get_current_directory(sys));
+    baseline_builder.extend_from_slice(b"\nuseCaseSensitiveFileNames::");
+    baseline_builder.extend_from_slice(if tsc::System::fs(sys).use_case_sensitive_file_names() {
+        b"true"
+    } else {
+        b"false"
+    });
+    baseline_builder.extend_from_slice(b"\nInput::\n");
+    sys.baseline_fs_with_diff(baseline_builder);
 }

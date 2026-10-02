@@ -268,8 +268,9 @@ pub use config_syntax::{
 
 mod option_declarations;
 pub use option_declarations::{
-    find_declaration, option_declaration, EnumValue, OptionDeclaration, OptionKind, BUILD_OPTIONS,
-    COMPILER_OPTIONS, ROOT_OPTIONS, TYPE_ACQUISITION_OPTIONS, WATCH_OPTIONS,
+    find_declaration, option_declaration, DefaultValueDescription, EnumValue, OptionDeclaration,
+    OptionKind, BUILD_HELP_OPTIONS, BUILD_OPTIONS, COMPILER_OPTIONS, ROOT_OPTIONS,
+    TYPE_ACQUISITION_OPTIONS, WATCH_OPTIONS,
 };
 mod parse_options;
 pub use parse_options::{

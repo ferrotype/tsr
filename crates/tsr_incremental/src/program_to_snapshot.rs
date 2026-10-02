@@ -6,8 +6,7 @@ use crate::program::Program;
 use crate::reference_map::ReferenceSet;
 use crate::snapshot::{
     get_file_emit_kind, get_pending_emit_kind_with_options, lock, BuildInfoDiagnosticWithFileName,
-    DiagnosticsOrBuildInfoDiagnosticsWithFileName, FileEmitKind, FileInfo, Path,
-    ProgramDiagnostics, Snapshot,
+    DiagnosticsOrBuildInfoDiagnosticsWithFileName, FileEmitKind, FileInfo, Path, Snapshot,
 };
 use std::collections::BTreeSet;
 use std::sync::atomic::Ordering;
@@ -602,25 +601,14 @@ pub(crate) fn repopulate_diagnostics_of_file(
         let Some(repopulated) =
             repopulate_diagnostics_list(&program_diagnostics.diagnostics, p, file)?
         else {
-            // Go's cached diagnostics retain only the source files they
-            // reference. Our cache also carries its resolving program, so
-            // sharing it unchanged would pin an entire obsolete program,
-            // even for an empty list. Move its provenance to this program.
-            if let Some(rebound) = program_diagnostics.rebind_for_reuse(p)? {
-                return Ok(Arc::new(DiagnosticsOrBuildInfoDiagnosticsWithFileName {
-                    diagnostics: Mutex::new(Some(rebound)),
-                    ..DiagnosticsOrBuildInfoDiagnosticsWithFileName::default()
-                }));
-            }
+            // The cached list owns only its referenced source files. Reuse the
+            // actual entry when its contents are unchanged, including empty
+            // diagnostics; this neither pins an old Program nor fakes identity.
             return Ok(diags.clone());
         };
         // The repopulated list is recorded as `p`'s, so the files it still
         // names as the old program held them must become `p`'s.
-        let repopulated = ProgramDiagnostics {
-            diagnostics: repopulated,
-            ..program_diagnostics
-        }
-        .diagnostics_for(p)?;
+        let repopulated = program_diagnostics.rebind_list(&repopulated, p)?;
         return Ok(Arc::new(
             DiagnosticsOrBuildInfoDiagnosticsWithFileName::from_diagnostics(p, repopulated),
         ));

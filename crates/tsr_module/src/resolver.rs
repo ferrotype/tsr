@@ -146,6 +146,29 @@ pub struct Resolver {
         BTreeMap<crate::type_references::TypeKey, crate::ResolvedTypeReferenceDirective>,
 }
 impl Resolver {
+    /// Retain resolution observations for a compiler program whose file graph
+    /// is unchanged, while directing any later host queries to the new cycle.
+    pub fn fork_for_host(&self, host: Arc<dyn FileSystem>) -> Self {
+        Self {
+            config_lookup: self.config_lookup,
+            package_directory_only: self.package_directory_only,
+            host,
+            options: self.options.clone(),
+            operation_base_options: self.operation_base_options.clone(),
+            typings_location: self.typings_location.clone(),
+            project_name: self.project_name.clone(),
+            extra_extensions: self.extra_extensions.clone(),
+            cwd: self.cwd.clone(),
+            cache: self.cache.clone(),
+            option_patterns: self.option_patterns.clone(),
+            packages: self.packages.clone(),
+            trace_resolution: self.trace_resolution,
+            last_resolution: self.last_resolution.clone(),
+            tracer: crate::trace::Tracer::default(),
+            probes: Vec::new(),
+            type_cache: self.type_cache.clone(),
+        }
+    }
     pub fn new(
         host: Arc<dyn FileSystem>,
         options: Arc<CompilerOptions>,
@@ -928,13 +951,24 @@ pub fn resolve_config(
     host: Arc<dyn FileSystem>,
     cwd: &[u8],
 ) -> Result<ResolvedModule, Error> {
+    resolve_config_with_options(name, containing_file, host, cwd, ResolverOptions::default())
+}
+
+/// A fresh one-shot resolver; live hosts may opt in because no cache escapes.
+pub fn resolve_config_with_options(
+    name: &[u8],
+    containing_file: &[u8],
+    host: Arc<dyn FileSystem>,
+    cwd: &[u8],
+    settings: ResolverOptions,
+) -> Result<ResolvedModule, Error> {
     let options = Arc::new(CompilerOptions {
         module_resolution: ModuleResolutionKind::NODE_NEXT,
         ..Default::default()
     });
     let mut context = crate::package_maps::Context::new(&options, ModuleKind::COMMON_JS);
     context.extensions = JSON;
-    let mut resolver = Resolver::new(host, options, cwd)?;
+    let mut resolver = Resolver::with_options(host, options, cwd, settings)?;
     resolver.config_lookup = true;
     resolver.resolve_worker(name, &path::directory(containing_file), &context)
 }

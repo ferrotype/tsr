@@ -32,6 +32,11 @@ impl FileCache {
     pub fn new() -> Self {
         Self::default()
     }
+    /// Drop the reuse candidates for a changed source path. Existing programs
+    /// still retain their bound owners until the replacement program is ready.
+    pub fn evict(&mut self, path: &[u8]) {
+        self.files.remove(path);
+    }
     pub fn prune(&mut self) {
         self.files.retain(|_, entries| {
             entries.retain(|entry| entry.strong_count() != 0);
@@ -44,6 +49,7 @@ impl FileCache {
         kind: ScriptKind,
         options: SourceFileParseOptions,
         counters: &Counters,
+        tracing: Option<&Arc<dyn tsr_checker::TraceSink>>,
     ) -> Result<Arc<ProgramFile>, Error> {
         let entries = self.files.entry(options.path.clone()).or_default();
         entries.retain(|entry| entry.strong_count() != 0);
@@ -60,6 +66,31 @@ impl FileCache {
         }
         let parsed = tsr_parser::parse_source_file_with_counters(source, kind, options, counters);
         // port: tsc/internal/compiler/program.go:Program.BindSourceFiles
+        let _trace = tsr_checker::TraceScope::new(
+            tracing,
+            tsr_checker::TracePhase::Bind,
+            "bindSourceFile",
+            || {
+                [(
+                    "path".into(),
+                    tsr_checker::TraceValue::Str(
+                        String::from_utf8_lossy(
+                            parsed
+                                .view()
+                                .source_file(parsed.root())
+                                .expect("parsed source file")
+                                .parse_options()
+                                .path
+                                .as_bytes(),
+                        )
+                        .into_owned(),
+                    ),
+                )]
+                .into_iter()
+                .collect()
+            },
+            true,
+        );
         let bound = tsr_binder::bind_parsed_file(parsed)?;
         let file = Arc::new(ProgramFile { bound });
         entries.push(Arc::downgrade(&file));

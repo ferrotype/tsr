@@ -8,12 +8,17 @@ use tsr_jsstring::JsString;
 
 pub fn path_and_file_name(file: &ProgramFile) -> (JsString, JsString) {
     let view = file.bound().view();
-    let source = view.source_file().expect("a program file has its source file");
+    let source = view
+        .source_file()
+        .expect("a program file has its source file");
     let options = source.parse_options();
     (options.path.clone(), options.file_name.clone())
 }
 
-pub fn semantic_diagnostics_identity(snapshot: &Snapshot, path: &JsString) -> Option<CachedDiagnosticsIdentity> {
+pub fn semantic_diagnostics_identity(
+    snapshot: &Snapshot,
+    path: &JsString,
+) -> Option<CachedDiagnosticsIdentity> {
     snapshot.cached_semantic_diagnostics_identity(path)
 }
 

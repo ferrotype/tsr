@@ -77,7 +77,7 @@ def buckets(comparison):
     over every row that is not a match."""
     groups = defaultdict(lambda: {"scenarios": [], "families": Counter(), "sections": set()})
     for row in comparison["rows"]:
-        if row["category"] == "match":
+        if row["category"] == "match" or (row["category"] == "different" and row.get("approved_difference")):
             continue
         group = groups[(row["category"], compare.cause_of(row))]
         group["scenarios"].append(row["id"])
@@ -89,6 +89,15 @@ def buckets(comparison):
 
 def shown(path):
     return str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else str(path)
+
+
+def approved_exceptions(comparison):
+    """Retain raw differences whose exact observation pair has owner approval."""
+    return [{"scenario": row["id"], "kind": "different", "disposition": "approved_exception",
+             "approval": row["approved_difference"], "cause": compare.cause_of(row),
+             "transcript": f"baselines/{row['id']}"}
+            for row in comparison["rows"]
+            if row["category"] == "different" and row.get("approved_difference")]
 
 
 def emit_state():
@@ -149,6 +158,7 @@ def build(rust_dir=RUST, record=False, *, comparison=None, capture=None):
                   "4). A blocker explains a difference and never reclassifies it. The orphan reference renders "
                   "from no scenario and is not a blocker."),
         "entries": entries,
+        "approved_exceptions": approved_exceptions(comparison),
         "by_owner": dict(sorted(Counter(entry["owner"] for entry in entries).items())),
         "cross_phase": [emit_state()],
     }
@@ -172,7 +182,8 @@ def complete(register, comparison):
              for entry in register["entries"]}
     owners_known = all(entry["evidence"] and (entry["cross_phase"] or set(entry["owner"].split("/")) <= set(CHECKPOINTS))
                        for entry in register["entries"])
-    return needed == named and len(named) == len(register["entries"]) and owners_known
+    return (needed == named and len(named) == len(register["entries"]) and owners_known
+            and register.get("approved_exceptions", []) == approved_exceptions(comparison))
 
 
 def check(rust_dir=RUST):

@@ -304,7 +304,7 @@ pub use state::CheckerOptions;
 pub(crate) use state::CheckerState;
 pub use trace::{
     write_type_records, JsonLinesTraceSink, MemoryTraceSink, TraceArgs, TraceEvent, TraceLocation,
-    TracePhase, TraceSink, TraceTypeRecord, TraceValue, Tracer,
+    TracePhase, TraceScope, TraceSink, TraceTypeRecord, TraceValue, Tracer,
 };
 #[cfg(test)]
 use type_display::{alias_symbol, alias_type_arguments};

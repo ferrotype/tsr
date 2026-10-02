@@ -374,11 +374,11 @@ REVIEWED = {
         "X5", "Called only by Program.ReuseProgram (program.go:414)."),
     # processingDiagnostic.go
     "tsc/internal/compiler/processingDiagnostic.go:processingDiagnostic.asFileIncludeReason": _equivalent(
-        _REASON, "Self::UnknownReference(reason) => {",
+        _REASON, "let location = reason.reference_location(program)?;",
         "A type assertion on the diagnostic's data; the Rust processing diagnostic is an enum whose "
         "UnknownReference variant carries the reason, destructured in to_diagnostic."),
     "tsc/internal/compiler/processingDiagnostic.go:processingDiagnostic.asIncludeExplainingDiagnostic": _equivalent(
-        _REASON, "Self::ExplainingFileInclude {",
+        _REASON, "} => program.explain_file_include_with_reason(",
         "A type assertion on the diagnostic's data; the ExplainingFileInclude variant carries the file, reason, "
         "message and arguments, destructured in to_diagnostic."),
     # projectreferencefilemapper.go
@@ -477,6 +477,114 @@ REVIEWED = {
                    "until Phase 6 supplies the server."),
     "tsc/cmd/tsc/api.go:parseAPIFlags": _later("Phase 6", "runAPI's flag parser (api.go:42); decision 12."),
 }
+
+
+_MACOS = "crates/tsr_fswatch/src/macos.rs"
+_MACOS_NATIVE = "crates/tsr_fswatch/src/macos/native.rs"
+# Reviewed X4 adaptations: typed framework bindings and ownership replace the
+# pin's Go runtime/assembly bridge. Every anchor is a live operation, not a
+# comment claiming an implementation exists.
+REVIEWED.update({
+    "tsc/internal/fswatch/fsevents_darwin.go:init#1": _equivalent(
+        "crates/tsr_fswatch/src/watcher.rs", "Kind::Fsevents => crate::macos::new(),",
+        "The target-specific factory is an explicit backend match arm instead of a Go init mutation. "
+        "FsEventsBackend::sequence supplies FSEventsGetCurrentEventId through the Backend trait."),
+    "tsc/internal/fswatch/fsevents_darwin.go:fsEventsBackend.start": _equivalent(
+        _MACOS, "Ok(Arc::new(FsEventsBackend::default()))",
+        "Go start only signals readiness; this backend has no event-loop startup. The synchronous Rust factory "
+        "returns the ready backend, and native streams are started by add_many before that operation returns."),
+    "tsc/internal/fswatch/fsevents_darwin.go:checkWatcher": _equivalent(
+        _MACOS, "let metadata = std::fs::metadata(os_path(&watch.physical_dir))?;",
+        "Folded into add_many's pre-mutation validation of every physical directory: follow the root symlink, "
+        "propagate stat errors and reject non-directories with ENOTDIR. Common watcher registration supplies "
+        "the logical request context."),
+    "tsc/internal/fswatch/fsevents_darwin.go:fsEventsBackend.startStreams": _equivalent(
+        _MACOS, "let streams = match start_streams(&state.active_watches(), Stream::new) {",
+        "Go's method only forwards watches and b.startStream. Both Rust subscription and removal call the "
+        "ported start_streams with Stream::new directly."),
+    "tsc/internal/fswatch/fsevents_darwin.go:stopFSEventsStreams": _equivalent(
+        _MACOS, "state.streams.clear();",
+        "Vec<Stream> owns each native stream. Clearing or replacing the vector runs Stream::drop for every "
+        "element, including partially constructed chunk sets on error; Drop stops, invalidates, drains and "
+        "releases each stream once."),
+    "tsc/internal/fswatch/fsevents_darwin.go:fsEventsBackend.subscribe": _equivalent(
+        "crates/tsr_fswatch/src/watcher.rs", "if let Err(error) = backend.add_many(&added) {",
+        "The one-watch wrapper only delegates to subscribeMany. Common Rust registration sends both single "
+        "and batched requests through Backend::add_many, whose FSEvents implementation is the marked port."),
+    **{f"tsc/internal/fswatch/fsevents_darwin_ffi.go:{name}": _equivalent(
+        _MACOS_NATIVE, anchor, reason) for name, anchor, reason in (
+        ("syscall_syscall6", "unsafe extern \"C-unwind\" fn callback(",
+         "Go's runtime ABI trampoline is unnecessary with the typed objc2 framework imports and Rust C ABI "
+         "callback. The compiler supplies native argument passing, including FSEventStreamCreate's float "
+         "latency; callback catches panics and aborts before one can cross the framework boundary."),
+        ("cfRelease", "fn cf_string(bytes: &[u8]) -> Option<CFRetained<CFString>> {",
+         "CFRetained owns CFString/CFMutableString/CFArray creation results and releases them on every return "
+         "path. Callback CFArray/CFString values are borrowed only until callback return, requiring no retain."),
+        ("cfArrayCreate", "            CFArray::new(",
+         "Typed CFArray::new calls the same framework constructor with null element callbacks; the owned "
+         "CFString vector stays alive through FSEventStreamCreate, which copies the paths."),
+        ("cfArrayGetValueAtIndex", "cf_string_to_nfc(unsafe { paths.get_unchecked(index as isize) })",
+         "The typed CFArray accessor performs the same indexed lookup after the callback checks the array "
+         "length. The immutable borrowed CFString is normalized before callback return."),
+        ("cfStringCreateMutableCopy", "if let Some(normalized) = CFMutableString::new_copy(None, 0, Some(value)) {",
+         "The binding calls CFStringCreateMutableCopy with the same allocator/capacity and owns the result; "
+         "null preserves the pin's fallback to the original string."),
+        ("cfStringNormalize", "CFMutableString::normalize(Some(&normalized), CFStringNormalizationForm::C);",
+         "The typed binding calls CFStringNormalize with canonical composition, on an exclusively owned copy."),
+        ("cfStringGetLength", "CFString::maximum_size_for_encoding(value.length(), UTF8)",
+         "The typed CFString length method calls CFStringGetLength for the UTF-8 output-buffer calculation."),
+        ("cfStringGetMaximumSizeForEncoding", "CFString::maximum_size_for_encoding(value.length(), UTF8)",
+         "The typed binding computes the same maximum UTF-8 byte capacity; checked_add reserves the trailing NUL."),
+        ("cfStringGetCString", "if !unsafe { value.c_string(bytes.as_mut_ptr().cast(), size, UTF8) } {",
+         "The binding calls CFStringGetCString into the owned buffer with its exact capacity and UTF-8 encoding; "
+         "false returns empty, and success trims the first NUL as in the pin."),
+        ("isASCII", "    if path.is_ascii() {",
+         "The byte-slice ASCII predicate performs the same all-bytes-below-0x80 test before any CF allocation."),
+        ("cfStringNormalizedToGo", "if let Some(normalized) = CFMutableString::new_copy(None, 0, Some(value)) {",
+         "Folded into cf_string_to_nfc: make an owned mutable copy, normalize to C, convert to UTF-8, release "
+         "the copy and fall back to the original contents if allocation or conversion fails."),
+        ("dispatchQueueCreate", "let queue = DispatchQueue::new(\"typescript.fswatch.fsevents.stream\", None);",
+         "dispatch2 creates the same named per-stream serial queue and returns an owning DispatchRetained."),
+        ("dispatchRelease", "    queue: DispatchRetained<DispatchQueue>,",
+         "DispatchRetained releases the queue when Stream fields drop, after Stop/Invalidate, the synchronous "
+         "queue barrier and FSEventStreamRelease. No copied integer queue handle survives that owner."),
+        ("dispatchSync", "self.queue.exec_sync(|| {});",
+         "dispatch2's synchronous no-op on the serial queue is the same teardown barrier as dispatch_sync_f."),
+        ("fsEventStreamCreate", "            FSEventStreamCreate(",
+         "The typed framework call supplies the native C callback, stable boxed context, path array, SinceNow, "
+         "0.001 latency and UseCFTypes|FileEvents directly, replacing the arch-specific argument trampoline."),
+        ("fsEventStreamSetDispatchQueue", "FSEventStreamSetDispatchQueue(stream, Some(&result.queue));",
+         "Direct typed framework call before start; the owning Stream retains the queue through teardown."),
+        ("fsEventStreamStart", "if !unsafe { FSEventStreamStart(stream) } {",
+         "Direct typed framework call with the same false-result error; a failed start still invalidates/releases."),
+        ("fsEventStreamFlushSync", "FSEventStreamFlushSync(stream);",
+         "Direct typed framework call after successful start, before returning the subscription."),
+        ("fsEventStreamStop", "FSEventStreamStop(self.stream);",
+         "Direct typed framework call in the unique owner's destructor, before invalidation and queue draining."),
+        ("fsEventStreamInvalidate", "FSEventStreamInvalidate(self.stream);",
+         "Direct typed framework call during teardown, before waiting for the serial callback queue."),
+        ("fsEventStreamRelease", "FSEventStreamRelease(self.stream);",
+         "Direct typed framework call after callbacks finish and before callback context/queue fields drop."),
+        ("libcFree", "std::slice::from_raw_parts(flags.as_ptr(), count),",
+         "Only Go's assembly payload copies need libcFree. Rust borrows native flags/IDs/path values for the "
+         "callback duration and processes them synchronously; its owned path Vec values use Rust drop."),
+        ("fsEventsCallbackPayload.close", "process_events(&context.watches, events, |path| {",
+         "There is no retained/copied assembly payload: the callback borrows framework arrays and classifies "
+         "before returning. Local Rust path buffers drop normally; native arrays remain framework-owned."),
+        ("newStreamCallback", "let mut context = Box::new(CallbackContext { watches });",
+         "A stable boxed immutable watch snapshot and owned per-stream serial queue replace the Go pinner, "
+         "assembly write pipe and event-loop goroutine. FSEvents invokes the typed C callback directly."),
+        ("streamCallback.waitDispatchQueue", "self.queue.exec_sync(|| {});",
+         "The synchronous serial-queue barrier waits for callback classification as well as callback return, "
+         "since Rust does not hand a payload to a second Go worker."),
+        ("streamCallback.close", "impl Drop for Stream {",
+         "Stream's unique owner stops and invalidates the stream, waits for all classification on its serial "
+         "queue, releases the stream, then drops queue/context. No pipe or event-loop goroutine remains to close."),
+        ("streamCallback.eventLoop", "process_events(&context.watches, events, |path| {",
+         "Classification runs directly in the serial C callback; there is no Go ABI handoff pipe. The shared "
+         "debouncer still delivers user callbacks outside this queue, preserving callback self-close safety."),
+    )},
+})
 
 
 def inventory(root=ROOT):

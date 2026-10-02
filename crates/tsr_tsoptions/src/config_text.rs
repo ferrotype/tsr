@@ -65,6 +65,10 @@ static ROOT_DECLARATION: OptionDeclaration = OptionDeclaration {
     min_value: 0,
     allow_config_dir_template: false,
     preserve_falsy: false,
+    category: None,
+    description: None,
+    default_value_description: crate::DefaultValueDescription::Nil,
+    show_in_simplified_help_view: false,
 };
 fn child_option(
     parent: Option<&OptionDeclaration>,

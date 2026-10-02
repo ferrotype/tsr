@@ -96,6 +96,7 @@ fn args_json(args: &BTreeMap<String, TraceValue>) -> Value {
         args.iter()
             .map(|(key, value)| {
                 let value = match value {
+                    TraceValue::Bool(value) => json!(value),
                     TraceValue::Int(value) => json!(value),
                     TraceValue::Str(value) => json!(value),
                     TraceValue::Strs(values) => json!(values),

@@ -42,6 +42,7 @@ impl CheckedProgram {
         counters: &Counters,
         tracing: Option<Arc<dyn TraceSink>>,
     ) -> Self {
+        let tracing = tracing.or_else(|| program.tracing().cloned());
         let pool = Arc::new(CompilerCheckerPool::with_tracing(
             program.clone(),
             counters,

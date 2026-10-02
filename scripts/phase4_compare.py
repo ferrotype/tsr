@@ -79,6 +79,7 @@ from s08_oracle import ROOT, canonical, digest  # noqa: E402
 import phase4_corpus as corpus  # noqa: E402
 
 RECORD = ROOT / "data/phase4/first-comparison.json"
+APPROVED = ROOT / "data/phase4/approved-differences.json"
 REFERENCES = "tsc/testdata/baselines/reference"
 CATEGORIES = ("match", "different", "failed", "unsupported", "unexecuted")
 SECTIONS = ("input", "edit", "command", "output", "files", "buildinfo", "watch", "program", "incremental",
@@ -362,6 +363,19 @@ def outcome(category, **detail):
     return dict(detail, category=category)
 
 
+def approved_difference(identity, reference, transcript, ledger):
+    """Exact observed pairs only. Raw comparison results are never rewritten."""
+    if ledger.get("version") != 1 or ledger.get("pin") != pin():
+        raise ValueError("Phase 4 difference approvals have another version or pin")
+    matches = [entry["id"] for entry in ledger["exceptions"] if entry.get("approved") is True
+               and entry.get("approval") and entry.get("reason")
+               for row in entry["observations"] if row["scenario"] == identity
+               and row["native_sha256"] == digest(reference) and row["rust_sha256"] == digest(transcript)]
+    if len(matches) > 1:
+        raise ValueError("a Phase 4 observation has duplicate approvals")
+    return matches[0] if matches else None
+
+
 def compare_row(scenario, reference, row, transcript):
     """One scenario's outcome; never blank."""
     edits = len(scenario["edits"])
@@ -408,6 +422,7 @@ def report(rust_dir=corpus.DEFAULT_OUTPUT, *, capture=None):
     identities = [item["id"] for item in document["scenarios"]]
     orphans = list(document["orphan_references"])
     references = read_references(identities + orphans, document["provenance"]["pin"])
+    approvals = strict_json_loads(APPROVED.read_bytes())
     rows = {row["id"]: row for row in capture.rows}
     results, harness = [], []
     buckets = defaultdict(lambda: defaultdict(lambda: {"rows": [], "families": Counter(), "examples": []}))
@@ -429,6 +444,10 @@ def report(rust_dir=corpus.DEFAULT_OUTPUT, *, capture=None):
                 result = outcome("failed", reason="harness: " + problem)
             else:
                 result = compare_row(scenario, reference, row, capture.transcripts[identity])
+                if result["category"] == "different":
+                    approval = approved_difference(identity, reference, capture.transcripts[identity], approvals)
+                    if approval:
+                        result["approved_difference"] = approval
         if result["category"] != "match":
             bucket = buckets[result["category"]][cause_of(result)]
             bucket["rows"].append(identity)
@@ -449,6 +468,8 @@ def report(rust_dir=corpus.DEFAULT_OUTPUT, *, capture=None):
         "categories": {category: categories[category] for category in CATEGORIES},
         "families": families,
         "matched": categories["match"],
+        "approved_differences": sum("approved_difference" in result for result in results),
+        "accepted": sum(result["category"] == "match" or "approved_difference" in result for result in results),
         "unsupported_rows": categories["unsupported"],
         "edit_steps": sum(result["edits"] for result in results),
         "edit_steps_agreeing": sum(result.get("incremental_agreeing", 0) for result in results),
@@ -461,6 +482,7 @@ def report(rust_dir=corpus.DEFAULT_OUTPUT, *, capture=None):
         raise ValueError("a scenario is not in exactly one category")
     return {
         "version": 1, "pin": document["provenance"]["pin"], "summary": summary,
+        "approvals_sha256": digest(APPROVED.read_bytes()),
         "inventory": capture.metadata["inventory"],
         "references": {"scenarios": len(identities),
                        "git_blobs_sha256": digest(canonical({identity: references[identity][1]

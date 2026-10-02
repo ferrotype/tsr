@@ -69,6 +69,9 @@ pub(crate) struct IncludeReason {
     related: Cached<Option<Arc<Diagnostic>>>,
 }
 impl IncludeReason {
+    pub(crate) fn fresh_for_program(&self) -> Self {
+        Self::new(self.data.clone())
+    }
     pub(crate) fn new(data: IncludeReasonData) -> Self {
         Self {
             data,
@@ -472,6 +475,26 @@ pub(crate) enum ProcessingDiagnostic {
     },
 }
 impl ProcessingDiagnostic {
+    pub(crate) fn fresh_for_program(&self) -> Self {
+        match self {
+            Self::UnknownReference(reason) => {
+                Self::UnknownReference(Arc::new(reason.fresh_for_program()))
+            }
+            Self::ExplainingFileInclude {
+                file,
+                reason,
+                message,
+                args,
+            } => Self::ExplainingFileInclude {
+                file: file.clone(),
+                reason: reason
+                    .as_ref()
+                    .map(|reason| Arc::new(reason.fresh_for_program())),
+                message,
+                args: args.clone(),
+            },
+        }
+    }
     /// port: tsc/internal/compiler/processingDiagnostic.go:processingDiagnostic.toDiagnostic
     pub(crate) fn to_diagnostic(&self, program: &Program) -> Result<Diagnostic, AstError> {
         match self {
@@ -676,6 +699,72 @@ impl IncludeExplanations {
 }
 
 impl Program {
+    /// Render the program's file order, including package-identity redirects at
+    /// their original collection positions. The callback is the host writer;
+    /// the pinned CLI ignores its write errors.
+    /// port: tsc/internal/compiler/program.go:Program.ExplainFiles
+    pub fn explain_files(
+        &self,
+        locale: &tsr_locale::Locale,
+        write: &mut dyn FnMut(&[u8]),
+    ) -> Result<(), Error> {
+        let explain =
+            |name: &[u8], file_path: &[u8], write: &mut dyn FnMut(&[u8])| -> Result<(), Error> {
+                write(file_name_for(self, name, true).as_bytes());
+                write(b"\n");
+                if let Some(reasons) = self.include_reasons.get(file_path) {
+                    for reason in reasons {
+                        write(b"   ");
+                        write(&reason.diagnostic(self, true)?.localize(None, locale)?);
+                        write(b"\n");
+                    }
+                }
+                for diagnostic in self
+                    .include_explanations
+                    .redirects(self, file_path, true)?
+                    .iter()
+                {
+                    write(b"   ");
+                    write(&diagnostic.localize(None, locale)?);
+                    write(b"\n");
+                }
+                Ok(())
+            };
+        let mut files = self.files().iter();
+        let mut explained = 0;
+        for (index, path) in &self.redirect_order {
+            while explained < *index {
+                let file = files
+                    .next()
+                    .expect("redirect index is a collected file position");
+                let view = file.bound().view();
+                let source = view.source_file()?;
+                explain(
+                    source.file_name(),
+                    source.parse_options().path.as_bytes(),
+                    write,
+                )?;
+                explained += 1;
+            }
+            explain(
+                self.redirect_file_names[path].as_bytes(),
+                path.as_bytes(),
+                write,
+            )?;
+            explained += 1;
+        }
+        for file in files {
+            let view = file.bound().view();
+            let source = view.source_file()?;
+            explain(
+                source.file_name(),
+                source.parse_options().path.as_bytes(),
+                write,
+            )?;
+        }
+        Ok(())
+    }
+
     /// Explain a source inclusion diagnostic. A real incoming reference supplies
     /// its location; callers must classify the resulting diagnostic by `file`.
     /// The program owns all raw file identities retained by the result.

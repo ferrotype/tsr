@@ -79,20 +79,22 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 2,
+    "mapped": 2,
+    "pending": 0,
     "total": 2
    },
    "functions": {
     "tsc/cmd/tsc/main.go:main": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/main.rs:13"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/main.go:runMain": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/main.rs:29"
+     ],
+     "status": "mapped"
     }
    },
    "group": "X1"
@@ -103,95 +105,112 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 17,
+    "mapped": 17,
+    "pending": 0,
     "total": 17
    },
    "functions": {
     "tsc/cmd/tsc/sys.go:childProcess.Close": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/process.rs:115"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:childProcess.ExitCode": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/process.rs:169"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:childProcess.Read": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/process.rs:181"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:childProcess.Write": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/process.rs:188"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:newSystem": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/system.rs:33"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:osSys.DefaultLibraryPath": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/system.rs:73"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:osSys.ErrorWriter": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/system.rs:65"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:osSys.FS": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/system.rs:69"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:osSys.GetCurrentDirectory": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/system.rs:77"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:osSys.GetEnvironmentVariable": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/system.rs:89"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:osSys.GetWidthOfTerminal": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/system.rs:85"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:osSys.Now": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/system.rs:93"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:osSys.SinceStart": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/system.rs:97"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:osSys.Spawn": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/system.rs:47"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:osSys.WriteOutputIsTTY": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/system.rs:81"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:osSys.Writer": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/system.rs:61"
+     ],
+     "status": "mapped"
     },
     "tsc/cmd/tsc/sys.go:spawnProcess": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr/src/process.rs:197"
+     ],
+     "status": "mapped"
     }
    },
    "group": "X1"
@@ -211,7 +230,7 @@
      "marker_to_add": false,
      "reason": "A type assertion on the reason's data; the AutomaticType variant carries the name and package id, destructured by the match arms of compute_diagnostic and compute_related_info.",
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:268"
+      "crates/tsr_compiler/src/include_reason.rs:271"
      ],
      "status": "equivalent"
     },
@@ -235,61 +254,61 @@
      "marker_to_add": false,
      "reason": "Its one caller, getReferencedLocation, is compute_location, which destructures the four referenced-file variants and panics otherwise, as the pin's assertion does.",
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:120"
+      "crates/tsr_compiler/src/include_reason.rs:123"
      ],
      "status": "equivalent"
     },
     "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeDiagnostic": {
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:224"
+      "crates/tsr_compiler/src/include_reason.rs:227"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeReferenceFileDiagnostic": {
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:317"
+      "crates/tsr_compiler/src/include_reason.rs:320"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileInclude.go:FileIncludeReason.computeReferenceFileRelatedInfo": {
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:367"
+      "crates/tsr_compiler/src/include_reason.rs:370"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileInclude.go:FileIncludeReason.getReferencedLocation": {
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:102"
+      "crates/tsr_compiler/src/include_reason.rs:105"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileInclude.go:FileIncludeReason.isReferencedFile": {
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:83"
+      "crates/tsr_compiler/src/include_reason.rs:86"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileInclude.go:FileIncludeReason.toDiagnostic": {
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:211"
+      "crates/tsr_compiler/src/include_reason.rs:214"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileInclude.go:FileIncludeReason.toRelatedInfo": {
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:365"
+      "crates/tsr_compiler/src/include_reason.rs:368"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileInclude.go:referenceFileLocation.diagnosticAt": {
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:545"
+      "crates/tsr_compiler/src/include_reason.rs:568"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileInclude.go:referenceFileLocation.text": {
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:105"
+      "crates/tsr_compiler/src/include_reason.rs:108"
      ],
      "status": "mapped"
     }
@@ -351,25 +370,25 @@
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.addAutomaticTypeDirectiveTasks": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1138"
+      "crates/tsr_compiler/src/loader.rs:1342"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:620"
+      "crates/tsr_compiler/src/loader.rs:715"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.addRootFileTask": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:718"
+      "crates/tsr_compiler/src/loader.rs:881"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.addRootTask": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:750"
+      "crates/tsr_compiler/src/loader.rs:913"
      ],
      "status": "mapped"
     },
@@ -387,31 +406,31 @@
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.emptyContentMappedFile": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1694"
+      "crates/tsr_compiler/src/loader.rs:1963"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.getContentMapperTransformIdentity": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1672"
+      "crates/tsr_compiler/src/loader.rs:1941"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.getDefaultLibFilePriority": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:2136"
+      "crates/tsr_compiler/src/loader.rs:2498"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.getSourceFileFromReference": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1215"
+      "crates/tsr_compiler/src/loader.rs:1438"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1201"
+      "crates/tsr_compiler/src/loader.rs:1424"
      ],
      "status": "mapped"
     },
@@ -423,19 +442,19 @@
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.parseContentMappedFile": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1573"
+      "crates/tsr_compiler/src/loader.rs:1842"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.parseSourceFile": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1546"
+      "crates/tsr_compiler/src/loader.rs:1801"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.pathForLibFile": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1303"
+      "crates/tsr_compiler/src/loader.rs:1540"
      ],
      "status": "mapped"
     },
@@ -453,43 +472,43 @@
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.resolveAutomaticTypeDirectives": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1128"
+      "crates/tsr_compiler/src/loader.rs:1325"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.resolveImportsAndModuleAugmentations": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1825"
+      "crates/tsr_compiler/src/loader.rs:2142"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.resolveLibrary": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1295"
+      "crates/tsr_compiler/src/loader.rs:1532"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.resolveTripleslashPathReference": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1756"
+      "crates/tsr_compiler/src/loader.rs:2026"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.resolveTypeReferenceDirectives": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1763"
+      "crates/tsr_compiler/src/loader.rs:2033"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.sortLibs": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:811"
+      "crates/tsr_compiler/src/loader.rs:974"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:fileLoader.toPath": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:973"
+      "crates/tsr_compiler/src/loader.rs:1162"
      ],
      "status": "mapped"
     },
@@ -507,13 +526,13 @@
     },
     "tsc/internal/compiler/fileloader.go:getInferredLibraryNameResolveFrom": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:2120"
+      "crates/tsr_compiler/src/loader.rs:2482"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/fileloader.go:getLibraryNameFromLibFileName": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:2103"
+      "crates/tsr_compiler/src/loader.rs:2465"
      ],
      "status": "mapped"
     },
@@ -541,7 +560,7 @@
      "marker_to_add": false,
      "reason": "C7's recorded disposition (data/phase2/c7-audit.json): Loader::new and Loader::run split the pinned function; the mapper extensions reach the supported-extension set and the resolver as in the pin.",
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:641"
+      "crates/tsr_compiler/src/loader.rs:741"
      ],
      "status": "equivalent"
     },
@@ -549,7 +568,7 @@
      "marker_to_add": false,
      "reason": "ast.HasFileName on the redirect record. The Rust program keeps each redirect's file name in Program.redirect_file_names by path, read where the include processor explains a redirect (includeprocessor.go:133).",
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:597"
+      "crates/tsr_compiler/src/include_reason.rs:620"
      ],
      "status": "equivalent"
     },
@@ -557,7 +576,7 @@
      "marker_to_add": false,
      "reason": "ast.HasFileName on the redirect record; the redirect's path is the key of Program.redirect_file_names.",
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:597"
+      "crates/tsr_compiler/src/include_reason.rs:620"
      ],
      "status": "equivalent"
     }
@@ -577,25 +596,25 @@
    "functions": {
     "tsc/internal/compiler/filesparser.go:filesParser.addIncludeReason": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:2279"
+      "crates/tsr_compiler/src/loader.rs:2645"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/filesparser.go:filesParser.getProcessedFiles": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1062"
+      "crates/tsr_compiler/src/loader.rs:1254"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/filesparser.go:filesParser.parse": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:775"
+      "crates/tsr_compiler/src/loader.rs:938"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/filesparser.go:filesParser.start": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1392"
+      "crates/tsr_compiler/src/loader.rs:1629"
      ],
      "status": "mapped"
     },
@@ -603,7 +622,7 @@
      "marker_to_add": false,
      "reason": "A sync.Pool allocation of the per-path task record (tasks by casing, lowest depth). The Rust loader runs its tasks in order and keeps that state in per-path maps (depths, child_tasks) in load_worker's filesParser.start section.",
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1400"
+      "crates/tsr_compiler/src/loader.rs:1637"
      ],
      "status": "equivalent"
     },
@@ -611,7 +630,7 @@
      "marker_to_add": false,
      "reason": "ast.HasFileName on the parse task; load_worker (marked parseTask.load) computes the task's normalized file name, and its path, on entry.",
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1383"
+      "crates/tsr_compiler/src/loader.rs:1620"
      ],
      "status": "equivalent"
     },
@@ -619,33 +638,33 @@
      "marker_to_add": false,
      "reason": "ast.HasFileName on the parse task; load_worker (marked parseTask.load) computes the task's path on entry.",
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1383"
+      "crates/tsr_compiler/src/loader.rs:1620"
      ],
      "status": "equivalent"
     },
     "tsc/internal/compiler/filesparser.go:parseTask.addSubTask": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1369"
+      "crates/tsr_compiler/src/loader.rs:1606"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/filesparser.go:parseTask.load": {
      "reason": "load_worker ports the task's load; its supplemental-file sub-task section carries the second marker.",
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1382",
-      "crates/tsr_compiler/src/loader.rs:1528"
+      "crates/tsr_compiler/src/loader.rs:1619",
+      "crates/tsr_compiler/src/loader.rs:1783"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/filesparser.go:parseTask.loadAutomaticTypeDirectives": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1158"
+      "crates/tsr_compiler/src/loader.rs:1381"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/filesparser.go:parseTask.redirect": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1912"
+      "crates/tsr_compiler/src/loader.rs:2246"
      ],
      "status": "mapped"
     },
@@ -653,7 +672,7 @@
      "marker_to_add": false,
      "reason": "Returns a pooled per-path record to the sync.Pool; the Rust loader's per-path maps need no pool.",
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1400"
+      "crates/tsr_compiler/src/loader.rs:1637"
      ],
      "status": "equivalent"
     }
@@ -680,7 +699,7 @@
      "marker_to_add": false,
      "reason": "C7's recorded disposition (data/phase2/c7-audit.json): the Rust compiler host carries no mapper project; the caller hands the project to the program load, where the pin reads it back from the host. Its file system, current directory and default library path are ProgramOptions fields.",
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:157"
+      "crates/tsr_compiler/src/loader.rs:227"
      ],
      "status": "equivalent"
     },
@@ -688,7 +707,7 @@
      "marker_to_add": false,
      "reason": "C7's recorded disposition (data/phase2/c7-audit.json): the project the pinned host returns is the one passed to load_with_content_mapper_project.",
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:157"
+      "crates/tsr_compiler/src/loader.rs:227"
      ],
      "status": "equivalent"
     },
@@ -696,7 +715,7 @@
      "marker_to_add": false,
      "reason": "The Rust program takes the host's default library path as ProgramOptions.default_library_path.",
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:67"
+      "crates/tsr_compiler/src/loader.rs:74"
      ],
      "status": "equivalent"
     },
@@ -704,13 +723,13 @@
      "marker_to_add": false,
      "reason": "The Rust program takes the host's file system as ProgramOptions.host; Program::host (marked Program.Host) returns it.",
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:65"
+      "crates/tsr_compiler/src/loader.rs:72"
      ],
      "status": "equivalent"
     },
     "tsc/internal/compiler/host.go:compilerHost.GetContentMappedSourceFiles": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1637"
+      "crates/tsr_compiler/src/loader.rs:1906"
      ],
      "status": "mapped"
     },
@@ -718,25 +737,25 @@
      "marker_to_add": false,
      "reason": "The Rust program takes the host's current directory as ProgramOptions.current_directory.",
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:66"
+      "crates/tsr_compiler/src/loader.rs:73"
      ],
      "status": "equivalent"
     },
     "tsc/internal/compiler/host.go:compilerHost.GetResolvedProjectReference": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:82"
+      "crates/tsr_compiler/src/project_references.rs:120"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/host.go:compilerHost.GetSourceFile": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:1726"
+      "crates/tsr_compiler/src/loader.rs:1995"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/host.go:compilerHost.Trace": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:2090"
+      "crates/tsr_compiler/src/loader.rs:2424"
      ],
      "status": "mapped"
     }
@@ -764,19 +783,19 @@
     },
     "tsc/internal/compiler/includeprocessor.go:includeProcessor.addProcessingDiagnosticsForFileCasing": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:2417"
+      "crates/tsr_compiler/src/loader.rs:2792"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/includeprocessor.go:includeProcessor.explainRedirectAndImpliedFormat": {
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:579"
+      "crates/tsr_compiler/src/include_reason.rs:602"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/includeprocessor.go:includeProcessor.getCompilerOptionsObjectLiteralSyntax": {
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:559"
+      "crates/tsr_compiler/src/include_reason.rs:582"
      ],
      "status": "mapped"
     },
@@ -788,13 +807,13 @@
     },
     "tsc/internal/compiler/includeprocessor.go:includeProcessor.getReferenceLocation": {
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:94"
+      "crates/tsr_compiler/src/include_reason.rs:97"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/includeprocessor.go:includeProcessor.getRelatedInfo": {
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:356"
+      "crates/tsr_compiler/src/include_reason.rs:359"
      ],
      "status": "mapped"
     },
@@ -834,7 +853,7 @@
      "marker_to_add": false,
      "reason": "A type assertion on the diagnostic's data; the Rust processing diagnostic is an enum whose UnknownReference variant carries the reason, destructured in to_diagnostic.",
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:478"
+      "crates/tsr_compiler/src/include_reason.rs:502"
      ],
      "status": "equivalent"
     },
@@ -842,19 +861,19 @@
      "marker_to_add": false,
      "reason": "A type assertion on the diagnostic's data; the ExplainingFileInclude variant carries the file, reason, message and arguments, destructured in to_diagnostic.",
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:521"
+      "crates/tsr_compiler/src/include_reason.rs:549"
      ],
      "status": "equivalent"
     },
     "tsc/internal/compiler/processingDiagnostic.go:processingDiagnostic.createDiagnosticExplainingFile": {
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:682"
+      "crates/tsr_compiler/src/include_reason.rs:771"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/processingDiagnostic.go:processingDiagnostic.toDiagnostic": {
      "rust": [
-      "crates/tsr_compiler/src/include_reason.rs:475"
+      "crates/tsr_compiler/src/include_reason.rs:498"
      ],
      "status": "mapped"
     }
@@ -867,8 +886,8 @@
     "equivalent": 12,
     "gap": 0,
     "later": 19,
-    "mapped": 96,
-    "pending": 17,
+    "mapped": 103,
+    "pending": 10,
     "total": 144
    },
    "functions": {
@@ -880,7 +899,7 @@
     },
     "tsc/internal/compiler/program.go:FilterNoEmitSemanticDiagnostics": {
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:465"
+      "crates/tsr_compiler/src/checked_program.rs:466"
      ],
      "status": "mapped"
     },
@@ -900,21 +919,21 @@
      "marker_to_add": false,
      "reason": "C7's recorded disposition (data/phase2/c7-audit.json): Loader::run ends as the pin's constructor does, with option verification and then the mapper projects' option diagnostics.",
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:968"
+      "crates/tsr_compiler/src/loader.rs:1157"
      ],
      "status": "equivalent"
     },
     "tsc/internal/compiler/program.go:Program.BindSourceFiles": {
      "reason": "Files the cache parses bind in cache.rs; content-mapped and supplemental files the loader parses itself bind in loader.rs.",
      "rust": [
-      "crates/tsr_compiler/src/cache.rs:62",
-      "crates/tsr_compiler/src/loader.rs:2094"
+      "crates/tsr_compiler/src/cache.rs:68",
+      "crates/tsr_compiler/src/loader.rs:2456"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.CommandLine": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:267"
+      "crates/tsr_compiler/src/loader.rs:348"
      ],
      "status": "mapped"
     },
@@ -926,13 +945,13 @@
     },
     "tsc/internal/compiler/program.go:Program.ContentMapperExtensions": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:214"
+      "crates/tsr_compiler/src/loader.rs:295"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.ContentMapperProject": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:218"
+      "crates/tsr_compiler/src/loader.rs:299"
      ],
      "status": "mapped"
     },
@@ -953,9 +972,10 @@
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.ExplainFiles": {
-     "owner": "X1",
-     "reason": "--explainFiles output (execute/tsc/emit.go:156); plan X1.",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_compiler/src/include_reason.rs:705"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.FileExists": {
      "rust": [
@@ -970,7 +990,7 @@
     },
     "tsc/internal/compiler/program.go:Program.ForEachCheckerParallel": {
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:132"
+      "crates/tsr_compiler/src/checked_program.rs:133"
      ],
      "status": "mapped"
     },
@@ -998,37 +1018,37 @@
     },
     "tsc/internal/compiler/program.go:Program.GetCheckerPool": {
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:78"
+      "crates/tsr_compiler/src/checked_program.rs:79"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.GetConfigFileParsingDiagnostics": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:385"
+      "crates/tsr_compiler/src/loader.rs:466"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.GetContentMapper": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:200"
+      "crates/tsr_compiler/src/loader.rs:281"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.GetCurrentDirectory": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:278"
+      "crates/tsr_compiler/src/loader.rs:359"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.GetDeclarationDiagnostics": {
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:322"
+      "crates/tsr_compiler/src/checked_program.rs:323"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.GetDefaultLibFile": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:337"
+      "crates/tsr_compiler/src/loader.rs:418"
      ],
      "status": "mapped"
     },
@@ -1054,7 +1074,7 @@
     },
     "tsc/internal/compiler/program.go:Program.GetGlobalDiagnostics": {
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:362"
+      "crates/tsr_compiler/src/checked_program.rs:363"
      ],
      "status": "mapped"
     },
@@ -1068,7 +1088,7 @@
     },
     "tsc/internal/compiler/program.go:Program.GetImpliedNodeFormatForEmit": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:396"
+      "crates/tsr_compiler/src/loader.rs:477"
      ],
      "status": "mapped"
     },
@@ -1128,7 +1148,7 @@
     },
     "tsc/internal/compiler/program.go:Program.GetParseFileRedirect": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:493"
+      "crates/tsr_compiler/src/loader.rs:587"
      ],
      "status": "mapped"
     },
@@ -1152,7 +1172,7 @@
     },
     "tsc/internal/compiler/program.go:Program.GetRedirectForResolution": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:462"
+      "crates/tsr_compiler/src/loader.rs:556"
      ],
      "status": "mapped"
     },
@@ -1170,7 +1190,7 @@
     },
     "tsc/internal/compiler/program.go:Program.GetResolvedModuleFromModuleSpecifier": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:2063"
+      "crates/tsr_compiler/src/loader.rs:2397"
      ],
      "status": "mapped"
     },
@@ -1178,7 +1198,7 @@
      "marker_to_add": true,
      "reason": "checker.Program's whole-map view of the resolved modules. Its one pinned caller, the checker's getPackagesMap (checker/utilities.go:1686), is ported as the host's package_bundles_types (marked Program.GetPackagesMap), which scans Program::resolutions, the program's published resolved modules.",
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:408"
+      "crates/tsr_compiler/src/loader.rs:502"
      ],
      "status": "equivalent"
     },
@@ -1186,7 +1206,7 @@
      "marker_to_add": false,
      "reason": "No caller and no interface requirement at the pin (data/phase1/coverage-review.json, reviewed_unused_compiler_operations); the configToProjectReference lookup it wraps is the mapper's map, read by range_resolved_reference_worker.",
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:130"
+      "crates/tsr_compiler/src/project_references.rs:168"
      ],
      "status": "equivalent"
     },
@@ -1202,31 +1222,31 @@
     },
     "tsc/internal/compiler/program.go:Program.GetResolvedTypeReferenceDirectives": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:355"
+      "crates/tsr_compiler/src/loader.rs:436"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.GetSemanticDiagnostics": {
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:267"
+      "crates/tsr_compiler/src/checked_program.rs:268"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.GetSemanticDiagnosticsWithoutNoEmitFiltering": {
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:284"
+      "crates/tsr_compiler/src/checked_program.rs:285"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.GetSourceFile": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:324"
+      "crates/tsr_compiler/src/loader.rs:405"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.GetSourceFileByPath": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:318"
+      "crates/tsr_compiler/src/loader.rs:399"
      ],
      "status": "mapped"
     },
@@ -1250,19 +1270,19 @@
     },
     "tsc/internal/compiler/program.go:Program.GetSourceFiles": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:292"
+      "crates/tsr_compiler/src/loader.rs:373"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.GetSourceOfProjectReferenceIfOutputIncluded": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:429"
+      "crates/tsr_compiler/src/loader.rs:523"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.GetSuggestionDiagnostics": {
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:307"
+      "crates/tsr_compiler/src/checked_program.rs:308"
      ],
      "status": "mapped"
     },
@@ -1280,19 +1300,19 @@
     },
     "tsc/internal/compiler/program.go:Program.GetTypeChecker": {
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:89"
+      "crates/tsr_compiler/src/checked_program.rs:90"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.GetTypeCheckerForFile": {
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:103"
+      "crates/tsr_compiler/src/checked_program.rs:104"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.GetTypeCheckerForFileExclusive": {
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:117"
+      "crates/tsr_compiler/src/checked_program.rs:118"
      ],
      "status": "mapped"
     },
@@ -1313,19 +1333,21 @@
     },
     "tsc/internal/compiler/program.go:Program.Host": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:302"
+      "crates/tsr_compiler/src/loader.rs:383"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.IdentifierCount": {
-     "owner": "X6",
-     "reason": "Read only by the statistics report (execute/tsc/statistics.go:76); plan X6 ports the five counters.",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_compiler/src/statistics.rs:12"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.InstantiationCount": {
-     "owner": "X6",
-     "reason": "Read only by the statistics report (execute/tsc/statistics.go:79); plan X6 ports the five counters.",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_compiler/src/statistics.rs:43"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.IsEmitBlocked": {
      "rust": [
@@ -1344,19 +1366,20 @@
      "status": "later"
     },
     "tsc/internal/compiler/program.go:Program.IsMissingPath": {
-     "owner": "X2",
-     "reason": "Testing only: its one pinned caller is the harness's program baseline (execute/tsctests/sys.go:393); plan X2 names it. Program::missing_files publishes the names, not this path test.",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_compiler/src/loader.rs:493"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.IsSourceFileDefaultLibrary": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:332"
+      "crates/tsr_compiler/src/loader.rs:413"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.IsSourceFileFromExternalLibrary": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:288"
+      "crates/tsr_compiler/src/loader.rs:369"
      ],
      "status": "mapped"
     },
@@ -1367,31 +1390,32 @@
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.LineCount": {
-     "owner": "X6",
-     "reason": "Read only by the statistics report (execute/tsc/statistics.go:75); plan X6 ports the five counters.",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_compiler/src/statistics.rs:6"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.Options": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:297"
+      "crates/tsr_compiler/src/loader.rs:378"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.PackageJsonCacheEntries": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:343"
+      "crates/tsr_compiler/src/loader.rs:424"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.Program": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:390"
+      "crates/tsr_compiler/src/loader.rs:471"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.RangeResolvedProjectReference": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:444"
+      "crates/tsr_compiler/src/loader.rs:538"
      ],
      "status": "mapped"
     },
@@ -1404,7 +1428,7 @@
      "marker_to_add": false,
      "reason": "No caller and no interface requirement at the pin (data/phase1/coverage-review.json, reviewed_unused_compiler_operations): the language service and type acquisition call module.Resolver.ResolveModuleName directly (ls/sourcedefinition.go:426, project/ata/ata.go:480). The nil-redirect resolution it forwards to is Resolver::resolve, as Phase 3 recorded for emitHost.ResolveModuleName.",
      "rust": [
-      "crates/tsr_module/src/resolver.rs:303"
+      "crates/tsr_module/src/resolver.rs:326"
      ],
      "status": "equivalent"
     },
@@ -1420,7 +1444,7 @@
     },
     "tsc/internal/compiler/program.go:Program.SingleThreaded": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:271"
+      "crates/tsr_compiler/src/loader.rs:352"
      ],
      "status": "mapped"
     },
@@ -1438,27 +1462,29 @@
     },
     "tsc/internal/compiler/program.go:Program.SourceFiles": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:293"
+      "crates/tsr_compiler/src/loader.rs:374"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.SymbolCount": {
-     "owner": "X6",
-     "reason": "Read only by the statistics report (execute/tsc/statistics.go:77); plan X6 ports the five counters.",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_compiler/src/statistics.rs:24"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.Tracing": {
      "marker_to_add": true,
      "reason": "Its one pinned caller is the incremental program's emitBuildInfo (execute/incremental/program.go:323), ported in tsr_incremental through push_emit_trace, which reads this accessor; the trace-file writer of X6 is one more TraceSink behind it.",
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:74"
+      "crates/tsr_compiler/src/checked_program.rs:75"
      ],
      "status": "equivalent"
     },
     "tsc/internal/compiler/program.go:Program.TypeCount": {
-     "owner": "X6",
-     "reason": "Read only by the statistics report (execute/tsc/statistics.go:78); plan X6 ports the five counters.",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_compiler/src/statistics.rs:35"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.UnresolvedPackageNames": {
      "owner": "Phase 5",
@@ -1472,7 +1498,7 @@
     },
     "tsc/internal/compiler/program.go:Program.UseCaseSensitiveFileNames": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:306"
+      "crates/tsr_compiler/src/loader.rs:387"
      ],
      "status": "mapped"
     },
@@ -1506,19 +1532,19 @@
     },
     "tsc/internal/compiler/program.go:Program.collectCheckerDiagnostics": {
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:236"
+      "crates/tsr_compiler/src/checked_program.rs:237"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.collectCheckerDiagnosticsFromFiles": {
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:176"
+      "crates/tsr_compiler/src/checked_program.rs:177"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/program.go:Program.collectContentMapperOptionDiagnostics": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:223"
+      "crates/tsr_compiler/src/loader.rs:304"
      ],
      "status": "mapped"
     },
@@ -1530,7 +1556,7 @@
     },
     "tsc/internal/compiler/program.go:Program.collectDiagnosticsFromFiles": {
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:146"
+      "crates/tsr_compiler/src/checked_program.rs:147"
      ],
      "status": "mapped"
     },
@@ -1609,7 +1635,7 @@
     },
     "tsc/internal/compiler/program.go:Program.toPath": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:310"
+      "crates/tsr_compiler/src/loader.rs:391"
      ],
      "status": "mapped"
     },
@@ -1627,7 +1653,7 @@
     },
     "tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:605"
+      "crates/tsr_compiler/src/loader.rs:700"
      ],
      "status": "mapped"
     },
@@ -1742,37 +1768,37 @@
    "functions": {
     "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getCompilerOptionsForFile": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:332"
+      "crates/tsr_compiler/src/project_references.rs:396"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getParseFileRedirect": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:187"
+      "crates/tsr_compiler/src/project_references.rs:251"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromOutputDts": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:237"
+      "crates/tsr_compiler/src/project_references.rs:301"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getProjectReferenceFromSource": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:225"
+      "crates/tsr_compiler/src/project_references.rs:289"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectForResolution": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:260"
+      "crates/tsr_compiler/src/project_references.rs:324"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getRedirectParsedCommandLineForResolution": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:291"
+      "crates/tsr_compiler/src/project_references.rs:355"
      ],
      "status": "mapped"
     },
@@ -1785,25 +1811,25 @@
      "marker_to_add": false,
      "reason": "Its one caller is the unused Program.GetResolvedProjectReferenceFor (program.go:202; data/phase1/coverage-review.json); the configToProjectReference lookup is the mapper's map.",
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:130"
+      "crates/tsr_compiler/src/project_references.rs:168"
      ],
      "status": "equivalent"
     },
     "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getSourceToDtsIfSymlink": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:359"
+      "crates/tsr_compiler/src/project_references.rs:423"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.isSourceFromProjectReference": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:232"
+      "crates/tsr_compiler/src/project_references.rs:296"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReference": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:404"
+      "crates/tsr_compiler/src/project_references.rs:468"
      ],
      "status": "mapped"
     },
@@ -1814,13 +1840,13 @@
     },
     "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:424"
+      "crates/tsr_compiler/src/project_references.rs:488"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rootConfigPath": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:460"
+      "crates/tsr_compiler/src/project_references.rs:524"
      ],
      "status": "mapped"
     }
@@ -1840,37 +1866,37 @@
    "functions": {
     "tsc/internal/compiler/projectreferenceparser.go:createProjectReferenceParseTasks": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:651"
+      "crates/tsr_compiler/src/project_references.rs:759"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParseTask.parse": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:554"
+      "crates/tsr_compiler/src/project_references.rs:640"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapper": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:574"
+      "crates/tsr_compiler/src/project_references.rs:682"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.initMapperWorker": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:589"
+      "crates/tsr_compiler/src/project_references.rs:697"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.parse": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:516"
+      "crates/tsr_compiler/src/project_references.rs:602"
      ],
      "status": "mapped"
     },
     "tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser.start": {
      "rust": [
-      "crates/tsr_compiler/src/project_references.rs:541"
+      "crates/tsr_compiler/src/project_references.rs:627"
      ],
      "status": "mapped"
     }
@@ -2167,15 +2193,16 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 26,
+    "mapped": 14,
+    "pending": 12,
     "total": 26
    },
    "functions": {
     "tsc/internal/execute/build/buildtask.go:BuildTask.buildProject": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/task.rs:193"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.canUpdateJsDtsOutputTimestamps": {
      "owner": "X3",
@@ -2183,9 +2210,10 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.cleanProject": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/task.rs:900"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.cleanProjectOutput": {
      "owner": "X3",
@@ -2193,9 +2221,10 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.compileAndEmit": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/task.rs:663"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.getContentMapperProject": {
      "owner": "X3",
@@ -2203,19 +2232,22 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.getLatestChangedDtsMTime": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/task.rs:158"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.getUpToDateStatus": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/task.rs:387"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.handleStatusThatDoesntRequireBuild": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/task.rs:306"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.hasConflictingBuildInfo": {
      "owner": "X3",
@@ -2223,9 +2255,10 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.loadOrStoreBuildInfo": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/task.rs:115"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.onBuildInfoEmit": {
      "owner": "X3",
@@ -2243,14 +2276,16 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.reportDiagnostic": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/task.rs:179"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.reportUpToDateStatus": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/status.rs:78"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.resetConfig": {
      "owner": "X3",
@@ -2258,14 +2293,16 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.resetStatus": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/task.rs:91"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.storeOutputTimeStamp": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/task.rs:848"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.unblockDownstream": {
      "owner": "X3",
@@ -2273,14 +2310,16 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.updateDownstream": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/task.rs:248"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.updateTimeStamps": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/task.rs:853"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/buildtask.go:BuildTask.updateWatch": {
      "owner": "X3",
@@ -2298,9 +2337,10 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/buildtask.go:isContentMapperSupplementalBuildInfoPath": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/task.rs:957"
+     ],
+     "status": "mapped"
     }
    },
    "group": "X3"
@@ -2311,25 +2351,28 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 8,
+    "mapped": 4,
+    "pending": 4,
     "total": 8
    },
    "functions": {
     "tsc/internal/execute/build/compilerHost.go:compilerHost.ContentMapperProject": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/host.rs:76"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/compilerHost.go:compilerHost.DefaultLibraryPath": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/host.rs:68"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/compilerHost.go:compilerHost.FS": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/host.rs:64"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/compilerHost.go:compilerHost.GetContentMappedSourceFiles": {
      "owner": "X3",
@@ -2337,9 +2380,10 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/compilerHost.go:compilerHost.GetCurrentDirectory": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/host.rs:72"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/compilerHost.go:compilerHost.GetResolvedProjectReference": {
      "owner": "X3",
@@ -2365,8 +2409,8 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 14,
+    "mapped": 5,
+    "pending": 9,
     "total": 14
    },
    "functions": {
@@ -2381,9 +2425,10 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/host.go:host.FS": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/host.rs:45"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/host.go:host.GetContentMappedSourceFiles": {
      "owner": "X3",
@@ -2396,9 +2441,10 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/host.go:host.GetMTime": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/host.rs:49"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/host.go:host.GetResolvedProjectReference": {
      "owner": "X3",
@@ -2411,14 +2457,16 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/host.go:host.ReadBuildInfo": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/task.rs:948"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/host.go:host.SetMTime": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/host.rs:53"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/host.go:host.Trace": {
      "owner": "X3",
@@ -2431,9 +2479,10 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/host.go:host.storeMTime": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/host.rs:39"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/host.go:host.storeMTimeFromOldCache": {
      "owner": "X3",
@@ -2449,50 +2498,58 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 29,
+    "mapped": 19,
+    "pending": 10,
     "total": 29
    },
    "functions": {
     "tsc/internal/execute/build/orchestrator.go:NewOrchestrator": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/lib.rs:120"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.DoCycle": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/watch.rs:73"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.Downstream": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/lib.rs:152"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.GenerateGraph": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/graph.rs:7"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.GenerateGraphReusingOldTasks": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/graph.rs:15"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.Order": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/lib.rs:137"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.Start": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/lib.rs:227"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.Upstream": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/lib.rs:144"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.Watch": {
      "owner": "X3",
@@ -2500,9 +2557,10 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.addPackageJsonWatchDirs": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/watch.rs:416"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.addWatchDir": {
      "owner": "X3",
@@ -2510,9 +2568,10 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.buildOrClean": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/lib.rs:262"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.buildOrCleanProject": {
      "owner": "X3",
@@ -2520,14 +2579,16 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.checkTasksForEventChanges": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/watch.rs:183"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.computeDesiredWatches": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/watch.rs:320"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.createBuildTasks": {
      "owner": "X3",
@@ -2540,9 +2601,10 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.createDiagnosticReporter": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/lib.rs:217"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.getTask": {
      "owner": "X3",
@@ -2555,9 +2617,10 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.packageJsonLookupChanged": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/watch.rs:165"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.rangeTask": {
      "owner": "X3",
@@ -2565,9 +2628,10 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.relativeFileName": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/lib.rs:191"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.resetCaches": {
      "owner": "X3",
@@ -2575,24 +2639,28 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.resolveBuildInfoFileName": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/watch.rs:157"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.setupBuildTask": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/graph.rs:131"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.toPath": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/lib.rs:187"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.updateWatch": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/watch.rs:140"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:orchestratorResult.report": {
      "owner": "X3",
@@ -2642,8 +2710,8 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 6,
+    "mapped": 2,
+    "pending": 4,
     "total": 6
    },
    "functions": {
@@ -2658,14 +2726,16 @@
      "status": "pending"
     },
     "tsc/internal/execute/build/uptodatestatus.go:upToDateStatus.isError": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/status.rs:63"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/uptodatestatus.go:upToDateStatus.isPseudoBuild": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_build/src/status.rs:70"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/build/uptodatestatus.go:upToDateStatus.oldestOutputFileName": {
      "owner": "X3",
@@ -2797,61 +2867,61 @@
    "functions": {
     "tsc/internal/execute/incremental/buildInfo.go:BuildInfo.ContentMapperIdentitiesMatch": {
      "rust": [
-      "crates/tsr_incremental/src/build_info.rs:871"
+      "crates/tsr_incremental/src/build_info.rs:876"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildInfo.go:BuildInfo.GetBuildInfoRootInfoReader": {
      "rust": [
-      "crates/tsr_incremental/src/build_info.rs:958"
+      "crates/tsr_incremental/src/build_info.rs:969"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildInfo.go:BuildInfo.GetCompilerOptions": {
      "rust": [
-      "crates/tsr_incremental/src/build_info.rs:902"
+      "crates/tsr_incremental/src/build_info.rs:907"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildInfo.go:BuildInfo.GetMissingPackageJsons": {
      "rust": [
-      "crates/tsr_incremental/src/build_info.rs:950"
+      "crates/tsr_incremental/src/build_info.rs:958"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildInfo.go:BuildInfo.GetPackageJsons": {
      "rust": [
-      "crates/tsr_incremental/src/build_info.rs:942"
+      "crates/tsr_incremental/src/build_info.rs:947"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildInfo.go:BuildInfo.IsEmitPending": {
      "rust": [
-      "crates/tsr_incremental/src/build_info.rs:922"
+      "crates/tsr_incremental/src/build_info.rs:927"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildInfo.go:BuildInfo.IsIncremental": {
      "rust": [
-      "crates/tsr_incremental/src/build_info.rs:880"
+      "crates/tsr_incremental/src/build_info.rs:885"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildInfo.go:BuildInfo.IsValidVersion": {
      "rust": [
-      "crates/tsr_incremental/src/build_info.rs:864"
+      "crates/tsr_incremental/src/build_info.rs:869"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildInfo.go:BuildInfo.fileInfo": {
      "rust": [
-      "crates/tsr_incremental/src/build_info.rs:893"
+      "crates/tsr_incremental/src/build_info.rs:898"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildInfo.go:BuildInfo.fileName": {
      "rust": [
-      "crates/tsr_incremental/src/build_info.rs:885"
+      "crates/tsr_incremental/src/build_info.rs:890"
      ],
      "status": "mapped"
     },
@@ -2965,13 +3035,13 @@
     },
     "tsc/internal/execute/incremental/buildInfo.go:BuildInfoRootInfoReader.GetBuildInfoFileInfo": {
      "rust": [
-      "crates/tsr_incremental/src/build_info.rs:1064"
+      "crates/tsr_incremental/src/build_info.rs:1076"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildInfo.go:BuildInfoRootInfoReader.Roots": {
      "rust": [
-      "crates/tsr_incremental/src/build_info.rs:1081"
+      "crates/tsr_incremental/src/build_info.rs:1093"
      ],
      "status": "mapped"
     },
@@ -2989,19 +3059,19 @@
     },
     "tsc/internal/execute/incremental/buildInfo.go:ContentMapperIdentities": {
      "rust": [
-      "crates/tsr_incremental/src/build_info.rs:1025"
+      "crates/tsr_incremental/src/build_info.rs:1037"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildInfo.go:IsBuildInfoFileNameDefaultLibrary": {
      "rust": [
-      "crates/tsr_incremental/src/build_info.rs:1041"
+      "crates/tsr_incremental/src/build_info.rs:1053"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildInfo.go:getNormalizedPaths": {
      "rust": [
-      "crates/tsr_incremental/src/build_info.rs:1046"
+      "crates/tsr_incremental/src/build_info.rs:1058"
      ],
      "status": "mapped"
     },
@@ -3033,85 +3103,85 @@
     },
     "tsc/internal/execute/incremental/buildinfotosnapshot.go:fromBuildInfoRepopulateInfo": {
      "rust": [
-      "crates/tsr_incremental/src/build_info_to_snapshot.rs:304"
+      "crates/tsr_incremental/src/build_info_to_snapshot.rs:328"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.setAffectedFilesPendingEmit": {
      "rust": [
-      "crates/tsr_incremental/src/build_info_to_snapshot.rs:266"
+      "crates/tsr_incremental/src/build_info_to_snapshot.rs:282"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.setChangeFileSet": {
      "rust": [
-      "crates/tsr_incremental/src/build_info_to_snapshot.rs:215"
+      "crates/tsr_incremental/src/build_info_to_snapshot.rs:226"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.setCompilerOptions": {
      "rust": [
-      "crates/tsr_incremental/src/build_info_to_snapshot.rs:164"
+      "crates/tsr_incremental/src/build_info_to_snapshot.rs:175"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.setEmitDiagnostics": {
      "rust": [
-      "crates/tsr_incremental/src/build_info_to_snapshot.rs:254"
+      "crates/tsr_incremental/src/build_info_to_snapshot.rs:270"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.setFileInfoAndEmitSignatures": {
      "rust": [
-      "crates/tsr_incremental/src/build_info_to_snapshot.rs:172"
+      "crates/tsr_incremental/src/build_info_to_snapshot.rs:183"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.setPackageJsons": {
      "rust": [
-      "crates/tsr_incremental/src/build_info_to_snapshot.rs:284"
+      "crates/tsr_incremental/src/build_info_to_snapshot.rs:306"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.setReferencedMap": {
      "rust": [
-      "crates/tsr_incremental/src/build_info_to_snapshot.rs:205"
+      "crates/tsr_incremental/src/build_info_to_snapshot.rs:216"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.setSemanticDiagnostics": {
      "rust": [
-      "crates/tsr_incremental/src/build_info_to_snapshot.rs:223"
+      "crates/tsr_incremental/src/build_info_to_snapshot.rs:234"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.toAbsolutePath": {
      "rust": [
-      "crates/tsr_incremental/src/build_info_to_snapshot.rs:100"
+      "crates/tsr_incremental/src/build_info_to_snapshot.rs:108"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.toBuildInfoDiagnosticsWithFileName": {
      "rust": [
-      "crates/tsr_incremental/src/build_info_to_snapshot.rs:118"
+      "crates/tsr_incremental/src/build_info_to_snapshot.rs:126"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.toDiagnosticsOrBuildInfoDiagnosticsWithFileName": {
      "rust": [
-      "crates/tsr_incremental/src/build_info_to_snapshot.rs:153"
+      "crates/tsr_incremental/src/build_info_to_snapshot.rs:164"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.toFilePath": {
      "rust": [
-      "crates/tsr_incremental/src/build_info_to_snapshot.rs:108"
+      "crates/tsr_incremental/src/build_info_to_snapshot.rs:116"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.toFilePathSet": {
      "rust": [
-      "crates/tsr_incremental/src/build_info_to_snapshot.rs:113"
+      "crates/tsr_incremental/src/build_info_to_snapshot.rs:121"
      ],
      "status": "mapped"
     }
@@ -3463,97 +3533,97 @@
    "functions": {
     "tsc/internal/execute/incremental/programtosnapshot.go:addReferencedFileFromFileName": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:477"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:476"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/programtosnapshot.go:addReferencedFilesFromImportLiteral": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:464"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:463"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/programtosnapshot.go:addReferencedFilesFromSymbol": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:441"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:440"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/programtosnapshot.go:astDiagToBuildInfoDiag": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:716"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:706"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/programtosnapshot.go:fileAffectsGlobalScope": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:405"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:404"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/programtosnapshot.go:getReferencedFiles": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:500"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:499"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/programtosnapshot.go:programToSnapshot": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:21"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:20"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/programtosnapshot.go:repopulateDiagnosticMessageChain": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:661"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:649"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/programtosnapshot.go:repopulateDiagnosticsList": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:634"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:622"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/programtosnapshot.go:repopulateDiagnosticsOfFile": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:595"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:594"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/programtosnapshot.go:toProgramSnapshot.computeProgramFileChanges": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:109"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:108"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/programtosnapshot.go:toProgramSnapshot.handleFileDelete": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:282"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:281"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/programtosnapshot.go:toProgramSnapshot.handleGlobalScopeChange": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:313"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:312"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/programtosnapshot.go:toProgramSnapshot.handlePendingCheck": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:380"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:379"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/programtosnapshot.go:toProgramSnapshot.handlePendingEmit": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:346"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:345"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/programtosnapshot.go:toProgramSnapshot.reuseFromOldProgram": {
      "rust": [
-      "crates/tsr_incremental/src/program_to_snapshot.rs:78"
+      "crates/tsr_incremental/src/program_to_snapshot.rs:77"
      ],
      "status": "mapped"
     }
@@ -3617,7 +3687,7 @@
     },
     "tsc/internal/execute/incremental/snapshot.go:DiagnosticsOrBuildInfoDiagnosticsWithFileName.getDiagnostics": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot.rs:379"
+      "crates/tsr_incremental/src/snapshot.rs:417"
      ],
      "status": "mapped"
     },
@@ -3653,19 +3723,19 @@
     },
     "tsc/internal/execute/incremental/snapshot.go:buildInfoDiagnosticWithFileName.toDiagnostic": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot.rs:405"
+      "crates/tsr_incremental/src/snapshot.rs:440"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshot.go:buildInfoDiagnosticWithFileName.toDiagnosticWithoutRepopulate": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot.rs:451"
+      "crates/tsr_incremental/src/snapshot.rs:492"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshot.go:diagnosticToStringBuilder": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot.rs:784"
+      "crates/tsr_incremental/src/snapshot.rs:856"
      ],
      "status": "mapped"
     },
@@ -3689,61 +3759,61 @@
     },
     "tsc/internal/execute/incremental/snapshot.go:getTextHandlingSourceMapForSignature": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot.rs:759"
+      "crates/tsr_incremental/src/snapshot.rs:831"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshot.go:repopulateDiagnosticChain": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot.rs:484"
+      "crates/tsr_incremental/src/snapshot.rs:531"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshot.go:repopulateModeMismatchChain": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot.rs:512"
+      "crates/tsr_incremental/src/snapshot.rs:559"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshot.go:repopulateModuleNotFoundChain": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot.rs:547"
+      "crates/tsr_incremental/src/snapshot.rs:594"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshot.go:snapshot.addFileToAffectedFilesPendingEmit": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot.rs:668"
+      "crates/tsr_incremental/src/snapshot.rs:740"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshot.go:snapshot.addFileToChangeSet": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot.rs:662"
+      "crates/tsr_incremental/src/snapshot.rs:734"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshot.go:snapshot.canUseIncrementalState": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot.rs:745"
+      "crates/tsr_incremental/src/snapshot.rs:817"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshot.go:snapshot.computeHash": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot.rs:740"
+      "crates/tsr_incremental/src/snapshot.rs:812"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshot.go:snapshot.computeSignatureWithDiagnostics": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot.rs:724"
+      "crates/tsr_incremental/src/snapshot.rs:796"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshot.go:snapshot.getAllFilesExcludingDefaultLibraryFile": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot.rs:685"
+      "crates/tsr_incremental/src/snapshot.rs:757"
      ],
      "status": "mapped"
     }
@@ -3763,121 +3833,121 @@
    "functions": {
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:snapshotToBuildInfo": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:31"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:32"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.collectRootFiles": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:325"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:362"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.relativeToBuildInfo": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:106"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:107"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.setAffectedFilesPendingEmit": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:568"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:618"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.setChangeFileSet": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:505"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:551"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.setCompilerOptions": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:462"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:507"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.setEmitDiagnostics": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:551"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:600"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.setFileInfoAndEmitSignatures": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:348"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:385"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.setPackageJsons": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:621"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:672"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.setReferencedMap": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:485"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:530"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.setRootOfIncrementalProgram": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:419"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:463"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.setRootOfNonIncrementalProgram": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:598"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:649"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.setSemanticDiagnostics": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:515"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:562"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.toBuildInfoDiagnosticsFromDiagnostics": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:244"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:273"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.toBuildInfoDiagnosticsFromFileNameDiagnostics": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:207"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:235"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.toBuildInfoDiagnosticsOfFile": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:295"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:332"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.toFileId": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:119"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:120"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.toFileIdListId": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:136"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:148"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.toRelativeToBuildInfoCompilerOptionValue": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:162"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:182"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfoRepopulateInfo": {
      "rust": [
-      "crates/tsr_incremental/src/snapshot_to_build_info.rs:642"
+      "crates/tsr_incremental/src/snapshot_to_build_info.rs:697"
      ],
      "status": "mapped"
     }
@@ -3890,20 +3960,22 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 12,
+    "mapped": 9,
+    "pending": 3,
     "total": 12
    },
    "functions": {
     "tsc/internal/execute/tsc.go:CommandLine": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_execute/src/command.rs:19"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc.go:findConfigFile": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_execute/src/command.rs:248"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc.go:fmtMain": {
      "owner": "X1",
@@ -3921,39 +3993,46 @@
      "status": "pending"
     },
     "tsc/internal/execute/tsc.go:performCompilation": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_execute/src/compile.rs:69"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc.go:performIncrementalCompilation": {
-     "owner": "X2",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_execute/src/compile.rs:70"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc.go:showConfig": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_execute/src/command.rs:262"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc.go:startTracingIfNeeded": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/tracing.rs:7"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc.go:stopTracing": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/tracing.rs:40"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc.go:tscBuildCompilation": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_execute/src/command.rs:58"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc.go:tscCompilation": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_execute/src/command.rs:95"
+     ],
+     "status": "mapped"
     }
    },
    "group": "X1"
@@ -3964,8 +4043,8 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 2,
+    "mapped": 1,
+    "pending": 1,
     "total": 2
    },
    "functions": {
@@ -3975,9 +4054,10 @@
      "status": "pending"
     },
     "tsc/internal/execute/tsc/compile.go:newContentMapperLogger": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_execute/src/compile.rs:29"
+     ],
+     "status": "mapped"
     }
    },
    "group": "X1"
@@ -3988,80 +4068,94 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 14,
+    "mapped": 14,
+    "pending": 0,
     "total": 14
    },
    "functions": {
     "tsc/internal/execute/tsc/diagnostics.go:CreateBuilderStatusReporter": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/diagnostics.rs:218"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/diagnostics.go:CreateDiagnosticReporter": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/diagnostics.rs:87"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/diagnostics.go:CreateReportErrorSummary": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/diagnostics.rs:132"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/diagnostics.go:CreateWatchStatusReporter": {
-     "owner": "X5",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/diagnostics.rs:237"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/diagnostics.go:QuietDiagnosticReporter": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/diagnostics.rs:53"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/diagnostics.go:QuietDiagnosticsReporter": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/diagnostics.rs:56"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/diagnostics.go:colors.blue": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/colors.rs:49"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/diagnostics.go:colors.blueBackground": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/colors.rs:58"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/diagnostics.go:colors.bold": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/colors.rs:44"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/diagnostics.go:colors.brightWhite": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/colors.rs:71"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/diagnostics.go:createColors": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/colors.rs:12"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/diagnostics.go:defaultIsPretty": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/diagnostics.rs:25"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/diagnostics.go:getFormatOptsOfSys": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/diagnostics.rs:13"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/diagnostics.go:shouldBePretty": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/diagnostics.rs:45"
+     ],
+     "status": "mapped"
     }
    },
    "group": "X1"
@@ -4072,30 +4166,34 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 4,
+    "mapped": 4,
+    "pending": 0,
     "total": 4
    },
    "functions": {
     "tsc/internal/execute/tsc/emit.go:EmitAndReportStatistics": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/emit.rs:158"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/emit.go:EmitFilesAndReportErrors": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/emit.rs:60"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/emit.go:GetTraceWithWriterFromSys": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/lib.rs:179"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/emit.go:listFiles": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/emit.rs:188"
+     ],
+     "status": "mapped"
     }
    },
    "group": "X1"
@@ -4136,90 +4234,106 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 16,
+    "mapped": 16,
+    "pending": 0,
     "total": 16
    },
    "functions": {
     "tsc/internal/execute/tsc/help.go:PrintBuildHelp": {
-     "owner": "X3",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:222"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/help.go:PrintHelp": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:36"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/help.go:PrintVersion": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:26"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/help.go:formatDefaultValue": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:407"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/help.go:generateGroupOptionOutput": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:286"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/help.go:generateOptionOutput": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:315"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/help.go:generateSectionOptionsOutput": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:241"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/help.go:getDisplayNameTextOfOption": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:538"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/help.go:getHeader": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:81"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/help.go:getOptionsForHelp": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:47"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/help.go:getPossibleValues": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:471"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/help.go:getPrettyOutput": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:502"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/help.go:getValueCandidate": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:456"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/help.go:printAllHelp": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:193"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/help.go:printEasyHelp": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:123"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/help.go:showAdditionalInfoOutput": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/help.rs:441"
+     ],
+     "status": "mapped"
     }
    },
    "group": "X1"
@@ -4230,20 +4344,22 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 2,
+    "mapped": 2,
+    "pending": 0,
     "total": 2
    },
    "functions": {
     "tsc/internal/execute/tsc/init.go:WriteConfigFile": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/init.rs:13"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/init.go:generateTSConfig": {
-     "owner": "X1",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/init.rs:165"
+     ],
+     "status": "mapped"
     }
    },
    "group": "X1"
@@ -4254,55 +4370,64 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 9,
+    "mapped": 9,
+    "pending": 0,
     "total": 9
    },
    "functions": {
     "tsc/internal/execute/tsc/statistics.go:Statistics.Aggregate": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/statistics.rs:144"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/statistics.go:Statistics.Report": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/statistics.rs:43"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/statistics.go:Statistics.SetTotalTime": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/statistics.rs:178"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/statistics.go:Statistics.addContentMapperStatistics": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/statistics.rs:98"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/statistics.go:formatDuration": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/statistics.rs:184"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/statistics.go:identifierCount": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_compiler/src/statistics.rs:13"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/statistics.go:statisticsFromProgram": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/statistics.rs:24"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/statistics.go:table.add": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/statistics.rs:194"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/execute/tsc/statistics.go:table.print": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tsc/src/statistics.rs:198"
+     ],
+     "status": "mapped"
     }
    },
    "group": "X6"
@@ -4444,7 +4569,7 @@
    "functions": {
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setAffectedFilesPendingEmit": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:562"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:570"
      ],
      "status": "mapped"
     },
@@ -4456,13 +4581,13 @@
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setEmitDiagnostics": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:546"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:550"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setEmitSignatures": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:588"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:595"
      ],
      "status": "mapped"
     },
@@ -4486,7 +4611,7 @@
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setResolvedRoot": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:604"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:612"
      ],
      "status": "mapped"
     },
@@ -4498,25 +4623,25 @@
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.setSemanticDiagnostics": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:521"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:520"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.toFilePath": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:385"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:380"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.toFilePathSet": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:390"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:385"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfo.toReadableBuildInfoDiagnostic": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:395"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:390"
      ],
      "status": "mapped"
     },
@@ -4528,7 +4653,7 @@
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfoDiagnosticsOfFile.MarshalJSON": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:254"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:249"
      ],
      "status": "mapped"
     },
@@ -4536,13 +4661,13 @@
      "marker_to_add": false,
      "reason": "No caller at the pin: the readable build info is only marshalled (toReadableBuildInfo's json.MarshalIndent, readablebuildinfo.go:242). The unexported type is used only in readablebuildinfo.go, and the package's json.Unmarshal calls (fs.go:40, 62) decode incremental.BuildInfo, never a readable form. The harness renders the shape encode-only; the site is its marked MarshalJSON port.",
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:253"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:248"
      ],
      "status": "equivalent"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfoFilePendingEmit.MarshalJSON": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:290"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:285"
      ],
      "status": "mapped"
     },
@@ -4550,13 +4675,13 @@
      "marker_to_add": false,
      "reason": "No caller at the pin: the readable build info is only marshalled (toReadableBuildInfo's json.MarshalIndent, readablebuildinfo.go:242). The unexported type is used only in readablebuildinfo.go, and the package's json.Unmarshal calls (fs.go:40, 62) decode incremental.BuildInfo, never a readable form. The harness renders the shape encode-only; the site is its marked MarshalJSON port.",
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:289"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:284"
      ],
      "status": "equivalent"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfoResolvedRoot.MarshalJSON": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:328"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:323"
      ],
      "status": "mapped"
     },
@@ -4564,13 +4689,13 @@
      "marker_to_add": false,
      "reason": "No caller at the pin: the readable build info is only marshalled (toReadableBuildInfo's json.MarshalIndent, readablebuildinfo.go:242). The unexported type is used only in readablebuildinfo.go, and the package's json.Unmarshal calls (fs.go:40, 62) decode incremental.BuildInfo, never a readable form. The harness renders the shape encode-only; the site is its marked MarshalJSON port.",
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:327"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:322"
      ],
      "status": "equivalent"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfoSemanticDiagnostic.MarshalJSON": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:273"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:268"
      ],
      "status": "mapped"
     },
@@ -4578,25 +4703,25 @@
      "marker_to_add": false,
      "reason": "No caller at the pin: the readable build info is only marshalled (toReadableBuildInfo's json.MarshalIndent, readablebuildinfo.go:242). The unexported type is used only in readablebuildinfo.go, and the package's json.Unmarshal calls (fs.go:40, 62) decode incremental.BuildInfo, never a readable form. The harness renders the shape encode-only; the site is its marked MarshalJSON port.",
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:272"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:267"
      ],
      "status": "equivalent"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:toReadableBuildInfo": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:341"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:336"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:toReadableBuildInfoRepopulateInfo": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:618"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:626"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:toReadableFileEmitKind": {
      "rust": [
-      "tools/phase4/tsctests/src/readablebuildinfo.rs:632"
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:640"
      ],
      "status": "mapped"
     }
@@ -4616,7 +4741,7 @@
    "functions": {
     "tsc/internal/execute/tsctests/runner.go:getDiffForIncremental": {
      "rust": [
-      "tools/phase4/tsctests/src/runner.rs:315"
+      "tools/phase4/tsctests/src/runner.rs:304"
      ],
      "status": "mapped"
     },
@@ -4628,7 +4753,7 @@
     },
     "tsc/internal/execute/tsctests/runner.go:tscInput.getBaselineSubFolder": {
      "rust": [
-      "tools/phase4/tsctests/src/runner.rs:265"
+      "tools/phase4/tsctests/src/runner.rs:254"
      ],
      "status": "mapped"
     },
@@ -5631,103 +5756,133 @@
   "tsc/internal/fswatch/fsevents_darwin.go": {
    "counts": {
     "duplicate": 0,
-    "equivalent": 0,
+    "equivalent": 6,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 18,
+    "mapped": 12,
+    "pending": 0,
     "total": 18
    },
    "functions": {
     "tsc/internal/fswatch/fsevents_darwin.go:checkWatcher": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Folded into add_many's pre-mutation validation of every physical directory: follow the root symlink, propagate stat errors and reject non-directories with ENOTDIR. Common watcher registration supplies the logical request context.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos.rs:76"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:fsEventsBackend.activeWatchesLocked": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos.rs:58"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:fsEventsBackend.closeWatch": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos.rs:110"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:fsEventsBackend.start": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Go start only signals readiness; this backend has no event-loop startup. The synchronous Rust factory returns the ready backend, and native streams are started by add_many before that operation returns.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos.rs:46"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:fsEventsBackend.startStream": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:45"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:fsEventsBackend.startStreams": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Go's method only forwards watches and b.startStream. Both Rust subscription and removal call the ported start_streams with Stream::new directly.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos.rs:94"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:fsEventsBackend.subscribe": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "The one-watch wrapper only delegates to subscribeMany. Common Rust registration sends both single and batched requests through Backend::add_many, whose FSEvents implementation is the marked port.",
+     "rust": [
+      "crates/tsr_fswatch/src/watcher.rs:333"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:fsEventsBackend.subscribeMany": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos.rs:69"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:fsEventsCallback": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos.rs:209"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:fseventsDisplayPath": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos.rs:189"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:fseventsOverflowMatches": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos.rs:200"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:init#1": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "The target-specific factory is an explicit backend match arm instead of a Go init mutation. FsEventsBackend::sequence supplies FSEventsGetCurrentEventId through the Backend trait.",
+     "rust": [
+      "crates/tsr_fswatch/src/watcher.rs:163"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:newFSEventsBackend": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos.rs:44"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:startFSEventsStreams": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos.rs:153"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:stopFSEventsStream": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:121"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:stopFSEventsStreams": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Vec<Stream> owns each native stream. Clearing or replacing the vector runs Stream::drop for every element, including partially constructed chunk sets on error; Drop stops, invalidates, drains and releases each stream once.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos.rs:139"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:teardownStream": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:122"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin.go:watchesForFSEventsPaths": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos.rs:180"
+     ],
+     "status": "mapped"
     }
    },
    "group": "X4"
@@ -5735,173 +5890,259 @@
   "tsc/internal/fswatch/fsevents_darwin_ffi.go": {
    "counts": {
     "duplicate": 0,
-    "equivalent": 0,
+    "equivalent": 27,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 32,
+    "mapped": 5,
+    "pending": 0,
     "total": 32
    },
    "functions": {
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:cfArrayCreate": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Typed CFArray::new calls the same framework constructor with null element callbacks; the owned CFString vector stays alive through FSEventStreamCreate, which copies the paths.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:61"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:cfArrayGetValueAtIndex": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "The typed CFArray accessor performs the same indexed lookup after the callback checks the array length. The immutable borrowed CFString is normalized before callback return.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:181"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:cfRelease": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "CFRetained owns CFString/CFMutableString/CFArray creation results and releases them on every return path. Callback CFArray/CFString values are borrowed only until callback return, requiring no retain.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:198"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:cfStringCreate": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:197"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:cfStringCreateMutableCopy": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "The binding calls CFStringCreateMutableCopy with the same allocator/capacity and owns the result; null preserves the pin's fallback to the original string.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:230"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:cfStringGetCString": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "The binding calls CFStringGetCString into the owned buffer with its exact capacity and UTF-8 encoding; false returns empty, and success trims the first NUL as in the pin.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:219"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:cfStringGetLength": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "The typed CFString length method calls CFStringGetLength for the UTF-8 output-buffer calculation.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:210"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:cfStringGetMaximumSizeForEncoding": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "The typed binding computes the same maximum UTF-8 byte capacity; checked_add reserves the trailing NUL.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:210"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:cfStringNormalize": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "The typed binding calls CFStringNormalize with canonical composition, on an exclusively owned copy.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:234"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:cfStringNormalizedToGo": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Folded into cf_string_to_nfc: make an owned mutable copy, normalize to C, convert to UTF-8, release the copy and fall back to the original contents if allocation or conversion fails.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:230"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:cfStringToGo": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:208"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:cfStringToNFC": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:228"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:dispatchQueueCreate": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "dispatch2 creates the same named per-stream serial queue and returns an owning DispatchRetained.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:69"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:dispatchRelease": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "DispatchRetained releases the queue when Stream fields drop, after Stop/Invalidate, the synchronous queue barrier and FSEventStreamRelease. No copied integer queue handle survives that owner.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:31"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:dispatchSync": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "dispatch2's synchronous no-op on the serial queue is the same teardown barrier as dispatch_sync_f.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:134"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:fsEventStreamCreate": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "The typed framework call supplies the native C callback, stable boxed context, path array, SinceNow, 0.001 latency and UseCFTypes|FileEvents directly, replacing the arch-specific argument trampoline.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:81"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:fsEventStreamFlushSync": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Direct typed framework call after successful start, before returning the subscription.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:113"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:fsEventStreamInvalidate": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Direct typed framework call during teardown, before waiting for the serial callback queue.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:130"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:fsEventStreamRelease": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Direct typed framework call after callbacks finish and before callback context/queue fields drop.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:138"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:fsEventStreamSetDispatchQueue": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Direct typed framework call before start; the owning Stream retains the queue through teardown.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:103"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:fsEventStreamStart": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Direct typed framework call with the same false-result error; a failed start still invalidates/releases.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:106"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:fsEventStreamStop": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Direct typed framework call in the unique owner's destructor, before invalidation and queue draining.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:128"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:fsEventsCallbackPayload.close": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "There is no retained/copied assembly payload: the callback borrows framework arrays and classifies before returning. Local Rust path buffers drop normally; native arrays remain framework-owned.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:187"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:fsEventsGetCurrentEventID": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:143"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:isASCII": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "The byte-slice ASCII predicate performs the same all-bytes-below-0x80 test before any CF allocation.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:246"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:libcFree": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Only Go's assembly payload copies need libcFree. Rust borrows native flags/IDs/path values for the callback duration and processes them synchronously; its owned path Vec values use Rust drop.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:171"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:newStreamCallback": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "A stable boxed immutable watch snapshot and owned per-stream serial queue replace the Go pinner, assembly write pipe and event-loop goroutine. FSEvents invokes the typed C callback directly.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:70"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:normalizeNFC": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:244"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:streamCallback.close": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Stream's unique owner stops and invalidates the stream, waits for all classification on its serial queue, releases the stream, then drops queue/context. No pipe or event-loop goroutine remains to close.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:119"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:streamCallback.eventLoop": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Classification runs directly in the serial C callback; there is no Go ABI handoff pipe. The shared debouncer still delivers user callbacks outside this queue, preserving callback self-close safety.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:187"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:streamCallback.waitDispatchQueue": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "The synchronous serial-queue barrier waits for callback classification as well as callback return, since Rust does not hand a payload to a second Go worker.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:134"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/fswatch/fsevents_darwin_ffi.go:syscall_syscall6": {
-     "owner": "X4",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "Go's runtime ABI trampoline is unnecessary with the typed objc2 framework imports and Rust C ABI callback. The compiler supplies native argument passing, including FSEventStreamCreate's float latency; callback catches panics and aborts before one can cross the framework boundary.",
+     "rust": [
+      "crates/tsr_fswatch/src/macos/native.rs:149"
+     ],
+     "status": "equivalent"
     }
    },
    "group": "X4"
@@ -6506,110 +6747,130 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 20,
+    "mapped": 20,
+    "pending": 0,
     "total": 20
    },
    "functions": {
     "tsc/internal/tracing/tracing.go:StartTracing": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/lib.rs:115"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:Tracing.Instant": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/lib.rs:465"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:Tracing.NewTypeTracer": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/lib.rs:489"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:Tracing.Push": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/lib.rs:369"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:Tracing.StopTracing": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/lib.rs:263"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:Tracing.maybeFlushLocked": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/lib.rs:222"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:Tracing.threadIDLocked": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/lib.rs:194"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:Tracing.timestamp": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/lib.rs:185"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:Tracing.writeEvent": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/wire.rs:74"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:Tracing.writeThreadNameEventLocked": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/lib.rs:210"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:getLocation": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_checker/src/trace.rs:1002"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:mapTypeIds": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_checker/src/trace.rs:720"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:stableTraceThreadID": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/lib.rs:74"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:traceThreadKey.defaultThreadID": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/lib.rs:67"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:traceThreadKey.displayName": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/lib.rs:60"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:traceThreadKeyFromArgs": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/lib.rs:40"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:typeTracer.DumpTypes": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/lib.rs:274"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:typeTracer.RecordType": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/lib.rs:493"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:typeTracer.buildTypeDescriptor": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_checker/src/trace.rs:1040"
+     ],
+     "status": "mapped"
     },
     "tsc/internal/tracing/tracing.go:writeEventTo": {
-     "owner": "X6",
-     "reason": "not yet ported",
-     "status": "pending"
+     "rust": [
+      "crates/tsr_tracing/src/wire.rs:72"
+     ],
+     "status": "mapped"
     }
    },
    "group": "X6"
@@ -6641,8 +6902,8 @@
     "equivalent": 48,
     "gap": 0,
     "later": 27,
-    "mapped": 210,
-    "pending": 88,
+    "mapped": 282,
+    "pending": 16,
     "total": 373
    },
    "files": [
@@ -6707,8 +6968,8 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 87,
+    "mapped": 44,
+    "pending": 43,
     "total": 87
    },
    "files": [
@@ -6724,11 +6985,11 @@
   "X4": {
    "counts": {
     "duplicate": 0,
-    "equivalent": 0,
+    "equivalent": 33,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 198,
+    "mapped": 17,
+    "pending": 148,
     "total": 198
    },
    "files": [
@@ -6771,8 +7032,8 @@
     "equivalent": 0,
     "gap": 0,
     "later": 0,
-    "mapped": 0,
-    "pending": 29,
+    "mapped": 29,
+    "pending": 0,
     "total": 29
    },
    "files": [
@@ -6820,15 +7081,23 @@
  ],
  "pending_by_checkpoint": {
   "X0": 0,
-  "X1": 64,
-  "X2": 3,
-  "X3": 90,
-  "X4": 198,
-  "X5": 60,
-  "X6": 36,
+  "X1": 5,
+  "X2": 1,
+  "X3": 43,
+  "X4": 148,
+  "X5": 59,
+  "X6": 0,
   "X7": 0
  },
- "pending_reviews_superseded": [],
+ "pending_reviews_superseded": [
+  "tsc/internal/compiler/program.go:Program.LineCount",
+  "tsc/internal/compiler/program.go:Program.IdentifierCount",
+  "tsc/internal/compiler/program.go:Program.SymbolCount",
+  "tsc/internal/compiler/program.go:Program.TypeCount",
+  "tsc/internal/compiler/program.go:Program.InstantiationCount",
+  "tsc/internal/compiler/program.go:Program.IsMissingPath",
+  "tsc/internal/compiler/program.go:Program.ExplainFiles"
+ ],
  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
  "problems": [],
  "scope": {
@@ -6843,7 +7112,7 @@
     "functions": 1007,
     "harness": 5,
     "lines": 21294,
-    "marked": 477,
+    "marked": 639,
     "source": 62
    },
    "before_decisions": {
@@ -6851,7 +7120,7 @@
     "functions": 1055,
     "harness": 5,
     "lines": 22479,
-    "marked": 477,
+    "marked": 639,
     "source": 65
    },
    "ledger_out_of_scope": 10,
@@ -6867,14 +7136,192 @@
    "tsc/internal/pprof/pprof.go": "Phase 7: profiling is deferred (decisions 4 and 6)"
   }
  },
- "test_file_markers": {},
+ "test_file_markers": {
+  "tsc/internal/execute/build/buildtask_contentmapper_test.go:TestIsContentMapperSupplementalBuildInfoPath": [
+   "crates/tsr_build/src/tests.rs:256"
+  ],
+  "tsc/internal/execute/build/graph_test.go:TestBuildOrderGenerator": [
+   "crates/tsr_build/src/tests.rs:184"
+  ],
+  "tsc/internal/execute/tsc/emit_test.go:TestContentMapperLoggerEnvironmentVariable": [
+   "crates/tsr_execute/src/compile.rs:282"
+  ],
+  "tsc/internal/execute/tsc/emit_test.go:TestIncrementalDeclarationEmitTimeIsExcludedFromCheckTime": [
+   "crates/tsr_tsc/tests/phase4_emit.rs:105"
+  ],
+  "tsc/internal/execute/tsc/extendedconfigcache_test.go:TestExtendedConfigCacheExtendsCircularity": [
+   "tools/phase4/tsctests/tests/build_direct.rs:274"
+  ],
+  "tsc/internal/execute/tsc/extendedconfigcache_test.go:TestExtendedConfigCacheNullExtendsDoesNotPanic": [
+   "tools/phase4/tsctests/tests/build_direct.rs:299"
+  ],
+  "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildDetectsNewPhysicalSupplementalFile": [
+   "tools/phase4/tsctests/tests/build_direct.rs:197"
+  ],
+  "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildIdentityFailureExitStatus": [
+   "tools/phase4/tsctests/tests/build_direct.rs:230"
+  ],
+  "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildLifecycle": [
+   "tools/phase4/tsctests/tests/build_direct.rs:162"
+  ],
+  "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildWatchSharedLifecycle": [
+   "tools/phase4/tsctests/tests/build_direct.rs:603"
+  ],
+  "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildWatchSymlinkedManifestChange": [
+   "tools/phase4/tsctests/tests/build_direct.rs:557"
+  ],
+  "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildWatchSymlinkedManifestDelete": [
+   "tools/phase4/tsctests/tests/build_direct.rs:579"
+  ],
+  "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperMixedWatchBatchForcesFullRebuild": [
+   "tools/phase4/tsctests/tests/build_direct.rs:492"
+  ],
+  "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperSupplementalCollisionWatch": [
+   "tools/phase4/tsctests/tests/build_direct.rs:418"
+  ],
+  "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperSupplementalDiagnosticUsesOriginalFileName": [
+   "tools/phase4/tsctests/tests/build_direct.rs:177"
+  ],
+  "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperWatchLifecycle": [
+   "tools/phase4/tsctests/tests/build_direct.rs:358"
+  ],
+  "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestDynamicContentMapperBuildWatchDependency": [
+   "tools/phase4/tsctests/tests/build_direct.rs:486"
+  ],
+  "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestDynamicContentMapperWatchDependency": [
+   "tools/phase4/tsctests/tests/build_direct.rs:481"
+  ],
+  "tsc/internal/fswatch/eventlist_test.go:TestEventListCreateDeleteCreate": [
+   "crates/tsr_fswatch/src/event.rs:185"
+  ],
+  "tsc/internal/fswatch/eventlist_test.go:TestEventListCreateThenDelete": [
+   "crates/tsr_fswatch/src/event.rs:162"
+  ],
+  "tsc/internal/fswatch/eventlist_test.go:TestEventListDeleteThenCreate": [
+   "crates/tsr_fswatch/src/event.rs:171"
+  ],
+  "tsc/internal/fswatch/eventlist_test.go:TestEventListDrainForSequences": [
+   "crates/tsr_fswatch/src/event.rs:254"
+  ],
+  "tsc/internal/fswatch/eventlist_test.go:TestEventListDrainIsAtomic": [
+   "crates/tsr_fswatch/src/event.rs:214"
+  ],
+  "tsc/internal/fswatch/eventlist_test.go:TestEventListDrainReturnsErrorWithEvents": [
+   "crates/tsr_fswatch/src/event.rs:238"
+  ],
+  "tsc/internal/fswatch/eventlist_test.go:TestEventListErrorIsLatchedAndCleared": [
+   "crates/tsr_fswatch/src/event.rs:200"
+  ],
+  "tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherDoesNotFallbackForUnrelatedError": [
+   "crates/tsr_fswatch/src/fallback.rs:135"
+  ],
+  "tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherDoesNotUseSecondaryOnHappyPath": [
+   "crates/tsr_fswatch/src/fallback.rs:149"
+  ],
+  "tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherRollsBackRoutedWatchesOnFailure": [
+   "crates/tsr_fswatch/src/fallback.rs:162"
+  ],
+  "tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherRoutesUnsupportedDirectories": [
+   "crates/tsr_fswatch/src/fallback.rs:104"
+  ],
+  "tsc/internal/fswatch/fanotify_linux_test.go:TestFanotifyCrossWatcherSameFs": [
+   "crates/tsr_fswatch/src/linux/tests.rs:351"
+  ],
+  "tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyBackendSelection": [
+   "crates/tsr_fswatch/src/linux/tests.rs:302"
+  ],
+  "tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyMarkENODEVTagged": [
+   "crates/tsr_fswatch/src/linux/tests.rs:436"
+  ],
+  "tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyMaybeWrapUnsupportedFilesystem": [
+   "crates/tsr_fswatch/src/linux/tests.rs:420"
+  ],
+  "tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyParseDfidNameRoundTrip": [
+   "crates/tsr_fswatch/src/linux/tests.rs:334"
+  ],
+  "tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyShutdownBeforeStart": [
+   "crates/tsr_fswatch/src/linux/tests.rs:292"
+  ],
+  "tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifySubscribeCleansUpAfterMarkFailure": [
+   "crates/tsr_fswatch/src/linux/tests.rs:318"
+  ],
+  "tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyUnsupportedTagSurvivesDirWatchError": [
+   "crates/tsr_fswatch/src/linux/tests.rs:447"
+  ],
+  "tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestFSEventsNFDOnDiskNFCSubscribe": [
+   "crates/tsr_fswatch/src/macos/tests.rs:529"
+  ],
+  "tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestFSEventsNFDOnDiskNFCWatchFile": [
+   "crates/tsr_fswatch/src/macos/tests.rs:610"
+  ],
+  "tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestIsASCII": [
+   "crates/tsr_fswatch/src/macos/tests.rs:63"
+  ],
+  "tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestNormalizeNFC": [
+   "crates/tsr_fswatch/src/macos/tests.rs:20"
+  ],
+  "tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestNormalizeNFCASCIIFastPath": [
+   "crates/tsr_fswatch/src/macos/tests.rs:56"
+  ],
+  "tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsConsolidatedWatchTerminatesLogicalRoot": [
+   "crates/tsr_fswatch/src/macos/tests.rs:493"
+  ],
+  "tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsConsolidatedWatchValidatesLogicalRoot": [
+   "crates/tsr_fswatch/src/macos/tests.rs:467"
+  ],
+  "tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsOverflowMatchesWatch": [
+   "crates/tsr_fswatch/src/macos/tests.rs:81"
+  ],
+  "tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsSharedStreamAcrossWatches": [
+   "crates/tsr_fswatch/src/macos/tests.rs:408"
+  ],
+  "tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsSharedStreamFallsBackToChunks": [
+   "crates/tsr_fswatch/src/macos/tests.rs:230"
+  ],
+  "tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsSharedStreamRoutesEvents": [
+   "crates/tsr_fswatch/src/macos/tests.rs:424"
+  ],
+  "tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestWatchesForFSEventsPaths": [
+   "crates/tsr_fswatch/src/macos/tests.rs:277"
+  ],
+  "tsc/internal/fswatch/walkdir_test.go:TestWalkDirCallback": [
+   "crates/tsr_fswatch/src/walkdir.rs:172"
+  ],
+  "tsc/internal/fswatch/walkdir_test.go:TestWalkDirCallbackError": [
+   "crates/tsr_fswatch/src/walkdir.rs:198"
+  ],
+  "tsc/internal/fswatch/walkdir_test.go:TestWalkDirDoesNotFollowRootSymlinkedDir": [
+   "crates/tsr_fswatch/src/walkdir.rs:85"
+  ],
+  "tsc/internal/fswatch/walkdir_test.go:TestWalkDirDoesNotFollowSymlinkedDir": [
+   "crates/tsr_fswatch/src/walkdir.rs:66"
+  ],
+  "tsc/internal/fswatch/walkdir_test.go:TestWalkDirEntries": [
+   "crates/tsr_fswatch/src/walkdir.rs:140"
+  ],
+  "tsc/internal/fswatch/walkdir_test.go:TestWalkDirIgnoresUnreadableSubdir": [
+   "crates/tsr_fswatch/src/walkdir.rs:211"
+  ],
+  "tsc/internal/fswatch/walkdir_test.go:TestWalkDirMissingDir": [
+   "crates/tsr_fswatch/src/walkdir.rs:117"
+  ],
+  "tsc/internal/fswatch/walkdir_test.go:TestWalkDirNotADir": [
+   "crates/tsr_fswatch/src/walkdir.rs:128"
+  ],
+  "tsc/internal/tracing/tracing_test.go:TestConcurrentDurationEventsUseSeparateThreadIDs": [
+   "crates/tsr_tracing/src/tests.rs:97"
+  ],
+  "tsc/internal/tracing/tracing_test.go:TestThreadIDsAreStableAcrossFirstSeenOrder": [
+   "crates/tsr_tracing/src/tests.rs:176"
+  ]
+ },
  "totals": {
   "duplicate": 0,
-  "equivalent": 52,
+  "equivalent": 85,
   "gap": 0,
   "later": 27,
-  "mapped": 477,
-  "pending": 451,
+  "mapped": 639,
+  "pending": 256,
   "total": 1007
  },
  "unknown_markers": {},

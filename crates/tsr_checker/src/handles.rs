@@ -654,6 +654,11 @@ impl Operation<'_> {
         self.state().symbol_count
     }
 
+    /// `Checker.TotalInstantiationCount`, across all completed checking work.
+    pub fn instantiation_count(&self) -> u64 {
+        self.state().instantiation.total_count
+    }
+
     /// `Checker.SignatureCount`.
     pub fn signature_count(&self) -> usize {
         self.state().signatures.len()

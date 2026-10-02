@@ -306,8 +306,6 @@ impl CheckerState {
             .ok_or(tsr_arena::Error::InvalidGraph)?;
         let name = required(data.name(), "export specifier name")?;
         let property = data.property_name();
-        let type_only = data.is_type_only();
-        let ambient = read.flags() & nf::AMBIENT != 0;
         let parent = required(read.parent(), "export list")?;
         let declaration = required(self.node(parent)?.parent(), "export declaration")?;
         let read = self.node(declaration)?;
@@ -316,7 +314,6 @@ impl CheckerState {
             .as_export_declaration()
             .ok_or(tsr_arena::Error::InvalidGraph)?;
         let external = declaration_data.module_specifier().is_some();
-        let declaration_type_only = declaration_data.is_type_only();
         self.check_module_export_name(property, external)?;
         self.check_module_export_name(Some(name), true)?;
         if external {
@@ -380,42 +377,13 @@ impl CheckerState {
                 d::Cannot_export_0_Only_local_declarations_can_be_exported_from_a_module,
                 vec![text],
             )?;
-        } else if !ambient
-            && !type_only
-            && !declaration_type_only
-            && !self
-                .program()?
-                .host
-                .options()
-                .verbatim_module_syntax
-                .is_true()
-        {
-            let target = if let Some(symbol) = symbol {
-                Some(if self.symbol(symbol)?.flags() & sf::ALIAS != 0 {
-                    self.resolve_alias(symbol)?
-                } else {
-                    symbol
-                })
-            } else {
-                None
-            };
-            if target.is_none()
-                || self.module_symbol_flags(
-                    target.expect("target is present in right operand"),
-                    false,
-                    false,
-                )? & sf::VALUE
-                    != 0
-            {
-                self.mark_module_export_referenced(node)?;
-                if let Some(symbol) = symbol {
-                    if tsr_ast::is_non_local_alias(Some(&self.symbol(symbol)?), sf::VALUE)
-                        && !self.module_aliases.type_only.contains_key(&symbol)
-                    {
-                        self.mark_module_alias_referenced(symbol)?;
-                    }
-                }
-            }
+        } else {
+            self.mark_linked_references(
+                node,
+                crate::linked_references::ReferenceHint::ExportSpecifier,
+                None,
+                None,
+            )?;
         }
         Ok(())
     }

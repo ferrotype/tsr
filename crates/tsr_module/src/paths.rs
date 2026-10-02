@@ -6,7 +6,7 @@ use tsr_diagnostics as diagnostics;
 use tsr_jsstring::JsString;
 use tsr_tspath as path;
 /// Exact keys and patterns are parsed once for an immutable options map.
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct ParsedPatterns {
     exact: std::collections::BTreeSet<Vec<u8>>,
     patterns: Vec<Pattern>,

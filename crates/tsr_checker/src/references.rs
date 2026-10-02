@@ -373,7 +373,10 @@ impl CheckerState {
             )?;
             return Ok(self.builtins.error_type);
         }
-        self.get_regular_type_of_literal_type(ty)
+        // The alias forwards the declared type, including freshness. An alias
+        // of `typeof import(...).default` can name a fresh literal whose const
+        // declaration must be serialized with an initializer.
+        Ok(ty)
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getTypeFromClassOrInterfaceReference

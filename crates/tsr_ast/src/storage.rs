@@ -665,6 +665,10 @@ impl<'a> AstView<'a> {
     pub fn source(self) -> &'a SourceText {
         self.0.source()
     }
+    /// Observe the allocation domain that owns this syntax without retaining it.
+    pub fn counters(self) -> &'a Counters {
+        self.0.counters()
+    }
     pub fn position_map(self) -> &'a tsr_jsstring::PositionMap {
         self.0.position_map()
     }

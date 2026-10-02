@@ -501,8 +501,7 @@
   },
   "by_status": {
    "not_applicable": 5,
-   "pending": 164,
-   "ported": 5
+   "ported": 169
   },
   "direct": 24,
   "direct_by_file": {
@@ -510,13 +509,7 @@
    "watcher_race_test.go": 12
   },
   "neither": 1,
-  "pending_by_checkpoint": {
-   "X1": 7,
-   "X3": 5,
-   "X4": 123,
-   "X5": 27,
-   "X6": 2
-  },
+  "pending_by_checkpoint": {},
   "roster": 174,
   "tsctests_functions": 76,
   "unit": 150,
@@ -631,8 +624,14 @@
    "kind": "unit",
    "package": "cmd/tsc",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr/src/process.rs:311",
+     "test": "crates/tsr/src/process.rs::close_does_not_wait_for_launcher_descendants"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -645,8 +644,14 @@
    "kind": "unit",
    "package": "internal/execute/build",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_build/src/tests.rs:256",
+     "test": "crates/tsr_build/src/tests.rs::pinned_supplemental_paths_require_numeric_index_and_supported_extension"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -659,8 +664,14 @@
    "kind": "unit",
    "package": "internal/execute/build",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_build/src/tests.rs:184",
+     "test": "crates/tsr_build/src/tests.rs::pinned_graph_order_diamonds_cycles_and_watch_edges"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -773,8 +784,14 @@
    "kind": "unit",
    "package": "internal/execute/tsc",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_execute/src/compile.rs:282",
+     "test": "crates/tsr_execute/src/compile.rs::content_mapper_logger_environment_variable"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -787,8 +804,14 @@
    "kind": "unit",
    "package": "internal/execute/tsc",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/tests/phase4_emit.rs:105",
+     "test": "crates/tsr_tsc/tests/phase4_emit.rs::incremental_declaration_emit_time_is_excluded_from_check_time"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -801,8 +824,14 @@
    "kind": "unit",
    "package": "internal/execute/tsc",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:274",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::extended_config_cache_extends_circularity"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": [
     "self-referencing extends",
     "mutual extends cycle",
@@ -819,8 +848,14 @@
    "kind": "unit",
    "package": "internal/execute/tsc",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:299",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::extended_config_cache_null_extends_does_not_panic"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -837,8 +872,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:162",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_build_lifecycle"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -855,8 +896,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:177",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::supplemental_diagnostic_uses_original_file_name"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -874,8 +921,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:197",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::build_detects_new_physical_supplemental_file"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -892,8 +945,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:230",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::build_identity_failure_exit_status"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -911,8 +970,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:358",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_watch_lifecycle"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -929,8 +994,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:418",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_supplemental_collision_watch"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -947,8 +1018,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:481",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::dynamic_content_mapper_watch_dependency"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -966,8 +1043,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:492",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_mixed_watch_batch_forces_full_rebuild"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -985,8 +1068,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:486",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::dynamic_content_mapper_build_watch_dependency"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1004,8 +1093,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:557",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_build_watch_symlinked_manifest_change"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1023,8 +1118,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:579",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_build_watch_symlinked_manifest_delete"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1042,8 +1143,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:603",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_build_watch_shared_lifecycle"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1059,8 +1166,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:86",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::concurrent_cycles_with_source_writes"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1076,8 +1189,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:102",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::concurrent_cycles_and_state_reads"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1093,8 +1212,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:128",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::create_delete_and_cycle_concurrently"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1110,8 +1235,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:163",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::rapid_config_and_source_edits"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1127,8 +1258,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:203",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::concurrent_cycles_without_changes"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1144,8 +1281,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:218",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::alternating_writes_and_cycles"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1163,8 +1306,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:239",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::cancelled_build_watch_returns_without_waiting_for_interval"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1183,8 +1332,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:268",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::watch_reads_existing_build_info"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1201,8 +1356,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:298",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::changed_jsx_pragma_resolves_the_new_runtime"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1218,8 +1379,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:323",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::body_only_edits_reuse_program_and_import_changes_rebuild"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1236,8 +1403,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:379",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::overflow_rediscovers_previously_missing_dependency"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1254,8 +1427,14 @@
    "kind": "direct",
    "package": "internal/execute/tsctests",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:392",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::non_source_dependency_in_edit_batch_forces_rebuild"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1268,8 +1447,14 @@
    "kind": "unit",
    "package": "internal/execute/watchmanager",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/src/watchmanager/tests.rs:10",
+     "test": "crates/tsr_tsc/src/watchmanager/tests.rs::dir_watch_set_coverage"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1282,8 +1467,14 @@
    "kind": "unit",
    "package": "internal/execute/watchmanager",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/src/watchmanager/tests.rs:31",
+     "test": "crates/tsr_tsc/src/watchmanager/tests.rs::dir_watch_set_case_sensitive"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1296,8 +1487,14 @@
    "kind": "unit",
    "package": "internal/execute/watchmanager",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/src/watchmanager/tests.rs:42",
+     "test": "crates/tsr_tsc/src/watchmanager/tests.rs::dir_watch_set_case_insensitive"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1310,8 +1507,14 @@
    "kind": "unit",
    "package": "internal/execute/watchmanager",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/src/watchmanager/tests.rs:52",
+     "test": "crates/tsr_tsc/src/watchmanager/tests.rs::dir_watch_set_canonical_dedup"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1324,8 +1527,14 @@
    "kind": "unit",
    "package": "internal/execute/watchmanager",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/src/watchmanager/tests.rs:65",
+     "test": "crates/tsr_tsc/src/watchmanager/tests.rs::dir_watch_set_upgrade_to_recursive"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1338,8 +1547,14 @@
    "kind": "unit",
    "package": "internal/execute/watchmanager",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/src/watchmanager/tests.rs:76",
+     "test": "crates/tsr_tsc/src/watchmanager/tests.rs::dir_watch_set_never_downgrades"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1352,8 +1567,14 @@
    "kind": "unit",
    "package": "internal/execute/watchmanager",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/src/watchmanager/tests.rs:85",
+     "test": "crates/tsr_tsc/src/watchmanager/tests.rs::dir_watch_set_dirs"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1366,8 +1587,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/event.rs:162",
+     "test": "crates/tsr_fswatch/src/event.rs::create_then_delete_cancels_the_event_but_keeps_pending_entry"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1380,8 +1607,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/event.rs:171",
+     "test": "crates/tsr_fswatch/src/event.rs::delete_then_create_is_an_update"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1394,8 +1627,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/event.rs:185",
+     "test": "crates/tsr_fswatch/src/event.rs::create_delete_create_is_an_update"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1408,8 +1647,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/event.rs:200",
+     "test": "crates/tsr_fswatch/src/event.rs::first_error_is_latched_and_cleared_by_the_production_drain"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1422,8 +1667,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/event.rs:214",
+     "test": "crates/tsr_fswatch/src/event.rs::drain_takes_events_and_error_together_then_clears_both"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1436,8 +1687,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/event.rs:238",
+     "test": "crates/tsr_fswatch/src/event.rs::drain_returns_error_alongside_events"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1450,8 +1707,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/event.rs:254",
+     "test": "crates/tsr_fswatch/src/event.rs::later_subscription_sees_deletion_of_an_earlier_pending_create"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1464,8 +1727,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/fallback.rs:104",
+     "test": "crates/tsr_fswatch/src/fallback.rs::routes_only_filesystem_unsupported_watches"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1478,8 +1747,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/fallback.rs:135",
+     "test": "crates/tsr_fswatch/src/fallback.rs::unrelated_errors_do_not_fallback"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1492,8 +1767,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/fallback.rs:149",
+     "test": "crates/tsr_fswatch/src/fallback.rs::supported_filesystem_does_not_initialize_secondary"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1506,8 +1787,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/fallback.rs:162",
+     "test": "crates/tsr_fswatch/src/fallback.rs::rollback_closes_primary_and_routed_watches"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1520,8 +1807,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1447",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::fanotify_uses_shared_internal_inotify"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1534,8 +1827,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:292",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_shutdown_before_start"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1548,10 +1847,16 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:302",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_backend_selection"
+    }
+   ],
    "skips": [
     "fanotify not available"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1564,8 +1869,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:318",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_subscribe_cleans_up_after_mark_failure"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1578,10 +1889,16 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:334",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_handle_key_round_trip"
+    }
+   ],
    "skips": [
     "NameToHandleAt not supported: %v"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1594,10 +1911,16 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:351",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_cross_watcher_same_filesystem"
+    }
+   ],
    "skips": [
     "fanotify not available"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": [
     "Modify"
    ]
@@ -1612,8 +1935,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:420",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_unsupported_filesystem_keeps_tag_and_errno"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1626,8 +1955,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:436",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_mark_enodev_is_tagged"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1640,8 +1975,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:447",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_unsupported_tag_survives_directory_watch_error"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1672,8 +2013,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:20",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::normalization_preserves_pinned_byte_boundaries"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1686,8 +2033,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:56",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::normalize_ascii_fast_path_preserves_input"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1700,8 +2053,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:63",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::ascii_predicate_matches_pinned_byte_cases"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1714,8 +2073,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:529",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::native_nfd_directory_subscription_reports_nfc_child_paths"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1728,8 +2093,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:610",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::native_nfd_file_reaches_nfc_filter_and_close_releases_watch"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1742,8 +2113,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:408",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::native_five_directory_subscriptions_share_one_stream"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1756,8 +2133,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:424",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::native_shared_stream_routes_both_siblings_without_leaking_events"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1770,8 +2153,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:467",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::native_consolidated_watch_validates_missing_and_file_roots"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1784,8 +2173,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:493",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::native_consolidated_watch_delivers_delete_and_terminal_error_for_logical_root"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1798,8 +2193,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:230",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::shared_stream_first_then_chunk_fallback_and_failure_rollback"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1812,8 +2213,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:277",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::watches_for_paths_selects_only_exact_physical_roots"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1826,8 +2233,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:81",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::overflow_and_display_use_component_boundaries_and_both_roots"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1840,8 +2253,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:66",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::recursion_does_not_follow_descendant_symlinks"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1854,8 +2273,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:85",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::root_symlink_is_not_followed"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1868,11 +2293,17 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:211",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::unreadable_descendants_are_skipped_when_permissions_are_enforced"
+    }
+   ],
    "skips": [
     "Windows does not enforce POSIX directory permission bits",
     "root can read directories regardless of mode bits"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1885,8 +2316,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:117",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::missing_root_fails_before_callback"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1899,8 +2336,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:128",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::non_directory_root_fails_before_callback"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1913,8 +2356,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:140",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::recursive_walk_reports_all_files_and_directories"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1927,8 +2376,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:172",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::callback_distinguishes_root_subdirectories_and_files"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1941,8 +2396,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:198",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::callback_error_stops_before_visiting_descendants"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1955,8 +2416,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1033",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::rebase_paths"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1969,10 +2436,16 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1049",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::physical_dir_resolves_symlink_ancestor"
+    }
+   ],
    "skips": [
     "directory symlink support is not available: %v"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1985,8 +2458,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1062",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::directory_containment"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -1999,8 +2478,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:211",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::watch_file_create"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2013,8 +2498,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:217",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::watch_file_update"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2027,8 +2518,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:223",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::watch_file_rename"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2041,8 +2538,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:229",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::watch_file_rename_existing"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2055,8 +2558,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:235",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::watch_file_delete"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2069,8 +2578,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:241",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_dir_create"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2083,8 +2598,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:343",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_non_ascii_path"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2097,8 +2618,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:247",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_dir_rename"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2111,8 +2638,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:253",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_dir_delete"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2125,8 +2658,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:382",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_watched_dir_deleted"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2139,8 +2678,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:355",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_subfile_create"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2153,8 +2698,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:259",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_subfile_update"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2167,8 +2718,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:265",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_subfile_rename"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2181,8 +2738,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:271",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_subfile_delete"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2195,8 +2758,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:277",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_subdir_create"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2209,8 +2778,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:369",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_subdir_delete_with_files"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2223,10 +2798,16 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:416",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_symlink_create"
+    }
+   ],
    "skips": [
     "DragonFlyBSD kqueue doesn't fire NOTE_WRITE on symlink creation"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2239,8 +2820,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:421",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_symlink_delete"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2253,10 +2840,16 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:426",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::symlinked_directory_rebases_target_events"
+    }
+   ],
    "skips": [
     "directory symlink support is not available: %v"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2269,11 +2862,17 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:439",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::recursive_symlink_root_does_not_follow_descendant"
+    }
+   ],
    "skips": [
     "fast recursive backends do not use the userspace recursive walk",
     "directory symlink support is not available: %v"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2286,8 +2885,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1007",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::coalesce_create_update"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2300,8 +2905,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1012",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::coalesce_delete_create"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2314,8 +2925,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1017",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::coalesce_create_delete"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2328,8 +2945,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1022",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::coalesce_multiple_updates"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2342,8 +2965,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1027",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::coalesce_update_delete"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2356,8 +2985,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:533",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::multiple_same_dir"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2370,8 +3005,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:538",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::multiple_different_dirs"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2384,8 +3025,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:543",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::watch_directories_batch"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2398,8 +3045,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1296",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::recursive_backend_consolidates_siblings"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2412,10 +3065,16 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1301",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::recursive_backend_does_not_consolidate_outside_symlink"
+    }
+   ],
    "skips": [
     "directory symlink support is not available: %v"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2428,10 +3087,16 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1327",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::consolidated_symlink_maps_shared_path"
+    }
+   ],
    "skips": [
     "directory symlink support is not available: %v"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2444,10 +3109,16 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1347",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::consolidated_symlink_terminates_shared_path"
+    }
+   ],
    "skips": [
     "directory symlink support is not available: %v"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2460,8 +3131,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1361",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::consolidated_child_filters_requested_dir"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2474,8 +3151,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1396",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::consolidated_child_ignores_earlier_events"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2488,8 +3171,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1422",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::recursive_ignore_does_not_filter_logical_root"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2502,8 +3191,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1109",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::missing_directory_error"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2516,8 +3211,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1122",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::not_directory_error"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2530,8 +3231,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher.rs:172",
+     "test": "crates/tsr_fswatch/src/watcher.rs::watch_directory"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2544,8 +3251,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1133",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::relative_paths_rejected"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2558,8 +3271,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:553",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::unsubscribe_idempotent"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2572,8 +3291,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:562",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::close_then_resubscribe"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2586,8 +3311,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:575",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::final_subscription_releases_native_and_debounce_workers"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2600,8 +3331,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:622",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::deep_nested_create"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2614,8 +3351,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:639",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::many_files_at_once"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2628,8 +3371,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:283",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_truncate_file"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2642,8 +3391,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:595",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::concurrent_subscribe_unsubscribe"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2656,8 +3411,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:654",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::rename_populated_dir"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2670,8 +3431,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:686",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::replace_file_with_dir"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2684,8 +3451,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:289",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_append_to_file"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2698,8 +3471,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:612",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::no_events_after_unsubscribe"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2712,8 +3491,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1149",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::backend_start_error_propagates"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2726,8 +3511,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1163",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::directory_error_implements_error"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2740,8 +3531,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1169",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_callback_preserves_events_and_errors"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2754,8 +3551,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:895",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::rename_out_drops_descendants"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2768,10 +3571,16 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1082",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::default_backend_matches_platform"
+    }
+   ],
    "skips": [
     "no expected default watcher for %s"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2784,10 +3593,16 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1099",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::unavailable_backend_returns_error"
+    }
+   ],
    "skips": [
     "all watchers are available on this platform"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2800,8 +3615,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:696",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::nested_deletion_cleans_descendants"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2814,8 +3635,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:295",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_file_create"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2828,8 +3655,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:301",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_file_update"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2842,8 +3675,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:307",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_file_delete"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2856,8 +3695,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:313",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_dir_create"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2870,8 +3715,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:733",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_grandchild_ignored"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2884,8 +3735,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:738",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_new_subdir_content_ignored"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2898,8 +3755,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:743",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_and_recursive_same_dir"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2912,10 +3775,16 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:773",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_denied_subdir"
+    }
+   ],
    "skips": [
     "chmod is not meaningful on Windows"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2928,8 +3797,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:319",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_watch_create"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2942,8 +3817,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:325",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_watch_update"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2956,8 +3837,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:331",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_watch_delete"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2970,8 +3857,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:783",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_watch_ignores_siblings"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2984,8 +3877,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:548",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_watch_multiple_same_dir"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -2998,8 +3897,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:796",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_watch_delete_and_recreate"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -3012,8 +3917,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:337",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_watch_non_existent_target"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -3026,8 +3937,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:852",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::recursive_move_in_prepopulated"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -3040,8 +3957,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:820",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::atomic_save_directory_watch"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -3054,8 +3977,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:825",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::atomic_save_file_watch"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -3068,8 +3997,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:691",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::replace_dir_with_file"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -3082,8 +4017,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:865",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::recreate_subdir_and_modify"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -3096,8 +4037,14 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:880",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::replace_parent_with_different_tree"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -3110,10 +4057,16 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:918",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::round_trip_rename"
+    }
+   ],
    "skips": [
     "kqueue fd-based tracking delivers stale delete before parent NOTE_WRITE reconciles"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -3126,10 +4079,16 @@
    "kind": "unit",
    "package": "internal/fswatch",
    "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:778",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::recursive_denied_subdir"
+    }
+   ],
    "skips": [
     "chmod is not meaningful on Windows"
    ],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -3142,8 +4101,14 @@
    "kind": "unit",
    "package": "internal/nativepath",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_vfs/src/os/native.rs:344",
+     "test": "crates/tsr_vfs/src/os/native.rs::realpath_preserves_the_hardlink_name_while_another_link_is_opened"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -3225,8 +4190,14 @@
    "kind": "unit",
    "package": "internal/tracing",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tracing/src/tests.rs:97",
+     "test": "crates/tsr_tracing/src/tests.rs::concurrent_duration_events_have_matching_ends_names_and_per_thread_nesting"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   },
   {
@@ -3239,8 +4210,14 @@
    "kind": "unit",
    "package": "internal/tracing",
    "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tracing/src/tests.rs:176",
+     "test": "crates/tsr_tracing/src/tests.rs::thread_ids_are_stable_across_first_seen_order_in_written_events"
+    }
+   ],
    "skips": [],
-   "status": "pending",
+   "status": "ported",
    "subtests": []
   }
  ],

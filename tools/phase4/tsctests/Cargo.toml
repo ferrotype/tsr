@@ -15,6 +15,7 @@ name = "phase4_tsctests"
 path = "src/main.rs"
 
 [dependencies]
+tsr_execute = { path = "../../../crates/tsr_execute" }
 serde_json = "1"
 sha2 = "0.10"
 tsr_compiler = { path = "../../../crates/tsr_compiler" }
@@ -30,6 +31,10 @@ tsr_locale = { path = "../../../crates/tsr_locale" }
 tsr_tsoptions = { path = "../../../crates/tsr_tsoptions" }
 tsr_tspath = { path = "../../../crates/tsr_tspath" }
 tsr_vfs = { path = "../../../crates/tsr_vfs" }
+
+[dev-dependencies]
+tsr_arena = { path = "../../../crates/tsr_arena" }
+tsr_ast = { path = "../../../crates/tsr_ast" }
 
 [lints]
 workspace = true

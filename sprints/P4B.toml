@@ -20,7 +20,7 @@ exit = [
   "sprint.P4A.done == 1",
   "sprint.P3B.done == 1",
   "run.tsc.harness_valid == true",
-  "run.tsc.baseline_parity == 1",
+  "run.tsc.baseline_accepted == 1",
   "run.tsc.incremental_correctness == 1",
   "run.tsc.buildinfo_codec == 1",
   "run.tsc.buildinfo_interop == true",

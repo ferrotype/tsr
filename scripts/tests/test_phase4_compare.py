@@ -260,3 +260,25 @@ class Mutation(Fixture):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ApprovedDifferences(unittest.TestCase):
+    def test_only_the_exact_paired_observation_is_approved(self):
+        ledger = json.loads(compare.APPROVED.read_bytes())
+        row = ledger["exceptions"][0]["observations"][0]
+        # Use small bytes while preserving the reviewed scenario identity.
+        row["native_sha256"] = compare.digest(b"native")
+        row["rust_sha256"] = compare.digest(b"rust")
+        self.assertEqual(compare.approved_difference(row["scenario"], b"native", b"rust", ledger),
+                         "P4-eager-bind-trace-order")
+        self.assertIsNone(compare.approved_difference(row["scenario"], b"native", b"rust changed", ledger))
+        self.assertIsNone(compare.approved_difference(row["scenario"], b"native changed", b"rust", ledger))
+        self.assertIsNone(compare.approved_difference("unreviewed-scenario", b"native", b"rust", ledger))
+        ledger["exceptions"][0]["approved"] = False
+        self.assertIsNone(compare.approved_difference(row["scenario"], b"native", b"rust", ledger))
+
+    def test_approval_does_not_survive_a_pin_change(self):
+        ledger = json.loads(compare.APPROVED.read_bytes())
+        ledger["pin"] = "unreviewed"
+        with self.assertRaisesRegex(ValueError, "another version or pin"):
+            compare.approved_difference("scenario", b"a", b"b", ledger)

@@ -150,6 +150,7 @@ def tsc(rust=None, *, verify=verification):
         print("recorded comparison unavailable: " + str(error), file=sys.stderr)
     metrics["unsupported_required"] = summary["unsupported_rows"]
     metrics["baseline_parity"] = ratio(summary["matched"], summary["rows"])
+    metrics["baseline_accepted"] = ratio(summary["accepted"], summary["rows"])
     metrics["incremental_correctness"] = ratio(summary["edit_steps_agreeing"], summary["edit_steps"])
     try:
         register = phase4_blockers.build(rust, comparison=comparison, capture=capture)

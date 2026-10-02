@@ -13,9 +13,9 @@
 //!   build info with a readable rendering beside it is rendered again from its
 //!   text, and every recorded scenario's transcript up to its first command
 //!   is rendered again from the recording.
+use crate::execute::fswatch;
 use crate::execute::tsc::{CommandLineTesting, SharedWriter, System, Writer};
 use crate::execute::watchmanager::{Closer, WatchBackend, WatchDirectoryRequest};
-use crate::execute::{fswatch, COMMAND_LINE_OPERATION};
 use crate::fsbaselineutil::{sanitize_internal_symbol_name, FileChange};
 use crate::goutil::StringBuilder;
 use crate::harnessutil::{ComparePathsOptions, TracerForBaselining};
@@ -468,7 +468,11 @@ fn readable_build_info_preserves_null_and_empty_collection_shapes() {
         for value in ["null", empty] {
             let text = format!("{{\"{field}\":{value}}}");
             let build_info = unmarshal_build_info(text.as_bytes()).unwrap();
-            let readable_value = if field == "referencedMap" { "{}" } else { empty };
+            let readable_value = if field == "referencedMap" {
+                "{}"
+            } else {
+                empty
+            };
             let member = if value == "null" || field == "contentMapperIdentities" {
                 String::new()
             } else {
@@ -899,10 +903,10 @@ fn every_scenario_renders_the_references_header() {
     );
     let mut matched = 0;
     for scenario in &inventory.scenarios {
-        let (row, transcript) = crate::row::run_scenario(scenario);
-        assert_eq!(row["state"], "unsupported", "{row}");
-        assert_eq!(row["operation"], COMMAND_LINE_OPERATION);
-        assert_eq!(row["progress"]["stage"], "initial");
+        let input = scenario.to_tsc_input();
+        let sys = new_test_sys(&input, false);
+        let mut transcript = Vec::new();
+        crate::runner::write_header(&sys, &mut transcript);
         let reference = std::fs::read(references().join(&scenario.id)).unwrap();
         assert_eq!(
             String::from_utf8_lossy(&transcript),
@@ -1084,4 +1088,36 @@ fn rows_classify_refusals_panics_and_harness_defects() {
         "{row}"
     );
     assert!(transcript.is_empty());
+}
+
+/// Complete pinned transcripts witness checker alias marking, literal freshness,
+/// dependency-bearing casing aliases, and cached incremental rebuilds together.
+#[test]
+fn command_line_regressions_match_complete_native_scenarios() {
+    let prefixes = [
+        "tsc/incremental/const-enums",
+        "tsc/incremental/change-to-type-that-gets-used-as-global-through-export",
+        "tsc/incremental/Compile-incremental-with-case-insensitive-file-names.js",
+        "tsc/forceConsistentCasingInFileNames/when-file-is-included-from-multiple-places-with-different-casing.js",
+    ];
+    let mut count = 0;
+    for scenario in &inventory().scenarios {
+        if !prefixes
+            .iter()
+            .any(|prefix| scenario.id.starts_with(prefix))
+        {
+            continue;
+        }
+        let (row, transcript) = crate::row::run_scenario(scenario);
+        assert_eq!(row["state"], "completed", "{row}");
+        let expected = std::fs::read(references().join(&scenario.id)).unwrap();
+        assert_eq!(
+            String::from_utf8_lossy(&transcript),
+            String::from_utf8_lossy(&expected),
+            "{}",
+            scenario.id
+        );
+        count += 1;
+    }
+    assert_eq!(count, 8);
 }

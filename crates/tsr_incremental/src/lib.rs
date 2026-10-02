@@ -36,7 +36,10 @@ pub use host::{create_host, get_mtime, CompilerHost, Host, ProgramCompilerHost};
 pub use incremental::{new_build_info_reader, read_build_info_program, BuildInfoReader};
 pub use json::AnyValue;
 pub use program::{new_program, NestedEmitNow, Program, SignatureUpdateKind, TestingData};
-pub use snapshot::{CachedDiagnosticsIdentity, compute_hash, get_file_emit_kind, FileEmitKind, FileInfo, Path, Snapshot};
+pub use snapshot::{
+    compute_hash, get_file_emit_kind, CachedDiagnosticsIdentity, FileEmitKind, FileInfo, Path,
+    Snapshot,
+};
 
 #[cfg(test)]
 mod tests;

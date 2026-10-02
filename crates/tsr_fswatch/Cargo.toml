@@ -1,0 +1,25 @@
+[package]
+name = "tsr_fswatch"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Pinned native filesystem watcher backends"
+
+[target.'cfg(unix)'.dependencies]
+rustix = { version = "1.1", features = ["fs", "event", "pipe"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+libc = "0.2"
+
+# The small native FFI modules document each unsafe operation. The rest of
+# the crate forbids unsafe code locally rather than weakening workspace code.
+[lints.rust]
+unsafe_code = "deny"
+unsafe_op_in_unsafe_fn = "deny"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2-core-services = { version = "0.3.2", default-features = false, features = ["std", "FSEvents", "dispatch2"] }
+objc2-core-foundation = { version = "0.3.2", default-features = false, features = ["std", "CFArray", "CFString", "CFBase"] }
+dispatch2 = { version = "0.3.1", default-features = false, features = ["std"] }

@@ -40,3 +40,44 @@ impl Encode for ConfigValue {
         }
     }
 }
+
+/// The field order and omitzero rules of tsoptions.TSConfig, used by the
+/// production --showConfig path. Empty allocated lists are emitted.
+impl Encode for crate::show_config::TsConfig {
+    fn encode(&self, out: &mut Encoder<'_>) -> Result<(), JsonError> {
+        use tsr_json::Token;
+        out.write_token(Token::BeginObject)?;
+        out.string(b"compilerOptions")?;
+        out.value(&self.compiler_options)?;
+        if let Some(references) = &self.references {
+            out.string(b"references")?;
+            out.write_token(Token::BeginArray)?;
+            for (path, circular) in references {
+                out.write_token(Token::BeginObject)?;
+                out.string(b"path")?;
+                out.value(path)?;
+                if *circular {
+                    out.string(b"circular")?;
+                    out.value(circular)?;
+                }
+                out.write_token(Token::EndObject)?;
+            }
+            out.write_token(Token::EndArray)?;
+        }
+        for (name, values) in [
+            (b"files".as_slice(), &self.files),
+            (b"include", &self.include),
+            (b"exclude", &self.exclude),
+        ] {
+            if let Some(values) = values {
+                out.string(name)?;
+                out.value(values)?;
+            }
+        }
+        if let Some(value) = self.compile_on_save {
+            out.string(b"compileOnSave")?;
+            out.value(&value)?;
+        }
+        out.write_token(Token::EndObject)
+    }
+}

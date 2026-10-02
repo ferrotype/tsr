@@ -86,6 +86,12 @@
       "reason": "Repository-only benchmark, experiment, test or capture tool"
     },
     {
+      "name": "tsr",
+      "manifest": "crates/tsr/Cargo.toml",
+      "publish": false,
+      "reason": "Native compiler implementation; binary publication is a separate release decision"
+    },
+    {
       "name": "tsr_api",
       "manifest": "crates/tsr_api/Cargo.toml",
       "publish": true,
@@ -120,6 +126,12 @@
       "manifest": "crates/tsr_binder/Cargo.toml",
       "publish": true,
       "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_build",
+      "manifest": "crates/tsr_build/Cargo.toml",
+      "publish": false,
+      "reason": "Phase 4 implementation; publication requires a separate release decision"
     },
     {
       "name": "tsr_bundled",
@@ -182,10 +194,22 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
+      "name": "tsr_execute",
+      "manifest": "crates/tsr_execute/Cargo.toml",
+      "publish": false,
+      "reason": "Phase 4 implementation; publication requires a separate release decision"
+    },
+    {
       "name": "tsr_format",
       "manifest": "crates/tsr_format/Cargo.toml",
       "publish": true,
       "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_fswatch",
+      "manifest": "crates/tsr_fswatch/Cargo.toml",
+      "publish": false,
+      "reason": "Phase 4 implementation; publication requires a separate release decision"
     },
     {
       "name": "tsr_glob",
@@ -338,6 +362,12 @@
       "reason": "Repository-only benchmark, experiment, test or capture tool"
     },
     {
+      "name": "tsr_tracing",
+      "manifest": "crates/tsr_tracing/Cargo.toml",
+      "publish": false,
+      "reason": "Phase 4 implementation; publication requires a separate release decision"
+    },
+    {
       "name": "tsr_transformers",
       "manifest": "crates/tsr_transformers/Cargo.toml",
       "publish": true,
@@ -348,6 +378,12 @@
       "manifest": "crates/tsr_transpile/Cargo.toml",
       "publish": true,
       "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_tsc",
+      "manifest": "crates/tsr_tsc/Cargo.toml",
+      "publish": false,
+      "reason": "Phase 4 implementation; publication requires a separate release decision"
     },
     {
       "name": "tsr_tsoptions",

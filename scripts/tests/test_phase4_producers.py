@@ -148,6 +148,26 @@ class Producer(Fixture):
 
 
 class Register(Fixture):
+    def test_approved_raw_differences_remain_visible_without_open_blockers(self):
+        texts = dict(self.references)
+        texts[BUILD] = texts[BUILD].replace(b"ExitStatus:: Success", b"ExitStatus:: NotImplemented", 1)
+        rust = self.capture(texts=texts)
+        comparison = compare.report(rust)
+        row = next(row for row in comparison["rows"] if row["id"] == BUILD)
+        row["approved_difference"] = "reviewed-exact-pair"
+        register = blockers.build(rust, comparison=comparison)
+        self.assertEqual(row["category"], "different")
+        self.assertEqual(register["entries"], [])
+        self.assertEqual(register["approved_exceptions"][0]["approval"], "reviewed-exact-pair")
+        self.assertEqual(register["approved_exceptions"][0]["disposition"], "approved_exception")
+        self.assertTrue(blockers.complete(register, comparison))
+        register["approved_exceptions"].clear()
+        self.assertFalse(blockers.complete(register, comparison))
+        # Approval cannot waive a failed operation even if such a field were supplied.
+        row.update(category="failed", reason="operation failed")
+        self.assertEqual(len(blockers.buckets(comparison)), 1)
+        self.assertEqual(blockers.approved_exceptions(comparison), [])
+
     def test_a_new_bucket_makes_the_committed_register_incomplete(self):
         texts, rows = self.refused_rows()
         rust = self.capture(texts=texts, rows=rows)

@@ -341,6 +341,36 @@ mod tests {
         }
     }
 
+    /// source: tsc/internal/nativepath/realpath_darwin_test.go:TestRealpathHardlinkedFile
+    #[cfg(target_os = "macos")]
+    #[test]
+    fn realpath_preserves_the_hardlink_name_while_another_link_is_opened() {
+        use std::sync::{
+            atomic::{AtomicBool, Ordering},
+            Arc,
+        };
+        let scratch = Scratch::new("realpath-hardlink");
+        let original = scratch.0.join("real.d.ts");
+        let alias = scratch.0.join("alias.d.ts");
+        std::fs::write(&original, b"export * from './lib';\n").unwrap();
+        std::fs::hard_link(&original, &alias).unwrap();
+        let expected = bytes(&std::fs::canonicalize(&alias).unwrap());
+        let stop = Arc::new(AtomicBool::new(false));
+        let worker_stop = stop.clone();
+        let worker = std::thread::spawn(move || {
+            while !worker_stop.load(Ordering::Acquire) {
+                drop(std::fs::File::open(&original)?);
+            }
+            Ok::<_, std::io::Error>(())
+        });
+        let observations: Vec<_> = (0..200).map(|_| super::realpath(&bytes(&alias))).collect();
+        stop.store(true, Ordering::Release);
+        worker.join().unwrap().unwrap();
+        for actual in observations {
+            assert_eq!(actual.unwrap(), expected);
+        }
+    }
+
     #[test]
     fn mkdir_all_retries_an_interrupted_mkdir_at_every_level() {
         let scratch = Scratch::new("mkdir-eintr");
