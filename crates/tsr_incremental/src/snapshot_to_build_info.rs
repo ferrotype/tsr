@@ -18,7 +18,7 @@ use crate::snapshot::{
 use std::collections::HashMap;
 use std::sync::Arc;
 use tsr_ast::diagnostic_api::RepopulateDiagnosticInfo;
-use tsr_ast::Diagnostic;
+use tsr_ast::{Diagnostic, NodeId};
 use tsr_compiler::{CheckedProgram, Error, Program, ProgramFile};
 use tsr_core::collections::OrderedMap;
 use tsr_core::ModuleKind;
@@ -54,7 +54,7 @@ pub(crate) fn snapshot_to_build_info(
         compare_paths_options_use_case_sensitive_file_names: loaded.use_case_sensitive_file_names(),
         file_name_to_file_id: HashMap::new(),
         file_names_to_file_id_list_id: HashMap::new(),
-        roots: Vec::new(),
+        roots: HashMap::new(),
     };
 
     if snapshot.options.is_incremental() {
@@ -94,7 +94,7 @@ struct ToBuildInfo<'a> {
     file_names_to_file_id_list_id: HashMap<Vec<u8>, BuildInfoFileIdListId>,
     /// Each root file with the path of the root name that included it (the
     /// pin's map from file to root path).
-    roots: Vec<(Arc<ProgramFile>, Path)>,
+    roots: HashMap<NodeId, (Arc<ProgramFile>, Path)>,
 }
 
 #[allow(clippy::wrong_self_convention)] // the pin's `toBuildInfo` method names
@@ -339,15 +339,7 @@ impl ToBuildInfo<'_> {
                     self.compare_paths_options_use_case_sensitive_file_names,
                 );
                 // The pin's map keeps the last root name that included the file.
-                if let Some(entry) = self
-                    .roots
-                    .iter_mut()
-                    .find(|(existing, _)| Arc::ptr_eq(existing, &file))
-                {
-                    entry.1 = root;
-                } else {
-                    self.roots.push((file, root));
-                }
+                self.roots.insert(file.source(), (file, root));
             }
         }
         Ok(())
@@ -427,7 +419,7 @@ impl ToBuildInfo<'_> {
     // port: tsc/internal/execute/incremental/snapshottobuildinfo.go:toBuildInfo.setRootOfIncrementalProgram
     fn set_root_of_incremental_program(&mut self) -> Result<(), Error> {
         let mut keys = Vec::with_capacity(self.roots.len());
-        for (file, root) in self.roots.clone() {
+        for (file, root) in std::mem::take(&mut self.roots).into_values() {
             let path = source_path(&file)?;
             let file_id = self.to_file_id(&path);
             keys.push((file_id, path, root));
