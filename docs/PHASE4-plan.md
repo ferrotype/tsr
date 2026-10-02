@@ -727,9 +727,9 @@ register rebuilt from evidence, never edited. `cargo xtask run tsc` and
 
 ## 8. Owner decisions
 
-Fifteen proposals. On 2026-10-02 the owner decided thirteen of them; each
-entry keeps its proposal and records the outcome. Decisions 6 (profiling) and
-7 (dependencies) are still open.
+Fifteen proposals. On 2026-10-02 the owner decided fourteen of them; each
+entry keeps its proposal and records the outcome. Decision 7 (dependencies)
+is still open.
 
 1. **Names.** Checkpoints X0 to X7, sprints `P4A` and `P4B`, producer `tsc`,
    data under `data/phase4/`.
@@ -753,8 +753,8 @@ entry keeps its proposal and records the outcome. Decisions 6 (profiling) and
    `pprof/pprof.go` by decision 6. One regeneration, together with Phase 3's
    decision 1 if its T0 has not run.
    **Confirmed, without the `GetDiagnosticsOfAnyProgram` move:** Phase 3
-   ported and marked it, so it stays Phase 3's. The `pprof.go` move waits on
-   decision 6.
+   ported and marked it, so it stays Phase 3's. `pprof.go` moves to Phase 7
+   (decision 6).
 5. **Crates.** New `tsr_execute` (with `execute/tsc` and `watchmanager`, as
    the ledger maps them), `tsr_incremental`, `tsr_build`, `tsr_fswatch`,
    `tsr_tracing` and the binary crate `tsc`; the harness under
@@ -776,6 +776,7 @@ entry keeps its proposal and records the outcome. Decisions 6 (profiling) and
    statistics table's memory row reports the allocator's counter where Go
    reports its runtime's; the row is never in a baseline. The alternative is
    a sampling-profiler dependency now.
+   **Confirmed:** profiling is deferred to Phase 7.
 7. **Dependencies** ([ADR 0017](adr/0017-dependency-policy.md)). `libc` as a
    direct dependency for fanotify, signal handling and directory entries (it
    is already in the lock file); the `rustix` features the terminal, process
