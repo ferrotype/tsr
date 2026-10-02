@@ -842,6 +842,70 @@ fn binding_one_logical_source_cannot_stage_a_siblings_headers_in_the_same_arena(
 }
 
 #[test]
+fn factory_reads_exclusively_bound_core_without_walking_its_parents() {
+    let counters = Counters::new();
+    let mut source = AstBuilder::new(SourceText::default(), &counters);
+    let leaf = source.new_identifier(JsString::from_bytes(b"value".as_slice()));
+    let mut nodes = vec![leaf];
+    for _ in 0..2048 {
+        let child = *nodes.last().unwrap();
+        let parent = source.new_parenthesized_expression(Some(child));
+        source.set_node_parent(child, Some(parent));
+        nodes.push(parent);
+    }
+    let root = source.new_source_file(
+        SourceFileParseOptions {
+            file_name: JsString::from_bytes(b"/deep.ts".as_slice()),
+            ..Default::default()
+        },
+        SourceText::default(),
+        None,
+        None,
+    );
+    source.set_node_parent(*nodes.last().unwrap(), Some(root));
+    let completed = source
+        .complete(root)
+        .unwrap()
+        .bind_and_publish(|binding| {
+            binding.set_node_flags(leaf, node_flags::UNREACHABLE)?;
+            binding.set_common_js_module_indicator(Some(leaf));
+            Ok(())
+        })
+        .unwrap();
+    assert!(completed.bound_in_place());
+    let mut factory = AstBuilder::new(SourceText::default(), &counters);
+    factory.retain_completed(&completed);
+    drop(completed);
+
+    crate::storage::SOURCE_LOOKUP_STEPS.with(|steps| steps.set(0));
+    for _ in 0..2 {
+        for &node in &nodes {
+            assert_eq!(Factory::node(&factory, node).id(), node);
+        }
+        assert_eq!(
+            Factory::node(&factory, leaf).flags(),
+            node_flags::UNREACHABLE
+        );
+        assert_eq!(
+            factory
+                .read_source_file(root)
+                .unwrap()
+                .common_js_module_indicator(),
+            Some(leaf)
+        );
+    }
+    assert_eq!(
+        crate::storage::SOURCE_LOOKUP_STEPS.with(std::cell::Cell::get),
+        0
+    );
+    let invalid = NodeId::from_parts(leaf.arena(), u32::MAX).unwrap();
+    assert!(matches!(
+        factory.factory_view(invalid),
+        Err(Error::InvalidSlot)
+    ));
+}
+
+#[test]
 fn factory_copies_select_each_retained_logical_sources_completed_binding() {
     let mut original = AstBuilder::new(SourceText::default(), &Counters::new());
     let mut sources = Vec::new();
