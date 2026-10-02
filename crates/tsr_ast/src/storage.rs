@@ -16,6 +16,12 @@ use tsr_jsstring::SourceText;
 #[cfg(test)]
 mod parent_tests;
 
+#[cfg(test)]
+std::thread_local! {
+    /// Counts actual logical-source traversal steps, not successful lookups.
+    pub(crate) static SOURCE_LOOKUP_STEPS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+}
+
 /// Exclusive syntax construction. Hooks exist only during this exclusive phase.
 pub struct AstBuilder {
     pub(crate) storage: StorageBuilder<StoredNode>,
@@ -719,6 +725,8 @@ impl<'a> AstView<'a> {
         let mut slow = Some(id);
         let mut fast = Some(id);
         loop {
+            #[cfg(test)]
+            SOURCE_LOOKUP_STEPS.with(|steps| steps.set(steps.get() + 1));
             let current = slow.ok_or(Error::InvalidGraph)?;
             let node = AstView(self.0, None).node(current)?;
             if node.kind() == crate::SyntaxKind::SourceFile {

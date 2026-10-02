@@ -168,20 +168,14 @@ fn a_files_transformation_is_released_with_its_emit_and_the_source_is_unchanged(
     }
 }
 
-/// Depth of the deep inputs through the transforms. Every transform reads a
-/// source node through `AstBuilder::factory_view`, which walks the node's
-/// parent chain to its source file, so the cost is quadratic in the depth.
+/// Depth of the deep inputs through the transforms. Reads of exclusively
+/// bound core nodes select their owner without walking the parent chain.
 const DEPTH: usize = 500;
 
 /// The corpus's own stress row, `binderBinaryExpressionStress.ts` (a
 /// 1,499-term chain), emitted with its options, prints the pinned
-/// reference baseline's JavaScript byte for byte. The transforms' quadratic
-/// reads make it take about a minute per mode in a debug build, so only the
-/// release run emits it.
+/// reference baseline's JavaScript byte for byte in both build profiles.
 fn stress_row() {
-    if cfg!(debug_assertions) {
-        return;
-    }
     let root = concat!(env!("CARGO_MANIFEST_DIR"), "/../../upstream/tsc/testdata");
     let source = std::fs::read_to_string(format!(
         "{root}/tests/cases/compiler/binderBinaryExpressionStress.ts"
@@ -216,7 +210,7 @@ fn stress_row() {
 /// Deep inputs through the TypeScript transforms (type eraser, import
 /// elision, runtime syntax, legacy decorators) and the use-strict and
 /// implied-module transforms (ADR 0011; plan section 6 "Recursion"): the
-/// corpus's stress row against its baseline (release only); `DEPTH` levels
+/// corpus's stress row against its baseline; `DEPTH` levels
 /// of a left-nested binary chain, nested parentheses, property-access and
 /// call chains, nested blocks, functions and arrow functions; half that of
 /// nested namespaces, classes, and classes with parameter properties (the
