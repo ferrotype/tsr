@@ -15,7 +15,7 @@ use std::sync::{
     Arc, Condvar, Mutex, MutexGuard,
 };
 use tsr_ast::Diagnostic;
-use tsr_compiler::{diagnostic_writer::DiagnosticSources, Error, FileCache};
+use tsr_compiler::{diagnostic_writer::DiagnosticSources, Error, FileCache, SharedSourceFileCache};
 use tsr_contentmapper::{Host as _, HostImpl};
 use tsr_core::workgroup::WorkGroup;
 use tsr_diagnostics as d;
@@ -91,7 +91,7 @@ pub struct Orchestrator {
     order_indices: Vec<usize>,
     errors: Vec<Diagnostic>,
     mapper_host: Option<HostImpl>,
-    source_files: Mutex<FileCache>,
+    source_files: Arc<SharedSourceFileCache>,
     #[cfg(test)]
     task_observer: Option<Arc<dyn Fn(bool) + Send + Sync>>,
 }
@@ -129,7 +129,7 @@ impl Orchestrator {
             order_indices: Vec::new(),
             errors: Vec::new(),
             mapper_host: None,
-            source_files: Mutex::new(FileCache::new()),
+            source_files: Arc::new(SharedSourceFileCache::new()),
             #[cfg(test)]
             task_observer: None,
         }
@@ -171,7 +171,7 @@ impl Orchestrator {
     }
     pub fn reset_caches(&self) {
         self.host.fs.clear_cache();
-        *lock(&self.source_files) = FileCache::new();
+        self.source_files.reset();
         for node in &self.tasks {
             *lock(&node.task.config_time) = std::time::Duration::ZERO;
         }

@@ -43,7 +43,7 @@ pub use verify_options::{verify_compiler_options, FileIncludeDiagnostic, OptionV
 mod loader;
 mod metadata;
 mod resolver_host;
-pub use cache::{FileCache, ProgramFile};
+pub use cache::{FileCache, ProgramFile, SharedSourceFileCache};
 pub use checker_host::ProgramCheckerHost;
 pub use loader::{
     Error, LibFile, Program, ProgramHostServices, ProgramOptions, ProgramReuse, Resolution,

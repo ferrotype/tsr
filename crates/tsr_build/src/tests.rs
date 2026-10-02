@@ -7,11 +7,14 @@ use tsr_vfs::{
     Entries, FileContent, FileInfo, FileSystem, MemoryBuilder, MemorySnapshot, SnapshotId,
 };
 
+type ReadObserver = Arc<dyn Fn(&[u8]) + Send + Sync>;
+
 struct Fs {
     files: Mutex<MemoryBuilder>,
     times: Mutex<HashMap<Vec<u8>, Time>>,
     writes: Mutex<Vec<JsString>>,
     panic_read: Mutex<Option<Vec<u8>>>,
+    read_observer: Mutex<Option<ReadObserver>>,
     touches: Mutex<Vec<JsString>>,
     clock: Arc<AtomicI64>,
 }
@@ -28,6 +31,7 @@ impl Fs {
             times: Mutex::new(times),
             writes: Mutex::default(),
             panic_read: Mutex::default(),
+            read_observer: Mutex::default(),
             touches: Mutex::default(),
             clock,
         }
@@ -57,6 +61,10 @@ impl FileSystem for Fs {
             }
         };
         assert!(!panic, "intentional project read failure");
+        let observer = lock(&self.read_observer).clone();
+        if let Some(observer) = observer {
+            observer(name);
+        }
         self.snapshot().read_file(name)
     }
     fn stat(&self, name: &[u8]) -> Result<Option<FileInfo>, tsr_vfs::Error> {
@@ -702,5 +710,54 @@ fn active_project_tasks_respect_the_builder_limit() {
         o.start(&Context::background()).unwrap();
         assert_eq!(active.load(Ordering::SeqCst), 0);
         assert_eq!(peak.load(Ordering::SeqCst), builders);
+    }
+}
+
+#[test]
+fn independent_project_loads_are_not_serialized_by_the_source_cache() {
+    // Run both the ordinary-source path and two distinct shared-cache keys.
+    // A blocked read must not stop the other project from entering its read.
+    for extension in ["ts", "d.ts"] {
+        let files: Vec<_> = (0..2).flat_map(|i| [
+            (format!("/work/p{i}/tsconfig.json"), format!(r#"{{"compilerOptions":{{"noLib":true,"noCheck":true}},"files":["a.{extension}"]}}"#)),
+            (format!("/work/p{i}/a.{extension}"), "export {};".to_owned()),
+        ]).collect();
+        let sys = Sys::new(
+            &files
+                .iter()
+                .map(|(name, text)| (name.as_str(), text.as_str()))
+                .collect::<Vec<_>>(),
+        );
+        let mut o = orchestrator(sys.clone(), &["--build", "--builders", "2", "p0", "p1"]);
+        let release = Arc::new((Mutex::new(false), Condvar::new()));
+        let (entered, observed) = std::sync::mpsc::channel();
+        *lock(&sys.fs.read_observer) = Some({
+            let release = release.clone();
+            let suffix = format!("/a.{extension}");
+            Arc::new(move |name| {
+                if name.ends_with(suffix.as_bytes()) {
+                    entered.send(name.to_vec()).unwrap();
+                    let _ = release
+                        .1
+                        .wait_timeout_while(lock(&release.0), Duration::from_secs(5), |ready| {
+                            !*ready
+                        })
+                        .unwrap();
+                }
+            })
+        });
+        std::thread::scope(|scope| {
+            let worker = scope.spawn(|| o.start(&Context::background()));
+            let first = observed.recv_timeout(Duration::from_secs(2));
+            let second = observed.recv_timeout(Duration::from_secs(2));
+            *lock(&release.0) = true;
+            release.1.notify_all();
+            worker.join().unwrap().unwrap();
+            assert!(
+                first.is_ok() && second.is_ok(),
+                "project {extension} loads serialized: {first:?}, {second:?}"
+            );
+            assert_ne!(first.unwrap(), second.unwrap());
+        });
     }
 }

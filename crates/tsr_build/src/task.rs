@@ -710,6 +710,10 @@ impl BuildTask {
         times.build_info_read_time = tsr_tsc::elapsed(o.opts.sys.now(), start);
         let start = o.opts.sys.now();
         let counters = tsr_arena::Counters::new();
+        // Each project owns its ordinary sources; declarations and JSON use
+        // the host's per-file build-cycle cache without serializing loaders.
+        // port: tsc/internal/execute/build/compilerHost.go:compilerHost.GetSourceFile
+        let mut source_files = FileCache::for_build(o.source_files.clone());
         let program = Arc::new(Program::load_live_with_host_services(
             ProgramOptions {
                 config: config.as_ref().clone(),
@@ -724,7 +728,7 @@ impl BuildTask {
                 resolved_project_references: Some(o),
                 ..Default::default()
             },
-            &mut lock(&o.source_files),
+            &mut source_files,
             &counters,
         )?);
         let trace = tsr_tsc::get_trace_with_writer_from_sys(

@@ -1998,16 +1998,13 @@ impl<'a> Loader<'a> {
         options: SourceFileParseOptions,
         kind: ScriptKind,
     ) -> Result<Option<Arc<ProgramFile>>, Error> {
-        let Some(content) = self.host.read_file(options.file_name.as_bytes())? else {
-            return Ok(None);
-        };
-        Ok(Some(self.cache.acquire(
-            content.text,
+        self.cache.load(
+            self.host.as_ref(),
             kind,
             options,
             self.counters,
             self.tracing.as_ref(),
-        )?))
+        )
     }
     /// A `/// <reference path>`: its absolute file name, or the diagnostic's
     /// message and arguments (`resolveTripleslashPathReference`; the marker is
@@ -2424,7 +2421,7 @@ impl<'a> Loader<'a> {
 /// port: tsc/internal/compiler/host.go:compilerHost.Trace
 /// Binds a file the loader parsed itself: a content-mapped file or one of
 /// its supplemental files.
-fn bind(
+pub(super) fn bind(
     parsed: tsr_ast::ParsedFile,
     tracing: Option<&Arc<dyn TraceSink>>,
 ) -> Result<Arc<ProgramFile>, Error> {
