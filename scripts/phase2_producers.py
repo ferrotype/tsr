@@ -738,7 +738,7 @@ PREREQUISITE_RUNS = ("binder", "bindworkload", "checkerbench", "checkertext", "c
                      "program", "relater", "scanner", "selftest", "syntax", "testhost", "workspace")
 # Producers of later phases, declared beside these in status/runs.toml. They
 # are no prerequisite of C7 and their state does not enter its evidence check.
-LATER_PHASE_RUNS = ("emit",)
+LATER_PHASE_RUNS = ("emit", "tsc")
 
 
 def recorded_metric(evidence_id, metric, run="checker", root=ROOT):

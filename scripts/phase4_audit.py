@@ -449,6 +449,17 @@ REVIEWED = {
     "tsc/internal/execute/tsc.go:fmtMain": _pending(
         "X1", "No caller at the pin: CommandLine's `-f` dispatch is commented out (execute/tsc.go:58-59). The "
               "formatting it would run is tsr_format's FormatDocument; X1 records the disposition."),
+    # execute/tsctests/readablebuildinfo.go: decoders with no caller (X0).
+    **{f"tsc/internal/execute/tsctests/readablebuildinfo.go:{name}.UnmarshalJSON": _equivalent(
+        "tools/phase4/tsctests/src/readablebuildinfo.rs", f"impl Encode for {rust} {{",
+        "No caller at the pin: the readable build info is only marshalled (toReadableBuildInfo's json.MarshalIndent, "
+        "readablebuildinfo.go:242). The unexported type is used only in readablebuildinfo.go, and the package's "
+        "json.Unmarshal calls (fs.go:40, 62) decode incremental.BuildInfo, never a readable form. The harness "
+        "renders the shape encode-only; the site is its marked MarshalJSON port.")
+       for name, rust in (("readableBuildInfoDiagnosticsOfFile", "ReadableBuildInfoDiagnosticsOfFile"),
+                          ("readableBuildInfoSemanticDiagnostic", "ReadableBuildInfoSemanticDiagnostic"),
+                          ("readableBuildInfoFilePendingEmit", "ReadableBuildInfoFilePendingEmit<'_>"),
+                          ("readableBuildInfoResolvedRoot", "ReadableBuildInfoResolvedRoot"))},
     # cmd/tsc: --lsp and --api (decision 12).
     "tsc/cmd/tsc/lsp.go:runLSP": _later(
         "Phase 5", "The --lsp entry (cmd/tsc/main.go:24); decision 12: the binary reports the mode unavailable "

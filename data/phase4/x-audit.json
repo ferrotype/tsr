@@ -4434,11 +4434,11 @@
   "tsc/internal/execute/tsctests/readablebuildinfo.go": {
    "counts": {
     "duplicate": 0,
-    "equivalent": 0,
+    "equivalent": 4,
     "gap": 0,
     "later": 0,
     "mapped": 21,
-    "pending": 4,
+    "pending": 0,
     "total": 25
    },
    "functions": {
@@ -4533,9 +4533,12 @@
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfoDiagnosticsOfFile.UnmarshalJSON": {
-     "owner": "X0",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "No caller at the pin: the readable build info is only marshalled (toReadableBuildInfo's json.MarshalIndent, readablebuildinfo.go:242). The unexported type is used only in readablebuildinfo.go, and the package's json.Unmarshal calls (fs.go:40, 62) decode incremental.BuildInfo, never a readable form. The harness renders the shape encode-only; the site is its marked MarshalJSON port.",
+     "rust": [
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:253"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfoFilePendingEmit.MarshalJSON": {
      "rust": [
@@ -4544,9 +4547,12 @@
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfoFilePendingEmit.UnmarshalJSON": {
-     "owner": "X0",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "No caller at the pin: the readable build info is only marshalled (toReadableBuildInfo's json.MarshalIndent, readablebuildinfo.go:242). The unexported type is used only in readablebuildinfo.go, and the package's json.Unmarshal calls (fs.go:40, 62) decode incremental.BuildInfo, never a readable form. The harness renders the shape encode-only; the site is its marked MarshalJSON port.",
+     "rust": [
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:289"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfoResolvedRoot.MarshalJSON": {
      "rust": [
@@ -4555,9 +4561,12 @@
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfoResolvedRoot.UnmarshalJSON": {
-     "owner": "X0",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "No caller at the pin: the readable build info is only marshalled (toReadableBuildInfo's json.MarshalIndent, readablebuildinfo.go:242). The unexported type is used only in readablebuildinfo.go, and the package's json.Unmarshal calls (fs.go:40, 62) decode incremental.BuildInfo, never a readable form. The harness renders the shape encode-only; the site is its marked MarshalJSON port.",
+     "rust": [
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:327"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfoSemanticDiagnostic.MarshalJSON": {
      "rust": [
@@ -4566,9 +4575,12 @@
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:readableBuildInfoSemanticDiagnostic.UnmarshalJSON": {
-     "owner": "X0",
-     "reason": "not yet ported",
-     "status": "pending"
+     "marker_to_add": false,
+     "reason": "No caller at the pin: the readable build info is only marshalled (toReadableBuildInfo's json.MarshalIndent, readablebuildinfo.go:242). The unexported type is used only in readablebuildinfo.go, and the package's json.Unmarshal calls (fs.go:40, 62) decode incremental.BuildInfo, never a readable form. The harness renders the shape encode-only; the site is its marked MarshalJSON port.",
+     "rust": [
+      "tools/phase4/tsctests/src/readablebuildinfo.rs:272"
+     ],
+     "status": "equivalent"
     },
     "tsc/internal/execute/tsctests/readablebuildinfo.go:toReadableBuildInfo": {
      "rust": [
@@ -6607,11 +6619,11 @@
   "X0": {
    "counts": {
     "duplicate": 0,
-    "equivalent": 0,
+    "equivalent": 4,
     "gap": 0,
     "later": 0,
     "mapped": 92,
-    "pending": 4,
+    "pending": 0,
     "total": 96
    },
    "files": [
@@ -6807,7 +6819,7 @@
   "tsc/internal/execute/tsc/extendedconfigcache.go:ExtendedConfigCache.GetExtendedConfig"
  ],
  "pending_by_checkpoint": {
-  "X0": 4,
+  "X0": 0,
   "X1": 64,
   "X2": 3,
   "X3": 90,
@@ -6858,11 +6870,11 @@
  "test_file_markers": {},
  "totals": {
   "duplicate": 0,
-  "equivalent": 48,
+  "equivalent": 52,
   "gap": 0,
   "later": 27,
   "mapped": 477,
-  "pending": 455,
+  "pending": 451,
   "total": 1007
  },
  "unknown_markers": {},

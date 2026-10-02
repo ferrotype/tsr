@@ -1,0 +1,70 @@
+{
+ "by_owner": {
+  "X1": 1
+ },
+ "comparison": {
+  "matched": 0,
+  "orphan_references": [
+   "tsc/commandLine/adds-color-when-FORCE_COLOR-is-set.js"
+  ],
+  "rows": 516,
+  "rust_capture_sha256": "81c2ac39b39b74791b4dfc30b5fd77c79680b6d2b93d05824747c3a66397ecaa"
+ },
+ "cross_phase": [
+  {
+   "consumer": "X1, X2, X3 and X5: the scenarios whose baselines contain emitted files (plan section 2: 420 of the 517 baselines)",
+   "dependency": "Phase 3's emit: Program.Emit, HandleNoEmitOptions, CombineEmitResults, the EmitOnly and ForceEmit modes and the write seam",
+   "evidence": "crates/tsr_compiler/src/program_emit.rs: Program.Emit, CombineEmitResults, HandleNoEmitOptions marked; data/phase3/first-comparison.json: all_domains_met 13432 of 13432 rows, unsupported_rows 0",
+   "owner": "Phase 3 (T8)",
+   "rule": "a content difference inside an emitted output file is a cross-phase entry owned by Phase 3 (emit residual)",
+   "state": "landed"
+  }
+ ],
+ "entries": [
+  {
+   "cause": "execute.CommandLine is Phase 4 X1",
+   "cross_phase": false,
+   "evidence": [
+    {
+     "observation": "unsupported: execute.CommandLine is Phase 4 X1",
+     "scenario": "tsbuild/clean/file-name-and-output-name-clashing.js",
+     "transcript": "baselines/tsbuild/clean/file-name-and-output-name-clashing.js"
+    },
+    {
+     "observation": "unsupported: execute.CommandLine is Phase 4 X1",
+     "scenario": "tsbuild/clean/tsx-with-dts-emit.js",
+     "transcript": "baselines/tsbuild/clean/tsx-with-dts-emit.js"
+    },
+    {
+     "observation": "unsupported: execute.CommandLine is Phase 4 X1",
+     "scenario": "tsbuild/commandLine/bad-locale.js",
+     "transcript": "baselines/tsbuild/commandLine/bad-locale.js"
+    },
+    {
+     "observation": "unsupported: execute.CommandLine is Phase 4 X1",
+     "scenario": "tsbuild/commandLine/different-options-with-incremental.js",
+     "transcript": "baselines/tsbuild/commandLine/different-options-with-incremental.js"
+    },
+    {
+     "observation": "unsupported: execute.CommandLine is Phase 4 X1",
+     "scenario": "tsbuild/commandLine/different-options.js",
+     "transcript": "baselines/tsbuild/commandLine/different-options.js"
+    }
+   ],
+   "families": {
+    "tsbuild": 192,
+    "tsbuildWatch": 65,
+    "tsc": 217,
+    "tscWatch": 42
+   },
+   "id": "B01",
+   "kind": "unsupported",
+   "owner": "X1",
+   "scenarios": 516,
+   "scenarios_sha256": "2762ab52ea7502b829126117ac6401312630ba1946dc0d28e10860e508a41248"
+  }
+ ],
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "scope": "Buckets of scenarios that cannot pass yet in the Phase 4 command-line comparison, each with the execution evidence that establishes it and its owning checkpoint (docs/PHASE4-plan.md section 4). A blocker explains a difference and never reclassifies it. The orphan reference renders from no scenario and is not a blocker.",
+ "version": 1
+}

@@ -1,0 +1,104 @@
+{
+ "buckets": {
+  "different": [],
+  "failed": [],
+  "unexecuted": [],
+  "unsupported": [
+   {
+    "cause": "execute.CommandLine is Phase 4 X1",
+    "examples": [
+     "tsbuild/clean/file-name-and-output-name-clashing.js",
+     "tsbuild/clean/tsx-with-dts-emit.js",
+     "tsbuild/commandLine/bad-locale.js"
+    ],
+    "families": {
+     "tsbuild": 192,
+     "tsbuildWatch": 65,
+     "tsc": 217,
+     "tscWatch": 42
+    },
+    "rows": 516
+   }
+  ]
+ },
+ "harness_errors": [],
+ "inventory": {
+  "path": "data/phase4/scenarios.json.gz",
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "scenarios": 516,
+  "sha256": "99e437f94df0d5718ad0d24ef18387b4573cf57146318b76ef99bf0adff1e3af"
+ },
+ "orphan_references": [
+  {
+   "git_blob": "f158bb77874f549c8dd86e85182c069d18ab5af0",
+   "reason": "no scenario of the pinned suite renders it; it is not a scenario",
+   "reference": "tsc/commandLine/adds-color-when-FORCE_COLOR-is-set.js"
+  }
+ ],
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "references": {
+  "git_blobs_sha256": "e677ffc786c87facc612f5524e9507c7e0d5437703f8243904a467347861ad1e",
+  "scenarios": 516
+ },
+ "rust": {
+  "capture_sha256": "81c2ac39b39b74791b4dfc30b5fd77c79680b6d2b93d05824747c3a66397ecaa",
+  "executable_sha256": "66180f1a46746d50823af43f7e3676548d9fb7b9b554e3a3e7e9140e5eafe452",
+  "partial": false,
+  "selectors": [
+   "all"
+  ],
+  "source_stable": true
+ },
+ "summary": {
+  "categories": {
+   "different": 0,
+   "failed": 0,
+   "match": 0,
+   "unexecuted": 0,
+   "unsupported": 516
+  },
+  "different_sections": {},
+  "edit_steps": 1255,
+  "edit_steps_agreeing": 0,
+  "families": {
+   "tsbuild": {
+    "different": 0,
+    "failed": 0,
+    "match": 0,
+    "unexecuted": 0,
+    "unsupported": 192
+   },
+   "tsbuildWatch": {
+    "different": 0,
+    "failed": 0,
+    "match": 0,
+    "unexecuted": 0,
+    "unsupported": 65
+   },
+   "tsc": {
+    "different": 0,
+    "failed": 0,
+    "match": 0,
+    "unexecuted": 0,
+    "unsupported": 217
+   },
+   "tscWatch": {
+    "different": 0,
+    "failed": 0,
+    "match": 0,
+    "unexecuted": 0,
+    "unsupported": 42
+   }
+  },
+  "harness_errors": 0,
+  "matched": 0,
+  "partial": false,
+  "rows": 516,
+  "selected": 516,
+  "stopped_rows": 516,
+  "stopped_rows_prefix_of_reference": 516,
+  "unsupported_rows": 516,
+  "valid": true
+ },
+ "version": 1
+}

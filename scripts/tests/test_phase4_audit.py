@@ -131,6 +131,23 @@ class Audit(unittest.TestCase):
         pending = sum(self.document["pending_by_checkpoint"].values())
         self.assertEqual(pending, self.document["totals"]["pending"])
 
+    def test_the_harness_group_closes_with_its_decoders_recorded_without_a_caller(self):
+        # X0 ports the harness; the readable build info's four UnmarshalJSON
+        # methods have no caller at the pin and are recorded as equivalent at
+        # the encode-only Rust type.
+        self.assertEqual(self.document["pending_by_checkpoint"]["X0"], 0)
+        counts = self.document["groups"]["X0"]["counts"]
+        self.assertEqual((counts["total"], counts["mapped"], counts["equivalent"], counts["pending"]), (96, 92, 4, 0))
+        decoders = {identity: entry for identity, entry in
+                    self.document["files"]["tsc/internal/execute/tsctests/readablebuildinfo.go"]["functions"].items()
+                    if identity.endswith(".UnmarshalJSON")}
+        self.assertEqual(len(decoders), 4)
+        for identity, entry in decoders.items():
+            self.assertEqual(entry["status"], "equivalent", identity)
+            self.assertTrue(entry["rust"][0].startswith("tools/phase4/tsctests/src/readablebuildinfo.rs:"), identity)
+            self.assertFalse(entry["marker_to_add"])
+            self.assertIn("No caller at the pin", entry["reason"])
+
     def test_a_duplicate_marker_changes_the_result(self):
         identity = self.mapped(PROGRAM + ":")
         markers = copy.deepcopy(self.markers)
