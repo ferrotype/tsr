@@ -727,25 +727,34 @@ register rebuilt from evidence, never edited. `cargo xtask run tsc` and
 
 ## 8. Owner decisions
 
-Fifteen proposals. Each stands as written unless the owner changes it.
+Fifteen proposals. On 2026-10-02 the owner decided fourteen of them; each
+entry keeps its proposal and records the outcome. Decision 7 (dependencies)
+is still open.
 
 1. **Names.** Checkpoints X0 to X7, sprints `P4A` and `P4B`, producer `tsc`,
    data under `data/phase4/`.
+   **Confirmed.**
 2. **The scenarios are recorded from the pin**, by an overlay over the pinned
    test package, and verified by reproduction and replay (X0). The committed
    references are the authority, so baseline parity needs no native capture.
    The alternative, transcribing the 380 declarations and their closures by
    hand, is more work and cannot be proven faithful.
+   **Confirmed.**
 3. **Ordering against Phase 3.** X1, X2, X3 and X5 cannot close before
    Phase 3's T8, and the P4B exit requires P3B. Proposed for one implementer:
    Phase 3 first; X0, X4 and the emit-free part of X1 may be taken while a
    Phase 3 checkpoint waits on review; X2, X3 and X5 after T8. The
    alternative is to start Phase 4 only after P3B closes.
+   **Settled by events:** Phase 3 is merged (#77, #78), so Phase 4 starts
+   after Phase 3's green-up with no interleaving.
 4. **Ledger moves.** `fswatch/kqueue.go` to out of scope (ADR 0002 already
    excludes it); `compiler/projectreferencedtsfakinghost.go` to Phase 5;
    `GetDiagnosticsOfAnyProgram`'s destination from Phase 3 to Phase 4;
    `pprof/pprof.go` by decision 6. One regeneration, together with Phase 3's
    decision 1 if its T0 has not run.
+   **Confirmed, without the `GetDiagnosticsOfAnyProgram` move:** Phase 3
+   ported and marked it, so it stays Phase 3's. `pprof.go` moves to Phase 7
+   (decision 6).
 5. **Crates.** New `tsr_execute` (with `execute/tsc` and `watchmanager`, as
    the ledger maps them), `tsr_incremental`, `tsr_build`, `tsr_fswatch`,
    `tsr_tracing` and the binary crate `tsc`; the harness under
@@ -755,12 +764,20 @@ Fifteen proposals. Each stands as written unless the owner changes it.
    register in `tools/packaging/packages.json` as unpublished; whether they
    join the next lockstep release, and the name the command line is
    published under, are separate decisions.
+   **Confirmed, with the names already reserved:** the crates keep the
+   `tsr_` prefix (`tsr_incremental` exists since Phase 3 and is registered
+   as published), and the command line is published under the reserved
+   names, the `tsr` crate on crates.io and the `tsrust` organisation on npm,
+   not as a crate called `tsc`. The installed command is `tsrust`: two
+   unrelated npm packages already install a command called `tsr`. The
+   workspace's binary target is still named `tsc`, as decision 11 stages it.
 6. **Profiling.** `--pprofDir` is accepted and reports that profiling is not
    available in this build; `pprof.go` moves to Phase 7, beside the
    benchmarking work, and no `tsr_pprof` crate is created now. The
    statistics table's memory row reports the allocator's counter where Go
    reports its runtime's; the row is never in a baseline. The alternative is
    a sampling-profiler dependency now.
+   **Confirmed:** profiling is deferred to Phase 7.
 7. **Dependencies** ([ADR 0017](adr/0017-dependency-policy.md)). `libc` as a
    direct dependency for fanotify, signal handling and directory entries (it
    is already in the lock file); the `rustix` features the terminal, process
@@ -770,32 +787,42 @@ Fifteen proposals. Each stands as written unless the owner changes it.
    system allocator, over the harness suite, the race tests and the Phase 4
    crates' tests; recorded at X7 on this host and run by a scheduled CI job
    on Linux, not on every pull request.
+   **Confirmed.**
 9. **Linux evidence.** inotify and fanotify can be witnessed only on Linux.
    The `fswatch` roster, the live-watch witness and the smoke test run in
    CI's Linux job, which enforces their metrics; the recorded run on this
    host covers FSEvents. If a recorded Linux run is wanted, it joins as a
    second provenance.
+   **Confirmed, with a recorded Linux run:** the owner takes it in a Linux
+   container on this host or in the cloud, and it joins as a second
+   provenance. fanotify needs a privileged container.
 10. **The live witnesses.** The smoke test, the live-watch witness and the
     interoperability witness compare the Rust binary with the pinned Go
     binary on the same host at X7. They are observations the `tsc` producer
     takes, not committed captures.
+    **Confirmed.**
 11. **The binary.** X7 stages the release binary as `lib/tsc` and, on Linux,
     checks the ELF's versioned symbols against glibc 2.28 in CI: the first
     native binary is the place for PLAN's item 15. The run on a glibc 2.28
     image, the second Linux architecture, the size budget and cut-over stay
     Phase 7's.
+    **Confirmed.**
 12. **`--lsp` and `--api`.** The binary recognizes both; until Phases 5 and 6
     supply the servers it says the mode is not available and exits with
     `NotImplemented` (5). `runLSP`, `runAPI`, the parent-process watchdog and
     `isProcessAlive` are `later` with those owners.
+    **Confirmed.**
 13. **Performance.** One bounded timing capture at X7 on the smoke fixture,
     beside Go's, no threshold.
+    **Confirmed.**
 14. **Evidence.** Phase 4's changes stale the recorded `checker` and `emit`
     runs and the producers that bind the option-declaration generator.
     Nothing is re-recorded per fix; X7's green-up re-records them, and the
     recordings are the owner's.
+    **Confirmed.**
 15. **The mapper child process** is ported here with `cmd/tsc/sys.go`,
     amending C7's record, which named Phase 5.
+    **Confirmed.**
 
 X0 starts on this plan once the decisions are settled; the X0 record
 (`docs/PHASE4-X0.md`) carries the measured costs, the first run and the
