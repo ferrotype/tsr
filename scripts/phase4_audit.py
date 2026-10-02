@@ -25,8 +25,9 @@ Each function gets one status, by `scripts/phase2_audit.py`'s rules as
 * `equivalent` -- folded into another function, an unmarked port, or without a
   caller at the pin while the same fact is computed elsewhere; a reviewed entry
   names the Rust site by file and an anchor text that must occur exactly once
-  there, and the build resolves it to `path:line`; `marker_to_add` says that
-  the site is a one-to-one port that should carry the marker;
+  there, and the build records the file (a line number would stale the audit
+  on every edit above it); `marker_to_add` says that the site is a
+  one-to-one port that should carry the marker;
 * `later` -- handed to a later phase (Phase 5 project system, auto-import,
   type acquisition and the language server; Phase 6 the API; Phase 7
   profiling), with the reason;
@@ -1376,28 +1377,28 @@ def binding(values):
 
 
 def marker_sites(root=ROOT):
-    """Every marker under crates/ and tools/ with all of its sites, `path:line`."""
+    """Every marker under crates/ and tools/ with all of its sites, by file (a
+    file that carries one marker twice lists twice, so duplicates still show)."""
     sites = {}
     for base in MARKER_ROOTS:
         for path in sorted((root / base).rglob("*.rs")):
             if "target" in path.relative_to(root).parts:
                 continue
-            for number, line in enumerate(path.read_text(errors="replace").splitlines(), 1):
+            for line in path.read_text(errors="replace").splitlines():
                 match = MARKER.match(line)
                 if match and ":" in match.group(1):
-                    sites.setdefault(match.group(1), []).append(f"{path.relative_to(root).as_posix()}:{number}")
+                    sites.setdefault(match.group(1), []).append(path.relative_to(root).as_posix())
     return sites
 
 
 def resolve_site(site, root=ROOT):
-    """A reviewed (path, anchor) site as `path:line`, or None when it does not resolve uniquely."""
+    """A reviewed (path, anchor) site as its path, or None when the anchor does not occur exactly once there."""
     path, anchor = site
     target = root / path
     if not path.startswith(tuple(f"{base}/" for base in MARKER_ROOTS)) or target.suffix != ".rs" \
             or not target.is_file():
         return None
-    lines = [number for number, line in enumerate(target.read_text().splitlines(), 1) if anchor in line]
-    return f"{path}:{lines[0]}" if len(lines) == 1 else None
+    return path if sum(anchor in line for line in target.read_text().splitlines()) == 1 else None
 
 
 def phase4_prefixes(files):
@@ -1456,7 +1457,7 @@ def build_document(root=ROOT, markers=None, reviewed=None, functions=None, multi
             if kind == "equivalent":
                 site = resolve_site(review.get("rust") or ("", ""), root)
                 if site is None:
-                    problems.append(f"{identity}: equivalent site {review.get('rust')} does not resolve to one line")
+                    problems.append(f"{identity}: equivalent site {review.get('rust')} does not resolve to one anchor")
                 entry |= {"status": "equivalent", "rust": [site] if site else [], "reason": reason,
                           "marker_to_add": bool(review.get("marker_to_add"))}
             elif kind == "later":

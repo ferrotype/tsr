@@ -137,14 +137,14 @@ class Audit(unittest.TestCase):
         self.assertEqual(len(decoders), 4)
         for identity, entry in decoders.items():
             self.assertEqual(entry["status"], "equivalent", identity)
-            self.assertTrue(entry["rust"][0].startswith("tools/phase4/tsctests/src/readablebuildinfo.rs:"), identity)
+            self.assertEqual(entry["rust"], ["tools/phase4/tsctests/src/readablebuildinfo.rs"], identity)
             self.assertFalse(entry["marker_to_add"])
             self.assertIn("No caller at the pin", entry["reason"])
 
     def test_a_duplicate_marker_changes_the_result(self):
         identity = self.mapped(PROGRAM + ":")
         markers = copy.deepcopy(self.markers)
-        markers[identity].append("crates/tsr_compiler/src/loader.rs:1")
+        markers[identity].append("crates/tsr_compiler/src/loader.rs")
         document = self.rebuilt(markers)
         self.assertEqual(self.entry(document, identity)["status"], "duplicate")
         self.assertEqual(document["groups"]["X1"]["counts"]["duplicate"], 1)
@@ -155,7 +155,7 @@ class Audit(unittest.TestCase):
         multi = PROGRAM + ":Program.BindSourceFiles"
         self.assertEqual(self.entry(self.document, multi)["status"], "mapped")
         markers = copy.deepcopy(self.markers)
-        markers[multi].append("crates/tsr_compiler/src/loader.rs:1")
+        markers[multi].append("crates/tsr_compiler/src/loader.rs")
         document = self.rebuilt(markers)
         self.assertEqual(self.entry(document, multi)["status"], "duplicate")
         markers[multi] = markers[multi][:1]
@@ -165,12 +165,12 @@ class Audit(unittest.TestCase):
         markers = copy.deepcopy(self.markers)
         for typo in (PROGRAM + ":Program.NoSuchMethod", "tsc/internal/fswatch/nosuchfile.go:watch",
                      "tsc/internal/execute/tsc/help.go:printNothing", "tsc/cmd/tsc/main.go:mian"):
-            markers[typo] = ["crates/tsr_compiler/src/loader.rs:1"]
+            markers[typo] = ["crates/tsr_compiler/src/loader.rs"]
         # Unknown ids outside the Phase 4 files and packages are not this
         # audit's, and test-file ids are reported apart.
-        markers["tsc/internal/checker/checker.go:Checker.noSuchFunction"] = ["crates/tsr_checker/src/lib.rs:1"]
-        markers["tsc/internal/compiler/checkerpool.go:noSuchFunction"] = ["crates/tsr_compiler/src/lib.rs:1"]
-        markers["tsc/internal/execute/tsctests/tscwatch_test.go:newTscEdit"] = ["tools/phase4/x.rs:1"]
+        markers["tsc/internal/checker/checker.go:Checker.noSuchFunction"] = ["crates/tsr_checker/src/lib.rs"]
+        markers["tsc/internal/compiler/checkerpool.go:noSuchFunction"] = ["crates/tsr_compiler/src/lib.rs"]
+        markers["tsc/internal/execute/tsctests/tscwatch_test.go:newTscEdit"] = ["tools/phase4/x.rs"]
         document = self.rebuilt(markers)
         self.assertEqual(sorted(document["unknown_markers"]), [
             "tsc/cmd/tsc/main.go:mian", PROGRAM + ":Program.NoSuchMethod",
@@ -190,7 +190,7 @@ class Audit(unittest.TestCase):
         self.assertEqual(document["groups"]["X2"]["counts"]["gap"], 1)
         self.assertIn(f"{identity}: no port marker and no reviewed disposition", document["problems"])
         unported = "tsc/internal/execute/build/orchestrator.go:Orchestrator.Order"
-        markers = dict(self.markers, **{unported: ["crates/tsr_compiler/src/loader.rs:1"]})
+        markers = dict(self.markers, **{unported: ["crates/tsr_compiler/src/loader.rs"]})
         self.assertEqual(self.entry(self.rebuilt(markers), unported)["status"], "mapped")
         markers.pop(unported)
         self.assertEqual(self.entry(self.rebuilt(markers), unported),
@@ -213,9 +213,9 @@ class Audit(unittest.TestCase):
 
     def test_a_marker_supersedes_a_pending_review_and_stales_any_other(self):
         pending, equivalent = PROGRAM + ":Program.ExplainFiles", WRITER + ":diagnosticPrefix"
-        markers = dict(self.markers, **{pending: ["tools/phase4/x.rs:1"], equivalent: ["crates/x.rs:1"]})
+        markers = dict(self.markers, **{pending: ["tools/phase4/x.rs"], equivalent: ["crates/x.rs"]})
         document = self.rebuilt(markers)
-        self.assertEqual(self.entry(document, pending), {"status": "mapped", "rust": ["tools/phase4/x.rs:1"]})
+        self.assertEqual(self.entry(document, pending), {"status": "mapped", "rust": ["tools/phase4/x.rs"]})
         self.assertIn(pending, document["pending_reviews_superseded"])
         self.assertEqual(document["problems"],
                          [f"{equivalent}: a port marker names it, so its reviewed disposition is stale"])
