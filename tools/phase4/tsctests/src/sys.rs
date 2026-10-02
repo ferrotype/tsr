@@ -175,7 +175,10 @@ pub fn new_tsc_system(
 
 /// The files the command line wrote, added to `files`.
 // port: tsc/internal/execute/tsctests/sys.go:GetFileMapWithBuild
-pub fn get_file_map_with_build(mut files: FileMap, command_line_args: &[JsString]) -> FileMap {
+pub fn get_file_map_with_build(
+    mut files: FileMap,
+    command_line_args: &[JsString],
+) -> Result<FileMap, tsr_compiler::Error> {
     let sys = new_test_sys(
         &TscInput {
             files: files.clone(),
@@ -188,13 +191,13 @@ pub fn get_file_map_with_build(mut files: FileMap, command_line_args: &[JsString
         sys.clone(),
         command_line_args,
         Some(sys.clone()),
-    );
+    )?;
     for key in sys.fs.written_files.to_slice() {
         if let Some(text) = sys.fs_from_file_map().read_file(&key) {
             files.insert(key, InputFile::Text(text));
         }
     }
-    files
+    Ok(files)
 }
 
 // port: tsc/internal/execute/tsctests/sys.go:newTestSys

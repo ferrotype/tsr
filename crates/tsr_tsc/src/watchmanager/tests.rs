@@ -280,10 +280,32 @@ fn cancellation_wakes_idle_loop_and_closes_subscriptions() {
     let context = tsr_ipc::Context::background().with_cancel();
     let worker_context = context.clone();
     let worker = std::thread::spawn(move || {
-        manager.run_loop(&worker_context, || panic!("no filesystem event"))
+        manager.run_loop::<()>(&worker_context, || panic!("no filesystem event"))
     });
     context.cancel();
-    worker.join().unwrap();
+    worker.join().unwrap().unwrap();
+    assert_eq!(backend.closed.load(Ordering::Relaxed), 1);
+}
+#[test]
+fn failed_cycle_returns_its_error_and_closes_subscriptions() {
+    let (manager, backend, _) = fixture();
+    manager.reconcile_watches(&desired(false)).unwrap();
+    let context = tsr_ipc::Context::background().with_cancel();
+    manager.signal_cycle();
+    let mut cycles = 0;
+    let result = manager.run_loop(&context, || {
+        cycles += 1;
+        Err(tsr_compiler::Error::Unsupported("watch cycle refusal"))
+    });
+    assert!(matches!(
+        result,
+        Err(tsr_compiler::Error::Unsupported("watch cycle refusal"))
+    ));
+    assert_eq!(cycles, 1);
+    assert_eq!(backend.closed.load(Ordering::Relaxed), 1);
+    assert!(context.err().is_none());
+    context.cancel();
+    manager.close_all_watches();
     assert_eq!(backend.closed.load(Ordering::Relaxed), 1);
 }
 #[test]

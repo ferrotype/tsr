@@ -452,13 +452,20 @@ impl WatchManager {
             )
         })
     }
-    pub fn run_loop(&self, context: &tsr_ipc::Context, mut do_cycle: impl FnMut()) {
+    /// Drives cycles until cancellation or a cycle error, closing subscriptions
+    /// on either return path.
+    pub fn run_loop<E>(
+        &self,
+        context: &tsr_ipc::Context,
+        mut do_cycle: impl FnMut() -> Result<(), E>,
+    ) -> Result<(), E> {
         let weak = Arc::downgrade(&self.0);
         let stop = context.after_func(move || {
             if let Some(inner) = weak.upgrade() {
                 Self(inner).signal_cycle();
             }
         });
+        let mut result = Ok(());
         while context.err().is_none() {
             let mut changes = lock(&self.0.changes);
             while !changes.signalled && context.err().is_none() {
@@ -471,11 +478,15 @@ impl WatchManager {
             changes.signalled = false;
             drop(changes);
             if context.err().is_none() {
-                do_cycle();
+                if let Err(error) = do_cycle() {
+                    result = Err(error);
+                    break;
+                }
             }
         }
         stop.stop();
         self.close_all_watches();
+        result
     }
 }
 impl Drop for Inner {

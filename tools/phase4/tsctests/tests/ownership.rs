@@ -156,7 +156,8 @@ fn repeat_command(arguments: &[&str], build_info: bool) {
             observer.sys.clone(),
             &args(arguments),
             Some(observer.clone()),
-        );
+        )
+        .expect("command completes");
         assert_eq!(
             result.status,
             ExitStatus::Success,
@@ -217,7 +218,8 @@ fn watch_fifty_cycles_plateau_after_second_cycle_and_release_on_close() {
         observer.sys.clone(),
         &args(&["--watch", "--pretty", "false"]),
         Some(observer.clone()),
-    );
+    )
+    .expect("command completes");
     assert_eq!(result.status, ExitStatus::Success);
     let watcher = result.watcher.unwrap();
     let mut plateau = None;
@@ -227,7 +229,7 @@ fn watch_fifty_cycles_plateau_after_second_cycle_and_release_on_close() {
             kind: EventKind::EventUpdate,
             path: format!("{ROOT}index.ts").into_bytes(),
         }]);
-        watcher.do_cycle();
+        watcher.do_cycle().expect("watch cycle completes");
         let observations = observer.observations.lock().unwrap();
         assert_eq!(observations.len(), cycle + 1);
         retained_readable(&observations);

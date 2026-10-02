@@ -6,19 +6,19 @@
 //!   reports with `t.Errorf` (`null` when nothing).
 //! - `unsupported`: the Rust command line refused a named `operation`.
 //! - `failed`: a `panic` (with its `reason` and `location`, `null` when the
-//!   hook saw none) or a `harness` defect (the scenario does not replay as
+//!   hook saw none), a typed production `error`, or a `harness` defect (the scenario does not replay as
 //!   recorded, or the runner named another baseline).
 //!
 //! Every row carries how far the transcript got (`progress`) and the digest
 //! and size of the transcript as far as it got (`transcript`), which the
 //! binary writes beside the rows.
-use crate::execute::Unsupported;
 use crate::runner::{Progress, Transcript};
 use crate::scenario::{hex_digest, Scenario};
 use serde_json::{json, Value};
 use std::any::Any;
 use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::sync::{Mutex, Once, PoisonError};
+use tsr_compiler::Error;
 
 /// The row format's version.
 pub const ROW_VERSION: u64 = 1;
@@ -30,23 +30,17 @@ pub const ROW_VERSION: u64 = 1;
 static PANICS: Mutex<Vec<(String, Option<String>)>> = Mutex::new(Vec::new());
 const PANICS_KEPT: usize = 256;
 
-/// The text of a panic payload, `None` for an [`Unsupported`] refusal.
-fn payload_message(payload: &(dyn Any + Send)) -> Option<String> {
-    if payload.is::<Unsupported>() {
-        return None;
-    }
-    Some(
-        payload
-            .downcast_ref::<String>()
-            .map(String::as_str)
-            .or_else(|| payload.downcast_ref::<&str>().copied())
-            .unwrap_or("non-string panic payload")
-            .to_owned(),
-    )
+/// Genuine panics are never interpreted as expected unsupported outcomes.
+fn payload_message(payload: &(dyn Any + Send)) -> String {
+    payload
+        .downcast_ref::<String>()
+        .map(String::as_str)
+        .or_else(|| payload.downcast_ref::<&str>().copied())
+        .unwrap_or("non-string panic payload")
+        .to_owned()
 }
 
-/// Records every panic's location; prints the panic unless it is a named
-/// refusal.
+/// Records and prints every genuine panic.
 pub fn install_panic_hook() {
     static INSTALL: Once = Once::new();
     INSTALL.call_once(|| {
@@ -54,7 +48,8 @@ pub fn install_panic_hook() {
             let location = info
                 .location()
                 .map(|at| format!("{}:{}", at.file(), at.line()));
-            if let Some(message) = payload_message(info.payload()) {
+            let message = payload_message(info.payload());
+            {
                 let mut panics = PANICS.lock().unwrap_or_else(PoisonError::into_inner);
                 if panics.len() == PANICS_KEPT {
                     panics.remove(0);
@@ -78,12 +73,16 @@ fn panic_location(message: &str) -> Option<String> {
 
 /// The state of a run that unwound.
 pub fn unwound(payload: &(dyn Any + Send)) -> Value {
-    if let Some(refusal) = payload.downcast_ref::<Unsupported>() {
-        return json!({"state": "unsupported", "operation": refusal.operation});
-    }
-    let reason = payload_message(payload).expect("a payload that is not a refusal has a message");
+    let reason = payload_message(payload);
     let location = panic_location(&reason);
     json!({"state": "failed", "class": "panic", "reason": reason, "location": location})
+}
+
+pub fn command_error(error: &Error) -> Value {
+    if let Some(operation) = crate::execute::unsupported_operation(error) {
+        return json!({"state": "unsupported", "operation": operation});
+    }
+    json!({"state": "failed", "class": "error", "reason": error.to_string(), "location": null})
 }
 
 fn harness_failure(reason: &str) -> Value {
@@ -105,13 +104,17 @@ pub fn run_scenario(scenario: &Scenario) -> (Value, Vec<u8>) {
     let mut transcript = Transcript::default();
     let outcome = catch_unwind(AssertUnwindSafe(|| {
         let input = scenario.to_tsc_input();
-        scenario.check_initial_state(&input)?;
-        let result = input.run(&scenario.scenario, &mut transcript);
+        scenario
+            .check_initial_state(&input)
+            .map_err(|reason| harness_failure(&reason))?;
+        let result = input
+            .run(&scenario.scenario, &mut transcript)
+            .map_err(|error| command_error(&error))?;
         if result.baseline_path != scenario.id {
-            return Err(format!(
+            return Err(harness_failure(&format!(
                 "the runner named the baseline {}, the recording {}",
                 result.baseline_path, scenario.id
-            ));
+            )));
         }
         Ok(result)
     }));
@@ -122,7 +125,7 @@ pub fn run_scenario(scenario: &Scenario) -> (Value, Vec<u8>) {
             json!({"state": "completed", "sha256": hex_digest(&transcript.text),
                    "bytes": transcript.text.len(), "unexpected_diff": unexpected})
         }
-        Ok(Err(reason)) => harness_failure(&reason),
+        Ok(Err(state)) => state,
         Err(payload) => unwound(payload.as_ref()),
     };
     let mut row = json!({

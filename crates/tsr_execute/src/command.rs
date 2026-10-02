@@ -1,4 +1,4 @@
-use crate::{tsc, unsupported};
+use crate::tsc;
 use std::sync::Arc;
 use tsc::{CommandLineResult, CommandLineTesting, ExitStatus, System};
 use tsr_ast::Diagnostic;
@@ -17,15 +17,17 @@ fn finished(status: ExitStatus) -> CommandLineResult {
 }
 
 /// port: tsc/internal/execute/tsc.go:CommandLine
+/// Compilation errors, including named unsupported operations, are returned to
+/// the caller. Genuine invariant panics retain their original panic payload.
 pub fn command_line(
     ctx: &Context,
     sys: Arc<dyn System>,
     args: &[JsString],
     testing: Option<Arc<dyn CommandLineTesting>>,
-) -> CommandLineResult {
+) -> Result<CommandLineResult, Error> {
     let host =
         CompilerConfigHost::new_live(sys.fs(), JsString::from_bytes(sys.get_current_directory()));
-    let result = if args.first().is_some_and(|arg| {
+    if args.first().is_some_and(|arg| {
         matches!(
             tsr_jsstring::helpers::to_lower_go(arg.as_bytes()).as_slice(),
             b"-b" | b"--b" | b"-build" | b"--build"
@@ -36,12 +38,6 @@ pub fn command_line(
     } else {
         let command = tsr_tsoptions::parse_command_line(args, &host);
         compilation(ctx, sys, command, testing)
-    };
-    match result {
-        Ok(result) => result,
-        Err(Error::Unsupported(reason)) => unsupported(reason),
-        Err(Error::Host(tsr_vfs::Error::Unsupported(reason))) => unsupported(reason),
-        Err(error) => panic!("command-line compilation failed: {error}"),
     }
 }
 

@@ -109,7 +109,10 @@ pub mod tsc {
 
     /// `tsc.Watcher`: a watch session the runner drives one cycle at a time.
     pub trait Watcher: Send + Sync + std::any::Any {
-        fn do_cycle(&self);
+        /// Returns a compilation failure or named refusal without unwinding.
+        /// Callers end the watch session after an error; a failed cycle does
+        /// not promise a state that can be retried.
+        fn do_cycle(&self) -> Result<(), tsr_compiler::Error>;
     }
 
     /// `tsc.CommandLineResult`.
@@ -163,18 +166,6 @@ pub mod watcher;
 pub mod watchmanager;
 
 pub use tsc::*;
-
-/// A named operation the partial driver cannot yet execute. The harness keeps
-/// this separate from a panic and never turns it into a passing observation.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Unsupported {
-    pub operation: String,
-}
-pub fn unsupported(operation: &str) -> ! {
-    std::panic::panic_any(Unsupported {
-        operation: operation.to_owned(),
-    })
-}
 
 /// port: tsc/internal/execute/tsc/emit.go:GetTraceWithWriterFromSys
 pub fn get_trace_with_writer_from_sys(

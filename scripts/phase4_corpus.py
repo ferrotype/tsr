@@ -40,13 +40,13 @@ A capture directory holds:
 
 Every row is validated: its shape, exactly one state (`completed` with the
 transcript's digest and size and `unexpected_diff`; `unsupported` with the
-named operation; `failed` with class `panic` or `harness`, a reason and a
+named operation; `failed` with class `panic`, `error` or `harness`, a reason and a
 location or null), the scenario's id, family and recorded digest, its
 progress against the scenario's edits, and the transcript file's digest and
 size; the ids equal the selection's, in inventory order; the summary agrees
 with the rows. Harness defects are separate from product outcomes: a
 `harness` failure, or a panic located outside `crates/`, is a harness error
-and invalidates the run; a production panic and a named refusal are measured
+and invalidates the run; a production panic, a typed operational error and a named refusal are measured
 outcomes.
 """
 from __future__ import annotations
@@ -76,7 +76,7 @@ CAPTURE_VERSION = 1
 ROW_BASE = {"version", "id", "family", "baseline", "scenario_sha256", "progress", "transcript", "state"}
 STATE_FIELDS = {"completed": {"sha256", "bytes", "unexpected_diff"}, "unsupported": {"operation"},
                 "failed": {"class", "reason", "location"}}
-FAILURE_CLASSES = ("panic", "harness")
+FAILURE_CLASSES = ("panic", "error", "harness")
 STAGES = ("setup", "header", "initial", "edit", "done")
 PROGRESS_FIELDS = {"stage", "commands", "edits_completed", "edits"}
 SUMMARY_FIELDS = {"version", "pin", "inventory", "selectors", "rows", "families", "states"}
@@ -227,6 +227,8 @@ def harness_problem(row):
         return None
     if row["class"] == "harness":
         return "harness failure: " + row["reason"]
+    if row["class"] == "error":
+        return None
     location = row["location"] or ""
     if not location.startswith("crates/"):
         return f"panic at {location or 'unknown location'}: {row['reason']}"[:400]

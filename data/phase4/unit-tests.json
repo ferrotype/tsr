@@ -826,7 +826,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/build_direct.rs:274",
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:275",
      "test": "tools/phase4/tsctests/tests/build_direct.rs::extended_config_cache_extends_circularity"
     }
    ],
@@ -850,7 +850,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/build_direct.rs:299",
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:300",
      "test": "tools/phase4/tsctests/tests/build_direct.rs::extended_config_cache_null_extends_does_not_panic"
     }
    ],
@@ -874,7 +874,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/build_direct.rs:162",
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:163",
      "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_build_lifecycle"
     }
    ],
@@ -898,7 +898,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/build_direct.rs:177",
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:178",
      "test": "tools/phase4/tsctests/tests/build_direct.rs::supplemental_diagnostic_uses_original_file_name"
     }
    ],
@@ -923,7 +923,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/build_direct.rs:197",
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:198",
      "test": "tools/phase4/tsctests/tests/build_direct.rs::build_detects_new_physical_supplemental_file"
     }
    ],
@@ -947,7 +947,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/build_direct.rs:230",
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:231",
      "test": "tools/phase4/tsctests/tests/build_direct.rs::build_identity_failure_exit_status"
     }
    ],
@@ -972,7 +972,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/build_direct.rs:358",
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:359",
      "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_watch_lifecycle"
     }
    ],
@@ -996,7 +996,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/build_direct.rs:418",
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:419",
      "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_supplemental_collision_watch"
     }
    ],
@@ -1020,7 +1020,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/build_direct.rs:481",
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:482",
      "test": "tools/phase4/tsctests/tests/build_direct.rs::dynamic_content_mapper_watch_dependency"
     }
    ],
@@ -1045,7 +1045,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/build_direct.rs:492",
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:493",
      "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_mixed_watch_batch_forces_full_rebuild"
     }
    ],
@@ -1070,7 +1070,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/build_direct.rs:486",
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:487",
      "test": "tools/phase4/tsctests/tests/build_direct.rs::dynamic_content_mapper_build_watch_dependency"
     }
    ],
@@ -1095,7 +1095,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/build_direct.rs:557",
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:558",
      "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_build_watch_symlinked_manifest_change"
     }
    ],
@@ -1120,7 +1120,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/build_direct.rs:579",
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:580",
      "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_build_watch_symlinked_manifest_delete"
     }
    ],
@@ -1145,7 +1145,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/build_direct.rs:603",
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:604",
      "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_build_watch_shared_lifecycle"
     }
    ],
@@ -1168,7 +1168,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/watcher_race.rs:86",
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:87",
      "test": "tools/phase4/tsctests/tests/watcher_race.rs::concurrent_cycles_with_source_writes"
     }
    ],
@@ -1191,7 +1191,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/watcher_race.rs:102",
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:103",
      "test": "tools/phase4/tsctests/tests/watcher_race.rs::concurrent_cycles_and_state_reads"
     }
    ],
@@ -1214,7 +1214,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/watcher_race.rs:128",
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:129",
      "test": "tools/phase4/tsctests/tests/watcher_race.rs::create_delete_and_cycle_concurrently"
     }
    ],
@@ -1237,7 +1237,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/watcher_race.rs:163",
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:164",
      "test": "tools/phase4/tsctests/tests/watcher_race.rs::rapid_config_and_source_edits"
     }
    ],
@@ -1260,7 +1260,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/watcher_race.rs:203",
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:204",
      "test": "tools/phase4/tsctests/tests/watcher_race.rs::concurrent_cycles_without_changes"
     }
    ],
@@ -1283,7 +1283,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/watcher_race.rs:218",
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:219",
      "test": "tools/phase4/tsctests/tests/watcher_race.rs::alternating_writes_and_cycles"
     }
    ],
@@ -1308,7 +1308,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/watcher_race.rs:239",
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:240",
      "test": "tools/phase4/tsctests/tests/watcher_race.rs::cancelled_build_watch_returns_without_waiting_for_interval"
     }
    ],
@@ -1334,7 +1334,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/watcher_race.rs:268",
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:272",
      "test": "tools/phase4/tsctests/tests/watcher_race.rs::watch_reads_existing_build_info"
     }
    ],
@@ -1358,7 +1358,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/watcher_race.rs:298",
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:304",
      "test": "tools/phase4/tsctests/tests/watcher_race.rs::changed_jsx_pragma_resolves_the_new_runtime"
     }
    ],
@@ -1381,7 +1381,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/watcher_race.rs:323",
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:329",
      "test": "tools/phase4/tsctests/tests/watcher_race.rs::body_only_edits_reuse_program_and_import_changes_rebuild"
     }
    ],
@@ -1405,7 +1405,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/watcher_race.rs:379",
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:385",
      "test": "tools/phase4/tsctests/tests/watcher_race.rs::overflow_rediscovers_previously_missing_dependency"
     }
    ],
@@ -1429,7 +1429,7 @@
    "per_backend": false,
    "rust": [
     {
-     "site": "tools/phase4/tsctests/tests/watcher_race.rs:392",
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:398",
      "test": "tools/phase4/tsctests/tests/watcher_race.rs::non_source_dependency_in_edit_batch_forces_rebuild"
     }
    ],

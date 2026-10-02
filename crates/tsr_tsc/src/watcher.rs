@@ -186,7 +186,7 @@ pub fn start(context: &Context, options: Options) -> Result<CommandLineResult, E
         manager: manager.clone(),
     });
     if !testing {
-        manager.run_loop(context, || crate::Watcher::do_cycle(watcher.as_ref()));
+        manager.run_loop(context, || crate::Watcher::do_cycle(watcher.as_ref()))?;
     }
     Ok(CommandLineResult {
         status: ExitStatus::Success,
@@ -194,12 +194,9 @@ pub fn start(context: &Context, options: Options) -> Result<CommandLineResult, E
     })
 }
 impl crate::Watcher for CompilerWatcher {
-    fn do_cycle(&self) {
+    fn do_cycle(&self) -> Result<(), Error> {
         let _cycle = self.manager.lock();
-        let result = lock(&self.state).cycle(&self.manager);
-        if let Err(error) = result {
-            panic!("watch compilation failed: {error}");
-        }
+        lock(&self.state).cycle(&self.manager)
     }
 }
 impl CompilerWatcher {

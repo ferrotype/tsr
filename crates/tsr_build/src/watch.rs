@@ -52,7 +52,7 @@ pub fn start(ctx: &Context, options: Options) -> Result<CommandLineResult, Error
         debug,
     });
     if !testing {
-        manager.run_loop(ctx, || tsr_tsc::Watcher::do_cycle(watcher.as_ref()));
+        manager.run_loop(ctx, || tsr_tsc::Watcher::do_cycle(watcher.as_ref()))?;
     }
     result.watcher = Some(watcher);
     Ok(result)
@@ -71,7 +71,7 @@ impl Drop for BuildWatcher {
 }
 impl tsr_tsc::Watcher for BuildWatcher {
     // port: tsc/internal/execute/build/orchestrator.go:Orchestrator.DoCycle
-    fn do_cycle(&self) {
+    fn do_cycle(&self) -> Result<(), Error> {
         let _guard = self.manager.lock();
         let (changes, overflow) = self.manager.drain_events();
         let mut o = lock(&self.orchestrator);
@@ -82,7 +82,7 @@ impl tsr_tsc::Watcher for BuildWatcher {
                     b"[watch] DoCycle: no events, skipping\n",
                 );
             }
-            return;
+            return Ok(());
         }
         let (reparse, update) = if overflow {
             for node in &o.tasks {
@@ -90,24 +90,21 @@ impl tsr_tsc::Watcher for BuildWatcher {
             }
             (true, true)
         } else {
-            o.check_event_changes(&changes, &self.manager)
-                .unwrap_or_else(|error| panic!("build watch input reload failed: {error}"))
+            o.check_event_changes(&changes, &self.manager)?
         };
         if !update {
             o.reset_caches();
-            return;
+            return Ok(());
         }
-        o.watch_status(d::File_change_detected_Starting_incremental_compilation)
-            .unwrap_or_else(|error| panic!("build watch status failed: {error}"));
+        o.watch_status(d::File_change_detected_Starting_incremental_compilation)?;
         if reparse {
-            o.generate_graph_reusing_old_tasks()
-                .unwrap_or_else(|error| panic!("build watch graph failed: {error}"));
+            o.generate_graph_reusing_old_tasks()?;
         }
-        o.build_or_clean(&self.context)
-            .unwrap_or_else(|error| panic!("build watch compilation failed: {error}"));
+        o.build_or_clean(&self.context)?;
         o.update_watch();
         o.reconcile(&self.manager);
         o.reset_caches();
+        Ok(())
     }
 }
 

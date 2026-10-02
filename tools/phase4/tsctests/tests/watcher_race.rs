@@ -44,7 +44,8 @@ fn start(files: &[(&str, &str)]) -> (Arc<dyn Watcher>, Arc<TestSys>) {
         sys.clone(),
         &args(&["--watch", "--pretty", "false"]),
         Some(sys.clone()),
-    );
+    )
+    .expect("command completes");
     (result.watcher.expect("watch session"), sys)
 }
 fn minimal() -> (Arc<dyn Watcher>, Arc<TestSys>) {
@@ -93,7 +94,7 @@ fn concurrent_cycles_with_source_writes() {
             s.spawn(move || {
                 for j in 0..10 {
                     write(sys, "a.ts", &format!("const a: number = {};", i * 10 + j));
-                    w.do_cycle();
+                    w.do_cycle().expect("watch cycle completes");
                 }
             });
         }
@@ -109,7 +110,7 @@ fn concurrent_cycles_and_state_reads() {
             s.spawn(move || {
                 for j in 0..15 {
                     write(sys, "a.ts", &format!("const a: number = {};", i * 15 + j));
-                    w.do_cycle();
+                    w.do_cycle().expect("watch cycle completes");
                 }
             });
         }
@@ -118,7 +119,7 @@ fn concurrent_cycles_and_state_reads() {
             s.spawn(move || {
                 for _ in 0..50 {
                     for _ in 0..4 {
-                        w.do_cycle();
+                        w.do_cycle().expect("watch cycle completes");
                     }
                 }
             });
@@ -154,7 +155,7 @@ fn create_delete_and_cycle_concurrently() {
             let w = &w;
             s.spawn(move || {
                 for _ in 0..10 {
-                    w.do_cycle();
+                    w.do_cycle().expect("watch cycle completes");
                 }
             });
         }
@@ -176,7 +177,7 @@ fn rapid_config_and_source_edits() {
             s.spawn(move || {
                 for j in 0..10 {
                     write(sys, "tsconfig.json", CONFIGS[(i + j) % 4]);
-                    w.do_cycle();
+                    w.do_cycle().expect("watch cycle completes");
                 }
             });
         }
@@ -185,7 +186,7 @@ fn rapid_config_and_source_edits() {
             s.spawn(move || {
                 for j in 0..15 {
                     write(sys, "a.ts", &format!("const a: number = {};", i * 15 + j));
-                    w.do_cycle();
+                    w.do_cycle().expect("watch cycle completes");
                 }
             });
         }
@@ -193,8 +194,8 @@ fn rapid_config_and_source_edits() {
             let w = &w;
             s.spawn(move || {
                 for _ in 0..30 {
-                    w.do_cycle();
-                    w.do_cycle();
+                    w.do_cycle().expect("watch cycle completes");
+                    w.do_cycle().expect("watch cycle completes");
                 }
             });
         }
@@ -209,7 +210,7 @@ fn concurrent_cycles_without_changes() {
             let w = &w;
             s.spawn(move || {
                 for _ in 0..50 {
-                    w.do_cycle();
+                    w.do_cycle().expect("watch cycle completes");
                 }
             });
         }
@@ -230,7 +231,7 @@ fn alternating_writes_and_cycles() {
             let w = &w;
             s.spawn(move || {
                 for _ in 0..count {
-                    w.do_cycle();
+                    w.do_cycle().expect("watch cycle completes");
                 }
             });
         }
@@ -250,12 +251,15 @@ fn cancelled_build_watch_returns_without_waiting_for_interval() {
     context.cancel();
     let (tx, rx) = std::sync::mpsc::channel();
     let worker = std::thread::spawn(move || {
-        tx.send(command_line(
-            &context,
-            sys.clone(),
-            &args(&["--build", "--watch", "--watchInterval", "60000"]),
-            Some(sys),
-        ))
+        tx.send(
+            command_line(
+                &context,
+                sys.clone(),
+                &args(&["--build", "--watch", "--watchInterval", "60000"]),
+                Some(sys),
+            )
+            .expect("command completes"),
+        )
         .unwrap()
     });
     let result = rx
@@ -280,7 +284,8 @@ fn watch_reads_existing_build_info() {
         sys.clone(),
         &args(&["-p", "tsconfig.json", "--pretty", "false"]),
         Some(sys.clone()),
-    );
+    )
+    .expect("command completes");
     assert_eq!(r.status, ExitStatus::Success);
     assert!(sys
         .fs_from_file_map()
@@ -291,7 +296,8 @@ fn watch_reads_existing_build_info() {
         sys.clone(),
         &args(&["--watch", "--noEmit", "--pretty", "false"]),
         Some(sys),
-    );
+    )
+    .expect("command completes");
     assert_eq!(r.status, ExitStatus::Success);
     assert!(r.watcher.is_some());
 }
@@ -315,7 +321,7 @@ fn changed_jsx_pragma_resolves_the_new_runtime() {
         "/** @jsxImportSource bar */\nexport const x = <div />;",
     );
     event(&sys, &["index.tsx"]);
-    w.do_cycle();
+    w.do_cycle().expect("watch cycle completes");
     let text = output(&sys);
     assert!(text.contains("bar/jsx-runtime"), "{text}");
     assert!(!text.contains("foo/jsx-runtime"), "{text}");
@@ -355,7 +361,7 @@ fn body_only_edits_reuse_program_and_import_changes_rebuild() {
         sys.current_write().reset();
         write(&sys, path, text);
         event(&sys, &[path]);
-        w.do_cycle();
+        w.do_cycle().expect("watch cycle completes");
         let out = output(&sys);
         assert_eq!(out.contains("Found 0 errors"), !errors, "{out}");
         assert_eq!(
@@ -385,7 +391,7 @@ fn overflow_rediscovers_previously_missing_dependency() {
     write(&sys, "dep.ts", "export const dep: number = 1;");
     let before = counts(w.as_ref());
     sys.mock_watch_backend.send_overflow();
-    w.do_cycle();
+    w.do_cycle().expect("watch cycle completes");
     assert_eq!(counts(w.as_ref()).1, before.1 + 1);
     assert!(sys.fs_from_file_map().file_exists(dep.as_bytes()));
 }
@@ -403,7 +409,7 @@ fn non_source_dependency_in_edit_batch_forces_rebuild() {
     write(&sys, "dep.ts", "export const dep: number = 1;");
     let before = counts(w.as_ref());
     event(&sys, &["index.ts", "dep.ts"]);
-    w.do_cycle();
+    w.do_cycle().expect("watch cycle completes");
     assert_eq!(counts(w.as_ref()).1, before.1 + 1);
     assert!(sys.fs_from_file_map().file_exists(dep.as_bytes()));
 }

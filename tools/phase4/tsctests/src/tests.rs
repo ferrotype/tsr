@@ -1059,9 +1059,9 @@ fn a_writer_is_compared_by_identity() {
 #[test]
 fn rows_classify_refusals_panics_and_harness_defects() {
     crate::row::install_panic_hook();
-    let refusal = catch_unwind(|| crate::execute::unsupported("an operation")).unwrap_err();
+    let refusal = tsr_compiler::Error::Unsupported("an operation");
     assert_eq!(
-        crate::row::unwound(refusal.as_ref()),
+        crate::row::command_error(&refusal),
         json!({"state": "unsupported", "operation": "an operation"})
     );
     let reason = format!("a probe panic {:?}", std::thread::current().id());
@@ -1120,4 +1120,40 @@ fn command_line_regressions_match_complete_native_scenarios() {
         count += 1;
     }
     assert_eq!(count, 8);
+}
+
+#[test]
+fn clean_build_refusal_is_returned_after_both_jobs_finish() {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    let completed = AtomicBool::new(false);
+    let outcome = catch_unwind(AssertUnwindSafe(|| {
+        crate::runner::parallel_builds(
+            || {
+                completed.store(true, Ordering::SeqCst);
+                Ok(())
+            },
+            || Err::<(), _>(tsr_compiler::Error::Unsupported("clean build operation")),
+        )
+    }));
+    assert!(completed.load(Ordering::SeqCst));
+    assert!(matches!(
+        outcome,
+        Ok(Err(tsr_compiler::Error::Unsupported(
+            "clean build operation"
+        )))
+    ));
+}
+
+#[test]
+fn parallel_build_refusals_do_not_hide_genuine_panics() {
+    let outcome = catch_unwind(|| {
+        crate::runner::parallel_builds(
+            || Err(tsr_compiler::Error::Unsupported("incremental operation")),
+            || -> Result<(), tsr_compiler::Error> { panic!("actual clean-build failure") },
+        )
+    });
+    let panic = outcome.expect_err("genuine panic is propagated");
+    let row = crate::row::unwound(panic.as_ref());
+    assert_eq!(row["class"], "panic");
+    assert_eq!(row["reason"], "actual clean-build failure");
 }

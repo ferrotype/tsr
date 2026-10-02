@@ -54,7 +54,16 @@ fn run_main() -> i32 {
             return 3;
         }
     };
-    tsr_execute::command_line(&context, Arc::new(sys), &args, None)
-        .status
-        .0
+    match tsr_execute::command_line(&context, Arc::new(sys), &args, None) {
+        Ok(result) => result.status.0,
+        Err(error) => {
+            if let Some(operation) = tsr_execute::unsupported_operation(&error) {
+                eprintln!("This operation is not implemented in this build: {operation}");
+                tsr_tsc::ExitStatus::NotImplemented.0
+            } else {
+                eprintln!("Command-line compilation failed: {error}");
+                tsr_tsc::ExitStatus::InvalidProject_OutputsSkipped.0
+            }
+        }
+    }
 }

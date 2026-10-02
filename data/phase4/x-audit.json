@@ -2558,7 +2558,7 @@
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.addPackageJsonWatchDirs": {
      "rust": [
-      "crates/tsr_build/src/watch.rs:416"
+      "crates/tsr_build/src/watch.rs:413"
      ],
      "status": "mapped"
     },
@@ -2580,13 +2580,13 @@
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.checkTasksForEventChanges": {
      "rust": [
-      "crates/tsr_build/src/watch.rs:183"
+      "crates/tsr_build/src/watch.rs:180"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.computeDesiredWatches": {
      "rust": [
-      "crates/tsr_build/src/watch.rs:320"
+      "crates/tsr_build/src/watch.rs:317"
      ],
      "status": "mapped"
     },
@@ -2618,7 +2618,7 @@
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.packageJsonLookupChanged": {
      "rust": [
-      "crates/tsr_build/src/watch.rs:165"
+      "crates/tsr_build/src/watch.rs:162"
      ],
      "status": "mapped"
     },
@@ -2640,7 +2640,7 @@
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.resolveBuildInfoFileName": {
      "rust": [
-      "crates/tsr_build/src/watch.rs:157"
+      "crates/tsr_build/src/watch.rs:154"
      ],
      "status": "mapped"
     },
@@ -2658,7 +2658,7 @@
     },
     "tsc/internal/execute/build/orchestrator.go:Orchestrator.updateWatch": {
      "rust": [
-      "crates/tsr_build/src/watch.rs:140"
+      "crates/tsr_build/src/watch.rs:137"
      ],
      "status": "mapped"
     },
@@ -3973,7 +3973,7 @@
     },
     "tsc/internal/execute/tsc.go:findConfigFile": {
      "rust": [
-      "crates/tsr_execute/src/command.rs:248"
+      "crates/tsr_execute/src/command.rs:244"
      ],
      "status": "mapped"
     },
@@ -4006,7 +4006,7 @@
     },
     "tsc/internal/execute/tsc.go:showConfig": {
      "rust": [
-      "crates/tsr_execute/src/command.rs:262"
+      "crates/tsr_execute/src/command.rs:258"
      ],
      "status": "mapped"
     },
@@ -4024,13 +4024,13 @@
     },
     "tsc/internal/execute/tsc.go:tscBuildCompilation": {
      "rust": [
-      "crates/tsr_execute/src/command.rs:58"
+      "crates/tsr_execute/src/command.rs:54"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsc.go:tscCompilation": {
      "rust": [
-      "crates/tsr_execute/src/command.rs:95"
+      "crates/tsr_execute/src/command.rs:91"
      ],
      "status": "mapped"
     }
@@ -4185,7 +4185,7 @@
     },
     "tsc/internal/execute/tsc/emit.go:GetTraceWithWriterFromSys": {
      "rust": [
-      "crates/tsr_tsc/src/lib.rs:179"
+      "crates/tsr_tsc/src/lib.rs:170"
      ],
      "status": "mapped"
     },
@@ -4741,25 +4741,25 @@
    "functions": {
     "tsc/internal/execute/tsctests/runner.go:getDiffForIncremental": {
      "rust": [
-      "tools/phase4/tsctests/src/runner.rs:304"
+      "tools/phase4/tsctests/src/runner.rs:324"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/runner.go:tscInput.executeCommand": {
      "rust": [
-      "tools/phase4/tsctests/src/runner.rs:103"
+      "tools/phase4/tsctests/src/runner.rs:104"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/runner.go:tscInput.getBaselineSubFolder": {
      "rust": [
-      "tools/phase4/tsctests/src/runner.rs:254"
+      "tools/phase4/tsctests/src/runner.rs:257"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/runner.go:tscInput.run": {
      "rust": [
-      "tools/phase4/tsctests/src/runner.rs:121"
+      "tools/phase4/tsctests/src/runner.rs:122"
      ],
      "status": "mapped"
     }
@@ -4803,247 +4803,247 @@
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.DefaultLibraryPath": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:462"
+      "tools/phase4/tsctests/src/sys.rs:465"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.ErrorWriter": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:477"
+      "tools/phase4/tsctests/src/sys.rs:480"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.FS": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:457"
+      "tools/phase4/tsctests/src/sys.rs:460"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.GetCurrentDirectory": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:467"
+      "tools/phase4/tsctests/src/sys.rs:470"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.GetEnvironmentVariable": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:500"
+      "tools/phase4/tsctests/src/sys.rs:503"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.GetTrace": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:671"
+      "tools/phase4/tsctests/src/sys.rs:674"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.GetWidthOfTerminal": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:490"
+      "tools/phase4/tsctests/src/sys.rs:493"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.Now": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:447"
+      "tools/phase4/tsctests/src/sys.rs:450"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnBuildStatusReportEnd": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:656"
+      "tools/phase4/tsctests/src/sys.rs:659"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnBuildStatusReportStart": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:651"
+      "tools/phase4/tsctests/src/sys.rs:654"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnEmittedFiles": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:584"
+      "tools/phase4/tsctests/src/sys.rs:587"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnListFilesEnd": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:636"
+      "tools/phase4/tsctests/src/sys.rs:639"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnListFilesStart": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:631"
+      "tools/phase4/tsctests/src/sys.rs:634"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnProgram": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:686"
+      "tools/phase4/tsctests/src/sys.rs:689"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnStatisticsEnd": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:646"
+      "tools/phase4/tsctests/src/sys.rs:649"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnStatisticsStart": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:641"
+      "tools/phase4/tsctests/src/sys.rs:644"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnWatchStatusReportEnd": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:666"
+      "tools/phase4/tsctests/src/sys.rs:669"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.OnWatchStatusReportStart": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:661"
+      "tools/phase4/tsctests/src/sys.rs:664"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.SinceStart": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:452"
+      "tools/phase4/tsctests/src/sys.rs:455"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.Spawn": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:551"
+      "tools/phase4/tsctests/src/sys.rs:554"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.WatchBackend": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:784"
+      "tools/phase4/tsctests/src/sys.rs:787"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.WriteOutputIsTTY": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:482"
+      "tools/phase4/tsctests/src/sys.rs:485"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.Writer": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:472"
+      "tools/phase4/tsctests/src/sys.rs:475"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.appendFile": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:424"
+      "tools/phase4/tsctests/src/sys.rs:427"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.baselineFSwithDiff": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:377"
+      "tools/phase4/tsctests/src/sys.rs:380"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.baselineOutput": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:359"
+      "tools/phase4/tsctests/src/sys.rs:362"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.baselinePrograms": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:328"
+      "tools/phase4/tsctests/src/sys.rs:331"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.clearOutput": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:371"
+      "tools/phase4/tsctests/src/sys.rs:374"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.ensureLibPathExists": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:287"
+      "tools/phase4/tsctests/src/sys.rs:290"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.fsFromFileMap": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:277"
+      "tools/phase4/tsctests/src/sys.rs:280"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.getOutput": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:366"
+      "tools/phase4/tsctests/src/sys.rs:369"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.mapFs": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:282"
+      "tools/phase4/tsctests/src/sys.rs:285"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.prependFile": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:430"
+      "tools/phase4/tsctests/src/sys.rs:433"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.readFileNoError": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:396"
+      "tools/phase4/tsctests/src/sys.rs:399"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.removeNoError": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:389"
+      "tools/phase4/tsctests/src/sys.rs:392"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.renameFileNoError": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:404"
+      "tools/phase4/tsctests/src/sys.rs:407"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.replaceFileText": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:410"
+      "tools/phase4/tsctests/src/sys.rs:413"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.replaceFileTextAll": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:417"
+      "tools/phase4/tsctests/src/sys.rs:420"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.serializeState": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:347"
+      "tools/phase4/tsctests/src/sys.rs:350"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.writeFileNoError": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:382"
+      "tools/phase4/tsctests/src/sys.rs:385"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:TestSys.writeHeaderToBaseline": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:306"
+      "tools/phase4/tsctests/src/sys.rs:309"
      ],
      "status": "mapped"
     },
@@ -5055,31 +5055,31 @@
     },
     "tsc/internal/execute/tsctests/sys.go:newTestSys": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:200"
+      "tools/phase4/tsctests/src/sys.rs:203"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:outputSanitizer.addOrSkipLinesForComparing": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:927"
+      "tools/phase4/tsctests/src/sys.rs:930"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:outputSanitizer.addOutputLine": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:839"
+      "tools/phase4/tsctests/src/sys.rs:842"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:outputSanitizer.sanitizeBuildStatusTimeStamp": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:852"
+      "tools/phase4/tsctests/src/sys.rs:855"
      ],
      "status": "mapped"
     },
     "tsc/internal/execute/tsctests/sys.go:outputSanitizer.transformLines": {
      "rust": [
-      "tools/phase4/tsctests/src/sys.rs:874"
+      "tools/phase4/tsctests/src/sys.rs:877"
      ],
      "status": "mapped"
     }
@@ -7150,46 +7150,46 @@
    "crates/tsr_tsc/tests/phase4_emit.rs:105"
   ],
   "tsc/internal/execute/tsc/extendedconfigcache_test.go:TestExtendedConfigCacheExtendsCircularity": [
-   "tools/phase4/tsctests/tests/build_direct.rs:274"
+   "tools/phase4/tsctests/tests/build_direct.rs:275"
   ],
   "tsc/internal/execute/tsc/extendedconfigcache_test.go:TestExtendedConfigCacheNullExtendsDoesNotPanic": [
-   "tools/phase4/tsctests/tests/build_direct.rs:299"
+   "tools/phase4/tsctests/tests/build_direct.rs:300"
   ],
   "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildDetectsNewPhysicalSupplementalFile": [
-   "tools/phase4/tsctests/tests/build_direct.rs:197"
+   "tools/phase4/tsctests/tests/build_direct.rs:198"
   ],
   "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildIdentityFailureExitStatus": [
-   "tools/phase4/tsctests/tests/build_direct.rs:230"
+   "tools/phase4/tsctests/tests/build_direct.rs:231"
   ],
   "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildLifecycle": [
-   "tools/phase4/tsctests/tests/build_direct.rs:162"
+   "tools/phase4/tsctests/tests/build_direct.rs:163"
   ],
   "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildWatchSharedLifecycle": [
-   "tools/phase4/tsctests/tests/build_direct.rs:603"
+   "tools/phase4/tsctests/tests/build_direct.rs:604"
   ],
   "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildWatchSymlinkedManifestChange": [
-   "tools/phase4/tsctests/tests/build_direct.rs:557"
+   "tools/phase4/tsctests/tests/build_direct.rs:558"
   ],
   "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildWatchSymlinkedManifestDelete": [
-   "tools/phase4/tsctests/tests/build_direct.rs:579"
+   "tools/phase4/tsctests/tests/build_direct.rs:580"
   ],
   "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperMixedWatchBatchForcesFullRebuild": [
-   "tools/phase4/tsctests/tests/build_direct.rs:492"
+   "tools/phase4/tsctests/tests/build_direct.rs:493"
   ],
   "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperSupplementalCollisionWatch": [
-   "tools/phase4/tsctests/tests/build_direct.rs:418"
+   "tools/phase4/tsctests/tests/build_direct.rs:419"
   ],
   "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperSupplementalDiagnosticUsesOriginalFileName": [
-   "tools/phase4/tsctests/tests/build_direct.rs:177"
+   "tools/phase4/tsctests/tests/build_direct.rs:178"
   ],
   "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperWatchLifecycle": [
-   "tools/phase4/tsctests/tests/build_direct.rs:358"
+   "tools/phase4/tsctests/tests/build_direct.rs:359"
   ],
   "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestDynamicContentMapperBuildWatchDependency": [
-   "tools/phase4/tsctests/tests/build_direct.rs:486"
+   "tools/phase4/tsctests/tests/build_direct.rs:487"
   ],
   "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestDynamicContentMapperWatchDependency": [
-   "tools/phase4/tsctests/tests/build_direct.rs:481"
+   "tools/phase4/tsctests/tests/build_direct.rs:482"
   ],
   "tsc/internal/fswatch/eventlist_test.go:TestEventListCreateDeleteCreate": [
    "crates/tsr_fswatch/src/event.rs:185"

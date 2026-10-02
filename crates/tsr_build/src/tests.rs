@@ -530,7 +530,7 @@ fn build_watch_retains_graph_and_rebuilds_only_after_an_event() {
     let watcher = result.watcher.unwrap();
     let before = sys.output();
     let clock = sys.clock.load(Ordering::SeqCst);
-    watcher.do_cycle();
+    watcher.do_cycle().unwrap();
     assert_eq!(sys.output(), before);
     assert_eq!(sys.clock.load(Ordering::SeqCst), clock);
     sys.fs
@@ -541,7 +541,7 @@ fn build_watch_retains_graph_and_rebuilds_only_after_an_event() {
         .unwrap();
     lock(&sys.fs.writes).clear();
     backend.notify(b"/work/project/source/code/a.ts");
-    watcher.do_cycle();
+    watcher.do_cycle().unwrap();
     assert_eq!(hooks.programs.load(Ordering::SeqCst), 2);
     assert!(sys.output().contains("File change detected"));
     assert!(sys

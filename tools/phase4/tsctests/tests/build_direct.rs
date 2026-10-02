@@ -153,6 +153,7 @@ fn run_with_context(ctx: &Context, sys: &Arc<RecordingSystem>, args: &[&str]) ->
             .collect::<Vec<_>>(),
         Some(sys.inner.clone()),
     )
+    .expect("command completes")
 }
 fn output(sys: &RecordingSystem) -> String {
     String::from_utf8(sys.inner.current_write().string()).unwrap()
@@ -382,7 +383,7 @@ fn content_mapper_watch_lifecycle() {
         assert_process_counts(&sys, 1, 0);
         write(&sys, "tsconfig.json", &config_b);
         notify(&sys, &["tsconfig.json"]);
-        watcher.do_cycle();
+        watcher.do_cycle().expect("watch cycle completes");
         assert_process_counts(&sys, 2, 1);
         write(
             &sys,
@@ -390,11 +391,11 @@ fn content_mapper_watch_lifecycle() {
             r#"{"compilerOptions":{"composite":true}}"#,
         );
         notify(&sys, &["tsconfig.json"]);
-        watcher.do_cycle();
+        watcher.do_cycle().expect("watch cycle completes");
         assert_process_counts(&sys, 2, 2);
         write(&sys, "tsconfig.json", &config_a);
         notify(&sys, &["tsconfig.json"]);
-        watcher.do_cycle();
+        watcher.do_cycle().expect("watch cycle completes");
         assert_process_counts(&sys, 3, 2);
         ctx.0.cancel();
         let (completed, _) = sys
@@ -429,7 +430,7 @@ fn content_mapper_supplemental_collision_watch() {
     let full_builds = compiler_watcher(watcher.as_ref()).full_builds();
     write(&sys, "app.vue.0.ts", "export {};\n");
     notify(&sys, &["app.vue.0.ts"]);
-    watcher.do_cycle();
+    watcher.do_cycle().expect("watch cycle completes");
     assert_eq!(
         compiler_watcher(watcher.as_ref()).full_builds(),
         full_builds + 1
@@ -439,7 +440,7 @@ fn content_mapper_supplemental_collision_watch() {
         .remove(format!("{PROJECT_ROOT}app.vue.0.ts").as_bytes())
         .unwrap();
     notify(&sys, &["app.vue.0.ts"]);
-    watcher.do_cycle();
+    watcher.do_cycle().expect("watch cycle completes");
     assert_eq!(
         compiler_watcher(watcher.as_ref()).full_builds(),
         full_builds + 2
@@ -466,7 +467,7 @@ fn dynamic_mapper_watch_dependency(build: bool) {
     assert_eq!(sys.lifecycle.opens.load(Ordering::Acquire), 1);
     write(&sys, "mapper.config.json", r#"{"version":2}"#);
     notify(&sys, &["mapper.config.json"]);
-    watcher.do_cycle();
+    watcher.do_cycle().expect("watch cycle completes");
     if let Some(full_builds) = full_builds {
         assert_eq!(
             compiler_watcher(watcher.as_ref()).full_builds(),
@@ -519,7 +520,7 @@ fn content_mapper_mixed_watch_batch_forces_full_rebuild() {
         r#"import { marker } from "./app.vue"; const check: 2 = marker;"#,
     );
     notify(&sys, &["app.vue", "main.ts"]);
-    watcher.do_cycle();
+    watcher.do_cycle().expect("watch cycle completes");
     assert_eq!(compiler.full_builds(), full_builds + 1);
     assert_eq!(compiler.fast_path_builds(), fast_builds);
     let output = output(&sys);
@@ -572,7 +573,7 @@ fn content_mapper_build_watch_symlinked_manifest_change() {
         kind: EventKind::EventUpdate,
         path: target.to_vec(),
     }]);
-    watcher.do_cycle();
+    watcher.do_cycle().expect("watch cycle completes");
     assert_process_counts(&sys, 2, 1);
 }
 #[test]
@@ -590,7 +591,7 @@ fn content_mapper_build_watch_symlinked_manifest_delete() {
         kind: EventKind::EventDelete,
         path: target.to_vec(),
     }]);
-    watcher.do_cycle();
+    watcher.do_cycle().expect("watch cycle completes");
     assert_process_counts(&sys, 1, 1);
     let output = output(&sys);
     assert!(
@@ -619,7 +620,7 @@ fn content_mapper_build_watch_shared_lifecycle() {
         let config = format!("{project}/tsconfig.json");
         write(&sys, &config, r#"{"compilerOptions":{"composite":true}}"#);
         notify(&sys, &[&config]);
-        watcher.do_cycle();
+        watcher.do_cycle().expect("watch cycle completes");
         assert_process_counts(&sys, 1, closes);
     }
 }

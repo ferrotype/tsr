@@ -159,6 +159,9 @@ class RowContract(Fixture):
         self.assertEqual(corpus.harness_problem(failed), "panic at unknown location: boom")
         failed["location"] = "crates/tsr_compiler/src/program.rs:3:9"
         self.assertIsNone(corpus.harness_problem(failed))
+        failed.update(**{"class": "error"}, reason="Host(Io)", location=None)
+        self.validate(failed)
+        self.assertIsNone(corpus.harness_problem(failed))
         self.assertIsNone(corpus.harness_problem(self.refused(WITH_EDITS)))
 
 

@@ -8,6 +8,7 @@ use crate::execute::{command_line, tsc};
 use crate::sys::{new_test_sys, FileMap, TestSys};
 use std::collections::BTreeMap;
 use std::sync::Arc;
+use tsr_compiler::Error;
 use tsr_core::workgroup::WorkGroup;
 use tsr_ipc::Context;
 use tsr_jsstring::JsString;
@@ -107,19 +108,19 @@ impl TscInput {
         sys: &Arc<TestSys>,
         baseline_builder: &mut Vec<u8>,
         command_line_args: &[JsString],
-    ) -> CommandLineResult {
+    ) -> Result<CommandLineResult, Error> {
         baseline_builder.extend_from_slice(b"tsgo ");
         baseline_builder.extend_from_slice(&join(command_line_args));
         baseline_builder.push(b'\n');
-        let result = command_line(ctx, sys.clone(), command_line_args, Some(sys.clone()));
+        let result = command_line(ctx, sys.clone(), command_line_args, Some(sys.clone()))?;
         baseline_builder.extend_from_slice(exit_status_line(result.status));
-        result
+        Ok(result)
     }
 
     /// Runs the scenario into `transcript`. `scenario` is the folder below
     /// the family (`commandLine`, `sample`, ...).
     // port: tsc/internal/execute/tsctests/runner.go:tscInput.run
-    pub fn run(&self, scenario: &str, transcript: &mut Transcript) -> RunResult {
+    pub fn run(&self, scenario: &str, transcript: &mut Transcript) -> Result<RunResult, Error> {
         // ctx is cancelled when the subtest ends, tearing down any content mapper host created during the run.
         let ctx = CancelOnDrop(Context::background().with_cancel());
         let ctx = &ctx.0;
@@ -129,7 +130,7 @@ impl TscInput {
         let sys = new_test_sys(self, false);
         write_header(&sys, baseline_builder);
         transcript.progress.stage = "initial";
-        let result = self.execute_command(ctx, &sys, baseline_builder, &self.command_line_args);
+        let result = self.execute_command(ctx, &sys, baseline_builder, &self.command_line_args)?;
         transcript.progress.commands += 1;
         sys.serialize_state(baseline_builder);
         if result.watcher.is_some() && sys.mock_watch_backend.has_watches() {
@@ -142,64 +143,66 @@ impl TscInput {
         for (index, edit) in self.edits.iter().enumerate() {
             transcript.progress.stage = "edit";
             sys.clear_output();
-            let mut non_incremental_sys: Option<Arc<TestSys>> = None;
             let command_line_args = edit
                 .command_line_args
                 .as_deref()
                 .unwrap_or(&self.command_line_args);
-            {
-                let wg = WorkGroup::new(false);
+            let non_incremental_sys = {
                 let commands = &mut transcript.progress.commands;
                 let baseline_builder = &mut transcript.text;
                 let unexpected = &mut unexpected_diff;
                 let sys = &sys;
                 let result = &result;
-                wg.queue(move || {
-                    baseline_builder.extend_from_slice(
-                        format!("\n\nEdit [{index}]:: {}\n", edit.caption).as_bytes(),
-                    );
-                    if let Some(edit) = &edit.edit {
-                        edit(sys);
-                    }
-                    let changed_paths = sys.fs_differ.changed_paths();
-                    sys.baseline_fs_with_diff(baseline_builder);
-
-                    match &result.watcher {
-                        None => {
-                            self.execute_command(ctx, sys, baseline_builder, command_line_args);
-                        }
-                        Some(watcher) => {
-                            sys.mock_watch_backend.send_changed_paths(&changed_paths);
-                            watcher.do_cycle();
-                        }
-                    }
-                    *commands += 1;
-                    sys.serialize_state(baseline_builder);
-                    if result.watcher.is_some() && sys.mock_watch_backend.has_watches() {
-                        baseline_builder.extend_from_slice(&sys.mock_watch_backend.watch_state());
-                    }
-                    unexpected.extend_from_slice(&sys.baseline_programs(
-                        baseline_builder,
-                        &format!("Edit [{index}]:: {}\n", edit.caption),
-                    ));
-                });
-                let non_incremental = &mut non_incremental_sys;
-                wg.queue(move || {
-                    // Compute build with all the edits
-                    let shadow = new_test_sys(self, true);
-                    for edit in &self.edits[..=index] {
+                parallel_builds(
+                    move || {
+                        baseline_builder.extend_from_slice(
+                            format!("\n\nEdit [{index}]:: {}\n", edit.caption).as_bytes(),
+                        );
                         if let Some(edit) = &edit.edit {
-                            edit(&shadow);
+                            edit(sys);
                         }
-                    }
-                    command_line(ctx, shadow.clone(), command_line_args, Some(shadow.clone()));
-                    *non_incremental = Some(shadow);
-                });
-                wg.run_and_wait();
-            }
+                        let changed_paths = sys.fs_differ.changed_paths();
+                        sys.baseline_fs_with_diff(baseline_builder);
 
-            let non_incremental_sys =
-                non_incremental_sys.expect("the clean build ran beside the edit");
+                        match &result.watcher {
+                            None => {
+                                self.execute_command(
+                                    ctx,
+                                    sys,
+                                    baseline_builder,
+                                    command_line_args,
+                                )?;
+                            }
+                            Some(watcher) => {
+                                sys.mock_watch_backend.send_changed_paths(&changed_paths);
+                                watcher.do_cycle()?;
+                            }
+                        }
+                        *commands += 1;
+                        sys.serialize_state(baseline_builder);
+                        if result.watcher.is_some() && sys.mock_watch_backend.has_watches() {
+                            baseline_builder
+                                .extend_from_slice(&sys.mock_watch_backend.watch_state());
+                        }
+                        unexpected.extend_from_slice(&sys.baseline_programs(
+                            baseline_builder,
+                            &format!("Edit [{index}]:: {}\n", edit.caption),
+                        ));
+                        Ok(())
+                    },
+                    move || {
+                        // Compute build with all the edits
+                        let shadow = new_test_sys(self, true);
+                        for edit in &self.edits[..=index] {
+                            if let Some(edit) = &edit.edit {
+                                edit(&shadow);
+                            }
+                        }
+                        command_line(ctx, shadow.clone(), command_line_args, Some(shadow.clone()))?;
+                        Ok(shadow)
+                    },
+                )?
+            };
             let diff = get_diff_for_incremental(&sys, &non_incremental_sys);
             let baseline_builder = &mut transcript.text;
             if !diff.is_empty() {
@@ -241,14 +244,14 @@ impl TscInput {
             transcript.progress.edits_completed += 1;
         }
         transcript.progress.stage = "done";
-        RunResult {
+        Ok(RunResult {
             baseline_path: format!(
                 "{}/{scenario}/{}.js",
                 self.get_baseline_sub_folder(),
                 self.sub_scenario.replace(' ', "-")
             ),
             unexpected_diff,
-        }
+        })
     }
 
     // port: tsc/internal/execute/tsctests/runner.go:tscInput.getBaselineSubFolder
@@ -271,6 +274,23 @@ impl TscInput {
         }
         format!("{command_name}{w}")
     }
+}
+
+/// Join both jobs before returning an operational error. Incremental failure
+/// has deterministic precedence; genuine worker panics retain WorkGroup's unwind.
+pub(crate) fn parallel_builds<T: Send>(
+    incremental: impl FnOnce() -> Result<(), Error> + Send,
+    clean: impl FnOnce() -> Result<T, Error> + Send,
+) -> Result<T, Error> {
+    let (mut incremental_result, mut clean_result) = (None, None);
+    {
+        let group = WorkGroup::new(false);
+        group.queue(|| incremental_result = Some(incremental()));
+        group.queue(|| clean_result = Some(clean()));
+        group.run_and_wait();
+    }
+    incremental_result.expect("incremental build ran")?;
+    clean_result.expect("clean build ran")
 }
 
 /// The `ExitStatus::` line `executeCommand` writes for `status`.

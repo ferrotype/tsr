@@ -81,3 +81,20 @@ Native build entry point:
 Then `run --build target/phase4/native-final --output target/phase4/native-witnesses`.
 The build exports the pinned Go sources and creates the release target `tsrust`;
 its runner checks the source closure and immutable executable digests.
+
+## Refusal-path correction after the checkpoint
+
+The production command entry now returns `Result<CommandLineResult, Error>`.
+Unsupported operations are ordinary typed errors; the old panic payload and
+helper are removed. Watch cycles propagate the same result through a loop that
+closes subscriptions on exit. The native binary reports named refusals with
+exit status 5 and other operational errors with status 3. Real invariant panics
+still unwind. The harness joins both incremental and clean-build jobs before
+propagating errors, emits `unsupported` for explicit unported operations, and
+uses a separate `failed/error` classification for other returned errors.
+
+Validation for this correction: the real command-entry refusal regression,
+three harness refusal/panic tests, 15 watch-manager tests, 30 build/watch/ownership
+integration tests, the complete-transcript regression selection, and 31 Python
+capture/comparison tests passed. All-targets compilation and formatting passed.
+No full corpus, benchmark or acceptance producer was rerun.
