@@ -177,7 +177,24 @@ fn main() -> ExitCode {
                 println!("{id}");
             }
         }),
-        Command::Run { id, local } => run(&arguments, id, local, &testdata).and_then(|report| {
+        // The variant runs on a thread with the work groups' reserved stack,
+        // as the tsc runner's rows do: the pin's harness has Go's growable
+        // stacks, and the main thread's default is the one stack here that
+        // would rely on growth guards alone.
+        Command::Run { id, local } => std::thread::scope(|scope| {
+            std::thread::Builder::new()
+                .stack_size(tsr_core::workgroup::RESERVED_STACK)
+                .spawn_scoped(scope, || run(&arguments, id, local, &testdata))
+                .map_err(|error| Stop::fatal(format!("spawning the variant's thread: {error}")))?
+                .join()
+                .unwrap_or_else(|payload| {
+                    Err(Stop::fatal(format!(
+                        "the variant's thread panicked: {}",
+                        compiler_runner::panic_message(payload.as_ref())
+                    )))
+                })
+        })
+        .and_then(|report| {
             report
                 .write(&mut std::io::stdout().lock())
                 .map_err(|error| Stop::fatal(format!("stdout: {error}")))
