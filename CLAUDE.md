@@ -109,14 +109,20 @@ Name a branch after the work, for example `s09-ownership`. Do not prefix it with
 
 ## Things to ask about first
 
-- `cargo xtask run <id>` and `cargo xtask status --record` rewrite tracked
-  evidence, `STATUS.md`, `status.json` and `docs/status.html`.
+- `parity.py accept` rewrites `status/parity/<suite>.json`; a reason or an
+  approval in it is the owner's to word.
 - The quiet-host measurement captures are the owner's to run.
 - Do not stage `PLAN.md`, `.playwright-mcp/` or `four-robots.png`.
 
+## Status
+
+`cargo xtask status` renders `target/status/{STATUS.md,index.html,unmapped-functions.json}`
+from the parity files, `status/perf/`, the ledger and the markers; nothing
+rendered is committed. `cargo xtask validate` checks the ledger's provenance
+and every `// port:` marker under `crates/` and `tools/`.
+
 ## S07 chain order
 
-`scripts/s07_benchmark_graph.py capture` (the bindworkload producer) rebuilds the
-shared binaries and rewrites `target/s07-bindworkload/report.json`, which
-invalidates an existing benchmark capture. Run it before
-`scripts/s07_benchmark.py capture`, then `cargo xtask run e5` and `e6`.
+`scripts/s07_benchmark_graph.py capture` rebuilds the shared binaries and
+rewrites `target/s07-bindworkload/report.json`, which invalidates an existing
+benchmark capture. Run it before `scripts/s07_benchmark.py capture`.

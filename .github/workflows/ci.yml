@@ -13,6 +13,9 @@
 # native:       on Linux and macOS, the tsc suite (the pin's recorded command-line
 #               scenarios through the ported harness) against status/parity/tsc.json,
 #               and the tests of the crates with platform code.
+# status:       renders `cargo xtask status` (parity files, perf runs, port coverage)
+#               as a workflow artifact on every run and publishes it to GitHub Pages
+#               on main. Nothing rendered is committed.
 #
 # The repository variable PARITY_RUNNER moves the runner build and the shards to a
 # self-hosted runner; unset, they use ubuntu-latest.
@@ -26,6 +29,8 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -263,3 +268,29 @@ jobs:
           name: parity-tsc-${{ matrix.os }}
           path: results
           retention-days: 7
+
+  status:
+    name: status page
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install the pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - name: Render
+        run: cargo xtask status --out target/status
+      - uses: actions/upload-artifact@v4
+        with:
+          name: status
+          path: target/status
+          retention-days: 30
+      - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          path: target/status
+      - uses: actions/deploy-pages@v4
+        id: deploy
+        if: github.ref == 'refs/heads/main'
