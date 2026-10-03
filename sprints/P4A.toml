@@ -1,0 +1,40 @@
+# Phase 4, stage A: the command-line acceptance contract (X0). Preparation
+# only; no Rust command-line parity is claimed. docs/PHASE4-plan.md, section 4,
+# defines the work.
+#
+# The `tsc` producer (scripts/phase4_producers.py) checks the recorded scenario
+# inventory, re-runs its three-way verification, replays the Rust capture at
+# target/phase4/rust and emits:
+#   run.tsc.inventory_frozen, run.tsc.inventory_verified,
+#   run.tsc.harness_valid, run.tsc.result_recorded, run.tsc.blockers_named.
+#
+# The pinned suite renders 516 of the 517 committed references; the 517th,
+# tsc/commandLine/adds-color-when-FORCE_COLOR-is-set.js, is an orphan whose
+# scenario upstream commit 31ff97358f removed (data/phase4/scenarios.json.gz,
+# `orphan_references`). It is listed apart and never counted as a scenario.
+#
+# No threshold is introduced here. The Phase 2 and Phase 3 producers and their
+# metrics are untouched.
+id = "P4A"
+title = "Phase 4 stage A: the command-line acceptance contract"
+goal = "The 516 command-line scenarios are recorded from the pin and verified by reproduction, a second identical recording and replay through the pin's own runner; the ported tsctests harness renders them; one complete Rust run is recorded with every scenario in exactly one category and harness-valid; and every scenario that cannot pass is a named blocker."
+exit = [
+  "run.tsc.inventory_frozen == true",
+  "run.tsc.inventory_verified == true",
+  "run.tsc.harness_valid == true",
+  "run.tsc.result_recorded == true",
+  "run.tsc.blockers_named == true",
+]
+
+[[item]]
+id = "P4A-X0"
+title = "X0: scenario inventory and verification, unit-test roster, function audit, harness, categorized Rust run, blockers and wiring"
+kind = "task"
+required = true
+done_when = [
+  "run.tsc.inventory_frozen == true",
+  "run.tsc.inventory_verified == true",
+  "run.tsc.harness_valid == true",
+  "run.tsc.result_recorded == true",
+  "run.tsc.blockers_named == true",
+]

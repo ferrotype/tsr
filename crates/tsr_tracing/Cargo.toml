@@ -1,0 +1,19 @@
+[package]
+name = "tsr_tracing"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "Pinned compiler trace sessions and file serialization"
+
+[dependencies]
+tsr_checker = { path = "../tsr_checker" }
+tsr_json = { path = "../tsr_json" }
+tsr_jsstring = { path = "../tsr_jsstring" }
+tsr_tspath = { path = "../tsr_tspath" }
+tsr_vfs = { path = "../tsr_vfs" }
+xxhash-rust = { version = "=0.8.18", features = ["xxh3"] }
+
+[lints]
+workspace = true

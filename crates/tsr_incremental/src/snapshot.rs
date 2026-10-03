@@ -240,73 +240,102 @@ pub struct BuildInfoDiagnosticWithFileName {
     pub(crate) source: JsString,
     pub(crate) message_text: JsString,
     pub(crate) message_key: JsString,
-    pub(crate) message_args: Vec<JsString>,
-    pub(crate) message_chain: Vec<BuildInfoDiagnosticWithFileName>,
-    pub(crate) related_information: Vec<BuildInfoDiagnosticWithFileName>,
+    pub(crate) message_args: Option<Vec<JsString>>,
+    pub(crate) message_chain: Option<Vec<BuildInfoDiagnosticWithFileName>>,
+    pub(crate) related_information: Option<Vec<BuildInfoDiagnosticWithFileName>>,
     pub(crate) reports_unnecessary: bool,
     pub(crate) reports_deprecated: bool,
     pub(crate) skipped_on_no_emit: bool,
     pub(crate) repopulate_info: Option<Arc<RepopulateDiagnosticInfo>>,
 }
 
-/// Diagnostics a program reported, with the program whose files they name
-/// (a diagnostic's file is an id that only its program resolves).
+/// Cached diagnostics retain exactly their referenced source owners, as Go's
+/// diagnostic file pointers do. Retaining a complete Program would keep every
+/// obsolete source and resolver alive across watch generations.
 #[derive(Clone)]
 pub struct ProgramDiagnostics {
-    pub(crate) program: Arc<Program>,
+    sources: BTreeMap<NodeId, DiagnosticSource>,
     pub(crate) diagnostics: Vec<Diagnostic>,
 }
 
+#[derive(Clone)]
+enum DiagnosticSource {
+    Source(Arc<ProgramFile>),
+    Config(tsr_tsoptions::TsConfigSourceFile),
+}
+
 impl ProgramDiagnostics {
-    /// Transfer an unchanged cache entry to the next program when all of
-    /// its file references can be rebound. Otherwise keep the old owner
-    /// until affected-file invalidation removes the entry; a diagnostic may
-    /// still refer to a deleted file while the new snapshot is being built.
-    pub(crate) fn rebind_for_reuse(&self, program: &Arc<Program>) -> Result<Option<Self>, Error> {
-        if Arc::ptr_eq(&self.program, program) {
-            return Ok(None);
+    pub(crate) fn file_path(&self, id: NodeId) -> Result<Path, Error> {
+        match self.sources.get(&id) {
+            Some(DiagnosticSource::Source(source)) => crate::program::source_path(source),
+            Some(DiagnosticSource::Config(source)) => Ok(source
+                .file
+                .view()
+                .source_file(source.root)?
+                .parse_options()
+                .path
+                .clone()),
+            None => Err(tsr_arena::Error::WrongOwner.into()),
         }
-        let diagnostics = self.diagnostics_for(program)?;
-        fn belongs_to(diagnostic: &Diagnostic, program: &Program) -> bool {
-            diagnostic.file.is_none_or(|file| {
-                program.file_of_node(file).is_some() || program.config_source(file).is_some()
-            }) && diagnostic
-                .message_chain
-                .iter()
-                .all(|d| belongs_to(d, program))
-                && diagnostic
-                    .related_information
-                    .iter()
-                    .all(|d| belongs_to(d, program))
-        }
-        Ok(diagnostics
-            .iter()
-            .all(|d| belongs_to(d, program))
-            .then(|| Self {
-                program: program.clone(),
-                diagnostics,
-            }))
     }
 
-    /// The diagnostics with their files, chains' and related information's
-    /// files as `program` holds them. Each program parses its files into
-    /// owners of its own, so a program that parsed an unchanged file again
-    /// holds it as another node, found by the file's path; the pin's programs
-    /// share an unchanged `SourceFile`. A file `program` lacks keeps its node.
-    pub(crate) fn diagnostics_for(&self, program: &Arc<Program>) -> Result<Vec<Diagnostic>, Error> {
-        if Arc::ptr_eq(&self.program, program) {
-            return Ok(self.diagnostics.clone());
+    fn new(program: &Program, diagnostics: Vec<Diagnostic>) -> Self {
+        fn retain(
+            diagnostic: &Diagnostic,
+            program: &Program,
+            sources: &mut BTreeMap<NodeId, DiagnosticSource>,
+        ) {
+            if let Some(id) = diagnostic.file {
+                if let Some(file) = program.file_of_node(id) {
+                    sources
+                        .entry(id)
+                        .or_insert_with(|| DiagnosticSource::Source(file.clone()));
+                } else if let Some(file) = program.config_source(id) {
+                    sources
+                        .entry(id)
+                        .or_insert_with(|| DiagnosticSource::Config(file.clone()));
+                }
+            }
+            for nested in diagnostic
+                .message_chain
+                .iter()
+                .chain(&diagnostic.related_information)
+            {
+                retain(nested, program, sources);
+            }
         }
-        self.diagnostics
+        let mut sources = BTreeMap::new();
+        for diagnostic in &diagnostics {
+            retain(diagnostic, program, &mut sources);
+        }
+        Self {
+            sources,
+            diagnostics,
+        }
+    }
+
+    /// Rebind source identities when a caller reparses unchanged files instead
+    /// of using FileCache. The shared cached entry remains immutable, and no
+    /// whole-program owner is needed to resolve its original source paths.
+    pub(crate) fn diagnostics_for(&self, program: &Arc<Program>) -> Result<Vec<Diagnostic>, Error> {
+        self.rebind_list(&self.diagnostics, program)
+    }
+
+    pub(crate) fn rebind_list(
+        &self,
+        diagnostics: &[Diagnostic],
+        program: &Arc<Program>,
+    ) -> Result<Vec<Diagnostic>, Error> {
+        diagnostics
             .iter()
-            .map(|diagnostic| rebind_diagnostic(diagnostic, &self.program, program))
+            .map(|d| rebind_diagnostic(d, &self.sources, program))
             .collect()
     }
 }
 
 fn rebind_diagnostic(
     diagnostic: &Diagnostic,
-    from: &Program,
+    from: &BTreeMap<NodeId, DiagnosticSource>,
     to: &Program,
 ) -> Result<Diagnostic, Error> {
     let rebind_all = |diagnostics: &[Arc<Diagnostic>]| {
@@ -325,15 +354,27 @@ fn rebind_diagnostic(
     Ok(rebound)
 }
 
-fn rebind_file(file: NodeId, from: &Program, to: &Program) -> Result<NodeId, Error> {
-    if to.file_of_node(file).is_some() {
+fn rebind_file(
+    file: NodeId,
+    from: &BTreeMap<NodeId, DiagnosticSource>,
+    to: &Program,
+) -> Result<NodeId, Error> {
+    if to.file_of_node(file).is_some() || to.config_source(file).is_some() {
         return Ok(file);
     }
-    let Some(source) = from.file_of_node(file) else {
-        return Ok(file);
-    };
-    let path = crate::program::source_path(source)?;
-    Ok(to.file(path.as_bytes()).map_or(file, ProgramFile::source))
+    match from.get(&file) {
+        Some(DiagnosticSource::Source(source)) => {
+            let path = crate::program::source_path(source)?;
+            Ok(to.file(path.as_bytes()).map_or(file, ProgramFile::source))
+        }
+        Some(DiagnosticSource::Config(source)) => {
+            // Config diagnostics are invalidated by their option/config change;
+            // until then their original file remains a retained capability.
+            source.file.view().node(file)?;
+            Ok(file)
+        }
+        None => Err(tsr_arena::Error::WrongOwner.into()),
+    }
 }
 
 impl std::fmt::Debug for ProgramDiagnostics {
@@ -356,10 +397,7 @@ pub struct DiagnosticsOrBuildInfoDiagnosticsWithFileName {
 impl DiagnosticsOrBuildInfoDiagnosticsWithFileName {
     pub(crate) fn from_diagnostics(program: &Arc<Program>, diagnostics: Vec<Diagnostic>) -> Self {
         Self {
-            diagnostics: Mutex::new(Some(ProgramDiagnostics {
-                program: program.clone(),
-                diagnostics,
-            })),
+            diagnostics: Mutex::new(Some(ProgramDiagnostics::new(program, diagnostics))),
             build_info_diagnostics: Vec::new(),
         }
     }
@@ -392,10 +430,7 @@ impl DiagnosticsOrBuildInfoDiagnosticsWithFileName {
             converted.push(diag.to_diagnostic(p, file.map(ProgramFile::source))?);
         }
         if !self.build_info_diagnostics.is_empty() {
-            *diagnostics = Some(ProgramDiagnostics {
-                program: p.clone(),
-                diagnostics: converted.clone(),
-            });
+            *diagnostics = Some(ProgramDiagnostics::new(p, converted.clone()));
         }
         Ok(converted)
     }
@@ -420,12 +455,18 @@ impl BuildInfoDiagnosticWithFileName {
             return repopulate_diagnostic_chain(self, p, file_for_diagnostic);
         }
 
-        let mut message_chain = Vec::with_capacity(self.message_chain.len());
-        for msg in &self.message_chain {
+        let mut message_chain =
+            Vec::with_capacity(self.message_chain.as_deref().unwrap_or_default().len());
+        for msg in self.message_chain.iter().flatten() {
             message_chain.push(Arc::new(msg.to_diagnostic(p, file_for_diagnostic)?));
         }
-        let mut related_information = Vec::with_capacity(self.related_information.len());
-        for info in &self.related_information {
+        let mut related_information = Vec::with_capacity(
+            self.related_information
+                .as_deref()
+                .unwrap_or_default()
+                .len(),
+        );
+        for info in self.related_information.iter().flatten() {
             related_information.push(Arc::new(info.to_diagnostic(p, file_for_diagnostic)?));
         }
         let mut diagnostic = Diagnostic::from_serialized(
@@ -434,7 +475,7 @@ impl BuildInfoDiagnosticWithFileName {
             self.code,
             self.category,
             self.message_key.clone(),
-            self.message_args.clone(),
+            self.message_args.clone().unwrap_or_default(),
             message_chain,
             related_information,
             self.reports_unnecessary,
@@ -454,12 +495,18 @@ impl BuildInfoDiagnosticWithFileName {
         p: &Arc<Program>,
         file: Option<NodeId>,
     ) -> Result<Diagnostic, Error> {
-        let mut message_chain = Vec::with_capacity(self.message_chain.len());
-        for msg in &self.message_chain {
+        let mut message_chain =
+            Vec::with_capacity(self.message_chain.as_deref().unwrap_or_default().len());
+        for msg in self.message_chain.iter().flatten() {
             message_chain.push(Arc::new(msg.to_diagnostic(p, file)?));
         }
-        let mut related_information = Vec::with_capacity(self.related_information.len());
-        for info in &self.related_information {
+        let mut related_information = Vec::with_capacity(
+            self.related_information
+                .as_deref()
+                .unwrap_or_default()
+                .len(),
+        );
+        for info in self.related_information.iter().flatten() {
             related_information.push(Arc::new(info.to_diagnostic(p, file)?));
         }
         Ok(Diagnostic::from_serialized(
@@ -468,7 +515,7 @@ impl BuildInfoDiagnosticWithFileName {
             self.code,
             self.category,
             self.message_key.clone(),
-            self.message_args.clone(),
+            self.message_args.clone().unwrap_or_default(),
             message_chain,
             related_information,
             self.reports_unnecessary,
@@ -524,8 +571,8 @@ fn repopulate_mode_mismatch_chain(
     let details =
         tsr_checker::create_mode_mismatch_details(&host, file_name.as_bytes(), path.as_bytes())?;
 
-    let mut next_chain = Vec::with_capacity(b.message_chain.len());
-    for msg in &b.message_chain {
+    let mut next_chain = Vec::with_capacity(b.message_chain.as_deref().unwrap_or_default().len());
+    for msg in b.message_chain.iter().flatten() {
         next_chain.push(Arc::new(msg.to_diagnostic(p, Some(file))?));
     }
 
@@ -570,8 +617,8 @@ fn repopulate_module_not_found_chain(
         package_name.as_bytes(),
     )?;
 
-    let mut next_chain = Vec::with_capacity(b.message_chain.len());
-    for msg in &b.message_chain {
+    let mut next_chain = Vec::with_capacity(b.message_chain.as_deref().unwrap_or_default().len());
+    for msg in b.message_chain.iter().flatten() {
         next_chain.push(Arc::new(msg.to_diagnostic(p, Some(file))?));
     }
 
@@ -658,7 +705,32 @@ impl std::fmt::Debug for Snapshot {
     }
 }
 
+/// Retained identity of a cached diagnostics entry. Holding this value keeps
+/// its allocation alive, so replacement cannot reuse an address and compare
+/// equal. The entry contents and cache mutation remain private.
+#[derive(Clone, Debug)]
+pub struct CachedDiagnosticsIdentity(Arc<DiagnosticsOrBuildInfoDiagnosticsWithFileName>);
+
+impl PartialEq for CachedDiagnosticsIdentity {
+    fn eq(&self, other: &Self) -> bool {
+        Arc::ptr_eq(&self.0, &other.0)
+    }
+}
+impl Eq for CachedDiagnosticsIdentity {}
+
 impl Snapshot {
+    /// Observe the same identity that Go's testing hook reads from
+    /// `SemanticDiagnosticsPerFile.Load`, without exposing the mutable map.
+    pub fn cached_semantic_diagnostics_identity(
+        &self,
+        path: &Path,
+    ) -> Option<CachedDiagnosticsIdentity> {
+        lock(&self.semantic_diagnostics_per_file)
+            .get(path)
+            .cloned()
+            .map(CachedDiagnosticsIdentity)
+    }
+
     // port: tsc/internal/execute/incremental/snapshot.go:snapshot.addFileToChangeSet
     pub(crate) fn add_file_to_change_set(&self, file_path: &Path) {
         lock(&self.changed_files_set).insert(file_path.clone());
@@ -835,5 +907,38 @@ fn category_name(category: i32) -> &'static str {
         2 => "suggestion",
         3 => "message",
         _ => panic!("Unhandled diagnostic category"),
+    }
+}
+
+#[cfg(test)]
+mod cache_identity_tests {
+    use super::*;
+    #[test]
+    fn diagnostics_identity_tracks_sharing_and_retains_replaced_entry() {
+        let snapshot = Snapshot::default();
+        let path = JsString::from_bytes(b"/main.ts".as_slice());
+        assert!(snapshot
+            .cached_semantic_diagnostics_identity(&path)
+            .is_none());
+        let entry = Arc::new(DiagnosticsOrBuildInfoDiagnosticsWithFileName::default());
+        lock(&snapshot.semantic_diagnostics_per_file).insert(path.clone(), entry.clone());
+        let old = snapshot
+            .cached_semantic_diagnostics_identity(&path)
+            .unwrap();
+        assert_eq!(
+            Some(old.clone()),
+            snapshot.cached_semantic_diagnostics_identity(&path)
+        );
+        lock(&snapshot.semantic_diagnostics_per_file).insert(
+            path.clone(),
+            Arc::new(DiagnosticsOrBuildInfoDiagnosticsWithFileName::default()),
+        );
+        assert_ne!(
+            Some(old.clone()),
+            snapshot.cached_semantic_diagnostics_identity(&path)
+        );
+        assert_eq!(Arc::strong_count(&entry), 2);
+        drop(old);
+        assert_eq!(Arc::strong_count(&entry), 1);
     }
 }

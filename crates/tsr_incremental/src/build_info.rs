@@ -332,9 +332,9 @@ pub struct BuildInfoDiagnostic {
     pub source: JsString,
     pub message_text: JsString,
     pub message_key: JsString,
-    pub message_args: Vec<JsString>,
-    pub message_chain: Vec<BuildInfoDiagnostic>,
-    pub related_information: Vec<BuildInfoDiagnostic>,
+    pub message_args: Option<Vec<JsString>>,
+    pub message_chain: Option<Vec<BuildInfoDiagnostic>>,
+    pub related_information: Option<Vec<BuildInfoDiagnostic>>,
     pub reports_unnecessary: bool,
     pub reports_deprecated: bool,
     pub skipped_on_no_emit: bool,
@@ -353,9 +353,9 @@ impl Encode for BuildInfoDiagnostic {
         object.string_omitzero(b"source", &self.source)?;
         object.string_omitzero(b"messageText", &self.message_text)?;
         object.string_omitzero(b"messageKey", &self.message_key)?;
-        object.slice_omitzero(b"messageArgs", &self.message_args)?;
-        object.slice_omitzero(b"messageChain", &self.message_chain)?;
-        object.slice_omitzero(b"relatedInformation", &self.related_information)?;
+        object.option_omitzero(b"messageArgs", self.message_args.as_deref())?;
+        object.option_omitzero(b"messageChain", self.message_chain.as_deref())?;
+        object.option_omitzero(b"relatedInformation", self.related_information.as_deref())?;
         object.bool_omitzero(b"reportsUnnecessary", self.reports_unnecessary)?;
         object.bool_omitzero(b"reportsDeprecated", self.reports_deprecated)?;
         object.bool_omitzero(b"skippedOnNoEmit", self.skipped_on_no_emit)?;
@@ -701,15 +701,15 @@ impl Decode for BuildInfoEmitSignature {
                     length => {
                         return Err(JsonError::Message(format!(
                             "invalid signature in BuildInfoEmitSignature: expected string or []string with 0 or 1 element, got {length} elements"
-                        )))
+                        )));
                     }
                 }
             }
             other => {
                 return Err(JsonError::Message(format!(
-                "invalid signature in BuildInfoEmitSignature: expected string or []string, got {}",
-                json::go_type_name(other)
-            )))
+                    "invalid signature in BuildInfoEmitSignature: expected string or []string, got {}",
+                    json::go_type_name(other)
+                )));
             }
         }
         *self = Self {
@@ -748,10 +748,9 @@ impl Decode for BuildInfoResolvedRoot {
     }
 }
 
-/// `BuildInfo`. A slice the pin leaves nil when it has no entries is a
-/// `Vec` here that encodes only when it is not empty; the slices the pin can
-/// leave empty but non-nil (`fileInfos`, `contentMapperIdentities` and the
-/// non-incremental `root`) are `Option`s.
+/// `BuildInfo`. `None` is a nil Go slice; `Some(Vec::new())` is a non-nil
+/// empty slice. `omitzero` omits only the former, including after decoding
+/// externally supplied build info. Cache consumers borrow these as slices.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct BuildInfo {
     pub version: JsString,
@@ -760,25 +759,25 @@ pub struct BuildInfo {
     pub errors: bool,
     pub check_pending: bool,
     pub root: Option<Vec<BuildInfoRoot>>,
-    pub package_jsons: Vec<JsString>,
-    pub missing_package_jsons: Vec<JsString>,
+    pub package_jsons: Option<Vec<JsString>>,
+    pub missing_package_jsons: Option<Vec<JsString>>,
     pub content_mapper_identities: Option<Vec<JsString>>,
 
     // IncrementalProgram info
-    pub file_names: Vec<JsString>,
+    pub file_names: Option<Vec<JsString>>,
     pub file_infos: Option<Vec<BuildInfoFileInfo>>,
-    pub file_ids_list: Vec<Vec<BuildInfoFileId>>,
+    pub file_ids_list: Option<Vec<Vec<BuildInfoFileId>>>,
     pub options: Option<OrderedMap<JsString, AnyValue>>,
-    pub referenced_map: Vec<BuildInfoReferenceMapEntry>,
-    pub semantic_diagnostics_per_file: Vec<BuildInfoSemanticDiagnostic>,
+    pub referenced_map: Option<Vec<BuildInfoReferenceMapEntry>>,
+    pub semantic_diagnostics_per_file: Option<Vec<BuildInfoSemanticDiagnostic>>,
     /// A file whose cached emit diagnostics are empty is the pin's nil entry.
-    pub emit_diagnostics_per_file: Vec<Option<BuildInfoDiagnosticsOfFile>>,
-    pub change_file_set: Vec<BuildInfoFileId>,
-    pub affected_files_pending_emit: Vec<BuildInfoFilePendingEmit>,
+    pub emit_diagnostics_per_file: Option<Vec<Option<BuildInfoDiagnosticsOfFile>>>,
+    pub change_file_set: Option<Vec<BuildInfoFileId>>,
+    pub affected_files_pending_emit: Option<Vec<BuildInfoFilePendingEmit>>,
     /// Because this is only output file in the program, we dont need fileId to deduplicate name
     pub latest_changed_dts_file: JsString,
-    pub emit_signatures: Vec<BuildInfoEmitSignature>,
-    pub resolved_root: Vec<BuildInfoResolvedRoot>,
+    pub emit_signatures: Option<Vec<BuildInfoEmitSignature>>,
+    pub resolved_root: Option<Vec<BuildInfoResolvedRoot>>,
 
     // NonIncrementalProgram info
     pub semantic_errors: bool,
@@ -793,33 +792,39 @@ impl Encode for BuildInfo {
         if let Some(root) = &self.root {
             object.field(b"root", root)?;
         }
-        object.slice_omitzero(b"packageJsons", &self.package_jsons)?;
-        object.slice_omitzero(b"missingPackageJsons", &self.missing_package_jsons)?;
+        object.option_omitzero(b"packageJsons", self.package_jsons.as_deref())?;
+        object.option_omitzero(
+            b"missingPackageJsons",
+            self.missing_package_jsons.as_deref(),
+        )?;
         if let Some(identities) = &self.content_mapper_identities {
             object.field(b"contentMapperIdentities", identities)?;
         }
-        object.slice_omitzero(b"fileNames", &self.file_names)?;
+        object.option_omitzero(b"fileNames", self.file_names.as_deref())?;
         if let Some(file_infos) = &self.file_infos {
             object.field(b"fileInfos", file_infos)?;
         }
-        object.slice_omitzero(b"fileIdsList", &self.file_ids_list)?;
+        object.option_omitzero(b"fileIdsList", self.file_ids_list.as_deref())?;
         if let Some(options) = &self.options {
             object.field(b"options", options)?;
         }
-        object.slice_omitzero(b"referencedMap", &self.referenced_map)?;
-        object.slice_omitzero(
+        object.option_omitzero(b"referencedMap", self.referenced_map.as_deref())?;
+        object.option_omitzero(
             b"semanticDiagnosticsPerFile",
-            &self.semantic_diagnostics_per_file,
+            self.semantic_diagnostics_per_file.as_deref(),
         )?;
-        object.slice_omitzero(b"emitDiagnosticsPerFile", &self.emit_diagnostics_per_file)?;
-        object.slice_omitzero(b"changeFileSet", &self.change_file_set)?;
-        object.slice_omitzero(
+        object.option_omitzero(
+            b"emitDiagnosticsPerFile",
+            self.emit_diagnostics_per_file.as_deref(),
+        )?;
+        object.option_omitzero(b"changeFileSet", self.change_file_set.as_deref())?;
+        object.option_omitzero(
             b"affectedFilesPendingEmit",
-            &self.affected_files_pending_emit,
+            self.affected_files_pending_emit.as_deref(),
         )?;
         object.string_omitzero(b"latestChangedDtsFile", &self.latest_changed_dts_file)?;
-        object.slice_omitzero(b"emitSignatures", &self.emit_signatures)?;
-        object.slice_omitzero(b"resolvedRoot", &self.resolved_root)?;
+        object.option_omitzero(b"emitSignatures", self.emit_signatures.as_deref())?;
+        object.option_omitzero(b"resolvedRoot", self.resolved_root.as_deref())?;
         object.bool_omitzero(b"semanticErrors", self.semantic_errors)?;
         object.end()
     }
@@ -879,15 +884,15 @@ impl BuildInfo {
     /// `this` is `None` for the pin's nil receiver.
     // port: tsc/internal/execute/incremental/buildInfo.go:BuildInfo.IsIncremental
     pub fn is_incremental(this: Option<&Self>) -> bool {
-        this.is_some_and(|b| !b.file_names.is_empty())
+        this.is_some_and(|b| !b.file_names.as_deref().unwrap_or_default().is_empty())
     }
 
     // port: tsc/internal/execute/incremental/buildInfo.go:BuildInfo.fileName
     pub(crate) fn file_name(&self, file_id: BuildInfoFileId) -> JsString {
-        if file_id < 1 || file_id > self.file_names.len() as i64 {
+        if file_id < 1 || file_id > self.file_names.as_deref().unwrap_or_default().len() as i64 {
             return JsString::default();
         }
-        self.file_names[(file_id - 1) as usize].clone()
+        self.file_names.as_deref().unwrap_or_default()[(file_id - 1) as usize].clone()
     }
 
     // port: tsc/internal/execute/incremental/buildInfo.go:BuildInfo.fileInfo
@@ -944,7 +949,10 @@ impl BuildInfo {
         &'a self,
         build_info_directory: &'a [u8],
     ) -> impl Iterator<Item = Vec<u8>> + 'a {
-        get_normalized_paths(&self.package_jsons, build_info_directory)
+        get_normalized_paths(
+            self.package_jsons.as_deref().unwrap_or_default(),
+            build_info_directory,
+        )
     }
 
     // port: tsc/internal/execute/incremental/buildInfo.go:BuildInfo.GetMissingPackageJsons
@@ -952,7 +960,10 @@ impl BuildInfo {
         &'a self,
         build_info_directory: &'a [u8],
     ) -> impl Iterator<Item = Vec<u8>> + 'a {
-        get_normalized_paths(&self.missing_package_jsons, build_info_directory)
+        get_normalized_paths(
+            self.missing_package_jsons.as_deref().unwrap_or_default(),
+            build_info_directory,
+        )
     }
 
     // port: tsc/internal/execute/incremental/buildInfo.go:BuildInfo.GetBuildInfoRootInfoReader
@@ -961,12 +972,13 @@ impl BuildInfo {
         build_info_directory: &[u8],
         compare_paths_options_use_case_sensitive_file_names: bool,
     ) -> BuildInfoRootInfoReader {
-        let mut resolved_root_file_infos = HashMap::with_capacity(self.file_names.len());
+        let mut resolved_root_file_infos =
+            HashMap::with_capacity(self.file_names.as_deref().unwrap_or_default().len());
         // Roots of the File
         let mut root_to_resolved: OrderedMap<Path, Path> =
-            OrderedMap::with_capacity(self.file_names.len());
+            OrderedMap::with_capacity(self.file_names.as_deref().unwrap_or_default().len());
         let mut resolved_to_root: HashMap<Path, Path> =
-            HashMap::with_capacity(self.resolved_root.len());
+            HashMap::with_capacity(self.resolved_root.as_deref().unwrap_or_default().len());
         let to_path = |file_name: &[u8]| {
             tsr_tspath::to_path(
                 file_name,
@@ -976,7 +988,7 @@ impl BuildInfo {
         };
 
         // Create map from resolvedRoot to Root
-        for resolved in &self.resolved_root {
+        for resolved in self.resolved_root.as_deref().unwrap_or_default() {
             let resolved_root = self.file_name(resolved.resolved);
             let root = self.file_name(resolved.root);
             if !resolved_root.is_empty() && !root.is_empty() {

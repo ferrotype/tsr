@@ -1,0 +1,103 @@
+# Phase 4, stage B: programs, command line, build and watch (X1-X7).
+# docs/PHASE4-plan.md, sections 4 and 5.
+#
+# Each checkpoint closes on a recorded fact, `xN_complete`, on the tsc run
+# recorded at its exit; until a checkpoint wires that metric its item names one
+# no producer emits yet, so the sprint stays open by construction. The exit is
+# PLAN's Phase 4 gate over the P4A denominator: all 516 tsc, watch, build and
+# build-watch scenarios match their committed references whole (the plan's 517
+# counts the orphan reference tsc/commandLine/adds-color-when-FORCE_COLOR-is-set.js,
+# whose scenario upstream commit 31ff97358f removed; no scenario renders it),
+# the incremental runs agree with clean builds at every edit step, the build
+# info codec and its interoperability with the Go binary hold, the pinned unit
+# tests are ported, the native watcher's tests and the live witnesses pass,
+# the smoke test, the ThreadSanitizer run and the determinism runs pass, and
+# the Phase 2 and Phase 3 gates still hold on the final sources.
+id = "P4B"
+title = "Phase 4 stage B: programs, command line, build and watch"
+goal = "The native command line does what the pinned one does: tsc over a project or a file list, --incremental, --watch and tsc -b with clean, dry, force and build-watch, with the pin's console output, exit statuses, written files and .tsbuildinfo, on all 516 scenarios, the native watcher and live systems."
+exit = [
+  "sprint.P4A.done == 1",
+  "sprint.P3B.done == 1",
+  "run.tsc.harness_valid == true",
+  "run.tsc.baseline_accepted == 1",
+  "run.tsc.incremental_correctness == 1",
+  "run.tsc.buildinfo_codec == 1",
+  "run.tsc.buildinfo_interop == true",
+  "run.tsc.unit_rosters == 1",
+  "run.tsc.watcher_tests == true",
+  "run.tsc.live_watch_parity == true",
+  "run.tsc.smoke == true",
+  "run.tsc.thread_sanitizer == true",
+  "run.tsc.determinism == true",
+  "run.tsc.unsupported_required == 0",
+  "run.tsc.residuals == 0",
+  "run.checker.errors_parity == 1",
+  "run.checker.types_parity == 1",
+  "run.checker.symbols_parity == 1",
+  "run.checker.display_parity == 1",
+  "run.checker.trace_parity == 1",
+  "run.checker.ordering == 1",
+  "run.checker.parent_pointers == 1",
+  "run.emit.harness_valid == true",
+  "run.emit.harness_valid_concurrent == true",
+  "run.emit.output_parity == 1",
+  "run.emit.declaration_parity == 1",
+  "run.emit.sourcemap_parity == 1",
+  "run.emit.sourcemap_record_parity == 1",
+  "run.emit.emit_diagnostics_parity == 1",
+  "run.emit.transpile_parity == 1",
+  "run.emit.reprint_parity == 1",
+  "run.emit.mode_parity == true",
+  "run.emit.unsupported_required == 0",
+  "run.emit.residuals == 0",
+]
+
+[[item]]
+id = "P4B-X1"
+title = "X1: the driver, one compilation from the command line"
+kind = "task"
+required = true
+done_when = ["run.tsc.x1_complete == true"]
+
+[[item]]
+id = "P4B-X2"
+title = "X2: incremental programs and .tsbuildinfo"
+kind = "task"
+required = true
+done_when = ["run.tsc.x2_complete == true"]
+
+[[item]]
+id = "P4B-X3"
+title = "X3: the build orchestrator"
+kind = "task"
+required = true
+done_when = ["run.tsc.x3_complete == true"]
+
+[[item]]
+id = "P4B-X4"
+title = "X4: the native file watcher"
+kind = "task"
+required = true
+done_when = ["run.tsc.x4_complete == true"]
+
+[[item]]
+id = "P4B-X5"
+title = "X5: watch mode"
+kind = "task"
+required = true
+done_when = ["run.tsc.x5_complete == true"]
+
+[[item]]
+id = "P4B-X6"
+title = "X6: tracing, statistics and profiling"
+kind = "task"
+required = true
+done_when = ["run.tsc.x6_complete == true"]
+
+[[item]]
+id = "P4B-X7"
+title = "X7: live systems and closure"
+kind = "task"
+required = true
+done_when = ["run.tsc.x7_complete == true"]

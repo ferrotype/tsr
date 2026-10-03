@@ -46,7 +46,7 @@ fn declarations(kind: &str) -> Result<&'static [OptionDeclaration], String> {
         other => return Err(format!("unknown synthetic declaration {other:?}")),
     };
     // createVerifyNullForNonNullIncluded appends this test-only declaration.
-    // Descriptive metadata unused by parsing is absent from Rust declarations.
+    // Descriptive metadata is unused by this parsing-only synthetic option.
     Ok(cell.get_or_init(|| {
         let mut declarations = COMPILER_OPTIONS.to_vec();
         declarations.push(OptionDeclaration {
@@ -63,6 +63,10 @@ fn declarations(kind: &str) -> Result<&'static [OptionDeclaration], String> {
             min_value: 0,
             allow_config_dir_template: false,
             preserve_falsy: false,
+            category: None,
+            description: None,
+            default_value_description: tsr_tsoptions::DefaultValueDescription::Nil,
+            show_in_simplified_help_view: false,
         });
         declarations
     }))

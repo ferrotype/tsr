@@ -27,6 +27,17 @@ pub enum EnumValue {
     String(&'static str),
     Number(i32),
 }
+/// The pinned help default, preserving nil, TSUnknown, diagnostic identity,
+/// string and scalar values until the help renderer interprets them.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum DefaultValueDescription {
+    Nil,
+    Unknown,
+    Message(i32),
+    Boolean(bool),
+    String(&'static str),
+    Number(i64),
+}
 #[derive(Clone, Copy, Debug)]
 pub struct OptionDeclaration {
     pub name: &'static str,
@@ -42,6 +53,10 @@ pub struct OptionDeclaration {
     pub min_value: i64,
     pub allow_config_dir_template: bool,
     pub preserve_falsy: bool,
+    pub category: Option<i32>,
+    pub description: Option<i32>,
+    pub default_value_description: DefaultValueDescription,
+    pub show_in_simplified_help_view: bool,
 }
 impl OptionDeclaration {
     pub fn disallow_null(&self) -> bool {
@@ -72,7 +87,8 @@ impl OptionDeclaration {
 #[path = "option_declarations_generated.rs"]
 mod generated;
 pub use generated::{
-    BUILD_OPTIONS, COMPILER_OPTIONS, ROOT_OPTIONS, TYPE_ACQUISITION_OPTIONS, WATCH_OPTIONS,
+    BUILD_HELP_OPTIONS, BUILD_OPTIONS, COMPILER_OPTIONS, ROOT_OPTIONS, TYPE_ACQUISITION_OPTIONS,
+    WATCH_OPTIONS,
 };
 
 /// port: tsc/internal/tsoptions/namemap.go:NameMap.GetOptionDeclarationFromName

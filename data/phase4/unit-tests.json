@@ -1,0 +1,4226 @@
+{
+ "baseline_tests": [
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/showconfig_test.go",
+   "function": "TestShowConfig",
+   "id": "tsc/internal/execute/tsctests/showconfig_test.go:TestShowConfig",
+   "scenario_folders": [
+    "showConfig"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscCommandline",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscCommandline",
+   "scenario_folders": [
+    "commandLine"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscMissingFiles",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscMissingFiles",
+   "scenario_folders": [
+    "commandLine"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscComposite",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscComposite",
+   "scenario_folders": [
+    "composite"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscDeclarationEmit",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscDeclarationEmit",
+   "scenario_folders": [
+    "declarationEmit"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscExtends",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscExtends",
+   "scenario_folders": [
+    "extends"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestForceConsistentCasingInFileNames",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestForceConsistentCasingInFileNames",
+   "scenario_folders": [
+    "forceConsistentCasingInFileNames"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscIgnoreConfig",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscIgnoreConfig",
+   "scenario_folders": [
+    "ignoreConfig"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscIncremental",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscIncremental",
+   "scenario_folders": [
+    "incremental"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscLibraryResolution",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscLibraryResolution",
+   "scenario_folders": [
+    "libraryResolution"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscListFilesOnly",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscListFilesOnly",
+   "scenario_folders": [
+    "listFilesOnly"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscModuleResolution",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscModuleResolution",
+   "scenario_folders": [
+    "moduleResolution"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscNoCheck",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscNoCheck",
+   "scenario_folders": [
+    "noCheck"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscNoEmit",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscNoEmit",
+   "scenario_folders": [
+    "noEmit"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscNoEmitOnError",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscNoEmitOnError",
+   "scenario_folders": [
+    "noEmitOnError"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscProjectReferences",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscProjectReferences",
+   "scenario_folders": [
+    "projectReferences"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTypeAcquisition",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTypeAcquisition",
+   "scenario_folders": [
+    "typeAcquisition"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestGenerateTrace",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestGenerateTrace",
+   "scenario_folders": [
+    "generateTrace"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscContentMapperEmit",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscContentMapperEmit",
+   "scenario_folders": [
+    "contentMapperEmit"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscContentMapperExplainFiles",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscContentMapperExplainFiles",
+   "scenario_folders": [
+    "contentMapperExplainFiles"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscContentMapperOptionDiagnostics",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscContentMapperOptionDiagnostics",
+   "scenario_folders": [
+    "contentMapperOptionDiagnostics"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscContentMapperFailures",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscContentMapperFailures",
+   "scenario_folders": [
+    "contentMapperFailures"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tsc_test.go",
+   "function": "TestTscContentMapperSynthesized",
+   "id": "tsc/internal/execute/tsctests/tsc_test.go:TestTscContentMapperSynthesized",
+   "scenario_folders": [
+    "contentMapperSynthesized"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildCommandLine",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildCommandLine",
+   "scenario_folders": [
+    "commandLine"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildContentMapperIdentity",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildContentMapperIdentity",
+   "scenario_folders": [
+    "contentMapperIdentity"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildContentMapperOptionDiagnostics",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildContentMapperOptionDiagnostics",
+   "scenario_folders": [
+    "contentMapperOptionDiagnostics"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildClean",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildClean",
+   "scenario_folders": [
+    "clean"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildConfigFileErrors",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildConfigFileErrors",
+   "scenario_folders": [
+    "configFileErrors"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildDemoProject",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildDemoProject",
+   "scenario_folders": [
+    "demo"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildEmitDeclarationOnly",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildEmitDeclarationOnly",
+   "scenario_folders": [
+    "emitDeclarationOnly"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildFileDelete",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildFileDelete",
+   "scenario_folders": [
+    "fileDelete"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildDependencyUpdate",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildDependencyUpdate",
+   "scenario_folders": [
+    "dependencyUpdate"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildInferredTypeFromTransitiveModule",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildInferredTypeFromTransitiveModule",
+   "scenario_folders": [
+    "inferredTypeFromTransitiveModule"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildInferredTypeFromMonorepoReference",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildInferredTypeFromMonorepoReference",
+   "scenario_folders": [
+    "inferredTypeFromMonorepoReference"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildDeclarationEmitForReferencedProjectTypesSubpath",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildDeclarationEmitForReferencedProjectTypesSubpath",
+   "scenario_folders": [
+    "declarationEmitForReferencedProjectTypesSubpath"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildJavascriptProjectEmit",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildJavascriptProjectEmit",
+   "scenario_folders": [
+    "javascriptProjectEmit"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildLateBoundSymbol",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildLateBoundSymbol",
+   "scenario_folders": [
+    "lateBoundSymbol"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildModuleSpecifiers",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildModuleSpecifiers",
+   "scenario_folders": [
+    "moduleSpecifiers"
+   ]
+  },
+  {
+   "asserts_directly": true,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildOutputPaths",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildOutputPaths",
+   "scenario_folders": [
+    "outputPaths"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildProgramUpdates",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildProgramUpdates",
+   "scenario_folders": [
+    "programUpdates"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildProjectsBuilding",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildProjectsBuilding",
+   "scenario_folders": [
+    "projectsBuilding"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildProjectReferenceWithRootDirInParent",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildProjectReferenceWithRootDirInParent",
+   "scenario_folders": [
+    "projectReferenceWithRootDirInParent"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildReexport",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildReexport",
+   "scenario_folders": [
+    "reexport"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildResolveJsonModule",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildResolveJsonModule",
+   "scenario_folders": [
+    "resolveJsonModule"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildRoots",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildRoots",
+   "scenario_folders": [
+    "roots"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildSample",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildSample",
+   "scenario_folders": [
+    "sample"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildTransitiveReferences",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildTransitiveReferences",
+   "scenario_folders": [
+    "transitiveReferences"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildSolutionProject",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildSolutionProject",
+   "scenario_folders": [
+    "solution"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscbuild_test.go",
+   "function": "TestBuildProjectReferenceRedirectWithMultipleSubProjects",
+   "id": "tsc/internal/execute/tsctests/tscbuild_test.go:TestBuildProjectReferenceRedirectWithMultipleSubProjects",
+   "scenario_folders": [
+    "projectReferenceRedirect"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscwatch_test.go",
+   "function": "TestWatch",
+   "id": "tsc/internal/execute/tsctests/tscwatch_test.go:TestWatch",
+   "scenario_folders": [
+    "commandLineWatch"
+   ]
+  },
+  {
+   "asserts_directly": false,
+   "file": "tsc/internal/execute/tsctests/tscwatch_test.go",
+   "function": "TestTscNoEmitWatch",
+   "id": "tsc/internal/execute/tsctests/tscwatch_test.go:TestTscNoEmitWatch",
+   "scenario_folders": [
+    "noEmit"
+   ]
+  }
+ ],
+ "counts": {
+  "applicable_by_checkpoint_and_host": {
+   "X1": {
+    "any": 6,
+    "macos": 1
+   },
+   "X2": {
+    "any": 5
+   },
+   "X3": {
+    "any": 5
+   },
+   "X4": {
+    "any": 103,
+    "linux": 8,
+    "macos": 12
+   },
+   "X5": {
+    "any": 27
+   },
+   "X6": {
+    "any": 2
+   }
+  },
+  "baseline": 51,
+  "by_checkpoint": {
+   "X1": 11,
+   "X2": 5,
+   "X3": 5,
+   "X4": 124,
+   "X5": 27,
+   "X6": 2
+  },
+  "by_host": {
+   "any": 148,
+   "linux": 8,
+   "macos": 14,
+   "windows": 4
+  },
+  "by_status": {
+   "not_applicable": 5,
+   "ported": 169
+  },
+  "direct": 24,
+  "direct_by_file": {
+   "contentmapper_watch_test.go": 12,
+   "watcher_race_test.go": 12
+  },
+  "neither": 1,
+  "pending_by_checkpoint": {},
+  "roster": 174,
+  "tsctests_functions": 76,
+  "unit": 150,
+  "unit_by_package": {
+   "cmd/tsc": 1,
+   "internal/execute/build": 2,
+   "internal/execute/incremental": 5,
+   "internal/execute/tsc": 4,
+   "internal/execute/watchmanager": 7,
+   "internal/fswatch": 124,
+   "internal/nativepath": 5,
+   "internal/tracing": 2
+  }
+ },
+ "neither": [
+  {
+   "id": "tsc/internal/execute/tsctests/testmain_test.go:TestMain",
+   "reason": "TestMain(m *testing.M) sets the package up; it is neither a unit test nor a baseline test"
+  }
+ ],
+ "notes": {
+  "baseline": "The tsctests functions that call the runner's run(t, scenario) produce the 517 baselines; the scenario inventory (X0) owns them, scenario by scenario.",
+  "per_backend": "runForEachWatcher runs a subtest per available backend. In the pin, macOS has fsevents and kqueue and Linux has inotify, fanotify and the test-only fanotify-no-rename; the kqueue subtests do not apply (decision 4, ADR 0002), and the port runs FSEvents on macOS and inotify, fanotify and fanotify-no-rename on Linux (plan X4)."
+ },
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "plan": {
+  "baseline": 61,
+  "direct": 14,
+  "direct_content_mapper": 12,
+  "direct_race": 2,
+  "nativepath_windows": 4,
+  "tsctests_functions": 76,
+  "unit": 146,
+  "unit_by_package": {
+   "cmd/tsc": 1,
+   "internal/execute/build": 2,
+   "internal/execute/incremental": 5,
+   "internal/execute/watchmanager": 7,
+   "internal/fswatch": 124,
+   "internal/nativepath": 5,
+   "internal/tracing": 2
+  }
+ },
+ "plan_differences": [
+  "unit: plan 146, pin 150",
+  "direct: plan 14, pin 24",
+  "baseline: plan 61, pin 51",
+  "unit tests of internal/execute/tsc: plan 0, pin 4",
+  "direct tests of watcher_race_test.go: plan 2, pin 12"
+ ],
+ "problems": [],
+ "scope": {
+  "description": "The Go tests of the Phase 4 packages (every PORTS.toml file of the directory is phase 4, and one is in docs/PHASE4-plan.md's scope after decision 4) and the execute/tsctests functions that assert directly (docs/PHASE4-plan.md sections 1, 4 and 5).",
+  "packages": [
+   "cmd/tsc",
+   "internal/diagnosticwriter",
+   "internal/execute",
+   "internal/execute/build",
+   "internal/execute/incremental",
+   "internal/execute/tsc",
+   "internal/execute/tsctests",
+   "internal/execute/watchmanager",
+   "internal/fswatch",
+   "internal/nativepath",
+   "internal/tracing"
+  ],
+  "rust_roots": [
+   "crates",
+   "tools"
+  ],
+  "test_files": {
+   "tsc/cmd/tsc/sys_unix_test.go": "0997a6f1083254726e9790b2c7cb336feb80b65cb0ec7e0df71d1a0519e5fb69",
+   "tsc/internal/execute/build/buildtask_contentmapper_test.go": "6d7c4099a8ec22d3b6d244d47a0053a9be28896735c19e4aca080955cb7feca5",
+   "tsc/internal/execute/build/graph_test.go": "5295ebecdcdd423e0a6c0c6c3b50e29671dbd1d12dbf99bac5cf416ff9be3eba",
+   "tsc/internal/execute/incremental/buildinfo_contentmapper_test.go": "bebb3029cd36a1b940cffe849453f2523e1b5ff6fa0b4c3fc061e27a01a97152",
+   "tsc/internal/execute/incremental/external_diagnostic_test.go": "1ba5abd37c4c36d6084baf69545a6df768b6cbba71f4c0b0d717630503daf646",
+   "tsc/internal/execute/tsc/emit_test.go": "d514cd77ce909550728c210194effc70ebc3afa9ea8598ad6419a2ab029af10f",
+   "tsc/internal/execute/tsc/extendedconfigcache_test.go": "b84bd496c49a75d967e2de684fad5f9ff13a9a03358b3c1d0a27439765394415",
+   "tsc/internal/execute/tsctests/contentmapper_watch_test.go": "6b8cd9eb8a5972dc21036764029fe0883f973844c7a359721abd11096e77764b",
+   "tsc/internal/execute/tsctests/showconfig_test.go": "8aee82b9e3891048c3295187b882d2d57f2dcebe3b51789e233923c924bb77bb",
+   "tsc/internal/execute/tsctests/testmain_test.go": "694444dc408d736fc316a6a182b44b1c2b37c51582e6dd6088d7e72f12c78800",
+   "tsc/internal/execute/tsctests/tsc_test.go": "9fb3746c1dbb7dd6f32ede72e82dbfca4159aa6f4a71b7bf1d003ddda13cee98",
+   "tsc/internal/execute/tsctests/tscbuild_test.go": "6f36a20c4fe5610db4ca13e510a4c1466948e76f0231bdc292c4d21caddd97c0",
+   "tsc/internal/execute/tsctests/tscwatch_test.go": "d02dcfad4c20c08fdc6a196745014303be357956bb99e60db3c2418e18dee95c",
+   "tsc/internal/execute/tsctests/watcher_race_test.go": "949a4b34d9a96f888be975ea7d655cd5cf4dd45988f3444834045bf1c06125f4",
+   "tsc/internal/execute/watchmanager/watchmanager_test.go": "a13f670dcd604d0ef704f7e646722a60a0b176ad4aa2393fa87f7f9d896cc221",
+   "tsc/internal/fswatch/eventlist_test.go": "9ddf22124dccda50cc405e73b5377d1ddfc10419cd4bb8dfa39de91e06fd80a9",
+   "tsc/internal/fswatch/fallback_test.go": "8f97283fdf38133af509e79c812994df26d75a82c82040151ca260d0060e563b",
+   "tsc/internal/fswatch/fanotify_linux_test.go": "f5e1b08aad68b1e9538f14f1d442bf09bc2aee362706d66a5a492024120cb6a9",
+   "tsc/internal/fswatch/fsevents_darwin_ffi_arm64_test.go": "6e95f7b7877deda72a0e35620a02af48c20872dceff802e6a864f5be9d650c62",
+   "tsc/internal/fswatch/fsevents_darwin_nfd_test.go": "31bd0469e4959c91d4f7e505aa321dd9e4eff3b8aa94b512fc144042d641d3b5",
+   "tsc/internal/fswatch/fsevents_darwin_shared_test.go": "9f1fdc83c5dee7c9d1985a220ae89430f1ded38825543a3b6ed87f2186ec413a",
+   "tsc/internal/fswatch/testutil_test.go": "27b72236d7d81abc20bb56cf6c3a97a6c4f41c47f0a27c924e51937919a46e05",
+   "tsc/internal/fswatch/walkdir_test.go": "dde30bb8fb90742e3b6b5ddaca066dc29dc68a12081e83c1e5cd0e7d33d165af",
+   "tsc/internal/fswatch/watcher_test.go": "71b0e3c30086aff69d4b36da3d5e410c1c62f5bb65e1d19a920286fc8f840f7d",
+   "tsc/internal/nativepath/realpath_darwin_test.go": "3e0a649df8c65aeff875acedf29efb4559ae503f427bfa8997faaf48b76f0d4b",
+   "tsc/internal/nativepath/symlink_windows_test.go": "1b3aa01cd9a4dc25da57e1232f05030a8ed227a59ead2923dff51fca5a51eef8",
+   "tsc/internal/tracing/tracing_test.go": "9c8a7cf9cf943ee5c7d8c7431bef44494c5543f8c7a5293c9292a82693ee8173"
+  },
+  "test_files_sha256": "f78c6546e8a968292533869d53bba022f403e155249878a35e9693aa1a5637c7",
+  "test_functions": 226,
+  "test_functions_sha256": "91bb95a23163cb464df634a5f9dc0593d564e808c4974ed08ca846f293f15a1f"
+ },
+ "tests": [
+  {
+   "checkpoint": "X1",
+   "computed_subtests": false,
+   "file": "tsc/cmd/tsc/sys_unix_test.go",
+   "function": "TestChildProcessCloseDoesNotWaitForLauncherDescendants",
+   "host": "any",
+   "id": "tsc/cmd/tsc/sys_unix_test.go:TestChildProcessCloseDoesNotWaitForLauncherDescendants",
+   "kind": "unit",
+   "package": "cmd/tsc",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr/src/process.rs:311",
+     "test": "crates/tsr/src/process.rs::close_does_not_wait_for_launcher_descendants"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X3",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/build/buildtask_contentmapper_test.go",
+   "function": "TestIsContentMapperSupplementalBuildInfoPath",
+   "host": "any",
+   "id": "tsc/internal/execute/build/buildtask_contentmapper_test.go:TestIsContentMapperSupplementalBuildInfoPath",
+   "kind": "unit",
+   "package": "internal/execute/build",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_build/src/tests.rs:264",
+     "test": "crates/tsr_build/src/tests.rs::pinned_supplemental_paths_require_numeric_index_and_supported_extension"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X3",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/build/graph_test.go",
+   "function": "TestBuildOrderGenerator",
+   "host": "any",
+   "id": "tsc/internal/execute/build/graph_test.go:TestBuildOrderGenerator",
+   "kind": "unit",
+   "package": "internal/execute/build",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_build/src/tests.rs:192",
+     "test": "crates/tsr_build/src/tests.rs::pinned_graph_order_diamonds_cycles_and_watch_edges"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X2",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/incremental/buildinfo_contentmapper_test.go",
+   "function": "TestStaticContentMapperTransformIdentity",
+   "host": "any",
+   "id": "tsc/internal/execute/incremental/buildinfo_contentmapper_test.go:TestStaticContentMapperTransformIdentity",
+   "kind": "unit",
+   "package": "internal/execute/incremental",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_incremental/src/tests.rs:25",
+     "test": "crates/tsr_incremental/src/tests.rs::static_content_mapper_transform_identity"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X2",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/incremental/buildinfo_contentmapper_test.go",
+   "function": "TestDynamicContentMapperIdentities",
+   "host": "any",
+   "id": "tsc/internal/execute/incremental/buildinfo_contentmapper_test.go:TestDynamicContentMapperIdentities",
+   "kind": "unit",
+   "package": "internal/execute/incremental",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_incremental/src/tests.rs:168",
+     "test": "crates/tsr_incremental/src/tests.rs::dynamic_content_mapper_identities"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X2",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/incremental/buildinfo_contentmapper_test.go",
+   "function": "TestContentMapperIdentityError",
+   "host": "any",
+   "id": "tsc/internal/execute/incremental/buildinfo_contentmapper_test.go:TestContentMapperIdentityError",
+   "kind": "unit",
+   "package": "internal/execute/incremental",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_incremental/src/tests.rs:203",
+     "test": "crates/tsr_incremental/src/tests.rs::content_mapper_identity_error"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X2",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/incremental/buildinfo_contentmapper_test.go",
+   "function": "TestReadBuildInfoProgramContentMapperIdentityMismatch",
+   "host": "any",
+   "id": "tsc/internal/execute/incremental/buildinfo_contentmapper_test.go:TestReadBuildInfoProgramContentMapperIdentityMismatch",
+   "kind": "unit",
+   "package": "internal/execute/incremental",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_incremental/src/tests.rs:217",
+     "test": "crates/tsr_incremental/src/tests.rs::read_build_info_program_content_mapper_identity_mismatch"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X2",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/incremental/external_diagnostic_test.go",
+   "function": "TestExternalDiagnosticBuildInfoRoundTrip",
+   "host": "any",
+   "id": "tsc/internal/execute/incremental/external_diagnostic_test.go:TestExternalDiagnosticBuildInfoRoundTrip",
+   "kind": "unit",
+   "package": "internal/execute/incremental",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_incremental/src/tests.rs:251",
+     "test": "crates/tsr_incremental/src/tests.rs::external_diagnostic_build_info_round_trip"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X1",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsc/emit_test.go",
+   "function": "TestContentMapperLoggerEnvironmentVariable",
+   "host": "any",
+   "id": "tsc/internal/execute/tsc/emit_test.go:TestContentMapperLoggerEnvironmentVariable",
+   "kind": "unit",
+   "package": "internal/execute/tsc",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_execute/src/compile.rs:278",
+     "test": "crates/tsr_execute/src/compile.rs::content_mapper_logger_environment_variable"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X1",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsc/emit_test.go",
+   "function": "TestIncrementalDeclarationEmitTimeIsExcludedFromCheckTime",
+   "host": "any",
+   "id": "tsc/internal/execute/tsc/emit_test.go:TestIncrementalDeclarationEmitTimeIsExcludedFromCheckTime",
+   "kind": "unit",
+   "package": "internal/execute/tsc",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/tests/phase4_emit.rs:105",
+     "test": "crates/tsr_tsc/tests/phase4_emit.rs::incremental_declaration_emit_time_is_excluded_from_check_time"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X1",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsc/extendedconfigcache_test.go",
+   "function": "TestExtendedConfigCacheExtendsCircularity",
+   "host": "any",
+   "id": "tsc/internal/execute/tsc/extendedconfigcache_test.go:TestExtendedConfigCacheExtendsCircularity",
+   "kind": "unit",
+   "package": "internal/execute/tsc",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:275",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::extended_config_cache_extends_circularity"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": [
+    "self-referencing extends",
+    "mutual extends cycle",
+    "case-insensitive self-referencing extends"
+   ]
+  },
+  {
+   "checkpoint": "X1",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsc/extendedconfigcache_test.go",
+   "function": "TestExtendedConfigCacheNullExtendsDoesNotPanic",
+   "host": "any",
+   "id": "tsc/internal/execute/tsc/extendedconfigcache_test.go:TestExtendedConfigCacheNullExtendsDoesNotPanic",
+   "kind": "unit",
+   "package": "internal/execute/tsc",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:300",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::extended_config_cache_null_extends_does_not_panic"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X3",
+   "command_line_flags": [
+    "--build",
+    "--runExternalCode"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/contentmapper_watch_test.go",
+   "function": "TestContentMapperBuildLifecycle",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildLifecycle",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:163",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_build_lifecycle"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X1",
+   "command_line_flags": [
+    "--pretty",
+    "--runExternalCode"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/contentmapper_watch_test.go",
+   "function": "TestContentMapperSupplementalDiagnosticUsesOriginalFileName",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperSupplementalDiagnosticUsesOriginalFileName",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:178",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::supplemental_diagnostic_uses_original_file_name"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X3",
+   "command_line_flags": [
+    "--build",
+    "--pretty",
+    "--runExternalCode"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/contentmapper_watch_test.go",
+   "function": "TestContentMapperBuildDetectsNewPhysicalSupplementalFile",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildDetectsNewPhysicalSupplementalFile",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:198",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::build_detects_new_physical_supplemental_file"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X3",
+   "command_line_flags": [
+    "--build",
+    "--runExternalCode"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/contentmapper_watch_test.go",
+   "function": "TestContentMapperBuildIdentityFailureExitStatus",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildIdentityFailureExitStatus",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:231",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::build_identity_failure_exit_status"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--build",
+    "--runExternalCode",
+    "--watch"
+   ],
+   "computed_subtests": true,
+   "file": "tsc/internal/execute/tsctests/contentmapper_watch_test.go",
+   "function": "TestContentMapperWatchLifecycle",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperWatchLifecycle",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:359",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_watch_lifecycle"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--runExternalCode",
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/contentmapper_watch_test.go",
+   "function": "TestContentMapperSupplementalCollisionWatch",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperSupplementalCollisionWatch",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:419",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_supplemental_collision_watch"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--runExternalCode",
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/contentmapper_watch_test.go",
+   "function": "TestDynamicContentMapperWatchDependency",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestDynamicContentMapperWatchDependency",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:482",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::dynamic_content_mapper_watch_dependency"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--pretty",
+    "--runExternalCode",
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/contentmapper_watch_test.go",
+   "function": "TestContentMapperMixedWatchBatchForcesFullRebuild",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperMixedWatchBatchForcesFullRebuild",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:493",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_mixed_watch_batch_forces_full_rebuild"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--build",
+    "--runExternalCode",
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/contentmapper_watch_test.go",
+   "function": "TestDynamicContentMapperBuildWatchDependency",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestDynamicContentMapperBuildWatchDependency",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:487",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::dynamic_content_mapper_build_watch_dependency"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--build",
+    "--runExternalCode",
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/contentmapper_watch_test.go",
+   "function": "TestContentMapperBuildWatchSymlinkedManifestChange",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildWatchSymlinkedManifestChange",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:558",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_build_watch_symlinked_manifest_change"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--build",
+    "--runExternalCode",
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/contentmapper_watch_test.go",
+   "function": "TestContentMapperBuildWatchSymlinkedManifestDelete",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildWatchSymlinkedManifestDelete",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:580",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_build_watch_symlinked_manifest_delete"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--build",
+    "--runExternalCode",
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/contentmapper_watch_test.go",
+   "function": "TestContentMapperBuildWatchSharedLifecycle",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/contentmapper_watch_test.go:TestContentMapperBuildWatchSharedLifecycle",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/build_direct.rs:604",
+     "test": "tools/phase4/tsctests/tests/build_direct.rs::content_mapper_build_watch_shared_lifecycle"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/watcher_race_test.go",
+   "function": "TestWatcherConcurrentDoCycle",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/watcher_race_test.go:TestWatcherConcurrentDoCycle",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:87",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::concurrent_cycles_with_source_writes"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/watcher_race_test.go",
+   "function": "TestWatcherDoCycleWithConcurrentStateReads",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/watcher_race_test.go:TestWatcherDoCycleWithConcurrentStateReads",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:103",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::concurrent_cycles_and_state_reads"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/watcher_race_test.go",
+   "function": "TestWatcherConcurrentFileChangesAndDoCycle",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/watcher_race_test.go:TestWatcherConcurrentFileChangesAndDoCycle",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:129",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::create_delete_and_cycle_concurrently"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/watcher_race_test.go",
+   "function": "TestWatcherRapidConfigChanges",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/watcher_race_test.go:TestWatcherRapidConfigChanges",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:164",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::rapid_config_and_source_edits"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/watcher_race_test.go",
+   "function": "TestWatcherConcurrentDoCycleNoChanges",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/watcher_race_test.go:TestWatcherConcurrentDoCycleNoChanges",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:204",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::concurrent_cycles_without_changes"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/watcher_race_test.go",
+   "function": "TestWatcherAlternatingModifyAndDoCycle",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/watcher_race_test.go:TestWatcherAlternatingModifyAndDoCycle",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:219",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::alternating_writes_and_cycles"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--build",
+    "--watch",
+    "--watchInterval"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/watcher_race_test.go",
+   "function": "TestBuildWatchStopsWhenContextIsCancelled",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/watcher_race_test.go:TestBuildWatchStopsWhenContextIsCancelled",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:240",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::cancelled_build_watch_returns_without_waiting_for_interval"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--noEmit",
+    "--pretty",
+    "--watch",
+    "-p"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/watcher_race_test.go",
+   "function": "TestWatcherStartsFromExistingBuildInfo",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/watcher_race_test.go:TestWatcherStartsFromExistingBuildInfo",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:272",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::watch_reads_existing_build_info"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--pretty",
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/watcher_race_test.go",
+   "function": "TestWatcherRebuildsWhenJsxImportSourcePragmaChanges",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/watcher_race_test.go:TestWatcherRebuildsWhenJsxImportSourcePragmaChanges",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:304",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::changed_jsx_pragma_resolves_the_new_runtime"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/watcher_race_test.go",
+   "function": "TestWatcherUpdateProgramFastPath",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/watcher_race_test.go:TestWatcherUpdateProgramFastPath",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:329",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::body_only_edits_reuse_program_and_import_changes_rebuild"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--pretty",
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/watcher_race_test.go",
+   "function": "TestWatcherOverflowForcesFullRebuild",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/watcher_race_test.go:TestWatcherOverflowForcesFullRebuild",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:385",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::overflow_rediscovers_previously_missing_dependency"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "command_line_flags": [
+    "--pretty",
+    "--watch"
+   ],
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/tsctests/watcher_race_test.go",
+   "function": "TestWatcherNonSourceDependencyForcesFullRebuild",
+   "host": "any",
+   "id": "tsc/internal/execute/tsctests/watcher_race_test.go:TestWatcherNonSourceDependencyForcesFullRebuild",
+   "kind": "direct",
+   "package": "internal/execute/tsctests",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "tools/phase4/tsctests/tests/watcher_race.rs:398",
+     "test": "tools/phase4/tsctests/tests/watcher_race.rs::non_source_dependency_in_edit_batch_forces_rebuild"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/watchmanager/watchmanager_test.go",
+   "function": "TestDirWatchSetCoverage",
+   "host": "any",
+   "id": "tsc/internal/execute/watchmanager/watchmanager_test.go:TestDirWatchSetCoverage",
+   "kind": "unit",
+   "package": "internal/execute/watchmanager",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/src/watchmanager/tests.rs:10",
+     "test": "crates/tsr_tsc/src/watchmanager/tests.rs::dir_watch_set_coverage"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/watchmanager/watchmanager_test.go",
+   "function": "TestDirWatchSetCaseSensitive",
+   "host": "any",
+   "id": "tsc/internal/execute/watchmanager/watchmanager_test.go:TestDirWatchSetCaseSensitive",
+   "kind": "unit",
+   "package": "internal/execute/watchmanager",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/src/watchmanager/tests.rs:31",
+     "test": "crates/tsr_tsc/src/watchmanager/tests.rs::dir_watch_set_case_sensitive"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/watchmanager/watchmanager_test.go",
+   "function": "TestDirWatchSetCaseInsensitive",
+   "host": "any",
+   "id": "tsc/internal/execute/watchmanager/watchmanager_test.go:TestDirWatchSetCaseInsensitive",
+   "kind": "unit",
+   "package": "internal/execute/watchmanager",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/src/watchmanager/tests.rs:42",
+     "test": "crates/tsr_tsc/src/watchmanager/tests.rs::dir_watch_set_case_insensitive"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/watchmanager/watchmanager_test.go",
+   "function": "TestDirWatchSetCanonicalDedup",
+   "host": "any",
+   "id": "tsc/internal/execute/watchmanager/watchmanager_test.go:TestDirWatchSetCanonicalDedup",
+   "kind": "unit",
+   "package": "internal/execute/watchmanager",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/src/watchmanager/tests.rs:52",
+     "test": "crates/tsr_tsc/src/watchmanager/tests.rs::dir_watch_set_canonical_dedup"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/watchmanager/watchmanager_test.go",
+   "function": "TestDirWatchSetUpgradeToRecursive",
+   "host": "any",
+   "id": "tsc/internal/execute/watchmanager/watchmanager_test.go:TestDirWatchSetUpgradeToRecursive",
+   "kind": "unit",
+   "package": "internal/execute/watchmanager",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/src/watchmanager/tests.rs:65",
+     "test": "crates/tsr_tsc/src/watchmanager/tests.rs::dir_watch_set_upgrade_to_recursive"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/watchmanager/watchmanager_test.go",
+   "function": "TestDirWatchSetNeverDowngrades",
+   "host": "any",
+   "id": "tsc/internal/execute/watchmanager/watchmanager_test.go:TestDirWatchSetNeverDowngrades",
+   "kind": "unit",
+   "package": "internal/execute/watchmanager",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/src/watchmanager/tests.rs:76",
+     "test": "crates/tsr_tsc/src/watchmanager/tests.rs::dir_watch_set_never_downgrades"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X5",
+   "computed_subtests": false,
+   "file": "tsc/internal/execute/watchmanager/watchmanager_test.go",
+   "function": "TestDirWatchSetDirs",
+   "host": "any",
+   "id": "tsc/internal/execute/watchmanager/watchmanager_test.go:TestDirWatchSetDirs",
+   "kind": "unit",
+   "package": "internal/execute/watchmanager",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tsc/src/watchmanager/tests.rs:85",
+     "test": "crates/tsr_tsc/src/watchmanager/tests.rs::dir_watch_set_dirs"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/eventlist_test.go",
+   "function": "TestEventListCreateThenDelete",
+   "host": "any",
+   "id": "tsc/internal/fswatch/eventlist_test.go:TestEventListCreateThenDelete",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/event.rs:188",
+     "test": "crates/tsr_fswatch/src/event.rs::create_then_delete_cancels_the_event_but_keeps_pending_entry"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/eventlist_test.go",
+   "function": "TestEventListDeleteThenCreate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/eventlist_test.go:TestEventListDeleteThenCreate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/event.rs:197",
+     "test": "crates/tsr_fswatch/src/event.rs::delete_then_create_is_an_update"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/eventlist_test.go",
+   "function": "TestEventListCreateDeleteCreate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/eventlist_test.go:TestEventListCreateDeleteCreate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/event.rs:211",
+     "test": "crates/tsr_fswatch/src/event.rs::create_delete_create_is_an_update"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/eventlist_test.go",
+   "function": "TestEventListErrorIsLatchedAndCleared",
+   "host": "any",
+   "id": "tsc/internal/fswatch/eventlist_test.go:TestEventListErrorIsLatchedAndCleared",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/event.rs:226",
+     "test": "crates/tsr_fswatch/src/event.rs::first_error_is_latched_and_cleared_by_the_production_drain"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/eventlist_test.go",
+   "function": "TestEventListDrainIsAtomic",
+   "host": "any",
+   "id": "tsc/internal/fswatch/eventlist_test.go:TestEventListDrainIsAtomic",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/event.rs:240",
+     "test": "crates/tsr_fswatch/src/event.rs::drain_takes_events_and_error_together_then_clears_both"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/eventlist_test.go",
+   "function": "TestEventListDrainReturnsErrorWithEvents",
+   "host": "any",
+   "id": "tsc/internal/fswatch/eventlist_test.go:TestEventListDrainReturnsErrorWithEvents",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/event.rs:264",
+     "test": "crates/tsr_fswatch/src/event.rs::drain_returns_error_alongside_events"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/eventlist_test.go",
+   "function": "TestEventListDrainForSequences",
+   "host": "any",
+   "id": "tsc/internal/fswatch/eventlist_test.go:TestEventListDrainForSequences",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/event.rs:280",
+     "test": "crates/tsr_fswatch/src/event.rs::later_subscription_sees_deletion_of_an_earlier_pending_create"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fallback_test.go",
+   "function": "TestFallbackWatcherRoutesUnsupportedDirectories",
+   "host": "any",
+   "id": "tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherRoutesUnsupportedDirectories",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/fallback.rs:105",
+     "test": "crates/tsr_fswatch/src/fallback.rs::routes_only_filesystem_unsupported_watches"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fallback_test.go",
+   "function": "TestFallbackWatcherDoesNotFallbackForUnrelatedError",
+   "host": "any",
+   "id": "tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherDoesNotFallbackForUnrelatedError",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/fallback.rs:136",
+     "test": "crates/tsr_fswatch/src/fallback.rs::unrelated_errors_do_not_fallback"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fallback_test.go",
+   "function": "TestFallbackWatcherDoesNotUseSecondaryOnHappyPath",
+   "host": "any",
+   "id": "tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherDoesNotUseSecondaryOnHappyPath",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/fallback.rs:150",
+     "test": "crates/tsr_fswatch/src/fallback.rs::supported_filesystem_does_not_initialize_secondary"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fallback_test.go",
+   "function": "TestFallbackWatcherRollsBackRoutedWatchesOnFailure",
+   "host": "any",
+   "id": "tsc/internal/fswatch/fallback_test.go:TestFallbackWatcherRollsBackRoutedWatchesOnFailure",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/fallback.rs:163",
+     "test": "crates/tsr_fswatch/src/fallback.rs::rollback_closes_primary_and_routed_watches"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fallback_test.go",
+   "function": "TestFanotifyUsesInternalInotifyFallback",
+   "host": "any",
+   "id": "tsc/internal/fswatch/fallback_test.go:TestFanotifyUsesInternalInotifyFallback",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1445",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::fanotify_uses_shared_internal_inotify"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fanotify_linux_test.go",
+   "function": "TestLinuxFanotifyShutdownBeforeStart",
+   "host": "linux",
+   "id": "tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyShutdownBeforeStart",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:292",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_shutdown_before_start"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fanotify_linux_test.go",
+   "function": "TestLinuxFanotifyBackendSelection",
+   "host": "linux",
+   "id": "tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyBackendSelection",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:302",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_backend_selection"
+    }
+   ],
+   "skips": [
+    "fanotify not available"
+   ],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fanotify_linux_test.go",
+   "function": "TestLinuxFanotifySubscribeCleansUpAfterMarkFailure",
+   "host": "linux",
+   "id": "tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifySubscribeCleansUpAfterMarkFailure",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:318",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_subscribe_cleans_up_after_mark_failure"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fanotify_linux_test.go",
+   "function": "TestLinuxFanotifyParseDfidNameRoundTrip",
+   "host": "linux",
+   "id": "tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyParseDfidNameRoundTrip",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:334",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_handle_key_round_trip"
+    }
+   ],
+   "skips": [
+    "NameToHandleAt not supported: %v"
+   ],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fanotify_linux_test.go",
+   "function": "TestFanotifyCrossWatcherSameFs",
+   "host": "linux",
+   "id": "tsc/internal/fswatch/fanotify_linux_test.go:TestFanotifyCrossWatcherSameFs",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:351",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_cross_watcher_same_filesystem"
+    }
+   ],
+   "skips": [
+    "fanotify not available"
+   ],
+   "status": "ported",
+   "subtests": [
+    "Modify"
+   ]
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fanotify_linux_test.go",
+   "function": "TestLinuxFanotifyMaybeWrapUnsupportedFilesystem",
+   "host": "linux",
+   "id": "tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyMaybeWrapUnsupportedFilesystem",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:420",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_unsupported_filesystem_keeps_tag_and_errno"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fanotify_linux_test.go",
+   "function": "TestLinuxFanotifyMarkENODEVTagged",
+   "host": "linux",
+   "id": "tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyMarkENODEVTagged",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:436",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_mark_enodev_is_tagged"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fanotify_linux_test.go",
+   "function": "TestLinuxFanotifyUnsupportedTagSurvivesDirWatchError",
+   "host": "linux",
+   "id": "tsc/internal/fswatch/fanotify_linux_test.go:TestLinuxFanotifyUnsupportedTagSurvivesDirWatchError",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/linux/tests.rs:447",
+     "test": "crates/tsr_fswatch/src/linux/tests.rs::fanotify_unsupported_tag_survives_directory_watch_error"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "arch": [
+    "arm64"
+   ],
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fsevents_darwin_ffi_arm64_test.go",
+   "function": "TestCallbackASMTouchesOnlySafeRegisters",
+   "host": "macos",
+   "id": "tsc/internal/fswatch/fsevents_darwin_ffi_arm64_test.go:TestCallbackASMTouchesOnlySafeRegisters",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "reason": "The Go FFI trampoline test: it disassembles a Go test binary to check that fsEventsCallbackASM, the Go assembly callback FSEvents enters from C, touches only AAPCS caller-saved registers. The port declares FSEvents, CoreFoundation and libdispatch extern \"C\" with framework linkage and has no Go-ABI trampoline (plan X4).",
+   "skips": [],
+   "status": "not_applicable",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/fsevents_darwin_nfd_test.go",
+   "function": "TestNormalizeNFC",
+   "host": "macos",
+   "id": "tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestNormalizeNFC",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:20",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::normalization_preserves_pinned_byte_boundaries"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fsevents_darwin_nfd_test.go",
+   "function": "TestNormalizeNFCASCIIFastPath",
+   "host": "macos",
+   "id": "tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestNormalizeNFCASCIIFastPath",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:56",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::normalize_ascii_fast_path_preserves_input"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fsevents_darwin_nfd_test.go",
+   "function": "TestIsASCII",
+   "host": "macos",
+   "id": "tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestIsASCII",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:63",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::ascii_predicate_matches_pinned_byte_cases"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fsevents_darwin_nfd_test.go",
+   "function": "TestFSEventsNFDOnDiskNFCSubscribe",
+   "host": "macos",
+   "id": "tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestFSEventsNFDOnDiskNFCSubscribe",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:529",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::native_nfd_directory_subscription_reports_nfc_child_paths"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fsevents_darwin_nfd_test.go",
+   "function": "TestFSEventsNFDOnDiskNFCWatchFile",
+   "host": "macos",
+   "id": "tsc/internal/fswatch/fsevents_darwin_nfd_test.go:TestFSEventsNFDOnDiskNFCWatchFile",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:610",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::native_nfd_file_reaches_nfc_filter_and_close_releases_watch"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fsevents_darwin_shared_test.go",
+   "function": "TestFSEventsSharedStreamAcrossWatches",
+   "host": "macos",
+   "id": "tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsSharedStreamAcrossWatches",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:408",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::native_five_directory_subscriptions_share_one_stream"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fsevents_darwin_shared_test.go",
+   "function": "TestFSEventsSharedStreamRoutesEvents",
+   "host": "macos",
+   "id": "tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsSharedStreamRoutesEvents",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:424",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::native_shared_stream_routes_both_siblings_without_leaking_events"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fsevents_darwin_shared_test.go",
+   "function": "TestFSEventsConsolidatedWatchValidatesLogicalRoot",
+   "host": "macos",
+   "id": "tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsConsolidatedWatchValidatesLogicalRoot",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:467",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::native_consolidated_watch_validates_missing_and_file_roots"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fsevents_darwin_shared_test.go",
+   "function": "TestFSEventsConsolidatedWatchTerminatesLogicalRoot",
+   "host": "macos",
+   "id": "tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsConsolidatedWatchTerminatesLogicalRoot",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:493",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::native_consolidated_watch_delivers_delete_and_terminal_error_for_logical_root"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fsevents_darwin_shared_test.go",
+   "function": "TestFSEventsSharedStreamFallsBackToChunks",
+   "host": "macos",
+   "id": "tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsSharedStreamFallsBackToChunks",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:230",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::shared_stream_first_then_chunk_fallback_and_failure_rollback"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/fsevents_darwin_shared_test.go",
+   "function": "TestWatchesForFSEventsPaths",
+   "host": "macos",
+   "id": "tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestWatchesForFSEventsPaths",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:277",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::watches_for_paths_selects_only_exact_physical_roots"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/fsevents_darwin_shared_test.go",
+   "function": "TestFSEventsOverflowMatchesWatch",
+   "host": "macos",
+   "id": "tsc/internal/fswatch/fsevents_darwin_shared_test.go:TestFSEventsOverflowMatchesWatch",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/macos/tests.rs:81",
+     "test": "crates/tsr_fswatch/src/macos/tests.rs::overflow_and_display_use_component_boundaries_and_both_roots"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/walkdir_test.go",
+   "function": "TestWalkDirDoesNotFollowSymlinkedDir",
+   "host": "any",
+   "id": "tsc/internal/fswatch/walkdir_test.go:TestWalkDirDoesNotFollowSymlinkedDir",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:79",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::recursion_does_not_follow_descendant_symlinks"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/walkdir_test.go",
+   "function": "TestWalkDirDoesNotFollowRootSymlinkedDir",
+   "host": "any",
+   "id": "tsc/internal/fswatch/walkdir_test.go:TestWalkDirDoesNotFollowRootSymlinkedDir",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:98",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::root_symlink_is_not_followed"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/walkdir_test.go",
+   "function": "TestWalkDirIgnoresUnreadableSubdir",
+   "host": "any",
+   "id": "tsc/internal/fswatch/walkdir_test.go:TestWalkDirIgnoresUnreadableSubdir",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:224",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::unreadable_descendants_are_skipped_when_permissions_are_enforced"
+    }
+   ],
+   "skips": [
+    "Windows does not enforce POSIX directory permission bits",
+    "root can read directories regardless of mode bits"
+   ],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/walkdir_test.go",
+   "function": "TestWalkDirMissingDir",
+   "host": "any",
+   "id": "tsc/internal/fswatch/walkdir_test.go:TestWalkDirMissingDir",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:130",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::missing_root_fails_before_callback"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/walkdir_test.go",
+   "function": "TestWalkDirNotADir",
+   "host": "any",
+   "id": "tsc/internal/fswatch/walkdir_test.go:TestWalkDirNotADir",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:141",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::non_directory_root_fails_before_callback"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/walkdir_test.go",
+   "function": "TestWalkDirEntries",
+   "host": "any",
+   "id": "tsc/internal/fswatch/walkdir_test.go:TestWalkDirEntries",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:153",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::recursive_walk_reports_all_files_and_directories"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/walkdir_test.go",
+   "function": "TestWalkDirCallback",
+   "host": "any",
+   "id": "tsc/internal/fswatch/walkdir_test.go:TestWalkDirCallback",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:185",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::callback_distinguishes_root_subdirectories_and_files"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/walkdir_test.go",
+   "function": "TestWalkDirCallbackError",
+   "host": "any",
+   "id": "tsc/internal/fswatch/walkdir_test.go:TestWalkDirCallbackError",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/walkdir.rs:211",
+     "test": "crates/tsr_fswatch/src/walkdir.rs::callback_error_stops_before_visiting_descendants"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestRebasePath",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestRebasePath",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1031",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::rebase_paths"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestPhysicalDirForResolvesSymlinkAncestor",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestPhysicalDirForResolvesSymlinkAncestor",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1047",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::physical_dir_resolves_symlink_ancestor"
+    }
+   ],
+   "skips": [
+    "directory symlink support is not available: %v"
+   ],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestIsInDirectoryOrSelf",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestIsInDirectoryOrSelf",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1060",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::directory_containment"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestWatchFileCreate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestWatchFileCreate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:211",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::watch_file_create"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestWatchFileUpdate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestWatchFileUpdate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:217",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::watch_file_update"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestWatchFileRename",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestWatchFileRename",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:223",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::watch_file_rename"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestWatchFileRenameExisting",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestWatchFileRenameExisting",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:229",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::watch_file_rename_existing"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestWatchFileDelete",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestWatchFileDelete",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:235",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::watch_file_delete"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeDirCreate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeDirCreate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:241",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_dir_create"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeNonASCIIPath",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeNonASCIIPath",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:343",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_non_ascii_path"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeDirRename",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeDirRename",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:247",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_dir_rename"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeDirDelete",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeDirDelete",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:253",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_dir_delete"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeWatchedDirDeleted",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeWatchedDirDeleted",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:382",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_watched_dir_deleted"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeSubfileCreate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeSubfileCreate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:355",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_subfile_create"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeSubfileUpdate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeSubfileUpdate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:259",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_subfile_update"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeSubfileRename",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeSubfileRename",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:265",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_subfile_rename"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeSubfileDelete",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeSubfileDelete",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:271",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_subfile_delete"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeSubdirCreate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeSubdirCreate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:277",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_subdir_create"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeSubdirDeleteWithFiles",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeSubdirDeleteWithFiles",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:369",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_subdir_delete_with_files"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeSymlinkCreate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeSymlinkCreate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:416",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_symlink_create"
+    }
+   ],
+   "skips": [
+    "DragonFlyBSD kqueue doesn't fire NOTE_WRITE on symlink creation"
+   ],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeSymlinkDelete",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeSymlinkDelete",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:421",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_symlink_delete"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeSymlinkedDirectoryRebasesTargetEvents",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeSymlinkedDirectoryRebasesTargetEvents",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:426",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::symlinked_directory_rebases_target_events"
+    }
+   ],
+   "skips": [
+    "directory symlink support is not available: %v"
+   ],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestRecursiveSubscribeSymlinkedDirectoryDoesNotFollowDescendantSymlink",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestRecursiveSubscribeSymlinkedDirectoryDoesNotFollowDescendantSymlink",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:439",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::recursive_symlink_root_does_not_follow_descendant"
+    }
+   ],
+   "skips": [
+    "fast recursive backends do not use the userspace recursive walk",
+    "directory symlink support is not available: %v"
+   ],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeCoalesceCreateUpdate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeCoalesceCreateUpdate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1005",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::coalesce_create_update"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeCoalesceDeleteCreateAsUpdate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeCoalesceDeleteCreateAsUpdate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1010",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::coalesce_delete_create"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeCoalesceCreateThenDelete",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeCoalesceCreateThenDelete",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1015",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::coalesce_create_delete"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeCoalesceMultipleUpdates",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeCoalesceMultipleUpdates",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1020",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::coalesce_multiple_updates"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeCoalesceUpdateDelete",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeCoalesceUpdateDelete",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1025",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::coalesce_update_delete"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeMultipleSameDir",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeMultipleSameDir",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:531",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::multiple_same_dir"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeMultipleDifferentDirs",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeMultipleDifferentDirs",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:536",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::multiple_different_dirs"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestWatchDirectoriesBatch",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestWatchDirectoriesBatch",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:541",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::watch_directories_batch"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestFastRecursiveWatcherConsolidatesSiblingDirectories",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestFastRecursiveWatcherConsolidatesSiblingDirectories",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1294",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::recursive_backend_consolidates_siblings"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestFastRecursiveWatcherDoesNotConsolidateSymlinkOutsideRoot",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestFastRecursiveWatcherDoesNotConsolidateSymlinkOutsideRoot",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1299",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::recursive_backend_does_not_consolidate_outside_symlink"
+    }
+   ],
+   "skips": [
+    "directory symlink support is not available: %v"
+   ],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestConsolidatedSymlinkChildMapsSharedLogicalPath",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestConsolidatedSymlinkChildMapsSharedLogicalPath",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1325",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::consolidated_symlink_maps_shared_path"
+    }
+   ],
+   "skips": [
+    "directory symlink support is not available: %v"
+   ],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestConsolidatedSymlinkChildTerminatesFromSharedLogicalPath",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestConsolidatedSymlinkChildTerminatesFromSharedLogicalPath",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1345",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::consolidated_symlink_terminates_shared_path"
+    }
+   ],
+   "skips": [
+    "directory symlink support is not available: %v"
+   ],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestConsolidatedChildWatchFiltersAgainstRequestedDir",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestConsolidatedChildWatchFiltersAgainstRequestedDir",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1359",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::consolidated_child_filters_requested_dir"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestConsolidatedChildWatchIgnoresEventsBeforeSubscribe",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestConsolidatedChildWatchIgnoresEventsBeforeSubscribe",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1394",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::consolidated_child_ignores_earlier_events"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestRecursiveWatchWithIgnoreDoesNotFilterByLogicalRoot",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestRecursiveWatchWithIgnoreDoesNotFilterByLogicalRoot",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1420",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::recursive_ignore_does_not_filter_logical_root"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeMissingDirError",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeMissingDirError",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1107",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::missing_directory_error"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeNotADirError",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeNotADirError",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1120",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::not_directory_error"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeRejectsNilCallback",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeRejectsNilCallback",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher.rs:190",
+     "test": "crates/tsr_fswatch/src/watcher.rs::watch_directory"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeRejectsRelativePath",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeRejectsRelativePath",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1131",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::relative_paths_rejected"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeUnsubscribeIdempotent",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeUnsubscribeIdempotent",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:551",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::unsubscribe_idempotent"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeCloseThenReSubscribe",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeCloseThenReSubscribe",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:560",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::close_then_resubscribe"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeNoGoroutineLeak",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeNoGoroutineLeak",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:573",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::final_subscription_releases_native_and_debounce_workers"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeDeepNestedCreate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeDeepNestedCreate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:620",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::deep_nested_create"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeManyFilesAtOnce",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeManyFilesAtOnce",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:637",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::many_files_at_once"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeTruncateFile",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeTruncateFile",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:283",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_truncate_file"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeConcurrentSubscribeUnsubscribe",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeConcurrentSubscribeUnsubscribe",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:593",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::concurrent_subscribe_unsubscribe"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeRenameDir",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeRenameDir",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:652",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::rename_populated_dir"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeReplaceFileWithDir",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeReplaceFileWithDir",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:684",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::replace_file_with_dir"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeAppendToFile",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeAppendToFile",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:289",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::subscribe_append_to_file"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeNoEventsAfterUnsubscribe",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeNoEventsAfterUnsubscribe",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:610",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::no_events_after_unsubscribe"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestBackendRunReturnsStartError",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestBackendRunReturnsStartError",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1147",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::backend_start_error_propagates"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestDirWatchErrorImplementsError",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestDirWatchErrorImplementsError",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1161",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::directory_error_implements_error"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestFileCallbackForwardsErrAlongsideEvents",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestFileCallbackForwardsErrAlongsideEvents",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1167",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_callback_preserves_events_and_errors"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestRenameDirOutOfTreeNoStaleEvents",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestRenameDirOutOfTreeNoStaleEvents",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:893",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::rename_out_drops_descendants"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestDefaultBackendMatchesPlatform",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestDefaultBackendMatchesPlatform",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1080",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::default_backend_matches_platform"
+    }
+   ],
+   "skips": [
+    "no expected default watcher for %s"
+   ],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": false,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestUnavailableBackendReturnsError",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestUnavailableBackendReturnsError",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:1097",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::unavailable_backend_returns_error"
+    }
+   ],
+   "skips": [
+    "all watchers are available on this platform"
+   ],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestSubscribeNestedDirDeletionCleansDescendants",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestSubscribeNestedDirDeletionCleansDescendants",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:694",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::nested_deletion_cleans_descendants"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestNonRecursiveFileCreate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestNonRecursiveFileCreate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:295",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_file_create"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestNonRecursiveFileUpdate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestNonRecursiveFileUpdate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:301",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_file_update"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestNonRecursiveFileDelete",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestNonRecursiveFileDelete",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:307",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_file_delete"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestNonRecursiveDirCreate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestNonRecursiveDirCreate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:313",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_dir_create"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestNonRecursiveGrandchildIgnored",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestNonRecursiveGrandchildIgnored",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:731",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_grandchild_ignored"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestNonRecursiveNewSubdirContentIgnored",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestNonRecursiveNewSubdirContentIgnored",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:736",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_new_subdir_content_ignored"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestNonRecursiveAndRecursiveSameDir",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestNonRecursiveAndRecursiveSameDir",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:741",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_and_recursive_same_dir"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestNonRecursiveWithDeniedSubdir",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestNonRecursiveWithDeniedSubdir",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:771",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::non_recursive_denied_subdir"
+    }
+   ],
+   "skips": [
+    "chmod is not meaningful on Windows"
+   ],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestFileWatchCreate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestFileWatchCreate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:319",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_watch_create"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestFileWatchUpdate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestFileWatchUpdate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:325",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_watch_update"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestFileWatchDelete",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestFileWatchDelete",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:331",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_watch_delete"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestFileWatchIgnoresSiblings",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestFileWatchIgnoresSiblings",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:781",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_watch_ignores_siblings"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestFileWatchMultipleSameDir",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestFileWatchMultipleSameDir",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:546",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_watch_multiple_same_dir"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestFileWatchDeleteAndRecreate",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestFileWatchDeleteAndRecreate",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:794",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_watch_delete_and_recreate"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestFileWatchNonExistentTarget",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestFileWatchNonExistentTarget",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:337",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::file_watch_non_existent_target"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestRecursiveMoveInPrePopulated",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestRecursiveMoveInPrePopulated",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:850",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::recursive_move_in_prepopulated"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestAtomicSave",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestAtomicSave",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:818",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::atomic_save_directory_watch"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestAtomicSaveFileWatch",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestAtomicSaveFileWatch",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:823",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::atomic_save_file_watch"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestReplaceDirWithFile",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestReplaceDirWithFile",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:689",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::replace_dir_with_file"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestRecreateSubdirAndModify",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestRecreateSubdirAndModify",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:863",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::recreate_subdir_and_modify"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestReplaceParentDirWithDifferent",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestReplaceParentDirWithDifferent",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:878",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::replace_parent_with_different_tree"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestRoundTripRename",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestRoundTripRename",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:916",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::round_trip_rename"
+    }
+   ],
+   "skips": [
+    "kqueue fd-based tracking delivers stale delete before parent NOTE_WRITE reconciles"
+   ],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X4",
+   "computed_subtests": true,
+   "file": "tsc/internal/fswatch/watcher_test.go",
+   "function": "TestRecursiveWithDeniedSubdir",
+   "host": "any",
+   "id": "tsc/internal/fswatch/watcher_test.go:TestRecursiveWithDeniedSubdir",
+   "kind": "unit",
+   "package": "internal/fswatch",
+   "per_backend": true,
+   "rust": [
+    {
+     "site": "crates/tsr_fswatch/src/watcher/roster.rs:776",
+     "test": "crates/tsr_fswatch/src/watcher/roster.rs::recursive_denied_subdir"
+    }
+   ],
+   "skips": [
+    "chmod is not meaningful on Windows"
+   ],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X1",
+   "computed_subtests": false,
+   "file": "tsc/internal/nativepath/realpath_darwin_test.go",
+   "function": "TestRealpathHardlinkedFile",
+   "host": "macos",
+   "id": "tsc/internal/nativepath/realpath_darwin_test.go:TestRealpathHardlinkedFile",
+   "kind": "unit",
+   "package": "internal/nativepath",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_vfs/src/os/native.rs:344",
+     "test": "crates/tsr_vfs/src/os/native.rs::realpath_preserves_the_hardlink_name_while_another_link_is_opened"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X1",
+   "computed_subtests": false,
+   "file": "tsc/internal/nativepath/symlink_windows_test.go",
+   "function": "TestIsSymlinkOrReparsePoint",
+   "host": "windows",
+   "id": "tsc/internal/nativepath/symlink_windows_test.go:TestIsSymlinkOrReparsePoint",
+   "kind": "unit",
+   "package": "internal/nativepath",
+   "per_backend": false,
+   "reason": "Windows-only (file name suffix or build constraint); Windows is not a target (ADR 0002)",
+   "skips": [],
+   "status": "not_applicable",
+   "subtests": [
+    "regular file",
+    "regular directory",
+    "junction point",
+    "file symlink",
+    "directory symlink",
+    "nonexistent path",
+    "empty path",
+    "invalid path with null byte"
+   ]
+  },
+  {
+   "checkpoint": "X1",
+   "computed_subtests": false,
+   "file": "tsc/internal/nativepath/symlink_windows_test.go",
+   "function": "TestIsSymlinkOrReparsePointLongPath",
+   "host": "windows",
+   "id": "tsc/internal/nativepath/symlink_windows_test.go:TestIsSymlinkOrReparsePointLongPath",
+   "kind": "unit",
+   "package": "internal/nativepath",
+   "per_backend": false,
+   "reason": "Windows-only (file name suffix or build constraint); Windows is not a target (ADR 0002)",
+   "skips": [],
+   "status": "not_applicable",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X1",
+   "computed_subtests": false,
+   "file": "tsc/internal/nativepath/symlink_windows_test.go",
+   "function": "TestIsSymlinkOrReparsePointNestedInSymlink",
+   "host": "windows",
+   "id": "tsc/internal/nativepath/symlink_windows_test.go:TestIsSymlinkOrReparsePointNestedInSymlink",
+   "kind": "unit",
+   "package": "internal/nativepath",
+   "per_backend": false,
+   "reason": "Windows-only (file name suffix or build constraint); Windows is not a target (ADR 0002)",
+   "skips": [],
+   "status": "not_applicable",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X1",
+   "computed_subtests": false,
+   "file": "tsc/internal/nativepath/symlink_windows_test.go",
+   "function": "TestIsSymlinkOrReparsePointRelativePath",
+   "host": "windows",
+   "id": "tsc/internal/nativepath/symlink_windows_test.go:TestIsSymlinkOrReparsePointRelativePath",
+   "kind": "unit",
+   "package": "internal/nativepath",
+   "per_backend": false,
+   "reason": "Windows-only (file name suffix or build constraint); Windows is not a target (ADR 0002)",
+   "skips": [],
+   "status": "not_applicable",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X6",
+   "computed_subtests": false,
+   "file": "tsc/internal/tracing/tracing_test.go",
+   "function": "TestConcurrentDurationEventsUseSeparateThreadIDs",
+   "host": "any",
+   "id": "tsc/internal/tracing/tracing_test.go:TestConcurrentDurationEventsUseSeparateThreadIDs",
+   "kind": "unit",
+   "package": "internal/tracing",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tracing/src/tests.rs:97",
+     "test": "crates/tsr_tracing/src/tests.rs::concurrent_duration_events_have_matching_ends_names_and_per_thread_nesting"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  },
+  {
+   "checkpoint": "X6",
+   "computed_subtests": false,
+   "file": "tsc/internal/tracing/tracing_test.go",
+   "function": "TestThreadIDsAreStableAcrossFirstSeenOrder",
+   "host": "any",
+   "id": "tsc/internal/tracing/tracing_test.go:TestThreadIDsAreStableAcrossFirstSeenOrder",
+   "kind": "unit",
+   "package": "internal/tracing",
+   "per_backend": false,
+   "rust": [
+    {
+     "site": "crates/tsr_tracing/src/tests.rs:176",
+     "test": "crates/tsr_tracing/src/tests.rs::thread_ids_are_stable_across_first_seen_order_in_written_events"
+    }
+   ],
+   "skips": [],
+   "status": "ported",
+   "subtests": []
+  }
+ ],
+ "unknown_ported": {},
+ "version": 1
+}

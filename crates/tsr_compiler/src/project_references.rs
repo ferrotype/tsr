@@ -14,17 +14,43 @@ use tsr_tsoptions::{ConfigValue, ParseConfigHost, ParsedCommandLine, TsConfigSou
 use tsr_tspath as path;
 use tsr_vfs::FileSystem;
 
+/// Supplies the parsed configurations owned by a build graph. Returned configs
+/// must have their input/output maps initialized before publication. Their source
+/// identity distinguishes a circular reference to the root from a fresh parse.
+/// The pinned CompilerHost.GetResolvedProjectReference host contract.
+pub trait ResolvedProjectReferenceProvider: Send + Sync {
+    fn get_resolved_project_reference(
+        &self,
+        file_name: &[u8],
+        path: &[u8],
+    ) -> Option<Arc<ParsedCommandLine>>;
+}
+
 /// The compiler host's configuration reader: extends and content-mapper
 /// packages resolve through the production module resolver over the program's
 /// own filesystem, as the pinned `compilerHost` does for `tsoptions`.
 pub struct CompilerConfigHost {
     fs: Arc<dyn FileSystem>,
     cwd: JsString,
+    allow_live: bool,
 }
 
 impl CompilerConfigHost {
+    /// Command-line configuration loading owns a fresh resolver per operation;
+    /// it does not publish a resolver cache over a changing OS filesystem.
+    pub fn new_live(fs: Arc<dyn FileSystem>, cwd: JsString) -> Self {
+        Self {
+            fs,
+            cwd,
+            allow_live: true,
+        }
+    }
     pub fn new(fs: Arc<dyn FileSystem>, cwd: JsString) -> Self {
-        Self { fs, cwd }
+        Self {
+            fs,
+            cwd,
+            allow_live: false,
+        }
     }
 }
 
@@ -57,9 +83,17 @@ impl ParseConfigHost for CompilerConfigHost {
         name: &[u8],
         containing: &[u8],
     ) -> Result<Option<JsString>, tsr_vfs::Error> {
-        let result =
-            tsr_module::resolve_config(name, containing, self.fs.clone(), self.cwd.as_bytes())
-                .map_err(module_error)?;
+        let result = tsr_module::resolve_config_with_options(
+            name,
+            containing,
+            self.fs.clone(),
+            self.cwd.as_bytes(),
+            tsr_module::ResolverOptions {
+                allow_live_host: self.allow_live,
+                ..Default::default()
+            },
+        )
+        .map_err(module_error)?;
         Ok((!result.resolved_file_name.is_empty()).then_some(result.resolved_file_name))
     }
     fn resolve_content_mapper(
@@ -67,11 +101,15 @@ impl ParseConfigHost for CompilerConfigHost {
         containing: &[u8],
         package: &[u8],
     ) -> Result<tsr_tsoptions::config_mappers::MapperResolution, tsr_vfs::Error> {
-        tsr_module::resolve_content_mapper_manifest(
+        tsr_module::resolve_content_mapper_manifest_with_options(
             &self.fs,
             self.cwd.as_bytes(),
             containing,
             package,
+            tsr_module::ResolverOptions {
+                allow_live_host: self.allow_live,
+                ..Default::default()
+            },
         )
         .map_err(module_error)
     }
@@ -135,6 +173,32 @@ pub(crate) struct ProjectReferenceFileMapper {
 }
 
 impl ProjectReferenceFileMapper {
+    /// A finished program's reference map has no loader host. Copy its lookup
+    /// state while retaining the immutable parsed configuration owners.
+    pub(crate) fn fork_published(&self) -> Self {
+        assert!(
+            self.loader.is_none(),
+            "only finished reference maps can be reused"
+        );
+        Self {
+            root_config_path: self.root_config_path.clone(),
+            has_project_references: self.has_project_references,
+            can_use_source: self.can_use_source,
+            preserve_symlinks: self.preserve_symlinks,
+            loader: None,
+            configs: self.configs.clone(),
+            config_to_project_reference: self.config_to_project_reference.clone(),
+            references_in_config_file: self.references_in_config_file.clone(),
+            source_to_project_reference: self.source_to_project_reference.clone(),
+            output_dts_to_project_reference: self.output_dts_to_project_reference.clone(),
+            realpath_dts_to_source: Mutex::new(
+                self.realpath_dts_to_source
+                    .lock()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner)
+                    .clone(),
+            ),
+        }
+    }
     /// The empty mapper every program builds, with or without references.
     pub(crate) fn new(config: &ParsedCommandLine, can_use_source: bool) -> Self {
         Self {
@@ -485,6 +549,8 @@ struct ParseTask {
 /// source: tsc/internal/compiler/projectreferenceparser.go:projectReferenceParser
 pub(crate) struct ProjectReferenceParser<'a> {
     mapper: &'a mut ProjectReferenceFileMapper,
+    reference_provider: Option<&'a dyn ResolvedProjectReferenceProvider>,
+    tracing: Option<Arc<dyn tsr_checker::TraceSink>>,
     host: CompilerConfigHost,
     case_sensitive: bool,
     tasks: Vec<ParseTask>,
@@ -497,16 +563,36 @@ impl<'a> ProjectReferenceParser<'a> {
         mapper: &'a mut ProjectReferenceFileMapper,
         fs: Arc<dyn FileSystem>,
         cwd: JsString,
+        allow_live_host: bool,
     ) -> Self {
         let case_sensitive = fs.use_case_sensitive_file_names();
         Self {
             mapper,
-            host: CompilerConfigHost::new(fs, cwd),
+            reference_provider: None,
+            tracing: None,
+            host: if allow_live_host {
+                CompilerConfigHost::new_live(fs, cwd)
+            } else {
+                CompilerConfigHost::new(fs, cwd)
+            },
             case_sensitive,
             tasks: Vec::new(),
             tasks_by_file_name: BTreeMap::new(),
             queue: Vec::new(),
         }
+    }
+
+    pub(crate) fn with_tracing(mut self, tracing: Option<Arc<dyn tsr_checker::TraceSink>>) -> Self {
+        self.tracing = tracing;
+        self
+    }
+
+    pub(crate) fn with_reference_provider(
+        mut self,
+        provider: Option<&'a dyn ResolvedProjectReferenceProvider>,
+    ) -> Self {
+        self.reference_provider = provider;
+        self
     }
 
     fn to_path(&self, file_name: &[u8]) -> JsString {
@@ -555,14 +641,36 @@ impl<'a> ProjectReferenceParser<'a> {
     fn parse_task(&mut self, task: usize) -> Result<(), Error> {
         let name = self.tasks[task].config_name.clone();
         let path = self.to_path(name.as_bytes());
-        let Some(mut resolved) = get_resolved_project_reference(&self.host, name.as_bytes(), path)?
-        else {
+        let _trace = tsr_checker::TraceScope::new(
+            self.tracing.as_ref(),
+            tsr_checker::TracePhase::Parse,
+            "parseJsonSourceFileConfigFileContent",
+            || {
+                [(
+                    "path".into(),
+                    tsr_checker::TraceValue::Str(
+                        String::from_utf8_lossy(name.as_bytes()).into_owned(),
+                    ),
+                )]
+                .into_iter()
+                .collect()
+            },
+            false,
+        );
+        let resolved = if let Some(provider) = self.reference_provider {
+            provider.get_resolved_project_reference(name.as_bytes(), path.as_bytes())
+        } else {
+            get_resolved_project_reference(&self.host, name.as_bytes(), path)?.map(|mut config| {
+                config.parse_input_output_names();
+                Arc::new(config)
+            })
+        };
+        let Some(resolved) = resolved else {
             return Ok(());
         };
-        resolved.parse_input_output_names();
         let sub_references = resolved.resolved_project_reference_paths().to_vec();
         let index = self.mapper.configs.len();
-        self.mapper.configs.push(Arc::new(resolved));
+        self.mapper.configs.push(resolved);
         self.tasks[task].resolved = Some(index);
         if !sub_references.is_empty() {
             self.tasks[task].sub_tasks =

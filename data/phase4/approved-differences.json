@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "exceptions": [
+    {
+      "id": "P4-eager-bind-trace-order",
+      "approved": true,
+      "approved_on": "2026-10-02",
+      "approval": "Owner approved retaining the S07 eager-binding design and recording raw parse/bind trace differences in this task.",
+      "reason": "Rust binds each exclusive parsed file before publication during loading. Go binds published files later. Only the createProgram/parse/bind trace prefix differs; all type dumps, legend, diagnostics, emitted bytes and subsequent check/emit trace events match.",
+      "scope": "Exact paired transcript hashes. A different byte anywhere is outside this approval until reviewed; raw outcomes stay different.",
+      "record": "docs/PHASE4-X6.md",
+      "observations": [
+        {
+          "scenario": "tsc/generateTrace/generateTrace-generates-types-file.js",
+          "native_sha256": "1adebff23b1f356afde0a2b51464c5052fdad2be02f14c18a4ca5c53072437b7",
+          "rust_sha256": "1337e2e64759706804d4210519b88d36d33ad0afc7a7e6ca3474beb88b7e08a2"
+        },
+        {
+          "scenario": "tsc/generateTrace/generateTrace-with-multiple-files-and-complex-types.js",
+          "native_sha256": "fb153c16e39912390ae7b86091b10d178fb3f0187ec13a93c50210dfdae6d0f8",
+          "rust_sha256": "ef8af45bcb9bbf4b46799173409fe53948c39db48bf4420236da4d5ad6953ac1"
+        }
+      ]
+    }
+  ]
+}

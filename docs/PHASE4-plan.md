@@ -11,7 +11,7 @@ Planning reference: branch `phase2-c7` at `8a456baf`, with the accepted
 
 ## 1. Outcome and starting point
 
-Deliver the pinned command line as a native binary: `tsc` over a project or a
+Deliver the pinned command line as the native `tsrust` binary over a project or a
 file list, `--incremental`, `--watch`, and `tsc -b` with clean, dry, force and
 build-watch, with the pin's console output (plain and pretty, colors,
 locales), exit statuses, written files and `.tsbuildinfo`. This is PLAN's
@@ -356,7 +356,7 @@ Preparation only; no Rust command-line parity is claimed.
     `ContentMapperProjectDiagnostic` (C7's handoff), `Program.ExplainFiles`.
     The 15 unmarked diagnostic-writer functions get markers or recorded
     equivalents.
-  - *The binary.* Crate `tsc` (`publish = false`): `main` and `runMain`, the
+  - *The binary.* Crate `tsr` (`publish = false`), target `tsrust`: `main` and `runMain`, the
     OS system (standard output and error, `IsTerminal`, the terminal width,
     the environment, the normalized working directory, the clock, the
     bundled library path over the OS file system), SIGINT and SIGTERM into
@@ -592,7 +592,7 @@ Preparation only; no Rust command-line parity is claimed.
   steps and the Rust binary the rest, and the reverse; the final files and
   output equal the all-Go run's. This is PLAN's "both binaries can share
   build state".
-- **The binary.** A release build staged as `lib/tsc` (ADR 0002); on Linux
+- **The binary.** Build release target `tsrust`, staged as `lib/tsc` (ADR 0002); on Linux
   the ELF's versioned symbols checked against glibc 2.28 (decision 11).
 - **Phase 2's ownership contracts** through the command-line paths (C7's
   "E3 contracts through the compiler pool"): a compile, an incremental
@@ -615,6 +615,10 @@ libraries; one producer, `tsc`, with its inputs and sources declared in
 `status/runs.toml`; contract witnesses `x1-contracts` to `x5-contracts` with
 receipts as Phase 2's.
 
+The implemented X7 witness commands, external capture index and replay rules
+are documented in [PHASE4-acceptance.md](PHASE4-acceptance.md). Wiring a runner
+does not mark its metric passed; current authenticated executions are required.
+
 | Required claim | Evidence and denominator | Reuse |
 | --- | --- | --- |
 | Every command-line baseline matches | The 517 rendered transcripts against the committed references, whole text: `tsc` 218, `tsbuild` 192, `tscWatch` 42, `tsbuildWatch` 65; sections compared for attribution | The ported harness over the recorded scenarios |
@@ -632,7 +636,8 @@ receipts as Phase 2's.
 
 Producer metrics (`run.tsc.*`): `inventory_frozen`, `inventory_verified`,
 `harness_valid`, `result_recorded`, `blockers_named`, `unsupported_required`,
-`baseline_parity`, `incremental_correctness`, `buildinfo_codec`,
+`baseline_parity` (raw equality), `baseline_accepted` (raw matches plus exact
+owner-approved pairs), `incremental_correctness`, `buildinfo_codec`,
 `buildinfo_interop`, `unit_rosters`, `watcher_tests`, `live_watch_parity`,
 `smoke`, `thread_sanitizer`, `determinism`, `residuals`, `dispositions`,
 `evidence_current`, `report`, and per checkpoint `xN_complete` bound to
@@ -642,7 +647,7 @@ Producer metrics (`run.tsc.*`): `inventory_frozen`, `inventory_verified`,
 sprint.P4A.done == 1
 sprint.P3B.done == 1
 run.tsc.harness_valid == true
-run.tsc.baseline_parity == 1
+run.tsc.baseline_accepted == 1
 run.tsc.incremental_correctness == 1
 run.tsc.buildinfo_codec == 1
 run.tsc.buildinfo_interop == true
@@ -728,8 +733,7 @@ register rebuilt from evidence, never edited. `cargo xtask run tsc` and
 ## 8. Owner decisions
 
 Fifteen proposals. On 2026-10-02 the owner decided fourteen of them; each
-entry keeps its proposal and records the outcome. Decision 7 (dependencies)
-is still open.
+entry keeps its proposal and records the outcome. Decision 7 (dependencies) was resolved during the X0 review; all fifteen decisions are now recorded.
 
 1. **Names.** Checkpoints X0 to X7, sprints `P4A` and `P4B`, producer `tsc`,
    data under `data/phase4/`.
@@ -757,7 +761,7 @@ is still open.
    (decision 6).
 5. **Crates.** New `tsr_execute` (with `execute/tsc` and `watchmanager`, as
    the ledger maps them), `tsr_incremental`, `tsr_build`, `tsr_fswatch`,
-   `tsr_tracing` and the binary crate `tsc`; the harness under
+   `tsr_tracing` and binary crate `tsr` (target `tsrust`); the harness under
    `tools/phase4/tsctests`, repository-only. The diagnostic writer stays in
    `tsr_compiler::diagnostic_writer` although the crate map names a separate
    `tsr_diagnosticwriter`, and the record notes the deviation. New crates
@@ -770,7 +774,9 @@ is still open.
    names, the `tsr` crate on crates.io and the `tsrust` organisation on npm,
    not as a crate called `tsc`. The installed command is `tsrust`: two
    unrelated npm packages already install a command called `tsr`. The
-   workspace's binary target is still named `tsc`, as decision 11 stages it.
+   workspace's binary target is named `tsrust` too: `cargo install` installs
+   a binary under its target name, and a target called `tsc` would collide
+   with TypeScript's own `tsc` on a user's path.
 6. **Profiling.** `--pprofDir` is accepted and reports that profiling is not
    available in this build; `pprof.go` moves to Phase 7, beside the
    benchmarking work, and no `tsr_pprof` crate is created now. The
@@ -778,11 +784,28 @@ is still open.
    reports its runtime's; the row is never in a baseline. The alternative is
    a sampling-profiler dependency now.
    **Confirmed:** profiling is deferred to Phase 7.
-7. **Dependencies** ([ADR 0017](adr/0017-dependency-policy.md)). `libc` as a
-   direct dependency for fanotify, signal handling and directory entries (it
-   is already in the lock file); the `rustix` features the terminal, process
-   and event calls need; FSEvents by framework linkage with no binding
-   crate; `xxhash-rust` in `tsr_incremental`. No watcher crate (PLAN).
+7. **Dependencies** ([ADR 0017](adr/0017-dependency-policy.md)).
+   **Accepted with amendments, 2026-10-02:** use the existing `rustix` for
+   inotify, directory iteration, polling, pipes, process operations and
+   terminal queries (features `fs`, `event`, `pipe`, `process`, `termios`).
+   Direct `libc` is limited to missing fanotify/file-handle operations and
+   Unix signal registration, and `localtime_r` for the pinned local watch-clock
+   formatting (Rust std has no local-time conversion). Directory iteration
+   does not require libc.
+   On macOS, use feature-limited `objc2-core-services`,
+   `objc2-core-foundation` and `dispatch2` bindings, replacing the original
+   handwritten framework-declaration proposal. These supply native APIs and
+   ownership wrappers; the pinned watcher algorithm remains ours. Their
+   selected dependency closure must satisfy ADR 0017. `xxhash-rust` is
+   already used by `tsr_incremental`. No generic watcher crate (PLAN).
+   The signal handler only notifies normal execution, which cancels the
+   context. Restore prior handlers when the scope ends, matching Go's
+   deferred `NotifyContext.stop`; do not restore after the first signal.
+
+   A shared `tsr_tsc` crate owns Go's `execute/tsc` contracts and compilation
+   helpers. Both `tsr_execute` and `tsr_build` consume it, avoiding a circular
+   dependency between the driver and build orchestrator. It remains
+   unpublished along with the other Phase 4 crates until a release decision.
 8. **The ThreadSanitizer run.** The pinned nightly with `-Zbuild-std` and the
    system allocator, over the harness suite, the race tests and the Phase 4
    crates' tests; recorded at X7 on this host and run by a scheduled CI job
@@ -806,7 +829,10 @@ is still open.
     native binary is the place for PLAN's item 15. The run on a glibc 2.28
     image, the second Linux architecture, the size budget and cut-over stay
     Phase 7's.
-    **Confirmed.**
+    **Confirmed, with the target renamed:** the release binary is built as
+    `tsrust` (decision 5). X7 copies it to `lib/tsc` only as the staging name
+    that mirrors upstream's package layout; what upstream's launcher expects
+    there is confirmed at the Phase 7 cut-over.
 12. **`--lsp` and `--api`.** The binary recognizes both; until Phases 5 and 6
     supply the servers it says the mode is not available and exits with
     `NotImplemented` (5). `runLSP`, `runAPI`, the parent-process watchdog and
@@ -819,6 +845,15 @@ is still open.
     runs and the producers that bind the option-declaration generator.
     Nothing is re-recorded per fix; X7's green-up re-records them, and the
     recordings are the owner's.
+15. **Parse/bind trace order. Accepted, 2026-10-02.** Retain S07's exclusive
+    eager binding: Rust binds during source loading, while Go binds later.
+    The two `generateTrace` scenarios retain their raw `different` results.
+    `data/phase4/approved-differences.json` names the exact native/Rust
+    transcript hashes accepted by the owner. Type dumps, legends, diagnostics,
+    emitted output and subsequent check/emit events match byte for byte.
+    No generic trace normalization or future byte difference is approved.
+    `baseline_parity` remains the raw ratio; `baseline_accepted` is the exit
+    criterion including only those reviewed pairs. See `PHASE4-X6.md`.
     **Confirmed.**
 15. **The mapper child process** is ported here with `cmd/tsc/sys.go`,
     amending C7's record, which named Phase 5.

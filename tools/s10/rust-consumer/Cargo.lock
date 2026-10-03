@@ -493,6 +493,7 @@ dependencies = [
  "tsr_ipc",
  "tsr_json",
  "tsr_jsstring",
+ "tsr_tspath",
 ]
 
 [[package]]

@@ -29,17 +29,28 @@ pub struct OsFs {
 }
 /// port: tsc/internal/vfs/osvfs/os.go:FS
 pub fn fs() -> &'static OsFs {
-    static FS: OnceLock<OsFs> = OnceLock::new();
-    FS.get_or_init(|| OsFs {
-        common: Common {
-            root_for: Box::new(|root| {
-                Some(Arc::new(dir::Dir {
-                    root: native::path(root),
-                }))
-            }),
-            is_reparse_point: Some(Box::new(is_reparse_point)),
-        },
-        case_sensitive: case_sensitive(),
+    shared_instance().as_ref()
+}
+
+/// The same process-wide OS filesystem, retained by command-line hosts.
+pub fn shared_fs() -> Arc<OsFs> {
+    shared_instance().clone()
+}
+
+fn shared_instance() -> &'static Arc<OsFs> {
+    static FS: OnceLock<Arc<OsFs>> = OnceLock::new();
+    FS.get_or_init(|| {
+        Arc::new(OsFs {
+            common: Common {
+                root_for: Box::new(|root| {
+                    Some(Arc::new(dir::Dir {
+                        root: native::path(root),
+                    }))
+                }),
+                is_reparse_point: Some(Box::new(is_reparse_point)),
+            },
+            case_sensitive: case_sensitive(),
+        })
     })
 }
 fn case_sensitive() -> bool {

@@ -31,12 +31,19 @@ pub(crate) fn build_info_to_snapshot(
             config.current_directory(),
         )),
         snapshot: Snapshot::default(),
-        file_paths: Vec::with_capacity(build_info.file_names.len()),
-        file_path_set: Vec::with_capacity(build_info.file_ids_list.len()),
+        file_paths: Vec::with_capacity(build_info.file_names.as_deref().unwrap_or_default().len()),
+        file_path_set: Vec::with_capacity(
+            build_info
+                .file_ids_list
+                .as_deref()
+                .unwrap_or_default()
+                .len(),
+        ),
     };
     to.file_paths = build_info
         .file_names
         .iter()
+        .flatten()
         .map(|file_name| {
             if is_build_info_file_name_default_library(file_name.as_bytes()) {
                 return tsr_tspath::to_path(
@@ -55,6 +62,7 @@ pub(crate) fn build_info_to_snapshot(
     to.file_path_set = build_info
         .file_ids_list
         .iter()
+        .flatten()
         .map(|file_id_list| {
             let mut file_set = BTreeSet::new();
             for &file_id in file_id_list {
@@ -138,9 +146,12 @@ impl ToSnapshot<'_> {
                     message_text: d.message_text.clone(),
                     message_key: d.message_key.clone(),
                     message_args: d.message_args.clone(),
-                    message_chain: self.to_build_info_diagnostics_with_file_name(&d.message_chain),
-                    related_information: self
-                        .to_build_info_diagnostics_with_file_name(&d.related_information),
+                    message_chain: d.message_chain.as_deref().map(|diagnostics| {
+                        self.to_build_info_diagnostics_with_file_name(diagnostics)
+                    }),
+                    related_information: d.related_information.as_deref().map(|diagnostics| {
+                        self.to_build_info_diagnostics_with_file_name(diagnostics)
+                    }),
                     reports_unnecessary: d.reports_unnecessary,
                     reports_deprecated: d.reports_deprecated,
                     skipped_on_no_emit: d.skipped_on_no_emit,
@@ -191,7 +202,7 @@ impl ToSnapshot<'_> {
             }
         }
         // Fix up emit signatures
-        for value in &self.build_info.emit_signatures {
+        for value in self.build_info.emit_signatures.iter().flatten() {
             if value.no_emit_signature() {
                 lock(&self.snapshot.emit_signatures).remove(&self.to_file_path(value.file_id));
             } else {
@@ -204,7 +215,7 @@ impl ToSnapshot<'_> {
 
     // port: tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.setReferencedMap
     fn set_referenced_map(&mut self) {
-        for entry in &self.build_info.referenced_map {
+        for entry in self.build_info.referenced_map.iter().flatten() {
             self.snapshot.referenced_map.store_references(
                 &self.to_file_path(entry.file_id),
                 self.to_file_path_set(entry.file_id_list_id),
@@ -214,7 +225,7 @@ impl ToSnapshot<'_> {
 
     // port: tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.setChangeFileSet
     fn set_change_file_set(&mut self) {
-        for &file_id in &self.build_info.change_file_set {
+        for &file_id in self.build_info.change_file_set.iter().flatten() {
             let file_path = self.to_file_path(file_id);
             lock(&self.snapshot.changed_files_set).insert(file_path);
         }
@@ -232,7 +243,12 @@ impl ToSnapshot<'_> {
                 );
             }
         }
-        for diagnostic in &self.build_info.semantic_diagnostics_per_file {
+        for diagnostic in self
+            .build_info
+            .semantic_diagnostics_per_file
+            .iter()
+            .flatten()
+        {
             if diagnostic.file_id != 0 {
                 let file_path = self.to_file_path(diagnostic.file_id);
                 lock(&self.snapshot.semantic_diagnostics_per_file).remove(&file_path);
@@ -253,7 +269,7 @@ impl ToSnapshot<'_> {
 
     // port: tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.setEmitDiagnostics
     fn set_emit_diagnostics(&mut self) {
-        for diagnostic in &self.build_info.emit_diagnostics_per_file {
+        for diagnostic in self.build_info.emit_diagnostics_per_file.iter().flatten() {
             let diagnostic = diagnostic
                 .as_ref()
                 .expect("an emit diagnostics entry of the build info");
@@ -265,11 +281,17 @@ impl ToSnapshot<'_> {
 
     // port: tsc/internal/execute/incremental/buildinfotosnapshot.go:toSnapshot.setAffectedFilesPendingEmit
     fn set_affected_files_pending_emit(&mut self) {
-        if self.build_info.affected_files_pending_emit.is_empty() {
+        if self
+            .build_info
+            .affected_files_pending_emit
+            .as_deref()
+            .unwrap_or_default()
+            .is_empty()
+        {
             return;
         }
         let own_options_emit_kind = get_file_emit_kind(&self.snapshot.options);
-        for pending_emit in &self.build_info.affected_files_pending_emit {
+        for pending_emit in self.build_info.affected_files_pending_emit.iter().flatten() {
             lock(&self.snapshot.affected_files_pending_emit).insert(
                 self.to_file_path(pending_emit.file_id),
                 if pending_emit.emit_kind == FileEmitKind::NONE {
@@ -287,12 +309,14 @@ impl ToSnapshot<'_> {
             .build_info
             .package_jsons
             .iter()
+            .flatten()
             .map(|path| self.to_absolute_path(path))
             .collect();
         let missing_package_jsons = self
             .build_info
             .missing_package_jsons
             .iter()
+            .flatten()
             .map(|path| self.to_absolute_path(path))
             .collect();
         let mut state = self.snapshot.state();

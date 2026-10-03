@@ -6,9 +6,10 @@ mod failing;
 mod lisp;
 mod supplemental;
 mod transforming;
+mod verbatim;
 
 use std::io::Write;
-use std::sync::Arc;
+use std::sync::{atomic::AtomicI32, Arc};
 use tsr_ast::span_map::{SpanMap, FEATURE_ALL, KIND_VERBATIM};
 use tsr_ast::SpanSegment;
 use tsr_contentmapper::{
@@ -55,6 +56,14 @@ pub trait MapperHandler: Send + Sync {
 pub trait ProjectLifecycleHandler {
     fn open_project(&self, params: &OpenProjectParams) -> Result<(), HandlerError>;
     fn close_project(&self, params: &CloseProjectParams);
+}
+
+/// Records the dynamic mapper's real project protocol calls.
+/// Source type: tsc/internal/testutil/contentmappertest/dynamic_verbatim.go:ProjectLifecycle
+#[derive(Default)]
+pub struct ProjectLifecycle {
+    pub opens: AtomicI32,
+    pub closes: AtomicI32,
 }
 
 /// Answers openProject and closeProject for a mapper without dynamic
@@ -149,12 +158,25 @@ fn unexpected_method(method: &str) -> HandlerError {
 /// The handler a mapper command names. Only the mappers the corpus rows
 /// run are ported; the pin's other mappers are later work and refused.
 /// port: tsc/internal/testutil/contentmappertest/registry.go:handlerForMapper
-fn handler_for_mapper(command: &[JsString]) -> Result<Arc<dyn MapperHandler>, SpawnError> {
+fn handler_for_mapper(
+    command: &[JsString],
+    lifecycle: Option<Arc<ProjectLifecycle>>,
+) -> Result<Arc<dyn MapperHandler>, SpawnError> {
     let Some(name) = command.first() else {
         return Err("contentmappertest: empty mapper command".into());
     };
     let handler: Arc<dyn MapperHandler> = match name.as_bytes() {
         name if name == TRANSFORMING_MAPPER.as_bytes() => Arc::new(TransformingHandler::default()),
+        name if name == VERBATIM_MAPPER.as_bytes() => {
+            Arc::new(verbatim::Verbatim { module: false })
+        }
+        name if name == MODULE_VERBATIM_MAPPER.as_bytes() => {
+            Arc::new(verbatim::Verbatim { module: true })
+        }
+        name if name == DYNAMIC_VERBATIM_MAPPER.as_bytes() => {
+            Arc::new(verbatim::DynamicVerbatim { lifecycle })
+        }
+        name if name == SYNTHESIZING_MAPPER.as_bytes() => Arc::new(verbatim::Synthesizing),
         name if name == FAILING_MAPPER.as_bytes() => Arc::new(failing::FailingHandler),
         name if name == LISP_MAPPER.as_bytes() => Arc::new(lisp::LispHandler),
         name if name == SUPPLEMENTAL_MAPPER.as_bytes() => {
@@ -193,6 +215,23 @@ pub fn new_spawner() -> Arc<dyn Spawner> {
     Arc::new(InProcessSpawner)
 }
 
+/// port: tsc/internal/testutil/contentmappertest/spawner.go:NewSpawnerWithProjectLifecycle
+pub fn new_spawner_with_project_lifecycle(lifecycle: Arc<ProjectLifecycle>) -> Arc<dyn Spawner> {
+    Arc::new(LifecycleSpawner(lifecycle))
+}
+
+struct LifecycleSpawner(Arc<ProjectLifecycle>);
+impl Spawner for LifecycleSpawner {
+    fn spawn(
+        &self,
+        command: &[JsString],
+        _: &[u8],
+        _: Box<dyn Write + Send>,
+    ) -> Result<tsr_ipc::Stream, SpawnError> {
+        spawn_mapper(command, Some(self.0.clone()))
+    }
+}
+
 impl Spawner for InProcessSpawner {
     /// A pipe whose far end a connection serves with the command's mapper.
     /// port: tsc/internal/testutil/contentmappertest/spawner.go:spawner.Spawn
@@ -202,14 +241,27 @@ impl Spawner for InProcessSpawner {
         _dir: &[u8],
         _stderr: Box<dyn Write + Send>,
     ) -> Result<tsr_ipc::Stream, SpawnError> {
-        let handler = handler_for_mapper(command)?;
-        let (client, server) = tsr_ipc::pipe();
-        let conn = tsr_ipc::AsyncConn::new(server, Arc::new(StaticProjectHandler(handler)));
-        std::thread::spawn(move || {
-            let _ = tsr_ipc::Conn::run(&conn, &Context::background());
-        });
-        Ok(client)
+        spawn_mapper(command, None)
     }
+}
+
+fn spawn_mapper(
+    command: &[JsString],
+    lifecycle: Option<Arc<ProjectLifecycle>>,
+) -> Result<tsr_ipc::Stream, SpawnError> {
+    let handler = handler_for_mapper(command, lifecycle)?;
+    let (client, server) = tsr_ipc::pipe();
+    let handler: Arc<dyn tsr_ipc::Handler> =
+        if command[0].as_bytes() == DYNAMIC_VERBATIM_MAPPER.as_bytes() {
+            Arc::new(DynamicProjectHandler(handler))
+        } else {
+            Arc::new(StaticProjectHandler(handler))
+        };
+    let conn = tsr_ipc::AsyncConn::new(server, handler);
+    std::thread::spawn(move || {
+        let _ = tsr_ipc::Conn::run(&conn, &Context::background());
+    });
+    Ok(client)
 }
 
 /// Drives the transforming mapper over `stream` until it closes or `ctx` ends.
@@ -226,3 +278,14 @@ pub fn serve(ctx: &Context, stream: tsr_ipc::Stream) -> Result<(), tsr_ipc::Erro
 
 #[cfg(test)]
 mod tests;
+
+/// Dynamic mappers implement their own project protocol, as in the native spawner.
+struct DynamicProjectHandler(Arc<dyn MapperHandler>);
+impl tsr_ipc::Handler for DynamicProjectHandler {
+    fn handle_request(&self, ctx: &Context, method: &str, params: &[u8]) -> HandlerResult {
+        self.0.handle_request(ctx, method, params)
+    }
+    fn handle_notification(&self, _: &Context, _: &str, _: &[u8]) -> Result<(), HandlerError> {
+        Ok(())
+    }
+}

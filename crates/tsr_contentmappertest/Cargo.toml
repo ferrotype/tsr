@@ -9,6 +9,7 @@ description = "The in-process content mappers the tsr compiler tests and corpus 
 repository.workspace = true
 
 [dependencies]
+tsr_tspath = { path = "../tsr_tspath" }
 tsr_ast = { path = "../tsr_ast" }
 tsr_contentmapper = { path = "../tsr_contentmapper" }
 tsr_core = { path = "../tsr_core" }

@@ -188,7 +188,7 @@ fn dynamic_content_mapper_identities() {
 
     let build_info = BuildInfo {
         version: js(tsr_core::version()),
-        file_names: vec![js("/src/a.ts")],
+        file_names: Some(vec![js("/src/a.ts")]),
         content_mapper_identities: Some(vec![js("dynamic@1.0.0:old")]),
         ..BuildInfo::default()
     };
@@ -221,7 +221,7 @@ fn read_build_info_program_content_mapper_identity_mismatch() {
     // project cannot be reused: the old program is discarded (None) so the project is rebuilt.
     let build_info = BuildInfo {
         version: js(tsr_core::version()),
-        file_names: vec![js("/src/a.ts")],
+        file_names: Some(vec![js("/src/a.ts")]),
         content_mapper_identities: Some(vec![js("vue@1.0.0")]),
         ..BuildInfo::default()
     };

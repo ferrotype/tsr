@@ -310,13 +310,10 @@ fn invalid_resolution_kind_preserves_the_native_refusal() {
     );
 }
 
-/// One path spelled in two casings on a case-insensitive host: the loader
-/// parses the spelling it reaches first, and collection keeps the spelling the
-/// pin's walk visits first. A file without dependencies is parsed again under
-/// that spelling; one with its own dependencies is an explicit boundary,
-/// because another spelling's dependencies resolve from another spelling.
+/// The kept spelling owns every diagnostic even when the first loaded spelling
+/// has references, imports, or a self-cycle.
 #[test]
-fn casing_variants_reparse_leaves_and_refuse_files_with_dependencies() {
+fn casing_variants_retain_dependencies_and_diagnostic_sources() {
     let request = |dependency: &str| {
         let hex = |text: &str| {
             use std::fmt::Write;
@@ -349,28 +346,35 @@ fn casing_variants_reparse_leaves_and_refuse_files_with_dependencies() {
         })
         .collect();
     assert_eq!(names, [b"/src/a.ts".to_vec(), b"/src/main.ts".to_vec()]);
-    // A failing `/// <reference path>` leaves a diagnostic on the first
-    // spelling's parse, which the reparse would orphan. The pin reports it
-    // for every spelling's task, so the file is refused like a dependency.
     for dependency in [
         "import \"./b\";",
         "/// <reference path=\"./missing.ts\" />\nexport {};",
         "/// <reference path=\"./a.ts\" />\nexport {};",
     ] {
-        let refused = observation::try_load(
+        let program = load(
             &request(dependency),
             &mut FileCache::new(),
             &Counters::new(),
-            None,
         );
-        assert!(
-            matches!(
-                refused,
-                Err(ts_compiler_error::Error::Unsupported(
-                    "file-name casing variant with its own dependencies"
-                ))
-            ),
-            "{dependency}"
+        let source = program.source_file(b"/src/a.ts").unwrap();
+        assert_eq!(
+            source.bound().view().source_file().unwrap().file_name(),
+            b"/src/a.ts"
         );
+        if dependency.contains("missing") {
+            let diagnostic = program
+                .include_diagnostics_for_file(b"/src/a.ts")
+                .unwrap()
+                .iter()
+                .find(|d| d.code == 6053)
+                .expect("missing reference is reported");
+            assert_eq!(diagnostic.file, Some(source.source()));
+            let retained = crate::diagnostic_writer::DiagnosticSources::diagnostic_source(
+                &program,
+                diagnostic.file.unwrap(),
+            )
+            .unwrap();
+            assert_eq!(retained.file_name(), b"/src/a.ts");
+        }
     }
 }

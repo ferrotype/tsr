@@ -1,0 +1,70 @@
+{
+ "approved_exceptions": [
+  {
+   "approval": "P4-eager-bind-trace-order",
+   "cause": "files differs (initial step)",
+   "disposition": "approved_exception",
+   "kind": "different",
+   "scenario": "tsc/generateTrace/generateTrace-generates-types-file.js",
+   "transcript": "baselines/tsc/generateTrace/generateTrace-generates-types-file.js"
+  },
+  {
+   "approval": "P4-eager-bind-trace-order",
+   "cause": "files differs (initial step)",
+   "disposition": "approved_exception",
+   "kind": "different",
+   "scenario": "tsc/generateTrace/generateTrace-with-multiple-files-and-complex-types.js",
+   "transcript": "baselines/tsc/generateTrace/generateTrace-with-multiple-files-and-complex-types.js"
+  }
+ ],
+ "by_owner": {
+  "X3": 1
+ },
+ "comparison": {
+  "matched": 512,
+  "orphan_references": [
+   "tsc/commandLine/adds-color-when-FORCE_COLOR-is-set.js"
+  ],
+  "rows": 516,
+  "rust_capture_sha256": "86134c5eb8abed8e67b2438c83fc0b8c653ce1709e019fe1363ea25950e5cb7f"
+ },
+ "cross_phase": [
+  {
+   "consumer": "X1, X2, X3 and X5: the scenarios whose baselines contain emitted files (plan section 2: 420 of the 517 baselines)",
+   "dependency": "Phase 3's emit: Program.Emit, HandleNoEmitOptions, CombineEmitResults, the EmitOnly and ForceEmit modes and the write seam",
+   "evidence": "crates/tsr_compiler/src/program_emit.rs: Program.Emit, CombineEmitResults, HandleNoEmitOptions marked; data/phase3/first-comparison.json: all_domains_met 13432 of 13432 rows, unsupported_rows 0",
+   "owner": "Phase 3 (T8)",
+   "rule": "a content difference inside an emitted output file is a cross-phase entry owned by Phase 3 (emit residual)",
+   "state": "landed"
+  }
+ ],
+ "entries": [
+  {
+   "cause": "output differs (initial step)",
+   "cross_phase": false,
+   "evidence": [
+    {
+     "observation": "different: output differs (initial step)",
+     "scenario": "tsbuild/outputPaths/when-rootDir-is-specified-but-not-all-files-belong-to-rootDir-and-is-composite.js",
+     "transcript": "baselines/tsbuild/outputPaths/when-rootDir-is-specified-but-not-all-files-belong-to-rootDir-and-is-composite.js"
+    },
+    {
+     "observation": "different: output differs (initial step)",
+     "scenario": "tsbuild/outputPaths/when-rootDir-is-specified-but-not-all-files-belong-to-rootDir.js",
+     "transcript": "baselines/tsbuild/outputPaths/when-rootDir-is-specified-but-not-all-files-belong-to-rootDir.js"
+    }
+   ],
+   "families": {
+    "tsbuild": 2
+   },
+   "id": "B01",
+   "kind": "different",
+   "owner": "X3",
+   "scenarios": 2,
+   "scenarios_sha256": "19b972d88d1be270fd28b205d89cb7891994ddf3326f24093def1bd19db52b97"
+  }
+ ],
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "scope": "Buckets of scenarios that cannot pass yet in the Phase 4 command-line comparison, each with the execution evidence that establishes it and its owning checkpoint (docs/PHASE4-plan.md section 4). A blocker explains a difference and never reclassifies it. The orphan reference renders from no scenario and is not a blocker.",
+ "version": 1
+}

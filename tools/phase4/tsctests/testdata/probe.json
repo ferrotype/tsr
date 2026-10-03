@@ -1,0 +1,1953 @@
+{
+ "go": "go1.27.1",
+ "overlay_sha256": "805fae971e7736bda19f3a49c8c7b265d40a0ab0142cf6753115538157f186f6",
+ "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+ "results": {
+  "clock": {
+   "readings": [
+    1,
+    2,
+    3,
+    5
+   ],
+   "since_start_ns": 4000000000
+  },
+  "emit_kinds": [
+   "None",
+   "Js",
+   "JsMap",
+   "Js|JsMap",
+   "JsInlineMap",
+   "Js|JsInlineMap",
+   "JsMap|JsInlineMap",
+   "Js|JsMap|JsInlineMap",
+   "DtsErrors",
+   "Js|DtsErrors",
+   "JsMap|DtsErrors",
+   "Js|JsMap|DtsErrors",
+   "JsInlineMap|DtsErrors",
+   "Js|JsInlineMap|DtsErrors",
+   "JsMap|JsInlineMap|DtsErrors",
+   "Js|JsMap|JsInlineMap|DtsErrors",
+   "DtsEmit",
+   "Js|DtsEmit",
+   "JsMap|DtsEmit",
+   "Js|JsMap|DtsEmit",
+   "JsInlineMap|DtsEmit",
+   "Js|JsInlineMap|DtsEmit",
+   "JsMap|JsInlineMap|DtsEmit",
+   "Js|JsMap|JsInlineMap|DtsEmit",
+   "Dts",
+   "Js|Dts",
+   "JsMap|Dts",
+   "Js|JsMap|Dts",
+   "JsInlineMap|Dts",
+   "Js|JsInlineMap|Dts",
+   "JsMap|JsInlineMap|Dts",
+   "Js|JsMap|JsInlineMap|Dts",
+   "DtsMap",
+   "Js|DtsMap",
+   "JsMap|DtsMap",
+   "Js|JsMap|DtsMap",
+   "JsInlineMap|DtsMap",
+   "Js|JsInlineMap|DtsMap",
+   "JsMap|JsInlineMap|DtsMap",
+   "Js|JsMap|JsInlineMap|DtsMap",
+   "DtsErrors|DtsMap",
+   "Js|DtsErrors|DtsMap",
+   "JsMap|DtsErrors|DtsMap",
+   "Js|JsMap|DtsErrors|DtsMap",
+   "JsInlineMap|DtsErrors|DtsMap",
+   "Js|JsInlineMap|DtsErrors|DtsMap",
+   "JsMap|JsInlineMap|DtsErrors|DtsMap",
+   "Js|JsMap|JsInlineMap|DtsErrors|DtsMap",
+   "DtsEmit|DtsMap",
+   "Js|DtsEmit|DtsMap",
+   "JsMap|DtsEmit|DtsMap",
+   "Js|JsMap|DtsEmit|DtsMap",
+   "JsInlineMap|DtsEmit|DtsMap",
+   "Js|JsInlineMap|DtsEmit|DtsMap",
+   "JsMap|JsInlineMap|DtsEmit|DtsMap",
+   "Js|JsMap|JsInlineMap|DtsEmit|DtsMap",
+   "Dts|DtsMap",
+   "Js|Dts|DtsMap",
+   "JsMap|Dts|DtsMap",
+   "Js|JsMap|Dts|DtsMap",
+   "JsInlineMap|Dts|DtsMap",
+   "Js|JsInlineMap|Dts|DtsMap",
+   "JsMap|JsInlineMap|Dts|DtsMap",
+   "Js|JsMap|JsInlineMap|Dts|DtsMap"
+  ],
+  "fs": [
+   {
+    "case": {
+     "cwd": "",
+     "files": {
+      "/home/src/tslibs/TS/Lib/lib.dom.d.ts": "interface Dom {}",
+      "/home/src/workspaces/project/a.ts": "export const a = 1;",
+      "/home/src/workspaces/project/sub/b.ts": "export const b = �@b@123;",
+      "/home/src/workspaces/project/tsconfig.json": "{}"
+     },
+     "ignore_case": false,
+     "steps": [
+      {
+       "op": "readings"
+      },
+      {
+       "op": "default_libs"
+      },
+      {
+       "op": "changed_paths"
+      },
+      {
+       "op": "baseline"
+      },
+      {
+       "op": "changed_paths"
+      },
+      {
+       "op": "baseline"
+      },
+      {
+       "op": "write",
+       "path": "/home/src/workspaces/project/a.ts",
+       "text": "export const a = 2;"
+      },
+      {
+       "op": "write",
+       "path": "/home/src/workspaces/project/new/c.ts",
+       "text": "c"
+      },
+      {
+       "op": "readings"
+      },
+      {
+       "op": "fs_write",
+       "path": "/home/src/workspaces/project/tsconfig.json",
+       "text": "{}"
+      },
+      {
+       "op": "touch",
+       "path": "/home/src/workspaces/project/sub/b.ts"
+      },
+      {
+       "op": "fs_read",
+       "path": "/home/src/tslibs/TS/Lib/lib.es5.d.ts"
+      },
+      {
+       "op": "fs_read",
+       "path": "/home/src/tslibs/TS/Lib/lib.dom.d.ts"
+      },
+      {
+       "op": "remove",
+       "path": "/home/src/workspaces/project/sub/b.ts"
+      },
+      {
+       "op": "remove",
+       "path": "/home/src/workspaces/project/link.ts"
+      },
+      {
+       "op": "written"
+      },
+      {
+       "op": "changed_paths"
+      },
+      {
+       "op": "baseline"
+      },
+      {
+       "op": "written"
+      },
+      {
+       "op": "baseline"
+      },
+      {
+       "op": "write",
+       "path": "/home/src/workspaces/linkdir/d.ts",
+       "text": "d"
+      },
+      {
+       "op": "fs_remove",
+       "path": "/home/src/tslibs/TS/Lib/lib.es2015.d.ts"
+      },
+      {
+       "op": "remove",
+       "path": "/home/src/workspaces/project/new"
+      },
+      {
+       "op": "baseline"
+      },
+      {
+       "op": "fs_write",
+       "path": "/home/src/workspaces/project/out/a.tsbuildinfo",
+       "text": "{\"version\":\"{{VERSION}}\",\"root\":[2],\"fileNames\":[\"lib.d.ts\",\"./a.ts\"],\"fileInfos\":[\"h1\",\"h2\"],\"options\":{\"composite\":true},\"latestChangedDtsFile\":\"./a.d.ts\"}"
+      },
+      {
+       "op": "written"
+      },
+      {
+       "op": "baseline"
+      },
+      {
+       "op": "fs_read",
+       "path": "/home/src/workspaces/project/out/a.tsbuildinfo"
+      },
+      {
+       "op": "write",
+       "path": "/home/src/workspaces/project/raw.tsbuildinfo",
+       "text": "{\"version\":\"other\",\"fileNames\":[\"x\"]}"
+      },
+      {
+       "op": "fs_read",
+       "path": "/home/src/workspaces/project/raw.tsbuildinfo"
+      },
+      {
+       "op": "write",
+       "path": "/home/src/workspaces/project/fake.tsbuildinfo",
+       "text": "{\"version\":\"FakeTSVersion\",\"root\":[\"./a.ts\"]}"
+      },
+      {
+       "op": "fs_read",
+       "path": "/home/src/workspaces/project/fake.tsbuildinfo"
+      },
+      {
+       "op": "fs_read",
+       "path": "/home/src/workspaces/project/missing.tsbuildinfo"
+      },
+      {
+       "op": "fs_write",
+       "path": "/home/src/workspaces/project/bad.tsbuildinfo",
+       "text": "not json"
+      },
+      {
+       "op": "baseline"
+      },
+      {
+       "op": "fs_write",
+       "path": "/home/src/workspaces/project/a.js",
+       "text": "a"
+      },
+      {
+       "op": "fs_write",
+       "path": "/home/src/workspaces/project/b.js",
+       "text": "b"
+      },
+      {
+       "cache": [
+        "/home/src/workspaces/project/a.js",
+        "/home/src/workspaces/project/x.js"
+       ],
+       "files": [
+        "/home/src/workspaces/project/a.js",
+        "/home/src/workspaces/project/b.js"
+       ],
+       "op": "emitted"
+      },
+      {
+       "op": "baseline"
+      },
+      {
+       "cache": [
+        "/home/src/workspaces/project/a.js"
+       ],
+       "files": [
+        "/home/src/workspaces/project/a.js"
+       ],
+       "op": "emitted"
+      },
+      {
+       "files": [
+        "/home/src/workspaces/project/missing.js"
+       ],
+       "op": "emitted"
+      },
+      {
+       "op": "emitted_nil"
+      },
+      {
+       "op": "readings"
+      },
+      {
+       "op": "write_output",
+       "text": "build starting at 10:00:00 AM\nhello\n"
+      },
+      {
+       "op": "trace"
+      },
+      {
+       "op": "output"
+      },
+      {
+       "op": "clear_output"
+      },
+      {
+       "op": "trace"
+      }
+     ],
+     "symlinks": {
+      "/home/src/workspaces/linkdir": "/home/src/workspaces/project/sub",
+      "/home/src/workspaces/project/link.ts": "/home/src/workspaces/project/a.ts"
+     },
+     "windows_style_root": ""
+    },
+    "outputs": [
+     {
+      "result": {
+       "text": "121"
+      }
+     },
+     {
+      "result": {
+       "text": "107"
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": "//// [/home/src/tslibs/TS/Lib/lib.dom.d.ts] *new* \ninterface Dom {}\n//// [/home/src/workspaces/linkdir] -> /home/src/workspaces/project/sub *new*\n//// [/home/src/workspaces/project/a.ts] *new* \nexport const a = 1;\n//// [/home/src/workspaces/project/link.ts] -> /home/src/workspaces/project/a.ts *new*\n//// [/home/src/workspaces/project/sub/b.ts] *new* \nexport const b = �@b@<symbolId>;\n//// [/home/src/workspaces/project/tsconfig.json] *new* \n{}\n\n"
+      }
+     },
+     {
+      "result": {
+       "text": "changed /home/src/workspaces/project/sub/b.ts"
+      }
+     },
+     {
+      "result": {
+       "text": "\n"
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": "124"
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": "/// <reference no-default-lib=\"true\"/>\ninterface Boolean {}\ninterface Function {}\ninterface CallableFunction {}\ninterface NewableFunction {}\ninterface IArguments {}\ninterface Number { toExponential: any; }\ninterface Object {}\ninterface RegExp {}\ninterface String { charAt: any; }\ninterface Array<T> { length: number; [n: number]: T; }\ninterface ReadonlyArray<T> {}\ninterface SymbolConstructor {\n    (desc?: string | number): symbol;\n    for(name: string): symbol;\n    readonly toStringTag: symbol;\n}\ndeclare var Symbol: SymbolConstructor;\ninterface Symbol {\n    readonly [Symbol.toStringTag]: string;\n}\ndeclare const console: { log(msg: any): void; };"
+      }
+     },
+     {
+      "result": {
+       "text": "interface Dom {}"
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": "/home/src/workspaces/project/tsconfig.json"
+      }
+     },
+     {
+      "result": {
+       "text": "changed /home/src/workspaces/project/a.ts\nchanged /home/src/workspaces/project/new/c.ts\nchanged /home/src/workspaces/project/tsconfig.json\ndeleted /home/src/workspaces/project/link.ts\ndeleted /home/src/workspaces/project/sub/b.ts"
+      }
+     },
+     {
+      "result": {
+       "text": "//// [/home/src/tslibs/TS/Lib/lib.es5.d.ts] *Lib*\n/// <reference no-default-lib=\"true\"/>\ninterface Boolean {}\ninterface Function {}\ninterface CallableFunction {}\ninterface NewableFunction {}\ninterface IArguments {}\ninterface Number { toExponential: any; }\ninterface Object {}\ninterface RegExp {}\ninterface String { charAt: any; }\ninterface Array<T> { length: number; [n: number]: T; }\ninterface ReadonlyArray<T> {}\ninterface SymbolConstructor {\n    (desc?: string | number): symbol;\n    for(name: string): symbol;\n    readonly toStringTag: symbol;\n}\ndeclare var Symbol: SymbolConstructor;\ninterface Symbol {\n    readonly [Symbol.toStringTag]: string;\n}\ndeclare const console: { log(msg: any): void; };\n//// [/home/src/workspaces/project/a.ts] *modified* \nexport const a = 2;\n//// [/home/src/workspaces/project/link.ts] *deleted*\n//// [/home/src/workspaces/project/new/c.ts] *new* \nc\n//// [/home/src/workspaces/project/sub/b.ts] *deleted*\n//// [/home/src/workspaces/project/tsconfig.json] *rewrite with same content*\n\n"
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": "\n"
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": "//// [/home/src/tslibs/TS/Lib/lib.es2015.d.ts] *deleted*\n//// [/home/src/workspaces/linkdir/d.ts] *new* \nd\n//// [/home/src/workspaces/project/new/c.ts] *deleted*\n\n"
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": "/home/src/workspaces/project/out/a.tsbuildinfo\n/home/src/workspaces/project/out/a.tsbuildinfo.readable.baseline.txt"
+      }
+     },
+     {
+      "result": {
+       "text": "//// [/home/src/workspaces/linkdir/d.ts] *deleted*\n//// [/home/src/workspaces/project/out/a.tsbuildinfo] *new* \n{\"version\":\"FakeTSVersion\",\"root\":[2],\"fileNames\":[\"lib.d.ts\",\"./a.ts\"],\"fileInfos\":[\"h1\",\"h2\"],\"options\":{\"composite\":true},\"latestChangedDtsFile\":\"./a.d.ts\"}\n//// [/home/src/workspaces/project/out/a.tsbuildinfo.readable.baseline.txt] *new* \n{\n  \"version\": \"FakeTSVersion\",\n  \"root\": [\n    {\n      \"files\": [\n        \"./a.ts\"\n      ],\n      \"original\": 2\n    }\n  ],\n  \"fileNames\": [\n    \"lib.d.ts\",\n    \"./a.ts\"\n  ],\n  \"fileInfos\": [\n    {\n      \"fileName\": \"lib.d.ts\",\n      \"version\": \"h1\",\n      \"signature\": \"h1\",\n      \"impliedNodeFormat\": \"CommonJS\"\n    },\n    {\n      \"fileName\": \"./a.ts\",\n      \"version\": \"h2\",\n      \"signature\": \"h2\",\n      \"impliedNodeFormat\": \"CommonJS\"\n    }\n  ],\n  \"options\": {\n    \"composite\": true\n  },\n  \"latestChangedDtsFile\": \"./a.d.ts\",\n  \"size\": 159\n}\n\n"
+      }
+     },
+     {
+      "result": {
+       "text": "{\"version\":\"{{VERSION}}\",\"root\":[2],\"fileNames\":[\"lib.d.ts\",\"./a.ts\"],\"fileInfos\":[\"h1\",\"h2\"],\"options\":{\"composite\":true},\"latestChangedDtsFile\":\"./a.d.ts\"}"
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": "{\"version\":\"other\",\"fileNames\":[\"x\"]}"
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": "{\"version\":\"{{VERSION}}\",\"root\":[\"./a.ts\"]}"
+      }
+     },
+     {
+      "result": {
+       "text": "<missing>"
+      }
+     },
+     {
+      "panic": "testFs.WriteFile: failed to unmarshal build info: - use underlying FS's write method if this is intended use for testcasejsontext: invalid character 'o' in literal null (expecting 'u') after offset 1"
+     },
+     {
+      "result": {
+       "text": "//// [/home/src/workspaces/linkdir/d.ts] *deleted*\n//// [/home/src/workspaces/project/fake.tsbuildinfo] *new* \n{\"version\":\"FakeTSVersion\",\"root\":[\"./a.ts\"]}\n//// [/home/src/workspaces/project/raw.tsbuildinfo] *new* \n{\"version\":\"other\",\"fileNames\":[\"x\"]}\n\n"
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": "readings +2\n/home/src/workspaces/project/a.js=+1\n/home/src/workspaces/project/x.js=zero"
+      }
+     },
+     {
+      "result": {
+       "text": "//// [/home/src/workspaces/linkdir/d.ts] *deleted*\n//// [/home/src/workspaces/project/a.js] *new* \na\n//// [/home/src/workspaces/project/b.js] *new* \nb\n\n"
+      }
+     },
+     {
+      "result": {
+       "text": "readings +0\n/home/src/workspaces/project/a.js=zero"
+      }
+     },
+     {
+      "panic": "Failed to change time for emitted file: /home/src/workspaces/project/missing.js: file does not exist"
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": "137"
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": "build starting at 10:00:00 AM\nhello\n!!! Trace start\nFound 'package.json' at '/a/package.json'.\n!!! Trace end\n!!! Trace start\nFile '/a/package.json' exists according to earlier cached lookups.\n!!! Trace end\n!!! Watch Status Report Start\n!!! Watch Status Report End\n|other|!!! Trace start\nFile '/b/package.json' does not exist.\n!!! Trace end\n!!! Trace start\nFile '/b/package.json' does not exist.\n!!! Trace end\n!!! List files start\n!!! List files end\n!!! Statistics start\n!!! Statistics end\n!!! Build Status Report Start\n!!! Build Status Report End\n"
+      }
+     },
+     {
+      "result": {
+       "text": "build starting at HH:MM:SS AM\nhello\nFound 'package.json' at '/a/package.json'.\nFile '/a/package.json' exists according to earlier cached lookups.\n"
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": "!!! Trace start\nFound 'package.json' at '/a/package.json'.\n!!! Trace end\n!!! Trace start\nFile '/a/package.json' exists according to earlier cached lookups.\n!!! Trace end\n!!! Watch Status Report Start\n!!! Watch Status Report End\n|other|!!! Trace start\nFile '/b/package.json' does not exist.\n!!! Trace end\n!!! Trace start\nFile '/b/package.json' does not exist.\n!!! Trace end\n!!! List files start\n!!! List files end\n!!! Statistics start\n!!! Statistics end\n!!! Build Status Report Start\n!!! Build Status Report End\n"
+      }
+     }
+    ]
+   },
+   {
+    "case": {
+     "cwd": "D:/Work/Project",
+     "files": {
+      "D:/Work/Project/A.ts": "a",
+      "D:/Work/Project/tsconfig.json": "{}",
+      "D:/home/src/tslibs/TS/Lib/lib.d.ts": "custom"
+     },
+     "ignore_case": true,
+     "steps": [
+      {
+       "op": "readings"
+      },
+      {
+       "op": "default_libs"
+      },
+      {
+       "op": "baseline"
+      },
+      {
+       "op": "write",
+       "path": "D:/work/project/a.ts",
+       "text": "b"
+      },
+      {
+       "op": "fs_write",
+       "path": "D:/WORK/PROJECT/Out.js",
+       "text": "o"
+      },
+      {
+       "op": "changed_paths"
+      },
+      {
+       "op": "baseline"
+      },
+      {
+       "op": "fs_read",
+       "path": "d:/home/src/tslibs/ts/lib/LIB.ES5.D.TS"
+      },
+      {
+       "op": "baseline"
+      },
+      {
+       "op": "remove",
+       "path": "D:/work/PROJECT/out.js"
+      },
+      {
+       "op": "changed_paths"
+      },
+      {
+       "op": "baseline"
+      }
+     ],
+     "symlinks": null,
+     "windows_style_root": "D:/"
+    },
+    "outputs": [
+     {
+      "result": {
+       "text": "118"
+      }
+     },
+     {
+      "result": {
+       "text": "107"
+      }
+     },
+     {
+      "result": {
+       "text": "//// [D:/Work/Project/A.ts] *new* \na\n//// [D:/Work/Project/tsconfig.json] *new* \n{}\n//// [D:/home/src/tslibs/TS/Lib/lib.d.ts] *new* \ncustom\n\n"
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": "changed D:/work/project/a.ts\nchanged D:/WORK/PROJECT/Out.js"
+      }
+     },
+     {
+      "result": {
+       "text": "//// [D:/WORK/PROJECT/Out.js] *new* \no\n//// [D:/work/project/a.ts] *new* \nb\n\n"
+      }
+     },
+     {
+      "result": {
+       "text": "/// <reference no-default-lib=\"true\"/>\ninterface Boolean {}\ninterface Function {}\ninterface CallableFunction {}\ninterface NewableFunction {}\ninterface IArguments {}\ninterface Number { toExponential: any; }\ninterface Object {}\ninterface RegExp {}\ninterface String { charAt: any; }\ninterface Array<T> { length: number; [n: number]: T; }\ninterface ReadonlyArray<T> {}\ninterface SymbolConstructor {\n    (desc?: string | number): symbol;\n    for(name: string): symbol;\n    readonly toStringTag: symbol;\n}\ndeclare var Symbol: SymbolConstructor;\ninterface Symbol {\n    readonly [Symbol.toStringTag]: string;\n}\ndeclare const console: { log(msg: any): void; };"
+      }
+     },
+     {
+      "result": {
+       "text": "\n"
+      }
+     },
+     {
+      "result": {
+       "text": ""
+      }
+     },
+     {
+      "result": {
+       "text": "deleted D:/WORK/PROJECT/Out.js"
+      }
+     },
+     {
+      "result": {
+       "text": "//// [D:/WORK/PROJECT/Out.js] *deleted*\n\n"
+      }
+     }
+    ]
+   }
+  ],
+  "incremental_diff": [
+   {
+    "diff": {
+     "result": {
+      "text": "--- nonIncremental /p/a.js\n+++ incremental /p/a.js\n@@ -1,3 +1,3 @@\n x\n-y\n+Y\n z\n"
+     }
+    },
+    "incremental": {
+     "output": "error\n",
+     "raw": null,
+     "writes": [
+      [
+       "/p/a.js",
+       "x\nY\nz\n"
+      ],
+      [
+       "/p/b.js",
+       "same"
+      ]
+     ]
+    },
+    "non_incremental": {
+     "output": "error\n",
+     "raw": null,
+     "writes": [
+      [
+       "/p/a.js",
+       "x\ny\nz\n"
+      ],
+      [
+       "/p/b.js",
+       "same"
+      ]
+     ]
+    }
+   },
+   {
+    "diff": {
+     "result": {
+      "text": "--- nonIncremental /p/c.js\n+++ incremental /p/c.js\n@@ -1,1 +0,0 @@\n-only in clean\n--- nonIncremental /p/out.tsbuildinfo\n+++ incremental /p/out.tsbuildinfo\n@@ -1,1 +0,0 @@\n-Exists\n--- nonIncremental /p/out.tsbuildinfo.readable.baseline.txt\n+++ incremental /p/out.tsbuildinfo.readable.baseline.txt\n@@ -1,1 +0,0 @@\n-Exists\n--- nonIncremental.output.txt\n+++ incremental.output.txt\n@@ -1,2 +1,2 @@\n a\n-b\n+c"
+     }
+    },
+    "incremental": {
+     "output": "a\nbuild starting at 1:00:00 PM\nc\n",
+     "raw": null,
+     "writes": null
+    },
+    "non_incremental": {
+     "output": "a\n!!! List files start\nl\n!!! List files end\nb\n",
+     "raw": null,
+     "writes": [
+      [
+       "/p/c.js",
+       "only in clean"
+      ],
+      [
+       "/p/out.tsbuildinfo",
+       "{\"version\":\"{{VERSION}}\"}"
+      ]
+     ]
+    }
+   },
+   {
+    "diff": {
+     "result": {
+      "text": "--- nonIncremental /p/d.js\n+++ incremental /p/d.js\n@@ -3,7 +3,7 @@\n 3\n 4\n 5\n-6\n+six\n 7\n 8\n 9\n--- nonIncremental /p/out.tsbuildinfo.readable.baseline.txt\n+++ incremental /p/out.tsbuildinfo.readable.baseline.txt\n@@ -1,1 +0,0 @@\n-Exists\n"
+     }
+    },
+    "incremental": {
+     "output": "",
+     "raw": [
+      [
+       "/p/out.tsbuildinfo",
+       "{}"
+      ],
+      [
+       "/p/d.js",
+       "1\n2\n3\n4\n5\nsix\n7\n8\n9\n10"
+      ]
+     ],
+     "writes": null
+    },
+    "non_incremental": {
+     "output": "",
+     "raw": null,
+     "writes": [
+      [
+       "/p/out.tsbuildinfo",
+       "{\"version\":\"{{VERSION}}\"}"
+      ],
+      [
+       "/p/d.js",
+       "1\n2\n3\n4\n5\n6\n7\n8\n9\n10"
+      ]
+     ]
+    }
+   },
+   {
+    "diff": {
+     "result": {
+      "text": ""
+     }
+    },
+    "incremental": {
+     "output": "same\n",
+     "raw": null,
+     "writes": null
+    },
+    "non_incremental": {
+     "output": "same\n",
+     "raw": null,
+     "writes": null
+    }
+   }
+  ],
+  "path_is_under": [
+   {
+    "case_sensitive": true,
+    "dir": "/a",
+    "event": "/a/b",
+    "recursive": false,
+    "under": true
+   },
+   {
+    "case_sensitive": true,
+    "dir": "/a",
+    "event": "/a/b/c",
+    "recursive": false,
+    "under": false
+   },
+   {
+    "case_sensitive": true,
+    "dir": "/a",
+    "event": "/a/b/c",
+    "recursive": true,
+    "under": true
+   },
+   {
+    "case_sensitive": true,
+    "dir": "/a",
+    "event": "/a",
+    "recursive": true,
+    "under": false
+   },
+   {
+    "case_sensitive": true,
+    "dir": "/a",
+    "event": "/ab",
+    "recursive": true,
+    "under": false
+   },
+   {
+    "case_sensitive": true,
+    "dir": "/a",
+    "event": "/A/b",
+    "recursive": true,
+    "under": false
+   },
+   {
+    "case_sensitive": false,
+    "dir": "/a",
+    "event": "/A/b",
+    "recursive": true,
+    "under": true
+   },
+   {
+    "case_sensitive": false,
+    "dir": "/A",
+    "event": "/a/B/c",
+    "recursive": false,
+    "under": false
+   },
+   {
+    "case_sensitive": true,
+    "dir": "/a",
+    "event": "/a/",
+    "recursive": false,
+    "under": true
+   },
+   {
+    "case_sensitive": true,
+    "dir": "/a",
+    "event": "/a//b",
+    "recursive": false,
+    "under": false
+   },
+   {
+    "case_sensitive": true,
+    "dir": "/",
+    "event": "/a/b",
+    "recursive": true,
+    "under": false
+   },
+   {
+    "case_sensitive": true,
+    "dir": "",
+    "event": "/a/b",
+    "recursive": true,
+    "under": true
+   },
+   {
+    "case_sensitive": true,
+    "dir": "D:/x",
+    "event": "D:/x/y",
+    "recursive": false,
+    "under": true
+   },
+   {
+    "case_sensitive": false,
+    "dir": "D:/x",
+    "event": "d:/X/y",
+    "recursive": false,
+    "under": true
+   }
+  ],
+  "readable": [
+   {
+    "readable": {
+     "result": {
+      "text": "{\n  \"version\": \"FakeTSVersion\",\n  \"size\": 27\n}"
+     }
+    },
+    "text": "{\"version\":\"FakeTSVersion\"}"
+   },
+   {
+    "readable": {
+     "result": {
+      "text": "{\n  \"version\": \"FakeTSVersion\",\n  \"errors\": true,\n  \"checkPending\": true,\n  \"root\": [\n    {\n      \"files\": [\n        \"./a.ts\"\n      ],\n      \"original\": \"./a.ts\"\n    },\n    {\n      \"files\": [\n        \"./b.ts\"\n      ],\n      \"original\": \"./b.ts\"\n    }\n  ],\n  \"size\": 110,\n  \"semanticErrors\": true\n}"
+     }
+    },
+    "text": "{\"version\":\"FakeTSVersion\",\"errors\":true,\"checkPending\":true,\"root\":[\"./a.ts\",\"./b.ts\"],\"semanticErrors\":true}"
+   },
+   {
+    "readable": {
+     "result": {
+      "text": "{\n  \"version\": \"FakeTSVersion\",\n  \"root\": [],\n  \"fileNames\": [],\n  \"fileInfos\": [],\n  \"size\": 67\n}"
+     }
+    },
+    "text": "{\"version\":\"FakeTSVersion\",\"root\":[],\"fileNames\":[],\"fileInfos\":[]}"
+   },
+   {
+    "readable": {
+     "result": {
+      "text": "{\n  \"version\": \"FakeTSVersion\",\n  \"root\": [\n    {\n      \"files\": [\n        \"./a.ts\",\n        \"./b.ts\",\n        \"./c.ts\"\n      ],\n      \"original\": [\n        2,\n        4\n      ]\n    },\n    {\n      \"files\": [\n        \"./d.ts\"\n      ],\n      \"original\": 5\n    }\n  ],\n  \"packageJsons\": [\n    \"../package.json\"\n  ],\n  \"missingPackageJsons\": [\n    \"./package.json\",\n    \"../../package.json\"\n  ],\n  \"fileNames\": [\n    \"lib.d.ts\",\n    \"./a.ts\",\n    \"./b.ts\",\n    \"./c.ts\",\n    \"./d.ts\"\n  ],\n  \"fileInfos\": [\n    {\n      \"fileName\": \"lib.d.ts\",\n      \"version\": \"v1\",\n      \"signature\": \"v1\",\n      \"impliedNodeFormat\": \"CommonJS\"\n    },\n    {\n      \"fileName\": \"./a.ts\",\n      \"version\": \"v2\",\n      \"affectsGlobalScope\": true,\n      \"impliedNodeFormat\": \"None\",\n      \"original\": {\n        \"version\": \"v2\",\n        \"noSignature\": true,\n        \"affectsGlobalScope\": true\n      }\n    },\n    {\n      \"fileName\": \"./b.ts\",\n      \"version\": \"v3\",\n      \"signature\": \"s3\",\n      \"impliedNodeFormat\": \"ESNext\",\n      \"original\": {\n        \"version\": \"v3\",\n        \"signature\": \"s3\",\n        \"impliedNodeFormat\": 99\n      }\n    },\n    {\n      \"fileName\": \"./c.ts\",\n      \"version\": \"v4\",\n      \"signature\": \"v4\",\n      \"impliedNodeFormat\": \"CommonJS\",\n      \"original\": {\n        \"version\": \"v4\",\n        \"impliedNodeFormat\": 1\n      }\n    },\n    {\n      \"fileName\": \"./d.ts\",\n      \"version\": \"v5\",\n      \"impliedNodeFormat\": \"Node16\",\n      \"original\": {\n        \"version\": \"v5\",\n        \"noSignature\": true,\n        \"impliedNodeFormat\": 100\n      }\n    }\n  ],\n  \"fileIdsList\": [\n    [\n      \"./a.ts\",\n      \"./b.ts\"\n    ],\n    [\n      \"./c.ts\"\n    ],\n    []\n  ],\n  \"options\": {\n    \"composite\": true,\n    \"declaration\": true,\n    \"declarationMap\": true,\n    \"outDir\": \"./out\",\n    \"target\": 99,\n    \"lib\": [\n      \"lib.es5.d.ts\"\n    ],\n    \"paths\": {\n      \"@x/*\": [\n        \"./x/*\"\n      ]\n    }\n  },\n  \"referencedMap\": {\n    \"./a.ts\": [\n      \"./a.ts\",\n      \"./b.ts\"\n    ],\n    \"./b.ts\": [\n      \"./c.ts\"\n    ],\n    \"./d.ts\": []\n  },\n  \"semanticDiagnosticsPerFile\": [\n    \"lib.d.ts\",\n    [\n      \"./a.ts\",\n      [\n        {\n          \"pos\": 1,\n          \"end\": 2,\n          \"code\": 2322,\n          \"category\": 1,\n          \"messageKey\": \"Type_0_is_not_assignable_to_type_1_2322\",\n          \"messageArgs\": [\n            \"number\",\n            \"string\"\n          ],\n          \"messageChain\": [\n            {\n              \"code\": 2322,\n              \"category\": 1,\n              \"messageKey\": \"Type_0_is_not_assignable_to_type_1_2322\",\n              \"messageArgs\": [\n                \"a\",\n                \"b\"\n              ]\n            }\n          ],\n          \"relatedInformation\": [\n            {\n              \"file\": \"./b.ts\",\n              \"pos\": 5,\n              \"end\": 6,\n              \"code\": 2728,\n              \"category\": 3,\n              \"messageKey\": \"_0_is_declared_here_2728\",\n              \"messageArgs\": [\n                \"x\"\n              ]\n            }\n          ]\n        }\n      ]\n    ],\n    [\n      \"./b.ts\",\n      []\n    ],\n    [\n      \"./c.ts\",\n      [\n        {\n          \"noFile\": true,\n          \"code\": 6053,\n          \"category\": 1,\n          \"messageKey\": \"File_0_not_found_6053\",\n          \"messageArgs\": [\n            \"/x.ts\"\n          ],\n          \"reportsUnnecessary\": true,\n          \"reportsDeprecated\": true,\n          \"skippedOnNoEmit\": true\n        }\n      ]\n    ],\n    [\n      \"./d.ts\",\n      [\n        {\n          \"pos\": 3,\n          \"end\": 4,\n          \"code\": 2307,\n          \"category\": 1,\n          \"messageKey\": \"Cannot_find_module_0_or_its_corresponding_type_declarations_2307\",\n          \"messageArgs\": [\n            \"x\"\n          ],\n          \"repopulateInfo\": {\n            \"kind\": 2,\n            \"moduleReference\": \"x\",\n            \"mode\": 99\n          }\n        },\n        {\n          \"pos\": 3,\n          \"end\": 4,\n          \"code\": 1,\n          \"messageKey\": \"k\",\n          \"repopulateInfo\": {\n            \"kind\": 1,\n            \"packageName\": \"p\"\n          }\n        }\n      ]\n    ]\n  ],\n  \"emitDiagnosticsPerFile\": [\n    [\n      \"./a.ts\",\n      [\n        {\n          \"pos\": 7,\n          \"end\": 8,\n          \"code\": 4025,\n          \"category\": 1,\n          \"messageKey\": \"Exported_variable_0_has_or_is_using_private_name_1_4025\",\n          \"messageArgs\": [\n            \"a\",\n            \"B\"\n          ]\n        }\n      ]\n    ]\n  ],\n  \"changeFileSet\": [\n    \"./b.ts\",\n    \"./d.ts\"\n  ],\n  \"affectedFilesPendingEmit\": [\n    [\n      \"./a.ts\",\n      \"Js|Dts|DtsMap\",\n      2\n    ],\n    [\n      \"./b.ts\",\n      \"Dts\",\n      [\n        3\n      ]\n    ],\n    [\n      \"./c.ts\",\n      \"Js|DtsEmit\",\n      [\n        4,\n        17\n      ]\n    ],\n    [\n      \"./d.ts\",\n      \"Js\",\n      [\n        5,\n        1\n      ]\n    ]\n  ],\n  \"latestChangedDtsFile\": \"./out/b.d.ts\",\n  \"emitSignatures\": [\n    {\n      \"file\": \"./a.ts\",\n      \"original\": 2\n    },\n    {\n      \"file\": \"./b.ts\",\n      \"signature\": \"sig3\",\n      \"original\": [\n        3,\n        \"sig3\"\n      ]\n    },\n    {\n      \"file\": \"./c.ts\",\n      \"differsOnlyInDtsMap\": true,\n      \"original\": [\n        4,\n        []\n      ]\n    },\n    {\n      \"file\": \"./d.ts\",\n      \"signature\": \"sig5\",\n      \"differsInOptions\": true,\n      \"original\": [\n        5,\n        [\n          \"sig5\"\n        ]\n      ]\n    }\n  ],\n  \"resolvedRoot\": [\n    [\n      \"./c.ts\",\n      \"./d.ts\"\n    ]\n  ],\n  \"size\": 1953\n}"
+     }
+    },
+    "text": "{\"version\":\"FakeTSVersion\",\"root\":[[2,4],5],\"packageJsons\":[\"../package.json\"],\"missingPackageJsons\":[\"./package.json\",\"../../package.json\"],\"fileNames\":[\"lib.d.ts\",\"./a.ts\",\"./b.ts\",\"./c.ts\",\"./d.ts\"],\"fileInfos\":[\"v1\",{\"version\":\"v2\",\"noSignature\":true,\"affectsGlobalScope\":true},{\"version\":\"v3\",\"signature\":\"s3\",\"impliedNodeFormat\":99},{\"version\":\"v4\",\"impliedNodeFormat\":1},{\"version\":\"v5\",\"noSignature\":true,\"impliedNodeFormat\":100}],\"fileIdsList\":[[2,3],[4],[]],\"options\":{\"composite\":true,\"declaration\":true,\"declarationMap\":true,\"outDir\":\"./out\",\"target\":99,\"lib\":[\"lib.es5.d.ts\"],\"paths\":{\"@x/*\":[\"./x/*\"]}},\"referencedMap\":[[2,1],[3,2],[5,3]],\"semanticDiagnosticsPerFile\":[1,[2,[{\"pos\":1,\"end\":2,\"code\":2322,\"category\":1,\"messageKey\":\"Type_0_is_not_assignable_to_type_1_2322\",\"messageArgs\":[\"number\",\"string\"],\"messageChain\":[{\"pos\":0,\"end\":0,\"code\":2322,\"category\":1,\"messageKey\":\"Type_0_is_not_assignable_to_type_1_2322\",\"messageArgs\":[\"a\",\"b\"]}],\"relatedInformation\":[{\"file\":3,\"pos\":5,\"end\":6,\"code\":2728,\"category\":3,\"messageKey\":\"_0_is_declared_here_2728\",\"messageArgs\":[\"x\"]}]}]],[3,[]],[4,[{\"noFile\":true,\"code\":6053,\"category\":1,\"messageKey\":\"File_0_not_found_6053\",\"messageArgs\":[\"/x.ts\"],\"reportsUnnecessary\":true,\"reportsDeprecated\":true,\"skippedOnNoEmit\":true}]],[5,[{\"pos\":3,\"end\":4,\"code\":2307,\"category\":1,\"messageKey\":\"Cannot_find_module_0_or_its_corresponding_type_declarations_2307\",\"messageArgs\":[\"x\"],\"repopulateInfo\":{\"kind\":2,\"moduleReference\":\"x\",\"mode\":99}},{\"pos\":3,\"end\":4,\"code\":1,\"category\":0,\"messageKey\":\"k\",\"repopulateInfo\":{\"kind\":1,\"packageName\":\"p\"}}]]],\"emitDiagnosticsPerFile\":[[2,[{\"pos\":7,\"end\":8,\"code\":4025,\"category\":1,\"messageKey\":\"Exported_variable_0_has_or_is_using_private_name_1_4025\",\"messageArgs\":[\"a\",\"B\"]}]]],\"changeFileSet\":[3,5],\"affectedFilesPendingEmit\":[2,[3],[4,17],[5,1]],\"latestChangedDtsFile\":\"./out/b.d.ts\",\"emitSignatures\":[2,[3,\"sig3\"],[4,[]],[5,[\"sig5\"]]],\"resolvedRoot\":[[4,5]]}"
+   },
+   {
+    "readable": {
+     "result": {
+      "text": "{\n  \"version\": \"FakeTSVersion\",\n  \"fileNames\": [\n    \"./a.ts\"\n  ],\n  \"fileInfos\": [\n    {\n      \"fileName\": \"./a.ts\",\n      \"version\": \"h\",\n      \"signature\": \"h\",\n      \"impliedNodeFormat\": \"CommonJS\"\n    }\n  ],\n  \"options\": {\n    \"sourceMap\": true,\n    \"inlineSourceMap\": false\n  },\n  \"affectedFilesPendingEmit\": [\n    [\n      \"./a.ts\",\n      \"Js|JsMap\",\n      1\n    ]\n  ],\n  \"size\": 152\n}"
+     }
+    },
+    "text": "{\"version\":\"FakeTSVersion\",\"fileNames\":[\"./a.ts\"],\"fileInfos\":[\"h\"],\"options\":{\"sourceMap\":true,\"inlineSourceMap\":false},\"affectedFilesPendingEmit\":[1]}"
+   },
+   {
+    "readable": {
+     "result": {
+      "text": "{\n  \"version\": \"FakeTSVersion\",\n  \"fileNames\": [\n    \"./a.ts\"\n  ],\n  \"fileInfos\": [\n    {\n      \"fileName\": \"./a.ts\",\n      \"version\": \"h\",\n      \"signature\": \"h\",\n      \"impliedNodeFormat\": \"CommonJS\"\n    }\n  ],\n  \"options\": {\n    \"noEmit\": true,\n    \"declaration\": true\n  },\n  \"affectedFilesPendingEmit\": [\n    [\n      \"./a.ts\",\n      \"Js|Dts\",\n      1\n    ],\n    [\n      \"./a.ts\",\n      \"Js|Dts\",\n      1\n    ]\n  ],\n  \"size\": 150\n}"
+     }
+    },
+    "text": "{\"version\":\"FakeTSVersion\",\"fileNames\":[\"./a.ts\"],\"fileInfos\":[\"h\"],\"options\":{\"noEmit\":true,\"declaration\":true},\"affectedFilesPendingEmit\":[1,[1,0]]}"
+   },
+   {
+    "readable": {
+     "result": {
+      "text": "{\n  \"version\": \"FakeTSVersion\",\n  \"fileNames\": [\n    \"./a.ts\"\n  ],\n  \"fileInfos\": [\n    {\n      \"fileName\": \"./a.ts\",\n      \"version\": \"h\",\n      \"signature\": \"h\",\n      \"impliedNodeFormat\": \"CommonJS\"\n    }\n  ],\n  \"options\": {\n    \"emitDeclarationOnly\": true,\n    \"declaration\": true,\n    \"declarationMap\": true\n  },\n  \"affectedFilesPendingEmit\": [\n    [\n      \"./a.ts\",\n      \"Dts|DtsMap\",\n      1\n    ]\n  ],\n  \"size\": 179\n}"
+     }
+    },
+    "text": "{\"version\":\"FakeTSVersion\",\"fileNames\":[\"./a.ts\"],\"fileInfos\":[\"h\"],\"options\":{\"emitDeclarationOnly\":true,\"declaration\":true,\"declarationMap\":true},\"affectedFilesPendingEmit\":[1]}"
+   },
+   {
+    "readable": {
+     "result": {
+      "text": "{\n  \"version\": \"FakeTSVersion\",\n  \"errors\": true,\n  \"root\": [\n    {\n      \"files\": [\n        \"./a.ts\"\n      ],\n      \"original\": \"./a.ts\"\n    }\n  ],\n  \"packageJsons\": [\n    \"./package.json\"\n  ],\n  \"size\": 115,\n  \"semanticErrors\": true\n}"
+     }
+    },
+    "text": "{\"version\":\"FakeTSVersion\",\"root\":[\"./a.ts\"],\"errors\":true,\"semanticErrors\":true,\"packageJsons\":[\"./package.json\"]}"
+   },
+   {
+    "readable": {
+     "result": {
+      "text": "{\n  \"version\": \"FakeTSVersion\",\n  \"root\": [\n    {\n      \"files\": [\n        \"./é.ts\",\n        \"./�@x@12.ts\"\n      ],\n      \"original\": [\n        1,\n        2\n      ]\n    }\n  ],\n  \"fileNames\": [\n    \"./é.ts\",\n    \"./�@x@12.ts\"\n  ],\n  \"fileInfos\": [\n    {\n      \"fileName\": \"./é.ts\",\n      \"version\": \"h-�@x@12\",\n      \"signature\": \"h-�@x@12\",\n      \"impliedNodeFormat\": \"CommonJS\"\n    },\n    {\n      \"fileName\": \"./�@x@12.ts\",\n      \"version\": \"g\",\n      \"signature\": \"g\",\n      \"impliedNodeFormat\": \"CommonJS\"\n    }\n  ],\n  \"latestChangedDtsFile\": \"./é.d.ts\",\n  \"size\": 162\n}"
+     }
+    },
+    "text": "{\"version\":\"FakeTSVersion\",\"fileNames\":[\"./\\u00e9.ts\",\"./\\uFFFD@x@12.ts\"],\"fileInfos\":[\"h-\\uFFFD@x@12\",\"g\"],\"root\":[[1,2]],\"latestChangedDtsFile\":\"./\\u00e9.d.ts\"}"
+   }
+  ],
+  "sanitizer": [
+   {
+    "comparing": {
+     "result": {
+      "text": ""
+     }
+    },
+    "input": {
+     "text": ""
+    },
+    "output": {
+     "result": {
+      "text": ""
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": "hello\nworld\n"
+     }
+    },
+    "input": {
+     "text": "hello\nworld\n"
+    },
+    "output": {
+     "result": {
+      "text": "hello\nworld\n"
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": "hello\r\nworld\r\n"
+     }
+    },
+    "input": {
+     "text": "hello\r\nworld\r\n"
+    },
+    "output": {
+     "result": {
+      "text": "hello\r\nworld\r\n"
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": "something\n"
+     }
+    },
+    "input": {
+     "text": "build starting at 10:20:30 AM\nsomething\nbuild finished in 1.234s\n"
+    },
+    "output": {
+     "result": {
+      "text": "build starting at HH:MM:SS AM\nsomething\nbuild finished in d.ddds\n"
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": "a\nb\n"
+     }
+    },
+    "input": {
+     "text": "a\n!!! List files start\n/home/a.ts\nbuild starting at 1:00:00 AM\n!!! List files end\nb\n"
+    },
+    "output": {
+     "result": {
+      "text": "a\n/home/a.ts\nbuild starting at 1:00:00 AM\nb\n"
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": ""
+     }
+    },
+    "input": {
+     "text": "!!! List files start\n!!! List files end\n!!! List files start\nx\n!!! List files end\n"
+    },
+    "output": {
+     "result": {
+      "text": "x\n"
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": "after\n"
+     }
+    },
+    "input": {
+     "text": "!!! Statistics start\nFiles: 3\nLines: 10\n!!! Statistics end\nafter\n"
+    },
+    "output": {
+     "result": {
+      "text": "after\n"
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": ""
+     }
+    },
+    "input": {
+     "text": "!!! Trace start\n======== Resolving module 'x' ========\n!!! Trace end\n"
+    },
+    "output": {
+     "result": {
+      "text": "======== Resolving module 'x' ========\n"
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": ""
+     }
+    },
+    "input": {
+     "text": "!!! List files start\n!!! Trace start\nx\n!!! List files end\n"
+    },
+    "output": {
+     "result": {
+      "text": "!!! Trace start\nx\n"
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": " !!! List files start\nnot a block\n"
+     }
+    },
+    "input": {
+     "text": " !!! List files start\nnot a block\n"
+    },
+    "output": {
+     "result": {
+      "text": " !!! List files start\nnot a block\n"
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": ""
+     }
+    },
+    "input": {
+     "text": "!!! Build Status Report Start\n10:20:30 AM - Projects in this build: \n    * tsconfig.json\n\n!!! Build Status Report End\n"
+    },
+    "output": {
+     "result": {
+      "text": "HH:MM:SS AM - Projects in this build: \n    * tsconfig.json\n\n"
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": ""
+     }
+    },
+    "input": {
+     "text": "!!! Build Status Report Start\n[\u001b[90m10:20:30 AM\u001b[0m] Projects in this build: \r\n    * a/tsconfig.json\r\n\r\n!!! Build Status Report End\n"
+    },
+    "output": {
+     "result": {
+      "text": "[\u001b[90mHH:MM:SS AM\u001b[0m] Projects in this build: \r\n    * a/tsconfig.json\r\n\r\n"
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": ""
+     }
+    },
+    "input": {
+     "text": "!!! Build Status Report Start\n1:02:03 PM - Project 'a' is up to date\n!!! Build Status Report End\n"
+    },
+    "output": {
+     "panic": "Expected timestamp"
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": ""
+     }
+    },
+    "input": {
+     "text": "!!! Watch Status Report Start\n\u001b[2J\u001b[3J\u001b[H[\u001b[90m9:00:00 AM\u001b[0m] Starting compilation in watch mode...\n\n!!! Watch Status Report End\n"
+    },
+    "output": {
+     "result": {
+      "text": "\u001b[2J\u001b[3J\u001b[H[\u001b[90HH:MM:SS AM\u001b[0m] Starting compilation in watch mode...\n\n"
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": ""
+     }
+    },
+    "input": {
+     "text": "!!! Watch Status Report Start\n10:00:00 PM - Found 0 errors. Watching for file changes.\n\n!!! Watch Status Report End\n"
+    },
+    "output": {
+     "result": {
+      "text": "HH:MM:SS AM - Found 0 errors. Watching for file changes.\n\n"
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": ""
+     }
+    },
+    "input": {
+     "text": "!!! Build Status Report Start\nno timestamp here\n!!! Build Status Report End\n"
+    },
+    "output": {
+     "panic": "Expected timestamp"
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": ""
+     }
+    },
+    "input": {
+     "text": "!!! Build Status Report Start\n1:2\n!!! Build Status Report End\n"
+    },
+    "output": {
+     "panic": "Expected timestamp"
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": ""
+     }
+    },
+    "input": {
+     "text": "!!! Build Status Report Start\n\n!!! Build Status Report End\n"
+    },
+    "output": {
+     "panic": "Expected timestamp"
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": ""
+     }
+    },
+    "input": {
+     "text": "!!! Build Status Report Start\nx:y\n!!! Build Status Report End\n"
+    },
+    "output": {
+     "panic": "Expected timestamp"
+    }
+   },
+   {
+    "comparing": {
+     "panic": "Expected lineEnd!!! List files end not found after !!! List files start"
+    },
+    "input": {
+     "text": "!!! List files start\nunterminated\n"
+    },
+    "output": {
+     "panic": "Expected lineEnd!!! List files end not found after !!! List files start"
+    }
+   },
+   {
+    "comparing": {
+     "panic": "Expected lineEnd!!! Statistics end not found after !!! Statistics start"
+    },
+    "input": {
+     "text": "!!! Statistics start\nunterminated\n"
+    },
+    "output": {
+     "panic": "Expected lineEnd!!! Statistics end not found after !!! Statistics start"
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": "Version FakeTSVersion\n'FakeTSVersion' and 'FakeTSVersion'\nVerze FakeTSVersion\n"
+     }
+    },
+    "input": {
+     "text": "Version 7.1.0-dev\n'7.1.0-dev' and '7.1.0-dev'\nVerze 7.1.0-dev\n"
+    },
+    "output": {
+     "result": {
+      "text": "Version FakeTSVersion\n'FakeTSVersion' and 'FakeTSVersion'\nVerze FakeTSVersion\n"
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": "�@foo@<symbolId> and �@bar@<symbolId>\n"
+     }
+    },
+    "input": {
+     "text": "�@foo@123 and �@bar@4\n"
+    },
+    "output": {
+     "result": {
+      "text": "�@foo@<symbolId> and �@bar@<symbolId>\n"
+     }
+    }
+   },
+   {
+    "comparing": {
+     "result": {
+      "text": ""
+     }
+    },
+    "input": {
+     "text": "!!! Build Status Report Start\n10:20:30 AM - �@foo@123 Version 7.1.0-dev\n!!! Build Status Report End\n"
+    },
+    "output": {
+     "result": {
+      "text": "HH:MM:SS AM - �@foo@<symbolId> Version FakeTSVersion\n"
+     }
+    }
+   }
+  ],
+  "sub_folders": [
+   {
+    "args": null,
+    "folder": "tsc"
+   },
+   {
+    "args": [],
+    "folder": "tsc"
+   },
+   {
+    "args": [
+     "-b"
+    ],
+    "folder": "tsbuild"
+   },
+   {
+    "args": [
+     "--b"
+    ],
+    "folder": "tsbuild"
+   },
+   {
+    "args": [
+     "-build"
+    ],
+    "folder": "tsbuild"
+   },
+   {
+    "args": [
+     "--build"
+    ],
+    "folder": "tsbuild"
+   },
+   {
+    "args": [
+     "-B"
+    ],
+    "folder": "tsc"
+   },
+   {
+    "args": [
+     "--BUILD"
+    ],
+    "folder": "tsc"
+   },
+   {
+    "args": [
+     "-w"
+    ],
+    "folder": "tscWatch"
+   },
+   {
+    "args": [
+     "--w"
+    ],
+    "folder": "tscWatch"
+   },
+   {
+    "args": [
+     "-watch"
+    ],
+    "folder": "tscWatch"
+   },
+   {
+    "args": [
+     "--watch"
+    ],
+    "folder": "tscWatch"
+   },
+   {
+    "args": [
+     "-W"
+    ],
+    "folder": "tsc"
+   },
+   {
+    "args": [
+     "-b",
+     "-w"
+    ],
+    "folder": "tsbuildWatch"
+   },
+   {
+    "args": [
+     "-p",
+     "x",
+     "--build",
+     "--watch"
+    ],
+    "folder": "tsbuildWatch"
+   },
+   {
+    "args": [
+     "--watchFile"
+    ],
+    "folder": "tsc"
+   },
+   {
+    "args": [
+     "-b=true"
+    ],
+    "folder": "tsc"
+   },
+   {
+    "args": [
+     "build"
+    ],
+    "folder": "tsc"
+   }
+  ],
+  "symbol_names": [
+   {
+    "input": {
+     "text": "no symbol"
+    },
+    "output": {
+     "text": "no symbol"
+    }
+   },
+   {
+    "input": {
+     "text": "�@foo@123"
+    },
+    "output": {
+     "text": "�@foo@<symbolId>"
+    }
+   },
+   {
+    "input": {
+     "text": "x�@foo@123y"
+    },
+    "output": {
+     "text": "x�@foo@<symbolId>y"
+    }
+   },
+   {
+    "input": {
+     "text": "�@foo@"
+    },
+    "output": {
+     "text": "�@foo@"
+    }
+   },
+   {
+    "input": {
+     "text": "�@@123"
+    },
+    "output": {
+     "text": "�@@123"
+    }
+   },
+   {
+    "input": {
+     "text": "�@a@b@12"
+    },
+    "output": {
+     "text": "�@a@b@12"
+    }
+   },
+   {
+    "input": {
+     "text": "�@na\nme@99"
+    },
+    "output": {
+     "text": "�@na\nme@<symbolId>"
+    }
+   },
+   {
+    "input": {
+     "text": "�@foo@123�@bar@456"
+    },
+    "output": {
+     "text": "�@foo@<symbolId>�@bar@<symbolId>"
+    }
+   },
+   {
+    "input": {
+     "text": "�@foo@12a"
+    },
+    "output": {
+     "text": "�@foo@<symbolId>a"
+    }
+   },
+   {
+    "input": {
+     "hex": "ff40666f6f403120efbfbd40784032"
+    },
+    "output": {
+     "hex": "ff40666f6f403c73796d626f6c49643e20efbfbd4078403c73796d626f6c49643e"
+    }
+   },
+   {
+    "input": {
+     "hex": "ff40666f6f4031"
+    },
+    "output": {
+     "hex": "ff40666f6f4031"
+    }
+   },
+   {
+    "input": {
+     "text": "�@é@7"
+    },
+    "output": {
+     "text": "�@é@<symbolId>"
+    }
+   },
+   {
+    "input": {
+     "text": "��@a@1"
+    },
+    "output": {
+     "text": "��@a@<symbolId>"
+    }
+   },
+   {
+    "input": {
+     "text": "@a@1"
+    },
+    "output": {
+     "text": "@a@1"
+    }
+   },
+   {
+    "input": {
+     "hex": "efbfbd4061ff4033"
+    },
+    "output": {
+     "hex": "efbfbd4061ff403c73796d626f6c49643e"
+    }
+   },
+   {
+    "input": {
+     "text": "�@x@1@2"
+    },
+    "output": {
+     "text": "�@x@<symbolId>@2"
+    }
+   }
+  ],
+  "terminal_width": [
+   {
+    "value": null,
+    "width": 0
+   },
+   {
+    "value": "",
+    "width": 0
+   },
+   {
+    "value": "80",
+    "width": 80
+   },
+   {
+    "value": "-5",
+    "width": -5
+   },
+   {
+    "value": "+7",
+    "width": 7
+   },
+   {
+    "value": "007",
+    "width": 7
+   },
+   {
+    "panic": "strconv.Atoi: parsing \"abc\": invalid syntax",
+    "value": "abc"
+   },
+   {
+    "panic": "strconv.Atoi: parsing \"8 0\": invalid syntax",
+    "value": "8 0"
+   },
+   {
+    "panic": "strconv.Atoi: parsing \"99999999999999999999\": value out of range",
+    "value": "99999999999999999999"
+   },
+   {
+    "panic": "strconv.Atoi: parsing \"0x10\": invalid syntax",
+    "value": "0x10"
+   }
+  ],
+  "tracer": [
+   {
+    "builder": "Found 'package.json' at '/a/package.json'.\nFile '/a/package.json' exists according to earlier cached lookups.\nFile '/a/package.json' exists according to earlier cached lookups.\nFound 'package.json' at '/c/package.json'.\nFile '/c/package.json' exists according to earlier cached lookups.\nFile '/b/package.json' does not exist.\nFile '/b/package.json' does not exist according to earlier cached lookups.\nFile '/d/package.json' does not exist.\nFile '/d/package.json' does not exist according to earlier cached lookups.\nFile 'x/package.json' does not exist.\nFile '/home/src/workspaces/project/x/package.json' does not exist according to earlier cached lookups.\nFound 'package.json' at '/a/package.json'.\nVersion 'FakeTSVersion' and '7.1.0-dev'\nResolving module 'x' from '/a.ts'.\nFile '/z/package.json' does not exist.\nFile '/z/package.json' does not exist according to earlier cached lookups.\n",
+    "case_sensitive": true,
+    "cwd": "/home/src/workspaces/project",
+    "other": "File '/e/package.json' does not exist.\nFound 'package.json' at '/e/package.json'.\nFile '/e/package.json' does not exist.\nFound 'package.json' at '/e/package.json'.\n",
+    "steps": [
+     {
+      "msg": "Found 'package.json' at '/a/package.json'.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "Found 'package.json' at '/a/package.json'.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "File '/a/package.json' exists according to earlier cached lookups.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "File '/c/package.json' exists according to earlier cached lookups.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "File '/c/package.json' exists according to earlier cached lookups.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "File '/b/package.json' does not exist.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "File '/b/package.json' does not exist.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "File '/d/package.json' does not exist according to earlier cached lookups.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "File '/d/package.json' does not exist according to earlier cached lookups.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "File '/e/package.json' does not exist according to earlier cached lookups.",
+      "other": true,
+      "reset": false,
+      "use_cache": false
+     },
+     {
+      "msg": "File '/e/package.json' exists according to earlier cached lookups.",
+      "other": true,
+      "reset": false,
+      "use_cache": false
+     },
+     {
+      "msg": "File '/e/package.json' does not exist.",
+      "other": true,
+      "reset": false,
+      "use_cache": false
+     },
+     {
+      "msg": "Found 'package.json' at '/e/package.json'.",
+      "other": true,
+      "reset": false,
+      "use_cache": false
+     },
+     {
+      "msg": "File 'x/package.json' does not exist.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "File '/home/src/workspaces/project/x/package.json' does not exist.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "",
+      "other": false,
+      "reset": true,
+      "use_cache": false
+     },
+     {
+      "msg": "Found 'package.json' at '/a/package.json'.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "Version '{{VERSION}}' and '{{VERSION}}'",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "Resolving module 'x' from '/a.ts'.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     }
+    ]
+   },
+   {
+    "builder": "Found 'package.json' at '/A/package.json'.\nFile '/a/PACKAGE.json' exists according to earlier cached lookups.\nFile 'X/package.json' does not exist.\nFile '/home/project/x/package.json' does not exist according to earlier cached lookups.\nFile '/z/package.json' does not exist.\nFile '/z/package.json' does not exist according to earlier cached lookups.\n",
+    "case_sensitive": false,
+    "cwd": "/Home/Project",
+    "other": "",
+    "steps": [
+     {
+      "msg": "Found 'package.json' at '/A/package.json'.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "Found 'package.json' at '/a/PACKAGE.json'.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "File 'X/package.json' does not exist.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     },
+     {
+      "msg": "File '/home/project/x/package.json' does not exist.",
+      "other": false,
+      "reset": false,
+      "use_cache": true
+     }
+    ]
+   }
+  ],
+  "version_placeholder": "{{VERSION}}",
+  "watch": [
+   {
+    "case_sensitive": true,
+    "existing": [
+     "/home/src/workspaces/project",
+     "/home/src/workspaces/project/src",
+     "/home/src/workspaces/project/node_modules",
+     "/home/src/tslibs/TS/Lib",
+     "/Users/Me/Project"
+    ],
+    "outputs": [
+     false,
+     "Watch Registrations::\nDirectory watches::\n  (none)\n",
+     "ok",
+     true,
+     "Watch Registrations::\nDirectory watches::\n  /home/src/tslibs/TS/Lib\n  /home/src/workspaces/project (recursive)\n",
+     "error: directory does not exist: /missing",
+     "error: directory does not exist: /nowhere",
+     "Watch Registrations::\nDirectory watches::\n  /home/src/tslibs/TS/Lib\n  /home/src/workspaces/project (recursive)\n",
+     "ok",
+     [
+      "/home/src/tslibs/TS/Lib|000|delete|/home/src/tslibs/TS/Lib/lib.d.ts",
+      "/home/src/workspaces/project/src|000|update|/home/src/workspaces/project/src/a.ts",
+      "/home/src/workspaces/project/src|001|update|/home/src/workspaces/project/src/deep",
+      "/home/src/workspaces/project/src|002|delete|/home/src/workspaces/project/src/a.ts",
+      "/home/src/workspaces/project|000|update|/home/src/workspaces/project/src/a.ts",
+      "/home/src/workspaces/project|001|update|/home/src/workspaces/project/src",
+      "/home/src/workspaces/project|002|update|/home/src/workspaces/project/src/deep/b.ts",
+      "/home/src/workspaces/project|003|update|/home/src/workspaces/project/src/deep",
+      "/home/src/workspaces/project|004|update|/home/src/workspaces/project/node_modules",
+      "/home/src/workspaces/project|005|delete|/home/src/workspaces/project/src/a.ts"
+     ],
+     [
+      "/home/src/tslibs/TS/Lib|error|fswatch: event overflow; some changes were missed",
+      "/home/src/workspaces/project/src|error|fswatch: event overflow; some changes were missed",
+      "/home/src/workspaces/project|error|fswatch: event overflow; some changes were missed"
+     ],
+     "<nil>",
+     "Watch Registrations::\nDirectory watches::\n  /home/src/workspaces/project (recursive)\n  /home/src/workspaces/project/src\n",
+     null,
+     "ok",
+     "Watch Registrations::\nDirectory watches::\n  /home/src/workspaces/project\n  /home/src/workspaces/project/src\n",
+     "<nil>",
+     "<nil>",
+     "Watch Registrations::\nDirectory watches::\n  (none)\n",
+     true
+    ],
+    "steps": [
+     {
+      "op": "has_watches"
+     },
+     {
+      "op": "state"
+     },
+     {
+      "op": "watch",
+      "requests": [
+       {
+        "dir": "/home/src/workspaces/project",
+        "ignore": "/node_modules/",
+        "recursive": true
+       },
+       {
+        "dir": "/home/src/tslibs/TS/Lib",
+        "recursive": false
+       }
+      ]
+     },
+     {
+      "op": "has_watches"
+     },
+     {
+      "op": "state"
+     },
+     {
+      "op": "watch",
+      "requests": [
+       {
+        "dir": "/missing",
+        "recursive": false
+       }
+      ]
+     },
+     {
+      "op": "watch",
+      "requests": [
+       {
+        "dir": "/home/src/workspaces/project/src",
+        "recursive": false
+       },
+       {
+        "dir": "/nowhere",
+        "recursive": false
+       }
+      ]
+     },
+     {
+      "op": "state"
+     },
+     {
+      "op": "watch",
+      "requests": [
+       {
+        "dir": "/home/src/workspaces/project/src",
+        "recursive": false
+       }
+      ]
+     },
+     {
+      "changes": [
+       {
+        "path": "/home/src/workspaces/project/src/a.ts"
+       },
+       {
+        "path": "/home/src/workspaces/project/src/deep/b.ts"
+       },
+       {
+        "path": "/home/src/workspaces/project/node_modules/x/index.d.ts"
+       },
+       {
+        "path": "/home/src/workspaces/projectx/c.ts"
+       },
+       {
+        "deleted": true,
+        "path": "/home/src/tslibs/TS/Lib/lib.d.ts"
+       },
+       {
+        "deleted": true,
+        "path": "/home/src/workspaces/project/src/a.ts"
+       }
+      ],
+      "op": "send_changed_paths"
+     },
+     {
+      "op": "overflow"
+     },
+     {
+      "dir": "/home/src/tslibs/TS/Lib",
+      "op": "close"
+     },
+     {
+      "op": "state"
+     },
+     {
+      "changes": [
+       {
+        "path": "/home/src/tslibs/TS/Lib/lib.es5.d.ts"
+       }
+      ],
+      "op": "send_changed_paths"
+     },
+     {
+      "op": "watch",
+      "requests": [
+       {
+        "dir": "/home/src/workspaces/project",
+        "recursive": false
+       }
+      ]
+     },
+     {
+      "op": "state"
+     },
+     {
+      "dir": "/home/src/workspaces/project",
+      "op": "close"
+     },
+     {
+      "dir": "/home/src/workspaces/project/src",
+      "op": "close"
+     },
+     {
+      "op": "state"
+     },
+     {
+      "op": "has_watches"
+     }
+    ]
+   },
+   {
+    "case_sensitive": false,
+    "existing": [
+     "/home/src/workspaces/project",
+     "/home/src/workspaces/project/src",
+     "/home/src/workspaces/project/node_modules",
+     "/home/src/tslibs/TS/Lib",
+     "/Users/Me/Project"
+    ],
+    "outputs": [
+     "ok",
+     [
+      "/Users/Me/Project|000|update|/users/me/project/A.ts",
+      "/Users/Me/Project|001|update|/USERS/ME/PROJECT/b/c.ts",
+      "/Users/Me/Project|002|update|/USERS/ME/PROJECT/b"
+     ],
+     "Watch Registrations::\nDirectory watches::\n  /Users/Me/Project (recursive)\n"
+    ],
+    "steps": [
+     {
+      "op": "watch",
+      "requests": [
+       {
+        "dir": "/Users/Me/Project",
+        "recursive": true
+       }
+      ]
+     },
+     {
+      "changes": [
+       {
+        "path": "/users/me/project/A.ts"
+       },
+       {
+        "path": "/USERS/ME/PROJECT/b/c.ts"
+       },
+       {
+        "path": "/Users/Me/Projectile/d.ts"
+       }
+      ],
+      "op": "send_changed_paths"
+     },
+     {
+      "op": "state"
+     }
+    ]
+   }
+  ]
+ },
+ "version": 1
+}

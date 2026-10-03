@@ -13,8 +13,30 @@ pub fn resolve_content_mapper_manifest(
     containing_file: &[u8],
     name: &[u8],
 ) -> Result<MapperResolution, crate::Error> {
+    resolve_content_mapper_manifest_with_options(
+        host,
+        cwd,
+        containing_file,
+        name,
+        crate::ResolverOptions::default(),
+    )
+}
+
+/// Config-loading callers explicitly select a live, one-shot resolver.
+pub fn resolve_content_mapper_manifest_with_options(
+    host: &Arc<dyn FileSystem>,
+    cwd: &[u8],
+    containing_file: &[u8],
+    name: &[u8],
+    settings: crate::ResolverOptions,
+) -> Result<MapperResolution, crate::Error> {
+    let options = Arc::new(tsr_core::CompilerOptions {
+        module_resolution: tsr_core::ModuleResolutionKind::BUNDLER,
+        ..Default::default()
+    });
+    let mut resolver = crate::Resolver::with_options(host.clone(), options, cwd, settings)?;
     let Some(resolved) =
-        crate::resolve_package_directory(name, containing_file, host.clone(), cwd)?
+        resolver.resolve_package_directory(name, containing_file, tsr_core::ModuleKind::NONE)?
     else {
         return Ok(failure(
             name,

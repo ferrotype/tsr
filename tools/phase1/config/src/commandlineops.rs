@@ -248,6 +248,10 @@ pub(super) fn worker_declaration(value: &Value) -> Result<OptionDeclaration, Out
         min_value: 0,
         allow_config_dir_template: false,
         preserve_falsy: false,
+        category: None,
+        description: None,
+        default_value_description: tsr_tsoptions::DefaultValueDescription::Nil,
+        show_in_simplified_help_view: false,
     })
 }
 

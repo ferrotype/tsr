@@ -1,0 +1,30 @@
+[package]
+name = "tsr_execute"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+description = "TypeScript command-line compilation and watch driver"
+
+[dependencies]
+tsr_build = { path = "../tsr_build" }
+tsr_arena = { path = "../tsr_arena" }
+tsr_checker = { path = "../tsr_checker" }
+tsr_json = { path = "../tsr_json" }
+tsr_tsc = { path = "../tsr_tsc" }
+tsr_compiler = { path = "../tsr_compiler" }
+tsr_contentmapper = { path = "../tsr_contentmapper" }
+tsr_core = { path = "../tsr_core" }
+tsr_diagnostics = { path = "../tsr_diagnostics" }
+tsr_incremental = { path = "../tsr_incremental" }
+tsr_jsstring = { path = "../tsr_jsstring" }
+tsr_locale = { path = "../tsr_locale" }
+tsr_vfs = { path = "../tsr_vfs" }
+tsr_ast = { path = "../tsr_ast" }
+tsr_tsoptions = { path = "../tsr_tsoptions" }
+tsr_tspath = { path = "../tsr_tspath" }
+tsr_ipc = { path = "../tsr_ipc" }
+
+[lints]
+workspace = true

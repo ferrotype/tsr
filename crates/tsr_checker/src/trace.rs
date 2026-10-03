@@ -48,10 +48,11 @@ impl TracePhase {
 }
 
 /// A trace argument value: the pin's arguments are integers (node kinds,
-/// positions, type ids and counts), strings (file names) and string lists
+/// positions, type ids and counts), booleans, strings (file names) and string lists
 /// (variances).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum TraceValue {
+    Bool(bool),
     Int(i64),
     Str(String),
     Strs(Vec<String>),
@@ -64,6 +65,9 @@ pub type TraceArgs = BTreeMap<String, TraceValue>;
 /// The trace session a checker writes to: the shapes of `tracing.Tracing`'s
 /// `Push` and `Instant` and of the type tracer's `RecordType` (ADR 0014).
 pub trait TraceSink: Send + Sync {
+    /// Register the per-checker type tracer before intrinsic types are made.
+    /// File sinks need its legend entry even if the checker records no types.
+    fn new_type_tracer(&self, _checker_index: usize) {}
     /// `Tracing.Push`: begins an event and returns the token that ends it.
     /// With `separate_begin_and_end` the session writes a begin event now and
     /// an end event when the token ends; without it, the event is a sampled
@@ -83,6 +87,38 @@ pub trait TraceSink: Send + Sync {
     fn instant(&self, phase: TracePhase, name: &str, args: &TraceArgs);
     /// `NewTypeTracer(checkerIndex).RecordType`, by the type's id.
     fn record_type(&self, checker_index: usize, type_id: u32);
+}
+
+/// A compiler/driver span without a checker index. Argument construction is
+/// lazy so disabled tracing does not allocate a map or copy paths.
+#[must_use]
+pub struct TraceScope {
+    sink: Arc<dyn TraceSink>,
+    token: u64,
+    args: TraceArgs,
+}
+impl TraceScope {
+    pub fn new(
+        sink: Option<&Arc<dyn TraceSink>>,
+        phase: TracePhase,
+        name: &str,
+        args: impl FnOnce() -> TraceArgs,
+        separate: bool,
+    ) -> Option<Self> {
+        let sink = sink?;
+        let args = args();
+        let token = sink.push(phase, name, &args, separate);
+        Some(Self {
+            sink: sink.clone(),
+            token,
+            args,
+        })
+    }
+}
+impl Drop for TraceScope {
+    fn drop(&mut self) {
+        self.sink.pop(self.token, &self.args);
+    }
 }
 
 /// The checker's tracer: a session and the checker's index in its pool.
@@ -135,6 +171,7 @@ impl Drop for TraceSpan {
 impl Tracer {
     // port: tsc/internal/checker/tracer.go:NewTracer
     pub fn new(sink: Arc<dyn TraceSink>, checker_index: usize) -> Self {
+        sink.new_type_tracer(checker_index);
         Self {
             sink,
             checker_index,
@@ -457,6 +494,7 @@ fn args_json(out: &mut String, args: &TraceArgs) {
         json_string(out, key);
         out.push(':');
         match value {
+            TraceValue::Bool(value) => out.push_str(if *value { "true" } else { "false" }),
             TraceValue::Int(value) => out.push_str(&value.to_string()),
             TraceValue::Str(value) => json_string(out, value),
             TraceValue::Strs(values) => {
@@ -679,6 +717,7 @@ pub(crate) fn wrap_type(state: &mut CheckerState, ty: TypeId) -> TracedTypeAdapt
 }
 
 // port: tsc/internal/checker/tracer.go:wrapTypes
+// port: tsc/internal/tracing/tracing.go:mapTypeIds
 fn wrap_types(types: &[TypeId]) -> Vec<u32> {
     types.iter().map(|ty| ty.get()).collect()
 }
@@ -960,6 +999,7 @@ impl TracedTypeAdapter<'_> {
 }
 
 impl CheckerState {
+    // port: tsc/internal/tracing/tracing.go:getLocation
     fn trace_location(&mut self, node: NodeId) -> Result<Option<TraceLocation>, Error> {
         let view = self.ast(node)?;
         let Some(file) = tsr_ast::utilities::get_source_file_of_node(view, Some(node))? else {
@@ -997,6 +1037,7 @@ impl CheckerState {
         let mut identities: Vec<crate::constraints::RecursionIdentity> = Vec::new();
         let mut records = Vec::with_capacity(ids.len());
         for &raw in ids {
+            // port: tsc/internal/tracing/tracing.go:typeTracer.buildTypeDescriptor
             let ty = TypeId::new(raw).ok_or(Error::MissingLink("recorded trace type id"))?;
             let mut adapter = wrap_type(self, ty);
             let symbol = adapter.symbol()?;
