@@ -47,9 +47,12 @@ class Suite:
 
 
 # `arguments` precede `list` / `run --id ID --local DIR` on the runner's command line.
+# The deadline guards against a hang, so it is generous: the slowest compiler
+# variants (the union/intersection stress tests) take about a minute alone on a
+# fast core and several on a shared 4-vCPU runner.
 SUITES = {
-    "compiler": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "single"), 120),
-    "compiler-concurrent": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "concurrent"), 120),
+    "compiler": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "single"), 600),
+    "compiler-concurrent": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "concurrent"), 600),
     "transpile": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "transpile"), 60),
     "tsc": Suite("phase4_tsctests", "phase4_tsctests", ("--suite", "tsc"), 120),
 }
