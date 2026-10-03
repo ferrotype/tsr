@@ -16,17 +16,18 @@ or edit the guide itself is an exception.
 
 These loading conditions also apply when another document links to the guide.
 
-# Finishing changes and recording evidence
+# Finishing changes
 
-Before recording evidence or preparing a commit, follow
-[the finish procedure](docs/TRACKING.md#finish-procedure).
+Parity with the pin is an expectation file per suite, `status/parity/<suite>.json`,
+that CI recomputes on every pull request ([docs/EVIDENCE-plan.md](docs/EVIDENCE-plan.md)).
 
-- Run focused checks for the changed code. Do not rerun every producer or the
-  full `selftest` merely to commit; CI runs the full suite.
-- A stale historical capture is not a failing compiler test. Refresh only the
-  evidence required by the current task; preserve earlier results and approvals.
-- Finish source edits before captures, render status once at the end, and stage
-  the referenced artifacts with their pointers. Do not regenerate inventories
-  unless their actual inputs or classifications changed.
-- Check each command's exit status. Never commit after a failed staging or
-  validation command. Use new commits and normal pushes for published branches.
+- Run focused checks for the changed code: the crate's tests and clippy, and
+  `python3 scripts/parity.py run <suite> --output DIR --id <variant>` for the
+  tests a change touches. CI runs the full suites.
+- A change that fixes or breaks a test shows up as a `check` difference; run
+  `parity.py accept` so the expectation file is exact for the commit, and give
+  every entry you add a reason. Approvals (`approved`) are the owner's.
+- `cargo xtask validate` must pass: every `// port:` marker names a function of
+  the pinned inventory. Do not regenerate the ledger unless the pin moved.
+- Check each command's exit status. Never commit after a failed validation
+  command. Use new commits and normal pushes for published branches.

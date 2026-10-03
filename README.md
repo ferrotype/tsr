@@ -20,7 +20,7 @@ The first contract leaves are implemented: `tsr_jsstring` preserves source/strin
 | [Architecture decisions](docs/adr/README.md) | Accepted ADRs 0001 to 0018 and the Proposed placeholders 0019 (test-host protocol) and 0020 (Phase 0 gate). |
 | `PORTS.toml`, `data/go-functions.tsv` | Upstream file ledger and function inventory used for traceability. |
 | `rust-toolchain.toml`, `rustfmt.toml`, `deny.toml`, `Cargo.toml` lints | Pinned stable toolchain, formatting, dependency policy and the clippy allow-list (ADRs 0016 and 0017); the CI `quality` job runs them. |
-| `data/divergences.toml` | Owner-approved baseline divergences (ADR 0004); an input of the E2 producer. |
+| `data/divergences.toml` | The former divergence allow-list (ADR 0004, amended): approvals now live as `approved` entries in `status/parity/<suite>.json`; the file is empty of entries and retires with Phase 0. |
 | `.github/workflows/ci.yml` | CI on every pull request: `quality` (fmt, clippy, dependency policy, ledger and markers, Rust and script tests), minimum-Rust builds, the sharded parity suites and their check against `status/parity/`, and the `tsc` suite and native crates on macOS and Linux. |
 | `crates/tsr_jsstring/`, `crates/tsr_arena/` | Text and ownership contract leaves; see [S04](docs/S04.md). |
 | `crates/tsr_scanner/`, `crates/tsr_jsnum/`, `crates/tsr_core/` | Byte scanner, numeric conversion and shared target/range slices; see [S05](docs/S05.md). |

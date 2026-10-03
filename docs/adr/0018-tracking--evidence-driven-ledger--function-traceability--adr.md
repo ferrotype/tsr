@@ -1,6 +1,6 @@
 # ADR 0018: Tracking: evidence-driven ledger, function traceability, ADRs and a dashboard
 
-Status: Accepted (2026-09-05)
+Status: Superseded by ADR 0023 (2026-10-03) (2026-09-05)
 Plan: [Tracking](../TRACKING.md); [PLAN.md, section 8](../../PLAN.md#8-strategy-and-crate-map)
 
 ## Context

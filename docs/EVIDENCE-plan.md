@@ -1,7 +1,7 @@
 # Evidence: replacing the recorded-evidence machine with expectation files
 
 Owner decisions of 2026-10-03, recorded in section 10. This plan replaces
-[TRACKING.md](TRACKING.md)'s model (producers, recorded artifacts, sprints,
+ADR 0018's model, `docs/TRACKING.md` (producers, recorded artifacts, sprints,
 experiments, derived verification) with one that CI computes on every pull
 request. It is executed in the PR sequence of section 9; nothing in it waits
 for another green-up.

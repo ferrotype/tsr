@@ -3,8 +3,8 @@
 //!
 //! The rows are the 15 executed conformance rows that run content mappers,
 //! observed through the corpus harness in both test-program modes. Each is
-//! compared with the verified native captures (`fixtures/c7`, frozen by its
-//! `regenerate.py`) and with the content-mapper baseline the pin commits for
+//! compared with the verified native captures (`fixtures/c7`, frozen from the
+//! Phase 2 native capture) and with the content-mapper baseline the pin commits for
 //! it (`compilerTest.verifyContentMapper`), which renders every mapped file's
 //! diagnostics against the text its span maps to.
 #[allow(dead_code)]
