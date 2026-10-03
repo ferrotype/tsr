@@ -1,6 +1,6 @@
 [package]
 name = "tsr_vfs"
-version = "0.1.0"
+version = "0.2.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -18,9 +18,9 @@ default = []
 harness = []
 
 [dependencies]
-tsr_core = { version = "0.1.0", path = "../tsr_core" }
-tsr_tspath = { version = "0.1.0", path = "../tsr_tspath" }
-tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
+tsr_core = { version = "0.2.0", path = "../tsr_core" }
+tsr_tspath = { version = "0.2.0", path = "../tsr_tspath" }
+tsr_jsstring = { version = "0.2.0", path = "../tsr_jsstring" }
 
 [lints]
 workspace = true

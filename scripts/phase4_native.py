@@ -44,7 +44,7 @@ ORDERS = {"go": ("go",) * 5, "rust": ("rust",) * 5,
 
 
 def rust_command(repo_root=ROOT):
-    return ["cargo", "build", "--locked", "--release", "-p", "tsr", "--bin", "tsrust",
+    return ["cargo", "build", "--locked", "--release", "-p", "tsrust", "--bin", "tsrust",
             "--message-format=json", "--target-dir", str(repo_root / "target")]
 
 
@@ -174,7 +174,7 @@ def cargo_binary(directory, repo_root=ROOT):
             finished.append(event.get("success"))
         if event.get("reason") == "compiler-artifact" and event.get("target", {}).get("name") == "tsrust":
             target, profile = event["target"], event.get("profile", {})
-            if (target.get("kind") != ["bin"] or target.get("src_path") != str(repo_root / "crates/tsr/src/main.rs")
+            if (target.get("kind") != ["bin"] or target.get("src_path") != str(repo_root / "crates/tsrust/src/main.rs")
                     or profile.get("opt_level") != "3" or profile.get("debug_assertions") is not False
                     or profile.get("test") is not False
                     or event.get("executable") != str(repo_root / "target/release/tsrust")):

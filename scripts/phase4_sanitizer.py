@@ -31,9 +31,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from s04_common import strict_json_loads
 
 ROOT = Path(__file__).resolve().parents[1]
-PACKAGES = ("phase4_tsctests", "tsr", "tsr_execute", "tsr_tsc", "tsr_build",
+PACKAGES = ("phase4_tsctests", "tsrust", "tsr_execute", "tsr_tsc", "tsr_build",
             "tsr_incremental", "tsr_fswatch", "tsr_tracing")
-PACKAGE_PATHS = {name: ("tools/phase4/tsctests" if name == PACKAGES[0] else "crates/" + name)
+PACKAGE_PATHS = {name: "tools/phase4/tsctests" if name == PACKAGES[0] else "crates/" + name
                  for name in PACKAGES}
 FLAGS = "-Zsanitizer=thread"
 TSAN_OPTIONS = "halt_on_error=1:exitcode=66"
@@ -272,7 +272,7 @@ def cargo_command(report, test):
               "--config", 'build.rustc-workspace-wrapper=""']
     if test:
         prefix += ["--no-run", "--lib", "--bins", "--tests",
-                   "--features", "tsr/" + SYSTEM_ALLOCATOR_FEATURE]
+                   "--features", "tsrust/" + SYSTEM_ALLOCATOR_FEATURE]
         for package in PACKAGES:
             prefix += ["--package", package]
     else:
@@ -303,7 +303,7 @@ def built_images(directory, report, test):
                    and target.get("src_path") == str(Path(report["source_root"]) / item["source"])]
         require(len(matches) == 1, "unexpected Cargo executable target")
         item = matches[0]
-        if item["package"] == "tsr":
+        if item["package"] == "tsrust":
             require(event.get("features") == [SYSTEM_ALLOCATOR_FEATURE],
                     "CLI Cargo artifact did not select the system allocator")
         key = target_id(item)
@@ -414,7 +414,7 @@ def audit_images(directory, report, images):
         require(any(checksum == actual and ("--test" in row["arguments"]) is image["test"]
                     and FLAGS in row["arguments"] and "--target" in row["arguments"]
                     for row, checksum in candidates), "copied image is not the audited instrumented artifact")
-        if image["package"] == "tsr":
+        if image["package"] == "tsrust":
             feature = 'feature="' + SYSTEM_ALLOCATOR_FEATURE + '"'
             require(all(("--cfg", feature) in zip(row["arguments"], row["arguments"][1:])
                         for row, _ in candidates),
@@ -429,19 +429,19 @@ def allocator_policy():
     for pattern in ("crates/*/src/**/*.rs", "tools/phase4/tsctests/**/*.rs"):
         paths += [p.relative_to(ROOT).as_posix() for p in ROOT.glob(pattern)
                   if "#[global_allocator]" in p.read_text()]
-    require(sorted(paths) == ["crates/tsr/src/main.rs", "crates/tsr_bench/src/main.rs"],
+    require(sorted(paths) == ["crates/tsr_bench/src/main.rs", "crates/tsrust/src/main.rs"],
             "review changed global allocator declarations before sanitizer capture")
-    allocation = ROOT / "crates/tsr/src/allocation.rs"
+    allocation = ROOT / "crates/tsrust/src/allocation.rs"
     text = allocation.read_text()
     require(digest(allocation.read_bytes()) == COUNTING_ALLOCATOR_SHA256,
             "system allocator implementation needs policy review")
     require("unsafe impl GlobalAlloc for CountingAllocator" in text
             and '#[cfg(feature = "system-allocator")]\nuse std::alloc::System as InnerAllocator;' in text
             and all("InnerAllocator." + name + "(" in text for name in ("alloc", "alloc_zeroed", "dealloc", "realloc"))
-            and "CountingAllocator" in (ROOT / "crates/tsr/src/main.rs").read_text(),
+            and "CountingAllocator" in (ROOT / "crates/tsrust/src/main.rs").read_text(),
             "CLI allocator must forward to the system allocator")
-    return {"default": "std::alloc::System", "tsr": "CountingAllocator forwarding to System",
-            "tsr_feature": SYSTEM_ALLOCATOR_FEATURE,
+    return {"default": "std::alloc::System", "tsrust": "CountingAllocator forwarding to System",
+            "tsrust_feature": SYSTEM_ALLOCATOR_FEATURE,
             "source_sha256": digest(allocation.read_bytes())}
 
 

@@ -22,6 +22,7 @@ def publication_policy():
     if len({r['name'] for r in rows}) != len(rows) or {r['manifest'] for r in rows} != manifests:
         raise ValueError('publication policy must name every package exactly once')
     by_name = {r['name']: r for r in rows}
+    retained = {}  # public package -> public packages its archive depends on, dev included
     workspace = tomllib.loads((ROOT / 'Cargo.toml').read_text())['workspace']['package']
     if workspace['publish'] is not False:
         raise ValueError('workspace publication default must stay false')
@@ -49,6 +50,21 @@ def publication_policy():
                     name = dep.get('package', key)
                     if name not in by_name or not by_name[name]['publish'] or 'version' not in dep:
                         raise ValueError(f"unpublishable dependency: {row['name']} -> {name}")
+                    retained.setdefault(row['name'], set()).add(name)
+    # Publishing resolves each archive's dev-dependencies against the registry,
+    # so a cycle through any retained dependency can never be published.
+    done, path = set(), []
+    def visit(name):
+        if name in path:
+            raise ValueError('publication dependency cycle: ' + ' -> '.join(path[path.index(name):] + [name]))
+        if name not in done:
+            path.append(name)
+            for dep in sorted(retained.get(name, ())):
+                visit(dep)
+            path.pop()
+            done.add(name)
+    for name in sorted(retained):
+        visit(name)
     return rows
 
 

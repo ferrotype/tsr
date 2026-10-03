@@ -6,8 +6,8 @@ sessions, diagnostics and scoped type queries without requiring a compiler proce
 
 Requires **Rust 1.96 or newer**. The project is under development; its APIs and
 supported compiler behavior are not stable. See the repository's status and
-sprint records for current coverage. The `0.1.0` packages are being prepared for
-release; until published, use the workspace checkout.
+sprint records for current coverage. The `tsr_*` crates are released together at
+one version.
 
 ## Check an in-memory file
 
@@ -18,12 +18,12 @@ compose the host with `tsr_bundled::BundledFs`.
 
 ```toml
 [dependencies]
-tsr_embed = "0.1.0"
-tsr_arena = "0.1.0"
-tsr_core = "0.1.0"
-tsr_jsstring = "0.1.0"
-tsr_tsoptions = "0.1.0"
-tsr_vfs = "0.1.0"
+tsr_embed = "0.2.0"
+tsr_arena = "0.2.0"
+tsr_core = "0.2.0"
+tsr_jsstring = "0.2.0"
+tsr_tsoptions = "0.2.0"
+tsr_vfs = "0.2.0"
 ```
 
 ```rust
@@ -87,7 +87,7 @@ for file in &output.files {
 
 ## Parser only
 
-Use `tsr_embed = { version = "0.1.0", default-features = false }` to omit the
+Use `tsr_embed = { version = "0.2.0", default-features = false }` to omit the
 checker. `parse` returns an immutable syntax tree; `parse_and_encode` returns
 owned protocol-8 bytes. Both take loaded `SourceText`, a `ScriptKind` and explicit
 `SourceFileParseOptions`. Physical-file BOM and encoding conversion belong to

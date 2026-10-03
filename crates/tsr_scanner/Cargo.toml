@@ -1,6 +1,6 @@
 [package]
 name = "tsr_scanner"
-version = "0.1.0"
+version = "0.2.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -13,13 +13,13 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
-tsr_arena = { path = "../tsr_arena", version = "0.1.0" }
+tsr_arena = { path = "../tsr_arena", version = "0.2.0" }
 stacker = "=0.1.25"
-tsr_ast = { path = "../tsr_ast", version = "0.1.0" }
-tsr_core = { path = "../tsr_core", version = "0.1.0" }
-tsr_diagnostics = { path = "../tsr_diagnostics", version = "0.1.0" }
-tsr_jsnum = { path = "../tsr_jsnum", version = "0.1.0" }
-tsr_jsstring = { path = "../tsr_jsstring", version = "0.1.0" }
+tsr_ast = { path = "../tsr_ast", version = "0.2.0" }
+tsr_core = { path = "../tsr_core", version = "0.2.0" }
+tsr_diagnostics = { path = "../tsr_diagnostics", version = "0.2.0" }
+tsr_jsnum = { path = "../tsr_jsnum", version = "0.2.0" }
+tsr_jsstring = { path = "../tsr_jsstring", version = "0.2.0" }
 
 [dev-dependencies]
 serde = { version = "1", features = ["derive"] }

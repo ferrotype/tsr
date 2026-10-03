@@ -58,12 +58,19 @@ Work is sequenced by dependency, not by calendar (ADR 0005). Each phase closes w
 
 ## Try it
 
-Nothing is published yet (the crate names are reserved); build from source. You need the pinned stable Rust toolchain (`rust-toolchain.toml` selects it) and the upstream submodule for the test data.
+Install the command line from crates.io (Rust 1.96 or newer):
+
+```bash
+cargo install tsrust
+tsrust --version        # Version 7.1.0-dev, the pin's
+```
+
+Or build from source. You need the pinned stable Rust toolchain (`rust-toolchain.toml` selects it) and the upstream submodule for the test data.
 
 ```bash
 git clone --recurse-submodules https://github.com/ferrotype/tsr
 cd tsr
-cargo build --release -p tsr --bin tsrust
+cargo build --release -p tsrust --bin tsrust
 ./target/release/tsrust --version        # Version 7.1.0-dev, the pin's
 ```
 
