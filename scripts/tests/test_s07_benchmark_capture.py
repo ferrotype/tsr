@@ -88,6 +88,14 @@ class CaptureArtifacts(unittest.TestCase):
         self.assertEqual(report["graph_report_sha256"], measure.sha(self.graph_path.read_bytes()))
         self.assertEqual(report["allocation_preflight"], {"calibrated": True})
 
+    def test_hosts_outside_the_threshold_class_are_measured(self):
+        # ADR 0021's host class is reported by `perf.py check`, not enforced here.
+        linux = {"os": "linux", "architecture": "x86_64"}
+        with patch.object(measure, "host_info", return_value=linux):
+            report = self.capture()
+        self.assertEqual(report["host"], linux)
+        self.assertEqual(report["samples"], 56)
+
     def test_graph_reuse_rejects_source_changes_during_validation(self):
         with patch.object(graph, 'source_fingerprint', side_effect=[self.source, {}]):
             with self.assertRaisesRegex(ValueError, 'changed during reuse validation'):

@@ -23,7 +23,7 @@ class S10Evidence(unittest.TestCase):
         captured = set(corpus.sources())
         for required in ['scripts/s10_measure.py', 'tools/s10/wasm/imports.mjs',
                          'tools/s10/go-parser/main.go', 'tools/s10/rust-consumer/Cargo.lock',
-                         'scripts/s07_benchmark_stats.py', 'status/experiments.toml']:
+                         'scripts/s07_benchmark_stats.py']:
             self.assertIn(required, captured)
 
     def test_unrelated_edits_do_not_stale_capture(self):
@@ -99,29 +99,23 @@ class S10Evidence(unittest.TestCase):
             measure.summarize(changed, 'parser', 7)
 
     def test_timing_stability_uses_approved_parser_and_node_limits(self):
-        ledger = tomllib.loads((corpus.ROOT / 'status/experiments.toml').read_text())
         for kind, experiment, criterion, rust_ns, approved, original in [
                 ('parser', 'E7', 'parse_throughput', 600, 1.5, 2.0),
                 ('node', 'E8', 'node_parse_latency', 350, 0.40, 0.10)]:
-            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as directory:
-                root = Path(directory)
-                (root / 'status').mkdir()
-                path = root / 'status/experiments.toml'
-                configured = next(c['threshold'] for c in ledger[experiment]['criteria']
-                                  if c['id'] == criterion)
+            with self.subTest(kind=kind):
+                configured = measure.threshold(experiment, criterion)
                 self.assertEqual(configured, approved)
                 raw = self.timing()
                 for row in raw['samples']:
                     row['elapsed_ns']['rust'] = rust_ns
                     if kind == 'node':
                         row['order'].reverse()
-                with patch.object(measure, 'ROOT', root):
-                    for limit, passes in [(configured, True), (original, False)]:
-                        path.write_text(f'[[{experiment}.criteria]]\nid = "{criterion}"\nthreshold = {limit}\n')
+                for limit, passes in [(configured, True), (original, False)]:
+                    with patch.dict(measure.THRESHOLDS, {(experiment, criterion): limit}):
                         result = measure.summarize(raw, kind, 7)
-                        self.assertEqual(result['stable'], passes)
-                        expected = 1 / limit if kind == 'parser' else limit
-                        self.assertEqual(result['bootstrap']['threshold'], expected)
+                    self.assertEqual(result['stable'], passes)
+                    expected = 1 / limit if kind == 'parser' else limit
+                    self.assertEqual(result['bootstrap']['threshold'], expected)
 
     def test_stale_source_rejected_before_raw_data_or_process_access(self):
         with tempfile.TemporaryDirectory() as directory:

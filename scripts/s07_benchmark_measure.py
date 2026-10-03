@@ -134,27 +134,24 @@ def allocation_preflight():
     return validate_allocation_preflight(results)
 
 
+THRESHOLDS = "status/perf/thresholds.toml"
+
+
 def e6_thresholds():
-    """Per-mode timing criteria from the ledger (ADR 0021); the only source of the E6 thresholds."""
-    items = tomllib.loads((ROOT / "status/experiments.toml").read_text())["E6"]["criteria"]
-    criteria = {item["id"]: item for item in items}
-    if len(criteria) != len(items):
-        raise ValueError("duplicate E6 criterion")
+    """Per-mode wall-time thresholds (ADR 0021) from `[parse-bind]` of status/perf/thresholds.toml,
+    the only source of the thresholds the stability and extension rule judges against."""
+    table = tomllib.loads((ROOT / THRESHOLDS).read_text()).get("parse-bind")
+    if type(table) is not dict:
+        raise ValueError(THRESHOLDS + " has no [parse-bind] table")
     thresholds = {}
-    for workers, name in (("1", "one_thread"), ("8", "eight_threads")):
-        item = criteria[name]
-        if item["metric"] != f"run.e6.{name}_wall_time_ratio" or item["op"] != "<=" or type(item["threshold"]) not in {int, float}:
-            raise ValueError("E6 criterion shape changed; the stability rule must be re-derived")
-        thresholds[workers] = float(item["threshold"])
-        if not math.isfinite(thresholds[workers]) or thresholds[workers] <= 0:
-            raise ValueError("E6 threshold must be a positive finite ratio")
+    for workers, name in (("1", "one_thread_wall_time"), ("8", "eight_threads_wall_time")):
+        if name not in table:
+            raise ValueError(f"{THRESHOLDS} [parse-bind] has no {name} threshold")
+        value = table[name]
+        if type(value) not in {int, float} or not math.isfinite(value) or value <= 0:
+            raise ValueError(f"{THRESHOLDS} [parse-bind] {name} must be a positive finite ratio")
+        thresholds[workers] = float(value)
     return thresholds
-
-
-def validate_threshold_host(host):
-    # ADR 0021 authorizes these thresholds only for the measured host class.
-    if host["os"] != "darwin" or host["architecture"] not in {"arm64", "aarch64"}:
-        raise ValueError("ADR 0021 acceptance requires macOS arm64; other hosts need a separate threshold decision")
 
 
 def aggregate(rows):
@@ -213,8 +210,10 @@ def capture(graph_report, destination):
         (destination / "report.json").write_text('{"version":1,"status":"capture_in_progress"}\n')
         before = source_fingerprint()
         thresholds = e6_thresholds()
-        host = host_info()
-        validate_threshold_host(host)
+        # Capacity check before any build. The thresholds' host class (ADR 0021)
+        # is not enforced here: another host is measured and recorded, and
+        # `scripts/perf.py check` reports it beside any miss.
+        host_info()
         cargo_config = cargo_configuration()
         graph_bytes = Path(graph_report).read_bytes()
         prerequisite = strict_json_loads(graph_bytes)

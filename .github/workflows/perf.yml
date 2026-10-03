@@ -1,0 +1,131 @@
+# Performance against Go on one fixed workload (docs/EVIDENCE-plan.md, sections 3
+# and 6). Dispatch only: it never runs on a push or a pull request.
+#
+# The first dispatch is the experiment that tells which workloads GitHub's runners
+# can host at all. A 4 vCPU Linux runner cannot run the eight-thread parse-bind
+# mode meaningfully, and both harnesses refuse a host with fewer than eight
+# schedulable CPUs (s07_benchmark_measure.host_info), so on the standard runners
+# the capture step is expected to stop there. The owner's host, or a self-hosted
+# runner named by `runs-on`, remains the measurement of record.
+#
+# workload: parse-bind  parse and bind of the pinned VS Code tree at one and eight
+#                       workers (ADR 0021): graph capture, then benchmark capture.
+#           checker     the frozen checker query workload and the per-type
+#                       footprint (ADR 0022). Its requests come from an E2 corpus
+#                       capture at target/s08/e2/corpus (docs/S08-E2.md) that this
+#                       job does not produce, so it runs only where that exists.
+#
+# The job writes one status/perf/<workload>/<run>.json with `scripts/perf.py
+# record` and uploads it as an artifact; committing it is a separate, manual step.
+# `perf.py check` then compares it with status/perf/thresholds.toml and writes the
+# ratios to the job summary. The thresholds are authorized for macOS arm64 only
+# (ADR 0021), so a miss does not fail the job.
+name: perf
+
+on:
+  workflow_dispatch:
+    inputs:
+      runs-on:
+        description: Runner label (ubuntu-latest, macos-latest, or a self-hosted runner's label)
+        type: string
+        default: ubuntu-latest
+      workload:
+        description: Workload to measure
+        type: choice
+        options:
+          - parse-bind
+          - checker
+
+permissions:
+  contents: read
+
+# One measurement at a time per runner: a concurrent job would share its CPUs.
+concurrency:
+  group: perf-${{ inputs.runs-on }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  RUNS_ON: ${{ inputs.runs-on }}
+  WORKLOAD: ${{ inputs.workload }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  measure:
+    name: ${{ inputs.workload }} on ${{ inputs.runs-on }}
+    runs-on: ${{ inputs.runs-on }}
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Host
+        run: |
+          echo "Runner \`$RUNS_ON\`: $(uname -sm), $(getconf _NPROCESSORS_ONLN) CPUs" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Install the pinned toolchain and the minimum Rust
+        # The parse-bind allocator preflight builds its probe on the declared minimum.
+        run: |
+          rustup show active-toolchain || rustup toolchain install
+          rustup toolchain install "$(python3 -c "import tomllib;print(tomllib.load(open('data/s04/toolchains.toml','rb'))['msrv'])")" --profile minimal
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: perf-${{ inputs.workload }}
+      - name: Read the Go pin
+        id: go
+        run: echo "version=$(python3 -c "import tomllib;print(tomllib.load(open('data/s04/toolchains.toml','rb'))['go'].removeprefix('go'))")" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ steps.go.outputs.version }}
+          cache-dependency-path: upstream/tsc/go.sum
+
+      # parse-bind: the benchmark reads the VS Code archive offline, so it is
+      # downloaded and checked against data/s07/vscode-files.json first.
+      - name: Download the VS Code workload
+        if: inputs.workload == 'parse-bind'
+        run: python3 scripts/s07_inventory.py workload
+      - name: Preflight (Go build, frozen parse options)
+        if: inputs.workload == 'parse-bind'
+        run: python3 scripts/s07_benchmark.py preflight
+      - name: Graph capture (graph parity of the measured binaries)
+        if: inputs.workload == 'parse-bind'
+        run: python3 scripts/s07_benchmark_graph.py capture
+      - name: Benchmark capture
+        if: inputs.workload == 'parse-bind'
+        run: python3 scripts/s07_benchmark.py capture
+      - name: Record the run
+        if: inputs.workload == 'parse-bind'
+        run: python3 scripts/perf.py record parse-bind --capture target/s07-benchmark --label "github $RUNS_ON" | tee target/perf-record.txt
+
+      # checker
+      - name: Require the E2 corpus capture
+        if: inputs.workload == 'checker'
+        run: |
+          if [ ! -f target/s08/e2/corpus/requests.json ]; then
+            echo "::error::checkerbench reads its requests from an E2 corpus capture at target/s08/e2/corpus (docs/S08-E2.md); this job does not produce one"
+            exit 1
+          fi
+      - name: Build
+        if: inputs.workload == 'checker'
+        run: python3 scripts/s08_checkerbench.py build --output target/s08/checkerbench
+      - name: Capture
+        if: inputs.workload == 'checker'
+        run: python3 scripts/s08_checkerbench.py capture --output target/s08/checkerbench
+      - name: Record the run
+        if: inputs.workload == 'checker'
+        run: python3 scripts/perf.py record checker --capture target/s08/checkerbench --label "github $RUNS_ON" | tee target/perf-record.txt
+
+      - name: Locate the run file
+        id: run
+        run: echo "path=$(head -n 1 target/perf-record.txt)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: perf-${{ inputs.workload }}-${{ github.run_id }}
+          path: ${{ steps.run.outputs.path }}
+          retention-days: 90
+          if-no-files-found: error
+      - name: Compare with the thresholds
+        continue-on-error: true
+        run: python3 scripts/perf.py check "$WORKLOAD" --run "${{ steps.run.outputs.path }}"

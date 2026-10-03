@@ -12,7 +12,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 import shutil
 import subprocess
-import tomllib
 
 import s08_p4 as p4
 from s07_benchmark_stats import ratio_summary
@@ -20,9 +19,14 @@ from s10_corpus import ROOT, file_digest, node_version, node_command, node_flags
 from s10_inputs import prepare
 
 
+# The timing limits the stability rule judges against, as amended by ADR 0020
+# (E7 parser throughput at least 1.5 times Go, E8 Node parse latency at most
+# 0.40 of the socket path). They are not perf workloads of status/perf.
+THRESHOLDS = {('E7', 'parse_throughput'): 1.5, ('E8', 'node_parse_latency'): 0.40}
+
+
 def threshold(experiment, criterion):
-    ledger = tomllib.loads((ROOT / 'status/experiments.toml').read_text())
-    return next(c['threshold'] for c in ledger[experiment]['criteria'] if c['id'] == criterion)
+    return THRESHOLDS[experiment, criterion]
 
 
 def build_files(kind, before):

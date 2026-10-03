@@ -38,7 +38,7 @@ def source_fingerprint():
     for directory in ("scripts/s07_oracle", "tools/s07/benchmark", ".cargo"):
         sources.update(p for p in (ROOT / directory).rglob("*") if p.is_file() and "__pycache__" not in p.parts)
     sources.update(ROOT.glob("scripts/s07_benchmark*.py"))
-    sources.update(ROOT / name for name in ("Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "data/upstream.json", "data/s04/toolchains.toml", "data/s07/vscode-files.json", "data/s07/vscode-parse-options.json", "data/s07/bindworkload-probes.json", "data/workloads.toml", "status/experiments.toml", "scripts/s07_binder.py", "scripts/s07_inventory.py", "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py", "scripts/s04_ownership.py", "scripts/s06_protocol.py", "scripts/s06_process.py"))
+    sources.update(ROOT / name for name in ("Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "data/upstream.json", "data/s04/toolchains.toml", "data/s07/vscode-files.json", "data/s07/vscode-parse-options.json", "data/s07/bindworkload-probes.json", "data/workloads.toml", "status/perf/thresholds.toml", "scripts/s07_binder.py", "scripts/s07_inventory.py", "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py", "scripts/s04_ownership.py", "scripts/s06_protocol.py", "scripts/s06_process.py"))
     sources = {path for path in sources if path.exists()}
     files = {str(path.relative_to(ROOT)): sha(path.read_bytes()) for path in sorted(sources)}
     return {"sha256": sha(json.dumps(files, sort_keys=True, separators=(",", ":")).encode()), "files": files}
