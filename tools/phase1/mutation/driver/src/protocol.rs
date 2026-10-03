@@ -368,6 +368,10 @@ mod tests {
 
     #[test]
     fn stages_switch_the_mutant_stage_and_rows_take_the_native_shape() {
+        // The driver begins a row on its thread before staging it (jobs.rs);
+        // only a row thread reads its own stage, every other thread reads the
+        // shared row stage that the tests running alongside keep switching.
+        phase1_mutants::begin_row();
         let session = Session::new(Oracle::Binder, "row", true);
         assert!(session.stage("parse", || {
             assert_eq!(stage(), Stage::Production);
