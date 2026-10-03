@@ -1,7 +1,7 @@
 # Rust package preparation
 
 The publication policy includes 44 public packages (42 libraries, the
-`tsrust` command line and the `tsr` facade) and 27 private
+`tsrust` command line and the `tsr` facade) and 12 private
 packages, all named explicitly in [packages.json](packages.json). The workspace
 defaults to `publish = false`. This policy and the dependency order below track
 the current source tree; they are not a record of registry releases. The Node
@@ -157,76 +157,61 @@ goes last:
 
 | Package | crates.io | Reason |
 | --- | --- | --- |
-| `phase1_config` | Private | Repository-only benchmark, experiment, test or capture tool |
-| `phase1_filesystem` | Private | Repository-only benchmark, experiment, test or capture tool |
-| `phase1_harness` | Private | Repository-only benchmark, experiment, test or capture tool |
-| `phase1_leaves` | Private | Repository-only Phase 1 foundation test harness |
-| `phase1_mutants` | Private | Repository-only Phase 1 mutation-witness tool |
-| `phase1_mutation_driver` | Private | Repository-only Phase 1 mutation-witness tool |
-| `phase1_mutation_splicer` | Private | Repository-only Phase 1 mutation-witness tool |
-| `phase1_syntax` | Private | Repository-only Phase 1 syntax test harness |
 | `phase4_tsctests` | Private | Repository-only Phase 4 command-line test harness |
 | `s08_relater_prototype` | Private | Repository-only benchmark, experiment, test or capture tool |
 | `s09_format_harness` | Private | Repository-only benchmark, experiment, test or capture tool |
 | `s10_corpus` | Private | Repository-only benchmark, experiment, test or capture tool |
 | `s10_rust_consumer` | Private | Repository-only benchmark, experiment, test or capture tool |
 | `s10_wasm_corpus` | Private | Repository-only benchmark, experiment, test or capture tool |
-| `tsr` | Public | Facade re-exporting the public libraries; a plain re-export until the embedding API settles |
-| `tsr_api` | Public | Rust library and its public dependency closure |
-| `tsr_arena` | Public | Rust library and its public dependency closure |
-| `tsr_ast` | Public | Rust library and its public dependency closure |
-| `tsr_astnav` | Public | Rust library and its public dependency closure |
+| `tsr` | Prepared | Facade re-exporting the public libraries; a plain re-export until the embedding API settles |
+| `tsr_api` | Prepared | Rust library and its public dependency closure |
+| `tsr_arena` | Prepared | Rust library and its public dependency closure |
+| `tsr_ast` | Prepared | Rust library and its public dependency closure |
+| `tsr_astnav` | Prepared | Rust library and its public dependency closure |
 | `tsr_bench` | Private | Repository-only benchmark, experiment, test or capture tool |
-| `tsr_binder` | Public | Rust library and its public dependency closure |
-| `tsr_build` | Public | Rust library in the tsrust command line's public dependency closure |
-| `tsr_bundled` | Public | Rust library and its public dependency closure |
-| `tsr_checker` | Public | Rust library and its public dependency closure |
-| `tsr_compiler` | Public | Rust library and its public dependency closure |
-| `tsr_contentmapper` | Public | Rust library and its public dependency closure |
+| `tsr_binder` | Prepared | Rust library and its public dependency closure |
+| `tsr_build` | Prepared | Rust library in the tsrust command line's public dependency closure |
+| `tsr_bundled` | Prepared | Rust library and its public dependency closure |
+| `tsr_checker` | Prepared | Rust library and its public dependency closure |
+| `tsr_compiler` | Prepared | Rust library and its public dependency closure |
+| `tsr_contentmapper` | Prepared | Rust library and its public dependency closure |
 | `tsr_contentmappertest` | Private | Repository-only benchmark, experiment, test or capture tool |
-| `tsr_core` | Public | Rust library and its public dependency closure |
-| `tsr_cpu_profile` | Private | Repository-only benchmark, experiment, test or capture tool |
-| `tsr_diagnostics` | Public | Rust library and its public dependency closure |
-| `tsr_embed` | Public | Rust library and its public dependency closure |
-| `tsr_encoder` | Public | Rust library and its public dependency closure |
-| `tsr_execute` | Public | Rust library in the tsrust command line's public dependency closure |
-| `tsr_format` | Public | Rust library and its public dependency closure |
-| `tsr_fswatch` | Public | Rust library in the tsrust command line's public dependency closure |
-| `tsr_glob` | Public | Rust library and its public dependency closure |
-| `tsr_incremental` | Public | Rust library and its public dependency closure |
-| `tsr_ipc` | Public | Rust library and its public dependency closure |
-| `tsr_jsnum` | Public | Rust library and its public dependency closure |
-| `tsr_json` | Public | Rust library and its public dependency closure |
-| `tsr_jsonrpc` | Public | Rust library and its public dependency closure |
-| `tsr_jsstring` | Public | Rust library and its public dependency closure |
-| `tsr_locale` | Public | Rust library and its public dependency closure |
-| `tsr_memory_profile` | Private | Repository-only benchmark, experiment, test or capture tool |
-| `tsr_module` | Public | Rust library and its public dependency closure |
+| `tsr_core` | Prepared | Rust library and its public dependency closure |
+| `tsr_diagnostics` | Prepared | Rust library and its public dependency closure |
+| `tsr_embed` | Prepared | Rust library and its public dependency closure |
+| `tsr_encoder` | Prepared | Rust library and its public dependency closure |
+| `tsr_execute` | Prepared | Rust library in the tsrust command line's public dependency closure |
+| `tsr_format` | Prepared | Rust library and its public dependency closure |
+| `tsr_fswatch` | Prepared | Rust library in the tsrust command line's public dependency closure |
+| `tsr_glob` | Prepared | Rust library and its public dependency closure |
+| `tsr_incremental` | Prepared | Rust library and its public dependency closure |
+| `tsr_ipc` | Prepared | Rust library and its public dependency closure |
+| `tsr_jsnum` | Prepared | Rust library and its public dependency closure |
+| `tsr_json` | Prepared | Rust library and its public dependency closure |
+| `tsr_jsonrpc` | Prepared | Rust library and its public dependency closure |
+| `tsr_jsstring` | Prepared | Rust library and its public dependency closure |
+| `tsr_locale` | Prepared | Rust library and its public dependency closure |
+| `tsr_module` | Prepared | Rust library and its public dependency closure |
 | `tsr_node` | Private | Node addon distributed separately; not a Rust library package |
-| `tsr_nodebuilder` | Public | Rust library and its public dependency closure |
-| `tsr_parser` | Public | Rust library and its public dependency closure |
-| `tsr_printer` | Public | Rust library and its public dependency closure |
-| `tsr_project` | Public | Rust library and its public dependency closure |
-| `tsr_pseudochecker` | Public | Rust library and its public dependency closure |
-| `tsr_s07_access_trace_native_verify` | Private | Repository-only benchmark, experiment, test or capture tool |
-| `tsr_s07_bis_access_trace` | Private | Repository-only benchmark, experiment, test or capture tool |
-| `tsr_s07_bis_owner_census` | Private | Repository-only benchmark, experiment, test or capture tool |
-| `tsr_s07_bis_phases` | Private | Repository-only benchmark, experiment, test or capture tool |
-| `tsr_s07_storage_pilot` | Private | Repository-only benchmark, experiment, test or capture tool |
-| `tsr_scanner` | Public | Rust library and its public dependency closure |
-| `tsr_semver` | Public | Rust library and its public dependency closure |
-| `tsr_sourcemap` | Public | Rust library and its public dependency closure |
+| `tsr_nodebuilder` | Prepared | Rust library and its public dependency closure |
+| `tsr_parser` | Prepared | Rust library and its public dependency closure |
+| `tsr_printer` | Prepared | Rust library and its public dependency closure |
+| `tsr_project` | Prepared | Rust library and its public dependency closure |
+| `tsr_pseudochecker` | Prepared | Rust library and its public dependency closure |
+| `tsr_scanner` | Prepared | Rust library and its public dependency closure |
+| `tsr_semver` | Prepared | Rust library and its public dependency closure |
+| `tsr_sourcemap` | Prepared | Rust library and its public dependency closure |
 | `tsr_testhost` | Private | Repository-only benchmark, experiment, test or capture tool |
 | `tsr_testrunner` | Private | Repository-only port of the pinned compiler and transpile test runners (docs/EVIDENCE-plan.md) |
-| `tsr_tracing` | Public | Rust library in the tsrust command line's public dependency closure |
-| `tsr_transformers` | Public | Rust library and its public dependency closure |
-| `tsr_transpile` | Public | Rust library and its public dependency closure |
-| `tsr_tsc` | Public | Rust library in the tsrust command line's public dependency closure |
-| `tsr_tsoptions` | Public | Rust library and its public dependency closure |
-| `tsr_tspath` | Public | Rust library and its public dependency closure |
-| `tsr_vfs` | Public | Rust library and its public dependency closure |
-| `tsr_wasm` | Public | Rust library and its public dependency closure |
-| `tsrust` | Public | The compiler command line; installs the tsrust binary |
+| `tsr_tracing` | Prepared | Rust library in the tsrust command line's public dependency closure |
+| `tsr_transformers` | Prepared | Rust library and its public dependency closure |
+| `tsr_transpile` | Prepared | Rust library and its public dependency closure |
+| `tsr_tsc` | Prepared | Rust library in the tsrust command line's public dependency closure |
+| `tsr_tsoptions` | Prepared | Rust library and its public dependency closure |
+| `tsr_tspath` | Prepared | Rust library and its public dependency closure |
+| `tsr_vfs` | Prepared | Rust library and its public dependency closure |
+| `tsr_wasm` | Prepared | Rust library and its public dependency closure |
+| `tsrust` | Prepared | The compiler command line; installs the tsrust binary |
 | `xtask` | Private | Repository-only benchmark, experiment, test or capture tool |
 
 See [the validation record](../../docs/CRATE-PUBLISHING-PREP.md) for the

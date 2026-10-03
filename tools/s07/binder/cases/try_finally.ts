@@ -1,1 +1,0 @@
-function f(x) { try { if (x) return 1; x = 1; } catch(e) { x = 2; return 3; } finally { x = 4; } return x; } function g() { try { return 1; } finally { throw 2; } }

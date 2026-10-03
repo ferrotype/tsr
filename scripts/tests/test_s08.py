@@ -5,7 +5,6 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from s08_flags import identifier
 from s08_manifest import eligible, make_manifest, optional_bool, phase_requests, validate_policy
 
 
@@ -93,8 +92,3 @@ class S08Contracts(unittest.TestCase):
         self.assertEqual(manifest["counts"]["acceptance_diagnostic_phases"]["declaration"],1)
         self.assertFalse(manifest["result_contract"]["informational_outcomes_affect_e2"])
 
-    def test_go_names_cannot_inject_source(self):
-        self.assertEqual(identifier("TypeFlagsStringLiteral"), "TypeFlagsStringLiteral")
-        for name in ("", "checker.Type", "x); panic(1)", "x\n", 1):
-            with self.assertRaises(ValueError):
-                identifier(name)

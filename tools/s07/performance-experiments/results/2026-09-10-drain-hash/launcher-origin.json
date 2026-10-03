@@ -1,9 +1,0 @@
-{
-  "changes": [
-    "Replace exactly the two bootstrap paths with this archive directory.",
-    "Change help text from eight validators to five."
-  ],
-  "launcher_sha256": "53c7697f367d6ef01919c588164143c99b35a387573174dd27ff0ddd6d7bb9f4",
-  "source": "tools/s07/performance-experiments/results/2026-09-10-pages-text-helpers/verify.py",
-  "source_sha256": "5f5c86d655a5f9db3c87ff084e5c02430c80087df1f58eb6da90567ea517dcef"
-}

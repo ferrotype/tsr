@@ -1,6 +1,0 @@
-[
-  "lossless-source-and-regenerated-literals",
-  "numeric-and-bigint-literals",
-  "source-annotation-and-regeneration",
-  "byte-truncation-boundaries"
-]

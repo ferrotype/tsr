@@ -1,1 +1,0 @@
-switch (x) { case 0: case 1: x=1; case 2: f(x); break; default: x=3; } switch (true) { case x>0: x--; case y: y++; } x;
