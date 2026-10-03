@@ -194,10 +194,15 @@ def run(args):
     print(json.dumps({"suite": suite, **meta["counts"], "variants": len(selected)}))
 
 
-def variant_of(row_id):
-    """The variant a result id belongs to: everything before the sub-test."""
-    suite, rest = row_id.split("/", 1)
-    return f"{suite}/{rest.rsplit('/', 1)[0]}" if "/" in rest else row_id
+def variant_of(row_id, selected):
+    """The selected variant a result id belongs to: the id itself (a crash or a
+    deadline fails the whole variant) or the id without its sub-test suffix.
+    Variant ids themselves contain slashes (`tsc/commandLine/help.js`), so
+    membership decides, not the number of segments."""
+    if row_id in selected:
+        return row_id
+    variant = row_id.rsplit("/", 1)[0]
+    return variant if variant in selected else row_id
 
 
 def complete(directory, meta, rows):
@@ -206,7 +211,7 @@ def complete(directory, meta, rows):
     selected = set(meta["variants"])
     answered = {}
     for row in rows:
-        answered.setdefault(variant_of(row["id"]), []).append(row["id"])
+        answered.setdefault(variant_of(row["id"], selected), []).append(row["id"])
     missing = sorted(selected - set(answered))
     strangers = sorted(set(answered) - selected)
     duplicates = sorted(key for ids in answered.values() for key in set(ids) if ids.count(key) > 1)

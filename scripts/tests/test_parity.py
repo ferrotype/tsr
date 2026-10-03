@@ -213,6 +213,31 @@ class ParityTests(unittest.TestCase):
         finally:
             parity.subprocess.run = saved
 
+    def test_variant_of_uses_membership_not_segment_counts(self):
+        selected = {"tsc/commandLine/help.js", "compiler/a.ts", "transpile/x(sourceMap=true)"}
+        self.assertEqual(parity.variant_of("tsc/commandLine/help.js", selected), "tsc/commandLine/help.js")
+        self.assertEqual(parity.variant_of("tsc/commandLine/help.js/transcript", selected), "tsc/commandLine/help.js")
+        self.assertEqual(parity.variant_of("compiler/a.ts/types", selected), "compiler/a.ts")
+        self.assertEqual(parity.variant_of("compiler/a.ts", selected), "compiler/a.ts")
+        self.assertEqual(parity.variant_of("transpile/x(sourceMap=true)/module", selected), "transpile/x(sourceMap=true)")
+        # Not selected in any reading: reported as itself, so `complete` names it a stranger.
+        self.assertEqual(parity.variant_of("tsc/other/thing.js/transcript", selected), "tsc/other/thing.js/transcript")
+
+    def test_a_crashed_nested_variant_is_reported_as_itself(self):
+        self.run_shard("out")
+        parity.main(["accept", "compiler", *self.results("out")])
+        meta = json.loads((self.directory / "out/meta.json").read_text())
+        results = self.directory / "out/results.ndjson"
+        rows = results.read_text().splitlines()
+        # Swap one variant for a three-segment id that crashed: it must count as answered.
+        meta["variants"] = sorted(set(meta["variants"]) - {"compiler/crash.ts"} | {"tsc/commandLine/help.js"})
+        (self.directory / "out/meta.json").write_text(json.dumps(meta))
+        rows = [row for row in rows if "compiler/crash.ts" not in row]
+        rows.append(json.dumps({"id": "tsc/commandLine/help.js", "state": "fail", "reason": "signal 11"}))
+        results.write_text("\n".join(rows) + "\n")
+        parity.main(["accept", "compiler", *self.results("out")])
+        self.assertIn("tsc/commandLine/help.js", self.expectation()["failing"])
+
     def test_check_reports_new_failures_pin_and_denominator_drift(self):
         self.run_shard("out")
         parity.main(["accept", "compiler", *self.results("out")])
