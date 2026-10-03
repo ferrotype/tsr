@@ -11,7 +11,8 @@
 //! (the baselining tracer) and [`baseline`] (`DiffText`, the Phase 3 port of
 //! the patience diff, included as it is). [`execute`] holds the command-line
 //! entry and the pinned interfaces it is called through, which Phase 4 X1
-//! supplies; until then the entry refuses with a named operation.
+//! supplies; until then the entry refuses with a named operation. [`suite`]
+//! turns a scenario's row into the result lines of the `tsc` parity suite.
 pub mod execute;
 pub mod fs;
 pub mod fsbaselineutil;
@@ -23,6 +24,7 @@ pub mod readablebuildinfo;
 pub mod row;
 pub mod runner;
 pub mod scenario;
+pub mod suite;
 pub mod sys;
 
 #[path = "../../../phase3/harness/patience.rs"]

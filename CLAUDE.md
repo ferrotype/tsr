@@ -51,7 +51,9 @@ The differing outputs land under `$SCRATCH/compiler/local/`. A full run is
 then `check compiler --results DIR` compares with the expectation file and
 `accept compiler --results DIR` rewrites it, keeping every `reason` and
 `approved` text. Suites: `compiler` (the pin's default single-threaded
-mode), `compiler-concurrent`, `transpile`, `tsc`. A variant id is
+mode), `compiler-concurrent`, `transpile`, and `tsc` (the recorded
+command-line scenarios of `data/phase4/scenarios.json.gz`, runner
+`phase4_tsctests`, sub-tests `transcript` and `incremental`). A variant id is
 `<suite>/<configured name>`; the runner binary is `tsr-testrunner`
 (`crates/tsr_testrunner`), built in release by `run` and `list` (Cargo's
 reported executable; `--runner PATH` uses a prebuilt one, as CI does).

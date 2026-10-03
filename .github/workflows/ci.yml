@@ -10,6 +10,9 @@
 #               uploads its results.
 # parity-check: merges the shards and compares the failing set with
 #               status/parity/<suite>.json. Any difference fails the workflow.
+# native:       on Linux and macOS, the tsc suite (the pin's recorded command-line
+#               scenarios through the ported harness) against status/parity/tsc.json,
+#               and the tests of the crates with platform code.
 #
 # The repository variable PARITY_RUNNER moves the runner build and the shards to a
 # self-hosted runner; unset, they use ubuntu-latest.
@@ -231,3 +234,32 @@ jobs:
             python3 scripts/parity.py check "$suite" --results results/"$suite"/* || status=1
           done
           exit "$status"
+
+  native:
+    name: tsc suite and native crates on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Install the pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - name: Native crate tests
+        run: cargo test -p tsr_fswatch -p tsr -p tsr_execute -p tsr_build -p tsr_tsc --all-features --locked
+      - name: Build the tsc runner
+        run: cargo build --release --locked -p phase4_tsctests --bin phase4_tsctests
+      - name: Run the tsc suite
+        run: python3 scripts/parity.py run tsc --runner target/release/phase4_tsctests --output results/tsc
+      - name: Compare with the expectation file
+        run: python3 scripts/parity.py check tsc --results results/tsc
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: parity-tsc-${{ matrix.os }}
+          path: results
+          retention-days: 7
