@@ -173,5 +173,27 @@ class CaptureArtifacts(unittest.TestCase):
                 consumer.read_capture(self.destination, self.graph_path)
 
 
+class HostCapacity(unittest.TestCase):
+    """parse-bind's eight-worker mode needs eight CPUs; checkerbench runs one process at a time."""
+
+    def cpus(self, count):
+        stack = ExitStack()
+        self.addCleanup(stack.close)
+        stack.enter_context(patch.object(measure.os, "sched_getaffinity", return_value=set(range(count)), create=True))
+        stack.enter_context(patch.object(measure.os, "cpu_count", return_value=count))
+
+    def test_parse_bind_needs_eight_available_cpus(self):
+        self.cpus(4)
+        with self.assertRaisesRegex(ValueError, "has 4 available CPUs; this workload needs at least 8"):
+            measure.host_info()
+        self.cpus(8)
+        self.assertEqual(measure.host_info()["cpu_capacity"], 8)
+
+    def test_checkerbench_measures_on_fewer_cpus(self):
+        import s08_checkerbench as checker
+        self.cpus(4)
+        self.assertEqual(checker.measurement_host()["cpu_capacity"], 4)
+
+
 if __name__ == "__main__":
     unittest.main()
