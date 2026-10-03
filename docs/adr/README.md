@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-One decision per file, numbered. `Status` is `Proposed`, `Accepted`, `Amended` or `Superseded`; the status tool reads the `Status:` line. A change that alters a decision amends the record or supersedes it with a new one. See `docs/TRACKING.md`.
+One decision per file, numbered. `Status` is `Proposed`, `Accepted`, `Amended` or `Superseded`; the status tool reads the `Status:` line. A change that alters a decision amends the record or supersedes it with a new one. See `docs/EVIDENCE-plan.md`.
 
 | ADR | Title | Status |
 |---|---|---|

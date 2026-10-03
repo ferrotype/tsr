@@ -14,21 +14,18 @@ The first contract leaves are implemented: `tsr_jsstring` preserves source/strin
 |---|---|
 | [PLAN.md](PLAN.md) | The canonical plan. Update the HTML mirror when it changes. |
 | [Plan page](docs/corsa-in-rust.html) | The designed HTML mirror. An earlier version was published as a private page at https://claude.ai/code/artifact/6c72abf7-0d30-43fe-a7a8-6457828dcce8; that external copy is not automatically synchronized. |
-| [Tracking](docs/TRACKING.md) | Ledger, function-mapping, evidence, experiment and sprint-check contracts. |
+| [Evidence](docs/EVIDENCE-plan.md) | How parity, performance, build quality, port coverage and approved divergences are tracked. |
 | [Rust implementation guide](docs/CODEX-RUST-GUIDELINES.md) | Codex/Astra rules for Rust implementation and code review; loading conditions are in [AGENTS.md](AGENTS.md). |
-| [Current status](STATUS.md), [dashboard](docs/status.html) | Generated reports; evidence validity and parity are separate from implementation and mapping counts. |
-| [Unmapped functions](status/unmapped-functions.json) | Complete function worklist linked from the compact JSON status summary. |
+| [`status/parity/`](status/parity) | One expectation file per suite naming every sub-test that does not pass, with its reason; CI fails on any difference. |
 | [Architecture decisions](docs/adr/README.md) | Accepted ADRs 0001 to 0018 and the Proposed placeholders 0019 (test-host protocol) and 0020 (Phase 0 gate). |
 | `PORTS.toml`, `data/go-functions.tsv` | Upstream file ledger and function inventory used for traceability. |
-| `status/runs.toml`, `status/experiments.toml` | Reviewed run specifications and experiment gates. |
-| [Phase 0 implementation plan](sprints/README.md), `sprints/` | Sprint files S01 to S12 with machine-checked exit criteria; the README gives the order, producers and conventions. |
-| `rust-toolchain.toml`, `rustfmt.toml`, `deny.toml`, `Cargo.toml` lints | Pinned stable toolchain, formatting, dependency policy and the clippy allow-list (ADRs 0016 and 0017); `scripts/checks.py` runs them as producers. |
+| `rust-toolchain.toml`, `rustfmt.toml`, `deny.toml`, `Cargo.toml` lints | Pinned stable toolchain, formatting, dependency policy and the clippy allow-list (ADRs 0016 and 0017); the CI `quality` job runs them. |
 | `data/divergences.toml` | Owner-approved baseline divergences (ADR 0004); an input of the E2 producer. |
-| `.github/workflows/status.yml` | Status workflow: provenance, archived-view check, live producer metrics and S01/S03/S04/S05 on the four macOS/Linux targets, minimum-Rust builds, artifacts including the worklist and scanner failure logs. |
+| `.github/workflows/ci.yml` | CI on every pull request: `quality` (fmt, clippy, dependency policy, ledger and markers, Rust and script tests), minimum-Rust builds, the sharded parity suites and their check against `status/parity/`, and the `tsc` suite and native crates on macOS and Linux. |
 | `crates/tsr_jsstring/`, `crates/tsr_arena/` | Text and ownership contract leaves; see [S04](docs/S04.md). |
 | `crates/tsr_scanner/`, `crates/tsr_jsnum/`, `crates/tsr_core/` | Byte scanner, numeric conversion and shared target/range slices; see [S05](docs/S05.md). |
 | `crates/tsr_embed/`, `crates/tsr_wasm/`, `crates/tsr_node/` | Rust sessions, bare wasm and Node-API adapters; see [S10](docs/S10.md). |
-| `xtask/` | Local commands for evidence capture, status generation and sprint validation. |
+| `xtask/` | Local commands: code generation (`gen`), ledger and marker validation (`validate`) and the status render (`status`). |
 | `data/import-graph.txt` | Internal import edges of the Go module (`importer imported`), produced by `go list`. 766 edges. |
 | `data/topological-order.txt` | The packages in dependency order, leaves first, produced by `tsort` over the graph. The plan's crate map groups related packages; its dependency slices also use the actual import edges. |
 | `data/MEASURED.txt` | Which TypeScript commit and Go version the data was measured with. |
@@ -41,19 +38,17 @@ The first contract leaves are implemented: `tsr_jsstring` preserves source/strin
 3. Section 9 for prototype dependencies, full parity gates and the spike experiments.
 4. Section 5 for the native, WebAssembly and Rust embedding cut-over criteria.
 5. Section 13 for remaining implementation choices and settled contracts.
-6. [Tracking](docs/TRACKING.md), [status](STATUS.md) and the [ADR index](docs/adr/README.md) for recorded work, current evidence and unresolved decisions.
+6. [Evidence](docs/EVIDENCE-plan.md), the parity files in [`status/parity/`](status/parity) and the [ADR index](docs/adr/README.md) for how work is tracked, where parity stands and unresolved decisions.
 
 ## Tracking work
 
-`cargo xtask run <run-id>` executes a reviewed specification from `status/runs.toml` and captures typed metrics with evidence bound to the upstream pin, command, that run's selected sources and declared corpus/configuration inputs. `cargo xtask status` validates that evidence and regenerates the reports; `cargo xtask check <sprint>` enforces sprint exit criteria and required item checks. Source globs default to compiler crates, Cargo manifests/lockfile, `.cargo` configuration, Rust toolchain selectors, `xtask` and scripts. Documentation and policy edits do not invalidate measurements unless that producer explicitly consumes those files; declared inputs and case manifests are always hashed.
+Each pinned suite the port runs has an expectation file, `status/parity/<suite>.json`, that names every sub-test the Rust does not pass, each with a reason, and an `approved` note where the owner accepted the difference. CI runs the suites on every pull request and fails on any difference in either direction: a new failure, or a listed test that now passes. The files are therefore exact for `HEAD`, and progress is the diff of the file in the pull request that made it. `scripts/parity.py` runs a suite (`run`), compares the results with the file (`check`) and rewrites it (`accept`); [EVIDENCE-plan.md](docs/EVIDENCE-plan.md) describes the model.
 
-The ledger's `status`, `rust` and `verify` fields are editable without regenerating upstream provenance. Threshold, sprint-check and ledger-progress changes reevaluate existing metrics; selected source or run-input changes invalidate affected evidence. Metric-producer contracts define the workload and assertions behind each measurement, so neither function markers nor a successful command alone establishes parity. See [Tracking](docs/TRACKING.md) for version-2 provenance, source selection and the run schema.
-
-`cargo xtask check-metrics 'run.fmt.clean == true'` enforces measured results independently of unfinished sprints. `cargo xtask status --check-committed` verifies all four committed views against validated evidence using the recorded context and date, without rewriting files; live gates still require evidence valid for the current host and environment.
+`PORTS.toml`, `data/go-functions.tsv` and the `// port:` and `// source:` markers record what is ported and from where; `cargo xtask validate` checks them. Function markers record traceability; the parity files record behavior.
 
 ## Status
 
-Draft 3.2, 5 September 2026, measured against microsoft/TypeScript commit `1f70213d49`. The canonical `upstream/` submodule is registered, initialized and clean at `1f70213d4922b434345f639b441681e470c7cfc1`; the actual Go oracle build and `--version` smoke test have passing execution evidence. ADRs 0006, 0007 and 0013 and the [ownership](docs/design/ownership.md), [symbols](docs/design/symbols.md) and [text](docs/design/text.md) design notes are accepted; S01 passes against the current bootstrap evidence. The S04 leaf portions of E3 and E4 and S05 scanner parity have executable producers; full E1–E8 verification remains pending; their sprints are the [Phase 0 implementation plan](sprints/README.md). A status workflow is installed under `.github/workflows/`; no run of it is recorded here. Bootstrap success does not establish Rust compiler parity or complete function coverage.
+Draft 3.2, 5 September 2026, measured against microsoft/TypeScript commit `1f70213d49`. The canonical `upstream/` submodule is registered, initialized and clean at `1f70213d4922b434345f639b441681e470c7cfc1`; the actual Go oracle build and `--version` smoke test have passing execution evidence. ADRs 0006, 0007 and 0013 and the [ownership](docs/design/ownership.md), [symbols](docs/design/symbols.md) and [text](docs/design/text.md) design notes are accepted; S01 passes against the current bootstrap evidence. The S04 leaf portions of E3 and E4 and S05 scanner parity have executable producers; full E1–E8 verification remains pending. Suite parity is tracked in [`status/parity/`](status/parity) as [EVIDENCE-plan.md](docs/EVIDENCE-plan.md) describes. Bootstrap success does not establish Rust compiler parity or complete function coverage.
 
 Native targets are macOS arm64/x64 and Linux x64/arm64 (glibc). The plan specifies file/lazy/bundle ownership, checker-local merges, generation-aware invalidation and raw-byte handling. Repeated identity checks may be elided only within a proven ownership scope, with release-mode rejection required at every unproven boundary. The spike tests bounded memory, WebAssembly and embedding prototypes; full compiler WebAssembly and Rust-consumer acceptance are required before cut-over. The owner approves baseline divergences, and work is sequenced by dependency slices and parity gates rather than a calendar.
 

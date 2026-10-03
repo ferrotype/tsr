@@ -3,9 +3,7 @@ from contextlib import redirect_stderr
 import io
 from pathlib import Path
 import re
-import subprocess
 import sys
-import tomllib
 import unittest
 from unittest.mock import patch
 
@@ -320,44 +318,6 @@ class CheckerOwnershipProducer(unittest.TestCase):
             with self.assertRaises(ValueError):
                 publish_metrics({"metrics": {}}, self.modes, changed_arena, self.manifest)
 
-
-class OwnershipInputsAndCI(unittest.TestCase):
-    def test_e3_fingerprints_the_test_packages_dependency_closure_and_insertion_inputs(self):
-        runs = tomllib.loads((ROOT / "status/runs.toml").read_text())
-
-        def tracked(*patterns):
-            return set(subprocess.check_output(
-                ["git", "ls-files", "-z", "--", *patterns], cwd=ROOT
-            ).decode().rstrip("\0").split("\0")) - {""}
-
-        covered = tracked(*(f":(top,glob){pattern}" for pattern in runs["e3"]["sources"]))
-        suite_manifests = {(ROOT / "crates" / package / "Cargo.toml").resolve()
-                           for package, _ in SUITES.values()}
-        pending = list(suite_manifests)
-        visited = set()
-        required = set()
-        while pending:
-            manifest = pending.pop().resolve()
-            if manifest in visited:
-                continue
-            visited.add(manifest)
-            required |= tracked(str(manifest.parent.relative_to(ROOT)))
-            package = tomllib.loads(manifest.read_text())
-            scopes = [package, *package.get("target", {}).values()]
-            # Cargo builds dev dependencies only for the selected test
-            # packages, not for every library in their dependency graph.
-            sections = ["dependencies", "build-dependencies"]
-            if manifest in suite_manifests:
-                sections.append("dev-dependencies")
-            for scope in scopes:
-                for section in sections:
-                    for dependency in scope.get(section, {}).values():
-                        if isinstance(dependency, dict) and "path" in dependency:
-                            pending.append(manifest.parent / dependency["path"] / "Cargo.toml")
-        required |= tracked("tools/s09/format_oracle")
-        required |= {"scripts/s09_format.py", "data/s09/insertion-cases.json",
-                     "data/s09/insertion-observations.json"}
-        self.assertFalse(required - covered, f"unfingerprinted E3 inputs: {sorted(required - covered)}")
 
 if __name__ == "__main__":
     unittest.main()

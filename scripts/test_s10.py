@@ -19,31 +19,19 @@ from s06_ownership import validate_output
 
 
 class S10Evidence(unittest.TestCase):
-    def test_all_capture_inputs_are_covered_by_consuming_ledgers(self):
+    def test_capture_inputs_include_the_measurement_dependencies(self):
         captured = set(corpus.sources())
-        runs = tomllib.loads((corpus.ROOT / 'status/runs.toml').read_text())
-        for producer in ['e7', 'e8']:
-            self.assertEqual(set(runs[producer]['sources']),
-                             (set(corpus.source_patterns()) - {'upstream/package.json'})
-                             | {'xtask/**', 'upstream'})
-            paths = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard', '-z', '--',
-                    *(':(top,glob)' + p for p in runs[producer]['sources'])], cwd=corpus.ROOT)
-            covered = set(paths.decode().split('\0')) | set(runs[producer]['inputs'])
-            self.assertFalse(captured - covered, sorted(captured - covered))
         for required in ['scripts/s10_measure.py', 'tools/s10/wasm/imports.mjs',
                          'tools/s10/go-parser/main.go', 'tools/s10/rust-consumer/Cargo.lock',
                          'scripts/s07_benchmark_stats.py', 'status/experiments.toml']:
             self.assertIn(required, captured)
 
-    def test_unrelated_edits_do_not_stale_capture_or_ledgers(self):
+    def test_unrelated_edits_do_not_stale_capture(self):
         import fnmatch
         patterns = corpus.source_patterns()
-        runs = tomllib.loads((corpus.ROOT / 'status/runs.toml').read_text())
         for name in ['scripts/s09_format.py', 'tools/s08/p7/child.rs',
                      'crates/tsr_api/src/lib.rs', 'data/s10/initial-acceptance.json']:
             self.assertFalse(any(fnmatch.fnmatchcase(name, p) for p in patterns), name)
-            for producer in ['e7', 'e8']:
-                self.assertFalse(any(fnmatch.fnmatchcase(name, p) for p in runs[producer]['sources']), name)
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / 'tools/s10').mkdir(parents=True)

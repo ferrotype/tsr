@@ -7,8 +7,7 @@ runner and writes one result row per scenario with the transcript it rendered
 (the row format is `tools/phase4/tsctests/src/row.rs`). The whole suite is one
 process and takes about a second, so a capture is one run of that process,
 not the S08 per-row protocol (no per-row process, deadline or resume). What it
-keeps of Phase 3's discipline (`scripts/phase3_corpus.py`) is the binding and
-the replay: a capture is bound to the inventory it ran over, the executable
+keeps of the Phase 3 corpus runner's discipline is the binding and the replay: a capture is bound to the inventory it ran over, the executable
 and the sources it was built from, and every raw artifact by digest; `replay`
 recomputes the result from the raw rows and refuses anything that changed.
 
@@ -92,7 +91,7 @@ HEX64 = re.compile(r"[0-9a-f]{64}")
 
 def test_only(path):
     """A crate's integration suites and fixtures (`crates/<crate>/tests/**`),
-    which no harness binary builds (the rule of scripts/phase2_corpus.py)."""
+    which no harness binary builds (the Phase 2 corpus runner's rule)."""
     parts = path.split("/")
     return len(parts) > 3 and parts[0] == "crates" and parts[2] == "tests"
 

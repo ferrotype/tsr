@@ -15,7 +15,6 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import phase1_capture as capture
-import phase1_integration as integration
 from s04_common import strict_json_loads
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -67,19 +66,6 @@ class ParserTokensFixtureTests(unittest.TestCase):
         table = ROOT / "crates/tsr_parser/src/testdata/keyword_or_punctuation.rs"
         self.assertEqual(self.observe.TABLE, table)
         self.assertEqual(table.read_text(), self.observe.table(self.observed))
-
-    def test_the_rust_gate_reads_the_table_and_its_receipt_binds_the_fixture(self):
-        tests = (ROOT / "crates/tsr_parser/src/tokens_tests.rs").read_text()
-        self.assertIn('#[path = "testdata/keyword_or_punctuation.rs"]', tests)
-        command, expected = integration.RUST_WITNESS_TESTS[WITNESS]
-        self.assertEqual(command[command.index("-p") + 1], "tsr_parser")
-        self.assertEqual(expected, ["tokens::tests::keyword_or_punctuation_matches_the_pinned_kind_table"])
-        self.assertIn("tools/phase1/parser-tokens", integration.RECEIPT_INPUTS["rust-witnesses"]["directories"])
-        paths = set(integration.receipt_input_paths("rust-witnesses"))
-        for name in ("export_test.go", "requests.json", "native-observations.json", "native-provenance.json",
-                     "observe.py"):
-            self.assertIn(f"tools/phase1/parser-tokens/{name}", paths)
-        self.assertIn("crates/tsr_parser/src/testdata/keyword_or_punctuation.rs", paths)
 
 
 if __name__ == "__main__":

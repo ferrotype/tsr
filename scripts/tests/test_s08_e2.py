@@ -1,7 +1,5 @@
 """Acceptance cannot be manufactured by shrinking, skipping or waiving failures."""
 import copy
-import contextlib
-import io
 from pathlib import Path
 import sys
 import tempfile
@@ -34,26 +32,6 @@ class CaptureProvenance(unittest.TestCase):
                             with self.assertRaisesRegex(ValueError, 'stale sources'):
                                 e2.verify(root)
                         (root / name).write_text('original')
-
-    def test_equal_metrics_keep_distinct_authenticated_capture_identities(self):
-        reports = []
-        identities = []
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            (root / 'corpus').mkdir()
-            for capture in ('a' * 64, 'b' * 64):
-                verified = {'metrics': {'types_parity': 1}, 'capture_sha256': capture,
-                            'obligations_sha256': 'c' * 64, 'divergences_sha256': 'd' * 64}
-                stderr = io.StringIO()
-                with patch.object(e2, 'DEFAULT', root), patch.object(e2, 'verify', return_value=verified), \
-                        patch('s07_producers.e2', return_value={'metrics': {'frozen_subset': True}}), \
-                        contextlib.redirect_stderr(stderr):
-                    reports.append(e2.producer())
-                identity = e2.p4.strict_json_loads(stderr.getvalue().removeprefix('E2 verified capture: '))
-                self.assertEqual(identity, {key: value for key, value in verified.items() if key != 'metrics'})
-                identities.append(identity)
-        self.assertEqual(reports[0], reports[1])
-        self.assertNotEqual(identities[0], identities[1])
 
 
 class Acceptance(unittest.TestCase):

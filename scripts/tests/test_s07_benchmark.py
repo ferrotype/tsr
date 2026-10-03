@@ -68,13 +68,9 @@ class ThresholdLedger(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "duplicate"):
                     measure.e6_thresholds()
 
-    def test_threshold_ledger_is_in_capture_and_producer_inputs(self):
-        import tomllib
-        from s07_benchmark import ROOT, source_fingerprint
+    def test_threshold_ledger_is_a_capture_input(self):
+        from s07_benchmark import source_fingerprint
         self.assertIn("status/experiments.toml", source_fingerprint()["files"])
-        runs = tomllib.loads((ROOT / "status/runs.toml").read_text())
-        for producer in ("bindworkload", "e5", "e6"):
-            self.assertIn("status/experiments.toml", runs[producer]["inputs"])
 
     def test_thresholds_do_not_authorize_other_hosts(self):
         from s07_benchmark_measure import validate_threshold_host

@@ -416,46 +416,6 @@ class JoinTests(unittest.TestCase):
             capture.join([a], selection_required=True)
 
 
-class DispatcherTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.result = phase1.inventory_check()
-
-    def test_inventory_check_passes_on_the_committed_manifests(self):
-        result = self.result
-        self.assertEqual(result["problems"], [])
-        # Scope drift is strict for `inventory --check` (its `ok` and exit
-        # status) but only reported here: a source edit in flight must not fail
-        # the self-tests. ScopeDriftTests prove the strict half.
-        self.assertEqual(result["ok"], result["scope_drift"]["current"])
-        if not result["scope_drift"]["current"]:
-            print(f"scope.json drift (informational): {result['scope_drift']}", file=sys.stderr)
-
-    def test_inventory_check_reports_the_blocked_baseline_group(self):
-        self.assertIn("matchFiles", self.result["baseline_groups_blocked"])
-
-    def test_f0_is_not_reported_complete_while_outputs_are_unmapped(self):
-        result = self.result
-        self.assertFalse(result["f0_complete"],
-                         "F0 cannot claim completion while 142 outputs have no mapping")
-        self.assertTrue(result["f0_outstanding"])
-        self.assertEqual(result["baseline_outputs_verified"], 167)
-
-    def test_manifest_health_is_separate_from_f0_completion(self):
-        # The manifests are internally consistent; that is a different claim
-        # from the checkpoint being finished.
-        self.assertEqual(self.result["problems"], [])
-        self.assertFalse(self.result["f0_complete"])
-
-    def test_stale_syntax_reports_are_outstanding_not_problems(self):
-        item = "data/phase1/syntax-full.json records a Rust closure that differs (test)"
-        with patch.object(phase1.syntax_module, "freshness_items", return_value=[item]), \
-             patch.object(phase1.scope_module, "scope_drift", return_value=self.result["scope_drift"]):
-            result = phase1.inventory_check()
-        self.assertIn(item, result["f0_outstanding"])
-        self.assertEqual(result["problems"], self.result["problems"])
-
-
 class ScopeDriftTests(unittest.TestCase):
     """Scope drift is strict in the audit commands; a bare name elsewhere is no drift at all."""
 
@@ -474,20 +434,6 @@ class ScopeDriftTests(unittest.TestCase):
         with patch.object(Path, "read_text", lambda path, *a, **k: original(path, *a, **k) + text
                           if path == target else original(path, *a, **k)):
             return scope.build()
-
-    def test_inventory_check_and_producer_check_fail_on_drift(self):
-        import phase1_producers
-        operation = self.committed["operations"][0]["id"]
-        drifted = json.loads(json.dumps(self.built))
-        drifted["operations"][0]["basis"] += " (drifted)"
-        with patch.object(scope, "build", return_value=drifted):
-            result = phase1.inventory_check()
-            self.assertFalse(result["ok"])
-            self.assertFalse(result["scope_drift"]["current"])
-            self.assertIn(operation, result["scope_drift"]["changed_operations"])
-            health = phase1_producers.harness_check(current_classification=True)
-        self.assertTrue(any("scope.json differs from current source classification" in problem
-                            and operation in problem for problem in health["problems"]))
 
     def test_the_self_test_view_of_drift_is_informational(self):
         drift = scope.scope_drift(self.committed)
@@ -891,13 +837,6 @@ class CoverageLinkTests(unittest.TestCase):
         forged["counts"]["implemented_untested"] -= 1
         problems = scope.verify(forged)
         self.assertTrue(any("covered requires exact case links" in p for p in problems))
-
-    def test_unlinked_coverage_is_named_as_outstanding_f0_work(self):
-        result = phase1.inventory_check()
-        self.assertTrue(
-            any("operation-level coverage link" in item for item in result["f0_outstanding"]),
-            "connecting existing evidence to operation ids must be named, not assumed",
-        )
 
 
 class FreezeTests(unittest.TestCase):
@@ -1684,7 +1623,6 @@ class PortAnnotationTests(unittest.TestCase):
         row = next(r for r in json.loads((ROOT / "data/phase1/scope.json").read_text())["operations"]
                    if r["id"] == "tsc/internal/tsoptions/tsconfigparsing.go:isDoubleQuotedString")
         self.assertIn("crates/tsr_tsoptions/src/config_syntax.rs", row["annotated_home"])
-
 
     def test_an_annotated_home_is_recorded_beside_the_ledger_claim(self):
         # PORTS.toml records a Rust home per source FILE, so a package the

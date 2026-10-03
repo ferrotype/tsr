@@ -22,7 +22,6 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import phase1  # noqa: E402
 import phase1_coverage as coverage  # noqa: E402
 import phase1_integration as integration  # noqa: E402
-import phase1_producers as producers  # noqa: E402
 import phase1_scope as scope  # noqa: E402
 import phase1_tables  # noqa: E402
 
@@ -1987,32 +1986,6 @@ class ExpectationTests(MutationFixture):
                 integration.mutation_expectation(self.root)
 
 
-class ObserveTests(unittest.TestCase):
-    def test_observe_runs_the_confirmation_for_the_mutation_receipt(self):
-        # HR: without its `observe` entry the receipt, and so the P1B metric,
-        # could never be produced. Nothing runs here: the command is captured.
-        directory = tempfile.TemporaryDirectory()
-        self.addCleanup(directory.cleanup)
-        output = Path(directory.name) / "receipts"
-        calls = []
-
-        def run(command, **kwargs):
-            calls.append((command, kwargs.get("cwd")))
-            return producers.subprocess.CompletedProcess(command, 1, stdout=b"{}", stderr=b"")
-
-        with patch.object(producers, "source_closure", return_value={"fixture": "a" * 64}), \
-                patch.object(producers, "DEFAULT", Path(directory.name)), \
-                patch.object(producers.subprocess, "run", run):
-            result = producers.observe(integration.MUTATION_RECEIPT, output)
-        self.assertEqual(calls, [(scope.MUTATION_CONFIRM_COMMAND, producers.ROOT)])
-        receipt = json.loads(Path(result["receipt"]).read_text())
-        self.assertEqual((receipt["id"], receipt["command"]), (integration.MUTATION_RECEIPT, scope.MUTATION_CONFIRM_COMMAND))
-        registry = json.loads((Path(directory.name) / "integration-receipts.json").read_text())
-        self.assertEqual(set(registry), {integration.MUTATION_RECEIPT})
-        with self.assertRaisesRegex(ValueError, "unknown executable witness"):
-            producers.observe("mutation-witness", output)
-
-
 class ReceiptEvaluationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -2029,61 +2002,8 @@ class ReceiptEvaluationTests(unittest.TestCase):
         with patch.object(integration, "mutation_expectation", return_value=self.expectation):
             return integration.evaluate(self.prepared, [], receipts, source_inputs=self.inputs)
 
-    def test_measured_receipt_sets_the_mutation_state_only(self):
-        result = self.evaluate([self.receipt(receipt_output(self.expectation))])
-        self.assertEqual(result["problems"], [])
-        self.assertEqual(result["mutation_witnesses"], {"state": "match"})
-        self.assertFalse(result["complete"])
-        failing = self.evaluate([self.receipt(receipt_output(self.expectation, lost={("kA", "e1", "r1")}), 1)])
-        self.assertEqual(failing["mutation_witnesses"], {"state": "different"})
-        self.assertEqual(failing["problems"], [])
-
-    def test_confirmation_that_printed_no_receipt_failed(self):
-        result = self.evaluate([self.receipt("Traceback (most recent call last):\n", exit_code=1)])
-        self.assertEqual(result["problems"], [])
-        self.assertEqual(result["metric_observations"]["receipts"][integration.MUTATION_RECEIPT], "failed")
-        self.assertEqual(result["mutation_witnesses"], {"state": "failed"})
-
     def test_absent_receipt_is_pending(self):
         self.assertEqual(self.evaluate([])["mutation_witnesses"], {"state": "pending"})
-
-    def test_tampered_stdout_or_mismatched_exit_is_invalid(self):
-        receipt = self.receipt(receipt_output(self.expectation))
-        receipt["stdout"] = receipt["stdout"].replace('"confirmed": 3', '"confirmed": 2')
-        self.assertTrue(any("output digest differs" in p for p in self.evaluate([receipt])["problems"]))
-        mismatched = self.receipt(receipt_output(self.expectation), exit_code=1)
-        self.assertTrue(any("exit code disagrees" in p for p in self.evaluate([mismatched])["problems"]))
-        changed = self.receipt(receipt_output(self.expectation))
-        changed["command"] = [*scope.MUTATION_CONFIRM_COMMAND, "--ws", "target/elsewhere"]
-        self.assertTrue(any("command differs" in p for p in self.evaluate([changed])["problems"]))
-
-    def test_stale_receipt_is_unavailable_and_keeps_independent_results(self):
-        stale = self.receipt(receipt_output(self.expectation), inputs={"fixture": "b" * 64})
-        observations = [{"id": identity, "command": command, "exit_code": 0,
-                         "stdout": "".join("test " + name + " ... ok\n" for name in tests)}
-                        for identity, (command, tests) in integration.RUST_WITNESS_TESTS.items()]
-        rust = integration.receipt("rust-witnesses",
-                                   ["python3", "scripts/phase1_integration.py", "observe-rust-witnesses"],
-                                   self.inputs, json.dumps(observations))
-        result = self.evaluate([stale, rust])
-        self.assertEqual(result["problems"], [])
-        self.assertEqual(result["mutation_witnesses"], {"state": "unavailable"})
-        self.assertEqual(result["metric_observations"]["receipts"][integration.MUTATION_RECEIPT], "unavailable")
-        self.assertIn(integration.MUTATION_RECEIPT, result["unavailable"])
-        self.assertEqual(result["rust_witnesses"], {"state": "match"})
-
-    def test_aggregate_emits_the_metric_only_from_a_matching_receipt(self):
-        health = {"healthy": True, "integration": {"mutation_witnesses": {"state": "match"}, "prepared": True,
-                                                   "complete": False}, "coverage": {"preparation_complete": False},
-                  "preparations": {step: {"complete": False} for step in scope.STEP_PACKAGES}}
-        metrics = producers.aggregate("foundations", {}, health)["metrics"]
-        self.assertIs(metrics["mutation_witnesses_complete"], True)
-        for state in ("different", "pending", "unavailable", "failed", "invalid"):
-            health["integration"]["mutation_witnesses"]["state"] = state
-            self.assertIs(producers.aggregate("foundations", {}, health)["metrics"]["mutation_witnesses_complete"], False)
-        health["integration"]["mutation_witnesses"]["state"] = "match"
-        health["healthy"] = False
-        self.assertIs(producers.aggregate("foundations", {}, health)["metrics"]["mutation_witnesses_complete"], False)
 
 
 class HarnessJoinTests(MutationFixture):
@@ -2157,90 +2077,6 @@ class HarnessJoinTests(MutationFixture):
         self.campaign.mutants[0] = self.campaign.fn_mutant(1, "kA", [operation], FAKE, "parse_a")
         self.campaign.write_all()
 
-    def test_bound_witness_links_its_operation_without_a_child_process(self):
-        operation = self.real_pending_operation()
-        self.retarget(operation)
-        witness = self.campaign.record(self.campaign.declaration([operation], ["kA"]))
-        report = self.join(witness)
-        row = next(row for row in report["operations"] if row["id"] == operation)
-        self.assertIn("mutation/e1", row["links"])
-        self.assertIsNone(row["root_cause"])
-        joined = next(row for row in report["witnesses"] if row["id"] == "mutation/e1")
-        self.assertEqual(joined["producer_metrics"], [scope.MUTATION_METRIC])
-        self.assertEqual(joined["operations"], [operation])
-        self.assertIn("mutation/e1", report["metric_contributors"][scope.MUTATION_METRIC])
-        self.assertIn(scope.MUTATION_RESULTS, report["input_sha256"])
-        self.assertIn("scripts/e1_oracle/main.go", report["input_sha256"])
-        self.assertEqual(report["problems"], [])
-
-    def test_scope_that_predates_the_recording_links_nothing(self):
-        operation = self.real_pending_operation()
-        self.retarget(operation)
-        witness = self.campaign.record(self.campaign.declaration([operation], ["kA"]))
-        report = self.join(witness, linked=False)
-        row = next(row for row in report["gaps"] if row["id"] == operation)
-        self.assertEqual(row["root_cause"], "mutation_witness_stale")
-        self.assertIn("committed scope.json does not link it", row["mutation_witnesses"]["mutation/e1"])
-        self.assertEqual(report["problems"], [])
-
-    def test_link_that_stopped_binding_is_a_gap_not_a_problem(self):
-        # H2: the committed scope still links the operation, but an artifact
-        # binding broke. The operation is a named gap and coverage stays
-        # healthy, even though every mutation witness is now stale.
-        operation = self.real_pending_operation()
-        self.retarget(operation)
-        witness = self.campaign.record(self.campaign.declaration([operation], ["kA"]))
-        self.campaign.write_all(results={**self.campaign.results(), "note": "rerun"})
-        report = self.join(witness)
-        row = next(row for row in report["gaps"] if row["id"] == operation)
-        self.assertEqual(row["root_cause"], "mutation_witness_stale")
-        self.assertIn("changed after the evidence was recorded", row["mutation_witnesses"]["mutation/e1"])
-        self.assertEqual(report["problems"], [])
-        self.assertTrue(report["healthy"])
-        joined = next(row for row in report["witnesses"] if row["id"] == "mutation/e1")
-        self.assertEqual((joined["state"], joined["producer_metrics"]), ("stale", []))
-
-    def test_unrecorded_witness_is_a_named_gap_and_healthy(self):
-        operation = self.real_pending_operation()
-        self.retarget(operation)
-        report = self.join(self.campaign.declaration([operation], ["kA"]), linked=False)
-        row = next(row for row in report["gaps"] if row["id"] == operation)
-        self.assertEqual(row["root_cause"], "mutation_witness_stale")
-        self.assertIn("never recorded", row["mutation_witnesses"]["mutation/e1"])
-        self.assertTrue(report["healthy"], report["problems"])
-
-    def test_metric_route_is_required_only_while_a_witness_binds(self):
-        report = coverage.build()
-        row = {"id": "mutation/e1", "kind": "mutation_kill", "state": "bound", "operations": [OP_A],
-               "producer_metrics": []}
-        with self.assertRaisesRegex(ValueError, scope.MUTATION_METRIC):
-            coverage.metric_contributors(report["cases"], report["witnesses"] + [row], report["external_inventories"])
-        routed = dict(row, producer_metrics=[scope.MUTATION_METRIC])
-        contributors = coverage.metric_contributors(report["cases"], report["witnesses"] + [routed],
-                                                    report["external_inventories"])
-        self.assertEqual(contributors[scope.MUTATION_METRIC], ["mutation/e1"])
-        for stale in (dict(row, state="stale", operations=[]), dict(row, state="unrecorded", operations=[])):
-            coverage.metric_contributors(report["cases"], report["witnesses"] + [stale], report["external_inventories"])
-
-    def test_a_bound_mutation_witness_resolves_a_later_step_operation(self):
-        # HR3: a mutation witness is a gated link like a rust_gated one, so a
-        # later-step operation it covers exactly is no later_step_unresolved gap.
-        # Closure leaves no unresolved transfer; the join's roster override
-        # makes any unlinked operation one for this test.
-        operation = self.real_pending_operation()
-        self.retarget(operation)
-        witness = self.campaign.record(self.campaign.declaration([operation], ["kA"]))
-        report = self.join(witness, roster="exempt:later_step")
-        row = next(row for row in report["operations"] if row["id"] == operation)
-        self.assertEqual(row["roster_state"], "exempt:later_step")
-        self.assertIn("mutation/e1", row["links"])
-        self.assertIsNone(row["root_cause"])
-        self.assertNotIn(operation, {gap["id"] for gap in report["gaps"]})
-        # The same link, stale, leaves the later-step gap open.
-        self.campaign.write_all(results={**self.campaign.results(), "note": "rerun"})
-        stale = self.join(witness, roster="exempt:later_step")
-        self.assertIn(operation, {gap["id"] for gap in stale["gaps"]})
-
     def test_exempt_operation_claimed_by_a_mutation_witness_fails_the_roster(self):
         document = json.loads((ROOT / "data/phase1/scope.json").read_text())
         roster = json.loads((ROOT / "data/phase1/syntax-roster.json").read_text())
@@ -2254,33 +2090,6 @@ class HarnessJoinTests(MutationFixture):
         with patch.object(scope, "recorded_mutations", return_value=bound):
             problems = scope.roster_problems(document, cases, "syntax")
         self.assertTrue(any(exempt in p and "exempted but also prepared by mutation/e1" in p for p in problems))
-
-    def test_foundations_closure_binds_the_mutation_tools_and_artifacts(self):
-        # HR: the switch crate reaches the closure through the syntax harness
-        # anyway; the driver's kill rule, the splicer's operators, the Go
-        # instrumentation and the committed artifacts only through the
-        # mutation inputs. Each change must stale the confirmation receipt.
-        closure = producers.source_closure("foundations")
-        tools = [name for name in closure if name.startswith(producers.MUTATION_TOOLS + "/")]
-        for required in ("switch/src/lib.rs", "driver/src/jobs.rs", "splicer/src/operators.rs", "go/phase1_cover.go"):
-            self.assertIn(f"{producers.MUTATION_TOOLS}/{required}", closure, required)
-        self.assertTrue(any(name.startswith(scope.MUTATION_DIRECTORY + "/") and name.endswith(".json.gz")
-                            for name in closure))
-        self.assertIn(scope.MUTATION_MANIFEST, closure)
-        self.assertFalse(any("/target/" in name for name in tools))
-        self.assertLessEqual(producers.python_import_closure(producers.MUTATION_COMMANDS), set(closure))
-
-    def test_receipt_closure_includes_every_module_the_mutation_commands_import(self):
-        # H5: `comparable` (s07_binder), the protocol and its codec fixtures are
-        # imported lazily or transitively; a change to any of them stales the receipt.
-        imported = producers.python_import_closure(producers.MUTATION_COMMANDS)
-        with patch.object(producers, "MUTATION_TOOLS", "tools/phase1/absent-for-this-test"):
-            inputs = producers.mutation_inputs()
-        for module in ("scripts/s07_binder.py", "scripts/s06_protocol.py", "scripts/s06_codec_fixtures.py",
-                       "scripts/s08_oracle.py", "scripts/s04_common.py", *producers.MUTATION_COMMANDS):
-            self.assertIn(module, imported)
-        self.assertLessEqual(imported, inputs)
-        self.assertNotIn("scripts/json.py", imported)
 
 
 if __name__ == "__main__":
