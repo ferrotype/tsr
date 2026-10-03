@@ -28,6 +28,15 @@ cargo fmt --all --check
 cargo clippy --workspace --all-targets --all-features --locked -- -D warnings   # the lint gate
 ```
 
+The clippy gate is `cargo clippy --workspace --all-targets --all-features
+--locked -- -D warnings`. `clippy::pedantic` is warn-level in `Cargo.toml`, so
+the gate's `-D warnings` is what turns an unused `self` or a `match` on one
+variant into a failure. Dropping `--all-features` gives a faster inner loop but
+compiles less code, so re-run the real command before committing.
+
+Note that `cargo clippy --fix` rewrites `use super::*` and breaks test modules
+that relied on the parent glob. Add the explicit imports to `mod tests` instead.
+
 ## Suite parity (docs/EVIDENCE-plan.md)
 
 `status/parity/<suite>.json` names every failing sub-test of a suite; CI runs
@@ -45,15 +54,6 @@ then `check compiler --results DIR` compares with the expectation file and
 mode), `compiler-concurrent`, `transpile`, `tsc`. A variant id is
 `<suite>/<configured name>`; the runner binary is `tsr-testrunner`
 (`crates/tsr_testrunner`), built in release by `run` unless `--no-build`.
-
-The clippy gate is `cargo clippy --workspace --all-targets --all-features
---locked -- -D warnings`. `clippy::pedantic` is warn-level in `Cargo.toml`, so
-the gate's `-D warnings` is what turns an unused `self` or a `match` on one
-variant into a failure. Dropping `--all-features` gives a faster inner loop but
-compiles less code, so re-run the real command before committing.
-
-Note that `cargo clippy --fix` rewrites `use super::*` and breaks test modules
-that relied on the parent glob. Add the explicit imports to `mod tests` instead.
 
 ## Comparing the relater implementations
 
