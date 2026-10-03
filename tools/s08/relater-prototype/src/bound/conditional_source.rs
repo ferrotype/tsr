@@ -863,7 +863,7 @@ impl Construction {
         )
     }
 
-    // port: tsc/internal/checker/checker.go:Checker.getRestTypeAtPosition
+    // port: tsc/internal/checker/relater.go:Checker.getRestTypeAtPosition
     fn rest_type_at_position(
         self: &Rc<Self>,
         location: NodeId,

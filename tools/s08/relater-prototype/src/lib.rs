@@ -1188,7 +1188,7 @@ impl Checker {
 }
 
 impl Relater<'_> {
-    // port: tsc/internal/checker/checker.go:Checker.getNonNullableType
+    // port: tsc/internal/checker/checker.go:Checker.GetNonNullableType
     /// `getAdjustedTypeWithFacts(t, NEUndefinedOrNull)`: constituents that are
     /// only null or undefined drop out, and each remaining constituent that can
     /// still compare equal to them is wrapped in `NonNullable<T>`.
@@ -1233,7 +1233,7 @@ impl Relater<'_> {
         }
     }
 
-    // port: tsc/internal/checker/checker.go:Checker.isInstantiatedGenericParameter
+    // port: tsc/internal/checker/relater.go:Checker.isInstantiatedGenericParameter
     /// Resolves the parameter of the signature this one instantiates, as
     /// upstream does, and reports whether that declared type is generic.
     fn is_instantiated_generic_parameter(
@@ -1281,7 +1281,7 @@ fn is_generic_type(ty: &Rc<TypeCell>) -> Result<bool, Error> {
 }
 
 impl Checker {
-    // port: tsc/internal/checker/relater.go:Checker.getNormalizedType
+    // port: tsc/internal/checker/checker.go:Checker.getNormalizedType
     /// Fresh literals relate as their regular forms and a deferred (node-backed)
     /// reference as the ordinary reference of its target and resolved
     /// arguments; carried unions and intersections are reduced by construction.

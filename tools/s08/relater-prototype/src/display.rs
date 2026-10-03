@@ -148,7 +148,7 @@ impl Display<'_> {
     }
 
     fn composite(&mut self, ty: &Rc<TypeCell>) -> Result<Printed, Error> {
-        // port: tsc/internal/checker/nodebuilderimpl.go:nodeBuilderImpl.typeToTypeNodeWorker
+        // port: tsc/internal/checker/nodebuilderimpl.go:NodeBuilderImpl.typeToTypeNode
         // A union that carries a denormalized origin prints as that origin, so
         // `(A | B) & (C | D)` is not printed as its expanded cross product.
         let origin = ty

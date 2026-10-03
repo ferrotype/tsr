@@ -114,12 +114,7 @@ fn outputs(root: &Path, stage: &Path, pin: &str) -> Result<BTreeMap<PathBuf, Vec
     }
     let hashes: BTreeMap<_, _> = files
         .iter()
-        .map(|(path, bytes)| {
-            (
-                path.to_string_lossy().into_owned(),
-                super::evidence::hash(bytes),
-            )
-        })
+        .map(|(path, bytes)| (path.to_string_lossy().into_owned(), super::hash(bytes)))
         .collect();
     files.insert(
         PathBuf::from(MANIFEST),
