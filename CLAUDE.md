@@ -47,7 +47,7 @@ python3 scripts/parity.py run compiler --output "$SCRATCH/compiler" --id 'compil
 ```
 
 The differing outputs land under `$SCRATCH/compiler/local/`. A full run is
-`run compiler --output DIR` (about three minutes on this host, sharded in CI),
+`run compiler --output DIR` (under two minutes on this host, sharded in CI),
 then `check compiler --results DIR` compares with the expectation file and
 `accept compiler --results DIR` rewrites it, keeping every `reason` and
 `approved` text. Suites: `compiler` (the pin's default single-threaded
