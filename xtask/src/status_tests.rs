@@ -19,6 +19,27 @@ fn perf_run(revision: &str, at: &str, label: &str, ratios: &serde_json::Value) -
     .to_string()
 }
 
+/// What `scripts/parity.py accept` writes for a new failure before anyone
+/// explains it: `reason` and the first differing line as `detail`
+/// (`scripts/tests/test_parity.py` pins the writer's side of this contract).
+#[test]
+fn an_accepted_entry_with_detail_renders() {
+    let f = Fixture::new();
+    parity(
+        &f,
+        "compiler",
+        PIN,
+        3,
+        &json!({"compiler/c.ts/types": {"reason": "the baseline file compiler/c.types has changed.",
+                                         "detail": "-  >a : E"}}),
+    );
+    let md = render_markdown(&Page::read(&f.0));
+    assert!(
+        md.contains("- `compiler/c.ts/types`: the baseline file compiler/c.types has changed. (`-  >a : E`)\n"),
+        "{md}"
+    );
+}
+
 #[test]
 fn suite_parity_renders_rows_failures_approvals_and_pin_flags() {
     let f = Fixture::new();
@@ -100,7 +121,9 @@ fn parity_entries_reject_misspelled_fields_and_require_a_reason() {
         ))
     };
     assert!(file(r#"{"reason":"r","approved":"o"}"#).is_ok());
+    assert!(file(r#"{"reason":"r","detail":"-  >a : E"}"#).is_ok());
     assert!(file(r#"{"reason":"r","aproved":"o"}"#).is_err());
+    assert!(file(r#"{"reason":"r","details":"d"}"#).is_err());
     assert!(file(r#"{"approved":"o"}"#).is_err());
 }
 

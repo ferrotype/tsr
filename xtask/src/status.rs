@@ -23,12 +23,16 @@ pub(crate) struct Parity {
 }
 
 /// An approved entry still fails; `approved` carries the owner's words.
+/// `detail` is what `parity.py accept` keeps of a new failure's first
+/// differing line until someone writes the reason.
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct Failure {
     reason: String,
     #[serde(default)]
     approved: Option<String>,
+    #[serde(default)]
+    detail: Option<String>,
 }
 
 /// `status/perf/<workload>/<run>.json`, one measurement run. Only the fields
@@ -319,10 +323,16 @@ fn blocks(page: &Page) -> Vec<Block> {
                 b.push(Text("No failing sub-tests.".into()));
                 continue;
             }
-            let items = p.failing.iter().map(|(id, f)| match &f.approved {
-                Some(a) => format!("`{id}`: {} **Approved:** {}", f.reason.trim(), a.trim()),
-                None => format!("`{id}`: {}", f.reason.trim()),
-            });
+            let items = p
+                .failing
+                .iter()
+                .map(|(id, f)| match (&f.approved, &f.detail) {
+                    (Some(a), _) => {
+                        format!("`{id}`: {} **Approved:** {}", f.reason.trim(), a.trim())
+                    }
+                    (None, Some(d)) => format!("`{id}`: {} (`{}`)", f.reason.trim(), d.trim()),
+                    (None, None) => format!("`{id}`: {}", f.reason.trim()),
+                });
             b.push(List(items.collect()));
         }
     }
