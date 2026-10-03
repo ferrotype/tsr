@@ -1,7 +1,5 @@
 """An informational failure cannot certify or fail E2 acceptance."""
-import fnmatch
 import sys
-import tomllib
 import unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
@@ -16,16 +14,6 @@ class AcceptanceBoundaryTests(unittest.TestCase):
             report={**facts,"go":"go1.27.1","goos":goos,"goarch":goarch}
             self.assertEqual(policy_observation(report),facts)
             self.assertEqual(report["goos"],goos)
-
-    def test_both_consumers_fingerprint_policy_sources_and_observations(self):
-        root=Path(__file__).resolve().parents[2]
-        runs=tomllib.loads((root/"status/runs.toml").read_text())
-        paths=("scripts/s07_acceptance.py","scripts/s08_oracle.py","tools/s08/oracle/acceptance_policy_test.go",
-               "data/s07/e2-acceptance.json","data/s07/e2-policy-observations.json")
-        for consumer in ("e2","program"):
-            for path in paths:
-                with self.subTest(consumer=consumer,path=path):
-                    self.assertTrue(any(fnmatch.fnmatchcase(path,pattern) for pattern in runs[consumer]["sources"]+runs[consumer]["inputs"]))
 
     def fixture(self):
         rows=[({"source":{"path":f"compiler/{i}.ts"}},

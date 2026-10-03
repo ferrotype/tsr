@@ -1,7 +1,5 @@
 """Checkerbench provenance checks without compilers or benchmark children."""
-import subprocess
 import tempfile
-import tomllib
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -12,23 +10,11 @@ from s08_oracle import canonical, digest
 
 
 class Fingerprints(unittest.TestCase):
-    def test_capture_inputs_are_covered_by_both_consuming_ledgers(self):
+    def test_capture_inputs_include_the_census_runtime_and_its_observers(self):
         captured = set(checker.sources())
         self.assertIn('scripts/s08_census_runtime.py', captured)
         for name in runtime.OBSERVER_SOURCES:
             self.assertIn('tools/s08/oracle/families/' + name, captured)
-        runs = tomllib.loads((checker.ROOT / 'status/runs.toml').read_text())
-        for producer in ('checkerbench', 'e5'):
-            with self.subTest(producer=producer):
-                self.assertIn('scripts/s08_census_runtime.py', runs[producer]['sources'])
-                # Use the same Git pathspec expansion as xtask's source record,
-                # including nonignored additions and tracked deletions.
-                paths = subprocess.check_output(
-                    ['git', 'ls-files', '--cached', '--others', '--exclude-standard', '-z', '--',
-                     *(':(top,glob)' + p for p in runs[producer]['sources'])], cwd=checker.ROOT)
-                # Explicit manifest inputs are hashed separately by xtask.
-                covered = set(paths.decode().split('\0')) | set(runs[producer]['inputs'])
-                self.assertFalse(captured - covered, f'{producer} omits {sorted(captured - covered)}')
 
     def test_directory_inputs_include_nested_files_and_detect_edits(self):
         with tempfile.TemporaryDirectory() as directory:

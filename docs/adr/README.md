@@ -1,13 +1,13 @@
 # Architecture Decision Records
 
-One decision per file, numbered. `Status` is `Proposed`, `Accepted`, `Amended` or `Superseded`; the status tool reads the `Status:` line. A change that alters a decision amends the record or supersedes it with a new one. See `docs/TRACKING.md`.
+One decision per file, numbered. `Status` is `Proposed`, `Accepted`, `Amended` or `Superseded`; the status tool reads the `Status:` line. A change that alters a decision amends the record or supersedes it with a new one. See `docs/EVIDENCE-plan.md`.
 
 | ADR | Title | Status |
 |---|---|---|
 | [0001](0001-independent-repository-with-upstream-pinned-as-a-submodule.md) | Independent repository with upstream pinned as a submodule | Accepted |
 | [0002](0002-native-targets-and-the-glibc-floor.md) | Native targets and the glibc floor | Accepted |
 | [0003](0003-memory--webassembly-and-embedding-are-all-required.md) | Memory, WebAssembly and embedding are all required | Accepted |
-| [0004](0004-the-owner-approves-baseline-divergences.md) | The owner approves baseline divergences | Accepted |
+| [0004](0004-the-owner-approves-baseline-divergences.md) | The owner approves baseline divergences | Amended (ADR 0023) |
 | [0005](0005-sequencing-by-dependency-slices-and-parity-gates--with-no-ca.md) | Sequencing by dependency slices and parity gates, with no calendar or staffing model | Accepted |
 | [0006](0006-node-ownership--arenas--lazy-file-storage--bundles-and-check.md) | Node ownership: arenas, lazy file storage, bundles and checked identities | Accepted |
 | [0007](0007-symbol-ownership--file-owned-binding--checker-local-merges.md) | Symbol ownership: file-owned binding, checker-local merges, checker-owned types | Accepted |
@@ -21,11 +21,12 @@ One decision per file, numbered. `Status` is `Proposed`, `Accepted`, `Amended` o
 | [0015](0015-generated-code-from-the-pinned-schemas--with-upstream-s-extr.md) | Generated code from the pinned schemas, with upstream's extractors authoritative | Accepted |
 | [0016](0016-toolchain-and-lints.md) | Toolchain and lints | Accepted |
 | [0017](0017-dependency-policy.md) | Dependency policy | Accepted |
-| [0018](0018-tracking--evidence-driven-ledger--function-traceability--adr.md) | Tracking: evidence-driven ledger, function traceability, ADRs and a dashboard | Accepted |
+| [0018](0018-tracking--evidence-driven-ledger--function-traceability--adr.md) | Tracking: evidence-driven ledger, function traceability, ADRs and a dashboard | Superseded by 0023 |
 | [0019](0019-test-host-protocol-and-transport-contract-tests.md) | Test-host protocol and transport contract tests | Accepted |
 | [0020](0020-phase-0-gate-decision.md) | Phase 0 gate decision | Accepted |
 | [0021](0021-parse-and-bind-performance-thresholds.md) | Parse-and-bind performance thresholds re-based on measured evidence | Accepted |
 | [0022](0022-checker-type-footprint-threshold.md) | Checker per-type footprint threshold | Accepted |
+| [0023](0023-expectation-files-replace-recorded-evidence.md) | Expectation files computed by CI replace recorded evidence | Accepted |
 
 The three contracts (0006, 0007, 0013) were accepted by the owner on 2026-09-05 after review of their design notes: [ownership](../design/ownership.md), [symbols](../design/symbols.md) and [text](../design/text.md). Each note cites the pinned upstream code it reproduces and lists what E3 or E4 asserts. ADR 0019 was accepted by the owner on 2026-09-19 with server-owned options, a raw plugin stream tunnel and explicit Phase 5 limitations. ADR 0020 was accepted on 2026-09-20: the owner approved the amended prototype limits, Phase 7 budgets and S12 closure using the indexed recent evidence. Normal current-source freshness checks remain unchanged.
 

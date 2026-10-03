@@ -238,6 +238,15 @@ class ParityTests(unittest.TestCase):
         parity.main(["accept", "compiler", *self.results("out")])
         self.assertIn("tsc/commandLine/help.js", self.expectation()["failing"])
 
+    def test_accept_writes_only_the_fields_the_status_renderer_reads(self):
+        # xtask/src/status.rs `Failure` is `deny_unknown_fields` over exactly these.
+        self.run_shard("out")
+        parity.main(["accept", "compiler", *self.results("out")])
+        for key, entry in self.expectation()["failing"].items():
+            self.assertTrue(set(entry) <= {"reason", "approved", "detail"}, (key, entry))
+            self.assertIn("reason", entry)
+        self.assertEqual(self.expectation()["failing"]["compiler/a.ts/types"]["detail"], "line 1")
+
     def test_check_reports_new_failures_pin_and_denominator_drift(self):
         self.run_shard("out")
         parity.main(["accept", "compiler", *self.results("out")])

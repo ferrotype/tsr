@@ -1,7 +1,7 @@
 # Evidence: replacing the recorded-evidence machine with expectation files
 
 Owner decisions of 2026-10-03, recorded in section 10. This plan replaces
-[TRACKING.md](TRACKING.md)'s model (producers, recorded artifacts, sprints,
+ADR 0018's model, `docs/TRACKING.md` (producers, recorded artifacts, sprints,
 experiments, derived verification) with one that CI computes on every pull
 request. It is executed in the PR sequence of section 9; nothing in it waits
 for another green-up.
@@ -112,7 +112,9 @@ The entries below are illustrative; `accept` writes the real ones.
   separately and an id maps directly to a reference file.
 - `failing` is sorted by id. `reason` is required. `approved` is optional and
   carries the owner's words; an approved entry is still a failing entry (the
-  Rust output differs from the pin), rendered separately. Approval is the
+  Rust output differs from the pin), rendered separately. `detail`, optional,
+  is the first differing line `accept` keeps for a new failure until its
+  reason is written. No other field is allowed. Approval is the
   merge of the PR that adds the field. This replaces `data/divergences.toml`,
   both `approved-differences.json`, `dispositions.json`,
   `informational.json`, `services-approvals.json`,

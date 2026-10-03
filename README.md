@@ -1,62 +1,103 @@
 <p align="center">
-  <img src="assets/tsr-icon.png" alt="tsr logo" width="320">
+  <img src="assets/tsr-icon.png" alt="tsr" width="280">
 </p>
 
-# ts-rust
+<h1 align="center">tsr</h1>
 
-The Rust rewrite of the TypeScript 7 native compiler and language server (the Go module under `tsc/` in microsoft/TypeScript, codename Corsa). Upstream is consumed as a pinned dependency; this repository is the workspace.
+<p align="center"><b>TypeScript's native compiler, in Rust.</b><br>
+A faithful port of TypeScript 7's Go compiler (Corsa) that passes the same test suites against the same baselines, byte for byte.</p>
 
-The first contract leaves are implemented: `tsr_jsstring` preserves source/string bytes and Go position semantics; `tsr_arena` provides checked identities, immutable file storage, lazy publication and bundle retention. S03 adds pinned schema generation for `tsr_ast`, `tsr_diagnostics` and `tsr_encoder`, with drift checks and byte-identical TypeScript client regeneration; see [S03](docs/S03.md). S05 adds the scanner, rescans, regexp recovery and Unicode tables with frozen Go differential evidence; see [S05](docs/S05.md) and its [reviewed implementation plan](docs/S05-implementation-plan.md). Subsequent slices add parsing, binding, program loading, the S08 checker subset and S09 ownership contracts. S10 adds [wasm and Rust/Node embedding interfaces](docs/S10.md); their performance and parity gates are tracked separately. The [S04 synthesis plan](docs/S04-synthesis-plan.md) records the implementation choices; [S04 documentation](docs/S04.md) describes the supported APIs and verification. Mapped functions and implementation labels are reported separately from verified parity.
+<p align="center">
+  <a href="https://ferrotype.github.io/tsr/">Status page</a> ·
+  <a href="docs/EVIDENCE-plan.md">How parity is tracked</a> ·
+  <a href="PLAN.md">The plan</a> ·
+  <a href="docs/adr/README.md">Architecture decisions</a>
+</p>
 
-## Layout
+---
 
-| Path | What it is |
+## What it is
+
+TypeScript 7 moved its compiler to Go (microsoft/TypeScript, module `tsc/`). `tsr` ports that compiler to Rust, function by function, and holds it to the pin's own test corpus: 13,432 compiler and conformance variants, the transpile cases and 516 command-line scenarios, compared whole against the baselines the pin commits. Where the Rust output differs, the difference is named in a committed file and CI fails if it changes.
+
+What you get:
+
+- **`tsrust`** — the compiler command line. The same arguments as `tsc`: a project or a file list, `--incremental`, `--watch`, `-b` with clean, dry, force and build-watch; the same console output, exit statuses, emitted files and `.tsbuildinfo`.
+- **A library workspace** of 48 `tsr_*` crates — scanner, parser, binder, checker, transformers, printer, source maps, module resolution, program loading, the build orchestrator and a native file watcher — with ownership modelled on arenas and checked identities instead of a garbage collector, so a checker can be embedded, retained and dropped from Rust.
+- **WebAssembly and embedding adapters** (`tsr_wasm`, `tsr_embed`, `tsr_node`), at prototype level until Phase 7.
+
+Why: the Rust tooling TypeScript projects use today stops at syntax. Type-aware tooling in Rust — a usage index, a bundler that knows types, an editor service you can link — needs a checker that answers exactly what TypeScript answers. Porting the compiler the TypeScript team wrote, and keeping it honest against their tests, is the only way to get one.
+
+## Development status
+
+Work is sequenced by dependency, not by calendar (ADR 0005). Each phase closes when the pinned suites it covers pass; the numbers below are what CI measures on every pull request.
+
+| Phase | Scope | State |
+|---|---|---|
+| 0 | Contracts, scanner, parser, encoder, the arena and ownership model, the test-host transport, spike measurements | Done |
+| 1 | Foundations: core, collections, text, JSON, paths, virtual file systems, config and command-line parsing, binder, module resolution | Done |
+| 2 | **The checker** — 60,703 lines of Go on the critical path | Done: types, symbols and errors match the pin on every corpus variant |
+| 3 | Emit: transformers, printer, source maps, declaration emit, transpile | Done |
+| 4 | Programs, command line, build orchestrator, native watcher, watch mode, tracing | Done: `tsrust` |
+| 5 | Language service, project system, LSP server | Planned ([docs/PHASE5-plan.md](docs/PHASE5-plan.md)) |
+| 6 | JS API server (the `--api` protocol the TypeScript npm package speaks) | Planned |
+| 7 | Hardening, WebAssembly and embedding acceptance, cut-over | Planned |
+
+**Measured against the pin today** (`status/parity/`, recomputed by CI):
+
+| Suite | Variants | Result |
+|---|---:|---|
+| `compiler` (compiler + conformance, the pin's single-threaded mode) | 13,432 | 119,602 sub-tests pass; 13 failing, one enum-literal typing issue |
+| `compiler-concurrent` (the production checker pool) | 13,432 | same |
+| `transpile` | 28 | all pass |
+| `tsc` (command line, `-b`, `--watch`, `--incremental` scenarios) | 516 | 514 match; 2 approved differences in trace event order |
+
+**Performance against Go** (`status/perf/`, the owner's host, September 2026): parse and bind of the VS Code workload at **1.15×** Go's wall time single-threaded and **1.40×** at eight threads, with **0.70×** its peak memory and allocation; the checker query workload at **0.47×** Go's throughput with **0.81×** its per-type memory. The checker's throughput is the open performance item; Phase 7 owns it.
+
+**Port coverage:** 7,538 of 11,485 upstream functions carry a `// port:` marker to their Rust counterpart; the language service, project system and API packages are the unported remainder. The [status page](https://ferrotype.github.io/tsr/) breaks this down by package.
+
+## Try it
+
+Nothing is published yet (the crate names are reserved); build from source. You need the pinned stable Rust toolchain (`rust-toolchain.toml` selects it) and the upstream submodule for the test data.
+
+```bash
+git clone --recurse-submodules https://github.com/ferrotype/tsr
+cd tsr
+cargo build --release -p tsr --bin tsrust
+./target/release/tsrust --version        # Version 7.1.0-dev, the pin's
+```
+
+```bash
+./target/release/tsrust -p path/to/tsconfig.json
+./target/release/tsrust app.ts util.ts --target es2022 --module esnext
+./target/release/tsrust -b --watch
+```
+
+Targets: macOS arm64 and x64, Linux x64 and arm64 (glibc). There is no language server yet; that is Phase 5.
+
+## How it stays honest
+
+- **One upstream pin.** microsoft/TypeScript at `1f70213d4922b434345f639b441681e470c7cfc1` (2026-09-04) is a submodule under `upstream/`; it supplies the test cases, the committed baselines, the lib files, the schemas and the client. Moving the pin means porting the diff against the file ledger (`PORTS.toml`).
+- **The pin's test runner, ported.** `crates/tsr_testrunner` is the Rust port of `internal/testrunner`: it parses the test cases, expands their configurations, compiles, composes every baseline the Go runner composes and compares each with `testdata/baselines/reference`. No Go runs in CI, nothing is recorded or replayed.
+- **Expectation files.** `status/parity/<suite>.json` names every sub-test that does not pass, with a reason, and `approved` where the owner accepted a difference. CI fails on a new failure and on a listed test that starts passing, so the file is exact for every commit and progress is its diff. [docs/EVIDENCE-plan.md](docs/EVIDENCE-plan.md) is the model; ADR 0023 the decision.
+- **Function traceability.** Every ported function carries `// port: tsc/internal/<file>.go:<Func>`; `cargo xtask validate` rejects a marker that names nothing in the pinned inventory (`data/go-functions.tsv`).
+- **Architecture decisions** are recorded in [docs/adr/](docs/adr/README.md): node ownership on arenas, file-owned symbols with checker-local merges, order-sensitive output by ported comparators, growth guards for deep recursion, the test-host protocol, the dependency policy.
+
+## Repository map
+
+| Path | Contents |
 |---|---|
-| [PLAN.md](PLAN.md) | The canonical plan. Update the HTML mirror when it changes. |
-| [Plan page](docs/corsa-in-rust.html) | The designed HTML mirror. An earlier version was published as a private page at https://claude.ai/code/artifact/6c72abf7-0d30-43fe-a7a8-6457828dcce8; that external copy is not automatically synchronized. |
-| [Tracking](docs/TRACKING.md) | Ledger, function-mapping, evidence, experiment and sprint-check contracts. |
-| [Rust implementation guide](docs/CODEX-RUST-GUIDELINES.md) | Codex/Astra rules for Rust implementation and code review; loading conditions are in [AGENTS.md](AGENTS.md). |
-| [Current status](STATUS.md), [dashboard](docs/status.html) | Generated reports; evidence validity and parity are separate from implementation and mapping counts. |
-| [Unmapped functions](status/unmapped-functions.json) | Complete function worklist linked from the compact JSON status summary. |
-| [Architecture decisions](docs/adr/README.md) | Accepted ADRs 0001 to 0018 and the Proposed placeholders 0019 (test-host protocol) and 0020 (Phase 0 gate). |
-| `PORTS.toml`, `data/go-functions.tsv` | Upstream file ledger and function inventory used for traceability. |
-| `status/runs.toml`, `status/experiments.toml` | Reviewed run specifications and experiment gates. |
-| [Phase 0 implementation plan](sprints/README.md), `sprints/` | Sprint files S01 to S12 with machine-checked exit criteria; the README gives the order, producers and conventions. |
-| `rust-toolchain.toml`, `rustfmt.toml`, `deny.toml`, `Cargo.toml` lints | Pinned stable toolchain, formatting, dependency policy and the clippy allow-list (ADRs 0016 and 0017); `scripts/checks.py` runs them as producers. |
-| `data/divergences.toml` | Owner-approved baseline divergences (ADR 0004); an input of the E2 producer. |
-| `.github/workflows/status.yml` | Status workflow: provenance, archived-view check, live producer metrics and S01/S03/S04/S05 on the four macOS/Linux targets, minimum-Rust builds, artifacts including the worklist and scanner failure logs. |
-| `crates/tsr_jsstring/`, `crates/tsr_arena/` | Text and ownership contract leaves; see [S04](docs/S04.md). |
-| `crates/tsr_scanner/`, `crates/tsr_jsnum/`, `crates/tsr_core/` | Byte scanner, numeric conversion and shared target/range slices; see [S05](docs/S05.md). |
-| `crates/tsr_embed/`, `crates/tsr_wasm/`, `crates/tsr_node/` | Rust sessions, bare wasm and Node-API adapters; see [S10](docs/S10.md). |
-| `xtask/` | Local commands for evidence capture, status generation and sprint validation. |
-| `data/import-graph.txt` | Internal import edges of the Go module (`importer imported`), produced by `go list`. 766 edges. |
-| `data/topological-order.txt` | The packages in dependency order, leaves first, produced by `tsort` over the graph. The plan's crate map groups related packages; its dependency slices also use the actual import edges. |
-| `data/MEASURED.txt` | Which TypeScript commit and Go version the data was measured with. |
-| `scripts/import-graph.sh` | Regenerates `data/` from a TypeScript checkout: `scripts/import-graph.sh ~/git/TypeScript`. |
+| `crates/` | The 48 `tsr_*` crates; `crates/tsr` is the `tsrust` binary |
+| `upstream/` | The pinned microsoft/TypeScript checkout (submodule) |
+| `status/parity/`, `status/perf/` | Expectation files per suite; performance runs per workload |
+| `scripts/parity.py`, `scripts/perf.py` | The suite driver and the performance recorder |
+| `tools/` | Harnesses: the `tsc` scenario runner, the benchmark workloads, generators |
+| `xtask/` | `cargo xtask gen` (code from the pinned schemas), `validate` (ledger and markers), `status` (the rendered page) |
+| `docs/` | [PLAN.md](PLAN.md), the per-phase plans and records, ADRs, design notes |
+| `PORTS.toml`, `data/go-functions.tsv` | The upstream file ledger and function inventory |
 
-## Reading order
-
-1. `PLAN.md`, section 1, for the scope and eight-point summary.
-2. Section 6 for the architecture decisions, which are where the plan differs from a straight port.
-3. Section 9 for prototype dependencies, full parity gates and the spike experiments.
-4. Section 5 for the native, WebAssembly and Rust embedding cut-over criteria.
-5. Section 13 for remaining implementation choices and settled contracts.
-6. [Tracking](docs/TRACKING.md), [status](STATUS.md) and the [ADR index](docs/adr/README.md) for recorded work, current evidence and unresolved decisions.
-
-## Tracking work
-
-`cargo xtask run <run-id>` executes a reviewed specification from `status/runs.toml` and captures typed metrics with evidence bound to the upstream pin, command, that run's selected sources and declared corpus/configuration inputs. `cargo xtask status` validates that evidence and regenerates the reports; `cargo xtask check <sprint>` enforces sprint exit criteria and required item checks. Source globs default to compiler crates, Cargo manifests/lockfile, `.cargo` configuration, Rust toolchain selectors, `xtask` and scripts. Documentation and policy edits do not invalidate measurements unless that producer explicitly consumes those files; declared inputs and case manifests are always hashed.
-
-The ledger's `status`, `rust` and `verify` fields are editable without regenerating upstream provenance. Threshold, sprint-check and ledger-progress changes reevaluate existing metrics; selected source or run-input changes invalidate affected evidence. Metric-producer contracts define the workload and assertions behind each measurement, so neither function markers nor a successful command alone establishes parity. See [Tracking](docs/TRACKING.md) for version-2 provenance, source selection and the run schema.
-
-`cargo xtask check-metrics 'run.fmt.clean == true'` enforces measured results independently of unfinished sprints. `cargo xtask status --check-committed` verifies all four committed views against validated evidence using the recorded context and date, without rewriting files; live gates still require evidence valid for the current host and environment.
-
-## Status
-
-Draft 3.2, 5 September 2026, measured against microsoft/TypeScript commit `1f70213d49`. The canonical `upstream/` submodule is registered, initialized and clean at `1f70213d4922b434345f639b441681e470c7cfc1`; the actual Go oracle build and `--version` smoke test have passing execution evidence. ADRs 0006, 0007 and 0013 and the [ownership](docs/design/ownership.md), [symbols](docs/design/symbols.md) and [text](docs/design/text.md) design notes are accepted; S01 passes against the current bootstrap evidence. The S04 leaf portions of E3 and E4 and S05 scanner parity have executable producers; full E1–E8 verification remains pending; their sprints are the [Phase 0 implementation plan](sprints/README.md). A status workflow is installed under `.github/workflows/`; no run of it is recorded here. Bootstrap success does not establish Rust compiler parity or complete function coverage.
-
-Native targets are macOS arm64/x64 and Linux x64/arm64 (glibc). The plan specifies file/lazy/bundle ownership, checker-local merges, generation-aware invalidation and raw-byte handling. Repeated identity checks may be elided only within a proven ownership scope, with release-mode rejection required at every unproven boundary. The spike tests bounded memory, WebAssembly and embedding prototypes; full compiler WebAssembly and Rust-consumer acceptance are required before cut-over. The owner approves baseline divergences, and work is sequenced by dependency slices and parity gates rather than a calendar.
+Working in the repository: [CLAUDE.md](CLAUDE.md) has the commands; [AGENTS.md](AGENTS.md) the implementation rules.
 
 ## License
 
-Licensed under the Apache License, Version 2.0 ([LICENSE](LICENSE)). ts-rust is a port of Microsoft's TypeScript compiler, itself licensed under Apache-2.0; [NOTICE](NOTICE) carries the attribution. Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in ts-rust by you, as defined in the Apache-2.0 license, shall be licensed as above, without any additional terms or conditions.
+Apache License, Version 2.0 ([LICENSE](LICENSE)). tsr is a port of Microsoft's TypeScript compiler, itself Apache-2.0; [NOTICE](NOTICE) carries the attribution. Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in tsr by you, as defined in the Apache-2.0 license, shall be licensed as above, without any additional terms or conditions.

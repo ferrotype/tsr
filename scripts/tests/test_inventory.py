@@ -123,7 +123,7 @@ func init() {}
         for entry in self.ledger()["file"]:
             self.assertEqual(entry["pin"], pin)
             self.assertEqual(entry["rust"], [])
-            self.assertEqual(entry["verify"], [])
+            self.assertNotIn("verify", entry)
             self.assertEqual(entry["source_hash"], hashlib.sha256((self.upstream / entry["go"]).read_bytes()).hexdigest())
 
     def test_pin_mismatch_leaves_outputs_unchanged(self):
@@ -168,7 +168,7 @@ func init() {}
         path = self.output / "PORTS.toml"
         text = path.read_text().replace('status = "planned"', 'status = "ported"')
         text = text.replace('rust = []', 'rust = ["crates/tsr_scanner/src/a.rs", "crates/tsr_scanner/src/b.rs"]')
-        path.write_text(text.replace('verify = []', 'verify = ["evidence.scanner.passed == 1"]'))
+        path.write_text(text)
         self.write_source("scanner.go", "package scanner\nfunc Scan() { println(2) }\n")
         second = self.commit("change one source")
         self.generate()
@@ -180,7 +180,6 @@ func init() {}
         for entry in entries.values():
             self.assertEqual(entry["status"], "ported")
             self.assertEqual(len(entry["rust"]), 2)
-            self.assertEqual(entry["verify"], ["evidence.scanner.passed == 1"])
         self.write_source("new.go", "package scanner\nfunc New() {}\n")
         third = self.commit("unrelated addition")
         self.generate()
@@ -206,7 +205,7 @@ verify = ["evidence.scanner.passed == 1"]
         self.assertEqual(entry["pin"], self.pin)
         self.assertEqual(entry["status"], "ported")
         self.assertEqual(entry["rust"], ["crates/tsr_scanner/src/lib.rs"])
-        self.assertEqual(entry["verify"], ["evidence.scanner.passed == 1"])
+        self.assertNotIn("verify", entry)
 
     def test_parse_error_is_fatal_and_does_not_publish_partial_outputs(self):
         self.generate()

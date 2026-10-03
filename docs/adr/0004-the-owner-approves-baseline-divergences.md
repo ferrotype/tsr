@@ -1,6 +1,6 @@
 # ADR 0004: The owner approves baseline divergences
 
-Status: Accepted (2026-09-05)
+Status: Amended (2026-10-03, ADR 0023)
 Plan: section 5
 
 ## Context
@@ -11,13 +11,16 @@ Upstream records its own accepted divergences from TypeScript 6 in `testdata/sub
 
 Intentional differences are recorded in an allow-list in this repository, one entry per case with the reason, and each entry is approved by the repository owner. A baseline failure without an approved entry is a failure; the allow-list cannot be edited in the same change that introduces the difference without the owner's approval on record.
 
-`data/divergences.toml` is the shared allow-list. Entries default to the E2
-domain; command-line transcript entries specify `domain = "phase4"` and
-`metric = "baseline_parity"`. The owner's 2026-10-02 eager-binding trace-order
-approval is recorded there as two exact native/Rust transcript hash pairs
-(Phase 4 decision 15). Raw results remain `different`; only those pairs enter
-`baseline_accepted`. A matching case name alone or an approval in another
-domain cannot waive a new difference.
+**Amended 2026-10-03 (ADR 0023).** The allow-list is the `approved` field of
+a failing entry in the suite's expectation file, `status/parity/<suite>.json`
+(docs/EVIDENCE-plan.md, section 3): the entry names the exact sub-test, its
+`reason` says how the Rust output differs and why that is acceptable, and
+`approved` carries the owner's words and date. The owner approves by merging
+the pull request that adds the field; CI rejects a change in that sub-test's
+outcome either way, so an approval covers one difference, not a case name.
+`data/divergences.toml` carried the earlier entries and is retired as they
+move; the 2026-10-02 eager-binding trace-order approval (Phase 4 decision 15)
+is the first carried entry, in `status/parity/tsc.json`.
 
 ## Consequences
 

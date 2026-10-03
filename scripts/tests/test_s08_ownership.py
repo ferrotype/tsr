@@ -5,7 +5,6 @@ import json
 from pathlib import Path
 import sys
 import tempfile
-import tomllib
 import unittest
 from unittest.mock import patch
 
@@ -134,14 +133,6 @@ class CheckerMergeOwnership(unittest.TestCase):
                 patch.object(ownership, 'merges') as merges:
             self.assertEqual(ownership.run(ROOT), early)
             merges.assert_not_called()
-
-    def test_e3_fingerprints_cover_checker_and_native_fixture(self):
-        spec = tomllib.loads((ROOT / 'status/runs.toml').read_text())['e3']
-        self.assertEqual(spec['command'], ['python3', 'scripts/s08_ownership.py'])
-        for name in ('scripts/s08_ownership.py', 'scripts/s08_p2.py', 'scripts/s08_oracle.py',
-                     'crates/tsr_checker/**', 'crates/tsr_printer/**', 'crates/tsr_nodebuilder/**',
-                     'crates/tsr_transformers/**', ownership.ARCHIVE, ownership.RECORD, 'data/upstream.json'):
-            self.assertIn(name, spec['sources'])
 
 
 if __name__ == '__main__':

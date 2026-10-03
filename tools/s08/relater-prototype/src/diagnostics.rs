@@ -119,7 +119,7 @@ impl ErrorChain {
         }
     }
 
-    /// port: tsc/internal/checker/relater.go:reportError
+    /// port: tsc/internal/checker/relater.go:Relater.reportError
     pub(crate) fn report(&mut self, mut message: &'static Message, mut args: Vec<String>) {
         if message == d::Types_of_property_0_are_incompatible {
             if matches!(self.code(0), Some(2353 | 2561)) {

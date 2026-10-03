@@ -291,7 +291,7 @@ def string_list(value, field, path, migrate_scalar=False):
 def ledger_generated_projection(ledger):
     """Validate and select the immutable provenance fields of a parsed ledger.
 
-    Editable status/rust/verify and TOML formatting are deliberately excluded.
+    Editable status/rust and TOML formatting are deliberately excluded.
     Keep this projection and its canonical JSON encoding aligned with xtask.
     """
     if not isinstance(ledger, dict):
@@ -392,13 +392,12 @@ def build_ledger(upstream, pin, previous, blobs):
             "go": path, "package": pkg, "crate": krate, "phase": phase,
             "kind": kind, "status": status,
             "rust": string_list(prev.get("rust", []), "rust", path, migrate_scalar=True),
-            "verify": string_list(prev.get("verify", []), "verify", path),
             "pin": synchronized_pin, "source_hash": source_hash, "loc": text.count("\n"),
         })
     lines = [
         "# Port ledger: non-test Go files from the pinned upstream tsc module.",
-        "# Regenerate with scripts/ledger-init.py; status, rust and verify are preserved.",
-        "# status: planned | in-progress | ported | out-of-scope; verification is computed.",
+        "# Regenerate with scripts/ledger-init.py; status and rust are preserved.",
+        "# status: planned | in-progress | ported | out-of-scope; parity is per suite (status/parity).",
         "# pin records last synchronization; source_hash hashes current upstream bytes.",
         "# kind: source | generated | harness | out-of-scope",
         f'pin = "{pin}"', "",

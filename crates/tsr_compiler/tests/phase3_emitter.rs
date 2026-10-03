@@ -1,6 +1,6 @@
 //! The emitter witness (docs/PHASE3-plan.md, T8): corpus rows whose emit the
 //! pin's harness observed (`tests/fixtures/phase3/emitter/emitter.json`,
-//! frozen by its `regenerate.py` from a `phase3_native.py capture --texts`).
+//! frozen from the Phase 3 native capture).
 //! Each row's program is loaded as the harness loads its post-emit program
 //! and emitted with an in-memory write callback, which records what the
 //! harness's `OutputRecorderFS` records. A row compares `EmitSkipped`,
