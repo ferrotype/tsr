@@ -99,6 +99,10 @@ jobs:
         with:
           go-version: ${{ steps.go.outputs.version }}
           cache-dependency-path: upstream/tsc/go.sum
+      # Several script tests read `cargo metadata --offline`; the registry has
+      # to hold the locked crates before anything builds.
+      - name: Fetch the locked dependencies
+        run: cargo fetch --locked
       # The tests' own output (subprocess chatter, expected-error messages) goes
       # to a file; the log keeps the summary, and the file on a failure.
       - name: Script tests

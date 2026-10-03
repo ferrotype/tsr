@@ -254953,7 +254953,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/enumerate.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255000,7 +255002,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/enumerate.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255094,7 +255098,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255141,7 +255147,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/enumerate.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255188,7 +255196,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/enumerate.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255282,7 +255292,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255329,7 +255341,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255376,7 +255390,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255423,7 +255439,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255470,7 +255488,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255517,7 +255537,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255564,7 +255586,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255611,7 +255635,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255658,7 +255684,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255705,7 +255733,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255752,7 +255782,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255799,7 +255831,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/enumerate.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255846,7 +255880,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/configurations.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255893,7 +255929,10 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs",
+        "crates/tsr_testrunner/src/enumerate.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -255987,7 +256026,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/test_case_parser.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -256034,7 +256075,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/test_case_parser.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -256081,7 +256124,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/test_case_parser.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -256128,7 +256173,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/test_case_parser.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -256175,7 +256222,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/test_case_parser.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -256316,7 +256365,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/transpile_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -256410,7 +256461,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/transpile_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -256457,7 +256510,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/transpile_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -256598,7 +256653,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/transpile_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -256645,7 +256702,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/baseline.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -256676,7 +256735,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/baseline.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -256707,7 +256768,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/baseline.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -257382,7 +257445,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compile.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -257582,7 +257647,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compile.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -257632,7 +257699,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compile.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -257682,7 +257751,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/enumerate.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -257732,7 +257803,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness_options.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -257782,7 +257855,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/configurations.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -257932,7 +258007,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness_options.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -257982,7 +258059,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/configurations.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -258382,7 +258461,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compile.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -258432,7 +258513,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/configurations.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -258482,7 +258565,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/configurations.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -258532,7 +258617,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compile.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -258582,7 +258669,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compile.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -258632,7 +258721,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/configurations.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -258682,7 +258773,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness_options.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -258732,7 +258825,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness_options.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -258782,7 +258877,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/configurations.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -258832,7 +258929,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness_options.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -258882,7 +258981,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness_options.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -258982,7 +259083,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness_options.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -259032,7 +259135,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/enumerate.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -259082,7 +259187,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/enumerate.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -259132,7 +259239,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compile.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -259182,7 +259291,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness_options.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -259232,7 +259343,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/configurations.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -259332,7 +259445,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness_options.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -259382,7 +259497,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness/recorder.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -259432,7 +259549,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness/recorder.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -259482,7 +259601,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness/recorder.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -260905,7 +261026,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -260963,7 +261086,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -261011,7 +261136,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness/errors.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -261059,7 +261186,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness/errors.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -261107,7 +261236,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -261155,7 +261286,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness/errors.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -261251,7 +261384,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness/errors.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -261395,7 +261530,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -261539,7 +261676,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -261779,7 +261918,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -261827,7 +261968,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/compiler_runner.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -261923,7 +262066,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness/typebaseline/mod.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -262163,7 +262308,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness/typebaseline/mod.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
@@ -262211,7 +262358,9 @@
     },
     {
       "actual_home": null,
-      "annotated_home": [],
+      "annotated_home": [
+        "crates/tsr_testrunner/src/harness/typebaseline/mod.rs"
+      ],
       "basis": "ledger maps the symbol but records no verification link",
       "basis_kind": "rule",
       "cases": [],
