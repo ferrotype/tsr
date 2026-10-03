@@ -368,6 +368,7 @@ mod tests {
 
     #[test]
     fn stages_switch_the_mutant_stage_and_rows_take_the_native_shape() {
+        let _serial = crate::serial();
         // The driver begins a row on its thread before staging it (jobs.rs);
         // only a row thread reads its own stage, every other thread reads the
         // shared row stage that the tests running alongside keep switching.
@@ -419,6 +420,7 @@ mod tests {
 
     #[test]
     fn reassembled_graph_fragments_digest_like_the_whole_record() {
+        let _serial = crate::serial();
         let record = json!({"name": {"raw_hex": "fe31", "identity": {"kind": "node", "ref": 2}}, "items": [1, 2, 3]});
         let whole = Session::new(Oracle::Binder, "row", false);
         whole.observe("bound_graph", "symbol", record.clone());

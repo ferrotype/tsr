@@ -147,6 +147,16 @@ fn run(args: &[String]) -> Result<(), String> {
     jobs::run_mode(&Driver(oracle), mode, &options)
 }
 
+/// The mutation switch's reach, stage and tracing state is process-wide: the
+/// driver runs one row at a time, so the tests that stage rows run one at a
+/// time too.
+#[cfg(test)]
+pub(crate) fn serial() -> std::sync::MutexGuard<'static, ()> {
+    static LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+    LOCK.lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+}
+
 #[cfg(test)]
 mod tests {
     use super::{Driver, Oracle};
@@ -171,6 +181,7 @@ mod tests {
 
     #[test]
     fn facts_rows_parse_then_list_every_node_with_its_subtree_facts() {
+        let _serial = crate::serial();
         let row = run_row(&Driver(Oracle::Facts), &request("let x = a ?? b;"), true, 0);
         let output = row.output;
         assert!(output.error.is_none(), "{:?}", output.error);
