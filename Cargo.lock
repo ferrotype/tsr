@@ -580,6 +580,7 @@ dependencies = [
  "tsr_json",
  "tsr_jsstring",
  "tsr_locale",
+ "tsr_testrunner",
  "tsr_tsoptions",
  "tsr_tspath",
  "tsr_vfs",

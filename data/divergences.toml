@@ -24,29 +24,3 @@
 # never approves changed output. Failures, missing operations and native-unavailable
 # cases cannot be waived. Unused or changed acceptance witnesses prevent the
 # approval gate; informational witnesses are reported without affecting gates.
-
-# Phase 4's transcript approvals use the same schema and registry. `variant_id`
-# is the exact scenario identity; `baseline_parity` hashes the complete transcript.
-# Owner approval recorded in docs/PHASE4-X6.md and Phase 4 decision 15.
-[[divergence]]
-id = "P4-eager-bind-trace-order"
-domain = "phase4"
-title = "Eager binding changes the parse/bind trace prefix"
-scope = ["tsc/generateTrace/generateTrace-generates-types-file.js", "tsc/generateTrace/generateTrace-with-multiple-files-and-complex-types.js"]
-kind = "ordering"
-rationale = "Rust binds each exclusive parsed file before publication during loading; Go binds published files later. The owner approved retaining this S07 design. Only the createProgram/parse/bind trace prefix differs; type dumps, legend, diagnostics, emitted bytes and subsequent check/emit events match. Approval covers only the exact paired whole-transcript hashes below."
-approved_by = "owner"
-approved_on = "2026-10-02"
-upstream_pin = "1f70213d4922b434345f639b441681e470c7cfc1"
-
-[[divergence.observations]]
-variant_id = "tsc/generateTrace/generateTrace-generates-types-file.js"
-metric = "baseline_parity"
-native_sha256 = "1adebff23b1f356afde0a2b51464c5052fdad2be02f14c18a4ca5c53072437b7"
-rust_sha256 = "1337e2e64759706804d4210519b88d36d33ad0afc7a7e6ca3474beb88b7e08a2"
-
-[[divergence.observations]]
-variant_id = "tsc/generateTrace/generateTrace-with-multiple-files-and-complex-types.js"
-metric = "baseline_parity"
-native_sha256 = "fb153c16e39912390ae7b86091b10d178fb3f0187ec13a93c50210dfdae6d0f8"
-rust_sha256 = "ef8af45bcb9bbf4b46799173409fe53948c39db48bf4420236da4d5ad6953ac1"

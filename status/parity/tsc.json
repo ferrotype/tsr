@@ -1,0 +1,15 @@
+{
+  "suite": "tsc",
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "total": 516,
+  "failing": {
+    "tsc/generateTrace/generateTrace-generates-types-file.js/transcript": {
+      "reason": "eager binding changes the parse/bind trace prefix: Rust binds each exclusive parsed file before publication during loading, Go binds published files later; only the createProgram/parse/bind trace events and their timestamps differ, the type dumps, legend, diagnostics and emitted bytes match",
+      "approved": "owner 2026-10-02, Phase 4 decision 15 (docs/PHASE4-X6.md); carried from data/divergences.toml P4-eager-bind-trace-order"
+    },
+    "tsc/generateTrace/generateTrace-with-multiple-files-and-complex-types.js/transcript": {
+      "reason": "eager binding changes the parse/bind trace prefix: Rust binds each exclusive parsed file before publication during loading, Go binds published files later; only the createProgram/parse/bind trace events and their timestamps differ, the type dumps, legend, diagnostics and emitted bytes match",
+      "approved": "owner 2026-10-02, Phase 4 decision 15 (docs/PHASE4-X6.md); carried from data/divergences.toml P4-eager-bind-trace-order"
+    }
+  }
+}

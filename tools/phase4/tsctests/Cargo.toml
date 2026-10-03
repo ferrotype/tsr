@@ -5,7 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish = false
-description = "Phase 4 X0: the pinned tsctests harness (fake system, file-system differ, readable build info, mock watch backend, runner) over the recorded scenarios"
+description = "Phase 4 X0: the pinned tsctests harness (fake system, file-system differ, readable build info, mock watch backend, runner) over the recorded scenarios; the tsc suite's runner for scripts/parity.py"
 
 [lib]
 path = "src/lib.rs"
@@ -28,6 +28,7 @@ tsr_ipc = { path = "../../../crates/tsr_ipc" }
 tsr_json = { path = "../../../crates/tsr_json" }
 tsr_jsstring = { path = "../../../crates/tsr_jsstring" }
 tsr_locale = { path = "../../../crates/tsr_locale" }
+tsr_testrunner = { path = "../../../crates/tsr_testrunner" }
 tsr_tsoptions = { path = "../../../crates/tsr_tsoptions" }
 tsr_tspath = { path = "../../../crates/tsr_tspath" }
 tsr_vfs = { path = "../../../crates/tsr_vfs" }
