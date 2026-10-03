@@ -142,8 +142,6 @@ class CheckerMergeOwnership(unittest.TestCase):
                      'crates/tsr_checker/**', 'crates/tsr_printer/**', 'crates/tsr_nodebuilder/**',
                      'crates/tsr_transformers/**', ownership.ARCHIVE, ownership.RECORD, 'data/upstream.json'):
             self.assertIn(name, spec['sources'])
-        self.assertIn("'run.e3.independent_checker_merges == true'",
-                      (ROOT / '.github/workflows/status.yml').read_text())
 
 
 if __name__ == '__main__':

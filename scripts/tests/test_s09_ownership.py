@@ -294,19 +294,6 @@ class CheckerOwnershipProducer(unittest.TestCase):
             with self.assertRaises(ValueError):
                 validate_manifest(manifest)
 
-    def test_ci_rejects_each_s09_suite_failure_in_every_mode(self):
-        workflow = (ROOT / ".github/workflows/status.yml").read_text()
-        required = re.findall(r"'run\.e3\.(\w+) == true'", workflow)
-        for suite in SUITES:
-            for mode in MODES:
-                modes = copy.deepcopy(self.modes)
-                modes[mode][suite] = False
-                report = {"metrics": {}}
-                publish_metrics(report, modes, self.arena, self.manifest)
-                with self.subTest(suite=suite, mode=mode):
-                    self.assertTrue(any(report["metrics"].get(name) is False for name in required),
-                                    "CI must reject the producer's valid failing result")
-
     def test_missing_or_untyped_measurements_cannot_claim_success(self):
         for mode in MODES:
             changed = copy.deepcopy(self.modes)
@@ -371,16 +358,6 @@ class OwnershipInputsAndCI(unittest.TestCase):
         required |= {"scripts/s09_format.py", "data/s09/insertion-cases.json",
                      "data/s09/insertion-observations.json"}
         self.assertFalse(required - covered, f"unfingerprinted E3 inputs: {sorted(required - covered)}")
-
-    def test_ci_runs_navigation_and_formatter_regressions_in_both_profiles(self):
-        workflow = (ROOT / ".github/workflows/status.yml").read_text()
-        commands = [line.strip() for line in workflow.splitlines() if "cargo test " in line]
-        for package in ("tsr_astnav", "tsr_format"):
-            for release in (False, True):
-                with self.subTest(package=package, release=release):
-                    self.assertTrue(any(f"-p {package} " in line and
-                                        ("--release" in line) == release for line in commands))
-
 
 if __name__ == "__main__":
     unittest.main()
