@@ -2838,7 +2838,7 @@
     },
     "tsc/internal/execute/build/parseCache.go:parseCache.store": {
      "marker_to_add": false,
-     "reason": "Only pin caller replaces reloaded resolved configuration; Rust stores new Arc config on graph task after root-file reload. ",
+     "reason": "Only pin caller replaces reloaded resolved configuration; Rust stores new Arc config on graph task after root-file reload and retires the lazily prepared project-reference view. ",
      "rust": [
       "crates/tsr_build/src/watch.rs"
      ],
@@ -7703,8 +7703,8 @@
     "marked": 734,
     "source": 65
    },
-   "ledger_out_of_scope": 10,
-   "ledger_phase4_files": 80
+   "ledger_out_of_scope": 11,
+   "ledger_phase4_files": 78
   },
   "marker_roots": [
    "crates",

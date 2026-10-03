@@ -260,7 +260,7 @@ fn cancelled_build_watch_returns_without_waiting_for_interval() {
             )
             .expect("command completes"),
         )
-        .unwrap()
+        .unwrap();
     });
     let result = rx
         .recv_timeout(Duration::from_secs(2))

@@ -193,7 +193,14 @@ class SiteTests(unittest.TestCase):
         # operations.
         manifest = ROOT / "data/phase1/mutation/manifest.json"
         if manifest.is_file():
-            self.assertEqual(ops, sorted(json.loads(manifest.read_bytes())["homes"]))
+            planned = set(json.loads(manifest.read_bytes())["homes"])
+            self.assertLessEqual(set(ops), planned)
+            # A later direct witness can remove an operation from mutation
+            # work without rewriting the historical campaign's manifest.
+            # Only operations with concrete coverage links may disappear.
+            covered = {row["id"] for row in report["operations"]
+                       if row["disposition"] == "covered" and row.get("links")}
+            self.assertLessEqual(planned - set(ops), covered)
         found, unsited = mutation._resolve(ROOT, ops)
         self.assertEqual({site["op"] for site in found} | {entry["op"] for entry in unsited}, set(ops))
         self.assertFalse({site["op"] for site in found} & {entry["op"] for entry in unsited})

@@ -62,7 +62,7 @@ class Audit(unittest.TestCase):
         before = scope["ledger"]["before_decisions"]
         self.assertEqual((before["files"], before["source"], before["harness"], before["functions"],
                           before["lines"]), (70, 65, 5, 1055, 22479))
-        self.assertEqual((scope["ledger"]["ledger_phase4_files"], scope["ledger"]["ledger_out_of_scope"]), (80, 10))
+        self.assertEqual((scope["ledger"]["ledger_phase4_files"], scope["ledger"]["ledger_out_of_scope"]), (78, 11))
         self.assertEqual(sum(row["counts"]["total"] for row in self.document["groups"].values()), 1007)
         self.assertEqual(set(self.document["groups"]), set(audit.GROUPS))
         for go, group in (("tsc/internal/execute/tsctests/runner.go", "X0"), ("tsc/cmd/tsc/sys.go", "X1"),

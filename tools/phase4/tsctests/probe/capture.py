@@ -49,7 +49,8 @@ def capture():
         output.unlink()
     command = ["go", "test", "-mod=readonly", "-count=1", "-overlay", str(overlay), "-run", f"^{TEST}$",
                "./internal/execute/tsctests"]
-    completed = subprocess.run(command, cwd=upstream / "tsc", env=dict(env, PHASE4_PROBE_OUTPUT=str(output)),
+    completed = subprocess.run(command, cwd=upstream / "tsc", env=dict(env, PHASE4_PROBE_OUTPUT=str(output),
+                               PHASE4_REFERENCE_ROOT=str(upstream / "tsc/testdata/baselines/reference")),
                                capture_output=True, check=False)
     if completed.returncode or not output.exists():
         raise ValueError("the probe failed:\n" + (completed.stdout + completed.stderr).decode(errors="replace")[-6000:])

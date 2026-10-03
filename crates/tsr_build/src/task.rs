@@ -25,6 +25,7 @@ pub(crate) struct TaskState {
 pub(crate) struct BuildTask {
     pub config: JsString,
     pub resolved: Option<Arc<ParsedCommandLine>>,
+    reference_config: OnceLock<Arc<ParsedCommandLine>>,
     pub config_time: Mutex<Duration>,
     pub state: Mutex<TaskState>,
     pub done: Completion,
@@ -68,10 +69,8 @@ impl BuildTask {
     ) -> Self {
         Self {
             config,
-            resolved: resolved.map(|mut config| {
-                config.parse_input_output_names();
-                Arc::new(config)
-            }),
+            resolved: resolved.map(Arc::new),
+            reference_config: OnceLock::new(),
             config_time: Mutex::new(config_time),
             state: Mutex::default(),
             done: Completion::default(),
@@ -82,6 +81,27 @@ impl BuildTask {
             project: OnceLock::new(),
             project_error: Mutex::default(),
         }
+    }
+    pub(crate) fn project_reference(&self) -> Option<Arc<ParsedCommandLine>> {
+        let config = self.resolved.as_ref()?;
+        Some(
+            self.reference_config
+                .get_or_init(|| {
+                    // The pin prepares these maps only when a project-reference parse
+                    // asks for them. Doing so at task creation leaks its rootDir error
+                    // into the primary config's parsing diagnostics, before Program
+                    // supplies the diagnostic with its file-inclusion explanation.
+                    // Retain the same config source identity for circular references.
+                    let mut reference = config.as_ref().clone();
+                    reference.parse_input_output_names();
+                    Arc::new(reference)
+                })
+                .clone(),
+        )
+    }
+    pub(crate) fn replace_config(&mut self, config: ParsedCommandLine) {
+        self.resolved = Some(Arc::new(config));
+        self.reference_config = OnceLock::new();
     }
     pub fn close_project(&self) {
         if let Some(Some(project)) = self.project.get() {

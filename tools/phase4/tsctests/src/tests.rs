@@ -535,7 +535,13 @@ fn shown_sections(text: &str) -> Vec<(String, String)> {
             continue;
         }
         if path.ends_with(".tsbuildinfo") {
-            sections.push((path.to_owned(), lines[index].to_owned()));
+            let start = index;
+            if lines[index] == "{" {
+                while lines[index].trim() != "}" {
+                    index += 1;
+                }
+            }
+            sections.push((path.to_owned(), lines[start..=index].join("\n")));
         } else if path.ends_with(".tsbuildinfo.readable.baseline.txt") {
             let start = index;
             while lines[index] != "}" {
@@ -571,6 +577,7 @@ fn reference_files() -> Vec<PathBuf> {
 /// same build info in the same reference).
 #[test]
 fn readable_build_info_renders_every_committed_rendering() {
+    use sha2::{Digest, Sha256};
     let (mut build_infos, mut readable, mut matched) = (0, 0, 0);
     let mut mismatches = Vec::new();
     for file in reference_files() {
@@ -599,6 +606,30 @@ fn readable_build_info_renders_every_committed_rendering() {
                 }
             } else {
                 build_infos += 1;
+                let input_hash = format!("{:x}", Sha256::digest(section.as_bytes()));
+                let expected = &results("buildinfo_codec")[&input_hash];
+                assert!(
+                    !expected.is_null(),
+                    "{}: {path} is not in the native codec observation",
+                    file.display()
+                );
+                let decoded = unmarshal_build_info(section.as_bytes());
+                assert_eq!(
+                    decoded.is_err(),
+                    expected["error"].as_bool().unwrap(),
+                    "{}: {path}",
+                    file.display()
+                );
+                if let Ok(decoded) = decoded {
+                    let encoded =
+                        tsr_json::marshal(&decoded, tsr_json::Options::default()).unwrap();
+                    assert_eq!(
+                        format!("{:x}", Sha256::digest(&encoded)),
+                        expected["sha256"].as_str().unwrap(),
+                        "{}: {path}",
+                        file.display()
+                    );
+                }
                 latest.insert(path, section);
             }
         }
@@ -610,7 +641,8 @@ fn readable_build_info_renders_every_committed_rendering() {
         mismatches.len()
     );
     assert_eq!(matched, readable);
-    assert!(readable > 1_200, "the witness found {readable} renderings");
+    assert_eq!(build_infos, 1_271, "the pinned codec denominator changed");
+    assert_eq!(readable, 1_257, "the pinned rendering denominator changed");
 }
 
 /// Builds the fake system of a probe case.
@@ -876,8 +908,7 @@ fn library_text_is_the_pins() {
 fn header_of(reference: &[u8]) -> &[u8] {
     let start =
         crate::goutil::index(reference, b"\ntsgo ").expect("a reference runs a command") + 1;
-    let end = start + reference[start..].iter().position(|&b| b == b'\n').unwrap() + 1;
-    &reference[..end]
+    &reference[..start]
 }
 
 #[test]
@@ -1099,6 +1130,7 @@ fn command_line_regressions_match_complete_native_scenarios() {
         "tsc/incremental/change-to-type-that-gets-used-as-global-through-export",
         "tsc/incremental/Compile-incremental-with-case-insensitive-file-names.js",
         "tsc/forceConsistentCasingInFileNames/when-file-is-included-from-multiple-places-with-different-casing.js",
+        "tsbuild/outputPaths/when-rootDir-is-specified-but-not-all-files-belong-to-rootDir",
     ];
     let mut count = 0;
     for scenario in &inventory().scenarios {
@@ -1119,7 +1151,7 @@ fn command_line_regressions_match_complete_native_scenarios() {
         );
         count += 1;
     }
-    assert_eq!(count, 8);
+    assert_eq!(count, 10);
 }
 
 #[test]
@@ -1142,6 +1174,51 @@ fn clean_build_refusal_is_returned_after_both_jobs_finish() {
             "clean build operation"
         )))
     ));
+}
+
+/// X3's separate repetition contract: the sample projects still report in
+/// build order when four builders race. Full native parity is measured by the
+/// scenario capture; this witness compares twenty executions of the same input.
+#[test]
+fn build_sample_transcripts_are_deterministic_with_four_builders() {
+    let samples: Vec<_> = inventory()
+        .scenarios
+        .iter()
+        .filter(|s| s.id.starts_with("tsbuild/sample/"))
+        .cloned()
+        .map(|mut scenario| {
+            let set_builders = |args: &mut Vec<JsString>| {
+                args.extend([
+                    JsString::from_bytes(b"--builders".as_slice()),
+                    JsString::from_bytes(b"4".as_slice()),
+                ]);
+            };
+            set_builders(scenario.command_line_args.as_mut().unwrap());
+            for edit in &mut scenario.edits {
+                if let Some(args) = &mut edit.command_line_args {
+                    set_builders(args);
+                }
+            }
+            scenario
+        })
+        .collect();
+    assert_eq!(samples.len(), 30);
+    let mut first = Vec::new();
+    for iteration in 0..20 {
+        for (index, scenario) in samples.iter().enumerate() {
+            let (row, transcript) = crate::row::run_scenario(scenario);
+            assert_eq!(row["state"], "completed", "{}: {row}", scenario.id);
+            if iteration == 0 {
+                first.push(transcript);
+            } else {
+                assert_eq!(
+                    transcript, first[index],
+                    "{}: iteration {iteration}",
+                    scenario.id
+                );
+            }
+        }
+    }
 }
 
 #[test]

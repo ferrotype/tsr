@@ -148,7 +148,7 @@
     "tsc/internal/compiler/emitHost.go:emitHost.ResolveModuleName": {
      "reason": "No caller and no interface requirement at the pin (moduletransforms' getExternalModuleNameFromPath, which names such a host, is a stub returning \"\"); Phase 1's review records the Program wrapper with the same body unused at the pin. The nil-redirect resolution it forwards to is Resolver::resolve.",
      "rust": [
-      "crates/tsr_module/src/resolver.rs:303"
+      "crates/tsr_module/src/resolver.rs:327"
      ],
      "status": "equivalent"
     },
@@ -363,7 +363,7 @@
     },
     "tsc/internal/compiler/program.go:Program.CommandLine": {
      "rust": [
-      "crates/tsr_compiler/src/loader.rs:267"
+      "crates/tsr_compiler/src/loader.rs:348"
      ],
      "status": "mapped"
     },
@@ -375,7 +375,7 @@
     },
     "tsc/internal/compiler/program.go:Program.GetDeclarationDiagnostics": {
      "rust": [
-      "crates/tsr_compiler/src/checked_program.rs:322"
+      "crates/tsr_compiler/src/checked_program.rs:323"
      ],
      "status": "mapped"
     },

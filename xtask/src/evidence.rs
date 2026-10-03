@@ -129,7 +129,9 @@ impl Context {
             .map_err(|e| e.to_string())?
             .trim()
             .to_string();
-        // Git's glob pathspecs include tracked deletions and nonignored additions.
+        // Git supplies the candidate paths, including tracked deletions and
+        // nonignored additions. Hash the working tree, not the index: staging
+        // an already absent file must not change the measured source tree.
         // Positive declarations omit docs/policy by default, but can opt them in.
         // Exclusions take paths back out of the positive set, for example test-only
         // suites that a run's executables never build.
@@ -155,7 +157,15 @@ impl Context {
                 continue;
             }
             let p = root.join(path);
-            let digest = if p.is_dir() {
+            let metadata = match fs::symlink_metadata(&p) {
+                Ok(metadata) => metadata,
+                // Omission already invalidates a capture that included this
+                // file. A "deleted" entry would disappear on git add/commit,
+                // needlessly invalidating a capture made after the deletion.
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+                Err(error) => return Err(format!("{path}: {error}")),
+            };
+            let digest = if metadata.is_dir() {
                 // Gitlinks: include actual commit and dirtiness, never walk their fixtures.
                 let state = git(&p, &["rev-parse", "HEAD"])?;
                 let dirty = git(&p, &["status", "--porcelain", "--untracked-files=all"])?;
@@ -163,10 +173,10 @@ impl Context {
                     return Err(format!("dirty gitlink cannot supply evidence: {path}"));
                 }
                 hash(&state)
-            } else if p.exists() {
-                sha_file(root, path)?
             } else {
-                "deleted".into()
+                // This also rejects dangling or repository-escaping symlinks;
+                // they are present inputs, not absent files to skip.
+                sha_file(root, path)?
             };
             entries.insert(path.to_string(), digest);
         }

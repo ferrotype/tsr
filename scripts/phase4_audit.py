@@ -673,9 +673,9 @@ REVIEWED.update({
         'project configs remain retained on graph tasks until invalidated. '
     ),
     'tsc/internal/execute/build/parseCache.go:parseCache.store': _equivalent(
-        'crates/tsr_build/src/watch.rs', 'config.parse_input_output_names();',
+        'crates/tsr_build/src/watch.rs', '.replace_config(config);',
         'Only pin caller replaces reloaded resolved configuration; Rust stores new Arc config on graph task '
-        'after root-file reload. '
+        'after root-file reload and retires the lazily prepared project-reference view. '
     ),
     'tsc/internal/execute/build/uptodatestatus.go:upToDateStatus.inputOutputFileAndTime': _equivalent(
         'crates/tsr_build/src/status.rs', 'pub has_times: bool,',
@@ -1345,8 +1345,10 @@ def scope_files(root=ROOT, entries=None):
 def ledger_numbers(entries, functions, marked):
     """The ledger's Phase 4 files, before and after the decisions (the plan counted before)."""
     phase4 = [entry for entry in entries if entry.get("phase") == 4]
-    before = [entry for entry in phase4 if entry.get("kind") in ("source", "harness")]
-    after = [entry for entry in before if entry["go"] not in MOVED_OUT]
+    after = [entry for entry in phase4 if entry.get("kind") in ("source", "harness") and entry["go"] not in MOVED_OUT]
+    # The plan's historical denominator predates decision 4. Reconstruct it
+    # explicitly even after the live ledger applies those moves.
+    before = after + [dict(entry, kind="source") for entry in entries if entry["go"] in MOVED_OUT]
     by_file = {}
     for identity, go in functions:
         by_file.setdefault(go, []).append(identity)

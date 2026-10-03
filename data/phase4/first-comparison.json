@@ -1,5 +1,5 @@
 {
- "approvals_sha256": "4a501d3295df5095dac4cfba14dccec48b38e238cd9d318417b5629238f492a8",
+ "approvals_sha256": "738871f5aa1a440750623a4704c2e50409fb8096177994e3e70d81a0622a9e13",
  "buckets": {
   "different": [
    {
@@ -10,17 +10,6 @@
     ],
     "families": {
      "tsc": 2
-    },
-    "rows": 2
-   },
-   {
-    "cause": "output differs (initial step)",
-    "examples": [
-     "tsbuild/outputPaths/when-rootDir-is-specified-but-not-all-files-belong-to-rootDir-and-is-composite.js",
-     "tsbuild/outputPaths/when-rootDir-is-specified-but-not-all-files-belong-to-rootDir.js"
-    ],
-    "families": {
-     "tsbuild": 2
     },
     "rows": 2
    }
@@ -49,8 +38,8 @@
   "scenarios": 516
  },
  "rust": {
-  "capture_sha256": "86134c5eb8abed8e67b2438c83fc0b8c653ce1709e019fe1363ea25950e5cb7f",
-  "executable_sha256": "ad6ffe003216c9df724348c028ca9711bb8a72f4309f316de6d8241f8a762e24",
+  "capture_sha256": "196b1b098445543743ff36007f6e482aa565ae960491f87b80bddc575f48afb3",
+  "executable_sha256": "cf27ca2e5e8be0f042962d686b55314f568315000447038fb294fd751071b680",
   "partial": false,
   "selectors": [
    "all"
@@ -58,26 +47,25 @@
   "source_stable": true
  },
  "summary": {
-  "accepted": 514,
+  "accepted": 516,
   "approved_differences": 2,
   "categories": {
-   "different": 4,
+   "different": 2,
    "failed": 0,
-   "match": 512,
+   "match": 514,
    "unexecuted": 0,
    "unsupported": 0
   },
   "different_sections": {
-   "files": 2,
-   "output": 2
+   "files": 2
   },
   "edit_steps": 1255,
   "edit_steps_agreeing": 1255,
   "families": {
    "tsbuild": {
-    "different": 2,
+    "different": 0,
     "failed": 0,
-    "match": 190,
+    "match": 192,
     "unexecuted": 0,
     "unsupported": 0
    },
@@ -104,7 +92,7 @@
    }
   },
   "harness_errors": 0,
-  "matched": 512,
+  "matched": 514,
   "partial": false,
   "rows": 516,
   "selected": 516,

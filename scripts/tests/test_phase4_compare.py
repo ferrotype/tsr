@@ -263,22 +263,53 @@ if __name__ == "__main__":
 
 
 class ApprovedDifferences(unittest.TestCase):
+    def ledger(self):
+        return compare.tomllib.loads(compare.APPROVED.read_text())
+
+    def approvals(self, ledger):
+        ids = {row["variant_id"] for entry in ledger["divergence"]
+               if entry.get("domain") == "phase4" for row in entry["observations"]}
+        return compare.divergence_approvals(ledger, compare.pin(), ids, domain="phase4")
+
     def test_only_the_exact_paired_observation_is_approved(self):
-        ledger = json.loads(compare.APPROVED.read_bytes())
-        row = ledger["exceptions"][0]["observations"][0]
+        ledger = self.ledger()
+        entry = next(entry for entry in ledger["divergence"] if entry.get("domain") == "phase4")
+        row = entry["observations"][0]
         # Use small bytes while preserving the reviewed scenario identity.
         row["native_sha256"] = compare.digest(b"native")
         row["rust_sha256"] = compare.digest(b"rust")
-        self.assertEqual(compare.approved_difference(row["scenario"], b"native", b"rust", ledger),
+        approvals = self.approvals(ledger)
+        self.assertEqual(compare.approved_difference(row["variant_id"], b"native", b"rust", approvals),
                          "P4-eager-bind-trace-order")
-        self.assertIsNone(compare.approved_difference(row["scenario"], b"native", b"rust changed", ledger))
-        self.assertIsNone(compare.approved_difference(row["scenario"], b"native changed", b"rust", ledger))
-        self.assertIsNone(compare.approved_difference("unreviewed-scenario", b"native", b"rust", ledger))
-        ledger["exceptions"][0]["approved"] = False
-        self.assertIsNone(compare.approved_difference(row["scenario"], b"native", b"rust", ledger))
+        self.assertIsNone(compare.approved_difference(row["variant_id"], b"native", b"rust changed", approvals))
+        self.assertIsNone(compare.approved_difference(row["variant_id"], b"native changed", b"rust", approvals))
+        self.assertIsNone(compare.approved_difference("unreviewed-scenario", b"native", b"rust", approvals))
+        del entry["approved_by"]
+        with self.assertRaises(ValueError):
+            self.approvals(ledger)
 
     def test_approval_does_not_survive_a_pin_change(self):
-        ledger = json.loads(compare.APPROVED.read_bytes())
-        ledger["pin"] = "unreviewed"
-        with self.assertRaisesRegex(ValueError, "another version or pin"):
-            compare.approved_difference("scenario", b"a", b"b", ledger)
+        ledger = self.ledger()
+        ledger["divergence"][0]["upstream_pin"] = "unreviewed"
+        with self.assertRaisesRegex(ValueError, "wrong divergence pin"):
+            self.approvals(ledger)
+
+    def test_the_shared_registry_does_not_approve_other_domains(self):
+        ledger = self.ledger()
+        self.assertEqual(compare.divergence_approvals(ledger, compare.pin(), set()), {})
+        self.assertEqual(len(self.approvals(ledger)), 2)
+        entry = ledger["divergence"][0]
+        entry["domain"] = "typo"
+        with self.assertRaisesRegex(ValueError, "unknown divergence domain"):
+            self.approvals(ledger)
+        entry["domain"] = "e2"
+        with self.assertRaises(ValueError):
+            self.approvals(ledger)
+
+    def test_unknown_or_duplicate_scenario_witnesses_are_rejected(self):
+        ledger = self.ledger()
+        with self.assertRaises(ValueError):
+            compare.divergence_approvals(ledger, compare.pin(), set(), domain="phase4")
+        ledger["divergence"][0]["observations"].append(ledger["divergence"][0]["observations"][0].copy())
+        with self.assertRaises(ValueError):
+            self.approvals(ledger)

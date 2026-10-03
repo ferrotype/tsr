@@ -631,7 +631,17 @@ fn circular_build_keeps_root_config_identity_and_emits_both_projects() {
             b"/work/a/tsconfig.json",
         )
         .unwrap();
-    assert!(Arc::ptr_eq(a, &from_provider));
+    assert!(Arc::ptr_eq(
+        a.config_file.as_ref().unwrap(),
+        from_provider.config_file.as_ref().unwrap(),
+    ));
+    assert!(Arc::ptr_eq(
+        &from_provider,
+        &o.tasks[o.index(b"/work/a/tsconfig.json")]
+            .task
+            .project_reference()
+            .unwrap(),
+    ));
 }
 
 #[test]

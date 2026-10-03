@@ -72,14 +72,16 @@ from pathlib import Path
 import re
 import subprocess
 import sys
+import tomllib
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from s04_common import strict_json_loads  # noqa: E402
 from s08_oracle import ROOT, canonical, digest  # noqa: E402
+from s08_e2_contract import approvals as divergence_approvals  # noqa: E402
 import phase4_corpus as corpus  # noqa: E402
 
 RECORD = ROOT / "data/phase4/first-comparison.json"
-APPROVED = ROOT / "data/phase4/approved-differences.json"
+APPROVED = ROOT / "data/divergences.toml"
 REFERENCES = "tsc/testdata/baselines/reference"
 CATEGORIES = ("match", "different", "failed", "unsupported", "unexecuted")
 SECTIONS = ("input", "edit", "command", "output", "files", "buildinfo", "watch", "program", "incremental",
@@ -365,15 +367,11 @@ def outcome(category, **detail):
 
 def approved_difference(identity, reference, transcript, ledger):
     """Exact observed pairs only. Raw comparison results are never rewritten."""
-    if ledger.get("version") != 1 or ledger.get("pin") != pin():
-        raise ValueError("Phase 4 difference approvals have another version or pin")
-    matches = [entry["id"] for entry in ledger["exceptions"] if entry.get("approved") is True
-               and entry.get("approval") and entry.get("reason")
-               for row in entry["observations"] if row["scenario"] == identity
-               and row["native_sha256"] == digest(reference) and row["rust_sha256"] == digest(transcript)]
-    if len(matches) > 1:
-        raise ValueError("a Phase 4 observation has duplicate approvals")
-    return matches[0] if matches else None
+    witness = ledger.get((identity, "baseline_parity"))
+    if (witness and witness["native_sha256"] == digest(reference)
+            and witness["rust_sha256"] == digest(transcript)):
+        return witness["approval"]
+    return None
 
 
 def compare_row(scenario, reference, row, transcript):
@@ -422,7 +420,7 @@ def report(rust_dir=corpus.DEFAULT_OUTPUT, *, capture=None):
     identities = [item["id"] for item in document["scenarios"]]
     orphans = list(document["orphan_references"])
     references = read_references(identities + orphans, document["provenance"]["pin"])
-    approvals = strict_json_loads(APPROVED.read_bytes())
+    approvals = divergence_approvals(tomllib.loads(APPROVED.read_text()), pin(), set(identities), domain="phase4")
     rows = {row["id"]: row for row in capture.rows}
     results, harness = [], []
     buckets = defaultdict(lambda: defaultdict(lambda: {"rows": [], "families": Counter(), "examples": []}))

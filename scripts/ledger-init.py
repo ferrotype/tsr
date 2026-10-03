@@ -23,7 +23,7 @@ GENERATED_FILE_FIELDS = ("go", "package", "crate", "phase", "kind", "pin", "sour
 
 # Longest-prefix map from Go package (relative to tsc/) to (Rust crate, parity phase).
 CRATES = {
-    "cmd/tsc": ("tsc", 4),
+    "cmd/tsc": ("tsr", 4),
     "internal/api/encoder": ("tsr_encoder", 0),
     "internal/api": ("tsr_api", 6),
     "internal/ast": ("tsr_ast", 0),
@@ -41,7 +41,7 @@ CRATES = {
     "internal/evaluator": ("tsr_ast", 1),
     "internal/execute/build": ("tsr_build", 4),
     "internal/execute/incremental": ("tsr_incremental", 4),
-    "internal/execute/tsc": ("tsr_execute", 4),
+    "internal/execute/tsc": ("tsr_tsc", 4),
     "internal/execute/tsctests": ("tsr_tsctests", 4),
     "internal/execute/watchmanager": ("tsr_execute", 4),
     "internal/execute": ("tsr_execute", 4),
@@ -66,7 +66,7 @@ CRATES = {
     "internal/outputpaths": ("tsr_outputpaths", 3),
     "internal/packagejson": ("tsr_packagejson", 1),
     "internal/parser": ("tsr_parser", 0),
-    "internal/pprof": ("tsr_pprof", 4),
+    "internal/pprof": ("tsr_pprof", 7),
     "internal/printer": ("tsr_printer", 3),
     "internal/project": ("tsr_project", 5),
     "internal/pseudochecker": ("tsr_pseudochecker", 3),
@@ -132,7 +132,12 @@ CONTENT_MAPPER_FILES = (
 # gate cannot close without them; program.go stays Phase 4's file.
 EMITTER_FILES = ("tsc/internal/compiler/emitter.go", "tsc/internal/compiler/emitHost.go")
 FILE_PHASES = ({"tsc/internal/compiler/checkerpool.go": 2} | dict.fromkeys(CONTENT_MAPPER_FILES, 2)
-               | dict.fromkeys(EMITTER_FILES, 3))
+               | dict.fromkeys(EMITTER_FILES, 3)
+               | {"tsc/internal/compiler/projectreferencedtsfakinghost.go": 5})
+
+# Phase 4 decision 4 and ADR 0002: macOS uses FSEvents; kqueue is not a
+# supported fallback even though this file's build constraint includes Darwin.
+EXCLUDED_FILES = {"tsc/internal/fswatch/kqueue.go"}
 
 
 def crate_for(pkg):
@@ -192,6 +197,8 @@ def eval_constraint(expr, goos, goarch):
 
 
 def in_scope(path, head):
+    if path in EXCLUDED_FILES:
+        return False
     base = os.path.basename(path)[:-3]
     parts = base.split("_")
     suffix_os = suffix_arch = None
@@ -368,7 +375,7 @@ def build_ledger(upstream, pin, previous, blobs):
         if not in_scope(path, head):
             kind = "out-of-scope"
         prev = existing.get(path, {})
-        status = prev.get("status", "out-of-scope" if kind == "out-of-scope" else "planned")
+        status = "out-of-scope" if kind == "out-of-scope" else prev.get("status", "planned")
         if status == "verified":
             status = "ported"  # Verification is derived from evidence, never a hand-written status.
         if status not in {"planned", "in-progress", "ported", "out-of-scope"}:

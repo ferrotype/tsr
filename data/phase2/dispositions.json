@@ -1,8 +1,8 @@
 {
  "counts": {
   "equivalent": 793,
-  "later": 9,
-  "mapped": 2331
+  "later": 8,
+  "mapped": 2332
  },
  "dispositions": [
   {
@@ -1005,7 +1005,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.checkModuleExportName",
-   "rust": "crates/tsr_checker/src/source_module_aliases.rs:422"
+   "rust": "crates/tsr_checker/src/source_module_aliases.rs:390"
   },
   {
    "disposition": "mapped",
@@ -1035,7 +1035,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.checkImportEqualsDeclaration",
-   "rust": "crates/tsr_checker/src/source_module_aliases.rs:450"
+   "rust": "crates/tsr_checker/src/source_module_aliases.rs:418"
   },
   {
    "disposition": "mapped",
@@ -1312,7 +1312,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.checkTypeNameIsReserved",
-   "rust": "crates/tsr_checker/src/source_module_aliases.rs:615"
+   "rust": "crates/tsr_checker/src/source_module_aliases.rs:583"
   },
   {
    "disposition": "mapped",
@@ -5150,7 +5150,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getTypeArguments",
-   "rust": "crates/tsr_checker/src/references.rs:599"
+   "rust": "crates/tsr_checker/src/references.rs:602"
   },
   {
    "audit": "C2",
@@ -5521,7 +5521,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.getTypeFromClassOrInterfaceReference",
-   "rust": "crates/tsr_checker/src/references.rs:379"
+   "rust": "crates/tsr_checker/src/references.rs:382"
   },
   {
    "audit": "C2",
@@ -5540,17 +5540,17 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.isDeferredTypeReferenceNode",
-   "rust": "crates/tsr_checker/src/references.rs:474"
+   "rust": "crates/tsr_checker/src/references.rs:477"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.isResolvedByTypeAlias",
-   "rust": "crates/tsr_checker/src/references.rs:510"
+   "rust": "crates/tsr_checker/src/references.rs:513"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.mayResolveTypeAlias",
-   "rust": "crates/tsr_checker/src/references.rs:535"
+   "rust": "crates/tsr_checker/src/references.rs:538"
   },
   {
    "disposition": "mapped",
@@ -5716,7 +5716,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:isLocalTypeAlias",
-   "rust": "crates/tsr_checker/src/references.rs:687"
+   "rust": "crates/tsr_checker/src/references.rs:690"
   },
   {
    "disposition": "mapped",
@@ -6248,7 +6248,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.createDeferredTypeReference",
-   "rust": "crates/tsr_checker/src/references.rs:574"
+   "rust": "crates/tsr_checker/src/references.rs:577"
   },
   {
    "disposition": "mapped",
@@ -6520,7 +6520,7 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.UnionTypes",
-   "rust": "crates/tsr_checker/src/handles.rs:698"
+   "rust": "crates/tsr_checker/src/handles.rs:703"
   },
   {
    "disposition": "mapped",
@@ -7331,12 +7331,12 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.markAliasSymbolAsReferenced",
-   "rust": "crates/tsr_checker/src/source_module_aliases.rs:680"
+   "rust": "crates/tsr_checker/src/source_module_aliases.rs:648"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/checker.go:Checker.markExportAsReferenced",
-   "rust": "crates/tsr_checker/src/source_module_aliases.rs:653"
+   "rust": "crates/tsr_checker/src/source_module_aliases.rs:621"
   },
   {
    "disposition": "mapped",
@@ -14072,192 +14072,192 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:NewTracer",
-   "rust": "crates/tsr_checker/src/trace.rs:136"
+   "rust": "crates/tsr_checker/src/trace.rs:172"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:Tracer.RecordType",
-   "rust": "crates/tsr_checker/src/trace.rs:148"
+   "rust": "crates/tsr_checker/src/trace.rs:185"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:Tracer.Push",
-   "rust": "crates/tsr_checker/src/trace.rs:153"
+   "rust": "crates/tsr_checker/src/trace.rs:190"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:Tracer.Instant",
-   "rust": "crates/tsr_checker/src/trace.rs:180"
+   "rust": "crates/tsr_checker/src/trace.rs:217"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:Tracer.copyWithCheckerIndex",
-   "rust": "crates/tsr_checker/src/trace.rs:186"
+   "rust": "crates/tsr_checker/src/trace.rs:223"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:Tracer.temporarilyAddCheckerIndex",
-   "rust": "crates/tsr_checker/src/trace.rs:197"
+   "rust": "crates/tsr_checker/src/trace.rs:234"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.Id",
-   "rust": "crates/tsr_checker/src/trace.rs:696"
+   "rust": "crates/tsr_checker/src/trace.rs:735"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.FormatFlags",
-   "rust": "crates/tsr_checker/src/trace.rs:701"
+   "rust": "crates/tsr_checker/src/trace.rs:740"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.IsConditional",
-   "rust": "crates/tsr_checker/src/trace.rs:706"
+   "rust": "crates/tsr_checker/src/trace.rs:745"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.Symbol",
-   "rust": "crates/tsr_checker/src/trace.rs:711"
+   "rust": "crates/tsr_checker/src/trace.rs:750"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.AliasSymbol",
-   "rust": "crates/tsr_checker/src/trace.rs:716"
-  },
-  {
-   "disposition": "mapped",
-   "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.AliasTypeArguments",
-   "rust": "crates/tsr_checker/src/trace.rs:725"
-  },
-  {
-   "disposition": "mapped",
-   "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.IntrinsicName",
-   "rust": "crates/tsr_checker/src/trace.rs:733"
-  },
-  {
-   "disposition": "mapped",
-   "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.UnionTypes",
-   "rust": "crates/tsr_checker/src/trace.rs:747"
-  },
-  {
-   "disposition": "mapped",
-   "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.IntersectionTypes",
    "rust": "crates/tsr_checker/src/trace.rs:755"
   },
   {
    "disposition": "mapped",
+   "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.AliasTypeArguments",
+   "rust": "crates/tsr_checker/src/trace.rs:764"
+  },
+  {
+   "disposition": "mapped",
+   "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.IntrinsicName",
+   "rust": "crates/tsr_checker/src/trace.rs:772"
+  },
+  {
+   "disposition": "mapped",
+   "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.UnionTypes",
+   "rust": "crates/tsr_checker/src/trace.rs:786"
+  },
+  {
+   "disposition": "mapped",
+   "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.IntersectionTypes",
+   "rust": "crates/tsr_checker/src/trace.rs:794"
+  },
+  {
+   "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.IndexType",
-   "rust": "crates/tsr_checker/src/trace.rs:763"
+   "rust": "crates/tsr_checker/src/trace.rs:802"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.IndexedAccessObjectType",
-   "rust": "crates/tsr_checker/src/trace.rs:771"
+   "rust": "crates/tsr_checker/src/trace.rs:810"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.IndexedAccessIndexType",
-   "rust": "crates/tsr_checker/src/trace.rs:781"
+   "rust": "crates/tsr_checker/src/trace.rs:820"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.ConditionalCheckType",
-   "rust": "crates/tsr_checker/src/trace.rs:798"
+   "rust": "crates/tsr_checker/src/trace.rs:837"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.ConditionalExtendsType",
-   "rust": "crates/tsr_checker/src/trace.rs:803"
+   "rust": "crates/tsr_checker/src/trace.rs:842"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.ConditionalTrueType",
-   "rust": "crates/tsr_checker/src/trace.rs:808"
+   "rust": "crates/tsr_checker/src/trace.rs:847"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.ConditionalFalseType",
-   "rust": "crates/tsr_checker/src/trace.rs:816"
+   "rust": "crates/tsr_checker/src/trace.rs:855"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.SubstitutionBaseType",
-   "rust": "crates/tsr_checker/src/trace.rs:824"
+   "rust": "crates/tsr_checker/src/trace.rs:863"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.SubstitutionConstraintType",
-   "rust": "crates/tsr_checker/src/trace.rs:832"
+   "rust": "crates/tsr_checker/src/trace.rs:871"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.ReferenceTarget",
-   "rust": "crates/tsr_checker/src/trace.rs:849"
+   "rust": "crates/tsr_checker/src/trace.rs:888"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.ReferenceTypeArguments",
-   "rust": "crates/tsr_checker/src/trace.rs:857"
+   "rust": "crates/tsr_checker/src/trace.rs:896"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.ReferenceNode",
-   "rust": "crates/tsr_checker/src/trace.rs:866"
+   "rust": "crates/tsr_checker/src/trace.rs:905"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.ReverseMappedSourceType",
-   "rust": "crates/tsr_checker/src/trace.rs:878"
+   "rust": "crates/tsr_checker/src/trace.rs:917"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.ReverseMappedMappedType",
-   "rust": "crates/tsr_checker/src/trace.rs:886"
+   "rust": "crates/tsr_checker/src/trace.rs:925"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.ReverseMappedConstraintType",
-   "rust": "crates/tsr_checker/src/trace.rs:894"
+   "rust": "crates/tsr_checker/src/trace.rs:933"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.EvolvingArrayElementType",
-   "rust": "crates/tsr_checker/src/trace.rs:909"
+   "rust": "crates/tsr_checker/src/trace.rs:948"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.EvolvingArrayFinalType",
-   "rust": "crates/tsr_checker/src/trace.rs:914"
+   "rust": "crates/tsr_checker/src/trace.rs:953"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.IsTuple",
-   "rust": "crates/tsr_checker/src/trace.rs:922"
+   "rust": "crates/tsr_checker/src/trace.rs:961"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.Pattern",
-   "rust": "crates/tsr_checker/src/trace.rs:927"
+   "rust": "crates/tsr_checker/src/trace.rs:966"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.RecursionIdentity",
-   "rust": "crates/tsr_checker/src/trace.rs:932"
+   "rust": "crates/tsr_checker/src/trace.rs:971"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:tracedTypeAdapter.Display",
-   "rust": "crates/tsr_checker/src/trace.rs:937"
+   "rust": "crates/tsr_checker/src/trace.rs:976"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:wrapType",
-   "rust": "crates/tsr_checker/src/trace.rs:676"
+   "rust": "crates/tsr_checker/src/trace.rs:714"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/checker/tracer.go:wrapTypes",
-   "rust": "crates/tsr_checker/src/trace.rs:681"
+   "rust": "crates/tsr_checker/src/trace.rs:719"
   },
   {
    "disposition": "mapped",
@@ -17175,49 +17175,47 @@
   {
    "disposition": "mapped",
    "id": "tsc/internal/testutil/contentmappertest/protocol.go:noNotifications.HandleNotification",
-   "rust": "crates/tsr_contentmappertest/src/lib.rs:105"
+   "rust": "crates/tsr_contentmappertest/src/lib.rs:114"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/testutil/contentmappertest/protocol.go:initializeResult",
-   "rust": "crates/tsr_contentmappertest/src/lib.rs:111"
-  },
-  {
-   "disposition": "mapped",
-   "id": "tsc/internal/testutil/contentmappertest/protocol.go:identityMappedOutput",
    "rust": "crates/tsr_contentmappertest/src/lib.rs:120"
   },
   {
    "disposition": "mapped",
+   "id": "tsc/internal/testutil/contentmappertest/protocol.go:identityMappedOutput",
+   "rust": "crates/tsr_contentmappertest/src/lib.rs:129"
+  },
+  {
+   "disposition": "mapped",
    "id": "tsc/internal/testutil/contentmappertest/protocol.go:staticProjectHandler.HandleRequest",
-   "rust": "crates/tsr_contentmappertest/src/lib.rs:65"
+   "rust": "crates/tsr_contentmappertest/src/lib.rs:74"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/testutil/contentmappertest/registry.go:handlerForMapper",
-   "rust": "crates/tsr_contentmappertest/src/lib.rs:151"
+   "rust": "crates/tsr_contentmappertest/src/lib.rs:160"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/testutil/contentmappertest/spawner.go:Serve",
-   "rust": "crates/tsr_contentmappertest/src/lib.rs:216"
+   "rust": "crates/tsr_contentmappertest/src/lib.rs:268"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/testutil/contentmappertest/spawner.go:NewSpawner",
-   "rust": "crates/tsr_contentmappertest/src/lib.rs:191"
+   "rust": "crates/tsr_contentmappertest/src/lib.rs:213"
   },
   {
-   "audit": "C7",
-   "disposition": "later",
+   "disposition": "mapped",
    "id": "tsc/internal/testutil/contentmappertest/spawner.go:NewSpawnerWithProjectLifecycle",
-   "owner": "Phase 5",
-   "reason": "The spawner that records mapper project calls for the project system's lifecycle tests (with the dynamic-verbatim mapper); no compiler or conformance row runs it."
+   "rust": "crates/tsr_contentmappertest/src/lib.rs:218"
   },
   {
    "disposition": "mapped",
    "id": "tsc/internal/testutil/contentmappertest/spawner.go:spawner.Spawn",
-   "rust": "crates/tsr_contentmappertest/src/lib.rs:198"
+   "rust": "crates/tsr_contentmappertest/src/lib.rs:237"
   },
   {
    "disposition": "mapped",

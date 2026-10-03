@@ -334,6 +334,70 @@ fn source_globs_track_additions_deletions_and_selected_dependencies() {
 }
 
 #[test]
+fn staging_and_committing_deletions_or_renames_preserves_current_evidence() {
+    for rename in [false, true] {
+        let f = Fixture::new();
+        let mut spec = f.spec();
+        spec.sources[0] = "source*.txt".into();
+        f.set_spec(&spec);
+        f.success();
+        let original = f.context();
+        if rename {
+            fs::rename(f.0.join("source.txt"), f.0.join("source-renamed.txt")).unwrap();
+        } else {
+            fs::remove_file(f.0.join("source.txt")).unwrap();
+        }
+        f.rejected();
+        let changed = f.context();
+        assert!(!original.same_inputs(&changed));
+        f.success();
+        let artifact = f.loaded().artifacts["probe"].clone();
+        git(&f.0, &["add", "-A", "--", ":(glob)source*.txt"]).unwrap();
+        assert!(changed.same_inputs(&f.context()));
+        assert_eq!(f.loaded().states["probe"], "current");
+        f.commit();
+        assert!(changed.same_inputs(&f.context()));
+        assert_eq!(f.loaded().states["probe"], "current");
+        assert_eq!(f.loaded().artifacts["probe"], artifact);
+        // Restoring the old path is a real source change, even when untracked.
+        f.write("source.txt", "source version one");
+        f.rejected();
+    }
+}
+
+#[test]
+fn staging_additions_and_edits_preserves_evidence_but_further_edits_do_not() {
+    let f = Fixture::new();
+    let mut spec = f.spec();
+    spec.sources[0] = "source*.txt".into();
+    f.set_spec(&spec);
+    f.success();
+    f.write("source.txt", "edited");
+    f.write("source-new.txt", "added");
+    f.rejected();
+    f.success();
+    let measured = f.context();
+    git(&f.0, &["add", "--", ":(glob)source*.txt"]).unwrap();
+    assert!(measured.same_inputs(&f.context()));
+    assert_eq!(f.loaded().states["probe"], "current");
+    f.commit();
+    assert!(measured.same_inputs(&f.context()));
+    assert_eq!(f.loaded().states["probe"], "current");
+    f.write("source.txt", "edited again after staging");
+    f.rejected();
+}
+
+#[cfg(unix)]
+#[test]
+fn dangling_source_symlink_is_an_invalid_input_not_a_deleted_file() {
+    let f = Fixture::new();
+    fs::remove_file(f.0.join("source.txt")).unwrap();
+    std::os::unix::fs::symlink("missing-target", f.0.join("source.txt")).unwrap();
+    let error = Context::capture_run(&f.0, PIN, &f.spec()).unwrap_err();
+    assert!(error.contains("source.txt"), "{error}");
+}
+
+#[test]
 fn excluded_source_globs_leave_test_suites_out_of_the_fingerprint() {
     let f = Fixture::new();
     fs::create_dir_all(f.0.join("crates/one/src")).unwrap();

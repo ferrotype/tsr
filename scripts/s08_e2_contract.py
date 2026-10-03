@@ -55,18 +55,29 @@ def inventory(requests, frozen, *, partial=False):
             raise ValueError('E2 requires error baselines and public TypeToString observations')
 
 
-def approvals(ledger, pin, ids):
+def approvals(ledger, pin, ids, *, domain='e2'):
+    """Validate the shared ADR 0004 ledger; return only this domain's witnesses.
+
+    Existing entries default to E2. Explicit domains prevent a command-line
+    transcript approval from waiving a checker difference, or vice versa.
+    """
+    domains = {'e2': METRICS, 'phase4': ('baseline_parity',)}
+    if domain not in domains:
+        raise ValueError('unknown divergence domain')
     if set(ledger) != {'divergence'} or not isinstance(ledger['divergence'], list):
         raise ValueError('invalid divergence ledger')
-    result, seen = {}, set()
+    result, seen, witnessed = {}, set(), set()
     for entry in ledger['divergence']:
         required = {'id', 'title', 'scope', 'kind', 'rationale', 'approved_by', 'approved_on', 'upstream_pin', 'observations'}
-        if set(entry) != required or entry['id'] in seen:
+        if set(entry) not in (required, required | {'domain'}) or entry['id'] in seen:
             raise ValueError('divergence requires unique identity, approval and exact observation witnesses')
         seen.add(entry['id'])
         if any(not isinstance(entry[k], str) or not entry[k].strip() for k in required - {'scope', 'observations'}):
             raise ValueError('empty divergence metadata')
         date.fromisoformat(entry['approved_on'])
+        entry_domain = entry.get('domain', 'e2')
+        if not isinstance(entry_domain, str) or entry_domain not in domains:
+            raise ValueError('unknown divergence domain')
         if entry['upstream_pin'] != pin or entry['kind'] not in ('ordering', 'message', 'position', 'emit', 'other'):
             raise ValueError('wrong divergence pin/kind')
         if not isinstance(entry['scope'], list) or not entry['scope'] or any(not isinstance(s, str) or not s for s in entry['scope']):
@@ -77,11 +88,16 @@ def approvals(ledger, pin, ids):
             if set(witness) != {'variant_id', 'metric', 'native_sha256', 'rust_sha256'}:
                 raise ValueError('incomplete divergence witness')
             key = witness['variant_id'], witness['metric']
-            if key[0] not in ids or key[1] not in METRICS or key in result or not any(fnmatchcase(key[0], s) for s in entry['scope']):
+            if (not all(isinstance(value, str) for value in key)
+                    or (entry_domain == domain and key[0] not in ids)
+                    or key[1] not in domains[entry_domain] or (entry_domain, key) in witnessed
+                    or not any(fnmatchcase(key[0], s) for s in entry['scope'])):
                 raise ValueError('unknown, duplicated or out-of-scope divergence witness')
             if any(not isinstance(witness[k], str) or re.fullmatch('[0-9a-f]{64}', witness[k]) is None for k in ('native_sha256', 'rust_sha256')):
                 raise ValueError('invalid divergence output digest')
-            result[key] = dict(witness, approval=entry['id'])
+            witnessed.add((entry_domain, key))
+            if entry_domain == domain:
+                result[key] = dict(witness, approval=entry['id'])
     return result
 
 
