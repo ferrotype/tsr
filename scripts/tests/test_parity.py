@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import stat
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -141,6 +142,76 @@ class ParityTests(unittest.TestCase):
         self.assertIn("compiler/a.ts/types", out)
         parity.main(["accept", "compiler", *results])
         self.assertNotIn("compiler/a.ts/types", self.expectation()["failing"])
+
+    def test_check_refuses_incomplete_results_and_stale_metadata(self):
+        self.run_shard("out")
+        parity.main(["accept", "compiler", *self.results("out")])
+        results = self.directory / "out/results.ndjson"
+        rows = results.read_text().splitlines()
+        # Results of one variant lost: the shard's metadata still names it.
+        results.write_text("\n".join(row for row in rows if "compiler/a.ts" not in row) + "\n")
+        with self.assertRaisesRegex(SystemExit, "1 selected variants without a result"):
+            parity.main(["check", "compiler", *self.results("out")])
+        # A sub-test answered twice.
+        results.write_text("\n".join(rows + [rows[0]]) + "\n")
+        with self.assertRaisesRegex(SystemExit, "1 duplicate sub-tests"):
+            parity.main(["check", "compiler", *self.results("out")])
+        # Results of a variant the shard did not select.
+        stranger = json.dumps({"id": "compiler/zzz.ts/error", "state": "pass"})
+        results.write_text("\n".join(rows + [stranger]) + "\n")
+        with self.assertRaisesRegex(SystemExit, "1 results of unselected variants"):
+            parity.main(["check", "compiler", *self.results("out")])
+        # Only the expected failures left over: not a pass.
+        results.write_text("\n".join(row for row in rows if '"fail"' in row) + "\n")
+        with self.assertRaisesRegex(SystemExit, "selected variants without a result"):
+            parity.main(["check", "compiler", *self.results("out")])
+        # Shards that do not partition the enumeration.
+        self.run_shard("one", "--shard", "1/2")
+        self.run_shard("two", "--shard", "1/2")
+        two = json.loads((self.directory / "two/meta.json").read_text())
+        two["shard"] = [2, 2]
+        (self.directory / "two/meta.json").write_text(json.dumps(two))
+        with self.assertRaisesRegex(SystemExit, "distinct variants of the 5 enumerated"):
+            parity.main(["check", "compiler", *self.results("one", "two")])
+
+    def test_a_restarted_run_discards_earlier_metadata_and_local_output(self):
+        self.run_shard("out")
+        stale = self.directory / "out/local/compiler/stale.types"
+        stale.parent.mkdir(parents=True)
+        stale.write_text("old")
+        meta = self.directory / "out/meta.json"
+        self.assertTrue(meta.exists())
+        # An interrupted rerun: `run` removes the metadata first, so the
+        # truncated results cannot be checked against the earlier run's.
+        parity.PARITY.mkdir(parents=True, exist_ok=True)
+        def interrupted(*_args, **_kwargs):
+            raise KeyboardInterrupt
+        saved = parity.run_variant
+        parity.run_variant = interrupted
+        try:
+            with self.assertRaises(KeyboardInterrupt):
+                self.run_shard("out")
+        finally:
+            parity.run_variant = saved
+        self.assertFalse(meta.exists())
+        self.assertFalse(stale.exists())
+        with self.assertRaises(FileNotFoundError):
+            parity.main(["check", "compiler", *self.results("out")])
+
+    def test_runner_path_is_the_executable_cargo_reports(self):
+        reported = self.directory / "elsewhere/release/x"
+        def fake_run(command, **kwargs):
+            self.assertIn("--message-format=json-render-diagnostics", command)
+            lines = [json.dumps({"reason": "compiler-artifact", "executable": None}),
+                     json.dumps({"reason": "compiler-artifact", "executable": str(reported)}),
+                     json.dumps({"reason": "build-finished", "success": True})]
+            return subprocess.CompletedProcess(command, 0, stdout="\n".join(lines) + "\n", stderr="")
+        saved = parity.subprocess.run
+        parity.subprocess.run = fake_run
+        try:
+            self.assertEqual(parity.runner_path("compiler"), reported)
+        finally:
+            parity.subprocess.run = saved
 
     def test_check_reports_new_failures_pin_and_denominator_drift(self):
         self.run_shard("out")

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Suite parity against the pin, as expectation files (docs/EVIDENCE-plan.md).
 
-    parity.py list   <suite> [--runner PATH | --no-build]
-    parity.py run    <suite> --output DIR [--shard i/n] [--jobs J] [--timeout S] [--id ID ...] [--runner PATH | --no-build]
+    parity.py list   <suite> [--runner PATH]
+    parity.py run    <suite> --output DIR [--shard i/n] [--jobs J] [--timeout S] [--id ID ...] [--runner PATH]
     parity.py check  <suite> --results DIR [DIR ...]
     parity.py accept <suite> --results DIR [DIR ...]
 
@@ -27,6 +27,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import shutil
 import subprocess
 import sys
 import time
@@ -76,18 +77,24 @@ def write_expectation(suite, document):
     expectation_path(suite).write_text(json.dumps(document, indent=2, ensure_ascii=False) + "\n")
 
 
-def runner_path(suite, build, explicit=None):
-    """The suite's runner binary: --runner PATH as given, else target/release,
-    built in release unless --no-build."""
+def runner_path(suite, explicit=None):
+    """The suite's runner binary: --runner PATH as given, else the executable
+    Cargo reports for the release build, which honors CARGO_TARGET_DIR and
+    .cargo/config (a fresh build is a no-op that still reports the path)."""
     if explicit:
         return Path(explicit).resolve()
-    binary = ROOT / "target/release" / SUITES[suite].binary
-    if build:
-        subprocess.run(["cargo", "build", "--release", "--locked", "-p", SUITES[suite].package,
-                        "--bin", SUITES[suite].binary], cwd=ROOT, check=True)
-    if not binary.exists():
-        sys.exit(f"runner binary missing: {binary} (build it, or drop --no-build)")
-    return binary
+    command = ["cargo", "build", "--release", "--locked", "-p", SUITES[suite].package,
+               "--bin", SUITES[suite].binary, "--message-format=json-render-diagnostics"]
+    completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+    if completed.returncode != 0:
+        sys.stderr.write(completed.stderr)
+        sys.exit(f"cargo build failed for {SUITES[suite].package}")
+    executables = [json.loads(line).get("executable") for line in completed.stdout.splitlines()
+                   if line.startswith("{") and '"compiler-artifact"' in line]
+    executables = [path for path in executables if path and Path(path).name == SUITES[suite].binary]
+    if not executables:
+        sys.exit(f"cargo reported no executable for {SUITES[suite].binary}")
+    return Path(executables[-1])
 
 
 def runner_command(suite, runner, *rest):
@@ -145,16 +152,23 @@ def run_variant(suite, runner, variant, local, timeout):
 
 def run(args):
     suite = args.suite
-    runner = runner_path(suite, not args.no_build, args.runner)
+    runner = runner_path(suite, args.runner)
     variants = args.id or list_variants(suite, runner)
     selected, (index, count) = shard(variants, args.shard)
     output = Path(args.output)
+    output.mkdir(parents=True, exist_ok=True)
+    # A restarted run starts clean: no metadata of an earlier run can vouch
+    # for these results, and no earlier local output can outlive its failure
+    # (the pin's runner cleans its local directory the same way).
+    (output / "meta.json").unlink(missing_ok=True)
     local = output / "local"
+    shutil.rmtree(local, ignore_errors=True)
     local.mkdir(parents=True, exist_ok=True)
     timeout = args.timeout or SUITES[suite].timeout
     jobs = args.jobs or os.cpu_count() or 1
     meta = {"suite": suite, "pin": pin(), "shard": [index, count], "total": len(variants),
-            "selected": len(selected), "partial": bool(args.id), "jobs": jobs, "timeout": timeout,
+            "selected": len(selected), "variants": selected, "partial": bool(args.id), "jobs": jobs,
+            "timeout": timeout,
             "host": {"system": platform.system(), "machine": platform.machine(), "cpus": os.cpu_count()},
             "started": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
     counts = dict.fromkeys(STATES, 0)
@@ -177,16 +191,42 @@ def run(args):
     print(json.dumps({"suite": suite, **meta["counts"], "variants": len(selected)}))
 
 
+def variant_of(row_id):
+    """The variant a result id belongs to: everything before the sub-test."""
+    suite, rest = row_id.split("/", 1)
+    return f"{suite}/{rest.rsplit('/', 1)[0]}" if "/" in rest else row_id
+
+
+def complete(directory, meta, rows):
+    """Every variant the shard selected answered, with no stranger and no
+    duplicate sub-test; otherwise the run is incomplete and cannot be checked."""
+    selected = set(meta["variants"])
+    answered = {}
+    for row in rows:
+        answered.setdefault(variant_of(row["id"]), []).append(row["id"])
+    missing = sorted(selected - set(answered))
+    strangers = sorted(set(answered) - selected)
+    duplicates = sorted(key for ids in answered.values() for key in set(ids) if ids.count(key) > 1)
+    if missing or strangers or duplicates:
+        sys.exit(f"{directory}: incomplete results ({len(missing)} selected variants without a result, "
+                 f"{len(strangers)} results of unselected variants, {len(duplicates)} duplicate sub-tests); "
+                 f"first: {(missing or strangers or duplicates)[0]}")
+
+
 def merge(suite, directories):
-    """(meta, rows) of a complete set of result directories: every shard once."""
-    metas, rows = [], []
+    """(meta, rows) of a complete set of result directories: every shard once,
+    every shard complete, the shards' variants partitioning the total."""
+    metas, rows, variants = [], [], []
     for directory in map(Path, directories):
         meta = json.loads((directory / "meta.json").read_text())
         if meta["suite"] != suite:
             sys.exit(f"{directory}: results of suite {meta['suite']}, not {suite}")
-        metas.append(meta)
         with (directory / "results.ndjson").open() as results:
-            rows.extend(json.loads(line) for line in results if line.strip())
+            shard_rows = [json.loads(line) for line in results if line.strip()]
+        complete(directory, meta, shard_rows)
+        metas.append(meta)
+        rows.extend(shard_rows)
+        variants.extend(meta["variants"])
     counts = {meta["shard"][1] for meta in metas}
     pins = {meta["pin"] for meta in metas}
     totals = {meta["total"] for meta in metas}
@@ -197,7 +237,10 @@ def merge(suite, directories):
         sys.exit(f"shards present: {seen}; every shard must appear exactly once")
     if any(meta.get("partial") for meta in metas):
         sys.exit("a `run --id` result is a development check and cannot be checked or accepted")
-    return {"pin": pins.pop(), "total": totals.pop()}, rows
+    total = totals.pop()
+    if len(variants) != total or len(set(variants)) != total:
+        sys.exit(f"the shards answer {len(set(variants))} distinct variants of the {total} enumerated")
+    return {"pin": pins.pop(), "total": total}, rows
 
 
 def failing_ids(rows):
@@ -258,7 +301,7 @@ def accept(args):
 
 
 def list_command(args):
-    runner = runner_path(args.suite, not args.no_build, args.runner)
+    runner = runner_path(args.suite, args.runner)
     print("\n".join(list_variants(args.suite, runner)))
 
 
@@ -270,8 +313,7 @@ def main(argv=None):
         command.add_argument("suite", choices=sorted(SUITES))
         command.set_defaults(function=function)
         if name in ("list", "run"):
-            command.add_argument("--no-build", action="store_true", help="use the built runner as is")
-            command.add_argument("--runner", help="the runner binary to use instead of target/release")
+            command.add_argument("--runner", help="a prebuilt runner binary to use instead of building one")
         if name == "run":
             command.add_argument("--output", required=True)
             command.add_argument("--shard", help="i/n: this shard of the sorted variant list")

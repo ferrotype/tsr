@@ -53,7 +53,8 @@ then `check compiler --results DIR` compares with the expectation file and
 `approved` text. Suites: `compiler` (the pin's default single-threaded
 mode), `compiler-concurrent`, `transpile`, `tsc`. A variant id is
 `<suite>/<configured name>`; the runner binary is `tsr-testrunner`
-(`crates/tsr_testrunner`), built in release by `run` unless `--no-build`.
+(`crates/tsr_testrunner`), built in release by `run` and `list` (Cargo's
+reported executable; `--runner PATH` uses a prebuilt one, as CI does).
 
 ## Comparing the relater implementations
 

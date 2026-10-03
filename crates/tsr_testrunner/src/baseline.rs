@@ -47,11 +47,23 @@ const DIFF_LINES: usize = 60;
 pub fn run(roots: &Roots, file_name: &[u8], actual: &[u8], options: Options<'_>) -> Outcome {
     let relative = Path::new(options.subfolder).join(String::from_utf8_lossy(file_name).as_ref());
     let local = roots.local.join(&relative);
+    let marker = PathBuf::from(format!("{}.delete", local.display()));
     let reference = roots.reference.join(&relative);
     if actual.is_empty() {
         return Outcome::fail(
             "the generated content was \"\". Return 'baseline.NoContent' if no baselining is required.",
         );
+    }
+    // An earlier run's output for this baseline says nothing about this one.
+    for stale in [&local, &marker] {
+        if let Err(error) = std::fs::remove_file(stale) {
+            if error.kind() != std::io::ErrorKind::NotFound {
+                return Outcome::fail(format!(
+                    "failed to remove the local baseline file {}: {error}",
+                    stale.display()
+                ));
+            }
+        }
     }
     let expected = std::fs::read(&reference).ok();
     let found_expected = expected.is_some();
@@ -68,7 +80,6 @@ pub fn run(roots: &Roots, file_name: &[u8], actual: &[u8], options: Options<'_>)
         }
     }
     if actual == NO_CONTENT {
-        let marker = PathBuf::from(format!("{}.delete", local.display()));
         if let Err(error) = std::fs::write(&marker, b"") {
             return Outcome::fail(format!(
                 "failed to write the local baseline file {}: {error}",
@@ -163,6 +174,32 @@ mod tests {
             matches!(outcome, Outcome::Fail { ref reason, .. } if reason.contains("no longer produced"))
         );
         assert!(roots.local.join("compiler/a.js.delete").exists());
+    }
+
+    #[test]
+    fn a_pass_removes_the_local_output_and_marker_of_an_earlier_failure() {
+        let (_dir, roots) = roots();
+        let options = Options {
+            subfolder: "compiler",
+            ..Options::default()
+        };
+        std::fs::write(roots.reference.join("compiler/a.js"), b"x").unwrap();
+        assert!(matches!(
+            run(&roots, b"a.js", b"y", options),
+            Outcome::Fail { .. }
+        ));
+        assert!(roots.local.join("compiler/a.js").exists());
+        assert_eq!(run(&roots, b"a.js", b"x", options), Outcome::Pass);
+        assert!(!roots.local.join("compiler/a.js").exists());
+        std::fs::remove_file(roots.reference.join("compiler/a.js")).unwrap();
+        std::fs::write(roots.reference.join("compiler/b.js"), b"x").unwrap();
+        assert!(matches!(
+            run(&roots, b"b.js", NO_CONTENT, options),
+            Outcome::Fail { .. }
+        ));
+        assert!(roots.local.join("compiler/b.js.delete").exists());
+        assert_eq!(run(&roots, b"b.js", b"x", options), Outcome::Pass);
+        assert!(!roots.local.join("compiler/b.js.delete").exists());
     }
 
     #[test]
