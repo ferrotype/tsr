@@ -52,6 +52,8 @@ jobs:
           command: check advisories licenses bans sources
       - name: Ledger and markers
         run: cargo xtask validate
+      - name: Packaged assets and publication policy
+        run: python3 scripts/package_assets.py --check
       - name: Tests
         run: cargo test --workspace --all-features --locked
       - name: Read the Go pin
