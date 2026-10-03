@@ -1,7 +1,9 @@
 # CI (docs/EVIDENCE-plan.md, section 6).
 #
-# quality:      format, the clippy gate, dependency policy, the workspace tests and
-#               the ledger/marker validation.
+# lint:         format, the clippy gate, dependency policy, the ledger/marker
+#               validation and the packaging policy.
+# rust-tests:   the workspace's tests in three shards (checker, compiler, the rest).
+# script-tests: the Python tests, their output kept in an artifact.
 # msrv:         the locked workspace compiles on the declared minimum Rust.
 # runner:       builds the suite runner once in release and hands the binary to the shards.
 # parity:       one job per suite shard; each runs its share of the pin's tests and
@@ -32,8 +34,8 @@ env:
   CARGO_PROFILE_DEV_DEBUG: 0
 
 jobs:
-  quality:
-    name: quality
+  lint:
+    name: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -54,8 +56,42 @@ jobs:
         run: cargo xtask validate
       - name: Packaged assets and publication policy
         run: python3 scripts/package_assets.py --check
+
+  rust-tests:
+    name: rust tests ${{ matrix.shard }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # The checker's and the compiler's test targets dominate the build; each
+        # gets a runner of its own, the rest of the workspace shares one.
+        include:
+          - { shard: checker, packages: "-p tsr_checker" }
+          - { shard: compiler, packages: "-p tsr_compiler" }
+          - { shard: workspace, packages: "--workspace --exclude tsr_checker --exclude tsr_compiler" }
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Install the pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: rui314/setup-mold@v1
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: tests-${{ matrix.shard }}
       - name: Tests
-        run: cargo test --workspace --all-features --locked
+        run: cargo test ${{ matrix.packages }} --all-features --locked
+
+  script-tests:
+    name: script tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Install the pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
       - name: Read the Go pin
         id: go
         run: echo "version=$(python3 -c "import tomllib;print(tomllib.load(open('data/s04/toolchains.toml','rb'))['go'].removeprefix('go'))")" >> "$GITHUB_OUTPUT"
@@ -63,8 +99,22 @@ jobs:
         with:
           go-version: ${{ steps.go.outputs.version }}
           cache-dependency-path: upstream/tsc/go.sum
+      # The tests' own output (subprocess chatter, expected-error messages) goes
+      # to a file; the log keeps the summary, and the file on a failure.
       - name: Script tests
-        run: python3 scripts/run_tests.py
+        run: |
+          if python3 scripts/run_tests.py > "$RUNNER_TEMP/script-tests.log" 2>&1; then
+            tail -n 3 "$RUNNER_TEMP/script-tests.log"
+          else
+            tail -n 300 "$RUNNER_TEMP/script-tests.log"
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: script-tests-log
+          path: ${{ runner.temp }}/script-tests.log
+          retention-days: 7
 
   msrv:
     name: minimum Rust on ${{ matrix.os }}
