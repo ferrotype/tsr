@@ -76,7 +76,6 @@
     ".cargo/**/*",
     "tools/s10/**/*",
     "scripts/s10*.py",
-    "status/experiments.toml",
     "rust-toolchain.toml",
     "status/runs.toml",
     "data/divergences.toml",

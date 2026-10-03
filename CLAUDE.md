@@ -121,8 +121,22 @@ from the parity files, `status/perf/`, the ledger and the markers; nothing
 rendered is committed. `cargo xtask validate` checks the ledger's provenance
 and every `// port:` marker under `crates/` and `tools/`.
 
-## S07 chain order
+## Performance
 
-`scripts/s07_benchmark_graph.py capture` rebuilds the shared binaries and
-rewrites `target/s07-bindworkload/report.json`, which invalidates an existing
-benchmark capture. Run it before `scripts/s07_benchmark.py capture`.
+A perf run is one file, `status/perf/<workload>/<recorded_at>-<rev8>.json`,
+recorded from a finished harness capture. For `parse-bind` the chain is two
+commands, in this order (the graph capture rebuilds the measured binaries and
+invalidates an older benchmark capture), then the record:
+
+```sh
+python3 scripts/s07_benchmark_graph.py capture
+python3 scripts/s07_benchmark.py capture
+python3 scripts/perf.py record parse-bind --capture target/s07-benchmark --label "owner quiet host (macOS arm64, 18 CPUs)"
+```
+
+`checker` is `scripts/s08_checkerbench.py build` and `capture`, then
+`perf.py record checker --capture target/s08/checkerbench`; its requests come
+from an E2 corpus capture (docs/S08-E2.md). `perf.py check <workload>` compares
+the newest run with `status/perf/thresholds.toml`. Run files are committed by
+hand, or from the artifact of the dispatch-only `perf.yml` workflow, and never
+regenerated.

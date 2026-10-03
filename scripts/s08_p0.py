@@ -58,11 +58,10 @@ def validate_methods():
         sampling = read(DATA / name)['sampling']
         if sampling['measured_samples_per_runtime'] != 7 or sampling['warmups_per_runtime'] != 1:
             raise ValueError('sampling protocol changed without a reviewed freeze')
-    # The experiment ledger remains authoritative; a method edit cannot move a gate.
-    experiments = tomllib.loads((ROOT / 'status/experiments.toml').read_text())
-    criteria = [c for c in experiments['E5']['criteria'] if c['id'] == 'type_footprint']
-    if len(criteria) != 1 or criteria[0]['threshold'] != read(DATA / 'type-footprint.json')['threshold']['maximum']:
-        raise ValueError('type footprint methodology disagrees with ledger')
+    # The perf thresholds remain authoritative; a method edit cannot move a gate.
+    thresholds = tomllib.loads((ROOT / 'status/perf/thresholds.toml').read_text())
+    if thresholds.get('checker', {}).get('type_footprint') != read(DATA / 'type-footprint.json')['threshold']['maximum']:
+        raise ValueError('type footprint methodology disagrees with status/perf/thresholds.toml')
     owners = read(DATA / 'ownership-fixtures.json')['cases']
     if len({r['id'] for r in owners}) != len(owners) or not owners:
         raise ValueError('duplicate or empty ownership fixture inventory')

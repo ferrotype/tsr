@@ -41,43 +41,36 @@ class FixedStatistics(unittest.TestCase):
         self.assertFalse(boundary["needs_more"])
 
 
-class ThresholdLedger(unittest.TestCase):
-    def test_reads_both_modes_and_rejects_invalid_criteria(self):
+class Thresholds(unittest.TestCase):
+    def test_reads_both_modes_and_rejects_invalid_thresholds(self):
         import tempfile
         from unittest.mock import patch
         import s07_benchmark_measure as measure
-        ledger = (measure.ROOT / "status/experiments.toml").read_text()
+        committed = (measure.ROOT / measure.THRESHOLDS).read_text()
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            (root / "status").mkdir()
-            path = root / "status/experiments.toml"
-            path.write_text(ledger)
+            path = root / measure.THRESHOLDS
+            path.parent.mkdir(parents=True)
+            path.write_text(committed)
             with patch.object(measure, "ROOT", root):
                 self.assertEqual(measure.e6_thresholds(), {"1": 1.25, "8": 1.45})
                 for bad in ("true", "0", "-1", "nan", "inf", '"1.25"'):
-                    path.write_text(ledger.replace("threshold = 1.25", "threshold = " + bad))
+                    path.write_text(committed.replace("one_thread_wall_time = 1.25", "one_thread_wall_time = " + bad))
                     with self.subTest(bad=bad), self.assertRaises(ValueError):
                         measure.e6_thresholds()
-                path.write_text(ledger.replace('run.e6.one_thread_wall_time_ratio', 'run.e6.wrong_metric'))
-                with self.assertRaises(ValueError):
+                path.write_text(committed.replace("eight_threads_wall_time = 1.45", ""))
+                with self.assertRaisesRegex(ValueError, "eight_threads_wall_time"):
                     measure.e6_thresholds()
-                path.write_text(ledger.replace('metric = "run.e6.one_thread_wall_time_ratio"\nop = "<="', 'metric = "run.e6.one_thread_wall_time_ratio"\nop = ">="'))
-                with self.assertRaises(ValueError):
+                path.write_text(committed.replace("[parse-bind]", "[parse-and-bind]"))
+                with self.assertRaisesRegex(ValueError, r"\[parse-bind\]"):
                     measure.e6_thresholds()
-                path.write_text(ledger + '\n[[E6.criteria]]\nid = "one_thread"\n')
-                with self.assertRaisesRegex(ValueError, "duplicate"):
+                path.write_text(committed + "\n[parse-bind]\none_thread_wall_time = 1.0\n")
+                with self.assertRaises(ValueError):
                     measure.e6_thresholds()
 
-    def test_threshold_ledger_is_a_capture_input(self):
+    def test_thresholds_file_is_a_capture_input(self):
         from s07_benchmark import source_fingerprint
-        self.assertIn("status/experiments.toml", source_fingerprint()["files"])
-
-    def test_thresholds_do_not_authorize_other_hosts(self):
-        from s07_benchmark_measure import validate_threshold_host
-        validate_threshold_host({"os": "darwin", "architecture": "arm64"})
-        for os, architecture in (("linux", "aarch64"), ("darwin", "x86_64")):
-            with self.assertRaisesRegex(ValueError, "ADR 0021"):
-                validate_threshold_host({"os": os, "architecture": architecture})
+        self.assertIn("status/perf/thresholds.toml", source_fingerprint()["files"])
 
     def test_noisy_capture_is_extended_then_remains_uncertain(self):
         values = [60, 70, 80, 100, 110, 120, 130]

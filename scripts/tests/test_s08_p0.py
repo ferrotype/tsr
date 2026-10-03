@@ -30,17 +30,17 @@ def load(name):
 
 
 class FootprintPolicyTests(unittest.TestCase):
-    def test_owner_amendment_agrees_with_all_e5_criteria_and_frozen_receipt(self):
+    def test_owner_amendment_agrees_with_all_e5_thresholds_and_frozen_receipt(self):
         p0.validate_methods()
-        criteria = tomllib.loads((ROOT / 'status/experiments.toml').read_text())['E5']['criteria']
-        self.assertEqual({c['id']: (c['op'], c['threshold']) for c in criteria}, {
-            'peak_rss': ('<=', 0.85), 'allocated_bytes': ('<=', 0.85),
-            'type_footprint': ('<=', 0.85),
-        })
+        thresholds = tomllib.loads((ROOT / 'status/perf/thresholds.toml').read_text())
+        self.assertEqual(
+            (thresholds['parse-bind']['peak_rss'], thresholds['parse-bind']['allocated_bytes'],
+             thresholds['checker']['type_footprint']),
+            (0.85, 0.85, 0.85))
         manifest = load('data/s08/p0-contract.json')
         p0.validate_sources({'type-footprint.json': manifest['artifacts']['type-footprint.json']}, p0.DATA)
 
-    def test_old_method_limit_cannot_disagree_with_the_amended_ledger(self):
+    def test_old_method_limit_cannot_disagree_with_the_amended_thresholds(self):
         read = p0.read
 
         def old_method(path):
@@ -50,7 +50,7 @@ class FootprintPolicyTests(unittest.TestCase):
             return value
 
         with patch.object(p0, 'read', side_effect=old_method):
-            with self.assertRaisesRegex(ValueError, 'footprint methodology disagrees with ledger'):
+            with self.assertRaisesRegex(ValueError, 'footprint methodology disagrees with status/perf/thresholds.toml'):
                 p0.validate_methods()
 
 

@@ -1,0 +1,23 @@
+# Performance thresholds, one table per workload of status/perf/<workload>/,
+# `<ratio> = <threshold>`. Every ratio is Rust over Go and passes when it is at
+# or below its threshold. `scripts/perf.py check` compares a run with them for
+# the dispatch workflow's summary and `cargo xtask status` shows them beside
+# each run; they are not a pull-request gate.
+#
+# They are authorized for the owner's host class only: macOS arm64 with at
+# least eight schedulable CPUs, Go pinned by data/s04/toolchains.toml with
+# GOGC=100, Rust on the pinned stable toolchain with mimalloc (ADR 0021). A run
+# on another host is recorded and compared, but a miss there is informational.
+#
+# `scripts/s07_benchmark_measure.e6_thresholds()` reads the two wall-time
+# entries of [parse-bind]: the capture's stability and sample-extension rule
+# judges each mode's bootstrap bound against them.
+
+[parse-bind]
+one_thread_wall_time = 1.25    # ADR 0021, re-based from 1.0
+eight_threads_wall_time = 1.45 # ADR 0021, re-based from 1.0
+peak_rss = 0.85                # ADR 0021 (re-based from 0.7), confirmed by ADR 0022
+allocated_bytes = 0.85         # ADR 0021 (re-based from 0.7), confirmed by ADR 0022
+
+[checker]
+type_footprint = 0.85          # ADR 0022, re-based from 0.80
