@@ -71,9 +71,16 @@ version-1 captures remain historical evidence, not evidence for this contract.
    operations exercise the transport; Phase 5 attaches the real mapper host.
 
 8. Carry a patch against the pinned Go fourslash harness, not a fork. Retain Go
-   executable assertions and patch transport only. S11's small access-only
-   oracle overlays are separate from that future harness patch. Replay the five
-   actual Go test-spawner sequences through the tunnel and compare concatenated
+   executable assertions; adapt transport and access to server-owned state.
+   Phase 5's state-baseline writer needs a read-only projection of the real
+   Rust snapshot, including the identities its comparisons use. Validate the
+   projection adapter against the unchanged Go writer; never supply Rust's
+   state from a second Go project system. Direct tests of Go internals become
+   Rust unit-test ports, not client-driven passes. See
+   [the Phase 5 plan](../PHASE5-plan.md#22-the-harness-patch-and-the-actual-seams).
+   S11's small access-only oracle overlays are separate from that future
+   harness patch. Replay the five actual Go test-spawner sequences through
+   the tunnel and compare concatenated
    bytes in each direction. Read/write chunk boundaries are not semantic.
    Report transport-only stress/failure cases separately from Go observations.
 
@@ -103,7 +110,8 @@ boundary so the production host can be exercised in Phase 5.
 ## Consequences
 
 * Version 1 peers must migrate; accepting the ADR alone does not certify the
-  revised implementation. Fresh S11 evidence must cover version 2.
+  revised implementation. S11's closure records version-2 validation; Phase 5
+  retains the Rust transport regressions while connecting the real server.
 * Base64 expands bytes by roughly one third. Credits, chunk limits and lifecycle
   states add protocol complexity, but bound memory and avoid waiting inside the
   router for a plugin consumer. The shared connection still has head-of-line
@@ -125,9 +133,12 @@ The authorities at the pin are `internal/api/callbackfs.go`,
 `internal/fourslash/fourslash.go`, and `internal/lsp/server.go`
 (`SetCompilerOptionsForInferredProjects`, `InitComplete`).
 
-The frozen inventories live in `data/s11/`; access-only bridges in `tools/s11/`;
-the producer is `cargo xtask run testhost`. See [S11](../S11.md) for the exact
-wire schema, bounds, hook contract and validation scope.
+S11 originally used inventories in `data/s11/`, access-only bridges in
+`tools/s11/` and a `cargo xtask run testhost` producer. Those historical
+artifacts and commands were retired with ADR 0023; they are not Phase 5
+prerequisites. The Rust contract tests remain in `tsr_testhost`. See
+[S11](../S11.md) for the wire schema, bounds, hook contract and original
+validation scope.
 
 [S11 closure](../S11-closure.md) records the successful macOS ARM64 and Linux
 x86-64 CI captures, the satisfied S06 prerequisite and the retained evidence.

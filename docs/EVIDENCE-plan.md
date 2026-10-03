@@ -76,9 +76,16 @@ from Go. The two runner assertions that are not baselines (union ordering,
 parent pointers) are assertions in the ported runner, not observations to
 replay.
 
+Phase 5 retains the executable Go fourslash/client assertions required by
+ADR 0019; those run against Rust through a carried harness patch. Direct
+Go-object tests become Rust unit tests. This narrow client-runner exception
+does not bring back oracle captures or producers; its assertion/baseline
+results use the same expectation files. See [the Phase 5 plan](PHASE5-plan.md).
+
 **One tool.** `scripts/parity.py` drives every suite through one process
-model and one expectation-file format. Suite-specific work is in the Rust
-runner binaries it spawns.
+supervisor and one expectation-file format. Suite-specific work is in the
+runner adapters it spawns. Phase 5 adds a serialized batch capability for
+the carried Go client runner; the existing Rust runners keep per-case processes.
 
 ## 3. File formats
 
@@ -159,6 +166,10 @@ parity.py accept <suite> --results DIR [DIR …]            # rewrite the expect
   failed test, never a lost run) and writes one result line per id:
   `{"id", "state": "pass"|"fail", "reason"?, "detail"?}` plus the runner's
   `local/` output for failures, which is the diff a developer reads.
+- Phase 5's batch adapter preserves that failure isolation: one active test
+  per server worker, a reset barrier between tests, and restart after an
+  active-case crash/timeout without losing completed results. It uses the
+  same result format and expectation-file commands, not a parallel tool.
 - `check` exits non-zero and prints the two sets that differ: ids failing
   now that the file does not name, and ids the file names that pass now. It
   also prints `passing / approved / failing / total` and writes the same to
