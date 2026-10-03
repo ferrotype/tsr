@@ -600,6 +600,7 @@ mod tests {
 
     #[test]
     fn a_row_observes_its_setup_and_digests_the_column_value() {
+        let _serial = crate::serial();
         assert!(!is_production("setup") && is_production("column"));
         let input = json!({"s": [1, 2, 3], "cases": [{"start": 1, "count": 1, "items": [9]}]});
         let row = run_row(

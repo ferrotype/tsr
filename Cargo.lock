@@ -1439,6 +1439,40 @@ dependencies = [
 ]
 
 [[package]]
+name = "tsr_testrunner"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "sha2",
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_astnav",
+ "tsr_bundled",
+ "tsr_checker",
+ "tsr_compiler",
+ "tsr_contentmapper",
+ "tsr_contentmappertest",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_incremental",
+ "tsr_ipc",
+ "tsr_json",
+ "tsr_jsstring",
+ "tsr_locale",
+ "tsr_module",
+ "tsr_nodebuilder",
+ "tsr_parser",
+ "tsr_printer",
+ "tsr_scanner",
+ "tsr_sourcemap",
+ "tsr_transpile",
+ "tsr_tsoptions",
+ "tsr_tspath",
+ "tsr_vfs",
+]
+
+[[package]]
 name = "tsr_tracing"
 version = "0.1.0"
 dependencies = [

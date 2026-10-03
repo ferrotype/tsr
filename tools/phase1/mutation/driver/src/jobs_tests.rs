@@ -83,6 +83,7 @@ fn lines(bytes: &[u8]) -> Vec<Value> {
 // The mutant switch is process-global, so one test exercises it in order.
 #[test]
 fn reach_follows_the_stage_rule_and_controls_decide_kills() {
+    let _serial = crate::serial();
     set_tracing(true);
     let request = Fake {
         observe_counts: false,

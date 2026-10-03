@@ -236,17 +236,15 @@ impl State {
             };
             if !self.no_rename {
                 match ffi::mark(&fd, &watch.physical_dir, FAN_ADD, self.mask) {
-                    Ok(()) => loop {
-                        match ffi::mark(
+                    Ok(()) => {
+                        // Retry the removal while it is interrupted.
+                        while let Err(rustix::io::Errno::INTR) = ffi::mark(
                             &fd,
                             &watch.physical_dir,
                             libc::FAN_MARK_REMOVE | libc::FAN_MARK_ONLYDIR,
                             self.mask,
-                        ) {
-                            Err(rustix::io::Errno::INTR) => continue,
-                            _ => break,
-                        }
-                    },
+                        ) {}
+                    }
                     Err(rustix::io::Errno::INVAL | rustix::io::Errno::OPNOTSUPP) => {
                         self.mask = FAN_BASE | libc::FAN_MOVED_FROM | libc::FAN_MOVED_TO
                     }

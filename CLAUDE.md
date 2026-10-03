@@ -23,9 +23,9 @@ concluding that a producer is broken.
 
 ```sh
 cargo test -p s08_relater_prototype        # underscores; the hyphenated name is rejected
-python3 -m pytest scripts/tests -q         # ~445 tests, including the relater contracts; needs go on PATH
-python3 scripts/checks.py fmt              # wraps cargo fmt --all --check
-python3 scripts/checks.py clippy           # the workspace lint gate
+python3 scripts/run_tests.py               # the script tests (unittest discovery); needs go on PATH
+cargo fmt --all --check
+cargo clippy --workspace --all-targets --all-features --locked -- -D warnings   # the lint gate
 ```
 
 The clippy gate is `cargo clippy --workspace --all-targets --all-features
@@ -36,6 +36,25 @@ compiles less code, so re-run the real command before committing.
 
 Note that `cargo clippy --fix` rewrites `use super::*` and breaks test modules
 that relied on the parent glob. Add the explicit imports to `mod tests` instead.
+
+## Suite parity (docs/EVIDENCE-plan.md)
+
+`status/parity/<suite>.json` names every failing sub-test of a suite; CI runs
+the suite on every pull request and fails on any difference. One variant:
+
+```sh
+python3 scripts/parity.py run compiler --output "$SCRATCH/compiler" --id 'compiler/foo(target=es2015).ts'
+```
+
+The differing outputs land under `$SCRATCH/compiler/local/`. A full run is
+`run compiler --output DIR` (under two minutes on this host, sharded in CI),
+then `check compiler --results DIR` compares with the expectation file and
+`accept compiler --results DIR` rewrites it, keeping every `reason` and
+`approved` text. Suites: `compiler` (the pin's default single-threaded
+mode), `compiler-concurrent`, `transpile`, `tsc`. A variant id is
+`<suite>/<configured name>`; the runner binary is `tsr-testrunner`
+(`crates/tsr_testrunner`), built in release by `run` and `list` (Cargo's
+reported executable; `--runner PATH` uses a prebuilt one, as CI does).
 
 ## Comparing the relater implementations
 

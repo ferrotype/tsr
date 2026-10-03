@@ -601,15 +601,22 @@ def reproduced(comparison):
 
 
 def render(document):
-    return gzip.compress(canonical(document) + b"\n", compresslevel=9, mtime=0)
+    """The inventory's gzip container: canonical JSON, level 9, header mtime 0
+    and the OS byte fixed to "unknown" (0xff). Python 3.12's gzip.compress
+    hands a zero mtime to zlib, which stamps its platform code there (19 on
+    macOS, 3 on Linux); the byte carries no information and must not make the
+    container differ between hosts."""
+    data = bytearray(gzip.compress(canonical(document) + b"\n", compresslevel=9, mtime=0))
+    data[9] = 0xFF
+    return bytes(data)
 
 
 # --- check -------------------------------------------------------------------------
 
 def read_inventory(data):
     """The document of a gzip container, after checking the container and the canonical form."""
-    if data[:4] != b"\x1f\x8b\x08\x00" or data[4:8] != b"\x00\x00\x00\x00":
-        raise ValueError("the inventory is gzip with no flags and header mtime 0")
+    if data[:4] != b"\x1f\x8b\x08\x00" or data[4:8] != b"\x00\x00\x00\x00" or data[9] != 0xFF:
+        raise ValueError("the inventory is gzip with no flags, header mtime 0 and an unknown OS byte")
     payload = gzip.decompress(data)
     document = strict_json_loads(payload)
     if payload != canonical(document) + b"\n":

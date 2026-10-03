@@ -304,7 +304,9 @@ mod tests {
         assert_eq!(&bytes, b"hello\n");
         assert_eq!(stream.closer.exit_code(), None);
         stream.closer.close().unwrap();
-        assert_eq!(stream.closer.exit_code(), Some(-1));
+        // close shuts stdin before it kills: cat is reaped either by the
+        // kill (-1) or, when it reads the EOF first, by its own exit (0).
+        assert!(matches!(stream.closer.exit_code(), Some(0 | -1)));
         stream.closer.close().unwrap();
         assert!(stream.writer.write_all(b"closed").is_err());
     }

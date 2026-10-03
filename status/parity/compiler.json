@@ -1,0 +1,46 @@
+{
+  "suite": "compiler",
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "total": 13432,
+  "failing": {
+    "compiler/computedEnumTypeWidening.ts/type": {
+      "reason": "enum literal types: a mutable location keeps the member type (`a : E.A`) where the pin widens it to the enum (`a : E`), and an enum-literal union prints its members where the pin prints the alias; first seen on the first expectation-file run, after Phase 2 closed; candidate cause 6245f59b (Phase 3, enum evaluation). Fix in its own PR."
+    },
+    "compiler/enumLiteralUnionNotWidened.ts/type": {
+      "reason": "enum literal types: a mutable location keeps the member type (`a : E.A`) where the pin widens it to the enum (`a : E`), and an enum-literal union prints its members where the pin prints the alias; first seen on the first expectation-file run, after Phase 2 closed; candidate cause 6245f59b (Phase 3, enum evaluation). Fix in its own PR."
+    },
+    "compiler/enumNaNValues.ts/type": {
+      "reason": "enum literal types: a mutable location keeps the member type (`a : E.A`) where the pin widens it to the enum (`a : E`), and an enum-literal union prints its members where the pin prints the alias; first seen on the first expectation-file run, after Phase 2 closed; candidate cause 6245f59b (Phase 3, enum evaluation). Fix in its own PR."
+    },
+    "compiler/numericEnumMappedType.ts/output": {
+      "reason": "declaration emit of `const x = E.ONE` writes `= E.ONE` where the pin writes `: E.ONE`; the same enum-literal cause as the .types entries. Fix in its own PR."
+    },
+    "compiler/parseEntityNameWithReservedWord.ts/type": {
+      "reason": "enum literal types: a mutable location keeps the member type (`a : E.A`) where the pin widens it to the enum (`a : E`), and an enum-literal union prints its members where the pin prints the alias; first seen on the first expectation-file run, after Phase 2 closed; candidate cause 6245f59b (Phase 3, enum evaluation). Fix in its own PR."
+    },
+    "compiler/strictModeEnumMemberNameReserved.ts/type": {
+      "reason": "enum literal types: a mutable location keeps the member type (`a : E.A`) where the pin widens it to the enum (`a : E`), and an enum-literal union prints its members where the pin prints the alias; first seen on the first expectation-file run, after Phase 2 closed; candidate cause 6245f59b (Phase 3, enum evaluation). Fix in its own PR."
+    },
+    "conformance/enumLiteralTypes1.ts/type": {
+      "reason": "enum literal types: a mutable location keeps the member type (`a : E.A`) where the pin widens it to the enum (`a : E`), and an enum-literal union prints its members where the pin prints the alias; first seen on the first expectation-file run, after Phase 2 closed; candidate cause 6245f59b (Phase 3, enum evaluation). Fix in its own PR."
+    },
+    "conformance/enumLiteralTypes2.ts/type": {
+      "reason": "enum literal types: a mutable location keeps the member type (`a : E.A`) where the pin widens it to the enum (`a : E`), and an enum-literal union prints its members where the pin prints the alias; first seen on the first expectation-file run, after Phase 2 closed; candidate cause 6245f59b (Phase 3, enum evaluation). Fix in its own PR."
+    },
+    "conformance/enumLiteralTypes3.ts/type": {
+      "reason": "enum literal types: a mutable location keeps the member type (`a : E.A`) where the pin widens it to the enum (`a : E`), and an enum-literal union prints its members where the pin prints the alias; first seen on the first expectation-file run, after Phase 2 closed; candidate cause 6245f59b (Phase 3, enum evaluation). Fix in its own PR."
+    },
+    "conformance/mappedTypeOverlappingStringEnumKeys.ts/type": {
+      "reason": "enum literal types: a mutable location keeps the member type (`a : E.A`) where the pin widens it to the enum (`a : E`), and an enum-literal union prints its members where the pin prints the alias; first seen on the first expectation-file run, after Phase 2 closed; candidate cause 6245f59b (Phase 3, enum evaluation). Fix in its own PR."
+    },
+    "conformance/stringEnumLiteralTypes1.ts/type": {
+      "reason": "enum literal types: a mutable location keeps the member type (`a : E.A`) where the pin widens it to the enum (`a : E`), and an enum-literal union prints its members where the pin prints the alias; first seen on the first expectation-file run, after Phase 2 closed; candidate cause 6245f59b (Phase 3, enum evaluation). Fix in its own PR."
+    },
+    "conformance/stringEnumLiteralTypes2.ts/type": {
+      "reason": "enum literal types: a mutable location keeps the member type (`a : E.A`) where the pin widens it to the enum (`a : E`), and an enum-literal union prints its members where the pin prints the alias; first seen on the first expectation-file run, after Phase 2 closed; candidate cause 6245f59b (Phase 3, enum evaluation). Fix in its own PR."
+    },
+    "conformance/stringEnumLiteralTypes3.ts/type": {
+      "reason": "enum literal types: a mutable location keeps the member type (`a : E.A`) where the pin widens it to the enum (`a : E`), and an enum-literal union prints its members where the pin prints the alias; first seen on the first expectation-file run, after Phase 2 closed; candidate cause 6245f59b (Phase 3, enum evaluation). Fix in its own PR."
+    }
+  }
+}

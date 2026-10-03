@@ -53,9 +53,17 @@ class InventoryTests(unittest.TestCase):
         payload = gzip.decompress(self.data)
         with self.assertRaisesRegex(ValueError, "mtime 0"):
             scenarios.read_inventory(gzip.compress(payload, mtime=1))
+        # The OS byte is fixed to "unknown" so the container is identical on
+        # every host; a platform-stamped header is rejected.
+        stamped = bytearray(self.data)
+        stamped[9] = 3
+        with self.assertRaisesRegex(ValueError, "OS byte"):
+            scenarios.read_inventory(bytes(stamped))
         pretty = json.dumps(self.document, indent=1, sort_keys=True).encode() + b"\n"
+        container = bytearray(gzip.compress(pretty, mtime=0))
+        container[9] = 0xFF
         with self.assertRaisesRegex(ValueError, "canonical"):
-            scenarios.read_inventory(gzip.compress(pretty, mtime=0))
+            scenarios.read_inventory(bytes(container))
 
     def test_recorded_facts(self):
         document = self.document

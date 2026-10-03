@@ -414,6 +414,12 @@
       "manifest": "xtask/Cargo.toml",
       "publish": false,
       "reason": "Repository-only benchmark, experiment, test or capture tool"
+    },
+    {
+      "name": "tsr_testrunner",
+      "manifest": "crates/tsr_testrunner/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only port of the pinned compiler and transpile test runners (docs/EVIDENCE-plan.md)"
     }
   ]
 }

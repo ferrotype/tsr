@@ -1,0 +1,233 @@
+# CI (docs/EVIDENCE-plan.md, section 6).
+#
+# lint:         format, the clippy gate, dependency policy, the ledger/marker
+#               validation and the packaging policy.
+# rust-tests:   the workspace's tests in six shards (checker, compiler ×4, the rest).
+# script-tests: the Python tests, their output kept in an artifact.
+# msrv:         the locked workspace compiles on the declared minimum Rust.
+# runner:       builds the suite runner once in release and hands the binary to the shards.
+# parity:       one job per suite shard; each runs its share of the pin's tests and
+#               uploads its results.
+# parity-check: merges the shards and compares the failing set with
+#               status/parity/<suite>.json. Any difference fails the workflow.
+#
+# The repository variable PARITY_RUNNER moves the runner build and the shards to a
+# self-hosted runner; unset, they use ubuntu-latest.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: 0
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Install the pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - name: Format
+        run: cargo fmt --all --check
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
+      - name: Dependency policy
+        uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check advisories licenses bans sources
+      - name: Ledger and markers
+        run: cargo xtask validate
+      - name: Packaged assets and publication policy
+        run: python3 scripts/package_assets.py --check
+
+  rust-tests:
+    name: rust tests ${{ matrix.shard }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # tsr_compiler's 59 integration-test binaries each link the whole
+        # compiler and took 69 minutes as one job; scripts/ci_test_shard.py
+        # slices them four ways. The checker and the rest of the workspace get
+        # a runner each.
+        include:
+          - { shard: checker, packages: "-p tsr_checker" }
+          - { shard: compiler-1, packages: "-p tsr_compiler", targets: "1/4" }
+          - { shard: compiler-2, packages: "-p tsr_compiler", targets: "2/4" }
+          - { shard: compiler-3, packages: "-p tsr_compiler", targets: "3/4" }
+          - { shard: compiler-4, packages: "-p tsr_compiler", targets: "4/4" }
+          - { shard: workspace, packages: "--workspace --exclude tsr_checker --exclude tsr_compiler" }
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Install the pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: rui314/setup-mold@v1
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: tests-${{ matrix.shard }}
+      - name: Tests
+        env:
+          PACKAGES: ${{ matrix.packages }}
+          TARGETS: ${{ matrix.targets }}
+        run: |
+          flags=""
+          if [ -n "$TARGETS" ]; then
+            flags="$(python3 scripts/ci_test_shard.py tsr_compiler "$TARGETS")"
+          fi
+          # shellcheck disable=SC2086
+          cargo test $PACKAGES $flags --all-features --locked
+
+  script-tests:
+    name: script tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Install the pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - name: Read the Go pin
+        id: go
+        run: echo "version=$(python3 -c "import tomllib;print(tomllib.load(open('data/s04/toolchains.toml','rb'))['go'].removeprefix('go'))")" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ steps.go.outputs.version }}
+          cache-dependency-path: upstream/tsc/go.sum
+      # Several script tests read `cargo metadata --offline`; the registry has
+      # to hold the locked crates before anything builds.
+      - name: Fetch the locked dependencies
+        run: cargo fetch --locked
+      # The tests' own output (subprocess chatter, expected-error messages) goes
+      # to a file; the log keeps the summary, and the file on a failure.
+      - name: Script tests
+        run: |
+          if python3 scripts/run_tests.py > "$RUNNER_TEMP/script-tests.log" 2>&1; then
+            tail -n 3 "$RUNNER_TEMP/script-tests.log"
+          else
+            tail -n 300 "$RUNNER_TEMP/script-tests.log"
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: script-tests-log
+          path: ${{ runner.temp }}/script-tests.log
+          retention-days: 7
+
+  msrv:
+    name: minimum Rust on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Read the declared minimum
+        id: msrv
+        run: echo "version=$(python3 -c "import tomllib;print(tomllib.load(open('Cargo.toml','rb'))['workspace']['package']['rust-version'])")" >> "$GITHUB_OUTPUT"
+      - name: Install it
+        run: rustup toolchain install "${{ steps.msrv.outputs.version }}" --profile minimal
+      - uses: Swatinem/rust-cache@v2
+      - name: Check the locked workspace
+        run: cargo +${{ steps.msrv.outputs.version }} check --workspace --all-targets --all-features --locked
+
+  runner:
+    name: build the suite runner
+    runs-on: ${{ vars.PARITY_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Install the pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: runner-release
+      - name: Build
+        run: cargo build --release --locked -p tsr_testrunner --bin tsr-testrunner
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tsr-testrunner
+          path: target/release/tsr-testrunner
+          retention-days: 1
+          if-no-files-found: error
+
+  parity:
+    name: ${{ matrix.suite }} ${{ matrix.shard }}
+    needs: runner
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { suite: compiler, shard: 1/4 }
+          - { suite: compiler, shard: 2/4 }
+          - { suite: compiler, shard: 3/4 }
+          - { suite: compiler, shard: 4/4 }
+          - { suite: compiler-concurrent, shard: 1/4 }
+          - { suite: compiler-concurrent, shard: 2/4 }
+          - { suite: compiler-concurrent, shard: 3/4 }
+          - { suite: compiler-concurrent, shard: 4/4 }
+          - { suite: transpile, shard: 1/1 }
+    runs-on: ${{ vars.PARITY_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: tsr-testrunner
+          path: runner
+      - name: Run the shard
+        run: |
+          chmod +x runner/tsr-testrunner
+          python3 scripts/parity.py run "${{ matrix.suite }}" --runner runner/tsr-testrunner --shard "${{ matrix.shard }}" --output "results/${{ matrix.suite }}/$(echo '${{ matrix.shard }}' | tr / -)"
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: parity-${{ matrix.suite }}-${{ strategy.job-index }}
+          path: results
+          retention-days: 7
+          if-no-files-found: error
+
+  parity-check:
+    name: parity check
+    needs: parity
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: parity-*
+          path: results
+          merge-multiple: true
+      - name: Compare with the expectation files
+        run: |
+          status=0
+          for suite in compiler compiler-concurrent transpile; do
+            python3 scripts/parity.py check "$suite" --results results/"$suite"/* || status=1
+          done
+          exit "$status"
