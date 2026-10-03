@@ -37,6 +37,10 @@ compiles less code, so re-run the real command before committing.
 Note that `cargo clippy --fix` rewrites `use super::*` and breaks test modules
 that relied on the parent glob. Add the explicit imports to `mod tests` instead.
 
+`tools/s08/relater-prototype` stays only as the dev-dependency of
+`tsr_compiler`'s relation-probe example `p7_relater`; the relater comparison is
+retired with Phase 0.
+
 ## Suite parity (docs/EVIDENCE-plan.md)
 
 `status/parity/<suite>.json` names every failing sub-test of a suite; CI runs
@@ -57,30 +61,6 @@ command-line scenarios of `data/phase4/scenarios.json.gz`, runner
 `<suite>/<configured name>`; the runner binary is `tsr-testrunner`
 (`crates/tsr_testrunner`), built in release by `run` and `list` (Cargo's
 reported executable; `--runner PATH` uses a prebuilt one, as CI does).
-
-## Comparing the relater implementations
-
-The comparison is over the 21 frozen fixtures in
-`data/s08/relater-fixtures.json`, five relation modes each, so 105 groups per
-implementation. Point `--output` at a scratch directory: the default
-`target/s08/relater` is the official capture directory and the owner's capture
-lives there.
-
-```sh
-python3 scripts/s08_relater.py build  --output "$SCRATCH/relater-parity"
-python3 scripts/s08_relater.py parity --output "$SCRATCH/relater-parity"
-```
-
-`parity` prints `matched`, `behavior_matched`, `unsupported` and
-`all_cases_match` for both `id` and `reference`. Both must reach 105/105 with
-`all_cases_match: true`, because the report derives `same_work` from that and
-withholds every ratio metric when it is false. `build` compiles the
-`p7_relater` example in both feature sets, which takes a few minutes.
-
-To exercise one program that is not in the frozen inventory, clone a frozen
-request and replace `source_hex`; `scripts/s08_relater.py` reads requests only
-from the frozen inventory, so ad-hoc programs are a development check and never
-evidence.
 
 ## Comparing the formatter and printer with Go
 

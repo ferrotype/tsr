@@ -1,1 +1,0 @@
-function f(x, xs) { outer: for (let i=0; i<3; i++) { if (x) continue outer; x++; if (i) break; } while(x) x--; do { x++; } while(x<2); for (x of xs) { if(x) break; } for (x in xs) continue; return x; }

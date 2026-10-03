@@ -1,1 +1,0 @@
-function f(x) { (()=>{ if(x) return; x=1; })(); (async()=>{ x=2; })(); (function*(){ x=3; })(); return this; } class C { constructor(x) { if(x) return; this.x=1; } static { if(x) throw 0; this.x=1; } m(){ return ()=>this; } }

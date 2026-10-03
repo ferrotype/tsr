@@ -1,28 +1,33 @@
 [package]
 name = "tsr_build"
-version = "0.1.0"
+version = "0.2.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
-publish = false
-description = "Project-reference build orchestration"
+publish = ["crates-io"]
+description = "Project-reference build orchestration (tsc -b) for tsr"
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme = "README.md"
+include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
-tsr_tsc = { path = "../tsr_tsc" }
-tsr_tsoptions = { path = "../tsr_tsoptions" }
-tsr_core = { path = "../tsr_core" }
-tsr_ast = { path = "../tsr_ast" }
-tsr_arena = { path = "../tsr_arena" }
-tsr_compiler = { path = "../tsr_compiler" }
-tsr_incremental = { path = "../tsr_incremental" }
-tsr_contentmapper = { path = "../tsr_contentmapper" }
-tsr_jsstring = { path = "../tsr_jsstring" }
-tsr_diagnostics = { path = "../tsr_diagnostics" }
-tsr_locale = { path = "../tsr_locale" }
-tsr_vfs = { path = "../tsr_vfs" }
-tsr_tspath = { path = "../tsr_tspath" }
-tsr_json = { path = "../tsr_json" }
-tsr_ipc = { path = "../tsr_ipc" }
+tsr_tsc = { version = "0.2.0", path = "../tsr_tsc" }
+tsr_tsoptions = { version = "0.2.0", path = "../tsr_tsoptions" }
+tsr_core = { version = "0.2.0", path = "../tsr_core" }
+tsr_ast = { version = "0.2.0", path = "../tsr_ast" }
+tsr_arena = { version = "0.2.0", path = "../tsr_arena" }
+tsr_compiler = { version = "0.2.0", path = "../tsr_compiler" }
+tsr_incremental = { version = "0.2.0", path = "../tsr_incremental" }
+tsr_contentmapper = { version = "0.2.0", path = "../tsr_contentmapper" }
+tsr_jsstring = { version = "0.2.0", path = "../tsr_jsstring" }
+tsr_diagnostics = { version = "0.2.0", path = "../tsr_diagnostics" }
+tsr_locale = { version = "0.2.0", path = "../tsr_locale" }
+tsr_vfs = { version = "0.2.0", path = "../tsr_vfs" }
+tsr_tspath = { version = "0.2.0", path = "../tsr_tspath" }
+tsr_json = { version = "0.2.0", path = "../tsr_json" }
+tsr_ipc = { version = "0.2.0", path = "../tsr_ipc" }
 
 [lints]
 workspace = true

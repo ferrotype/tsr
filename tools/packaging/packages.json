@@ -2,54 +2,6 @@
   "version": 1,
   "packages": [
     {
-      "name": "phase1_config",
-      "manifest": "tools/phase1/config/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "phase1_filesystem",
-      "manifest": "tools/phase1/filesystem/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "phase1_harness",
-      "manifest": "tools/phase1/harness/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "phase1_leaves",
-      "manifest": "tools/phase1/leaves/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only Phase 1 foundation test harness"
-    },
-    {
-      "name": "phase1_mutants",
-      "manifest": "tools/phase1/mutation/switch/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only Phase 1 mutation-witness tool"
-    },
-    {
-      "name": "phase1_mutation_driver",
-      "manifest": "tools/phase1/mutation/driver/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only Phase 1 mutation-witness tool"
-    },
-    {
-      "name": "phase1_mutation_splicer",
-      "manifest": "tools/phase1/mutation/splicer/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only Phase 1 mutation-witness tool"
-    },
-    {
-      "name": "phase1_syntax",
-      "manifest": "tools/phase1/syntax/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only Phase 1 syntax test harness"
-    },
-    {
       "name": "phase4_tsctests",
       "manifest": "tools/phase4/tsctests/Cargo.toml",
       "publish": false,
@@ -87,9 +39,15 @@
     },
     {
       "name": "tsr",
-      "manifest": "crates/tsr/Cargo.toml",
-      "publish": false,
-      "reason": "Native compiler implementation; binary publication is a separate release decision"
+      "manifest": "crates/tsr_facade/Cargo.toml",
+      "publish": true,
+      "reason": "Facade re-exporting the public libraries; a plain re-export until the embedding API settles"
+    },
+    {
+      "name": "tsrust",
+      "manifest": "crates/tsrust/Cargo.toml",
+      "publish": true,
+      "reason": "The compiler command line; installs the tsrust binary"
     },
     {
       "name": "tsr_api",
@@ -130,8 +88,8 @@
     {
       "name": "tsr_build",
       "manifest": "crates/tsr_build/Cargo.toml",
-      "publish": false,
-      "reason": "Phase 4 implementation; publication requires a separate release decision"
+      "publish": true,
+      "reason": "Rust library in the tsrust command line's public dependency closure"
     },
     {
       "name": "tsr_bundled",
@@ -170,12 +128,6 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
-      "name": "tsr_cpu_profile",
-      "manifest": "tools/s07/cpu-profile/rust/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
       "name": "tsr_diagnostics",
       "manifest": "crates/tsr_diagnostics/Cargo.toml",
       "publish": true,
@@ -196,8 +148,8 @@
     {
       "name": "tsr_execute",
       "manifest": "crates/tsr_execute/Cargo.toml",
-      "publish": false,
-      "reason": "Phase 4 implementation; publication requires a separate release decision"
+      "publish": true,
+      "reason": "Rust library in the tsrust command line's public dependency closure"
     },
     {
       "name": "tsr_format",
@@ -208,8 +160,8 @@
     {
       "name": "tsr_fswatch",
       "manifest": "crates/tsr_fswatch/Cargo.toml",
-      "publish": false,
-      "reason": "Phase 4 implementation; publication requires a separate release decision"
+      "publish": true,
+      "reason": "Rust library in the tsrust command line's public dependency closure"
     },
     {
       "name": "tsr_glob",
@@ -260,12 +212,6 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
-      "name": "tsr_memory_profile",
-      "manifest": "tools/s07/memory-profile/rust/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
       "name": "tsr_module",
       "manifest": "crates/tsr_module/Cargo.toml",
       "publish": true,
@@ -308,36 +254,6 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
-      "name": "tsr_s07_access_trace_native_verify",
-      "manifest": "tools/s07/performance-experiments/access-trace-native-verify/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "tsr_s07_bis_access_trace",
-      "manifest": "tools/s07/performance-experiments/access-trace/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "tsr_s07_bis_owner_census",
-      "manifest": "tools/s07/performance-experiments/owner-census/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "tsr_s07_bis_phases",
-      "manifest": "tools/s07/performance-experiments/phases/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "tsr_s07_storage_pilot",
-      "manifest": "tools/s07/performance-experiments/storage-pilot/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
       "name": "tsr_scanner",
       "manifest": "crates/tsr_scanner/Cargo.toml",
       "publish": true,
@@ -364,8 +280,8 @@
     {
       "name": "tsr_tracing",
       "manifest": "crates/tsr_tracing/Cargo.toml",
-      "publish": false,
-      "reason": "Phase 4 implementation; publication requires a separate release decision"
+      "publish": true,
+      "reason": "Rust library in the tsrust command line's public dependency closure"
     },
     {
       "name": "tsr_transformers",
@@ -382,8 +298,8 @@
     {
       "name": "tsr_tsc",
       "manifest": "crates/tsr_tsc/Cargo.toml",
-      "publish": false,
-      "reason": "Phase 4 implementation; publication requires a separate release decision"
+      "publish": true,
+      "reason": "Rust library in the tsrust command line's public dependency closure"
     },
     {
       "name": "tsr_tsoptions",
