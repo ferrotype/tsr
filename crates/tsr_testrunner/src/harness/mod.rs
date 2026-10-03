@@ -12,6 +12,7 @@
 //! | `subtests` | `compiler_runner.go:verifyUnionOrdering`, `verifyParentPointers`, `harnessutil.go:TracerForBaselining` |
 //! | `incremental` | `harnessutil.go:createProgram` and the test build-info reader |
 //! | `program_view` | the writers' `ProgramView` over a loaded program |
+//! | `recorder` | `recorderfs.go:OutputRecorderFS` |
 //! | `transpile` | `transpile_runner.go:runKind`, `appendTranspileSection` |
 //! | `config_host` | the `ParseConfigHost` over the in-memory file system |
 pub mod baselines;
@@ -20,6 +21,7 @@ pub mod errors;
 pub mod incremental;
 pub mod paths;
 pub mod program_view;
+pub mod recorder;
 pub mod subtests;
 pub mod transpile;
 pub mod typebaseline;

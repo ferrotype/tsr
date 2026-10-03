@@ -12,7 +12,7 @@
 //! variant and prints one result line per sub-test (`tsr_testrunner::result`);
 //! differing baselines are written under `--local`. The root defaults to
 //! the current directory and must hold `upstream/tsc/testdata`.
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use tsr_testrunner::baseline::Roots;
 use tsr_testrunner::enumerate::{self, CompilerTestType, Variant};
@@ -114,25 +114,22 @@ fn list(suite: &str, testdata: &TestData) -> Result<Vec<Variant>, Stop> {
     Ok(variants)
 }
 
-fn read(file: &std::path::Path) -> Result<Vec<u8>, Stop> {
-    std::fs::read(file).map_err(|error| {
-        Stop::fatal(format!(
-            "Could not read test file: {}: {error}",
-            file.display()
-        ))
-    })
+/// A test file's text as the pin's runners read it (a byte order mark
+/// hides a first-line directive otherwise).
+fn read(file: &Path) -> Result<Vec<u8>, Stop> {
+    enumerate::read_test_file(file)
 }
 
 fn run(
     arguments: &Arguments,
     id: &str,
-    local: &PathBuf,
+    local: &Path,
     testdata: &TestData,
 ) -> Result<Report, Stop> {
     let variant = enumerate::find_variant(testdata, id)?
         .ok_or_else(|| Stop::fatal(format!("no variant {id} in suite {}", arguments.suite)))?;
     let content = read(&variant.file)?;
-    let roots = Roots::new(testdata.reference(), local.clone());
+    let roots = Roots::new(testdata.reference(), local.to_path_buf());
     let mut report = Report::default();
     if variant.suite == "transpile" {
         transpile_runner::run_transpile_test(&variant, &content, &roots, &mut report);

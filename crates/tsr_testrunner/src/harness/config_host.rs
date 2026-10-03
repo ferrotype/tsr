@@ -4,9 +4,12 @@ use tsr_jsstring::JsString;
 use tsr_tsoptions::ParseConfigHost;
 use tsr_vfs::FileSystem;
 
-pub(super) struct Host {
-    pub(super) fs: Arc<dyn FileSystem>,
-    pub(super) cwd: JsString,
+/// `tsoptionstest.VfsParseConfigHost`: the in-memory file system of a test's
+/// units and its current directory, with the production config and
+/// content-mapper resolvers.
+pub struct Host {
+    pub fs: Arc<dyn FileSystem>,
+    pub cwd: JsString,
 }
 #[allow(
     clippy::needless_pass_by_value,

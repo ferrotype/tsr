@@ -29,6 +29,7 @@ tsr_contentmappertest = { path = "../tsr_contentmappertest" }
 tsr_core = { path = "../tsr_core" }
 tsr_diagnostics = { path = "../tsr_diagnostics" }
 tsr_incremental = { path = "../tsr_incremental" }
+tsr_ipc = { path = "../tsr_ipc" }
 tsr_json = { path = "../tsr_json" }
 tsr_jsstring = { path = "../tsr_jsstring" }
 tsr_locale = { path = "../tsr_locale" }

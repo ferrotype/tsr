@@ -12,7 +12,7 @@ use crate::harness::baselines::patience;
 use crate::result::Outcome;
 use std::path::{Path, PathBuf};
 
-// port: tsc/internal/testutil/baseline/baseline.go:NoContent
+// source: tsc/internal/testutil/baseline/baseline.go:NoContent
 pub const NO_CONTENT: &[u8] = b"<no content>";
 
 /// `baseline.Options`; the diff fix-ups only shape the diff text.
@@ -190,7 +190,7 @@ mod tests {
         );
         match run(&roots, b"b.js", b"new", options) {
             Outcome::Fail { reason, .. } => {
-                assert!(reason.contains("new baseline created"), "{reason}")
+                assert!(reason.contains("new baseline created"), "{reason}");
             }
             other => panic!("{other:?}"),
         }
