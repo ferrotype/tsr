@@ -86,20 +86,31 @@ pub fn configured_name(file: &[u8], configuration_name: &[u8]) -> (Vec<u8>, Vec<
 /// Harness port: tsc/internal/testrunner/transpile_runner.go:TranspileBaselineRunner.runTest.
 pub fn run_test(configuration: &Configuration<'_>) -> Result<Vec<Run>, String> {
     let (configured_name, extension) = configured_name(configuration.file, configuration.name);
-    let options = configuration.options;
-    let mut runs = Vec::new();
+    kinds(configuration.options)
+        .into_iter()
+        .map(|declaration| run_kind(&configured_name, &extension, configuration, declaration))
+        .collect()
+}
+
+/// The kinds `runTest` runs for these options, in its order: the module
+/// kind (`false`) unless `emitDeclarationOnly`, then the declaration kind
+/// (`true`) when `declaration`.
+pub fn kinds(options: &CompilerOptions) -> Vec<bool> {
+    let mut kinds = Vec::new();
     if !options.emit_declaration_only.is_true() {
-        runs.push(run_kind(
-            &configured_name,
-            &extension,
-            configuration,
-            false,
-        )?);
+        kinds.push(false);
     }
     if options.declaration.is_true() {
-        runs.push(run_kind(&configured_name, &extension, configuration, true)?);
+        kinds.push(true);
     }
-    Ok(runs)
+    kinds
+}
+
+/// One kind of the configuration's runs: the declaration kind when
+/// `declaration`, else the module kind.
+pub fn run_one(configuration: &Configuration<'_>, declaration: bool) -> Result<Run, String> {
+    let (configured_name, extension) = configured_name(configuration.file, configuration.name);
+    run_kind(&configured_name, &extension, configuration, declaration)
 }
 
 /// Harness port: tsc/internal/testrunner/transpile_runner.go:TranspileBaselineRunner.runKind.

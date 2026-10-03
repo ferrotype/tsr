@@ -19,9 +19,8 @@ pub trait Timing {
     fn pause(&mut self) {}
     fn resume(&mut self) {}
 }
-// Some shared harness binaries only use generate_with_timing.
-#[allow(dead_code)]
-struct NoTiming;
+/// No measurement interval: the test runner's walks.
+pub struct NoTiming;
 impl Timing for NoTiming {}
 
 struct Row {
@@ -191,6 +190,26 @@ struct Walker<'a, 'checkers, 'operation> {
 }
 impl Walker<'_, '_, '_> {
     fn baseline(&mut self, files: &[InputFile<'_>], header: &[u8], symbols: bool) -> Result<Value> {
+        let text = self.baseline_text(files, header, symbols)?;
+        self.timing.pause();
+        let result = match text {
+            None => json!({"state":"no_content"}),
+            Some(full) => json!({"state":"content","text_hex":hex(&full)}),
+        };
+        self.timing.resume();
+        Ok(result)
+    }
+
+    /// One kind of the walk: the `.types` text, or with `symbols` the
+    /// `.symbols` text; `None` is `<no content>`.
+    // port: tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:generateBaseline
+    // port: tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:iterateBaseline
+    fn baseline_text(
+        &mut self,
+        files: &[InputFile<'_>],
+        header: &[u8],
+        symbols: bool,
+    ) -> Result<Option<Vec<u8>>> {
         let mut output = Vec::new();
         for input in files {
             let path = tsr_tspath::to_path(
@@ -239,19 +258,57 @@ impl Walker<'_, '_, '_> {
             output.extend_from_slice(&decorated?);
             self.timing.resume();
         }
-        self.timing.pause();
         if output.is_empty() {
-            let result = json!({"state":"no_content"});
-            self.timing.resume();
-            return Ok(result);
+            return Ok(None);
         }
+        self.timing.pause();
         let mut full = b"//// [".to_vec();
         full.extend_from_slice(header);
         full.extend_from_slice(b"] ////\r\n\r\n");
         full.extend_from_slice(&output);
-        let result = json!({"state":"content","text_hex":hex(&full)});
         self.timing.resume();
-        Ok(result)
+        Ok(Some(full))
+    }
+}
+
+/// The pin's `typeWriterWalker` over the checkers a caller holds: each
+/// [`TypeWriterWalker::text`] is one `checkBaselines` walk, run in the
+/// order the caller runs the `type` and `symbol` sub-tests, on the same
+/// checkers, so a failed walk leaves the other kind to run.
+pub struct TypeWriterWalker<'a, 'checkers, 'operation> {
+    walker: Walker<'a, 'checkers, 'operation>,
+}
+
+impl<'a, 'checkers, 'operation> TypeWriterWalker<'a, 'checkers, 'operation> {
+    // port: tsc/internal/testutil/tsbaseline/type_symbol_baseline.go:newTypeWriterWalker
+    pub fn new(
+        program: &'a Program,
+        op: &'a mut tsr_compiler::FileCheckers<'checkers, 'operation>,
+        had_errors: bool,
+        trace: &'a mut Trace,
+        timing: &'a mut dyn Timing,
+    ) -> Self {
+        Self {
+            walker: Walker {
+                program,
+                op,
+                had_errors,
+                trace,
+                timing,
+                type_strings: Vec::new(),
+            },
+        }
+    }
+
+    /// The `.types` text of `files`, or with `symbols` their `.symbols`
+    /// text, under `header`; `None` is `<no content>`.
+    pub fn text(
+        &mut self,
+        files: &[InputFile<'_>],
+        header: &[u8],
+        symbols: bool,
+    ) -> Result<Option<Vec<u8>>> {
+        self.walker.baseline_text(files, header, symbols)
     }
 }
 

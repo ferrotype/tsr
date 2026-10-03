@@ -104,7 +104,7 @@ fn list(suite: &str, testdata: &TestData) -> Result<Vec<Variant>, Stop> {
         for file in enumerate::compiler_test_files(testdata, kind)? {
             let content = read(&file)?;
             for variant in enumerate::compiler_variants(&file, kind, &content)? {
-                match compiler_runner::prepare(variant.clone(), &content) {
+                match prepare(variant.clone(), &content) {
                     Ok(_) | Err(Stop::Fatal(_)) => variants.push(variant),
                     Err(Stop::Skip(_)) => {}
                 }
@@ -120,12 +120,22 @@ fn read(file: &Path) -> Result<Vec<u8>, Stop> {
     enumerate::read_test_file(file)
 }
 
-fn run(
-    arguments: &Arguments,
-    id: &str,
-    local: &Path,
-    testdata: &TestData,
-) -> Result<Report, Stop> {
+/// `newCompilerTest` up to the compilation; a panic there is the pin's
+/// `RecoverAndFail`: the variant fails instead of the process.
+fn prepare(variant: Variant, content: &[u8]) -> Result<compiler_runner::Prepared, Stop> {
+    let file = variant.file.display().to_string();
+    match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        compiler_runner::prepare(variant, content)
+    })) {
+        Ok(prepared) => prepared,
+        Err(payload) => Err(Stop::fatal(format!(
+            "Panic on compiler test {file}:\n{}",
+            compiler_runner::panic_message(payload.as_ref())
+        ))),
+    }
+}
+
+fn run(arguments: &Arguments, id: &str, local: &Path, testdata: &TestData) -> Result<Report, Stop> {
     let variant = enumerate::find_variant(testdata, id)?
         .ok_or_else(|| Stop::fatal(format!("no variant {id} in suite {}", arguments.suite)))?;
     let content = read(&variant.file)?;
@@ -135,7 +145,7 @@ fn run(
         transpile_runner::run_transpile_test(&variant, &content, &roots, &mut report);
         return Ok(report);
     }
-    match compiler_runner::prepare(variant.clone(), &content) {
+    match prepare(variant.clone(), &content) {
         Ok(prepared) => compiler_runner::run_single_config_test(
             prepared,
             testdata,

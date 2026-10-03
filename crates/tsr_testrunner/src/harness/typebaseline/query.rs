@@ -154,8 +154,6 @@ impl Walker<'_, '_, '_> {
                 self.trace.count("TypeToTypeNode");
             }
             self.timing.resume();
-            #[cfg(feature = "s08-phase-timer")]
-            let _display = super::instrument::Display::begin();
             let mut builder = self.op.current_mut().node_builder();
             let mut generated =
                 builder.type_to_type_node(typ, Some(parent), flags, ALLOW_UNRESOLVED_NAMES)?;
@@ -248,8 +246,6 @@ impl Walker<'_, '_, '_> {
         }
         let text = {
             self.timing.resume();
-            #[cfg(feature = "s08-phase-timer")]
-            let _display = super::instrument::Display::begin();
             self.op.current_mut().symbol_to_string_at(
                 symbol,
                 Some(parent),

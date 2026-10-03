@@ -161,6 +161,9 @@ impl Annotation<'_, '_> {
         Ok(())
     }
 }
+/// The `.errors.txt` text as JSON: `no_content` without diagnostics, else
+/// the text in hex. A failed coverage check of the pin's walk, or a
+/// diagnostic with code -1, is an error here.
 /// Harness port: tsc/internal/testutil/tsbaseline/error_baseline.go:GetErrorBaseline.
 pub fn render(
     program: &Program,
@@ -171,6 +174,37 @@ pub fn render(
     if diagnostics.is_empty() {
         return Ok(json!({"state":"no_content"}));
     }
+    let baseline = error_baseline(program, inputs, diagnostics, pretty)?;
+    if let Some(check) = baseline.failed_checks.first() {
+        return Err(check.clone().into());
+    }
+    if diagnostics.iter().any(|d| d.code == -1) {
+        return Err("native baseline critical assertion diagnostic -1".into());
+    }
+    let hex = hex(&baseline.text);
+    Ok(json!({"state":"content","text_hex":hex}))
+}
+
+/// What `GetErrorBaseline` composes: the text, and the messages of the
+/// pin's `assert.Check`s that failed on the way (the per-file and total
+/// diagnostic counts), which fail the test without stopping it.
+pub struct ErrorBaseline {
+    pub text: Vec<u8>,
+    pub failed_checks: Vec<String>,
+}
+
+/// `GetErrorBaseline` over a non-empty diagnostic list. The caller decides
+/// what a code -1 diagnostic means (`DoErrorBaseline` fails after
+/// comparing).
+// port: tsc/internal/testutil/tsbaseline/error_baseline.go:GetErrorBaseline
+// port: tsc/internal/testutil/tsbaseline/error_baseline.go:iterateErrorBaseline
+pub fn error_baseline(
+    program: &Program,
+    inputs: &[InputFile<'_>],
+    diagnostics: &[Diagnostic],
+    pretty: bool,
+) -> Result<ErrorBaseline> {
+    let mut failed_checks = Vec::new();
     let mut writer = DiagnosticWriter::new(
         program,
         FormattingOptions {
@@ -272,7 +306,11 @@ pub fn render(
             }
         }
         if marked != file_errors.len() {
-            return Err("native baseline per-file diagnostic coverage assertion".into());
+            failed_checks.push(format!(
+                "count of errors in {}: {marked} marked, {} in the file",
+                String::from_utf8_lossy(input.name),
+                file_errors.len()
+            ));
         }
         // dupeCase at the pin is never populated. Do not silently repair its
         // duplicate-input counting behaviour in the Rust comparison.
@@ -288,17 +326,20 @@ pub fn render(
             supplemental += usize::from(file.is_supplemental());
         }
     }
-    if state.non_library + libraries + configs + supplemental != sorted.len() {
-        return Err("native baseline total diagnostic coverage assertion".into());
+    let counted = state.non_library + libraries + configs + supplemental;
+    if counted != sorted.len() {
+        failed_checks.push(format!(
+            "total number of errors: {counted} counted, {} diagnostics",
+            sorted.len()
+        ));
     }
     if pretty {
         output.extend_from_slice(&remove_prefixes(&state.writer.error_summary(&sorted)?));
     }
-    if sorted.iter().any(|d| d.code == -1) {
-        return Err("native baseline critical assertion diagnostic -1".into());
-    }
-    let hex = hex(&output);
-    Ok(json!({"state":"content","text_hex":hex}))
+    Ok(ErrorBaseline {
+        text: output,
+        failed_checks,
+    })
 }
 
 /// The content-mapped files' baseline: each file's original and transformed
@@ -306,7 +347,7 @@ pub fn render(
 /// removed, which renders each against the text its span maps to. `None`
 /// when the program has no content-mapped files.
 /// Harness port: tsc/internal/testutil/tsbaseline/contentmapper_baseline.go:getContentMapperBaseline.
-#[allow(dead_code)]
+// port: tsc/internal/testutil/tsbaseline/contentmapper_baseline.go:getContentMapperBaseline
 pub fn content_mapper(program: &Program, diagnostics: &[Diagnostic]) -> Result<Option<Vec<u8>>> {
     let mut mapped = Vec::new();
     let mut out = Vec::new();
@@ -351,7 +392,7 @@ pub fn content_mapper(program: &Program, diagnostics: &[Diagnostic]) -> Result<O
     Ok(Some(out))
 }
 
-#[allow(dead_code)]
+// port: tsc/internal/testutil/tsbaseline/contentmapper_baseline.go:ensureTrailingNewline
 fn trailing_new_line(out: &mut Vec<u8>, text: &[u8]) {
     out.extend_from_slice(text);
     if !text.is_empty() && !text.ends_with(b"\n") {
@@ -360,7 +401,6 @@ fn trailing_new_line(out: &mut Vec<u8>, text: &[u8]) {
 }
 
 /// The pin's `\x1b\[[0-9;]*m` removed.
-#[allow(dead_code)]
 fn without_ansi_escapes(bytes: &[u8]) -> Vec<u8> {
     let mut out = Vec::with_capacity(bytes.len());
     let mut i = 0;
