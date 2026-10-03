@@ -1,12 +1,16 @@
 # Phase 5: language service, project system, LSP server
 
-Status: **proposed for owner review** (2026-10-03).
+Status: **amended after PR #82 review** (2026-10-03).
 The detailed implementation plan for [PLAN Phase 5](../PLAN.md#phase-5-language-service-project-system-lsp-server).
 Its checkpoints carry their own work items, witnesses and exit checks;
 production implementation starts at L0.
 
-Planning reference: `main` at `e3d7d435` (Phase 4 merged, #81). Upstream
-remains Corsa `1f70213d4922b434345f639b441681e470c7cfc1`.
+Planning reference: `main` at `a89193d2` (Phase 4, expectation files,
+Phase 0/1 harness retirement and 0.2.0 release preparation merged).
+The CLI package is now `tsrust` under `crates/tsrust`; package `tsr` under
+`crates/tsr_facade` is the public library facade. Scope counts below are the
+planning census at `e3d7d435`; L0 checks test discovery against the pin.
+Upstream remains Corsa `1f70213d4922b434345f639b441681e470c7cfc1`.
 
 ## 1. Outcome and starting point
 
@@ -39,7 +43,7 @@ and mapper streams over JSON-RPC but runs no compiler behind them.
 | The test-host transport | `tsr_testhost` (`--stdio`, `serve`, `Session`; framing, wire version 2, `callbackFS` semantics, options staging, mapper stream tunnel) | S11, ADR 0019: proves input continues while callbacks and streams wait; does **not** prove the synchronous file-system bridge from a blocked worker, parse-cache injection or real project options |
 | Project retention | `tsr_project::retention` | The S09/E3 ownership contracts for retained snapshots and bundles; no project system |
 | `lsutil` fragments | `tsr_ast`/`tsr_format` carry `asi.go` (7), `children.go` (5), `completednode.go` (4) and two `lsconv` functions | Ported for the formatter; markers in place |
-| Programs, checking, emit, incremental, watch | Phases 2 to 4 | `Program::load`, `CheckedProgram`, `CompilerCheckerPool`, `CancellationToken`, `CheckedProgram::emit`, `tsr_incremental`, `tsr_fswatch`, the watch manager (`tsr_tsc::watchmanager`), the mapper child process (`tsr::process`), `--lsp` and `--api` recognized by `tsrust` and refused with `NotImplemented` (Phase 4 decision 12) |
+| Programs, checking, emit, incremental, watch | Phases 2 to 4 | `Program::load`, `CheckedProgram`, `CompilerCheckerPool`, `CancellationToken`, `CheckedProgram::emit`, `tsr_incremental`, `tsr_fswatch`, the watch manager (`tsr_tsc::watchmanager`), the mapper child process (`crates/tsrust/src/process.rs`), `--lsp` and `--api` recognized by `tsrust` and refused with `NotImplemented` (Phase 4 decision 12) |
 | Source maps | `tsr_sourcemap` (T2) | The decoder and the document position mapper the service's `sourcedefinition.go` reads |
 | Content mappers | `tsr_contentmapper`, `tsr_ipc`, `tsr_jsonrpc`, `tsr_contentmappertest` | The host, the in-process fakes, and since Phase 4 the child-process spawner |
 | The pinned harnesses | `internal/fourslash` (5 files, 8,019 lines), `testutil/lsptestutil` (the in-process LSP client, 15 functions), `testutil/projecttestutil` (48 functions, with generated client and npm mocks) | Go; drive the Go server in process |
@@ -49,8 +53,8 @@ and mapper streams over JSON-RPC but runs no compiler behind them.
 | Suite | Count | Form |
 | --- | --- | --- |
 | fourslash | 4,355 test files, 4,548 test functions under `internal/fourslash/tests` (PLAN's 4,356 counts the files); 1,749 committed baselines under `testdata/baselines/reference/fourslash` | Go test bodies that open files, move to markers, edit, and verify a result (a list of completions, a quick-info text, a baseline file) against the in-process server |
-| project | 85 tests in `internal/project` | Direct assertions on sessions, snapshots, projects, watches, caches and the config registry, with mocked client and npm |
-| lsp | 30 tests in `internal/lsp` | The server over the in-process client: completions, progress, project info, project-reference updates, semantic tokens, content mappers, the dynamic queue, the stack sanitizer, replay |
+| project | 85 top-level tests in `internal/project`, plus tests in its subpackages | Direct Go-object assertions. Port these tests to Rust with their client, npm and clock mocks; a client transport patch cannot redirect them |
+| lsp | 30 top-level tests in `internal/lsp`, plus `lsproto` and `lspwatcher` tests | Mixed: client-driven server tests stay in Go over the transport patch; direct server, queue, progress, codec, sanitizer and watcher tests become Rust tests |
 | ls and helpers | 8 `ls`, 12 `autoimport`, 12 `lsutil`, 1 `change`, 7 `format` | Unit tests |
 | replay | `lsp/replay_test.go` with `-replay FILE` | A recorded editor session replayed against a server; no file is committed |
 
@@ -105,457 +109,605 @@ Phase 4.
   decision 3) is not proven.
 - Nothing drives the pinned fourslash suite against a Rust server.
 
-## 2. Scope and phase boundaries
+## 2. Implementation decisions
 
-| Area | Phase 5 responsibility | Boundary |
+### 2.1 What runs against Rust
+
+There are two test paths, chosen by what the assertion reads:
+
+| Test shape | Implementation | Result home |
 | --- | --- | --- |
-| `lsproto` | The LSP 3.17 types generated from the pinned meta model by a Rust generator (ADR 0015), `baseproto.go` framing, `jsonrpc.go`, `structcodec.go` | Phase 6's `api` protocol is separate; S11's framing is retired in favour of `lsproto`'s, keeping its contract tests |
-| `project` | Complete: `Session`, `Snapshot`, `SnapshotFS`, the overlay FS, the config-file registry and its builder, the project collection and its builder, `Project`, program counter, owner cache, parse cache, ref-count cache, file changes, watches with timeouts, the project checker pool, `dirty`, `background`, `logging`, `ata` | The compiler's `CheckedProgram` and pool are Phase 2's; `project/api.go` is ported here and exercised by Phase 6 |
-| `ls` | Complete: every feature file, `lsutil`, `lsconv`, `change`, `autoimport` | `format` is S09's and is consumed; `ls/api.go` is ported here and exercised by Phase 6 |
-| `lsp` | `server.go`, `dynamic_queue.go`, `progress.go`, `logger.go`, `stack_sanitizer.go`, `lspwatcher` | `--lsp` dispatch in `tsrust` exists (Phase 4); `runLSP`, the parent-process watchdog and `isProcessAlive` are ported here (Phase 4 left them `later` with this owner) |
-| The compiler remainder | `projectreferencedtsfakinghost.go` (`UseSourceOfProjectReference`, set only by `project/project.go`), the 19 `program.go` functions Phase 4's audit left to Phase 5 (project references, unresolved imports, package names, lib-file lookups) and the mapper's two | The rest of `program.go` is Phase 4's |
-| The test hosts | The carried harness patch, `tsrust --lsp`'s test-host extension, the project-test mock surface | The pinned Go suites stay the executable specification; no Rust rewrite of their bodies (PLAN) |
-| Acceptance | The fourslash run through the patch, the project and LSP suites, the replay corpus, the bridge contracts, the latency scenarios, the audit | The JS API suites are Phase 6's; the benchmark budgets are Phase 7's |
+| Fourslash test bodies and LSP tests that send client requests | Keep the pinned Go bodies and assertions. A carried transport patch connects their client to the private test-host entry point running the production `tsr_lsp` server | `status/parity/fourslash.json` and the client-driven part of `lsp.json` |
+| Tests that construct or inspect Go project/server objects | Port the bodies, mocks and assertions to Rust against the real Rust components | The owning crate's `cargo test` suite, with `// source:` references |
+| Replay sessions | A client adapter sends the same recorded actions to both servers and compares responses; it also checks the committed expected responses during ordinary CI | Replay variants in `lsp.json` |
 
-Six boundaries need explicit settling:
+This split is necessary. `project/checkerpool_test.go` calls `NewSession`
+and checks `pool.checkers[0]`; `snapshot_test.go` inspects cached files and
+object identity. `lsp/dynamic_queue_test.go` constructs `newDynamicQueue`
+directly. Patching `lsptestutil` or `projecttestutil` would leave those
+assertions testing Go. They cannot count as Rust passes that way.
 
-**How the fourslash suite drives Rust.** The pinned harness
-(`fourslash.go`) builds `lsp.ServerOptions{FS, DefaultLibraryPath, ParseCache,
-Spawn}` and hands them to `lsptestutil.NewLSPClient`, which runs
-`lsp.NewServer` in process over an in-memory pipe. Its test bodies are 4,548 Go
-functions with closures, so recording them as Phase 4 recorded `tsctests`
-is not an option. The plan's seam is the one PLAN and ADR 0019 reserved: a
-carried patch of `lsptestutil` (and the few `fourslash.go` lines that set the
-server options) that connects the client to a `tsrust --lsp --test-host`
-process over stdio instead of an in-process server, serving the test's file
-system through S11's `callbackFS` callbacks, its options through
-`test/initialize`, and its content-mapper fakes through the stream tunnel. The
-Go harness keeps asserting; the Rust server answers (decision 2).
+L0 lists each pinned test file and its route in `docs/PHASE5-tests.md`, with
+named exceptions within a mixed file and the checkpoint that implements it.
+Include the subpackages (`ata`, `dirty`, `background`, `logging`, `lsproto`,
+`lspwatcher`, `lsutil`, `lsconv`, `change`, `autoimport`, `format`); the
+planning table is not an exhaustive test roster. Preserve subtest assertions,
+not just top-level names. Existing Rust ports are reused by name. Unported
+unit tests remain explicit work in that document; they are not placeholder
+passing tests or permanent `#[ignore]` tests. L8 requires every routed unit
+test implemented or an owner-reviewed explanation of its equivalent coverage.
 
-**The parse cache.** The Go harness shares one `project.ParseCache` across
-every test in the package, so the bundled libraries parse once per process.
-A Rust server started per test would parse them 4,548 times. The patch
-therefore keeps one Rust server per Go test binary and ends each test with a
-`test/reset` that discards the session (projects, snapshots, open files,
-watches) and keeps the parse cache, as the Go variable does. `reset` is the
-test-host protocol's one Phase 5 addition (decision 3).
+ADR 0019's carried Go fourslash harness remains the semantic specification.
+Using Go as the client/assertion runner is the Phase 5 qualification to
+ADR 0023's no-Go statement for suites that already have Rust runners. It does
+not restore Go oracle captures, producers or source-freshness checks.
 
-**The synchronous bridge.** Go's project system calls its file system
-synchronously from worker goroutines; under the harness those calls become
-reverse requests to the Go client. S11 proved the router pumps while
-asynchronous callbacks wait and left the blocked-worker form to Phase 5. L1
-builds it: a worker blocked in `ReadFile` parks on a reply slot while the
-single-threaded router keeps reading, cancellation reaches the parked worker,
-and progress keeps flowing. Its contracts are the first L1 witness.
+### 2.2 The harness patch and the actual seams
 
-**Automatic type acquisition** runs npm as a child process. The pinned tests
-mock it (`npmexecutormock_generated.go`); production uses the real executor
-through Phase 4's process module. No test or producer touches the network
-(decision 8).
+Keep the patch under `tools/phase5/harness/`, applied to a disposable copy or
+through `go test -overlay`; never edit the pinned submodule. The adapter has
+`list`, single-case `run`, and batch execution, and implements the existing
+`parity.py` result format. Build its Go test executables and the Rust server
+once before running cases; compilation is not part of a case's deadline.
 
-**The `fourslash` package itself.** The ledger maps its five files to a crate
-`tsr_fourslash`. With the pinned harness driving, no Rust fourslash runner is
-needed for the gate. The test-data parser, baseline utilities and
-state-baseline writer (306 functions) are recorded `later` with Phase 7 as the
-owner, which decides whether a Rust-side runner is wanted for the dogfood
-period (decision 9); the ledger's crate name stays reserved.
+The production entry point is `tsrust --lsp`. The private harness owns a
+`phase5_testserver` entry point that instantiates that same `tsr_lsp` server
+with `tsr_testhost` adapters and the injected filesystem/cache/spawner. LSP
+and `test/` methods share its connection, as ADR 0019 requires. Keep service
+dispatch, project construction and requests in the production libraries;
+only injection, reset and state inspection live in the test adapter. This
+keeps the private `tsr_testhost` dependency out of the published `tsrust`
+closure. Also run ordinary-client smoke tests against `tsrust --lsp` itself;
+passing through the private entry point cannot substitute for a working CLI.
 
-**Strada-only behaviour.** `MarkTestAsStradaServer` and the triage files
-(`testdata/submoduleAccepted.txt`, 1,539 lines; `submoduleTriaged.txt`)
-describe where Corsa differs from Strada. They do not change the Rust gate:
-the committed references are Corsa's, and the Rust server matches Corsa. A
-Corsa behaviour the owner does not want reproduced is a divergence entry,
-never a silent allow-list item (decision 6).
+Port the seams used by the tests, not a shadow language service:
 
-## 3. Prerequisites and coordination
+- Replace `lsptestutil.NewLSPClient`'s in-process `lsp.NewServer` with the Rust
+  process connection. The Go side serves the injected filesystem and fake
+  mapper spawner through S11's callback and byte-stream interfaces.
+- Carry inferred-project options through `test/initialize`/`test/setOptions`.
+  Replace direct `Server.InitComplete()` waits with the corresponding
+  initialization notification, after the real `workspace/configuration`
+  exchange. A request's response remains the options-completion barrier.
+- Keep filesystem case sensitivity, symlinks, bundled libraries, cwd,
+  preferences and `runExternalCode` exactly as each test specifies. Preserve
+  the pin's fixture setup, including `@tsc` prebuilds; that setup is not a Go
+  language server answering requests on behalf of Rust.
+- Handle fourslash's direct state inspection too:
+  `statebaseline.go:printStateDiff` reads `Server.Session().Snapshot()`.
+  Add a test-only, read-only `test/projectState` projection of the real Rust
+  snapshot. It supplies the project/file/config data and stable identities
+  that the pinned state-diff writer reads. Adapt the writer's data access to
+  this projection; retain its sorting, diff rules and baseline bytes. Program
+  and source-file identity changes must not be replaced by content equality.
+  A Go-side projection of an actual Go snapshot must reproduce the original
+  writer's output before this path is used to judge Rust. Never construct a
+  second Go program or project system to supply Rust's state.
+- Audit remaining direct `client.Server` access. A lifecycle/state getter gets
+  an explicit seam; a test of internal Go behavior gets a Rust unit-test port.
+  There must be no accidental Go-server fallback in the Rust execution mode.
 
-Phase 5 consumes these contracts as they are, through their public entry
-points. A missing operation among them is a named joint blocker with an
-owner, not a Phase 5 patch:
+All semantic test bodies and their expectations stay unchanged. The patch
+changes transport and access to server-owned state. Baselines are compared by
+the pin's baseline code; the adapter reports the result and preserves `local/`
+output. A changed reference byte, a deliberately failed assertion, and a
+missing test result must each make the common parity check fail.
 
-| Contract | Owner | Phase 5 use |
+### 2.3 Batches, isolation and cache lifetime
+
+Choose **one Rust server per batch worker, one active test per worker**.
+Several workers/shards may run independently. This preserves a cache without
+sharing mutable sessions between tests.
+
+The existing `parity.py` launches one process per variant. L0 adds an optional
+batch capability there; existing compiler/tsc execution remains unchanged.
+For fourslash, each worker launches one compiled Go test binary for its
+selected test names with `-test.parallel=1`. The Go tests' `t.Parallel()`
+calls remain in place; the flag serializes active parallel tests, while
+concurrent requests and background work *inside* each server/test still run
+normally. Acquire the session only after the test resumes from `t.Parallel`;
+L0 must check that ordering at the harness entry points. Any case that starts
+server work before pausing runs in its own process, rather than holding a
+shared-session lease while paused. Nested subtests must finish before their
+session lease is released.
+
+The worker owns the Rust process and connection for the batch. Per-test Go
+clients attach to it through the adapter; closing one client releases its
+session instead of terminating the process. The adapter runs a reset barrier
+before the next test can initialize:
+
+1. Stop admitting work for the old session, cancel outstanding work and join
+   its tasks; drain or retire pending callbacks and mapper streams.
+2. Drop the session, projects, snapshots, overlays, watchers, checker pools,
+   options, capabilities, position encoding and per-client routing state.
+   Late replies cannot resolve a request of the next session.
+3. Keep only the explicitly injected parse cache. Its keys and invalidation
+   follow `project/parsecache.go`, including parse options, content and mapper
+   identity. The pin's test cache disables deletion; that policy is test-only.
+4. Acknowledge `test/reset`, then admit the next initialization. If cleanup
+   cannot finish within the deadline, kill the worker and start clean. Do not
+   continue with a partly reset process.
+
+Use the same server/session code for production requests. Reset and state
+inspection are available only through the private test entry point. Version
+and test the extension of S11's protocol; do not silently change its
+version-2 contract.
+Small LSP client tests may use one fresh process per case, especially when a
+case verifies shutdown or exit. They need no shared-cache optimization.
+
+Batch supervision is deliberately bounded. Read Go test events to identify
+an active top-level case (including `pause`/`cont`, not just `run`), enforce
+its deadline, and publish only completed case results. On a crash or timeout,
+mark that active case failed, preserve completed results and restart with
+only the unstarted cases. Kill/reap the Go process, Rust server and their
+children together. A startup failure with no identifiable case is a harness
+failure, not thousands of invented test outcomes; repeated startup failure
+stops the batch. Missing/duplicate/foreign result IDs still fail `parity.py`.
+
+L0 proves reset of the state it implements, timeout continuation and
+single-case/batch outcome equivalence. L1 adds real project/cache witnesses:
+two tests reuse a library parse; the second cannot observe the first's files,
+options, encoding or callbacks; changed text/options/mapper identity cannot
+reuse an incompatible parse. Establish these before enabling cache reuse
+across semantic tests. Measure this small working path before claiming any
+full-suite duration. There is no assumed ten-minute bound.
+
+### 2.4 Protocol generation and positions
+
+ADR 0015's pinned resolver is authoritative. The raw `metaModel.json` is not
+the complete Corsa protocol: `_generate/generate.mts` adds custom structures,
+requests, notifications, aliases and transformations, including
+`InitializationOptions` and content-mapper configuration.
+
+L0's pipeline is:
+
+1. Obtain the model version selected by the pin's `fetchModel.mts` and
+   package lock. Keep the exact external schema bytes and their source in the
+   generator's inputs so normal generation is offline and repeatable. This
+   is a code-generation input, not a recorded test run.
+2. Add a narrow JSON-export hook to a scratch copy of the pinned generator,
+   after its model augmentation and resolution. Export the normalized types,
+   inheritance, union/discriminator rules, methods and wire field behavior
+   needed by Rust. Do not reimplement that resolver in Rust.
+3. A Rust emitter under `tools/phase5/lsproto-gen` consumes that export and
+   writes `tsr_lsproto`'s generated types/codecs. Wire it into the existing
+   generation command; keep handwritten special codecs explicit.
+4. Check type/method/field coverage against the pin and port `lsp_test.go`,
+   `lsp_json_test.go` and `baseproto_test.go`. Include custom initialization
+   and mapper fields, absent/null/empty values, union alternatives, unknown
+   fields and field ordering; matching type names alone is insufficient.
+
+Port `baseproto`, `jsonrpc`, `structcodec` and `util`, reusing the existing
+transport/JSON implementation where it satisfies the same contract. Keep
+S11's retained Rust transport tests when replacing its framing implementation;
+do not restore the retired S11 Python producers. Its explicit
+strict-Unicode filesystem limitation remains visible (ADR 0019).
+
+Positions are **negotiated per initialized session** (ADR 0013). Match
+`server.go:handleInitialize`: default UTF-16, choose UTF-8 when the client
+offers it. The pinned fourslash harness offers UTF-8. Source offsets remain
+bytes internally; document sync, every request position and every returned
+range use that session's converter. Test UTF-8 and default UTF-16 on BMP and
+non-BMP text, combining characters, CRLF and edits before a marker. Reset
+must also reset this choice. Do not rewrite the Go client's advertised
+encoding to conceal a conversion bug.
+
+### 2.5 Ownership and remaining boundaries
+
+- Port the synchronous filesystem bridge first in L1: a worker waits on a
+  reply slot while the router continues reading. Cancellation, disconnect,
+  reset and normal completion each settle the slot once; progress can flow
+  while a worker is parked. No router lock may be held across the wait.
+- Port the project/session ownership graph, snapshot immutability, lazy
+  storage, mapper bundle lifetime and canceled checker disposal through the
+  existing public compiler contracts. Use production lifecycle tests, not
+  detached counter-only fakes.
+- Automatic type acquisition uses a mockable npm executor. Rust unit tests
+  retain the pinned mocks and fake time. Network access and real npm installs
+  are excluded from ordinary CI; an explicit manual integration test covers
+  the real executor. Replay fixtures supply their dependencies locally.
+- The Go fourslash parser and baseline writers remain the test harness;
+  Phase 5 does not create a Rust `tsr_fourslash` runner. Phase 7 may revisit
+  that choice for cut-over. This deferral does not cover the state projection
+  required above or any production language-service operation.
+
+## 3. Scope, prerequisites and coordination
+
+| Area | Phase 5 work | Existing dependency |
 | --- | --- | --- |
-| `Program::load`, `CheckedProgram`, `CheckerRequest`, `CompilerCheckerPool`, generation retirement, `CancellationToken` | Phase 2 | Every project's program and checker; the project pool is built over them; a request's cancellation token |
-| `CheckedProgram::emit`, `EmitOnly`, the write callback | Phase 3 | `getEmitOutput`, the API's emit (Phase 6), source-definition's declaration maps |
-| `tsr_sourcemap` decoder and document position mapper | Phase 3 | `sourcedefinition.go`, `source_map.go` |
-| `tsr_incremental` | Phase 3/4 | Not consumed by the server (the pin's language server does not read build info); listed to say so |
-| The watch manager and `tsr_fswatch`, the mapper child process, `System`, the signal scope, `--lsp` dispatch | Phase 4 | `lspwatcher`, `project/watch.go`, `runLSP`, content mappers in the server |
-| `ParseCommandLine`, `GetParsedCommandLineOfConfigFile`, the extended-config cache, wildcard directories, `ConvertToTSConfig` | Phase 1/4 | The config registry, `--showConfig` through the API, project options |
-| `tsr_format`, `tsr_api::printing`/`formatting` | S09 | Formatting requests, code-action text, the API's printing (Phase 6) |
-| `tsr_testhost` wire version 2: framing, `callbackFS`, options staging, streams | S11 (ADR 0019) | The test-host extension of `tsrust --lsp`; its contract tests keep passing |
-| `tsr_contentmapper` host and spawners | Phase 2 (C7.8), Phase 4 | Mapper projects in the server, the fakes the fourslash and LSP tests name |
+| Protocol and server | `tsr_lsproto`, `tsr_lsp`: generation, framing/codecs, initialization, request queue, cancellation, progress, logging, stack sanitizing, capabilities and watcher registration | `tsr_json`, S11 session/transport, Phase 4 native watcher/process/signal layer |
+| Projects | Extend `tsr_project`: sessions, snapshots, overlay FS, configured/inferred projects, config registry and builders, project collection, references, parse/ref-count caches, owner/program counters, checker pool, file changes, watch timeouts, background work, logging, ATA and API-facing methods | `Program::load`, `CheckedProgram`, compiler checker pool, generation retirement, cancellation, config parsing and resolver |
+| Language service | `tsr_ls`, `tsr_autoimport`: all feature files, `lsutil`, `lsconv`, `change`, auto-imports and API-facing methods | Checker/service operations, formatter, request-scoped printing, source maps and emit |
+| Compiler hand-overs | `projectreferencedtsfakinghost.go`, remaining project-facing `program.go` operations and mapper hand-overs from Phase 4 | Existing compiler/program implementation; no build-info dependency in the server |
+| Native entry point | Replace `--lsp` refusal in `tsrust`; port `runLSP`, parent-process watchdog and `isProcessAlive` | Phase 4 command dispatch and process layer |
+| Tests | Carried Go client harness; Rust ports of direct tests; existing parity/CI/performance tools | ADRs 0013, 0015, 0019 and 0023 |
 
-Coordination:
+There is no historical-capture prerequisite to L0 and no phase-end evidence
+refresh. Work from main, run focused tests for changed behavior, and let CI
+run the full applicable suites. Amend expectation files only from actual
+results, preserving reasons and owner approvals. Do not regenerate the
+ledger or any retired inventory because a marker moved. Update existing
+ledger status/Rust homes as ports land, within `cargo xtask validate`'s rules;
+`later` is a planning disposition in this document, not a new ledger status.
 
-- **Phase 4's green-up first.** Every recorded run is stale after #81; the
-  re-freezes and re-recordings (`docs/PHASE4-X0.md`, the X7 witnesses) are the
-  owner's and precede L0's own recordings. L0 can start before they finish:
-  it adds files and does not touch `crates/**` beyond the new crates.
-- **Phase 6 overlaps the tail.** `ls/api.go` and `project/api.go` are Phase
-  5's ports; Phase 6 exercises them. Phase 6 can start at L6 against L1's
-  project system and L3's read-only features.
-- **One ledger regeneration** at L0: `format` and the `lsutil` fragments read
-  `ported`, `fourslash` reads `later` (decision 9), the Phase 4 `later`
-  functions move to their L checkpoints. Later moves wait for L8.
-- **Staleness is expected mid-phase.** Every change under `crates/**` stales
-  the recorded `checker`, `emit` and `tsc` runs. Nothing is re-recorded per
-  fix; L8's green-up re-records what is stale (decision 12).
-- **Recorded inputs are not edited.** The phase1 to phase4 scripts and oracles
-  stay as they are; Phase 5 adds `scripts/phase5_*.py` and
-  `tools/phase5/**`.
-- **The shared checkout.** Phase 5 develops on its own branch; units that
-  edit the same crate work on disjoint files and the integrator commits.
+The retired Phase 0/1 harness crates and scripts are not dependencies to
+resurrect. The current parity, generation and perf commands are the tooling
+base. Respect the 0.2.0 packaging split: production dependencies belong to
+the public closure and test adapters remain private. In particular, keep the
+compiler's reverse development dependency on `tsr_project` path-only while
+the project system gains its normal compiler dependency; do not reintroduce
+the release-order cycle removed by #88.
 
-## 4. Delivery order
+A missing dependency is part of the implementation task when it can be fixed
+faithfully through the existing API. Make the change and its regression test
+in a separate commit; seek owner input only for a real behavior, dependency
+or scope decision. Phase ownership is not a reason to stop at a routine
+cross-crate fix. Phase 6 may begin after the session/service API it consumes
+is stable; implementing `project/api.go` and `ls/api.go` belongs here.
 
-Checkpoints are **L0 to L8** (L for the language service; C, E, F, P, S, T
-and X are taken). Each pairs its witnesses with its production work and
-verifies the combined result; L0 is preparation only. The order follows the
-dependency graph:
+## 4. Delivery order and completion rules
+
+L0 establishes the working protocol and test path; it includes production
+skeleton code, but claims no language-service parity. L1 builds project
+ownership and the bridge; L2 connects the server; L3 to L5 implement features;
+L6 completes cross-project/ATA/mapper behavior; L7 closes remaining failures
+and measures latency; L8 documents completion.
 
 ```text
-L0 ─ L1 ─ L2 ─┬─ L3 ─┐
-              ├─ L4 ─┼─ L6 ─ L7 ─ L8
-              └─ L5 ─┘
+L0 -> L1 -> L2 -> L3 / L4 / L5 -> L6 -> L7 -> L8
 ```
 
-L3, L4 and L5 are independent feature blocks over the same server and can run
-in parallel. L6 completes the project system (cross-project, type
-acquisition, mappers) that only a minority of tests need; L7 is the long
-tail; L8 closes.
+This is dependency order, not a ban on implementing a shared helper or a
+small later-checkpoint dependency early. Feature blocks share code and need
+integration review; their names do not imply fully disjoint implementations.
 
-A checkpoint is complete when every test assigned to it passes or is on the
-triaged allow-list. Before a feature exists, its tests read `unsupported` under
-the register entry for the checkpoint that ports it, never `failed`.
+Before an implementation exists, the end-to-end case is a **failure with a
+named missing-operation reason** in the ordinary expectation file. The wire
+format remains `pass|fail|skip`; there is no new `unsupported` success or
+untracked denominator. A Go-native skip keeps its reason and does not count
+as a Rust semantic pass. L0 identifies native skips separately; unexpected
+skips are harness failures, not a way to reduce the phase's failure count.
 
-### L0 — the service acceptance contract
+Each checkpoint's assigned work must be implemented and its unit tests pass.
+A green CI run with thousands of expected failures does not itself complete
+a checkpoint. Unresolved failures stay named; move a task to a later
+checkpoint only with a concrete dependency, not to make an exit look green.
+At L7, only the owner-approved, bounded final exceptions of section 5 may
+remain. Routine commits need focused checks, not a local full-suite rerun.
 
-Preparation only; no Rust service parity is claimed.
+### L0 — working protocol and acceptance path
 
-- **Exists:** the pinned suites; `tsr_testhost` and ADR 0019; the overlay
-  pattern of `scripts/phase4_scenarios.py`; `scripts/parity.py` and its
-  result-line contract; the `tsc` suite as the model of a runner over
-  recorded Go-side data.
-- **Build:**
-  - *`tsr_lsproto`.* The generator (`tools/phase5/lsproto-gen`, a Rust
-    program reading the pinned `metaModel.json` the Go `_generate` reads) and
-    its output `lsp_generated.rs`, bound to the model's digest; `baseproto`,
-    `jsonrpc`, `structcodec`, `util` ported with markers. L0 needs the types
-    to speak `initialize`.
-  - *The server skeleton.* `tsr_lsp::Server` over `lsproto`: `initialize`,
-    `initialized`, `shutdown`, `exit`, document sync accepted, every other
-    request answered with a named refusal (`lsp.Server is Phase 5 L2`) as a
-    typed error, never a panic; `tsrust --lsp` runs it; `--test-host` adds
-    the S11 surface (`test/initialize`, `test/setOptions`, `callbackFS`, the
-    mapper stream tunnel) and the new `test/reset`.
-  - *The carried harness patch.* `tools/phase5/harness/`: unified diffs of
-    `testutil/lsptestutil/lspclient.go` (connect to the Rust process instead
-    of `lsp.NewServer`; serve the test's `vfs` through `callbackFS`; forward
-    options; tunnel the spawner), of the `fourslash.go` lines that build the
-    server options, and of `projecttestutil` where the project tests need the
-    same redirection; each diff headed with the pinned file's hash, applied
-    by `scripts/phase5_harness.py` into a scratch tree (`go test -overlay`),
-    the Rust binary path and the test-host wire carried in the environment.
-    One Rust process per Go test binary, `test/reset` between tests.
-  - *The inventory.* `scripts/phase5_inventory.py record`: the 4,548 fourslash
-    test functions with their file, the verifiers each calls (by the
-    `f.Verify*`/edit tally above), the features that implies, the baselines
-    each writes (1,749), the `MarkTestAsStradaServer` flag, the global options
-    (`@Filename`, `@module`, ...) parsed by the pin's `test_parser.go` (an
-    overlay logs them), and the 153 project, lsp, ls, autoimport, lsutil,
-    change and format tests with their packages; each test gets its first
-    checkpoint from its features. Recorded as `data/phase5/inventory.json.gz`
-    with provenance; verified by a second identical recording.
-  - *The first run.* The patched suites against the skeleton: every fourslash
-    test reads `unsupported` at `lsp.Server is Phase 5 L2`; the Go harness's
-    own assertions on connection, initialization and file-system callbacks
-    pass, which is the first proof that the bridge carries a real client. The
-    result rows are the Go test outcomes (`pass`, `fail` with the first
-    assertion message, `unsupported` with the operation, `skip` with the
-    reason), parsed from `go test -json`, one per test, never blank.
-  - *The comparison and register.* `scripts/phase5_compare.py report`: per
-    test the outcome, per baseline the whole-file match against the committed
-    reference (the pin writes `local/` copies the harness diffs; the patch
-    captures them), the summary by suite, feature and checkpoint; mutation
-    checked (a forced assertion failure, a changed reference byte and a
-    dropped baseline must each read `fail`/`different`).
-    `scripts/phase5_blockers.py`: one entry per cause with owner by feature.
-  - *The audit.* `scripts/phase5_audit.py` over the 130 files, seeded with
-    `format` and the `lsutil` fragments as `mapped`, `fourslash` as `later`
-    (decision 9), the generated files as `generated`, and the Phase 4
-    hand-overs.
-  - *The bridge contracts.* `tsr_testhost`'s S11 contracts re-run against
-    `tsrust --lsp --test-host` so the production endpoint, not the prototype,
-    holds them.
-  - *Wiring.* The `fourslash` and `lsp` suites in `scripts/parity.py` and
-    `ci.yml` (sharded like the compiler suites), `data/phase5/` for the
-    carried patch and the recorded inventory, the L0 record
-    (`docs/PHASE5-L0.md`).
-  - *Cost.* The patched suite's time against the skeleton and the pinned
-    suite's own time.
-- **Exit:** `status/parity/fourslash.json` and `lsp.json` accepted from a
-  full run with every entry explained; the bridge contracts in `cargo test`;
-  CI green on the pull request.
+1. Implement the generation pipeline in section 2.4 and its wire tests. Add
+   `tsr_lsproto`, the `tsr_lsp` skeleton and the harness/emitter tooling.
+   Register production crates in the publication policy and dependency-first
+   release order at the workspace's lockstep version; harness/emitter crates
+   stay private. This changes package metadata, not registry publication.
+   The binary remains `tsrust`; do not add CLI code to the `tsr` facade.
+2. Support `initialize`, `initialized`, `shutdown`, `exit`, S11 test-host
+   setup/options/streams and the lifecycle reset. Other requests fail by name
+   through a typed error, not a panic. A not-yet-implemented state projection
+   is also an explicit failure until L1 connects real snapshots.
+3. Implement the carried client patch, initialization barrier and common
+   result adapter in `tools/phase5/harness/`. Add the optional batch path to
+   `scripts/parity.py`, plus tests for single/batch equivalence, deadlines,
+   restart, incomplete output and session isolation. Keep the ordinary
+   single-case path for `--id` debugging.
+4. Separate direct Go-object tests from transport-driven ones in
+   `docs/PHASE5-tests.md`. Derive executable case names from the pinned test
+   binaries; route the direct tests to their Rust crate/checkpoint. Include
+   all relevant subpackages. The list is implementation work allocation,
+   not a generated coverage/evidence register.
+5. Keep baseline comparison in the pinned writer. Prototype the read-only
+   state projection and the Go writer's adapted input against a native
+   session: initial state, file edit, changed program identity, project
+   removal and config changes must reproduce the existing text exactly.
+6. Demonstrate a real Rust endpoint with initialization, option completion,
+   filesystem callbacks, case sensitivity, symlinks and fake mapper bytes.
+   Check that Rust mode cannot instantiate the Go language server. Prove
+   reset of the implemented state with two small tests before a batch of the
+   corpus. Actual project/cache reuse waits for L1's witnesses.
+7. Add `fourslash` and transport `lsp` suites to the existing CI/parity tool;
+   Go is installed for this client harness. Rust unit tests remain in the
+   workspace test job. The adapter returns assertion/baseline failures even
+   though Go's test binary exits nonzero on an ordinary failing test; process
+   crashes and missing outcomes remain distinct harness failures.
+8. Run the complete initial suite once, accept its exact failing set and
+   explain missing features by checkpoint. Keep logs/local baselines as CI
+   artifacts. Note preparation/build time and test time separately. Do not
+   run a second copy merely to authenticate a recording.
 
-### L1 — the project system
+**Exit:** the real endpoint and adapter work; transport and batch regression
+checks pass; CI exercises both new expectation files. A skeletal server must
+not yield semantic passes merely because initialization succeeded.
 
-- **Exists:** `Program::load`, the checker pool, retention contracts, the
-  config parsing, the watch manager, `tsr_project::retention`.
-- **Build:** `tsr_project` complete: `Session` (the request entry: open,
-  change, close, `GetLanguageService`, `WaitForBackgroundTasks`), `Snapshot`
-  and `SnapshotFS`, the overlay FS over the Phase 1 file systems, the
-  config-file registry and builder, the project collection and builder
-  (inferred and configured projects, default project selection, project
-  references), `Project` with its program, `programcounter`, `ownercache`,
-  `parsecache`, `refcountcache`, `filechange`, `watch.go` with timeouts, the
-  project `checkerpool` (its disposal of a canceled checker was C7's hand-over),
-  `compilerhost`, `snapshothost`, `client.go` (the server callbacks the
-  session needs: configuration, watchers, publishing), `dirty` (the
-  copy-on-write maps), `background` (the queue), `logging` (collector, logger,
-  tree), `extendedconfigcache` (shared with Phase 4's), and the compiler
-  hand-overs that projects call. The synchronous bridge: a worker blocked in a
-  file-system call parks on its reply slot while the router pumps;
-  cancellation unparks it with the token's error; progress is reported while
-  it waits.
-- **Witnesses:** the 85 project tests through the patched `projecttestutil`
-  (their mocked client and npm stay mocks); E3's ownership contracts repeated
-  through sessions and snapshots (an opened file's storage is released when
-  the snapshot that holds it is dropped; a project's program and checkers are
-  released with the project; a mapper bundle is disposed with its project;
-  generation retirement after a panic in one snapshot leaves other snapshots
-  working) as `l1-contracts`; the bridge contracts (blocked worker, reverse
-  request, cancellation, progress) as recorded facts; fourslash tests that
-  only open files and verify diagnostics counts (`VerifyNoErrors`,
-  `VerifyNumberOfErrorsInCurrentFile`) through the server's publish path.
-- **Exit:** the 85 project tests pass in `lsp.json`; the ownership tests in
-  `cargo test`; the bridge facts true.
+### L1 — project ownership, snapshots and the synchronous bridge
 
-### L2 — the server
+1. Port the core `Session`, snapshot/overlay filesystem, config registry and
+   builders, configured/inferred project selection, program construction,
+   parse/ref-count caches, owner/program counters, checker pool, file changes,
+   project watches/timeouts, dirty maps, background queue and logging. Bring
+   in compiler hand-overs as callers need them.
+2. Port direct core project tests to Rust with the same observations: old
+   snapshots stay unchanged, identity is reused only where Go reuses it,
+   caches release on the same lifecycle transitions, configuration changes
+   select the same projects, checker request affinity and idle cleanup hold.
+   Use controllable clocks/notification barriers in timeout tests. Tests
+   needing ATA, cross-project or mapper support are explicitly assigned L6.
+3. Connect synchronous FS calls to the router's reply slots. Test delayed
+   reads, several blocked workers, progress, cancellation, disconnect, reset
+   and late replies. The router continues to drain both directions; canceled
+   requests do not leak slots or strand workers.
+4. Wire options application and `test/projectState` to the actual session.
+   Match the pinned state-baseline writer through the data projection, with
+   identity tokens that preserve its equality tests. Keep snapshot reads
+   consistent with the preceding acknowledged client actions.
+5. Repeat ownership/disposal and panic-retirement tests through real sessions:
+   retained snapshots and bundles remain usable, their final drop releases
+   storage, and one retired generation does not invalidate another project.
+   Include the test-cache lifetime as a separate deliberate retention case.
+6. Prove the real cross-test parse reuse and invalidation cases in section
+   2.3, then enable the retained-cache batch path for semantic tests.
 
-- **Exists:** L0's skeleton, L1's session, Phase 4's watch manager and
-  mapper spawner.
-- **Build:** `tsr_lsp` complete: `server.go` (the handler table, request
-  dispatch to the session's language service, document sync, diagnostics
-  publishing, `workspace/configuration`, watched-file notifications,
-  `initialize` capabilities exactly as the pin's), `dynamic_queue.go` (the
-  request queue with its cancellation and ordering rules), `progress.go`,
-  `logger.go`, `stack_sanitizer.go`, `lspwatcher` over the Phase 4 watch
-  manager, `lsconv` (converters, line maps, UTF-16 positions by ADR 0013),
-  `runLSP` with the parent-process watchdog and `isProcessAlive` in `tsrust`.
-  The service surface is `tsr_ls::LanguageService` with every method present
-  and refusing by name until its checkpoint.
-- **Witnesses:** the 30 lsp tests through the patch (the dynamic queue,
-  progress, project info, project-reference updates, the stack sanitizer, the
-  content-mapper server tests, `server_completion_test` once L4 lands); the
-  replay runner against a first recorded session (decision 7); fourslash
-  tests that only exercise sync and diagnostics.
-- **Exit:** the lsp tests pass except those naming an L3 to L6 feature, which
-  stay in `lsp.json` with that reason.
+**Exit:** assigned core project/bridge Rust tests pass and the state projection
+is faithful. Do not claim all 85 project tests pass while L6 work remains.
+Protocol-level diagnostics checks are added when L2's publishing path exists.
+
+### L2 — server behavior and negotiated conversions
+
+1. Port dispatch, document sync, configuration exchange, diagnostics publishing,
+   capabilities, dynamic queue, cancellation/ordering, progress and logging.
+   Connect the project session rather than creating a parallel test model.
+2. Port direct LSP internal tests to Rust: queue ordering and cancellation,
+   progress state, server recovery/logger internals, stack sanitizing and
+   content-mapper configuration parsing. Port `lsconv` tests and verify
+   negotiated UTF-8/default UTF-16 on non-ASCII document changes and ranges.
+3. Implement `lspwatcher` and dynamic client watcher registration, including
+   the native fallback when the client lacks registration support. Port its
+   fake-backend tests and keep real-backend checks on the applicable hosts.
+4. Implement `runLSP`, shutdown/exit and the parent watchdog in the native
+   `crates/tsrust` entry point. Explicitly test orderly cleanup and parent
+   disappearance. Run an ordinary client against that binary through
+   initialize, open/edit, diagnostics, one service request and shutdown;
+   compare its responses with the private test entry point on the same files.
+5. Run client-driven Go tests over the patched transport: initialization,
+   options, progress, project info and document sync. Preserve feature failures
+   until L3 to L6 implement them; direct unit tests never enter `lsp.json`.
+
+**Exit:** assigned server/unit tests pass; the endpoint dispatches into the
+real session, and remaining protocol failures name their missing feature.
 
 ### L3 — read-only features
 
-In fourslash weight order: hover and quick info (533 files; `hover.go`,
-`hovericon.go`, `displaypartswriter.go`, `symbol_display.go`), find all
-references and document highlights (507; `findallreferences.go`,
-`documenthighlights.go`, `importTracker.go`), go to definition,
-implementation and source definition (332; `definition.go`,
-`sourcedefinition.go`, `source_map.go`), document and workspace symbols
-(84; `symbols.go`), signature help (82), inlay hints (64), semantic tokens
-(45), call hierarchy (39), selection ranges (37), folding, code lens, linked
-editing, `diagnostics.go` with suggestion diagnostics (37) and the
-`VerifyBaseline*` writers' exact text shapes.
+Implement hover/quick info and symbol display (`hover.go`, `hovericon.go`,
+`displaypartswriter.go`, `symbol_display.go`); references/highlights
+(`findallreferences.go`, `documenthighlights.go`, `importTracker.go`);
+definition/implementation/source definition and source maps; document and
+workspace symbols; signature help; inlay hints; semantic tokens; call
+hierarchy; selection ranges; folding; code lens; linked editing; diagnostics
+and suggestion diagnostics. Port shared `lsutil`/`lsconv` helpers as needed.
 
-- **Witnesses:** the fourslash tests whose primary verifier is one of these,
-  and the 1,749 baselines they write, compared whole with the committed
-  references.
-- **Exit:** every L3 test passes or stays in `fourslash.json` with a reason.
+Use the primary-verifier families from section 1 to select focused cases,
+including edits between requests, cross-file results, cancellation and both
+position encodings. Baseline writers stay in Go; Rust returns the real
+service results. Port relevant direct `ls` and helper tests alongside code.
+
+**Exit:** assigned features and unit tests work; end-to-end failures are fixed
+or explicitly dependent on the named L4 to L6 work. A reason alone does not
+turn an unimplemented L3 operation into completed work.
 
 ### L4 — completions and auto-imports
 
-`completions.go` (the largest file of `ls`), `string_completions.go`,
-`jsdoc.go`, `jsdoc_snippet.go`, `autoinsert.go`, `constants.go`, and the
-`autoimport` package complete: `index.go`, `registry.go`, `export.go`,
-`extract.go`, `view.go`, `aliasresolver.go`, `specifiers.go`, `fix.go`,
-`import_adder.go`, `util.go`; `codeactions_importfixes.go`;
-`VerifyApplyCodeActionFromCompletion`.
+Implement `completions.go`, `string_completions.go`, JSDoc completions/snippets,
+`autoinsert.go`, constants, import fixes and the complete `autoimport`
+package (`index`, `registry`, `export`, `extract`, `view`, `aliasresolver`,
+`specifiers`, `fix`, `import_adder`, `util`). Implement completion resolution
+and applying its code action, not just the initial list.
 
-- **Order sensitivity:** completion lists are sorted by the pin's comparators
-  and `sortText`; the index is built from the program's exports in the pin's
-  order. ADR 0010 applies: the comparators are ported, not re-derived, and
-  the first L4 witness is the completion ordering over a sample of 200 tests
-  before the bodies are chased.
-- **Witnesses:** the 1,111 completion tests, the 231 import-fix tests, the
-  27 JSDoc completion tests, the 75 apply-code-action tests, the 12
-  `autoimport` unit tests.
-- **Exit:** every L4 test passes or stays in `fourslash.json` with a reason.
+Port the pinned comparators and `sortText` rules (ADR 0010). Start with the
+completion-ordering cases and a bounded sample, then expand to the 1,111
+completion, 231 import-fix, 27 JSDoc and apply-action families. Those planning
+family counts overlap; they are not added to create a denominator. Include
+the direct auto-import tests and invalidation after edits/config changes.
+
+**Exit:** the assigned completion/import features and unit tests pass; pending
+multi-project/ATA behavior has an explicit L6 dependency.
 
 ### L5 — edits
 
-Rename (148 files; `rename.go`, `file_rename.go`), code actions and fixes
-(270 plus 97 not-available checks; `codeactions.go` and the four fixer
-files), organize imports (62; `organizeimports.go` with its comparer, the
-Unicode normalization dependency ADR 0017 anticipated), formatting requests
-over `tsr_format` (164; `format.go`, `formatcodeoptions.go`), the change
-tracker (`ls/change`: `tracker.go`, `trackerimpl.go`, `delete.go`), and the
-edit-and-verify tests (`Insert`, `Backspace`, `VerifyCurrentFileContent`,
-`VerifyRangeAfterCodeFix`).
+Implement rename and file rename; code actions/fixes; organize imports and
+its pinned Unicode normalization comparer; formatting over `tsr_format`;
+formatting options; and the change tracker (`tracker`, `trackerimpl`,
+`delete`). Apply changes and verify resulting contents, not just edit counts.
 
-- **Witnesses:** the fourslash tests named above, the `change` and `format`
-  unit tests, and the text edits compared against the pin's exact
-  `TextEdit` ranges and texts (positions in UTF-16 code units).
-- **Exit:** every L5 test passes or stays in `fourslash.json` with a reason.
+Use the rename, code-fix, organize-imports, formatting and edit/verify
+fourslash families, plus direct `change`/`format` tests. Compare exact text
+and ranges in the **negotiated** encoding. Include edit ordering, overlapping
+changes where the pin rejects them, non-BMP identifiers, CRLF and cancellation.
 
-### L6 — the project system's long reach
+**Exit:** assigned edit behavior and unit tests pass; retained exceptions
+require the same explicit disposition as other feature work.
 
-`crossproject.go` and the project-reference program tests, `project/ata`
-(discover typings, types map, package-name validation, the npm executor
-behind a trait, mocked in tests), `projectreferencedtsfakinghost.go`,
-content mappers in the server (`server_contentmapper_test`,
-`contentmapper_test`, the `verbatim`, `dynamic-verbatim` and `manifest`
-fakes Phase 4 left), config-file changes, custom config names, untitled and
-dynamic files, project lifetime, bulk cache, watch timeouts, `project/api.go`
-and `ls/api.go` for Phase 6.
+### L6 — cross-project, ATA and mapper completion
 
-- **Witnesses:** the remaining project and lsp tests; the fourslash tests
-  with `@tsc` build directives and multi-project setups; the mapper
-  lifecycle tests.
-- **Exit:** the project and lsp suites pass whole (`lsp.json` empty).
+Finish `crossproject.go`, project-reference source redirection and
+`projectreferencedtsfakinghost.go`, config changes/custom names, untitled and
+dynamic files, project lifetime, bulk cache and watch timeouts. Complete ATA
+(discovery, types map, package validation and mockable npm execution), mapper
+projects and lifecycle, and `project/api.go`/`ls/api.go` for Phase 6.
 
-### L7 — the long tail
+Complete the deferred direct project/ATA tests with Rust mocks. Run the
+client-driven project-reference and mapper tests, fourslash `@tsc` and
+multi-project cases, state baselines and mapper cancellation/disposal tests.
+Use the actual mapper host over S11's stream tunnel. A client/server failure
+must not leave an external child or leased bundle behind.
 
-Everything the inventory still reads `fail` for: the per-feature residuals
-chased in descending count, the allow-list triaged with the owner (each entry
-names the test, the pinned behaviour, the Rust behaviour and the reason it is
-retained), the replay corpus against both servers (decision 7), the latency
-scenarios (decision 10).
+**Exit:** every project/internal LSP unit-test port assigned to this phase
+passes; transport LSP cases pass. Replay variants still being prepared in L7
+remain explicit pending cases, not claimed complete here.
 
-- **Exit:** `fourslash.json` holds at most 22 entries, each with a reason;
-  the replay corpus replays identically; the latency run shows no regression.
+### L7 — residuals, replay and latency
+
+1. Fix remaining fourslash failures by shared cause and then individual case.
+   Read the existing expectation entries and CI diffs; do not build a second
+   blockers/register system. Retained differences need the owner's approval
+   in the relevant entries, bounded by section 5's distinct-test count.
+2. Add repository-owned replay fixtures for TypeScript project references,
+   JavaScript with `checkJs`, and a monorepo. Include the project files and
+   local dependencies the actions read, not only request logs against a
+   mutable directory. Owner-supplied editor sessions may extend these fixtures;
+   collecting private projects is not a prerequisite to L0.
+3. Adapt `lsp/replay_test.go`'s input handling. Its existing test is a replay
+   driver, not a cross-server semantic comparator. Compare each request's
+   result/error and the relevant ordered server notifications from Go and
+   Rust; retain the expected responses for CI. Correlate request IDs and
+   project-root placeholders explicitly, compare arrays/order and text/ranges
+   exactly, and do not discard fields merely because they differ. No replay
+   makes a network/npm request in CI. A deliberate changed response must fail.
+4. Add the `lsp` workload to `scripts/perf.py`, `status/perf/thresholds.toml`
+   and the existing dispatch-only `.github/workflows/perf.yml`. Do not add
+   another workflow or require the old checker/parse-bind capture setup for
+   this workload. Measure the actual `tsrust --lsp` and pinned Go binary with
+   the same local filesystem fixture, without test-host callbacks. Measure
+   open-to-first-diagnostics, completion, hover, references and rename on a
+   representative checked-in fixture, with an owner project optional. Use
+   twenty paired repetitions in alternating runtime order. Define the exact
+   document/version/marker and completion event for every scenario. First
+   diagnostics uses a fresh process/cache; other scenarios use identical
+   initialization and warmup actions on each runtime. Retain raw samples,
+   host, revision and per-scenario ratios in `status/perf/lsp/`.
+5. Apply PLAN's no-request-latency-regression requirement: compare each
+   scenario's Rust/Go median to 1.0, report variability, and resolve an
+   inconclusive/noisy result before claiming closure. A measured regression
+   needs a fix or a separate owner decision; do not turn it into a report-only
+   requirement. This run is not required after each commit or in PR CI.
+
+**Exit:** section 5's correctness count holds, replay comparisons pass, and
+request latency meets PLAN. There is no additional Phase 5 memory budget;
+retained memory is reported for Phase 7.
 
 ### L8 — closure
 
-Every Phase 5 function marked or documented as equivalent, the ledger
-`ported`, the Phase 5 record and the consumption report for Phases 6 and 7.
-There is no green-up: the expectation files are exact for every commit.
+Check the merged implementation against section 5. Finish missing unit ports,
+feature work, docs and ledger homes; describe the Phase 6/7 API hand-over.
+Use the actual CI results and existing performance run. Update the Phase 5
+record and let `cargo xtask status` render the current files. No historical
+captures are refreshed to manufacture a green dashboard.
 
-- **Exit:** section 5's table holds on the merged pull request.
+## 5. Acceptance and counting
 
-## 5. Acceptance
+All correctness runs use the existing common parity tool or `cargo test`.
+`status/parity/fourslash.json` and `lsp.json` are the only end-to-end failing
+sets; their `approved` fields are the only retained-divergence approvals.
 
-Amended 2026-10-03 for [EVIDENCE-plan.md](EVIDENCE-plan.md) (ADR 0023): no
-producer, no sprint files, no recorded evidence. Phase 5's acceptance is two
-expectation files that CI recomputes on every pull request, and the
-checkpoints close by merged pull requests that shrink them.
+| Required result | How it is checked |
+| --- | --- |
+| At least 99.5% semantic fourslash passes | The pinned 4,548 top-level test functions, discovered and checked in L0, run against Rust. Count distinct tests with any nonpassing required outcome, not failing subtest entries; at this pin the maximum is 22 |
+| Fourslash assertions and baseline bytes | Keep every assertion outcome and baseline subtest in the expectation file. The 1,749 references are checked by the pin's writers; none is dropped to improve the percentage |
+| Project and internal LSP/related unit tests | Rust ports against production components pass under `cargo test`; the L0 routing document accounts for every pinned test including subpackages |
+| Client-driven LSP and replay | `lsp.json` is empty at closure; the client/assertions execute against Rust, and replay responses match |
+| Synchronous bridge | Integration tests cover blocked workers, callbacks, cancellation, progress, disconnect and cleanup |
+| Ownership | Production session/snapshot/project/bundle lifetime and panic-retirement tests pass; test-cache retention is distinguished from leaks |
+| Request latency | The existing perf workflow/tool records the paired L7 scenarios; no scenario regresses against Go without a separate owner decision |
+| Port completion and build quality | All Phase 5 production work is ported or explicitly accounted for; ordinary CI and `cargo xtask validate` pass |
 
-| Required claim | Evidence and denominator | Reuse |
-| --- | --- | --- |
-| fourslash passes | `status/parity/fourslash.json`: the 4,548 pinned test functions run through the carried harness patch against `tsrust --lsp --test-host`, each test's outcome and its baseline (1,749, compared whole) as sub-tests; at most 22 failing entries (99.5 percent of 4,548), each with a reason, `approved` where the owner accepted the difference | ADR 0019's seams, `tsr_testhost`, `scripts/parity.py` |
-| The project and LSP suites | `status/parity/lsp.json`: the 85 project tests through the patched `projecttestutil` and the 30 LSP tests through the patched client, one variant each | The pinned mocks and client |
-| The unit suites | Rust ports of the pinned tests (8 + 12 + 12 + 1 + 7), counted from their `// source:` comments by `cargo xtask status`; `cargo test` runs them | — |
-| The bridge | A worker blocked in a synchronous file-system call issues a reverse request while the router pumps; cancellation reaches it; progress flows: integration tests of `tsr_lsp`, in `cargo test` | S11's contracts, promoted to the production endpoint |
-| Ownership | Release per snapshot, project and bundle; retirement after a panic; two runs identical: tests of `tsr_project`, in `cargo test` | E3, C6, T3/T7 shapes |
-| Replay | The recorded editor sessions (decision 7) replay identically against the Go and Rust servers: a variant each in `lsp.json` | `lsp/replay_test.go` |
-| Latency | The editor scenarios (decision 10) as a `status/perf/lsp` workload of the dispatch-only perf workflow, Rust beside Go on the owner's host | The S07 measurement discipline, `scripts/perf.py` |
-| Function disposition | Every function of the 130 files carries a `// port:` marker or a documented equivalent; `cargo xtask validate` rejects unknown markers and `cargo xtask status` reports the mapped count per package | — |
+Let `N` be the pinned top-level fourslash test count, and `F` the set of those
+test IDs with any failed required assertion/baseline, crash, timeout, missing
+implementation or unresolved skip. Closure requires
+`(N - len(F)) / N >= 0.995`; with `N = 4548`, `len(F) <= 22`.
+One test with three failed baseline subtests contributes **one** to `F`, but
+all three failing entries remain visible. Approval does not remove the test
+from `F`. A skipped test is not a semantic pass: L0 identifies pinned skips,
+and any unresolved skipped test remains in `F` unless the owner separately
+changes the scope. The harness must also fail on unexpected/new skips;
+`parity.py`'s generic acceptance of a `skip` row is not sufficient here.
 
-The runner behind the two files is the pinned Go suites themselves, driven
-through the carried patch of `lsptestutil.NewLSPClient` (section 2) and
-emitting the result-line contract of `scripts/parity.py` (one line per test
-and per baseline); `parity.py run fourslash` and `run lsp` shard and drive
-it like the compiler suites. L0 delivers that runner and the two files
-accepted from the first run, with every entry explained; L1 to L8 shrink
-them. The 99.5 percent threshold is PLAN's and the only one; it is the size
-of `fourslash.json`'s failing set at L8, not a recorded metric. A retained
-behaviour difference that is not a test failure is an `approved` entry
-(ADR 0004 as amended).
+The adapter supplies the exact parent-test mapping for baseline/subtest IDs;
+the report must not infer parents by an arbitrary number of slashes. Add
+focused counting tests: several failures in one test; 22 versus 23 distinct
+failing tests; an approved failure; a missing result; and a skipped test.
+Use runner output/common summaries for this count, not another committed
+metric file. Do not add fabricated failures to the expectation file for an
+unobserved behavior difference: first add a witness that exposes it, or
+state the untested limitation without claiming it passed.
 
-## 6. Cost control and performance risk
+Each final retained failing entry names the native behavior, Rust behavior
+and reason and carries the owner's approval. Green intermediate CI only
+means the observed failures equal those entries; it does not assert that the
+99.5% phase exit already holds.
 
-- **Runs.** The pinned fourslash package runs in a few minutes in Go with
-  its shared parse cache; against one long-lived Rust process with
-  `test/reset` the suite is expected under ten minutes once features exist
-  (measured at L0 against the skeleton, where every test fails fast). During
-  a checkpoint, the inventory's feature tags select the subset that
-  checkpoint owns; the full suite runs at each exit.
-- **Threads.** The server's request handling, background queue and project
-  pool follow the pin's goroutine shape over the bounded work group (ADR
-  0009); a request's work runs on the reserved stacks the checker uses.
-- **Memory.** The project system is the first long-lived process in the
-  port: snapshots, overlays, parse-cache entries and checker generations are
-  released by the E3 contracts, which `l1-contracts` repeat; the latency
-  capture records retained memory beside time. Phase 7 owns the budgets.
-- **Latency.** Decision 10 names the scenarios; one capture at L7 beside Go,
-  no threshold other than "no regression".
-- **Correctness first.** No speed or memory gate; unfavourable timing is
-  reported beside Go's without conversion.
+## 6. Day-to-day work and cost control
 
-## 7. Risks
+- Begin with a small working protocol/fixture, then port production behavior
+  with the focused tests that exercise it. Source/API fidelity comes before
+  inventing new infrastructure.
+- Use `parity.py run ... --id ...` or a small feature batch during development.
+  CI runs the applicable full suites. Run a full local suite only for a
+  specific integration need or the initial acceptance setup, not to commit.
+- Keep test inputs, patches, generated source and readable implementation
+  notes. Put runtime logs and local baseline output in disposable output/CI
+  artifacts. Add no `phase5_compare`, `phase5_blockers`, `phase5_audit`,
+  producer, fingerprint, frozen-observation or approval-register system.
+- Checkpoints use new commits and normal pushes. Update the expectation
+  files from actual results when behavior changes; preserve owner approvals.
+  Do not change thresholds or classify a real failure away.
+- The ledger is maintained as ports land; code generation owns only its
+  schema inputs/output. Neither activity triggers historical corpus or
+  benchmark re-recording. Render status only when useful; never commit it.
+- Make a bounded corrective experiment when performance or reliability
+  warrants one. Measure the working batch/cache path before optimizing it;
+  do not design a multi-session server solely to accelerate the harness.
+- Stop for owner input only on an unresolvable semantic/scope choice, new
+  dependency outside the choices below, or a demonstrated blocker requiring
+  external data/access. Do independent implementation work meanwhile.
 
-| Risk | Where it shows | Mitigation |
-| --- | --- | --- |
-| The long tail: 4,548 tests, many features with few tests each | L7 stalls at 98 percent with hundreds of one-off failures | Feature tags in the inventory; residuals chased by count; the allow-list capped by the threshold |
-| Completion ordering and `sortText` | Whole lists read `fail` for an ordering difference | ADR 0010: comparators ported; the L4 ordering witness before the bodies |
-| The synchronous bridge deadlocks or starves | Tests hang; cancellation does not reach a parked worker | L1 builds it first with its contracts; a per-test deadline in the patch turns a hang into a recorded failure |
-| Nondeterminism in the queue and diagnostics publishing | Flaky outcomes | The replay corpus and the two-runs-identical contract; the pin's ordering rules ported exactly |
-| UTF-16 positions and line maps | Off-by-one ranges in every edit | ADR 0013; `lsconv` ported with its tests before L3 |
-| Automatic type acquisition needs npm | CI cannot run it | Mocked in tests as the pin mocks it; the real executor exercised only by a manual witness |
-| `lsproto` generation drifts from the Go generator | Field names or optionality differ, breaking the harness's JSON | The generator is checked against `lsp_generated.go`'s type list by a test; the JSON fixtures of `lsp_json_test.go` are ported |
-| Staleness | Every recorded run reads `stale` while Phase 5 changes shared crates | Accepted mid-phase (decision 12); L8's green-up |
+## 7. Main risks and required witnesses
 
-## 8. Owner decisions
+| Risk | Required check |
+| --- | --- |
+| A Go test passes without touching Rust | Classify direct tests; poison the in-process Go server in Rust-harness mode; demonstrate an injected Rust response defect fails its Go assertion |
+| Custom protocol behavior is lost | Run the pinned resolver, export its normalized model, and check wire fixtures including custom fields/methods |
+| One test corrupts another's session | Serialized worker lifetimes, a quiescent reset barrier, late-callback/changed-option/changed-encoding tests |
+| Cache reuse hides changed inputs or leaks owners | Pinned cache keys, changed text/options/mapper identity tests, explicit test retention policy and production disposal tests |
+| A parked worker deadlocks the router | Concurrent blocked reads plus progress/cancellation/disconnect tests with deadlines |
+| Wrong encoding corrupts edits | Both negotiated UTF-8 and default UTF-16 on non-ASCII and non-BMP edits/ranges |
+| A Go process crash loses a batch | Preserve completed results, fail the active test, restart only unstarted cases, stop on startup failure |
+| Long-tail failures are hidden by bookkeeping | One expectation file per suite, distinct-test counting, no passing credit for skips or approvals |
+| Replay or latency uses different work | Fixed local fixtures and action sequences, response comparison, explicit warm/cold setup and raw timing samples |
 
-Twelve proposals. Each stands as written unless the owner changes it.
+## 8. Decisions for execution
 
-1. **Names.** Checkpoints L0 to L8, suites `fourslash` and `lsp`
-   (`status/parity/fourslash.json`, `lsp.json`), data under `data/phase5/`.
-2. **The pinned suites drive the Rust server** through a carried harness
-   patch (`lsptestutil`, the server-options lines of `fourslash.go`,
-   `projecttestutil`) that connects the in-process client to
-   `tsrust --lsp --test-host` over stdio with S11's file-system, option and
-   stream seams. No Rust rewrite of the 4,548 test bodies; the Go harness
-   keeps asserting. The alternative, porting the fourslash runner and
-   converting the tests, is more work and cannot be proven equivalent.
-3. **One Rust server per Go test binary** with a `test/reset` that discards
-   the session and keeps the parse cache, as the pin's shared `parseCache`
-   does. The alternative, one process per test, parses the bundled libraries
-   4,548 times.
-4. **Crates.** `tsr_lsproto` (generated types plus the base protocol),
-   `tsr_lsp`, `tsr_ls`, `tsr_autoimport`, `tsr_project` (extended), with
-   `tsr_format` and `tsr_api` consumed as they are; the harness patch and the
-   generator under `tools/phase5/`, repository-only. New crates register in
-   `tools/packaging/packages.json` as unpublished until a release decision.
-5. **`lsproto` is generated here** from the pinned meta model by a Rust
-   generator (ADR 0015), not transcribed from `lsp_generated.go`; the
-   generator's output is checked against the Go file's type and method lists.
-6. **The failing set** of `fourslash.json` holds at most 22 tests at L8,
-   each with a reason; it is the only tolerated-failure mechanism, and a
-   retained behaviour difference is an `approved` entry (ADR 0004 as amended).
-   Corsa's own Strada deviations (`MarkTestAsStradaServer`, the triage files)
-   are reproduced, not excused.
-7. **The replay corpus.** The owner records editor sessions with the pinned
-   server's replay facility on their own projects (at least one per family:
-   a TypeScript project with references, a JavaScript project with
-   `checkJs`, a monorepo) and commits them under `data/phase5/replay/`; the
-   replay runner compares both servers' responses. No session, no
-   `replay_parity`.
-8. **Automatic type acquisition** is ported with npm as a child process
-   behind a trait; the pinned mocks drive the tests; no producer touches the
-   network.
-9. **The `fourslash` package** (parser, baseline utilities, state baseline)
-   is `later` with Phase 7 as the owner: a Rust-side runner is a dogfood and
-   cut-over tool, not a Phase 5 gate. The ledger keeps `tsr_fourslash`.
-10. **Latency scenarios.** Five editor scenarios on the smoke fixture and one
-    of the owner's projects: open a project and first diagnostics, completion
-    at a marker, hover, find references, rename; each measured as the
-    request's wall time over twenty repetitions, Rust beside Go, recorded at
-    L7, no threshold beyond "no regression".
-11. **Dependencies.** The Unicode normalization crate ADR 0017 anticipated for
-    the organize-imports comparer; nothing else new. The JSON codec is
-    `tsr_json`; msgpack stays Phase 6's.
-12. **Evidence.** Phase 5 changes stale the recorded `checker`, `emit` and
-    `tsc` runs. Nothing is re-recorded per fix; L8's green-up re-records
-    them, and the recordings are the owner's.
+This revision resolves the review's design questions as follows. L0 can start
+without waiting for historical runs or owner-recorded editor sessions.
 
-L0 starts on this plan once the decisions are settled; the L0 record
-(`docs/PHASE5-L0.md`) carries the measured costs, the frozen inventory and the
-first categorized run.
+1. **Names and tools:** L0 to L8; `fourslash` and `lsp` parity files; existing
+   parity, generation, CI and perf commands. No new evidence framework.
+2. **Test routing:** retain Go fourslash and client-driven LSP assertions;
+   port direct project/server/helper tests to Rust. A Go internal test is
+   never counted as a Rust pass.
+3. **Isolation:** one Rust server per serialized fourslash batch worker,
+   per-test reset retaining only the explicitly injected cache; independent
+   workers provide concurrency. Small LSP lifecycle tests may use fresh
+   processes. Production request concurrency remains covered inside tests.
+4. **Crates:** `tsr_lsproto`, `tsr_lsp`, `tsr_ls`, `tsr_autoimport`, and the
+   extended `tsr_project`, consuming existing compiler/format/API crates.
+   Public dependency closure, lockstep versions and release order are updated
+   at creation. The private test entry point and emitter remain repository-only.
+5. **Generation:** pinned LSP resolver plus normalized export and Rust emitter,
+   including Corsa extensions. No second interpreter of the raw metamodel.
+6. **Threshold:** retain PLAN's 99.5%, measured in distinct semantic tests;
+   final differences need owner approval. Subtest details remain visible.
+7. **Replay:** repository-owned TS-reference, JS/checkJs and monorepo fixtures
+   and sessions by default. Owner-supplied sessions are optional additions.
+8. **ATA:** a mockable npm executor; deterministic local tests and replay,
+   explicit manual coverage of real external execution.
+9. **Harness ownership:** the Go fourslash parser/renderer stays in use; a
+   Rust runner is deferred to Phase 7. Required state/lifecycle transport
+   adapters and every production service operation are implemented here.
+10. **Latency:** the five scenarios in L7, twenty paired repetitions,
+    dispatch/local measurement once the service works. PLAN's no-regression
+    exit remains; there is no additional Phase 5 memory threshold.
+11. **Dependencies:** the normalization dependency anticipated by ADR 0017;
+    otherwise reuse current dependencies. JSON uses `tsr_json`; msgpack is
+    Phase 6. Bring any additional dependency choice to the owner with reasons.
+12. **Closure:** actual CI parity and unit tests, the L7 performance result,
+    code/docs review and merged PRs. No freeze, freshness or green-up cycle.

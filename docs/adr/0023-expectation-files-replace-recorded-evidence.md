@@ -27,7 +27,12 @@ plan.
    pin's runner (`crates/tsr_testrunner`, `tools/phase4/tsctests`) against
    the pin's committed `testdata/baselines/reference`, and fails when the
    observed failing set differs from the file in either direction. Progress
-   is the diff of the file. No Go runs at CI time and nothing is replayed.
+   is the diff of the file. Those Rust baseline runners need no Go execution
+   or recorded oracle observations at CI time. Phase 5 retains ADR 0019's
+   carried Go fourslash/client assertions against the Rust server; direct
+   Go-object tests are ported to Rust. That client harness uses the same
+   parity tool and expectation files, not a second evidence system (see
+   [the Phase 5 plan](../PHASE5-plan.md#21-what-runs-against-rust)).
 2. **Approved divergences are entries of those files.** A failing entry with
    an `approved` field carries the owner's words; the owner approves by
    merging the pull request that adds the field. `data/divergences.toml` and
@@ -50,9 +55,10 @@ plan.
 the `cargo xtask run`/`check`/`check-metrics` commands and the per-phase
 producer, comparison and register scripts are deleted (plan, section 8).
 `cargo xtask validate` still enforces ledger provenance and marker validity.
-The pin's baselines are the only truth the suites compare against; a
-difference the pin's runner would not see (a Go-only observation) is not a
-suite failure.
+The pin's baselines and executable test assertions are the suites' authority;
+a difference the pin's runner would not see (an extra Go-only observation)
+is not a suite failure. Phase 5's Go client runner and fixed editor replay
+fixtures do not restore source-fingerprinted oracle captures or producers.
 
 ## Evidence
 

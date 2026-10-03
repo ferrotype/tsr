@@ -247,7 +247,7 @@ What must hold at cut-over, what pins it, and whether the existing verification 
 | Emit: `.js`, `.map`, `.d.ts`, source-map records | Same corpus; 41 transpile baselines | Runner sub-tests | Data as-is |
 | Command line: `tsc`, `--watch`, `-b`, `--incremental`, pretty output, locales | 517 baselines across `tsc`, `tscWatch`, `tsbuild`, `tsbuildWatch`; `.tsbuildinfo` JSON | Ported `tsctests` harness with fake system and clock | Data as-is; harness ported |
 | Configuration parsing | 309 baselines under `config` and `tsoptions` | Ported unit tests | Data as-is |
-| Language server over LSP 3.17 | 4,356 fourslash tests; 1,749 fourslash baselines; project and LSP suites; replay corpus | Phase 1 transport/filesystem contracts; Phase 5 semantic assertions from the pinned Go harness through the test-host patch, followed by full-suite coverage | Retain Go executable tests; patch transport only |
+| Language server over LSP 3.17 | 4,356 fourslash tests; 1,749 fourslash baselines; project and LSP suites; replay corpus | Phase 1 transport/filesystem contracts; Phase 5 semantic assertions from the pinned Go harness through the test-host patch, followed by full-suite coverage | Retain Go client assertions; adapt transport and read-only server-state access; port direct internal tests to Rust |
 | JS API: msgpack framing, encoder protocol 8 with WTF-8 strings and UTF-16 positions, 144 methods, snapshots, batches, callback FS | `packages/typescript` sync and async suites and benchmarks; `api` baselines; `proto.generated.ts` | The suites spawn whichever binary `getExePath` resolves | Unchanged |
 | Content-mapper plugins | JSON-RPC child-process protocol; `spanmap` fidelity; 15 contentmapper baselines | Ported `contentmappertest` | Harness ported |
 | Diagnostic text and localization | 2,135 + 85 messages; 13 locales | Baselines; message-format unit tests | Regenerated |
@@ -267,11 +267,19 @@ The Go oracle is built from the pinned upstream. Rust grows through explicitly s
 
 ### Progress and evidence
 
-The [tracking specification](docs/TRACKING.md), [current status](STATUS.md), [dashboard](docs/status.html) and [ADR index](docs/adr/README.md) accompany this plan. The Cargo tracking scaffold and the S04 text/ownership contract leaves are implemented; the compiler pipeline remains pending. See the [S04 synthesis plan](docs/S04-synthesis-plan.md) and [implementation/verification notes](docs/S04.md). The canonical `upstream/` submodule is registered, initialized and clean at `1f70213d4922b434345f639b441681e470c7cfc1`; its actual Go oracle build and `--version` smoke have passing execution evidence. ADRs 0006, 0007 and 0013 and their design notes are accepted; S01 passes against the current bootstrap evidence. The S04 leaf portions of E3 and E4 have executable producers; full E1–E8 verification remains pending. A status workflow for macOS and Linux is installed under `.github/workflows/status.yml`; no run of it is recorded here, and a rendered report never establishes that a job ran. The Phase 0 implementation plan is the sprint set under [sprints/](sprints/README.md). Bootstrap success does not establish Rust compiler parity.
+[ADR 0023](docs/adr/0023-expectation-files-replace-recorded-evidence.md)
+and the [expectation-file plan](docs/EVIDENCE-plan.md) replace the historical
+producer/sprint/fingerprint system. CI runs the suites and compares the actual
+failing sets with `status/parity/<suite>.json`; owner approvals live in those
+entries. Performance is measured through the dispatch-only workflow and
+recorded under `status/perf/`. Build quality remains in CI.
 
-Editable ledger states describe implementation work; `port:` markers describe function mappings. Neither establishes semantic parity or complete behavioral coverage. Verified states and experimental results are generated from validated run evidence, with every required test, baseline, generation and experiment gate enforced. Required sprint items have machine checks in addition to the sprint's exit criteria; missing checks cannot silently close an item.
-
-`cargo xtask run <run-id>` captures typed metrics from a reviewed command specification in `status/runs.toml`, bound to the upstream pin, command, source digest and declared corpus/configuration input digests. Relevant edits invalidate earlier evidence. Producers require reviewed contracts defining their workload, denominator, units and assertions, because a valid evidence envelope cannot prove a metric producer implemented the intended test. `cargo xtask status` validates evidence and writes the reports; `cargo xtask check <sprint-id>` enforces the sprint gates. CI also uses `check-metrics` to require live build and quality results independently of unfinished sprints, and compiles with the declared minimum Rust version on macOS and Linux. `status --check-committed` checks all four generated views, including the unmapped-function worklist, in their recorded context without rewriting them; live gates retain current-host and toolchain validation. The tracking specification owns the detailed schema.
+`PORTS.toml` and `port:`/`source:` markers describe implementation and test
+ports, not semantic passes. `cargo xtask validate` checks them;
+`cargo xtask status` renders the parity, performance and coverage files to
+`target/status/` without committing a dashboard. See the [ADR index](docs/adr/README.md)
+and [Phase 5 plan](docs/PHASE5-plan.md) for the current editor work. The retired
+Phase 0/1 harnesses and captures are not prerequisites to continued work.
 
 ### Crate map, leaves first
 
@@ -344,10 +352,10 @@ E4 progresses through leaf helpers in S04, scanner values in S05 and encoder beh
 - **Gate.** E1 to E4 pass; E5 to E8 meet their thresholds for the parts they measure, with the extrapolations written down as extrapolations. Otherwise stop.
 
 Phase 0 was accepted on **2026-09-20** through [ADR 0020](docs/adr/0020-phase-0-gate-decision.md).
-At the owner's direction, S12 closes on the [indexed recent evidence](docs/S12-evidence.md)
-under the approved limits, without repeating the captures after the crate rename
-and publishing work. S12 records that dated milestone; current-source experiment
-and other sprint freshness checks remain unchanged.
+At the owner's direction, S12 reused the recent evidence under the approved
+limits, without repeating captures after the crate rename and publishing work.
+This remains a dated milestone. ADR 0023 subsequently retired sprint freshness
+checks and historical evidence artifacts in favor of the current CI model.
 
 ### Phase 1: foundations
 
@@ -442,7 +450,7 @@ Remaining choices are resolved by measurement or owner review. None may override
 2. **Performance budgets per benchmark scenario.** Settled by owner-approved ADR 0020 and [the full acceptance matrix](docs/S12-acceptance.md). Native targets retain section 5's Go-relative goals. Separate full WebAssembly and embedding size, latency and retained-memory budgets apply to the named release workloads; parser measurements are not used as full-checker thresholds.
 3. **WebAssembly and embedding API details.** The host callbacks, public Rust types and browser adapter are refined from the E7/E8 prototypes. Both entry points must support full checking and emit and pass section 5 before cut-over; delivery timing is not deferred beyond that gate.
 4. **The residual id-sensitive cases in practice.** Whether reverse mapped types without symbol or mapper, and undeclared duplicate-name symbols, ever change observable output in the corpus. Measured in the spike.
-5. **The fourslash harness patch — settled.** Carry a transport-only patch against the pinned Go harness, retaining its executable assertions; do not fork the harness. Accepted in ADR 0019 on 2026-09-19.
+5. **The fourslash harness patch — settled.** Carry a patch against the pinned Go harness, retaining its executable assertions; do not fork the harness. Adapt transport and read-only server-state access as detailed in the Phase 5 plan; direct tests of Go internals become Rust unit-test ports. Accepted in ADR 0019 on 2026-09-19; state-access and test-routing seams clarified on 2026-10-03.
 
 Implementation choices and status, including references to the settled contracts:
 
@@ -466,7 +474,7 @@ Implementation choices and status, including references to the settled contracts
 4. Build parser parity over the corpus and libs plus malformed-byte/BOM fixtures. Compare encoded bytes when Go succeeds, and scanner/encoder errors and positions when it does not (E1/E4).
 5. Implement the frozen checker slice, its binder/resolution/printer dependencies and the comparators. Add the E3 identity, lazy-allocation, bundle, shared-pool panic and disposal scenarios as permanent assertions alongside sanitizer runs.
 6. Design the test-host protocol and prototype callback filesystem/plugin operations over the connection using case-insensitive, symlink and mapper fixtures. These are transport contract tests; defer semantic fourslash assertions to Phase 5 and keep their coverage separate.
-7. Create the allow-list with the owner as approver and maintain the existing ledger under the [tracking specification](docs/TRACKING.md). Review metric-producer contracts and gate definitions, require checks on every required sprint item, and keep implementation/function mapping separate from generated verified parity.
+7. Maintain owner-approved differences in the parity expectation files under the [current model](docs/EVIDENCE-plan.md), and maintain ledger/function mappings separately from semantic results. The historical producer and sprint machinery is retired.
 8. Run E5 to E8, including the actual Rust consumer and WebAssembly checker slice, and record numbers with their workload limits. Define the full checking/emit acceptance matrix and fix its remaining performance budgets before Phase 7.
 
 ---
