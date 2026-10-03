@@ -123,12 +123,6 @@ fn scan_markers(root: &Path) -> Markers {
                 if p.file_name().is_some_and(|n| n == "target") {
                     continue;
                 }
-                // The Phase 1 mutation splicer's tests hold marker-shaped
-                // strings; the tool leaves with Phase 1 (docs/EVIDENCE-plan.md,
-                // step 5).
-                if p.ends_with("tools/phase1/mutation/splicer") {
-                    continue;
-                }
                 walk(&p, out);
             } else if p.extension().is_some_and(|x| x == "rs") {
                 let Ok(text) = fs::read_to_string(&p) else {

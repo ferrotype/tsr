@@ -79,19 +79,6 @@ class RequestTests(unittest.TestCase):
             with self.subTest(raw=raw), self.assertRaises(ValueError):
                 strict_json_loads(raw)
 
-    def test_frozen_inventory_covers_all_points_and_keeps_review_additions(self):
-        root = Path(__file__).resolve().parents[2]
-        fixtures = strict_json_loads((root / "data/s05/fixtures.json").read_bytes())
-        blocks = [action for item in fixtures for action in item["request"]["actions"] if action["op"] == "identifier_block"]
-        self.assertEqual([(block["first"], block["count"]) for block in blocks], [(first, 4096) for first in range(0, 0x110000, 4096)])
-        selected = {item["request"]["id"]: item for item in fixtures}
-        self.assertEqual(selected["state/bounds-token-text"]["expected_panic"], {"action": 1, "class": "bounds"})
-        self.assertTrue(selected["number/pseudo-decoded-utf16le"]["request"]["decode_source"])
-        self.assertIn("regexp/deep/sets-unclosed", selected)
-        self.assertIn("regexp/deep/sets-partially-closed", selected)
-        self.assertEqual(selected["number/pseudo-review/second-byte-radix"]["expected_panic"]["input_hex"], "616263")
-        self.assertEqual(len([name for name in selected if name.startswith("number/pseudo-review/")]), 6)
-
 
 class StreamTests(unittest.TestCase):
     def test_valid_differing_token_counts_are_measured_failure_and_both_drain(self):

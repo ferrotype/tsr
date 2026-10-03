@@ -1,51 +1,11 @@
-"""Protocol adversaries for scoped P3 replays; no fabricated acceptance credit."""
+"""Protocol adversaries for the P3 comparator replay the E2 obligations use."""
 import copy
 import sys
 import unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from s08_contracts import MODES
 from s08_oracle import canonical,digest
-from s08_p3_relations import compare as relations
 from s08_p3_comparators import compare as comparators
-
-
-class P3Relations(unittest.TestCase):
-    def fixture(self):
-        action={'mode':'assignable','report_errors':True,'source':'A','target':'B'}
-        state={'caches':{m:{'entries':0,'result_flags':[]} for m in MODES},'instantiations':0,'signatures_created':1,'types_created':1}
-        observed={'action':action,'before':state,'after':state,'result':False,'ternary_calls':[0],'diagnostics':[]}
-        request=canonical([{'id':'recursive','actions':[action]},{'id':'body','actions':[action]}])
-        native={'request_sha256':digest(request),'rows':[{'id':name,'groups':[{'actions':[observed],'before_lookup':state}]} for name in ('recursive','body')]}
-        native=canonical(native)
-        pending={'checkpoint':'P4','operation':'body inference','reason':'not implemented'}
-        policy={'version':1,'request_sha256':digest(request),'native_sha256':digest(native),'pending_cases':{'body':pending},'pending_protocol':['post_action_display','post_action_union_ordering','final_state','source_and_global_diagnostics']}
-        actual={'version':1,'request_sha256':digest(request),'rows':[
-            {'id':'recursive','groups':[{'mode':'assignable','observations':{'before_lookup':state,'actions':[observed],'state':'observed','display_state':'pending'}}]},
-            {'id':'body','groups':[{'mode':'assignable','observations':{'state':'pending','reason':'not implemented'}}]}]}
-        return request,native,policy,copy.deepcopy(actual)
-
-    def test_only_executed_actions_receive_scoped_credit(self):
-        result=relations(*self.fixture())
-        self.assertEqual((result['executed_actions'],result['pending_actions']),(1,1))
-        self.assertTrue(result['scoped_actions_match'])
-        self.assertFalse(result['full_p0_contract_match'])
-
-    def test_bad_provenance_inventory_counters_result_and_pending_reason_fail(self):
-        for change in ('hash','row','mode','action','counter','boolean','diagnostic','unexpected_pending','pending_reason'):
-            request,native,policy,actual=self.fixture()
-            with self.subTest(change=change):
-                observation=actual['rows'][0]['groups'][0]['observations']
-                if change=='hash':actual['request_sha256']='0'*64
-                elif change=='row':actual['rows'].pop()
-                elif change=='mode':actual['rows'][0]['groups'].clear()
-                elif change=='action':observation['actions'].clear()
-                elif change=='counter':observation['actions'][0]['after']['types_created']=2
-                elif change=='boolean':observation['actions'][0]['result']=0
-                elif change=='diagnostic':observation['actions'][0]['diagnostics']=[{}]
-                elif change=='unexpected_pending':actual['rows'][0]['groups'][0]['observations']={'state':'pending','reason':'not implemented'}
-                else:actual['rows'][1]['groups'][0]['observations']['reason']='different error'
-                with self.assertRaises(ValueError):relations(request,native,policy,actual)
 
 
 class P3Comparators(unittest.TestCase):

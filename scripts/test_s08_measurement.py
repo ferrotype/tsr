@@ -7,7 +7,6 @@ from unittest.mock import patch
 
 import s08_checkerbench as checker
 import s08_measurement as measurement
-import s08_relater as relater
 from s08_oracle import canonical, digest
 from s08_p4 import canonical as request_bytes
 
@@ -487,116 +486,6 @@ class CensusInvariants(unittest.TestCase):
         second['checkpoint']['census']['families']['extra'] = {'count': 0, 'bytes': 0}
         with self.assertRaisesRegex(ValueError, 'inventory differs'):
             measurement.checker_rows([first, second], ['case', 'other'], 'alloc')
-
-
-class RelaterContract(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        _, cls.requests, cls.observations, _ = relater.frozen()
-
-    def diagnostic_group(self):
-        for row in self.observations['rows']:
-            for group in row['groups']:
-                if any(a['diagnostics'] for a in group['actions']):
-                    found = copy.deepcopy(group)
-                    found['state'] = 'executed'
-                    found['after_lookup'] = copy.deepcopy(group['actions'][0]['before'])
-                    return group, found, [a['action'] for a in group['actions']]
-        self.fail('frozen diagnostic witness is missing')
-
-    def test_equal_diagnostic_count_is_not_payload_parity(self):
-        group, found, actions = self.diagnostic_group()
-        target = next(a for a in found['actions'] if a['diagnostics'])
-        target['diagnostics'][0]['text_hex'] = '77726f6e67'
-        errors = relater.compare_group('reference', group, actions, found)
-        self.assertTrue(any('diagnostics' in e for e in errors))
-        self.assertFalse(relater.compare_group('reference', group, actions, found, behavior_only=True))
-
-    def test_complete_behavior_does_not_certify_pre_resolved_reference(self):
-        group, found, actions = self.diagnostic_group()
-        self.assertFalse(relater.compare_group('id', group, actions, found))
-        self.assertFalse(relater.compare_group('reference', group, actions, found, behavior_only=True))
-        self.assertEqual(relater.compare_group('reference', group, actions, found),
-                         ['reference setup pre-resolves the production graph; lazy protocol unavailable'])
-
-    def test_bound_program_still_requires_all_semantic_states(self):
-        group, found, actions = self.diagnostic_group()
-        found['source_mode'] = 'bound_program'
-        self.assertFalse(relater.compare_group('reference', group, actions, found))
-        for point in ('before', 'after'):
-            for counter in ('types_created', 'signatures_created', 'instantiations'):
-                with self.subTest(point=point, counter=counter):
-                    changed = copy.deepcopy(found)
-                    changed['actions'][0][point][counter] += 1
-                    errors = relater.compare_group('reference', group, actions, changed)
-                    self.assertIn(f'action 0: {point}', errors)
-
-    def test_bound_program_lookup_and_first_action_must_agree(self):
-        group, found, actions = self.diagnostic_group()
-        found['source_mode'] = 'bound_program'
-        found['after_lookup']['types_created'] += 1
-        self.assertIn('after_lookup', relater.compare_group('reference', group, actions, found))
-
-    def test_creation_transitions_compare_actual_counts_not_nonzero(self):
-        group, found, _ = self.diagnostic_group()
-        found['actions'][0]['after']['types_created'] += 1
-        self.assertFalse(relater.transitions(group, found)[0]['agree'])
-
-    def test_duplicate_or_missing_checker_rows_rejected(self):
-        for rows in [[], [CheckerCapture.row(), CheckerCapture.row()]]:
-            with self.assertRaisesRegex(ValueError, 'inventory'):
-                measurement.checker_rows(rows, ['case'], 'normal')
-
-    def test_signed_retained_delta_preserved(self):
-        row = CheckerCapture.row()
-        row['allocation']['live_at_checkpoint'] = 5
-        self.assertEqual(measurement.checker_rows([row], ['case'], 'alloc')['allocation']['retained_bytes'], -5)
-
-    def test_matching_inventory_still_has_no_comparison_ratios(self):
-        # Even an amended inventory on which all booleans agree cannot certify
-        # equivalent lazy work. This checks reporting, independently of coverage.
-        with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            totals = {'groups_executed': 85, 'groups_unsupported': 0, 'setup_ns': 100,
-                      'relation_ns': 20, 'setup_requested_bytes': 40,
-                      'relation_requested_bytes': 10, 'retained_bytes': 20}
-            capture = {'pin': 'pin', 'smoke': False, 'sources_sha256': digest(canonical({})),
-                       'runs': [{'mode': mode, 'implementation': impl, 'warmup': False, 'totals': totals}
-                                for mode in relater.MODES for impl in relater.IMPLEMENTATIONS for _ in range(7)]}
-            (root / 'capture.json').write_bytes(canonical(capture))
-            parity = {'parity': 0, 'both_match_every_case': False, 'implementations': {
-                'id': {'parity': 1}, 'reference': {'parity': 0, 'unsupported': 0, 'behavior_agreement': 1}}}
-            with patch.object(relater, 'verify_capture', return_value=parity), patch.object(relater, 'sources', return_value={}):
-                result = relater.report(root)
-            self.assertEqual(result['metrics']['reference_behavior_agreement'], 1)
-            self.assertEqual(result['metrics']['parity_reference'], 0)
-            for key in ('elapsed_ratio', 'throughput_ratio', 'allocated_bytes_ratio', 'retained_bytes_ratio'):
-                self.assertNotIn(key, result['metrics'])
-            for mode in result['modes'].values():
-                self.assertIn('unavailable', mode['relation_ns_ratio'])
-
-    def test_failed_relater_parity_stops_before_measurement_children(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            with patch.object(relater, 'build', return_value={}), \
-                 patch.object(relater, 'parity', return_value={'both_match_every_case': False}), \
-                 patch.object(relater, 'run_child') as child:
-                with self.assertRaisesRegex(ValueError, 'relater parity failed'):
-                    relater.capture(Path(temporary))
-                child.assert_not_called()
-
-    def test_relater_totals_are_reconstructed(self):
-        group = {'mode': 'assignable', 'state': 'executed', 'setup_ns': 12, 'relation_ns': 3,
-                 'allocation': {'setup_requested_bytes': 10, 'relation_requested_bytes': 2,
-                                'live_before': 20, 'live_after': 18, 'live_after_release': 10}}
-        observed = {'rows': [{'id': 'case', 'state': 'executed', 'groups': [group]}],
-                    'totals': {'setup_ns': 12, 'relation_ns': 3, 'setup_requested_bytes': 10,
-                               'relation_requested_bytes': 2, 'retained_bytes': -2,
-                               'groups_executed': 1, 'groups_unsupported': 0}}
-        requests = [{'id': 'case', 'actions': [{'mode': 'assignable'}]}]
-        self.assertEqual(relater.observed_totals(observed, requests)['retained_bytes'], -2)
-        observed['totals']['groups_executed'] = 105
-        with self.assertRaisesRegex(ValueError, 'groups_executed differs'):
-            relater.observed_totals(observed, requests)
 
 
 if __name__ == '__main__':

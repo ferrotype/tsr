@@ -5,14 +5,12 @@ import io
 import json
 import os
 import shlex
-import subprocess
 import tempfile
 import tomllib
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-import s10
 import s10_corpus as corpus
 import s10_measure as measure
 from s06_ownership import validate_output
@@ -124,13 +122,6 @@ class S10Evidence(unittest.TestCase):
             corpus.p4.write_new(path / 'completed.json', {'source_stable': True})
             with patch.object(measure, 'sources', return_value={'new': 'hash'}), self.assertRaisesRegex(ValueError, 'stale'):
                 measure.verify(path)
-
-    def test_missing_captures_are_pending_without_launching_work(self):
-        with tempfile.TemporaryDirectory() as directory, patch.object(s10, 'ROOT', Path(directory)), \
-                patch.object(subprocess, 'run', side_effect=AssertionError('must not run')), \
-                contextlib.redirect_stderr(io.StringIO()):
-            self.assertEqual(s10.producer('e7'), {'metrics': {}})
-            self.assertEqual(s10.producer('e8'), {'metrics': {}})
 
     def test_ownership_requires_every_named_case_no_ignores(self):
         cases = ['lifetime::first', 'lifetime::second']

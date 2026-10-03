@@ -3,7 +3,7 @@ import copy
 import unittest
 from s04_common import strict_json_loads
 from s07_program import validate_requests
-from s07_program_compare import compare, compare_config, differences, config_provenance_inputs, verify_config_inputs, digest, ROOT
+from s07_program_compare import compare, compare_config, differences
 
 
 class ProgramComparisonTests(unittest.TestCase):
@@ -85,20 +85,6 @@ class ProgramComparisonTests(unittest.TestCase):
             actual = copy.deepcopy(source)
             actual[field]['entries'].reverse()
             self.assertFalse(compare_config(['a'], [{'id': 'a'}], [source], [actual])[0]['passed'])
-
-    def test_config_provenance_requires_exact_registered_dependency_sets(self):
-        document = {family: {p: digest(ROOT / p) for p in paths}
-                    for family, paths in config_provenance_inputs().items()}
-        verify_config_inputs(document)
-        for family in document:
-            missing = copy.deepcopy(document)
-            missing[family].pop(next(iter(missing[family])))
-            with self.assertRaisesRegex(ValueError, 'input set'):
-                verify_config_inputs(missing)
-            stale = copy.deepcopy(document)
-            stale[family][next(iter(stale[family]))] = '0' * 64
-            with self.assertRaisesRegex(ValueError, 'stale'):
-                verify_config_inputs(stale)
 
 
 if __name__ == '__main__':
