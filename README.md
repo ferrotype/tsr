@@ -17,6 +17,7 @@ The first contract leaves are implemented: `tsr_jsstring` preserves source/strin
 | [Evidence](docs/EVIDENCE-plan.md) | How parity, performance, build quality, port coverage and approved divergences are tracked. |
 | [Rust implementation guide](docs/CODEX-RUST-GUIDELINES.md) | Codex/Astra rules for Rust implementation and code review; loading conditions are in [AGENTS.md](AGENTS.md). |
 | [`status/parity/`](status/parity) | One expectation file per suite naming every sub-test that does not pass, with its reason; CI fails on any difference. |
+| [Status page](https://ferrotype.github.io/tsr/) | `cargo xtask status` rendered from `main` by CI: suite parity, performance runs, port coverage. Nothing rendered is committed. |
 | [Architecture decisions](docs/adr/README.md) | Accepted ADRs 0001 to 0018 and the Proposed placeholders 0019 (test-host protocol) and 0020 (Phase 0 gate). |
 | `PORTS.toml`, `data/go-functions.tsv` | Upstream file ledger and function inventory used for traceability. |
 | `rust-toolchain.toml`, `rustfmt.toml`, `deny.toml`, `Cargo.toml` lints | Pinned stable toolchain, formatting, dependency policy and the clippy allow-list (ADRs 0016 and 0017); the CI `quality` job runs them. |
