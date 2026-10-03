@@ -48,7 +48,7 @@ SOURCE_PATTERNS = ("crates/**/*", "tools/phase4/**/*", "tools/**/*.rs",
                    "scripts/s04.py", "scripts/s04_common.py", "scripts/s04_runtime.py",
                    "scripts/tracking-bootstrap.py",
                    "scripts/tests/test_phase4_sanitizer.py", "data/s04/toolchains.toml",
-                   "data/upstream.json", "data/phase4/scenarios.json.gz", "data/phase4/unit-tests.json",
+                   "data/upstream.json", "data/phase4/scenarios.json.gz",
                    "PORTS.toml")
 DIAGNOSTIC = re.compile(rb"ThreadSanitizer|Sanitizer CHECK failed|Sanitizer:DEADLYSIGNAL|"
                         rb"(?:WARNING|SUMMARY|FATAL):[^\n]*[Ss]anitizer", re.I)
