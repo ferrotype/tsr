@@ -84,7 +84,13 @@ target = "aarch64-apple-darwin"
 config = "release; frozen scanner corpus"
 ```
 
-This is an example; the scanner harness does not exist yet. The registered producers are the workspace and oracle bootstrap runs, the `fmt`, `clippy`, `deny` and `selftest` check runs (`scripts/checks.py`), the S03 `gen` run ([contract](S03.md)), and the S04 `e3`/`e4` leaf runs. The [S04 producer contracts](S04.md) specify frozen coverage, measured counters and actual instrumented execution. Add the `scanner`, `binder`, `program`, `testhost`, `checkerbench`, `relater` and remaining experiment producers when their implementations exist; [sprints/README.md](../sprints/README.md) names each one with the metrics it must emit. Numeric and boolean thresholds are defined now so missing implementations remain pending.
+This is a declaration example; `status/runs.toml` is the current producer
+inventory. It includes compiler parity, ownership, benchmarks and the quality
+checks in `scripts/checks.py`. `selftest` runs the tracker's Rust tests and the
+Python harness tests (`cargo test -p xtask --locked`, then
+`python3 scripts/run_tests.py`). It tests the testing/tracking infrastructure;
+it is not a compiler performance benchmark. CI runs it on each configured host.
+It is not a mandatory local rerun for every edit or commit.
 
 Run a producer with `cargo xtask run scanner`. The command executes directly, without a shell, in the repository root. It must write exactly one JSON object to stdout; logs go to stderr:
 
@@ -99,6 +105,12 @@ The runner records the full Rust revision, the run's source fingerprint, full up
 The workspace producer declares its own source set, using `Cargo.*` for the root manifest/lockfile alongside the relevant configuration and code. The oracle producer includes the `upstream` gitlink in its source set and `.gitmodules` as a declared input, so its evidence is tied to the actual checkout and submodule registration as well as the pinned provenance.
 
 Documentation, root Markdown files and sprint files are outside the default source set. A producer that consumes them can include them explicitly in `sources`; `inputs` and `cases` are always hashed even when their paths are documentation or otherwise outside the source set. Changes to a run's source set, selected source bytes, command, target/configuration or declared corpus/configuration inputs invalidate that run. The specification of an unrelated run does not invalidate it. The upstream pin and relevant captured build environment must also match. Source-identical commits may reuse results; the original tested revision remains recorded.
+
+The source digest describes existing working-tree inputs, independent of Git's
+staging state. Deleting a selected file invalidates evidence that included it;
+staging or committing that same deletion does not invalidate a capture made
+after deletion. The same rule holds for additions, renames and edits. Broken
+symlinks and unreadable inputs are errors, not silently omitted files.
 
 Acceptance policy is separate from measurement inputs. Changing experiment thresholds, sprint checks or editable ledger fields reevaluates the recorded metrics without rerunning unaffected producers. If such a file is explicitly consumed through `sources`, `inputs` or `cases`, its change does invalidate that producer. Review policy changes directly; changing a threshold must not manufacture a new measurement timestamp or hide an unmet requirement from the plan.
 
@@ -138,6 +150,101 @@ The tracker's `stale` label denotes an exact fingerprint mismatch, not aged
 measurements; the crate rename changes those fingerprints. S12's items and exit
 check the accepted reuse decision. Original artifact identities and normal
 producer, experiment and other sprint checks remain unchanged.
+
+## Finish procedure
+
+Use this sequence for an ordinary implementation or review-fix PR. Closing an
+entire phase is a separate task with its named acceptance requirements.
+
+1. **Establish the scope before running anything.** Read `git status --short`,
+   `git diff --stat` and the PR's actual check results (`gh pr checks <number>`).
+   Pending CI jobs are not failures. A historical sprint that is pending because
+   its capture fingerprint changed is not a new compiler regression. Do not
+   expand a PR fix into refreshing every historical sprint or benchmark.
+2. **Finish the code and the necessary inventory edits.** Inspect each changed
+   port marker and classification. Run an inventory generator only when those
+   inputs really changed; don't regenerate all inventories as a precaution.
+   Review its diff before accepting it. Keep unrelated working-tree edits and
+   unreferenced old capture files out of the commit.
+3. **Validate the affected code once.** Examples:
+
+   ```sh
+   cargo fmt --all --check
+   cargo test -p xtask --locked                  # tracker changes
+   cargo clippy -p xtask --all-targets --locked -- -D warnings
+   PYTHONPATH=scripts python3 -m unittest discover -s scripts/tests -p 'test_phase4_compare.py'
+   ```
+
+   Select the package/test file that the change touches; the examples are not
+   a mandatory batch. If Python tests need Go, put the pinned toolchain on
+   `PATH` first. Run the full local `cargo xtask run selftest` only when the
+   task calls for its recorded result or cross-harness changes warrant the
+   whole suite. A new local tracker regression test does not require rerunning
+   every Python test. CI still runs the full suite. Repeat a check only after
+   relevant edits or a concrete failure, not after staging, committing or
+   editing unrelated prose.
+4. **Record only the results the task requires.** Finish source changes first
+   and stage the intended source paths explicitly (`git add -- <paths>`).
+   Run each selected producer once. For example, a Phase 4 gate update can
+   replay existing authenticated captures through `cargo xtask run tsc`;
+   it does not imply a new checker corpus or benchmark. Check the emitted
+   metrics, not only the command exit code: a capture can validly record a
+   failed measurement. When enforcing several results, use a single call:
+
+   ```sh
+   cargo xtask check-metrics 'run.fmt.clean == true' 'run.clippy.clean == true'
+   ```
+
+   Only request metrics that this task needs and actually recorded. Preserve
+   other captures, even if stale. Do not edit their timestamps, hashes or
+   outcomes to make them current. Owner-approved historical reuse must cite
+   the original capture and the precise unchanged behavior, using the existing
+   decision/approval record. For mutation witnesses, unchanged requests alone
+   do not prove an unchanged mutation site; compare the site and observation
+   payloads and retain the original run identity. Put approved per-case
+   deviations in `data/divergences.toml`, not a second approval registry.
+5. **Render views once, after the final inputs.** Run:
+
+   ```sh
+   cargo xtask status
+   cargo xtask status --check-committed
+   ```
+
+   `status` already validates the inputs while building the report; a separate
+   `validate` immediately before it repeats that work. `--check-committed`
+   confirms the four saved views reproduce from those inputs; it does not
+   require every historical experiment to pass. Use `--record` only when a
+   new history point is intended, not as a routine commit step. If only a view
+   differs, regenerate the view; do not rerun producers to repair formatting.
+6. **Stage and inspect the deliverable.** Add the four views explicitly:
+
+   ```sh
+   git add -- STATUS.md status/status.json status/unmapped-functions.json docs/status.html
+   git diff --cached --check
+   git diff --cached --stat
+   git diff --name-only
+   ```
+
+   For each changed `status/evidence/<run>.latest`, also stage the exact
+   `status/evidence/<digest>.json` it names. If history was changed, its new
+   artifact references must be present too. Do not bulk-add
+   `status/evidence/`, which can contain unrelated or superseded attempts.
+   Inspect any remaining unstaged tracked files so the commit contains the
+   source tree that the checks actually examined. Don't blindly re-add a
+   deleted path that is already absent from the index.
+7. **Commit, then push normally.** Every dependent command must have succeeded
+   before the next runs. In tool orchestration, inspect `exit_code`: a returned
+   command result is not necessarily success. In shell scripts, use `set -e`
+   or explicit status handling. Never proceed to commit after `git add` or a
+   required check failed. Keep pushed history intact. Inspect CI when results
+   arrive and fix the named failed step; don't repeat the entire local suite
+   while CI is already running it.
+
+This procedure fixes the 2026-10-03 failure mode: an unstaged deletion once
+contributed a synthetic `deleted` entry to the fingerprint, which vanished
+after staging. That cost a second full self-test run despite identical files.
+The tracker now hashes the same working tree before and after staging, and
+tests preserve that invariant. No compiler measurement or threshold changed.
 
 ## Commands, publication and history
 

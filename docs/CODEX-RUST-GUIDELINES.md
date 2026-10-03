@@ -354,11 +354,13 @@ CI retrieves all required files.
    pushes for published branches; do not rewrite remote history without the
    user's specific authorization.
 
-Stage the final file inventory before evidence captures when moving or deleting
-files. The tracker currently hashes an unstaged tracked deletion as `deleted`,
-but omits the path after staging. Verify current gates again after staging and
-before committing; source-byte stability alone does not establish stability of
-this tracker's input inventory.
+Follow the [finish procedure](TRACKING.md#finish-procedure) before recording
+evidence or committing. Finalize source edits first; use focused local tests and
+let CI run its full suite. The source fingerprint describes the working tree:
+staging or committing an unchanged deletion, rename, addition or edit must not
+invalidate evidence. A regression test covers those transitions. Do not turn a
+stale historical capture into an automatic project-wide recapture, and do not
+confuse a successfully recorded measurement with a passing metric.
 
 For quantitative acceptance targets, estimate the representation budget from
 representative counts and measure a storage prototype early. Include replacement
