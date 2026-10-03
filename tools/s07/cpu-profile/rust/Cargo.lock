@@ -88,6 +88,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "hashbrown"
+version = "0.17.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
+
+[[package]]
 name = "itoa"
 version = "1.0.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -280,25 +286,30 @@ dependencies = [
 
 [[package]]
 name = "tsr_arena"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
+ "hashbrown",
  "tsr_jsstring",
 ]
 
 [[package]]
 name = "tsr_ast"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
+ "hashbrown",
  "stacker",
  "tsr_arena",
  "tsr_core",
  "tsr_diagnostics",
+ "tsr_jsnum",
+ "tsr_json",
  "tsr_jsstring",
+ "tsr_locale",
 ]
 
 [[package]]
 name = "tsr_binder"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "stacker",
  "tsr_arena",
@@ -312,7 +323,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_core"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "tsr_jsstring",
 ]
@@ -334,11 +345,16 @@ dependencies = [
 
 [[package]]
 name = "tsr_diagnostics"
-version = "0.1.0"
+version = "0.2.0"
+dependencies = [
+ "tsr_core",
+ "tsr_json",
+ "tsr_locale",
+]
 
 [[package]]
 name = "tsr_jsnum"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "num-bigint",
  "num-traits",
@@ -347,12 +363,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "tsr_json"
+version = "0.2.0"
+dependencies = [
+ "stacker",
+ "tsr_core",
+ "tsr_jsnum",
+ "tsr_jsstring",
+]
+
+[[package]]
 name = "tsr_jsstring"
-version = "0.1.0"
+version = "0.2.0"
+
+[[package]]
+name = "tsr_locale"
+version = "0.2.0"
 
 [[package]]
 name = "tsr_parser"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "stacker",
  "tsr_arena",
@@ -366,7 +396,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_scanner"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "stacker",
  "tsr_arena",

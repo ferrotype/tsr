@@ -66,11 +66,11 @@ class Receipt(unittest.TestCase):
                 events.append({"reason": "compiler-artifact", "target": {"name": target["name"], "kind": [target["kind"]],
                                "src_path": "/original/checkout/" + target["source"]}, "profile": {"test": test},
                                "executable": path, "fresh": False,
-                               "features": [sanitizer.SYSTEM_ALLOCATOR_FEATURE] if target["package"] == "tsr" else []})
+                               "features": [sanitizer.SYSTEM_ALLOCATOR_FEATURE] if target["package"] == "tsrust" else []})
                 args = ["--crate-name", target["name"], target["source"], "--target", self.report["target"], sanitizer.FLAGS]
                 if test:
                     args.append("--test")
-                if target["package"] == "tsr":
+                if target["package"] == "tsrust":
                     args += ["--cfg", 'feature="' + sanitizer.SYSTEM_ALLOCATOR_FEATURE + '"']
                 self.audit(identity.replace(":", "-"), args, {path: sanitizer.digest(payload)})
                 if test:
@@ -231,12 +231,12 @@ class Receipt(unittest.TestCase):
         self.verify(pattern="CLI Cargo artifact did not select the system allocator")
 
     def test_cli_compiler_must_select_system_allocator_even_when_cargo_claims_it(self):
-        self.mutate_json("compiler-audit/test-tsr-bin-tsrust.json",
+        self.mutate_json("compiler-audit/test-tsrust-bin-tsrust.json",
                          lambda value: value["arguments"].remove('feature="' + sanitizer.SYSTEM_ALLOCATOR_FEATURE + '"'))
         self.verify(pattern="CLI compiler invocation did not select the system allocator")
 
     def test_cli_feature_in_check_cfg_is_not_an_enabled_feature(self):
-        self.mutate_json("compiler-audit/test-tsr-bin-tsrust.json",
+        self.mutate_json("compiler-audit/test-tsrust-bin-tsrust.json",
                          lambda value: value["arguments"].__setitem__(value["arguments"].index("--cfg"), "--check-cfg"))
         self.verify(pattern="CLI compiler invocation did not select the system allocator")
 
@@ -301,7 +301,7 @@ class EnvironmentAndFailure(unittest.TestCase):
         report = {"nightly": sanitizer.nightly(), "target": "x86_64-unknown-linux-gnu",
                   "compiler": {"path": "/rustc"}, "capture_root": "/capture"}
         test = sanitizer.cargo_command(report, True)
-        self.assertEqual(test[test.index("--features") + 1], "tsr/system-allocator")
+        self.assertEqual(test[test.index("--features") + 1], "tsrust/system-allocator")
         self.assertNotIn("--features", sanitizer.cargo_command(report, False))
 
     def test_environment_keeps_homes_offline_and_registry_config(self):

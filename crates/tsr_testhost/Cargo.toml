@@ -10,9 +10,9 @@ publish.workspace = true
 base64 = "0.22.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["raw_value"] }
-tsr_vfs = { version = "0.1.0", path = "../tsr_vfs" }
+tsr_vfs = { version = "0.2.0", path = "../tsr_vfs" }
 
-tsr_tspath = { version = "0.1.0", path = "../tsr_tspath" }
+tsr_tspath = { version = "0.2.0", path = "../tsr_tspath" }
 
 [lints]
 workspace = true

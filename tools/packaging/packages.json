@@ -87,9 +87,15 @@
     },
     {
       "name": "tsr",
-      "manifest": "crates/tsr/Cargo.toml",
-      "publish": false,
-      "reason": "Native compiler implementation; binary publication is a separate release decision"
+      "manifest": "crates/tsr_facade/Cargo.toml",
+      "publish": true,
+      "reason": "Facade re-exporting the public libraries; a plain re-export until the embedding API settles"
+    },
+    {
+      "name": "tsrust",
+      "manifest": "crates/tsrust/Cargo.toml",
+      "publish": true,
+      "reason": "The compiler command line; installs the tsrust binary"
     },
     {
       "name": "tsr_api",
@@ -130,8 +136,8 @@
     {
       "name": "tsr_build",
       "manifest": "crates/tsr_build/Cargo.toml",
-      "publish": false,
-      "reason": "Phase 4 implementation; publication requires a separate release decision"
+      "publish": true,
+      "reason": "Rust library in the tsrust command line's public dependency closure"
     },
     {
       "name": "tsr_bundled",
@@ -196,8 +202,8 @@
     {
       "name": "tsr_execute",
       "manifest": "crates/tsr_execute/Cargo.toml",
-      "publish": false,
-      "reason": "Phase 4 implementation; publication requires a separate release decision"
+      "publish": true,
+      "reason": "Rust library in the tsrust command line's public dependency closure"
     },
     {
       "name": "tsr_format",
@@ -208,8 +214,8 @@
     {
       "name": "tsr_fswatch",
       "manifest": "crates/tsr_fswatch/Cargo.toml",
-      "publish": false,
-      "reason": "Phase 4 implementation; publication requires a separate release decision"
+      "publish": true,
+      "reason": "Rust library in the tsrust command line's public dependency closure"
     },
     {
       "name": "tsr_glob",
@@ -364,8 +370,8 @@
     {
       "name": "tsr_tracing",
       "manifest": "crates/tsr_tracing/Cargo.toml",
-      "publish": false,
-      "reason": "Phase 4 implementation; publication requires a separate release decision"
+      "publish": true,
+      "reason": "Rust library in the tsrust command line's public dependency closure"
     },
     {
       "name": "tsr_transformers",
@@ -382,8 +388,8 @@
     {
       "name": "tsr_tsc",
       "manifest": "crates/tsr_tsc/Cargo.toml",
-      "publish": false,
-      "reason": "Phase 4 implementation; publication requires a separate release decision"
+      "publish": true,
+      "reason": "Rust library in the tsrust command line's public dependency closure"
     },
     {
       "name": "tsr_tsoptions",

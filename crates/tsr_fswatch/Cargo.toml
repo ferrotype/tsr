@@ -1,11 +1,16 @@
 [package]
 name = "tsr_fswatch"
-version = "0.1.0"
+version = "0.2.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
-publish = false
-description = "Pinned native filesystem watcher backends"
+publish = ["crates-io"]
+description = "Native filesystem watcher backends (FSEvents, inotify, fanotify, kqueue) for tsr"
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme = "README.md"
+include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [target.'cfg(unix)'.dependencies]
 rustix = { version = "1.1", features = ["fs", "event", "pipe"] }

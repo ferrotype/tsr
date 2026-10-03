@@ -1,6 +1,6 @@
 [package]
 name = "tsr_transformers"
-version = "0.1.0"
+version = "0.2.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -14,20 +14,20 @@ include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/lice
 
 [dependencies]
 stacker = "=0.1.25"
-tsr_arena = { version = "0.1.0", path = "../tsr_arena" }
-tsr_ast = { version = "0.1.0", path = "../tsr_ast" }
-tsr_core = { version = "0.1.0", path = "../tsr_core" }
-tsr_diagnostics = { version = "0.1.0", path = "../tsr_diagnostics" }
-tsr_jsnum = { version = "0.1.0", path = "../tsr_jsnum" }
-tsr_jsstring = { version = "0.1.0", path = "../tsr_jsstring" }
-tsr_nodebuilder = { version = "0.1.0", path = "../tsr_nodebuilder" }
-tsr_printer = { version = "0.1.0", path = "../tsr_printer" }
-tsr_scanner = { version = "0.1.0", path = "../tsr_scanner" }
-tsr_tsoptions = { version = "0.1.0", path = "../tsr_tsoptions" }
-tsr_tspath = { version = "0.1.0", path = "../tsr_tspath" }
+tsr_arena = { version = "0.2.0", path = "../tsr_arena" }
+tsr_ast = { version = "0.2.0", path = "../tsr_ast" }
+tsr_core = { version = "0.2.0", path = "../tsr_core" }
+tsr_diagnostics = { version = "0.2.0", path = "../tsr_diagnostics" }
+tsr_jsnum = { version = "0.2.0", path = "../tsr_jsnum" }
+tsr_jsstring = { version = "0.2.0", path = "../tsr_jsstring" }
+tsr_nodebuilder = { version = "0.2.0", path = "../tsr_nodebuilder" }
+tsr_printer = { version = "0.2.0", path = "../tsr_printer" }
+tsr_scanner = { version = "0.2.0", path = "../tsr_scanner" }
+tsr_tsoptions = { version = "0.2.0", path = "../tsr_tsoptions" }
+tsr_tspath = { version = "0.2.0", path = "../tsr_tspath" }
 
 [dev-dependencies]
-tsr_parser = { version = "0.1.0", path = "../tsr_parser" }
+tsr_parser = { version = "0.2.0", path = "../tsr_parser" }
 serde_json = "1"
 
 [lints]

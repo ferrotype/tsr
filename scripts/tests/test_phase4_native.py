@@ -68,7 +68,7 @@ class NativeFixture(unittest.TestCase):
             path.write_bytes(raw)
         self.process(self.build / "go-build", ["go", "build", "-mod=readonly", "-o", self.recorded_build / "go-executable", "./cmd/tsc"], self.recorded_build / "export/tsc")
         cargo = [{"reason": "compiler-artifact", "target": {"name": "tsrust", "kind": ["bin"],
-                  "src_path": str(self.recorded_repo / "crates/tsr/src/main.rs")},
+                  "src_path": str(self.recorded_repo / "crates/tsrust/src/main.rs")},
                   "profile": {"opt_level": "3", "debug_assertions": False, "test": False},
                   "executable": str(self.recorded_repo / "target/release/tsrust")},
                  {"reason": "build-finished", "success": True}]
