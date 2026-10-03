@@ -1,0 +1,702 @@
+{
+  "Any partial scalar syntax failures": [
+    {
+      "encoded": "{\"settings\":null}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "{\"settings\":null}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"settings\":[1,null]}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "{\"settings\":null}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"settings\":{\"x\":null}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Boolean union": [
+    {
+      "encoded": "true",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "false",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "",
+      "marshal_failed": false,
+      "marshal_panicked": true,
+      "ok": false
+    }
+  ],
+  "CallHierarchyIncomingCall from null": [
+    {
+      "encoded": "{\"from\":null,\"fromRanges\":[]}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "CallHierarchyIncomingCallsParams item null": [
+    {
+      "encoded": "{\"item\":null}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Client scalar reuse and null": [
+    {
+      "encoded": "{\"name\":\"x\",\"version\":\"v\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"name\":\"x\",\"version\":\"v\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "CompletionItem insertTextFormat null": [
+    {
+      "encoded": "{\"label\":\"test\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Configuration any merge": [
+    {
+      "encoded": "{\"settings\":{\"a\":1,\"b\":[2]}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"settings\":{\"a\":1,\"b\":[2],\"c\":3}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"settings\":null}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"settings\":1.2345678901234568e+29}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"settings\":1.2345678901234568e+29}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Document edit discriminator and fallback": [
+    {
+      "encoded": "{\"textDocument\":{\"uri\":\"file:///a.ts\",\"version\":1},\"edits\":[]}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"kind\":\"create\",\"uri\":\"file:///x.ts\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"kind\":\"rename\",\"oldUri\":\"file:///x.ts\",\"newUri\":\"file:///y.ts\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"kind\":\"delete\",\"uri\":\"file:///x.ts\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"kind\":\"create\",\"uri\":\"\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "{\"textDocument\":{\"uri\":\"\",\"version\":null},\"edits\":[]}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "FoldingRange kind null": [
+    {
+      "encoded": "{\"startLine\":0,\"endLine\":10}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "FoldingRange receives boolean": [
+    {
+      "encoded": "{\"startLine\":0,\"endLine\":0}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "FoldingRange startCharacter null": [
+    {
+      "encoded": "{\"startLine\":0,\"endLine\":10}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "FoldingRange with only required fields": [
+    {
+      "encoded": "{\"startLine\":5,\"endLine\":10}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    }
+  ],
+  "Hover range null": [
+    {
+      "encoded": "{\"contents\":{\"kind\":\"plaintext\",\"value\":\"hi\"}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "InitializationOptions userPreferences null": [
+    {
+      "encoded": "{}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    }
+  ],
+  "InitializeParams capabilities null": [
+    {
+      "encoded": "{\"processId\":null,\"rootUri\":null,\"capabilities\":null}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "InitializeParams initializationOptions null": [
+    {
+      "encoded": "{\"processId\":null,\"rootUri\":null,\"capabilities\":{}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    }
+  ],
+  "InitializeParams processId null": [
+    {
+      "encoded": "{\"processId\":null,\"rootUri\":null,\"capabilities\":{}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    }
+  ],
+  "InitializeParams rootUri null": [
+    {
+      "encoded": "{\"processId\":null,\"rootUri\":null,\"capabilities\":{}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    }
+  ],
+  "InitializeParams workspaceFolders null": [
+    {
+      "encoded": "{\"processId\":null,\"rootUri\":null,\"capabilities\":{}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    }
+  ],
+  "InitializeResult capabilities null": [
+    {
+      "encoded": "{\"capabilities\":null}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "InlayHint kind null": [
+    {
+      "encoded": "{\"position\":{\"line\":0,\"character\":0},\"label\":\"foo\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "InlayHint missing label": [
+    {
+      "encoded": "",
+      "marshal_failed": false,
+      "marshal_panicked": true,
+      "ok": false
+    }
+  ],
+  "InlayHint missing position": [
+    {
+      "encoded": "{\"position\":{\"line\":0,\"character\":0},\"label\":\"test\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "InlayHint paddingLeft null": [
+    {
+      "encoded": "{\"position\":{\"line\":0,\"character\":0},\"label\":\"foo\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "InlayHint textEdits null": [
+    {
+      "encoded": "{\"position\":{\"line\":0,\"character\":0},\"label\":\"foo\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "InlayHint with only required fields": [
+    {
+      "encoded": "{\"position\":{\"line\":1,\"character\":5},\"label\":\"test\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    }
+  ],
+  "Integer union": [
+    {
+      "encoded": "7",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "\"hi\"",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "",
+      "marshal_failed": false,
+      "marshal_panicked": true,
+      "ok": false
+    },
+    {
+      "encoded": "0",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "",
+      "marshal_failed": false,
+      "marshal_panicked": true,
+      "ok": false
+    },
+    {
+      "encoded": "",
+      "marshal_failed": false,
+      "marshal_panicked": true,
+      "ok": false
+    },
+    {
+      "encoded": "",
+      "marshal_failed": false,
+      "marshal_panicked": true,
+      "ok": false
+    }
+  ],
+  "Literal discriminator": [
+    {
+      "encoded": "{\"kind\":\"begin\",\"title\":\"Index\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"kind\":\"report\",\"message\":\"half\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"kind\":\"end\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"kind\":\"begin\",\"title\":\"\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "",
+      "marshal_failed": false,
+      "marshal_panicked": true,
+      "ok": false
+    },
+    {
+      "encoded": "",
+      "marshal_failed": false,
+      "marshal_panicked": true,
+      "ok": false
+    }
+  ],
+  "Literal requires exact JSON bytes": [
+    {
+      "encoded": "\"create\"",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "\"create\"",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "\"create\"",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "\"create\"",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "\"create\"",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Location empty object": [
+    {
+      "encoded": "{\"uri\":\"\",\"range\":{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":0}}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Location missing uri": [
+    {
+      "encoded": "{\"uri\":\"\",\"range\":{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":0}}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Location receives array": [
+    {
+      "encoded": "{\"uri\":\"\",\"range\":{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":0}}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Location receives null": [
+    {
+      "encoded": "{\"uri\":\"\",\"range\":{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":0}}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Location receives number": [
+    {
+      "encoded": "{\"uri\":\"\",\"range\":{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":0}}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Location receives string": [
+    {
+      "encoded": "{\"uri\":\"\",\"range\":{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":0}}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Map merge and failure": [
+    {
+      "encoded": "{\"changes\":{\"file:///a.ts\":[]}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"changes\":{\"file:///a.ts\":[],\"file:///b.ts\":[]}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"changes\":{\"file:///a.ts\":[],\"file:///b.ts\":[]}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "{\"changes\":{\"file:///a.ts\":[],\"file:///b.ts\":[],\"file:///c.ts\":[{\"range\":{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":0}},\"newText\":\"\"}]}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Nullable union": [
+    {
+      "encoded": "7",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "null",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "null",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Optional-only struct null reset": [
+    {
+      "encoded": "{\"workDoneProgress\":false}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"workDoneProgress\":false}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "{\"workDoneProgress\":true}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    }
+  ],
+  "Position escaped key is unknown": [
+    {
+      "encoded": "{\"line\":0,\"character\":4}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Position reuse and required presence": [
+    {
+      "encoded": "{\"line\":2,\"character\":8}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"line\":3,\"character\":8}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "{\"line\":4,\"character\":8}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "{\"line\":0,\"character\":0}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"line\":1,\"character\":0}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Presence discriminator": [
+    {
+      "encoded": "{\"range\":{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":1}},\"newText\":\"x\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"newText\":\"x\",\"insert\":{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":1}},\"replace\":{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":2}}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"range\":{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":0}},\"newText\":\"\"}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Registration external discriminator": [
+    {
+      "encoded": "{\"id\":\"1\",\"method\":\"workspace/didChangeConfiguration\",\"registerOptions\":{}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"id\":\"h\",\"method\":\"textDocument/hover\",\"registerOptions\":{\"documentSelector\":null}}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "",
+      "marshal_failed": false,
+      "marshal_panicked": true,
+      "ok": false
+    },
+    {
+      "encoded": "",
+      "marshal_failed": false,
+      "marshal_panicked": true,
+      "ok": false
+    },
+    {
+      "encoded": "",
+      "marshal_failed": false,
+      "marshal_panicked": true,
+      "ok": false
+    }
+  ],
+  "SemanticTokens data null (required slice)": [
+    {
+      "encoded": "{\"data\":[]}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "TextDocumentEdit edits null (required slice)": [
+    {
+      "encoded": "{\"textDocument\":{\"uri\":\"file:///a.ts\",\"version\":1},\"edits\":[]}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Tuple length and reuse": [
+    {
+      "encoded": "\"p\"",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "[0,4]",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "[1,0]",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "[1,2]",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "[1,0]",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ],
+  "Unknown optional enum accepted": [
+    {
+      "encoded": "{\"position\":{\"line\":0,\"character\":0},\"label\":\"a\",\"kind\":999,\"paddingLeft\":false}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "{\"position\":{\"line\":0,\"character\":0},\"label\":[{\"value\":\"x\"}],\"kind\":999,\"paddingLeft\":false}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    }
+  ],
+  "WorkDoneProgressOptions workDoneProgress null": [
+    {
+      "encoded": "{}",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    }
+  ]
+}

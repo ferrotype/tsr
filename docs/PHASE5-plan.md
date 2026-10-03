@@ -269,9 +269,11 @@ L0's pipeline is:
    after its model augmentation and resolution. Export the normalized types,
    inheritance, union/discriminator rules, methods and wire field behavior
    needed by Rust. Do not reimplement that resolver in Rust.
-3. A Rust emitter under `tools/phase5/lsproto-gen` consumes that export and
+3. The Rust emitter `xtask/src/gen/lsproto.rs` consumes that export and
    writes `tsr_lsproto`'s generated types/codecs. Wire it into the existing
-   generation command; keep handwritten special codecs explicit.
+   generation command as `cargo xtask gen lsproto [--check]`; keep handwritten
+   special codecs explicit. The access adapter and metamodel inputs live under
+   `tools/phase5/lsproto`.
 4. Check type/method/field coverage against the pin and port `lsp_test.go`,
    `lsp_json_test.go` and `baseproto_test.go`. Include custom initialization
    and mapper fields, absent/null/empty values, union alternatives, unknown

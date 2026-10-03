@@ -1,0 +1,5 @@
+{
+  "url": "https://raw.githubusercontent.com/microsoft/vscode-languageserver-node/release/client/10.1.0/protocol/metaModel.json",
+  "client_version": "10.1.0",
+  "sha256": "35ebcc0b607eeda105dd092c990182eb338852d82130053d3a27499ff34c89a2"
+}

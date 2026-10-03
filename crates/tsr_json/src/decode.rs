@@ -14,6 +14,14 @@ pub trait Decode {
         std::any::type_name::<Self>()
     }
 }
+impl<T: Decode + ?Sized> Decode for Box<T> {
+    fn type_name() -> &'static str {
+        T::type_name()
+    }
+    fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
+        input.value(&mut **self)
+    }
+}
 impl Decoder<'_> {
     pub fn value<T: Decode + ?Sized>(&mut self, value: &mut T) -> Result<(), Error> {
         let before = self.depth_length();
@@ -205,6 +213,48 @@ impl<T: Decode + Default> Decode for Vec<T> {
         while input.peek_kind() != Kind::EndArray {
             self.push(T::default());
             input.value(self.last_mut().expect("inserted element"))?;
+        }
+        input.read_token()?;
+        Ok(())
+    }
+}
+
+impl<K, V, S> Decode for std::collections::HashMap<K, V, S>
+where
+    K: DecodeKey + Eq + Hash + Clone,
+    V: Decode + Default,
+    S: BuildHasher,
+{
+    fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
+        if input.peek_kind() == Kind::Null {
+            input.read_token()?;
+            self.clear();
+            return Ok(());
+        }
+        if input.peek_kind() != Kind::BeginObject {
+            return input.type_error("map");
+        }
+        input.read_token()?;
+        let check_duplicates = !input.allows_duplicate_names();
+        // A new map is itself the set of decoded keys. A merge needs a separate
+        // set because pre-existing entries are not duplicate input members.
+        let mut seen = (check_duplicates && !self.is_empty()).then(std::collections::HashSet::new);
+        while input.peek_kind() != Kind::EndObject {
+            let (offset, _) = input.next_location()?;
+            let Token::String(name) = input.read_token()? else {
+                return Err(Error::Message("object name must be a string".into()));
+            };
+            let key = K::decode_key(&name)?;
+            if check_duplicates
+                && seen
+                    .as_mut()
+                    .map_or_else(|| self.contains_key(&key), |seen| !seen.insert(key.clone()))
+            {
+                return Err(Error::duplicate(offset, input.stack_pointer()));
+            }
+            // json v2 merges existing map entries and keeps partial writes even
+            // if decoding that member subsequently fails.
+            input.value(self.entry(key).or_default())?;
         }
         input.read_token()?;
         Ok(())

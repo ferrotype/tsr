@@ -1,0 +1,23 @@
+[package]
+name = "tsr_lsproto"
+version = "0.2.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = ["crates-io"]
+description = "Pinned language server protocol types and wire codecs for tsr"
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme = "README.md"
+include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
+
+[dependencies]
+tsr_json = { version = "0.2.0", path = "../tsr_json" }
+tsr_jsonrpc = { version = "0.2.0", path = "../tsr_jsonrpc" }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+serde_json = "1"

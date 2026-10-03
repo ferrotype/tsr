@@ -15,6 +15,9 @@ pub struct Decoder<'a> {
     pub(crate) base_depth: usize,
 }
 impl<'a> Decoder<'a> {
+    pub(crate) fn allows_duplicate_names(&self) -> bool {
+        self.options.allow_duplicate_names.unwrap_or(false)
+    }
     pub fn new(reader: impl Read + 'a) -> Self {
         Self::with_options(reader, Options::default())
     }

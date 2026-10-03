@@ -1,6 +1,6 @@
 # Rust package preparation
 
-The publication policy includes 44 public packages (42 libraries, the
+The publication policy includes 45 public packages (43 libraries, the
 `tsrust` command line and the `tsr` facade) and 12 private
 packages, all named explicitly in [packages.json](packages.json). The workspace
 defaults to `publish = false`. This policy and the dependency order below track
@@ -120,38 +120,39 @@ goes last:
 10. `tsr_tspath`
 11. `tsr_diagnostics`
 12. `tsr_jsonrpc`
-13. `tsr_sourcemap`
-14. `tsr_vfs`
-15. `tsr_ast`
-16. `tsr_bundled`
-17. `tsr_ipc`
-18. `tsr_encoder`
-19. `tsr_nodebuilder`
-20. `tsr_scanner`
-21. `tsr_parser`
-22. `tsr_astnav`
-23. `tsr_binder`
-24. `tsr_tsoptions`
-25. `tsr_contentmapper`
-26. `tsr_format`
-27. `tsr_module`
-28. `tsr_printer`
-29. `tsr_pseudochecker`
-30. `tsr_checker`
-31. `tsr_transformers`
-32. `tsr_compiler`
-33. `tsr_tracing`
-34. `tsr_embed`
-35. `tsr_incremental`
-36. `tsr_project`
-37. `tsr_transpile`
-38. `tsr_api`
-39. `tsr_tsc`
-40. `tsr_wasm`
-41. `tsr_build`
-42. `tsr_execute`
-43. `tsrust`
-44. `tsr`
+13. `tsr_lsproto`
+14. `tsr_sourcemap`
+15. `tsr_vfs`
+16. `tsr_ast`
+17. `tsr_bundled`
+18. `tsr_ipc`
+19. `tsr_encoder`
+20. `tsr_nodebuilder`
+21. `tsr_scanner`
+22. `tsr_parser`
+23. `tsr_astnav`
+24. `tsr_binder`
+25. `tsr_tsoptions`
+26. `tsr_contentmapper`
+27. `tsr_format`
+28. `tsr_module`
+29. `tsr_printer`
+30. `tsr_pseudochecker`
+31. `tsr_checker`
+32. `tsr_transformers`
+33. `tsr_compiler`
+34. `tsr_tracing`
+35. `tsr_embed`
+36. `tsr_incremental`
+37. `tsr_project`
+38. `tsr_transpile`
+39. `tsr_api`
+40. `tsr_tsc`
+41. `tsr_wasm`
+42. `tsr_build`
+43. `tsr_execute`
+44. `tsrust`
+45. `tsr`
 
 ## Package policy
 
@@ -189,6 +190,7 @@ goes last:
 | `tsr_jsnum` | Prepared | Rust library and its public dependency closure |
 | `tsr_json` | Prepared | Rust library and its public dependency closure |
 | `tsr_jsonrpc` | Prepared | Rust library and its public dependency closure |
+| `tsr_lsproto` | Prepared | Pinned LSP protocol library for Phase 5 |
 | `tsr_jsstring` | Prepared | Rust library and its public dependency closure |
 | `tsr_locale` | Prepared | Rust library and its public dependency closure |
 | `tsr_module` | Prepared | Rust library and its public dependency closure |

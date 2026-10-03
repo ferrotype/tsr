@@ -121,6 +121,16 @@ jobs:
         with:
           go-version: ${{ steps.go.outputs.version }}
           cache-dependency-path: upstream/tsc/go.sum
+      - name: Read the protocol generator's Node pin
+        id: node
+        run: echo "version=$(python3 -c "import json;print(json.load(open('upstream/package.json'))['volta']['node'])")" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.node.outputs.version }}
+      - name: LSP generated code and pinned codec comparison
+        run: |
+          cargo xtask gen lsproto --check
+          python3 tools/phase5/lsproto/check.py
       # Several script tests read `cargo metadata --offline`; the registry has
       # to hold the locked crates before anything builds.
       - name: Fetch the locked dependencies

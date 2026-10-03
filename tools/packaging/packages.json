@@ -212,6 +212,12 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
+      "name": "tsr_lsproto",
+      "manifest": "crates/tsr_lsproto/Cargo.toml",
+      "publish": true,
+      "reason": "Pinned LSP protocol library for Phase 5"
+    },
+    {
       "name": "tsr_module",
       "manifest": "crates/tsr_module/Cargo.toml",
       "publish": true,
