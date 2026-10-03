@@ -184,7 +184,6 @@ owner, not a Phase 5 patch:
 | `tsr_format`, `tsr_api::printing`/`formatting` | S09 | Formatting requests, code-action text, the API's printing (Phase 6) |
 | `tsr_testhost` wire version 2: framing, `callbackFS`, options staging, streams | S11 (ADR 0019) | The test-host extension of `tsrust --lsp`; its contract tests keep passing |
 | `tsr_contentmapper` host and spawners | Phase 2 (C7.8), Phase 4 | Mapper projects in the server, the fakes the fourslash and LSP tests name |
-| The phase2 comparison, register and producer libraries | Phase 2 (C0) | Reused by the Phase 5 scripts, never edited |
 
 Coordination:
 
@@ -234,8 +233,9 @@ the register entry for the checkpoint that ports it, never `failed`.
 Preparation only; no Rust service parity is claimed.
 
 - **Exists:** the pinned suites; `tsr_testhost` and ADR 0019; the overlay
-  pattern of `scripts/phase4_scenarios.py`; the Phase 4 register, comparison
-  and producer libraries; the wiring pattern of `[tsc]`.
+  pattern of `scripts/phase4_scenarios.py`; `scripts/parity.py` and its
+  result-line contract; the `tsc` suite as the model of a runner over
+  recorded Go-side data.
 - **Build:**
   - *`tsr_lsproto`.* The generator (`tools/phase5/lsproto-gen`, a Rust
     program reading the pinned `metaModel.json` the Go `_generate` reads) and
@@ -287,15 +287,15 @@ Preparation only; no Rust service parity is claimed.
   - *The bridge contracts.* `tsr_testhost`'s S11 contracts re-run against
     `tsrust --lsp --test-host` so the production endpoint, not the prototype,
     holds them.
-  - *Wiring.* Sprints `P5A` and `P5B`, the `lsp` producer in `status/runs.toml`,
-    `data/phase5/`, `scripts/tests/test_phase5*.py`, the L0 record
-    (`docs/PHASE5-L0.md`), the ledger regeneration.
+  - *Wiring.* The `fourslash` and `lsp` suites in `scripts/parity.py` and
+    `ci.yml` (sharded like the compiler suites), `data/phase5/` for the
+    carried patch and the recorded inventory, the L0 record
+    (`docs/PHASE5-L0.md`).
   - *Cost.* The patched suite's time against the skeleton and the pinned
     suite's own time.
-- **Exit:** `run.lsp.inventory_frozen`, `inventory_verified`,
-  `harness_valid`, `result_recorded`, `blockers_named`, `bridge_contracts`
-  true on a recorded `lsp` run; every test in exactly one category; `P5A-L0`
-  passes.
+- **Exit:** `status/parity/fourslash.json` and `lsp.json` accepted from a
+  full run with every entry explained; the bridge contracts in `cargo test`;
+  CI green on the pull request.
 
 ### L1 — the project system
 
@@ -327,8 +327,8 @@ Preparation only; no Rust service parity is claimed.
   request, cancellation, progress) as recorded facts; fourslash tests that
   only open files and verify diagnostics counts (`VerifyNoErrors`,
   `VerifyNumberOfErrorsInCurrentFile`) through the server's publish path.
-- **Exit:** the 85 project tests pass; `l1-contracts` current; the bridge
-  facts true; `P5B-L1` passes.
+- **Exit:** the 85 project tests pass in `lsp.json`; the ownership tests in
+  `cargo test`; the bridge facts true.
 
 ### L2 — the server
 
@@ -350,7 +350,7 @@ Preparation only; no Rust service parity is claimed.
   replay runner against a first recorded session (decision 7); fourslash
   tests that only exercise sync and diagnostics.
 - **Exit:** the lsp tests pass except those naming an L3 to L6 feature, which
-  read `unsupported`; `P5B-L2` passes.
+  stay in `lsp.json` with that reason.
 
 ### L3 — read-only features
 
@@ -368,7 +368,7 @@ editing, `diagnostics.go` with suggestion diagnostics (37) and the
 - **Witnesses:** the fourslash tests whose primary verifier is one of these,
   and the 1,749 baselines they write, compared whole with the committed
   references.
-- **Exit:** every L3 test passes or is allow-listed; `P5B-L3` passes.
+- **Exit:** every L3 test passes or stays in `fourslash.json` with a reason.
 
 ### L4 — completions and auto-imports
 
@@ -387,7 +387,7 @@ editing, `diagnostics.go` with suggestion diagnostics (37) and the
 - **Witnesses:** the 1,111 completion tests, the 231 import-fix tests, the
   27 JSDoc completion tests, the 75 apply-code-action tests, the 12
   `autoimport` unit tests.
-- **Exit:** every L4 test passes or is allow-listed; `P5B-L4` passes.
+- **Exit:** every L4 test passes or stays in `fourslash.json` with a reason.
 
 ### L5 — edits
 
@@ -403,7 +403,7 @@ edit-and-verify tests (`Insert`, `Backspace`, `VerifyCurrentFileContent`,
 - **Witnesses:** the fourslash tests named above, the `change` and `format`
   unit tests, and the text edits compared against the pin's exact
   `TextEdit` ranges and texts (positions in UTF-16 code units).
-- **Exit:** every L5 test passes or is allow-listed; `P5B-L5` passes.
+- **Exit:** every L5 test passes or stays in `fourslash.json` with a reason.
 
 ### L6 — the project system's long reach
 
@@ -419,7 +419,7 @@ and `ls/api.go` for Phase 6.
 - **Witnesses:** the remaining project and lsp tests; the fourslash tests
   with `@tsc` build directives and multi-project setups; the mapper
   lifecycle tests.
-- **Exit:** the project and lsp suites pass whole; `P5B-L6` passes.
+- **Exit:** the project and lsp suites pass whole (`lsp.json` empty).
 
 ### L7 — the long tail
 
@@ -429,77 +429,45 @@ names the test, the pinned behaviour, the Rust behaviour and the reason it is
 retained), the replay corpus against both servers (decision 7), the latency
 scenarios (decision 10).
 
-- **Exit:** fourslash passes at or above 99.5 percent of 4,548 with every
-  failure on the triaged allow-list; the replay corpus replays identically;
-  the latency capture shows no regression; `P5B-L7` passes.
+- **Exit:** `fourslash.json` holds at most 22 entries, each with a reason;
+  the replay corpus replays identically; the latency run shows no regression.
 
 ### L8 — closure
 
-The residual list, the divergence ledger check, the audit complete over
-every Phase 5 file (`mapped`, `equivalent` with a site, `later` with an
-owner, no gap), the ledger `ported`, the S07 anchor refresh, the green-up
-(both runners green, `checker`, `emit`, `tsc` and `lsp` re-recorded), the
-Phase 5 record with the per-feature dashboard and the consumption report for
-Phases 6 and 7.
+Every Phase 5 function marked or documented as equivalent, the ledger
+`ported`, the Phase 5 record and the consumption report for Phases 6 and 7.
+There is no green-up: the expectation files are exact for every commit.
 
-- **Exit:** the P5B exit (section 5) on recorded runs; `P5B-L8` passes.
+- **Exit:** section 5's table holds on the merged pull request.
 
-## 5. Acceptance and evidence design
+## 5. Acceptance
 
-Namespace: sprints `P5A` (stage A, L0) and `P5B` (stage B, L1 to L8); data
-under `data/phase5/`; scripts `scripts/phase5_*.py` over the phase2 and
-phase4 libraries; one producer, `lsp`, with its inputs and sources declared in
-`status/runs.toml`; contract witnesses `l1-contracts` and `l2-contracts` with
-receipts as Phase 3's and 4's.
+Amended 2026-10-03 for [EVIDENCE-plan.md](EVIDENCE-plan.md) (ADR 0023): no
+producer, no sprint files, no recorded evidence. Phase 5's acceptance is two
+expectation files that CI recomputes on every pull request, and the
+checkpoints close by merged pull requests that shrink them.
 
 | Required claim | Evidence and denominator | Reuse |
 | --- | --- | --- |
-| fourslash passes | 4,548 test functions through the carried patch against `tsrust --lsp --test-host`; each test's outcome from `go test -json`; 1,749 baselines compared whole; at least 99.5 percent pass (4,526) with every failure on the triaged allow-list (`data/phase5/allowlist.toml`, owner-approved, one entry per test with the reason) | ADR 0019's seams, `tsr_testhost` |
-| The project suite | 85 tests through the patched `projecttestutil` | The pinned mocks |
-| The LSP suite | 30 tests | The patched client |
-| The unit suites | 8 + 12 + 12 + 1 + 7 | Rust ports of the pinned tests, named in the roster |
-| The bridge | A worker blocked in a synchronous file-system call issues a reverse request while the router pumps; cancellation reaches it; progress flows | S11's contracts, promoted to the production endpoint |
-| Ownership | `l1-contracts`: release per snapshot, project and bundle; retirement after a panic; two runs identical | E3, C6, T3/T7 shapes |
-| Replay | The recorded editor sessions replay identically against the Go and Rust servers | `lsp/replay_test.go` |
-| Latency | The editor scenarios (decision 10) on this host, Rust beside Go, no regression | The S07 measurement discipline |
-| Function disposition | Every function of the 130 files `mapped`, `equivalent` with a site or `later` with an owner; no `gap` at L8 | `phase4_audit.py`'s rules |
+| fourslash passes | `status/parity/fourslash.json`: the 4,548 pinned test functions run through the carried harness patch against `tsrust --lsp --test-host`, each test's outcome and its baseline (1,749, compared whole) as sub-tests; at most 22 failing entries (99.5 percent of 4,548), each with a reason, `approved` where the owner accepted the difference | ADR 0019's seams, `tsr_testhost`, `scripts/parity.py` |
+| The project and LSP suites | `status/parity/lsp.json`: the 85 project tests through the patched `projecttestutil` and the 30 LSP tests through the patched client, one variant each | The pinned mocks and client |
+| The unit suites | Rust ports of the pinned tests (8 + 12 + 12 + 1 + 7), counted from their `// source:` comments by `cargo xtask status`; `cargo test` runs them | — |
+| The bridge | A worker blocked in a synchronous file-system call issues a reverse request while the router pumps; cancellation reaches it; progress flows: integration tests of `tsr_lsp`, in `cargo test` | S11's contracts, promoted to the production endpoint |
+| Ownership | Release per snapshot, project and bundle; retirement after a panic; two runs identical: tests of `tsr_project`, in `cargo test` | E3, C6, T3/T7 shapes |
+| Replay | The recorded editor sessions (decision 7) replay identically against the Go and Rust servers: a variant each in `lsp.json` | `lsp/replay_test.go` |
+| Latency | The editor scenarios (decision 10) as a `status/perf/lsp` workload of the dispatch-only perf workflow, Rust beside Go on the owner's host | The S07 measurement discipline, `scripts/perf.py` |
+| Function disposition | Every function of the 130 files carries a `// port:` marker or a documented equivalent; `cargo xtask validate` rejects unknown markers and `cargo xtask status` reports the mapped count per package | — |
 
-Producer metrics (`run.lsp.*`): `inventory_frozen`, `inventory_verified`,
-`harness_valid`, `result_recorded`, `blockers_named`, `bridge_contracts`,
-`fourslash_pass` (fraction of 4,548), `fourslash_allowlisted` (count),
-`fourslash_baselines` (fraction of 1,749), `project_suite`, `lsp_suite`,
-`unit_suites`, `replay_parity`, `latency_regression`, `residuals`,
-`dispositions`, `evidence_current`, `report`, and per checkpoint
-`lN_complete`. The P5B exit is:
-
-```text
-sprint.P5A.done == 1
-sprint.P4B.done == 1
-run.lsp.harness_valid == true
-run.lsp.fourslash_pass >= 0.995
-run.lsp.fourslash_baselines == 1 (over the tests that pass)
-run.lsp.project_suite == true
-run.lsp.lsp_suite == true
-run.lsp.unit_suites == true
-run.lsp.bridge_contracts == true
-run.lsp.replay_parity == true
-run.lsp.latency_regression == false
-run.lsp.residuals == 0
-run.checker.errors_parity == 1 (and the six other Phase 2 metrics)
-run.emit.output_parity == 1 (and the other Phase 3 metrics)
-run.tsc.baseline_parity == 1 (and the other Phase 4 metrics)
-```
-
-The 99.5 percent threshold is PLAN's and the only one; it admits at most 22
-failing tests, each on the allow-list with an owner-approved reason. A
-retained behaviour difference that is not a test failure is a
-`data/divergences.toml` entry (ADR 0004).
-
-Every recorded fact keeps the Phase 2 discipline: the inventory recorded
-from the pin and bound by digest; the harness patch bound to the pinned
-files' hashes; the Rust capture bound to the executable and the source
-closure; `replay` before recording; the register rebuilt from evidence.
-`cargo xtask run lsp` and `status --record` remain the owner's.
+The runner behind the two files is the pinned Go suites themselves, driven
+through the carried patch of `lsptestutil.NewLSPClient` (section 2) and
+emitting the result-line contract of `scripts/parity.py` (one line per test
+and per baseline); `parity.py run fourslash` and `run lsp` shard and drive
+it like the compiler suites. L0 delivers that runner and the two files
+accepted from the first run, with every entry explained; L1 to L8 shrink
+them. The 99.5 percent threshold is PLAN's and the only one; it is the size
+of `fourslash.json`'s failing set at L8, not a recorded metric. A retained
+behaviour difference that is not a test failure is an `approved` entry
+(ADR 0004 as amended).
 
 ## 6. Cost control and performance risk
 
@@ -538,8 +506,8 @@ closure; `replay` before recording; the register rebuilt from evidence.
 
 Twelve proposals. Each stands as written unless the owner changes it.
 
-1. **Names.** Checkpoints L0 to L8, sprints `P5A` and `P5B`, producer `lsp`,
-   data under `data/phase5/`.
+1. **Names.** Checkpoints L0 to L8, suites `fourslash` and `lsp`
+   (`status/parity/fourslash.json`, `lsp.json`), data under `data/phase5/`.
 2. **The pinned suites drive the Rust server** through a carried harness
    patch (`lsptestutil`, the server-options lines of `fourslash.go`,
    `projecttestutil`) that connects the in-process client to
@@ -559,9 +527,9 @@ Twelve proposals. Each stands as written unless the owner changes it.
 5. **`lsproto` is generated here** from the pinned meta model by a Rust
    generator (ADR 0015), not transcribed from `lsp_generated.go`; the
    generator's output is checked against the Go file's type and method lists.
-6. **The allow-list** (`data/phase5/allowlist.toml`) holds at most 22 tests,
-   each with the owner's reason; it is the only tolerated-failure mechanism,
-   and a retained behaviour difference goes to `data/divergences.toml`.
+6. **The failing set** of `fourslash.json` holds at most 22 tests at L8,
+   each with a reason; it is the only tolerated-failure mechanism, and a
+   retained behaviour difference is an `approved` entry (ADR 0004 as amended).
    Corsa's own Strada deviations (`MarkTestAsStradaServer`, the triage files)
    are reproduced, not excused.
 7. **The replay corpus.** The owner records editor sessions with the pinned
