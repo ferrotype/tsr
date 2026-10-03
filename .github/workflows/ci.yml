@@ -54,6 +54,13 @@ jobs:
         run: cargo xtask validate
       - name: Tests
         run: cargo test --workspace --all-features --locked
+      - name: Read the Go pin
+        id: go
+        run: echo "version=$(python3 -c "import tomllib;print(tomllib.load(open('data/s04/toolchains.toml','rb'))['go'].removeprefix('go'))")" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ steps.go.outputs.version }}
+          cache-dependency-path: upstream/tsc/go.sum
       - name: Script tests
         run: python3 scripts/run_tests.py
 
