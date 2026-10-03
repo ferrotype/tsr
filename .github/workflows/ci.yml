@@ -75,6 +75,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          submodules: true
       - name: Read the declared minimum
         id: msrv
         run: echo "version=$(python3 -c "import tomllib;print(tomllib.load(open('Cargo.toml','rb'))['workspace']['package']['rust-version'])")" >> "$GITHUB_OUTPUT"
@@ -89,6 +91,8 @@ jobs:
     runs-on: ${{ vars.PARITY_RUNNER || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          submodules: true
       - name: Install the pinned toolchain
         run: rustup show active-toolchain || rustup toolchain install
       - uses: Swatinem/rust-cache@v2
