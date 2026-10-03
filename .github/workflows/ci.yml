@@ -14,8 +14,8 @@
 #               scenarios through the ported harness) against status/parity/tsc.json,
 #               and the tests of the crates with platform code.
 # status:       renders `cargo xtask status` (parity files, perf runs, port coverage)
-#               as a workflow artifact on every run and publishes it to GitHub Pages
-#               on main. Nothing rendered is committed.
+#               as a workflow artifact on every run; `pages` publishes it to GitHub
+#               Pages on main. Nothing rendered is committed.
 #
 # The repository variable PARITY_RUNNER moves the runner build and the shards to a
 # self-hosted runner; unset, they use ubuntu-latest.
@@ -272,9 +272,6 @@ jobs:
   status:
     name: status page
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v5
       - name: Install the pinned toolchain
@@ -291,6 +288,15 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           path: target/status
+
+  pages:
+    name: publish the status page
+    needs: status
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
       - uses: actions/deploy-pages@v4
         id: deploy
-        if: github.ref == 'refs/heads/main'
