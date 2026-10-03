@@ -118176,7 +118176,7 @@
         "tsc/internal/compiler/program.go:compactAndMergeRelatedInfos"
       ],
       "producer": "tools/s07/include-reason/export_test.go",
-      "rust_gate": "crates/tsr_compiler/src/include_reason_tests.rs:140 independently_observed_go_include_explanations and crates/tsr_compiler/src/program_diagnostics.rs:318 independently_observed_go_related_merge_and_sort_ties (`cargo test -p tsr_compiler --lib include_reason::tests program_diagnostics::tests`)",
+      "rust_gate": "crates/tsr_compiler/src/include_reason_tests.rs:142 independently_observed_go_include_explanations and crates/tsr_compiler/src/program_diagnostics.rs:328 independently_observed_go_related_merge_and_sort_ties (`cargo test -p tsr_compiler --lib include_reason::tests program_diagnostics::tests`)",
       "witnesses": "45 include-reason rows with 53 queries and 4 related-information merge rows. The adapter builds some processing diagnostics itself, so for those rows this witnesses how they render and merge. The loader's own processing diagnostics are compared through the include collection: file-name casing (casing/*: two spellings on a case-insensitive host with the 'File name ... differs' and 'Already included file name ...' wordings, forceConsistentCasingInFileNames false, two paths differing only in case on a case-sensitive host, duplicate root spellings whose equal diagnostics the collection keeps once, and two spellings of a root that fails to load (casing/missing-root-variants: 6053; casing/js-root-variants: 6504 without allowJs), whose failure is reported once, for the spelling collected first, next to the casing diagnostic), unknown library references (lib-reference/*: a spelling suggestion, none, and a file-name spelling lowercased and trimmed), a file's diagnostics arriving out of position order and global diagnostics out of message order (diagnostics/*), one resolution diagnostic reached from two files, and the rootDir/composite explanations. accessors/* read Program.GetConfigFileParsingDiagnostics (a tsconfig with syntax errors), Program.GetSourceFile by absolute, relative, other-casing and missing names, and Program.IsSourceFileDefaultLibrary over Program.Program().SourceFiles(). Every reason that names a file carries a `relative` explanation built from Program.GetCurrentDirectory (cwd /src), for example singleton-import's import of ./dep from main.ts, so a wrong current directory changes those rows."
     },
     {
@@ -154124,7 +154124,7 @@
         "manifest_sha256": "a32db4ff08c688c246f36c5942dff799b6b24acda4726b5ea486e515654696b3",
         "native_sha256": "6a686b577ff5e6b6c187db91a5aedfb8213edc48e1765a421215a3049a6f315b",
         "result": "killed",
-        "results_sha256": "d082a74f788e7a95759ef36aa1f57508b1c9d2f67f897c04572ffdc0e08ff70c"
+        "results_sha256": "b2416363fc8aa32ccaa2185554f99fb51ab4a94f743e6a16fe0bee37bb8a0cb0"
       },
       "mutation_gate": "python3 scripts/phase1_mutation_run.py confirm --results data/phase1/mutation/results.json.gz --plan data/phase1/mutation/manifest.json",
       "not_claimed": {
@@ -200538,7 +200538,7 @@
         "manifest_sha256": "a32db4ff08c688c246f36c5942dff799b6b24acda4726b5ea486e515654696b3",
         "native_sha256": "26e6686c6955c4add1df7c5d0d598b3afbac92d9bb08b17ba7b3153215989756",
         "result": "killed",
-        "results_sha256": "d082a74f788e7a95759ef36aa1f57508b1c9d2f67f897c04572ffdc0e08ff70c"
+        "results_sha256": "b2416363fc8aa32ccaa2185554f99fb51ab4a94f743e6a16fe0bee37bb8a0cb0"
       },
       "mutation_gate": "python3 scripts/phase1_mutation_run.py confirm --results data/phase1/mutation/results.json.gz --plan data/phase1/mutation/manifest.json",
       "not_claimed": {
@@ -234326,7 +234326,7 @@
         "manifest_sha256": "a32db4ff08c688c246f36c5942dff799b6b24acda4726b5ea486e515654696b3",
         "native_sha256": "56e53eda0e4d496acc6d0d992b359b3b30132b048d02ecd3445ba35ab5851239",
         "result": "killed",
-        "results_sha256": "d082a74f788e7a95759ef36aa1f57508b1c9d2f67f897c04572ffdc0e08ff70c"
+        "results_sha256": "b2416363fc8aa32ccaa2185554f99fb51ab4a94f743e6a16fe0bee37bb8a0cb0"
       },
       "mutation_gate": "python3 scripts/phase1_mutation_run.py confirm --results data/phase1/mutation/results.json.gz --plan data/phase1/mutation/manifest.json",
       "not_claimed": {},
@@ -235414,7 +235414,7 @@
       ],
       "mutation_evidence": {
         "claims_sha256": "6162eeb2ded2799715e45f7aded01d8ce50502afdb69352da10c2286df235604",
-        "go_reach_sha256": "a6b6508583f0f42b6534a335f02911734546b12f74ab8869a38143644c4279e9",
+        "go_reach_sha256": "00e9be15b4b2abad8b058799348cd5b073d38c77813c522d44dea4faf219a53e",
         "kills": [
           {
             "key": "314be4add1f15c46",
@@ -235856,9 +235856,9 @@
           }
         ],
         "manifest_sha256": "a32db4ff08c688c246f36c5942dff799b6b24acda4726b5ea486e515654696b3",
-        "native_sha256": "49cba86a5b74bb1673017e18fa911157a6b6fd83a9d67fcbfbf7a0ace6eb0808",
+        "native_sha256": "87a4628163d355c11f04ab1b7de38d7c06486fa69005a95fea459600bc020fbf",
         "result": "killed",
-        "results_sha256": "d082a74f788e7a95759ef36aa1f57508b1c9d2f67f897c04572ffdc0e08ff70c"
+        "results_sha256": "b2416363fc8aa32ccaa2185554f99fb51ab4a94f743e6a16fe0bee37bb8a0cb0"
       },
       "mutation_gate": "python3 scripts/phase1_mutation_run.py confirm --results data/phase1/mutation/results.json.gz --plan data/phase1/mutation/manifest.json",
       "not_claimed": {},
@@ -251322,7 +251322,7 @@
         "manifest_sha256": "a32db4ff08c688c246f36c5942dff799b6b24acda4726b5ea486e515654696b3",
         "native_sha256": "94c847ba3a12ca7ceb7d0035acf485952420386fecdb358a3e2275f7b95dd652",
         "result": "killed",
-        "results_sha256": "d082a74f788e7a95759ef36aa1f57508b1c9d2f67f897c04572ffdc0e08ff70c"
+        "results_sha256": "b2416363fc8aa32ccaa2185554f99fb51ab4a94f743e6a16fe0bee37bb8a0cb0"
       },
       "mutation_gate": "python3 scripts/phase1_mutation_run.py confirm --results data/phase1/mutation/results.json.gz --plan data/phase1/mutation/manifest.json",
       "not_claimed": {

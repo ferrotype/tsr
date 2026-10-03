@@ -21,6 +21,13 @@ spec.loader.exec_module(ledger_init)
 
 
 class PackageHomeTests(unittest.TestCase):
+    def test_phase4_approved_destinations(self):
+        self.assertEqual(ledger_init.crate_for("cmd/tsc"), ("tsr", 4))
+        self.assertEqual(ledger_init.crate_for("internal/execute/tsc"), ("tsr_tsc", 4))
+        self.assertEqual(ledger_init.crate_for("internal/pprof"), ("tsr_pprof", 7))
+        self.assertEqual(ledger_init.FILE_PHASES["tsc/internal/compiler/projectreferencedtsfakinghost.go"], 5)
+        self.assertFalse(ledger_init.in_scope("tsc/internal/fswatch/kqueue.go", "//go:build darwin"))
+
     def test_filesystem_package_homes_follow_the_production_paths(self):
         ledger = tomllib.loads((REPO / "PORTS.toml").read_text())
         for package, crate in (("internal/nativepath", "tsr_vfs"),

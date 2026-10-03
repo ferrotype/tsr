@@ -8,6 +8,15 @@
    },
    "reason": "2026-10-02 green-up: data/phase1/syntax-schedule.json was recaptured (its provenance names the new data/upstream.json of the Phase 3 ledger move, and C7.6's recapture before it); the schedule's rows are unchanged, so only the inventory's input digest moved.",
    "sha256": "c09721d36d361eb8646b2321ec3478da0fbdbf12253c086e7b1c34e966aea9b9"
+  },
+  {
+   "inputs": {
+    "data/phase1/syntax-schedule.json": "def323c9dbc9b2c3c1b072912d230239139513dffdaacbd192f044eef7704d5f",
+    "data/s07/e2-acceptance.json": "1ee86a7a575ff8d209dde0c2b30e3625fd4d5ac11d4da59cd7453763c6d0294b",
+    "data/s07/subset.json": "8539ce8af2f0cd5245554114e8d257805fe266e46fcabbb4ac220d5bcd2c4f2a"
+   },
+   "reason": "2026-10-03 Phase 4 ledger destinations and ported homes: native syntax recaptured against the regenerated upstream ledger; all 15,206 schedule rows and Phase 2 inventory rows are unchanged. Only the input digest changes.",
+   "sha256": "b4fd51ab64806ba66a3288288dc3f2f43d46c4311702f294d1d8c3b2f12150b5"
   }
  ],
  "scope": "Earlier inventory files the checkpoint claims were made over that differ from the current one only in their input digests: re-rendering the current inventory with an entry's inputs reproduces the entry's digest, so no row or rule changed (scripts/phase2_informational.py current).",

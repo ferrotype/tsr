@@ -29,14 +29,14 @@ struct RecordingClose {
 }
 impl Closer for RecordingClose {
     fn close(&self) -> std::io::Result<()> {
-        if !self.closed.swap(true, Ordering::AcqRel) {
+        if self.closed.swap(true, Ordering::AcqRel) {
+            Ok(())
+        } else {
             self.counts.closes.fetch_add(1, Ordering::AcqRel);
             let result = self.inner.close();
             *self.counts.completed_closes.lock().unwrap() += 1;
             self.counts.closed.notify_all();
             result
-        } else {
-            Ok(())
         }
     }
 }
@@ -263,7 +263,7 @@ fn read_config(files: &[(&str, &str)]) -> tsr_tsoptions::ParsedCommandLine {
     cache
         .read_config_file(
             b"/project/tsconfig.json",
-            &Default::default(),
+            &tsr_core::CompilerOptions::default(),
             &tsr_tsoptions::ConfigValue::Null,
         )
         .unwrap()

@@ -17,6 +17,7 @@ python3 scripts/phase4_native.py run --build target/phase4/native-final --output
 python3 scripts/phase4_live.py --build target/phase4/native-final --output target/phase4/live-final
 python3 scripts/phase4_determinism.py run --output target/phase4/determinism-final
 python3 scripts/phase4_sanitizer.py run --output target/phase4/tsan-final
+python3 scripts/phase4_contracts.py run --output target/phase4/contracts
 ```
 
 Native capture compares both smoke thread configurations and all six
@@ -41,6 +42,32 @@ run. An empty suite, skipped required tests or a sanitizer report cannot
 certify the gate. This command does not install a nightly or replace the
 user's Cargo/Rustup homes. A missing toolchain is an execution prerequisite,
 not an approved exception.
+
+The normal contract run builds all Phase 4 unit and integration targets plus
+the VFS nativepath witness. It records Cargo artifact identities, complete
+test inventories and raw outputs, and checks every applicable pinned roster
+entry against an executed Rust test. The nil-callback rejection is witnessed
+by its separately inventoried and executed compile-fail doctest, rather than
+by a runtime test. The codec test compares all 1,271 input
+texts with the pinned Go codec (including five intentionally malformed texts)
+and all 1,257 readable renderings. The X3 contract repeats all 30 sample
+scenarios twenty times with four builders. A skipped native backend cannot
+pass `watcher_tests`; another host's receipt cannot certify this host.
+`replay --output DIR` validates the receipt without rerunning tests. Use
+`phase4_producers.py tsc --contracts DIR` to inspect another retained receipt;
+the ledger producer uses `target/phase4/contracts`.
+
+`unit_rosters` is the observed/applicable test ratio on the current host,
+`buildinfo_codec` is 1 only when the entire codec witness passes, and
+`residuals` counts unapproved scenarios in the freshly rebuilt blocker
+register. Missing or stale observations withhold these metrics. The X1–X6
+completion predicates require current inventory verification, audit,
+comparison and blocker records, their full scenario families and their
+contract suites. X2 and X5 also require exact incremental correctness; X4
+requires the native watcher run; X6 accepts only the exact approved trace
+pairs. X7 joins those completions, a complete roster, zero residuals and all
+five X7 witness metrics. The sprint separately retains the required current
+Phase 2/3 gates; an X7 metric alone never declares P4B closed.
 
 ## Selecting evidence
 
@@ -99,6 +126,7 @@ The `[tsc]` source list includes these runners and their tests. No producer
 invocation launches these five expensive witnesses. The existing native
 scenario-inventory verification still runs as before.
 
-These results alone do not set `x7_complete` or close P4B. The remaining unit
-roster, watcher, codec, ownership and binary-floor evidence, final correctness
-captures and cross-phase gate refresh still have their own requirements.
+The five X7 witnesses alone do not set `x7_complete` or close P4B: the
+checkpoint and contract requirements above must also hold. Final correctness
+captures, the binary-floor evidence and cross-phase gates retain their own
+requirements.

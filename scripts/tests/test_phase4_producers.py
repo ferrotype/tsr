@@ -70,7 +70,8 @@ class Fixture(unittest.TestCase):
                                     rows=rows)
 
     def metrics(self, rust, verify=verified):
-        return producers.tsc(rust, verify=verify, witnesses=self.root / "absent-witness-index.json")["metrics"]
+        return producers.tsc(rust, verify=verify, witnesses=self.root / "absent-witness-index.json",
+                             contracts=self.root / "absent-contract-receipt")["metrics"]
 
     def record(self, rust):
         comparison = compare.report(rust)

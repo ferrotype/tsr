@@ -669,8 +669,10 @@ backends are witnessed by CI's Linux job, which runs the same producer and
 enforces the same metrics with `check-metrics` (decision 9).
 
 No threshold is introduced. A retained difference passes only with an
-owner-approved entry in `data/divergences.toml` (ADR 0004), which needs an
-exact observation witness per scenario; failures, missing operations and
+owner-approved entry in `data/divergences.toml` (ADR 0004,
+decision 15), with an exact native/Rust transcript hash pair per scenario.
+Phase 4 entries specify their domain, keeping them separate from E2's
+denominator within the shared registry. Failures, missing operations and
 unexecuted rows cannot be waived.
 
 Every recorded fact keeps the Phase 2 discipline: the recorded scenarios
@@ -848,7 +850,7 @@ entry keeps its proposal and records the outcome. Decision 7 (dependencies) was 
 15. **Parse/bind trace order. Accepted, 2026-10-02.** Retain S07's exclusive
     eager binding: Rust binds during source loading, while Go binds later.
     The two `generateTrace` scenarios retain their raw `different` results.
-    `data/phase4/approved-differences.json` names the exact native/Rust
+    `data/divergences.toml` names the exact native/Rust
     transcript hashes accepted by the owner. Type dumps, legends, diagnostics,
     emitted output and subsequent check/emit events match byte for byte.
     No generic trace normalization or future byte difference is approved.

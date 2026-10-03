@@ -211,7 +211,6 @@ impl tsr_compiler::ResolvedProjectReferenceProvider for Orchestrator {
             .get(path)
             .expect("reference belongs to build graph")]
         .task
-        .resolved
-        .clone()
+        .project_reference()
     }
 }

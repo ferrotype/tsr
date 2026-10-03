@@ -52,14 +52,14 @@ fn build_info_collection_decoding_clears_null_and_retains_absent_fields() {
             r#"{"fileNames":["./a.ts"],"referencedMap":[],"affectedFilesPendingEmit":[]}"#,
         ),
         (
-            r#"{}"#,
+            "{}",
             r#"{"fileNames":["./a.ts"],"referencedMap":[],"affectedFilesPendingEmit":[]}"#,
         ),
         (
             r#"{"fileNames":[],"referencedMap":null,"affectedFilesPendingEmit":null}"#,
             r#"{"fileNames":[]}"#,
         ),
-        (r#"{"fileNames":null}"#, r#"{}"#),
+        (r#"{"fileNames":null}"#, "{}"),
     ] {
         tsr_json::unmarshal(text.as_bytes(), &mut info, tsr_json::Options::default()).unwrap();
         assert_eq!(

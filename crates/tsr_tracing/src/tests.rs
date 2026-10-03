@@ -78,7 +78,7 @@ impl ObservedEvent {
     fn argument<T: tsr_json::Decode + Default>(&self, key: &str) -> Option<T> {
         let raw = self.args.get(key)?;
         let mut value = T::default();
-        tsr_json::unmarshal(&raw.0, &mut value, Default::default()).unwrap();
+        tsr_json::unmarshal(&raw.0, &mut value, tsr_json::Options::default()).unwrap();
         Some(value)
     }
 }
@@ -87,7 +87,7 @@ fn observe(fs: &dyn FileSystem) -> Vec<ObservedEvent> {
     tsr_json::unmarshal(
         text(fs, b"/trace/trace.json").as_bytes(),
         &mut events,
-        Default::default(),
+        tsr_json::Options::default(),
     )
     .unwrap();
     events

@@ -126,10 +126,10 @@ def host_from_target(target):
     return {"os": os_name, "arch": target.split("-", 1)[0]}
 
 
-def test_targets():
+def test_targets(*, package_paths=PACKAGE_PATHS):
     """Independently derive required lib/bin/integration targets from manifests."""
     targets = []
-    for package, directory in PACKAGE_PATHS.items():
+    for package, directory in package_paths.items():
         base = ROOT / directory
         manifest = tomllib.loads((base / "Cargo.toml").read_text())
         entries = []
@@ -325,9 +325,15 @@ def validate_inventory(raw):
     return sorted(names)
 
 
-def validate_test_run(raw, names):
+def validate_test_run(raw, names, *, name_suffixes=(" - should panic",)):
     text = raw.decode("utf-8")
-    lines = TEST_LINE.findall(text)
+    lines = []
+    for name, status in TEST_LINE.findall(text):
+        # libtest decorates expected-panic results, but not its --list names.
+        # Rustdoc similarly decorates compile-fail tests; callers must opt in.
+        for suffix in name_suffixes:
+            name = name.removesuffix(suffix)
+        lines.append((name, status))
     counts = SUMMARY.findall(text)
     measured(len(counts) == 1 and counts[0][0] == "ok"
             and tuple(map(int, counts[0][1:])) == (len(names), 0, 0, 0, 0),

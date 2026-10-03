@@ -41,9 +41,9 @@ Metrics:
 The parity ratios and the count are emitted only over a harness-valid capture;
 a missing, partial or stale capture leaves harness_valid false and withholds
 them. A scenario capture does not gate the independent X7 witnesses. No
-threshold is introduced. The remaining checkpoint metrics
-(buildinfo_codec, unit_rosters, watcher_tests, residuals,
-dispositions, xN_complete) come with those checkpoints.
+threshold is introduced. Normal contract receipts supply buildinfo_codec,
+unit_rosters and watcher_tests; the full comparison supplies residuals.
+Checkpoint completions join these current facts, never source presence alone.
 """
 from __future__ import annotations
 
@@ -62,6 +62,7 @@ import phase4_acceptance  # noqa: E402
 import phase4_blockers  # noqa: E402
 import phase4_compare  # noqa: E402
 import phase4_corpus  # noqa: E402
+import phase4_contracts  # noqa: E402
 import phase4_scenarios  # noqa: E402
 import phase4_unit_tests  # noqa: E402
 
@@ -111,17 +112,59 @@ def ratio(numerator, denominator):
     return numerator / denominator if denominator else 0.0
 
 
-def tsc(rust=None, *, verify=verification, witnesses=None):
+def checkpoint_metrics(metrics, comparison=None):
+    """A conjunction of measured checkpoint exits; missing inputs stay false.
+
+    X7 also requires the separate P2/P3 final-source gates in the sprint. Those
+    expensive producers are never run implicitly here.
+    """
+    out = {f"x{i}_complete": False for i in range(1, 8)}
+    prerequisites = all(metrics.get(n) is True for n in (
+        "inventory_frozen", "inventory_verified", "harness_valid", "result_recorded", "blockers_named", "audit"))
+    if not prerequisites or comparison is None:
+        return out
+    rows = comparison["rows"]
+    def matched(selected):
+        return bool(selected) and all(r["category"] == "match" or
+            (r["category"] == "different" and r.get("approved_difference")) for r in selected)
+    families = {family: [r for r in rows if r["family"] == family] for family in phase4_corpus.FAMILIES}
+    compiler = matched(families["tsc"])
+    # The tsc family includes X1 and X2; requiring the whole family prevents a
+    # filename-based partition from silently dropping incremental cases.
+    out["x1_complete"] = compiler and metrics.get("x1_contracts") is True
+    out["x2_complete"] = (compiler and metrics.get("x2_contracts") is True
+                           and metrics.get("buildinfo_codec") == 1 and metrics.get("incremental_correctness") == 1)
+    out["x3_complete"] = matched(families["tsbuild"]) and metrics.get("x3_contracts") is True
+    out["x4_complete"] = metrics.get("x4_contracts") is True and metrics.get("watcher_tests") is True
+    out["x5_complete"] = (matched(families["tscWatch"]) and matched(families["tsbuildWatch"])
+                           and metrics.get("x5_contracts") is True and metrics.get("incremental_correctness") == 1)
+    out["x6_complete"] = (matched([r for r in rows if r["id"].startswith("tsc/generateTrace/")])
+                           and metrics.get("x6_contracts") is True)
+    out["x7_complete"] = (all(out[f"x{i}_complete"] for i in range(1, 7))
+                           and metrics.get("unit_rosters") == 1 and metrics.get("residuals") == 0
+                           and all(metrics.get(n) is True for n in ("smoke", "buildinfo_interop", "live_watch_parity",
+                                                                   "determinism", "thread_sanitizer")))
+    return out
+
+
+def tsc(rust=None, *, verify=verification, witnesses=None, contracts=None):
     rust = Path(rust or RUST)
     metrics = {"inventory_frozen": False, "inventory_verified": False,
                **dict.fromkeys(VERIFY_METRICS.values(), False),
                "harness_valid": False, "result_recorded": False, "blockers_named": False,
-               "unit_tests": False, "audit": False}
+               "unit_tests": False, "audit": False, **checkpoint_metrics({})}
     witnesses = quietly(phase4_acceptance.collect, witnesses)
     metrics.update(witnesses["metrics"])
     # xtask's evidence record retains and hashes stderr too. Keep exact capture
     # identities here, not in numeric/boolean metrics or an uncommitted sidecar.
     print("tsc witnesses: " + canonical(witnesses).decode(), file=sys.stderr)
+    try:
+        receipt = phase4_contracts.replay(contracts or phase4_contracts.DEFAULT_OUTPUT,
+                                           expected_host=phase4_acceptance.current_host())
+        metrics.update(receipt["metrics"])
+        print("tsc contracts: " + canonical(receipt).decode(), file=sys.stderr)
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        print("contract receipt unavailable: " + str(error), file=sys.stderr)
     for name, module in (("unit_tests", phase4_unit_tests), ("audit", phase4_audit)):
         try:
             problems = module.check()
@@ -168,12 +211,14 @@ def tsc(rust=None, *, verify=verification, witnesses=None):
         committed = (strict_json_loads(phase4_blockers.REGISTER.read_bytes())
                      if phase4_blockers.REGISTER.exists() else None)
         metrics["blockers_named"] = register == committed and phase4_blockers.complete(register, comparison)
+        metrics["residuals"] = sum(entry["scenarios"] for entry in register["entries"])
     except (OSError, ValueError, KeyError) as error:
         print("blocker register unavailable: " + str(error), file=sys.stderr)
     print("tsc evidence: " + canonical({"inventory": capture.metadata["inventory"]["sha256"],
                                         "rust": capture.sha256,
                                         "references": comparison["references"]["git_blobs_sha256"]}).decode(),
           file=sys.stderr)
+    metrics.update(checkpoint_metrics(metrics, comparison))
     return {"metrics": metrics}
 
 
@@ -182,8 +227,9 @@ def main():
     parser.add_argument("command", choices=("tsc",))
     parser.add_argument("--rust", type=Path, default=RUST)
     parser.add_argument("--witnesses", type=Path, default=phase4_acceptance.DEFAULT_INDEX)
+    parser.add_argument("--contracts", type=Path, default=phase4_contracts.DEFAULT_OUTPUT)
     args = parser.parse_args()
-    print(json.dumps(tsc(args.rust, witnesses=args.witnesses), sort_keys=True))
+    print(json.dumps(tsc(args.rust, witnesses=args.witnesses, contracts=args.contracts), sort_keys=True))
 
 
 if __name__ == "__main__":

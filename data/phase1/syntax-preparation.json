@@ -1,5 +1,5 @@
 {
-  "accounted_operations": 3611,
+  "accounted_operations": 3608,
   "complete": false,
   "exempt_by_category": {
     "equivalent_rust": 83,
@@ -48,6 +48,9 @@
       "disposition": "implemented_untested",
       "operation": "tsc/internal/compiler/fileloader.go:fileLoader.isSupportedExtension",
       "rust_home": [
+        "crates/tsr_compiler/src/checker_host.rs",
+        "crates/tsr_compiler/src/content_mapped.rs",
+        "crates/tsr_compiler/src/include_reason.rs",
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/metadata.rs"
       ]
@@ -56,6 +59,31 @@
       "disposition": "implemented_untested",
       "operation": "tsc/internal/compiler/fileloader.go:fileLoader.parseSourceFile",
       "rust_home": [
+        "crates/tsr_compiler/src/checker_host.rs",
+        "crates/tsr_compiler/src/content_mapped.rs",
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_compiler/src/loader.rs",
+        "crates/tsr_compiler/src/metadata.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.resolveImportsAndModuleAugmentations",
+      "rust_home": [
+        "crates/tsr_compiler/src/checker_host.rs",
+        "crates/tsr_compiler/src/content_mapped.rs",
+        "crates/tsr_compiler/src/include_reason.rs",
+        "crates/tsr_compiler/src/loader.rs",
+        "crates/tsr_compiler/src/metadata.rs"
+      ]
+    },
+    {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/fileloader.go:fileLoader.resolveTypeReferenceDirectives",
+      "rust_home": [
+        "crates/tsr_compiler/src/checker_host.rs",
+        "crates/tsr_compiler/src/content_mapped.rs",
+        "crates/tsr_compiler/src/include_reason.rs",
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/metadata.rs"
       ]
@@ -69,13 +97,37 @@
       ]
     },
     {
+      "disposition": "implemented_untested",
+      "operation": "tsc/internal/compiler/host.go:compilerHost.GetSourceFile",
+      "rust_home": [
+        "crates/tsr_compiler/src/loader.rs",
+        "crates/tsr_compiler/src/project_references.rs",
+        "crates/tsr_execute/src/compile.rs"
+      ]
+    },
+    {
       "disposition": "covered",
       "operation": "tsc/internal/compiler/program.go:NewProgram",
       "rust_home": [
+        "crates/tsr_compiler/src/bind_diagnostics.rs",
+        "crates/tsr_compiler/src/cache.rs",
+        "crates/tsr_compiler/src/checked_program.rs",
+        "crates/tsr_compiler/src/checker_diagnostics.rs",
+        "crates/tsr_compiler/src/checker_host.rs",
+        "crates/tsr_compiler/src/checker_module_specifiers.rs",
+        "crates/tsr_compiler/src/declaration_diagnostics.rs",
+        "crates/tsr_compiler/src/declaration_host.rs",
+        "crates/tsr_compiler/src/include_reason.rs",
         "crates/tsr_compiler/src/loader.rs",
         "crates/tsr_compiler/src/output_paths.rs",
         "crates/tsr_compiler/src/program_diagnostics.rs",
-        "crates/tsr_compiler/src/verify_options.rs"
+        "crates/tsr_compiler/src/program_emit.rs",
+        "crates/tsr_compiler/src/project_references.rs",
+        "crates/tsr_compiler/src/reuse.rs",
+        "crates/tsr_compiler/src/statistics.rs",
+        "crates/tsr_compiler/src/syntactic_diagnostics.rs",
+        "crates/tsr_compiler/src/verify_options.rs",
+        "crates/tsr_module/src/resolver.rs"
       ]
     }
   ],
@@ -85,5 +137,5 @@
   "step": "syntax",
   "total_operations": 3617,
   "version": 2,
-  "witnessed_operations": 1587
+  "witnessed_operations": 1584
 }

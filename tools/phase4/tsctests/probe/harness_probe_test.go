@@ -15,10 +15,12 @@ package tsctests
 // both sides.
 
 import (
+	"crypto/sha256"
 	"encoding/hex"
 	stdjson "encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"slices"
 	"strings"
@@ -402,8 +404,8 @@ func phase4EmitKinds() []string {
 
 func phase4PathIsUnder() []map[string]any {
 	inputs := []struct {
-		event, dir             string
-		recursive, sensitive   bool
+		event, dir           string
+		recursive, sensitive bool
 	}{
 		{"/a/b", "/a", false, true},
 		{"/a/b/c", "/a", false, true},
@@ -701,8 +703,8 @@ func phase4FsCases() []phase4FsCase {
 		},
 		{
 			Files: map[string]string{
-				"D:/Work/Project/A.ts":           "a",
-				"D:/Work/Project/tsconfig.json":  "{}",
+				"D:/Work/Project/A.ts":               "a",
+				"D:/Work/Project/tsconfig.json":      "{}",
 				"D:/home/src/tslibs/TS/Lib/lib.d.ts": "custom",
 			},
 			Cwd:              "D:/Work/Project",
@@ -782,6 +784,67 @@ func phase4IncrementalDiffs() []map[string]any {
 	return results
 }
 
+// Includes malformed and noncanonical input texts, not just emitted JSON.
+// Each accepted text is decoded and re-encoded by the pinned production codec.
+func phase4BuildInfoCodec(t *testing.T) map[string]any {
+	root := os.Getenv("PHASE4_REFERENCE_ROOT")
+	if root == "" {
+		t.Fatal("PHASE4_REFERENCE_ROOT is required")
+	}
+	result := map[string]any{}
+	count, rejected := 0, 0
+	for _, family := range []string{"tsc", "tsbuild", "tscWatch", "tsbuildWatch"} {
+		err := filepath.WalkDir(filepath.Join(root, family), func(path string, entry os.DirEntry, err error) error {
+			if err != nil || entry.IsDir() {
+				return err
+			}
+			raw, err := os.ReadFile(path)
+			if err != nil {
+				return err
+			}
+			lines := strings.Split(string(raw), "\n")
+			for i, line := range lines {
+				if !strings.HasPrefix(line, "//// [") {
+					continue
+				}
+				name, label, ok := strings.Cut(strings.TrimPrefix(line, "//// ["), "] ")
+				if !ok || !strings.HasSuffix(name, ".tsbuildinfo") || (label != "*new* " && label != "*modified* ") {
+					continue
+				}
+				start, end := i+1, i+1
+				if lines[start] == "{" {
+					for strings.TrimSpace(lines[end]) != "}" {
+						end++
+					}
+				}
+				text := []byte(strings.Join(lines[start:end+1], "\n"))
+				var info incremental.BuildInfo
+				entry := map[string]any{"error": false}
+				if err := json.Unmarshal(text, &info); err != nil {
+					entry["error"] = true
+					rejected++
+				} else {
+					encoded, err := json.Marshal(&info)
+					if err != nil {
+						return err
+					}
+					entry["sha256"] = fmt.Sprintf("%x", sha256.Sum256(encoded))
+				}
+				result[fmt.Sprintf("%x", sha256.Sum256(text))] = entry
+				count++
+			}
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	if count != 1271 || rejected != 5 {
+		t.Fatalf("codec denominator: %d texts, %d rejected", count, rejected)
+	}
+	return result
+}
+
 func TestPhase4HarnessProbe(t *testing.T) {
 	output := os.Getenv("PHASE4_PROBE_OUTPUT")
 	if output == "" {
@@ -803,6 +866,7 @@ func TestPhase4HarnessProbe(t *testing.T) {
 		"emit_kinds":          phase4EmitKinds(),
 		"terminal_width":      phase4TerminalWidth(),
 		"readable":            phase4Readable(),
+		"buildinfo_codec":     phase4BuildInfoCodec(t),
 		"fs":                  fsResults,
 		"incremental_diff":    phase4IncrementalDiffs(),
 		"go":                  runtime.Version(),

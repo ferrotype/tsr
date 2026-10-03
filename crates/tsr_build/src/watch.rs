@@ -292,11 +292,10 @@ impl Orchestrator {
                 update = true;
             }
         }
-        for (index, mut config) in reloaded {
-            config.parse_input_output_names();
+        for (index, config) in reloaded {
             Arc::get_mut(&mut self.tasks[index].task)
                 .expect("completed graph uniquely owns each task")
-                .resolved = Some(Arc::new(config));
+                .replace_config(config);
         }
         if !update
             && changes.keys().any(|path| {

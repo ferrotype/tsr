@@ -2,8 +2,8 @@
 # docs/PHASE4-plan.md, sections 4 and 5.
 #
 # Each checkpoint closes on a recorded fact, `xN_complete`, on the tsc run
-# recorded at its exit; until a checkpoint wires that metric its item names one
-# no producer emits yet, so the sprint stays open by construction. The exit is
+# recorded at its exit, joining current scenario, contract and native receipts.
+# A missing or stale witness cannot complete its checkpoint. The exit is
 # PLAN's Phase 4 gate over the P4A denominator: all 516 tsc, watch, build and
 # build-watch scenarios match their committed references whole (the plan's 517
 # counts the orphan reference tsc/commandLine/adds-color-when-FORCE_COLOR-is-set.js,

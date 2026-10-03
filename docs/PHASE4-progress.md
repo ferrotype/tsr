@@ -14,7 +14,7 @@ development captures to current acceptance evidence.
 - Incremental diagnostic caches retain only referenced source/config owners,
   preserve cache identity across an unchanged rebuild, and release old programs.
 - The owner's narrow eager-binding trace-order exception is in
-  `data/phase4/approved-differences.json`. Raw comparisons remain `different`;
+  `data/divergences.toml`. Raw comparisons remain `different`;
   acceptance requires the approved exact transcript pair. The binary target
   is `tsrust`; `lib/tsc` is only X7's staging name.
 
@@ -56,8 +56,9 @@ The private ext4 loop image supplied that requirement without skipping tests.
 The build-cache review and function audit are complete (follow-up below).
 Phase 4 still needs these acceptance and infrastructure steps:
 
-1. Run a single stable full scenario capture and five determinism repetitions.
-   Refresh the comparison, blocker register and generated inventories.
+1. The stable full scenario capture, comparison, blocker register and
+   generated inventories are refreshed below. The five full determinism
+   repetitions remain to run.
 2. Run `scripts/phase4_native.py`'s authenticated release build and
    smoke/interop witnesses. The six-family development interop observation used
    earlier copied binaries; it is not the final build's receipt.
@@ -200,5 +201,76 @@ allocator. The isolated consumer resolves with its lockfile unchanged, and
 `tsr_execute` Clippy and both command-entry unit tests pass. All 163 Phase 4
 tooling tests, workspace formatting, tracker validation and the audit/roster
 checks pass. No full capture or sanitizer execution was run for these repairs.
-The full scenario comparison remains the historical result recorded in
-`first-comparison.json`; its two TS6059 differences are still open.
+At that checkpoint the full scenario comparison was historical and its two
+TS6059 differences were still open; the closure work below resolves them.
+
+## Ledger, baselines and contract evidence — 2026-10-03
+
+B01 is fixed in production. The build task no longer prepares project-reference
+input/output maps on its primary parsed config: that added a plain TS6059 to
+config diagnostics before the program produced the same error with its file
+inclusion explanation. A separate lazily prepared reference config preserves
+the config source's identity, and reload retires that cache. Both outputPaths
+cases now match the pinned transcript, with no new exception.
+
+The current full capture is `target/phase4/rust`: **514 exact matches and the
+two previously approved trace-order pairs, out of 516 scenarios**. Every
+scenario completes and all **1,255 incremental edit comparisons agree**.
+`first-comparison.json` and `blockers.json` bind this capture; the blocker
+register is empty. The two approvals now live in the existing
+`data/divergences.toml` with `domain = "phase4"`; the separate Phase 4 JSON
+registry is removed. ADR 0004 names the shared registry. The exact native/Rust
+hash pairs and the raw `different` classifications are unchanged, and a
+Phase 4 approval cannot waive an E2 difference.
+
+The ledger applies decision 4, assigns `execute/tsc` to `tsr_tsc`, and records
+the implemented Phase 4 homes as ported. S07 refreshes 76 Rust mapping locations
+and their review hashes, plus the ledger hash in the syntax observation's
+authenticated provenance; the complete observation digest is unchanged.
+Native Phase 1 observations were recaptured: all 15,152 native rows and 15,206
+schedule rows are unchanged. The syntax reach experiment was rerun in both
+shardings; all reach entries agree with the previous recording.
+Phase 2's inventory history records that input-only change; its C7 audit and
+the Phase 3/4 audits are refreshed. The Phase 4 audit remains 734 mapped,
+246 equivalents and 27 later-phase operations, with no gaps. The roster is
+169 ported and five justified not-applicable tests.
+
+The owner approved carrying forward the existing mutation results. The
+syntax native archive and reach archive differ only in provenance: requests,
+observations, instrumentation and reach entries are identical. The existing
+mutation results record the old/new archive hashes and this comparison; every
+Rust mutant, kill and control observation is preserved, with no claim of a new
+Rust execution. Updating these bindings restores 20 of the 23 syntax operation
+witnesses. The other three historical kills are also retained, but their Rust
+function bodies changed in Phase 4 before this refresh: import resolution
+gained tracing, type-reference resolution gained tracing and an empty-input
+branch, and `GetSourceFile` switched to `FileCache.load`. Those three remain
+pending current mutation validation. Their failure is a source-span change,
+not the archive or ledger regeneration.
+
+`target/phase4/contracts` retains the normal test receipt, copied executable
+identities, full inventories and raw streams. It passes 302 Rust tests,
+including the required compile-fail callback witness, and accounts for every
+one of this host's 161 applicable pinned tests. The codec compares all 1,271
+raw build-info texts against Go decode/re-encode observations (including five
+intentional parse failures) and all 1,257 readable renderings. X3's 30 sample
+scenarios repeat twenty times with four builders and identical transcripts.
+
+The recorded `tsc` producer now emits `buildinfo_codec = 1`,
+`unit_rosters = 1`, `watcher_tests = true`, `residuals = 0`, and X1–X6 complete
+on macOS. X7 is explicitly false: the five independent acceptance witnesses
+and the final cross-phase checks have not been refreshed. Linux still needs
+its own current native receipt; this macOS observation does not certify its
+backends. Phase 2's native-only reference runs were refreshed in both single
+and concurrent modes (13,432 variants each), with every normalized row digest
+unchanged. Its four creation-order fixtures were also recaptured. These refresh
+the native inputs required by the self-tests; they do not refresh the Rust
+correctness or performance evidence. No Rust checker/emit corpus or performance
+benchmark was run here.
+
+Formatting, warnings-denied workspace Clippy, dependency policy, workspace
+build, testhost, generation and scanner checks are recorded and passing. The
+final self-test passes 69 tracker tests and 1,844 script tests, with three
+declared skips. Ledger validation passes. The status views record the remaining
+Phase 4 and cross-phase requirements rather than treating these checks as
+whole-phase completion.

@@ -407,9 +407,7 @@
    "rust": "crates/tsr_compiler/src/loader.rs:880"
   },
   "tsc/internal/compiler/program.go:Program.ReuseProgram": {
-   "disposition": "later",
-   "owner": "Phase 4",
-   "reason": "Program reuse across edits (incremental and watch builds); the corpus builds each program fresh, and the mapped-file branch rides with the reuse port."
+   "disposition": "mapped"
   },
   "tsc/internal/modulespecifiers/preferences.go:getModuleSpecifierEndingPreference": {
    "disposition": "equivalent",
@@ -587,9 +585,7 @@
    "reason": "Compiles the auto-import exclusion patterns IsExcludedByRegex tests."
   },
   "tsc/internal/testutil/contentmappertest/spawner.go:NewSpawnerWithProjectLifecycle": {
-   "disposition": "later",
-   "owner": "Phase 5",
-   "reason": "The spawner that records mapper project calls for the project system's lifecycle tests (with the dynamic-verbatim mapper); no compiler or conformance row runs it."
+   "disposition": "mapped"
   }
  },
  "groups": {
