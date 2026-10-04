@@ -1,55 +1,89 @@
 name: diagnose concurrent compiler crash
-
-on:
+'on':
   push:
-    branches: [codex/concurrent-checker-crash]
+    branches:
+    - codex/concurrent-checker-crash
     paths:
-      - .github/workflows/diagnose-concurrent-crash.yml
-      - scripts/diagnose_concurrent_crash.py
-      - crates/tsr_testrunner/**
-
+    - .github/workflows/diagnose-concurrent-crash.yml
+    - .github/workflows/ci.yml
+    - scripts/parity.py
+    - crates/tsr_testrunner/**
 permissions:
   contents: read
-  actions: read
-
 jobs:
-  memcheck:
-    name: original executable under Memcheck
+  capture:
+    name: validate native crash diagnostics
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
-        with:
-          ref: 2f464bf525579d4faa141b466786d04ac04f462e
-          submodules: true
-          persist-credentials: false
-      - uses: actions/download-artifact@v4
-        with:
-          name: tsr-testrunner
-          run-id: 37187571575
-          github-token: ${{ github.token }}
-          path: runner
-      - name: Check the original concurrent process for invalid memory accesses
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y valgrind
-          mkdir -p crash-output
-          chmod +x runner/tsr-testrunner
-          for iteration in 1 2 3 4 5; do
-            MALLOC_PERTURB_=170 valgrind --tool=memcheck --error-exitcode=99 \
-              --track-origins=yes --leak-check=no --num-callers=50 \
-              --log-file="crash-output/memcheck-$iteration.log" \
-              runner/tsr-testrunner --suite compiler --mode concurrent run \
-              --id 'conformance/typeOfThisInStaticMembers11(target=esnext).ts' \
-              --local "crash-output/local-$iteration" \
-              > "crash-output/result-$iteration.ndjson"
-          done
-      - name: Print memory findings
-        if: always()
-        run: cat crash-output/memcheck-*.log
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: concurrent-crash-memcheck
-          path: crash-output
-          retention-days: 3
+    - uses: actions/checkout@v5
+    - name: Create an intentionally crashing diagnostic executable
+      run: "mkdir -p runner\ncat > \"$RUNNER_TEMP/crash-probe.c\" <<'C'\n#include\
+        \ <stdio.h>\nint main(void) {\n    for (int i = 0; i < 100; ++i) fprintf(stderr,\
+        \ \"phase-%d\\n\", i);\n    fputs(\"{\\\"id\\\":\", stdout);\n    fflush(stdout);\n\
+        \    *(volatile int *)0 = 42;\n    return 0;\n}\nC\ncc -g -O0 \"$RUNNER_TEMP/crash-probe.c\"\
+        \ -o runner/tsr-testrunner\n"
+    - name: Exercise the CI core-capture path
+      run: "chmod +x runner/tsr-testrunner\nif [[ \"compiler-concurrent\" == compiler-concurrent\
+        \ ]]; then\n  export TSR_TESTRUNNER_TRACE_PHASES=1\nfi\nif [[ \"$RUNNER_OS\"\
+        \ == Linux && \"${{ runner.environment }}\" == github-hosted ]]; then\n  mkdir\
+        \ -p \"$RUNNER_TEMP/parity-cores\"\n  # Keep cores outside results: they may\
+        \ contain process environment\n  # data. Only debugger reports and the failed\
+        \ process traces upload.\n  previous_core_pattern=$(cat /proc/sys/kernel/core_pattern)\n\
+        \  trap 'sudo sysctl -w \"kernel.core_pattern=$previous_core_pattern\" > /dev/null'\
+        \ EXIT\n  sudo sysctl -w \"kernel.core_pattern=$RUNNER_TEMP/parity-cores/core.%p.%t\"\
+        \n  ulimit -c unlimited\nfi\npython3 scripts/parity.py run \"compiler-concurrent\"\
+        \ --runner runner/tsr-testrunner --id diagnostic/segfault.ts --output \"results/compiler-concurrent/$(echo\
+        \ '2/4' | tr / -)\"\n"
+    - name: Exercise the CI backtrace path
+      if: always()
+      run: "shopt -s nullglob\ncores=(\"$RUNNER_TEMP/parity-cores/\"core.*)\nif ((\
+        \ ${#cores[@]} == 0 )); then exit 0; fi\nif ! command -v gdb; then\n  sudo\
+        \ apt-get update -qq\n  sudo apt-get install -y gdb\nfi\noutput=\"results/compiler-concurrent/$(echo\
+        \ '2/4' | tr / -)/crashes\"\nmkdir -p \"$output\"\nsha256sum runner/tsr-testrunner\
+        \ > \"$output/executable.sha256\"\nfor core in \"${cores[@]}\"; do\n  gdb\
+        \ --batch runner/tsr-testrunner \"$core\" \\\n    -ex 'set pagination off'\
+        \ -ex 'info registers' \\\n    -ex 'thread apply all bt 100' -ex 'info proc\
+        \ mappings' \\\n    > \"$output/$(basename \"$core\").backtrace.txt\" 2>&1\n\
+        \  cat \"$output/$(basename \"$core\").backtrace.txt\"\ndone\n"
+    - name: Verify signal, complete trace and fault location
+      run: 'python3 - <<''CHECK''
+
+        import json
+
+        from pathlib import Path
+
+        root=Path(''results/compiler-concurrent/2-4'')
+
+        rows=[json.loads(x) for x in (root/''results.ndjson'').read_text().splitlines()]
+
+        assert len(rows)==1 and rows[0][''reason'']==''signal 11'', rows
+
+        record,=(root/''crashes'').glob(''*/process.json'')
+
+        trace=(record.parent/''stderr'').read_text()
+
+        assert ''phase-0\n'' in trace and ''phase-99\n'' in trace
+
+        assert (record.parent/''stdout'').read_text()==''{"id":''
+
+        reports=list((root/''crashes'').glob(''*.backtrace.txt''))
+
+        assert len(reports)==1, reports
+
+        report=reports[0].read_text()
+
+        assert ''SIGSEGV'' in report and ''crash-probe.c:'' in report, report
+
+        print(''Verified: SIGSEGV remains a failure, full traces survive, and the
+        native backtrace identifies the fault line.'')
+
+        CHECK
+
+        '
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: validated-crash-diagnostics
+        path: results
+        retention-days: 3

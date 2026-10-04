@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -122,15 +123,35 @@ def shard(variants, spec):
     return variants[index - 1::count], (index, count)
 
 
+def save_process_failure(command, variant, local, reason, stdout, stderr):
+    """Keep the full crash trace separately from the result row's bounded tail."""
+    directory = local.parent / "crashes" / hashlib.sha256(variant.encode()).hexdigest()
+    directory.mkdir(parents=True, exist_ok=True)
+    for name, content in (("stdout", stdout), ("stderr", stderr)):
+        # TimeoutExpired may carry bytes even with subprocess text mode.
+        data = content.encode() if isinstance(content, str) else content or b""
+        (directory / name).write_bytes(data)
+    (directory / "process.json").write_text(json.dumps({
+        "variant": variant, "command": command, "cwd": str(ROOT), "reason": reason,
+    }, indent=2) + "\n")
+
+
 def run_variant(suite, runner, variant, local, timeout):
     """The result lines of one variant; a crash or a deadline fails the whole variant."""
     command = runner_command(suite, runner, "run", "--id", variant, "--local", str(local))
     started = time.monotonic()
     try:
         completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=timeout)
-    except subprocess.TimeoutExpired:
-        return [{"id": variant, "state": "fail", "reason": f"deadline: {timeout} s"}], time.monotonic() - started
+    except subprocess.TimeoutExpired as error:
+        reason = f"deadline: {timeout} s"
+        save_process_failure(command, variant, local, reason, error.stdout, error.stderr)
+        return [{"id": variant, "state": "fail", "reason": reason}], time.monotonic() - started
     elapsed = time.monotonic() - started
+    if completed.returncode != 0:
+        reason = f"exit {completed.returncode}" if completed.returncode > 0 else f"signal {-completed.returncode}"
+        save_process_failure(command, variant, local, reason, completed.stdout, completed.stderr)
+        tail = completed.stderr.strip().splitlines()[-30:]
+        return [{"id": variant, "state": "fail", "reason": reason, "detail": "\n".join(tail)[-4000:]}], elapsed
     rows = []
     for line in completed.stdout.splitlines():
         line = line.strip()
@@ -144,10 +165,6 @@ def run_variant(suite, runner, variant, local, timeout):
                 and row["id"].startswith(variant + "/")):
             return [{"id": variant, "state": "fail", "reason": "malformed result line", "detail": line[:2000]}], elapsed
         rows.append(row)
-    if completed.returncode != 0:
-        tail = completed.stderr.strip().splitlines()[-30:]
-        reason = f"exit {completed.returncode}" if completed.returncode > 0 else f"signal {-completed.returncode}"
-        return [{"id": variant, "state": "fail", "reason": reason, "detail": "\n".join(tail)[:4000]}], elapsed
     if not rows:
         return [{"id": variant, "state": "fail", "reason": "no result lines"}], elapsed
     return rows, elapsed
@@ -164,6 +181,7 @@ def run(args):
     # for these results, and no earlier local output can outlive its failure
     # (the pin's runner cleans its local directory the same way).
     (output / "meta.json").unlink(missing_ok=True)
+    shutil.rmtree(output / "crashes", ignore_errors=True)
     local = output / "local"
     shutil.rmtree(local, ignore_errors=True)
     local.mkdir(parents=True, exist_ok=True)

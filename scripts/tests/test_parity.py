@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import parity  # noqa: E402
@@ -99,6 +100,39 @@ class ParityTests(unittest.TestCase):
         self.assertEqual((meta["total"], meta["selected"], meta["shard"], meta["partial"]), (5, 5, [1, 1], False))
         self.assertEqual(meta["counts"]["fail"], 4)
         self.assertIn("compiler/slow.ts", {entry["variant"] for entry in meta["slowest"]})
+
+    def test_a_signal_keeps_the_full_trace_even_with_a_partial_result_line(self):
+        trace = "\n".join(f"phase-{index}" for index in range(100))
+        runner_result = subprocess.CompletedProcess([], -11, stdout='{"id":', stderr=trace)
+        local = self.directory / "signal/local"
+        with patch.object(parity.subprocess, "run", return_value=runner_result):
+            rows, _ = parity.run_variant("compiler", self.runner, "compiler/crash.ts", local, 1)
+        self.assertEqual(rows[0]["reason"], "signal 11")
+        self.assertNotIn("phase-0\n", rows[0]["detail"])
+        self.assertIn("phase-99", rows[0]["detail"])
+        records = list((local.parent / "crashes").glob("*/process.json"))
+        self.assertEqual(len(records), 1)
+        directory = records[0].parent
+        self.assertEqual((directory / "stderr").read_text(), trace)
+        self.assertEqual((directory / "stdout").read_text(), '{"id":')
+        record = json.loads(records[0].read_text())
+        self.assertEqual(record["variant"], "compiler/crash.ts")
+        self.assertEqual(record["reason"], "signal 11")
+        self.assertIn(str(self.runner), record["command"])
+
+    def test_a_deadline_preserves_partial_output_and_traces(self):
+        error = subprocess.TimeoutExpired([], 1, output=b"partial", stderr=b"last phase")
+        local = self.directory / "deadline/local"
+        with patch.object(parity.subprocess, "run", side_effect=error):
+            rows, _ = parity.run_variant("compiler", self.runner, "compiler/slow.ts", local, 1)
+        self.assertEqual(rows[0]["reason"], "deadline: 1 s")
+        directory, = (local.parent / "crashes").iterdir()
+        self.assertEqual((directory / "stderr").read_bytes(), b"last phase")
+        self.assertEqual((directory / "stdout").read_bytes(), b"partial")
+
+    def test_passing_variants_do_not_write_crash_logs(self):
+        self.run_shard("pass", "--id", "compiler/b(target=es2015).ts")
+        self.assertFalse((self.directory / "pass/crashes").exists())
 
     def test_shards_partition_the_sorted_variants(self):
         first = self.run_shard("one", "--shard", "1/2")
@@ -195,6 +229,7 @@ class ParityTests(unittest.TestCase):
             parity.run_variant = saved
         self.assertFalse(meta.exists())
         self.assertFalse(stale.exists())
+        self.assertFalse((self.directory / "out/crashes").exists())
         with self.assertRaises(FileNotFoundError):
             parity.main(["check", "compiler", *self.results("out")])
 

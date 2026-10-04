@@ -185,6 +185,9 @@ jobs:
         with:
           key: runner-release
       - name: Build
+        env:
+          # Function names alone cannot locate an optimized inlined fault.
+          CARGO_PROFILE_RELEASE_DEBUG: 1
         run: cargo build --release --locked -p tsr_testrunner --bin tsr-testrunner
       - uses: actions/upload-artifact@v4
         with:
@@ -221,7 +224,39 @@ jobs:
       - name: Run the shard
         run: |
           chmod +x runner/tsr-testrunner
+          if [[ "${{ matrix.suite }}" == compiler-concurrent ]]; then
+            export TSR_TESTRUNNER_TRACE_PHASES=1
+          fi
+          if [[ "$RUNNER_OS" == Linux && "${{ runner.environment }}" == github-hosted ]]; then
+            mkdir -p "$RUNNER_TEMP/parity-cores"
+            # Keep cores outside results: they may contain process environment
+            # data. Only debugger reports and the failed process traces upload.
+            previous_core_pattern=$(cat /proc/sys/kernel/core_pattern)
+            trap 'sudo sysctl -w "kernel.core_pattern=$previous_core_pattern" > /dev/null' EXIT
+            sudo sysctl -w "kernel.core_pattern=$RUNNER_TEMP/parity-cores/core.%p.%t"
+            ulimit -c unlimited
+          fi
           python3 scripts/parity.py run "${{ matrix.suite }}" --runner runner/tsr-testrunner --shard "${{ matrix.shard }}" --output "results/${{ matrix.suite }}/$(echo '${{ matrix.shard }}' | tr / -)"
+      - name: Backtrace crashed processes
+        if: ${{ !cancelled() && runner.os == 'Linux' }}
+        run: |
+          shopt -s nullglob
+          cores=("$RUNNER_TEMP/parity-cores/"core.*)
+          if (( ${#cores[@]} == 0 )); then exit 0; fi
+          if ! command -v gdb; then
+            sudo apt-get update -qq
+            sudo apt-get install -y gdb
+          fi
+          output="results/${{ matrix.suite }}/$(echo '${{ matrix.shard }}' | tr / -)/crashes"
+          mkdir -p "$output"
+          sha256sum runner/tsr-testrunner > "$output/executable.sha256"
+          for core in "${cores[@]}"; do
+            gdb --batch runner/tsr-testrunner "$core" \
+              -ex 'set pagination off' -ex 'info registers' \
+              -ex 'thread apply all bt 100' -ex 'info proc mappings' \
+              > "$output/$(basename "$core").backtrace.txt" 2>&1
+            cat "$output/$(basename "$core").backtrace.txt"
+          done
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:

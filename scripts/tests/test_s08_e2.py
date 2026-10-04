@@ -62,6 +62,20 @@ class Acceptance(unittest.TestCase):
         self.enable_types()
         self.assertEqual(self.grade()['metrics']['type_to_string_parity'], 1)
 
+    def test_empty_ledger_means_no_approvals_and_cannot_waive_a_difference(self):
+        self.ledger = {}
+        self.assertEqual(c.approvals(self.ledger, self.pin, {self.request['id']}), {})
+        self.assertEqual(self.grade()['metrics']['errors_parity'], 1)
+        self.row['error_baseline']['pretty'] = True
+        metrics = self.grade()['metrics']
+        self.assertEqual(metrics['errors_parity'], 0)
+        self.assertFalse(metrics['divergences_approved'])
+
+    def test_empty_ledger_support_does_not_accept_malformed_tables(self):
+        for ledger in ({'other': []}, {'divergence': {}}, {'divergence': None}):
+            with self.subTest(ledger=ledger), self.assertRaisesRegex(ValueError, 'invalid divergence ledger'):
+                c.approvals(ledger, self.pin, {self.request['id']})
+
     def test_partial_smoke_never_emits_metrics(self):
         self.assertEqual(self.grade(partial=True)['metrics'], {})
 
