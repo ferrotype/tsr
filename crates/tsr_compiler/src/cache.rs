@@ -85,6 +85,10 @@ pub(crate) struct ProgramRetention {
     _sources: Option<Arc<RetainedSources>>,
 }
 pub trait SourceFileCache: Send + Sync {
+    /// Editor overlays can supply a language independently of the file suffix.
+    fn script_kind(&self, name: &[u8]) -> ScriptKind {
+        ScriptKind::ensure_from_file_name(name)
+    }
     /// Retain an unchanged file in a cloned program, preserving its identity.
     fn retain(&self, file: &Arc<ProgramFile>) -> Result<Box<dyn Send + Sync>, Error>;
     fn acquire(
@@ -174,6 +178,12 @@ pub struct FileCache {
     project_retention: Weak<RetainedSources>,
 }
 impl FileCache {
+    pub(crate) fn script_kind(&self, name: &[u8]) -> ScriptKind {
+        self.project.as_ref().map_or_else(
+            || ScriptKind::ensure_from_file_name(name),
+            |cache| cache.script_kind(name),
+        )
+    }
     pub(crate) fn retain_project_file(&self, file: &Arc<ProgramFile>) -> Result<(), Error> {
         if let Some(cache) = &self.project {
             let lease = cache.retain(file)?;

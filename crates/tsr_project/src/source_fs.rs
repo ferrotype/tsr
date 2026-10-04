@@ -11,7 +11,7 @@ use tsr_jsstring::JsString;
 use tsr_vfs::{Entries, Error, FileContent, FileInfo, FileSystem, SnapshotId};
 
 pub struct SourceFs {
-    source: Arc<dyn FileSystem>,
+    source: Mutex<(Arc<dyn FileSystem>, bool)>,
     cwd: JsString,
     tracking: AtomicBool,
     seen_files: Mutex<BTreeSet<JsString>>,
@@ -21,18 +21,41 @@ impl SourceFs {
     // port: tsc/internal/project/snapshotfs.go:newSourceFS
     pub fn new(source: Arc<dyn FileSystem>, cwd: JsString, tracking: bool) -> Self {
         Self {
-            source,
+            source: Mutex::new((source, false)),
             cwd,
             tracking: AtomicBool::new(tracking),
             seen_files: Mutex::default(),
             missing_directories: Mutex::default(),
         }
     }
+    fn source(&self) -> Arc<dyn FileSystem> {
+        self.source.lock().expect("source filesystem").0.clone()
+    }
+    /// Replace the private construction host once, after its loaders join.
+    /// This releases the builder and its previous-snapshot roots.
+    pub(crate) fn freeze(&self, source: Arc<dyn FileSystem>) {
+        self.disable_tracking();
+        let mut state = self.source.lock().expect("source filesystem");
+        assert!(!state.1, "compiler host is already frozen");
+        let previous = std::mem::replace(&mut *state, (source, true));
+        drop(state);
+        drop(previous);
+    }
+    pub(crate) fn inherit_dependencies(&self, previous: &Self) {
+        self.seen_files
+            .lock()
+            .unwrap()
+            .clone_from(&previous.seen_files.lock().unwrap());
+        self.missing_directories
+            .lock()
+            .unwrap()
+            .clone_from(&previous.missing_directories.lock().unwrap());
+    }
     fn path(&self, name: &[u8]) -> JsString {
         tsr_tspath::to_path(
             name,
             self.cwd.as_bytes(),
-            self.source.use_case_sensitive_file_names(),
+            self.source().use_case_sensitive_file_names(),
         )
     }
     // port: tsc/internal/project/snapshotfs.go:sourceFS.DisableTracking
@@ -42,7 +65,8 @@ impl SourceFs {
     // port: tsc/internal/project/snapshotfs.go:sourceFS.Track
     pub fn track(&self, name: &[u8]) {
         if self.tracking.load(Ordering::Acquire) {
-            self.seen_files.lock().unwrap().insert(self.path(name));
+            let path = self.path(name);
+            self.seen_files.lock().unwrap().insert(path);
         }
     }
     pub fn seen_files(&self) -> BTreeSet<JsString> {
@@ -76,24 +100,24 @@ impl SourceFs {
 }
 impl FileSystem for SourceFs {
     fn snapshot_id(&self) -> Option<SnapshotId> {
-        self.source.snapshot_id()
+        self.source().snapshot_id()
     }
     fn use_case_sensitive_file_names(&self) -> bool {
-        self.source.use_case_sensitive_file_names()
+        self.source().use_case_sensitive_file_names()
     }
     // port: tsc/internal/project/snapshotfs.go:sourceFS.ReadFile
     fn read_file(&self, path: &[u8]) -> Result<Option<FileContent>, Error> {
         self.track(path);
-        self.source.read_file(path)
+        self.source().read_file(path)
     }
     // port: tsc/internal/project/snapshotfs.go:sourceFS.FileExists
     fn file_exists(&self, path: &[u8]) -> Result<bool, Error> {
         self.track(path);
-        self.source.file_exists(path)
+        self.source().file_exists(path)
     }
     // port: tsc/internal/project/snapshotfs.go:sourceFS.DirectoryExists
     fn directory_exists(&self, path: &[u8]) -> Result<bool, Error> {
-        let exists = self.source.directory_exists(path)?;
+        let exists = self.source().directory_exists(path)?;
         if !exists && self.tracking.load(Ordering::Acquire) {
             self.missing_directories
                 .lock()
@@ -103,16 +127,16 @@ impl FileSystem for SourceFs {
         Ok(exists)
     }
     fn entries(&self, path: &[u8]) -> Result<Entries, Error> {
-        self.source.entries(path)
+        self.source().entries(path)
     }
     fn stat(&self, path: &[u8]) -> Result<Option<FileInfo>, Error> {
-        self.source.stat(path)
+        self.source().stat(path)
     }
     fn realpath(&self, path: &[u8]) -> Result<JsString, Error> {
-        self.source.realpath(path)
+        self.source().realpath(path)
     }
     fn walk_dir(&self, path: &[u8], visit: &mut tsr_vfs::WalkCallback<'_>) -> Result<(), Error> {
-        self.source.walk_dir(path, visit)
+        self.source().walk_dir(path, visit)
     }
 }
 

@@ -13,6 +13,7 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
+tsr_tsoptions = { version = "0.2.0", path = "../tsr_tsoptions" }
 tsr_compiler = { version = "0.2.0", path = "../tsr_compiler" }
 tsr_ast = { version = "0.2.0", path = "../tsr_ast" }
 tsr_arena = { version = "0.2.0", path = "../tsr_arena" }
@@ -26,7 +27,6 @@ xxhash-rust = { version = "0.8.15", features = ["xxh3"] }
 
 [dev-dependencies]
 tsr_arena = { version = "0.2.0", path = "../tsr_arena", features = ["harness"] }
-tsr_tsoptions = { version = "0.2.0", path = "../tsr_tsoptions" }
 
 [lints]
 workspace = true

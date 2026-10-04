@@ -3,10 +3,18 @@
 #![forbid(unsafe_code)]
 
 pub mod background;
+pub mod config;
 pub mod dirty;
+pub mod extended_config;
 pub mod file_change;
 pub mod overlay;
+pub mod owner_cache;
 pub mod parse_cache;
+pub mod program_counter;
+pub mod project;
+pub mod session;
+mod snapshot;
+pub use snapshot::Snapshot;
 pub mod ref_count_cache;
 pub mod snapshot_fs;
 pub mod source_fs;
@@ -283,26 +291,14 @@ impl PooledChecker {
 #[derive(Clone)]
 pub struct Project {
     pool: Arc<CheckerPool>,
+    data: Option<Arc<project::ProjectData>>,
 }
 impl Project {
     pub fn new(pool: Arc<CheckerPool>) -> Self {
-        Self { pool }
+        Self { pool, data: None }
     }
     pub fn pool(&self) -> &Arc<CheckerPool> {
         &self.pool
-    }
-}
-
-#[derive(Clone)]
-pub struct Snapshot {
-    project: Project,
-}
-impl Snapshot {
-    pub fn new(project: Project) -> Self {
-        Self { project }
-    }
-    pub fn project(&self) -> &Project {
-        &self.project
     }
 }
 

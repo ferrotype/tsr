@@ -266,6 +266,18 @@ impl Program {
     ) -> Result<Self, Error> {
         Loader::new(options, None, cache, counters, true, false)?.run()
     }
+    /// Session loading uses the editor's source-of-reference mode. The existing
+    /// explicit faking-host boundary remains until that host is supplied.
+    pub fn load_live_for_project(
+        options: ProgramOptions,
+        cache: &mut FileCache,
+        counters: &Counters,
+    ) -> Result<Self, Error> {
+        Loader::new(options, None, cache, counters, true, true)?.run()
+    }
+    pub fn is_source_from_project_reference(&self, path: &[u8]) -> bool {
+        self.references.is_source_from_project_reference(path)
+    }
     /// Live command-line loading with a mapper project. The caller freezes
     /// filesystem edits for the load, as with `load_live`; loaded AST owners
     /// remain immutable and mapper identities belong to this compilation.
@@ -1300,7 +1312,7 @@ impl<'a> Loader<'a> {
                 is_lib,
                 self.skip_resolution,
             )?;
-            let kind = ScriptKind::ensure_from_file_name(name.as_bytes());
+            let kind = self.cache.script_kind(name.as_bytes());
             let file = self
                 .parse_source_file(name.as_bytes(), key, &meta, kind)?
                 .ok_or(Error::Unsupported("file-name casing variant without text"))?;
@@ -1668,7 +1680,7 @@ impl<'a> Loader<'a> {
                 .insert(key, self.pending_children(pending_start, depth));
             return Ok(());
         }
-        let kind = ScriptKind::ensure_from_file_name(&name);
+        let kind = self.cache.script_kind(&name);
         // A supplemental file arrives parsed with its canonical file.
         let supplemental = self.content_mappers.supplementals.remove(&key);
         if supplemental.is_none()

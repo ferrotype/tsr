@@ -464,8 +464,15 @@ cache can retain parses across disposed programs. Hashing reuses the workspace's
 `xxhash-rust` implementation of the pin's XXH3-128; the mapped key includes the
 raw hash, transform identity and locale.
 
-This is an implementation increment, **not L1's exit**. The core Session and
-configuration/project coordinators, owner/program counters, checker scheduling,
+The next increment adds the actual session/configuration coordinator, immutable
+project collections, owner-counted extended configs and program roots. Open and
+queued edit/config events construct real programs through the shared parse cache;
+unchanged projects retain identity, compatible edits use the compiler's reuse
+path, and old compiler hosts release their construction builders when frozen.
+Focused tests cover old-snapshot isolation, extended-config disposal, disk-cache
+pruning, overlay language kinds and independent project panic retirement.
+
+These are implementation increments, **not L1's exit**. Checker scheduling,
 watches/timeouts and logging remain. The router bridge still needs the actual
 server connection; options application and the native state-writer projection
 have not been connected. Mapped-bundle retention and the batch reset/cache

@@ -36,13 +36,13 @@ pub fn get_parsed_command_line_of_config_file_path(
 ) -> Result<ReadConfigResult, Error> {
     read_with_cache(name, path, options, raw, host, None)
 }
-pub(crate) fn read_with_cache(
+pub fn read_with_cache(
     name: &[u8],
     path: JsString,
     options: &CompilerOptions,
     raw: &ConfigValue,
     host: &dyn ParseConfigHost,
-    cache: Option<&crate::ExtendedConfigCache<'_>>,
+    cache: Option<&dyn crate::ExtendedConfigProvider>,
 ) -> Result<ReadConfigResult, Error> {
     let Some(content) = host.fs().read_file(name)? else {
         return Ok(ReadConfigResult {

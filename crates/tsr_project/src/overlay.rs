@@ -113,6 +113,10 @@ impl OverlayFs {
             overlays: Arc::default(),
         }
     }
+    pub(crate) fn with_overlays(mut self, overlays: Overlays) -> Self {
+        self.overlays = overlays;
+        self
+    }
     pub fn overlays(&self) -> &Overlays {
         &self.overlays
     }

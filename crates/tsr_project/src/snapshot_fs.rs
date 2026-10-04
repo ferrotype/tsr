@@ -50,7 +50,7 @@ impl SnapshotFs {
             read_files: Mutex::default(),
         })
     }
-    fn path(&self, name: &[u8]) -> JsString {
+    pub(crate) fn path(&self, name: &[u8]) -> JsString {
         tsr_tspath::to_path(
             name,
             self.cwd.as_bytes(),
