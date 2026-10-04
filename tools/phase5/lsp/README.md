@@ -16,6 +16,7 @@ cargo test -p tsrust --bin tsrust lsp::tests
 cargo build -p tsrust -p tsr_testhost --bin tsrust --bin phase5_testserver
 python3 tools/phase5/lsp/check.py
 python3 tools/phase5/lsp/interop.py
+python3 tools/phase5/lsp/review_cases.py
 ```
 
 The native watcher test requires ordinary host filesystem notification access.
@@ -48,6 +49,19 @@ diagnostics, project-info, incremental non-ASCII edits, validation off/on and
 shutdown, separately in UTF-8 and UTF-16. It also requires a clean process exit.
 Asynchronous logs/watch/progress messages are serviced but are not part of
 that response comparison; the dedicated tests cover their contracts.
+
+`review_cases.py` checks the #93 regressions against that pinned executable:
+full typed error responses, cancellation while queued behind configuration,
+early exit, unknown notifications, the unknown-file diagnostic fallback,
+stable/unstable config precedence and resetting the config, irrelevant watch
+events and one coalesced refresh. Both Rust entry points run the same requests.
+The native commands also compare complete malformed-JSON responses and 19 CLI
+flag cases (usage/errors, prefixes, separators and native-width integer bounds).
+The private endpoint retains ADR 0019's strict malformed-frame policy.
+Rust tests separately cover capability absence, known/deleted directories,
+ordinary edits cancelling pending refreshes, and shutdown invalidating queued
+delivery. Duplicate-ID and post-shutdown refusals are intentional safeguards,
+documented with owner approval in the L2 plan record.
 
 No canonical upstream file is changed. These scripts build only into `target/`
 and temporary directories; they do not produce archives, rewrite expectation

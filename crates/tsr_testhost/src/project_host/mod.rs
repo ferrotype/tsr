@@ -18,7 +18,10 @@ use serde_json::{value::RawValue, Value};
 use std::{
     collections::BTreeMap,
     io,
-    sync::{mpsc, Arc},
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        mpsc, Arc,
+    },
     thread,
 };
 use tsr_project::session::SessionOptions;
@@ -38,6 +41,7 @@ struct Task {
     action: Action,
     host: Arc<dyn FileSystem>,
     cancel: Arc<CancelCalls>,
+    started: Arc<AtomicBool>,
 }
 enum Completion {
     Request(Id),
@@ -55,6 +59,7 @@ struct Pending {
     cancel: Arc<CancelCalls>,
     completion: Completion,
     context: Option<tsr_ipc::Context>,
+    started: Arc<AtomicBool>,
 }
 
 /// Send incoming frames here; the reader can block independently of the router.
@@ -130,6 +135,7 @@ impl Connection {
         let worker = thread::spawn(move || {
             let mut worker = Worker::with_client(worker_client, worker_context);
             while let Ok(task) = receive.recv() {
+                task.started.store(true, Ordering::Release);
                 let resetting = matches!(task.action, Action::Reset);
                 let outcome = if task.cancel.is_canceled() && !resetting {
                     Err("request canceled".into())
@@ -268,6 +274,11 @@ impl Connection {
                 .values()
                 .filter(|p| p.id.as_ref() == Some(&cancel.id))
             {
+                // LSP cancellation starts at dispatch. Private test/ requests
+                // keep S11's existing admission-time cancellation contract.
+                if pending.context.is_some() && !pending.started.load(Ordering::Acquire) {
+                    continue;
+                }
                 pending.cancel.cancel();
                 if let Some(context) = &pending.context {
                     context.cancel();
@@ -571,6 +582,7 @@ impl Connection {
             Action::Protocol { context, .. } => Some(context.clone()),
             _ => None,
         };
+        let started = Arc::new(AtomicBool::new(false));
         self.tasks
             .as_ref()
             .unwrap()
@@ -579,6 +591,7 @@ impl Connection {
                 action,
                 host,
                 cancel: cancel.clone(),
+                started: started.clone(),
             })
             .map_err(protocol::invalid)?;
         self.pending.insert(
@@ -588,6 +601,7 @@ impl Connection {
                 cancel,
                 completion,
                 context,
+                started,
             },
         );
         Ok(())
@@ -607,8 +621,9 @@ impl Connection {
                 exit,
                 initialized,
             } => {
-                if exit {
+                if exit && outcome.as_ref().is_ok_and(|value| value.get() == "null") {
                     self.closed = true;
+                    return Ok(());
                 }
                 if let Some(id) = id {
                     let response = match outcome {
@@ -620,7 +635,11 @@ impl Connection {
                             } else {
                                 -32603
                             },
-                            &error,
+                            if pending.cancel.is_canceled() {
+                                "RequestCancelled"
+                            } else {
+                                &error
+                            },
                             None,
                         ),
                     };

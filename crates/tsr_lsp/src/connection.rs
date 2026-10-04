@@ -13,13 +13,11 @@ use tsr_ipc::Context;
 use tsr_json::RawValue;
 use tsr_lsproto::{Id, Message, ResponseError};
 
-struct Pending {
-    message: Message,
-    context: Context,
-}
 struct Admission {
-    requests: DynamicQueue<Pending>,
-    contexts: Mutex<HashMap<Id, Context>>,
+    requests: DynamicQueue<Message>,
+    // Reserve IDs at admission (ADR 0019), but only running requests are
+    // cancellable. Go registers their contexts when dispatch dequeues them.
+    contexts: Mutex<HashMap<Id, Option<Context>>>,
     context: Context,
     client: Arc<RpcClient>,
 }
@@ -32,7 +30,10 @@ impl Input {
         let mut message = Message::default();
         if let Err(error) = tsr_json::unmarshal(bytes, &mut message, tsr_json::Options::default()) {
             return self.0.client.write(&Message {
-                error: Some(crate::error(-32600, format!("invalid request: {error}"))),
+                error: Some(crate::coded_error(
+                    tsr_lsproto::ErrorCode::INVALID_REQUEST,
+                    Some(&error.to_string()),
+                )),
                 ..Default::default()
             });
         }
@@ -58,30 +59,49 @@ impl Input {
                 |s| Id::string(s.as_str()),
             );
             // cancel may run callbacks: never hold the contexts map across it.
-            let context = self.0.contexts.lock().unwrap().get(&id).cloned();
+            let context = self.0.contexts.lock().unwrap().get(&id).cloned().flatten();
             if let Some(context) = context {
                 context.cancel();
             }
             return Ok(());
         }
-        let context = self.0.context.with_cancel();
         if let Some(id) = &message.id {
             let mut pending = self.0.contexts.lock().unwrap();
             if pending.contains_key(id) {
-                return Err(crate::error(-32600, "duplicate in-flight request ID"));
+                return Err(crate::coded_error(
+                    tsr_lsproto::ErrorCode::INVALID_REQUEST,
+                    Some("duplicate in-flight request ID"),
+                ));
             }
-            pending.insert(id.clone(), context.clone());
+            pending.insert(id.clone(), None);
         }
-        self.0
-            .requests
-            .put(&self.0.context, Pending { message, context })
-            .map_err(|_| crate::canceled())
+        let id = message.id.clone();
+        if self.0.requests.put(&self.0.context, message).is_err() {
+            if let Some(id) = id {
+                self.0.contexts.lock().unwrap().remove(&id);
+            }
+            return Err(crate::canceled());
+        }
+        Ok(())
     }
     pub fn end(&self) {
         self.0.context.cancel();
     }
     pub fn client(&self) -> &Arc<RpcClient> {
         &self.0.client
+    }
+    fn start_request(&self, id: Option<&Id>) -> Context {
+        let context = self.0.context.with_cancel();
+        if let Some(id) = id {
+            *self
+                .0
+                .contexts
+                .lock()
+                .unwrap()
+                .get_mut(id)
+                .expect("request ID reserved at admission") = Some(context.clone());
+        }
+        context
     }
     fn cancel_requests(&self, except: Option<&Id>) {
         let contexts: Vec<_> = self
@@ -91,7 +111,7 @@ impl Input {
             .unwrap()
             .iter()
             .filter(|(id, _)| Some(*id) != except)
-            .map(|(_, ctx)| ctx.clone())
+            .filter_map(|(_, ctx)| ctx.clone())
             .collect();
         for context in contexts {
             context.cancel();
@@ -172,30 +192,26 @@ impl Connection {
                 })
             })
             .collect();
-        while let Ok(pending) = self.input.0.requests.get(&self.input.0.context) {
-            let message = pending.message;
+        while let Ok(message) = self.input.0.requests.get(&self.input.0.context) {
+            let context = self.input.start_request(message.id.as_ref());
             if message.method == "shutdown" {
                 self.input.cancel_requests(message.id.as_ref());
             }
-            let result = self
-                .runtime
-                .prepare(&pending.context, &message, self.host.clone());
+            let result = self.runtime.prepare(&context, &message, self.host.clone());
             match result {
                 Ok(Dispatch::Exit) => break,
                 Ok(Dispatch::Ready(value)) => {
-                    self.input.complete(message.id, &pending.context, Ok(value));
+                    self.input.complete(message.id, &context, Ok(value));
                 }
                 Ok(Dispatch::Work(work)) => {
                     if jobs
-                        .put(&query_context, (message.id, pending.context, work))
+                        .put(&query_context, (message.id, context, work))
                         .is_err()
                     {
                         break;
                     }
                 }
-                Err(error) => self
-                    .input
-                    .complete(message.id, &pending.context, Err(error)),
+                Err(error) => self.input.complete(message.id, &context, Err(error)),
             }
         }
         self.input.end();
@@ -209,5 +225,72 @@ impl Connection {
 impl Drop for Connection {
     fn drop(&mut self) {
         self.input.end();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn only_dispatched_requests_are_cancellable_but_all_ids_are_reserved() {
+        let (send, receive) = std::sync::mpsc::channel();
+        let (connection, input) = Connection::new(
+            Options::new(
+                tsr_project::session::SessionOptions::default(),
+                Arc::new(tsr_vfs::MemoryBuilder::new(b"/", true).finish()),
+            ),
+            &Context::background(),
+            Arc::new(move |raw| {
+                send.send(raw).unwrap();
+                Ok(())
+            }),
+            Box::new(std::io::sink()),
+        );
+        let message = Message {
+            id: Some(Id::int(7)),
+            method: "custom/projectInfo".into(),
+            ..Default::default()
+        };
+        let cancel = || {
+            input
+                .receive(Message {
+                    method: "$/cancelRequest".into(),
+                    params: Some(RawValue(br#"{"id":7}"#.to_vec())),
+                    ..Default::default()
+                })
+                .unwrap();
+        };
+        input.receive(message.clone()).unwrap();
+        cancel();
+        assert_eq!(
+            input.receive(message.clone()).unwrap_err().message,
+            "InvalidRequest: duplicate in-flight request ID"
+        );
+        let queued = input.0.requests.get(&input.0.context).unwrap();
+        let context = input.start_request(queued.id.as_ref());
+        assert!(
+            context.err().is_none(),
+            "queued cancellation must not survive dispatch"
+        );
+        cancel();
+        assert!(context.err().is_some());
+        input.complete(queued.id, &context, Ok(RawValue(b"null".to_vec())));
+        let mut response = Message::default();
+        tsr_json::unmarshal(
+            &receive.recv().unwrap().0,
+            &mut response,
+            tsr_json::Options::default(),
+        )
+        .unwrap();
+        let error = response.error.unwrap();
+        assert_eq!(
+            (error.code, error.message.as_str()),
+            (-32800, "RequestCancelled")
+        );
+        input.receive(message).unwrap(); // Completion frees the ID.
+        let next = input.start_request(Some(&Id::int(7)));
+        input.end();
+        assert!(next.err().is_some(), "teardown cancels active requests too");
+        drop(connection);
     }
 }

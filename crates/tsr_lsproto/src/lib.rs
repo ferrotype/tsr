@@ -6,13 +6,35 @@ mod generated;
 mod uri;
 mod values;
 pub use generated::*;
-pub use tsr_jsonrpc::{
-    FramingError, Id, Message, Reader, RequestMessage, ResponseError, ResponseMessage, Writer,
-};
+pub use tsr_jsonrpc::{FramingError, Id, Message, Reader, RequestMessage, ResponseError, Writer};
 pub use values::{Any, DocumentUri, EmptyObject, Null, UIntPair, URI};
 
 use std::marker::PhantomData;
 use tsr_json::{Decode, Decoder, Encode, Encoder, Error, Kind, Options, RawValue};
+
+/// LSP responses always carry an ID, including null for a parse error. The
+/// pin's lsp/lsproto/jsonrpc.go differs from generic jsonrpc.go at this field.
+pub struct ResponseMessage<'a> {
+    pub id: Option<&'a Id>,
+    pub result: Option<&'a dyn Encode>,
+    pub error: Option<&'a ResponseError>,
+}
+impl Encode for ResponseMessage<'_> {
+    fn type_name(&self) -> &'static str {
+        "lsproto.ResponseMessage"
+    }
+    fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+        tsr_jsonrpc::object(
+            out,
+            &[
+                tsr_jsonrpc::field(b"jsonrpc", &tsr_jsonrpc::JsonRpcVersion),
+                tsr_jsonrpc::field(b"id", &self.id),
+                tsr_jsonrpc::omitted(b"result", self.result),
+                tsr_jsonrpc::optional(b"error", self.error),
+            ],
+        )
+    }
+}
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct NoParams;

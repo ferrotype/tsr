@@ -31,7 +31,16 @@ impl RpcClient {
         })
     }
     pub fn write(&self, message: &Message) -> Result<(), ResponseError> {
-        (self.output)(raw(message)?)
+        let value = if message.method.is_empty() {
+            raw(&tsr_lsproto::ResponseMessage {
+                id: message.id.as_ref(),
+                result: message.result.as_ref().map(|v| v as &dyn tsr_json::Encode),
+                error: message.error.as_ref(),
+            })?
+        } else {
+            raw(message)?
+        };
+        (self.output)(value)
     }
     pub fn reply(&self, id: Id, result: Reply) -> Result<(), ResponseError> {
         (self.output)(Self::encode_reply(id, result)?)

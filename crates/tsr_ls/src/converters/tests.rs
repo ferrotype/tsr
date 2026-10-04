@@ -273,3 +273,39 @@ fn diagnostics_preserve_chains_tags_locales_and_client_capabilities() {
     );
     assert_ne!(localized.message, base.message);
 }
+
+#[test]
+fn empty_chain_root_keeps_the_separator_before_its_first_child() {
+    static EMPTY: tsr_diagnostics::Message = tsr_diagnostics::Message {
+        code: 0,
+        category: tsr_diagnostics::Category::Error,
+        key: "",
+        text: "",
+        reports_unnecessary: false,
+        reports_deprecated: false,
+        elided_in_compatibility_pyramid: false,
+    };
+    struct NoSources;
+    impl DiagnosticSources for NoSources {
+        fn diagnostic_source(
+            &self,
+            _: tsr_ast::NodeId,
+        ) -> Result<tsr_ast::SourceFileRead<'_>, tsr_compiler::Error> {
+            panic!("global diagnostic cannot read a source")
+        }
+    }
+    let mut root = Diagnostic::compiler(&EMPTY, vec![]);
+    root.message_chain
+        .push(std::sync::Arc::new(Diagnostic::external(
+            None,
+            TextRange::default(),
+            JsString::default(),
+            1,
+            0,
+            JsString::from_bytes(b"child".as_slice()),
+        )));
+    let actual = Converters::new(PositionEncoding::Utf16)
+        .diagnostic(&NoSources, &root, &DiagnosticOptions::default())
+        .unwrap();
+    assert_eq!(actual.message.string.as_deref().unwrap(), "\n  child");
+}

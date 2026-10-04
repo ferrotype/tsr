@@ -191,6 +191,7 @@ impl Worker {
                     ));
                 }
                 let runtime = self.runtime.as_mut().unwrap();
+                let mut exited = false;
                 let result =
                     runtime
                         .prepare(&context, &message, request_host)
@@ -199,13 +200,17 @@ impl Worker {
                             Dispatch::Work(work) => work(),
                             Dispatch::Exit => {
                                 runtime.close();
+                                exited = true;
                                 Ok(tsr_json::RawValue(b"null".to_vec()))
                             }
                         });
+                if exited {
+                    return Ok(raw(&()));
+                }
                 let result = if context.err().is_some() {
                     Err(tsr_lsproto::ResponseError {
                         code: -32800,
-                        message: "request cancelled".into(),
+                        message: tsr_lsproto::ErrorCode::REQUEST_CANCELLED.to_string(),
                         data: None,
                     })
                 } else {

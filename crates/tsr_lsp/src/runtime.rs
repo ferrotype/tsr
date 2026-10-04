@@ -170,20 +170,27 @@ impl Runtime {
         }
         let params = request.params.as_ref();
         let method = request.method.as_str();
-        if method == "exit" {
-            return Ok(Dispatch::Exit);
-        }
         if method == "initialize" {
             return self
                 .initialize(params)
                 .and_then(|r| client::raw(&r))
                 .map(Dispatch::Ready);
         }
-        if self.initialize.is_none() {
-            return Err(crate::error(-32002, "server not initialized"));
+        if self.initialize.is_none() || (!self.initialized && method != "initialized") {
+            return Err(crate::coded_error(
+                lsp::ErrorCode::SERVER_NOT_INITIALIZED,
+                None,
+            ));
+        }
+        if method == "exit" {
+            let _: lsp::NoParams = crate::decode(params)?;
+            return Ok(Dispatch::Exit);
         }
         if self.shutdown {
-            return Err(crate::error(-32600, "server is shut down"));
+            return Err(crate::coded_error(
+                lsp::ErrorCode::INVALID_REQUEST,
+                Some("server is shut down"),
+            ));
         }
         match method {
             "initialized" => {
@@ -201,7 +208,10 @@ impl Runtime {
             "custom/setLogVerbosity" => {
                 let value: lsp::SetLogVerbosityParams = crate::decode(params)?;
                 if !crate::logger::is_valid_log_verbosity(value.verbosity) {
-                    return Err(crate::invalid("invalid log verbosity"));
+                    return Err(crate::invalid(&format!(
+                        "invalid log verbosity {}",
+                        value.verbosity.0
+                    )));
                 }
                 self.logger.set_verbosity(value.verbosity);
             }
@@ -258,10 +268,24 @@ impl Runtime {
                         .unwrap()
                         .use_case_sensitive_file_names(),
                 );
-                let project = snapshot
-                    .project_for_file(path.as_bytes())
-                    .cloned()
-                    .ok_or_else(|| crate::error(-32603, "no project for file"))?;
+                let Some(project) = snapshot.project_for_file(path.as_bytes()).cloned() else {
+                    // contentMapperFallbackResponse applies only to an existing
+                    // file of unknown script kind, not every missing project.
+                    if snapshot
+                        .filesystem()
+                        .unwrap()
+                        .get_file(uri.file_name().as_bytes())
+                        .map_err(|e| crate::project_error(e.into()))?
+                        .is_some_and(|file| file.kind() == tsr_core::ScriptKind::UNKNOWN)
+                    {
+                        return client::raw(&lsp::RelatedFullDocumentDiagnosticReport::default())
+                            .map(Dispatch::Ready);
+                    }
+                    return Err(crate::error(
+                        -32603,
+                        format!("no project found for URI {}", uri.0),
+                    ));
+                };
                 let context = context.clone();
                 let request_id = request
                     .id
@@ -312,22 +336,29 @@ impl Runtime {
                     client::raw(&result)
                 })));
             }
-            _ => {
+            _ if unimplemented_method(method) => {
                 return Err(crate::error(
                     -32601,
                     format!("method not implemented: {method}"),
                 ))
             }
+            _ if request.id.is_some() => {
+                return Err(crate::coded_error(lsp::ErrorCode::INVALID_REQUEST, None));
+            }
+            _ => {} // The pin ignores unknown notifications.
         }
         Ok(Dispatch::Ready(RawValue(b"null".to_vec())))
     }
     fn ready(&self) -> Result<&Server, lsp::ResponseError> {
         if !self.initialized {
-            return Err(crate::error(-32002, "server not initialized"));
+            return Err(crate::coded_error(
+                lsp::ErrorCode::SERVER_NOT_INITIALIZED,
+                None,
+            ));
         }
         self.server
             .as_ref()
-            .ok_or_else(|| crate::error(-32002, "project session not initialized"))
+            .ok_or_else(|| crate::coded_error(lsp::ErrorCode::SERVER_NOT_INITIALIZED, None))
     }
     // port: tsc/internal/lsp/server.go:Server.handleInitialize
     fn initialize(
@@ -473,16 +504,7 @@ impl Runtime {
                 self.options.host.clone(),
                 Arc::new(move |changes| {
                     if let Some(session) = weak.upgrade() {
-                        for event in changes {
-                            use tsr_project::file_change::{FileChange, FileChangeKind as K};
-                            let kind = match event.r#type.0 {
-                                1 => K::WatchCreate,
-                                2 => K::WatchChange,
-                                3 => K::WatchDelete,
-                                _ => continue,
-                            };
-                            let _ = session.enqueue(FileChange::new(kind, event.uri));
-                        }
+                        let _ = session.did_change_watched_files(changes);
                     }
                 }),
                 self.logger.clone(),
@@ -597,6 +619,13 @@ impl Runtime {
                         }
                     }
                     SessionEvent::Published { .. } => {}
+                    SessionEvent::DiagnosticsRefresh { cancellation } => {
+                        if !cancellation.is_canceled() {
+                            if let Err(e) = refresh_diagnostics(client.as_ref(), &caps) {
+                                logger.send(lsp::MessageType::ERROR, e.message);
+                            }
+                        }
+                    }
                     SessionEvent::Closed => break,
                 }
             }
@@ -633,6 +662,9 @@ impl Runtime {
                         fields.get("reportStyleChecksAsWarnings"),
                         &mut next.style_warnings,
                     );
+                    if let Some(lsp::Any::String(name)) = fields.get("customConfigFileName") {
+                        next.config_name.clone_from(name);
+                    }
                     if let Some(lsp::Any::String(locale)) = fields.get("locale") {
                         next.locale = if locale == "auto" {
                             self.initialize
@@ -671,20 +703,7 @@ impl Runtime {
             || next.style_warnings != before.style_warnings
             || next.config_name != before.config_name
         {
-            if self
-                .capabilities
-                .workspace
-                .as_deref()
-                .and_then(|w| w.diagnostics.as_deref())
-                .and_then(|d| d.refresh_support.as_deref())
-                .copied()
-                .unwrap_or(false)
-            {
-                self.client.request_without_waiting(
-                    "workspace/diagnostic/refresh",
-                    RawValue(b"null".to_vec()),
-                )?;
-            }
+            refresh_diagnostics(self.client.as_ref(), &self.capabilities)?;
             if next.validation != before.validation
                 && !self
                     .initialization
@@ -814,4 +833,72 @@ fn wire_string(bytes: &[u8]) -> Result<String, lsp::ResponseError> {
     std::str::from_utf8(bytes)
         .map(str::to_owned)
         .map_err(|_| crate::invalid("invalid UTF-8 cannot cross the LSP transport (ADR 0019)"))
+}
+
+// port: tsc/internal/lsp/server.go:Server.RefreshDiagnostics
+fn refresh_diagnostics(
+    client: &dyn Client,
+    caps: &lsp::ClientCapabilities,
+) -> Result<(), lsp::ResponseError> {
+    if caps
+        .workspace
+        .as_deref()
+        .and_then(|w| w.diagnostics.as_deref())
+        .and_then(|d| d.refresh_support.as_deref())
+        .copied()
+        .unwrap_or(false)
+    {
+        client
+            .request_without_waiting("workspace/diagnostic/refresh", RawValue(b"null".to_vec()))?;
+    }
+    Ok(())
+}
+
+// Remaining entries in the pin's server.go handlers map. Only these receive
+// the temporary MethodNotFound refusal; a genuinely unknown method is an
+// InvalidRequest. Keep this list shrinking as L3–L6 install their handlers.
+fn unimplemented_method(method: &str) -> bool {
+    matches!(
+        method,
+        "workspace/willRenameFiles"
+            | "textDocument/hover"
+            | "textDocument/definition"
+            | "custom/textDocument/sourceDefinition"
+            | "textDocument/typeDefinition"
+            | "textDocument/signatureHelp"
+            | "textDocument/formatting"
+            | "textDocument/rangeFormatting"
+            | "textDocument/onTypeFormatting"
+            | "textDocument/documentSymbol"
+            | "textDocument/documentHighlight"
+            | "custom/textDocument/multiDocumentHighlight"
+            | "textDocument/selectionRange"
+            | "textDocument/inlayHint"
+            | "textDocument/codeLens"
+            | "textDocument/codeAction"
+            | "textDocument/prepareCallHierarchy"
+            | "textDocument/foldingRange"
+            | "textDocument/prepareRename"
+            | "textDocument/linkedEditingRange"
+            | "textDocument/completion"
+            | "textDocument/_vs_onAutoInsert"
+            | "textDocument/references"
+            | "textDocument/_vs_references"
+            | "textDocument/rename"
+            | "textDocument/implementation"
+            | "callHierarchy/incomingCalls"
+            | "callHierarchy/outgoingCalls"
+            | "workspace/symbol"
+            | "completionItem/resolve"
+            | "codeLens/resolve"
+            | "textDocument/semanticTokens/full"
+            | "textDocument/semanticTokens/range"
+            | "custom/runGC"
+            | "custom/saveHeapProfile"
+            | "custom/saveAllocProfile"
+            | "custom/startCPUProfile"
+            | "custom/stopCPUProfile"
+            | "custom/initializeAPISession"
+            | "custom/setContentMapperContributions"
+    )
 }

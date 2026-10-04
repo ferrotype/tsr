@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import tempfile
 import threading
+import time
 import tomllib
 ROOT = Path(__file__).resolve().parents[3]
 spec = importlib.util.spec_from_file_location('project_check', ROOT / 'tools/phase5/project/check.py')
@@ -25,6 +26,7 @@ class Peer:
         self.thread = threading.Thread(target=shared.reader, args=(self.process, self.queue), daemon=True)
         self.thread.start()
         self.id = 0
+        self.server_requests = []
 
     def write(self, message):
         body = json.dumps({'jsonrpc': '2.0', **message}, ensure_ascii=False).encode()
@@ -35,19 +37,42 @@ class Peer:
         self.write({'method': method, **({'params': params} if params is not None else {})})
 
     def request(self, method, params=None):
+        value = self.exchange(method, params)
+        assert 'error' not in value, value
+        return value['result']
+
+    def respond(self, value):
+        if 'method' in value and 'id' in value:
+            self.server_requests.append(value['method'])
+            result = [{}, {}, {}, {}] if value['method'] == 'workspace/configuration' else None
+            self.write({'id': value['id'], 'result': result})
+
+    def exchange(self, method, params=None):
         self.id += 1
         self.write({'id': self.id, 'method': method, **({'params': params} if params is not None else {})})
+        return self.await_response()
+
+    def await_response(self):
         while True:
             value = self.queue.get(timeout=20)
             if isinstance(value, Exception):
                 raise value
             if value.get('id') == self.id and 'method' not in value:
-                if 'error' in value:
-                    raise AssertionError(value)
-                return value['result']
-            if 'method' in value and 'id' in value:
-                result = [{}, {}, {}, {}] if value['method'] == 'workspace/configuration' else None
-                self.write({'id': value['id'], 'result': result})
+                return value
+            assert 'method' in value, f'unsolicited response: {value}'
+            self.respond(value)
+
+    def drain(self, seconds):
+        deadline = time.monotonic() + seconds
+        while time.monotonic() < deadline:
+            try:
+                value = self.queue.get(timeout=max(0, deadline - time.monotonic()))
+            except queue.Empty:
+                return
+            if isinstance(value, Exception):
+                raise value
+            assert 'method' in value, f'unsolicited response: {value}'
+            self.respond(value)
 
     def close(self):
         if self.process.poll() is None:

@@ -63,6 +63,9 @@ impl SnapshotFs {
     pub fn cached_file_count(&self) -> usize {
         self.disk_files.len()
     }
+    pub(crate) fn has_cached_directory(&self, path: &[u8]) -> bool {
+        self.disk_directories.contains_key(path)
+    }
     // port: tsc/internal/project/snapshotfs.go:SnapshotFS.GetFileByPath
     pub fn get_file(&self, name: &[u8]) -> Result<Option<Arc<FileHandle>>, Error> {
         let path = self.path(name);
@@ -479,19 +482,7 @@ impl SnapshotFsBuilder {
                     .any(|ext| tsr_tspath::file_extension_is(name.as_bytes(), ext.as_bytes()))
                 || tsr_tspath::is_dynamic_file_name(name.as_bytes())
                 || self.overlays.contains_key(&path)
-                || [
-                    b".js".as_slice(),
-                    b".jsx",
-                    b".mjs",
-                    b".cjs",
-                    b".ts",
-                    b".tsx",
-                    b".mts",
-                    b".cts",
-                    b".json",
-                ]
-                .iter()
-                .any(|ext| path.as_bytes().ends_with(ext))
+                || has_relevant_extension(path.as_bytes())
         };
         let mut deleted = BTreeSet::new();
         for uri in &change.deleted {
@@ -511,19 +502,35 @@ impl SnapshotFsBuilder {
                         }
                     }
                 }
-            } else if relevant(uri)
-                || path.as_bytes().ends_with(b"/node_modules")
-                || path
-                    .as_bytes()
-                    .windows(b"/node_modules/".len())
-                    .any(|w| w == b"/node_modules/")
-            {
+            } else if relevant(uri) || is_node_modules_path(path.as_bytes()) {
                 deleted.insert(uri.clone());
             }
         }
         change.deleted = deleted;
         change.changed.retain(relevant);
     }
+}
+
+pub(crate) fn has_relevant_extension(path: &[u8]) -> bool {
+    [
+        b".js".as_slice(),
+        b".jsx",
+        b".mjs",
+        b".cjs",
+        b".ts",
+        b".tsx",
+        b".mts",
+        b".cts",
+        b".json",
+    ]
+    .iter()
+    .any(|ext| path.ends_with(ext))
+}
+pub(crate) fn is_node_modules_path(path: &[u8]) -> bool {
+    path.ends_with(b"/node_modules")
+        || path
+            .windows(b"/node_modules/".len())
+            .any(|w| w == b"/node_modules/")
 }
 impl FileSystem for SnapshotFsBuilder {
     fn snapshot_id(&self) -> Option<tsr_vfs::SnapshotId> {

@@ -476,7 +476,7 @@ fn message_chain(
     let mut out = Vec::new();
     let mut stack = vec![(diagnostic, 0usize)];
     while let Some((node, depth)) = stack.pop() {
-        if !out.is_empty() {
+        if depth > 0 {
             out.push(b'\n');
         }
         out.extend(std::iter::repeat_n(b' ', depth * 2));

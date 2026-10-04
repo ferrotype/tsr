@@ -54,6 +54,10 @@ pub enum SessionEvent {
         previous: Snapshot,
         current: Snapshot,
     },
+    DiagnosticsRefresh {
+        // Remains cancellable while queued for the server's event observer.
+        cancellation: tsr_core::CancellationToken,
+    },
     Closed,
 }
 impl Default for SessionOptions {
@@ -295,6 +299,11 @@ impl Session {
                             self.fs.use_case_sensitive_file_names(),
                         ),
                     );
+        if change.kind == FileChangeKind::Change {
+            // Ordinary document edits trigger client-side diagnostic pulls.
+            // Content-mapped document refreshes are connected in L6.
+            self.timers.cancel(timers::Kind::DiagnosticsRefresh);
+        }
         self.pending
             .lock()
             .expect("session events")
@@ -306,6 +315,75 @@ impl Session {
         if update {
             self.schedule_snapshot_update();
         }
+        Ok(())
+    }
+    // port: tsc/internal/project/session.go:Session.DidChangeWatchedFiles
+    pub fn did_change_watched_files(
+        &self,
+        changes: impl IntoIterator<Item = tsr_lsproto::FileEvent>,
+    ) -> Result<(), Error> {
+        let snapshot = self.snapshot()?;
+        let state = snapshot.state().unwrap();
+        let mut pending = Vec::new();
+        let mut relevant = false;
+        let mut config = false;
+        for event in changes {
+            let kind = match event.r#type.0 {
+                1 => FileChangeKind::WatchCreate,
+                2 => FileChangeKind::WatchChange,
+                3 => FileChangeKind::WatchDelete,
+                _ => continue,
+            };
+            let name = event.uri.file_name();
+            let path = tsr_tspath::to_path(
+                name.as_bytes(),
+                self.options.current_directory.as_bytes(),
+                self.fs.use_case_sensitive_file_names(),
+            );
+            config |= state.configs.configs.contains_key(&path);
+            if !relevant {
+                let path = tsr_tspath::remove_trailing_directory_separator(path.as_bytes());
+                let ext = path
+                    .rsplit(|b| *b == b'/')
+                    .next()
+                    .unwrap_or_default()
+                    .iter()
+                    .rposition(|b| *b == b'.');
+                if ext.is_none() {
+                    relevant = if kind == FileChangeKind::WatchDelete {
+                        state.fs.has_cached_directory(path)
+                            || crate::snapshot_fs::is_node_modules_path(path)
+                    } else {
+                        self.fs.directory_exists(name.as_bytes())?
+                    };
+                } else {
+                    relevant = crate::snapshot_fs::has_relevant_extension(path);
+                }
+                // Content-mapper extensions and watched files are connected in L6.
+            }
+            pending.push(FileChange::new(kind, event.uri));
+        }
+        // Hold the snapshot lock only for admission, never for live host I/O.
+        let current = self.snapshot.read().expect("session snapshot");
+        if current.is_none() {
+            return Err(Error::Closed);
+        }
+        self.pending
+            .lock()
+            .expect("session events")
+            .changes
+            .extend(pending);
+        if relevant {
+            self.timers.schedule(
+                timers::Kind::DiagnosticsRefresh,
+                self.options.debounce_delay,
+            );
+        }
+        if config {
+            self.schedule_snapshot_update();
+        }
+        self.timers
+            .schedule(timers::Kind::IdleClean, std::time::Duration::from_secs(30));
         Ok(())
     }
     // port: tsc/internal/project/session.go:Session.ScheduleSnapshotUpdate
@@ -448,8 +526,15 @@ impl Session {
                     self.options.current_directory.as_bytes(),
                     self.fs.use_case_sensitive_file_names(),
                 );
+                // A retained containing project is not necessarily this file's
+                // current default after a config-name change. Only an explicit
+                // selection can bypass the request's config-discovery barrier.
                 previous
-                    .project_for_file(path.as_bytes())
+                    .state()
+                    .unwrap()
+                    .defaults
+                    .get(&path)
+                    .and_then(|key| previous.project_by_path(key.as_bytes()))
                     .is_some_and(|project| !project.data().unwrap().dirty)
             })
         {

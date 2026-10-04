@@ -212,3 +212,21 @@ fn enum_names_and_unknown_numeric_values_follow_the_pin() {
     assert_eq!(WatchKind(9).to_string(), "Create");
     assert_eq!(ErrorCode::INVALID_PARAMS.to_string(), "InvalidParams");
 }
+
+#[test]
+fn lsp_parse_error_response_preserves_a_null_id() {
+    let error = tsr_lsproto::ResponseError {
+        code: -32600,
+        message: "InvalidRequest".into(),
+        data: None,
+    };
+    let response = tsr_lsproto::ResponseMessage {
+        id: None,
+        result: None,
+        error: Some(&error),
+    };
+    assert_eq!(
+        tsr_json::marshal(&response, tsr_json::Options::default()).unwrap(),
+        br#"{"jsonrpc":"2.0","id":null,"error":{"code":-32600,"message":"InvalidRequest"}}"#
+    );
+}

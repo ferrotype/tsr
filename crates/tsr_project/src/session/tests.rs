@@ -570,6 +570,94 @@ fn timed_session() -> (
     (fs, session, clock)
 }
 
+fn watch(session: &Session, name: &str, kind: u32) {
+    session
+        .did_change_watched_files([tsr_lsproto::FileEvent {
+            uri: uri(name),
+            r#type: tsr_lsproto::FileChangeType(kind),
+        }])
+        .unwrap();
+}
+fn refreshes(events: &std::sync::mpsc::Receiver<SessionEvent>) -> Vec<tsr_core::CancellationToken> {
+    events
+        .try_iter()
+        .filter_map(|event| match event {
+            SessionEvent::DiagnosticsRefresh { cancellation } => Some(cancellation),
+            _ => None,
+        })
+        .collect()
+}
+
+#[test]
+fn watched_diagnostics_coalesce_and_edits_and_close_cancel_pending_delivery() {
+    use std::time::Duration;
+    let (_, session, clock) = timed_session();
+    open(&session, "/main.ts", "const x = 1;");
+    let events = session.subscribe();
+    watch(&session, "/dependency.ts", 2);
+    clock.advance(Duration::from_millis(900));
+    watch(&session, "/dependency.ts", 2);
+    clock.advance(Duration::from_millis(900));
+    session.wait_for_background_tasks();
+    assert!(refreshes(&events).is_empty());
+    clock.advance(Duration::from_millis(100));
+    session.wait_for_background_tasks();
+    let delivered = refreshes(&events);
+    assert_eq!(delivered.len(), 1);
+    assert!(!delivered[0].is_canceled());
+
+    watch(&session, "/dependency.ts", 2);
+    edit(&session, "/main.ts", "const x = 2;");
+    clock.advance(Duration::from_secs(1));
+    session.wait_for_background_tasks();
+    assert!(refreshes(&events).is_empty());
+    assert!(delivered[0].is_canceled());
+
+    watch(&session, "/dependency.ts", 2);
+    clock.advance(Duration::from_secs(1));
+    session.wait_for_background_tasks();
+    let queued = refreshes(&events);
+    assert_eq!(queued.len(), 1);
+    session.close();
+    assert!(
+        queued[0].is_canceled(),
+        "a queued refresh must not escape shutdown"
+    );
+    clock.advance(Duration::from_secs(30));
+    session.wait_for_background_tasks();
+    assert!(refreshes(&events).is_empty());
+}
+
+#[test]
+fn watched_diagnostics_filter_extensions_and_distinguish_deleted_directories() {
+    use std::time::Duration;
+    let (fs, session, clock) = timed_session();
+    fs.mkdir_all(b"dir", 0o755).unwrap();
+    fs.write_file(b"dir/dep.ts", b"export const x = 1;", 0)
+        .unwrap();
+    open(&session, "/main.ts", "import { x } from './dir/dep';");
+    let events = session.subscribe();
+    for name in ["/readme.md", "/LICENSE", "/some.dir/file", "/missing"] {
+        watch(&session, name, 3);
+    }
+    watch(&session, "/dep.ts", 99);
+    clock.advance(Duration::from_secs(1));
+    session.wait_for_background_tasks();
+    assert!(refreshes(&events).is_empty());
+    for (name, kind) in [
+        ("/dir/", 3),
+        ("/node_modules/pkg", 3),
+        ("/dir", 1),
+        ("/dep.json", 2),
+    ] {
+        watch(&session, name, kind);
+        clock.advance(Duration::from_secs(1));
+        session.wait_for_background_tasks();
+        assert_eq!(refreshes(&events).len(), 1, "{name}: {kind}");
+    }
+    assert!(session.take_background_errors().is_empty());
+}
+
 // The native close/config debounce and getSnapshot cancellation barrier. No
 // shortened wall-clock delays: the same callbacks run under a controlled clock.
 #[test]

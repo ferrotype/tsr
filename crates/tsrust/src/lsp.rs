@@ -9,13 +9,18 @@ use std::{
 use tsr_ipc::Context;
 use tsr_jsstring::JsString;
 use tsr_lsp::{connection::Connection, dynamic_queue::DynamicQueue, runtime::Options};
+mod flags;
+use flags::parse as flags;
 
 // port: tsc/cmd/tsc/lsp.go:runLSP
 pub fn run(args: &[JsString]) -> i32 {
     let flags = match flags(args) {
         Ok(flags) => flags,
         Err(error) => {
-            eprintln!("{error}");
+            if !error.is_empty() {
+                eprintln!("{error}");
+            }
+            eprint!("{}", flags::USAGE);
             return 2;
         }
     };
@@ -113,25 +118,26 @@ pub fn run(args: &[JsString]) -> i32 {
 }
 
 // port: tsc/cmd/tsc/lsp.go:newParentProcessWatchdog
-fn parent_watchdog(context: &Context, override_pid: i32) -> Option<Arc<dyn Fn(i32) + Send + Sync>> {
-    let context = context.clone();
-    let callback =
-        Arc::new(move |pid| start_parent_watchdog(&context, pid, Duration::from_secs(5)));
+fn parent_watchdog(
+    context: &Context,
+    override_pid: isize,
+) -> Option<Arc<dyn Fn(i32) + Send + Sync>> {
+    let callback_context = context.clone();
+    let callback = Arc::new(move |pid: i32| {
+        start_parent_watchdog(&callback_context, pid as isize, Duration::from_secs(5))
+    });
     if override_pid > 0 {
-        callback(override_pid);
+        start_parent_watchdog(context, override_pid, Duration::from_secs(5));
         None
     } else {
         Some(callback)
     }
 }
 // port: tsc/cmd/tsc/lsp.go:startParentProcessWatchdog
-fn start_parent_watchdog(context: &Context, parent: i32, interval: Duration) {
+fn start_parent_watchdog(context: &Context, parent: isize, interval: Duration) {
     if parent <= 0 {
         return;
     }
-    let Some(pid) = rustix::process::Pid::from_raw(parent) else {
-        return;
-    };
     let context = context.clone();
     std::thread::spawn(move || {
         let queue: DynamicQueue<()> = DynamicQueue::new();
@@ -141,7 +147,7 @@ fn start_parent_watchdog(context: &Context, parent: i32, interval: Duration) {
             if context.err().is_some() {
                 return;
             }
-            if rustix::process::test_kill_process(pid) == Err(rustix::io::Errno::SRCH) {
+            if !crate::process::is_process_alive(parent) {
                 eprintln!("Parent process {parent} has exited, shutting down.");
                 context.cancel();
                 return;
@@ -150,66 +156,6 @@ fn start_parent_watchdog(context: &Context, parent: i32, interval: Duration) {
     });
 }
 
-#[derive(Default, Debug)]
-struct Flags {
-    stdio: bool,
-    parent: i32,
-    pprof: Vec<u8>,
-}
-fn flags(args: &[JsString]) -> Result<Flags, String> {
-    let mut result = Flags::default();
-    let mut args = args.iter();
-    while let Some(arg) = args.next() {
-        let bytes = arg.as_bytes();
-        if bytes == b"--" || !bytes.starts_with(b"-") || bytes == b"-" {
-            break;
-        }
-        let name = bytes
-            .strip_prefix(b"--")
-            .or_else(|| bytes.strip_prefix(b"-"))
-            .unwrap();
-        let split = name.iter().position(|c| *c == b'=');
-        let (name, mut value) =
-            split.map_or((name, None), |at| (&name[..at], Some(&name[at + 1..])));
-        if name == b"stdio" {
-            result.stdio = match value {
-                None | Some(b"true" | b"TRUE" | b"True" | b"1" | b"t" | b"T") => true,
-                Some(b"false" | b"FALSE" | b"False" | b"0" | b"f" | b"F") => false,
-                _ => return Err("invalid value for flag -stdio".into()),
-            };
-            continue;
-        }
-        if ![
-            b"pipe".as_slice(),
-            b"socket",
-            b"clientProcessId",
-            b"pprofDir",
-        ]
-        .contains(&name)
-        {
-            return Err(format!(
-                "flag provided but not defined: -{}",
-                String::from_utf8_lossy(name)
-            ));
-        }
-        if value.is_none() {
-            value = args.next().map(JsString::as_bytes);
-        }
-        let value = value
-            .ok_or_else(|| format!("flag needs an argument: -{}", String::from_utf8_lossy(name)))?;
-        match name {
-            b"clientProcessId" => {
-                result.parent = std::str::from_utf8(value)
-                    .ok()
-                    .and_then(|v| v.parse().ok())
-                    .ok_or("invalid clientProcessId")?
-            }
-            b"pprofDir" => result.pprof = value.to_vec(),
-            _ => {}
-        }
-    }
-    Ok(result)
-}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -246,7 +192,7 @@ mod tests {
             .args(["-c", "exit 0"])
             .spawn()
             .unwrap();
-        let pid = child.id() as i32;
+        let pid = child.id() as isize;
         child.wait().unwrap();
         start_parent_watchdog(&ctx, pid, Duration::from_millis(2));
         let queue: DynamicQueue<()> = DynamicQueue::new();
