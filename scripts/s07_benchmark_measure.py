@@ -30,10 +30,13 @@ def integer(value, minimum, maximum, name):
     return value
 
 
-def host_info():
+def host_info(minimum_cpus=8):
+    """The measurement host's record. The default minimum is parse-bind's: its
+    eight-worker mode needs eight available CPUs. A workload that runs one
+    process at a time passes a lower minimum."""
     cpus = len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else os.cpu_count()
-    if cpus is None or cpus < 8:
-        raise ValueError("S07 requires a designated measurement host with at least eight available CPUs")
+    if cpus is None or cpus < minimum_cpus:
+        raise ValueError(f"the measurement host has {cpus} available CPUs; this workload needs at least {minimum_cpus}")
     if sys.platform == "darwin":
         memory = int(command(["sysctl", "-n", "hw.memsize"], cwd=ROOT))
         physical = int(command(["sysctl", "-n", "hw.physicalcpu"], cwd=ROOT))

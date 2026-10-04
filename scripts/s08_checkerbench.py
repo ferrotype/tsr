@@ -224,6 +224,12 @@ def build(directory, modes=None):
     return report
 
 
+def measurement_host():
+    """The host record of a capture. Samples run one process at a time and the
+    Go side single-threaded, so unlike parse-bind any CPU count serves."""
+    return host_info(minimum_cpus=1)
+
+
 def run_child(argv, env, cwd, stdout_path, timeout):
     """One sample process with its own resource accounting; never a reused process."""
     with open(stdout_path, "wb") as output, open(str(stdout_path) + ".stderr", "wb") as error:
@@ -301,7 +307,7 @@ def capture(directory, samples_per_runtime=7, smoke=None):
     # Share the replay checks so a writer regression fails before compilation.
     ids = verify_requests(directory, requests, smoke)
     build_report = build(directory)
-    host = host_info() if not smoke else {"os": sys.platform, "architecture": platform.machine(), "smoke": True}
+    host = measurement_host() if not smoke else {"os": sys.platform, "architecture": platform.machine(), "smoke": True}
     runs = []
     capture_report = {"version": 2, "pin": plan["pin"], "host": host, "smoke": smoke, "requests": requests,
                       "build_sha256": digest((directory / "build.json").read_bytes()), "sources_sha256": build_report["sources_sha256"],
