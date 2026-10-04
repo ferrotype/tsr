@@ -13,7 +13,8 @@ one variant per process (`run --id`), printing one JSON line per sub-test:
 as the whole variant, under the variant id alone.
 
 `run` writes DIR/results.ndjson and DIR/meta.json (and the runner's local
-baseline output under DIR/local). `check` merges the result directories,
+baseline output under DIR/local). Crashes and deadlines also retain their
+command and complete stdout/stderr under DIR/crashes. `check` merges the result directories,
 compares the failing set with status/parity/<suite>.json and exits non-zero
 on any difference; `accept` rewrites that file, keeping every reason and
 approval still in force.
