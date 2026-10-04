@@ -139,3 +139,86 @@ fn modifiers_do_not_form_a_selection_list() {
         (10, 36)
     );
 }
+
+fn hover_result(text: &[u8], position: u32, classified: bool) -> lsp::Hover {
+    let program = Arc::new(program(b"/index.ts", text));
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool
+        .checker_for_file_exclusive(program.source_file(b"/index.ts").unwrap().source())
+        .unwrap();
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    *service
+        .hover(
+            &mut checker,
+            &lsp::HoverParams {
+                text_document: lsp::TextDocumentIdentifier {
+                    uri: lsp::DocumentUri("file:///index.ts".into()),
+                },
+                position: lsp::Position {
+                    line: 0,
+                    character: position,
+                },
+                ..Default::default()
+            },
+            HoverOptions {
+                markdown: true,
+                classified,
+                ..Default::default()
+            },
+        )
+        .unwrap()
+        .hover
+        .unwrap()
+}
+
+#[test]
+fn classified_hover_preserves_the_type_reference_symbol() {
+    // Native hover carries the interface identity through createAccessFromSymbolChain.
+    let hover = hover_result(
+        b"interface Shape { value: number } const shape: Shape = {value: 1};",
+        41,
+        true,
+    );
+    assert_eq!(
+        hover.contents.markup_content.as_ref().unwrap().value,
+        "```typescript\nconst shape: Shape\n```\n"
+    );
+    let content = hover.vs_raw_content.unwrap();
+    let runs = &content.elements[1]
+        .classified_text_element
+        .as_ref()
+        .unwrap()
+        .runs;
+    assert!(runs
+        .iter()
+        .flatten()
+        .any(|r| r.text == "Shape" && r.classification_type_name == "interface name"));
+}
+
+#[test]
+fn hover_string_property_range_excludes_quotes() {
+    let hover = hover_result(b"const obj = {\"name\": 1};", 15, false);
+    let range = hover.range.unwrap();
+    assert_eq!((range.start.character, range.end.character), (14, 18));
+}
+
+#[test]
+fn hover_type_parameter_reports_its_function_context() {
+    let hover = hover_result(
+        b"function f<T extends number>(value: T): T { return value; }",
+        11,
+        false,
+    );
+    assert_eq!(hover.contents.markup_content.unwrap().value,"```typescript\n(type parameter) T extends number in f<T extends number>(value: T): T\n```\n");
+}
+
+#[test]
+fn hover_code_fences_do_not_close_inside_literal_types() {
+    let mut rendered = String::new();
+    documentation::code(&mut rendered, "typescript", "const text: \"```\"");
+    assert_eq!(rendered, "````typescript\nconst text: \"```\"\n````\n");
+}

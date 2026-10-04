@@ -206,7 +206,11 @@ pub(crate) fn object_literal_element(view: AstView<'_>, node: NodeId) -> Result<
 }
 
 impl LanguageService<'_> {
-    fn bound_symbol(&self, checker: &Operation<'_>, node: NodeId) -> Result<Option<SymbolRef>> {
+    pub(crate) fn bound_symbol(
+        &self,
+        checker: &Operation<'_>,
+        node: NodeId,
+    ) -> Result<Option<SymbolRef>> {
         let file = self
             .program
             .file_of_node(node)

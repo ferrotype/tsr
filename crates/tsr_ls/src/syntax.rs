@@ -23,6 +23,30 @@ impl<'a> Syntax<'a> {
     pub fn start(&mut self, node: NodeId) -> Result<i64> {
         Ok(self.nav().get_start_of_node(node, false)?)
     }
+    // port: tsc/internal/ls/findallreferences.go:getRangeOfNode
+    pub fn reference_range(
+        &mut self,
+        node: NodeId,
+        end_node: Option<NodeId>,
+    ) -> Result<tsr_core::TextRange> {
+        let mut start = self.start(node)?;
+        let mut end = i64::from(self.view.node(end_node.unwrap_or(node))?.end());
+        if tsr_ast::utilities::is_string_literal_like(&self.view.node(node)?) && end - start > 2 {
+            assert!(
+                end_node.is_none(),
+                "endNode is not nil for stringLiteralLike"
+            );
+            start += 1;
+            end -= 1;
+        }
+        if let Some(end_node) = end_node {
+            let read = self.view.node(end_node)?;
+            if read.kind() == tsr_ast::SyntaxKind::CaseBlock {
+                end = i64::from(read.pos());
+            }
+        }
+        Ok(tsr_core::TextRange::new(start, end))
+    }
     pub fn children(&self, node: NodeId) -> Result<Vec<NodeId>> {
         let mut result = Vec::new();
         for child in tsr_astnav::visit_each_child(self.view, node)? {

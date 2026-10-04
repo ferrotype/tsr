@@ -1,7 +1,14 @@
 //! Language service operations over a retained compiler snapshot.
 pub mod converters;
 mod definition;
+mod display_parts;
+mod documentation;
 mod folding;
+mod hover;
+mod hover_display;
+mod meaning;
+pub mod symbol_display;
+pub use hover::HoverOptions;
 mod linked_editing;
 mod selection_ranges;
 mod semantic_tokens;
@@ -24,8 +31,14 @@ pub enum Error {
     Compiler(tsr_compiler::Error),
     Checker(tsr_checker::Error),
     Navigation(tsr_astnav::Error),
+    Printer(tsr_printer::Error),
     Canceled,
     MissingFile(String),
+}
+impl From<tsr_printer::Error> for Error {
+    fn from(value: tsr_printer::Error) -> Self {
+        Self::Printer(value)
+    }
 }
 impl From<tsr_arena::Error> for Error {
     fn from(value: tsr_arena::Error) -> Self {
@@ -53,6 +66,7 @@ impl std::fmt::Display for Error {
             Self::Compiler(e) => e.fmt(f),
             Self::Checker(e) => e.fmt(f),
             Self::Navigation(e) => e.fmt(f),
+            Self::Printer(e) => e.fmt(f),
             Self::Canceled => f.write_str("request canceled"),
             Self::MissingFile(name) => write!(f, "file not found: {name}"),
         }

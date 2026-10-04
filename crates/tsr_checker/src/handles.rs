@@ -444,6 +444,12 @@ impl Operation<'_> {
         Ok(self.type_ref(ty))
     }
 
+    /// Resolve either a retained program node or a node owned by this checker.
+    /// The read cannot outlive the operation and validates the arena owner.
+    pub fn node(&self, node: NodeId) -> Result<tsr_ast::NodeRead<'_>, Error> {
+        Ok(self.state().ast(node)?.node(node)?)
+    }
+
     /// Whether this source node participates in an expression query. The
     /// contextual cases share the classifier used by checker name resolution.
     pub fn is_expression_node(&self, node: NodeId) -> Result<bool, Error> {
@@ -460,6 +466,32 @@ impl Operation<'_> {
     pub fn intrinsic_type_name(&self, ty: TypeRef) -> Result<JsString, Error> {
         let ty = self.check_type(ty)?;
         Ok(self.state().types.intrinsic(ty)?.name.clone())
+    }
+
+    /// A literal's `ValueToString` spelling, without an enum's qualified name.
+    pub fn literal_value_text(&self, ty: TypeRef) -> Result<JsString, Error> {
+        let ty = self.check_type(ty)?;
+        Ok(match &self.state().types.literal(ty)?.value {
+            crate::LiteralValue::String(text) => {
+                crate::enums::EnumValue::String(text.clone()).diagnostic_text()
+            }
+            crate::LiteralValue::Number(value) => {
+                crate::enums::EnumValue::Number(*value).diagnostic_text()
+            }
+            crate::LiteralValue::Boolean(value) => JsString::from_bytes(if *value {
+                b"true".as_slice()
+            } else {
+                b"false".as_slice()
+            }),
+            crate::LiteralValue::BigInt(value) => {
+                let mut text = value.to_text();
+                text.push(b'n');
+                JsString::from_bytes(text)
+            }
+            crate::LiteralValue::ComputedEnum => {
+                return Err(Error::Unsupported("ValueToString: computed enum"))
+            }
+        })
     }
 
     // port: tsc/internal/checker/exports.go:Checker.GetDeclaredTypeOfSymbol
@@ -947,6 +979,38 @@ impl Operation<'_> {
             .get(id)?
             .resolved_return_type
             .map(|id| self.type_ref(id)))
+    }
+
+    pub fn signature_flags(&self, s: SignatureRef) -> Result<crate::SignatureFlags, Error> {
+        let id = self.check_signature(s)?;
+        Ok(self.state().signatures.get(id)?.flags)
+    }
+
+    pub fn signature_type_parameters(&self, s: SignatureRef) -> Result<Vec<TypeRef>, Error> {
+        let id = self.check_signature(s)?;
+        Ok(self
+            .state()
+            .signatures
+            .get(id)?
+            .type_parameters
+            .as_deref()
+            .unwrap_or(&[])
+            .iter()
+            .map(|&id| self.type_ref(id))
+            .collect())
+    }
+
+    pub fn signature_parameters(&self, s: SignatureRef) -> Result<Vec<SymbolRef>, Error> {
+        let id = self.check_signature(s)?;
+        self.state()
+            .signatures
+            .get(id)?
+            .parameters
+            .as_deref()
+            .unwrap_or(&[])
+            .iter()
+            .map(|&id| self.symbol_ref(id))
+            .collect()
     }
 
     /// The synthetic declaration of a checker-created signature.

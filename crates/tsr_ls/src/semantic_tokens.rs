@@ -95,93 +95,6 @@ fn binding_declaration(view: AstView<'_>, mut node: NodeId) -> Result<NodeId> {
         node = grandparent;
     }
 }
-// Only identifier locations reach the semantic-token classifier. Adjusting
-// modifier/keyword locations (hover/navigation) is not needed on this path.
-fn identifier_meaning(view: AstView<'_>, node: NodeId, checker: &Operation<'_>) -> Result<i32> {
-    use utilities_positions::semantic_meaning as M;
-    let Some(parent) = view.node(node)?.parent() else {
-        return Ok(M::VALUE);
-    };
-    let read = view.node(parent)?;
-    if matches!(
-        read.kind().known(),
-        Some(
-            K::ExportAssignment
-                | K::ExportSpecifier
-                | K::ExternalModuleReference
-                | K::ImportSpecifier
-                | K::ImportClause
-        )
-    ) || read.kind() == K::ImportEqualsDeclaration && read.name() == Some(node)
-    {
-        return Ok(M::ALL);
-    }
-    let mut root = node;
-    while let Some(parent) = view
-        .node(root)?
-        .parent()
-        .filter(|id| view.node(*id).is_ok_and(|n| n.kind() == K::QualifiedName))
-    {
-        root = parent;
-    }
-    if let Some(parent) = view.node(root)?.parent() {
-        if let Some(data) = view
-            .node(parent)?
-            .data_source()
-            .as_import_equals_declaration()
-        {
-            if data.module_reference() == Some(root) {
-                let last = root != node
-                    && view
-                        .node(root)?
-                        .data_source()
-                        .as_qualified_name()
-                        .unwrap()
-                        .right()
-                        == Some(node);
-                return Ok(if last { M::ALL } else { M::NAMESPACE });
-            }
-        }
-    }
-    if utilities_positions::is_declaration_name(view, node)? {
-        return Ok(utilities_positions::get_meaning_from_declaration(
-            view, parent,
-        )?);
-    }
-    if tsr_ast::utilities_tail::is_js_doc_name_reference_context(view, node)? {
-        return Ok(M::ALL);
-    }
-    let effective =
-        if utilities_middle::is_right_side_of_qualified_name_or_property_access(view, node)? {
-            parent
-        } else {
-            node
-        };
-    if let Some(parent) = view.node(effective)?.parent() {
-        let parent = view.node(parent)?;
-        if parent.kind() == K::TypeReference
-            || parent.kind() == K::ImportType
-                && !parent
-                    .data_source()
-                    .as_import_type_node()
-                    .unwrap()
-                    .is_type_of()
-            || parent.kind() == K::ExpressionWithTypeArguments
-                && checker.is_part_of_type_node(view.node(effective)?.parent().unwrap())?
-        {
-            return Ok(M::TYPE);
-        }
-    }
-    if read.kind() == K::TypeParameter {
-        return Ok(M::TYPE);
-    }
-    if read.kind() == K::LiteralType {
-        return Ok(M::TYPE | M::VALUE);
-    }
-    // Remaining qualified/property-access prefixes have namespace meaning;
-    // neither can reclassify an interface as a type at this location.
-    Ok(M::VALUE)
-}
 
 impl LanguageService<'_> {
     // port: tsc/internal/ls/semantictokens.go:classifySymbol
@@ -393,7 +306,7 @@ impl LanguageService<'_> {
                 {
                     if let Some(symbol) = checker.get_symbol_at_location(node)? {
                         let symbol = checker.skip_alias(symbol)?;
-                        let meaning = identifier_meaning(view, node, checker)?;
+                        let meaning = crate::meaning::meaning(view, node, checker)?;
                         if let Some(mut kind) =
                             self.classify_token_symbol(checker, symbol, meaning)?
                         {

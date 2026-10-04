@@ -7,6 +7,7 @@ are compared in full, including nulls, ordering, and negotiated coordinates.
 """
 import difflib
 import json
+import re
 from pathlib import Path
 import tempfile
 
@@ -21,6 +22,7 @@ SOURCES = [
     ('main.ts', 'import {\n a, b\n} from "./dep";\nimport c from "./other";\n/** comment\n * // #region not a region\n */\nif (x) {\n f(\n  a, b\n );\n} else if (y) {\n while (z) {\n  z--;\n }\n}\n'),
     ('main.ts', 'namespace A.B { export class C<T> { static readonly value = 1; constructor(public x: T) {} get v() { return this.x; } method(p: T) { const local = p; return local; } } }\ninterface I { p: string; call(n: number): void }\ntype Alias = I; enum E { First, Second }\nconst fn = (x: number) => x; const {a, b: renamed} = {a: 1, b: "b"};\n'),
     ('main.ts', 'import { Point, make, Base } from "./dep";\nconst p: Point = { x: 1 }; const { x } = p; const short: Point = {x};\nclass Derived extends Base { override run() { return make(1); } }\nconst c = new Derived(); c.run();\nouter: for (;;) { if (p.x) break outer; continue outer; }\nfunction f(x: number) { switch(x) { case 1: return x; default: return 0; } }\n'),
+    ('main.ts', '/** Adds a value.\n * @param x - a value\n * @returns the value\n * @example <caption>Example</caption>\n * add(1)\n */\nfunction add<T extends {value: number}>(x: T): T { return x; }\n/** docs for Shape */\ninterface Shape { /** area docs */ area(): number; }\n/** child */ class Square implements Shape { area() { return 1; } }\nconst square = new Square(); square.area();\n/** See {@link Square} and {@link https://example.com | site}. */ const linked = 1;\n'),
 ]
 
 TOKEN_TYPES = ['namespace', 'class', 'enum', 'interface', 'struct', 'typeParameter', 'type', 'parameter', 'variable', 'property', 'enumMember', 'decorator', 'event', 'function', 'method', 'macro', 'label', 'comment', 'string', 'keyword', 'number', 'regexp', 'operator']
@@ -40,8 +42,11 @@ def run(binary, root, encoding, line_only):
     try:
         peer.request('initialize', {'processId': None, 'rootUri': root.as_uri(), 'capabilities': {
             'general': {'positionEncodings': [encoding]},
+            '_vs_supportsVisualStudioExtensions': line_only,
+            'experimental': {'hoverVerbosityLevel': True},
             'textDocument': {'foldingRange': {'lineFoldingOnly': line_only, 'foldingRange': {'collapsedText': True}},
                 'documentSymbol': {'hierarchicalDocumentSymbolSupport': not line_only},
+                'hover': {'contentFormat': ['markdown' if not line_only else 'plaintext']},
                 'definition': {'linkSupport': not line_only}, 'typeDefinition': {'linkSupport': not line_only},
                 'semanticTokens': {'requests': {'full': True, 'range': True}, 'tokenTypes': TOKEN_TYPES, 'tokenModifiers': TOKEN_MODIFIERS, 'formats': ['relative']}},
             'workspace': {'configuration': True}}})
@@ -60,9 +65,8 @@ def run(binary, root, encoding, line_only):
             results.append(('symbols', index, peer.request('textDocument/documentSymbol', document)))
             results.append(('semantic', index, peer.request('textDocument/semanticTokens/full', document)))
             results.append(('semantic-range', index, peer.request('textDocument/semanticTokens/range', {**document, 'range': {'start': positions[len(positions)//3], 'end': positions[2*len(positions)//3]}})))
-            import re
             for match in re.finditer(r'[A-Za-z_$][\w$]*', text):
-                for method in ['definition', 'typeDefinition']:
+                for method in ['definition', 'typeDefinition', 'hover']:
                     p = position(text, match.start(), encoding)
                     results.append((method, index, p, peer.request('textDocument/' + method, {**document, 'position': p})))
             if name.endswith('tsx'):

@@ -61,6 +61,7 @@ struct Settings {
     config_name: String,
     exclude_library_symbols: bool,
     workspace_current_project: bool,
+    maximum_hover_length: usize,
 }
 impl Default for Settings {
     fn default() -> Self {
@@ -71,6 +72,7 @@ impl Default for Settings {
             config_name: String::new(),
             exclude_library_symbols: true,
             workspace_current_project: false,
+            maximum_hover_length: 500,
         }
     }
 }
@@ -410,6 +412,7 @@ impl Runtime {
                 let project = snapshot.project_for_file(path.as_bytes()).cloned();
                 let context = context.clone();
                 let capabilities = self.capabilities.clone();
+                let maximum_hover_length = self.settings.lock().unwrap().maximum_hover_length;
                 let encoding = self.options.project.position_encoding;
                 let request_id = request
                     .id
@@ -425,6 +428,7 @@ impl Runtime {
                         feature,
                         encoding,
                         &capabilities,
+                        maximum_hover_length,
                     )
                 })));
             }
@@ -737,6 +741,10 @@ impl Runtime {
                         .flatten()
                     {
                         set_bool(raw.get("validateEnabled"), &mut next.validation);
+                        if let Some(lsp::Any::Number(length)) = raw.get("maximumHoverLength") {
+                            next.maximum_hover_length =
+                                if *length > 0.0 { *length as usize } else { 500 };
+                        }
                         set_bool(
                             raw.get("excludeLibrarySymbolsInNavTo"),
                             &mut next.exclude_library_symbols,

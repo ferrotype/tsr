@@ -24,6 +24,8 @@ tsr_jsstring = { version = "0.2.0", path = "../tsr_jsstring" }
 tsr_lsproto = { version = "0.2.0", path = "../tsr_lsproto" }
 tsr_locale = { version = "0.2.0", path = "../tsr_locale" }
 tsr_parser = { version = "0.2.0", path = "../tsr_parser" }
+tsr_printer = { version = "0.2.0", path = "../tsr_printer" }
+tsr_nodebuilder = { version = "0.2.0", path = "../tsr_nodebuilder" }
 tsr_scanner = { version = "0.2.0", path = "../tsr_scanner" }
 tsr_tspath = { version = "0.2.0", path = "../tsr_tspath" }
 

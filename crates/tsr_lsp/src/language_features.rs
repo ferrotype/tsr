@@ -9,6 +9,7 @@ pub fn handles(method: &str) -> bool {
     matches!(
         method,
         "textDocument/linkedEditingRange"
+            | "textDocument/hover"
             | "textDocument/selectionRange"
             | "textDocument/foldingRange"
             | "textDocument/semanticTokens/full"
@@ -19,6 +20,7 @@ pub fn handles(method: &str) -> bool {
     )
 }
 pub enum Request {
+    Hover(lsp::HoverParams),
     Linked(lsp::LinkedEditingRangeParams),
     Selection(lsp::SelectionRangeParams),
     Folding(lsp::FoldingRangeParams),
@@ -31,6 +33,7 @@ pub enum Request {
 impl Request {
     pub fn decode(method: &str, params: Option<&RawValue>) -> Result<Self, lsp::ResponseError> {
         Ok(match method {
+            "textDocument/hover" => Self::Hover(crate::decode(params)?),
             "textDocument/linkedEditingRange" => Self::Linked(crate::decode(params)?),
             "textDocument/selectionRange" => Self::Selection(crate::decode(params)?),
             "textDocument/foldingRange" => Self::Folding(crate::decode(params)?),
@@ -44,6 +47,7 @@ impl Request {
     }
     pub fn uri(&self) -> &lsp::DocumentUri {
         match self {
+            Self::Hover(p) => &p.text_document.uri,
             Self::Linked(p) => &p.text_document.uri,
             Self::Selection(p) => &p.text_document.uri,
             Self::Folding(p) => &p.text_document.uri,
@@ -68,6 +72,7 @@ pub fn execute(
     request: Request,
     encoding: tsr_jsstring::PositionEncoding,
     capabilities: &lsp::ClientCapabilities,
+    maximum_hover_length: usize,
 ) -> Result<RawValue, lsp::ResponseError> {
     if context.err().is_some() {
         return Err(crate::canceled());
@@ -93,7 +98,8 @@ pub fn execute(
     let mut service = tsr_ls::LanguageService::new(program, encoding, cancellation);
     if matches!(
         request,
-        Request::Semantic(_)
+        Request::Hover(_)
+            | Request::Semantic(_)
             | Request::SemanticRange(_)
             | Request::Definition(_)
             | Request::TypeDefinition(_)
@@ -121,6 +127,32 @@ pub fn execute(
             .operation()
             .map_err(|e| error(-32603, e.to_string()))?;
         let text_caps = capabilities.text_document.as_deref();
+        if let Request::Hover(params) = &request {
+            let content = text_caps
+                .and_then(|c| c.hover.as_deref())
+                .and_then(|c| c.content_format.as_ref())
+                .and_then(|c| c.first());
+            let options = tsr_ls::HoverOptions {
+                markdown: content.is_some_and(|kind| kind.0 == lsp::MarkupKind::MARKDOWN),
+                classified: capabilities
+                    .vs_supports_visual_studio_extensions
+                    .as_deref()
+                    .copied()
+                    .unwrap_or(false),
+                verbosity_signals: capabilities
+                    .experimental
+                    .as_deref()
+                    .and_then(|c| c.hover_verbosity_level.as_deref())
+                    .copied()
+                    .unwrap_or(false),
+                maximum_length: maximum_hover_length,
+            };
+            return client::raw(
+                &service
+                    .hover(&mut operation, params, options)
+                    .map_err(service_error)?,
+            );
+        }
         let definition = match &request {
             Request::Definition(p) => Some((
                 &p.position,
@@ -190,7 +222,8 @@ pub fn execute(
                     .map_err(service_error)?,
             )
         }
-        Request::Semantic(_)
+        Request::Hover(_)
+        | Request::Semantic(_)
         | Request::SemanticRange(_)
         | Request::Definition(_)
         | Request::TypeDefinition(_) => {

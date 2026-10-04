@@ -367,6 +367,15 @@ impl TypeNodeBuilder<'_> {
             })
     }
 
+    /// Identifier associations retained by this builder, for classified output.
+    /// The symbols remain scoped to the checker that owns the builder.
+    pub fn identifier_symbols(&self) -> impl Iterator<Item = (NodeId, tsr_ast::SymbolId)> + '_ {
+        self.builder
+            .id_to_symbol
+            .iter()
+            .filter_map(|(&node, &symbol)| symbol.map(|s| (node, s)))
+    }
+
     pub fn view(&self) -> AstView<'_> {
         self.builder.ast.view()
     }
