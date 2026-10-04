@@ -1,0 +1,53 @@
+name: diagnose concurrent compiler crash
+
+on:
+  push:
+    branches: [codex/concurrent-checker-crash]
+    paths:
+      - .github/workflows/diagnose-concurrent-crash.yml
+      - scripts/diagnose_concurrent_crash.py
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: tsr-testrunner
+          run-id: 37187571575
+          github-token: ${{ github.token }}
+          path: runner
+      - name: Preserve native crash state
+        run: |
+          mkdir -p crash-output
+          chmod +x runner/tsr-testrunner
+          command -v gdb
+          sudo sysctl -w "kernel.core_pattern=$PWD/crash-output/core.%p"
+          ulimit -c unlimited
+          python3 scripts/diagnose_concurrent_crash.py
+      - name: Backtraces
+        if: always()
+        run: |
+          shopt -s nullglob
+          for core in crash-output/core.*; do
+            gdb --batch runner/tsr-testrunner "$core" \
+              -ex 'set pagination off' -ex 'info registers' \
+              -ex 'thread apply all bt 100' -ex 'info proc mappings' \
+              > "$core.backtrace.txt" 2>&1
+            cat "$core.backtrace.txt"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: concurrent-crash-diagnostics
+          path: crash-output
+          retention-days: 3
