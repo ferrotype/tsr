@@ -1,28 +1,27 @@
-# Reproduction campaign for the rare signal 11 in the concurrent compiler suite
-# (#96): typeOfThisInStaticMembers11 on 2026-10-04 and
-# discriminantsAndNullOrUndefined on 2026-10-03, about one per 400,000 variant
-# processes on ubuntu-latest, never in the single-threaded suite.
+# Validation campaign for the work-group join fix (branch
+# workgroup-join-workers) of the concurrent suite's rare signal 11 (#96): the
+# reproduction campaign's stress matrix, unchanged, on the same traced runner
+# with the fix applied. Without the fix the same 48 concurrent suites produced
+# seven crashes on ubuntu-latest (run 37206082800), all in glibc's
+# pthread_detach under WorkGroup::run_and_wait.
 #
 # - stress: the full concurrent suite three times per job, half the jobs at
 #   CI's --jobs 4 and half oversubscribed at --jobs 12 so that preemption
 #   widens race windows. Phase breadcrumbs and the fatal-signal line go to
 #   stderr (kept per crash by parity.py); cores are backtraced with gdb.
-# - sanitizers: the full concurrent suite under AddressSanitizer and
-#   ThreadSanitizer, with an instrumented standard library.
 #
-# Diagnostic only; it runs on pushes to its own branch that touch this file.
-name: concurrent crash reproduction
+# Diagnostic only; it runs on pushes to its own branch.
+name: concurrent crash fix validation
 
 on:
   push:
-    branches: [concurrent-crash-repro]
-    paths: [.github/workflows/crash-repro.yml]
+    branches: [workgroup-join-workers-stress]
 
 permissions:
   contents: read
 
 concurrency:
-  group: crash-repro
+  group: crash-repro-fix
   cancel-in-progress: true
 
 env:
@@ -152,102 +151,5 @@ jobs:
             backtraces
             results/*/crashes
             results/*/meta.json
-          retention-days: 14
-          if-no-files-found: ignore
-
-  sanitizer-runner:
-    name: build the ${{ matrix.sanitizer }}-sanitized runner
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        sanitizer: [address, thread]
-    env:
-      CARGO_INCREMENTAL: 0
-      CARGO_PROFILE_RELEASE_DEBUG: 1
-      RUSTFLAGS: -Zsanitizer=${{ matrix.sanitizer }} -Cforce-frame-pointers=yes
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          submodules: true
-          persist-credentials: false
-      - name: Install the pinned instrumentation toolchain
-        run: |
-          nightly=$(python3 -c "import tomllib;print(tomllib.load(open('data/s04/toolchains.toml','rb'))['nightly'])")
-          rustup toolchain install "$nightly" --profile minimal --component rust-src
-          echo "NIGHTLY=$nightly" >> "$GITHUB_ENV"
-      - uses: Swatinem/rust-cache@v2
-        with:
-          key: crash-repro-${{ matrix.sanitizer }}
-      - name: Build with an instrumented standard library
-        run: cargo "+$NIGHTLY" build -Zbuild-std --release --locked --target x86_64-unknown-linux-gnu -p tsr_testrunner --bin tsr-testrunner
-      - uses: actions/upload-artifact@v4
-        with:
-          name: crash-repro-${{ matrix.sanitizer }}-runner
-          path: target/x86_64-unknown-linux-gnu/release/tsr-testrunner
-          retention-days: 7
-          if-no-files-found: error
-
-  sanitizer:
-    name: ${{ matrix.sanitizer }} sanitizer ${{ matrix.shard }}
-    needs: sanitizer-runner
-    runs-on: ubuntu-latest
-    timeout-minutes: 330
-    strategy:
-      fail-fast: false
-      matrix:
-        sanitizer: [address, thread]
-        shard: [1/4, 2/4, 3/4, 4/4]
-        include:
-          # ThreadSanitizer needs several times the memory: two at a time.
-          - { sanitizer: address, jobs: 4 }
-          - { sanitizer: thread, jobs: 2 }
-    env:
-      TSR_TESTRUNNER_TRACE_PHASES: 1
-      ASAN_OPTIONS: detect_leaks=0:halt_on_error=1:detect_stack_use_after_return=1
-      TSAN_OPTIONS: halt_on_error=1:second_deadlock_stack=1
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          submodules: true
-          persist-credentials: false
-      - uses: actions/download-artifact@v4
-        with:
-          name: crash-repro-${{ matrix.sanitizer }}-runner
-          path: runner
-      - name: Run the concurrent shard
-        timeout-minutes: 300
-        run: |
-          chmod +x runner/tsr-testrunner
-          python3 scripts/parity.py run compiler-concurrent --runner runner/tsr-testrunner \
-            --shard "${{ matrix.shard }}" --jobs ${{ matrix.jobs }} --timeout 3600 --output results || true
-      - name: Summarize sanitizer reports
-        if: always()
-        run: |
-          python3 - <<'PY'
-          import json, os
-          from pathlib import Path
-          results = Path("results/results.ndjson")
-          rows = [json.loads(line) for line in results.open()] if results.exists() else []
-          failed = [r for r in rows if r.get("state") == "fail"
-                    and r.get("reason", "").startswith(("signal", "exit", "deadline"))]
-          lines = [f"${{ matrix.sanitizer }} ${{ matrix.shard }}: {len(rows)} rows, process failures: {len(failed)}"]
-          for crash in sorted(Path("results/crashes").glob("*/process.json")):
-              process = json.loads(crash.read_text())
-              stderr = (crash.parent / "stderr").read_text(errors="replace")
-              report = [line for line in stderr.splitlines() if "Sanitizer" in line or "tsr-fatal" in line][:5]
-              lines.append(f"- {process['variant']}: {process['reason']}")
-              lines += [f"    {line}" for line in report]
-          print("\n".join(lines))
-          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
-              summary.write("\n".join(lines) + "\n")
-          PY
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: crash-repro-${{ matrix.sanitizer }}-${{ strategy.job-index }}
-          path: |
-            results/crashes
-            results/meta.json
           retention-days: 14
           if-no-files-found: ignore
