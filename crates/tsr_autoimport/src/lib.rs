@@ -8,6 +8,7 @@ mod import_adder;
 pub use import_adder::ImportAdder;
 pub mod fix;
 pub mod index;
+mod package_names;
 pub mod packages;
 mod realpaths;
 mod registry;
@@ -20,7 +21,6 @@ pub mod preferences;
 pub use preferences::Preferences;
 
 mod regexp;
-mod regexp_unicode_generated;
 
 #[cfg(test)]
 mod tests;

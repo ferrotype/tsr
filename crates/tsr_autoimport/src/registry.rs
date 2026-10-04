@@ -80,6 +80,7 @@ pub struct Registry {
     pub requested_file: Option<JsString>,
     pub(crate) build_key: crate::preferences::BuildKey,
     pub(crate) sources: std::collections::HashMap<JsString, NodeId>,
+    pub(crate) package_imports: std::collections::BTreeSet<crate::package_names::Import>,
 }
 impl Registry {
     pub fn build(
@@ -184,6 +185,7 @@ impl Registry {
             index,
             dependencies: crate::Dependencies::default(),
             sources: crate::cache::sources(program),
+            package_imports: crate::package_names::imports(program),
             requested_file: None,
             build_key: crate::preferences::BuildKey::default(),
         }))

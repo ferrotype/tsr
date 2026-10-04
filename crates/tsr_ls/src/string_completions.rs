@@ -61,6 +61,49 @@ fn string_types(
     }
     Ok(())
 }
+
+/// Follow the union/parenthesis path once for both the initial list and resolve.
+/// Only direct string-literal siblings are excluded, as in the pinned union helper.
+fn literal_type_context(
+    syntax: &Syntax<'_>,
+    current: NodeId,
+) -> Result<(Option<NodeId>, NodeId, HashSet<Vec<u8>>)> {
+    let view = syntax.view;
+    let mut argument = current;
+    let mut parent = view.node(current)?.parent();
+    let mut used = HashSet::new();
+    while let Some(id) = parent {
+        let read = view.node(id)?;
+        match read.kind().known() {
+            Some(K::UnionType) => {
+                for ty in crate::documentation::list(
+                    view,
+                    read.data_source().as_union_type_node().unwrap().types(),
+                )? {
+                    if ty == current {
+                        continue;
+                    }
+                    let ty = view.node(ty)?;
+                    if let Some(literal) = ty
+                        .data_source()
+                        .as_literal_type_node()
+                        .and_then(|t| t.literal())
+                    {
+                        if view.node(literal)?.kind() == K::StringLiteral {
+                            used.insert(view.node_text(literal)?.as_bytes().to_vec());
+                        }
+                    }
+                }
+            }
+            Some(K::ParenthesizedType | K::ParenthesizedExpression) => {}
+            _ => break,
+        }
+        argument = id;
+        parent = read.parent();
+    }
+    Ok((parent, argument, used))
+}
+
 impl LanguageService<'_> {
     pub(crate) fn string_completion_symbols(
         checker: &mut Operation<'_>,
@@ -73,6 +116,7 @@ impl LanguageService<'_> {
         };
         let pr = view.node(parent)?;
         let mut ty = None;
+        let mut used = HashSet::new();
         match pr.kind().known() {
             Some(K::ElementAccessExpression) => {
                 if let Some(expression) = pr.expression() {
@@ -96,13 +140,21 @@ impl LanguageService<'_> {
                 }
             }
             Some(K::LiteralType) => {
-                if let Some(grandparent) = pr.parent() {
+                let (grandparent, _, names) = literal_type_context(syntax, parent)?;
+                used = names;
+                if let Some(grandparent) = grandparent {
                     if let Some(data) = view
                         .node(grandparent)?
                         .data_source()
                         .as_indexed_access_type_node()
                     {
-                        if let Some(object) = data.object_type() {
+                        if let Some(object) = data.object_type().filter(|_| {
+                            data.index_type().is_some_and(|index| {
+                                view.node(index).is_ok_and(|index| {
+                                    index.pos() <= pr.pos() && pr.end() <= index.end()
+                                })
+                            })
+                        }) {
                             ty = Some(checker.get_type_from_type_node(object)?);
                         }
                     }
@@ -110,10 +162,14 @@ impl LanguageService<'_> {
             }
             _ => {}
         }
-        ty.map_or_else(
-            || Ok(Vec::new()),
-            |ty| crate::completions::properties(checker, ty),
-        )
+        let Some(ty) = ty else { return Ok(Vec::new()) };
+        crate::completions::properties(checker, ty)?
+            .into_iter()
+            .filter_map(|symbol| match checker.symbol(symbol) {
+                Ok(read) => (!used.contains(read.name_bytes())).then_some(Ok(symbol)),
+                Err(error) => Some(Err(error.into())),
+            })
+            .collect()
     }
     #[allow(
         clippy::if_not_else,
@@ -216,7 +272,9 @@ impl LanguageService<'_> {
                     }
                 }
                 if pr.kind() == K::LiteralType {
-                    if let Some(ty) = checker.get_type_argument_constraint(parent)? {
+                    let (_, argument, used) = literal_type_context(syntax, parent)?;
+                    seen.extend(used);
+                    if let Some(ty) = checker.get_type_argument_constraint(argument)? {
                         string_types(checker, ty, &mut seen, &mut types)?;
                     }
                 }

@@ -15,6 +15,8 @@ mod case_tables;
 mod go_fold_generated;
 mod go_print_generated;
 mod go_quote;
+pub mod go_unicode;
+mod go_unicode_generated;
 mod simple_fold;
 pub use simple_fold::{equal_fold, simple_fold_additions};
 

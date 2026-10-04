@@ -31,6 +31,7 @@ fn directories(mut path: Vec<u8>) -> Vec<Vec<u8>> {
 /// shadows the same name in its ancestors even if it has no usable entrypoint.
 pub fn discover(
     program: &Program,
+    checker: &mut tsr_checker::Operation<'_>,
     file: &[u8],
     host: &Arc<dyn FileSystem>,
     preferences: &crate::Preferences,
@@ -74,23 +75,11 @@ pub fn discover(
             }
         }
     }
+    let names = crate::package_names::collect(program, checker, &mut resolver)?;
     if let Some(allowed) = &mut allowed {
-        for resolution in program.resolutions() {
-            let name = &resolution.result.package_id.name;
-            if !name.is_empty() {
-                allowed.insert(JsString::from_bytes(
-                    tsr_module::package_name_from_types_package_name(name.as_bytes()),
-                ));
-            }
-        }
-        for name in program.options().types.iter().flatten() {
-            if name.as_bytes() != b"*" {
-                allowed.insert(JsString::from_bytes(
-                    tsr_module::package_name_from_types_package_name(name.as_bytes()),
-                ));
-            }
-        }
+        allowed.extend(names.resolved);
     }
+    let deep = names.deep;
     let excludes = preferences.file_matcher(host.use_case_sensitive_file_names());
     let mut seen = BTreeSet::new();
     let mut result = Vec::new();
@@ -159,11 +148,7 @@ pub fn discover(
                         package_name.starts_with(b"@types/")
                             || preferences.directory_search == Some(true)
                             || recursive_package(name.as_bytes())
-                            || program.resolutions().iter().any(|r| {
-                                r.result.package_id.name == name
-                                    && r.name.as_bytes().starts_with(name.as_bytes())
-                                    && r.name.as_bytes().get(name.len()) == Some(&b'/')
-                            }),
+                            || deep.contains(&name),
                     )?);
                     if let Some(excludes) = &excludes {
                         entrypoints

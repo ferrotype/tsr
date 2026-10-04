@@ -4,6 +4,7 @@
 Like pinned fourslash, sort completion lists by sortText/name (insensitive,
 then sensitive), retaining response order for ties. Everything else is exact.
 """
+import argparse
 import difflib
 import fnmatch
 import json
@@ -96,6 +97,36 @@ CASES = [
     'declare const state: \"one\" | \"two\"; state === /*cursor*/',
 
 
+]
+
+
+CONTEXT_CASES = [
+    'type T = {one: number; two: string}; type Key = T[("one" | "/*cursor*/")];',
+    'type T<K extends "one" | "two"> = K; type Key = T<"one" | "/*cursor*/">;',
+    'declare const object: {"١word": number; "²word": number; "123word": number}; object./*cursor*/',
+    'export const first = 1; const second = 2; export { /*cursor*/ };',
+    'const first = 1; const second = 2; export { first, /*cursor*/ };',
+
+    'const item = { one: 1, two: 2 }; const { one, /*cursor*/ } = item;',
+    'const item = { one: 1, two: 2 }; const { renamed: /*cursor*/ } = item;',
+    'interface Item { one: number; two?: string }; const item: Item = { "/*cursor*/": 1 };',
+    'interface Item { one: number; two?: string }; const item: Item = { one: 1, "/*cursor*/": 2 };',
+    'declare const item: { "a-b": number; "c d": string; plain: boolean }; "/*cursor*/" in item;',
+    'function choose<T extends "first" | "second">(value: T) {} choose("/*cursor*/");',
+    'function choose(value: "first"): void; function choose(value: "second"): void; function choose(value: string) {} choose("/*cursor*/");',
+    'type Key = "first" | "second"; let value: Key = `/*cursor*/`;',
+    'type T = { one: number; two: string }; type Key = T["one" | "/*cursor*/"];',
+    'class Base { protected value = 1; private hidden = 2; method() {} } class Derived extends Base { method() { super./*cursor*/ } }',
+    'interface Shape { value: number; method(): void } class Derived implements Shape { /*cursor*/ }',
+    'interface Shape { value: number; method(): void } class Derived implements Shape { override /*cursor*/ }',
+    'interface Shape { method(): void } class Base { value = 1 } class Derived extends Base implements Shape { override /*cursor*/ }',
+    'interface Shape { "a-b": number; optional?: number }; const item: Shape = { /*cursor*/ };',
+    'type Shape = {kind:"one"; a:number} | {kind:"two"; b:string}; const item: Shape = {kind:"one", /*cursor*/};',
+    'interface Item { one: number; two: number }; const other = { one: 1 }; const item: Item = {...other, /*cursor*/};',
+    'declare const object: { "a-b": number; default: number; 123: string }; object./*cursor*/',
+    'const αlpha = 1; α/*cursor*/',
+    'function f<T, U extends T = /*cursor*/>() {}',
+    'import { alpha as renamed } from "./dep"; export { /*cursor*/ };',
 ]
 
 def key(item):
@@ -312,6 +343,9 @@ SNIPPET_CASES = [
 ]
 
 PACKAGE_CASES = [
+    'import {PkgDevOnly} from "dev-only"; Pkg/*cursor*/',
+    '/// <reference path="./node_modules/ambient-provider/globals.d.ts" />\nimport {provided} from "declared-only"; Pkg/*cursor*/',
+
     'Pkg/*cursor*/',
     'let value: Pkg/*cursor*/',
     'import { PkgValue } from "sample"; Pkg/*cursor*/',
@@ -352,6 +386,9 @@ def package_fixture(root):
         'optional-only/index.d.ts': 'export declare const PkgOptionalOnly: number;',
         'require-package/package.json': '{"types":"index.d.ts"}',
         'require-package/index.d.ts': 'declare function PkgFactory(): void; export = PkgFactory;',
+        'ambient-provider/package.json': '{"types":"index.d.ts"}',
+        'ambient-provider/index.d.ts': 'export declare const PkgAmbient: number;',
+        'ambient-provider/globals.d.ts': 'declare module "declared-only" {export const provided: number}',
         'not-dependency/package.json': '{"types":"index.d.ts"}',
         'not-dependency/index.d.ts': 'export declare const PkgHidden: number;',
     }
@@ -375,7 +412,7 @@ def package_fixture(root):
     (store / 'node_modules' / 'shared').symlink_to(shared, target_is_directory=True)
     (root / 'node_modules' / 'symlinked').symlink_to(store, target_is_directory=True)
 
-def run_invalidation(binary, root, encoding):
+def run_invalidation(binary, root, encoding, config_replacement=False):
     root.mkdir(exist_ok=True)
     (root / 'tsconfig.json').write_text('{"compilerOptions":{"noLib":true},"files":["main.ts","dep.ts"]}')
     (root / 'main.ts').write_text('Cha')
@@ -387,7 +424,8 @@ def run_invalidation(binary, root, encoding):
         response = peer.request('textDocument/completion', {'textDocument': {'uri': main_uri}, 'position': {'line': 0, 'character': 3}})
         response['items'].sort(key=key)
         labels = {item['label'] for item in response['items']}
-        assert {name for name in labels if name.startswith('Changed')} == expected, (expected, labels)
+        if expected is not None:
+            assert {name for name in labels if name.startswith('Changed')} == expected, (expected, labels)
         rows.append(['invalidation', len(rows), response])
     try:
         peer.request('initialize', {'processId': None, 'rootUri': root.as_uri(), 'capabilities': {
@@ -413,9 +451,17 @@ def run_invalidation(binary, root, encoding):
         query({'ChangedDisk'})
         (root / 'tsconfig.json').write_text('{"compilerOptions":{"noLib":true},"files":["main.ts"]}')
         peer.send('workspace/didChangeWatchedFiles', {'changes': [{'uri': (root / 'tsconfig.json').as_uri(), 'type': 2}]})
-        # Native retains its project bucket on removal alone; adding a new
-        # source or modifying another source rebuilds it.
+        # Native retains its project bucket on removal alone. The additional
+        # replacement sequence is an explicit, unresolved L6 integration probe.
         query({'ChangedDisk'})
+        if config_replacement:
+            (root / 'extra.ts').write_text('export const ChangedExtra = 4;')
+            (root / 'tsconfig.json').write_text('{"compilerOptions":{"noLib":true},"files":["main.ts","extra.ts"]}')
+            peer.send('workspace/didChangeWatchedFiles', {'changes': [
+                {'uri': (root / 'extra.ts').as_uri(), 'type': 1},
+                {'uri': (root / 'tsconfig.json').as_uri(), 'type': 2},
+            ]})
+            query(None)
         peer.request('shutdown'); peer.send('exit')
         return rows
     finally:
@@ -472,6 +518,22 @@ def run_package_invalidation(binary, root, encoding):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--config-replacement', action='store_true', help='Run the unresolved L6 root-replacement sequence; differences exit nonzero')
+    args = parser.parse_args()
+    if args.config_replacement:
+        with tempfile.TemporaryDirectory(prefix='tsr-l4-config-') as directory:
+            root = Path(directory).resolve()
+            expected = run_invalidation(ROOT / 'target/phase5/go-lsp', root, 'utf-16', True)
+            actual = run_invalidation(ROOT / 'target/debug/tsrust', root, 'utf-16', True)
+            output = ROOT / 'target/phase5/l4-config-replacement'
+            output.mkdir(exist_ok=True)
+            for name, rows in [('Go', expected), ('Rust', actual)]:
+                (output / (name + '.json')).write_text(json.dumps(rows, indent=2, ensure_ascii=False))
+            if expected != actual:
+                raise SystemExit(f'L6 config replacement differs; full responses in {output}')
+            print('Config replacement responses match Go')
+        return
     with tempfile.TemporaryDirectory(prefix='tsr-l4-') as directory:
         root = Path(directory).resolve()
         (root / 'tsconfig.json').write_text('{"compilerOptions":{"noLib":true,"strict":true,"allowJs":true,"jsx":"preserve"},"files":["main.ts","jsx.tsx","script.js"]}')
@@ -486,7 +548,7 @@ def main():
             for rich in [False, True]:
                 expected = run(ROOT / 'target/phase5/go-lsp', root, encoding, rich)
                 actual = run(ROOT / 'target/debug/tsrust', root, encoding, rich)
-                for cases, name, auto in [(JSX_CASES, 'jsx.tsx', False), (AUTO_CASES, 'jsx.tsx', True), (JS_CASES, 'script.js', False)]:
+                for cases, name, auto in [(CONTEXT_CASES, 'main.ts', False), (JSX_CASES, 'jsx.tsx', False), (AUTO_CASES, 'jsx.tsx', True), (JS_CASES, 'script.js', False)]:
                     expected.extend(run(ROOT / 'target/phase5/go-lsp', root, encoding, rich, cases, name, auto))
                     actual.extend(run(ROOT / 'target/debug/tsrust', root, encoding, rich, cases, name, auto))
                 expected.extend(run(ROOT / 'target/phase5/go-lsp', package_root, encoding, rich, PACKAGE_CASES))
@@ -502,6 +564,10 @@ def main():
                     config = {'format': formatting, 'suggest': {'classMemberSnippets': {'enabled': True}, 'objectLiteralMethodSnippets': {'enabled': True}}}
                     for binary, rows in [('go-lsp', expected), ('../debug/tsrust', actual)]:
                         rows.extend(run(ROOT / 'target/phase5' / binary, root, encoding, rich, SNIPPET_CASES[:1] + CLASS_SNIPPET_CASES[:2] + ['met/*cursor*/', 'import {} from \"./dep\"; met/*cursor*/'], config=config))
+                for preference in ['single', 'double', 'auto']:
+                    cases = ['declare const object: {"a-b": number; "123word": number}; object./*cursor*/', "const first = 'single'; declare const object: {\"a-b\": number}; object./*cursor*/"]
+                    for binary, rows in [('go-lsp', expected), ('../debug/tsrust', actual)]:
+                        rows.extend(run(ROOT / 'target/phase5' / binary, root, encoding, rich, cases, config={'preferences': {'quotePreference': preference}}))
                 for preferences in [
                     {'importModuleSpecifier': 'relative', 'importModuleSpecifierEnding': 'js'},
                     {'importModuleSpecifier': 'non-relative', 'autoImportSpecifierExcludeRegexes': ['^sample$', '/^CONDITIONAL/i']},

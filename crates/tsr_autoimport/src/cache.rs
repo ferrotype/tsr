@@ -80,6 +80,7 @@ impl Cache {
             .as_ref()
             .filter(|index| {
                 index.build_key == preferences.build_key()
+                    && index.package_imports == crate::package_names::imports(program)
                     && index
                         .requested_file
                         .as_ref()

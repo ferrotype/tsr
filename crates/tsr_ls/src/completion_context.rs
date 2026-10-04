@@ -70,7 +70,7 @@ fn keyword(syntax: &Syntax<'_>, id: NodeId) -> Result<K> {
 }
 
 // port: tsc/internal/ls/completions.go:computeCommitCharactersAndIsNewIdentifier
-fn commits(
+pub(crate) fn commits(
     syntax: &Syntax<'_>,
     token: Option<NodeId>,
     position: i64,

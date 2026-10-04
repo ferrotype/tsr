@@ -836,6 +836,87 @@ fn completion_type_parameter_defaults_hide_self_and_later_parameters() {
 }
 
 #[test]
+fn completion_indexed_unions_omit_other_literal_constituents() {
+    for source in [
+        "type T = { one: number; two: string }; type Key = T[\"one\" | \"/*cursor*/\"];",
+        "type T = { one: number; two: string }; type Key = T[(\"one\" | \"/*cursor*/\")];",
+        "type T<K extends \"one\" | \"two\"> = K; type Key = T<\"one\" | \"/*cursor*/\">;",
+    ] {
+        let list = completion_result(source, &CompletionOptions::default());
+        let names: Vec<_> = list
+            .items
+            .iter()
+            .flatten()
+            .map(|item| item.label.as_str())
+            .collect();
+        assert_eq!(names, ["two"], "{source}");
+    }
+}
+
+#[test]
+fn completion_empty_contextual_members_fall_back_and_numeric_edits_keep_native_spelling() {
+    let list = completion_result("type Shape = {kind: \"one\"; a: number} | {kind: \"two\"; b: string}; const item: Shape = {kind: \"one\", /*cursor*/};", &CompletionOptions::default());
+    assert!(list
+        .items
+        .iter()
+        .flatten()
+        .any(|item| item.label == "globalThis"));
+    assert!(list
+        .items
+        .iter()
+        .flatten()
+        .any(|item| item.label == "const"));
+    let list = completion_result("declare const object: {123: number; \"١word\": string; \"²word\": boolean}; object./*cursor*/", &CompletionOptions::default());
+    for (label, expected) in [
+        ("123", "[123]"),
+        ("١word", "[١word]"),
+        ("²word", "[\"²word\"]"),
+    ] {
+        let item = list
+            .items
+            .iter()
+            .flatten()
+            .find(|item| item.label == label)
+            .unwrap();
+        assert_eq!(
+            item.insert_text.as_deref().map(String::as_str),
+            Some(expected)
+        );
+        assert_eq!(
+            item.text_edit
+                .as_ref()
+                .unwrap()
+                .text_edit
+                .as_ref()
+                .unwrap()
+                .new_text,
+            expected
+        );
+    }
+}
+
+#[test]
+fn local_export_completions_use_locals_and_deprioritize_existing_exports() {
+    let list = completion_result(
+        "export const first = 1; const second = 2; export { /*cursor*/ };",
+        &CompletionOptions::default(),
+    );
+    let items: Vec<_> = list
+        .items
+        .iter()
+        .flatten()
+        .filter(|item| item.kind.as_deref() != Some(&lsp::CompletionItemKind::KEYWORD))
+        .collect();
+    assert_eq!(items.len(), 2);
+    assert!(items
+        .iter()
+        .any(|item| item.label == "first"
+            && item.sort_text.as_deref().map(String::as_str) == Some("12")));
+    assert!(items.iter().any(|item| item.label == "second"
+        && item.sort_text.as_deref().map(String::as_str) == Some("11")));
+}
+
+#[test]
 fn completion_switch_values_are_filtered_and_snippet_preserves_native_order() {
     let list = completion_result(
         "declare const state: 'one' | 'two'; switch(state) { case 'one': break; case /*cursor*/ }",

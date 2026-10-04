@@ -38,6 +38,7 @@ impl LanguageService<'_> {
             let host = dependencies.wrap(host);
             let packages = tsr_autoimport::packages::discover(
                 self.program,
+                checker,
                 syntax.file.path(),
                 &host,
                 preferences,

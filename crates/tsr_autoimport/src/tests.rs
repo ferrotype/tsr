@@ -167,6 +167,20 @@ fn export_cache_rejects_foreign_programs_dependency_edits_and_extraction_prefere
         &index,
         &copy.get(&updated, b"/main.ts", &prefs).unwrap().unwrap()
     ));
+    let imported = program(
+        b"import { A } from './dep'; import { B } from 'ambient-package';",
+        b"export const A=1;",
+        &mut files,
+    );
+    let imported_cache = Cache::for_update(
+        &imported,
+        &cache,
+        &JsString::from_bytes(b"/main.ts".as_slice()),
+    );
+    assert!(imported_cache
+        .get(&imported, b"/main.ts", &prefs)
+        .unwrap()
+        .is_none());
     let changed = program(
         b"import { A } from './dep'; A;",
         b"export const B=2;",
@@ -400,9 +414,15 @@ fn package_discovery_ignores_hidden_directories_and_obeys_directory_search() {
         &tsr_arena::Counters::new(),
     )
     .unwrap();
+    let p = Arc::new(p);
+    let pool = tsr_compiler::CompilerCheckerPool::new(p.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool
+        .checker_for_file_exclusive(p.files()[0].source())
+        .unwrap();
     for (search, count) in [(false, 1), (true, 2)] {
         let packages = packages::discover(
             &p,
+            &mut checker,
             b"/main.ts",
             &host,
             &Preferences {
@@ -439,6 +459,64 @@ fn export_equals_keeps_the_function_alias_in_the_index() {
     assert_eq!(exports.len(), 1, "{:?}", registry.index.entries());
     assert_eq!(exports[0].id.name.as_bytes(), b"export=");
     assert_ne!(exports[0].flags & tsr_ast::symbol_flags::FUNCTION, 0);
+}
+
+#[test]
+fn imported_and_ambient_packages_are_admitted_without_package_versions() {
+    let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
+    for (name, text) in [
+        ("/package.json", r#"{"dependencies":{}}"#),
+        ("/main.ts", "/// <reference path=\"./node_modules/ambient-provider/globals.d.ts\" />\nimport {provided} from 'declared-only'; import {value} from 'direct';"),
+        ("/node_modules/direct/package.json", r#"{"types":"index.d.ts"}"#),
+        ("/node_modules/direct/index.d.ts", "export {value} from 'transitive';"),
+        ("/node_modules/transitive/package.json", r#"{"types":"index.d.ts"}"#),
+        ("/node_modules/transitive/index.d.ts", "export const value: number;"),
+        ("/node_modules/ambient-provider/package.json", r#"{"types":"index.d.ts"}"#),
+        ("/node_modules/ambient-provider/index.d.ts", "export const ambient: number;"),
+        ("/node_modules/ambient-provider/globals.d.ts", "declare module 'declared-only' {export const provided: number}"),
+    ] {
+        fs.insert_loaded(name.as_bytes(), text.as_bytes());
+    }
+    let host: Arc<dyn tsr_vfs::FileSystem> = Arc::new(fs.finish());
+    let p = Arc::new(
+        Program::load(
+            ProgramOptions {
+                config: tsr_tsoptions::ParsedCommandLine::new(
+                    tsr_core::CompilerOptions {
+                        no_lib: tsr_core::Tristate::TRUE,
+                        types: Some(vec![]),
+                        module_resolution: tsr_core::ModuleResolutionKind::NODE16,
+                        ..Default::default()
+                    },
+                    vec![JsString::from_bytes(b"/main.ts".as_slice())],
+                ),
+                host: host.clone(),
+                current_directory: JsString::from_bytes(b"/".as_slice()),
+                default_library_path: JsString::from_bytes(b"/".as_slice()),
+                skip_module_resolution: false,
+                single_threaded: tsr_core::Tristate::TRUE,
+            },
+            &mut FileCache::new(),
+            &tsr_arena::Counters::new(),
+        )
+        .unwrap(),
+    );
+    let pool = tsr_compiler::CompilerCheckerPool::new(p.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool
+        .checker_for_file_exclusive(p.source_file(b"/main.ts").unwrap().source())
+        .unwrap();
+    let packages = packages::discover(
+        &p,
+        &mut checker,
+        b"/main.ts",
+        &host,
+        &Preferences::default(),
+        || false,
+    )
+    .unwrap()
+    .unwrap();
+    let names: Vec<_> = packages.iter().map(|p| p.name.as_bytes()).collect();
+    assert_eq!(names, [b"ambient-provider".as_slice(), b"direct"]);
 }
 
 #[test]

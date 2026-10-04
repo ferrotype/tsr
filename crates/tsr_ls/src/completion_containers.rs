@@ -51,7 +51,7 @@ impl LanguageService<'_> {
             }
             Container::Object | Container::Binding => {
                 let ty = if kind == Container::Object {
-                    checker.get_contextual_type(node, cf::NONE)?
+                    object_contextual_type(checker, syntax, node)?
                 } else {
                     Some(checker.get_type_at_location(node)?)
                 };
@@ -61,13 +61,23 @@ impl LanguageService<'_> {
                     context.new_identifier = true;
                     return Ok(None);
                 };
-                symbols = if kind == Container::Object {
+                if kind == Container::Object {
                     let completions =
                         checker.get_contextual_type(node, cf::IGNORE_NODE_INFERENCES)?;
-                    self.object_expression_properties(checker, node, ty, completions)?
+                    let index_type = completions.unwrap_or(ty);
+                    let number_index = checker.get_number_index_type(index_type)?;
+                    context.new_identifier = checker.get_string_index_type(index_type)?.is_some()
+                        || number_index.is_some();
+                    symbols = self.object_expression_properties(checker, node, ty, completions)?;
+                    if symbols.is_empty() && number_index.is_none() {
+                        context.container = None;
+                        context.filter = Filter::All;
+                        return Ok(None);
+                    }
                 } else {
-                    properties(checker, ty)?
-                };
+                    context.new_identifier = false;
+                    symbols = properties(checker, ty)?;
+                }
                 existing = if kind == Container::Object {
                     view.node_slice(view.node(node)?.properties(view)?)?
                         .iter()
@@ -79,8 +89,6 @@ impl LanguageService<'_> {
                         .flatten()
                         .collect()
                 };
-                context.new_identifier = checker.get_string_index_type(ty)?.is_some()
-                    || checker.get_number_index_type(ty)?.is_some();
             }
             Container::Class => {
                 let read = view.node(node)?;
@@ -136,10 +144,9 @@ impl LanguageService<'_> {
                         symbols = checker.get_exports_of_module(module)?;
                     }
                 } else if kind == Container::Exports {
-                    symbols = checker.get_symbols_in_scope(
-                        node,
-                        sf::VALUE | sf::TYPE | sf::NAMESPACE | sf::ALIAS,
-                    )?;
+                    return self
+                        .local_export_completions(checker, syntax, node)
+                        .map(Some);
                 }
                 existing = view
                     .node_slice(view.node(node)?.elements(view)?)?
@@ -244,6 +251,92 @@ impl LanguageService<'_> {
         }
         Ok(Some(candidates))
     }
+
+    fn local_export_completions(
+        &self,
+        checker: &Operation<'_>,
+        syntax: &Syntax<'_>,
+        node: tsr_ast::NodeId,
+    ) -> Result<Vec<Candidate>> {
+        let Some(container) = crate::definition::ancestor(syntax.view, Some(node), |id| {
+            Ok(matches!(
+                syntax.view.node(id)?.kind().known(),
+                Some(K::SourceFile | K::ModuleDeclaration)
+            ))
+        })?
+        else {
+            return Ok(Vec::new());
+        };
+        let file = self
+            .program
+            .file_of_node(container)
+            .ok_or(tsr_arena::Error::WrongOwner)?;
+        let Some(binding) = file.bound().view().node_binding(container)? else {
+            return Ok(Vec::new());
+        };
+        let Some(locals) = binding.locals else {
+            return Ok(Vec::new());
+        };
+        let exports = binding
+            .symbol
+            .map(|id| {
+                checker
+                    .symbol_ref(id)
+                    .and_then(|id| checker.symbol(id).map(tsr_ast::SymbolRef::exports))
+            })
+            .transpose()?
+            .flatten();
+        let exports = exports.map(|id| checker.symbol_table(id)).transpose()?;
+        checker
+            .symbol_table(locals)?
+            .iter()
+            .filter_map(|(name, symbol)| {
+                symbol.map(|symbol| {
+                    Ok(Candidate {
+                        symbol: checker.symbol_ref(symbol)?,
+                        sort: if exports.is_some_and(|table| table.contains_key(name)) {
+                            "12"
+                        } else {
+                            "11"
+                        },
+                        nullable: false,
+                        this_member: false,
+                        promise: false,
+                    })
+                })
+            })
+            .collect()
+    }
+}
+
+// port: tsc/internal/ls/completions.go:tryGetObjectLiteralContextualType
+fn object_contextual_type(
+    checker: &mut Operation<'_>,
+    syntax: &Syntax<'_>,
+    node: tsr_ast::NodeId,
+) -> Result<Option<tsr_checker::TypeRef>> {
+    if let Some(ty) = checker.get_contextual_type(node, cf::NONE)? {
+        return Ok(Some(ty));
+    }
+    let view = syntax.view;
+    let Some(parent) = ast::walk_up_parenthesized_expressions(view, view.node(node)?.parent())?
+    else {
+        return Ok(None);
+    };
+    let read = view.node(parent)?;
+    if let Some(binary) = read.data_source().as_binary_expression() {
+        if binary.left() == Some(node)
+            && binary
+                .operator_token()
+                .is_some_and(|id| view.node(id).is_ok_and(|n| n.kind() == K::EqualsToken))
+        {
+            return Ok(Some(checker.get_type_at_location(parent)?));
+        }
+    }
+    if tsr_ast::utilities_positions::is_expression(view, parent)? {
+        return Ok(checker.get_contextual_type(parent, cf::NONE)?);
+    }
+    Ok(None)
 }
 
 impl LanguageService<'_> {

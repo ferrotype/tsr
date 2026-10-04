@@ -578,6 +578,8 @@ impl LanguageService<'_> {
         if let Some(candidates) = self.completion_container(checker, syntax, context, position)? {
             return Ok(candidates);
         }
+        (context.new_identifier, context.commit) =
+            crate::completion_context::commits(syntax, context.token, position)?;
         let adjusted = if context.previous == context.token {
             position
         } else {
@@ -852,14 +854,17 @@ impl LanguageService<'_> {
             insert = if valid {
                 format!("this.{name}")
             } else {
-                format!("this[{}]", quote(&name))
+                format!(
+                    "this[{}]",
+                    quote_property_name(&name, syntax, options.quote)?
+                )
             };
         } else if let Some((access, _)) = context.member {
             if !valid || candidate.nullable {
                 insert = if valid {
                     name.clone()
                 } else {
-                    format!("[{}]", quote(&name))
+                    format!("[{}]", quote_property_name(&name, syntax, options.quote)?)
                 };
                 let token = context.token.expect("member context has a dot");
                 if candidate.nullable || syntax.view.node(token)?.kind() == K::QuestionDotToken {
@@ -1225,5 +1230,25 @@ impl LanguageService<'_> {
             }));
         }
         Ok(item)
+    }
+}
+
+// port: tsc/internal/ls/completions.go:quotePropertyName
+fn quote_property_name(
+    name: &str,
+    syntax: &Syntax<'_>,
+    preference: crate::QuotePreference,
+) -> Result<String> {
+    if name
+        .chars()
+        .next()
+        .is_some_and(tsr_jsstring::go_unicode::is_digit)
+    {
+        Ok(name.to_owned())
+    } else {
+        Ok(tsr_autoimport::edits::quote_module(
+            name,
+            crate::inlay_hints::single_quote(syntax, preference)?,
+        ))
     }
 }

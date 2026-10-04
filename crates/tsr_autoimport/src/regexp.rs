@@ -378,10 +378,7 @@ fn unicode_class(class: &ast::ClassUnicode, insensitive: bool) -> Option<ClassUn
     let table = if name == "Any" {
         &[(0, 0x0010_ffff)][..]
     } else {
-        let index = super::regexp_unicode_generated::PROPERTIES
-            .binary_search_by_key(&name, |&(key, _)| key)
-            .ok()?;
-        super::regexp_unicode_generated::PROPERTIES[index].1
+        tsr_jsstring::go_unicode::property_ranges(name)?
     };
     let mut result = fold(ranges(table), insensitive);
     if class.negated != reverse {
