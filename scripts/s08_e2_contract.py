@@ -64,10 +64,11 @@ def approvals(ledger, pin, ids, *, domain='e2'):
     domains = {'e2': METRICS, 'phase4': ('baseline_parity',)}
     if domain not in domains:
         raise ValueError('unknown divergence domain')
-    if set(ledger) != {'divergence'} or not isinstance(ledger['divergence'], list):
+    # An empty ledger file parses to {}: no approvals, not a malformed ledger.
+    if set(ledger) - {'divergence'} or not isinstance(ledger.get('divergence', []), list):
         raise ValueError('invalid divergence ledger')
     result, seen, witnessed = {}, set(), set()
-    for entry in ledger['divergence']:
+    for entry in ledger.get('divergence', []):
         required = {'id', 'title', 'scope', 'kind', 'rationale', 'approved_by', 'approved_on', 'upstream_pin', 'observations'}
         if set(entry) not in (required, required | {'domain'}) or entry['id'] in seen:
             raise ValueError('divergence requires unique identity, approval and exact observation witnesses')

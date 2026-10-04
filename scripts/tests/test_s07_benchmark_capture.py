@@ -173,5 +173,44 @@ class CaptureArtifacts(unittest.TestCase):
                 consumer.read_capture(self.destination, self.graph_path)
 
 
+class HostCapacity(unittest.TestCase):
+    """parse-bind needs eight workers; checkerbench uses one checker per program."""
+
+    def setUp(self):
+        # Capacity is the subject; do not read the developer host's sysctl or
+        # memory/load counters just to test the admission policy.
+        stack = ExitStack()
+        self.addCleanup(stack.close)
+        stack.enter_context(patch.object(measure, "command", return_value=b"1024\n"))
+        stack.enter_context(patch.object(measure.os, "sysconf", return_value=1024))
+        stack.enter_context(patch.object(measure.os, "getloadavg", return_value=(0, 0, 0)))
+
+    def cpus(self, count):
+        stack = ExitStack()
+        self.addCleanup(stack.close)
+        stack.enter_context(patch.object(measure.os, "sched_getaffinity", return_value=set(range(count)), create=True))
+        stack.enter_context(patch.object(measure.os, "cpu_count", return_value=count))
+
+    def test_parse_bind_needs_eight_available_cpus(self):
+        self.cpus(4)
+        with self.assertRaisesRegex(ValueError, "has 4 available CPUs; this workload needs at least 8"):
+            measure.host_info()
+        self.cpus(8)
+        self.assertEqual(measure.host_info()["cpu_capacity"], 8)
+
+    def test_checkerbench_measures_on_fewer_cpus(self):
+        import s08_checkerbench as checker
+        for count in (1, 4):
+            with self.subTest(cpus=count):
+                self.cpus(count)
+                self.assertEqual(checker.measurement_host()["cpu_capacity"], count)
+
+    def test_checkerbench_still_requires_an_available_cpu(self):
+        import s08_checkerbench as checker
+        self.cpus(0)
+        with self.assertRaisesRegex(ValueError, "needs at least 1"):
+            checker.measurement_host()
+
+
 if __name__ == "__main__":
     unittest.main()
