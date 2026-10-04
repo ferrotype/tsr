@@ -13,17 +13,10 @@ permissions:
   actions: read
 
 jobs:
-  reproduce:
-    name: ${{ matrix.kind }} failing shard
+  memcheck:
+    name: original executable under Memcheck
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        kind: [original, traced]
-    env:
-      CARGO_INCREMENTAL: 0
-      CARGO_PROFILE_RELEASE_DEBUG: 1
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
         with:
@@ -36,50 +29,27 @@ jobs:
           run-id: 37187571575
           github-token: ${{ github.token }}
           path: runner
-      - name: Apply phase traces to the original failing source
-        if: matrix.kind == 'traced'
+      - name: Check the original concurrent process for invalid memory accesses
         run: |
-          git fetch --depth=1 origin "$GITHUB_SHA" 1ec148d488991b17228de343dcc01c1477559059
-          git diff 1ec148d488991b17228de343dcc01c1477559059 "$GITHUB_SHA" -- crates/tsr_testrunner | git apply
-          rustup show active-toolchain || rustup toolchain install
-      - uses: Swatinem/rust-cache@v2
-        if: matrix.kind == 'traced'
-        with:
-          key: crash-runner-symbols
-      - name: Build the traced executable with line tables
-        if: matrix.kind == 'traced'
-        run: |
-          cargo build --release --locked -p tsr_testrunner --bin tsr-testrunner
-          cp target/release/tsr-testrunner runner/tsr-testrunner
-      - name: Reproduce the original shard with core dumps enabled
-        env:
-          TSR_TESTRUNNER_TRACE_PHASES: 1
-        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y valgrind
           mkdir -p crash-output
           chmod +x runner/tsr-testrunner
-          if ! command -v gdb; then
-            sudo apt-get update -qq
-            sudo apt-get install -y gdb
-          fi
-          sudo sysctl -w "kernel.core_pattern=$PWD/crash-output/core.%p"
-          ulimit -c unlimited
-          runner/tsr-testrunner --suite compiler --mode concurrent run --id 'conformance/typeOfThisInStaticMembers11(target=esnext).ts' --local crash-output/probe-local > crash-output/probe.stdout 2> crash-output/probe.trace
-          python3 scripts/parity.py run compiler-concurrent --runner runner/tsr-testrunner --shard 2/4 --jobs 4 --output crash-output/shard
-          cp runner/tsr-testrunner crash-output/tsr-testrunner
-      - name: Backtraces
-        if: always()
-        run: |
-          shopt -s nullglob
-          for core in crash-output/core.*; do
-            gdb --batch runner/tsr-testrunner "$core" \
-              -ex 'set pagination off' -ex 'info registers' \
-              -ex 'thread apply all bt 100' -ex 'info proc mappings' \
-              > "$core.backtrace.txt" 2>&1
-            cat "$core.backtrace.txt"
+          for iteration in 1 2 3 4 5; do
+            MALLOC_PERTURB_=170 valgrind --tool=memcheck --error-exitcode=99 \
+              --track-origins=yes --leak-check=no --num-callers=50 \
+              --log-file="crash-output/memcheck-$iteration.log" \
+              runner/tsr-testrunner --suite compiler --mode concurrent run \
+              --id 'conformance/typeOfThisInStaticMembers11(target=esnext).ts' \
+              --local "crash-output/local-$iteration" \
+              > "crash-output/result-$iteration.ndjson"
           done
+      - name: Print memory findings
+        if: always()
+        run: cat crash-output/memcheck-*.log
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: concurrent-crash-${{ matrix.kind }}
+          name: concurrent-crash-memcheck
           path: crash-output
           retention-days: 3
