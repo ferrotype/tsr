@@ -55,6 +55,8 @@ impl Options {
 }
 #[derive(Clone)]
 struct Settings {
+    rename: tsr_ls::RenameOptions,
+    formatting: bool,
     completion: tsr_ls::CompletionOptions,
     auto_closing_tags: bool,
     locale: tsr_locale::Locale,
@@ -74,6 +76,8 @@ impl Default for Settings {
         Self {
             locale: tsr_locale::Locale::default(),
             validation: true,
+            formatting: true,
+            rename: tsr_ls::RenameOptions::default(),
             style_warnings: true,
             config_name: String::new(),
             exclude_library_symbols: true,
@@ -436,6 +440,8 @@ impl Runtime {
                 let capabilities = self.capabilities.clone();
                 let settings = self.settings.lock().unwrap().clone();
                 let options = crate::language_features::Options {
+                    rename: settings.rename,
+                    formatting: settings.formatting,
                     completion: settings.completion,
                     auto_closing_tags: settings.auto_closing_tags,
                     maximum_hover_length: settings.maximum_hover_length,
@@ -815,6 +821,15 @@ impl Runtime {
                         );
                         apply_inlay_preferences(raw, true, &mut next.inlay, &mut next.inlay_flags);
                         set_bool(raw.get("validateEnabled"), &mut next.validation);
+                        set_bool(raw.get("formatEnabled"), &mut next.formatting);
+                        set_bool(
+                            raw.get("providePrefixAndSuffixTextForRename"),
+                            &mut next.rename.aliases,
+                        );
+                        set_bool(
+                            raw.get("allowRenameOfImportPath"),
+                            &mut next.rename.import_paths,
+                        );
                         if let Some(lsp::Any::Number(length)) = raw.get("maximumHoverLength") {
                             next.maximum_hover_length =
                                 if *length > 0.0 { *length as usize } else { 500 };
@@ -837,6 +852,15 @@ impl Runtime {
                     set_bool(
                         nested(fields, "preferGoToSourceDefinition"),
                         &mut next.prefer_source_definition,
+                    );
+                    set_bool(
+                        nested(fields, "format.enabled")
+                            .or_else(|| nested(fields, "format.enable")),
+                        &mut next.formatting,
+                    );
+                    set_bool(
+                        nested(fields, "preferences.useAliasesForRenames"),
+                        &mut next.rename.aliases,
                     );
                     apply_lens_preferences(fields, false, &mut next.code_lens);
                     apply_completion_preferences(

@@ -1059,3 +1059,57 @@ fn completion_snippet_formatting_obeys_config() {
         Some("method (arg,optional)\n{\n},")
     );
 }
+
+#[test]
+fn formatting_preserves_unicode_coordinates_and_cancellation() {
+    let text = "/*😀*/ const x={one:1};\r\n";
+    let program = program(b"/index.ts", text.as_bytes());
+    for encoding in [
+        tsr_jsstring::PositionEncoding::Utf8,
+        tsr_jsstring::PositionEncoding::Utf16,
+    ] {
+        let cancel = CancellationToken::new();
+        let mut service = LanguageService::new(&program, encoding, cancel.clone());
+        let params = lsp::DocumentFormattingParams {
+            text_document: lsp::TextDocumentIdentifier {
+                uri: lsp::DocumentUri("file:///index.ts".into()),
+            },
+            options: Some(Box::new(lsp::FormattingOptions {
+                tab_size: 2,
+                insert_spaces: true,
+                ..Default::default()
+            })),
+            ..Default::default()
+        };
+        let edits = service
+            .format_document(&params, &tsr_format::FormatCodeSettings::default(), true)
+            .unwrap()
+            .text_edits
+            .unwrap();
+        let script = Script::plain(b"/index.ts", text.as_bytes());
+        let edits = edits
+            .iter()
+            .flatten()
+            .map(|edit| tsr_core::TextChange {
+                range: service
+                    .converters
+                    .from_lsp_range_to_original(&script, &edit.range),
+                new_text: edit.new_text.as_bytes().to_vec(),
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(
+            tsr_core::apply_bulk_edits(text.as_bytes(), &edits).unwrap(),
+            "/*😀*/ const x = { one: 1 };\r\n".as_bytes()
+        );
+        assert!(service
+            .format_document(&params, &tsr_format::FormatCodeSettings::default(), false)
+            .unwrap()
+            .text_edits
+            .is_none());
+        cancel.cancel();
+        assert!(matches!(
+            service.format_document(&params, &tsr_format::FormatCodeSettings::default(), true),
+            Err(Error::Canceled)
+        ));
+    }
+}

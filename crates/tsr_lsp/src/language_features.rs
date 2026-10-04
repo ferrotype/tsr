@@ -1,4 +1,4 @@
-//! Read-only request execution over the snapshot selected at dispatch. Parsing
+//! Request execution over the snapshot selected at dispatch. Parsing
 //! and project updates happen before this boundary; worker work retains both.
 use crate::{client, error};
 use tsr_ipc::Context;
@@ -9,6 +9,11 @@ pub fn handles(method: &str) -> bool {
     matches!(
         method,
         "textDocument/_vs_onAutoInsert"
+            | "textDocument/prepareRename"
+            | "textDocument/rename"
+            | "textDocument/formatting"
+            | "textDocument/rangeFormatting"
+            | "textDocument/onTypeFormatting"
             | "textDocument/completion"
             | "completionItem/resolve"
             | "textDocument/linkedEditingRange"
@@ -36,6 +41,11 @@ pub fn handles(method: &str) -> bool {
     )
 }
 pub enum Request {
+    PrepareRename(lsp::PrepareRenameParams),
+    Rename(lsp::RenameParams),
+    Format(lsp::DocumentFormattingParams),
+    FormatRange(lsp::DocumentRangeFormattingParams),
+    FormatType(lsp::DocumentOnTypeFormattingParams),
     AutoInsert(lsp::VSOnAutoInsertParams),
     Completion(lsp::CompletionParams),
     ResolveCompletion(lsp::CompletionItem, lsp::DocumentUri),
@@ -64,7 +74,37 @@ pub enum Request {
 }
 impl Request {
     pub fn decode(method: &str, params: Option<&RawValue>) -> Result<Self, lsp::ResponseError> {
+        // These pointer-valued protocol fields may decode as null, but the
+        // formatter requires settings. Refuse before entering the service.
+        fn format_options(
+            options: Option<&lsp::FormattingOptions>,
+        ) -> Result<(), lsp::ResponseError> {
+            if options.is_none() {
+                return Err(crate::coded_error(
+                    lsp::ErrorCode::INVALID_PARAMS,
+                    Some("missing formatting options"),
+                ));
+            }
+            Ok(())
+        }
         Ok(match method {
+            "textDocument/prepareRename" => Self::PrepareRename(crate::decode(params)?),
+            "textDocument/rename" => Self::Rename(crate::decode(params)?),
+            "textDocument/formatting" => {
+                let p: lsp::DocumentFormattingParams = crate::decode(params)?;
+                format_options(p.options.as_deref())?;
+                Self::Format(p)
+            }
+            "textDocument/rangeFormatting" => {
+                let p: lsp::DocumentRangeFormattingParams = crate::decode(params)?;
+                format_options(p.options.as_deref())?;
+                Self::FormatRange(p)
+            }
+            "textDocument/onTypeFormatting" => {
+                let p: lsp::DocumentOnTypeFormattingParams = crate::decode(params)?;
+                format_options(p.options.as_deref())?;
+                Self::FormatType(p)
+            }
             "textDocument/_vs_onAutoInsert" => Self::AutoInsert(crate::decode(params)?),
             "textDocument/completion" => Self::Completion(crate::decode(params)?),
             "completionItem/resolve" => {
@@ -148,6 +188,11 @@ impl Request {
     }
     pub fn uri(&self) -> &lsp::DocumentUri {
         match self {
+            Self::PrepareRename(p) => &p.text_document.uri,
+            Self::Rename(p) => &p.text_document.uri,
+            Self::Format(p) => &p.text_document.uri,
+            Self::FormatRange(p) => &p.text_document.uri,
+            Self::FormatType(p) => &p.text_document.uri,
             Self::AutoInsert(p) => &p.vs_text_document.uri,
             Self::Completion(p) => &p.text_document.uri,
             Self::ResolveCompletion(_, uri) => uri,
@@ -210,6 +255,8 @@ impl tsr_ls::QueryChecker for RequestChecker<'_> {
 }
 #[derive(Clone)]
 pub struct Options {
+    pub rename: tsr_ls::RenameOptions,
+    pub formatting: bool,
     pub completion: tsr_ls::CompletionOptions,
     pub auto_closing_tags: bool,
     pub maximum_hover_length: usize,
@@ -282,7 +329,9 @@ pub fn execute(
     }
     if matches!(
         request,
-        Request::Completion(_)
+        Request::PrepareRename(_)
+            | Request::Rename(_)
+            | Request::Completion(_)
             | Request::ResolveCompletion(_, _)
             | Request::Hover(_)
             | Request::SignatureHelp(_)
@@ -511,6 +560,54 @@ pub fn execute(
                     .map_err(service_error)?,
             );
         }
+        if matches!(&request, Request::PrepareRename(_) | Request::Rename(_)) {
+            let caps = capabilities
+                .workspace
+                .as_deref()
+                .and_then(|c| c.workspace_edit.as_deref());
+            let rename = tsr_ls::RenameOptions {
+                document_changes: caps
+                    .and_then(|c| c.document_changes.as_deref())
+                    .copied()
+                    .unwrap_or(false),
+                rename_resources: caps
+                    .and_then(|c| c.resource_operations.as_deref())
+                    .is_some_and(|r| r.iter().any(|r| r.0 == "rename")),
+                quote: options.completion.quote,
+                ..options.rename
+            };
+            if let Request::PrepareRename(p) = &request {
+                let info = service
+                    .rename_info(
+                        &mut operation,
+                        &p.text_document.uri,
+                        &p.position,
+                        "",
+                        rename,
+                        &options.locale,
+                    )
+                    .map_err(service_error)?;
+                if !info.can_rename {
+                    return Err(error(-32803, info.error));
+                }
+                return client::raw(
+                    &lsp::RangeOrPrepareRenamePlaceholderOrPrepareRenameDefaultBehaviorOrNull {
+                        prepare_rename_placeholder: Some(Box::new(lsp::PrepareRenamePlaceholder {
+                            range: info.range,
+                            placeholder: info.name,
+                        })),
+                        ..Default::default()
+                    },
+                );
+            }
+            if let Request::Rename(p) = &request {
+                return client::raw(
+                    &service
+                        .rename(&mut operation, p, rename, &options.locale)
+                        .map_err(service_error)?,
+                );
+            }
+        }
         if let Request::References(params) = &request {
             return client::raw(
                 &service
@@ -575,6 +672,21 @@ pub fn execute(
         );
     }
     match request {
+        Request::Format(p) => client::raw(
+            &service
+                .format_document(&p, &options.completion.format, options.formatting)
+                .map_err(service_error)?,
+        ),
+        Request::FormatRange(p) => client::raw(
+            &service
+                .format_range(&p, &options.completion.format, options.formatting)
+                .map_err(service_error)?,
+        ),
+        Request::FormatType(p) => client::raw(
+            &service
+                .format_on_type(&p, &options.completion.format, options.formatting)
+                .map_err(service_error)?,
+        ),
         Request::AutoInsert(p) => client::raw(
             &service
                 .auto_insert(&p, options.auto_closing_tags)
@@ -609,7 +721,9 @@ pub fn execute(
                     .map_err(service_error)?,
             )
         }
-        Request::Completion(_)
+        Request::PrepareRename(_)
+        | Request::Rename(_)
+        | Request::Completion(_)
         | Request::ResolveCompletion(_, _)
         | Request::Hover(_)
         | Request::SignatureHelp(_)

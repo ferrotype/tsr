@@ -22,7 +22,8 @@ impl SearchState<'_, '_, '_> {
     ) -> Result<Vec<ReferenceGroup>> {
         self.l.check_canceled()?;
         if self.options.adjust {
-            node = crate::meaning::adjusted_location(self.l.view(node)?, node, false)?;
+            node =
+                crate::meaning::adjusted_location(self.l.view(node)?, node, self.options.rename)?;
         }
         let view = self.l.view(node)?;
         let n = view.node(node)?;
@@ -505,6 +506,7 @@ impl SearchState<'_, '_, '_> {
                         == target
                     {
                         entries.push(ReferenceEntry {
+                            kind: crate::references::EntryKind::Node,
                             node: None,
                             context: None,
                             source,
@@ -522,6 +524,7 @@ impl SearchState<'_, '_, '_> {
                         == target
                     {
                         entries.push(ReferenceEntry {
+                            kind: crate::references::EntryKind::Node,
                             node: None,
                             context: None,
                             source,
