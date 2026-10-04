@@ -30,7 +30,10 @@ jobs:
         run: |
           mkdir -p crash-output
           chmod +x runner/tsr-testrunner
-          command -v gdb
+          if ! command -v gdb; then
+            sudo apt-get update -qq
+            sudo apt-get install -y gdb
+          fi
           sudo sysctl -w "kernel.core_pattern=$PWD/crash-output/core.%p"
           ulimit -c unlimited
           python3 scripts/diagnose_concurrent_crash.py
