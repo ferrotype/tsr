@@ -15,5 +15,18 @@ tsr_jsstring = { version = "0.2.0", path = "../tsr_jsstring" }
 
 tsr_tspath = { version = "0.2.0", path = "../tsr_tspath" }
 
+tsr_lsp = { version = "0.2.0", path = "../tsr_lsp" }
+tsr_project = { version = "0.2.0", path = "../tsr_project" }
+tsr_arena = { version = "0.2.0", path = "../tsr_arena" }
+tsr_compiler = { version = "0.2.0", path = "../tsr_compiler" }
+tsr_core = { version = "0.2.0", path = "../tsr_core" }
+tsr_json = { version = "0.2.0", path = "../tsr_json" }
+tsr_lsproto = { version = "0.2.0", path = "../tsr_lsproto" }
+tsr_tsoptions = { version = "0.2.0", path = "../tsr_tsoptions" }
+
+[[bin]]
+name = "phase5_testserver"
+path = "src/bin/phase5_testserver.rs"
+
 [lints]
 workspace = true

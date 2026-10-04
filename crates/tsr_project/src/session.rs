@@ -5,7 +5,7 @@ use crate::{
     extended_config::{ConfigOwnership, ExtendedConfigCache},
     file_change::{FileChange, FileChangeKind, FileChangeSummary},
     overlay::OverlayFs,
-    parse_cache::ParseCache,
+    parse_cache::{ContentMappedParseCache, ParseCache},
     program_counter::ProgramCounter,
     ref_count_cache::RefCountCacheOptions,
     snapshot::SessionSnapshot,
@@ -103,6 +103,7 @@ pub struct Session {
     fs: Arc<dyn FileSystem>,
     counters: Counters,
     parse_cache: Arc<ParseCache>,
+    mapped_parse_cache: Arc<ContentMappedParseCache>,
     extended_cache: Arc<ExtendedConfigCache>,
     program_counter: Arc<ProgramCounter>,
     snapshot: RwLock<Option<Snapshot>>,
@@ -134,13 +135,38 @@ impl Session {
         counters: &Counters,
         parse_cache: Arc<ParseCache>,
     ) -> Arc<Self> {
-        Self::with_clock(options, fs, counters, parse_cache, crate::clock::system())
+        Self::with_caches(
+            options,
+            fs,
+            counters,
+            parse_cache,
+            Arc::new(ContentMappedParseCache::new(RefCountCacheOptions::default())),
+        )
+    }
+    /// Both caches may be injected by a batch worker. Production sessions use
+    /// deletion-on-last-release; only the private test worker retains entries.
+    pub fn with_caches(
+        options: SessionOptions,
+        fs: Arc<dyn FileSystem>,
+        counters: &Counters,
+        parse_cache: Arc<ParseCache>,
+        mapped_parse_cache: Arc<ContentMappedParseCache>,
+    ) -> Arc<Self> {
+        Self::with_clock(
+            options,
+            fs,
+            counters,
+            parse_cache,
+            mapped_parse_cache,
+            crate::clock::system(),
+        )
     }
     fn with_clock(
         options: SessionOptions,
         fs: Arc<dyn FileSystem>,
         counters: &Counters,
         parse_cache: Arc<ParseCache>,
+        mapped_parse_cache: Arc<ContentMappedParseCache>,
         clock: Arc<dyn crate::clock::Clock>,
     ) -> Arc<Self> {
         assert!(
@@ -166,6 +192,7 @@ impl Session {
             fs,
             counters: counters.clone(),
             parse_cache,
+            mapped_parse_cache,
             extended_cache,
             program_counter: Arc::default(),
             snapshot: RwLock::new(Some(Snapshot::from_session(state))),
@@ -215,6 +242,9 @@ impl Session {
     }
     pub fn parse_cache(&self) -> &Arc<ParseCache> {
         &self.parse_cache
+    }
+    pub fn mapped_parse_cache(&self) -> &Arc<ContentMappedParseCache> {
+        &self.mapped_parse_cache
     }
     pub fn extended_config_cache(&self) -> &Arc<ExtendedConfigCache> {
         &self.extended_cache
@@ -286,13 +316,37 @@ impl Session {
     }
     // port: tsc/internal/project/session.go:Session.DidChangeCompilerOptionsForInferredProjects
     pub fn set_inferred_options(&self, options: CompilerOptions) -> Result<(), Error> {
+        self.apply_inferred_options(options, self.fs.clone())
+    }
+    pub fn apply_inferred_options(
+        &self,
+        options: CompilerOptions,
+        host: Arc<dyn FileSystem>,
+    ) -> Result<(), Error> {
         let current = self.snapshot.read().expect("session snapshot");
         if current.is_none() {
             return Err(Error::Closed);
         }
-        self.pending.lock().expect("session events").inferred = Some(Arc::new(options));
+        let options = Arc::new(options);
+        let previous = self
+            .pending
+            .lock()
+            .expect("session events")
+            .inferred
+            .replace(options.clone());
         drop(current);
-        self.flush(None).map(|_| ())
+        let result = self.flush_with_host(None, host).map(|_| ());
+        if result.is_err() {
+            let mut pending = self.pending.lock().expect("session events");
+            if pending
+                .inferred
+                .as_ref()
+                .is_some_and(|value| Arc::ptr_eq(value, &options))
+            {
+                pending.inferred = previous;
+            }
+        }
+        result
     }
     pub fn set_custom_config_file_name(&self, name: JsString) -> Result<(), Error> {
         let current = self.snapshot.read().expect("session snapshot");
@@ -318,13 +372,23 @@ impl Session {
         Ok(snapshot)
     }
     pub fn flush(&self, requested: Option<&DocumentUri>) -> Result<Snapshot, Error> {
-        self.flush_inner(requested, false, None)
+        self.flush_with_host(requested, self.fs.clone())
+    }
+    /// Use the same injected filesystem with a request-scoped cancellation
+    /// handle. It must describe the session's filesystem, not a different tree.
+    pub fn flush_with_host(
+        &self,
+        requested: Option<&DocumentUri>,
+        host: Arc<dyn FileSystem>,
+    ) -> Result<Snapshot, Error> {
+        self.flush_inner(requested, false, None, host)
     }
     fn flush_inner(
         &self,
         requested: Option<&DocumentUri>,
         clean_disk: bool,
         timer: Option<(timers::Kind, u64)>,
+        host: Arc<dyn FileSystem>,
     ) -> Result<Snapshot, Error> {
         // Serialize construction, while current-snapshot reads and notification
         // admission remain available during a synchronous filesystem callback.
@@ -333,6 +397,11 @@ impl Session {
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
         let previous = self.snapshot()?;
+        assert_eq!(
+            host.use_case_sensitive_file_names(),
+            self.fs.use_case_sensitive_file_names(),
+            "request host case sensitivity changed"
+        );
         if let Some((kind, epoch)) = timer {
             if !self.timers.matches(kind, epoch) {
                 return Ok(previous);
@@ -360,15 +429,16 @@ impl Session {
         };
         let pending = transaction.pending.as_ref().unwrap();
         let mut overlays = OverlayFs::new(
-            self.fs.clone(),
+            host.clone(),
             self.options.current_directory.clone(),
             self.options.position_encoding,
         )
         .with_overlays(old.fs.overlays().clone());
         let mut changes = overlays.process_changes(&pending.changes)?;
-        let fs = Arc::new(SnapshotFsBuilder::new(
+        let fs = Arc::new(SnapshotFsBuilder::with_host(
             old.fs.clone(),
             overlays.overlays().clone(),
+            host,
         ));
         old.fs.expand_realpath_aliases(&mut changes);
         fs.mark_dirty_files(&mut changes)?;

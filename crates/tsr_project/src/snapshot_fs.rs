@@ -165,7 +165,17 @@ pub struct SnapshotFsBuilder {
 impl SnapshotFsBuilder {
     // port: tsc/internal/project/snapshotfs.go:newSnapshotFSBuilder
     pub fn new(base: Arc<SnapshotFs>, overlays: Overlays) -> Self {
-        let fs = Arc::new(CachedFs::new(base.origin.clone()));
+        let origin = base.origin.clone();
+        Self::with_host(base, overlays, origin)
+    }
+    /// A callback-backed request can have its own cancellation scope. The
+    /// origin stays session-owned for future updates; this build owns its host.
+    pub(crate) fn with_host(
+        base: Arc<SnapshotFs>,
+        overlays: Overlays,
+        host: Arc<dyn FileSystem>,
+    ) -> Self {
+        let fs = Arc::new(CachedFs::new(host));
         let overlay_directories = Arc::new(directories(
             overlays.iter().map(|(path, file)| (path, file.file_name())),
         ));

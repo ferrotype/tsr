@@ -27,6 +27,7 @@ tsr_vfs = { version = "0.2.0", path = "../tsr_vfs" }
 xxhash-rust = { version = "0.8.15", features = ["xxh3"] }
 
 [dev-dependencies]
+tsr_parser = { version = "0.2.0", path = "../tsr_parser" }
 tsr_arena = { version = "0.2.0", path = "../tsr_arena", features = ["harness"] }
 
 [lints]

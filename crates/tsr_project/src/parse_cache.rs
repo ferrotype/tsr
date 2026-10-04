@@ -141,6 +141,23 @@ pub struct ContentMappedParseCacheKey {
     hash: u128,
 }
 impl ContentMappedParseCacheKey {
+    pub fn from_options_hash(options: &SourceFileParseOptions, hash: u128) -> Self {
+        Self {
+            file_name: options.file_name.clone(),
+            path: options.path.clone(),
+            jsx: options.external_module_indicator_options.jsx,
+            force_module: options.external_module_indicator_options.force,
+            hash,
+        }
+    }
+    // port: tsc/internal/project/parsecache.go:contentMappedParseCacheKeyForFile
+    pub fn from_file(file: &ProgramFile) -> Result<Self, Error> {
+        let source = file.bound().view().source_file()?;
+        Ok(Self::from_options_hash(
+            &source.content_mapper_parse_options(),
+            (u128::from(source.hash.hi) << 64) | u128::from(source.hash.lo),
+        ))
+    }
     // port: tsc/internal/project/parsecache.go:contentMappedParseCacheKey
     pub fn new(
         options: &SourceFileParseOptions,
@@ -154,13 +171,63 @@ impl ContentMappedParseCacheKey {
             bytes.extend_from_slice(&(value as u64).to_le_bytes());
         }
         bytes.extend_from_slice(locale.as_bytes());
+        Self::from_options_hash(options, xxhash_rust::xxh3::xxh3_128(&bytes))
+    }
+}
+
+pub struct ContentMappedSourceFiles {
+    pub canonical: Arc<ProgramFile>,
+    pub supplemental: Vec<Arc<ProgramFile>>,
+}
+pub struct ContentMappedParseCache {
+    entries: RefCountCache<ContentMappedParseCacheKey, Arc<ContentMappedSourceFiles>>,
+}
+impl ContentMappedParseCache {
+    // port: tsc/internal/project/parsecache.go:NewContentMappedParseCache
+    pub fn new(options: RefCountCacheOptions) -> Self {
         Self {
-            file_name: options.file_name.clone(),
-            path: options.path.clone(),
-            jsx: options.external_module_indicator_options.jsx,
-            force_module: options.external_module_indicator_options.force,
-            hash: xxhash_rust::xxh3::xxh3_128(&bytes),
+            entries: RefCountCache::new(options),
         }
+    }
+    pub fn len(&self) -> usize {
+        self.entries.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.entries.is_empty()
+    }
+    pub fn reference_count(&self, key: &ContentMappedParseCacheKey) -> Option<isize> {
+        self.entries.reference_count(key)
+    }
+    /// A single lease covers canonical and supplemental outputs. Construction
+    /// failures publish nothing; dropping the last lease evicts the whole row.
+    pub fn acquire_or_error<E>(
+        self: &Arc<Self>,
+        key: &ContentMappedParseCacheKey,
+        produce: impl FnOnce() -> Result<ContentMappedSourceFiles, E>,
+    ) -> Result<ContentMappedLease, E> {
+        let files = self
+            .entries
+            .acquire_or_error(key, || produce().map(Arc::new))?;
+        Ok(ContentMappedLease {
+            cache: self.clone(),
+            key: key.clone(),
+            files,
+        })
+    }
+}
+pub struct ContentMappedLease {
+    cache: Arc<ContentMappedParseCache>,
+    key: ContentMappedParseCacheKey,
+    files: Arc<ContentMappedSourceFiles>,
+}
+impl ContentMappedLease {
+    pub fn files(&self) -> &Arc<ContentMappedSourceFiles> {
+        &self.files
+    }
+}
+impl Drop for ContentMappedLease {
+    fn drop(&mut self) {
+        self.cache.entries.release(&self.key);
     }
 }
 

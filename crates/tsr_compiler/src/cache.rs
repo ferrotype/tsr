@@ -36,8 +36,17 @@ impl ProgramFile {
         tracing: Option<&Arc<dyn tsr_checker::TraceSink>>,
         source_hash: Option<tsr_ast::SourceHash>,
     ) -> Result<Arc<Self>, Error> {
-        let mut parsed =
-            tsr_parser::parse_source_file_with_counters(source, kind, options, counters);
+        let parsed = tsr_parser::parse_source_file_with_counters(source, kind, options, counters);
+        Self::bind_parsed(parsed, tracing, source_hash)
+    }
+    /// Bind a parsed mapper output using the same publication and trace path as
+    /// ordinary source files. A bundle cache publishes only after all outputs
+    /// have successfully crossed this boundary.
+    pub fn bind_parsed(
+        mut parsed: tsr_ast::ParsedFile,
+        tracing: Option<&Arc<dyn tsr_checker::TraceSink>>,
+        source_hash: Option<tsr_ast::SourceHash>,
+    ) -> Result<Arc<Self>, Error> {
         if let Some(hash) = source_hash {
             parsed.root_source_file_mut()?.hash = hash;
         }

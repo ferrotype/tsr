@@ -95,6 +95,7 @@ impl Timers {
                                 None,
                                 matches!(kind, Kind::IdleClean),
                                 Some((kind, epoch)),
+                                session.fs.clone(),
                             ) {
                                 if !matches!(error, Error::Closed) {
                                     session.timers.errors.lock().unwrap().push(error);

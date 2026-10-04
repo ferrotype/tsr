@@ -57,6 +57,17 @@ impl Project {
     pub fn program(&self) -> Option<&Arc<Program>> {
         self.data.as_ref().map(|d| &d.program)
     }
+    // port: tsc/internal/project/project.go:Project.DisplayName
+    pub fn display_name(&self, cwd: &[u8]) -> Option<JsString> {
+        let data = self.data.as_ref()?;
+        Some(JsString::from_bytes(
+            if data.kind == ProjectKind::Inferred {
+                tsr_tspath::base_name(data.current_directory.as_bytes()).to_vec()
+            } else {
+                tsr_tspath::convert_to_relative_path(data.name.as_bytes(), cwd, true)
+            },
+        ))
+    }
     // port: tsc/internal/project/project.go:Project.containsFile
     pub fn contains_file(&self, path: &[u8]) -> bool {
         self.program()

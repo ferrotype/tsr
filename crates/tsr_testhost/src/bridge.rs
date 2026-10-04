@@ -156,6 +156,18 @@ pub struct CancelCalls {
     request: Arc<AtomicBool>,
 }
 impl CancelCalls {
+    pub fn is_canceled(&self) -> bool {
+        self.request.load(Ordering::Relaxed)
+    }
+    pub fn owns(&self, id: &str) -> bool {
+        self.shared
+            .state
+            .lock()
+            .expect("callback state poisoned")
+            .pending
+            .get(id)
+            .is_some_and(|pending| Arc::ptr_eq(&pending.request, &self.request))
+    }
     pub fn cancel(&self) {
         let mut state = self.shared.state.lock().expect("callback state poisoned");
         self.request.store(true, Ordering::Relaxed);

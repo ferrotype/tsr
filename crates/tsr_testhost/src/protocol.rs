@@ -14,6 +14,49 @@ pub(crate) enum Id {
 }
 
 pub(crate) type RequestResult = Result<Vec<Json>, (i64, String)>;
+pub(crate) struct CallbackResponse {
+    pub id: String,
+    pub result: Option<Json>,
+    pub error: Option<Json>,
+}
+pub(crate) fn callback_response(
+    envelope: &BTreeMap<String, &RawValue>,
+) -> io::Result<CallbackResponse> {
+    fields(envelope, &["jsonrpc", "id", "result", "error"])?;
+    if envelope
+        .get("jsonrpc")
+        .is_none_or(|v| serde_json::from_str::<String>(v.get()).ok().as_deref() != Some("2.0"))
+    {
+        return Err(invalid("expected jsonrpc version 2.0"));
+    }
+    let id = envelope
+        .get("id")
+        .and_then(|v| serde_json::from_str::<String>(v.get()).ok())
+        .ok_or_else(|| invalid("callback response requires string ID"))?;
+    if envelope.contains_key("result") == envelope.contains_key("error") {
+        return Err(invalid("response requires exactly one result or error"));
+    }
+    if let Some(error) = envelope.get("error") {
+        let error = wire::fields(error).map_err(invalid)?;
+        fields(&error, &["code", "message", "data"])?;
+        if error
+            .get("code")
+            .and_then(|v| serde_json::from_str::<i32>(v.get()).ok())
+            .is_none()
+            || error
+                .get("message")
+                .and_then(|v| serde_json::from_str::<String>(v.get()).ok())
+                .is_none()
+        {
+            return Err(invalid("invalid callback error"));
+        }
+    }
+    Ok(CallbackResponse {
+        id,
+        result: envelope.get("result").map(|v| (*v).to_owned()),
+        error: envelope.get("error").map(|v| (*v).to_owned()),
+    })
+}
 pub(crate) fn decode<T: DeserializeOwned>(value: &RawValue) -> Result<T, (i64, String)> {
     serde_json::from_str(value.get()).map_err(|error| (-32602, error.to_string()))
 }

@@ -4,6 +4,7 @@ pub mod bridge;
 mod configuration;
 mod filesystem;
 pub mod framing;
+pub mod project_host;
 mod protocol;
 mod session;
 mod streams;

@@ -489,11 +489,35 @@ controlled-clock tests; inferred-options changes publish before acknowledgement.
 Project log sinks and forked collectors are implemented with an injected local
 timestamp formatter. ATA log embedding remains with L6.
 
-These are implementation increments, **not L1's exit**. The router bridge still needs the actual
-server connection; options application and the native state-writer projection
-have not been connected. Mapped-bundle retention and the batch reset/cache
-witnesses remain before enabling semantic batch reuse. L0's codec work alone
-does not satisfy its unfinished server/Go-harness prerequisites.
+The version-3 private endpoint now drives the real `tsr_lsp::Server` and
+`tsr_project::Session`. An ordered worker performs updates while the router
+continues processing filesystem replies, progress and cancellation. Options
+responses wait for the actual application hook; reset retires callbacks and
+joins old session work before admitting the next test. The reset queue slot is
+reserved even at the admission bound.
+
+The state projection is read-only, with identity tokens for the native writer's
+pointer comparisons. `tools/phase5/project/check.py` compares eight successive
+states through the original Go writer, first validating the native projection
+round trip. It also checks identical output in a fresh process and a two-test
+retained-cache batch. This small endpoint sequence takes about 1.3 seconds on
+the development host after builds; it is not a full-suite estimate.
+
+Mapped cache leases retain canonical and supplemental outputs together and
+reconstruct the key from the original input options. Failed construction
+publishes nothing. Real-worker reset tests verify shared library parse reuse,
+changed text/parse-option invalidation, old session/filesystem disposal, and
+isolation of overlays, options, encodings and callbacks. The retained cache is
+an explicit private-test policy; production caches release on the last lease.
+
+The L1 core implementation and focused tests are complete. The test assignment
+and reproduction commands are in `tools/phase5/project/README.md`; this does
+not claim all 85 native project tests or their subcases. L2 owns diagnostics,
+progress publication, capability negotiation and watcher registration; L6 owns
+ATA, mapper execution and cross-project/API project construction. L0's full
+fourslash transport patch remains a separate prerequisite for semantic corpus
+execution: the retained-cache path is enabled and tested in the real private
+endpoint, but the eight-state project adapter is not that complete harness.
 
 ### L2 — server behavior and negotiated conversions
 

@@ -2441,34 +2441,7 @@ pub(super) fn bind(
     parsed: tsr_ast::ParsedFile,
     tracing: Option<&Arc<dyn TraceSink>>,
 ) -> Result<Arc<ProgramFile>, Error> {
-    let _trace = TraceScope::new(
-        tracing,
-        TracePhase::Bind,
-        "bindSourceFile",
-        || {
-            [(
-                "path".into(),
-                TraceValue::Str(
-                    String::from_utf8_lossy(
-                        parsed
-                            .view()
-                            .source_file(parsed.root())
-                            .expect("parsed source file")
-                            .parse_options()
-                            .path
-                            .as_bytes(),
-                    )
-                    .into_owned(),
-                ),
-            )]
-            .into_iter()
-            .collect()
-        },
-        true,
-    );
-    // port: tsc/internal/compiler/program.go:Program.BindSourceFiles
-    let bound = tsr_binder::bind_parsed_file(parsed)?;
-    Ok(Arc::new(ProgramFile::new(bound)))
+    ProgramFile::bind_parsed(parsed, tracing, None)
 }
 fn host_trace(log: &mut Vec<tsr_module::DiagAndArgs>, traces: Vec<tsr_module::DiagAndArgs>) {
     log.extend(traces);

@@ -2,6 +2,95 @@ use super::*;
 use tsr_compiler::{FileCache, Program, ProgramOptions};
 use tsr_core::{CompilerOptions, Tristate};
 use tsr_vfs::MemoryBuilder;
+
+// source: tsc/internal/project/refcountcache_test.go:TestContentMappedParseCacheBundleLifetime
+// source: tsc/internal/project/refcountcache_test.go:TestContentMappedParseCacheKeyReconstruction
+#[test]
+fn mapped_bundle_lease_keeps_every_output_and_reconstructs_the_original_parse_key() {
+    let counters = Counters::new();
+    let baseline = counters.snapshot();
+    let options = SourceFileParseOptions {
+        file_name: js("/component.box"),
+        path: js("/component.box"),
+        ..Default::default()
+    };
+    let key = ContentMappedParseCacheKey::new(&options, 12, 34, "en");
+    let cache = Arc::new(ContentMappedParseCache::new(RefCountCacheOptions::default()));
+    let make_file = |name: &str| {
+        let mut mapped = options.clone();
+        mapped.file_name = js(name);
+        mapped.path = js(name);
+        mapped.external_module_indicator_options.force = true;
+        let mut parsed = tsr_parser::parse_source_file_with_counters(
+            SourceText::from_loaded_bytes(b"export const x = 1;".as_slice()),
+            ScriptKind::TS,
+            mapped,
+            &counters,
+        );
+        parsed
+            .root_source_file_mut()
+            .unwrap()
+            .set_content_mapper_info(tsr_ast::ContentMapperSourceFileInfo {
+                content_mapper: js("mapper"),
+                parse_options: options.clone(),
+                ..Default::default()
+            });
+        ProgramFile::bind_parsed(
+            parsed,
+            None,
+            Some(tsr_ast::SourceHash {
+                hi: (key.hash >> 64) as u64,
+                lo: key.hash as u64,
+            }),
+        )
+        .unwrap()
+    };
+    let first = cache
+        .acquire_or_error(&key, || {
+            Ok::<_, Error>(ContentMappedSourceFiles {
+                canonical: make_file("/component.box"),
+                supplemental: vec![make_file("/component.box.0.ts")],
+            })
+        })
+        .unwrap();
+    assert_eq!(
+        ContentMappedParseCacheKey::from_file(&first.files.canonical).unwrap(),
+        key
+    );
+    assert_eq!(
+        ContentMappedParseCacheKey::from_file(&first.files.supplemental[0]).unwrap(),
+        key
+    );
+    let second = cache
+        .acquire_or_error(&key, || -> Result<ContentMappedSourceFiles, Error> {
+            panic!("cached bundle must not rebuild")
+        })
+        .unwrap();
+    assert!(Arc::ptr_eq(first.files(), second.files()));
+    assert_eq!(cache.reference_count(&key), Some(2));
+    let escaped = first.files().clone();
+    drop(first);
+    assert_eq!(cache.reference_count(&key), Some(1));
+    drop(second);
+    assert!(cache.is_empty());
+    assert_eq!(
+        escaped.supplemental[0]
+            .bound()
+            .view()
+            .source_file()
+            .unwrap()
+            .text()
+            .as_bytes(),
+        b"export const x = 1;"
+    );
+    drop(escaped);
+    assert_eq!(counters.snapshot(), baseline);
+    let failed = cache.acquire_or_error(&key, || {
+        Err::<ContentMappedSourceFiles, _>("failed transform")
+    });
+    assert!(failed.is_err());
+    assert!(cache.is_empty());
+}
 fn js(s: &str) -> JsString {
     JsString::from_bytes(s.as_bytes())
 }

@@ -402,6 +402,7 @@ fn timed_session() -> (
         Arc::new(iovfs::from(fs.clone(), false)),
         &Counters::new(),
         Arc::new(ParseCache::new(RefCountCacheOptions::default())),
+        Arc::new(ContentMappedParseCache::new(RefCountCacheOptions::default())),
         clock.clone(),
     );
     (fs, session, clock)
@@ -499,4 +500,146 @@ fn inferred_options_response_is_a_snapshot_barrier() {
         .options()
         .strict
         .is_true());
+}
+
+// source: tsc/internal/project/customconfigfilename_test.go:TestCustomConfigFileName
+#[test]
+fn custom_config_preferences_reselect_open_files_and_remove_inferred_roots() {
+    let (_, session) = setup(
+        &[
+            (
+                "/src/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true,"strict":false}}"#,
+            ),
+            (
+                "/src/tsconfig.all.json",
+                r#"{"compilerOptions":{"noLib":true,"strict":true}}"#,
+            ),
+            ("/src/main.ts", "const x = 1;"),
+        ],
+        &Counters::new(),
+    );
+    let original = open(&session, "/src/main.ts", "const x = 1;");
+    for (custom, expected, strict) in [
+        ("tsconfig.all.json", "/src/tsconfig.all.json", true),
+        ("", "/src/tsconfig.json", false),
+        ("missing.json", "/src/tsconfig.json", false),
+    ] {
+        session.set_custom_config_file_name(js(custom)).unwrap();
+        let snapshot = session.snapshot_for_file(&uri("/src/main.ts")).unwrap();
+        let project = snapshot.project_for_file(b"/src/main.ts").unwrap();
+        assert_eq!(project.data().unwrap().name, js(expected));
+        assert_eq!(
+            project.program().unwrap().options().strict.is_true(),
+            strict
+        );
+    }
+    assert!(!original
+        .project()
+        .program()
+        .unwrap()
+        .options()
+        .strict
+        .is_true());
+    let (_, other) = setup(
+        &[
+            (
+                "/src/tsconfig.all.json",
+                r#"{"compilerOptions":{"noLib":true},"include":["./**/*"]}"#,
+            ),
+            ("/src/main.ts", "const x = 1;"),
+        ],
+        &Counters::new(),
+    );
+    let first = open(&other, "/src/main.ts", "const x = 1;");
+    assert!(first.project_by_path(INFERRED_PROJECT_NAME).is_some());
+    other
+        .set_custom_config_file_name(js("tsconfig.all.json"))
+        .unwrap();
+    let next = other.snapshot_for_file(&uri("/src/main.ts")).unwrap();
+    assert!(next.project_by_path(INFERRED_PROJECT_NAME).is_none());
+    assert_eq!(next.projects().len(), 1);
+    assert!(first.project_by_path(INFERRED_PROJECT_NAME).is_some());
+}
+
+// source: tsc/internal/project/untitled_test.go:TestUntitledFileInInferredProject
+// source: tsc/internal/project/project_test.go:TestDisplayName
+// References and returned URI conversion are exercised with the L3 service.
+#[test]
+fn untitled_overlays_form_an_inferred_program_and_project_names_follow_go() {
+    let mut fs = tsr_vfs::MemoryBuilder::new(b"/home/projects", true);
+    fs.insert_loaded(
+        b"/home/projects/sub/tsconfig.json",
+        br#"{"compilerOptions":{"noLib":true}}"#.as_slice(),
+    );
+    fs.insert_loaded(b"/home/projects/sub/main.ts", b"const y = 1;".as_slice());
+    let session = Session::new(
+        SessionOptions {
+            current_directory: js("/home/projects"),
+            ..Default::default()
+        },
+        Arc::new(fs.finish()),
+        &Counters::new(),
+    );
+    session
+        .set_inferred_options(CompilerOptions {
+            no_lib: Tristate::TRUE,
+            allow_non_ts_extensions: Tristate::TRUE,
+            ..Default::default()
+        })
+        .unwrap();
+    let first = DocumentUri("untitled:Untitled-1".into());
+    let second = DocumentUri("untitled:Untitled-2".into());
+    session
+        .did_open_file(
+            first.clone(),
+            1,
+            js("x\n\n"),
+            LanguageKind("typescript".into()),
+        )
+        .unwrap();
+    let snapshot = session
+        .did_open_file(
+            second.clone(),
+            1,
+            js("let x = 42;\nx;"),
+            LanguageKind("typescript".into()),
+        )
+        .unwrap();
+    let project = snapshot
+        .project_for_file(second.file_name().as_bytes())
+        .unwrap();
+    assert_eq!(project.program().unwrap().files().len(), 2);
+    assert!(project
+        .program()
+        .unwrap()
+        .source_file(first.file_name().as_bytes())
+        .is_some());
+    assert_eq!(
+        project
+            .program()
+            .unwrap()
+            .source_file(second.file_name().as_bytes())
+            .unwrap()
+            .bound()
+            .view()
+            .source_file()
+            .unwrap()
+            .text()
+            .as_bytes(),
+        b"let x = 42;\nx;"
+    );
+    assert_eq!(project.display_name(b"/home"), Some(js("projects")));
+    let configured = open(&session, "/home/projects/sub/main.ts", "const y = 1;");
+    let project = configured
+        .project_for_file(b"/home/projects/sub/main.ts")
+        .unwrap();
+    assert_eq!(
+        project.display_name(b"/home/projects"),
+        Some(js("sub/tsconfig.json"))
+    );
+    assert_eq!(
+        project.display_name(b"/home/projects/sub"),
+        Some(js("tsconfig.json"))
+    );
 }
