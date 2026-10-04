@@ -124,19 +124,33 @@ impl<'env> WorkGroup<'env> {
             }
         };
         std::thread::scope(|scope| {
-            let mut started = 0;
+            let mut workers = Vec::with_capacity(first.len());
             for slot in &first {
                 let worker = std::thread::Builder::new()
                     .name("tsr-work".into())
                     .stack_size(RESERVED_STACK)
                     .spawn_scoped(scope, || work(slot));
-                if worker.is_err() {
-                    break;
+                match worker {
+                    Ok(worker) => workers.push(worker),
+                    Err(_) => break,
                 }
-                started += 1;
             }
-            for slot in &first[started..] {
+            for slot in &first[workers.len()..] {
                 work(slot);
+            }
+            // Join the workers rather than drop their handles: dropping one
+            // detaches its thread, and glibc's pthread_detach (before 2.43, BZ
+            // #19951) reads the thread's descriptor after marking it detached,
+            // when a worker that has already finished may have freed its stack
+            // and the descriptor in it. A reserved stack is larger than glibc's
+            // stack cache, so it is unmapped at once and that read faults.
+            for worker in workers {
+                if let Err(panic) = worker.join() {
+                    first_panic
+                        .lock()
+                        .unwrap_or_else(PoisonError::into_inner)
+                        .get_or_insert(panic);
+                }
             }
         });
         if let Some(panic) = first_panic
