@@ -13,7 +13,7 @@ use crate::{
     Snapshot,
 };
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, BTreeSet},
     sync::{
         atomic::{AtomicU64, Ordering},
         Arc, Mutex, OnceLock, RwLock,
@@ -448,7 +448,9 @@ impl Session {
                     self.options.current_directory.as_bytes(),
                     self.fs.use_case_sensitive_file_names(),
                 );
-                previous.project_for_file(path.as_bytes()).is_some()
+                previous
+                    .project_for_file(path.as_bytes())
+                    .is_some_and(|project| !project.data().unwrap().dirty)
             })
         {
             return Ok(previous);
@@ -470,6 +472,8 @@ impl Session {
             overlays.overlays().clone(),
             host,
         ));
+        // Content-mapper extensions and watched files are connected in L6.
+        fs.filter_watch_events(&mut changes, &[], &BTreeSet::new());
         old.fs.expand_realpath_aliases(&mut changes);
         fs.mark_dirty_files(&mut changes)?;
         fs.convert_open_and_close(&mut changes)?;

@@ -172,6 +172,144 @@ fn a_rebuilt_program_releases_its_previous_filesystem_root() {
 }
 
 #[test]
+fn deleting_a_watched_directory_removes_its_imported_files() {
+    let main = "import { value } from './dir/value'; export { value };";
+    let (fs, session) = setup(
+        &[
+            (
+                "/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true},"files":["main.ts"]}"#,
+            ),
+            ("/main.ts", main),
+            ("/dir/value.ts", "export const value = 1;"),
+        ],
+        &Counters::new(),
+    );
+    let first = open(&session, "/main.ts", main);
+    assert!(first.project().contains_file(b"/dir/value.ts"));
+    fs.remove(b"dir").unwrap();
+    session
+        .enqueue(FileChange::new(FileChangeKind::WatchDelete, uri("/dir")))
+        .unwrap();
+    let next = session.snapshot_for_file(&uri("/main.ts")).unwrap();
+    assert!(!next.project().contains_file(b"/dir/value.ts"));
+    assert_eq!(text(&first, "/dir/value.ts"), b"export const value = 1;");
+}
+
+#[test]
+fn retained_closed_projects_keep_watch_changes_until_requested() {
+    let (fs, session) = setup(
+        &[
+            ("/a/tsconfig.json", r#"{"compilerOptions":{"noLib":true}}"#),
+            ("/a/main.ts", "const first = 1;"),
+            ("/a/other.ts", "const other = 2;"),
+            ("/b/tsconfig.json", r#"{"compilerOptions":{"noLib":true}}"#),
+            ("/b/main.ts", "const second = 2;"),
+        ],
+        &Counters::new(),
+    );
+    open(&session, "/a/main.ts", "const first = 1;");
+    let first = open(&session, "/b/main.ts", "const second = 2;");
+    session.did_close_file(uri("/a/main.ts")).unwrap();
+    session.flush(None).unwrap();
+
+    // Two distinct updates are consumed without selecting the closed project.
+    // Neither may be forgotten, or reduced to a clone of just the last file.
+    for (path, updated) in [
+        ("/a/main.ts", "const first = 99;"),
+        ("/a/other.ts", "const other = 100;"),
+    ] {
+        fs.write_file(&path.as_bytes()[1..], updated.as_bytes(), 0o644)
+            .unwrap();
+        session
+            .enqueue(FileChange::new(FileChangeKind::WatchChange, uri(path)))
+            .unwrap();
+        let pending = session.flush(None).unwrap();
+        assert!(
+            pending
+                .project_by_path(b"/a/tsconfig.json")
+                .unwrap()
+                .data()
+                .unwrap()
+                .dirty
+        );
+        assert_eq!(text(&pending, "/a/main.ts"), b"const first = 1;");
+        assert_eq!(text(&pending, "/a/other.ts"), b"const other = 2;");
+    }
+    let next = session.snapshot_for_file(&uri("/a/main.ts")).unwrap();
+    assert_eq!(text(&next, "/a/main.ts"), b"const first = 99;");
+    assert_eq!(text(&next, "/a/other.ts"), b"const other = 100;");
+    assert!(
+        !next
+            .project_by_path(b"/a/tsconfig.json")
+            .unwrap()
+            .data()
+            .unwrap()
+            .dirty
+    );
+    assert_eq!(text(&first, "/a/main.ts"), b"const first = 1;");
+    assert_eq!(text(&first, "/a/other.ts"), b"const other = 2;");
+    assert!(Arc::ptr_eq(
+        first
+            .project_by_path(b"/b/tsconfig.json")
+            .unwrap()
+            .data()
+            .unwrap(),
+        next.project_by_path(b"/b/tsconfig.json")
+            .unwrap()
+            .data()
+            .unwrap(),
+    ));
+}
+
+#[test]
+fn retained_closed_projects_keep_config_changes_until_requested() {
+    let (fs, session) = setup(
+        &[
+            ("/a/tsconfig.json", r#"{"compilerOptions":{"noLib":true}}"#),
+            ("/a/main.ts", "const first = 1;"),
+            ("/b/tsconfig.json", r#"{"compilerOptions":{"noLib":true}}"#),
+            ("/b/main.ts", "const second = 2;"),
+        ],
+        &Counters::new(),
+    );
+    open(&session, "/a/main.ts", "const first = 1;");
+    let first = open(&session, "/b/main.ts", "const second = 2;");
+    session.did_close_file(uri("/a/main.ts")).unwrap();
+    session.flush(None).unwrap();
+    fs.write_file(
+        b"a/tsconfig.json",
+        br#"{"compilerOptions":{"noLib":true,"strict":true}}"#,
+        0o644,
+    )
+    .unwrap();
+    session
+        .enqueue(FileChange::new(
+            FileChangeKind::WatchChange,
+            uri("/a/tsconfig.json"),
+        ))
+        .unwrap();
+    session.flush(None).unwrap();
+    let next = session.snapshot_for_file(&uri("/a/main.ts")).unwrap();
+    assert!(next
+        .project_for_file(b"/a/main.ts")
+        .unwrap()
+        .program()
+        .unwrap()
+        .options()
+        .strict
+        .is_true());
+    assert!(!first
+        .project_for_file(b"/a/main.ts")
+        .unwrap()
+        .program()
+        .unwrap()
+        .options()
+        .strict
+        .is_true());
+}
+
+#[test]
 fn checker_panic_retires_only_the_affected_real_project() {
     let counters = Counters::new();
     let baseline = counters.snapshot();

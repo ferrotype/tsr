@@ -32,6 +32,10 @@ pub struct ProjectData {
     pub update_kind: ProgramUpdateKind,
     pub last_update: u64,
     pub host: Arc<SourceFs>,
+    // Like Go's dirty/dirtyFilePath, these belong to this snapshot, not the
+    // shared program. A dirty project with no single file needs a full rebuild.
+    pub(crate) dirty: bool,
+    pub(crate) dirty_file: Option<JsString>,
 }
 impl Project {
     pub(crate) fn from_program(data: ProjectData, counters: &Counters, queries: usize) -> Self {
