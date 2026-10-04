@@ -44,5 +44,12 @@ tsr_tsoptions = { path = "../tsr_tsoptions" }
 tsr_tspath = { path = "../tsr_tspath" }
 tsr_vfs = { path = "../tsr_vfs" }
 
-[lints]
-workspace = true
+# Diagnostic branch: the fatal-signal tracer is the one module that needs
+# unsafe code, as in tsr_fswatch; the workspace forbids it everywhere else.
+[lints.rust]
+unsafe_code = "deny"
+unsafe_op_in_unsafe_fn = "deny"
+rust_2018_idioms = { level = "warn", priority = -1 }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2.189"

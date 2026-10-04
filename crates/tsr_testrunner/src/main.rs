@@ -161,6 +161,10 @@ fn run(arguments: &Arguments, id: &str, local: &Path, testdata: &TestData) -> Re
 
 fn main() -> ExitCode {
     tsr_testrunner::trace_phase("process.start");
+    tsr_testrunner::install_fatal_signal_trace();
+    if std::env::var_os("TSR_TESTRUNNER_FAULT_SELFTEST").is_some() {
+        tsr_testrunner::fault_selftest();
+    }
     let arguments = parse_arguments();
     let testdata = TestData::in_repository(&arguments.root);
     if !testdata.path().is_dir() {
@@ -184,6 +188,7 @@ fn main() -> ExitCode {
         // would rely on growth guards alone.
         Command::Run { id, local } => std::thread::scope(|scope| {
             std::thread::Builder::new()
+                .name("tsr-variant".into())
                 .stack_size(tsr_core::workgroup::RESERVED_STACK)
                 .spawn_scoped(scope, || run(&arguments, id, local, &testdata))
                 .map_err(|error| Stop::fatal(format!("spawning the variant's thread: {error}")))?

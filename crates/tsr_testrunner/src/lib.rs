@@ -33,11 +33,14 @@ pub mod compile;
 pub mod compiler_runner;
 pub mod configurations;
 pub mod enumerate;
+#[allow(unsafe_code)]
+mod fatal_trace;
 pub mod harness;
 pub mod harness_options;
 pub mod result;
 pub mod test_case_parser;
 pub mod transpile_runner;
+pub use fatal_trace::{fault_selftest, install_fatal_signal_trace};
 
 /// Opt-in phase breadcrumbs for native crashes that cannot unwind. They use
 /// stderr, leaving the suite's JSON result stream unchanged. An output error
