@@ -15,6 +15,7 @@ pub struct MapperManifest {
 }
 #[derive(Clone, Debug, Default)]
 pub struct ContentMapper {
+    pub contribution_id: JsString,
     pub package: JsString,
     pub extensions: Vec<JsString>,
     pub options: Option<Vec<u8>>,

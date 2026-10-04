@@ -212,6 +212,12 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
+      "name": "tsr_ls",
+      "manifest": "crates/tsr_ls/Cargo.toml",
+      "publish": true,
+      "reason": "Production language service conversions and queries for Phase 5"
+    },
+    {
       "name": "tsr_lsp",
       "manifest": "crates/tsr_lsp/Cargo.toml",
       "publish": true,

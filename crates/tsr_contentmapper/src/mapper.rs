@@ -17,13 +17,15 @@ pub fn is_supported_virtual_extension(extension: &[u8]) -> bool {
 }
 
 /// The best available user-facing name, including when manifest resolution
-/// failed. Mappers contributed by an editor extension are a later phase's.
+/// failed, including editor-contributed mappers.
 /// port: tsc/internal/contentmapper/contentmapper.go:Mapper.DiagnosticName
 pub fn diagnostic_name(mapper: &ContentMapper) -> &JsString {
-    if mapper.manifest.name.is_empty() {
+    if !mapper.manifest.name.is_empty() {
+        &mapper.manifest.name
+    } else if !mapper.package.is_empty() {
         &mapper.package
     } else {
-        &mapper.manifest.name
+        &mapper.contribution_id
     }
 }
 
@@ -31,7 +33,15 @@ pub fn diagnostic_name(mapper: &ContentMapper) -> &JsString {
 /// empty before it resolves to a name.
 /// port: tsc/internal/contentmapper/contentmapper.go:Mapper.Identity
 pub fn identity(mapper: &ContentMapper) -> JsString {
-    manifest_identity(mapper)
+    let manifest = manifest_identity(mapper);
+    if mapper.contribution_id.is_empty() {
+        return manifest;
+    }
+    let mut value = mapper.contribution_id.as_bytes().to_vec();
+    value.extend_from_slice(b" (");
+    value.extend_from_slice(manifest.as_bytes());
+    value.push(b')');
+    JsString::from_bytes(value)
 }
 
 /// port: tsc/internal/contentmapper/contentmapper.go:Mapper.manifestIdentity

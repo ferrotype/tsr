@@ -1188,13 +1188,40 @@ name = "tsr_locale"
 version = "0.2.0"
 
 [[package]]
+name = "tsr_ls"
+version = "0.2.0"
+dependencies = [
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_compiler",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_jsstring",
+ "tsr_locale",
+ "tsr_lsproto",
+]
+
+[[package]]
 name = "tsr_lsp"
 version = "0.2.0"
 dependencies = [
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_checker",
+ "tsr_compiler",
+ "tsr_contentmapper",
+ "tsr_core",
+ "tsr_diagnostics",
+ "tsr_fswatch",
+ "tsr_ipc",
  "tsr_json",
  "tsr_jsstring",
+ "tsr_locale",
+ "tsr_ls",
  "tsr_lsproto",
  "tsr_project",
+ "tsr_tsoptions",
+ "tsr_tspath",
  "tsr_vfs",
 ]
 
@@ -1362,6 +1389,7 @@ dependencies = [
  "tsr_arena",
  "tsr_compiler",
  "tsr_core",
+ "tsr_ipc",
  "tsr_json",
  "tsr_jsstring",
  "tsr_lsp",
@@ -1551,7 +1579,11 @@ dependencies = [
  "tsr_core",
  "tsr_execute",
  "tsr_ipc",
+ "tsr_json",
  "tsr_jsstring",
+ "tsr_lsp",
+ "tsr_lsproto",
+ "tsr_project",
  "tsr_tsc",
  "tsr_tspath",
  "tsr_vfs",

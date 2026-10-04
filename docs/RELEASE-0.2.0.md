@@ -28,7 +28,7 @@ All existing names below are owned by the crates.io account `iantocristian`.
 - 11 names are new to crates.io: `tsr_fswatch`, `tsr_jsonrpc`, `tsr_sourcemap`,
   `tsr_ipc`, `tsr_contentmapper`, `tsr_tracing`, `tsr_incremental`,
   `tsr_transpile`, `tsr_tsc`, `tsr_build`, `tsr_execute`.
-- `tsr_lsproto` is newly added by Phase 5; check its registry availability and ownership before publishing.
+- `tsr_ls`, `tsr_lsp` and `tsr_lsproto` are newly added by Phase 5; check its registry availability and ownership before publishing.
 - Not part of this release, left at their `0.0.0` placeholders: `jscout`,
   `typescout`, `tsr_collections`.
 
@@ -106,6 +106,8 @@ cargo publish -p tsr_tracing --locked          # new name
 cargo publish -p tsr_embed --locked
 cargo publish -p tsr_incremental --locked      # new name
 cargo publish -p tsr_project --locked
+cargo publish -p tsr_ls --locked               # Phase 5; verify availability first
+cargo publish -p tsr_lsp --locked              # Phase 5; verify availability first
 cargo publish -p tsr_transpile --locked        # new name
 cargo publish -p tsr_api --locked
 cargo publish -p tsr_tsc --locked              # new name

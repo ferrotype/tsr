@@ -68,6 +68,30 @@ fn text(snapshot: &Snapshot, file: &str) -> Vec<u8> {
         .to_vec()
 }
 
+#[test]
+fn insensitive_project_keys_preserve_config_and_directory_spelling() {
+    let (_, session) = setup(
+        &[
+            (
+                "/Mixed/Project/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true}}"#,
+            ),
+            ("/Mixed/Project/main.ts", "const value = 1;"),
+        ],
+        &Counters::new(),
+    );
+    let snapshot = open(&session, "/Mixed/Project/main.ts", "const value = 1;");
+    let project = snapshot
+        .project_by_path(b"/mixed/project/tsconfig.json")
+        .unwrap()
+        .data()
+        .unwrap();
+    assert_eq!(project.path.as_bytes(), b"/mixed/project/tsconfig.json");
+    assert_eq!(project.name.as_bytes(), b"/Mixed/Project/tsconfig.json");
+    assert_eq!(project.current_directory.as_bytes(), b"/Mixed/Project");
+    session.close();
+}
+
 // Pinned TestSnapshot and TestProjectProgramUpdateKind: edits clone one program,
 // unrelated projects keep exact identity, and older hosts are frozen only once.
 #[test]

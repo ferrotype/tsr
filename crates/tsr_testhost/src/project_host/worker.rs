@@ -14,6 +14,7 @@ use tsr_vfs::FileSystem;
 pub(super) enum Action {
     Initialize {
         options: SessionOptions,
+        progress_delay: std::time::Duration,
         compiler: CompilerOptions,
         host: Arc<dyn FileSystem>,
     },
@@ -22,11 +23,19 @@ pub(super) enum Action {
         method: String,
         params: Option<tsr_json::RawValue>,
     },
+    Protocol {
+        message: tsr_lsproto::Message,
+        context: tsr_ipc::Context,
+    },
     State,
     Reset,
 }
 pub(super) struct Worker {
     server: Option<Server>,
+    runtime: Option<tsr_lsp::runtime::Runtime>,
+    lsp_options: Option<tsr_lsp::runtime::Options>,
+    client: Option<Arc<tsr_lsp::rpc_client::RpcClient>>,
+    context: tsr_ipc::Context,
     cache: Arc<ParseCache>,
     mapped_cache: Arc<ContentMappedParseCache>,
     counters: Counters,
@@ -40,6 +49,10 @@ impl Worker {
     pub(super) fn new() -> Self {
         Self {
             server: None,
+            runtime: None,
+            lsp_options: None,
+            client: None,
+            context: tsr_ipc::Context::background().with_cancel(),
             cache: Arc::new(ParseCache::new(RefCountCacheOptions {
                 disable_deletion: true,
             })),
@@ -50,6 +63,21 @@ impl Worker {
             projection: Projection::default(),
             notification_error: None,
         }
+    }
+    pub(super) fn with_client(
+        client: Arc<tsr_lsp::rpc_client::RpcClient>,
+        context: tsr_ipc::Context,
+    ) -> Self {
+        let mut worker = Self::new();
+        worker.client = Some(client);
+        worker.context = context;
+        worker
+    }
+    fn active_server(&self) -> Option<&Server> {
+        self.runtime
+            .as_ref()
+            .and_then(tsr_lsp::runtime::Runtime::server)
+            .or(self.server.as_ref())
     }
     pub(super) fn run(
         &mut self,
@@ -66,12 +94,21 @@ impl Worker {
         match action {
             Action::Initialize {
                 options,
+                progress_delay,
                 compiler,
                 host,
             } => {
                 if self.server.is_some() {
                     return Err("project session already initialized".into());
                 }
+                let mut lsp_options = tsr_lsp::runtime::Options::new(options.clone(), host.clone());
+                lsp_options.parse_cache = Some(self.cache.clone());
+                lsp_options.mapped_parse_cache = Some(self.mapped_cache.clone());
+                lsp_options.inferred_options = Some(compiler.clone());
+                // The private client owns its filesystem; never watch host disk.
+                lsp_options.native_watch = false;
+                lsp_options.progress_delay = progress_delay;
+                self.lsp_options = Some(lsp_options);
                 let session = Session::with_caches(
                     options,
                     host,
@@ -86,12 +123,21 @@ impl Worker {
                 Ok(raw(&()))
             }
             Action::Options(options) => {
-                self.server
-                    .as_ref()
-                    .ok_or("project session is not initialized")?
-                    .session()
-                    .apply_inferred_options(options, request_host)
-                    .map_err(|e| e.to_string())?;
+                if let Some(initial) = &mut self.lsp_options {
+                    initial.inferred_options = Some(options.clone());
+                }
+                if let Some(runtime) = &mut self.runtime {
+                    runtime
+                        .set_inferred_options(options, request_host)
+                        .map_err(|e| e.message)?;
+                } else {
+                    self.server
+                        .as_ref()
+                        .ok_or("project session is not initialized")?
+                        .session()
+                        .apply_inferred_options(options, request_host)
+                        .map_err(|e| e.to_string())?;
+                }
                 Ok(raw(&()))
             }
             Action::Notification { method, params } => {
@@ -106,10 +152,86 @@ impl Worker {
                 }
                 result.map(|()| raw(&()))
             }
+            Action::Protocol { message, context } => {
+                use tsr_lsp::runtime::{Dispatch, Runtime};
+                let client = self
+                    .client
+                    .as_ref()
+                    .ok_or("LSP client is not installed")?
+                    .clone();
+                if self.runtime.is_none() {
+                    if message.method != "initialize" {
+                        return Err("LSP is not initialized".into());
+                    }
+                    // L1-only project probes do not send initialize. An ordinary
+                    // client starts its session with negotiated options instead.
+                    if let Some(server) = &self.server {
+                        if !server
+                            .session()
+                            .snapshot()
+                            .map_err(|e| e.to_string())?
+                            .filesystem()
+                            .unwrap()
+                            .overlays()
+                            .is_empty()
+                        {
+                            return Err("LSP initialize must precede document actions".into());
+                        }
+                    }
+                    if let Some(server) = self.server.take() {
+                        server.close();
+                    }
+                    self.runtime = Some(Runtime::new(
+                        self.lsp_options
+                            .take()
+                            .ok_or("private project options missing")?,
+                        self.context.clone(),
+                        client.clone(),
+                        Box::new(std::io::sink()),
+                    ));
+                }
+                let runtime = self.runtime.as_mut().unwrap();
+                let result =
+                    runtime
+                        .prepare(&context, &message, request_host)
+                        .and_then(|dispatch| match dispatch {
+                            Dispatch::Ready(value) => Ok(value),
+                            Dispatch::Work(work) => work(),
+                            Dispatch::Exit => {
+                                runtime.close();
+                                Ok(tsr_json::RawValue(b"null".to_vec()))
+                            }
+                        });
+                let result = if context.err().is_some() {
+                    Err(tsr_lsproto::ResponseError {
+                        code: -32800,
+                        message: "request cancelled".into(),
+                        data: None,
+                    })
+                } else {
+                    result
+                };
+                if let Some(id) = message.id {
+                    // The router retires the in-flight ID before publishing
+                    // this response, so immediate ID reuse cannot race its
+                    // completion event.
+                    let response = tsr_lsp::rpc_client::RpcClient::encode_reply(id, result)
+                        .map_err(|e| e.message)?;
+                    return serde_json::value::RawValue::from_string(
+                        String::from_utf8(response.0).map_err(|e| e.to_string())?,
+                    )
+                    .map_err(|e| e.to_string());
+                } else if let Err(error) = result {
+                    runtime
+                        .logger()
+                        .send(tsr_lsproto::MessageType::ERROR, error.message.clone());
+                    return Err(error.message);
+                }
+                Ok(raw(&()))
+            }
             Action::State => {
                 let snapshot = self
-                    .server
-                    .as_ref()
+                    .active_server()
                     .ok_or("project session is not initialized")?
                     .snapshot(request_host)
                     .map_err(|e| e.message)?;
@@ -119,6 +241,10 @@ impl Worker {
         }
     }
     fn reset(&mut self) {
+        if let Some(mut runtime) = self.runtime.take() {
+            runtime.close();
+        }
+        self.lsp_options = None;
         if let Some(server) = self.server.take() {
             server.close();
         }
@@ -155,6 +281,7 @@ mod tests {
         worker
             .run(
                 Action::Initialize {
+                    progress_delay: std::time::Duration::ZERO,
                     options: SessionOptions {
                         position_encoding: encoding,
                         ..Default::default()

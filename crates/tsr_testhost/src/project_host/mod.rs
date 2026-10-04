@@ -44,11 +44,17 @@ enum Completion {
     Notification,
     Options(crate::OptionsToken),
     Reset(Id),
+    Protocol {
+        id: Option<Id>,
+        exit: bool,
+        initialized: bool,
+    },
 }
 struct Pending {
     id: Option<Id>,
     cancel: Arc<CancelCalls>,
     completion: Completion,
+    context: Option<tsr_ipc::Context>,
 }
 
 /// Send incoming frames here; the reader can block independently of the router.
@@ -77,14 +83,52 @@ pub struct Connection {
     resetting: bool,
     shutdown: bool,
     closed: bool,
+    lsp_client: Arc<tsr_lsp::rpc_client::RpcClient>,
+    context: tsr_ipc::Context,
+    lsp_started: bool,
 }
 impl Connection {
     pub fn new(output: mpsc::Sender<Json>) -> (Self, InputSender) {
         let (sender, events) = mpsc::channel();
         let input = InputSender(sender.clone());
         let (tasks, receive) = mpsc::sync_channel::<Task>(65);
+        let context = tsr_ipc::Context::background().with_cancel();
+        let output_clone = output.clone();
+        let lsp_client = tsr_lsp::rpc_client::RpcClient::new(
+            context.clone(),
+            Arc::new(move |value| {
+                let value = serde_json::value::RawValue::from_string(
+                    String::from_utf8(value.0).map_err(|e| tsr_lsproto::ResponseError {
+                        code: -32603,
+                        message: e.to_string(),
+                        data: None,
+                    })?,
+                )
+                .map_err(|e| tsr_lsproto::ResponseError {
+                    code: -32603,
+                    message: e.to_string(),
+                    data: None,
+                })?;
+                if !protocol::fits(&value) {
+                    return Err(tsr_lsproto::ResponseError {
+                        code: -32001,
+                        message: "LSP response exceeds frame limit".into(),
+                        data: None,
+                    });
+                }
+                output_clone
+                    .send(value)
+                    .map_err(|e| tsr_lsproto::ResponseError {
+                        code: -32603,
+                        message: e.to_string(),
+                        data: None,
+                    })
+            }),
+        );
+        let worker_client = lsp_client.clone();
+        let worker_context = context.clone();
         let worker = thread::spawn(move || {
-            let mut worker = Worker::new();
+            let mut worker = Worker::with_client(worker_client, worker_context);
             while let Ok(task) = receive.recv() {
                 let resetting = matches!(task.action, Action::Reset);
                 let outcome = if task.cancel.is_canceled() && !resetting {
@@ -120,6 +164,9 @@ impl Connection {
                 resetting: false,
                 shutdown: false,
                 closed: false,
+                lsp_client,
+                context,
+                lsp_started: false,
             },
             input,
         )
@@ -181,6 +228,13 @@ impl Connection {
         }
         let method = method.as_deref();
         if method.is_none() {
+            if matches!(&id, Some(Id::String(value)) if value.starts_with("ts")) {
+                let mut response = tsr_lsproto::Message::default();
+                tsr_json::unmarshal(bytes, &mut response, tsr_json::Options::default())
+                    .map_err(protocol::invalid)?;
+                self.lsp_client.receive(&response);
+                return Ok(());
+            }
             // Validate the response with the existing S11 decoder, even when it
             // belongs to a project worker or is a late, retired response.
             let owned = matches!(&id,Some(Id::String(id)) if self.session.has_callback(id));
@@ -215,6 +269,9 @@ impl Connection {
                 .filter(|p| p.id.as_ref() == Some(&cancel.id))
             {
                 pending.cancel.cancel();
+                if let Some(context) = &pending.context {
+                    context.cancel();
+                }
             }
             for response in self.session.receive(&message)? {
                 self.send(response)?;
@@ -281,6 +338,9 @@ impl Connection {
             };
             for pending in self.pending.values() {
                 pending.cancel.cancel();
+                if let Some(context) = &pending.context {
+                    context.cancel();
+                }
             }
             bridge.retire();
             let (fs, cancel) = bridge.filesystem();
@@ -309,7 +369,7 @@ impl Connection {
             let project = fields.remove("project").ok_or_else(|| {
                 protocol::invalid("version 3 initialization requires project options")
             })?;
-            let options = match ProjectOptions::parse(project) {
+            let (options, progress_delay) = match ProjectOptions::parse(project) {
                 Ok(value) => value,
                 Err(message) => return self.send(protocol::failure(&id, -32602, &message, None)),
             };
@@ -351,6 +411,7 @@ impl Connection {
                 return self.enqueue(
                     Action::Initialize {
                         options,
+                        progress_delay,
                         compiler,
                         host: Arc::new(base),
                     },
@@ -402,6 +463,41 @@ impl Connection {
                 );
             }
             return Ok(());
+        }
+        if method.is_some_and(|method| {
+            method == "initialize"
+                || self.lsp_started
+                    && !method.starts_with("test/")
+                    && !method.starts_with("testhost/")
+        }) {
+            if !self.initialized {
+                return Err(protocol::invalid(
+                    "LSP requires the private initialization barrier",
+                ));
+            }
+            let mut request = tsr_lsproto::Message::default();
+            tsr_json::unmarshal(bytes, &mut request, tsr_json::Options::default())
+                .map_err(protocol::invalid)?;
+            if request.method == "initialize" {
+                self.lsp_started = true;
+            }
+            let context = self.context.with_cancel();
+            let (fs, cancel) = self.bridge.as_ref().unwrap().filesystem();
+            let completion = Completion::Protocol {
+                id: id.clone(),
+                exit: request.method == "exit",
+                initialized: request.method == "initialized",
+            };
+            return self.enqueue(
+                Action::Protocol {
+                    message: request,
+                    context,
+                },
+                Arc::new(fs),
+                Arc::new(cancel),
+                id,
+                completion,
+            );
         }
         if method == Some("test/projectState")
             || method.is_some_and(|m| {
@@ -471,6 +567,10 @@ impl Connection {
             .sequence
             .checked_add(1)
             .ok_or_else(|| protocol::invalid("project request identity exhausted"))?;
+        let context = match &action {
+            Action::Protocol { context, .. } => Some(context.clone()),
+            _ => None,
+        };
         self.tasks
             .as_ref()
             .unwrap()
@@ -487,6 +587,7 @@ impl Connection {
                 id,
                 cancel,
                 completion,
+                context,
             },
         );
         Ok(())
@@ -497,7 +598,41 @@ impl Connection {
             .remove(&sequence)
             .ok_or_else(|| protocol::invalid("unknown project completion"))?;
         let resetting = matches!(pending.completion, Completion::Reset(_));
+        if let Some(context) = &pending.context {
+            context.cancel();
+        }
         match pending.completion {
+            Completion::Protocol {
+                id,
+                exit,
+                initialized,
+            } => {
+                if exit {
+                    self.closed = true;
+                }
+                if let Some(id) = id {
+                    let response = match outcome {
+                        Ok(response) => response,
+                        Err(error) => protocol::failure(
+                            &id,
+                            if pending.cancel.is_canceled() {
+                                -32800
+                            } else {
+                                -32603
+                            },
+                            &error,
+                            None,
+                        ),
+                    };
+                    self.send(response)?;
+                } else if initialized && outcome.is_ok() {
+                    // Publish InitComplete only after retiring this action,
+                    // so an immediate test/setOptions sees an idle router.
+                    self.send(
+                        wire!({"jsonrpc":"2.0","method":"testhost/lspInitialized","params":{}}),
+                    )?;
+                }
+            }
             Completion::Options(token) => {
                 let success = outcome.is_ok();
                 for message in self.session.complete_options(token, outcome.map(|_| ()))? {
@@ -534,6 +669,7 @@ impl Connection {
                     self.session.reset();
                     self.bridge.take();
                     self.initialized = false;
+                    self.lsp_started = false;
                     self.resetting = false;
                     self.closed = self.shutdown;
                 }
@@ -571,6 +707,7 @@ impl Connection {
 }
 impl Drop for Connection {
     fn drop(&mut self) {
+        self.context.cancel();
         if let Some(bridge) = &self.bridge {
             bridge.retire();
         }
@@ -592,26 +729,31 @@ struct ProjectOptions {
     position_encoding: String,
     #[serde(default)]
     run_external_code: bool,
+    #[serde(default)]
+    progress_delay_nanos: i64,
 }
 impl ProjectOptions {
-    fn parse(raw: &RawValue) -> Result<SessionOptions, String> {
+    fn parse(raw: &RawValue) -> Result<(SessionOptions, std::time::Duration), String> {
         let value: Self = serde_json::from_str(raw.get()).map_err(|e| e.to_string())?;
         let encoding = match value.position_encoding.as_str() {
             "utf-8" => tsr_jsstring::PositionEncoding::Utf8,
             "utf-16" => tsr_jsstring::PositionEncoding::Utf16,
             _ => return Err("unsupported project position encoding".into()),
         };
-        Ok(SessionOptions {
-            current_directory: tsr_jsstring::JsString::from_bytes(
-                value.current_directory.as_bytes(),
-            ),
-            default_library_path: tsr_jsstring::JsString::from_bytes(
-                value.default_library_path.as_bytes(),
-            ),
-            position_encoding: encoding,
-            run_external_code: value.run_external_code,
-            ..Default::default()
-        })
+        Ok((
+            SessionOptions {
+                current_directory: tsr_jsstring::JsString::from_bytes(
+                    value.current_directory.as_bytes(),
+                ),
+                default_library_path: tsr_jsstring::JsString::from_bytes(
+                    value.default_library_path.as_bytes(),
+                ),
+                position_encoding: encoding,
+                run_external_code: value.run_external_code,
+                ..Default::default()
+            },
+            std::time::Duration::from_nanos(value.progress_delay_nanos.max(0) as u64),
+        ))
     }
 }
 fn compiler_options(value: &RawValue) -> Result<tsr_core::CompilerOptions, String> {

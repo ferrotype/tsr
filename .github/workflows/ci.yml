@@ -265,7 +265,7 @@ jobs:
         run: rustup show active-toolchain || rustup toolchain install
       - uses: Swatinem/rust-cache@v2
       - name: Native crate tests
-        run: cargo test -p tsr_fswatch -p tsrust -p tsr_execute -p tsr_build -p tsr_tsc --all-features --locked
+        run: cargo test -p tsr_fswatch -p tsr_lsp -p tsrust -p tsr_execute -p tsr_build -p tsr_tsc --all-features --locked
       - name: Build the tsc runner
         run: cargo build --release --locked -p phase4_tsctests --bin phase4_tsctests
       - name: Run the tsc suite

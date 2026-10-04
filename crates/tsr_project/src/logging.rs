@@ -17,8 +17,13 @@ struct Inner {
     output: Mutex<Output>,
     timestamp: Timestamp,
 }
+pub trait LogSink: Send + Sync {
+    fn log(&self, message: &str);
+    fn set_verbose(&self, value: bool);
+    fn is_verbose(&self) -> bool;
+}
 #[derive(Clone, Default)]
-pub struct Logger(Option<Arc<Inner>>);
+pub struct Logger(Option<Arc<dyn LogSink>>);
 impl Logger {
     // port: tsc/internal/project/logging/logger.go:NewLogger
     pub fn new(writer: impl Write + Send + 'static, timestamp: Timestamp) -> Self {
@@ -34,25 +39,26 @@ impl Logger {
     pub fn nop() -> Self {
         Self::default()
     }
+    /// An LSP session routes project logs through its connection logger, so
+    /// changes in client verbosity take effect without replacing the session.
+    pub fn from_sink(sink: Arc<dyn LogSink>) -> Self {
+        Self(Some(sink))
+    }
     // port: tsc/internal/project/logging/logger.go:logger.Logf
     pub fn log(&self, message: fmt::Arguments<'_>) {
         if let Some(inner) = &self.0 {
-            let timestamp = (inner.timestamp)();
-            // Like the pin, logging must not fail the operation on a bad sink.
-            let _ = writeln!(inner.output.lock().unwrap().writer, "{timestamp} {message}");
+            inner.log(&message.to_string());
         }
     }
     // port: tsc/internal/project/logging/logger.go:logger.SetVerbose
     pub fn set_verbose(&self, value: bool) {
         if let Some(inner) = &self.0 {
-            inner.output.lock().unwrap().verbose = value;
+            inner.set_verbose(value);
         }
     }
     // port: tsc/internal/project/logging/logger.go:logger.IsVerbose
     pub fn is_verbose(&self) -> bool {
-        self.0
-            .as_ref()
-            .is_some_and(|inner| inner.output.lock().unwrap().verbose)
+        self.0.as_ref().is_some_and(|inner| inner.is_verbose())
     }
     // port: tsc/internal/project/logging/logger.go:logger.Verbose
     #[must_use]
@@ -62,6 +68,19 @@ impl Logger {
         } else {
             Self::nop()
         }
+    }
+}
+impl LogSink for Inner {
+    fn log(&self, message: &str) {
+        let timestamp = (self.timestamp)();
+        // Like the pin, logging must not fail the operation on a bad sink.
+        let _ = writeln!(self.output.lock().unwrap().writer, "{timestamp} {message}");
+    }
+    fn set_verbose(&self, value: bool) {
+        self.output.lock().unwrap().verbose = value;
+    }
+    fn is_verbose(&self) -> bool {
+        self.output.lock().unwrap().verbose
     }
 }
 

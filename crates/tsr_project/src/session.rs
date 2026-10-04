@@ -41,6 +41,21 @@ pub struct SessionOptions {
     pub debounce_delay: std::time::Duration,
     pub logger: crate::logging::Logger,
 }
+
+/// Publication and loading events for the server. Sending is nonblocking and
+/// invokes no client code under the session's update lock. The receiver owns
+/// delivery; snapshots retain all files used to format the notifications.
+pub enum SessionEvent {
+    ProjectLoading {
+        name: JsString,
+        finished: bool,
+    },
+    Published {
+        previous: Snapshot,
+        current: Snapshot,
+    },
+    Closed,
+}
 impl Default for SessionOptions {
     fn default() -> Self {
         Self {
@@ -110,6 +125,7 @@ pub struct Session {
     update: Mutex<()>,
     pending: Mutex<Pending>,
     watches: OnceLock<Arc<crate::watch::WatchManager>>,
+    events: OnceLock<std::sync::mpsc::Sender<SessionEvent>>,
     timers: timers::Timers,
 }
 static NEXT_SNAPSHOT: AtomicU64 = AtomicU64::new(1);
@@ -199,6 +215,7 @@ impl Session {
             update: Mutex::new(()),
             pending: Mutex::default(),
             watches: OnceLock::new(),
+            events: OnceLock::new(),
         })
     }
     // port: tsc/internal/project/session.go:Session.Snapshot
@@ -208,6 +225,19 @@ impl Session {
             .expect("session snapshot")
             .clone()
             .ok_or(Error::Closed)
+    }
+    pub fn subscribe(&self) -> std::sync::mpsc::Receiver<SessionEvent> {
+        let (send, receive) = std::sync::mpsc::channel();
+        assert!(
+            self.events.set(send).is_ok(),
+            "session already has an event subscriber"
+        );
+        receive
+    }
+    fn send_event(&self, event: SessionEvent) {
+        if let Some(events) = self.events.get() {
+            let _ = events.send(event);
+        }
     }
     #[must_use]
     pub fn with_watch_client(
@@ -542,6 +572,12 @@ impl Session {
         if let Some(watches) = self.watches.get() {
             watches.enqueue(old.watches(), next.state().unwrap().watches());
         }
+        if self.events.get().is_some() {
+            self.send_event(SessionEvent::Published {
+                previous,
+                current: next.clone(),
+            });
+        }
         Ok(next)
     }
     // port: tsc/internal/project/session.go:Session.Close
@@ -566,6 +602,7 @@ impl Session {
         if let Some(watches) = self.watches.get() {
             watches.close();
         }
+        self.send_event(SessionEvent::Closed);
     }
 }
 impl Drop for Session {

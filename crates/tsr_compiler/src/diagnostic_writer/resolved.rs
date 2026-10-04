@@ -128,7 +128,7 @@ impl DiagnosticWriter<'_> {
     }
     /// A message as `Diagnostic.Localize` shows it: a name a content mapper
     /// aliases reads in its original spelling (`displayMessageArgs`).
-    fn localized(&self, d: &Diagnostic) -> Result<Vec<u8>> {
+    pub fn localized(&self, d: &Diagnostic) -> Result<Vec<u8>> {
         let args = match d.file {
             Some(id) => {
                 let source = self.source(id)?;

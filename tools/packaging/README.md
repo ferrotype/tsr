@@ -145,15 +145,16 @@ goes last:
 35. `tsr_embed`
 36. `tsr_incremental`
 37. `tsr_project`
-38. `tsr_lsp`
-39. `tsr_transpile`
-40. `tsr_api`
-41. `tsr_tsc`
-42. `tsr_wasm`
-43. `tsr_build`
-44. `tsr_execute`
-45. `tsrust`
-46. `tsr`
+38. `tsr_ls`
+39. `tsr_lsp`
+40. `tsr_transpile`
+41. `tsr_api`
+42. `tsr_tsc`
+43. `tsr_wasm`
+44. `tsr_build`
+45. `tsr_execute`
+46. `tsrust`
+47. `tsr`
 
 ## Package policy
 
@@ -191,6 +192,7 @@ goes last:
 | `tsr_jsnum` | Prepared | Rust library and its public dependency closure |
 | `tsr_json` | Prepared | Rust library and its public dependency closure |
 | `tsr_jsonrpc` | Prepared | Rust library and its public dependency closure |
+| `tsr_ls` | Prepared | Production language service conversions and queries for Phase 5 |
 | `tsr_lsp` | Prepared | Production language server library for Phase 5 |
 | `tsr_lsproto` | Prepared | Pinned LSP protocol library for Phase 5 |
 | `tsr_jsstring` | Prepared | Rust library and its public dependency closure |

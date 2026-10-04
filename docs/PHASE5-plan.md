@@ -543,6 +543,34 @@ endpoint, but the eight-state project adapter is not that complete harness.
 **Exit:** assigned server/unit tests pass; the endpoint dispatches into the
 real session, and remaining protocol failures name their missing feature.
 
+#### L2 implementation record (2026-10-04)
+
+The native `tsrust --lsp --stdio` entry and version-3 private endpoint now use
+the same production runtime and real project session. Input/reverse replies
+remain independent of request preparation; diagnostic workers retain snapshots
+and honor cancellation. Initialization negotiates encoding/capabilities,
+exchanges configuration, registers watches, and connects progress, logging,
+recovery and diagnostic publication. Native watcher fallback uses the Phase 4
+backend on hosts with fast recursive watching. Shutdown, exit and the parent
+watchdog are connected.
+
+`tsr_ls` owns coordinate/diagnostic conversion, including canonical and
+supplemental projections, mapped diagnostic ranges, tags, localization and
+style severities. Pull diagnostics collect all four compiler phases and
+aggregate diagnostics in synthesized mapper code. Project-info retains config
+spelling independently of case-insensitive cache keys.
+
+[The L2 test record](../tools/phase5/lsp/README.md) maps the direct tests and
+documents the two small cross-runtime checks. Four unchanged pinned Go client
+tests and an additional options/document-sync contract pass against both
+implementations. Full initialize, diagnostic, project-info, incremental edit,
+configuration and shutdown responses match Go through both Rust entry points
+in UTF-8 and UTF-16. These checks are not fourslash/`lsp.json` acceptance credit.
+L3–L6 service handlers, mapper execution and ATA still refuse their named
+features; the full L0 fourslash supervisor/transport patch remains outstanding.
+Native pprof remains the recorded Phase 7 boundary. Telemetry uses the pinned
+sanitizer's unknown-frame rule, so Rust backtraces are redacted on the wire.
+
 ### L3 — read-only features
 
 Implement hover/quick info and symbol display (`hover.go`, `hovericon.go`,
