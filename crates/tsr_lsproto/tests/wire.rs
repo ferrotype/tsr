@@ -66,7 +66,48 @@ fn pinned_codec_matrix() {
         assert_eq!(json!(observed), expected[name], "{name}");
         count += observed.len();
     }
-    assert_eq!(count, 101);
+    assert_eq!(count, 107);
+}
+
+#[test]
+fn parameter_error_responses_match_the_pinned_server() {
+    let cases: Value = serde_json::from_str(include_str!(
+        "../../../tools/phase5/lsproto/params-cases.json"
+    ))
+    .unwrap();
+    let expected: Value = serde_json::from_str(include_str!(
+        "../../../tools/phase5/lsproto/params-expected.json"
+    ))
+    .unwrap();
+    fn response<T: Decode + Default + 'static>(raw: Option<&tsr_json::RawValue>) -> Value {
+        let message = match unmarshal_params::<T>(raw) {
+            Ok(_) => Message {
+                id: Some(Id::int(7)),
+                result: Some(tsr_json::RawValue(b"null".to_vec())),
+                ..Default::default()
+            },
+            Err(error) => Message {
+                id: Some(Id::int(7)),
+                error: Some(error),
+                ..Default::default()
+            },
+        };
+        serde_json::from_slice(&tsr_json::marshal(&message, Options::default()).unwrap()).unwrap()
+    }
+    for case in cases.as_array().unwrap() {
+        let raw = case["params"]
+            .as_str()
+            .map(|s| tsr_json::RawValue(s.as_bytes().to_vec()));
+        let actual = match case["type"].as_str().unwrap() {
+            "NoParams" => response::<NoParams>(raw.as_ref()),
+            "InitializedParams" => response::<InitializedParams>(raw.as_ref()),
+            "InitializeParams" => response::<InitializeParams>(raw.as_ref()),
+            "HoverParams" => response::<HoverParams>(raw.as_ref()),
+            other => panic!("unknown parameter type {other}"),
+        };
+        let name = case["name"].as_str().unwrap();
+        assert_eq!(actual, expected[name], "{name}");
+    }
 }
 
 fn decode<T: Decode + Default>(json: &str) -> T {
