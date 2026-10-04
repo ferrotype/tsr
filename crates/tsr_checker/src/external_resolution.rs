@@ -275,6 +275,27 @@ impl CheckerState {
         })
     }
 
+    pub(crate) fn implicit_import_symbol(
+        &mut self,
+        source: NodeId,
+        name: JsString,
+    ) -> Result<Option<SymbolId>, Error> {
+        let (_, file_name) = self.module_source(source)?;
+        let mode = self
+            .program()?
+            .host
+            .get_import_helpers_resolution_mode(file_name.as_bytes())?;
+        self.resolve_external_module_reference(ExternalModuleReference {
+            location: source,
+            module_reference: name,
+            error_node: None,
+            message: None,
+            augmentation: false,
+            mode,
+            attributes: None,
+        })
+    }
+
     // port: tsc/internal/checker/checker.go:Checker.resolveExternalModule
     fn resolve_external_module_reference(
         &mut self,

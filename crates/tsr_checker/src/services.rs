@@ -1830,6 +1830,18 @@ impl Operation<'_> {
             .transpose()
     }
 
+    /// Non-reporting resolution of the program's implicit JSX/helper imports.
+    pub fn implicit_import_symbol(
+        &mut self,
+        source: NodeId,
+        name: &[u8],
+    ) -> Result<Option<SymbolRef>, Error> {
+        let symbol = self
+            .state_mut()
+            .implicit_import_symbol(source, JsString::from_bytes(name))?;
+        self.optional_symbol(symbol)
+    }
+
     // port: tsc/internal/checker/services.go:Checker.SkipAlias
     pub fn skip_alias(&mut self, symbol: SymbolRef) -> Result<SymbolRef, Error> {
         let id = self.check_symbol_ref(symbol)?;

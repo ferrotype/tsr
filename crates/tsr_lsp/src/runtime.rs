@@ -64,6 +64,7 @@ struct Settings {
     maximum_hover_length: usize,
     inlay: tsr_ls::InlayHintsOptions,
     inlay_flags: [Option<bool>; 7],
+    code_lens: tsr_ls::CodeLensOptions,
 }
 impl Default for Settings {
     fn default() -> Self {
@@ -77,6 +78,7 @@ impl Default for Settings {
             maximum_hover_length: 500,
             inlay: tsr_ls::InlayHintsOptions::default(),
             inlay_flags: [None; 7],
+            code_lens: tsr_ls::CodeLensOptions::default(),
         }
     }
 }
@@ -431,6 +433,13 @@ impl Runtime {
                 let options = crate::language_features::Options {
                     maximum_hover_length: settings.maximum_hover_length,
                     inlay: settings.inlay,
+                    code_lens: settings.code_lens,
+                    lens_command: self
+                        .initialization
+                        .code_lens_show_locations_command_name
+                        .as_deref()
+                        .cloned(),
+                    locale: settings.locale,
                 };
                 let encoding = self.options.project.position_encoding;
                 let request_id = request
@@ -447,7 +456,7 @@ impl Runtime {
                         feature,
                         encoding,
                         &capabilities,
-                        options,
+                        &options,
                     )
                 })));
             }
@@ -759,6 +768,7 @@ impl Runtime {
                         .into_iter()
                         .flatten()
                     {
+                        apply_lens_preferences(raw, true, &mut next.code_lens);
                         apply_inlay_preferences(raw, true, &mut next.inlay, &mut next.inlay_flags);
                         set_bool(raw.get("validateEnabled"), &mut next.validation);
                         if let Some(lsp::Any::Number(length)) = raw.get("maximumHoverLength") {
@@ -780,6 +790,7 @@ impl Runtime {
                             next.config_name.clone_from(name);
                         }
                     }
+                    apply_lens_preferences(fields, false, &mut next.code_lens);
                     apply_inlay_preferences(fields, false, &mut next.inlay, &mut next.inlay_flags);
                     set_bool(
                         nested(fields, "validate.enabled")
@@ -841,6 +852,23 @@ impl Runtime {
             if let Err(e) = self
                 .client
                 .request_without_waiting("workspace/inlayHint/refresh", RawValue(b"null".to_vec()))
+            {
+                self.logger.send(lsp::MessageType::ERROR, e.message);
+            }
+        }
+        if next.code_lens != before.code_lens
+            && self
+                .capabilities
+                .workspace
+                .as_deref()
+                .and_then(|w| w.code_lens.as_deref())
+                .and_then(|c| c.refresh_support.as_deref())
+                .copied()
+                .unwrap_or(false)
+        {
+            if let Err(e) = self
+                .client
+                .request_without_waiting("workspace/codeLens/refresh", RawValue(b"null".to_vec()))
             {
                 self.logger.send(lsp::MessageType::ERROR, e.message);
             }
@@ -1141,4 +1169,46 @@ fn unimplemented_method(method: &str) -> bool {
             | "custom/initializeAPISession"
             | "custom/setContentMapperContributions"
     )
+}
+
+fn apply_lens_preferences(
+    fields: &HashMap<String, lsp::Any>,
+    raw: bool,
+    options: &mut tsr_ls::CodeLensOptions,
+) {
+    for (name, path, target) in [
+        (
+            "referencesCodeLensEnabled",
+            "referencesCodeLens.enabled",
+            &mut options.references,
+        ),
+        (
+            "implementationsCodeLensEnabled",
+            "implementationsCodeLens.enabled",
+            &mut options.implementations,
+        ),
+        (
+            "referencesCodeLensShowOnAllFunctions",
+            "referencesCodeLens.showOnAllFunctions",
+            &mut options.all_functions,
+        ),
+        (
+            "implementationsCodeLensShowOnInterfaceMethods",
+            "implementationsCodeLens.showOnInterfaceMethods",
+            &mut options.interface_methods,
+        ),
+        (
+            "implementationsCodeLensShowOnAllClassMethods",
+            "implementationsCodeLens.showOnAllClassMethods",
+            &mut options.all_class_methods,
+        ),
+    ] {
+        if let Some(lsp::Any::Boolean(value)) = if raw {
+            fields.get(name)
+        } else {
+            nested(fields, path)
+        } {
+            *target = Some(*value);
+        }
+    }
 }

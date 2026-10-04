@@ -5,6 +5,40 @@ use tsr_core::ResolutionMode;
 use tsr_module::{ResolvedModule, ResolvedTypeReferenceDirective};
 
 impl Program {
+    /// Implicit side-effect imports have no local bindings. Navigation uses
+    /// the same eligibility and names as the loader, in the pin's JSX/helpers
+    /// order, without publishing synthetic nodes into the parsed source.
+    pub fn implicit_imports(
+        &self,
+        file: &ProgramFile,
+    ) -> Result<Vec<tsr_jsstring::JsString>, Error> {
+        use tsr_core::ScriptKind;
+        let view = file.bound().view().ast();
+        let source = view.source_file(file.source())?;
+        let options =
+            self.options_for_file(source.parse_options().path.as_bytes(), source.file_name());
+        let mut result = Vec::new();
+        if matches!(
+            source.script_kind,
+            ScriptKind::JS | ScriptKind::JSX | ScriptKind::TSX
+        ) {
+            let runtime = metadata::jsx_runtime_import(
+                metadata::jsx_implicit_import_base(view, file.source(), options)?.as_bytes(),
+                options,
+            );
+            if !runtime.is_empty() {
+                result.push(runtime);
+            }
+        }
+        if options.import_helpers.is_true()
+            && (matches!(source.script_kind, ScriptKind::JS | ScriptKind::JSX)
+                || !source.is_declaration_file
+                    && (options.isolated_modules() || source.external_module_indicator.is_some()))
+        {
+            result.push(tsr_jsstring::JsString::from_bytes(b"tslib".as_slice()));
+        }
+        Ok(result)
+    }
     pub fn source_file_from_reference(
         &self,
         origin: &ProgramFile,

@@ -12,6 +12,16 @@ pub fn handles(method: &str) -> bool {
             | "textDocument/hover"
             | "textDocument/signatureHelp"
             | "textDocument/inlayHint"
+            | "textDocument/codeLens"
+            | "codeLens/resolve"
+            | "textDocument/prepareCallHierarchy"
+            | "callHierarchy/incomingCalls"
+            | "callHierarchy/outgoingCalls"
+            | "textDocument/documentHighlight"
+            | "custom/textDocument/multiDocumentHighlight"
+            | "textDocument/references"
+            | "textDocument/_vs_references"
+            | "textDocument/implementation"
             | "textDocument/selectionRange"
             | "textDocument/foldingRange"
             | "textDocument/semanticTokens/full"
@@ -25,6 +35,16 @@ pub enum Request {
     Hover(lsp::HoverParams),
     SignatureHelp(lsp::SignatureHelpParams),
     InlayHints(lsp::InlayHintParams),
+    CodeLenses(lsp::CodeLensParams),
+    ResolveLens(lsp::CodeLens),
+    CallPrepare(lsp::CallHierarchyPrepareParams),
+    CallIncoming(Box<lsp::CallHierarchyItem>),
+    CallOutgoing(Box<lsp::CallHierarchyItem>),
+    Highlights(lsp::DocumentHighlightParams),
+    MultiHighlights(lsp::MultiDocumentHighlightParams),
+    References(lsp::ReferenceParams),
+    VSReferences(lsp::ReferenceParams),
+    Implementation(lsp::ImplementationParams),
     Linked(lsp::LinkedEditingRangeParams),
     Selection(lsp::SelectionRangeParams),
     Folding(lsp::FoldingRangeParams),
@@ -37,6 +57,45 @@ pub enum Request {
 impl Request {
     pub fn decode(method: &str, params: Option<&RawValue>) -> Result<Self, lsp::ResponseError> {
         Ok(match method {
+            "textDocument/codeLens" => Self::CodeLenses(crate::decode(params)?),
+            "codeLens/resolve" => {
+                let lens: lsp::CodeLens = crate::decode(params)?;
+                if lens.data.is_none() {
+                    return Err(crate::coded_error(
+                        lsp::ErrorCode::INVALID_PARAMS,
+                        Some("missing code lens data"),
+                    ));
+                }
+                Self::ResolveLens(lens)
+            }
+            "textDocument/prepareCallHierarchy" => Self::CallPrepare(crate::decode(params)?),
+            "callHierarchy/incomingCalls" => Self::CallIncoming(
+                crate::decode::<lsp::CallHierarchyIncomingCallsParams>(params)?
+                    .item
+                    .ok_or_else(|| {
+                        crate::coded_error(
+                            lsp::ErrorCode::INVALID_PARAMS,
+                            Some("missing call hierarchy item"),
+                        )
+                    })?,
+            ),
+            "callHierarchy/outgoingCalls" => Self::CallOutgoing(
+                crate::decode::<lsp::CallHierarchyOutgoingCallsParams>(params)?
+                    .item
+                    .ok_or_else(|| {
+                        crate::coded_error(
+                            lsp::ErrorCode::INVALID_PARAMS,
+                            Some("missing call hierarchy item"),
+                        )
+                    })?,
+            ),
+            "textDocument/documentHighlight" => Self::Highlights(crate::decode(params)?),
+            "custom/textDocument/multiDocumentHighlight" => {
+                Self::MultiHighlights(crate::decode(params)?)
+            }
+            "textDocument/references" => Self::References(crate::decode(params)?),
+            "textDocument/_vs_references" => Self::VSReferences(crate::decode(params)?),
+            "textDocument/implementation" => Self::Implementation(crate::decode(params)?),
             "textDocument/inlayHint" => Self::InlayHints(crate::decode(params)?),
             "textDocument/signatureHelp" => Self::SignatureHelp(crate::decode(params)?),
             "textDocument/hover" => Self::Hover(crate::decode(params)?),
@@ -55,13 +114,26 @@ impl Request {
     pub fn unknown_script_fallback(&self) -> bool {
         matches!(
             self,
-            Self::Hover(_) | Self::SignatureHelp(_) | Self::Definition(_) | Self::TypeDefinition(_)
+            Self::Hover(_)
+                | Self::SignatureHelp(_)
+                | Self::Definition(_)
+                | Self::TypeDefinition(_)
+                | Self::References(_)
+                | Self::Implementation(_)
         )
     }
     pub fn uri(&self) -> &lsp::DocumentUri {
         match self {
             Self::SignatureHelp(p) => &p.text_document.uri,
             Self::InlayHints(p) => &p.text_document.uri,
+            Self::CodeLenses(p) => &p.text_document.uri,
+            Self::ResolveLens(p) => &p.data.as_ref().expect("validated code lens data").uri,
+            Self::CallPrepare(p) => &p.text_document.uri,
+            Self::CallIncoming(p) | Self::CallOutgoing(p) => &p.uri,
+            Self::Highlights(p) => &p.text_document.uri,
+            Self::MultiHighlights(p) => &p.text_document.uri,
+            Self::References(p) | Self::VSReferences(p) => &p.text_document.uri,
+            Self::Implementation(p) => &p.text_document.uri,
             Self::Hover(p) => &p.text_document.uri,
             Self::Linked(p) => &p.text_document.uri,
             Self::Selection(p) => &p.text_document.uri,
@@ -80,10 +152,13 @@ fn service_error(e: tsr_ls::Error) -> lsp::ResponseError {
         e => error(-32603, e.to_string()),
     }
 }
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct Options {
     pub maximum_hover_length: usize,
     pub inlay: tsr_ls::InlayHintsOptions,
+    pub code_lens: tsr_ls::CodeLensOptions,
+    pub lens_command: Option<String>,
+    pub locale: tsr_locale::Locale,
 }
 pub fn execute(
     context: &Context,
@@ -92,7 +167,7 @@ pub fn execute(
     request: Request,
     encoding: tsr_jsstring::PositionEncoding,
     capabilities: &lsp::ClientCapabilities,
-    options: Options,
+    options: &Options,
 ) -> Result<RawValue, lsp::ResponseError> {
     if context.err().is_some() {
         return Err(crate::canceled());
@@ -124,6 +199,15 @@ pub fn execute(
         Request::Hover(_)
             | Request::SignatureHelp(_)
             | Request::InlayHints(_)
+            | Request::ResolveLens(_)
+            | Request::CallPrepare(_)
+            | Request::CallIncoming(_)
+            | Request::CallOutgoing(_)
+            | Request::Highlights(_)
+            | Request::MultiHighlights(_)
+            | Request::References(_)
+            | Request::VSReferences(_)
+            | Request::Implementation(_)
             | Request::Semantic(_)
             | Request::SemanticRange(_)
             | Request::Definition(_)
@@ -215,6 +299,95 @@ pub fn execute(
                     .map_err(service_error)?,
             );
         }
+        if let Request::ResolveLens(lens) = &request {
+            return client::raw(
+                &service
+                    .resolve_code_lens(
+                        &mut operation,
+                        lens.clone(),
+                        options.lens_command.as_deref(),
+                        &options.locale,
+                    )
+                    .map_err(service_error)?,
+            );
+        }
+        if let Request::CallPrepare(params) = &request {
+            return client::raw(
+                &service
+                    .prepare_call_hierarchy(&mut operation, params)
+                    .map_err(service_error)?,
+            );
+        }
+        if let Request::CallIncoming(params) = &request {
+            return client::raw(
+                &service
+                    .incoming_calls(&mut operation, params)
+                    .map_err(service_error)?,
+            );
+        }
+        if let Request::CallOutgoing(params) = &request {
+            return client::raw(
+                &service
+                    .outgoing_calls(&mut operation, params)
+                    .map_err(service_error)?,
+            );
+        }
+        if let Request::Highlights(params) = &request {
+            return client::raw(
+                &service
+                    .document_highlights(&mut operation, params)
+                    .map_err(service_error)?,
+            );
+        }
+        if let Request::MultiHighlights(params) = &request {
+            return client::raw(
+                &service
+                    .multi_document_highlights(&mut operation, params)
+                    .map_err(service_error)?,
+            );
+        }
+        if let Request::VSReferences(params) = &request {
+            let classified = capabilities
+                .vs_supports_visual_studio_extensions
+                .as_deref()
+                .copied()
+                .unwrap_or(false);
+            return client::raw(
+                &service
+                    .vs_references(
+                        &mut operation,
+                        params,
+                        &String::from_utf8_lossy(
+                            project
+                                .data()
+                                .ok_or_else(|| error(-32603, "project has no data"))?
+                                .path
+                                .as_bytes(),
+                        ),
+                        classified,
+                    )
+                    .map_err(service_error)?,
+            );
+        }
+        if let Request::References(params) = &request {
+            return client::raw(
+                &service
+                    .references(&mut operation, params)
+                    .map_err(service_error)?,
+            );
+        }
+        if let Request::Implementation(params) = &request {
+            let links = text_caps
+                .and_then(|c| c.implementation.as_deref())
+                .and_then(|c| c.link_support.as_deref())
+                .copied()
+                .unwrap_or(false);
+            return client::raw(
+                &service
+                    .implementations(&mut operation, params, links)
+                    .map_err(service_error)?,
+            );
+        }
         let definition = match &request {
             Request::Definition(p) => Some((
                 &p.position,
@@ -260,6 +433,11 @@ pub fn execute(
         );
     }
     match request {
+        Request::CodeLenses(p) => client::raw(
+            &service
+                .code_lenses(&p, options.code_lens)
+                .map_err(service_error)?,
+        ),
         Request::Linked(p) => client::raw(&service.linked_editing(&p).map_err(service_error)?),
         Request::Selection(p) => client::raw(&service.selection_ranges(&p).map_err(service_error)?),
         Request::Folding(p) => {
@@ -287,6 +465,15 @@ pub fn execute(
         Request::Hover(_)
         | Request::SignatureHelp(_)
         | Request::InlayHints(_)
+        | Request::ResolveLens(_)
+        | Request::CallPrepare(_)
+        | Request::CallIncoming(_)
+        | Request::CallOutgoing(_)
+        | Request::Highlights(_)
+        | Request::MultiHighlights(_)
+        | Request::References(_)
+        | Request::VSReferences(_)
+        | Request::Implementation(_)
         | Request::Semantic(_)
         | Request::SemanticRange(_)
         | Request::Definition(_)

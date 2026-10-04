@@ -13,6 +13,7 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
+tsr_diagnostics = { version = "0.2.0", path = "../tsr_diagnostics" }
 stacker = "=0.1.25"
 tsr_arena = { version = "0.2.0", path = "../tsr_arena" }
 tsr_ast = { version = "0.2.0", path = "../tsr_ast" }
@@ -33,6 +34,5 @@ tsr_tspath = { version = "0.2.0", path = "../tsr_tspath" }
 workspace = true
 
 [dev-dependencies]
-tsr_diagnostics = { version = "0.2.0", path = "../tsr_diagnostics" }
 tsr_tsoptions = { version = "0.2.0", path = "../tsr_tsoptions" }
 tsr_vfs = { version = "0.2.0", path = "../tsr_vfs" }

@@ -1,14 +1,26 @@
 //! Language service operations over a retained compiler snapshot.
+mod call_declarations;
+mod call_hierarchy;
+mod call_sites;
+mod code_lens;
 pub mod converters;
 mod definition;
 mod display_parts;
 mod documentation;
 mod folding;
+mod highlights;
 mod hover;
 mod hover_display;
+mod import_tracker;
 mod inlay_hints;
 mod inlay_parts;
 mod meaning;
+mod reference_helpers;
+mod reference_special;
+mod references;
+mod vs_references;
+pub use code_lens::CodeLensOptions;
+mod highlight_syntax;
 pub use inlay_hints::{InlayHintsOptions, ParameterNameHints, QuotePreference};
 pub mod symbol_display;
 pub use hover::HoverOptions;

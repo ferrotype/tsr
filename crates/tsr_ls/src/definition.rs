@@ -597,7 +597,11 @@ impl LanguageService<'_> {
         Ok(links)
     }
     // port: tsc/internal/ls/utilities.go:getReferenceAtPosition
-    fn reference_at(&self, syntax: &mut Syntax<'_>, position: i64) -> Result<Option<Vec<u8>>> {
+    pub(crate) fn reference_at(
+        &self,
+        syntax: &mut Syntax<'_>,
+        position: i64,
+    ) -> Result<Option<Vec<u8>>> {
         let file = self
             .program
             .file_of_node(syntax.source)
@@ -902,7 +906,7 @@ impl LanguageService<'_> {
     }
 }
 // port: tsc/internal/ls/definition.go:lspRangeContains
-fn range_contains(outer: &lsp::Range, inner: &lsp::Range) -> bool {
+pub(crate) fn range_contains(outer: &lsp::Range, inner: &lsp::Range) -> bool {
     (outer.start.line, outer.start.character) <= (inner.start.line, inner.start.character)
         && (inner.end.line, inner.end.character) <= (outer.end.line, outer.end.character)
 }

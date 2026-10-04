@@ -379,3 +379,73 @@ fn inlay_parameter_name_links_to_its_declaration() {
     );
     assert_eq!(hint.padding_right.as_deref(), Some(&true));
 }
+
+// source: tsc/internal/ls/findallreferences_test.go:TestImplementationsWorklistDoesNotBlowUp
+#[test]
+fn implementations_retain_only_distinct_worklist_entries() {
+    let measure = |count: usize| {
+        let mut text = String::from("interface I { m(): void; }\n");
+        for i in 0..count {
+            use std::fmt::Write;
+            writeln!(text, "const a{i}: I = {{ m() {{}} }};").unwrap();
+        }
+        text.push_str("declare const i: I;\ni.m();\n");
+        let program = Arc::new(program(b"/index.ts", text.as_bytes()));
+        let pool =
+            tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+        let source = program.source_file(b"/index.ts").unwrap().source();
+        let mut checker = pool.checker_for_file_exclusive(source).unwrap();
+        let mut service = LanguageService::new(
+            &program,
+            tsr_jsstring::PositionEncoding::Utf16,
+            CancellationToken::new(),
+        );
+        let pos = (text.rfind("i.m").unwrap() + 2) as i64;
+        let node = syntax::Syntax::new(service.view(source).unwrap(), source)
+            .unwrap()
+            .nav()
+            .get_touching_property_name(pos)
+            .unwrap();
+        // Inspect retained internal entries, before LSP deduplication, as the
+        // native regression does. The queue only receives these unique nodes;
+        // this port does not retain an additional SymbolsAndEntries group list.
+        let entries = service
+            .implementation_entries(&mut checker, node, pos)
+            .unwrap();
+        let unique: std::collections::HashSet<_> =
+            entries.iter().map(|entry| entry.node.unwrap()).collect();
+        assert_eq!(unique.len(), entries.len());
+        assert!(entries.len() >= count);
+        entries.len()
+    };
+    let small = measure(40);
+    let large = measure(80);
+    assert!(
+        large <= small * 3,
+        "retained entries grew from {small} to {large}"
+    );
+}
+
+#[test]
+fn semantic_reference_search_observes_cancellation() {
+    let program = Arc::new(program(b"/index.ts", b"const value = 1; value;"));
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let source = program.source_file(b"/index.ts").unwrap().source();
+    let mut checker = pool.checker_for_file_exclusive(source).unwrap();
+    let cancellation = CancellationToken::new();
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        cancellation.clone(),
+    );
+    cancellation.cancel();
+    let node = syntax::Syntax::new(service.view(source).unwrap(), source)
+        .unwrap()
+        .nav()
+        .get_touching_property_name(6)
+        .unwrap();
+    assert!(matches!(
+        service.implementation_entries(&mut checker, node, 6),
+        Err(Error::Canceled)
+    ));
+}
