@@ -376,6 +376,7 @@ impl LanguageService<'_> {
             fix,
             &tsr_autoimport::edits::Options {
                 format: &options.format,
+                locale: &options.locale,
                 usage,
                 semicolons,
                 single_quote: quote,

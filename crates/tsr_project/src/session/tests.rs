@@ -1006,3 +1006,68 @@ fn consumed_config_preference_does_not_block_clean_program_inclusion_reuse() {
         js("/src/tsconfig.json")
     );
 }
+
+#[test]
+fn auto_import_watches_cover_open_projects_with_one_unescaped_directory_set() {
+    struct Client;
+    impl crate::watch::WatchClient for Client {
+        fn watch_files(
+            &self,
+            _: &tsr_ipc::Context,
+            _: &JsString,
+            _: &crate::watch::Watcher,
+        ) -> Result<(), String> {
+            Ok(())
+        }
+        fn unwatch_files(&self, _: &tsr_ipc::Context, _: &JsString) -> Result<(), String> {
+            Ok(())
+        }
+    }
+    let (_, session) = setup(
+        &[
+            (
+                "/a[one]/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true},"files":["main.ts"]}"#,
+            ),
+            ("/a[one]/main.ts", ""),
+            (
+                "/a[one]/node_modules/unused/index.d.ts",
+                "export const value: number;",
+            ),
+            (
+                "/b/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true},"files":["main.ts"]}"#,
+            ),
+            ("/b/main.ts", ""),
+            (
+                "/b/node_modules/unused/index.d.ts",
+                "export const other: number;",
+            ),
+        ],
+        &Counters::new(),
+    );
+    let session = session.with_watch_client(Arc::new(Client));
+    open(&session, "/a[one]/main.ts", "");
+    open(&session, "/b/main.ts", "");
+    let patterns = || {
+        let watches = session.auto_import_watches.lock().unwrap();
+        assert_eq!(watches.len(), 1);
+        let watchers = watches.get(b"auto-import".as_slice()).unwrap().watchers();
+        assert!(watchers.id.as_bytes().starts_with(b"auto-import watcher "));
+        watchers
+            .iter()
+            .map(|w| (w.pattern.clone(), w.kind))
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(
+        patterns(),
+        vec![
+            (js("/a[one]/node_modules/**/*"), 7),
+            (js("/b/node_modules/**/*"), 7)
+        ]
+    );
+    session.did_close_file(uri("/a[one]/main.ts")).unwrap();
+    session.snapshot_for_file(&uri("/b/main.ts")).unwrap();
+    assert_eq!(patterns(), vec![(js("/b/node_modules/**/*"), 7)]);
+    session.close();
+}

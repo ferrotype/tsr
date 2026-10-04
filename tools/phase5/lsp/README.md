@@ -198,3 +198,20 @@ pending for L7. These development comparisons and direct tests confer no
 `status/parity/lsp.json` corpus credit. Native pprof is Phase 7. Rust backtraces
 follow the sanitizer's unknown-frame policy and are empty in telemetry; local
 error logs retain the diagnostic backtrace.
+
+
+L4 review regressions can be run separately from the larger development matrix:
+
+```sh
+python3 tools/phase5/lsp/completions.py --review
+python3 tools/phase5/lsp/completions.py --config-replacement
+```
+
+The first compares string-index completion context, French import descriptions,
+full node_modules watcher payloads across two projects, and package invalidation.
+The second reports matching config-only responses separately from the
+owner-approved combined config/create difference: Rust replaces removed roots,
+while the pinned Go registry retains its old export bucket. It checks the entire
+response against the corresponding control and keeps raw outputs under
+`target/phase5/l4-config-replacement`; it does not count the exception as parity.
+The approval and its precise scope are in `docs/PHASE5-L4.md`.

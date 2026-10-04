@@ -23,7 +23,9 @@ tsr_binder = { version = "0.2.0", path = "../tsr_binder" }
 tsr_checker = { version = "0.2.0", path = "../tsr_checker" }
 tsr_compiler = { version = "0.2.0", path = "../tsr_compiler" }
 tsr_core = { version = "0.2.0", path = "../tsr_core" }
+tsr_diagnostics = { version = "0.2.0", path = "../tsr_diagnostics" }
 tsr_jsstring = { version = "0.2.0", path = "../tsr_jsstring" }
+tsr_locale = { version = "0.2.0", path = "../tsr_locale" }
 tsr_lsproto = { version = "0.2.0", path = "../tsr_lsproto" }
 tsr_module = { version = "0.2.0", path = "../tsr_module" }
 tsr_parser = { version = "0.2.0", path = "../tsr_parser" }

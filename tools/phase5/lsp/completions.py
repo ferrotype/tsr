@@ -15,6 +15,9 @@ from read_only import position
 
 CASES = [
     '/*😀*/ const alpha = 1; let beta = "b"; function call(p: number) { const local = p; /*cursor*/ }',
+    'declare const item: {[key: string]: number; known: number}; item./*cursor*/',
+    'declare const item: {[key: string]: number}; item./*cursor*/',
+    'interface Promise<T> {then(onfulfilled: (value: T) => unknown): Promise<unknown>} declare const item: Promise<{[key: string]: number; known: number}>; async function f() { item./*cursor*/ }',
     'const item = { alpha: 1, beta: "b", method(x: number) {} }; item./*cursor*/',
     'interface Item { required: string; optional?: number; method(): void } declare const item: Item; item.op/*cursor*/tional',
     'interface Item { "not an id": number; normal: string } declare const item: Item; item./*cursor*/',
@@ -219,10 +222,10 @@ class ConfiguredPeer(Peer):
             super().respond(value)
 
 
-def run(binary, root, encoding, rich, cases=CASES, filename="main.ts", auto_insert=False, config=None):
+def run(binary, root, encoding, rich, cases=CASES, filename="main.ts", auto_insert=False, config=None, locale=None):
     peer = ConfiguredPeer([str(binary), '--lsp', '--stdio'], root, config)
     try:
-        peer.request('initialize', {'processId': None, 'rootUri': root.as_uri(), 'capabilities': {
+        peer.request('initialize', {'processId': None, 'rootUri': root.as_uri(), **({'locale': locale} if locale else {}), 'capabilities': {
             'general': {'positionEncodings': [encoding]},
             'textDocument': {'completion': {'completionItem': {
                 'snippetSupport': rich, 'commitCharactersSupport': rich,
@@ -412,7 +415,7 @@ def package_fixture(root):
     (store / 'node_modules' / 'shared').symlink_to(shared, target_is_directory=True)
     (root / 'node_modules' / 'symlinked').symlink_to(store, target_is_directory=True)
 
-def run_invalidation(binary, root, encoding, config_replacement=False):
+def run_invalidation(binary, root, encoding, config_replacement=False, notify_creation=True):
     root.mkdir(exist_ok=True)
     (root / 'tsconfig.json').write_text('{"compilerOptions":{"noLib":true},"files":["main.ts","dep.ts"]}')
     (root / 'main.ts').write_text('Cha')
@@ -451,14 +454,14 @@ def run_invalidation(binary, root, encoding, config_replacement=False):
         query({'ChangedDisk'})
         (root / 'tsconfig.json').write_text('{"compilerOptions":{"noLib":true},"files":["main.ts"]}')
         peer.send('workspace/didChangeWatchedFiles', {'changes': [{'uri': (root / 'tsconfig.json').as_uri(), 'type': 2}]})
-        # Native retains its project bucket on removal alone. The additional
-        # replacement sequence is an explicit, unresolved L6 integration probe.
+        # Native retains its project bucket on removal alone. A subsequent
+        # create+config batch also retains it (the approved native cache bug).
         query({'ChangedDisk'})
         if config_replacement:
             (root / 'extra.ts').write_text('export const ChangedExtra = 4;')
             (root / 'tsconfig.json').write_text('{"compilerOptions":{"noLib":true},"files":["main.ts","extra.ts"]}')
             peer.send('workspace/didChangeWatchedFiles', {'changes': [
-                {'uri': (root / 'extra.ts').as_uri(), 'type': 1},
+                *([{'uri': (root / 'extra.ts').as_uri(), 'type': 1}] if notify_creation else []),
                 {'uri': (root / 'tsconfig.json').as_uri(), 'type': 2},
             ]})
             query(None)
@@ -496,6 +499,7 @@ def run_package_invalidation(binary, root, encoding):
         peer.drain(0.05)
         # Verify that a real editor can send the next event: do not merely
         # inject a change for a path the server never subscribed to.
+        rows.append(['auto-import-watches', auto_import_watches(peer)])
         patterns = [w['globPattern'] for group in peer.watchers.values() for w in group]
         assert any(isinstance(p, str) and fnmatch.fnmatchcase(str(dep / 'index.d.ts'), p) for p in patterns), patterns
         (dep / 'index.d.ts').write_text('export declare const ChangedAfter: number;')
@@ -517,22 +521,97 @@ def run_package_invalidation(binary, root, encoding):
         peer.close()
 
 
+
+def auto_import_watches(peer):
+    # Numeric ids are session-local. The registry retains an old registration
+    # when its glob is unchanged; one logical watcher can span numeric ids.
+    groups = [key for key in peer.watchers if key.startswith('auto-import')]
+    assert all(key.startswith('auto-import watcher ') for key in groups), groups
+    watches = [watch for key, group in peer.watchers.items() if key.startswith('auto-import') for watch in group]
+    return sorted(watches, key=lambda w: w['globPattern'])
+
+
+def run_auto_import_watches(binary, root, encoding):
+    root.mkdir(exist_ok=True)
+    for directory in ['a[one]', 'b']:
+        project = root / directory
+        (project / 'node_modules/unused').mkdir(parents=True, exist_ok=True)
+        (project / 'tsconfig.json').write_text('{"compilerOptions":{"noLib":true},"files":["main.ts"]}')
+        (project / 'main.ts').write_text('')
+        (project / 'node_modules/unused/index.d.ts').write_text('export const value: number;')
+    peer = ConfiguredPeer([str(binary), '--lsp', '--stdio'], root, {})
+    rows = []
+    def snapshot(name):
+        peer.request('custom/projectInfo', {'textDocument': {'uri': (root / name / 'main.ts').as_uri()}})
+        peer.drain(0.1)
+        rows.append(auto_import_watches(peer))
+    try:
+        peer.request('initialize', {'processId': None, 'rootUri': root.as_uri(), 'capabilities': {
+            'general': {'positionEncodings': [encoding]},
+            'workspace': {'configuration': True, 'didChangeWatchedFiles': {'dynamicRegistration': True}}}})
+        peer.send('initialized', {})
+        for directory in ['a[one]', 'b']:
+            peer.send('textDocument/didOpen', {'textDocument': {'uri': (root / directory / 'main.ts').as_uri(), 'languageId': 'typescript', 'version': 1, 'text': ''}})
+            snapshot(directory)
+        peer.send('textDocument/didClose', {'textDocument': {'uri': (root / 'a[one]/main.ts').as_uri()}})
+        snapshot('b')
+        assert [len(row) for row in rows] == [1, 2, 1], rows
+        peer.request('shutdown'); peer.send('exit')
+        return rows
+    finally:
+        peer.close()
+
+
+LOCALIZED_IMPORT_CASES = ['met/*cursor*/', 'import { alpha } from "./dep"; met/*cursor*/', 'import * as dep from "./dep"; met/*cursor*/']
+
+
+def review_regressions():
+    with tempfile.TemporaryDirectory(prefix='tsr-l4-review-') as directory:
+        root = Path(directory).resolve()
+        (root / 'tsconfig.json').write_text('{"compilerOptions":{"noLib":true},"files":["main.ts","dep.ts"]}')
+        (root / 'main.ts').write_text('')
+        (root / 'dep.ts').write_text('export const alpha=1; export function method(){}')
+        for encoding in ['utf-8', 'utf-16']:
+            for rich in [False, True]:
+                cases = CASES[1:4] + LOCALIZED_IMPORT_CASES
+                expected = run(ROOT / 'target/phase5/go-lsp', root, encoding, rich, cases, locale='fr')
+                actual = run(ROOT / 'target/debug/tsrust', root, encoding, rich, cases, locale='fr')
+                assert expected == actual, '\n'.join(difflib.unified_diff(json.dumps(expected, indent=2).splitlines(), json.dumps(actual, indent=2).splitlines()))
+                print(f'{len(actual)} index-signature/French completion responses match ({encoding}, rich={rich})', flush=True)
+            for probe, name in [(run_auto_import_watches, 'watches'), (run_package_invalidation, 'package-invalidation')]:
+                expected = probe(ROOT / 'target/phase5/go-lsp', root / name, encoding)
+                actual = probe(ROOT / 'target/debug/tsrust', root / name, encoding)
+                assert expected == actual, (name, expected, actual)
+                print(f'{len(actual)} {name} responses match ({encoding})', flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config-replacement', action='store_true', help='Run the unresolved L6 root-replacement sequence; differences exit nonzero')
+    parser.add_argument('--config-replacement', action='store_true', help='Check the approved root-replacement difference and matching config-only control')
+    parser.add_argument('--review', action='store_true', help='Run the bounded L4 review regressions')
     args = parser.parse_args()
+    if args.review:
+        review_regressions()
+        return
     if args.config_replacement:
         with tempfile.TemporaryDirectory(prefix='tsr-l4-config-') as directory:
             root = Path(directory).resolve()
-            expected = run_invalidation(ROOT / 'target/phase5/go-lsp', root, 'utf-16', True)
-            actual = run_invalidation(ROOT / 'target/debug/tsrust', root, 'utf-16', True)
             output = ROOT / 'target/phase5/l4-config-replacement'
             output.mkdir(exist_ok=True)
-            for name, rows in [('Go', expected), ('Rust', actual)]:
-                (output / (name + '.json')).write_text(json.dumps(rows, indent=2, ensure_ascii=False))
-            if expected != actual:
-                raise SystemExit(f'L6 config replacement differs; full responses in {output}')
-            print('Config replacement responses match Go')
+            for encoding in ['utf-8', 'utf-16']:
+                go_control = run_invalidation(ROOT / 'target/phase5/go-lsp', root, encoding, True, False)
+                rust_control = run_invalidation(ROOT / 'target/debug/tsrust', root, encoding, True, False)
+                expected = run_invalidation(ROOT / 'target/phase5/go-lsp', root, encoding, True)
+                actual = run_invalidation(ROOT / 'target/debug/tsrust', root, encoding, True)
+                for name, rows in [('Go-control', go_control), ('Rust-control', rust_control), ('Go', expected), ('Rust', actual)]:
+                    (output / (name + '-' + encoding + '.json')).write_text(json.dumps(rows, indent=2, ensure_ascii=False))
+                assert go_control == rust_control, 'Config-only control differs'
+                assert expected[:-1] == actual[:-1] == go_control[:-1], 'An earlier action differs'
+                assert expected[-1][2] == expected[-2][2], 'Native no longer retains the old bucket; reconsider the exception'
+                assert actual[-1] == rust_control[-1], 'Rust combined-event result differs from the correct control'
+                assert {i['label'] for i in actual[-1][2]['items'] if i['label'].startswith('Changed')} == {'ChangedExtra'}
+                assert expected[-1] != actual[-1], 'The approved raw difference has changed'
+                print(f'Config-only: {len(go_control)} responses match; combined events: {len(expected)-1} match, 1 approved raw difference ({encoding})', flush=True)
         return
     with tempfile.TemporaryDirectory(prefix='tsr-l4-') as directory:
         root = Path(directory).resolve()
@@ -575,6 +654,10 @@ def main():
                 ]:
                     for binary, rows in [('go-lsp', expected), ('../debug/tsrust', actual)]:
                         rows.extend(run(ROOT / 'target/phase5' / binary, package_root, encoding, rich, ['Pkg/*cursor*/'], config={'preferences': preferences}))
+                expected.extend(run(ROOT / 'target/phase5/go-lsp', root, encoding, rich, LOCALIZED_IMPORT_CASES, locale='fr'))
+                actual.extend(run(ROOT / 'target/debug/tsrust', root, encoding, rich, LOCALIZED_IMPORT_CASES, locale='fr'))
+                expected.extend(run_auto_import_watches(ROOT / 'target/phase5/go-lsp', root / 'watches', encoding))
+                actual.extend(run_auto_import_watches(ROOT / 'target/debug/tsrust', root / 'watches', encoding))
                 expected.extend(run_invalidation(ROOT / 'target/phase5/go-lsp', root / 'invalidation', encoding))
                 actual.extend(run_invalidation(ROOT / 'target/debug/tsrust', root / 'invalidation', encoding))
                 expected.extend(run_package_invalidation(ROOT / 'target/phase5/go-lsp', root / 'package-invalidation', encoding))

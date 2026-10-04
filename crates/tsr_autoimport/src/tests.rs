@@ -77,6 +77,7 @@ fn batched_bindings_share_clause_promotion_and_keep_existing_aliases() {
             f.source(),
             &edits::Options {
                 format: &tsr_format::FormatCodeSettings::default(),
+                locale: &tsr_locale::DEFAULT,
                 single_quote: true,
                 semicolons: true,
                 prefer_type_only: false,
@@ -116,6 +117,7 @@ fn empty_bindings_and_default_imports_are_coalesced_once() {
                 f.source(),
                 &edits::Options {
                     format: &tsr_format::FormatCodeSettings::default(),
+                    locale: &tsr_locale::DEFAULT,
                     single_quote: true,
                     semicolons: true,
                     prefer_type_only: false,
@@ -260,6 +262,7 @@ fn import_edits_preserve_multiline_ranges_and_native_comment_behavior() {
             &fix("Value", lsp::AddAsTypeOnly::NOT_ALLOWED),
             &edits::Options {
                 format: &tsr_format::FormatCodeSettings::default(),
+                locale: &tsr_locale::DEFAULT,
                 single_quote: true,
                 semicolons: true,
                 prefer_type_only: false,
@@ -558,6 +561,7 @@ fn require_destructuring_uses_its_variable_declaration_and_applies_the_fix() {
         fix,
         &edits::Options {
             format: &tsr_format::FormatCodeSettings::default(),
+            locale: &tsr_locale::DEFAULT,
             single_quote: true,
             semicolons: true,
             prefer_type_only: false,
@@ -571,4 +575,58 @@ fn require_destructuring_uses_its_variable_declaration_and_applies_the_fix() {
         apply(text, edits),
         "const { alpha, method } = require('./dep'); method();"
     );
+}
+
+#[test]
+fn auto_import_descriptions_use_the_request_locale() {
+    let locale = tsr_locale::Locale::parse("fr").0;
+    for (source, kind, expected) in [
+        (
+            "method",
+            lsp::AutoImportFixKind::ADD_NEW,
+            "Ajouter l'importation de \"./dep\"",
+        ),
+        (
+            "import { alpha } from './dep'; method",
+            lsp::AutoImportFixKind::ADD_TO_EXISTING,
+            "Mettre à jour l’importation à partir de \"./dep\"",
+        ),
+        (
+            "import * as dep from './dep'; method",
+            lsp::AutoImportFixKind::USE_NAMESPACE,
+            "Changer 'method' en 'dep.method'",
+        ),
+        (
+            "method",
+            lsp::AutoImportFixKind::JSDOC_TYPE_IMPORT,
+            "Changer 'method' en 'import(\"./dep\").method'",
+        ),
+    ] {
+        let program = program(
+            source.as_bytes(),
+            b"export const alpha=1; export function method(){}",
+            &mut FileCache::new(),
+        );
+        let file = program.source_file(b"/main.ts").unwrap();
+        let mut fix = fix("method", lsp::AddAsTypeOnly::ALLOWED);
+        fix.kind = kind;
+        fix.namespace_prefix = "dep".into();
+        let (_, message) = edits::edits(
+            file.bound().view().ast(),
+            file.source(),
+            &fix,
+            &edits::Options {
+                format: &tsr_format::FormatCodeSettings::default(),
+                locale: &locale,
+                single_quote: false,
+                semicolons: true,
+                prefer_type_only: false,
+                verbatim: false,
+                newline: "\n",
+                usage: Some(source.rfind("method").unwrap() as i64),
+            },
+        )
+        .unwrap();
+        assert_eq!(message, expected);
+    }
 }
