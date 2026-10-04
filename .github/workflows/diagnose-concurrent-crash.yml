@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/diagnose-concurrent-crash.yml
       - scripts/diagnose_concurrent_crash.py
+      - crates/tsr_testrunner/**
 
 permissions:
   contents: read
@@ -13,11 +14,20 @@ permissions:
 
 jobs:
   reproduce:
+    name: ${{ matrix.kind }} failing shard
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        kind: [original, traced]
+    env:
+      CARGO_INCREMENTAL: 0
+      CARGO_PROFILE_RELEASE_DEBUG: 1
     steps:
       - uses: actions/checkout@v5
         with:
+          ref: 2f464bf525579d4faa141b466786d04ac04f462e
           submodules: true
           persist-credentials: false
       - uses: actions/download-artifact@v4
@@ -26,7 +36,24 @@ jobs:
           run-id: 37187571575
           github-token: ${{ github.token }}
           path: runner
-      - name: Preserve native crash state
+      - name: Apply phase traces to the original failing source
+        if: matrix.kind == 'traced'
+        run: |
+          git fetch --depth=1 origin "$GITHUB_SHA" 1ec148d488991b17228de343dcc01c1477559059
+          git diff 1ec148d488991b17228de343dcc01c1477559059 "$GITHUB_SHA" -- crates/tsr_testrunner | git apply
+          rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        if: matrix.kind == 'traced'
+        with:
+          key: crash-runner-symbols
+      - name: Build the traced executable with line tables
+        if: matrix.kind == 'traced'
+        run: |
+          cargo build --release --locked -p tsr_testrunner --bin tsr-testrunner
+          cp target/release/tsr-testrunner runner/tsr-testrunner
+      - name: Reproduce the original shard with core dumps enabled
+        env:
+          TSR_TESTRUNNER_TRACE_PHASES: 1
         run: |
           mkdir -p crash-output
           chmod +x runner/tsr-testrunner
@@ -36,7 +63,9 @@ jobs:
           fi
           sudo sysctl -w "kernel.core_pattern=$PWD/crash-output/core.%p"
           ulimit -c unlimited
-          python3 scripts/diagnose_concurrent_crash.py
+          runner/tsr-testrunner --suite compiler --mode concurrent run --id 'conformance/typeOfThisInStaticMembers11(target=esnext).ts' --local crash-output/probe-local > crash-output/probe.stdout 2> crash-output/probe.trace
+          python3 scripts/parity.py run compiler-concurrent --runner runner/tsr-testrunner --shard 2/4 --jobs 4 --output crash-output/shard
+          cp runner/tsr-testrunner crash-output/tsr-testrunner
       - name: Backtraces
         if: always()
         run: |
@@ -51,6 +80,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: concurrent-crash-diagnostics
+          name: concurrent-crash-${{ matrix.kind }}
           path: crash-output
           retention-days: 3

@@ -160,6 +160,7 @@ fn run(arguments: &Arguments, id: &str, local: &Path, testdata: &TestData) -> Re
 }
 
 fn main() -> ExitCode {
+    tsr_testrunner::trace_phase("process.start");
     let arguments = parse_arguments();
     let testdata = TestData::in_repository(&arguments.root);
     if !testdata.path().is_dir() {
@@ -200,6 +201,7 @@ fn main() -> ExitCode {
                 .map_err(|error| Stop::fatal(format!("stdout: {error}")))
         }),
     };
+    tsr_testrunner::trace_phase("process.result-written");
     match outcome {
         Ok(()) => ExitCode::SUCCESS,
         Err(stop) => {

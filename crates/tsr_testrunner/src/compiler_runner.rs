@@ -306,17 +306,30 @@ pub fn run_single_config_test(
     let id = prepared.variant.id();
     let planned = planned_subtests(&prepared);
     let panic_context = format!("Panic on compiler test {}", prepared.variant.file.display());
+    crate::trace_phase(&format!("variant.compile {id}"));
     let stopped = match catch_unwind(AssertUnwindSafe(|| compile(prepared, testdata, mode))) {
         Ok(Ok(test)) => {
+            crate::trace_phase("baseline.diagnostics");
             test.verify_diagnostics(roots, report);
+            crate::trace_phase("baseline.content-mapper");
             test.verify_content_mapper(roots, report);
+            crate::trace_phase("baseline.javascript-output");
             test.verify_javascript_output(roots, testdata, report);
+            crate::trace_phase("baseline.source-map-output");
             test.verify_source_map_output(roots, testdata, report);
+            crate::trace_phase("baseline.source-map-record");
             test.verify_source_map_record(roots, testdata, report);
+            crate::trace_phase("baseline.types-and-symbols");
             test.verify_types_and_symbols(roots, testdata, report);
+            crate::trace_phase("baseline.module-resolution");
             test.verify_module_resolution(roots, report);
+            crate::trace_phase("baseline.union-ordering");
             test.verify_union_ordering(report);
+            crate::trace_phase("baseline.parent-pointers");
             test.verify_parent_pointers(report);
+            crate::trace_phase("program.drop.begin");
+            drop(test);
+            crate::trace_phase("program.drop.end");
             return;
         }
         Ok(Err(stop)) => Outcome::from(stop),

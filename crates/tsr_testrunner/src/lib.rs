@@ -39,6 +39,27 @@ pub mod result;
 pub mod test_case_parser;
 pub mod transpile_runner;
 
+/// Opt-in phase breadcrumbs for native crashes that cannot unwind. They use
+/// stderr, leaving the suite's JSON result stream unchanged. An output error
+/// must not turn a diagnostic attempt into another panic.
+#[doc(hidden)]
+pub fn trace_phase(phase: &str) {
+    use std::io::Write;
+    use std::sync::OnceLock;
+    static ENABLED: OnceLock<bool> = OnceLock::new();
+    static STARTED: OnceLock<std::time::Instant> = OnceLock::new();
+    if *ENABLED.get_or_init(|| std::env::var_os("TSR_TESTRUNNER_TRACE_PHASES").is_some()) {
+        let elapsed = STARTED.get_or_init(std::time::Instant::now).elapsed();
+        let _ = writeln!(
+            std::io::stderr().lock(),
+            "tsr-phase pid={} thread={:?} elapsed_us={} {phase}",
+            std::process::id(),
+            std::thread::current().id(),
+            elapsed.as_micros(),
+        );
+    }
+}
+
 /// Posix-style path to sources under test (`compiler_runner.go:srcFolder`).
 pub const SRC_FOLDER: &[u8] = b"/.src";
 /// Posix-style path to additional test libraries (`harnessutil.go:testLibFolder`).

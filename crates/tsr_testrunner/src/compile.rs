@@ -605,19 +605,25 @@ fn compile_files_with_host(
 
     let mut pre_config = config.clone();
     pre_config.options.trace_resolution = Tristate::FALSE;
+    crate::trace_phase("pre.load.begin");
     let pre_program = host.create_program(pre_config, &mut cache, &counters)?;
+    crate::trace_phase("pre.diagnostics.begin");
     let pre_errors = harness_diagnostics(
         pre_program.program_like(),
         harness_options.capture_suggestions,
     )?;
 
+    crate::trace_phase("post.load.begin");
     let post_program = host.create_program(config.clone(), &mut cache, &counters)?;
+    crate::trace_phase("post.emit.begin");
     let (emit_result, recorded) = emit(&post_program)?;
+    crate::trace_phase("post.diagnostics.begin");
     let post_errors = harness_diagnostics(
         post_program.program_like(),
         harness_options.capture_suggestions,
     )?;
 
+    crate::trace_phase("diagnostics.settle.begin");
     let counts_match = pre_errors.len() == post_errors.len();
     let errors = settle_diagnostics(
         pre_errors,
@@ -629,7 +635,9 @@ fn compile_files_with_host(
     )
     .map_err(tsr_compiler::Error::from)?;
 
+    crate::trace_phase("program.facts.begin");
     let facts = ProgramFacts::new(post_program.program().clone())?;
+    crate::trace_phase("compile.complete");
     Ok(HostCompilation {
         program: post_program,
         facts,
@@ -651,17 +659,23 @@ pub fn harness_diagnostics(
 ) -> Result<Vec<Diagnostic>, tsr_compiler::Error> {
     let program = program_like.checked_program().program();
     let request = CheckerRequest::default();
+    crate::trace_phase("diagnostics.config-program-syntactic");
     let mut values = program_like.config_file_parsing_diagnostics();
     values.extend(program_like.program_diagnostics()?);
     values.extend(program_like.syntactic_diagnostics(&request, None)?);
+    crate::trace_phase("diagnostics.semantic");
     values.extend(program_like.semantic_diagnostics(&request, None)?);
+    crate::trace_phase("diagnostics.global");
     values.extend(program_like.global_diagnostics(&request)?);
     if program_like.options().emit_declarations() {
+        crate::trace_phase("diagnostics.declaration");
         values.extend(program_like.declaration_diagnostics(&request, None)?);
     }
     if capture_suggestions {
+        crate::trace_phase("diagnostics.suggestion");
         values.extend(program_like.suggestion_diagnostics(&request, None)?);
     }
+    crate::trace_phase("diagnostics.sort");
     program.sort_and_deduplicate_diagnostics(&values)
 }
 
