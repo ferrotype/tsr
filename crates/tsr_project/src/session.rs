@@ -36,6 +36,7 @@ pub struct SessionOptions {
     pub position_encoding: PositionEncoding,
     pub run_external_code: bool,
     pub query_checkers: usize,
+    pub relative_watch_patterns: bool,
 }
 impl Default for SessionOptions {
     fn default() -> Self {
@@ -45,6 +46,7 @@ impl Default for SessionOptions {
             position_encoding: PositionEncoding::Utf16,
             run_external_code: false,
             query_checkers: 3,
+            relative_watch_patterns: false,
         }
     }
 }
@@ -101,6 +103,7 @@ pub struct Session {
     snapshot: RwLock<Option<Snapshot>>,
     update: Mutex<()>,
     pending: Mutex<Pending>,
+    watches: Option<Arc<crate::watch::WatchManager>>,
 }
 static NEXT_SNAPSHOT: AtomicU64 = AtomicU64::new(1);
 fn next_snapshot_id() -> u64 {
@@ -152,6 +155,7 @@ impl Session {
             snapshot: RwLock::new(Some(Snapshot::from_session(state))),
             update: Mutex::new(()),
             pending: Mutex::default(),
+            watches: None,
         }
     }
     // port: tsc/internal/project/session.go:Session.Snapshot
@@ -161,6 +165,25 @@ impl Session {
             .expect("session snapshot")
             .clone()
             .ok_or(Error::Closed)
+    }
+    #[must_use]
+    pub fn with_watch_client(mut self, client: Arc<dyn crate::watch::WatchClient>) -> Self {
+        assert!(
+            self.snapshot().expect("open session").projects().is_empty(),
+            "install the watch client before opening projects"
+        );
+        self.watches = Some(crate::watch::WatchManager::new(client));
+        self
+    }
+    pub fn wait_for_background_tasks(&self) {
+        if let Some(watches) = &self.watches {
+            watches.wait();
+        }
+    }
+    pub fn take_watch_errors(&self) -> Vec<String> {
+        self.watches
+            .as_ref()
+            .map_or_else(Vec::new, |watches| watches.take_errors())
     }
     pub fn parse_cache(&self) -> &Arc<ParseCache> {
         &self.parse_cache
@@ -303,7 +326,8 @@ impl Session {
                 .unwrap_or_else(|| old.configs.custom_config_file_name.clone()),
             self.options.run_external_code,
             ownership.clone(),
-        );
+        )
+        .with_relative_patterns(self.options.relative_watch_patterns);
         let affected = configs.did_change_files(&changes)?;
         let inferred_options = pending
             .inferred
@@ -363,19 +387,50 @@ impl Session {
             config_ownership: ownership,
             _programs: programs,
         });
+        for (key, project) in &old.projects {
+            if next
+                .project_by_path(key.as_bytes())
+                .is_none_or(|next| !Arc::ptr_eq(project.pool(), next.pool()))
+            {
+                if let Some(scheduler) = project.scheduler() {
+                    scheduler.discard();
+                }
+            }
+        }
         *self.snapshot.write().expect("session snapshot") = Some(next.clone());
         transaction.pending = None;
+        if let Some(watches) = &self.watches {
+            watches.enqueue(old.watches(), next.state().unwrap().watches());
+        }
         Ok(next)
     }
     // port: tsc/internal/project/session.go:Session.Close
     pub fn close(&self) {
-        let _update = self
+        let update = self
             .update
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
         let snapshot = self.snapshot.write().expect("session snapshot").take();
+        if let Some(snapshot) = &snapshot {
+            for project in snapshot.projects() {
+                if let Some(scheduler) = project.scheduler() {
+                    scheduler.discard();
+                }
+            }
+        }
         *self.pending.lock().expect("session events") = Pending::default();
         drop(snapshot);
+        drop(update);
+        if let Some(watches) = &self.watches {
+            watches.close();
+        }
+    }
+}
+impl Drop for Session {
+    fn drop(&mut self) {
+        if let Some(watches) = &self.watches {
+            watches.stop();
+        }
     }
 }
 struct PendingTransaction<'a> {

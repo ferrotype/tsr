@@ -349,8 +349,32 @@ impl<'a> ProjectBuilder<'a> {
                 )
             };
         host.disable_tracking();
+        let watch = old.map_or_else(
+            || {
+                crate::watch::WatchedFiles::new(
+                    JsString::from_bytes(
+                        [b"program files for ".as_slice(), key.as_bytes()].concat(),
+                    ),
+                    crate::watch::ALL_CHANGES,
+                    self.session.options.relative_watch_patterns,
+                )
+            },
+            |old| old.program_files_watch.clone(),
+        );
+        let program_files_watch = if update_kind == ProgramUpdateKind::NewFiles {
+            watch.with_input(crate::watch::resolution_patterns(
+                &host.seen_files(),
+                self.session.options.current_directory.as_bytes(),
+                self.session.options.default_library_path.as_bytes(),
+                cwd.as_bytes(),
+                self.session.fs.use_case_sensitive_file_names(),
+            ))
+        } else {
+            watch
+        };
         let project = Project::from_program(
             ProjectData {
+                program_files_watch,
                 name: key.clone(),
                 path: key.clone(),
                 kind,

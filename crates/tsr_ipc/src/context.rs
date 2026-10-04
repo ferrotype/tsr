@@ -112,9 +112,21 @@ impl Context {
         self.0.deadline
     }
 
+    /// Whether this scope has a cancellation lifetime (`ctx.Done() != nil`).
+    /// Background contexts do not install per-request cleanup callbacks.
+    pub fn can_cancel(&self) -> bool {
+        self.0.parent.is_some()
+    }
+
     /// Cancels this context and its descendants, running their after-functions.
     pub fn cancel(&self) {
         self.cancel_with(ContextError::Canceled);
+    }
+
+    /// Ends a scope whose caller-owned timer expired. Project timers can use
+    /// a controllable clock while preserving the native deadline error.
+    pub fn expire(&self) {
+        self.cancel_with(ContextError::DeadlineExceeded);
     }
 
     /// Ends the context once, with the first reason it was done for: a

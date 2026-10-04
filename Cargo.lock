@@ -1282,6 +1282,7 @@ dependencies = [
  "tsr_checker",
  "tsr_compiler",
  "tsr_core",
+ "tsr_ipc",
  "tsr_jsstring",
  "tsr_lsproto",
  "tsr_tsoptions",

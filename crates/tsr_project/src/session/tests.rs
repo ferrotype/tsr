@@ -320,3 +320,66 @@ fn overlay_language_kind_reaches_the_production_parser() {
         ScriptKind::TS
     );
 }
+
+#[test]
+fn published_snapshots_drive_deduplicated_watches_without_holding_the_session_lock() {
+    use crate::watch::{WatchClient, Watcher};
+    use tsr_ipc::Context;
+    struct Client {
+        session: Mutex<std::sync::Weak<Session>>,
+        calls: Mutex<Vec<(JsString, JsString)>>,
+    }
+    impl WatchClient for Client {
+        fn watch_files(&self, _: &Context, id: &JsString, watcher: &Watcher) -> Result<(), String> {
+            let session = self.session.lock().unwrap().upgrade().unwrap();
+            let snapshot = session.snapshot().unwrap();
+            assert!(snapshot.project_for_file(b"/main.ts").is_some());
+            self.calls
+                .lock()
+                .unwrap()
+                .push((id.clone(), watcher.glob_string()));
+            Ok(())
+        }
+        fn unwatch_files(&self, _: &Context, _: &JsString) -> Result<(), String> {
+            Ok(())
+        }
+    }
+    let client = Arc::new(Client {
+        session: Mutex::default(),
+        calls: Mutex::default(),
+    });
+    let (_, session) = setup(
+        &[("/tsconfig.json", r#"{"compilerOptions":{"noLib":true}}"#)],
+        &Counters::new(),
+    );
+    let session = Arc::new(session.with_watch_client(client.clone()));
+    *client.session.lock().unwrap() = Arc::downgrade(&session);
+    let first = open(&session, "/main.ts", "export const x = 1;");
+    session.wait_for_background_tasks();
+    assert_eq!(
+        client.calls.lock().unwrap().len(),
+        1,
+        "root and program globs share a registration"
+    );
+    let first_watch = first
+        .project()
+        .data()
+        .unwrap()
+        .program_files_watch
+        .id()
+        .clone();
+    edit(&session, "/main.ts", "export const x = 2;");
+    let next = session.snapshot_for_file(&uri("/main.ts")).unwrap();
+    session.wait_for_background_tasks();
+    assert_eq!(
+        next.project().data().unwrap().program_files_watch.id(),
+        &first_watch
+    );
+    assert_eq!(
+        client.calls.lock().unwrap().len(),
+        1,
+        "a text edit must not register an unchanged watch again"
+    );
+    assert!(session.take_watch_errors().is_empty());
+    session.close();
+}

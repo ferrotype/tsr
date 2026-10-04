@@ -472,8 +472,20 @@ path, and old compiler hosts release their construction builders when frozen.
 Focused tests cover old-snapshot isolation, extended-config disposal, disk-cache
 pruning, overlay language kinds and independent project panic retirement.
 
-These are implementation increments, **not L1's exit**. Checker scheduling,
-watches/timeouts and logging remain. The router bridge still needs the actual
+The session pool now schedules diagnostics, queries and persistent API checkers,
+with request/file affinity, cancellation cleanup, accumulated global diagnostics
+and staggered idle eviction. Discarded pools remain usable by retained snapshots.
+Manual-clock and contention-barrier tests exercise these transitions.
+
+Config and program watches now follow snapshot updates, with shared registration
+counts, external-directory grouping, URI-relative patterns, per-call deadlines
+and rollback/retry using the original watcher IDs. The client interface runs on
+the background queue; real-session tests check publication precedes callbacks and
+text-only edits keep watch identity. Native client registration is connected with
+the server in L2.
+
+These are implementation increments, **not L1's exit**. Session update timers
+and logging remain. The router bridge still needs the actual
 server connection; options application and the native state-writer projection
 have not been connected. Mapped-bundle retention and the batch reset/cache
 witnesses remain before enabling semantic batch reuse. L0's codec work alone

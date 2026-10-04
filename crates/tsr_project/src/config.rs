@@ -23,6 +23,7 @@ pub enum PendingReload {
 
 #[derive(Clone)]
 pub struct ConfigEntry {
+    pub root_files_watch: Option<Arc<crate::watch::WatchedFiles>>,
     pub file_name: JsString,
     pub pending_reload: PendingReload,
     pub command_line: Option<Arc<ParsedCommandLine>>,
@@ -31,8 +32,13 @@ pub struct ConfigEntry {
     pub retaining_configs: BTreeSet<JsString>,
 }
 impl ConfigEntry {
-    fn new(name: JsString) -> Self {
+    fn new(name: JsString, relative: bool) -> Self {
         Self {
+            root_files_watch: Some(crate::watch::WatchedFiles::new(
+                JsString::from_bytes([b"root files for ".as_slice(), name.as_bytes()].concat()),
+                crate::watch::ALL_CHANGES,
+                relative,
+            )),
             file_name: name,
             pending_reload: PendingReload::Full,
             command_line: None,
@@ -78,6 +84,7 @@ pub struct ConfigRegistryBuilder {
     custom_name: JsString,
     external_code: bool,
     ownership: Arc<ConfigOwnership>,
+    relative_patterns: bool,
 }
 impl ConfigRegistryBuilder {
     pub fn new(
@@ -98,6 +105,7 @@ impl ConfigRegistryBuilder {
         }
         Self {
             configs: dirty::Map::new(base.configs.clone()),
+            relative_patterns: false,
             names,
             base,
             host: CompilerConfigHost::new_live(fs.clone(), cwd),
@@ -114,6 +122,11 @@ impl ConfigRegistryBuilder {
             self.host.current_directory(),
             self.fs.use_case_sensitive_file_names(),
         )
+    }
+    #[must_use]
+    pub fn with_relative_patterns(mut self, relative: bool) -> Self {
+        self.relative_patterns = relative;
+        self
     }
     pub fn configs(&self) -> impl Iterator<Item = (JsString, Arc<ConfigEntry>)> + '_ {
         self.configs.keys().into_iter().map(|key| {
@@ -231,11 +244,10 @@ impl ConfigRegistryBuilder {
         project: bool,
     ) -> Result<Option<Arc<ParsedCommandLine>>, Error> {
         let path = self.path(name.as_bytes());
-        let old = self
-            .configs
-            .get(&path)
-            .cloned()
-            .unwrap_or_else(|| Arc::new(ConfigEntry::new(name.clone())));
+        let old =
+            self.configs.get(&path).cloned().unwrap_or_else(|| {
+                Arc::new(ConfigEntry::new(name.clone(), self.relative_patterns))
+            });
         let retain = project || self.overlays.contains_key(retainer);
         let retained = if project {
             &old.retaining_projects
@@ -286,6 +298,15 @@ impl ConfigRegistryBuilder {
                     entry.command_line.as_deref(),
                     old.command_line.as_deref(),
                 );
+                if let (Some(command), Some(watch)) = (&entry.command_line, &entry.root_files_watch)
+                {
+                    entry.root_files_watch = Some(watch.with_input(crate::watch::config_patterns(
+                        command,
+                        name.as_bytes(),
+                        self.host.current_directory(),
+                        self.fs.use_case_sensitive_file_names(),
+                    )));
+                }
             }
         }
         entry.pending_reload = PendingReload::None;
@@ -323,8 +344,9 @@ impl ConfigRegistryBuilder {
         {
             let key = self.path(name.as_bytes());
             if !self.configs.contains_key(&key) {
-                self.configs
-                    .insert(key.clone(), Arc::new(ConfigEntry::new(name.clone())));
+                let mut entry = ConfigEntry::new(name.clone(), self.relative_patterns);
+                entry.root_files_watch = None;
+                self.configs.insert(key.clone(), Arc::new(entry));
             }
             self.change(&key, |entry| entry.retaining_configs.insert(path.clone()));
             next.insert(key);

@@ -22,6 +22,7 @@ pub enum ProgramUpdateKind {
 
 #[derive(Clone)]
 pub struct ProjectData {
+    pub program_files_watch: Arc<crate::watch::WatchedFiles>,
     pub name: JsString,
     pub path: JsString,
     pub kind: ProjectKind,
@@ -39,8 +40,14 @@ impl Project {
             counters,
             queries,
         );
+        let scheduler = crate::scheduler::CheckerScheduler::new(
+            pool.clone(),
+            data.program.clone(),
+            std::time::Duration::ZERO,
+        );
         Self {
             pool,
+            scheduler: Some(scheduler),
             data: Some(Arc::new(data)),
         }
     }

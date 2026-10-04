@@ -21,6 +21,28 @@ pub(crate) struct SessionSnapshot {
     pub config_ownership: Arc<ConfigOwnership>,
     pub _programs: Vec<ProgramReference>,
 }
+impl SessionSnapshot {
+    pub(crate) fn watches(&self) -> crate::watch::WatchSet {
+        self.configs
+            .configs
+            .iter()
+            .filter_map(|(path, config)| {
+                config.root_files_watch.as_ref().map(|watch| {
+                    (
+                        JsString::from_bytes([b"config:".as_slice(), path.as_bytes()].concat()),
+                        watch.clone(),
+                    )
+                })
+            })
+            .chain(self.projects.iter().map(|(path, project)| {
+                (
+                    JsString::from_bytes([b"project:".as_slice(), path.as_bytes()].concat()),
+                    project.data().unwrap().program_files_watch.clone(),
+                )
+            }))
+            .collect()
+    }
+}
 #[derive(Clone)]
 enum Root {
     Standalone(Project),

@@ -220,11 +220,14 @@ impl CheckerIdentity {
     pub fn generation(&self) -> &Generation {
         &self.generation
     }
+    /// A scheduler must reject reentry before waiting for its own slot, rather
+    /// than waiting before the identity's lease can diagnose the same mistake.
+    pub fn is_leased_on_current_thread(&self) -> bool {
+        ACTIVE_LEASES.with(|active| active.borrow().contains(&self.id))
+    }
     pub fn lease(&self) -> Result<CheckerLease<'_>, Error> {
         self.generation.validate()?;
-        if ACTIVE_GATE.get().is_some()
-            || ACTIVE_LEASES.with(|active| active.borrow().contains(&self.id))
-        {
+        if ACTIVE_GATE.get().is_some() || self.is_leased_on_current_thread() {
             return Err(Error::Reentry);
         }
         #[cfg(any(test, feature = "harness"))]
