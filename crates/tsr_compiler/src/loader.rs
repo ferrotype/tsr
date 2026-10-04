@@ -105,6 +105,7 @@ pub struct TypeResolution {
 /// source-of-reference mode and checker construction remain explicit
 /// unsupported boundaries.
 pub struct Program {
+    _source_retention: crate::cache::ProgramRetention,
     tracing: Option<Arc<dyn TraceSink>>,
     pub(crate) owners: crate::resolver_host::OwnerIndex,
     pub(crate) include_reasons: BTreeMap<JsString, Vec<Arc<IncludeReason>>>,
@@ -649,6 +650,7 @@ impl Program {
     }
 }
 struct Loader<'a> {
+    source_retention: crate::cache::ProgramRetention,
     tracing: Option<Arc<dyn TraceSink>>,
     config: tsr_tsoptions::ParsedCommandLine,
     pending: Vec<LoadTask>,
@@ -839,6 +841,7 @@ impl<'a> Loader<'a> {
             skip_resolution: input.skip_module_resolution,
             single_threaded: input.single_threaded,
             resolver,
+            source_retention: cache.begin_program(),
             cache,
             counters,
             depths: BTreeMap::new(),
@@ -1090,6 +1093,7 @@ impl<'a> Loader<'a> {
             }
         }
         let mut program = Program {
+            _source_retention: self.source_retention,
             tracing: self.tracing,
             include_reasons: self.include_reasons,
             references,
@@ -2452,7 +2456,7 @@ pub(super) fn bind(
     );
     // port: tsc/internal/compiler/program.go:Program.BindSourceFiles
     let bound = tsr_binder::bind_parsed_file(parsed)?;
-    Ok(Arc::new(ProgramFile { bound }))
+    Ok(Arc::new(ProgramFile::new(bound)))
 }
 fn host_trace(log: &mut Vec<tsr_module::DiagAndArgs>, traces: Vec<tsr_module::DiagAndArgs>) {
     log.extend(traces);

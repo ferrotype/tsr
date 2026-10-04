@@ -1,6 +1,15 @@
-//! Minimal project owners for ADR 0012. Scheduling/affinity and idle timers are
-//! later project-system work; slot lifetime and generation retirement live here.
+//! Project ownership, immutable file snapshots and shared parse caches. The
+//! checker slots retain ADR 0012 generation and panic-retirement semantics.
 #![forbid(unsafe_code)]
+
+pub mod background;
+pub mod dirty;
+pub mod file_change;
+pub mod overlay;
+pub mod parse_cache;
+pub mod ref_count_cache;
+pub mod snapshot_fs;
+pub mod source_fs;
 
 use std::cell::RefCell;
 use std::sync::{Arc, Mutex, OnceLock};

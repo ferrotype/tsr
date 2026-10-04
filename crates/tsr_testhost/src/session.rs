@@ -70,10 +70,37 @@ pub struct Session {
     update: Option<Update>,
     pending: BTreeMap<String, Pending>,
     streams: Streams,
-    next_callback: u64,
+    callback_ids: crate::bridge::CallbackIds,
     closed: bool,
 }
 impl Session {
+    /// Attach compiler-worker callbacks to this initialized connection. The
+    /// embedding retains the returned router until it has joined its workers.
+    /// During reset retire it first, then construct another with this session's
+    /// allocator; never replay a reply into a fresh allocator.
+    pub fn callback_router(
+        &self,
+        outgoing: std::sync::mpsc::Sender<Box<RawValue>>,
+    ) -> io::Result<crate::bridge::CallbackRouter> {
+        if self.closed || self.update.is_some() {
+            return Err(invalid("test-host is closed or updating options"));
+        }
+        let configuration = self
+            .configuration
+            .as_ref()
+            .ok_or_else(|| invalid("test-host is not initialized"))?;
+        Ok(crate::bridge::CallbackRouter::new(
+            self.callback_ids.clone(),
+            outgoing,
+            configuration.host.clone(),
+        ))
+    }
+
+    /// Allows the shared connection to route ordinary S11 replies first and
+    /// pass other replies to its worker router (which tolerates late replies).
+    pub fn has_callback(&self, id: &str) -> bool {
+        self.pending.contains_key(id)
+    }
     pub fn is_closed(&self) -> bool {
         self.closed
     }
@@ -377,11 +404,10 @@ impl Session {
         if self.pending.len() == MAX_PENDING {
             return Err((-32002, "pending callback limit reached".into()));
         }
-        self.next_callback = self
-            .next_callback
-            .checked_add(1)
+        let callback = self
+            .callback_ids
+            .next()
             .ok_or_else(|| (-32002, "callback IDs exhausted".into()))?;
-        let callback = format!("callback:{}", self.next_callback);
         let message = wire!({"jsonrpc":"2.0","id":callback,"method":method,"params":params});
         let begin = progress(request, &callback, "begin");
         if !fits(&message) || !fits(&begin) {

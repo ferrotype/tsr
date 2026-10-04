@@ -1,6 +1,9 @@
 # tsr_project
 
-Checker ownership and project slot lifetimes for tsr.
+Checker ownership, immutable editor/file snapshots and shared parse caches for tsr.
+
+The Phase 5 session/configuration coordinator and checker scheduling are still
+under implementation; these building blocks do not constitute a language server.
 
 Part of [tsr](https://github.com/ferrotype/tsr), a Rust port of
 the TypeScript compiler. This project is under development; the API and supported

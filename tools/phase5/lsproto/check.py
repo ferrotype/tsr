@@ -47,14 +47,14 @@ def main():
         replacements[str(upstream / package / 'rust_codec_probe_test.go')] = str(HERE / 'probe_test.go')
         overlay = stage / 'overlay.json'
         output = stage / 'result.json'
-        env.update(TSR_CODEC_CASES=str(HERE / 'codec-cases.json'), TSR_CODEC_RESULT=str(output),
+        env.update(TSR_URI_CASES=str(ROOT / "crates/tsr_lsproto/src/uri-cases.json"), TSR_CODEC_CASES=str(HERE / 'codec-cases.json'), TSR_CODEC_RESULT=str(output),
                    TSR_PINNED_GO=str(stage / 'lsp_generated.go.pinned'), TSR_GENERATED_GO=str(generated))
         pinned = subprocess.check_output(['git', '-C', str(upstream), 'show', f'{pin}:{package}/lsp_generated.go'])
         Path(env['TSR_PINNED_GO']).write_bytes(pinned)
         replacements[str(upstream / package / 'lsp_generated.go')] = env['TSR_PINNED_GO']
         overlay.write_text(json.dumps({'Replace': replacements}))
         subprocess.run([go, 'test', '-overlay', str(overlay), './internal/lsp/lsproto',
-                        '-run', '^TestRust(CodecMatrix|ResolverMatchesPinnedGo)$', '-count=1'],
+                        '-run', '^TestRust(CodecMatrix|ResolverMatchesPinnedGo|DocumentURI)$', '-count=1'],
                        cwd=upstream / 'tsc', env=env, check=True, timeout=180)
         observed = json.loads(output.read_text())
         expected = HERE / 'codec-expected.json'

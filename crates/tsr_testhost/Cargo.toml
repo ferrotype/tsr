@@ -11,6 +11,7 @@ base64 = "0.22.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["raw_value"] }
 tsr_vfs = { version = "0.2.0", path = "../tsr_vfs" }
+tsr_jsstring = { version = "0.2.0", path = "../tsr_jsstring" }
 
 tsr_tspath = { version = "0.2.0", path = "../tsr_tspath" }
 

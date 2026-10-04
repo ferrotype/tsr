@@ -454,6 +454,24 @@ not yield semantic passes merely because initialization succeeded.
 is faithful. Do not claim all 85 project tests pass while L6 work remains.
 Protocol-level diagnostics checks are added when L2's publishing path exists.
 
+**Implementation progress:** the L1 branch starts with worker callback reply
+slots (including cancellation, retirement and disconnect), immutable overlays,
+disk snapshots and dependency tracking, copy-on-write maps, the background
+queue and reference-counted parse caches. The compiler now accepts a project
+cache: program loads and reuse own its leases, failed loads release them, and
+escaped ASTs retain syntax independently of those leases. The explicit test
+cache can retain parses across disposed programs. Hashing reuses the workspace's
+`xxhash-rust` implementation of the pin's XXH3-128; the mapped key includes the
+raw hash, transform identity and locale.
+
+This is an implementation increment, **not L1's exit**. The core Session and
+configuration/project coordinators, owner/program counters, checker scheduling,
+watches/timeouts and logging remain. The router bridge still needs the actual
+server connection; options application and the native state-writer projection
+have not been connected. Mapped-bundle retention and the batch reset/cache
+witnesses remain before enabling semantic batch reuse. L0's codec work alone
+does not satisfy its unfinished server/Go-harness prerequisites.
+
 ### L2 — server behavior and negotiated conversions
 
 1. Port dispatch, document sync, configuration exchange, diagnostics publishing,

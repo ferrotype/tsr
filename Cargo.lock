@@ -1194,6 +1194,8 @@ dependencies = [
  "serde_json",
  "tsr_json",
  "tsr_jsonrpc",
+ "tsr_jsstring",
+ "tsr_tspath",
 ]
 
 [[package]]
@@ -1281,8 +1283,11 @@ dependencies = [
  "tsr_compiler",
  "tsr_core",
  "tsr_jsstring",
+ "tsr_lsproto",
  "tsr_tsoptions",
+ "tsr_tspath",
  "tsr_vfs",
+ "xxhash-rust",
 ]
 
 [[package]]
@@ -1341,6 +1346,7 @@ dependencies = [
  "base64",
  "serde",
  "serde_json",
+ "tsr_jsstring",
  "tsr_tspath",
  "tsr_vfs",
 ]

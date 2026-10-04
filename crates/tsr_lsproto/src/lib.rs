@@ -3,6 +3,7 @@
 //! JSON-RPC messages and Content-Length framing are shared with `tsr_jsonrpc`.
 mod codec;
 mod generated;
+mod uri;
 mod values;
 pub use generated::*;
 pub use tsr_jsonrpc::{
