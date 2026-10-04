@@ -116,6 +116,12 @@ impl Encode for Null {
     }
 }
 impl Decode for Null {
+    fn type_name() -> &'static str {
+        "lsproto.Null"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     /// port: tsc/internal/lsp/lsproto/lsp.go:Null.UnmarshalJSONFrom
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         let data = input.read_value()?;

@@ -26,8 +26,15 @@ With the pinned Go on PATH, `python3 tools/phase5/lsproto/check.py` checks:
 `cargo test -p tsr_lsproto` compares Rust with the same fixture and checks union
 arms, parameter admission, literal/cardinality rules and enum names. The matrix
 starts from the pin's lsp_json_test.go inputs and adds reuse, raw escaped keys,
-registration dispatch and partial failure cases. It currently has 101 operations
-in 47 independent cases. These are protocol tests, not language-service passes.
+registration dispatch and partial failure cases. It currently has 107 operations
+in 48 independent cases. These are protocol tests, not language-service passes.
+
+The parameter fixture additionally compares 22 complete JSON-RPC responses
+from `UnmarshalParams` and the pinned server error envelope. It preserves
+error codes, message context, paths and offsets. The native JSON library
+deliberately chooses `cannot` or `unable to` once per process; only that
+documented prefix is normalized in the comparison. Boolean union cases retain
+the selected value even when token validation fails.
 
 The initial L0 slice implements protocol data/codecs and typed method descriptors.
 The remaining L0 work includes URI/location utilities, resolved capability helpers,

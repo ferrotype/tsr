@@ -13,6 +13,12 @@ pub trait Decode {
     fn type_name() -> &'static str {
         std::any::type_name::<Self>()
     }
+    /// Opt in for a port of Go's UnmarshalJSONFrom method. Its own errors
+    /// receive type/location context; syntax and I/O errors pass through.
+    /// Built-in decoders already construct their semantic errors directly.
+    fn custom_unmarshal() -> bool {
+        false
+    }
 }
 impl<T: Decode + ?Sized> Decode for Box<T> {
     fn type_name() -> &'static str {
@@ -25,7 +31,12 @@ impl<T: Decode + ?Sized> Decode for Box<T> {
 impl Decoder<'_> {
     pub fn value<T: Decode + ?Sized>(&mut self, value: &mut T) -> Result<(), Error> {
         let before = self.depth_length();
-        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || value.decode(self))?;
+        let result = stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || value.decode(self));
+        if T::custom_unmarshal() {
+            result.map_err(|error| self.custom_error(T::type_name(), before, error))?;
+        } else {
+            result?;
+        }
         if self.depth_length() != (before.0, before.1 + 1) {
             return Err(semantic(
                 T::type_name(),
