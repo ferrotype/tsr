@@ -777,6 +777,7 @@ dependencies = [
  "tsr_jsonrpc",
  "tsr_jsstring",
  "tsr_locale",
+ "tsr_lsproto",
  "tsr_module",
  "tsr_nodebuilder",
  "tsr_parser",
@@ -1185,6 +1186,15 @@ dependencies = [
 [[package]]
 name = "tsr_locale"
 version = "0.2.0"
+
+[[package]]
+name = "tsr_lsproto"
+version = "0.2.0"
+dependencies = [
+ "serde_json",
+ "tsr_json",
+ "tsr_jsonrpc",
+]
 
 [[package]]
 name = "tsr_module"

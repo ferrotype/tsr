@@ -6,6 +6,7 @@ mod ast_read;
 mod ast_runtime;
 mod diagnostics;
 mod encoder;
+mod lsproto;
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -313,6 +314,9 @@ fn ast_schema(summary: &Value) -> Result<bool, String> {
 }
 
 pub(super) fn run(root: &Path, args: &[String], pin: &str) -> Result<bool, String> {
+    if args.first().is_some_and(|arg| arg == "lsproto") {
+        return lsproto::run(root, &args[1..], pin);
+    }
     let mode = match args {
         [] => "write",
         [option] if option == "--check" || option == "--verify" => option,

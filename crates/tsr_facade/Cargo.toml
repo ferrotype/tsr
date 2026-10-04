@@ -35,6 +35,7 @@ tsr_ipc = { version = "0.2.0", path = "../tsr_ipc" }
 tsr_jsnum = { version = "0.2.0", path = "../tsr_jsnum" }
 tsr_json = { version = "0.2.0", path = "../tsr_json" }
 tsr_jsonrpc = { version = "0.2.0", path = "../tsr_jsonrpc" }
+tsr_lsproto = { version = "0.2.0", path = "../tsr_lsproto" }
 tsr_jsstring = { version = "0.2.0", path = "../tsr_jsstring" }
 tsr_locale = { version = "0.2.0", path = "../tsr_locale" }
 tsr_module = { version = "0.2.0", path = "../tsr_module" }

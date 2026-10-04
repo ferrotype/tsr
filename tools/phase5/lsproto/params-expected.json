@@ -1,0 +1,169 @@
+{
+  "InitializedParams '0'": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: params must be an object or array"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "InitializedParams '[]'": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: json: cannot unmarshal JSON array into Go lsproto.InitializedParams"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "InitializedParams 'null'": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: params must be an object or array"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "InitializedParams 'true'": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: params must be an object or array"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "InitializedParams '{}'": {
+    "id": 7,
+    "jsonrpc": "2.0",
+    "result": null
+  },
+  "InitializedParams None": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: params must be an object or array"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "NoParams '0'": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: expected no params, got 0"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "NoParams '[]'": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: expected no params, got []"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "NoParams 'null'": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: expected no params, got null"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "NoParams '{}'": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: expected no params, got {}"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "NoParams None": {
+    "id": 7,
+    "jsonrpc": "2.0",
+    "result": null
+  },
+  "bad capability union": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: json: cannot unmarshal into Go lsproto.BooleanOrClientSemanticTokensRequestFullDelta within \"/capabilities/textDocument/semanticTokens/requests/full\": invalid BooleanOrClientSemanticTokensRequestFullDelta: got number"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "missing capabilities": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: json: cannot unmarshal into Go lsproto.InitializeParams after offset 32: missing required properties: capabilities"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "missing client name": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: json: cannot unmarshal into Go lsproto.ClientInfo within \"/clientInfo\": missing required properties: name"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "missing position field": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: json: cannot unmarshal into Go lsproto.Position within \"/position\": missing required properties: character"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "nested hover null": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: json: cannot unmarshal into Go lsproto.HoverClientCapabilities within \"/capabilities/textDocument/hover/dynamicRegistration\": null value is not allowed for field \"dynamicRegistration\""
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "null capabilities": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: json: cannot unmarshal into Go lsproto.InitializeParams within \"/capabilities\": null value is not allowed for field \"capabilities\""
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "null position": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: json: cannot unmarshal into Go lsproto.Position within \"/position\": expected object start, but encountered null"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "truncated document": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: json: cannot unmarshal into Go lsproto.ClientCapabilities within \"/capabilities\": expected object start, but encountered invalid"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "valid initialize": {
+    "id": 7,
+    "jsonrpc": "2.0",
+    "result": null
+  },
+  "wrong capabilities": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: json: cannot unmarshal into Go lsproto.ClientCapabilities within \"/capabilities\": expected object start, but encountered true"
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  },
+  "wrong line type": {
+    "error": {
+      "code": -32602,
+      "message": "InvalidParams: json: cannot unmarshal JSON string into Go uint32 within \"/position/line\""
+    },
+    "id": 7,
+    "jsonrpc": "2.0"
+  }
+}

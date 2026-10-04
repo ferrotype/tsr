@@ -1,0 +1,112 @@
+[
+  {
+    "name": "NoParams None",
+    "type": "NoParams",
+    "params": null
+  },
+  {
+    "name": "NoParams 'null'",
+    "type": "NoParams",
+    "params": "null"
+  },
+  {
+    "name": "NoParams '{}'",
+    "type": "NoParams",
+    "params": "{}"
+  },
+  {
+    "name": "NoParams '[]'",
+    "type": "NoParams",
+    "params": "[]"
+  },
+  {
+    "name": "NoParams '0'",
+    "type": "NoParams",
+    "params": "0"
+  },
+  {
+    "name": "InitializedParams None",
+    "type": "InitializedParams",
+    "params": null
+  },
+  {
+    "name": "InitializedParams 'null'",
+    "type": "InitializedParams",
+    "params": "null"
+  },
+  {
+    "name": "InitializedParams '0'",
+    "type": "InitializedParams",
+    "params": "0"
+  },
+  {
+    "name": "InitializedParams 'true'",
+    "type": "InitializedParams",
+    "params": "true"
+  },
+  {
+    "name": "InitializedParams '[]'",
+    "type": "InitializedParams",
+    "params": "[]"
+  },
+  {
+    "name": "InitializedParams '{}'",
+    "type": "InitializedParams",
+    "params": "{}"
+  },
+  {
+    "name": "missing capabilities",
+    "type": "InitializeParams",
+    "params": "{\"processId\":null,\"rootUri\":null}"
+  },
+  {
+    "name": "null capabilities",
+    "type": "InitializeParams",
+    "params": "{\"capabilities\":null}"
+  },
+  {
+    "name": "wrong capabilities",
+    "type": "InitializeParams",
+    "params": "{\"capabilities\":true}"
+  },
+  {
+    "name": "missing client name",
+    "type": "InitializeParams",
+    "params": "{\"capabilities\":{},\"clientInfo\":{}}"
+  },
+  {
+    "name": "nested hover null",
+    "type": "InitializeParams",
+    "params": "{\"capabilities\":{\"textDocument\":{\"hover\":{\"dynamicRegistration\":null}}}}"
+  },
+  {
+    "name": "bad capability union",
+    "type": "InitializeParams",
+    "params": "{\"capabilities\":{\"textDocument\":{\"semanticTokens\":{\"requests\":{\"full\":42}}}}}"
+  },
+  {
+    "name": "truncated document",
+    "type": "InitializeParams",
+    "params": "{\"capabilities\":"
+  },
+  {
+    "name": "valid initialize",
+    "type": "InitializeParams",
+    "params": "{\"processId\":null,\"rootUri\":null,\"capabilities\":{}}"
+  },
+  {
+    "name": "missing position field",
+    "type": "HoverParams",
+    "params": "{\"textDocument\":{\"uri\":\"file:///x.ts\"},\"position\":{\"line\":0}}"
+  },
+  {
+    "name": "wrong line type",
+    "type": "HoverParams",
+    "params": "{\"textDocument\":{\"uri\":\"file:///x.ts\"},\"position\":{\"line\":\"x\",\"character\":0}}"
+  },
+  {
+    "name": "null position",
+    "type": "HoverParams",
+    "params": "{\"textDocument\":{\"uri\":\"file:///x.ts\"},\"position\":null}"
+  }
+]

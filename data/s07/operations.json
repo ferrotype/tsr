@@ -34355,7 +34355,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_json/src/lib.rs",
-          "line": 73
+          "line": 82
         }
       ],
       "source_sha256": "702dd64fda7d0942b9b461cd290fcb3fae5c32f1ade5d3a61e980c389c149a5d",
@@ -34369,7 +34369,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_json/src/lib.rs",
-          "line": 87
+          "line": 96
         }
       ],
       "source_sha256": "702dd64fda7d0942b9b461cd290fcb3fae5c32f1ade5d3a61e980c389c149a5d",
@@ -34383,7 +34383,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_json/src/decode.rs",
-          "line": 79
+          "line": 98
         }
       ],
       "source_sha256": "702dd64fda7d0942b9b461cd290fcb3fae5c32f1ade5d3a61e980c389c149a5d",

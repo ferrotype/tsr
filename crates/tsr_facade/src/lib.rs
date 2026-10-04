@@ -35,6 +35,7 @@ pub use tsr_json as json;
 pub use tsr_jsonrpc as jsonrpc;
 pub use tsr_jsstring as jsstring;
 pub use tsr_locale as locale;
+pub use tsr_lsproto as lsproto;
 pub use tsr_module as module;
 pub use tsr_nodebuilder as nodebuilder;
 pub use tsr_parser as parser;

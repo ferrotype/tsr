@@ -63,6 +63,15 @@ pub trait Encode {
     }
 }
 
+impl<T: Encode + ?Sized> Encode for Box<T> {
+    fn type_name(&self) -> &'static str {
+        (**self).type_name()
+    }
+    fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+        out.value(&**self)
+    }
+}
+
 /// Convenience wrapper for callers that discard incomplete output on error.
 pub fn marshal(value: &(impl Encode + ?Sized), options: Options<'_>) -> Result<Vec<u8>, Error> {
     let (bytes, result) = marshal_partial(value, options);
