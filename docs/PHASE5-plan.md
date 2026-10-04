@@ -650,6 +650,17 @@ completion and editing requests remain assigned to L4 and L5. The L3 service
 surface is implemented; full end-to-end acceptance waits for those integrations
 and the L7 supervisor.
 
+L3 review follow-up preserves symbol associations for generic `Array` and
+`ReadonlyArray` displays, skips absent declaration files in default-library
+semantic-token classification, and shares implicit-import eligibility with the
+loader and reuse path. Custom-config changes now remain pending for the next
+snapshot update; subsequent clean containing-project reads have no config-name
+barrier. The retained-owner index caches one foreign-arena miss, separately from
+slot validation, with fixed retained namespaces bounding its positive entries.
+Focused ownership/display regressions, project/LSP/LS unit tests, both encodings
+of the 1,218-response JS/JSX native comparison, the L2 lifecycle/config comparison
+and 26 compiler parity sub-tests pass; the complete L7 replay remains pending.
+
 ### L4 — completions and auto-imports
 
 Implement `completions.go`, `string_completions.go`, JSDoc completions/snippets,

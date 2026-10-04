@@ -463,7 +463,10 @@ impl Session {
         }
         self.pending.lock().expect("session events").custom_name = Some(name);
         drop(current);
-        self.flush(None).map(|_| ())
+        // Keep newConfig pending until the next snapshot update, so its
+        // requesting document participates in default-project invalidation.
+        self.schedule_snapshot_update();
+        Ok(())
     }
     /// Returns the snapshot as well as the selection: callers retain its program,
     /// config and filesystem roots for the complete request.
@@ -532,12 +535,7 @@ impl Session {
                 // with different options and loses the importing files.
                 previous
                     .project_for_file(path.as_bytes())
-                    .is_some_and(|project| {
-                        let data = project.data().unwrap();
-                        !data.dirty
-                            && (old.defaults.contains_key(&path)
-                                || data.config_search == old.configs.custom_config_file_name)
-                    })
+                    .is_some_and(|project| !project.data().unwrap().dirty)
             })
         {
             return Ok(previous);

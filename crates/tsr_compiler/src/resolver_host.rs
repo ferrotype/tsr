@@ -11,11 +11,19 @@ use tsr_jsstring::JsString;
 #[derive(Default)]
 pub(crate) struct OwnerIndex {
     nodes: HashMap<ArenaId, usize>,
-    // Token/JSDoc arenas can be created after the program is published.
-    // Discover each retained namespace once; core reads remain lock-free.
-    secondary_nodes: std::sync::RwLock<HashMap<ArenaId, usize>>,
+    // Lazy tokens/JSDoc nodes can be created after program publication.
+    // Each retained owner has fixed arena namespaces, bounding this cache;
+    // core reads remain lock-free.
+    secondary_nodes: std::sync::RwLock<SecondaryNodes>,
     symbols: HashMap<ArenaId, usize>,
     tables: HashMap<ArenaId, usize>,
+}
+#[derive(Default)]
+struct SecondaryNodes {
+    owners: HashMap<ArenaId, usize>,
+    // One negative entry avoids repeated scans for a transient display owner
+    // without retaining an unbounded set of foreign IDs supplied by callers.
+    last_miss: Option<ArenaId>,
 }
 impl OwnerIndex {
     /// Finds the retained file owning a node without creating a resolver scope.
@@ -31,22 +39,33 @@ impl OwnerIndex {
         if let Some(index) = self.node_file_index(node) {
             return Some(index);
         }
-        if let Some(&index) = self
-            .secondary_nodes
-            .read()
-            .unwrap_or_else(std::sync::PoisonError::into_inner)
-            .get(&node.arena())
         {
-            return Some(index);
+            let secondary = self
+                .secondary_nodes
+                .read()
+                .unwrap_or_else(std::sync::PoisonError::into_inner);
+            if let Some(&index) = secondary.owners.get(&node.arena()) {
+                return Some(index);
+            }
+            if secondary.last_miss == Some(node.arena()) {
+                return None;
+            }
         }
         let index = files
             .iter()
-            .position(|file| file.bound().view().ast().for_node_owner(node).is_ok())?;
-        self.secondary_nodes
+            .position(|file| file.bound().view().ast().retains_arena(node.arena()));
+        let mut secondary = self
+            .secondary_nodes
             .write()
-            .unwrap_or_else(std::sync::PoisonError::into_inner)
-            .insert(node.arena(), index);
-        Some(index)
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        if let Some(index) = index {
+            secondary.owners.insert(node.arena(), index);
+        } else {
+            // Retained file owners are fixed for this program. Lazy node IDs
+            // only escape after publication into their owner's lazy namespace.
+            secondary.last_miss = Some(node.arena());
+        }
+        index
     }
 
     pub(crate) fn from_files(files: &[std::sync::Arc<ProgramFile>]) -> Self {

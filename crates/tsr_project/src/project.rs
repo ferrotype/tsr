@@ -36,10 +36,6 @@ pub struct ProjectData {
     // shared program. A dirty project with no single file needs a full rebuild.
     pub(crate) dirty: bool,
     pub(crate) dirty_file: Option<JsString>,
-    // Config-discovery preference used when this project was last selected.
-    // Closed projects may be retained across a preference change; program
-    // inclusion alone must not resurrect their old default selection.
-    pub(crate) config_search: JsString,
 }
 impl Project {
     pub(crate) fn from_program(data: ProjectData, counters: &Counters, queries: usize) -> Self {
