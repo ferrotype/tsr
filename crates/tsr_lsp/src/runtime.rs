@@ -62,6 +62,7 @@ struct Settings {
     exclude_library_symbols: bool,
     workspace_current_project: bool,
     maximum_hover_length: usize,
+    prefer_source_definition: bool,
     inlay: tsr_ls::InlayHintsOptions,
     inlay_flags: [Option<bool>; 7],
     code_lens: tsr_ls::CodeLensOptions,
@@ -76,6 +77,7 @@ impl Default for Settings {
             exclude_library_symbols: true,
             workspace_current_project: false,
             maximum_hover_length: 500,
+            prefer_source_definition: false,
             inlay: tsr_ls::InlayHintsOptions::default(),
             inlay_flags: [None; 7],
             code_lens: tsr_ls::CodeLensOptions::default(),
@@ -432,6 +434,7 @@ impl Runtime {
                 let settings = self.settings.lock().unwrap().clone();
                 let options = crate::language_features::Options {
                     maximum_hover_length: settings.maximum_hover_length,
+                    prefer_source_definition: settings.prefer_source_definition,
                     inlay: settings.inlay,
                     code_lens: settings.code_lens,
                     lens_command: self
@@ -768,6 +771,10 @@ impl Runtime {
                         .into_iter()
                         .flatten()
                     {
+                        set_bool(
+                            raw.get("preferGoToSourceDefinition"),
+                            &mut next.prefer_source_definition,
+                        );
                         apply_lens_preferences(raw, true, &mut next.code_lens);
                         apply_inlay_preferences(raw, true, &mut next.inlay, &mut next.inlay_flags);
                         set_bool(raw.get("validateEnabled"), &mut next.validation);
@@ -790,6 +797,10 @@ impl Runtime {
                             next.config_name.clone_from(name);
                         }
                     }
+                    set_bool(
+                        nested(fields, "preferGoToSourceDefinition"),
+                        &mut next.prefer_source_definition,
+                    );
                     apply_lens_preferences(fields, false, &mut next.code_lens);
                     apply_inlay_preferences(fields, false, &mut next.inlay, &mut next.inlay_flags);
                     set_bool(
@@ -1129,38 +1140,15 @@ fn unimplemented_method(method: &str) -> bool {
     matches!(
         method,
         "workspace/willRenameFiles"
-            | "textDocument/hover"
-            | "textDocument/definition"
-            | "custom/textDocument/sourceDefinition"
-            | "textDocument/typeDefinition"
-            | "textDocument/signatureHelp"
             | "textDocument/formatting"
             | "textDocument/rangeFormatting"
             | "textDocument/onTypeFormatting"
-            | "textDocument/documentSymbol"
-            | "textDocument/documentHighlight"
-            | "custom/textDocument/multiDocumentHighlight"
-            | "textDocument/selectionRange"
-            | "textDocument/inlayHint"
-            | "textDocument/codeLens"
             | "textDocument/codeAction"
-            | "textDocument/prepareCallHierarchy"
-            | "textDocument/foldingRange"
             | "textDocument/prepareRename"
-            | "textDocument/linkedEditingRange"
             | "textDocument/completion"
             | "textDocument/_vs_onAutoInsert"
-            | "textDocument/references"
-            | "textDocument/_vs_references"
             | "textDocument/rename"
-            | "textDocument/implementation"
-            | "callHierarchy/incomingCalls"
-            | "callHierarchy/outgoingCalls"
-            | "workspace/symbol"
             | "completionItem/resolve"
-            | "codeLens/resolve"
-            | "textDocument/semanticTokens/full"
-            | "textDocument/semanticTokens/range"
             | "custom/runGC"
             | "custom/saveHeapProfile"
             | "custom/saveAllocProfile"

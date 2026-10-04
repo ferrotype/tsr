@@ -18,6 +18,9 @@ mod meaning;
 mod reference_helpers;
 mod reference_special;
 mod references;
+mod source_declarations;
+mod source_definition;
+mod source_map;
 mod vs_references;
 pub use code_lens::CodeLensOptions;
 mod highlight_syntax;
@@ -95,12 +98,34 @@ impl std::fmt::Display for Error {
 impl std::error::Error for Error {}
 pub type Result<T> = std::result::Result<T, Error>;
 
+/// Runs the semantic part of navigation with the requested file's checker.
+/// Source-definition's syntactic fast path never invokes this provider. The
+/// caller retains its lease for the callback and releases it afterwards.
+pub trait QueryChecker {
+    fn with_checker<T>(
+        &mut self,
+        source: NodeId,
+        query: impl FnOnce(&mut tsr_checker::Operation<'_>) -> Result<T>,
+    ) -> Result<T>;
+}
+
+impl QueryChecker for tsr_checker::Operation<'_> {
+    fn with_checker<T>(
+        &mut self,
+        _source: NodeId,
+        query: impl FnOnce(&mut tsr_checker::Operation<'_>) -> Result<T>,
+    ) -> Result<T> {
+        query(self)
+    }
+}
+
 /// One language-service request. The caller retains its program snapshot and
 /// checker lease for the entire request; nodes and coordinate maps never cross
 /// into a later snapshot. Syntax-only queries do not acquire a checker.
 pub struct LanguageService<'a> {
     program: &'a Program,
     converters: Converters,
+    source_maps: source_map::Maps,
     cancellation: CancellationToken,
 }
 impl<'a> LanguageService<'a> {
@@ -112,6 +137,7 @@ impl<'a> LanguageService<'a> {
         Self {
             program,
             converters: Converters::new(encoding),
+            source_maps: source_map::Maps::new(),
             cancellation,
         }
     }

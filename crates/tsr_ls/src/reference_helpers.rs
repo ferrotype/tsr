@@ -610,13 +610,15 @@ impl SearchState<'_, '_, '_> {
         }
         if let Some(decl) = self.c.symbol(symbol)?.value_declaration() {
             let view = self.l.view(decl)?;
-            if ast::is_parameter_property_declaration(
-                view,
-                decl,
-                view.node(decl)?
-                    .parent()
-                    .ok_or(tsr_arena::Error::InvalidGraph)?,
-            )? {
+            if view.node(decl)?.kind() == K::Parameter
+                && ast::is_parameter_property_declaration(
+                    view,
+                    decl,
+                    view.node(decl)?
+                        .parent()
+                        .ok_or(tsr_arena::Error::InvalidGraph)?,
+                )?
+            {
                 let name = self.c.symbol(symbol)?.name_bytes().to_vec();
                 let (param, member) = self
                     .c

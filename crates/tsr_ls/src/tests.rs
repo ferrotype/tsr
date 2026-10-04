@@ -6,6 +6,8 @@ fn program(name: &[u8], text: &[u8]) -> Program {
     fs.insert_loaded(name, text);
     let options = tsr_core::CompilerOptions {
         no_lib: tsr_core::Tristate::TRUE,
+        allow_js: tsr_core::Tristate::from(name.ends_with(b".js")),
+        check_js: tsr_core::Tristate::from(name.ends_with(b".js")),
         ..Default::default()
     };
     Program::load(
@@ -448,4 +450,253 @@ fn semantic_reference_search_observes_cancellation() {
         service.implementation_entries(&mut checker, node, 6),
         Err(Error::Canceled)
     ));
+}
+
+fn source_map_program(map: &[u8]) -> Program {
+    let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
+    fs.insert_loaded(
+        b"/index.ts",
+        b"import {foo} from './lib'; foo();".as_slice(),
+    );
+    fs.insert_loaded(
+        b"/lib.d.ts",
+        b"export declare function foo(): void;\n//# sourceMappingURL=lib.d.ts.map".as_slice(),
+    );
+    fs.insert_loaded(b"/lib.d.ts.map", map);
+    fs.insert_loaded(
+        b"/source.ts",
+        b"/** source */\nexport function foo() {}\n".as_slice(),
+    );
+    Program::load(
+        tsr_compiler::ProgramOptions {
+            config: tsr_tsoptions::ParsedCommandLine::new(
+                tsr_core::CompilerOptions {
+                    no_lib: tsr_core::Tristate::TRUE,
+                    ..Default::default()
+                },
+                vec![tsr_jsstring::JsString::from_bytes(b"/index.ts".as_slice())],
+            ),
+            host: Arc::new(fs.finish()),
+            current_directory: tsr_jsstring::JsString::from_bytes(b"/".as_slice()),
+            default_library_path: tsr_jsstring::JsString::from_bytes(b"/".as_slice()),
+            skip_module_resolution: false,
+            single_threaded: tsr_core::Tristate::TRUE,
+        },
+        &mut tsr_compiler::FileCache::new(),
+        &tsr_arena::Counters::new(),
+    )
+    .unwrap()
+}
+
+#[test]
+fn declaration_maps_load_navigation_targets_without_mutating_the_program() {
+    let program=Arc::new(source_map_program(br#"{"version":3,"file":"lib.d.ts","sources":["source.ts"],"names":[],"mappings":"wBACgB,GAAG"}"#));
+    let source = program.source_file(b"/index.ts").unwrap().source();
+    assert!(program.source_file(b"/source.ts").is_none());
+    let count = program.files().len();
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool.checker_for_file_exclusive(source).unwrap();
+    let uri = lsp::DocumentUri("file:///index.ts".into());
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    for source_definition in [false, true] {
+        let result = if source_definition {
+            service.source_definition(
+                &mut checker,
+                &uri,
+                &lsp::Position {
+                    line: 0,
+                    character: 8,
+                },
+                true,
+            )
+        } else {
+            service.definition(
+                &mut checker,
+                &uri,
+                &lsp::Position {
+                    line: 0,
+                    character: 8,
+                },
+                false,
+                true,
+            )
+        }
+        .unwrap();
+        let links = result.definition_links.unwrap();
+        assert_eq!(links.len(), 1);
+        let link = links[0].as_ref().unwrap();
+        assert_eq!(link.target_uri.0, "file:///source.ts");
+        assert_eq!(
+            (
+                link.target_selection_range.start.line,
+                link.target_selection_range.start.character,
+                link.target_selection_range.end.character
+            ),
+            (1, 16, 19)
+        );
+    }
+    assert_eq!(program.files().len(), count);
+    assert!(program.source_file(b"/source.ts").is_none());
+}
+
+#[test]
+fn cyclic_declaration_maps_fall_back_without_recursing() {
+    let program = source_map_program(
+        br#"{"version":3,"file":"lib.d.ts","sources":["lib.d.ts"],"names":[],"mappings":"AAAA"}"#,
+    );
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    assert!(service.source_position(b"/lib.d.ts", 0).is_none());
+}
+
+#[test]
+fn commonjs_module_names_have_local_reference_entries() {
+    let text =
+        b"const item=1; exports.item=item; module.exports.fn=function fn(p){return p+item;};";
+    let program = Arc::new(program(b"/index.js", text));
+    let source = program.source_file(b"/index.js").unwrap().source();
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool.checker_for_file_exclusive(source).unwrap();
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    let result = service
+        .references(
+            &mut checker,
+            &lsp::ReferenceParams {
+                text_document: lsp::TextDocumentIdentifier {
+                    uri: lsp::DocumentUri("file:///index.js".into()),
+                },
+                position: lsp::Position {
+                    line: 0,
+                    character: 14,
+                },
+                context: Some(Box::new(lsp::ReferenceContext {
+                    include_declaration: true,
+                })),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+    assert_eq!(result.locations.unwrap().len(), 1);
+}
+
+#[test]
+fn jsdoc_names_query_the_bound_reparsed_declarations() {
+    let text = b"/** @typedef {{value: number}} Shape */\n/** @param {Shape} obj */\nfunction f(obj){return obj.value;}\nconst shape={value:1}; f(shape);";
+    let program = Arc::new(program(b"/index.js", text));
+    let source = program.source_file(b"/index.js").unwrap().source();
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool.checker_for_file_exclusive(source).unwrap();
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    for (character, expected) in [
+        (15, [(0, 15, 20), (2, 27, 32)]),
+        (31, [(0, 31, 36), (1, 12, 17)]),
+    ] {
+        let result = service
+            .references(
+                &mut checker,
+                &lsp::ReferenceParams {
+                    text_document: lsp::TextDocumentIdentifier {
+                        uri: lsp::DocumentUri("file:///index.js".into()),
+                    },
+                    position: lsp::Position { line: 0, character },
+                    context: Some(Box::new(lsp::ReferenceContext {
+                        include_declaration: true,
+                    })),
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+        let ranges: Vec<_> = result
+            .locations
+            .unwrap()
+            .iter()
+            .map(|l| {
+                (
+                    l.range.start.line,
+                    l.range.start.character,
+                    l.range.end.character,
+                )
+            })
+            .collect();
+        assert_eq!(ranges, expected);
+    }
+    let mut syntax = syntax::Syntax::new(service.view(source).unwrap(), source).unwrap();
+    let declaration = syntax.nav().get_touching_property_name(15).unwrap();
+    let access = syntax.nav().get_touching_property_name(93).unwrap();
+    assert_eq!(
+        checker.get_type_at_location(declaration).unwrap(),
+        checker.get_type_at_location(access).unwrap()
+    );
+}
+
+#[test]
+fn source_definition_fast_path_does_not_acquire_a_checker() {
+    struct NoChecker;
+    impl QueryChecker for NoChecker {
+        fn with_checker<T>(
+            &mut self,
+            _: NodeId,
+            _: impl FnOnce(&mut tsr_checker::Operation<'_>) -> Result<T>,
+        ) -> Result<T> {
+            panic!("syntactic source definition requested a checker");
+        }
+    }
+    let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
+    fs.insert_loaded(
+        b"/index.ts",
+        b"import {foo} from './lib'; foo();".as_slice(),
+    );
+    fs.insert_loaded(b"/lib.ts", b"export function foo() {}".as_slice());
+    let program = Program::load(
+        tsr_compiler::ProgramOptions {
+            config: tsr_tsoptions::ParsedCommandLine::new(
+                tsr_core::CompilerOptions {
+                    no_lib: tsr_core::Tristate::TRUE,
+                    ..Default::default()
+                },
+                vec![tsr_jsstring::JsString::from_bytes(b"/index.ts".as_slice())],
+            ),
+            host: Arc::new(fs.finish()),
+            current_directory: tsr_jsstring::JsString::from_bytes(b"/".as_slice()),
+            default_library_path: tsr_jsstring::JsString::from_bytes(b"/".as_slice()),
+            skip_module_resolution: false,
+            single_threaded: tsr_core::Tristate::TRUE,
+        },
+        &mut tsr_compiler::FileCache::new(),
+        &tsr_arena::Counters::new(),
+    )
+    .unwrap();
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    for character in [8, 20] {
+        let result = service
+            .source_definition(
+                &mut NoChecker,
+                &lsp::DocumentUri("file:///index.ts".into()),
+                &lsp::Position { line: 0, character },
+                false,
+            )
+            .unwrap();
+        let locations = result.locations.unwrap();
+        assert_eq!(locations.len(), 1);
+        assert_eq!(locations[0].uri.0, "file:///lib.ts");
+    }
 }

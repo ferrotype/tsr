@@ -435,11 +435,23 @@ impl Operation<'_> {
     }
 
     pub fn get_symbol_at_location(&mut self, node: NodeId) -> Result<Option<SymbolRef>, Error> {
+        // Public queries can receive lazy JSDoc syntax; binding and checking
+        // use the corresponding reparsed declaration, as GetSymbolAtLocation does.
+        let node = tsr_ast::utilities_containers::get_reparsed_node_for_node(
+            self.state().ast(node)?,
+            Some(node),
+        )?
+        .expect("non-null query node");
         let symbol = self.state_mut().get_symbol_at_location(node)?;
         symbol.map(|symbol| self.symbol_ref(symbol)).transpose()
     }
 
     pub fn get_type_at_location(&mut self, node: NodeId) -> Result<TypeRef, Error> {
+        let node = tsr_ast::utilities_containers::get_reparsed_node_for_node(
+            self.state().ast(node)?,
+            Some(node),
+        )?
+        .expect("non-null query node");
         let ty = self.state_mut().get_type_at_location(node)?;
         Ok(self.type_ref(ty))
     }

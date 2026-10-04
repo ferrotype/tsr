@@ -617,6 +617,39 @@ service results. Port relevant direct `ls` and helper tests alongside code.
 or explicitly dependent on the named L4 to L6 work. A reason alone does not
 turn an unimplemented L3 operation into completed work.
 
+#### L3 implementation record (2026-10-04)
+
+The assigned read-only handlers now run through `tsr_ls` over the retained
+program/checker and both L2 transports. They include classified/documented hover,
+references/highlights/import tracking, definitions and implementations, source
+definitions and declaration maps, document/workspace symbols, signature help,
+inlay hints, semantic tokens, call hierarchy, selection/folding, code lenses and
+linked editing. Diagnostics retain L2's production compiler phases and suggestion
+handling. Runtime preference updates invalidate inlay hints and code lenses as
+in the pin.
+
+Source-definition implementation lookup holds temporary parsed/bound owners
+outside the published program. Its syntax-only path avoids checker acquisition.
+Mapped fallback stays within the current source projection. The implementation
+also fixes public JSDoc symbol/type queries to follow bound reparsed nodes and
+keeps requests for unopened imported files in their containing configured project.
+
+[The development test record](../tools/phase5/lsp/README.md#l3-read-only-features)
+gives the commands, checked features and native response counts. Direct tests
+include the pin's 1,000-level selection limit and implementation-worklist growth
+regression, plus owner/cancellation and map-cycle safeguards. Both position
+encodings, capability variants, cross-file references and live edits are covered.
+These checks are not the complete fourslash corpus and do not add L7 parity
+credit.
+
+Named remaining dependencies: L6 must load project trees and coordinate
+cross-project searches/workspace discovery, including reverse declaration-map
+lookup into another project. It also supplies content-mapper execution, ATA and
+the API bridge. Forward declaration-to-source mapping is implemented here;
+completion and editing requests remain assigned to L4 and L5. The L3 service
+surface is implemented; full end-to-end acceptance waits for those integrations
+and the L7 supervisor.
+
 ### L4 — completions and auto-imports
 
 Implement `completions.go`, `string_completions.go`, JSDoc completions/snippets,

@@ -526,16 +526,18 @@ impl Session {
                     self.options.current_directory.as_bytes(),
                     self.fs.use_case_sensitive_file_names(),
                 );
-                // A retained containing project is not necessarily this file's
-                // current default after a config-name change. Only an explicit
-                // selection can bypass the request's config-discovery barrier.
+                // Unopened dependencies normally have no explicit default.
+                // Like getSnapshot, use program inclusion before rebuilding;
+                // otherwise a node_modules request creates an inferred project
+                // with different options and loses the importing files.
                 previous
-                    .state()
-                    .unwrap()
-                    .defaults
-                    .get(&path)
-                    .and_then(|key| previous.project_by_path(key.as_bytes()))
-                    .is_some_and(|project| !project.data().unwrap().dirty)
+                    .project_for_file(path.as_bytes())
+                    .is_some_and(|project| {
+                        let data = project.data().unwrap();
+                        !data.dirty
+                            && (old.defaults.contains_key(&path)
+                                || data.config_search == old.configs.custom_config_file_name)
+                    })
             })
         {
             return Ok(previous);

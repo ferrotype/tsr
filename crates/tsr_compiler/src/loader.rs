@@ -397,6 +397,22 @@ impl Program {
     pub fn host(&self) -> &dyn FileSystem {
         self.host.as_ref()
     }
+    /// A request-local NoDts resolver over this program's retained host. It
+    /// does not mutate the program's options, loading graph, or resolver cache.
+    pub fn source_definition_resolver(&self) -> Result<Resolver, Error> {
+        let mut options = self.options().clone();
+        options.no_dts_resolution = Tristate::TRUE;
+        Ok(Resolver::with_options(
+            self.host.clone(),
+            Arc::new(options),
+            self.current_directory(),
+            tsr_module::ResolverOptions {
+                allow_live_host: self.host.snapshot_id().is_none(),
+                extra_extensions: self.content_mapper_extensions(),
+                ..Default::default()
+            },
+        )?)
+    }
     /// port: tsc/internal/compiler/program.go:Program.UseCaseSensitiveFileNames
     pub fn use_case_sensitive_file_names(&self) -> bool {
         self.host().use_case_sensitive_file_names()

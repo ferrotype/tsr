@@ -172,7 +172,16 @@ fn initialization_edit_diagnostics_and_shutdown_use_the_real_session() {
             br#"{"configFilePath":"/p/tsconfig.json"}"#
         );
         server.send(Some(Id::int(2)), "textDocument/hover", Some(r#"{"textDocument":{"uri":"file:///p/main.ts"},"position":{"line":0,"character":6}}"#));
-        assert_eq!(server.response(&Id::int(2)).error.unwrap().code, -32601);
+        let response = server.response(&Id::int(2));
+        assert!(response.error.is_none(), "{:?}", response.error);
+        let mut hover = tsr_lsproto::HoverOrNull::default();
+        tsr_json::unmarshal(
+            &response.result.unwrap().0,
+            &mut hover,
+            tsr_json::Options::default(),
+        )
+        .unwrap();
+        assert!(hover.hover.is_some());
         server.send(Some(Id::int(0)), "shutdown", None);
         assert_eq!(server.response(&Id::int(0)).result.unwrap().0, b"null");
         server.send(None, "exit", None);

@@ -556,45 +556,62 @@ impl LanguageService<'_> {
                 .program
                 .file_of_node(declaration)
                 .ok_or(tsr_arena::Error::WrongOwner)?;
-            let view = file.bound().view().ast();
-            let mut syntax = Syntax::new(view, file.source())?;
-            let name =
-                tsr_ast::get_name_of_declaration(view, Some(declaration))?.unwrap_or(declaration);
-            let name_read = view.node(name)?;
-            let name_range = if name_read.kind() == K::EmptyStatement {
-                TextRange::new(i64::from(name_read.pos()), i64::from(name_read.pos()))
-            } else {
-                TextRange::new(syntax.start(name)?, i64::from(name_read.end()))
-            };
-            if !seen.insert((file.source(), name_range.pos(), name_range.end())) {
-                continue;
+            if let Some(link) =
+                self.definition_location_in_file(origin, file, declaration, feature)?
+            {
+                let key = (
+                    link.target_uri.clone(),
+                    link.target_selection_range.start.line,
+                    link.target_selection_range.start.character,
+                    link.target_selection_range.end.line,
+                    link.target_selection_range.end.character,
+                );
+                if seen.insert(key) {
+                    links.push(Some(Box::new(link)));
+                }
             }
-            let context = context_node(view, declaration)?.unwrap_or(declaration);
-            let context_range = TextRange::new(
-                syntax.start(context)?.min(name_range.pos()),
-                i64::from(view.node(context)?.end()).max(name_range.end()),
-            );
-            let (selection, fidelity) = self.range(file.source(), name_range, feature)?;
-            if !fidelity.is_single_segment() {
-                continue;
-            }
-            let (range, context_fidelity) =
-                self.unrestricted_range(file.source(), context_range)?;
-            let range = if context_fidelity.is_none() || !range_contains(&range, &selection) {
-                selection.clone()
-            } else {
-                range
-            };
-            links.push(Some(Box::new(lsp::LocationLink {
-                origin_selection_range: Some(Box::new(origin.clone())),
-                target_uri: lsp::DocumentUri::from_file_name(
-                    syntax.file.original_file_name()?.as_bytes(),
-                ),
-                target_range: range,
-                target_selection_range: selection,
-            })));
         }
         Ok(links)
+    }
+    pub(crate) fn definition_location_in_file(
+        &mut self,
+        origin: &lsp::Range,
+        file: &tsr_compiler::ProgramFile,
+        declaration: NodeId,
+        feature: i32,
+    ) -> Result<Option<lsp::LocationLink>> {
+        let view = file.bound().view().ast();
+        let mut syntax = Syntax::new(view, file.source())?;
+        let name =
+            tsr_ast::get_name_of_declaration(view, Some(declaration))?.unwrap_or(declaration);
+        let read = view.node(name)?;
+        let name_range = if read.kind() == K::EmptyStatement {
+            TextRange::new(i64::from(read.pos()), i64::from(read.pos()))
+        } else {
+            TextRange::new(syntax.start(name)?, i64::from(read.end()))
+        };
+        let context = context_node(view, declaration)?.unwrap_or(declaration);
+        let context_range = TextRange::new(
+            syntax.start(context)?.min(name_range.pos()),
+            i64::from(view.node(context)?.end()).max(name_range.end()),
+        );
+        let (selection, fidelity) = self.file_location(&syntax.file, name_range, Some(feature))?;
+        if !fidelity.is_single_segment() {
+            return Ok(None);
+        }
+        let (mut target, fidelity) = self.file_location(&syntax.file, context_range, None)?;
+        if fidelity.is_none()
+            || target.uri != selection.uri
+            || !range_contains(&target.range, &selection.range)
+        {
+            target = selection.clone();
+        }
+        Ok(Some(lsp::LocationLink {
+            origin_selection_range: Some(Box::new(origin.clone())),
+            target_uri: target.uri,
+            target_range: target.range,
+            target_selection_range: selection.range,
+        }))
     }
     // port: tsc/internal/ls/utilities.go:getReferenceAtPosition
     pub(crate) fn reference_at(
@@ -689,6 +706,168 @@ impl LanguageService<'_> {
         // as well; only a loaded reference takes the early return.
         Ok(Some(name))
     }
+    // port: tsc/internal/ls/definition.go:LanguageService.provideDefinitionAtPosition
+    pub(crate) fn definition_at_position(
+        &mut self,
+        checker: &mut Operation<'_>,
+        source: NodeId,
+        position: i64,
+        type_definition: bool,
+    ) -> Result<Vec<Option<Box<lsp::LocationLink>>>> {
+        self.check_canceled()?;
+        let feature = if type_definition {
+            FEATURE_TYPE_DEFINITION
+        } else {
+            FEATURE_DEFINITION
+        };
+        let mut all = Vec::new();
+        let view = self.view(source)?;
+        let mut syntax = Syntax::new(view, source)?;
+        let node = syntax.nav().get_touching_property_name(position)?;
+        let read = view.node(node)?;
+        if read.kind() == K::SourceFile {
+            return Ok(all);
+        }
+        let origin = self
+            .unrestricted_range(
+                source,
+                TextRange::new(syntax.start(node)?, i64::from(read.end())),
+            )?
+            .0;
+        if type_definition {
+            let node = declaration_name_for_keyword(view, node)?;
+            if let Some(symbol) = checker.get_symbol_at_location(node)? {
+                let ty = self.definition_type(checker, symbol, node)?;
+                let mut declarations = Self::type_declarations(checker, ty)?;
+                if let Some(argument) = checker.get_first_type_argument_from_known_type(ty)? {
+                    let mut from_argument = Self::type_declarations(checker, argument)?;
+                    from_argument.extend(declarations);
+                    declarations = from_argument;
+                }
+                if declarations.is_empty()
+                    && checker.symbol(symbol)?.flags() & sf::VALUE == 0
+                    && checker.symbol(symbol)?.flags() & sf::TYPE != 0
+                {
+                    declarations.extend(checker.symbol_declarations(symbol)?.iter().flatten());
+                }
+                all.extend(self.definition_locations(&origin, &declarations, None, feature)?);
+            }
+            return Ok(all);
+        }
+        let reference = self.reference_at(&mut syntax, position)?;
+        if let Some(name) = reference
+            .as_deref()
+            .filter(|name| self.program.source_file(name).is_some())
+        {
+            all.extend(self.definition_locations(&origin, &[], Some(name), feature)?);
+            return Ok(all);
+        }
+        if read.kind() == K::OverrideKeyword {
+            if let Some(symbol) = self.overridden_symbol(checker, node)? {
+                let declarations: Vec<_> = checker
+                    .symbol_declarations(symbol)?
+                    .iter()
+                    .flatten()
+                    .collect();
+                all.extend(self.definition_locations(&origin, &declarations, None, feature)?);
+                return Ok(all);
+            }
+        }
+        if middle::is_jump_statement_target(view, node)? {
+            if let Some(label) = target_label(
+                view,
+                read.parent().ok_or(tsr_arena::Error::InvalidGraph)?,
+                view.node_text(node)?.as_bytes(),
+            )? {
+                all.extend(self.definition_locations(&origin, &[label], None, feature)?);
+                return Ok(all);
+            }
+        }
+        if read.kind() == K::CaseKeyword
+            || read.kind() == K::DefaultKeyword
+                && read
+                    .parent()
+                    .is_some_and(|id| view.node(id).is_ok_and(|n| n.kind() == K::DefaultClause))
+        {
+            if let Some(switch) = ancestor(view, read.parent(), |id| {
+                Ok(view.node(id)?.kind() == K::SwitchStatement)
+            })? {
+                let start = syntax.start(switch)?;
+                let (range, _) = self.range(source, TextRange::new(start, start + 6), feature)?;
+                all.push(Some(Box::new(lsp::LocationLink {
+                    target_uri: lsp::DocumentUri::from_file_name(
+                        syntax.file.original_file_name()?.as_bytes(),
+                    ),
+                    target_range: range.clone(),
+                    target_selection_range: range,
+                    ..Default::default()
+                })));
+                return Ok(all);
+            }
+        }
+        if matches!(
+            read.kind().known(),
+            Some(K::ReturnKeyword | K::YieldKeyword | K::AwaitKeyword)
+        ) {
+            if let Some(function) = ancestor(view, Some(node), |id| {
+                Ok(ast::is_function_like_declaration(Some(&view.node(id)?)))
+            })? {
+                all.extend(self.definition_locations(&origin, &[function], None, feature)?);
+                return Ok(all);
+            }
+        }
+        let mut declarations = self.declarations_at(checker, node)?;
+        if let Some(called) = self.called_declaration(checker, node)? {
+            let kind = self.view(called)?.node(called)?.kind();
+            let jsx_constructor = read.parent().is_some_and(|id| {
+                view.node(id)
+                    .is_ok_and(|n| middle::is_jsx_opening_like_element(&n))
+            }) && matches!(
+                kind.known(),
+                Some(
+                    K::Constructor | K::ConstructorType | K::CallSignature | K::ConstructSignature
+                )
+            );
+            if !jsx_constructor {
+                let mut matches = false;
+                if let Some(symbol) =
+                    checker.get_symbol_at_location(declaration_name_for_keyword(view, node)?)?
+                {
+                    for symbol in checker.get_root_symbols(symbol)? {
+                        if self.symbol_matches_signature(checker, symbol, called)? {
+                            matches = true;
+                            break;
+                        }
+                    }
+                }
+                if matches && kind != K::Constructor {
+                    declarations.clear();
+                } else {
+                    let mut kept = Vec::new();
+                    for id in declarations {
+                        if id != called
+                            && (!matches
+                                || matches!(
+                                    self.view(id)?.node(id)?.kind().known(),
+                                    Some(K::ClassDeclaration | K::ClassExpression)
+                                ))
+                        {
+                            kept.push(id);
+                        }
+                    }
+                    declarations = kept;
+                }
+                declarations.push(called);
+            }
+        }
+        all.extend(self.definition_locations(
+            &origin,
+            &declarations,
+            reference.as_deref(),
+            feature,
+        )?);
+        Ok(all)
+    }
     // port: tsc/internal/ls/definition.go:LanguageService.ProvideDefinition
     // port: tsc/internal/ls/definition.go:LanguageService.ProvideTypeDefinition
     pub fn definition(
@@ -717,158 +896,11 @@ impl LanguageService<'_> {
             if !projection.mapped.fidelity.is_single_segment() {
                 continue;
             }
-            let source = projection.script;
-            let view = self.view(source)?;
-            let mut syntax = Syntax::new(view, source)?;
-            let node = syntax
-                .nav()
-                .get_touching_property_name(i64::from(projection.mapped.position))?;
-            let read = view.node(node)?;
-            if read.kind() == K::SourceFile {
-                continue;
-            }
-            let origin = self
-                .unrestricted_range(
-                    source,
-                    TextRange::new(syntax.start(node)?, i64::from(read.end())),
-                )?
-                .0;
-            if type_definition {
-                let node = declaration_name_for_keyword(view, node)?;
-                if let Some(symbol) = checker.get_symbol_at_location(node)? {
-                    let ty = self.definition_type(checker, symbol, node)?;
-                    let mut declarations = Self::type_declarations(checker, ty)?;
-                    if let Some(argument) = checker.get_first_type_argument_from_known_type(ty)? {
-                        let mut from_argument = Self::type_declarations(checker, argument)?;
-                        from_argument.extend(declarations);
-                        declarations = from_argument;
-                    }
-                    if declarations.is_empty()
-                        && checker.symbol(symbol)?.flags() & sf::VALUE == 0
-                        && checker.symbol(symbol)?.flags() & sf::TYPE != 0
-                    {
-                        declarations.extend(checker.symbol_declarations(symbol)?.iter().flatten());
-                    }
-                    all.extend(self.definition_locations(&origin, &declarations, None, feature)?);
-                }
-                continue;
-            }
-            let reference =
-                self.reference_at(&mut syntax, i64::from(projection.mapped.position))?;
-            if let Some(name) = reference
-                .as_deref()
-                .filter(|name| self.program.source_file(name).is_some())
-            {
-                all.extend(self.definition_locations(&origin, &[], Some(name), feature)?);
-                continue;
-            }
-            if read.kind() == K::OverrideKeyword {
-                if let Some(symbol) = self.overridden_symbol(checker, node)? {
-                    let declarations: Vec<_> = checker
-                        .symbol_declarations(symbol)?
-                        .iter()
-                        .flatten()
-                        .collect();
-                    all.extend(self.definition_locations(&origin, &declarations, None, feature)?);
-                    continue;
-                }
-            }
-            if middle::is_jump_statement_target(view, node)? {
-                if let Some(label) = target_label(
-                    view,
-                    read.parent().ok_or(tsr_arena::Error::InvalidGraph)?,
-                    view.node_text(node)?.as_bytes(),
-                )? {
-                    all.extend(self.definition_locations(&origin, &[label], None, feature)?);
-                    continue;
-                }
-            }
-            if read.kind() == K::CaseKeyword
-                || read.kind() == K::DefaultKeyword
-                    && read
-                        .parent()
-                        .is_some_and(|id| view.node(id).is_ok_and(|n| n.kind() == K::DefaultClause))
-            {
-                if let Some(switch) = ancestor(view, read.parent(), |id| {
-                    Ok(view.node(id)?.kind() == K::SwitchStatement)
-                })? {
-                    let start = syntax.start(switch)?;
-                    let (range, _) =
-                        self.range(source, TextRange::new(start, start + 6), feature)?;
-                    all.push(Some(Box::new(lsp::LocationLink {
-                        target_uri: lsp::DocumentUri::from_file_name(
-                            syntax.file.original_file_name()?.as_bytes(),
-                        ),
-                        target_range: range.clone(),
-                        target_selection_range: range,
-                        ..Default::default()
-                    })));
-                    continue;
-                }
-            }
-            if matches!(
-                read.kind().known(),
-                Some(K::ReturnKeyword | K::YieldKeyword | K::AwaitKeyword)
-            ) {
-                if let Some(function) = ancestor(view, Some(node), |id| {
-                    Ok(ast::is_function_like_declaration(Some(&view.node(id)?)))
-                })? {
-                    all.extend(self.definition_locations(&origin, &[function], None, feature)?);
-                    continue;
-                }
-            }
-            let mut declarations = self.declarations_at(checker, node)?;
-            if let Some(called) = self.called_declaration(checker, node)? {
-                let kind = self.view(called)?.node(called)?.kind();
-                let jsx_constructor = read.parent().is_some_and(|id| {
-                    view.node(id)
-                        .is_ok_and(|n| middle::is_jsx_opening_like_element(&n))
-                }) && matches!(
-                    kind.known(),
-                    Some(
-                        K::Constructor
-                            | K::ConstructorType
-                            | K::CallSignature
-                            | K::ConstructSignature
-                    )
-                );
-                if !jsx_constructor {
-                    let mut matches = false;
-                    if let Some(symbol) =
-                        checker.get_symbol_at_location(declaration_name_for_keyword(view, node)?)?
-                    {
-                        for symbol in checker.get_root_symbols(symbol)? {
-                            if self.symbol_matches_signature(checker, symbol, called)? {
-                                matches = true;
-                                break;
-                            }
-                        }
-                    }
-                    if matches && kind != K::Constructor {
-                        declarations.clear();
-                    } else {
-                        let mut kept = Vec::new();
-                        for id in declarations {
-                            if id != called
-                                && (!matches
-                                    || matches!(
-                                        self.view(id)?.node(id)?.kind().known(),
-                                        Some(K::ClassDeclaration | K::ClassExpression)
-                                    ))
-                            {
-                                kept.push(id);
-                            }
-                        }
-                        declarations = kept;
-                    }
-                    declarations.push(called);
-                }
-            }
-            all.extend(self.definition_locations(
-                &origin,
-                &declarations,
-                reference.as_deref(),
-                feature,
+            all.extend(self.definition_at_position(
+                checker,
+                projection.script,
+                i64::from(projection.mapped.position),
+                type_definition,
             )?);
         }
         // port: tsc/internal/ls/definition.go:combineDefinitionResponses

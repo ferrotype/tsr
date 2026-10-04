@@ -4,7 +4,28 @@ use tsr_ast::{FileReference, NodeId};
 use tsr_core::ResolutionMode;
 use tsr_module::{ResolvedModule, ResolvedTypeReferenceDirective};
 
+/// Module format for a navigation target which need not belong to the program.
+pub fn navigation_module_format(name: &[u8], package_type: &[u8]) -> tsr_core::ModuleKind {
+    metadata::implied_node_format_for_file(name, package_type)
+}
 impl Program {
+    pub fn usage_resolution_mode(
+        &self,
+        file: &ProgramFile,
+        specifier: NodeId,
+    ) -> Result<ResolutionMode, Error> {
+        let view = file.bound().view().ast();
+        let source = view.source_file(file.source())?;
+        let path = source.parse_options().path.as_bytes();
+        metadata::usage_mode(
+            view,
+            source.file_name(),
+            self.metadata(path).ok_or(tsr_arena::Error::InvalidGraph)?,
+            specifier,
+            self.options_for_file(path, source.file_name()),
+        )
+    }
+
     /// Implicit side-effect imports have no local bindings. Navigation uses
     /// the same eligibility and names as the loader, in the pin's JSX/helpers
     /// order, without publishing synthetic nodes into the parsed source.

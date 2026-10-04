@@ -697,17 +697,9 @@ impl LanguageService<'_> {
         feature: i32,
     ) -> Result<Option<lsp::Location>> {
         let range = self.entry_range(entry)?;
-        let (range, fidelity) = self.range(entry.source, range, feature)?;
-        Ok(fidelity.is_single_segment().then(|| lsp::Location {
-            uri: lsp::DocumentUri::from_file_name(
-                self.source(entry.source)
-                    .unwrap()
-                    .original_file_name()
-                    .unwrap()
-                    .as_bytes(),
-            ),
-            range,
-        }))
+        let (location, fidelity) =
+            self.file_location(&self.source(entry.source)?, range, Some(feature))?;
+        Ok(fidelity.is_single_segment().then_some(location))
     }
     // port: tsc/internal/ls/findallreferences.go:LanguageService.ProvideReferences
     pub fn references(
@@ -872,17 +864,22 @@ impl LanguageService<'_> {
                 if let Some(context) = entry.context {
                     let view = self.view(context)?;
                     let mut syntax = Syntax::new(view, entry.source)?;
-                    let (r, f) = self.range(
-                        entry.source,
-                        syntax.reference_range(context, None)?,
-                        FEATURE_IMPLEMENTATION,
+                    let context_range = syntax.reference_range(context, None)?;
+                    let (location, fidelity) = self.file_location(
+                        &syntax.file,
+                        context_range,
+                        Some(FEATURE_IMPLEMENTATION),
                     )?;
-                    if !f.is_none() {
-                        range = r;
+                    if !fidelity.is_none() && location.uri == loc.uri {
+                        range = location.range;
                     }
                 }
                 out.push(Some(Box::new(lsp::LocationLink {
-                    target_uri: loc.uri,
+                    // The pin keeps the original entry URI on implementation
+                    // links even when its selection follows a declaration map.
+                    target_uri: lsp::DocumentUri::from_file_name(
+                        self.source(entry.source)?.original_file_name()?.as_bytes(),
+                    ),
                     target_selection_range: loc.range,
                     target_range: range,
                     ..Default::default()

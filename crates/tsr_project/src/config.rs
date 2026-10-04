@@ -87,6 +87,10 @@ pub struct ConfigRegistryBuilder {
     relative_patterns: bool,
 }
 impl ConfigRegistryBuilder {
+    pub(crate) fn custom_config_file_name(&self) -> &JsString {
+        &self.custom_name
+    }
+
     pub fn new(
         base: Arc<ConfigFileRegistry>,
         fs: Arc<dyn FileSystem>,

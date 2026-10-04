@@ -1,8 +1,8 @@
-# L2 server and conversion checks
+# Language server development checks (L2 and L3)
 
 L2 connects the generated protocol to production project sessions and compiler
 diagnostics. `tsrust --lsp --stdio` and the private version-3 endpoint use the
-same runtime. Later service methods return a named `-32601` error; their pinned
+same runtime. Unported L4–L6 service methods return a named `-32601` error; their pinned
 capabilities remain declared so the protocol surface does not drift during the
 port. This is not a complete editor server yet.
 
@@ -89,11 +89,81 @@ encodings. The direct tests, targeted clippy with warnings denied, ledger/marker
 validation and package policy pass. The real FSEvents test passed outside the
 desktop sandbox, which denies starting its stream. CI results are separate.
 
+## L3 read-only features
+
+The ordinary server and private endpoint dispatch through the same production
+language service. This increment implements hover (Markdown, plaintext and
+Visual Studio classified text), references and implementations, highlights,
+definitions/type definitions/source definitions, document/workspace symbols,
+signature help, inlay hints, semantic tokens, call hierarchy, selection ranges,
+folding, code lenses and linked editing. Pull diagnostics and suggestions keep
+the L2 compiler pipeline and now run alongside the semantic feature probes.
+
+Navigation retains the requesting program and checker lease. Source definitions
+use a private `NoDtsResolution` resolver for implementation files and forwarding
+exports. The syntactic path never acquires a checker; semantic resolution is a
+scoped callback. Declaration maps follow original positions through external,
+inline and chained maps, including files outside the loaded program. Unreadable
+maps fall back and map cycles terminate. No navigation target is inserted into
+the published program. L3 also fixes checker API queries on original JSDoc nodes
+to resolve their bound reparsed nodes, and reuses a containing configured project
+for an unopened dependency instead of creating an inferred project.
+
+The bounded scripts below compare complete native response objects, preserving
+array order and absent/null distinctions. They run against the same temporary
+files with UTF-8 and UTF-16 negotiation. They use the Go executable built by
+`interop.py`; run that first if `target/phase5/go-lsp` is absent or the pin changed.
+No renderer is duplicated and no output is accepted by normalization.
+
+```sh
+cargo build -p tsrust --bin tsrust
+python3 tools/phase5/lsp/read_only.py
+python3 tools/phase5/lsp/signature_help.py
+python3 tools/phase5/lsp/inlay_hints.py
+python3 tools/phase5/lsp/references.py
+python3 tools/phase5/lsp/call_hierarchy.py
+python3 tools/phase5/lsp/code_lens.py
+python3 tools/phase5/lsp/source_definition.py
+python3 tools/phase5/lsp/read_only_edges.py
+```
+
+Development comparisons on 2026-10-04:
+
+| Script | Matching responses | Scope |
+| --- | ---: | --- |
+| `read_only.py` | 3,608 | Hover, definition/type definition, symbols, tokens, folding, linked editing and selection ranges; hierarchical/flat symbols, line-only folding, text/link capabilities and edits |
+| `signature_help.py` | 5,152 | Cursor boundaries, type arguments, overloads, rest/spread tuples, tagged templates, JSX, classified text and nullable active parameter |
+| `inlay_hints.py` | 280, plus 14 refresh counts | All parameter/type/enum/return preferences, name suppression, locations, quote style, enabling/disabling/resetting preferences |
+| `references.py` | 6,220 | Cross-file aliases/re-exports, inheritance, implementations, destructuring/contextual properties, labels/keywords, Visual Studio references, location links and edits |
+| `call_hierarchy.py` | 646 | Prepare/incoming/outgoing, cross-file overloads, methods/accessors, anonymous functions, class initializers/static blocks and JSX |
+| `code_lens.py` | 180 | Reference/implementation lens admission, resolution, commands/counts and preference updates |
+| `source_definition.py` | 724 | Package implementation entry points, forwarded/default/type-only imports, normal definition fallback, malformed/inline/chained declaration maps and source-definition preference |
+| `read_only_edges.py` | 1,218 | CommonJS exports, JSDoc typedef/property names, JSX-runtime/tslib implicit imports, unopened dependencies, deprecation/unused diagnostics |
+
+The direct native selection-depth and implementation-worklist regressions are
+ported into `tsr_ls::tests`. Other regressions cover cancellation, escaped owner
+identities, classified type-reference handles, code fences and string-name
+ranges, inlay declaration links, signature printer context, declaration-map
+ownership/cycles, JSDoc symbol/type identity and the no-checker source-definition
+fast path. A session test protects configured-project selection for an unopened
+dependency. The L2 diagnostic/coordinate tests remain in `converters::tests`.
+The relevant preference parsing/reset and refresh behavior is exercised through
+the ordinary wire; editing/auto-import preferences and the full preference
+roundtrip belong to their L4/L5 consumers.
+
 ## Remaining Phase 5 boundaries
 
-L3–L6 own hover, completion, navigation, edits/formatting, code actions,
-cross-project/API services, mapper execution and ATA. The full L0 fourslash
-transport/supervisor and semantic acceptance run are still pending; these
-focused server tests do not add entries to `status/parity/lsp.json`. Native
-pprof is Phase 7. Rust backtraces follow the sanitizer's unknown-frame policy
-and are empty in telemetry; local error logs retain the diagnostic backtrace.
+L4 owns completions and auto-imports. L5 owns rename, edits/formatting and code
+fixes. L6 owns project-tree loading and searching across referenced projects,
+workspace discovery beyond loaded projects, reverse declaration-map lookup into
+other project programs, content-mapper execution/installation, ATA and the API
+bridge. L3 searches and workspace symbols currently use the loaded program(s);
+these are concrete L6 project-host dependencies, not completed cross-project
+acceptance. Source maps from a declaration target to an original file are
+implemented in L3.
+
+The full L0 fourslash transport/supervisor and semantic acceptance run are still
+pending for L7. These development comparisons and direct tests confer no
+`status/parity/lsp.json` corpus credit. Native pprof is Phase 7. Rust backtraces
+follow the sanitizer's unknown-frame policy and are empty in telemetry; local
+error logs retain the diagnostic backtrace.

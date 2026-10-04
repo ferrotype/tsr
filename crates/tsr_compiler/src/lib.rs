@@ -22,6 +22,7 @@ mod declaration_diagnostics;
 mod declaration_host;
 mod navigation;
 pub use declaration_host::ProgramDeclarationHost;
+pub use navigation::navigation_module_format;
 mod emit_host;
 pub use emit_host::EmitHost;
 pub mod diagnostic_writer;

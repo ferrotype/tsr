@@ -28,6 +28,7 @@ pub fn handles(method: &str) -> bool {
             | "textDocument/semanticTokens/range"
             | "textDocument/documentSymbol"
             | "textDocument/definition"
+            | "custom/textDocument/sourceDefinition"
             | "textDocument/typeDefinition"
     )
 }
@@ -52,6 +53,7 @@ pub enum Request {
     SemanticRange(lsp::SemanticTokensRangeParams),
     DocumentSymbols(lsp::DocumentSymbolParams),
     Definition(lsp::DefinitionParams),
+    SourceDefinition(lsp::DefinitionParams),
     TypeDefinition(lsp::TypeDefinitionParams),
 }
 impl Request {
@@ -104,6 +106,9 @@ impl Request {
             "textDocument/foldingRange" => Self::Folding(crate::decode(params)?),
             "textDocument/semanticTokens/full" => Self::Semantic(crate::decode(params)?),
             "textDocument/semanticTokens/range" => Self::SemanticRange(crate::decode(params)?),
+            "custom/textDocument/sourceDefinition" => {
+                Self::SourceDefinition(crate::decode(params)?)
+            }
             "textDocument/definition" => Self::Definition(crate::decode(params)?),
             "textDocument/typeDefinition" => Self::TypeDefinition(crate::decode(params)?),
             "textDocument/documentSymbol" => Self::DocumentSymbols(crate::decode(params)?),
@@ -116,6 +121,7 @@ impl Request {
             self,
             Self::Hover(_)
                 | Self::SignatureHelp(_)
+                | Self::SourceDefinition(_)
                 | Self::Definition(_)
                 | Self::TypeDefinition(_)
                 | Self::References(_)
@@ -140,7 +146,7 @@ impl Request {
             Self::Folding(p) => &p.text_document.uri,
             Self::Semantic(p) => &p.text_document.uri,
             Self::SemanticRange(p) => &p.text_document.uri,
-            Self::Definition(p) => &p.text_document.uri,
+            Self::Definition(p) | Self::SourceDefinition(p) => &p.text_document.uri,
             Self::TypeDefinition(p) => &p.text_document.uri,
             Self::DocumentSymbols(p) => &p.text_document.uri,
         }
@@ -152,9 +158,39 @@ fn service_error(e: tsr_ls::Error) -> lsp::ResponseError {
         e => error(-32603, e.to_string()),
     }
 }
+struct RequestChecker<'a> {
+    project: &'a tsr_project::Project,
+    context: &'a Context,
+    request_id: &'a str,
+}
+impl tsr_ls::QueryChecker for RequestChecker<'_> {
+    fn with_checker<T>(
+        &mut self,
+        source: tsr_ast::NodeId,
+        query: impl FnOnce(&mut tsr_checker::Operation<'_>) -> tsr_ls::Result<T>,
+    ) -> tsr_ls::Result<T> {
+        let checker = self
+            .project
+            .scheduler()
+            .unwrap()
+            .acquire(
+                tsr_checker::CheckerLifetime::Temporary,
+                Some(source),
+                self.context,
+                self.request_id,
+            )
+            .map_err(|e| match e {
+                tsr_project::scheduler::AcquireError::Canceled(_) => tsr_ls::Error::Canceled,
+                tsr_project::scheduler::AcquireError::Checker(e) => tsr_ls::Error::Checker(e),
+            })?;
+        let mut operation = checker.operation()?;
+        query(&mut operation)
+    }
+}
 #[derive(Clone)]
 pub struct Options {
     pub maximum_hover_length: usize,
+    pub prefer_source_definition: bool,
     pub inlay: tsr_ls::InlayHintsOptions,
     pub code_lens: tsr_ls::CodeLensOptions,
     pub lens_command: Option<String>,
@@ -194,6 +230,30 @@ pub fn execute(
     if matches!(request, Request::InlayHints(_)) && !options.inlay.enabled() {
         return client::raw(&lsp::Null);
     }
+    let source_definition = match &request {
+        Request::SourceDefinition(p) => Some(p),
+        Request::Definition(p) if options.prefer_source_definition => Some(p),
+        _ => None,
+    };
+    if let Some(p) = source_definition {
+        let links = capabilities
+            .text_document
+            .as_deref()
+            .and_then(|c| c.definition.as_deref())
+            .and_then(|c| c.link_support.as_deref())
+            .copied()
+            .unwrap_or(false);
+        let mut checker = RequestChecker {
+            project,
+            context,
+            request_id,
+        };
+        return client::raw(
+            &service
+                .source_definition(&mut checker, &p.text_document.uri, &p.position, links)
+                .map_err(service_error)?,
+        );
+    }
     if matches!(
         request,
         Request::Hover(_)
@@ -210,6 +270,7 @@ pub fn execute(
             | Request::Implementation(_)
             | Request::Semantic(_)
             | Request::SemanticRange(_)
+            | Request::SourceDefinition(_)
             | Request::Definition(_)
             | Request::TypeDefinition(_)
     ) {
@@ -476,6 +537,7 @@ pub fn execute(
         | Request::Implementation(_)
         | Request::Semantic(_)
         | Request::SemanticRange(_)
+        | Request::SourceDefinition(_)
         | Request::Definition(_)
         | Request::TypeDefinition(_) => {
             unreachable!("semantic requests acquired their checker above")
