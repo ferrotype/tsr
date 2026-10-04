@@ -243,12 +243,20 @@ fn write_rows(arguments: &Arguments) -> Result<(), String> {
         *rows[index].lock().unwrap_or_else(PoisonError::into_inner) = Some(result);
     };
     std::thread::scope(|scope| {
-        for _ in 0..arguments.jobs.min(selected.len()) {
-            std::thread::Builder::new()
-                .name("phase4-scenario".into())
-                .stack_size(tsr_core::workgroup::RESERVED_STACK)
-                .spawn_scoped(scope, worker)
-                .expect("a scenario thread starts");
+        let workers: Vec<_> = (0..arguments.jobs.min(selected.len()))
+            .map(|_| {
+                std::thread::Builder::new()
+                    .name("phase4-scenario".into())
+                    .stack_size(tsr_core::workgroup::RESERVED_STACK)
+                    .spawn_scoped(scope, worker)
+                    .expect("a scenario thread starts")
+            })
+            .collect();
+        // Joined, not dropped, as the work group joins its workers: detaching
+        // a finished thread on a reserved stack can fault in glibc.
+        let panics: Vec<_> = workers.into_iter().filter_map(|w| w.join().err()).collect();
+        if let Some(payload) = panics.into_iter().next() {
+            std::panic::resume_unwind(payload);
         }
     });
 
