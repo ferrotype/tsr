@@ -294,6 +294,35 @@ pub(crate) fn jsx_implicit_import_base(
     Ok(JsString::default())
 }
 
+/// Eligibility shared by loading, program reuse and navigation. The loader
+/// resolves helpers first, but its synthetic import list is JSX then helpers.
+pub(crate) struct ImplicitImports {
+    pub runtime: JsString,
+    pub helpers: bool,
+}
+pub(crate) fn implicit_imports(
+    view: AstView<'_>,
+    source: NodeId,
+    options: &CompilerOptions,
+) -> Result<ImplicitImports, Error> {
+    use tsr_core::ScriptKind;
+    let state = view.source_file(source)?;
+    let javascript = matches!(state.script_kind, ScriptKind::JS | ScriptKind::JSX);
+    let runtime = if javascript || state.script_kind == ScriptKind::TSX {
+        jsx_runtime_import(
+            jsx_implicit_import_base(view, source, options)?.as_bytes(),
+            options,
+        )
+    } else {
+        JsString::default()
+    };
+    let helpers = options.import_helpers.is_true()
+        && (javascript
+            || !state.is_declaration_file
+                && (options.isolated_modules() || state.external_module_indicator.is_some()));
+    Ok(ImplicitImports { runtime, helpers })
+}
+
 /// An empty base is no runtime import.
 /// port: tsc/internal/ast/utilities.go:GetJSXRuntimeImport
 pub(crate) fn jsx_runtime_import(base: &[u8], options: &CompilerOptions) -> JsString {

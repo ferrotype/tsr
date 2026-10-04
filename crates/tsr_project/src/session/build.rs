@@ -336,12 +336,6 @@ impl<'a> ProjectBuilder<'a> {
         kind: ProjectKind,
         command: Arc<ParsedCommandLine>,
     ) -> Result<(), Error> {
-        if let Some(project) = self.projects.get_mut(key) {
-            let data = project.data.as_mut().expect("session project");
-            if data.config_search != *self.configs.custom_config_file_name() {
-                Arc::make_mut(data).config_search = self.configs.custom_config_file_name().clone();
-            }
-        }
         if !self.updated.insert(key.clone()) {
             return Ok(());
         }
@@ -496,7 +490,6 @@ impl<'a> ProjectBuilder<'a> {
                 host,
                 dirty: false,
                 dirty_file: None,
-                config_search: self.configs.custom_config_file_name().clone(),
             },
             &self.session.counters,
             self.session.options.query_checkers,

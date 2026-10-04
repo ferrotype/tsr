@@ -2,7 +2,7 @@
 //! shared; derived include locations and checker state belong to the new program.
 use super::{
     metadata, Arc, CompilerOptions, Counters, Diagnostic, Error, FileCache, FileSystem,
-    IncludeExplanations, NodeId, OnceLock, ProcessingDiagnostic, Program, ProgramFile, ScriptKind,
+    IncludeExplanations, NodeId, OnceLock, ProcessingDiagnostic, Program, ProgramFile,
 };
 use tsr_ast::{AstView, FileReference, SourceFileRead, SyntaxKind};
 
@@ -361,21 +361,8 @@ fn equal_references<'a>(
 }
 fn synthetic_imports(file: &ProgramFile, options: &CompilerOptions) -> Result<bool, Error> {
     let view = file.bound().view().ast();
-    let source = view.source_file(file.source())?;
-    let javascript = matches!(source.script_kind, ScriptKind::JS | ScriptKind::JSX);
-    if options.import_helpers.is_true()
-        && (javascript
-            || !source.is_declaration_file
-                && (options.isolated_modules() || source.external_module_indicator.is_some()))
-    {
-        return Ok(true);
-    }
-    Ok((javascript || source.script_kind == ScriptKind::TSX)
-        && !metadata::jsx_runtime_import(
-            metadata::jsx_implicit_import_base(view, file.source(), options)?.as_bytes(),
-            options,
-        )
-        .is_empty())
+    let imports = metadata::implicit_imports(view, file.source(), options)?;
+    Ok(imports.helpers || !imports.runtime.is_empty())
 }
 fn references_source(diagnostic: &Diagnostic, source: NodeId) -> bool {
     diagnostic.file == Some(source)

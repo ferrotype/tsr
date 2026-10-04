@@ -346,18 +346,17 @@ impl LanguageService<'_> {
                                 {
                                     modifiers |= 1 << 10;
                                 }
-                                let file = decl_view.source_file(
-                                    self.program.file_of_node(decl).unwrap().source(),
-                                )?;
-                                if self.program.is_lib(file.parse_options().path.as_bytes()) {
-                                    modifiers |= 1 << 9;
+                                if let Some(owner) = self.program.file_of_node(decl) {
+                                    let file = decl_view.source_file(owner.source())?;
+                                    if self.program.is_lib(file.parse_options().path.as_bytes()) {
+                                        modifiers |= 1 << 9;
+                                    }
                                 }
                             } else {
                                 for decl in checker.symbol_declarations(symbol)?.iter().flatten() {
-                                    let file = self
-                                        .program
-                                        .file_of_node(decl)
-                                        .ok_or(tsr_arena::Error::WrongOwner)?;
+                                    let Some(file) = self.program.file_of_node(decl) else {
+                                        continue;
+                                    };
                                     if self.program.is_lib(
                                         file.bound()
                                             .view()

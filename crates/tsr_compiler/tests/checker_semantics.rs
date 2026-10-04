@@ -4665,3 +4665,51 @@ enum A {
     assert!(result.resolved_other_files);
     assert!(result.has_external_references);
 }
+
+// nodebuilderimpl.go:typeReferenceToTypeNode associates generic array names
+// with their target symbols, even though the identifier is synthetic.
+#[test]
+fn generic_array_display_records_the_target_symbol_for_both_array_kinds() {
+    let (owner, program, _) = fixture(
+        b"interface Array<T> { length: number; [n: number]: T }
+interface ReadonlyArray<T> { readonly length: number; readonly [n: number]: T }
+type Mutable = number[]; type Immutable = readonly number[];",
+        options(),
+    );
+    let declarations = declarations(&program);
+    let mut op = owner.operation().unwrap();
+    for (target, alias, expected) in [
+        (0, 2, b"Array".as_slice()),
+        (1, 3, b"ReadonlyArray".as_slice()),
+    ] {
+        let symbol = op
+            .get_symbol_at_location(declaration_name(&program, declarations[target]))
+            .unwrap()
+            .unwrap();
+        let typ = op
+            .get_type_at_location(declaration_name(&program, declarations[alias]))
+            .unwrap();
+        let mut builder = op.node_builder();
+        let generated = builder
+            .type_to_type_node(
+                typ,
+                Some(declarations[alias]),
+                tsr_nodebuilder::flags::WRITE_ARRAY_AS_GENERIC_TYPE
+                    | tsr_nodebuilder::flags::IN_TYPE_ALIAS,
+                0,
+            )
+            .unwrap()
+            .unwrap();
+        let name = builder
+            .view()
+            .node(generated)
+            .unwrap()
+            .data_source()
+            .as_type_reference_node()
+            .unwrap()
+            .type_name()
+            .unwrap();
+        assert_eq!(builder.view().node_text(name).unwrap().as_bytes(), expected);
+        assert_eq!(builder.id_to_symbol(name), Some(symbol));
+    }
+}

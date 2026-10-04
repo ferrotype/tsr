@@ -32483,7 +32483,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1374
+          "line": 1383
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32497,7 +32497,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 745
+          "line": 754
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32511,7 +32511,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 912
+          "line": 921
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32525,7 +32525,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 944
+          "line": 953
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32553,7 +32553,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 2500
+          "line": 2496
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32567,7 +32567,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1470
+          "line": 1479
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32581,7 +32581,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1456
+          "line": 1465
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32609,7 +32609,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1874
+          "line": 1883
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32623,7 +32623,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1833
+          "line": 1842
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32637,7 +32637,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1572
+          "line": 1581
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32651,7 +32651,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1357
+          "line": 1366
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32665,7 +32665,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 2171
+          "line": 2180
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32679,7 +32679,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1564
+          "line": 1573
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32693,7 +32693,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 2055
+          "line": 2064
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32707,7 +32707,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 2062
+          "line": 2071
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32721,7 +32721,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1005
+          "line": 1014
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32735,7 +32735,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1194
+          "line": 1203
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32749,7 +32749,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/metadata.rs",
-          "line": 328
+          "line": 357
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32777,7 +32777,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 2484
+          "line": 2480
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32791,7 +32791,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 2467
+          "line": 2463
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32805,7 +32805,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/metadata.rs",
-          "line": 313
+          "line": 342
         }
       ],
       "source_sha256": "d066141232fd136e7166361df4e3999f7693d53003eaeacb859479c2025c8d37",
@@ -32860,7 +32860,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 2647
+          "line": 2643
         }
       ],
       "source_sha256": "411a9e85dceb77ddbfc64cd40f247d16a337b78462c35f6a0273d5ad9edaf777",
@@ -32874,7 +32874,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1286
+          "line": 1295
         }
       ],
       "source_sha256": "411a9e85dceb77ddbfc64cd40f247d16a337b78462c35f6a0273d5ad9edaf777",
@@ -32888,7 +32888,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 969
+          "line": 978
         }
       ],
       "source_sha256": "411a9e85dceb77ddbfc64cd40f247d16a337b78462c35f6a0273d5ad9edaf777",
@@ -32902,7 +32902,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1661
+          "line": 1670
         }
       ],
       "source_sha256": "411a9e85dceb77ddbfc64cd40f247d16a337b78462c35f6a0273d5ad9edaf777",
@@ -32934,7 +32934,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1638
+          "line": 1647
         }
       ],
       "source_sha256": "411a9e85dceb77ddbfc64cd40f247d16a337b78462c35f6a0273d5ad9edaf777",
@@ -32948,11 +32948,11 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1651
+          "line": 1660
         },
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1815
+          "line": 1824
         }
       ],
       "source_sha256": "411a9e85dceb77ddbfc64cd40f247d16a337b78462c35f6a0273d5ad9edaf777",
@@ -32966,7 +32966,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 1413
+          "line": 1422
         }
       ],
       "source_sha256": "411a9e85dceb77ddbfc64cd40f247d16a337b78462c35f6a0273d5ad9edaf777",
@@ -32980,7 +32980,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 2275
+          "line": 2271
         }
       ],
       "source_sha256": "411a9e85dceb77ddbfc64cd40f247d16a337b78462c35f6a0273d5ad9edaf777",
@@ -33021,7 +33021,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 2794
+          "line": 2790
         }
       ],
       "source_sha256": "fbe67fc26d79dc7ea3ff0f332d93587c2952877fd0b386055ed5cf92428527be",
@@ -33179,7 +33179,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 506
+          "line": 515
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -33235,11 +33235,11 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 2426
+          "line": 2422
         },
         {
           "file": "crates/tsr_compiler/src/navigation.rs",
-          "line": 105
+          "line": 92
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -33253,7 +33253,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 428
+          "line": 437
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -33281,7 +33281,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 552
+          "line": 561
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -33295,7 +33295,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 396
+          "line": 405
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -33323,7 +33323,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 567
+          "line": 576
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -33337,7 +33337,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 416
+          "line": 425
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -33393,7 +33393,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 420
+          "line": 429
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",
@@ -33435,7 +33435,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_compiler/src/loader.rs",
-          "line": 730
+          "line": 739
         }
       ],
       "source_sha256": "e6d10b986ab5db9759373a60f465ba6a3c833a8b2c8e7dc58dd9d744f14b30a0",

@@ -392,8 +392,6 @@ impl Program {
     pub fn options(&self) -> &CompilerOptions {
         &self.options
     }
-    /// The pin's compiler host reduces to the loading file system here.
-    /// port: tsc/internal/compiler/program.go:Program.Host
     pub fn common_source_directory(&self) -> Result<Vec<u8>, tsr_arena::Error> {
         crate::output_paths::common_source_directory(self)
     }
@@ -403,6 +401,8 @@ impl Program {
         self.host.clone()
     }
 
+    /// The pin's compiler host reduces to the loading file system here.
+    /// port: tsc/internal/compiler/program.go:Program.Host
     pub fn host(&self) -> &dyn FileSystem {
         self.host.as_ref()
     }
@@ -1819,7 +1819,7 @@ impl<'a> Loader<'a> {
                     }
                 }
             }
-            self.resolve_imports_and_module_augmentations(&file, &key, &meta, &resolution, kind)?;
+            self.resolve_imports_and_module_augmentations(&file, &key, &meta, &resolution)?;
         }
         // port: tsc/internal/compiler/filesparser.go:parseTask.load
         for supplemental in state.supplemental_file_names() {
@@ -2184,7 +2184,6 @@ impl<'a> Loader<'a> {
         key: &JsString,
         meta: &SourceFileMetaData,
         resolution: &FileResolution,
-        kind: ScriptKind,
     ) -> Result<(), Error> {
         let view = file.bound.view().ast();
         let state = view.source_file(file.source())?;
@@ -2206,21 +2205,9 @@ impl<'a> Loader<'a> {
             false,
         );
         let name = resolution.name.clone();
-        let runtime = if matches!(kind, ScriptKind::JS | ScriptKind::JSX | ScriptKind::TSX) {
-            metadata::jsx_runtime_import(
-                metadata::jsx_implicit_import_base(view, file.source(), resolution.options())?
-                    .as_bytes(),
-                resolution.options(),
-            )
-        } else {
-            JsString::default()
-        };
-        if resolution.options().import_helpers.is_true()
-            && (matches!(kind, ScriptKind::JS | ScriptKind::JSX)
-                || !state.is_declaration_file
-                    && (resolution.options().isolated_modules()
-                        || state.external_module_indicator.is_some()))
-        {
+        let implicit = metadata::implicit_imports(view, file.source(), resolution.options())?;
+        let runtime = implicit.runtime;
+        if implicit.helpers {
             self.resolve_specifier(
                 file,
                 resolution,

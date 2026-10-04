@@ -527,3 +527,62 @@ fn checker_host_reads_project_references_and_their_options() {
         Err(Error::Unsupported(_))
     ));
 }
+
+#[test]
+fn retained_node_ownership_keeps_lazy_slots_checked_and_rejects_foreign_owners() {
+    let program = load(
+        CompilerOptions {
+            no_lib: Tristate::TRUE,
+            ..Default::default()
+        },
+        &[b"/src/main.ts"],
+        &[(b"/src/main.ts", b"const value = 1;")],
+        true,
+    );
+    let file = program.file(b"/src/main.ts").unwrap();
+    let view = file.bound().view().ast();
+    let first = view
+        .get_or_create_token(tsr_ast::SyntaxKind::ConstKeyword, 0, 5, file.source(), 0)
+        .unwrap()
+        .id();
+    assert_ne!(first.arena(), file.source().arena());
+    let invalid = NodeId::from_parts(first.arena(), u32::MAX).unwrap();
+    let host = program.resolver_host(&Counters::new());
+    assert_eq!(
+        tsr_binder::name_resolver::ResolverHost::ast(&host, invalid).unwrap_err(),
+        tsr_arena::Error::InvalidSlot
+    );
+    assert!(std::ptr::eq(
+        program.file_of_node(first).unwrap().as_ref(),
+        file
+    ));
+    let second = view
+        .get_or_create_token(tsr_ast::SyntaxKind::EqualsToken, 11, 12, file.source(), 0)
+        .unwrap()
+        .id();
+    assert!(std::ptr::eq(
+        program.file_of_node(second).unwrap().as_ref(),
+        file
+    ));
+    let foreign = load(
+        CompilerOptions {
+            no_lib: Tristate::TRUE,
+            ..Default::default()
+        },
+        &[b"/src/foreign.ts"],
+        &[(b"/src/foreign.ts", b"const other = 2;")],
+        true,
+    );
+    let foreign_node = foreign.file(b"/src/foreign.ts").unwrap().source();
+    for _ in 0..2 {
+        assert!(program.file_of_node(foreign_node).is_none());
+        assert_eq!(
+            tsr_binder::name_resolver::ResolverHost::ast(&host, foreign_node).unwrap_err(),
+            tsr_arena::Error::WrongOwner
+        );
+    }
+    assert!(std::ptr::eq(
+        program.file_of_node(first).unwrap().as_ref(),
+        file
+    ));
+}

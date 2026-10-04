@@ -662,6 +662,11 @@ impl<'a> AstView<'a> {
     pub fn for_node_owner(self, node: NodeId) -> Result<Self, Error> {
         self.0.for_node_owner(node).map(|view| Self(view, self.1))
     }
+    /// Whether this view retains an arena's owner, independent of slot validity.
+    /// This grants no node access; `node` still validates the arena and slot.
+    pub fn retains_arena(self, arena: tsr_arena::ArenaId) -> bool {
+        self.0.for_arena(arena).is_ok()
+    }
     pub fn source(self) -> &'a SourceText {
         self.0.source()
     }
