@@ -1,5 +1,20 @@
 //! Production document/project dispatch. Transports own admission and pump
 //! callbacks independently; this worker boundary may perform synchronous I/O.
+mod capabilities;
+pub mod client;
+pub mod connection;
+pub mod content_mappers;
+mod diagnostics;
+pub mod dynamic_queue;
+pub mod logger;
+pub mod progress;
+mod recovery;
+pub mod rpc_client;
+pub mod runtime;
+pub mod stack_sanitizer;
+#[cfg(test)]
+mod tests;
+pub mod watcher;
 use std::sync::Arc;
 use tsr_json::{Decode, RawValue};
 use tsr_jsstring::JsString;
@@ -69,17 +84,11 @@ impl Server {
             }
             "workspace/didChangeWatchedFiles" => {
                 let params: lsp::DidChangeWatchedFilesParams = decode(params)?;
-                for event in params.changes.into_iter().flatten() {
-                    let kind = match event.r#type.0 {
-                        1 => K::WatchCreate,
-                        2 => K::WatchChange,
-                        3 => K::WatchDelete,
-                        _ => continue,
-                    };
-                    self.session
-                        .enqueue(FileChange::new(kind, event.uri))
-                        .map_err(project_error)?;
-                }
+                self.session
+                    .did_change_watched_files(
+                        params.changes.into_iter().flatten().map(|event| *event),
+                    )
+                    .map_err(project_error)?;
                 return Ok(());
             }
             _ => {
@@ -105,8 +114,20 @@ fn decode<T: Decode + Default + 'static>(params: Option<&RawValue>) -> Result<T,
     lsp::unmarshal_params(params)
 }
 fn invalid(message: &str) -> ResponseError {
+    coded_error(lsp::ErrorCode::INVALID_PARAMS, Some(message))
+}
+fn canceled() -> ResponseError {
+    coded_error(lsp::ErrorCode::REQUEST_CANCELLED, None)
+}
+fn coded_error(code: lsp::ErrorCode, detail: Option<&str>) -> ResponseError {
+    error(
+        code.0,
+        detail.map_or_else(|| code.to_string(), |detail| format!("{code}: {detail}")),
+    )
+}
+fn error(code: i32, message: impl Into<String>) -> ResponseError {
     ResponseError {
-        code: -32602,
+        code,
         message: message.into(),
         data: None,
     }

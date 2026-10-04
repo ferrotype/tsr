@@ -244,3 +244,97 @@ fn reset_has_a_reserved_queue_slot_when_every_regular_slot_is_in_flight() {
     assert!(peer.state(3)["openFiles"].as_array().unwrap().is_empty());
     peer.finish();
 }
+
+#[test]
+fn private_transport_runs_negotiated_lsp_and_resets_its_session() {
+    let peer = Peer::new();
+    peer.initialize(&[]);
+    for encoding in ["utf-8", "utf-16"] {
+        peer.request(20,"initialize",json!({"processId":null,"rootUri":"file:///","capabilities":{"general":{"positionEncodings":[encoding]}}}));
+        assert_eq!(
+            peer.until(20)["result"]["capabilities"]["positionEncoding"],
+            encoding
+        );
+        peer.notify("initialized", json!({}));
+        peer.notify("textDocument/didOpen",json!({"textDocument":{"uri":"file:///main.ts","version":1,"languageId":"typescript","text":"/*😄*/ const x: number = \"bad\";"}}));
+        peer.request(
+            21,
+            "textDocument/diagnostic",
+            json!({"textDocument":{"uri":"file:///main.ts"}}),
+        );
+        let response = peer.until(21);
+        assert!(response.get("error").is_none(), "{response}");
+        let items = response["result"]["items"].as_array().unwrap();
+        let diagnostic = items.iter().find(|d| d["code"] == 2322).unwrap();
+        assert_eq!(
+            diagnostic["range"]["start"]["character"],
+            if encoding == "utf-8" { 15 } else { 13 }
+        );
+        peer.request(
+            22,
+            "custom/projectInfo",
+            json!({"textDocument":{"uri":"file:///main.ts"}}),
+        );
+        assert_eq!(peer.until(22)["result"]["configFilePath"], "/tsconfig.json");
+        // Reuse immediately after the response, while the reader and project
+        // worker are independent. Completion must retire the ID first.
+        for _ in 0..32 {
+            peer.request(
+                22,
+                "custom/projectInfo",
+                json!({"textDocument":{"uri":"file:///main.ts"}}),
+            );
+            assert_eq!(peer.until(22)["result"]["configFilePath"], "/tsconfig.json");
+        }
+        peer.send(json!({"jsonrpc":"2.0","id":23,"method":"shutdown"}));
+        let reply = peer.until(23);
+        assert!(reply.get("error").is_none(), "{reply}");
+        peer.request(24, "test/reset", json!({}));
+        assert_eq!(peer.until(24)["result"]["reset"], true);
+        if encoding == "utf-8" {
+            peer.initialize(&[]);
+        }
+    }
+    peer.finish();
+}
+
+#[test]
+fn inferred_options_between_initialize_and_initialized_reach_the_first_program() {
+    let peer = Peer::new();
+    peer.request(1, "test/initialize", json!({"version":3,"caseSensitive":true,"base":{},"symlinks":{},"callbacks":[],"plugins":[],"options":{"noLib":true},"project":{"currentDirectory":"/","defaultLibraryPath":"/","positionEncoding":"utf-16"}}));
+    assert_eq!(peer.until(1)["result"]["version"], 3);
+    peer.request(
+        2,
+        "initialize",
+        json!({"processId":null,"rootUri":"file:///","capabilities":{}}),
+    );
+    assert!(peer.until(2).get("error").is_none());
+    peer.request(
+        3,
+        "test/setOptions",
+        json!({"options":{"noLib":true,"noImplicitAny":true}}),
+    );
+    let options = peer.until(3);
+    assert!(options.get("error").is_none(), "{options}");
+    peer.notify("initialized", json!({}));
+    peer.notify("textDocument/didOpen", json!({"textDocument":{"uri":"file:///main.ts","version":1,"languageId":"typescript","text":"function f(value) { return value; }"}}));
+    peer.request(
+        4,
+        "textDocument/diagnostic",
+        json!({"textDocument":{"uri":"file:///main.ts"}}),
+    );
+    let result = peer.until(4);
+    assert!(
+        result["result"]["items"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|d| d["code"] == 7006),
+        "{result}"
+    );
+    peer.send(json!({"jsonrpc":"2.0","id":5,"method":"shutdown"}));
+    assert!(peer.until(5).get("error").is_none());
+    peer.send(json!({"jsonrpc":"2.0","method":"exit"}));
+    let mut peer = peer;
+    peer.join.take().unwrap().join().unwrap().unwrap();
+}

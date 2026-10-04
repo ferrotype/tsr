@@ -1,0 +1,111 @@
+{
+  "positionEncoding": "utf-16",
+  "textDocumentSync": {
+    "openClose": true,
+    "change": 2,
+    "save": true
+  },
+  "hoverProvider": true,
+  "definitionProvider": true,
+  "typeDefinitionProvider": true,
+  "referencesProvider": true,
+  "implementationProvider": true,
+  "diagnosticProvider": {
+    "identifier": "typescript",
+    "interFileDependencies": true,
+    "workspaceDiagnostics": false
+  },
+  "completionProvider": {
+    "triggerCharacters": [
+      ".",
+      "\"",
+      "'",
+      "`",
+      "/",
+      "@",
+      "<",
+      "#",
+      " ",
+      "*"
+    ],
+    "resolveProvider": true,
+    "completionItem": {
+      "labelDetailsSupport": true
+    }
+  },
+  "signatureHelpProvider": {
+    "triggerCharacters": [
+      "(",
+      ",",
+      "<"
+    ],
+    "retriggerCharacters": [
+      ")"
+    ]
+  },
+  "documentFormattingProvider": true,
+  "documentRangeFormattingProvider": true,
+  "documentOnTypeFormattingProvider": {
+    "firstTriggerCharacter": "{",
+    "moreTriggerCharacter": [
+      "}",
+      ";",
+      "\n"
+    ]
+  },
+  "workspaceSymbolProvider": true,
+  "documentSymbolProvider": true,
+  "foldingRangeProvider": true,
+  "renameProvider": {
+    "prepareProvider": true
+  },
+  "documentHighlightProvider": true,
+  "selectionRangeProvider": true,
+  "linkedEditingRangeProvider": true,
+  "inlayHintProvider": true,
+  "codeLensProvider": {
+    "resolveProvider": true
+  },
+  "codeActionProvider": {
+    "codeActionKinds": [
+      "quickfix",
+      "source.organizeImports.ts",
+      "source.removeUnusedImports.ts",
+      "source.sortImports.ts",
+      "source.fixAll.ts"
+    ]
+  },
+  "callHierarchyProvider": true,
+  "experimental": {
+    "customSourceDefinitionProvider": true,
+    "customMultiDocumentHighlightProvider": true
+  },
+  "_vs_referencesProvider": true,
+  "_vs_onAutoInsertProvider": {
+    "_vs_triggerCharacters": [
+      ">"
+    ]
+  },
+  "workspace": {
+    "fileOperations": {
+      "willRename": {
+        "filters": [
+          {
+            "scheme": "file",
+            "pattern": {
+              "glob": "**/*.{ts,tsx,js,jsx,cts,cjs,mts,mjs,json}"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "semanticTokensProvider": {
+    "legend": {
+      "tokenTypes": [],
+      "tokenModifiers": []
+    },
+    "full": true,
+    "range": true
+  }
+}

@@ -2,6 +2,7 @@
 mod allocation;
 #[global_allocator]
 static ALLOCATOR: allocation::CountingAllocator = allocation::CountingAllocator;
+mod lsp;
 mod process;
 mod signals;
 mod system;
@@ -32,10 +33,10 @@ fn run_main() -> i32 {
         .skip(1)
         .map(|arg| JsString::from_bytes(arg.as_bytes()))
         .collect();
-    if args
-        .first()
-        .is_some_and(|arg| matches!(arg.as_bytes(), b"--lsp" | b"--api"))
-    {
+    if args.first().is_some_and(|arg| arg.as_bytes() == b"--lsp") {
+        return lsp::run(&args[1..]);
+    }
+    if args.first().is_some_and(|arg| arg.as_bytes() == b"--api") {
         eprintln!("This command is not implemented in this build.");
         return tsr_tsc::ExitStatus::NotImplemented.0;
     }

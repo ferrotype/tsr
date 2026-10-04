@@ -13,6 +13,19 @@ use std::time::{Duration, Instant};
 use tsr_ipc::{Closer, Stream};
 use tsr_jsstring::JsString;
 
+// port: tsc/cmd/tsc/isprocessalive_unix.go:isProcessAlive
+#[allow(
+    unsafe_code,
+    reason = "kill(pid, 0) is a process-existence probe; no signal is sent"
+)]
+pub(crate) fn is_process_alive(pid: isize) -> bool {
+    // Go's syscall boundary narrows its native-width int to pid_t. Preserve
+    // that conversion for flag.Int values, including values outside int32.
+    // SAFETY: kill with signal zero takes no pointers and cannot deliver a signal.
+    let result = unsafe { libc::kill(pid as libc::pid_t, 0) };
+    result == 0 || io::Error::last_os_error().raw_os_error() == Some(libc::EPERM)
+}
+
 pub(crate) fn cancellation_pipe() -> io::Result<(OwnedFd, OwnedFd)> {
     #[cfg(target_os = "linux")]
     {

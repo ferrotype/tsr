@@ -361,14 +361,10 @@ fn next_inner(
             Kind::BeginArray
         };
         if !stack.last().is_some_and(|f| f.kind == required) {
-            return Err(Error::syntax(
-                start,
-                ptr,
-                "mismatching structural token for object or array",
-            ));
+            return Err(input.invalid(start, &ptr, "at start of value"));
         }
         if required == Kind::BeginObject && !expects_name {
-            return Err(Error::syntax(start, ptr, "missing value after object name"));
+            return Err(input.invalid(start, &ptr, "at start of value"));
         }
         stack.pop();
         *pos = start + 1;

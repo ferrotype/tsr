@@ -268,3 +268,38 @@ fn decoder_call_options_restore_after_success_and_failure() {
         Token::String("x".as_bytes().into())
     );
 }
+
+#[test]
+fn invalid_closing_delimiters_report_the_input_character_not_encoder_state() {
+    // encoding/json/jsontext decode contract; also observed through the pinned
+    // LSP reader when params contains a closing bracket in place of a value.
+    for (text, prefix, pointer, offset, byte) in [
+        (b"]".as_slice(), 0, "", 0, "]"),
+        (b"[}".as_slice(), 1, "/0", 1, "}"),
+        (br#"{"params":]}"#.as_slice(), 2, "/params", 10, "]"),
+        (br#"{"params":}"#.as_slice(), 2, "/params", 10, "}"),
+    ] {
+        for raw in [false, true] {
+            let mut input = Decoder::from_slice(text);
+            for _ in 0..prefix {
+                input.read_token().unwrap();
+            }
+            let error = if raw {
+                input.read_value().unwrap_err()
+            } else {
+                input.read_token().unwrap_err()
+            };
+            assert_eq!(
+                error.to_string(),
+                format!(
+                    "jsontext: invalid character '{byte}' at start of value{}",
+                    if pointer.is_empty() {
+                        String::new()
+                    } else {
+                        format!(" within {pointer:?} after offset {offset}")
+                    }
+                )
+            );
+        }
+    }
+}

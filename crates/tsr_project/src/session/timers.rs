@@ -13,12 +13,14 @@ use tsr_core::CancellationToken;
 pub(super) enum Kind {
     Update,
     IdleClean,
+    DiagnosticsRefresh,
 }
 impl Kind {
     fn index(self) -> usize {
         match self {
             Self::Update => 0,
             Self::IdleClean => 1,
+            Self::DiagnosticsRefresh => 2,
         }
     }
 }
@@ -26,11 +28,12 @@ impl Kind {
 struct Slot {
     epoch: u64,
     timer: Option<Timer>,
+    delivery: Option<CancellationToken>,
 }
 pub(super) struct Timers {
     session: Weak<Session>,
     clock: Arc<dyn Clock>,
-    slots: Mutex<[Slot; 2]>,
+    slots: Mutex<[Slot; 3]>,
     queue: Queue,
     token: CancellationToken,
     errors: Mutex<Vec<Error>>,
@@ -54,6 +57,9 @@ impl Timers {
                 .epoch
                 .checked_add(1)
                 .expect("session timer epoch exhausted");
+            if let Some(token) = slot.delivery.take() {
+                token.cancel();
+            }
             slot.timer.take()
         };
         drop(previous);
@@ -72,6 +78,12 @@ impl Timers {
                 .epoch
                 .checked_add(1)
                 .expect("session timer epoch exhausted");
+            if let Some(token) = slot.delivery.take() {
+                token.cancel();
+            }
+            if matches!(kind, Kind::DiagnosticsRefresh) {
+                slot.delivery = Some(CancellationToken::new());
+            }
             (slot.epoch, slot.timer.take())
         };
         drop(previous);
@@ -91,6 +103,16 @@ impl Timers {
                     .queue
                     .enqueue(session.timers.token.clone(), move |_| {
                         if let Some(session) = weak.upgrade() {
+                            if matches!(kind, Kind::DiagnosticsRefresh) {
+                                let slots = session.timers.slots.lock().unwrap();
+                                let slot = &slots[kind.index()];
+                                if slot.epoch == epoch && !session.timers.token.is_canceled() {
+                                    session.send_event(super::SessionEvent::DiagnosticsRefresh {
+                                        cancellation: slot.delivery.as_ref().unwrap().clone(),
+                                    });
+                                }
+                                return;
+                            }
                             if let Err(error) = session.flush_inner(
                                 None,
                                 matches!(kind, Kind::IdleClean),
@@ -126,6 +148,7 @@ impl Timers {
         self.token.cancel();
         self.cancel(Kind::Update);
         self.cancel(Kind::IdleClean);
+        self.cancel(Kind::DiagnosticsRefresh);
         self.queue.close();
     }
 }

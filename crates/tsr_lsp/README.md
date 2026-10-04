@@ -1,5 +1,21 @@
 # tsr_lsp
 
-Production language-server dispatch over immutable project sessions. L1 provides
-the document and project boundary; initialization and language-service requests
-are implemented in later Phase 5 steps.
+Production language-server dispatch over immutable project sessions. Includes
+initialization, document synchronization, inferred options and configuration,
+pull and push diagnostics, cancellation, progress, logging, watcher registration
+and a native watcher fallback. `tsrust --lsp --stdio` uses this library.
+
+The advertised pinned capabilities are the final protocol contract. Feature
+handlers assigned to Phase 5 L3–L6 currently return a named method-not-implemented
+error. This is not yet a complete editor language server.
+
+Cancellation targets requests once dispatch starts, as in the pin; queued IDs
+are still reserved. Watch events from either transport schedule one debounced,
+capability-gated diagnostic refresh for relevant files or directories.
+
+Two deliberate lifecycle safeguards are retained with owner approval
+(2026-10-04): duplicate in-flight IDs are rejected under ADR 0019, and requests
+after shutdown are rejected with `InvalidRequest: server is shut down` instead
+of re-entering a closed project session. Go overwrites duplicate IDs and has no
+shutdown admission state. `exit` still requires initialization and valid absent
+parameters, and remains available after shutdown.

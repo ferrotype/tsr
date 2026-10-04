@@ -36196,7 +36196,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_mappers.rs",
-          "line": 44
+          "line": 45
         }
       ],
       "source_sha256": "c899d92fbf8167867b749283517e3c19f0688d3b2300ec04ed27facf0e90e62c",
@@ -36247,7 +36247,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_mappers.rs",
-          "line": 36
+          "line": 37
         }
       ],
       "source_sha256": "c899d92fbf8167867b749283517e3c19f0688d3b2300ec04ed27facf0e90e62c",
@@ -36612,7 +36612,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_mappers.rs",
-          "line": 241
+          "line": 242
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36626,7 +36626,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_mappers.rs",
-          "line": 192
+          "line": 193
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36640,7 +36640,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_mappers.rs",
-          "line": 231
+          "line": 232
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",
@@ -36936,7 +36936,7 @@
       "rust_mappings": [
         {
           "file": "crates/tsr_tsoptions/src/config_mappers.rs",
-          "line": 268
+          "line": 269
         }
       ],
       "source_sha256": "47336cbf405f93504b6d51e867ea75b3cebd48db044d511a15b61f183c4ba5a0",

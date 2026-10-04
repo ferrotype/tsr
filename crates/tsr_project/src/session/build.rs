@@ -128,7 +128,7 @@ impl<'a> ProjectBuilder<'a> {
                     },
                     |old| old.command_line.clone(),
                 );
-            self.update_project(&key, ProjectKind::Inferred, command)?;
+            self.update_project(&key, &key, ProjectKind::Inferred, command)?;
             self.keep.insert(key);
         }
         let cleanup = self.changes.opened.is_some() || self.changes.reopened.is_some();
@@ -249,7 +249,7 @@ impl<'a> ProjectBuilder<'a> {
                         .configs
                         .acquire_for_project(&name, &key)?
                         .expect("loaded config");
-                    self.update_project(&key, ProjectKind::Configured, command)?;
+                    self.update_project(&key, &name, ProjectKind::Configured, command)?;
                 }
                 if !command.root_file_names.is_empty()
                     && (!command.options.composite.is_true()
@@ -260,7 +260,7 @@ impl<'a> ProjectBuilder<'a> {
                             .configs
                             .acquire_for_project(&name, &key)?
                             .expect("loaded config");
-                        self.update_project(&key, ProjectKind::Configured, command)?;
+                        self.update_project(&key, &name, ProjectKind::Configured, command)?;
                     }
                     if let Some(project) = self
                         .projects
@@ -314,6 +314,7 @@ impl<'a> ProjectBuilder<'a> {
     fn update_project(
         &mut self,
         key: &JsString,
+        name: &JsString,
         kind: ProjectKind,
         command: Arc<ParsedCommandLine>,
     ) -> Result<(), Error> {
@@ -327,8 +328,18 @@ impl<'a> ProjectBuilder<'a> {
             return Ok(());
         }
         let dirty_file = pending.and_then(|data| data.dirty_file.clone());
+        let display = if kind == ProjectKind::Configured {
+            tsr_tspath::convert_to_relative_path(
+                name.as_bytes(),
+                self.session.options.current_directory.as_bytes(),
+                true,
+            )
+        } else {
+            tsr_tspath::base_name(self.session.options.current_directory.as_bytes()).to_vec()
+        };
+        let _loading = Loading::new(self.session, JsString::from_bytes(display));
         let cwd = if kind == ProjectKind::Configured {
-            JsString::from_bytes(tsr_tspath::directory(key.as_bytes()))
+            JsString::from_bytes(tsr_tspath::directory(name.as_bytes()))
         } else {
             self.session.options.current_directory.clone()
         };
@@ -415,7 +426,7 @@ impl<'a> ProjectBuilder<'a> {
         let project = Project::from_program(
             ProjectData {
                 program_files_watch,
-                name: key.clone(),
+                name: name.clone(),
                 path: key.clone(),
                 kind,
                 current_directory: cwd,
@@ -432,6 +443,28 @@ impl<'a> ProjectBuilder<'a> {
         );
         self.projects.insert(key.clone(), project);
         Ok(())
+    }
+}
+struct Loading<'a> {
+    session: &'a Session,
+    name: JsString,
+}
+impl<'a> Loading<'a> {
+    fn new(session: &'a Session, name: JsString) -> Self {
+        session.send_event(super::SessionEvent::ProjectLoading {
+            name: name.clone(),
+            finished: false,
+        });
+        Self { session, name }
+    }
+}
+impl Drop for Loading<'_> {
+    fn drop(&mut self) {
+        self.session
+            .send_event(super::SessionEvent::ProjectLoading {
+                name: self.name.clone(),
+                finished: true,
+            });
     }
 }
 fn default_inferred_options() -> CompilerOptions {

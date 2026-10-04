@@ -4,7 +4,8 @@ The private `phase5_testserver --stdio` executable wraps the production
 `tsr_lsp::Server` and `tsr_project::Session`. It keeps one ordered project worker
 and a separate router that continues receiving host replies while that worker
 is blocked. `tsrust` does not depend on this test-only executable. Normal LSP
-initialization, diagnostics publication and client watcher registration are L2.
+initialization, diagnostics publication and client watcher registration are
+implemented by [L2](../lsp/README.md).
 
 ## Run the focused checks
 
@@ -30,9 +31,19 @@ needed for these tests.
 S11's version-2 transport remains unchanged. This executable accepts version 3
 of `test/initialize`: the existing filesystem/callback/plugin/options fields
 plus `project` with `currentDirectory`, `defaultLibraryPath`,
-`positionEncoding` (`utf-8` or `utf-16`) and optional `runExternalCode` (false).
+`positionEncoding` (`utf-8` or `utf-16`), optional `runExternalCode` (false), and
+optional `progressDelayNanos` (0, matching Go's test server default).
 Compiler options use the native compiler-struct JSON shape, not tsconfig text.
 Its response and `testhost/initialized` notification carry version 3.
+
+An ordinary LSP `initialize` after this barrier starts the production runtime;
+its negotiated position encoding replaces the private descriptor's initial
+encoding. `initialized` completes client configuration/watch registration and
+emits `testhost/lspInitialized` for the carried Go client's `InitComplete` wait.
+The ordinary `shutdown` response disposes the LSP session; `exit` closes this
+connection. Filesystem callbacks continue to run on the independent reader.
+`test/setOptions` between `initialize` and `initialized` stores options for the
+first session, matching `SetCompilerOptionsForInferredProjects` at the pin.
 
 - `textDocument/didOpen`, `didChange`, `didClose`, `didSave` and
   `workspace/didChangeWatchedFiles` use the generated protocol codecs and the
