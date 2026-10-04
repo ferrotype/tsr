@@ -16,7 +16,7 @@ use std::{
     collections::BTreeMap,
     sync::{
         atomic::{AtomicU64, Ordering},
-        Arc, Mutex, RwLock,
+        Arc, Mutex, OnceLock, RwLock,
     },
 };
 use tsr_arena::Counters;
@@ -28,6 +28,7 @@ use tsr_vfs::FileSystem;
 mod build;
 #[cfg(test)]
 mod tests;
+mod timers;
 
 #[derive(Clone)]
 pub struct SessionOptions {
@@ -37,6 +38,8 @@ pub struct SessionOptions {
     pub run_external_code: bool,
     pub query_checkers: usize,
     pub relative_watch_patterns: bool,
+    pub debounce_delay: std::time::Duration,
+    pub logger: crate::logging::Logger,
 }
 impl Default for SessionOptions {
     fn default() -> Self {
@@ -47,6 +50,8 @@ impl Default for SessionOptions {
             run_external_code: false,
             query_checkers: 3,
             relative_watch_patterns: false,
+            debounce_delay: std::time::Duration::ZERO,
+            logger: crate::logging::Logger::nop(),
         }
     }
 }
@@ -103,7 +108,8 @@ pub struct Session {
     snapshot: RwLock<Option<Snapshot>>,
     update: Mutex<()>,
     pending: Mutex<Pending>,
-    watches: Option<Arc<crate::watch::WatchManager>>,
+    watches: OnceLock<Arc<crate::watch::WatchManager>>,
+    timers: timers::Timers,
 }
 static NEXT_SNAPSHOT: AtomicU64 = AtomicU64::new(1);
 fn next_snapshot_id() -> u64 {
@@ -113,7 +119,7 @@ fn next_snapshot_id() -> u64 {
 }
 impl Session {
     // port: tsc/internal/project/session.go:NewSession
-    pub fn new(options: SessionOptions, fs: Arc<dyn FileSystem>, counters: &Counters) -> Self {
+    pub fn new(options: SessionOptions, fs: Arc<dyn FileSystem>, counters: &Counters) -> Arc<Self> {
         Self::with_parse_cache(
             options,
             fs,
@@ -127,7 +133,16 @@ impl Session {
         fs: Arc<dyn FileSystem>,
         counters: &Counters,
         parse_cache: Arc<ParseCache>,
-    ) -> Self {
+    ) -> Arc<Self> {
+        Self::with_clock(options, fs, counters, parse_cache, crate::clock::system())
+    }
+    fn with_clock(
+        options: SessionOptions,
+        fs: Arc<dyn FileSystem>,
+        counters: &Counters,
+        parse_cache: Arc<ParseCache>,
+        clock: Arc<dyn crate::clock::Clock>,
+    ) -> Arc<Self> {
         assert!(
             options.query_checkers > 0,
             "a session needs a query checker"
@@ -145,7 +160,8 @@ impl Session {
             config_ownership: Arc::new(ConfigOwnership::new(extended_cache.clone(), id)),
             _programs: Vec::new(),
         };
-        Self {
+        Arc::new_cyclic(|weak| Self {
+            timers: timers::Timers::new(weak.clone(), clock),
             options,
             fs,
             counters: counters.clone(),
@@ -155,8 +171,8 @@ impl Session {
             snapshot: RwLock::new(Some(Snapshot::from_session(state))),
             update: Mutex::new(()),
             pending: Mutex::default(),
-            watches: None,
-        }
+            watches: OnceLock::new(),
+        })
     }
     // port: tsc/internal/project/session.go:Session.Snapshot
     pub fn snapshot(&self) -> Result<Snapshot, Error> {
@@ -167,22 +183,34 @@ impl Session {
             .ok_or(Error::Closed)
     }
     #[must_use]
-    pub fn with_watch_client(mut self, client: Arc<dyn crate::watch::WatchClient>) -> Self {
+    pub fn with_watch_client(
+        self: Arc<Self>,
+        client: Arc<dyn crate::watch::WatchClient>,
+    ) -> Arc<Self> {
         assert!(
             self.snapshot().expect("open session").projects().is_empty(),
             "install the watch client before opening projects"
         );
-        self.watches = Some(crate::watch::WatchManager::new(client));
+        assert!(
+            self.watches
+                .set(crate::watch::WatchManager::new(client))
+                .is_ok(),
+            "watch client already installed"
+        );
         self
     }
     pub fn wait_for_background_tasks(&self) {
-        if let Some(watches) = &self.watches {
+        self.timers.wait();
+        if let Some(watches) = self.watches.get() {
             watches.wait();
         }
     }
+    pub fn take_background_errors(&self) -> Vec<Error> {
+        self.timers.take_errors()
+    }
     pub fn take_watch_errors(&self) -> Vec<String> {
         self.watches
-            .as_ref()
+            .get()
             .map_or_else(Vec::new, |watches| watches.take_errors())
     }
     pub fn parse_cache(&self) -> &Arc<ParseCache> {
@@ -196,15 +224,34 @@ impl Session {
     }
     pub fn enqueue(&self, change: FileChange) -> Result<(), Error> {
         let current = self.snapshot.read().expect("session snapshot");
-        if current.is_none() {
-            return Err(Error::Closed);
-        }
+        let snapshot = current.as_ref().ok_or(Error::Closed)?;
+        let update =
+            change.kind == FileChangeKind::Close
+                || change.kind.is_watch()
+                    && snapshot.state().unwrap().configs.configs.contains_key(
+                        &tsr_tspath::to_path(
+                            change.uri.file_name().as_bytes(),
+                            self.options.current_directory.as_bytes(),
+                            self.fs.use_case_sensitive_file_names(),
+                        ),
+                    );
         self.pending
             .lock()
             .expect("session events")
             .changes
             .push(change);
+        drop(current);
+        self.timers
+            .schedule(timers::Kind::IdleClean, std::time::Duration::from_secs(30));
+        if update {
+            self.schedule_snapshot_update();
+        }
         Ok(())
+    }
+    // port: tsc/internal/project/session.go:Session.ScheduleSnapshotUpdate
+    pub fn schedule_snapshot_update(&self) {
+        self.timers
+            .schedule(timers::Kind::Update, self.options.debounce_delay);
     }
     // port: tsc/internal/project/session.go:Session.DidOpenFile
     pub fn did_open_file(
@@ -244,7 +291,8 @@ impl Session {
             return Err(Error::Closed);
         }
         self.pending.lock().expect("session events").inferred = Some(Arc::new(options));
-        Ok(())
+        drop(current);
+        self.flush(None).map(|_| ())
     }
     pub fn set_custom_config_file_name(&self, name: JsString) -> Result<(), Error> {
         let current = self.snapshot.read().expect("session snapshot");
@@ -252,7 +300,8 @@ impl Session {
             return Err(Error::Closed);
         }
         self.pending.lock().expect("session events").custom_name = Some(name);
-        Ok(())
+        drop(current);
+        self.flush(None).map(|_| ())
     }
     /// Returns the snapshot as well as the selection: callers retain its program,
     /// config and filesystem roots for the complete request.
@@ -269,6 +318,14 @@ impl Session {
         Ok(snapshot)
     }
     pub fn flush(&self, requested: Option<&DocumentUri>) -> Result<Snapshot, Error> {
+        self.flush_inner(requested, false, None)
+    }
+    fn flush_inner(
+        &self,
+        requested: Option<&DocumentUri>,
+        clean_disk: bool,
+        timer: Option<(timers::Kind, u64)>,
+    ) -> Result<Snapshot, Error> {
         // Serialize construction, while current-snapshot reads and notification
         // admission remain available during a synchronous filesystem callback.
         let _update = self
@@ -276,9 +333,16 @@ impl Session {
             .lock()
             .unwrap_or_else(std::sync::PoisonError::into_inner);
         let previous = self.snapshot()?;
+        if let Some((kind, epoch)) = timer {
+            if !self.timers.matches(kind, epoch) {
+                return Ok(previous);
+            }
+        }
+        self.timers.cancel(timers::Kind::Update);
         let old = previous.state().expect("session snapshot");
         let pending = std::mem::take(&mut *self.pending.lock().expect("session events"));
-        if pending.is_empty()
+        if !clean_disk
+            && pending.is_empty()
             && requested.is_none_or(|uri| {
                 let path = tsr_tspath::to_path(
                     uri.file_name().as_bytes(),
@@ -357,7 +421,7 @@ impl Session {
             let data = project.data().unwrap();
             data.last_update == id && data.update_kind != crate::project::ProgramUpdateKind::Cloned
         });
-        if clean && new_structure {
+        if clean_disk || clean && new_structure {
             fs.retain_files(|path| {
                 projects
                     .values()
@@ -399,7 +463,13 @@ impl Session {
         }
         *self.snapshot.write().expect("session snapshot") = Some(next.clone());
         transaction.pending = None;
-        if let Some(watches) = &self.watches {
+        self.options.logger.log(format_args!(
+            "Updated snapshot {} from {} ({} projects)",
+            id,
+            old.id,
+            next.projects().len()
+        ));
+        if let Some(watches) = self.watches.get() {
             watches.enqueue(old.watches(), next.state().unwrap().watches());
         }
         Ok(next)
@@ -420,15 +490,18 @@ impl Session {
         }
         *self.pending.lock().expect("session events") = Pending::default();
         drop(snapshot);
+        self.timers.stop();
         drop(update);
-        if let Some(watches) = &self.watches {
+        self.timers.wait();
+        if let Some(watches) = self.watches.get() {
             watches.close();
         }
     }
 }
 impl Drop for Session {
     fn drop(&mut self) {
-        if let Some(watches) = &self.watches {
+        self.timers.stop();
+        if let Some(watches) = self.watches.get() {
             watches.stop();
         }
     }

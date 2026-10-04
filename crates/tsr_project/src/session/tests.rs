@@ -12,7 +12,7 @@ fn js(text: &str) -> JsString {
 fn uri(name: &str) -> DocumentUri {
     DocumentUri::from_file_name(name.as_bytes())
 }
-fn setup(files: &[(&str, &str)], counters: &Counters) -> (Arc<TestFs>, Session) {
+fn setup(files: &[(&str, &str)], counters: &Counters) -> (Arc<TestFs>, Arc<Session>) {
     let fs = Arc::new(vfstest::from_map(
         &files
             .iter()
@@ -352,7 +352,7 @@ fn published_snapshots_drive_deduplicated_watches_without_holding_the_session_lo
         &[("/tsconfig.json", r#"{"compilerOptions":{"noLib":true}}"#)],
         &Counters::new(),
     );
-    let session = Arc::new(session.with_watch_client(client.clone()));
+    let session = session.with_watch_client(client.clone());
     *client.session.lock().unwrap() = Arc::downgrade(&session);
     let first = open(&session, "/main.ts", "export const x = 1;");
     session.wait_for_background_tasks();
@@ -382,4 +382,121 @@ fn published_snapshots_drive_deduplicated_watches_without_holding_the_session_lo
     );
     assert!(session.take_watch_errors().is_empty());
     session.close();
+}
+
+fn timed_session() -> (
+    Arc<TestFs>,
+    Arc<Session>,
+    Arc<crate::clock::manual::ManualClock>,
+) {
+    let clock = crate::clock::manual::ManualClock::new();
+    let (fs, _) = setup(
+        &[("/tsconfig.json", r#"{"compilerOptions":{"noLib":true}}"#)],
+        &Counters::new(),
+    );
+    let session = Session::with_clock(
+        SessionOptions {
+            debounce_delay: std::time::Duration::from_secs(1),
+            ..Default::default()
+        },
+        Arc::new(iovfs::from(fs.clone(), false)),
+        &Counters::new(),
+        Arc::new(ParseCache::new(RefCountCacheOptions::default())),
+        clock.clone(),
+    );
+    (fs, session, clock)
+}
+
+// The native close/config debounce and getSnapshot cancellation barrier. No
+// shortened wall-clock delays: the same callbacks run under a controlled clock.
+#[test]
+fn config_notifications_coalesce_and_a_request_cancels_the_old_timer() {
+    use std::time::Duration;
+    let (fs, session, clock) = timed_session();
+    let first = open(&session, "/main.ts", "const x = 1;");
+    let change = || FileChange::new(FileChangeKind::WatchChange, uri("/tsconfig.json"));
+    fs.write_file(
+        b"tsconfig.json",
+        br#"{"compilerOptions":{"noLib":true,"strict":true}}"#,
+        0,
+    )
+    .unwrap();
+    session.enqueue(change()).unwrap();
+    clock.advance(Duration::from_millis(900));
+    session.enqueue(change()).unwrap();
+    clock.advance(Duration::from_millis(900));
+    session.wait_for_background_tasks();
+    assert_eq!(session.snapshot().unwrap().id(), first.id());
+    clock.advance(Duration::from_millis(100));
+    session.wait_for_background_tasks();
+    let next = session.snapshot().unwrap();
+    assert_eq!(next.parent_id(), first.id());
+    assert!(next.project().program().unwrap().options().strict.is_true());
+
+    session.did_close_file(uri("/main.ts")).unwrap();
+    let requested = session.flush(None).unwrap();
+    clock.advance(Duration::from_secs(1));
+    session.wait_for_background_tasks();
+    assert_eq!(session.snapshot().unwrap().id(), requested.id());
+    assert!(session.take_background_errors().is_empty());
+}
+
+#[test]
+fn idle_timer_flushes_changes_after_thirty_seconds_from_the_last_notification() {
+    use std::time::Duration;
+    let (_, session, clock) = timed_session();
+    let first = open(&session, "/main.ts", "const x = 1;");
+    clock.advance(Duration::from_secs(29));
+    edit(&session, "/main.ts", "const x = 2;");
+    clock.advance(Duration::from_secs(29));
+    session.wait_for_background_tasks();
+    assert_eq!(session.snapshot().unwrap().id(), first.id());
+    clock.advance(Duration::from_secs(1));
+    session.wait_for_background_tasks();
+    let next = session.snapshot().unwrap();
+    assert_eq!(next.parent_id(), first.id());
+    assert_eq!(text(&next, "/main.ts"), b"const x = 2;");
+    assert_eq!(text(&first, "/main.ts"), b"const x = 1;");
+    clock.advance(Duration::from_secs(30));
+    session.wait_for_background_tasks();
+    assert_eq!(
+        session.snapshot().unwrap().id(),
+        next.id(),
+        "cleanup is one-shot"
+    );
+    session.did_close_file(uri("/main.ts")).unwrap();
+    session.close();
+    clock.advance(Duration::from_secs(30));
+    session.wait_for_background_tasks();
+    assert!(matches!(session.snapshot(), Err(Error::Closed)));
+    assert!(session.take_background_errors().is_empty());
+}
+
+#[test]
+fn inferred_options_response_is_a_snapshot_barrier() {
+    let (_, session) = setup(&[], &Counters::new());
+    session
+        .set_inferred_options(CompilerOptions {
+            no_lib: Tristate::TRUE,
+            ..Default::default()
+        })
+        .unwrap();
+    let first = open(&session, "/main.ts", "const x = 1;");
+    session
+        .set_inferred_options(CompilerOptions {
+            no_lib: Tristate::TRUE,
+            strict: Tristate::TRUE,
+            ..Default::default()
+        })
+        .unwrap();
+    let next = session.snapshot().unwrap();
+    assert_ne!(first.id(), next.id());
+    assert!(next.project().program().unwrap().options().strict.is_true());
+    assert!(!first
+        .project()
+        .program()
+        .unwrap()
+        .options()
+        .strict
+        .is_true());
 }

@@ -484,8 +484,12 @@ the background queue; real-session tests check publication precedes callbacks an
 text-only edits keep watch identity. Native client registration is connected with
 the server in L2.
 
-These are implementation increments, **not L1's exit**. Session update timers
-and logging remain. The router bridge still needs the actual
+Session update and idle-clean timers now use the shared deadline service with
+controlled-clock tests; inferred-options changes publish before acknowledgement.
+Project log sinks and forked collectors are implemented with an injected local
+timestamp formatter. ATA log embedding remains with L6.
+
+These are implementation increments, **not L1's exit**. The router bridge still needs the actual
 server connection; options application and the native state-writer projection
 have not been connected. Mapped-bundle retention and the batch reset/cache
 witnesses remain before enabling semantic batch reuse. L0's codec work alone

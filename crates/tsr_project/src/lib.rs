@@ -8,6 +8,7 @@ pub mod config;
 pub mod dirty;
 pub mod extended_config;
 pub mod file_change;
+pub mod logging;
 pub mod overlay;
 pub mod owner_cache;
 pub mod parse_cache;
