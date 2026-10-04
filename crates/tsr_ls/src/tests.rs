@@ -222,3 +222,90 @@ fn hover_code_fences_do_not_close_inside_literal_types() {
     documentation::code(&mut rendered, "typescript", "const text: \"```\"");
     assert_eq!(rendered, "````typescript\nconst text: \"```\"\n````\n");
 }
+
+fn signature_result(text: &str, options: &SignatureHelpOptions) -> lsp::SignatureHelp {
+    let offset = text.find('|').unwrap();
+    let text = text.replacen('|', "", 1);
+    let program = Arc::new(program(b"/index.ts", text.as_bytes()));
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool
+        .checker_for_file_exclusive(program.source_file(b"/index.ts").unwrap().source())
+        .unwrap();
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    *service
+        .signature_help(
+            &mut checker,
+            &lsp::SignatureHelpParams {
+                text_document: lsp::TextDocumentIdentifier {
+                    uri: lsp::DocumentUri("file:///index.ts".into()),
+                },
+                position: lsp::Position {
+                    line: 0,
+                    character: offset as u32,
+                },
+                context: Some(Box::new(lsp::SignatureHelpContext {
+                    trigger_kind: lsp::SignatureHelpTriggerKind::INVOKED,
+                    ..Default::default()
+                })),
+                ..Default::default()
+            },
+            options,
+        )
+        .unwrap()
+        .signature_help
+        .unwrap()
+}
+#[test]
+fn signature_type_parameter_constraints_use_the_pins_printer_context() {
+    // Full native responses are also compared in tools/phase5/lsp/signature_help.py.
+    let help = signature_result(
+        "declare function f<T extends {x:number}>(x:T):T; f<|",
+        &SignatureHelpOptions::default(),
+    );
+    let sig = help.signatures[0].as_ref().unwrap();
+    assert_eq!(sig.label, "f<T extends {\n    x: number;\n}>(x: T): T");
+    assert_eq!(
+        sig.parameters.as_ref().unwrap()[0]
+            .as_ref()
+            .unwrap()
+            .label
+            .string
+            .as_deref()
+            .unwrap()
+            .as_str(),
+        "T extends {\n    x: number;\n}"
+    );
+}
+#[test]
+fn signature_middle_rest_respects_null_active_parameter_capability() {
+    let text="interface Array<T>{length:number;[n:number]:T} declare function f(...args:[prefix:string,...middle:number[],suffix:boolean]):void; f(\"\",1,|2,true);";
+    let help = signature_result(
+        text,
+        &SignatureHelpOptions {
+            per_signature_active_parameter: true,
+            null_active_parameter: true,
+            ..Default::default()
+        },
+    );
+    assert!(help.active_parameter.is_none());
+    let sig = help.signatures[0].as_ref().unwrap();
+    assert_eq!(
+        sig.label,
+        "f(prefix: string, ...middle: number[], suffix: boolean): void"
+    );
+    assert!(sig.active_parameter.as_ref().unwrap().uinteger.is_none());
+    let fallback = signature_result(text, &SignatureHelpOptions::default());
+    assert_eq!(
+        fallback
+            .active_parameter
+            .as_ref()
+            .unwrap()
+            .uinteger
+            .as_deref(),
+        Some(&3)
+    );
+}

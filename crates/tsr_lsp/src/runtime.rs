@@ -410,6 +410,17 @@ impl Runtime {
                         .use_case_sensitive_file_names(),
                 );
                 let project = snapshot.project_for_file(path.as_bytes()).cloned();
+                if project.is_none()
+                    && feature.unknown_script_fallback()
+                    && snapshot
+                        .filesystem()
+                        .unwrap()
+                        .get_file(uri.file_name().as_bytes())
+                        .map_err(|e| crate::project_error(e.into()))?
+                        .is_some_and(|file| file.kind() == tsr_core::ScriptKind::UNKNOWN)
+                {
+                    return client::raw(&lsp::Null).map(Dispatch::Ready);
+                }
                 let context = context.clone();
                 let capabilities = self.capabilities.clone();
                 let maximum_hover_length = self.settings.lock().unwrap().maximum_hover_length;

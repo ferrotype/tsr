@@ -986,6 +986,34 @@ impl Operation<'_> {
         Ok(self.state().signatures.get(id)?.flags)
     }
 
+    pub fn signature_target(&self, s: SignatureRef) -> Result<Option<SignatureRef>, Error> {
+        let id = self.check_signature(s)?;
+        Ok(self
+            .state()
+            .signatures
+            .get(id)?
+            .target
+            .map(|id| self.signature_ref(id)))
+    }
+
+    /// Initial fixed length and element flags of a tuple's target. As with the
+    /// other type readers, the operation validates the owner before reading.
+    pub fn tuple_element_flags(
+        &self,
+        ty: TypeRef,
+    ) -> Result<Option<(u32, Vec<crate::ElementFlags>)>, Error> {
+        let id = self.check_type(ty)?;
+        let state = self.state();
+        if !state.is_tuple_type(id)? {
+            return Ok(None);
+        }
+        let tuple = state.types.tuple(state.types.target(id)?)?;
+        Ok(Some((
+            tuple.fixed_length,
+            tuple.element_infos.iter().map(|info| info.flags).collect(),
+        )))
+    }
+
     pub fn signature_type_parameters(&self, s: SignatureRef) -> Result<Vec<TypeRef>, Error> {
         let id = self.check_signature(s)?;
         Ok(self

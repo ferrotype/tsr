@@ -12,7 +12,12 @@ pub use hover::HoverOptions;
 mod linked_editing;
 mod selection_ranges;
 mod semantic_tokens;
+mod signature_arguments;
+mod signature_help;
 mod symbols;
+pub use signature_help::{
+    SignatureHelpOptions, SIGNATURE_HELP_RETRIGGER_CHARACTERS, SIGNATURE_HELP_TRIGGER_CHARACTERS,
+};
 mod syntax;
 #[cfg(test)]
 mod tests;

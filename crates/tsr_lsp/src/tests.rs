@@ -401,3 +401,29 @@ fn watched_file_refresh_uses_the_client_capability() {
         assert_eq!(refreshes, usize::from(supported));
     }
 }
+
+#[test]
+fn read_only_features_return_null_for_unmapped_script_kinds() {
+    let server = TestConnection::with_files(&[(b"/p/view.custom", b"content")]);
+    server.initialize("utf-16");
+    for method in [
+        "textDocument/hover",
+        "textDocument/signatureHelp",
+        "textDocument/definition",
+        "textDocument/typeDefinition",
+    ] {
+        let id = Id::string(method);
+        server.send(Some(id.clone()),method,Some(r#"{"textDocument":{"uri":"file:///p/view.custom"},"position":{"line":0,"character":0}}"#));
+        let response = server.response(&id);
+        assert!(response.error.is_none(), "{method}: {:?}", response.error);
+        assert_eq!(response.result.unwrap().0, b"null");
+    }
+    // A method outside the pin's fallback list still reports the missing project.
+    let id = Id::string("selection");
+    server.send(
+        Some(id.clone()),
+        "textDocument/selectionRange",
+        Some(r#"{"textDocument":{"uri":"file:///p/view.custom"},"positions":[]}"#),
+    );
+    assert!(server.response(&id).error.is_some());
+}

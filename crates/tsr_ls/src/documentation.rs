@@ -394,6 +394,22 @@ impl LanguageService<'_> {
         markdown: bool,
         comment_only: bool,
     ) -> Result<String> {
+        self.declaration_documentation_for_feature(
+            checker,
+            declaration,
+            markdown,
+            comment_only,
+            tsr_ast::span_map::FEATURE_HOVER,
+        )
+    }
+    pub(crate) fn declaration_documentation_for_feature(
+        &mut self,
+        checker: &mut Operation<'_>,
+        declaration: NodeId,
+        markdown: bool,
+        comment_only: bool,
+        feature: i32,
+    ) -> Result<String> {
         let Some(doc) = self.jsdoc_or_tag(checker, declaration, &mut HashSet::new())? else {
             return Ok(String::new());
         };
@@ -421,7 +437,7 @@ impl LanguageService<'_> {
             .flatten()
             .collect();
         let mut out = String::new();
-        self.write_comments(checker, &mut out, comments, markdown)?;
+        self.write_comments(checker, &mut out, comments, markdown, feature)?;
         if comment_only {
             return Ok(out);
         }
@@ -514,11 +530,11 @@ impl LanguageService<'_> {
             {
                 out.push_str(" — ");
                 if let Some(name) = view.node(name_expr)?.name() {
-                    self.write_name_link(checker, &mut out, name, "", false, markdown)?;
+                    self.write_name_link(checker, &mut out, name, "", false, markdown, feature)?;
                 }
                 if !comments.is_empty() {
                     out.push(' ');
-                    self.write_comments(checker, &mut out, comments, markdown)?;
+                    self.write_comments(checker, &mut out, comments, markdown, feature)?;
                 }
             } else if let Some(ty) = read
                 .data_source()
@@ -529,7 +545,7 @@ impl LanguageService<'_> {
                 out.push_str(&self.node_text(ty)?);
                 if !comments.is_empty() {
                     out.push(' ');
-                    self.write_comments(checker, &mut out, comments, markdown)?;
+                    self.write_comments(checker, &mut out, comments, markdown, feature)?;
                 }
             } else if !comments.is_empty() {
                 out.push(' ');
@@ -538,7 +554,7 @@ impl LanguageService<'_> {
                 {
                     out.push_str("— ");
                 }
-                self.write_comments(checker, &mut out, comments, markdown)?;
+                self.write_comments(checker, &mut out, comments, markdown, feature)?;
             }
         }
         Ok(out)
@@ -559,6 +575,7 @@ impl LanguageService<'_> {
         out: &mut String,
         comments: Vec<NodeId>,
         markdown: bool,
+        feature: i32,
     ) -> Result<()> {
         for comment in comments {
             let view = self.view(comment)?;
@@ -604,7 +621,9 @@ impl LanguageService<'_> {
                                 }
                             }
                         } else {
-                            self.write_name_link(checker, out, name, &text, quote, markdown)?;
+                            self.write_name_link(
+                                checker, out, name, &text, quote, markdown, feature,
+                            )?;
                         }
                     } else {
                         quoted(out, &text, quote && markdown);
@@ -616,6 +635,10 @@ impl LanguageService<'_> {
         Ok(())
     }
     // port: tsc/internal/ls/hover.go:writeNameLink
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "The pinned link arguments plus the feature-specific source mapper"
+    )]
     fn write_name_link(
         &mut self,
         checker: &mut Operation<'_>,
@@ -624,6 +647,7 @@ impl LanguageService<'_> {
         text: &str,
         quote: bool,
         markdown: bool,
+        feature: i32,
     ) -> Result<()> {
         let decls = self.declarations_at(checker, name)?;
         let view = self.view(name)?;
@@ -636,7 +660,7 @@ impl LanguageService<'_> {
             let (range, fidelity) = self.range(
                 source,
                 TextRange::new(syntax.start(node)?, i64::from(v.node(node)?.end())),
-                tsr_ast::span_map::FEATURE_HOVER,
+                feature,
             )?;
             let prefix = if text.starts_with("()") { 2 } else { 0 };
             let label = comment_prefix(&text[prefix..]);

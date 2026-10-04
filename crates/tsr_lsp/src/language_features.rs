@@ -10,6 +10,7 @@ pub fn handles(method: &str) -> bool {
         method,
         "textDocument/linkedEditingRange"
             | "textDocument/hover"
+            | "textDocument/signatureHelp"
             | "textDocument/selectionRange"
             | "textDocument/foldingRange"
             | "textDocument/semanticTokens/full"
@@ -21,6 +22,7 @@ pub fn handles(method: &str) -> bool {
 }
 pub enum Request {
     Hover(lsp::HoverParams),
+    SignatureHelp(lsp::SignatureHelpParams),
     Linked(lsp::LinkedEditingRangeParams),
     Selection(lsp::SelectionRangeParams),
     Folding(lsp::FoldingRangeParams),
@@ -33,6 +35,7 @@ pub enum Request {
 impl Request {
     pub fn decode(method: &str, params: Option<&RawValue>) -> Result<Self, lsp::ResponseError> {
         Ok(match method {
+            "textDocument/signatureHelp" => Self::SignatureHelp(crate::decode(params)?),
             "textDocument/hover" => Self::Hover(crate::decode(params)?),
             "textDocument/linkedEditingRange" => Self::Linked(crate::decode(params)?),
             "textDocument/selectionRange" => Self::Selection(crate::decode(params)?),
@@ -45,8 +48,16 @@ impl Request {
             _ => return Err(crate::coded_error(lsp::ErrorCode::INVALID_REQUEST, None)),
         })
     }
+    // contentMapperFallbackResponse is restricted to the methods listed by Go.
+    pub fn unknown_script_fallback(&self) -> bool {
+        matches!(
+            self,
+            Self::Hover(_) | Self::SignatureHelp(_) | Self::Definition(_) | Self::TypeDefinition(_)
+        )
+    }
     pub fn uri(&self) -> &lsp::DocumentUri {
         match self {
+            Self::SignatureHelp(p) => &p.text_document.uri,
             Self::Hover(p) => &p.text_document.uri,
             Self::Linked(p) => &p.text_document.uri,
             Self::Selection(p) => &p.text_document.uri,
@@ -99,6 +110,7 @@ pub fn execute(
     if matches!(
         request,
         Request::Hover(_)
+            | Request::SignatureHelp(_)
             | Request::Semantic(_)
             | Request::SemanticRange(_)
             | Request::Definition(_)
@@ -150,6 +162,36 @@ pub fn execute(
             return client::raw(
                 &service
                     .hover(&mut operation, params, options)
+                    .map_err(service_error)?,
+            );
+        }
+        if let Request::SignatureHelp(params) = &request {
+            let caps = text_caps
+                .and_then(|c| c.signature_help.as_deref())
+                .and_then(|c| c.signature_information.as_deref());
+            let options = tsr_ls::SignatureHelpOptions {
+                format: caps
+                    .and_then(|c| c.documentation_format.as_deref())
+                    .and_then(|f| f.first())
+                    .cloned()
+                    .unwrap_or_else(|| lsp::MarkupKind(lsp::MarkupKind::PLAIN_TEXT.into())),
+                classified: capabilities
+                    .vs_supports_visual_studio_extensions
+                    .as_deref()
+                    .copied()
+                    .unwrap_or(false),
+                per_signature_active_parameter: caps
+                    .and_then(|c| c.active_parameter_support.as_deref())
+                    .copied()
+                    .unwrap_or(false),
+                null_active_parameter: caps
+                    .and_then(|c| c.no_active_parameter_support.as_deref())
+                    .copied()
+                    .unwrap_or(false),
+            };
+            return client::raw(
+                &service
+                    .signature_help(&mut operation, params, &options)
                     .map_err(service_error)?,
             );
         }
@@ -223,6 +265,7 @@ pub fn execute(
             )
         }
         Request::Hover(_)
+        | Request::SignatureHelp(_)
         | Request::Semantic(_)
         | Request::SemanticRange(_)
         | Request::Definition(_)

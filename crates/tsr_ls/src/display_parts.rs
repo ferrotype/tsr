@@ -6,7 +6,7 @@ use tsr_checker::Operation;
 use tsr_lsproto::VSClassifiedTextRun;
 use tsr_printer::EmitTextWriter;
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub(crate) struct DisplayParts {
     text: Vec<u8>,
     parts: Vec<(&'static str, Vec<u8>, Option<SymbolId>)>,
@@ -21,7 +21,12 @@ impl DisplayParts {
         }
     }
     // port: tsc/internal/ls/displaypartswriter.go:displayPartsWriter.addRun
-    fn add(&mut self, classification: &'static str, text: &[u8], symbol: Option<SymbolId>) {
+    pub(crate) fn add(
+        &mut self,
+        classification: &'static str,
+        text: &[u8],
+        symbol: Option<SymbolId>,
+    ) {
         if text.is_empty() {
             return;
         }

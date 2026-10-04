@@ -1822,6 +1822,14 @@ impl Operation<'_> {
         ))
     }
 
+    /// The binder's symbol attached to a declaration (without name resolution).
+    pub fn bound_symbol_of_node(&self, node: NodeId) -> Result<Option<SymbolRef>, Error> {
+        self.state()
+            .node_symbol(node)?
+            .map(|symbol| self.symbol_ref(symbol))
+            .transpose()
+    }
+
     // port: tsc/internal/checker/services.go:Checker.SkipAlias
     pub fn skip_alias(&mut self, symbol: SymbolRef) -> Result<SymbolRef, Error> {
         let id = self.check_symbol_ref(symbol)?;
