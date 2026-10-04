@@ -346,6 +346,15 @@ impl Context {
         let pr = syntax.view.node(parent)?;
         let kind = pr.kind().known().unwrap_or(K::Unknown);
         let tk = keyword(syntax, token)?;
+        // A contextual modifier parsed as a property name still starts a
+        // class-member completion (for example `public |` or `abstract |`).
+        if self
+            .container
+            .is_some_and(|(kind, _)| kind == Container::Class)
+            && class_keyword(tk)
+        {
+            return Ok(false);
+        }
         if read.kind() == K::JsxText || read.kind() == K::BigIntLiteral {
             return Ok(true);
         }

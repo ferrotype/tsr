@@ -700,6 +700,24 @@ impl Operation<'_> {
             .member_override_modifier_status(class, member, member_symbol)
     }
 
+    /// The same override decision for an edit's private generated member,
+    /// whose syntax is not part of the checker's immutable input graph.
+    pub fn member_override_status_for_flags(
+        &mut self,
+        class: NodeId,
+        symbol: SymbolRef,
+        flags: u32,
+    ) -> Result<MemberOverrideStatus, Error> {
+        let symbol = self.check_symbol_ref(symbol)?;
+        self.state_mut().member_override_status_from_flags(
+            class,
+            symbol,
+            flags & mf::OVERRIDE != 0,
+            flags & mf::ABSTRACT != 0,
+            flags & mf::STATIC != 0,
+        )
+    }
+
     // port: tsc/internal/checker/exports.go:Checker.GetRestTypeOfSignature
     pub fn get_rest_type_of_signature(
         &mut self,
@@ -1195,6 +1213,27 @@ impl CheckerState {
         }) else {
             return Ok(MemberOverrideStatus::None);
         };
+        let view = self.ast(member)?;
+        let has_override = tsr_ast::utilities::has_syntactic_modifier(view, member, mf::OVERRIDE)?;
+        let is_abstract = tsr_ast::utilities::has_syntactic_modifier(view, member, mf::ABSTRACT)?;
+        let is_static = tsr_ast::utilities::is_static(view, member)?;
+        self.member_override_status_from_flags(
+            node,
+            member_symbol,
+            has_override,
+            is_abstract,
+            is_static,
+        )
+    }
+
+    pub(crate) fn member_override_status_from_flags(
+        &mut self,
+        node: NodeId,
+        member_symbol: SymbolId,
+        has_override: bool,
+        is_abstract: bool,
+        is_static: bool,
+    ) -> Result<MemberOverrideStatus, Error> {
         let Some(class_symbol) = self.get_symbol_of_declaration(node)? else {
             return Ok(MemberOverrideStatus::None);
         };
@@ -1212,10 +1251,6 @@ impl CheckerState {
             }
         }
         let static_base = self.class_base_constructor_type(ty)?;
-        let view = self.ast(member)?;
-        let has_override = tsr_ast::utilities::has_syntactic_modifier(view, member, mf::OVERRIDE)?;
-        let is_abstract = tsr_ast::utilities::has_syntactic_modifier(view, member, mf::ABSTRACT)?;
-        let is_static = tsr_ast::utilities::is_static(view, member)?;
         self.override_modifier_status(
             node,
             crate::class_overrides::OverrideTypes {

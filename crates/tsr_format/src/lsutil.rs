@@ -91,7 +91,7 @@ pub(crate) fn get_last_child(
 }
 
 // port: tsc/internal/ls/lsutil/children.go:GetLastToken
-pub(crate) fn get_last_token(
+pub fn get_last_token(
     file: &mut FormatFile<'_, '_>,
     node: Option<NodeId>,
 ) -> Result<Option<NodeId>, Error> {

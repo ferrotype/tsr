@@ -22,7 +22,7 @@ use tsr_jsnum::{Number, PseudoBigInt};
 
 #[path = "handles_display.rs"]
 mod display;
-pub use display::{BuilderRequest, TypeNodeBuilder};
+pub use display::{BuilderRequest, GeneratedTypeNodes, TypeNodeBuilder};
 
 #[cfg(feature = "recursion-probe")]
 #[path = "handles_c2_probe.rs"]
@@ -1067,6 +1067,13 @@ impl Operation<'_> {
             .iter()
             .map(|&id| self.type_ref(id))
             .collect())
+    }
+
+    /// Stored arity, matching Signature.MinArgumentCount (without forcing the
+    /// separate effective minimum-argument-count calculation).
+    pub fn signature_min_argument_count(&self, signature: SignatureRef) -> Result<i32, Error> {
+        let id = self.check_signature(signature)?;
+        Ok(self.state().signatures.get(id)?.min_argument_count)
     }
 
     pub fn signature_parameters(&self, s: SignatureRef) -> Result<Vec<SymbolRef>, Error> {

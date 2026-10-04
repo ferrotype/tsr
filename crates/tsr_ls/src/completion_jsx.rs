@@ -270,11 +270,11 @@ impl LanguageService<'_> {
                 };
                 return Ok(Some(format!(
                     "{}={quote}$1{quote}",
-                    name.replace('$', "\\$").replace('}', "\\}")
+                    name.replace('$', "\\$")
                 )));
             }
             braces = true;
         }
-        Ok(braces.then(|| format!("{}={{$1}}", name.replace('$', "\\$").replace('}', "\\}"))))
+        Ok(braces.then(|| format!("{}={{$1}}", name.replace('$', "\\$"))))
     }
 }

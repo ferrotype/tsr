@@ -81,8 +81,8 @@ pub use bind_result::{
     SharedBoundFile,
 };
 pub use clone::{
-    clone_node, deep_clone_node, deep_clone_reparse, deep_clone_reparse_modifiers,
-    set_parent_in_children,
+    clone_node, deep_clone_node, deep_clone_node_with, deep_clone_reparse,
+    deep_clone_reparse_modifiers, set_parent_in_children,
 };
 pub use data_generated::*;
 pub use diagnostic::Diagnostic;

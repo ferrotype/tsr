@@ -175,7 +175,8 @@ pub fn fixes(
     source: NodeId,
     export: &Export,
     type_location: bool,
-    usage: lsp::Position,
+    usage: Option<lsp::Position>,
+    preferences: &crate::Preferences,
 ) -> Result<Vec<lsp::AutoImportFix>, Error> {
     let file = program
         .file_of_node(source)
@@ -240,7 +241,7 @@ pub fn fixes(
                 .and_then(|b| view.node(b).ok().and_then(|n| n.name()))
         };
         let specifier = String::from_utf8_lossy(view.node_text(literal)?.as_bytes()).into_owned();
-        if kind == lsp::ImportKind::NAMED && result.is_empty() {
+        if kind == lsp::ImportKind::NAMED && result.is_empty() && usage.is_some() {
             if let Some(namespace) = namespace {
                 result.push(lsp::AutoImportFix {
                     kind: lsp::AutoImportFixKind::USE_NAMESPACE,
@@ -249,7 +250,7 @@ pub fn fixes(
                     module_specifier: specifier.clone(),
                     add_as_type_only: lsp::AddAsTypeOnly::ALLOWED,
                     import_index: index as i32,
-                    usage_position: Some(Box::new(usage.clone())),
+                    usage_position: usage.clone().map(Box::new),
                     namespace_prefix: String::from_utf8_lossy(
                         view.node_text(namespace)?.as_bytes(),
                     )
@@ -311,21 +312,43 @@ pub fn fixes(
     let specifier = if !export.ambient_module_name().is_empty() {
         tsr_jsstring::JsString::from_bytes(export.ambient_module_name())
     } else if !export.package_name.is_empty() {
-        let Some(specifier) =
-            crate::specifiers::for_package(export, checker, source, program.options())?
+        let Some(specifier) = crate::specifiers::for_package(
+            export,
+            checker,
+            source,
+            program.options(),
+            preferences,
+        )?
         else {
             return Ok(result);
         };
         specifier
     } else {
-        checker.module_specifier_for_file(source, export.module_file_name.as_bytes())?
+        let Some(specifier) = checker.module_specifier_for_auto_import(
+            source,
+            export.module_file_name.as_bytes(),
+            preferences.module_specifier.as_deref(),
+            preferences.ending.as_deref(),
+            &|s| preferences.excludes(s),
+        )?
+        else {
+            return Ok(result);
+        };
+        specifier
     };
-    if source_file.is_js() && export.flags & sf::VALUE == 0 && !export.is_unresolved_alias() {
+    if preferences.excludes(specifier.as_bytes()) {
+        return Ok(result);
+    }
+    if source_file.is_js()
+        && export.flags & sf::VALUE == 0
+        && !export.is_unresolved_alias()
+        && usage.is_some()
+    {
         return Ok(vec![lsp::AutoImportFix {
             kind: lsp::AutoImportFixKind::JSDOC_TYPE_IMPORT,
             name,
             module_specifier: String::from_utf8_lossy(specifier.as_bytes()).into_owned(),
-            usage_position: Some(Box::new(usage)),
+            usage_position: usage.map(Box::new),
             ..Default::default()
         }]);
     }

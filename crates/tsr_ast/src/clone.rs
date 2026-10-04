@@ -21,6 +21,7 @@ pub fn clone_node(factory: &mut dyn RuntimeFactory, original: NodeId) -> NodeId 
 fn with_deep_clone<T>(
     factory: &mut dyn RuntimeFactory,
     synthetic: bool,
+    after_clone: Option<&dyn Fn(NodeId, NodeId)>,
     operation: impl FnOnce(&mut NodeVisitor<'_>) -> T,
 ) -> T {
     let visit = |visitor: &mut NodeVisitor<'_>, node: Option<NodeId>| {
@@ -34,6 +35,9 @@ fn with_deep_clone<T>(
             visitor
                 .factory_mut()
                 .set_node_range(cloned, TextRange::new(-1, -1));
+        }
+        if let Some(after_clone) = after_clone {
+            after_clone(cloned, node.expect("deep clone input"));
         }
         Some(cloned)
     };
@@ -92,7 +96,18 @@ fn clone_visited_list(
 }
 // port: tsc/internal/ast/deepclone.go:NodeFactory.DeepCloneNode
 pub fn deep_clone_node(factory: &mut dyn RuntimeFactory, node: Option<NodeId>) -> Option<NodeId> {
-    with_deep_clone(factory, true, |visitor| visitor.visit_node(node))
+    with_deep_clone(factory, true, None, |visitor| visitor.visit_node(node))
+}
+/// Deep cloning with side-table metadata propagation, once per cloned node.
+/// The callback cannot access the mutably borrowed factory.
+pub fn deep_clone_node_with(
+    factory: &mut dyn RuntimeFactory,
+    node: Option<NodeId>,
+    after_clone: &dyn Fn(NodeId, NodeId),
+) -> Option<NodeId> {
+    with_deep_clone(factory, true, Some(after_clone), |visitor| {
+        visitor.visit_node(node)
+    })
 }
 // port: tsc/internal/ast/deepclone.go:NodeFactory.DeepCloneReparse
 pub fn deep_clone_reparse(
@@ -100,8 +115,10 @@ pub fn deep_clone_reparse(
     node: Option<NodeId>,
 ) -> Option<NodeId> {
     let node = node?;
-    let cloned = with_deep_clone(factory, false, |visitor| visitor.visit_node(Some(node)))
-        .expect("deep clone root");
+    let cloned = with_deep_clone(factory, false, None, |visitor| {
+        visitor.visit_node(Some(node))
+    })
+    .expect("deep clone root");
     set_parent_in_children(factory, cloned);
     let flags = factory.node(cloned).flags() | node_flags::REPARSED;
     factory.set_node_flags(cloned, flags);
@@ -112,7 +129,9 @@ pub fn deep_clone_reparse_modifiers(
     factory: &mut dyn RuntimeFactory,
     list: Option<NodeListId>,
 ) -> Option<NodeListId> {
-    with_deep_clone(factory, false, |visitor| visitor.visit_modifiers(list))
+    with_deep_clone(factory, false, None, |visitor| {
+        visitor.visit_modifiers(list)
+    })
 }
 
 /// Set every descendant's immediate parent in depth-first child order. Repeated

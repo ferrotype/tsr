@@ -13,8 +13,11 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
+regex = { version = "=1.13.1", default-features = false, features = ["std", "unicode", "perf"] }
+regex-syntax = "=0.8.11"
 tsr_arena = { version = "0.2.0", path = "../tsr_arena" }
 tsr_ast = { version = "0.2.0", path = "../tsr_ast" }
+tsr_binder = { version = "0.2.0", path = "../tsr_binder" }
 tsr_checker = { version = "0.2.0", path = "../tsr_checker" }
 tsr_compiler = { version = "0.2.0", path = "../tsr_compiler" }
 tsr_core = { version = "0.2.0", path = "../tsr_core" }

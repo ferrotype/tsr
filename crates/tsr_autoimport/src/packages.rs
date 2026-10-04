@@ -32,6 +32,7 @@ pub fn discover(
     program: &Program,
     file: &[u8],
     host: &Arc<dyn FileSystem>,
+    preferences: &crate::Preferences,
     canceled: impl Fn() -> bool,
 ) -> Result<Option<Vec<Package>>, Error> {
     let ancestors = directories(path::directory(file));
@@ -80,6 +81,7 @@ pub fn discover(
             }
         }
     }
+    let excludes = preferences.file_matcher(host.use_case_sensitive_file_names());
     let mut seen = BTreeSet::new();
     let mut result = Vec::new();
     for directory in ancestors {
@@ -113,7 +115,8 @@ pub fn discover(
                 continue;
             }
             let mut entrypoints = Vec::new();
-            // The normal and @types packages may both contribute entrypoints.
+            // The native registry tries @types only when the package has no
+            // extractable TypeScript entrypoints (including file exclusions).
             for package_name in [
                 name.as_bytes().to_vec(),
                 tsr_module::get_types_package_name(name.as_bytes()),
@@ -126,8 +129,22 @@ pub fn discover(
                     entrypoints.extend(resolver.entrypoints(
                         &package,
                         name.as_bytes(),
-                        recursive_package(name.as_bytes()),
+                        package_name.starts_with(b"@types/")
+                            || preferences.directory_search == Some(true)
+                            || recursive_package(name.as_bytes())
+                            || program.resolutions().iter().any(|r| {
+                                r.result.package_id.name == name
+                                    && r.name.as_bytes().starts_with(name.as_bytes())
+                                    && r.name.as_bytes().get(name.len()) == Some(&b'/')
+                            }),
                     )?);
+                    if let Some(excludes) = &excludes {
+                        entrypoints
+                            .retain(|entry| !excludes.matches(entry.resolved_file_name.as_bytes()));
+                    }
+                    if !entrypoints.is_empty() {
+                        break;
+                    }
                 }
             }
             if !entrypoints.is_empty() {

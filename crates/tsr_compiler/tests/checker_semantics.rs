@@ -129,6 +129,76 @@ fn display_rejects_foreign_and_builder_generated_enclosing_nodes() {
 }
 
 #[test]
+fn explicit_generated_syntax_is_private_and_retains_its_source() {
+    use tsr_ast::Factory;
+    let (owner, program, _) = fixture(b"interface Shape { field: string }", options());
+    let file = program.source_file(b"/main.ts").unwrap();
+    let view = file.bound().view().ast();
+    let source = file.source();
+    let declaration = view
+        .node_slice(view.node(source).unwrap().statements(view).unwrap())
+        .unwrap()
+        .iter()
+        .flatten()
+        .next()
+        .unwrap();
+    let name = view.node(declaration).unwrap().name().unwrap();
+    let original_range = view.node(name).unwrap().range();
+    let mut op = owner.operation().unwrap();
+    let ty = op.get_type_at_location(name).unwrap();
+    let mut builder = op.node_builder();
+    let node = builder
+        .type_to_type_node(ty, Some(source), tsr_nodebuilder::flags::NO_TRUNCATION, 0)
+        .unwrap()
+        .unwrap();
+    let mut syntax = builder.into_syntax();
+    assert!(!syntax.identifier_symbols.is_empty());
+    let cloned = syntax.clone_node(Some(node)).unwrap();
+    assert_ne!(cloned, node);
+    syntax
+        .ast
+        .set_node_range(cloned, tsr_core::TextRange::new(20, 25));
+    assert_ne!(
+        syntax.ast.view().node(node).unwrap().range(),
+        syntax.ast.view().node(cloned).unwrap().range()
+    );
+    assert_eq!(view.node(name).unwrap().range(), original_range);
+    assert_eq!(op.type_to_string_default(ty).unwrap().as_bytes(), b"Shape");
+    let counters = Counters::new();
+    let foreign = Arc::new(
+        CheckerOwner::for_program(
+            CheckerIdentity::new(Generation::new(&counters), &counters),
+            &counters,
+            Arc::new(ProgramCheckerHost::new(program.clone())),
+        )
+        .unwrap(),
+    );
+    let foreign = foreign.operation().unwrap();
+    for symbol in syntax.identifier_symbols.values() {
+        assert!(op.symbol(*symbol).is_ok());
+        assert!(matches!(
+            foreign.symbol(*symbol),
+            Err(Error::Arena(tsr_arena::Error::WrongOwner))
+        ));
+    }
+    drop(foreign);
+    drop(op);
+    drop(owner);
+    drop(program);
+    assert_eq!(
+        syntax
+            .ast
+            .view()
+            .source_file(source)
+            .unwrap()
+            .text()
+            .as_bytes(),
+        b"interface Shape { field: string }"
+    );
+    assert!(syntax.ast.view().node(cloned).is_ok());
+}
+
+#[test]
 fn source_assignment_diagnostics_match_pinned_native_ranges_and_payload_on_repeat() {
     let requests: serde_json::Value =
         serde_json::from_str(include_str!("../../../tools/s08/p2/requests.json")).unwrap();

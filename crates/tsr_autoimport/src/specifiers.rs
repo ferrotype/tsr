@@ -7,10 +7,11 @@ pub fn for_package(
     checker: &mut Operation<'_>,
     source: tsr_ast::NodeId,
     options: &tsr_core::CompilerOptions,
+    preferences: &crate::Preferences,
 ) -> Result<Option<tsr_jsstring::JsString>, Error> {
     let mode = checker.import_file_module_formats(source)?.1;
     let conditions = tsr_module::get_conditions(options, mode);
-    let ending = checker.import_ending_preferences(source, mode, None)?[0];
+    let ending = checker.import_ending_preferences(source, mode, preferences.ending.as_deref())?[0];
     for entry in export.entrypoints.iter() {
         if entry
             .include_conditions
@@ -23,9 +24,10 @@ pub fn for_package(
         {
             continue;
         }
-        return Ok(Some(tsr_jsstring::JsString::from_bytes(process_ending(
-            entry, ending, options,
-        ))));
+        let specifier = process_ending(entry, ending, options);
+        if !preferences.excludes(&specifier) {
+            return Ok(Some(tsr_jsstring::JsString::from_bytes(specifier)));
+        }
     }
     Ok(None)
 }

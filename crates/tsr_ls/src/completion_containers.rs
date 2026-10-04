@@ -189,7 +189,7 @@ impl LanguageService<'_> {
                 symbol,
                 sort: if spread.contains(name) {
                     "13"
-                } else if s.flags() & sf::OPTIONAL != 0 {
+                } else if kind != Container::Class && s.flags() & sf::OPTIONAL != 0 {
                     "12"
                 } else {
                     "11"

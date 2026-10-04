@@ -37,7 +37,10 @@ pub struct CompletionOptions {
     pub locale: tsr_locale::Locale,
     pub automatic_optional_chain: Option<bool>,
     pub jsx_attribute_style: Option<String>,
-    pub import_module_specifier_ending: Option<String>,
+    pub auto_import: tsr_autoimport::Preferences,
+    pub import_statements: Option<bool>,
+    pub class_member_snippets: bool,
+    pub object_method_snippets: bool,
 }
 
 pub(crate) struct Candidate {
@@ -91,7 +94,7 @@ impl LanguageService<'_> {
         let position = i64::from(projection.mapped.position);
         let mut syntax = Syntax::new(self.view(source)?, source)?;
         if options.module_exports != Some(false) && self.auto_imports.is_prepared() {
-            self.prepare_auto_imports(checker, &syntax)?;
+            self.prepare_auto_imports(checker, &syntax, &options.auto_import)?;
         }
         let mut context = Context::collect(&mut syntax, position)?;
         let in_string =
@@ -107,6 +110,9 @@ impl LanguageService<'_> {
                 return Ok(lsp::CompletionItemsOrListOrNull::default());
             }
             if trigger == " " {
+                if options.import_statements != Some(true) {
+                    return Ok(lsp::CompletionItemsOrListOrNull::default());
+                }
                 return Ok(lsp::CompletionItemsOrListOrNull {
                     list: Some(Box::new(lsp::CompletionList {
                         is_incomplete: true,
@@ -164,6 +170,58 @@ impl LanguageService<'_> {
                 ..Default::default()
             });
         }
+        let import_info = crate::completion_imports::context(&mut syntax, context.token)?;
+        if import_info.keyword_only
+            || import_info.replacement.is_some() && options.import_statements == Some(true)
+        {
+            context.new_identifier = import_info.new_identifier;
+            context.type_only = import_info.top_level_type_only || import_info.specifier_type_only;
+            let mut list = lsp::CompletionList::default();
+            if let Some(keyword) = import_info.keyword {
+                list.items.push(Some(Box::new(lsp::CompletionItem {
+                    label: tsr_scanner::token_to_string(keyword).into(),
+                    kind: Some(Box::new(lsp::CompletionItemKind::KEYWORD)),
+                    sort_text: Some(Box::new("15".into())),
+                    ..Default::default()
+                })));
+            }
+            if !import_info.keyword_only {
+                self.auto_import_completions(
+                    checker,
+                    &mut syntax,
+                    &context,
+                    position,
+                    options,
+                    &mut list,
+                    Some(&import_info),
+                )?;
+            }
+            let replacement = if import_info.keyword_only {
+                context
+                    .previous
+                    .map(|p| self.completion_replacement(&mut syntax, p))
+                    .transpose()?
+                    .flatten()
+            } else {
+                self.completion_replacement(&mut syntax, context.location)?
+            };
+            items::defaults(
+                &mut list,
+                options,
+                &params.position,
+                replacement,
+                if import_info.new_identifier {
+                    &[]
+                } else {
+                    crate::completion_context::ALL
+                },
+            );
+            self.completion_data(source, position, &mut list)?;
+            return Ok(lsp::CompletionItemsOrListOrNull {
+                list: Some(Box::new(list)),
+                ..Default::default()
+            });
+        }
         if context.blocked(&syntax, position)? {
             return Ok(lsp::CompletionItemsOrListOrNull::default());
         }
@@ -190,6 +248,7 @@ impl LanguageService<'_> {
         let used_cases =
             crate::completion_switch::expression_case_values(checker, &syntax, context.token)?;
         let mut names = HashSet::new();
+        let mut method_snippets = Vec::new();
         for candidate in candidates {
             self.check_canceled()?;
             if let Some(used) = &used_cases {
@@ -219,11 +278,34 @@ impl LanguageService<'_> {
                 {
                     item.preselect = Some(Box::new(true));
                 }
+                if let Some(snippet) = self.object_method_snippet(
+                    checker,
+                    &syntax,
+                    &context,
+                    candidate.symbol,
+                    item.clone(),
+                    options,
+                )? {
+                    method_snippets.push(Some(Box::new(snippet)));
+                }
+                let Some(item) = self.class_member_snippet(
+                    checker,
+                    &mut syntax,
+                    &context,
+                    candidate.symbol,
+                    position,
+                    item,
+                    options,
+                )?
+                else {
+                    continue;
+                };
                 if names.insert(item.label.clone()) {
                     list.items.push(Some(Box::new(item)));
                 }
             }
         }
+        list.items.extend(method_snippets);
         let js = syntax.file.is_js();
         let filter = if context.member.is_some() {
             Filter::None
@@ -248,6 +330,7 @@ impl LanguageService<'_> {
                 position,
                 options,
                 &mut list,
+                None,
             )?;
         }
         list.items.extend(Self::literal_completions(
@@ -687,7 +770,7 @@ impl LanguageService<'_> {
         options: &CompletionOptions,
     ) -> Result<Option<lsp::CompletionItem>> {
         let symbol = candidate.symbol;
-        let name = symbol_name(checker, symbol)?;
+        let mut name = symbol_name(checker, symbol)?;
         if name.is_empty()
             || name.starts_with("__@")
             || checker.symbol(symbol)?.flags() & sf::MODULE != 0 && name.starts_with(['\'', '"'])
@@ -699,6 +782,13 @@ impl LanguageService<'_> {
                 || name.starts_with('#');
         if !valid && name.starts_with(' ') {
             return Ok(None);
+        }
+        if !valid
+            && context
+                .container
+                .is_some_and(|(kind, _)| matches!(kind, Container::Object | Container::Class))
+        {
+            name = quote(&name);
         }
         let mut insert = String::new();
         let mut snippet = false;
@@ -886,13 +976,22 @@ impl LanguageService<'_> {
                 }
             }
         }
+        let sort = if options.object_method_snippets
+            && context
+                .container
+                .is_some_and(|(kind, _)| kind == Container::Object)
+        {
+            format!("{}\0{name}\0", candidate.sort)
+        } else {
+            candidate.sort.into()
+        };
         Ok(Some(lsp::CompletionItem {
             label,
             kind: Some(Box::new(items::kind(kind))),
             sort_text: Some(Box::new(format!(
                 "{}{sort}",
                 if deprecated { "z" } else { "" },
-                sort = candidate.sort
+                sort = sort
             ))),
             filter_text: (!filter.is_empty()).then(|| Box::new(filter)),
             insert_text: (!insert.is_empty()).then(|| Box::new(insert)),
@@ -934,6 +1033,9 @@ impl LanguageService<'_> {
             .source_file(data.file_name.as_bytes())
             .ok_or_else(|| crate::Error::MissingFile(data.file_name.clone()))?;
         let mut syntax = Syntax::new(file.bound().view().ast(), file.source())?;
+        if data.is_import_statement_completion {
+            return Ok(item);
+        }
         if let Some(fix) = data.auto_import.as_deref() {
             return self.resolve_auto_import(item, fix, &mut syntax, options);
         }
@@ -994,7 +1096,18 @@ impl LanguageService<'_> {
             i64::from(data.position),
             options,
         )? {
-            if symbol_name(checker, candidate.symbol)? != data.name {
+            let mut name = symbol_name(checker, candidate.symbol)?;
+            if context
+                .container
+                .is_some_and(|(kind, _)| matches!(kind, Container::Object | Container::Class))
+                && !tsr_scanner::is_identifier_text(
+                    name.as_bytes(),
+                    tsr_core::LanguageVariant::STANDARD,
+                )
+            {
+                name = quote(&name);
+            }
+            if name != data.name {
                 continue;
             }
             return self.completion_details(

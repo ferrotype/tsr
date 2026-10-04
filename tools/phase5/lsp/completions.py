@@ -23,6 +23,8 @@ CASES = [
     'type Existing = string; let value: /*cursor*/',
     '/** Local description. */ const local = 1; loc/*cursor*/',
     'const current = /*cursor*/',
+    'declare const state: \"a$\" | \"brace}\"; switch(state) { /*cursor*/ }',
+    'import { enumValue } from \"./dep\"; switch(enumValue) { /*cursor*/ }',
     'function call(a = /*cursor*/, b: number) {}',
     'const /*cursor*/',
     'function /*cursor*/',
@@ -96,6 +98,36 @@ def offset_at(text, position, encoding):
     codec, width = ('utf-8', 1) if encoding == 'utf-8' else ('utf-16-le', 2)
     return len(prefix) + len(tail.encode(codec)[:position['character'] * width].decode(codec))
 
+def expand_snippet(text):
+    # The emitted L4 snippets use tab stops, defaults, and escaped text. Refuse
+    # unhandled snippet syntax rather than accidentally testing the raw wire.
+    def part(at, nested=False):
+        out = []
+        while at < len(text):
+            ch = text[at]
+            at += 1
+            if ch == "\\":
+                assert at < len(text) and text[at] in "\\$}", text
+                out.append(text[at]); at += 1
+            elif ch == "$":
+                braced = at < len(text) and text[at] == "{"
+                if braced: at += 1
+                start = at
+                while at < len(text) and text[at].isdigit(): at += 1
+                assert at > start, text
+                if braced:
+                    if text[at] == ":":
+                        value, at = part(at + 1, True); out.append(value)
+                    else:
+                        assert text[at] == "}", text
+                        at += 1
+            elif ch == "}" and nested:
+                return "".join(out), at
+            else: out.append(ch)
+        assert not nested, text
+        return "".join(out), at
+    return part(0)[0]
+
 def apply_completion(text, offset, encoding, item, defaults):
     edit = item.get('textEdit')
     if edit:
@@ -110,6 +142,8 @@ def apply_completion(text, offset, encoding, item, defaults):
                 start -= 1
             replace = {'start': position(text, start, encoding), 'end': position(text, offset, encoding)}
         primary = {'range': replace, 'newText': item.get('insertText', item['label'])}
+    if item.get('insertTextFormat') == 2:
+        primary['newText'] = expand_snippet(primary['newText'])
     edits = [primary, *item.get('additionalTextEdits', [])]
     converted = [(offset_at(text, e['range']['start'], encoding), offset_at(text, e['range']['end'], encoding), e['newText']) for e in edits]
     ordered = sorted(converted, key=lambda e: (e[0], e[1]))
@@ -118,8 +152,22 @@ def apply_completion(text, offset, encoding, item, defaults):
         text = text[:start] + insert + text[end:]
     return text
 
-def run(binary, root, encoding, rich, cases=CASES, filename="main.ts", auto_insert=False):
-    peer = Peer([str(binary), '--lsp', '--stdio'], root)
+class ConfiguredPeer(Peer):
+    def __init__(self, command, cwd, config):
+        self.config = config or {}
+        super().__init__(command, cwd)
+
+    def respond(self, value):
+        if value.get('method') == 'workspace/configuration' and 'id' in value:
+            self.server_requests.append(value['method'])
+            result = [self.config if item['section'] in ['typescript', 'javascript'] else {} for item in value['params']['items']]
+            self.write({'id': value['id'], 'result': result})
+        else:
+            super().respond(value)
+
+
+def run(binary, root, encoding, rich, cases=CASES, filename="main.ts", auto_insert=False, config=None):
+    peer = ConfiguredPeer([str(binary), '--lsp', '--stdio'], root, config)
     try:
         peer.request('initialize', {'processId': None, 'rootUri': root.as_uri(), 'capabilities': {
             'general': {'positionEncodings': [encoding]},
@@ -148,12 +196,14 @@ def run(binary, root, encoding, rich, cases=CASES, filename="main.ts", auto_inse
                 result['result']['items'].sort(key=key)
             rows.append(['list', index, result])
             for item in (result.get('result') or {}).get('items', []):
-                if item['label'].startswith(('Pkg', 'case ')) or item['label'].rstrip('?') in ['alpha', 'local', 'name', 'optional', 'method', 'Shape', 'Existing', 'string', 'title', 'onClick', 'greet']:
+                if item.get('data',{}).get('source') == 'ObjectLiteralMethodSnippet/' or item['label'].startswith(('Pkg', 'case ')) or item['label'].rstrip('?') in ['alpha', 'local', 'name', 'optional', 'method', 'Shape', 'Existing', 'string', 'title', 'onClick', 'greet']:
                     resolved = peer.request('completionItem/resolve', item)
                     rows.append(['resolve', index, item['label'], resolved])
                     if item.get('data', {}).get('autoImport'):
-                        assert 'additionalTextEdits' in resolved, resolved
+                        assert item.get('data', {}).get('isImportStatementCompletion') or 'additionalTextEdits' in resolved, resolved
                         rows.append(['apply', index, item['label'], apply_completion(text, offset, encoding, resolved, result['result'].get('itemDefaults', {}))])
+                    elif item.get('insertTextFormat') == 2 or item.get('insertText') and (config or {}).get('suggest', {}).get('classMemberSnippets', {}).get('enabled'):
+                        rows.append(['apply-snippet', index, item['label'], apply_completion(text, offset, encoding, resolved, result['result'].get('itemDefaults', {}))])
         peer.request('shutdown')
         peer.send('exit')
         return rows
@@ -180,6 +230,46 @@ JS_CASES = [
     '/**/*cursor*/\nfunction greet(name="hi", ...rest) {return name}',
 ]
 
+IMPORT_STATEMENT_CASES = [
+    'import /*cursor*/',
+    'import Sha/*cursor*/',
+    'import type /*cursor*/',
+    'import type Sha/*cursor*/',
+    'import { /*cursor*/',
+    'import { Sha/*cursor*/',
+    'import { type /*cursor*/',
+    'import { type Sha/*cursor*/',
+    'import { alpha, /*cursor*/',
+    'import { alpha } /*cursor*/',
+    'import * as deps /*cursor*/',
+    'export { alpha } /*cursor*/',
+    'export * /*cursor*/',
+    'import Sha/*cursor*/\ninterface Other {}',
+    'import { Sha/*cursor*/\ninterface Other {}',
+    '/** leading */\nimport Sha/*cursor*/',
+]
+
+CLASS_SNIPPET_CASES = [
+    'class Base { value: number; protected method(arg: number): void {} } class Derived extends Base { /*cursor*/ }',
+    'import { ImportedBase } from "./base"; class Derived extends ImportedBase { /*cursor*/ }',
+    'import { ImportedBase } from "./base"; import { alpha } from "./dep"; class Derived extends ImportedBase { /*cursor*/ }',
+    'interface Base { optional?: string; method(arg: string): number } class Derived implements Base { /*cursor*/ }',
+    'abstract class Base { abstract method<T>(arg: T): T; abstract property: string } class Derived extends Base { /*cursor*/ }',
+    'class Base { get name(): string { return "" } set name(value: string) {} } class Derived extends Base { /*cursor*/ }',
+    'interface Base { method(x: number): string; method(x: string, y?: boolean): number } class Derived implements Base { /*cursor*/ }',
+    'class Base { method(x: number): string; method(x: string): string; method(x: unknown): string { return "" } } class Derived extends Base { /*cursor*/ }',
+    'class Base { protected method(arg: number): void {} } class Derived extends Base { public /*cursor*/ }',
+    'class Base { protected method(arg: number): void {} } class Derived extends Base { public met/*cursor*/ }',
+    'abstract class Base { abstract method(arg: number): void } abstract class Derived extends Base { abstract /*cursor*/ }',
+]
+
+SNIPPET_CASES = [
+    'interface Target { method(arg: number, optional?: string): void }; const value: Target = { /*cursor*/ };',
+    'interface Target { property: ((x: number) => void) | undefined; other: ((a: number) => void) | ((b: string) => number) }; const value: Target = { /*cursor*/ };',
+    'interface Target { "not-a-method"(dollar$: string): void }; const value: Target = { /*cursor*/ };',
+    'interface Target { generic<T>(arg: T): T; optional?: (first?: number, ...rest: string[]) => void }; const value: Target = { /*cursor*/ };',
+]
+
 PACKAGE_CASES = [
     'Pkg/*cursor*/',
     'let value: Pkg/*cursor*/',
@@ -198,8 +288,14 @@ def package_fixture(root):
     root.mkdir()
     (root / 'tsconfig.json').write_text('{"compilerOptions":{"noLib":true,"module":"nodenext","paths":{"alias/*":["./src/*"],"ext/*":["./src/*.js"],"prefix*end":["./src/pre*.ts"]}},"files":["main.ts"]}')
     (root / 'main.ts').write_text('')
-    (root / 'package.json').write_text('{"type":"module","dependencies":{"sample":"*","conditional":"*","legacy":"*"},"devDependencies":{"dev-only":"*"},"optionalDependencies":{"optional-only":"*"},"imports":{"#internal/*":"./src/*.js"}}')
+    (root / 'package.json').write_text('{"type":"module","dependencies":{"sample":"*","conditional":"*","legacy":"*","typed":"*","fallback":"*"},"devDependencies":{"dev-only":"*"},"optionalDependencies":{"optional-only":"*"},"imports":{"#internal/*":"./src/*.js"}}')
     files = {
+        'typed/package.json': '{"types":"index.d.ts"}',
+        'typed/index.d.ts': 'export declare const PkgOwnTypes: number;',
+        '@types/typed/index.d.ts': 'export declare const PkgWrongFallback: number;',
+        'fallback/package.json': '{"main":"index.js"}',
+        'fallback/index.js': 'exports.PkgJavaScript = 1;',
+        '@types/fallback/deep.d.ts': 'export declare const PkgTypeFallback: number;',
         'sample/package.json': '{"types":"index.d.ts"}',
         'sample/index.d.ts': 'export declare const PkgValue: number; export interface PkgType { value: number }; export declare class PkgClass {}',
         'conditional/package.json': '{"exports":{".":{"import":"./esm.d.ts","require":"./cjs.d.cts"},"./feature":"./feature.d.ts","./features/*":"./features/*.d.ts"}}',
@@ -232,7 +328,8 @@ def main():
         (root / 'main.ts').write_text('')
         (root / 'jsx.tsx').write_text('')
         (root / 'script.js').write_text('')
-        (root / 'dep.ts').write_text('export const alpha = 1; export interface Shape { a: number } export function method() {} export default class Default {}')
+        (root / 'base.ts').write_text('import { Shape, Other, Default } from "./dep"; export interface ImportedBase { method(arg: Shape): Other; property: Default }')
+        (root / 'dep.ts').write_text('export const alpha = 1; export interface Shape { a: number } export function method() {} export interface Other { b: string } export class Default {} export default Default; export enum State {One, Two}; export declare const enumValue: State;')
         package_root = root / 'packages'
         package_fixture(package_root)
         for encoding in ['utf-8', 'utf-16']:
@@ -244,6 +341,17 @@ def main():
                     actual.extend(run(ROOT / 'target/debug/tsrust', root, encoding, rich, cases, name, auto))
                 expected.extend(run(ROOT / 'target/phase5/go-lsp', package_root, encoding, rich, PACKAGE_CASES))
                 actual.extend(run(ROOT / 'target/debug/tsrust', package_root, encoding, rich, PACKAGE_CASES))
+                for binary, rows in [('go-lsp', expected), ('../debug/tsrust', actual)]:
+                    rows.extend(run(ROOT / 'target/phase5' / binary, root, encoding, rich, IMPORT_STATEMENT_CASES, config={'suggest': {'includeCompletionsForImportStatements': True}}))
+                    rows.extend(run(ROOT / 'target/phase5' / binary, root, encoding, rich, SNIPPET_CASES, config={'suggest': {'objectLiteralMethodSnippets': {'enabled': True}}}))
+                    rows.extend(run(ROOT / 'target/phase5' / binary, root, encoding, rich, CLASS_SNIPPET_CASES, config={'suggest': {'classMemberSnippets': {'enabled': True}}}))
+                for preferences in [
+                    {'importModuleSpecifier': 'relative', 'importModuleSpecifierEnding': 'js'},
+                    {'importModuleSpecifier': 'non-relative', 'autoImportSpecifierExcludeRegexes': ['^sample$', '/^CONDITIONAL/i']},
+                    {'autoImportFileExcludePatterns': ['**/node_modules/sample/**'], 'autoImportEntrypointDirectorySearch': True},
+                ]:
+                    for binary, rows in [('go-lsp', expected), ('../debug/tsrust', actual)]:
+                        rows.extend(run(ROOT / 'target/phase5' / binary, package_root, encoding, rich, ['Pkg/*cursor*/'], config={'preferences': preferences}))
                 if actual != expected:
                     output = ROOT / 'target/phase5/l4-diff'
                     output.mkdir(exist_ok=True)

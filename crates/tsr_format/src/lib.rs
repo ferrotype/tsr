@@ -127,3 +127,6 @@ impl<'a> FormatFile<'a, '_> {
 
 #[cfg(test)]
 mod tests;
+
+/// Shared syntax helper used by formatter and language-service recovery.
+pub use lsutil::get_last_token;

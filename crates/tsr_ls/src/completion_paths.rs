@@ -145,7 +145,7 @@ impl LanguageService<'_> {
             endings: checker.import_ending_preferences(
                 syntax.source,
                 mode,
-                options.import_module_specifier_ending.as_deref(),
+                options.auto_import.ending.as_deref(),
             )?,
             reference,
         })

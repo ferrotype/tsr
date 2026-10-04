@@ -53,7 +53,12 @@ impl Cache {
             }),
         }
     }
-    pub fn get(&self, program: &Program, requested: &[u8]) -> Result<Option<Arc<Registry>>, Error> {
+    pub fn get(
+        &self,
+        program: &Program,
+        requested: &[u8],
+        preferences: &crate::Preferences,
+    ) -> Result<Option<Arc<Registry>>, Error> {
         if self.sources != sources(program) {
             return Err(tsr_arena::Error::WrongOwner.into());
         }
@@ -65,10 +70,11 @@ impl Cache {
             .index
             .as_ref()
             .filter(|index| {
-                index
-                    .requested_file
-                    .as_ref()
-                    .is_none_or(|file| file.as_bytes() == requested)
+                index.build_key == preferences.build_key()
+                    && index
+                        .requested_file
+                        .as_ref()
+                        .is_none_or(|file| file.as_bytes() == requested)
                     && self.sources.iter().all(|(path, id)| {
                         // New files always require extraction, even the requested file.
                         index

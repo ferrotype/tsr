@@ -3,7 +3,9 @@ use crate::{
     completion_context::Context, syntax::Syntax, CompletionOptions, LanguageService, Result,
 };
 use std::collections::HashSet;
-use tsr_ast::{symbol_flags as sf, utilities as ast, NodeId, SyntaxKind as K};
+use tsr_ast::{
+    symbol_flags as sf, utilities as ast, AstBuilder, FactoryMethods, NodeId, SyntaxKind as K,
+};
 use tsr_checker::{type_flags as tf, Operation, SymbolRef, TypeRef};
 use tsr_lsproto as lsp;
 use tsr_printer::emit_resolver::ConstantValue;
@@ -269,6 +271,7 @@ impl LanguageService<'_> {
         }
         let mut used = CaseValues::new(checker, syntax, block)?;
         let mut clauses = Vec::new();
+        let mut adder = tsr_autoimport::ImportAdder::default();
         for ty in types {
             self.check_canceled()?;
             if used.contains(checker, ty)? {
@@ -285,16 +288,31 @@ impl LanguageService<'_> {
                         used.add(value);
                     }
                 }
-                String::from_utf8_lossy(
-                    checker
-                        .type_to_string_at(
-                            ty,
-                            Some(block),
-                            tsr_checker::type_format_flags::USE_ALIAS_DEFINED_OUTSIDE_CURRENT_SCOPE,
-                        )?
-                        .as_bytes(),
+                let mut builder = checker.node_builder();
+                let Some(node) = builder.type_to_type_node(ty, Some(block), 0, 0)? else {
+                    return Ok(None);
+                };
+                let mut nodes = builder.into_syntax();
+                let mut roots = [node];
+                self.import_generated_types(
+                    checker, syntax, &mut nodes, &mut roots, options, &mut adder,
+                )?;
+                let single_quote = crate::inlay_hints::single_quote(syntax, options.quote)?;
+                let Some(expression) =
+                    type_node_to_expression(&mut nodes.ast, roots[0], single_quote)?
+                else {
+                    return Ok(None);
+                };
+                let mut writer = tsr_printer::TextWriter::new(b"", 0);
+                tsr_printer::Printer::new(
+                    tsr_printer::PrinterOptions {
+                        remove_comments: true,
+                        ..Default::default()
+                    },
+                    &nodes.emit,
                 )
-                .into_owned()
+                .write(nodes.ast.view(), expression, None, &mut writer, None)?;
+                String::from_utf8_lossy(tsr_printer::EmitTextWriter::text(&writer)).into_owned()
             } else {
                 Self::completion_literal_label(checker, ty, syntax, options)?
             };
@@ -310,14 +328,16 @@ impl LanguageService<'_> {
             .enumerate()
             .map(|(i, clause)| {
                 if options.snippets {
-                    format!("{clause}${}", i + 1)
+                    format!("{}${}", clause.replace('$', "\\$"), i + 1)
                 } else {
                     clause.clone()
                 }
             })
             .collect::<Vec<_>>()
             .join(newline);
+        let edits = self.import_adder_edits(syntax, options, &adder)?;
         Ok(Some(lsp::CompletionItem {
+            additional_text_edits: (!edits.is_empty()).then(|| Box::new(edits)),
             label: label.clone(),
             kind: Some(Box::new(lsp::CompletionItemKind::SNIPPET)),
             sort_text: Some(Box::new("15".into())),
@@ -336,4 +356,105 @@ impl LanguageService<'_> {
             ..Default::default()
         }))
     }
+}
+
+// port: tsc/internal/ls/completions.go:typeNodeToExpression
+fn type_node_to_expression(
+    ast: &mut AstBuilder,
+    node: NodeId,
+    single_quote: bool,
+) -> Result<Option<NodeId>> {
+    stacker::maybe_grow(64 * 1024, 1024 * 1024, || {
+        let read = ast.view().node(node)?;
+        let data = read.data_source();
+        Ok(match read.kind().known() {
+            Some(K::TypeReference) => data
+                .as_type_reference_node()
+                .and_then(|d| d.type_name())
+                .map(|n| entity_expression(ast, n))
+                .transpose()?,
+            Some(K::TypeQuery) => data
+                .as_type_query_node()
+                .and_then(|d| d.expr_name())
+                .map(|n| entity_expression(ast, n))
+                .transpose()?,
+            Some(K::IndexedAccessType) => {
+                let d = data.as_indexed_access_type_node().unwrap();
+                let object = d.object_type().ok_or(tsr_arena::Error::InvalidGraph)?;
+                let index = d.index_type().ok_or(tsr_arena::Error::InvalidGraph)?;
+                match (
+                    type_node_to_expression(ast, object, single_quote)?,
+                    type_node_to_expression(ast, index, single_quote)?,
+                ) {
+                    (Some(a), Some(b)) => {
+                        Some(ast.new_element_access_expression(Some(a), None, Some(b), 0))
+                    }
+                    _ => None,
+                }
+            }
+            Some(K::LiteralType) => {
+                let literal = data
+                    .as_literal_type_node()
+                    .and_then(|d| d.literal())
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
+                let read = ast.view().node(literal)?;
+                let text = ast.view().node_text(literal)?.into_js_string();
+                match read.kind().known() {
+                    Some(K::StringLiteral) => Some(ast.new_string_literal(
+                        text,
+                        if single_quote {
+                            tsr_ast::token_flags::SINGLE_QUOTE
+                        } else {
+                            0
+                        },
+                    )),
+                    Some(K::NumericLiteral) => {
+                        let flags = read
+                            .data_source()
+                            .as_numeric_literal()
+                            .unwrap()
+                            .token_flags();
+                        Some(ast.new_numeric_literal(text, flags))
+                    }
+                    _ => None,
+                }
+            }
+            Some(K::ParenthesizedType) => {
+                let inner = data
+                    .as_parenthesized_type_node()
+                    .and_then(|d| d.r#type())
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
+                type_node_to_expression(ast, inner, single_quote)?.map(|expr| {
+                    if ast
+                        .view()
+                        .node(expr)
+                        .is_ok_and(|r| r.kind() == K::Identifier)
+                    {
+                        expr
+                    } else {
+                        ast.new_parenthesized_expression(Some(expr))
+                    }
+                })
+            }
+            Some(K::ImportType) => panic!("import type remained after auto-import conversion"),
+            _ => None,
+        })
+    })
+}
+// port: tsc/internal/ls/completions.go:entityNameToExpression
+fn entity_expression(ast: &mut AstBuilder, mut name: NodeId) -> Result<NodeId> {
+    let mut rights = Vec::new();
+    while ast.view().node(name)?.kind() != K::Identifier {
+        let read = ast.view().node(name)?;
+        let d = read.data_source();
+        let d = d
+            .as_qualified_name()
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
+        rights.push(d.right());
+        name = d.left().ok_or(tsr_arena::Error::InvalidGraph)?;
+    }
+    for right in rights.into_iter().rev() {
+        name = ast.new_property_access_expression(Some(name), None, right, 0);
+    }
+    Ok(name)
 }

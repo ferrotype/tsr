@@ -77,6 +77,7 @@ impl Export {
 pub struct Registry {
     pub index: Index<Export>,
     pub requested_file: Option<JsString>,
+    pub(crate) build_key: crate::preferences::BuildKey,
     pub(crate) sources: std::collections::HashMap<JsString, NodeId>,
 }
 impl Registry {
@@ -184,7 +185,11 @@ impl Registry {
             index,
             sources: crate::cache::sources(program),
             requested_file: None,
+            build_key: crate::preferences::BuildKey::default(),
         }))
+    }
+    pub fn set_build_preferences(&mut self, preferences: &crate::Preferences) {
+        self.build_key = preferences.build_key();
     }
     pub fn search(&self, importing_path: &[u8], prefix: &[u8]) -> Vec<&Export> {
         self.index
@@ -194,6 +199,78 @@ impl Registry {
             .collect()
     }
 }
+// port: tsc/internal/ls/autoimport/export.go:SymbolToExport
+pub fn export_id_for_symbol(
+    program: &Program,
+    checker: &mut Operation<'_>,
+    symbol: SymbolRef,
+) -> Result<Option<ExportId>, Error> {
+    let read = checker.symbol(symbol)?;
+    if let Some(parent) = read.parent() {
+        let parent = checker.symbol_ref(parent)?;
+        if checker.symbol(parent)?.is_external_module() {
+            for declaration in checker.symbol_declarations(parent)?.iter().flatten() {
+                let Some(file) = program.file_of_node(declaration) else {
+                    continue;
+                };
+                let view = file.bound().view().ast();
+                if tsr_ast::utilities_modules::is_external_module_augmentation(view, declaration)?
+                    || tsr_ast::utilities::is_global_scope_augmentation(&view.node(declaration)?)
+                {
+                    continue;
+                }
+                let d = view.node(declaration)?;
+                let module = if d.kind() == K::SourceFile {
+                    JsString::from_bytes(view.source_file(declaration)?.path())
+                } else if let Some(name) = d
+                    .name()
+                    .filter(|&id| view.node(id).is_ok_and(|n| n.kind() == K::StringLiteral))
+                {
+                    view.node_text(name)?.into_js_string()
+                } else {
+                    return Ok(None);
+                };
+                return Ok(Some(ExportId {
+                    module,
+                    name: JsString::from_bytes(read.name_bytes()),
+                }));
+            }
+            return Ok(None);
+        }
+    }
+    let Some(declaration) = checker.symbol_declarations(symbol)?.iter().flatten().next() else {
+        return Ok(None);
+    };
+    let Some(file) = program.file_of_node(declaration) else {
+        return Ok(None);
+    };
+    let Some(module) = checker.bound_symbol_of_node(file.source())? else {
+        return Ok(None);
+    };
+    let module = checker.get_merged_symbol(module)?;
+    let target = checker.skip_alias(symbol)?;
+    let target = checker.get_merged_symbol(target)?;
+    let name = JsString::from_bytes(checker.symbol(symbol)?.name_bytes());
+    for name in [
+        b"default".as_slice(),
+        b"export=".as_slice(),
+        name.as_bytes(),
+    ] {
+        if let Some(exported) =
+            checker.try_get_member_in_module_exports_and_properties(name, module)?
+        {
+            let exported = checker.skip_alias(exported)?;
+            if checker.get_merged_symbol(exported)? == target {
+                return Ok(Some(ExportId {
+                    module: JsString::from_bytes(file.bound().view().source_file()?.path()),
+                    name: JsString::from_bytes(name),
+                }));
+            }
+        }
+    }
+    Ok(None)
+}
+
 fn unusable_name(name: &[u8]) -> bool {
     matches!(
         name,
@@ -212,14 +289,26 @@ fn extract(
         return Ok(None);
     }
     let name = JsString::from_bytes(checker.symbol(symbol)?.name_bytes());
-    let target = checker.skip_alias(symbol)?;
-    let flags = checker.get_symbol_flags(target)?;
     let declarations: Vec<_> = checker
         .symbol_declarations(symbol)?
         .iter()
         .flatten()
         .collect();
     let syntax = syntax(program, &declarations)?;
+    // The native extractor first uses the binder's non-reporting resolver.
+    // Preserve that result's flags (including an export-value local) instead
+    // of eagerly replacing it with the checker's exported target.
+    let local = local_alias_target(program, checker, symbol, syntax, &declarations)?;
+    let target = if let Some(local) = local {
+        local
+    } else {
+        checker.skip_alias(symbol)?
+    };
+    let flags = if local.is_some() {
+        checker.symbol(target)?.flags()
+    } else {
+        checker.get_symbol_flags(target)?
+    };
     let target_id = if target == symbol {
         None
     } else {
@@ -293,7 +382,84 @@ fn extract(
     };
     Ok((!unusable_name(export.name())).then_some(export))
 }
-fn declaration_name(program: &Program, declarations: &[NodeId]) -> Result<JsString, Error> {
+// port: tsc/internal/ls/autoimport/extract.go:symbolExtractor.tryResolveSymbol
+fn local_alias_target(
+    program: &Program,
+    checker: &Operation<'_>,
+    symbol: SymbolRef,
+    syntax: ExportSyntax,
+    declarations: &[NodeId],
+) -> Result<Option<SymbolRef>, Error> {
+    if checker.symbol(symbol)?.flags() & sf::ALIAS == 0 {
+        return Ok(None);
+    }
+    for &decl in declarations {
+        let read = checker.node(decl)?;
+        let name = match syntax {
+            ExportSyntax::DefaultDeclaration | ExportSyntax::Equals
+                if read.kind() == K::ExportAssignment =>
+            {
+                read.expression()
+            }
+            ExportSyntax::Named if read.kind() == K::ExportSpecifier => {
+                let named = read.parent().and_then(|id| checker.node(id).ok()?.parent());
+                if named.is_some_and(|id| {
+                    checker
+                        .node(id)
+                        .is_ok_and(|n| n.module_specifier().is_some())
+                }) {
+                    None
+                } else {
+                    read.name().or(read.property_name())
+                }
+            }
+            _ => None,
+        };
+        let Some(name) =
+            name.filter(|&id| checker.node(id).is_ok_and(|n| n.kind() == K::Identifier))
+        else {
+            continue;
+        };
+        let text = checker
+            .node(name)?
+            .data_source()
+            .as_identifier()
+            .expect("alias identifier")
+            .text()
+            .to_vec();
+        let mut host = program.resolver_host(&tsr_arena::Counters::new());
+        let mut resolver = tsr_binder::name_resolver::NameResolver::new(
+            tsr_binder::name_resolver::ResolverOptions {
+                emit_script_target: tsr_core::CompilerOptions::default().emit_script_target(),
+                isolated_modules: false,
+                verbatim_module_syntax: false,
+                emit_standard_class_fields: tsr_core::CompilerOptions::default()
+                    .emit_standard_class_fields(),
+            },
+        );
+        let mut hooks = tsr_binder::name_resolver::NoNameResolverHooks;
+        if let Some(local) = resolver.resolve(
+            &mut host,
+            &mut hooks,
+            Some(name),
+            &text,
+            sf::ALL,
+            None,
+            false,
+            false,
+        )? {
+            let local = checker.symbol_ref(local)?;
+            if checker.symbol(local)?.flags() & sf::ALIAS == 0 {
+                return Ok(Some(local));
+            }
+        }
+    }
+    Ok(None)
+}
+pub(crate) fn declaration_name(
+    program: &Program,
+    declarations: &[NodeId],
+) -> Result<JsString, Error> {
     for &decl in declarations {
         let Some(file) = program.file_of_node(decl) else {
             continue;

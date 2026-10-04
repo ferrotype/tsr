@@ -18,9 +18,11 @@ impl LanguageService<'_> {
         &self,
         checker: &mut Operation<'_>,
         syntax: &Syntax<'_>,
+        preferences: &tsr_autoimport::Preferences,
     ) -> Result<Arc<Registry>> {
         let registry = if let Some(registry) =
-            self.auto_imports.get(self.program, syntax.file.path())?
+            self.auto_imports
+                .get(self.program, syntax.file.path(), preferences)?
         {
             registry
         } else {
@@ -32,12 +34,15 @@ impl LanguageService<'_> {
                 .completion_host
                 .clone()
                 .unwrap_or_else(|| self.program.shared_host());
-            let packages =
-                tsr_autoimport::packages::discover(self.program, syntax.file.path(), &host, || {
-                    self.cancellation.is_canceled()
-                })
-                .map_err(crate::Error::Compiler)?
-                .ok_or(crate::Error::Canceled)?;
+            let packages = tsr_autoimport::packages::discover(
+                self.program,
+                syntax.file.path(),
+                &host,
+                preferences,
+                || self.cancellation.is_canceled(),
+            )
+            .map_err(crate::Error::Compiler)?
+            .ok_or(crate::Error::Canceled)?;
             for package in packages {
                 self.check_canceled()?;
                 let counters = tsr_arena::Counters::new();
@@ -88,6 +93,14 @@ impl LanguageService<'_> {
                     registry.index.insert(export.clone());
                 }
             }
+            if let Some(excludes) =
+                preferences.file_matcher(self.program.host().use_case_sensitive_file_names())
+            {
+                registry.index = registry
+                    .index
+                    .filtered(|export| !excludes.matches(export.path.as_bytes()));
+            }
+            registry.set_build_preferences(preferences);
             registry.requested_file = Some(tsr_jsstring::JsString::from_bytes(syntax.file.path()));
             self.auto_imports.publish(registry)
         };
@@ -116,6 +129,10 @@ impl LanguageService<'_> {
         }
         Ok(())
     }
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "The optional import-statement context and output list share the enclosing completion request"
+    )]
     pub(crate) fn auto_import_completions(
         &mut self,
         checker: &mut Operation<'_>,
@@ -124,19 +141,24 @@ impl LanguageService<'_> {
         position: i64,
         options: &CompletionOptions,
         list: &mut lsp::CompletionList,
+        statement: Option<&crate::completion_imports::ImportStatement>,
     ) -> Result<()> {
-        if options.module_exports == Some(false)
+        if options.module_exports == Some(false) && statement.is_none()
             || tsr_tspath::is_dynamic_file_name(syntax.file.file_name())
         {
             return Ok(());
         }
-        let registry = self.prepare_auto_imports(checker, syntax)?;
+        let registry = self.prepare_auto_imports(checker, syntax, &options.auto_import)?;
         let (prefix, usage) = if let Some(previous) = context
             .previous
             .filter(|&n| syntax.view.node(n).is_ok_and(|n| n.kind() == K::Identifier))
         {
             (
-                syntax.view.node_text(previous)?.as_bytes().to_vec(),
+                if statement.is_some() && context.previous == context.token {
+                    Vec::new()
+                } else {
+                    syntax.view.node_text(previous)?.as_bytes().to_vec()
+                },
                 syntax.start(previous)?,
             )
         } else {
@@ -174,7 +196,7 @@ impl LanguageService<'_> {
                 && (if context.type_only {
                     export.flags & (sf::TYPE | sf::MODULE) == 0
                 } else {
-                    export.flags & sf::VALUE == 0
+                    statement.is_none() && export.flags & sf::VALUE == 0
                 })
             {
                 continue;
@@ -191,7 +213,8 @@ impl LanguageService<'_> {
                 syntax.source,
                 export,
                 context.type_only,
-                usage_range.start.clone(),
+                Some(usage_range.start.clone()),
+                &options.auto_import,
             )? {
                 groups.entry(key.clone()).or_default().push((export, fix));
             }
@@ -215,7 +238,7 @@ impl LanguageService<'_> {
             };
             let modifiers = export.modifiers;
             let name = fix.name.clone();
-            list.items.push(Some(Box::new(lsp::CompletionItem {
+            let mut item = lsp::CompletionItem {
                 label: name.clone(),
                 kind: Some(Box::new(kind)),
                 label_details: Some(Box::new(lsp::CompletionItemLabelDetails {
@@ -240,15 +263,62 @@ impl LanguageService<'_> {
                     )
                     .into_owned(),
                     source: fix.module_specifier.clone(),
-                    auto_import: Some(Box::new(fix)),
+                    is_import_statement_completion: statement.is_some(),
+                    auto_import: Some(Box::new(fix.clone())),
                     ..Default::default()
                 })),
                 ..Default::default()
-            })));
+            };
+            if let Some(statement) = statement {
+                let kind = tsr_autoimport::fix::import_kind(
+                    self.program,
+                    checker,
+                    syntax.source,
+                    export,
+                    true,
+                )?;
+                let semicolons = tsr_format::FormatFile {
+                    view: syntax.view,
+                    source: syntax.source,
+                    jsdoc: &mut syntax.docs,
+                }
+                .probably_uses_semicolons()?;
+                let quote = crate::inlay_hints::single_quote(syntax, options.quote)?;
+                let text = crate::completion_imports::insert_text(
+                    statement,
+                    kind,
+                    &fix.name,
+                    &fix.module_specifier,
+                    options.snippets,
+                    semicolons,
+                    quote,
+                );
+                let (range, fidelity) = self.range(
+                    syntax.source,
+                    statement.replacement.expect("import completion range"),
+                    FEATURE_COMPLETION,
+                )?;
+                if !fidelity.is_exact() {
+                    continue;
+                }
+                item.text_edit = Some(Box::new(lsp::TextEditOrInsertReplaceEdit {
+                    text_edit: Some(Box::new(lsp::TextEdit {
+                        range,
+                        new_text: text,
+                    })),
+                    ..Default::default()
+                }));
+                item.filter_text = Some(Box::new(fix.name.clone()));
+                item.sort_text = Some(Box::new("11".into()));
+                item.insert_text_format = options
+                    .snippets
+                    .then(|| Box::new(lsp::InsertTextFormat::SNIPPET));
+            }
+            list.items.push(Some(Box::new(item)));
         }
         Ok(())
     }
-    fn export_symbol(
+    pub(crate) fn export_symbol(
         &self,
         checker: &mut Operation<'_>,
         export: &Export,
@@ -334,7 +404,7 @@ impl LanguageService<'_> {
         Ok(item)
     }
 }
-fn rank(a: &lsp::AutoImportFix, b: &lsp::AutoImportFix) -> std::cmp::Ordering {
+pub(crate) fn rank(a: &lsp::AutoImportFix, b: &lsp::AutoImportFix) -> std::cmp::Ordering {
     a.kind.0.cmp(&b.kind.0).then_with(|| {
         a.module_specifier
             .bytes()

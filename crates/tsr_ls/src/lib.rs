@@ -5,19 +5,24 @@ mod call_declarations;
 mod call_hierarchy;
 mod call_sites;
 mod code_lens;
+mod completion_class_snippets;
 mod completion_containers;
 mod completion_context;
+mod completion_imports;
 mod completion_items;
 mod completion_jsx;
 mod completion_keywords;
 mod completion_labels;
 mod completion_literals;
 mod completion_paths;
+mod completion_snippets;
 mod completion_switch;
 mod completions;
+mod import_adder;
 mod jsdoc_completions;
 mod jsdoc_parameters;
 mod jsdoc_template;
+mod snippet_printer;
 mod string_completions;
 pub use completion_keywords::compare as compare_completion_entries;
 pub use completions::{CompletionOptions, COMPLETION_TRIGGER_CHARACTERS};
@@ -73,8 +78,14 @@ pub enum Error {
     Checker(tsr_checker::Error),
     Navigation(tsr_astnav::Error),
     Printer(tsr_printer::Error),
+    Edits(tsr_core::UnappliableEdits),
     Canceled,
     MissingFile(String),
+}
+impl From<tsr_core::UnappliableEdits> for Error {
+    fn from(value: tsr_core::UnappliableEdits) -> Self {
+        Self::Edits(value)
+    }
 }
 impl From<tsr_printer::Error> for Error {
     fn from(value: tsr_printer::Error) -> Self {
@@ -108,6 +119,7 @@ impl std::fmt::Display for Error {
             Self::Checker(e) => e.fmt(f),
             Self::Navigation(e) => e.fmt(f),
             Self::Printer(e) => e.fmt(f),
+            Self::Edits(e) => write!(f, "unappliable snippet edits: {e:?}"),
             Self::Canceled => f.write_str("request canceled"),
             Self::MissingFile(name) => write!(f, "file not found: {name}"),
         }

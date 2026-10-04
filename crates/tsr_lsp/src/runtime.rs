@@ -1293,7 +1293,63 @@ fn apply_completion_preferences(
         "importModuleSpecifierEnding",
         "preferences.importModuleSpecifierEnding",
     ) {
-        options.import_module_specifier_ending = Some(value.clone());
+        options.auto_import.ending = Some(value.clone());
+    }
+    if let Some(lsp::Any::String(value)) = get(
+        "importModuleSpecifierPreference",
+        "preferences.importModuleSpecifier",
+    ) {
+        options.auto_import.module_specifier = Some(value.clone());
+    }
+    if let Some(lsp::Any::Boolean(value)) = get(
+        "autoImportEntrypointDirectorySearch",
+        "preferences.autoImportEntrypointDirectorySearch",
+    ) {
+        options.auto_import.directory_search = Some(*value);
+    }
+    if let Some(lsp::Any::Boolean(value)) = get(
+        "includeCompletionsForImportStatements",
+        "suggest.includeCompletionsForImportStatements",
+    ) {
+        options.import_statements = Some(*value);
+    }
+    set_bool(
+        get(
+            "includeCompletionsWithClassMemberSnippets",
+            "suggest.classMemberSnippets.enabled",
+        ),
+        &mut options.class_member_snippets,
+    );
+    set_bool(
+        get(
+            "includeCompletionsWithObjectLiteralMethodSnippets",
+            "suggest.objectLiteralMethodSnippets.enabled",
+        ),
+        &mut options.object_method_snippets,
+    );
+    if let Some(lsp::Any::Array(values)) = get(
+        "autoImportSpecifierExcludeRegexes",
+        "preferences.autoImportSpecifierExcludeRegexes",
+    ) {
+        options.auto_import.exclude_specifiers = values
+            .iter()
+            .filter_map(|v| match v {
+                lsp::Any::String(s) => Some(s.clone()),
+                _ => None,
+            })
+            .collect();
+    }
+    if let Some(lsp::Any::Array(values)) = get(
+        "autoImportFileExcludePatterns",
+        "preferences.autoImportFileExcludePatterns",
+    ) {
+        options.auto_import.exclude_files = values
+            .iter()
+            .filter_map(|v| match v {
+                lsp::Any::String(s) => Some(JsString::from_bytes(s.as_bytes())),
+                _ => None,
+            })
+            .collect();
     }
     if let Some(lsp::Any::String(value)) = get("newLineCharacter", "format.newLineCharacter") {
         options.newline = Some(value.clone());
