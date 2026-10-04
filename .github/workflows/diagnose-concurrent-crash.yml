@@ -1,89 +1,76 @@
 name: diagnose concurrent compiler crash
-'on':
+
+on:
   push:
-    branches:
-    - codex/concurrent-checker-crash
-    paths:
-    - .github/workflows/diagnose-concurrent-crash.yml
-    - .github/workflows/ci.yml
-    - scripts/parity.py
-    - crates/tsr_testrunner/**
+    branches: [codex/concurrent-checker-crash]
+    paths: [.github/workflows/diagnose-concurrent-crash.yml]
+
 permissions:
   contents: read
+
 jobs:
-  capture:
-    name: validate native crash diagnostics
+  sanitizer:
+    name: concurrent fixture under ${{ matrix.sanitizer }} sanitizer
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer: [address, thread]
+    env:
+      CARGO_INCREMENTAL: 0
+      CARGO_PROFILE_RELEASE_DEBUG: 1
+      RUSTFLAGS: -Zsanitizer=${{ matrix.sanitizer }} -Cforce-frame-pointers=yes
+      TSR_TESTRUNNER_TRACE_PHASES: 1
     steps:
-    - uses: actions/checkout@v5
-    - name: Create an intentionally crashing diagnostic executable
-      run: "mkdir -p runner\ncat > \"$RUNNER_TEMP/crash-probe.c\" <<'C'\n#include\
-        \ <stdio.h>\nint main(void) {\n    for (int i = 0; i < 100; ++i) fprintf(stderr,\
-        \ \"phase-%d\\n\", i);\n    fputs(\"{\\\"id\\\":\", stdout);\n    fflush(stdout);\n\
-        \    *(volatile int *)0 = 42;\n    return 0;\n}\nC\ncc -g -O0 \"$RUNNER_TEMP/crash-probe.c\"\
-        \ -o runner/tsr-testrunner\n"
-    - name: Exercise the CI core-capture path
-      run: "chmod +x runner/tsr-testrunner\nif [[ \"compiler-concurrent\" == compiler-concurrent\
-        \ ]]; then\n  export TSR_TESTRUNNER_TRACE_PHASES=1\nfi\nif [[ \"$RUNNER_OS\"\
-        \ == Linux && \"${{ runner.environment }}\" == github-hosted ]]; then\n  mkdir\
-        \ -p \"$RUNNER_TEMP/parity-cores\"\n  # Keep cores outside results: they may\
-        \ contain process environment\n  # data. Only debugger reports and the failed\
-        \ process traces upload.\n  previous_core_pattern=$(cat /proc/sys/kernel/core_pattern)\n\
-        \  trap 'sudo sysctl -w \"kernel.core_pattern=$previous_core_pattern\" > /dev/null'\
-        \ EXIT\n  sudo sysctl -w \"kernel.core_pattern=$RUNNER_TEMP/parity-cores/core.%p.%t\"\
-        \n  ulimit -c unlimited\nfi\npython3 scripts/parity.py run \"compiler-concurrent\"\
-        \ --runner runner/tsr-testrunner --id diagnostic/segfault.ts --output \"results/compiler-concurrent/$(echo\
-        \ '2/4' | tr / -)\"\n"
-    - name: Exercise the CI backtrace path
-      if: always()
-      run: "shopt -s nullglob\ncores=(\"$RUNNER_TEMP/parity-cores/\"core.*)\nif ((\
-        \ ${#cores[@]} == 0 )); then exit 0; fi\nif ! command -v gdb; then\n  sudo\
-        \ apt-get update -qq\n  sudo apt-get install -y gdb\nfi\noutput=\"results/compiler-concurrent/$(echo\
-        \ '2/4' | tr / -)/crashes\"\nmkdir -p \"$output\"\nsha256sum runner/tsr-testrunner\
-        \ > \"$output/executable.sha256\"\nfor core in \"${cores[@]}\"; do\n  gdb\
-        \ --batch runner/tsr-testrunner \"$core\" \\\n    -ex 'set pagination off'\
-        \ -ex 'info registers' \\\n    -ex 'thread apply all bt 100' -ex 'info proc\
-        \ mappings' \\\n    > \"$output/$(basename \"$core\").backtrace.txt\" 2>&1\n\
-        \  cat \"$output/$(basename \"$core\").backtrace.txt\"\ndone\n"
-    - name: Verify signal, complete trace and fault location
-      run: 'python3 - <<''CHECK''
-
-        import json
-
-        from pathlib import Path
-
-        root=Path(''results/compiler-concurrent/2-4'')
-
-        rows=[json.loads(x) for x in (root/''results.ndjson'').read_text().splitlines()]
-
-        assert len(rows)==1 and rows[0][''reason'']==''signal 11'', rows
-
-        record,=(root/''crashes'').glob(''*/process.json'')
-
-        trace=(record.parent/''stderr'').read_text()
-
-        assert ''phase-0\n'' in trace and ''phase-99\n'' in trace
-
-        assert (record.parent/''stdout'').read_text()==''{"id":''
-
-        reports=list((root/''crashes'').glob(''*.backtrace.txt''))
-
-        assert len(reports)==1, reports
-
-        report=reports[0].read_text()
-
-        assert ''SIGSEGV'' in report and ''crash-probe.c:'' in report, report
-
-        print(''Verified: SIGSEGV remains a failure, full traces survive, and the
-        native backtrace identifies the fault line.'')
-
-        CHECK
-
-        '
-    - uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: validated-crash-diagnostics
-        path: results
-        retention-days: 3
+      - uses: actions/checkout@v5
+        with:
+          ref: 2f464bf525579d4faa141b466786d04ac04f462e
+          submodules: true
+          persist-credentials: false
+      - name: Install the pinned instrumentation toolchain and apply traces
+        run: |
+          git fetch --depth=1 origin "$GITHUB_SHA" 1ec148d488991b17228de343dcc01c1477559059
+          git diff 1ec148d488991b17228de343dcc01c1477559059 "$GITHUB_SHA" -- crates/tsr_testrunner | git apply
+          rustup toolchain install nightly-2026-09-05 --profile minimal --component rust-src --component llvm-tools-preview
+          echo "$(rustc +nightly-2026-09-05 --print sysroot)/lib/rustlib/x86_64-unknown-linux-gnu/bin" >> "$GITHUB_PATH"
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: crash-runner-${{ matrix.sanitizer }}
+      - name: Build instrumented runner and standard library
+        timeout-minutes: 10
+        run: cargo +nightly-2026-09-05 build -Zbuild-std --release --locked --target x86_64-unknown-linux-gnu -p tsr_testrunner --bin tsr-testrunner
+      - name: Exercise the exact concurrent fixture
+        timeout-minutes: 2
+        env:
+          ASAN_OPTIONS: detect_leaks=1:detect_stack_use_after_return=1:halt_on_error=1
+          TSAN_OPTIONS: halt_on_error=1
+        run: |
+          mkdir -p crash-output
+          for iteration in $(seq 1 30); do
+            target/x86_64-unknown-linux-gnu/release/tsr-testrunner --suite compiler --mode concurrent run \
+              --id 'conformance/typeOfThisInStaticMembers11(target=esnext).ts' \
+              --local "crash-output/local-$iteration" \
+              > "crash-output/result-$iteration.ndjson" 2> "crash-output/trace-$iteration.log"
+          done
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          results=list(Path('crash-output').glob('result-*.ndjson'))
+          assert len(results)==30, len(results)
+          for path in results:
+              rows=[json.loads(line) for line in path.read_text().splitlines()]
+              assert len(rows)==9 and all(row['state']=='pass' for row in rows), (path,rows)
+          print('30 runs: all 270 subtests pass without sanitizer reports')
+          PY
+      - name: Print the last trace
+        if: always()
+        run: |
+          latest=$(find crash-output -name 'trace-*.log' 2>/dev/null | sort -V | tail -1)
+          if [[ -n "$latest" ]]; then tail -150 "$latest"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: concurrent-crash-${{ matrix.sanitizer }}
+          path: crash-output
+          retention-days: 3
