@@ -47,14 +47,16 @@ def main():
         replacements[str(upstream / package / 'rust_codec_probe_test.go')] = str(HERE / 'probe_test.go')
         overlay = stage / 'overlay.json'
         output = stage / 'result.json'
+        params_output = stage / 'params-result.json'
         env.update(TSR_CODEC_CASES=str(HERE / 'codec-cases.json'), TSR_CODEC_RESULT=str(output),
+                   TSR_PARAMS_CASES=str(HERE / 'params-cases.json'), TSR_PARAMS_RESULT=str(params_output),
                    TSR_PINNED_GO=str(stage / 'lsp_generated.go.pinned'), TSR_GENERATED_GO=str(generated))
         pinned = subprocess.check_output(['git', '-C', str(upstream), 'show', f'{pin}:{package}/lsp_generated.go'])
         Path(env['TSR_PINNED_GO']).write_bytes(pinned)
         replacements[str(upstream / package / 'lsp_generated.go')] = env['TSR_PINNED_GO']
         overlay.write_text(json.dumps({'Replace': replacements}))
         subprocess.run([go, 'test', '-overlay', str(overlay), './internal/lsp/lsproto',
-                        '-run', '^TestRust(CodecMatrix|ResolverMatchesPinnedGo)$', '-count=1'],
+                        '-run', '^TestRust(CodecMatrix|ParamsMatrix|ResolverMatchesPinnedGo)$', '-count=1'],
                        cwd=upstream / 'tsc', env=env, check=True, timeout=180)
         observed = json.loads(output.read_text())
         expected = HERE / 'codec-expected.json'
@@ -62,6 +64,21 @@ def main():
             expected.write_text(json.dumps(observed, indent=2, sort_keys=True, ensure_ascii=False) + '\n')
         elif observed != json.loads(expected.read_text()):
             raise SystemExit('codec fixture differs from pinned Go; inspect before updating')
+        params = json.loads(params_output.read_text())
+        # The pinned JSON library deliberately chooses "cannot" or "unable to"
+        # once per process (errors.go:errorModalVerb). Normalize only that
+        # documented prefix; preserve every other byte of the response message.
+        for response in params.values():
+            error = response.get('error')
+            if error and error['message'].startswith('InvalidParams: json: unable to '):
+                error['message'] = error['message'].replace(
+                    'InvalidParams: json: unable to ', 'InvalidParams: json: cannot ', 1)
+        expected_params = HERE / 'params-expected.json'
+        if args.update:
+            expected_params.write_text(json.dumps(params, indent=2, sort_keys=True, ensure_ascii=False) + '\n')
+        elif params != json.loads(expected_params.read_text()):
+            raise SystemExit('parameter response fixture differs from pinned Go; inspect before updating')
+        print(f'{len(params)} complete parameter responses checked')
         print(f'Pinned resolver matches; {sum(map(len, observed.values()))} codec operations checked')
 
 

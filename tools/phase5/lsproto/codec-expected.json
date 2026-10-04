@@ -57,6 +57,44 @@
       "ok": false
     }
   ],
+  "Boolean union partial token state": [
+    {
+      "encoded": "true",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "false",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "true",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "false",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": false
+    },
+    {
+      "encoded": "true",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    },
+    {
+      "encoded": "false",
+      "marshal_failed": false,
+      "marshal_panicked": false,
+      "ok": true
+    }
+  ],
   "CallHierarchyIncomingCall from null": [
     {
       "encoded": "{\"from\":null,\"fromRanges\":[]}",

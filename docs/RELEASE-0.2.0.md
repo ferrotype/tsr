@@ -1,7 +1,7 @@
 # Release 0.2.0
 
-The checklist for publishing tsr 0.2.0 to crates.io: 45 packages from one
-commit, all at version `0.2.0`. They are 43 libraries, the compiler command line
+The checklist for publishing tsr 0.2.0 to crates.io: 44 packages from one
+commit, all at version `0.2.0`. They are 42 libraries, the compiler command line
 `tsrust` (it installs the `tsrust` binary) and the facade `tsr`. Publishing is
 manual and irreversible: a published version can be yanked but never replaced
 or reused.
@@ -28,7 +28,6 @@ All existing names below are owned by the crates.io account `iantocristian`.
 - 11 names are new to crates.io: `tsr_fswatch`, `tsr_jsonrpc`, `tsr_sourcemap`,
   `tsr_ipc`, `tsr_contentmapper`, `tsr_tracing`, `tsr_incremental`,
   `tsr_transpile`, `tsr_tsc`, `tsr_build`, `tsr_execute`.
-- `tsr_lsproto` is newly added by Phase 5; check its registry availability and ownership before publishing.
 - Not part of this release, left at their `0.0.0` placeholders: `jscout`,
   `typescout`, `tsr_collections`.
 
@@ -40,7 +39,7 @@ means it is still free) and `/api/v1/crates/<name>/owners` for an existing one.
 
 1. A crates.io API token for `iantocristian`, entered with `cargo login`. If
    the token is scoped, it needs both `publish-new` and `publish-update` and
-   must cover every name above, including the eleven names above and `tsr_lsproto`.
+   must cover every name above, including the eleven new ones.
 2. A clean `main` at the release commit: `git switch main && git pull`, then
    `git status` shows nothing to commit inside `crates/`, and CI is green on that
    commit. `cargo publish` refuses uncommitted changes in a package directory;
@@ -53,7 +52,7 @@ means it is still free) and `/api/v1/crates/<name>/owners` for an existing one.
    python3 scripts/package_verify.py
    ```
 
-   The verifier must end with `Verified 45 Cargo archives at 0.2.0`. It builds
+   The verifier must end with `Verified 44 Cargo archives at 0.2.0`. It builds
    every archive in an isolated workspace, runs the embedding consumer, builds
    wasm, then builds `tsrust` from the archives and runs it (`--version`, a
    one-file compile with `--outDir`, a TS2322 type error).
@@ -81,7 +80,6 @@ cargo publish -p tsr_json --locked             # placeholder 0.0.0 only
 cargo publish -p tsr_tspath --locked
 cargo publish -p tsr_diagnostics --locked
 cargo publish -p tsr_jsonrpc --locked          # new name
-cargo publish -p tsr_lsproto --locked          # Phase 5; verify availability first
 cargo publish -p tsr_sourcemap --locked        # new name
 cargo publish -p tsr_vfs --locked
 cargo publish -p tsr_ast --locked
@@ -165,7 +163,7 @@ reason (the first release of a workspace that publishes its crates together).
 3. Create the GitHub release from the tag, for example
    `gh release create v0.2.0 --title "tsr 0.2.0" --notes-file <notes>`. The notes
    should say what is in it (the `tsrust` command line, `cargo install tsrust`,
-   the 43 libraries and the `tsr` facade, the supported targets) and what is
+   the 42 libraries and the `tsr` facade, the supported targets) and what is
    not (below), and link the status page.
 4. Trusted publishing from GitHub can be configured per crate after this first
    manual publish: on crates.io, each crate's Settings, Trusted Publishing, with

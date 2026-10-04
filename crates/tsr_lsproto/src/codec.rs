@@ -18,6 +18,9 @@ pub(crate) fn structure(
     // Generated ordinary struct codecs handle null by zeroing the destination
     // before entering this helper. Custom strict codecs require an object.
     if input.peek_kind() != Kind::BeginObject {
+        if !strict {
+            return input.type_error(type_name);
+        }
         return Err(Error::Message(format!(
             "expected object start, but encountered {}",
             input.peek_kind().name()

@@ -7,6 +7,10 @@ defaults to `publish = false`. This policy and the dependency order below track
 the current source tree; they are not a record of registry releases. The Node
 addon is a separate distribution artifact.
 
+The published 0.2.0 release is recorded in [RELEASE-0.2.0.md](../../docs/RELEASE-0.2.0.md).
+Phase 5 additions are unreleased; [RELEASE-next.md](../../docs/RELEASE-next.md)
+tracks the required version bump before publishing this source tree.
+
 ## Reproduction
 
 Run from the repository root with the pinned Rust toolchain and initialized

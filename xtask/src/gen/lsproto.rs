@@ -276,7 +276,7 @@ fn emit(schema: &Schema) -> Result<String, String> {
             out.push_str(&format!("{code},\n"));
         }
         out.push_str("]) } }\n");
-        out.push_str(&format!("impl Decode for {} {{ fn type_name() -> &'static str {{ {:?} }}\nfn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {{\n", s.name, format!("lsproto.{}", s.name)));
+        out.push_str(&format!("impl Decode for {} {{ fn type_name() -> &'static str {{ {:?} }}\nfn custom_unmarshal() -> bool {{ {} }}\nfn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {{\n", s.name, format!("lsproto.{}", s.name), s.strict));
         if !s.strict {
             out.push_str("if input.peek_kind() == Kind::Null { input.read_token()?; *self = Self::default(); return Ok(()); }\n");
         }
@@ -351,7 +351,7 @@ fn emit(schema: &Schema) -> Result<String, String> {
             ));
         }
         out.push_str("]) } }\n");
-        out.push_str(&format!("impl Decode for {} {{ fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {{\n*self = Self::default();\n", u.name));
+        out.push_str(&format!("impl Decode for {} {{ fn type_name() -> &'static str {{ {:?} }}\nfn custom_unmarshal() -> bool {{ true }}\nfn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {{\n*self = Self::default();\n", u.name, format!("lsproto.{}", u.name)));
         if u.dispatch {
             out.push_str("match input.peek_kind() {\n");
             if u.nullable {
@@ -367,7 +367,14 @@ fn emit(schema: &Schema) -> Result<String, String> {
                     other => return Err(format!("unknown JSON kind {other}")),
                 };
                 out.push_str(&format!("{k} => {{\n"));
-                if g.fields.len() == 1 {
+                if g.kind == "boolean" {
+                    let [field] = g.fields.as_slice() else {
+                        return Err(format!("ambiguous boolean arms in {}", u.name));
+                    };
+                    // The pin commits the value from PeekKind before ReadToken
+                    // validates the token, including truncated `tru`/`fals`.
+                    out.push_str(&format!("self.{} = Some(Box::new(input.peek_kind() == Kind::True));\ninput.read_token()?; Ok(())\n", ident(field)));
+                } else if g.fields.len() == 1 {
                     out.push_str(&direct(&g.fields[0], false));
                 } else {
                     out.push_str("let data = input.read_value()?;\n");
@@ -403,7 +410,7 @@ fn emit(schema: &Schema) -> Result<String, String> {
     for literal in &schema.literals {
         let name = &literal.name;
         let json = &literal.json;
-        out.push_str(&format!("#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]\npub struct {name};\nimpl Encode for {name} {{ fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {{ out.write_value(b{json:?}) }} }}\nimpl Decode for {name} {{ fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {{ crate::codec::literal(input, {name:?}, b{json:?}) }} }}\n"));
+        out.push_str(&format!("#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]\npub struct {name};\nimpl Encode for {name} {{ fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {{ out.write_value(b{json:?}) }} }}\nimpl Decode for {name} {{ fn type_name() -> &'static str {{ concat!(\"lsproto.\", stringify!({name})) }} fn custom_unmarshal() -> bool {{ true }} fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {{ crate::codec::literal(input, {name:?}, b{json:?}) }} }}\n"));
     }
     for a in &schema.aliases {
         out.push_str(&format!("pub type {} = {};\n", a.name, ty(&a.target.name)));

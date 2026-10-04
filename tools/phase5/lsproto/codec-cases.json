@@ -428,5 +428,18 @@
       "{\"settings\":{\"x\":1e}}"
     ],
     "error_contains": ""
+  },
+  {
+    "name": "Boolean union partial token state",
+    "type": "BooleanOrHoverOptions",
+    "inputs": [
+      "tru",
+      "fals",
+      "trux",
+      "falx",
+      "true",
+      "false"
+    ],
+    "error_contains": ""
   }
 ]

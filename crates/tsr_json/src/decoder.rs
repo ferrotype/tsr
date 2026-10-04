@@ -12,6 +12,7 @@ pub struct Decoder<'a> {
     stack: Vec<Frame>,
     options: Options<'a>,
     root_count: usize,
+    previous_start: Option<usize>,
     pub(crate) base_depth: usize,
 }
 impl<'a> Decoder<'a> {
@@ -29,6 +30,7 @@ impl<'a> Decoder<'a> {
             stack: Vec::new(),
             options,
             root_count: 0,
+            previous_start: None,
             base_depth: 0,
         }
     }
@@ -90,6 +92,57 @@ impl<'a> Decoder<'a> {
             self.stack.last().map_or(self.root_count, |f| f.count),
         )
     }
+    pub(crate) fn custom_error(
+        &mut self,
+        type_name: &'static str,
+        before: (usize, usize),
+        error: Error,
+    ) -> Error {
+        // json v2's newSemanticErrorWithPosition preserves the innermost
+        // semantic type and annotates only unset fields. A Peek invalidates
+        // the previous token span, so it instead points at the next value.
+        let mut semantic = match error {
+            Error::Syntax(_) | Error::Io { .. } => return error,
+            Error::Semantic(error) => error,
+            other => Box::new(crate::SemanticError {
+                marshal: false,
+                offset: 0,
+                pointer: String::new(),
+                kind: Kind::Invalid,
+                value: None,
+                type_name,
+                cause: Some(other),
+            }),
+        };
+        if semantic.cause == Some(Error::Eof) {
+            semantic.cause = Some(Error::Message("unexpected EOF".into()));
+        }
+        let after = self.depth_length();
+        if semantic.offset == 0 {
+            semantic.offset = if before == after {
+                None
+            } else {
+                self.previous_start
+            }
+            .unwrap_or_else(|| self.next_location().map_or(self.input_offset(), |p| p.0));
+        }
+        if semantic.pointer.is_empty() {
+            semantic.pointer = if before == after {
+                pointer(&self.stack, true)
+            } else if after == (before.0, before.1 + 1) {
+                pointer(&self.stack, false)
+            } else if self
+                .stack
+                .last()
+                .is_some_and(|frame| frame.kind == Kind::BeginArray || frame.expects_name())
+            {
+                pointer(&self.stack[..self.stack.len() - 1], false)
+            } else {
+                pointer(&self.stack, false)
+            };
+        }
+        Error::Semantic(semantic)
+    }
     pub fn unread_buffer(&self) -> &[u8] {
         &self.input.bytes[self.pos..]
     }
@@ -112,6 +165,7 @@ impl<'a> Decoder<'a> {
             .map_err(|e| self.absolute_error(e))
     }
     pub fn peek_kind(&mut self) -> Kind {
+        self.previous_start = None;
         match prepare(&mut self.input, self.pos, &self.stack).and_then(|p| self.input.at(p)) {
             Ok(Some(b)) => Kind::from_byte(b),
             _ => Kind::Invalid,
@@ -120,7 +174,7 @@ impl<'a> Decoder<'a> {
     pub fn read_token(&mut self) -> Result<Token<'static>, Error> {
         self.compact();
         let at_root = self.stack.is_empty();
-        let token = next(
+        let (token, start) = next(
             &mut self.input,
             &mut self.pos,
             &mut self.stack,
@@ -128,6 +182,7 @@ impl<'a> Decoder<'a> {
             self.base_depth,
         )
         .map_err(|e| self.absolute_error(e))?;
+        self.previous_start = Some(self.base + start);
         if at_root {
             self.root_count += 1;
         }
@@ -147,7 +202,7 @@ impl<'a> Decoder<'a> {
         let mut cursor = start;
         let mut frames = Vec::new();
         let result = (|| {
-            let first = next(
+            let (first, _) = next(
                 &mut self.input,
                 &mut cursor,
                 &mut frames,
@@ -197,6 +252,7 @@ impl<'a> Decoder<'a> {
             self.root_count += 1;
         }
         self.pos = cursor;
+        self.previous_start = Some(self.base + start);
         Ok(start..cursor)
     }
     pub fn skip_value(&mut self) -> Result<(), Error> {
@@ -272,7 +328,7 @@ fn next(
     stack: &mut Vec<Frame>,
     options: &Options<'_>,
     base_depth: usize,
-) -> Result<Token<'static>, Error> {
+) -> Result<(Token<'static>, usize), Error> {
     next_inner(input, pos, stack, options, base_depth).map_err(|mut e| {
         if let Error::Syntax(s) = &mut e {
             s.pointer = pointer(stack, true) + &s.pointer;
@@ -286,7 +342,7 @@ fn next_inner(
     stack: &mut Vec<Frame>,
     options: &Options<'_>,
     base_depth: usize,
-) -> Result<Token<'static>, Error> {
+) -> Result<(Token<'static>, usize), Error> {
     let start = prepare_inner(input, *pos, stack)?;
     let ptr = String::new();
     let Some(b) = input.at(start)? else {
@@ -316,11 +372,14 @@ fn next_inner(
         }
         stack.pop();
         *pos = start + 1;
-        return Ok(if kind == Kind::EndObject {
-            Token::EndObject
-        } else {
-            Token::EndArray
-        });
+        return Ok((
+            if kind == Kind::EndObject {
+                Token::EndObject
+            } else {
+                Token::EndArray
+            },
+            start,
+        ));
     }
     if expects_name && kind != Kind::String {
         return Err(Error::syntax(
@@ -370,5 +429,5 @@ fn next_inner(
         stack.push(Frame::new(kind));
     }
     *pos = end;
-    Ok(token)
+    Ok((token, start))
 }

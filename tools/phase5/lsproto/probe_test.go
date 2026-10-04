@@ -3,7 +3,9 @@ package lsproto
 
 import (
 	"encoding/json"
+	"errors"
 	wire "github.com/microsoft/TypeScript/tsc/internal/json"
+	"github.com/microsoft/TypeScript/tsc/internal/jsonrpc"
 	"go/ast"
 	"go/parser"
 	"go/token"
@@ -176,5 +178,65 @@ func codecTarget(name string) any {
 		return new(WorkspaceEdit)
 	default:
 		panic("unknown codec case type: " + name)
+	}
+}
+
+// Exercise UnmarshalParams and the same error envelope that Server.sendError
+// constructs. The native method supplies the entire message, including JSON
+// decoder type, pointer and offset context.
+func TestRustParamsMatrix(t *testing.T) {
+	data, err := os.ReadFile(os.Getenv("TSR_PARAMS_CASES"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var cases []struct {
+		Name   string
+		Type   string
+		Params *string
+	}
+	if err := json.Unmarshal(data, &cases); err != nil {
+		t.Fatal(err)
+	}
+	results := map[string]json.RawMessage{}
+	for _, c := range cases {
+		request := &RequestMessage{}
+		if c.Params != nil {
+			request.Params = wire.Value(*c.Params)
+		}
+		var err error
+		switch c.Type {
+		case "NoParams":
+			_, err = UnmarshalParams[NoParams](request)
+		case "InitializedParams":
+			_, err = UnmarshalParams[InitializedParams](request)
+		case "InitializeParams":
+			_, err = UnmarshalParams[InitializeParams](request)
+		case "HoverParams":
+			_, err = UnmarshalParams[HoverParams](request)
+		default:
+			t.Fatalf("unknown params case type: %s", c.Type)
+		}
+		response := &ResponseMessage{ID: jsonrpc.NewIDInt(7)}
+		if err != nil {
+			code := ErrorCodeInternalError
+			if errCode, ok := errors.AsType[ErrorCode](err); ok {
+				code = errCode
+			}
+			response.Error = &jsonrpc.ResponseError{Code: int32(code), Message: err.Error()}
+		} else {
+			response.Result = Null{}
+		}
+		encoded, err := wire.Marshal(response.Message())
+		if err != nil {
+			t.Fatal(err)
+		}
+		results[c.Name] = encoded
+	}
+	output, err := json.MarshalIndent(results, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(os.Getenv("TSR_PARAMS_RESULT"), append(output, '\n'), 0600); err != nil {
+		t.Fatal(err)
 	}
 }

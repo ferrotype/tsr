@@ -53,9 +53,9 @@ pub fn unmarshal_params<T: Decode + Default + 'static>(
     params: Option<&RawValue>,
 ) -> Result<T, ResponseError> {
     let mut value = T::default();
-    let invalid = |message| ResponseError {
-        code: -32602,
-        message,
+    let invalid = |message: String| ResponseError {
+        code: ErrorCode::INVALID_PARAMS.0,
+        message: format!("{}: {message}", ErrorCode::INVALID_PARAMS),
         data: None,
     };
     let raw = params.map_or(&[][..], |p| p.0.as_slice());
@@ -103,6 +103,12 @@ impl Encode for Registration {
     }
 }
 impl Decode for Registration {
+    fn type_name() -> &'static str {
+        "lsproto.Registration"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let mut method = String::new();

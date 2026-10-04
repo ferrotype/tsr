@@ -41,6 +41,9 @@ impl Decode for ImplementationParams {
     fn type_name() -> &'static str {
         "lsproto.ImplementationParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -101,6 +104,9 @@ impl Decode for Location {
     fn type_name() -> &'static str {
         "lsproto.Location"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -150,6 +156,9 @@ impl Encode for ImplementationRegistrationOptions {
 impl Decode for ImplementationRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.ImplementationRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -208,6 +217,9 @@ impl Encode for TypeDefinitionParams {
 impl Decode for TypeDefinitionParams {
     fn type_name() -> &'static str {
         "lsproto.TypeDefinitionParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -271,6 +283,9 @@ impl Decode for TypeDefinitionRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.TypeDefinitionRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -325,6 +340,9 @@ impl Decode for WorkspaceFolder {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceFolder"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -366,6 +384,9 @@ impl Decode for DidChangeWorkspaceFoldersParams {
     fn type_name() -> &'static str {
         "lsproto.DidChangeWorkspaceFoldersParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -398,6 +419,9 @@ impl Encode for ConfigurationParams {
 impl Decode for ConfigurationParams {
     fn type_name() -> &'static str {
         "lsproto.ConfigurationParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -440,6 +464,9 @@ impl Encode for DocumentColorParams {
 impl Decode for DocumentColorParams {
     fn type_name() -> &'static str {
         "lsproto.DocumentColorParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -495,6 +522,9 @@ impl Decode for ColorInformation {
     fn type_name() -> &'static str {
         "lsproto.ColorInformation"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -544,6 +574,9 @@ impl Encode for DocumentColorRegistrationOptions {
 impl Decode for DocumentColorRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.DocumentColorRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -604,6 +637,9 @@ impl Encode for ColorPresentationParams {
 impl Decode for ColorPresentationParams {
     fn type_name() -> &'static str {
         "lsproto.ColorPresentationParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -676,6 +712,9 @@ impl Decode for ColorPresentation {
     fn type_name() -> &'static str {
         "lsproto.ColorPresentation"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -729,6 +768,9 @@ impl Decode for WorkDoneProgressOptions {
     fn type_name() -> &'static str {
         "lsproto.WorkDoneProgressOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -767,6 +809,9 @@ impl Encode for TextDocumentRegistrationOptions {
 impl Decode for TextDocumentRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -809,6 +854,9 @@ impl Encode for FoldingRangeParams {
 impl Decode for FoldingRangeParams {
     fn type_name() -> &'static str {
         "lsproto.FoldingRangeParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -871,6 +919,9 @@ impl Encode for FoldingRange {
 impl Decode for FoldingRange {
     fn type_name() -> &'static str {
         "lsproto.FoldingRange"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -946,6 +997,9 @@ impl Decode for FoldingRangeRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.FoldingRangeRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -1003,6 +1057,9 @@ impl Encode for DeclarationParams {
 impl Decode for DeclarationParams {
     fn type_name() -> &'static str {
         "lsproto.DeclarationParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -1066,6 +1123,9 @@ impl Decode for DeclarationRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.DeclarationRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -1123,6 +1183,9 @@ impl Encode for SelectionRangeParams {
 impl Decode for SelectionRangeParams {
     fn type_name() -> &'static str {
         "lsproto.SelectionRangeParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -1184,6 +1247,9 @@ impl Decode for SelectionRange {
     fn type_name() -> &'static str {
         "lsproto.SelectionRange"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -1234,6 +1300,9 @@ impl Decode for SelectionRangeRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.SelectionRangeRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -1281,6 +1350,9 @@ impl Decode for WorkDoneProgressCreateParams {
     fn type_name() -> &'static str {
         "lsproto.WorkDoneProgressCreateParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -1313,6 +1385,9 @@ impl Encode for WorkDoneProgressCancelParams {
 impl Decode for WorkDoneProgressCancelParams {
     fn type_name() -> &'static str {
         "lsproto.WorkDoneProgressCancelParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -1355,6 +1430,9 @@ impl Encode for CallHierarchyPrepareParams {
 impl Decode for CallHierarchyPrepareParams {
     fn type_name() -> &'static str {
         "lsproto.CallHierarchyPrepareParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -1421,6 +1499,9 @@ impl Encode for CallHierarchyItem {
 impl Decode for CallHierarchyItem {
     fn type_name() -> &'static str {
         "lsproto.CallHierarchyItem"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -1508,6 +1589,9 @@ impl Decode for CallHierarchyRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.CallHierarchyRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -1564,6 +1648,9 @@ impl Decode for CallHierarchyIncomingCallsParams {
     fn type_name() -> &'static str {
         "lsproto.CallHierarchyIncomingCallsParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -1618,6 +1705,9 @@ impl Decode for CallHierarchyIncomingCall {
     fn type_name() -> &'static str {
         "lsproto.CallHierarchyIncomingCall"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -1667,6 +1757,9 @@ impl Encode for CallHierarchyOutgoingCallsParams {
 impl Decode for CallHierarchyOutgoingCallsParams {
     fn type_name() -> &'static str {
         "lsproto.CallHierarchyOutgoingCallsParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -1722,6 +1815,9 @@ impl Decode for CallHierarchyOutgoingCall {
     fn type_name() -> &'static str {
         "lsproto.CallHierarchyOutgoingCall"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -1771,6 +1867,9 @@ impl Encode for SemanticTokensParams {
 impl Decode for SemanticTokensParams {
     fn type_name() -> &'static str {
         "lsproto.SemanticTokensParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -1826,6 +1925,9 @@ impl Decode for SemanticTokens {
     fn type_name() -> &'static str {
         "lsproto.SemanticTokens"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -1866,6 +1968,9 @@ impl Encode for SemanticTokensPartialResult {
 impl Decode for SemanticTokensPartialResult {
     fn type_name() -> &'static str {
         "lsproto.SemanticTokensPartialResult"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -1914,6 +2019,9 @@ impl Encode for SemanticTokensRegistrationOptions {
 impl Decode for SemanticTokensRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.SemanticTokensRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -1991,6 +2099,9 @@ impl Decode for SemanticTokensDeltaParams {
     fn type_name() -> &'static str {
         "lsproto.SemanticTokensDeltaParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -2051,6 +2162,9 @@ impl Decode for SemanticTokensDelta {
     fn type_name() -> &'static str {
         "lsproto.SemanticTokensDelta"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -2091,6 +2205,9 @@ impl Encode for SemanticTokensDeltaPartialResult {
 impl Decode for SemanticTokensDeltaPartialResult {
     fn type_name() -> &'static str {
         "lsproto.SemanticTokensDeltaPartialResult"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -2135,6 +2252,9 @@ impl Encode for SemanticTokensRangeParams {
 impl Decode for SemanticTokensRangeParams {
     fn type_name() -> &'static str {
         "lsproto.SemanticTokensRangeParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -2200,6 +2320,9 @@ impl Decode for ShowDocumentParams {
     fn type_name() -> &'static str {
         "lsproto.ShowDocumentParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -2253,6 +2376,9 @@ impl Decode for ShowDocumentResult {
     fn type_name() -> &'static str {
         "lsproto.ShowDocumentResult"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -2294,6 +2420,9 @@ impl Encode for LinkedEditingRangeParams {
 impl Decode for LinkedEditingRangeParams {
     fn type_name() -> &'static str {
         "lsproto.LinkedEditingRangeParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -2349,6 +2478,9 @@ impl Decode for LinkedEditingRanges {
     fn type_name() -> &'static str {
         "lsproto.LinkedEditingRanges"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -2399,6 +2531,9 @@ impl Decode for LinkedEditingRangeRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.LinkedEditingRangeRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -2446,6 +2581,9 @@ impl Decode for CreateFilesParams {
     fn type_name() -> &'static str {
         "lsproto.CreateFilesParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -2488,6 +2626,9 @@ impl Encode for WorkspaceEdit {
 impl Decode for WorkspaceEdit {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceEdit"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -2536,6 +2677,9 @@ impl Decode for FileOperationRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.FileOperationRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -2569,6 +2713,9 @@ impl Decode for RenameFilesParams {
     fn type_name() -> &'static str {
         "lsproto.RenameFilesParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -2601,6 +2748,9 @@ impl Encode for DeleteFilesParams {
 impl Decode for DeleteFilesParams {
     fn type_name() -> &'static str {
         "lsproto.DeleteFilesParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -2645,6 +2795,9 @@ impl Encode for MonikerParams {
 impl Decode for MonikerParams {
     fn type_name() -> &'static str {
         "lsproto.MonikerParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -2710,6 +2863,9 @@ impl Decode for Moniker {
     fn type_name() -> &'static str {
         "lsproto.Moniker"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -2770,6 +2926,9 @@ impl Decode for MonikerRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.MonikerRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -2819,6 +2978,9 @@ impl Encode for TypeHierarchyPrepareParams {
 impl Decode for TypeHierarchyPrepareParams {
     fn type_name() -> &'static str {
         "lsproto.TypeHierarchyPrepareParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -2885,6 +3047,9 @@ impl Encode for TypeHierarchyItem {
 impl Decode for TypeHierarchyItem {
     fn type_name() -> &'static str {
         "lsproto.TypeHierarchyItem"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -2972,6 +3137,9 @@ impl Decode for TypeHierarchyRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.TypeHierarchyRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -3028,6 +3196,9 @@ impl Decode for TypeHierarchySupertypesParams {
     fn type_name() -> &'static str {
         "lsproto.TypeHierarchySupertypesParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -3083,6 +3254,9 @@ impl Encode for TypeHierarchySubtypesParams {
 impl Decode for TypeHierarchySubtypesParams {
     fn type_name() -> &'static str {
         "lsproto.TypeHierarchySubtypesParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -3141,6 +3315,9 @@ impl Encode for InlineValueParams {
 impl Decode for InlineValueParams {
     fn type_name() -> &'static str {
         "lsproto.InlineValueParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -3204,6 +3381,9 @@ impl Decode for InlineValueRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.InlineValueRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -3259,6 +3439,9 @@ impl Encode for InlayHintParams {
 impl Decode for InlayHintParams {
     fn type_name() -> &'static str {
         "lsproto.InlayHintParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -3325,6 +3508,9 @@ impl Encode for InlayHint {
 impl Decode for InlayHint {
     fn type_name() -> &'static str {
         "lsproto.InlayHint"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -3414,6 +3600,9 @@ impl Decode for InlayHintRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.InlayHintRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -3480,6 +3669,9 @@ impl Decode for DocumentDiagnosticParams {
     fn type_name() -> &'static str {
         "lsproto.DocumentDiagnosticParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -3545,6 +3737,9 @@ impl Decode for DiagnosticServerCancellationData {
     fn type_name() -> &'static str {
         "lsproto.DiagnosticServerCancellationData"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -3592,6 +3787,9 @@ impl Encode for DiagnosticRegistrationOptions {
 impl Decode for DiagnosticRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.DiagnosticRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -3669,6 +3867,9 @@ impl Decode for WorkspaceDiagnosticParams {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceDiagnosticParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -3722,6 +3923,9 @@ impl Decode for WorkspaceDiagnosticReport {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceDiagnosticReport"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -3754,6 +3958,9 @@ impl Encode for WorkspaceDiagnosticReportPartialResult {
 impl Decode for WorkspaceDiagnosticReportPartialResult {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceDiagnosticReportPartialResult"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -3798,6 +4005,9 @@ impl Encode for InlineCompletionParams {
 impl Decode for InlineCompletionParams {
     fn type_name() -> &'static str {
         "lsproto.InlineCompletionParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -3852,6 +4062,9 @@ impl Decode for InlineCompletionList {
     fn type_name() -> &'static str {
         "lsproto.InlineCompletionList"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -3895,6 +4108,9 @@ impl Encode for InlineCompletionItem {
 impl Decode for InlineCompletionItem {
     fn type_name() -> &'static str {
         "lsproto.InlineCompletionItem"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -3958,6 +4174,9 @@ impl Decode for InlineCompletionRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.InlineCompletionRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -4005,6 +4224,9 @@ impl Decode for TextDocumentContentParams {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentContentParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -4037,6 +4259,9 @@ impl Encode for TextDocumentContentResult {
 impl Decode for TextDocumentContentResult {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentContentResult"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -4077,6 +4302,9 @@ impl Encode for TextDocumentContentRegistrationOptions {
 impl Decode for TextDocumentContentRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentContentRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -4119,6 +4347,9 @@ impl Decode for TextDocumentContentRefreshParams {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentContentRefreshParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -4154,6 +4385,9 @@ impl Encode for RegistrationParams {
 impl Decode for RegistrationParams {
     fn type_name() -> &'static str {
         "lsproto.RegistrationParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -4193,6 +4427,9 @@ impl Encode for UnregistrationParams {
 impl Decode for UnregistrationParams {
     fn type_name() -> &'static str {
         "lsproto.UnregistrationParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -4252,6 +4489,9 @@ impl Encode for InitializeParams {
 impl Decode for InitializeParams {
     fn type_name() -> &'static str {
         "lsproto.InitializeParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -4349,6 +4589,9 @@ impl Decode for InitializeResult {
     fn type_name() -> &'static str {
         "lsproto.InitializeResult"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -4390,6 +4633,9 @@ impl Decode for InitializeError {
     fn type_name() -> &'static str {
         "lsproto.InitializeError"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -4421,6 +4667,9 @@ impl Decode for InitializedParams {
     fn type_name() -> &'static str {
         "lsproto.InitializedParams"
     }
+    fn custom_unmarshal() -> bool {
+        false
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         if input.peek_kind() == Kind::Null {
             input.read_token()?;
@@ -4451,6 +4700,9 @@ impl Encode for DidChangeConfigurationParams {
 impl Decode for DidChangeConfigurationParams {
     fn type_name() -> &'static str {
         "lsproto.DidChangeConfigurationParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -4487,6 +4739,9 @@ impl Encode for DidChangeConfigurationRegistrationOptions {
 impl Decode for DidChangeConfigurationRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.DidChangeConfigurationRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -4527,6 +4782,9 @@ impl Encode for ShowMessageParams {
 impl Decode for ShowMessageParams {
     fn type_name() -> &'static str {
         "lsproto.ShowMessageParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -4578,6 +4836,9 @@ impl Decode for ShowMessageRequestParams {
     fn type_name() -> &'static str {
         "lsproto.ShowMessageRequestParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -4625,6 +4886,9 @@ impl Decode for MessageActionItem {
     fn type_name() -> &'static str {
         "lsproto.MessageActionItem"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -4664,6 +4928,9 @@ impl Encode for LogMessageParams {
 impl Decode for LogMessageParams {
     fn type_name() -> &'static str {
         "lsproto.LogMessageParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -4709,6 +4976,9 @@ impl Decode for DidOpenTextDocumentParams {
     fn type_name() -> &'static str {
         "lsproto.DidOpenTextDocumentParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -4748,6 +5018,9 @@ impl Encode for DidChangeTextDocumentParams {
 impl Decode for DidChangeTextDocumentParams {
     fn type_name() -> &'static str {
         "lsproto.DidChangeTextDocumentParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -4797,6 +5070,9 @@ impl Decode for TextDocumentChangeRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentChangeRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -4841,6 +5117,9 @@ impl Decode for DidCloseTextDocumentParams {
     fn type_name() -> &'static str {
         "lsproto.DidCloseTextDocumentParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -4880,6 +5159,9 @@ impl Encode for DidSaveTextDocumentParams {
 impl Decode for DidSaveTextDocumentParams {
     fn type_name() -> &'static str {
         "lsproto.DidSaveTextDocumentParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -4929,6 +5211,9 @@ impl Decode for TextDocumentSaveRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentSaveRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -4976,6 +5261,9 @@ impl Encode for WillSaveTextDocumentParams {
 impl Decode for WillSaveTextDocumentParams {
     fn type_name() -> &'static str {
         "lsproto.WillSaveTextDocumentParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -5025,6 +5313,9 @@ impl Decode for TextEdit {
     fn type_name() -> &'static str {
         "lsproto.TextEdit"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -5066,6 +5357,9 @@ impl Decode for DidChangeWatchedFilesParams {
     fn type_name() -> &'static str {
         "lsproto.DidChangeWatchedFilesParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -5098,6 +5392,9 @@ impl Encode for DidChangeWatchedFilesRegistrationOptions {
 impl Decode for DidChangeWatchedFilesRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.DidChangeWatchedFilesRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -5140,6 +5437,9 @@ impl Encode for PublishDiagnosticsParams {
 impl Decode for PublishDiagnosticsParams {
     fn type_name() -> &'static str {
         "lsproto.PublishDiagnosticsParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -5200,6 +5500,9 @@ impl Encode for CompletionParams {
 impl Decode for CompletionParams {
     fn type_name() -> &'static str {
         "lsproto.CompletionParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -5303,6 +5606,9 @@ impl Encode for CompletionItem {
 impl Decode for CompletionItem {
     fn type_name() -> &'static str {
         "lsproto.CompletionItem"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -5458,6 +5764,9 @@ impl Decode for CompletionList {
     fn type_name() -> &'static str {
         "lsproto.CompletionList"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -5528,6 +5837,9 @@ impl Encode for CompletionRegistrationOptions {
 impl Decode for CompletionRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.CompletionRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -5605,6 +5917,9 @@ impl Decode for HoverParams {
     fn type_name() -> &'static str {
         "lsproto.HoverParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -5673,6 +5988,9 @@ impl Decode for Hover {
     fn type_name() -> &'static str {
         "lsproto.Hover"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -5733,6 +6051,9 @@ impl Decode for HoverRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.HoverRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -5784,6 +6105,9 @@ impl Encode for SignatureHelpParams {
 impl Decode for SignatureHelpParams {
     fn type_name() -> &'static str {
         "lsproto.SignatureHelpParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -5847,6 +6171,9 @@ impl Decode for SignatureHelp {
     fn type_name() -> &'static str {
         "lsproto.SignatureHelp"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -5904,6 +6231,9 @@ impl Encode for SignatureHelpRegistrationOptions {
 impl Decode for SignatureHelpRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.SignatureHelpRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -5969,6 +6299,9 @@ impl Decode for DefinitionParams {
     fn type_name() -> &'static str {
         "lsproto.DefinitionParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -6029,6 +6362,9 @@ impl Decode for DefinitionRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.DefinitionRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -6082,6 +6418,9 @@ impl Encode for ReferenceParams {
 impl Decode for ReferenceParams {
     fn type_name() -> &'static str {
         "lsproto.ReferenceParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -6149,6 +6488,9 @@ impl Decode for ReferenceRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.ReferenceRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -6200,6 +6542,9 @@ impl Encode for DocumentHighlightParams {
 impl Decode for DocumentHighlightParams {
     fn type_name() -> &'static str {
         "lsproto.DocumentHighlightParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -6261,6 +6606,9 @@ impl Decode for DocumentHighlight {
     fn type_name() -> &'static str {
         "lsproto.DocumentHighlight"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -6308,6 +6656,9 @@ impl Encode for DocumentHighlightRegistrationOptions {
 impl Decode for DocumentHighlightRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.DocumentHighlightRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -6358,6 +6709,9 @@ impl Encode for DocumentSymbolParams {
 impl Decode for DocumentSymbolParams {
     fn type_name() -> &'static str {
         "lsproto.DocumentSymbolParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -6420,6 +6774,9 @@ impl Encode for SymbolInformation {
 impl Decode for SymbolInformation {
     fn type_name() -> &'static str {
         "lsproto.SymbolInformation"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -6504,6 +6861,9 @@ impl Encode for DocumentSymbol {
 impl Decode for DocumentSymbol {
     fn type_name() -> &'static str {
         "lsproto.DocumentSymbol"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -6591,6 +6951,9 @@ impl Decode for DocumentSymbolRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.DocumentSymbolRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -6650,6 +7013,9 @@ impl Encode for CodeActionParams {
 impl Decode for CodeActionParams {
     fn type_name() -> &'static str {
         "lsproto.CodeActionParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -6720,6 +7086,9 @@ impl Encode for Command {
 impl Decode for Command {
     fn type_name() -> &'static str {
         "lsproto.Command"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -6794,6 +7163,9 @@ impl Encode for CodeAction {
 impl Decode for CodeAction {
     fn type_name() -> &'static str {
         "lsproto.CodeAction"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -6891,6 +7263,9 @@ impl Decode for CodeActionRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.CodeActionRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -6961,6 +7336,9 @@ impl Decode for WorkspaceSymbolParams {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceSymbolParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -7028,6 +7406,9 @@ impl Encode for WorkspaceSymbol {
 impl Decode for WorkspaceSymbol {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceSymbol"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -7101,6 +7482,9 @@ impl Decode for WorkspaceSymbolRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceSymbolRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -7150,6 +7534,9 @@ impl Encode for CodeLensParams {
 impl Decode for CodeLensParams {
     fn type_name() -> &'static str {
         "lsproto.CodeLensParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -7207,6 +7594,9 @@ impl Decode for CodeLens {
     fn type_name() -> &'static str {
         "lsproto.CodeLens"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -7263,6 +7653,9 @@ impl Decode for CodeLensRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.CodeLensRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -7318,6 +7711,9 @@ impl Encode for DocumentLinkParams {
 impl Decode for DocumentLinkParams {
     fn type_name() -> &'static str {
         "lsproto.DocumentLinkParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -7376,6 +7772,9 @@ impl Encode for DocumentLink {
 impl Decode for DocumentLink {
     fn type_name() -> &'static str {
         "lsproto.DocumentLink"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -7439,6 +7838,9 @@ impl Decode for DocumentLinkRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.DocumentLinkRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -7495,6 +7897,9 @@ impl Decode for DocumentFormattingParams {
     fn type_name() -> &'static str {
         "lsproto.DocumentFormattingParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -7549,6 +7954,9 @@ impl Decode for DocumentFormattingRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.DocumentFormattingRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -7600,6 +8008,9 @@ impl Encode for DocumentRangeFormattingParams {
 impl Decode for DocumentRangeFormattingParams {
     fn type_name() -> &'static str {
         "lsproto.DocumentRangeFormattingParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -7663,6 +8074,9 @@ impl Decode for DocumentRangeFormattingRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.DocumentRangeFormattingRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -7720,6 +8134,9 @@ impl Encode for DocumentRangesFormattingParams {
 impl Decode for DocumentRangesFormattingParams {
     fn type_name() -> &'static str {
         "lsproto.DocumentRangesFormattingParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -7784,6 +8201,9 @@ impl Encode for DocumentOnTypeFormattingParams {
 impl Decode for DocumentOnTypeFormattingParams {
     fn type_name() -> &'static str {
         "lsproto.DocumentOnTypeFormattingParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -7850,6 +8270,9 @@ impl Decode for DocumentOnTypeFormattingRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.DocumentOnTypeFormattingRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -7907,6 +8330,9 @@ impl Encode for RenameParams {
 impl Decode for RenameParams {
     fn type_name() -> &'static str {
         "lsproto.RenameParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -7970,6 +8396,9 @@ impl Decode for RenameRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.RenameRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -8025,6 +8454,9 @@ impl Encode for PrepareRenameParams {
 impl Decode for PrepareRenameParams {
     fn type_name() -> &'static str {
         "lsproto.PrepareRenameParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -8082,6 +8514,9 @@ impl Decode for ExecuteCommandParams {
     fn type_name() -> &'static str {
         "lsproto.ExecuteCommandParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -8136,6 +8571,9 @@ impl Decode for ExecuteCommandRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.ExecuteCommandRegistrationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -8185,6 +8623,9 @@ impl Encode for ApplyWorkspaceEditParams {
 impl Decode for ApplyWorkspaceEditParams {
     fn type_name() -> &'static str {
         "lsproto.ApplyWorkspaceEditParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -8241,6 +8682,9 @@ impl Encode for ApplyWorkspaceEditResult {
 impl Decode for ApplyWorkspaceEditResult {
     fn type_name() -> &'static str {
         "lsproto.ApplyWorkspaceEditResult"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -8301,6 +8745,9 @@ impl Encode for WorkDoneProgressBegin {
 impl Decode for WorkDoneProgressBegin {
     fn type_name() -> &'static str {
         "lsproto.WorkDoneProgressBegin"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -8372,6 +8819,9 @@ impl Decode for WorkDoneProgressReport {
     fn type_name() -> &'static str {
         "lsproto.WorkDoneProgressReport"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -8432,6 +8882,9 @@ impl Decode for WorkDoneProgressEnd {
     fn type_name() -> &'static str {
         "lsproto.WorkDoneProgressEnd"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -8473,6 +8926,9 @@ impl Decode for SetTraceParams {
     fn type_name() -> &'static str {
         "lsproto.SetTraceParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -8512,6 +8968,9 @@ impl Encode for LogTraceParams {
 impl Decode for LogTraceParams {
     fn type_name() -> &'static str {
         "lsproto.LogTraceParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -8554,6 +9013,9 @@ impl Decode for CancelParams {
     fn type_name() -> &'static str {
         "lsproto.CancelParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -8593,6 +9055,9 @@ impl Encode for ProgressParams {
 impl Decode for ProgressParams {
     fn type_name() -> &'static str {
         "lsproto.ProgressParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -8642,6 +9107,9 @@ impl Decode for TextDocumentPositionParams {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentPositionParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -8689,6 +9157,9 @@ impl Decode for WorkDoneProgressParams {
     fn type_name() -> &'static str {
         "lsproto.WorkDoneProgressParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -8727,6 +9198,9 @@ impl Encode for PartialResultParams {
 impl Decode for PartialResultParams {
     fn type_name() -> &'static str {
         "lsproto.PartialResultParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -8774,6 +9248,9 @@ impl Encode for LocationLink {
 impl Decode for LocationLink {
     fn type_name() -> &'static str {
         "lsproto.LocationLink"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -8835,6 +9312,9 @@ impl Decode for Range {
     fn type_name() -> &'static str {
         "lsproto.Range"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -8882,6 +9362,9 @@ impl Decode for ImplementationOptions {
     fn type_name() -> &'static str {
         "lsproto.ImplementationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -8914,6 +9397,9 @@ impl Encode for StaticRegistrationOptions {
 impl Decode for StaticRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.StaticRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -8954,6 +9440,9 @@ impl Decode for TypeDefinitionOptions {
     fn type_name() -> &'static str {
         "lsproto.TypeDefinitionOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -8993,6 +9482,9 @@ impl Encode for WorkspaceFoldersChangeEvent {
 impl Decode for WorkspaceFoldersChangeEvent {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceFoldersChangeEvent"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -9042,6 +9534,9 @@ impl Decode for ConfigurationItem {
     fn type_name() -> &'static str {
         "lsproto.ConfigurationItem"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -9082,6 +9577,9 @@ impl Encode for TextDocumentIdentifier {
 impl Decode for TextDocumentIdentifier {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentIdentifier"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -9126,6 +9624,9 @@ impl Encode for Color {
 impl Decode for Color {
     fn type_name() -> &'static str {
         "lsproto.Color"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -9186,6 +9687,9 @@ impl Decode for DocumentColorOptions {
     fn type_name() -> &'static str {
         "lsproto.DocumentColorOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -9224,6 +9728,9 @@ impl Encode for FoldingRangeOptions {
 impl Decode for FoldingRangeOptions {
     fn type_name() -> &'static str {
         "lsproto.FoldingRangeOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -9264,6 +9771,9 @@ impl Decode for DeclarationOptions {
     fn type_name() -> &'static str {
         "lsproto.DeclarationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -9303,6 +9813,9 @@ impl Encode for Position {
 impl Decode for Position {
     fn type_name() -> &'static str {
         "lsproto.Position"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -9351,6 +9864,9 @@ impl Decode for SelectionRangeOptions {
     fn type_name() -> &'static str {
         "lsproto.SelectionRangeOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -9389,6 +9905,9 @@ impl Encode for CallHierarchyOptions {
 impl Decode for CallHierarchyOptions {
     fn type_name() -> &'static str {
         "lsproto.CallHierarchyOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -9433,6 +9952,9 @@ impl Encode for SemanticTokensOptions {
 impl Decode for SemanticTokensOptions {
     fn type_name() -> &'static str {
         "lsproto.SemanticTokensOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -9496,6 +10018,9 @@ impl Decode for SemanticTokensEdit {
     fn type_name() -> &'static str {
         "lsproto.SemanticTokensEdit"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -9549,6 +10074,9 @@ impl Decode for LinkedEditingRangeOptions {
     fn type_name() -> &'static str {
         "lsproto.LinkedEditingRangeOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -9581,6 +10109,9 @@ impl Encode for FileCreate {
 impl Decode for FileCreate {
     fn type_name() -> &'static str {
         "lsproto.FileCreate"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -9621,6 +10152,9 @@ impl Encode for TextDocumentEdit {
 impl Decode for TextDocumentEdit {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentEdit"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -9673,6 +10207,9 @@ impl Encode for CreateFile {
 impl Decode for CreateFile {
     fn type_name() -> &'static str {
         "lsproto.CreateFile"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -9739,6 +10276,9 @@ impl Encode for RenameFile {
 impl Decode for RenameFile {
     fn type_name() -> &'static str {
         "lsproto.RenameFile"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -9810,6 +10350,9 @@ impl Decode for DeleteFile {
     fn type_name() -> &'static str {
         "lsproto.DeleteFile"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -9872,6 +10415,9 @@ impl Decode for ChangeAnnotation {
     fn type_name() -> &'static str {
         "lsproto.ChangeAnnotation"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -9926,6 +10472,9 @@ impl Decode for FileOperationFilter {
     fn type_name() -> &'static str {
         "lsproto.FileOperationFilter"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -9974,6 +10523,9 @@ impl Decode for FileRename {
     fn type_name() -> &'static str {
         "lsproto.FileRename"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -10015,6 +10567,9 @@ impl Decode for FileDelete {
     fn type_name() -> &'static str {
         "lsproto.FileDelete"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -10053,6 +10608,9 @@ impl Encode for MonikerOptions {
 impl Decode for MonikerOptions {
     fn type_name() -> &'static str {
         "lsproto.MonikerOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -10093,6 +10651,9 @@ impl Decode for TypeHierarchyOptions {
     fn type_name() -> &'static str {
         "lsproto.TypeHierarchyOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -10132,6 +10693,9 @@ impl Encode for InlineValueContext {
 impl Decode for InlineValueContext {
     fn type_name() -> &'static str {
         "lsproto.InlineValueContext"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -10180,6 +10744,9 @@ impl Encode for InlineValueText {
 impl Decode for InlineValueText {
     fn type_name() -> &'static str {
         "lsproto.InlineValueText"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -10230,6 +10797,9 @@ impl Encode for InlineValueVariableLookup {
 impl Decode for InlineValueVariableLookup {
     fn type_name() -> &'static str {
         "lsproto.InlineValueVariableLookup"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -10285,6 +10855,9 @@ impl Decode for InlineValueEvaluatableExpression {
     fn type_name() -> &'static str {
         "lsproto.InlineValueEvaluatableExpression"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -10332,6 +10905,9 @@ impl Decode for InlineValueOptions {
     fn type_name() -> &'static str {
         "lsproto.InlineValueOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -10375,6 +10951,9 @@ impl Encode for InlayHintLabelPart {
 impl Decode for InlayHintLabelPart {
     fn type_name() -> &'static str {
         "lsproto.InlayHintLabelPart"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -10436,6 +11015,9 @@ impl Decode for MarkupContent {
     fn type_name() -> &'static str {
         "lsproto.MarkupContent"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -10483,6 +11065,9 @@ impl Encode for InlayHintOptions {
 impl Decode for InlayHintOptions {
     fn type_name() -> &'static str {
         "lsproto.InlayHintOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -10542,6 +11127,9 @@ impl Encode for RelatedFullDocumentDiagnosticReport {
 impl Decode for RelatedFullDocumentDiagnosticReport {
     fn type_name() -> &'static str {
         "lsproto.RelatedFullDocumentDiagnosticReport"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -10612,6 +11200,9 @@ impl Decode for RelatedUnchangedDocumentDiagnosticReport {
     fn type_name() -> &'static str {
         "lsproto.RelatedUnchangedDocumentDiagnosticReport"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -10668,6 +11259,9 @@ impl Decode for DocumentDiagnosticReportPartialResult {
     fn type_name() -> &'static str {
         "lsproto.DocumentDiagnosticReportPartialResult"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -10711,6 +11305,9 @@ impl Encode for DiagnosticOptions {
 impl Decode for DiagnosticOptions {
     fn type_name() -> &'static str {
         "lsproto.DiagnosticOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -10772,6 +11369,9 @@ impl Decode for PreviousResultId {
     fn type_name() -> &'static str {
         "lsproto.PreviousResultId"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -10823,6 +11423,9 @@ impl Encode for TextDocumentItem {
 impl Decode for TextDocumentItem {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentItem"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -10887,6 +11490,9 @@ impl Decode for InlineCompletionContext {
     fn type_name() -> &'static str {
         "lsproto.InlineCompletionContext"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -10935,6 +11541,9 @@ impl Decode for StringValue {
     fn type_name() -> &'static str {
         "lsproto.StringValue"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -10982,6 +11591,9 @@ impl Decode for InlineCompletionOptions {
     fn type_name() -> &'static str {
         "lsproto.InlineCompletionOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -11014,6 +11626,9 @@ impl Encode for TextDocumentContentOptions {
 impl Decode for TextDocumentContentOptions {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentContentOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -11054,6 +11669,9 @@ impl Encode for Unregistration {
 impl Decode for Unregistration {
     fn type_name() -> &'static str {
         "lsproto.Unregistration"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -11101,6 +11719,9 @@ impl Encode for WorkspaceFoldersInitializeParams {
 impl Decode for WorkspaceFoldersInitializeParams {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceFoldersInitializeParams"
+    }
+    fn custom_unmarshal() -> bool {
+        false
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         if input.peek_kind() == Kind::Null {
@@ -11289,6 +11910,9 @@ impl Encode for ServerCapabilities {
 impl Decode for ServerCapabilities {
     fn type_name() -> &'static str {
         "lsproto.ServerCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -11548,6 +12172,9 @@ impl Decode for ServerInfo {
     fn type_name() -> &'static str {
         "lsproto.ServerInfo"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -11596,6 +12223,9 @@ impl Decode for VersionedTextDocumentIdentifier {
     fn type_name() -> &'static str {
         "lsproto.VersionedTextDocumentIdentifier"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -11643,6 +12273,9 @@ impl Decode for SaveOptions {
     fn type_name() -> &'static str {
         "lsproto.SaveOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -11682,6 +12315,9 @@ impl Encode for FileEvent {
 impl Decode for FileEvent {
     fn type_name() -> &'static str {
         "lsproto.FileEvent"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -11730,6 +12366,9 @@ impl Encode for FileSystemWatcher {
 impl Decode for FileSystemWatcher {
     fn type_name() -> &'static str {
         "lsproto.FileSystemWatcher"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -11792,6 +12431,9 @@ impl Encode for Diagnostic {
 impl Decode for Diagnostic {
     fn type_name() -> &'static str {
         "lsproto.Diagnostic"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -11883,6 +12525,9 @@ impl Decode for CompletionContext {
     fn type_name() -> &'static str {
         "lsproto.CompletionContext"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -11930,6 +12575,9 @@ impl Encode for CompletionItemLabelDetails {
 impl Decode for CompletionItemLabelDetails {
     fn type_name() -> &'static str {
         "lsproto.CompletionItemLabelDetails"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -11980,6 +12628,9 @@ impl Encode for InsertReplaceEdit {
 impl Decode for InsertReplaceEdit {
     fn type_name() -> &'static str {
         "lsproto.InsertReplaceEdit"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -12040,6 +12691,9 @@ impl Encode for CompletionItemDefaults {
 impl Decode for CompletionItemDefaults {
     fn type_name() -> &'static str {
         "lsproto.CompletionItemDefaults"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -12107,6 +12761,9 @@ impl Decode for CompletionItemApplyKinds {
     fn type_name() -> &'static str {
         "lsproto.CompletionItemApplyKinds"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -12163,6 +12820,9 @@ impl Encode for CompletionOptions {
 impl Decode for CompletionOptions {
     fn type_name() -> &'static str {
         "lsproto.CompletionOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -12229,6 +12889,9 @@ impl Decode for HoverOptions {
     fn type_name() -> &'static str {
         "lsproto.HoverOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -12275,6 +12938,9 @@ impl Encode for SignatureHelpContext {
 impl Decode for SignatureHelpContext {
     fn type_name() -> &'static str {
         "lsproto.SignatureHelpContext"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -12341,6 +13007,9 @@ impl Encode for SignatureInformation {
 impl Decode for SignatureInformation {
     fn type_name() -> &'static str {
         "lsproto.SignatureInformation"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -12410,6 +13079,9 @@ impl Decode for SignatureHelpOptions {
     fn type_name() -> &'static str {
         "lsproto.SignatureHelpOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -12463,6 +13135,9 @@ impl Decode for DefinitionOptions {
     fn type_name() -> &'static str {
         "lsproto.DefinitionOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -12501,6 +13176,9 @@ impl Encode for ReferenceContext {
 impl Decode for ReferenceContext {
     fn type_name() -> &'static str {
         "lsproto.ReferenceContext"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -12541,6 +13219,9 @@ impl Decode for ReferenceOptions {
     fn type_name() -> &'static str {
         "lsproto.ReferenceOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -12579,6 +13260,9 @@ impl Encode for DocumentHighlightOptions {
 impl Decode for DocumentHighlightOptions {
     fn type_name() -> &'static str {
         "lsproto.DocumentHighlightOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -12623,6 +13307,9 @@ impl Encode for BaseSymbolInformation {
 impl Decode for BaseSymbolInformation {
     fn type_name() -> &'static str {
         "lsproto.BaseSymbolInformation"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -12684,6 +13371,9 @@ impl Decode for DocumentSymbolOptions {
     fn type_name() -> &'static str {
         "lsproto.DocumentSymbolOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -12734,6 +13424,9 @@ impl Decode for CodeActionContext {
     fn type_name() -> &'static str {
         "lsproto.CodeActionContext"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -12781,6 +13474,9 @@ impl Decode for CodeActionDisabled {
     fn type_name() -> &'static str {
         "lsproto.CodeActionDisabled"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -12824,6 +13520,9 @@ impl Encode for CodeActionOptions {
 impl Decode for CodeActionOptions {
     fn type_name() -> &'static str {
         "lsproto.CodeActionOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -12878,6 +13577,9 @@ impl Decode for LocationUriOnly {
     fn type_name() -> &'static str {
         "lsproto.LocationUriOnly"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -12917,6 +13619,9 @@ impl Encode for WorkspaceSymbolOptions {
 impl Decode for WorkspaceSymbolOptions {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceSymbolOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -12966,6 +13671,9 @@ impl Decode for CodeLensOptions {
     fn type_name() -> &'static str {
         "lsproto.CodeLensOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -13013,6 +13721,9 @@ impl Encode for DocumentLinkOptions {
 impl Decode for DocumentLinkOptions {
     fn type_name() -> &'static str {
         "lsproto.DocumentLinkOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -13070,6 +13781,9 @@ impl Encode for FormattingOptions {
 impl Decode for FormattingOptions {
     fn type_name() -> &'static str {
         "lsproto.FormattingOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -13136,6 +13850,9 @@ impl Decode for DocumentFormattingOptions {
     fn type_name() -> &'static str {
         "lsproto.DocumentFormattingOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -13175,6 +13892,9 @@ impl Encode for DocumentRangeFormattingOptions {
 impl Decode for DocumentRangeFormattingOptions {
     fn type_name() -> &'static str {
         "lsproto.DocumentRangeFormattingOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -13227,6 +13947,9 @@ impl Decode for DocumentOnTypeFormattingOptions {
     fn type_name() -> &'static str {
         "lsproto.DocumentOnTypeFormattingOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -13274,6 +13997,9 @@ impl Encode for RenameOptions {
 impl Decode for RenameOptions {
     fn type_name() -> &'static str {
         "lsproto.RenameOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -13323,6 +14049,9 @@ impl Decode for PrepareRenamePlaceholder {
     fn type_name() -> &'static str {
         "lsproto.PrepareRenamePlaceholder"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -13370,6 +14099,9 @@ impl Decode for PrepareRenameDefaultBehavior {
     fn type_name() -> &'static str {
         "lsproto.PrepareRenameDefaultBehavior"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -13409,6 +14141,9 @@ impl Encode for ExecuteCommandOptions {
 impl Decode for ExecuteCommandOptions {
     fn type_name() -> &'static str {
         "lsproto.ExecuteCommandOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -13457,6 +14192,9 @@ impl Decode for WorkspaceEditMetadata {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceEditMetadata"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -13496,6 +14234,9 @@ impl Encode for SemanticTokensLegend {
 impl Decode for SemanticTokensLegend {
     fn type_name() -> &'static str {
         "lsproto.SemanticTokensLegend"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -13541,6 +14282,9 @@ impl Decode for SemanticTokensFullDelta {
     fn type_name() -> &'static str {
         "lsproto.SemanticTokensFullDelta"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -13580,6 +14324,9 @@ impl Encode for OptionalVersionedTextDocumentIdentifier {
 impl Decode for OptionalVersionedTextDocumentIdentifier {
     fn type_name() -> &'static str {
         "lsproto.OptionalVersionedTextDocumentIdentifier"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -13630,6 +14377,9 @@ impl Encode for AnnotatedTextEdit {
 impl Decode for AnnotatedTextEdit {
     fn type_name() -> &'static str {
         "lsproto.AnnotatedTextEdit"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -13687,6 +14437,9 @@ impl Decode for SnippetTextEdit {
     fn type_name() -> &'static str {
         "lsproto.SnippetTextEdit"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -13741,6 +14494,9 @@ impl Decode for ResourceOperation {
     fn type_name() -> &'static str {
         "lsproto.ResourceOperation"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -13788,6 +14544,9 @@ impl Encode for CreateFileOptions {
 impl Decode for CreateFileOptions {
     fn type_name() -> &'static str {
         "lsproto.CreateFileOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -13837,6 +14596,9 @@ impl Decode for RenameFileOptions {
     fn type_name() -> &'static str {
         "lsproto.RenameFileOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -13884,6 +14646,9 @@ impl Encode for DeleteFileOptions {
 impl Decode for DeleteFileOptions {
     fn type_name() -> &'static str {
         "lsproto.DeleteFileOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -13934,6 +14699,9 @@ impl Encode for FileOperationPattern {
 impl Decode for FileOperationPattern {
     fn type_name() -> &'static str {
         "lsproto.FileOperationPattern"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -13991,6 +14759,9 @@ impl Decode for FullDocumentDiagnosticReport {
     fn type_name() -> &'static str {
         "lsproto.FullDocumentDiagnosticReport"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -14045,6 +14816,9 @@ impl Decode for UnchangedDocumentDiagnosticReport {
     fn type_name() -> &'static str {
         "lsproto.UnchangedDocumentDiagnosticReport"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -14098,6 +14872,9 @@ impl Encode for WorkspaceFullDocumentDiagnosticReport {
 impl Decode for WorkspaceFullDocumentDiagnosticReport {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceFullDocumentDiagnosticReport"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -14169,6 +14946,9 @@ impl Decode for WorkspaceUnchangedDocumentDiagnosticReport {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceUnchangedDocumentDiagnosticReport"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -14229,6 +15009,9 @@ impl Decode for SelectedCompletionInfo {
     fn type_name() -> &'static str {
         "lsproto.SelectedCompletionInfo"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -14276,6 +15059,9 @@ impl Encode for ClientInfo {
 impl Decode for ClientInfo {
     fn type_name() -> &'static str {
         "lsproto.ClientInfo"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -14356,6 +15142,9 @@ impl Encode for ClientCapabilities {
 impl Decode for ClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.ClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -14461,6 +15250,9 @@ impl Decode for TextDocumentSyncOptions {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentSyncOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -14532,6 +15324,9 @@ impl Decode for WorkspaceOptions {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -14588,6 +15383,9 @@ impl Decode for TextDocumentContentChangePartial {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentContentChangePartial"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -14635,6 +15433,9 @@ impl Decode for TextDocumentContentChangeWholeDocument {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentContentChangeWholeDocument"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -14667,6 +15468,9 @@ impl Encode for CodeDescription {
 impl Decode for CodeDescription {
     fn type_name() -> &'static str {
         "lsproto.CodeDescription"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -14707,6 +15511,9 @@ impl Encode for DiagnosticRelatedInformation {
 impl Decode for DiagnosticRelatedInformation {
     fn type_name() -> &'static str {
         "lsproto.DiagnosticRelatedInformation"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -14756,6 +15563,9 @@ impl Decode for EditRangeWithInsertReplace {
     fn type_name() -> &'static str {
         "lsproto.EditRangeWithInsertReplace"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -14803,6 +15613,9 @@ impl Decode for ServerCompletionItemOptions {
     fn type_name() -> &'static str {
         "lsproto.ServerCompletionItemOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -14842,6 +15655,9 @@ impl Encode for MarkedStringWithLanguage {
 impl Decode for MarkedStringWithLanguage {
     fn type_name() -> &'static str {
         "lsproto.MarkedStringWithLanguage"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -14891,6 +15707,9 @@ impl Decode for ParameterInformation {
     fn type_name() -> &'static str {
         "lsproto.ParameterInformation"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -14939,6 +15758,9 @@ impl Decode for CodeActionKindDocumentation {
     fn type_name() -> &'static str {
         "lsproto.CodeActionKindDocumentation"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -14985,6 +15807,9 @@ impl Encode for FileOperationPatternOptions {
 impl Decode for FileOperationPatternOptions {
     fn type_name() -> &'static str {
         "lsproto.FileOperationPatternOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -15062,6 +15887,9 @@ impl Encode for WorkspaceClientCapabilities {
 impl Decode for WorkspaceClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -15254,6 +16082,9 @@ impl Encode for TextDocumentClientCapabilities {
 impl Decode for TextDocumentClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -15485,6 +16316,9 @@ impl Decode for WindowClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.WindowClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -15546,6 +16380,9 @@ impl Decode for GeneralClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.GeneralClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -15606,6 +16443,9 @@ impl Decode for WorkspaceFoldersServerCapabilities {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceFoldersServerCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -15661,6 +16501,9 @@ impl Encode for FileOperationOptions {
 impl Decode for FileOperationOptions {
     fn type_name() -> &'static str {
         "lsproto.FileOperationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -15734,6 +16577,9 @@ impl Decode for RelativePattern {
     fn type_name() -> &'static str {
         "lsproto.RelativePattern"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -15783,6 +16629,9 @@ impl Encode for TextDocumentFilterLanguage {
 impl Decode for TextDocumentFilterLanguage {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentFilterLanguage"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -15840,6 +16689,9 @@ impl Decode for TextDocumentFilterScheme {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentFilterScheme"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -15895,6 +16747,9 @@ impl Encode for TextDocumentFilterPattern {
 impl Decode for TextDocumentFilterPattern {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentFilterPattern"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -15965,6 +16820,9 @@ impl Encode for WorkspaceEditClientCapabilities {
 impl Decode for WorkspaceEditClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceEditClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -16043,6 +16901,9 @@ impl Decode for DidChangeConfigurationClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.DidChangeConfigurationClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -16085,6 +16946,9 @@ impl Encode for DidChangeWatchedFilesClientCapabilities {
 impl Decode for DidChangeWatchedFilesClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.DidChangeWatchedFilesClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -16137,6 +17001,9 @@ impl Encode for WorkspaceSymbolClientCapabilities {
 impl Decode for WorkspaceSymbolClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceSymbolClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -16197,6 +17064,9 @@ impl Decode for ExecuteCommandClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.ExecuteCommandClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -16236,6 +17106,9 @@ impl Decode for SemanticTokensWorkspaceClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.SemanticTokensWorkspaceClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -16274,6 +17147,9 @@ impl Encode for CodeLensWorkspaceClientCapabilities {
 impl Decode for CodeLensWorkspaceClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.CodeLensWorkspaceClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -16324,6 +17200,9 @@ impl Encode for FileOperationClientCapabilities {
 impl Decode for FileOperationClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.FileOperationClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -16402,6 +17281,9 @@ impl Decode for InlineValueWorkspaceClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.InlineValueWorkspaceClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -16440,6 +17322,9 @@ impl Encode for InlayHintWorkspaceClientCapabilities {
 impl Decode for InlayHintWorkspaceClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.InlayHintWorkspaceClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -16480,6 +17365,9 @@ impl Decode for DiagnosticWorkspaceClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.DiagnosticWorkspaceClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -16519,6 +17407,9 @@ impl Decode for FoldingRangeWorkspaceClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.FoldingRangeWorkspaceClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -16557,6 +17448,9 @@ impl Encode for TextDocumentContentClientCapabilities {
 impl Decode for TextDocumentContentClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentContentClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -16601,6 +17495,9 @@ impl Encode for TextDocumentSyncClientCapabilities {
 impl Decode for TextDocumentSyncClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentSyncClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -16661,6 +17558,9 @@ impl Decode for TextDocumentFilterClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.TextDocumentFilterClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -16708,6 +17608,9 @@ impl Encode for CompletionClientCapabilities {
 impl Decode for CompletionClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.CompletionClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -16781,6 +17684,9 @@ impl Decode for HoverClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.HoverClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -16833,6 +17739,9 @@ impl Encode for SignatureHelpClientCapabilities {
 impl Decode for SignatureHelpClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.SignatureHelpClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -16888,6 +17797,9 @@ impl Decode for DeclarationClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.DeclarationClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -16935,6 +17847,9 @@ impl Encode for DefinitionClientCapabilities {
 impl Decode for DefinitionClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.DefinitionClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -16984,6 +17899,9 @@ impl Decode for TypeDefinitionClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.TypeDefinitionClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -17032,6 +17950,9 @@ impl Decode for ImplementationClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.ImplementationClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -17079,6 +18000,9 @@ impl Decode for ReferenceClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.ReferenceClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -17117,6 +18041,9 @@ impl Encode for DocumentHighlightClientCapabilities {
 impl Decode for DocumentHighlightClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.DocumentHighlightClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -17166,6 +18093,9 @@ impl Encode for DocumentSymbolClientCapabilities {
 impl Decode for DocumentSymbolClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.DocumentSymbolClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -17255,6 +18185,9 @@ impl Encode for CodeActionClientCapabilities {
 impl Decode for CodeActionClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.CodeActionClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -17346,6 +18279,9 @@ impl Decode for CodeLensClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.CodeLensClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -17394,6 +18330,9 @@ impl Decode for DocumentLinkClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.DocumentLinkClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -17441,6 +18380,9 @@ impl Decode for DocumentColorClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.DocumentColorClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -17479,6 +18421,9 @@ impl Encode for DocumentFormattingClientCapabilities {
 impl Decode for DocumentFormattingClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.DocumentFormattingClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -17519,6 +18464,9 @@ impl Encode for DocumentRangeFormattingClientCapabilities {
 impl Decode for DocumentRangeFormattingClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.DocumentRangeFormattingClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -17566,6 +18514,9 @@ impl Encode for DocumentOnTypeFormattingClientCapabilities {
 impl Decode for DocumentOnTypeFormattingClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.DocumentOnTypeFormattingClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -17616,6 +18567,9 @@ impl Encode for RenameClientCapabilities {
 impl Decode for RenameClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.RenameClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -17683,6 +18637,9 @@ impl Decode for FoldingRangeClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.FoldingRangeClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -17748,6 +18705,9 @@ impl Decode for SelectionRangeClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.SelectionRangeClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -17796,6 +18756,9 @@ impl Encode for PublishDiagnosticsClientCapabilities {
 impl Decode for PublishDiagnosticsClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.PublishDiagnosticsClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -17862,6 +18825,9 @@ impl Decode for CallHierarchyClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.CallHierarchyClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -17927,6 +18893,9 @@ impl Encode for SemanticTokensClientCapabilities {
 impl Decode for SemanticTokensClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.SemanticTokensClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -18017,6 +18986,9 @@ impl Decode for LinkedEditingRangeClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.LinkedEditingRangeClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -18055,6 +19027,9 @@ impl Encode for MonikerClientCapabilities {
 impl Decode for MonikerClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.MonikerClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -18095,6 +19070,9 @@ impl Decode for TypeHierarchyClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.TypeHierarchyClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -18133,6 +19111,9 @@ impl Encode for InlineValueClientCapabilities {
 impl Decode for InlineValueClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.InlineValueClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -18173,6 +19154,9 @@ impl Encode for InlayHintClientCapabilities {
 impl Decode for InlayHintClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.InlayHintClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -18240,6 +19224,9 @@ impl Encode for DiagnosticClientCapabilities {
 impl Decode for DiagnosticClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.DiagnosticClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -18318,6 +19305,9 @@ impl Decode for InlineCompletionClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.InlineCompletionClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -18357,6 +19347,9 @@ impl Decode for ShowMessageRequestClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.ShowMessageRequestClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -18389,6 +19382,9 @@ impl Encode for ShowDocumentClientCapabilities {
 impl Decode for ShowDocumentClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.ShowDocumentClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -18429,6 +19425,9 @@ impl Encode for StaleRequestSupportOptions {
 impl Decode for StaleRequestSupportOptions {
     fn type_name() -> &'static str {
         "lsproto.StaleRequestSupportOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -18477,6 +19476,9 @@ impl Encode for RegularExpressionsClientCapabilities {
 impl Decode for RegularExpressionsClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.RegularExpressionsClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -18527,6 +19529,9 @@ impl Encode for MarkdownClientCapabilities {
 impl Decode for MarkdownClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.MarkdownClientCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -18581,6 +19586,9 @@ impl Decode for ChangeAnnotationsSupportOptions {
     fn type_name() -> &'static str {
         "lsproto.ChangeAnnotationsSupportOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -18620,6 +19628,9 @@ impl Decode for ClientSymbolKindOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientSymbolKindOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -18653,6 +19664,9 @@ impl Decode for ClientSymbolTagOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientSymbolTagOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -18685,6 +19699,9 @@ impl Encode for ClientSymbolResolveOptions {
 impl Decode for ClientSymbolResolveOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientSymbolResolveOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -18753,6 +19770,9 @@ impl Encode for ClientCompletionItemOptions {
 impl Decode for ClientCompletionItemOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientCompletionItemOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -18849,6 +19869,9 @@ impl Decode for ClientCompletionItemOptionsKind {
     fn type_name() -> &'static str {
         "lsproto.ClientCompletionItemOptionsKind"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -18888,6 +19911,9 @@ impl Encode for CompletionListCapabilities {
 impl Decode for CompletionListCapabilities {
     fn type_name() -> &'static str {
         "lsproto.CompletionListCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -18950,6 +19976,9 @@ impl Decode for ClientSignatureInformationOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientSignatureInformationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -19009,6 +20038,9 @@ impl Decode for ClientCodeActionLiteralOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientCodeActionLiteralOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -19041,6 +20073,9 @@ impl Encode for ClientCodeActionResolveOptions {
 impl Decode for ClientCodeActionResolveOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientCodeActionResolveOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -19075,6 +20110,9 @@ impl Decode for CodeActionTagOptions {
     fn type_name() -> &'static str {
         "lsproto.CodeActionTagOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -19107,6 +20145,9 @@ impl Encode for ClientCodeLensResolveOptions {
 impl Decode for ClientCodeLensResolveOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientCodeLensResolveOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -19147,6 +20188,9 @@ impl Decode for ClientFoldingRangeKindOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientFoldingRangeKindOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -19185,6 +20229,9 @@ impl Encode for ClientFoldingRangeOptions {
 impl Decode for ClientFoldingRangeOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientFoldingRangeOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -19232,6 +20279,9 @@ impl Encode for DiagnosticsCapabilities {
 impl Decode for DiagnosticsCapabilities {
     fn type_name() -> &'static str {
         "lsproto.DiagnosticsCapabilities"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -19293,6 +20343,9 @@ impl Decode for ClientSemanticTokensRequestOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientSemanticTokensRequestOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -19334,6 +20387,9 @@ impl Decode for ClientInlayHintResolveOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientInlayHintResolveOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -19373,6 +20429,9 @@ impl Decode for ClientShowMessageActionItemOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientShowMessageActionItemOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -19405,6 +20464,9 @@ impl Encode for CompletionItemTagOptions {
 impl Decode for CompletionItemTagOptions {
     fn type_name() -> &'static str {
         "lsproto.CompletionItemTagOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -19439,6 +20501,9 @@ impl Decode for ClientCompletionItemResolveOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientCompletionItemResolveOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -19471,6 +20536,9 @@ impl Encode for ClientCompletionItemInsertTextModeOptions {
 impl Decode for ClientCompletionItemInsertTextModeOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientCompletionItemInsertTextModeOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -19511,6 +20579,9 @@ impl Decode for ClientSignatureParameterInformationOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientSignatureParameterInformationOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -19544,6 +20615,9 @@ impl Decode for ClientCodeActionKindOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientCodeActionKindOptions"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -19576,6 +20650,9 @@ impl Encode for ClientDiagnosticsTagOptions {
 impl Decode for ClientDiagnosticsTagOptions {
     fn type_name() -> &'static str {
         "lsproto.ClientDiagnosticsTagOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -19612,6 +20689,9 @@ impl Encode for ClientSemanticTokensRequestFullDelta {
 impl Decode for ClientSemanticTokensRequestFullDelta {
     fn type_name() -> &'static str {
         "lsproto.ClientSemanticTokensRequestFullDelta"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -19671,6 +20751,9 @@ impl Encode for InitializationOptions {
 impl Decode for InitializationOptions {
     fn type_name() -> &'static str {
         "lsproto.InitializationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -19780,6 +20863,9 @@ impl Encode for AutoImportFix {
 impl Decode for AutoImportFix {
     fn type_name() -> &'static str {
         "lsproto.AutoImportFix"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -19900,6 +20986,9 @@ impl Decode for CompletionItemData {
     fn type_name() -> &'static str {
         "lsproto.CompletionItemData"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -19985,6 +21074,9 @@ impl Decode for CodeLensData {
     fn type_name() -> &'static str {
         "lsproto.CodeLensData"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -20051,6 +21143,9 @@ impl Decode for ExperimentalServerCapabilities {
     fn type_name() -> &'static str {
         "lsproto.ExperimentalServerCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -20098,6 +21193,9 @@ impl Decode for ExperimentalClientCapabilities {
     fn type_name() -> &'static str {
         "lsproto.ExperimentalClientCapabilities"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -20136,6 +21234,9 @@ impl Encode for VSOnAutoInsertOptions {
 impl Decode for VSOnAutoInsertOptions {
     fn type_name() -> &'static str {
         "lsproto.VSOnAutoInsertOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -20186,6 +21287,9 @@ impl Encode for VSReferenceItem {
 impl Decode for VSReferenceItem {
     fn type_name() -> &'static str {
         "lsproto.VSReferenceItem"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -20267,6 +21371,9 @@ impl Decode for VSOnAutoInsertParams {
     fn type_name() -> &'static str {
         "lsproto.VSOnAutoInsertParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -20321,6 +21428,9 @@ impl Decode for VSOnAutoInsertResponseItem {
     fn type_name() -> &'static str {
         "lsproto.VSOnAutoInsertResponseItem"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -20370,6 +21480,9 @@ impl Encode for RequestFailureTelemetryEvent {
 impl Decode for RequestFailureTelemetryEvent {
     fn type_name() -> &'static str {
         "lsproto.RequestFailureTelemetryEvent"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -20427,6 +21540,9 @@ impl Decode for RequestFailureTelemetryProperties {
     fn type_name() -> &'static str {
         "lsproto.RequestFailureTelemetryProperties"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -20474,6 +21590,9 @@ impl Decode for ProfileParams {
     fn type_name() -> &'static str {
         "lsproto.ProfileParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -20507,6 +21626,9 @@ impl Decode for ProfileResult {
     fn type_name() -> &'static str {
         "lsproto.ProfileResult"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -20539,6 +21661,9 @@ impl Encode for InitializeAPISessionParams {
 impl Decode for InitializeAPISessionParams {
     fn type_name() -> &'static str {
         "lsproto.InitializeAPISessionParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -20579,6 +21704,9 @@ impl Encode for InitializeAPISessionResult {
 impl Decode for InitializeAPISessionResult {
     fn type_name() -> &'static str {
         "lsproto.InitializeAPISessionResult"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -20624,6 +21752,9 @@ impl Decode for ProjectInfoParams {
     fn type_name() -> &'static str {
         "lsproto.ProjectInfoParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -20662,6 +21793,9 @@ impl Encode for ProjectInfoResult {
 impl Decode for ProjectInfoResult {
     fn type_name() -> &'static str {
         "lsproto.ProjectInfoResult"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -20710,6 +21844,9 @@ impl Encode for ContentMapperManifest {
 impl Decode for ContentMapperManifest {
     fn type_name() -> &'static str {
         "lsproto.ContentMapperManifest"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -20783,6 +21920,9 @@ impl Decode for InferredProjectContentMapperContribution {
     fn type_name() -> &'static str {
         "lsproto.InferredProjectContentMapperContribution"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -20835,6 +21975,9 @@ impl Encode for ContentMapperContribution {
 impl Decode for ContentMapperContribution {
     fn type_name() -> &'static str {
         "lsproto.ContentMapperContribution"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -20890,6 +22033,9 @@ impl Decode for SetContentMapperContributionsParams {
     fn type_name() -> &'static str {
         "lsproto.SetContentMapperContributionsParams"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -20930,6 +22076,9 @@ impl Encode for SetLogVerbosityParams {
 impl Decode for SetLogVerbosityParams {
     fn type_name() -> &'static str {
         "lsproto.SetLogVerbosityParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -20972,6 +22121,9 @@ impl Encode for PerformanceStatsTelemetryEvent {
 impl Decode for PerformanceStatsTelemetryEvent {
     fn type_name() -> &'static str {
         "lsproto.PerformanceStatsTelemetryEvent"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -21183,6 +22335,9 @@ impl Encode for PerformanceStatsTelemetryMeasurements {
 impl Decode for PerformanceStatsTelemetryMeasurements {
     fn type_name() -> &'static str {
         "lsproto.PerformanceStatsTelemetryMeasurements"
+    }
+    fn custom_unmarshal() -> bool {
+        false
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         if input.peek_kind() == Kind::Null {
@@ -21409,6 +22564,9 @@ impl Decode for ProjectInfoTelemetryEvent {
     fn type_name() -> &'static str {
         "lsproto.ProjectInfoTelemetryEvent"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -21515,6 +22673,9 @@ impl Decode for ProjectInfoTelemetryMeasurements {
     fn type_name() -> &'static str {
         "lsproto.ProjectInfoTelemetryMeasurements"
     }
+    fn custom_unmarshal() -> bool {
+        false
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         if input.peek_kind() == Kind::Null {
             input.read_token()?;
@@ -21616,6 +22777,9 @@ impl Decode for MultiDocumentHighlight {
     fn type_name() -> &'static str {
         "lsproto.MultiDocumentHighlight"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -21665,6 +22829,9 @@ impl Encode for MultiDocumentHighlightParams {
 impl Decode for MultiDocumentHighlightParams {
     fn type_name() -> &'static str {
         "lsproto.MultiDocumentHighlightParams"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -21728,6 +22895,9 @@ impl Encode for VSClassifiedTextRun {
 impl Decode for VSClassifiedTextRun {
     fn type_name() -> &'static str {
         "lsproto.VSClassifiedTextRun"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -21795,6 +22965,9 @@ impl Decode for VSClassifiedTextElement {
     fn type_name() -> &'static str {
         "lsproto.VSClassifiedTextElement"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -21844,6 +23017,9 @@ impl Encode for VSImageId {
 impl Decode for VSImageId {
     fn type_name() -> &'static str {
         "lsproto.VSImageId"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -21899,6 +23075,9 @@ impl Decode for VSImageElement {
     fn type_name() -> &'static str {
         "lsproto.VSImageElement"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -21949,6 +23128,9 @@ impl Decode for VSContainerElement {
     fn type_name() -> &'static str {
         "lsproto.VSContainerElement"
     }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
             input,
@@ -21994,6 +23176,9 @@ impl Decode for CallHierarchyItemData {
     fn type_name() -> &'static str {
         "lsproto.CallHierarchyItemData"
     }
+    fn custom_unmarshal() -> bool {
+        false
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         if input.peek_kind() == Kind::Null {
             input.read_token()?;
@@ -22022,6 +23207,9 @@ impl Encode for TypeHierarchyItemData {
 impl Decode for TypeHierarchyItemData {
     fn type_name() -> &'static str {
         "lsproto.TypeHierarchyItemData"
+    }
+    fn custom_unmarshal() -> bool {
+        false
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         if input.peek_kind() == Kind::Null {
@@ -22052,6 +23240,9 @@ impl Decode for InlayHintData {
     fn type_name() -> &'static str {
         "lsproto.InlayHintData"
     }
+    fn custom_unmarshal() -> bool {
+        false
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         if input.peek_kind() == Kind::Null {
             input.read_token()?;
@@ -22080,6 +23271,9 @@ impl Encode for CodeActionData {
 impl Decode for CodeActionData {
     fn type_name() -> &'static str {
         "lsproto.CodeActionData"
+    }
+    fn custom_unmarshal() -> bool {
+        false
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         if input.peek_kind() == Kind::Null {
@@ -22110,6 +23304,9 @@ impl Decode for WorkspaceSymbolData {
     fn type_name() -> &'static str {
         "lsproto.WorkspaceSymbolData"
     }
+    fn custom_unmarshal() -> bool {
+        false
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         if input.peek_kind() == Kind::Null {
             input.read_token()?;
@@ -22138,6 +23335,9 @@ impl Encode for DocumentLinkData {
 impl Decode for DocumentLinkData {
     fn type_name() -> &'static str {
         "lsproto.DocumentLinkData"
+    }
+    fn custom_unmarshal() -> bool {
+        false
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         if input.peek_kind() == Kind::Null {
@@ -22168,6 +23368,9 @@ impl Decode for DiagnosticData {
     fn type_name() -> &'static str {
         "lsproto.DiagnosticData"
     }
+    fn custom_unmarshal() -> bool {
+        false
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         if input.peek_kind() == Kind::Null {
             input.read_token()?;
@@ -22196,6 +23399,9 @@ impl Encode for CompletionItemDefaultsData {
 impl Decode for CompletionItemDefaultsData {
     fn type_name() -> &'static str {
         "lsproto.CompletionItemDefaultsData"
+    }
+    fn custom_unmarshal() -> bool {
+        false
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         if input.peek_kind() == Kind::Null {
@@ -22234,6 +23440,9 @@ impl Encode for ColorPresentationRegistrationOptions {
 impl Decode for ColorPresentationRegistrationOptions {
     fn type_name() -> &'static str {
         "lsproto.ColorPresentationRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
     }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::structure(
@@ -23717,6 +24926,12 @@ impl Encode for IntegerOrString {
     }
 }
 impl Decode for IntegerOrString {
+    fn type_name() -> &'static str {
+        "lsproto.IntegerOrString"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -23747,6 +24962,12 @@ impl Encode for DocumentSelectorOrNull {
     }
 }
 impl Decode for DocumentSelectorOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.DocumentSelectorOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -23781,12 +25002,19 @@ impl Encode for BooleanOrEmptyObject {
     }
 }
 impl Decode for BooleanOrEmptyObject {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrEmptyObject"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let value = self.empty_object.insert(Box::default());
@@ -23817,12 +25045,19 @@ impl Encode for BooleanOrSemanticTokensFullDelta {
     }
 }
 impl Decode for BooleanOrSemanticTokensFullDelta {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrSemanticTokensFullDelta"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let value = self.semantic_tokens_full_delta.insert(Box::default());
@@ -23858,6 +25093,12 @@ impl Encode for TextDocumentEditOrCreateFileOrRenameFileOrDeleteFile {
     }
 }
 impl Decode for TextDocumentEditOrCreateFileOrRenameFileOrDeleteFile {
+    fn type_name() -> &'static str {
+        "lsproto.TextDocumentEditOrCreateFileOrRenameFileOrDeleteFile"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -23902,6 +25143,12 @@ impl Encode for StringOrInlayHintLabelParts {
     }
 }
 impl Decode for StringOrInlayHintLabelParts {
+    fn type_name() -> &'static str {
+        "lsproto.StringOrInlayHintLabelParts"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -23939,6 +25186,12 @@ impl Encode for StringOrMarkupContent {
     }
 }
 impl Decode for StringOrMarkupContent {
+    fn type_name() -> &'static str {
+        "lsproto.StringOrMarkupContent"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -23978,6 +25231,12 @@ impl Encode for WorkspaceFullDocumentDiagnosticReportOrUnchangedDocumentDiagnost
     }
 }
 impl Decode for WorkspaceFullDocumentDiagnosticReportOrUnchangedDocumentDiagnosticReport {
+    fn type_name() -> &'static str {
+        "lsproto.WorkspaceFullDocumentDiagnosticReportOrUnchangedDocumentDiagnosticReport"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -24019,6 +25278,12 @@ impl Encode for StringOrStringValue {
     }
 }
 impl Decode for StringOrStringValue {
+    fn type_name() -> &'static str {
+        "lsproto.StringOrStringValue"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -24049,6 +25314,12 @@ impl Encode for IntegerOrNull {
     }
 }
 impl Decode for IntegerOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.IntegerOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -24079,6 +25350,12 @@ impl Encode for StringOrNull {
     }
 }
 impl Decode for StringOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.StringOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -24109,6 +25386,12 @@ impl Encode for DocumentUriOrNull {
     }
 }
 impl Decode for DocumentUriOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.DocumentUriOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -24142,6 +25425,12 @@ impl Encode for InitializationOptionsOrNull {
     }
 }
 impl Decode for InitializationOptionsOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.InitializationOptionsOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -24175,6 +25464,12 @@ impl Encode for WorkspaceFoldersOrNull {
     }
 }
 impl Decode for WorkspaceFoldersOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.WorkspaceFoldersOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -24209,6 +25504,12 @@ impl Encode for StringOrStrings {
     }
 }
 impl Decode for StringOrStrings {
+    fn type_name() -> &'static str {
+        "lsproto.StringOrStrings"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -24243,6 +25544,12 @@ impl Encode for TextDocumentContentChangePartialOrWholeDocument {
     }
 }
 impl Decode for TextDocumentContentChangePartialOrWholeDocument {
+    fn type_name() -> &'static str {
+        "lsproto.TextDocumentContentChangePartialOrWholeDocument"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -24279,6 +25586,12 @@ impl Encode for TextEditOrInsertReplaceEdit {
     }
 }
 impl Decode for TextEditOrInsertReplaceEdit {
+    fn type_name() -> &'static str {
+        "lsproto.TextEditOrInsertReplaceEdit"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -24324,6 +25637,12 @@ impl Encode for MarkupContentOrStringOrMarkedStringWithLanguageOrMarkedStrings {
     }
 }
 impl Decode for MarkupContentOrStringOrMarkedStringWithLanguageOrMarkedStrings {
+    fn type_name() -> &'static str {
+        "lsproto.MarkupContentOrStringOrMarkedStringWithLanguageOrMarkedStrings"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -24375,6 +25694,12 @@ impl Encode for UintegerOrNull {
     }
 }
 impl Decode for UintegerOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.UintegerOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -24409,6 +25734,12 @@ impl Encode for LocationOrLocationUriOnly {
     }
 }
 impl Decode for LocationOrLocationUriOnly {
+    fn type_name() -> &'static str {
+        "lsproto.LocationOrLocationUriOnly"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -24445,6 +25776,12 @@ impl Encode for WorkDoneProgressBeginOrReportOrEnd {
     }
 }
 impl Decode for WorkDoneProgressBeginOrReportOrEnd {
+    fn type_name() -> &'static str {
+        "lsproto.WorkDoneProgressBeginOrReportOrEnd"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -24492,6 +25829,12 @@ impl Encode for TextEditOrAnnotatedTextEditOrSnippetTextEdit {
     }
 }
 impl Decode for TextEditOrAnnotatedTextEditOrSnippetTextEdit {
+    fn type_name() -> &'static str {
+        "lsproto.TextEditOrAnnotatedTextEditOrSnippetTextEdit"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -24534,6 +25877,12 @@ impl Encode for FullDocumentDiagnosticReportOrUnchangedDocumentDiagnosticReport 
     }
 }
 impl Decode for FullDocumentDiagnosticReportOrUnchangedDocumentDiagnosticReport {
+    fn type_name() -> &'static str {
+        "lsproto.FullDocumentDiagnosticReportOrUnchangedDocumentDiagnosticReport"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -24575,6 +25924,12 @@ impl Encode for TextDocumentSyncOptionsOrKind {
     }
 }
 impl Decode for TextDocumentSyncOptionsOrKind {
+    fn type_name() -> &'static str {
+        "lsproto.TextDocumentSyncOptionsOrKind"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -24612,12 +25967,19 @@ impl Encode for BooleanOrHoverOptions {
     }
 }
 impl Decode for BooleanOrHoverOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrHoverOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let value = self.hover_options.insert(Box::default());
@@ -24652,12 +26014,19 @@ impl Encode for BooleanOrDeclarationOptionsOrDeclarationRegistrationOptions {
     }
 }
 impl Decode for BooleanOrDeclarationOptionsOrDeclarationRegistrationOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrDeclarationOptionsOrDeclarationRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let data = input.read_value()?;
@@ -24698,12 +26067,19 @@ impl Encode for BooleanOrDefinitionOptions {
     }
 }
 impl Decode for BooleanOrDefinitionOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrDefinitionOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let value = self.definition_options.insert(Box::default());
@@ -24741,12 +26117,19 @@ impl Encode for BooleanOrTypeDefinitionOptionsOrTypeDefinitionRegistrationOption
     }
 }
 impl Decode for BooleanOrTypeDefinitionOptionsOrTypeDefinitionRegistrationOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrTypeDefinitionOptionsOrTypeDefinitionRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let data = input.read_value()?;
@@ -24795,12 +26178,19 @@ impl Encode for BooleanOrImplementationOptionsOrImplementationRegistrationOption
     }
 }
 impl Decode for BooleanOrImplementationOptionsOrImplementationRegistrationOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrImplementationOptionsOrImplementationRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let data = input.read_value()?;
@@ -24843,12 +26233,19 @@ impl Encode for BooleanOrReferenceOptions {
     }
 }
 impl Decode for BooleanOrReferenceOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrReferenceOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let value = self.reference_options.insert(Box::default());
@@ -24882,12 +26279,19 @@ impl Encode for BooleanOrDocumentHighlightOptions {
     }
 }
 impl Decode for BooleanOrDocumentHighlightOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrDocumentHighlightOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let value = self.document_highlight_options.insert(Box::default());
@@ -24921,12 +26325,19 @@ impl Encode for BooleanOrDocumentSymbolOptions {
     }
 }
 impl Decode for BooleanOrDocumentSymbolOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrDocumentSymbolOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let value = self.document_symbol_options.insert(Box::default());
@@ -24960,12 +26371,19 @@ impl Encode for BooleanOrCodeActionOptions {
     }
 }
 impl Decode for BooleanOrCodeActionOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrCodeActionOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let value = self.code_action_options.insert(Box::default());
@@ -25003,12 +26421,19 @@ impl Encode for BooleanOrDocumentColorOptionsOrDocumentColorRegistrationOptions 
     }
 }
 impl Decode for BooleanOrDocumentColorOptionsOrDocumentColorRegistrationOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrDocumentColorOptionsOrDocumentColorRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let data = input.read_value()?;
@@ -25053,12 +26478,19 @@ impl Encode for BooleanOrWorkspaceSymbolOptions {
     }
 }
 impl Decode for BooleanOrWorkspaceSymbolOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrWorkspaceSymbolOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let value = self.workspace_symbol_options.insert(Box::default());
@@ -25092,12 +26524,19 @@ impl Encode for BooleanOrDocumentFormattingOptions {
     }
 }
 impl Decode for BooleanOrDocumentFormattingOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrDocumentFormattingOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let value = self.document_formatting_options.insert(Box::default());
@@ -25131,12 +26570,19 @@ impl Encode for BooleanOrDocumentRangeFormattingOptions {
     }
 }
 impl Decode for BooleanOrDocumentRangeFormattingOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrDocumentRangeFormattingOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let value = self
@@ -25170,12 +26616,19 @@ impl Encode for BooleanOrRenameOptions {
     }
 }
 impl Decode for BooleanOrRenameOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrRenameOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let value = self.rename_options.insert(Box::default());
@@ -25210,12 +26663,19 @@ impl Encode for BooleanOrFoldingRangeOptionsOrFoldingRangeRegistrationOptions {
     }
 }
 impl Decode for BooleanOrFoldingRangeOptionsOrFoldingRangeRegistrationOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrFoldingRangeOptionsOrFoldingRangeRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let data = input.read_value()?;
@@ -25264,12 +26724,19 @@ impl Encode for BooleanOrSelectionRangeOptionsOrSelectionRangeRegistrationOption
     }
 }
 impl Decode for BooleanOrSelectionRangeOptionsOrSelectionRangeRegistrationOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrSelectionRangeOptionsOrSelectionRangeRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let data = input.read_value()?;
@@ -25318,12 +26785,19 @@ impl Encode for BooleanOrCallHierarchyOptionsOrCallHierarchyRegistrationOptions 
     }
 }
 impl Decode for BooleanOrCallHierarchyOptionsOrCallHierarchyRegistrationOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrCallHierarchyOptionsOrCallHierarchyRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let data = input.read_value()?;
@@ -25373,12 +26847,19 @@ impl Encode for BooleanOrLinkedEditingRangeOptionsOrLinkedEditingRangeRegistrati
     }
 }
 impl Decode for BooleanOrLinkedEditingRangeOptionsOrLinkedEditingRangeRegistrationOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrLinkedEditingRangeOptionsOrLinkedEditingRangeRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let data = input.read_value()?;
@@ -25423,6 +26904,12 @@ impl Encode for SemanticTokensOptionsOrRegistrationOptions {
     }
 }
 impl Decode for SemanticTokensOptionsOrRegistrationOptions {
+    fn type_name() -> &'static str {
+        "lsproto.SemanticTokensOptionsOrRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -25461,12 +26948,19 @@ impl Encode for BooleanOrMonikerOptionsOrMonikerRegistrationOptions {
     }
 }
 impl Decode for BooleanOrMonikerOptionsOrMonikerRegistrationOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrMonikerOptionsOrMonikerRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let data = input.read_value()?;
@@ -25513,12 +27007,19 @@ impl Encode for BooleanOrTypeHierarchyOptionsOrTypeHierarchyRegistrationOptions 
     }
 }
 impl Decode for BooleanOrTypeHierarchyOptionsOrTypeHierarchyRegistrationOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrTypeHierarchyOptionsOrTypeHierarchyRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let data = input.read_value()?;
@@ -25567,12 +27068,19 @@ impl Encode for BooleanOrInlineValueOptionsOrInlineValueRegistrationOptions {
     }
 }
 impl Decode for BooleanOrInlineValueOptionsOrInlineValueRegistrationOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrInlineValueOptionsOrInlineValueRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let data = input.read_value()?;
@@ -25619,12 +27127,19 @@ impl Encode for BooleanOrInlayHintOptionsOrInlayHintRegistrationOptions {
     }
 }
 impl Decode for BooleanOrInlayHintOptionsOrInlayHintRegistrationOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrInlayHintOptionsOrInlayHintRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let data = input.read_value()?;
@@ -25667,6 +27182,12 @@ impl Encode for DiagnosticOptionsOrRegistrationOptions {
     }
 }
 impl Decode for DiagnosticOptionsOrRegistrationOptions {
+    fn type_name() -> &'static str {
+        "lsproto.DiagnosticOptionsOrRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -25703,12 +27224,19 @@ impl Encode for BooleanOrInlineCompletionOptions {
     }
 }
 impl Decode for BooleanOrInlineCompletionOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrInlineCompletionOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let value = self.inline_completion_options.insert(Box::default());
@@ -25740,6 +27268,12 @@ impl Encode for PatternOrRelativePattern {
     }
 }
 impl Decode for PatternOrRelativePattern {
+    fn type_name() -> &'static str {
+        "lsproto.PatternOrRelativePattern"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -25776,6 +27310,12 @@ impl Encode for RangeOrEditRangeWithInsertReplace {
     }
 }
 impl Decode for RangeOrEditRangeWithInsertReplace {
+    fn type_name() -> &'static str {
+        "lsproto.RangeOrEditRangeWithInsertReplace"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -25815,12 +27355,19 @@ impl Encode for BooleanOrSaveOptions {
     }
 }
 impl Decode for BooleanOrSaveOptions {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrSaveOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let value = self.save_options.insert(Box::default());
@@ -25851,6 +27398,12 @@ impl Encode for TextDocumentContentOptionsOrRegistrationOptions {
     }
 }
 impl Decode for TextDocumentContentOptionsOrRegistrationOptions {
+    fn type_name() -> &'static str {
+        "lsproto.TextDocumentContentOptionsOrRegistrationOptions"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -25885,6 +27438,12 @@ impl Encode for StringOrTuple {
     }
 }
 impl Decode for StringOrTuple {
+    fn type_name() -> &'static str {
+        "lsproto.StringOrTuple"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -25919,6 +27478,12 @@ impl Encode for StringOrBoolean {
     }
 }
 impl Decode for StringOrBoolean {
+    fn type_name() -> &'static str {
+        "lsproto.StringOrBoolean"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -25927,8 +27492,9 @@ impl Decode for StringOrBoolean {
                 return input.value(value);
             }
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             kind => Err(crate::codec::invalid_kind("StringOrBoolean", kind)),
         }
@@ -25953,6 +27519,12 @@ impl Encode for WorkspaceFolderOrURI {
     }
 }
 impl Decode for WorkspaceFolderOrURI {
+    fn type_name() -> &'static str {
+        "lsproto.WorkspaceFolderOrURI"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -25990,12 +27562,19 @@ impl Encode for BooleanOrClientSemanticTokensRequestFullDelta {
     }
 }
 impl Decode for BooleanOrClientSemanticTokensRequestFullDelta {
+    fn type_name() -> &'static str {
+        "lsproto.BooleanOrClientSemanticTokensRequestFullDelta"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
             Kind::True | Kind::False => {
-                let value = self.boolean.insert(Box::default());
-                return input.value(value);
+                self.boolean = Some(Box::new(input.peek_kind() == Kind::True));
+                input.read_token()?;
+                Ok(())
             }
             Kind::BeginObject => {
                 let value = self
@@ -26033,6 +27612,12 @@ impl Encode for VSImageElementOrClassifiedTextElementOrContainerElement {
     }
 }
 impl Decode for VSImageElementOrClassifiedTextElementOrContainerElement {
+    fn type_name() -> &'static str {
+        "lsproto.VSImageElementOrClassifiedTextElementOrContainerElement"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -26078,6 +27663,12 @@ impl Encode for LocationOrLocationsOrDefinitionLinksOrNull {
     }
 }
 impl Decode for LocationOrLocationsOrDefinitionLinksOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.LocationOrLocationsOrDefinitionLinksOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26124,6 +27715,12 @@ impl Encode for FoldingRangesOrNull {
     }
 }
 impl Decode for FoldingRangesOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.FoldingRangesOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26160,6 +27757,12 @@ impl Encode for LocationOrLocationsOrDeclarationLinksOrNull {
     }
 }
 impl Decode for LocationOrLocationsOrDeclarationLinksOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.LocationOrLocationsOrDeclarationLinksOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26206,6 +27809,12 @@ impl Encode for SelectionRangesOrNull {
     }
 }
 impl Decode for SelectionRangesOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.SelectionRangesOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26239,6 +27848,12 @@ impl Encode for CallHierarchyItemsOrNull {
     }
 }
 impl Decode for CallHierarchyItemsOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.CallHierarchyItemsOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26272,6 +27887,12 @@ impl Encode for CallHierarchyIncomingCallsOrNull {
     }
 }
 impl Decode for CallHierarchyIncomingCallsOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.CallHierarchyIncomingCallsOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26308,6 +27929,12 @@ impl Encode for CallHierarchyOutgoingCallsOrNull {
     }
 }
 impl Decode for CallHierarchyOutgoingCallsOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.CallHierarchyOutgoingCallsOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26341,6 +27968,12 @@ impl Encode for SemanticTokensOrNull {
     }
 }
 impl Decode for SemanticTokensOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.SemanticTokensOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26377,6 +28010,12 @@ impl Encode for SemanticTokensOrSemanticTokensDeltaOrNull {
     }
 }
 impl Decode for SemanticTokensOrSemanticTokensDeltaOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.SemanticTokensOrSemanticTokensDeltaOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26427,6 +28066,12 @@ impl Encode for LinkedEditingRangesOrNull {
     }
 }
 impl Decode for LinkedEditingRangesOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.LinkedEditingRangesOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26460,6 +28105,12 @@ impl Encode for WorkspaceEditOrNull {
     }
 }
 impl Decode for WorkspaceEditOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.WorkspaceEditOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26490,6 +28141,12 @@ impl Encode for MonikersOrNull {
     }
 }
 impl Decode for MonikersOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.MonikersOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26523,6 +28180,12 @@ impl Encode for TypeHierarchyItemsOrNull {
     }
 }
 impl Decode for TypeHierarchyItemsOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.TypeHierarchyItemsOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26553,6 +28216,12 @@ impl Encode for InlineValuesOrNull {
     }
 }
 impl Decode for InlineValuesOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.InlineValuesOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26583,6 +28252,12 @@ impl Encode for InlayHintsOrNull {
     }
 }
 impl Decode for InlayHintsOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.InlayHintsOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26621,6 +28296,12 @@ impl Encode for RelatedFullDocumentDiagnosticReportOrUnchangedDocumentDiagnostic
     }
 }
 impl Decode for RelatedFullDocumentDiagnosticReportOrUnchangedDocumentDiagnosticReport {
+    fn type_name() -> &'static str {
+        "lsproto.RelatedFullDocumentDiagnosticReportOrUnchangedDocumentDiagnosticReport"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -26662,6 +28343,12 @@ impl Encode for InlineCompletionListOrItemsOrNull {
     }
 }
 impl Decode for InlineCompletionListOrItemsOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.InlineCompletionListOrItemsOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26702,6 +28389,12 @@ impl Encode for MessageActionItemOrNull {
     }
 }
 impl Decode for MessageActionItemOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.MessageActionItemOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26732,6 +28425,12 @@ impl Encode for TextEditsOrNull {
     }
 }
 impl Decode for TextEditsOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.TextEditsOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26766,6 +28465,12 @@ impl Encode for CompletionItemsOrListOrNull {
     }
 }
 impl Decode for CompletionItemsOrListOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.CompletionItemsOrListOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26803,6 +28508,12 @@ impl Encode for HoverOrNull {
     }
 }
 impl Decode for HoverOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.HoverOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26833,6 +28544,12 @@ impl Encode for SignatureHelpOrNull {
     }
 }
 impl Decode for SignatureHelpOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.SignatureHelpOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26863,6 +28580,12 @@ impl Encode for LocationsOrNull {
     }
 }
 impl Decode for LocationsOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.LocationsOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26896,6 +28619,12 @@ impl Encode for DocumentHighlightsOrNull {
     }
 }
 impl Decode for DocumentHighlightsOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.DocumentHighlightsOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26932,6 +28661,12 @@ impl Encode for SymbolInformationsOrDocumentSymbolsOrNull {
     }
 }
 impl Decode for SymbolInformationsOrDocumentSymbolsOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.SymbolInformationsOrDocumentSymbolsOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -26978,6 +28713,12 @@ impl Encode for CommandOrCodeAction {
     }
 }
 impl Decode for CommandOrCodeAction {
+    fn type_name() -> &'static str {
+        "lsproto.CommandOrCodeAction"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -27008,6 +28749,12 @@ impl Encode for CommandOrCodeActionArrayOrNull {
     }
 }
 impl Decode for CommandOrCodeActionArrayOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.CommandOrCodeActionArrayOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -27047,6 +28794,12 @@ impl Encode for SymbolInformationsOrWorkspaceSymbolsOrNull {
     }
 }
 impl Decode for SymbolInformationsOrWorkspaceSymbolsOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.SymbolInformationsOrWorkspaceSymbolsOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -27089,6 +28842,12 @@ impl Encode for CodeLensesOrNull {
     }
 }
 impl Decode for CodeLensesOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.CodeLensesOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -27119,6 +28878,12 @@ impl Encode for DocumentLinksOrNull {
     }
 }
 impl Decode for DocumentLinksOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.DocumentLinksOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -27159,6 +28924,12 @@ impl Encode for RangeOrPrepareRenamePlaceholderOrPrepareRenameDefaultBehaviorOrN
     }
 }
 impl Decode for RangeOrPrepareRenamePlaceholderOrPrepareRenameDefaultBehaviorOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.RangeOrPrepareRenamePlaceholderOrPrepareRenameDefaultBehaviorOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -27210,6 +28981,12 @@ impl Encode for LSPAnyOrNull {
     }
 }
 impl Decode for LSPAnyOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.LSPAnyOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -27240,6 +29017,12 @@ impl Encode for MultiDocumentHighlightsOrNull {
     }
 }
 impl Decode for MultiDocumentHighlightsOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.MultiDocumentHighlightsOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -27276,6 +29059,12 @@ impl Encode for VSOnAutoInsertResponseItemOrNull {
     }
 }
 impl Decode for VSOnAutoInsertResponseItemOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.VSOnAutoInsertResponseItemOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -27309,6 +29098,12 @@ impl Encode for VSReferenceItemsOrNull {
     }
 }
 impl Decode for VSReferenceItemsOrNull {
+    fn type_name() -> &'static str {
+        "lsproto.VSReferenceItemsOrNull"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -27336,7 +29131,9 @@ self.project_info_telemetry_event.as_deref().map(|v| v as &dyn Encode),
 self.request_failure_telemetry_event.as_deref().map(|v| v as &dyn Encode),
 self.performance_stats_telemetry_event.as_deref().map(|v| v as &dyn Encode),
 ]) } }
-impl Decode for RequestFailureTelemetryEventOrPerformanceStatsTelemetryEventOrProjectInfoTelemetryEventOrNull { fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
+impl Decode for RequestFailureTelemetryEventOrPerformanceStatsTelemetryEventOrProjectInfoTelemetryEventOrNull { fn type_name() -> &'static str { "lsproto.RequestFailureTelemetryEventOrPerformanceStatsTelemetryEventOrProjectInfoTelemetryEventOrNull" }
+fn custom_unmarshal() -> bool { true }
+fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
 *self = Self::default();
 match input.peek_kind() {
 Kind::Null => { input.read_token()?; Ok(()) },
@@ -27377,6 +29174,12 @@ impl Encode for TextDocumentFilterLanguageOrSchemeOrPattern {
     }
 }
 impl Decode for TextDocumentFilterLanguageOrSchemeOrPattern {
+    fn type_name() -> &'static str {
+        "lsproto.TextDocumentFilterLanguageOrSchemeOrPattern"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -27416,6 +29219,12 @@ impl Encode for StringOrMarkedStringWithLanguage {
     }
 }
 impl Decode for StringOrMarkedStringWithLanguage {
+    fn type_name() -> &'static str {
+        "lsproto.StringOrMarkedStringWithLanguage"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         match input.peek_kind() {
@@ -27457,6 +29266,12 @@ impl Encode for InlineValueTextOrVariableLookupOrEvaluatableExpression {
     }
 }
 impl Decode for InlineValueTextOrVariableLookupOrEvaluatableExpression {
+    fn type_name() -> &'static str {
+        "lsproto.InlineValueTextOrVariableLookupOrEvaluatableExpression"
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         *self = Self::default();
         let data = input.read_value()?;
@@ -27484,6 +29299,12 @@ impl Encode for StringLiteralBegin {
     }
 }
 impl Decode for StringLiteralBegin {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralBegin))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(input, "StringLiteralBegin", b"\"begin\"")
     }
@@ -27496,6 +29317,12 @@ impl Encode for StringLiteralReport {
     }
 }
 impl Decode for StringLiteralReport {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralReport))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(input, "StringLiteralReport", b"\"report\"")
     }
@@ -27508,6 +29335,12 @@ impl Encode for StringLiteralEnd {
     }
 }
 impl Decode for StringLiteralEnd {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralEnd))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(input, "StringLiteralEnd", b"\"end\"")
     }
@@ -27520,6 +29353,12 @@ impl Encode for StringLiteralCreate {
     }
 }
 impl Decode for StringLiteralCreate {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralCreate))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(input, "StringLiteralCreate", b"\"create\"")
     }
@@ -27532,6 +29371,12 @@ impl Encode for StringLiteralRename {
     }
 }
 impl Decode for StringLiteralRename {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralRename))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(input, "StringLiteralRename", b"\"rename\"")
     }
@@ -27544,6 +29389,12 @@ impl Encode for StringLiteralDelete {
     }
 }
 impl Decode for StringLiteralDelete {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralDelete))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(input, "StringLiteralDelete", b"\"delete\"")
     }
@@ -27556,6 +29407,12 @@ impl Encode for StringLiteralFull {
     }
 }
 impl Decode for StringLiteralFull {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralFull))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(input, "StringLiteralFull", b"\"full\"")
     }
@@ -27568,6 +29425,12 @@ impl Encode for StringLiteralUnchanged {
     }
 }
 impl Decode for StringLiteralUnchanged {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralUnchanged))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(input, "StringLiteralUnchanged", b"\"unchanged\"")
     }
@@ -27580,6 +29443,12 @@ impl Encode for StringLiteralSnippet {
     }
 }
 impl Decode for StringLiteralSnippet {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralSnippet))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(input, "StringLiteralSnippet", b"\"snippet\"")
     }
@@ -27592,6 +29461,15 @@ impl Encode for StringLiteralLanguageServerErrorResponse {
     }
 }
 impl Decode for StringLiteralLanguageServerErrorResponse {
+    fn type_name() -> &'static str {
+        concat!(
+            "lsproto.",
+            stringify!(StringLiteralLanguageServerErrorResponse)
+        )
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(
             input,
@@ -27608,6 +29486,12 @@ impl Encode for StringLiteralError {
     }
 }
 impl Decode for StringLiteralError {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralError))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(input, "StringLiteralError", b"\"error\"")
     }
@@ -27620,6 +29504,15 @@ impl Encode for StringLiteralLanguageServerPerformanceStats {
     }
 }
 impl Decode for StringLiteralLanguageServerPerformanceStats {
+    fn type_name() -> &'static str {
+        concat!(
+            "lsproto.",
+            stringify!(StringLiteralLanguageServerPerformanceStats)
+        )
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(
             input,
@@ -27636,6 +29529,12 @@ impl Encode for StringLiteralUsage {
     }
 }
 impl Decode for StringLiteralUsage {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralUsage))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(input, "StringLiteralUsage", b"\"usage\"")
     }
@@ -27648,6 +29547,15 @@ impl Encode for StringLiteralLanguageServerProjectInfo {
     }
 }
 impl Decode for StringLiteralLanguageServerProjectInfo {
+    fn type_name() -> &'static str {
+        concat!(
+            "lsproto.",
+            stringify!(StringLiteralLanguageServerProjectInfo)
+        )
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(
             input,
@@ -27664,6 +29572,12 @@ impl Encode for StringLiteralClassifiedTextRun {
     }
 }
 impl Decode for StringLiteralClassifiedTextRun {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralClassifiedTextRun))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(
             input,
@@ -27680,6 +29594,12 @@ impl Encode for StringLiteralClassifiedTextElement {
     }
 }
 impl Decode for StringLiteralClassifiedTextElement {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralClassifiedTextElement))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(
             input,
@@ -27696,6 +29616,12 @@ impl Encode for StringLiteralImageId {
     }
 }
 impl Decode for StringLiteralImageId {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralImageId))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(input, "StringLiteralImageId", b"\"ImageId\"")
     }
@@ -27708,6 +29634,12 @@ impl Encode for StringLiteralImageElement {
     }
 }
 impl Decode for StringLiteralImageElement {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralImageElement))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(input, "StringLiteralImageElement", b"\"ImageElement\"")
     }
@@ -27720,6 +29652,12 @@ impl Encode for StringLiteralContainerElement {
     }
 }
 impl Decode for StringLiteralContainerElement {
+    fn type_name() -> &'static str {
+        concat!("lsproto.", stringify!(StringLiteralContainerElement))
+    }
+    fn custom_unmarshal() -> bool {
+        true
+    }
     fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
         crate::codec::literal(
             input,
