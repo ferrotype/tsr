@@ -1188,12 +1188,25 @@ name = "tsr_locale"
 version = "0.2.0"
 
 [[package]]
+name = "tsr_lsp"
+version = "0.2.0"
+dependencies = [
+ "tsr_json",
+ "tsr_jsstring",
+ "tsr_lsproto",
+ "tsr_project",
+ "tsr_vfs",
+]
+
+[[package]]
 name = "tsr_lsproto"
 version = "0.2.0"
 dependencies = [
  "serde_json",
  "tsr_json",
  "tsr_jsonrpc",
+ "tsr_jsstring",
+ "tsr_tspath",
 ]
 
 [[package]]
@@ -1280,9 +1293,14 @@ dependencies = [
  "tsr_checker",
  "tsr_compiler",
  "tsr_core",
+ "tsr_ipc",
  "tsr_jsstring",
+ "tsr_lsproto",
+ "tsr_parser",
  "tsr_tsoptions",
+ "tsr_tspath",
  "tsr_vfs",
+ "xxhash-rust",
 ]
 
 [[package]]
@@ -1341,6 +1359,15 @@ dependencies = [
  "base64",
  "serde",
  "serde_json",
+ "tsr_arena",
+ "tsr_compiler",
+ "tsr_core",
+ "tsr_json",
+ "tsr_jsstring",
+ "tsr_lsp",
+ "tsr_lsproto",
+ "tsr_project",
+ "tsr_tsoptions",
  "tsr_tspath",
  "tsr_vfs",
 ]

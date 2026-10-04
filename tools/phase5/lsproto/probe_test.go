@@ -2,6 +2,7 @@
 package lsproto
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	wire "github.com/microsoft/TypeScript/tsc/internal/json"
 	"go/ast"
@@ -176,5 +177,35 @@ func codecTarget(name string) any {
 		return new(WorkspaceEdit)
 	default:
 		panic("unknown codec case type: " + name)
+	}
+}
+
+// The URL parser dependency has behavior beyond ordinary filesystem paths.
+// Both runtimes consume these cases, including raw bytes and refusal paths.
+func TestRustDocumentURI(t *testing.T) {
+	data, err := os.ReadFile(os.Getenv("TSR_URI_CASES"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var cases []struct {
+		URI     string  `json:"uri"`
+		FileHex *string `json:"file_hex"`
+	}
+	if err := json.Unmarshal(data, &cases); err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range cases {
+		var result string
+		panicked := true
+		func() { defer func() { _ = recover() }(); result = DocumentUri(c.URI).FileName(); panicked = false }()
+		if c.FileHex == nil {
+			if !panicked {
+				t.Errorf("%q: expected panic, got %q", c.URI, result)
+			}
+			continue
+		}
+		if panicked || hex.EncodeToString([]byte(result)) != *c.FileHex {
+			t.Errorf("%q: got %x (panic=%v), expected %s", c.URI, result, panicked, *c.FileHex)
+		}
 	}
 }

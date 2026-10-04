@@ -1,6 +1,27 @@
-//! Minimal project owners for ADR 0012. Scheduling/affinity and idle timers are
-//! later project-system work; slot lifetime and generation retirement live here.
+//! Project ownership, immutable file snapshots and shared parse caches. The
+//! checker slots retain ADR 0012 generation and panic-retirement semantics.
 #![forbid(unsafe_code)]
+
+pub mod background;
+mod clock;
+pub mod config;
+pub mod dirty;
+pub mod extended_config;
+pub mod file_change;
+pub mod logging;
+pub mod overlay;
+pub mod owner_cache;
+pub mod parse_cache;
+pub mod program_counter;
+pub mod project;
+pub mod scheduler;
+pub mod session;
+mod snapshot;
+pub use snapshot::Snapshot;
+pub mod ref_count_cache;
+pub mod snapshot_fs;
+pub mod source_fs;
+pub mod watch;
 
 use std::cell::RefCell;
 use std::sync::{Arc, Mutex, OnceLock};
@@ -147,19 +168,27 @@ impl CheckerPool {
     /// Drops only the idle slot's root. Retained results still name and retain
     /// their exact old checker; a later checkout adopts a fresh identity.
     pub fn evict_idle(&self, slot: CheckerSlot) -> Result<bool, Error> {
+        let displaced = self.take_idle(slot)?;
+        let removed = displaced.is_some();
+        drop(displaced);
+        Ok(removed)
+    }
+
+    /// Separate removal from destruction so the scheduler can serialize
+    /// removal with Discard without running host destructors under its lock.
+    fn take_idle(&self, slot: CheckerSlot) -> Result<Option<CheckerCell>, Error> {
         let index = self.index(slot)?;
         let displaced = {
             let _gate = self.generation.enter()?;
             let mut slots = self.slots.lock().map_err(|_| tsr_arena::Error::Retired)?;
             if slot == CheckerSlot::Api || slots[index].checkouts != 0 {
-                return Ok(false);
+                return Ok(None);
             }
             std::mem::take(&mut slots[index].checker)
         };
         // A checker can retain a caller-owned host; do not run its destructor
         // while holding the gate or pool lock.
-        drop(displaced);
-        Ok(true)
+        Ok(Some(displaced))
     }
 }
 
@@ -187,21 +216,27 @@ impl CheckerPool {
     }
 }
 
-/// The pin's `GetChecker` picks the checker by the request's lifetime: the
-/// diagnostics checker, the persistent API checker, or a query checker. The
-/// pin's query acquisition finds or creates an idle query checker and keeps
-/// per-request affinity (`findOrCreateQueryCheckerLocked`), which is the
-/// project system's scheduling (Phase 5); this pool serves its first query
-/// slot. The file hint is unused, as in the pin. Releasing a canceled checker
-/// disposes it ([`PooledChecker`]'s drop). A project's pool serves the
-/// programs of its snapshots, so the project implements the interface.
+/// Session projects schedule diagnostics, queries and persistent API operations
+/// separately. Standalone type-system pools retain the low-level slot API.
 impl tsr_checker::CheckerPool for Project {
     fn with_checker(
         &self,
         lifetime: CheckerLifetime,
-        _file: Option<tsr_arena::NodeId>,
+        file: Option<tsr_arena::NodeId>,
         task: &mut dyn FnMut(&mut Operation<'_>) -> Result<(), Error>,
     ) -> Result<(), Error> {
+        if let Some(scheduler) = &self.scheduler {
+            let checkout = scheduler
+                .acquire(lifetime, file, &tsr_ipc::Context::background(), "")
+                .map_err(|error| match error {
+                    scheduler::AcquireError::Checker(error) => error,
+                    scheduler::AcquireError::Canceled(_) => {
+                        unreachable!("background context cannot expire")
+                    }
+                })?;
+            let mut operation = checkout.operation()?;
+            return task(&mut operation);
+        }
         let slot = match lifetime {
             CheckerLifetime::Diagnostics => CheckerSlot::Diagnostics,
             CheckerLifetime::Api => CheckerSlot::Api,
@@ -274,26 +309,22 @@ impl PooledChecker {
 #[derive(Clone)]
 pub struct Project {
     pool: Arc<CheckerPool>,
+    scheduler: Option<Arc<scheduler::CheckerScheduler>>,
+    data: Option<Arc<project::ProjectData>>,
 }
 impl Project {
     pub fn new(pool: Arc<CheckerPool>) -> Self {
-        Self { pool }
+        Self {
+            pool,
+            data: None,
+            scheduler: None,
+        }
     }
     pub fn pool(&self) -> &Arc<CheckerPool> {
         &self.pool
     }
-}
-
-#[derive(Clone)]
-pub struct Snapshot {
-    project: Project,
-}
-impl Snapshot {
-    pub fn new(project: Project) -> Self {
-        Self { project }
-    }
-    pub fn project(&self) -> &Project {
-        &self.project
+    pub fn scheduler(&self) -> Option<&Arc<scheduler::CheckerScheduler>> {
+        self.scheduler.as_ref()
     }
 }
 

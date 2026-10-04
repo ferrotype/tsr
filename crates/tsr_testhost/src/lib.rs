@@ -1,8 +1,10 @@
 //! Test-only transport for injected hosts. No compiler or language service runs here.
 //! See docs/S11.md for the versioned, deliberately bounded protocol.
+pub mod bridge;
 mod configuration;
 mod filesystem;
 pub mod framing;
+pub mod project_host;
 mod protocol;
 mod session;
 mod streams;

@@ -14,12 +14,100 @@ pub struct ProgramFile {
     pub(crate) bound: CompletedFile,
 }
 impl ProgramFile {
+    pub(crate) fn new(bound: CompletedFile) -> Self {
+        Self { bound }
+    }
     pub fn bound(&self) -> &CompletedFile {
         &self.bound
     }
     pub fn source(&self) -> tsr_ast::NodeId {
         self.bound.source()
     }
+}
+
+impl ProgramFile {
+    /// Shared construction primitive for loader and project caches. Binding
+    /// finishes before a cache can publish the result to another program.
+    pub fn parse_and_bind(
+        source: SourceText,
+        kind: ScriptKind,
+        options: SourceFileParseOptions,
+        counters: &Counters,
+        tracing: Option<&Arc<dyn tsr_checker::TraceSink>>,
+        source_hash: Option<tsr_ast::SourceHash>,
+    ) -> Result<Arc<Self>, Error> {
+        let parsed = tsr_parser::parse_source_file_with_counters(source, kind, options, counters);
+        Self::bind_parsed(parsed, tracing, source_hash)
+    }
+    /// Bind a parsed mapper output using the same publication and trace path as
+    /// ordinary source files. A bundle cache publishes only after all outputs
+    /// have successfully crossed this boundary.
+    pub fn bind_parsed(
+        mut parsed: tsr_ast::ParsedFile,
+        tracing: Option<&Arc<dyn tsr_checker::TraceSink>>,
+        source_hash: Option<tsr_ast::SourceHash>,
+    ) -> Result<Arc<Self>, Error> {
+        if let Some(hash) = source_hash {
+            parsed.root_source_file_mut()?.hash = hash;
+        }
+        // port: tsc/internal/compiler/program.go:Program.BindSourceFiles
+        let _trace = tsr_checker::TraceScope::new(
+            tracing,
+            tsr_checker::TracePhase::Bind,
+            "bindSourceFile",
+            || {
+                [(
+                    "path".into(),
+                    tsr_checker::TraceValue::Str(
+                        String::from_utf8_lossy(
+                            parsed
+                                .view()
+                                .source_file(parsed.root())
+                                .expect("parsed source file")
+                                .parse_options()
+                                .path
+                                .as_bytes(),
+                        )
+                        .into_owned(),
+                    ),
+                )]
+                .into_iter()
+                .collect()
+            },
+            true,
+        );
+        let bound = tsr_binder::bind_parsed_file(parsed)?;
+        Ok(Arc::new(Self::new(bound)))
+    }
+}
+
+/// Project-owned parse caches plug into the compiler without a reverse crate
+/// dependency. The program holds the cache lease; escaped ASTs independently
+/// retain their owner after the program has released its cache references.
+pub struct CachedProgramFile {
+    pub file: Arc<ProgramFile>,
+    pub retention: Box<dyn Send + Sync>,
+}
+type RetainedSources = Mutex<Vec<Box<dyn Send + Sync>>>;
+#[derive(Clone, Default)]
+pub(crate) struct ProgramRetention {
+    _sources: Option<Arc<RetainedSources>>,
+}
+pub trait SourceFileCache: Send + Sync {
+    /// Editor overlays can supply a language independently of the file suffix.
+    fn script_kind(&self, name: &[u8]) -> ScriptKind {
+        ScriptKind::ensure_from_file_name(name)
+    }
+    /// Retain an unchanged file in a cloned program, preserving its identity.
+    fn retain(&self, file: &Arc<ProgramFile>) -> Result<Box<dyn Send + Sync>, Error>;
+    fn acquire(
+        &self,
+        source: SourceText,
+        kind: ScriptKind,
+        options: SourceFileParseOptions,
+        counters: &Counters,
+        tracing: Option<&Arc<dyn tsr_checker::TraceSink>>,
+    ) -> Result<CachedProgramFile, Error>;
 }
 
 #[derive(PartialEq, Eq, Hash)]
@@ -95,10 +183,46 @@ impl SharedSourceFileCache {
 pub struct FileCache {
     files: BTreeMap<JsString, Vec<Weak<ProgramFile>>>,
     shared: Option<Arc<SharedSourceFileCache>>,
+    project: Option<Arc<dyn SourceFileCache>>,
+    project_retention: Weak<RetainedSources>,
 }
 impl FileCache {
+    pub(crate) fn script_kind(&self, name: &[u8]) -> ScriptKind {
+        self.project.as_ref().map_or_else(
+            || ScriptKind::ensure_from_file_name(name),
+            |cache| cache.script_kind(name),
+        )
+    }
+    pub(crate) fn retain_project_file(&self, file: &Arc<ProgramFile>) -> Result<(), Error> {
+        if let Some(cache) = &self.project {
+            let lease = cache.retain(file)?;
+            self.project_retention
+                .upgrade()
+                .expect("program retention scope")
+                .lock()
+                .expect("program retention poisoned")
+                .push(lease);
+        }
+        Ok(())
+    }
+    pub(crate) fn begin_program(&mut self) -> ProgramRetention {
+        let retention = self
+            .project
+            .as_ref()
+            .map(|_| Arc::new(Mutex::new(Vec::new())));
+        self.project_retention = retention.as_ref().map_or_else(Weak::new, Arc::downgrade);
+        ProgramRetention {
+            _sources: retention,
+        }
+    }
     pub fn new() -> Self {
         Self::default()
+    }
+    pub fn for_project(cache: Arc<dyn SourceFileCache>) -> Self {
+        Self {
+            project: Some(cache),
+            ..Self::default()
+        }
     }
     /// A project-local cache, with only declaration and JSON files shared with
     /// the other projects in this build cycle. Give every load its own instance.
@@ -158,6 +282,18 @@ impl FileCache {
         counters: &Counters,
         tracing: Option<&Arc<dyn tsr_checker::TraceSink>>,
     ) -> Result<Arc<ProgramFile>, Error> {
+        if let Some(cache) = &self.project {
+            let acquired = cache.acquire(source, kind, options, counters, tracing)?;
+            let retention = self
+                .project_retention
+                .upgrade()
+                .expect("project parse cache requires a program load");
+            retention
+                .lock()
+                .expect("program retention poisoned")
+                .push(acquired.retention);
+            return Ok(acquired.file);
+        }
         let entries = self.files.entry(options.path.clone()).or_default();
         entries.retain(|entry| entry.strong_count() != 0);
         for entry in entries.iter() {
@@ -171,35 +307,7 @@ impl FileCache {
                 }
             }
         }
-        let parsed = tsr_parser::parse_source_file_with_counters(source, kind, options, counters);
-        // port: tsc/internal/compiler/program.go:Program.BindSourceFiles
-        let _trace = tsr_checker::TraceScope::new(
-            tracing,
-            tsr_checker::TracePhase::Bind,
-            "bindSourceFile",
-            || {
-                [(
-                    "path".into(),
-                    tsr_checker::TraceValue::Str(
-                        String::from_utf8_lossy(
-                            parsed
-                                .view()
-                                .source_file(parsed.root())
-                                .expect("parsed source file")
-                                .parse_options()
-                                .path
-                                .as_bytes(),
-                        )
-                        .into_owned(),
-                    ),
-                )]
-                .into_iter()
-                .collect()
-            },
-            true,
-        );
-        let bound = tsr_binder::bind_parsed_file(parsed)?;
-        let file = Arc::new(ProgramFile { bound });
+        let file = ProgramFile::parse_and_bind(source, kind, options, counters, tracing, None)?;
         entries.push(Arc::downgrade(&file));
         Ok(file)
     }

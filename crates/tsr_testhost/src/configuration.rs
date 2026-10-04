@@ -46,7 +46,7 @@ pub(crate) struct Plugin {
     pub(crate) state: PluginState,
 }
 pub(crate) struct Configuration {
-    pub(crate) host: Host,
+    pub(crate) host: std::sync::Arc<Host>,
     pub(crate) options: Json,
     pub(crate) plugins: Vec<Plugin>,
 }
@@ -85,7 +85,7 @@ impl Configuration {
             })
             .collect();
         Ok(Self {
-            host,
+            host: std::sync::Arc::new(host),
             options: wire.options,
             plugins,
         })

@@ -1,0 +1,23 @@
+[package]
+name = "tsr_lsp"
+version = "0.2.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = ["crates-io"]
+description = "Language server session and project dispatch for tsr"
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+readme = "README.md"
+include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
+
+[dependencies]
+tsr_json = { version = "0.2.0", path = "../tsr_json" }
+tsr_lsproto = { version = "0.2.0", path = "../tsr_lsproto" }
+tsr_jsstring = { version = "0.2.0", path = "../tsr_jsstring" }
+tsr_project = { version = "0.2.0", path = "../tsr_project" }
+tsr_vfs = { version = "0.2.0", path = "../tsr_vfs" }
+
+[lints]
+workspace = true

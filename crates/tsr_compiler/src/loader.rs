@@ -105,6 +105,7 @@ pub struct TypeResolution {
 /// source-of-reference mode and checker construction remain explicit
 /// unsupported boundaries.
 pub struct Program {
+    _source_retention: crate::cache::ProgramRetention,
     tracing: Option<Arc<dyn TraceSink>>,
     pub(crate) owners: crate::resolver_host::OwnerIndex,
     pub(crate) include_reasons: BTreeMap<JsString, Vec<Arc<IncludeReason>>>,
@@ -264,6 +265,18 @@ impl Program {
         counters: &Counters,
     ) -> Result<Self, Error> {
         Loader::new(options, None, cache, counters, true, false)?.run()
+    }
+    /// Session loading uses the editor's source-of-reference mode. The existing
+    /// explicit faking-host boundary remains until that host is supplied.
+    pub fn load_live_for_project(
+        options: ProgramOptions,
+        cache: &mut FileCache,
+        counters: &Counters,
+    ) -> Result<Self, Error> {
+        Loader::new(options, None, cache, counters, true, true)?.run()
+    }
+    pub fn is_source_from_project_reference(&self, path: &[u8]) -> bool {
+        self.references.is_source_from_project_reference(path)
     }
     /// Live command-line loading with a mapper project. The caller freezes
     /// filesystem edits for the load, as with `load_live`; loaded AST owners
@@ -649,6 +662,7 @@ impl Program {
     }
 }
 struct Loader<'a> {
+    source_retention: crate::cache::ProgramRetention,
     tracing: Option<Arc<dyn TraceSink>>,
     config: tsr_tsoptions::ParsedCommandLine,
     pending: Vec<LoadTask>,
@@ -839,6 +853,7 @@ impl<'a> Loader<'a> {
             skip_resolution: input.skip_module_resolution,
             single_threaded: input.single_threaded,
             resolver,
+            source_retention: cache.begin_program(),
             cache,
             counters,
             depths: BTreeMap::new(),
@@ -1090,6 +1105,7 @@ impl<'a> Loader<'a> {
             }
         }
         let mut program = Program {
+            _source_retention: self.source_retention,
             tracing: self.tracing,
             include_reasons: self.include_reasons,
             references,
@@ -1296,7 +1312,7 @@ impl<'a> Loader<'a> {
                 is_lib,
                 self.skip_resolution,
             )?;
-            let kind = ScriptKind::ensure_from_file_name(name.as_bytes());
+            let kind = self.cache.script_kind(name.as_bytes());
             let file = self
                 .parse_source_file(name.as_bytes(), key, &meta, kind)?
                 .ok_or(Error::Unsupported("file-name casing variant without text"))?;
@@ -1664,7 +1680,7 @@ impl<'a> Loader<'a> {
                 .insert(key, self.pending_children(pending_start, depth));
             return Ok(());
         }
-        let kind = ScriptKind::ensure_from_file_name(&name);
+        let kind = self.cache.script_kind(&name);
         // A supplemental file arrives parsed with its canonical file.
         let supplemental = self.content_mappers.supplementals.remove(&key);
         if supplemental.is_none()
@@ -2425,34 +2441,7 @@ pub(super) fn bind(
     parsed: tsr_ast::ParsedFile,
     tracing: Option<&Arc<dyn TraceSink>>,
 ) -> Result<Arc<ProgramFile>, Error> {
-    let _trace = TraceScope::new(
-        tracing,
-        TracePhase::Bind,
-        "bindSourceFile",
-        || {
-            [(
-                "path".into(),
-                TraceValue::Str(
-                    String::from_utf8_lossy(
-                        parsed
-                            .view()
-                            .source_file(parsed.root())
-                            .expect("parsed source file")
-                            .parse_options()
-                            .path
-                            .as_bytes(),
-                    )
-                    .into_owned(),
-                ),
-            )]
-            .into_iter()
-            .collect()
-        },
-        true,
-    );
-    // port: tsc/internal/compiler/program.go:Program.BindSourceFiles
-    let bound = tsr_binder::bind_parsed_file(parsed)?;
-    Ok(Arc::new(ProgramFile { bound }))
+    ProgramFile::bind_parsed(parsed, tracing, None)
 }
 fn host_trace(log: &mut Vec<tsr_module::DiagAndArgs>, traces: Vec<tsr_module::DiagAndArgs>) {
     log.extend(traces);

@@ -95,7 +95,7 @@ tsr_arena = { version = "0.2.0", path = "../tsr_arena", features = ["harness"] }
 serde = { version = "1", features = ["derive"] }
 tsr_nodebuilder = { version = "0.2.0", path = "../tsr_nodebuilder" }
 tsr_astnav = { version = "0.2.0", path = "../tsr_astnav" }
-# Path-only: tsr_project's tests depend on this crate, and a versioned entry here
+# Path-only: tsr_project depends on this crate, and a versioned test entry here
 # would make the two unpublishable at a new version (Cargo drops this one).
 tsr_project = { path = "../tsr_project" }
 # The harness's in-process content mappers, which the corpus examples serve.

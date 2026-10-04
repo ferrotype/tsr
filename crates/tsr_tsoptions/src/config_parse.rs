@@ -450,7 +450,7 @@ fn parse_config(
     base: &[u8],
     name: &[u8],
     stack: &[JsString],
-    cache: Option<&crate::ExtendedConfigCache<'_>>,
+    cache: Option<&dyn crate::ExtendedConfigProvider>,
 ) -> Result<Parsed, Error> {
     let base = tsr_tspath::normalize_slashes(base);
     let resolved = tsr_tspath::to_path(name, &base, host.fs().use_case_sensitive_file_names());
@@ -743,7 +743,7 @@ pub(crate) fn parse_source_with_cache(
     existing: &CompilerOptions,
     existing_raw: &ConfigValue,
     name: &[u8],
-    cache: Option<&crate::ExtendedConfigCache<'_>>,
+    cache: Option<&dyn crate::ExtendedConfigProvider>,
 ) -> Result<ParsedCommandLine, Error> {
     tsr_parser::on_parser_worker(|| {
         let parsed = parse_config(Some(source), None, host, base, name, &[], cache)?;
@@ -850,7 +850,7 @@ pub(crate) fn parse_raw_with_cache(
     existing: &CompilerOptions,
     name: &[u8],
     resolution_stack: &[JsString],
-    cache: Option<&crate::ExtendedConfigCache<'_>>,
+    cache: Option<&dyn crate::ExtendedConfigProvider>,
 ) -> Result<ParsedCommandLine, Error> {
     let raw = crate::normalize_json_value(raw);
     let raw = if raw.as_object().is_some() {
@@ -1042,7 +1042,7 @@ fn get_extended_config(
     name: &[u8],
     host: &dyn ParseConfigHost,
     stack: &[JsString],
-    cache: Option<&crate::ExtendedConfigCache<'_>>,
+    cache: Option<&dyn crate::ExtendedConfigProvider>,
 ) -> Result<Arc<ExtendedConfigCacheEntry>, Error> {
     let path = tsr_tspath::to_path(
         name,
@@ -1050,7 +1050,7 @@ fn get_extended_config(
         host.fs().use_case_sensitive_file_names(),
     );
     if let Some(cache) = cache.filter(|_| !stack.contains(&path)) {
-        cache.get_extended_config(name, path, stack)
+        cache.get_extended_config(name, path, stack, host)
     } else {
         parse_extended_with_cache(name, path, stack, host, cache).map(Arc::new)
     }
@@ -1065,12 +1065,12 @@ pub fn parse_extended_config(
 ) -> Result<ExtendedConfigCacheEntry, Error> {
     parse_extended_with_cache(name, path, stack, host, None)
 }
-pub(crate) fn parse_extended_with_cache(
+pub fn parse_extended_with_cache(
     name: &[u8],
     path: JsString,
     stack: &[JsString],
     host: &dyn ParseConfigHost,
-    cache: Option<&crate::ExtendedConfigCache<'_>>,
+    cache: Option<&dyn crate::ExtendedConfigProvider>,
 ) -> Result<ExtendedConfigCacheEntry, Error> {
     tsr_parser::on_parser_worker(|| {
         let content = host.fs().read_file(name)?;

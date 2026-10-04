@@ -375,8 +375,10 @@ pub use config_parse::{parse_project_reference, ProjectReferenceParseResult};
 pub use config_value::normalize_json_value;
 
 mod extended_config;
+pub use config_parse::parse_extended_with_cache;
 pub use config_parse::{parse_extended_config, ExtendedConfigCacheEntry};
-pub use extended_config::ExtendedConfigCache;
+pub use config_read::read_with_cache as read_config_with_cache;
+pub use extended_config::{ExtendedConfigCache, ExtendedConfigProvider};
 
 // Phase 1 operation-table group tsoptions (docs/PHASE1-mutation-witnesses.md, section 9).
 pub mod affects;

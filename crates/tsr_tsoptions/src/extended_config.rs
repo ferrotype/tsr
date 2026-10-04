@@ -12,6 +12,18 @@ use tsr_core::CompilerOptions;
 use tsr_jsstring::JsString;
 use tsr_vfs::Error;
 
+/// Project snapshots supply an owner-scoped cache; command-line users keep the
+/// host-scoped cache below. Recursive parsing always uses the requesting host.
+pub trait ExtendedConfigProvider: Sync {
+    fn get_extended_config(
+        &self,
+        name: &[u8],
+        path: JsString,
+        stack: &[JsString],
+        host: &dyn ParseConfigHost,
+    ) -> Result<Arc<ExtendedConfigCacheEntry>, Error>;
+}
+
 pub struct ExtendedConfigCache<'host> {
     host: &'host dyn ParseConfigHost,
     entries: Mutex<HashMap<JsString, Arc<ExtendedConfigCacheEntry>>>,
@@ -107,5 +119,17 @@ impl<'host> ExtendedConfigCache<'host> {
             self.host.fs().use_case_sensitive_file_names(),
         );
         crate::config_read::read_with_cache(&name, path, options, raw, self.host, Some(self))
+    }
+}
+
+impl ExtendedConfigProvider for ExtendedConfigCache<'_> {
+    fn get_extended_config(
+        &self,
+        name: &[u8],
+        path: JsString,
+        stack: &[JsString],
+        _host: &dyn ParseConfigHost,
+    ) -> Result<Arc<ExtendedConfigCacheEntry>, Error> {
+        self.get_extended_config(name, path, stack)
     }
 }
