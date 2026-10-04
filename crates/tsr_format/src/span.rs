@@ -1961,7 +1961,7 @@ fn get_first_non_decorator_token_of_node(
 }
 
 // port: tsc/internal/format/span.go:getIndentationString
-pub(crate) fn get_indentation_string(indentation: i64, options: &FormatCodeSettings) -> Vec<u8> {
+pub fn get_indentation_string(indentation: i64, options: &FormatCodeSettings) -> Vec<u8> {
     if options.editor.convert_tabs_to_spaces.is_true() {
         return vec![b' '; usize::try_from(indentation).unwrap_or(0)];
     }

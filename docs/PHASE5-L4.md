@@ -63,7 +63,38 @@ Three focused compiler variants (25 comparisons) retain parity, including the
 destructuring display and import-attribute paths affected by shared helpers.
 Clippy with warnings denied, package policy and marker validation pass.
 
-Remaining L4 work includes formatting preferences, further import-adder and
-completion contexts, live invalidation comparisons and expansion against the
-assigned native families.
-Multi-project discovery and ATA remain L6 dependencies as in the Phase 5 plan.
+The fourth checkpoint connects format preferences to completion snippets and
+import edits, including CRLF, indentation, semicolons and brace/comma spacing.
+Existing multiline imports retain the pin's precise edit ranges and comment
+behavior. Private and computed class members, unchecked-JS name suggestions,
+JSDoc type keywords, existing `require` bindings and function `export =` aliases
+are covered. The latter two had missing or panicking lookup paths; focused
+regressions now exercise extraction and applying the resulting fix.
+
+Package extraction now caches canonical dependency roots, skips hidden package
+directories, and normalizes explicit `types` names. Pinned realpath, directory
+search, hidden-directory and erroneous-initializer cases have direct tests.
+The package wire fixture includes symlinked re-exports and export-equals functions.
+
+Auxiliary export-program reads now feed both watch registration and cache
+invalidation. The comparison checks a registered watcher before injecting a
+package change, then tests edits, deletion/recreation and package-entrypoint
+changes. New snapshots retire their own cache; retained snapshots keep theirs.
+Project-source edits, exclusion preference changes, closed-file changes and
+root removal are compared as well. The sample matches 647 responses with minimal
+capabilities and 658 with rich capabilities, in each encoding. Every auto-import
+item in this sample is resolved and its edits applied.
+
+One additional config sequence remains assigned to L6's config/registry
+integration: remove an export file from the root list, then replace it with a
+new root. The pin retains the removed file's auto-import bucket in that sequence;
+Rust rebuilds for the new source. This is an observed, unapproved difference,
+not part of the passing sample or a claim of completed config integration.
+Multi-project discovery, project-reference redirection, content-mapped packages
+and ATA remain L6 dependencies. Full family replay and its assigned-case counts
+remain L7 work; these bounded comparisons are not a substitute for that gate.
+
+Focused tests at this checkpoint: autoimport 13, language service 32, project 85,
+plus format/printer/LSP tests. Changed-crate clippy, marker validation, packaging
+policy and formatting pass. Further completion-context comparisons and the
+final L4 review follow before opening the PR.

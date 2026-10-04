@@ -5,6 +5,7 @@ Like pinned fourslash, sort completion lists by sortText/name (insensitive,
 then sensitive), retaining response order for ties. Everything else is exact.
 """
 import difflib
+import fnmatch
 import json
 import tempfile
 from pathlib import Path
@@ -54,6 +55,19 @@ CASES = [
     'class ClassName {} new /*cursor*/',
     'function accept<T extends {one: number; two?: string}>(arg: T): T {return arg} accept({/*cursor*/});',
     'import type { Default } from "./dep"; new De/*cursor*/',
+    'import type Default from "./dep"; new De/*cursor*/',
+    'import { type Default } from "./dep"; new De/*cursor*/',
+    'import { alpha as zebra } from "./dep"; met/*cursor*/',
+    'import {\n    alpha,\n} from "./dep"; met/*cursor*/',
+    'import {\n    alpha // keep comment\n} from "./dep"; met/*cursor*/',
+    'import Default, { alpha } from "./dep"; met/*cursor*/',
+    'import {} from "./dep"; met/*cursor*/',
+    '"use strict";\nmet/*cursor*/',
+    '#!/usr/bin/env node\n// license\nmet/*cursor*/',
+    'import { alpha } from "./dep"; let x: Sh/*cursor*/',
+    'class C { #private = 1; method() { this./*cursor*/ } }',
+    'const known = 1; function f() { this./*cursor*/ }',
+
 
     'const object = { alpha: 1, optional: true }; object["/*cursor*/"]',
     'let state: "ready" | "done" = "/*cursor*/";',
@@ -155,6 +169,7 @@ def apply_completion(text, offset, encoding, item, defaults):
 class ConfiguredPeer(Peer):
     def __init__(self, command, cwd, config):
         self.config = config or {}
+        self.watchers = {}
         super().__init__(command, cwd)
 
     def respond(self, value):
@@ -163,6 +178,13 @@ class ConfiguredPeer(Peer):
             result = [self.config if item['section'] in ['typescript', 'javascript'] else {} for item in value['params']['items']]
             self.write({'id': value['id'], 'result': result})
         else:
+            if value.get('method') == 'client/registerCapability':
+                for registration in value['params']['registrations']:
+                    if registration.get('method') == 'workspace/didChangeWatchedFiles':
+                        self.watchers[registration['id']] = registration['registerOptions']['watchers']
+            elif value.get('method') == 'client/unregisterCapability':
+                for registration in value['params']['unregisterations']:
+                    self.watchers.pop(registration['id'], None)
             super().respond(value)
 
 
@@ -196,7 +218,7 @@ def run(binary, root, encoding, rich, cases=CASES, filename="main.ts", auto_inse
                 result['result']['items'].sort(key=key)
             rows.append(['list', index, result])
             for item in (result.get('result') or {}).get('items', []):
-                if item.get('data',{}).get('source') == 'ObjectLiteralMethodSnippet/' or item['label'].startswith(('Pkg', 'case ')) or item['label'].rstrip('?') in ['alpha', 'local', 'name', 'optional', 'method', 'Shape', 'Existing', 'string', 'title', 'onClick', 'greet']:
+                if item.get('data',{}).get('autoImport') or item.get('data',{}).get('source') in ['ObjectLiteralMethodSnippet/', 'TypeOnlyAlias/'] or item['label'].startswith(('Pkg', 'case ')) or item['label'].rstrip('?') in ['alpha', 'local', 'name', 'optional', 'method', 'Shape', 'Existing', 'string', 'title', 'onClick', 'greet', 'Default', 'Shared', 'PkgDefault']:
                     resolved = peer.request('completionItem/resolve', item)
                     rows.append(['resolve', index, item['label'], resolved])
                     if item.get('data', {}).get('autoImport'):
@@ -224,6 +246,20 @@ JSX_CASES = [JSX_HEADER + text for text in [
 ]]
 AUTO_CASES = ['const element = <div>/*cursor*/', 'const element = <div>/*cursor*/</div>', 'const element = <>/*cursor*/', 'const element = <div><div>/*cursor*/</div>', 'const element = <Widget.Child>/*cursor*/', 'const element = <dollar$>/*cursor*/', 'const x = 1 >/*cursor*/ 0']
 JS_CASES = [
+    'const { alpha } = require("./dep"); met/*cursor*/',
+    'const { alpha: renamed } = require("./dep"); met/*cursor*/',
+    'const { alpha, } = require("./dep"); met/*cursor*/',
+    'const {\n    alpha,\n} = require("./dep"); met/*cursor*/',
+    'const dependency = require("./dep"); met/*cursor*/',
+    '/** @type {Sh/*cursor*/} */ const value = 1;',
+    '/** @import {Shape} from "./dep" */\n/** @type {Ot/*cursor*/} */ const value = 1;',
+
+    'const known=1; function f(){ this./*cursor*/ }',
+    '// @ts-check\nconst known=1; function f(){ this./*cursor*/ }',
+    'const someName=1; const obj={ alpha:1 }; obj./*cursor*/',
+    'const typed = 1; const other = { "quoted":1, "not-an-identifier":1 }; unknown./*cursor*/',
+    'const known=1; ident/*cursor*/',
+
     '/**\n * @param /*cursor*/\n */\nfunction greet(name, count) {}',
     '/**\n * @param /*cursor*/\n */\nfunction greet(name="hi", count=1, ...rest) {}',
     '/**\n * @param /*cursor*/\n */\nfunction greet({one, two: renamed, child: {name}}) {}',
@@ -261,6 +297,11 @@ CLASS_SNIPPET_CASES = [
     'class Base { protected method(arg: number): void {} } class Derived extends Base { public /*cursor*/ }',
     'class Base { protected method(arg: number): void {} } class Derived extends Base { public met/*cursor*/ }',
     'abstract class Base { abstract method(arg: number): void } abstract class Derived extends Base { abstract /*cursor*/ }',
+    'class Base { static value = 1; method() {} } class Derived extends Base { static /*cursor*/ }',
+    'interface Base { "not-an-identifier": string; "dollar$"(x: number): void } class Derived implements Base { /*cursor*/ }',
+    'interface Base { method(x: number): void } class Derived implements Base { method(x: number) {} /*cursor*/ }',
+    'import { ImportedBase } from "./base"; import type { Shape } from "./dep"; class Derived extends ImportedBase { /*cursor*/ }',
+    'import { ImportedBase } from "./base"; import {\n    alpha,\n} from "./dep"; class Derived extends ImportedBase { /*cursor*/ }',
 ]
 
 SNIPPET_CASES = [
@@ -288,7 +329,7 @@ def package_fixture(root):
     root.mkdir()
     (root / 'tsconfig.json').write_text('{"compilerOptions":{"noLib":true,"module":"nodenext","paths":{"alias/*":["./src/*"],"ext/*":["./src/*.js"],"prefix*end":["./src/pre*.ts"]}},"files":["main.ts"]}')
     (root / 'main.ts').write_text('')
-    (root / 'package.json').write_text('{"type":"module","dependencies":{"sample":"*","conditional":"*","legacy":"*","typed":"*","fallback":"*"},"devDependencies":{"dev-only":"*"},"optionalDependencies":{"optional-only":"*"},"imports":{"#internal/*":"./src/*.js"}}')
+    (root / 'package.json').write_text('{"type":"module","dependencies":{"sample":"*","conditional":"*","legacy":"*","typed":"*","fallback":"*","symlinked":"*","require-package":"*"},"devDependencies":{"dev-only":"*"},"optionalDependencies":{"optional-only":"*"},"imports":{"#internal/*":"./src/*.js"}}')
     files = {
         'typed/package.json': '{"types":"index.d.ts"}',
         'typed/index.d.ts': 'export declare const PkgOwnTypes: number;',
@@ -309,6 +350,8 @@ def package_fixture(root):
         'dev-only/index.d.ts': 'export declare const PkgDevOnly: number;',
         'optional-only/package.json': '{"types":"index.d.ts"}',
         'optional-only/index.d.ts': 'export declare const PkgOptionalOnly: number;',
+        'require-package/package.json': '{"types":"index.d.ts"}',
+        'require-package/index.d.ts': 'declare function PkgFactory(): void; export = PkgFactory;',
         'not-dependency/package.json': '{"types":"index.d.ts"}',
         'not-dependency/index.d.ts': 'export declare const PkgHidden: number;',
     }
@@ -320,6 +363,113 @@ def package_fixture(root):
         file = root / 'node_modules' / name
         file.parent.mkdir(parents=True, exist_ok=True)
         file.write_text(text)
+
+    store = root / '.store'
+    store.mkdir()
+    (store / 'package.json').write_text('{"types":"index.d.ts"}')
+    (store / 'index.d.ts').write_text('export { PkgShared } from "shared"; export declare const PkgLinked: number;')
+    shared = root / '.shared'
+    shared.mkdir()
+    (shared / 'index.d.ts').write_text('export declare const PkgShared: number;')
+    (store / 'node_modules').mkdir()
+    (store / 'node_modules' / 'shared').symlink_to(shared, target_is_directory=True)
+    (root / 'node_modules' / 'symlinked').symlink_to(store, target_is_directory=True)
+
+def run_invalidation(binary, root, encoding):
+    root.mkdir(exist_ok=True)
+    (root / 'tsconfig.json').write_text('{"compilerOptions":{"noLib":true},"files":["main.ts","dep.ts"]}')
+    (root / 'main.ts').write_text('Cha')
+    (root / 'dep.ts').write_text('export const ChangedOne = 1;')
+    peer = ConfiguredPeer([str(binary), '--lsp', '--stdio'], root, {})
+    rows = []
+    main_uri, dep_uri = ((root / name).as_uri() for name in ['main.ts', 'dep.ts'])
+    def query(expected):
+        response = peer.request('textDocument/completion', {'textDocument': {'uri': main_uri}, 'position': {'line': 0, 'character': 3}})
+        response['items'].sort(key=key)
+        labels = {item['label'] for item in response['items']}
+        assert {name for name in labels if name.startswith('Changed')} == expected, (expected, labels)
+        rows.append(['invalidation', len(rows), response])
+    try:
+        peer.request('initialize', {'processId': None, 'rootUri': root.as_uri(), 'capabilities': {
+            'general': {'positionEncodings': [encoding]},
+            'workspace': {'configuration': True, 'didChangeWatchedFiles': {'dynamicRegistration': True}}}})
+        peer.send('initialized', {})
+        peer.send('textDocument/didOpen', {'textDocument': {'uri': main_uri, 'languageId': 'typescript', 'version': 1, 'text': 'Cha'}})
+        query({'ChangedOne'})
+        peer.send('textDocument/didChange', {'textDocument': {'uri': main_uri, 'version': 2}, 'contentChanges': [{'text': 'Cha // same file edit'}]})
+        query({'ChangedOne'})
+        peer.send('textDocument/didOpen', {'textDocument': {'uri': dep_uri, 'languageId': 'typescript', 'version': 1, 'text': 'export const ChangedOne = 1;'}})
+        peer.send('textDocument/didChange', {'textDocument': {'uri': dep_uri, 'version': 2}, 'contentChanges': [{'text': 'export const ChangedTwo = 2;'}]})
+        query({'ChangedTwo'})
+        peer.config = {'preferences': {'autoImportFileExcludePatterns': ['**/dep.ts']}}
+        peer.send('workspace/didChangeConfiguration', {'settings': {'js/ts': peer.config}})
+        query(set())
+        peer.config = {}
+        peer.send('workspace/didChangeConfiguration', {'settings': {'js/ts': peer.config}})
+        query({'ChangedTwo'})
+        (root / 'dep.ts').write_text('export const ChangedDisk = 3;')
+        peer.send('textDocument/didClose', {'textDocument': {'uri': dep_uri}})
+        peer.send('workspace/didChangeWatchedFiles', {'changes': [{'uri': dep_uri, 'type': 2}]})
+        query({'ChangedDisk'})
+        (root / 'tsconfig.json').write_text('{"compilerOptions":{"noLib":true},"files":["main.ts"]}')
+        peer.send('workspace/didChangeWatchedFiles', {'changes': [{'uri': (root / 'tsconfig.json').as_uri(), 'type': 2}]})
+        # Native retains its project bucket on removal alone; adding a new
+        # source or modifying another source rebuilds it.
+        query({'ChangedDisk'})
+        peer.request('shutdown'); peer.send('exit')
+        return rows
+    finally:
+        peer.close()
+
+
+def run_package_invalidation(binary, root, encoding):
+    root.mkdir(exist_ok=True)
+    dep = root / 'node_modules/pkg'
+    dep.mkdir(parents=True, exist_ok=True)
+    (root / 'tsconfig.json').write_text('{"compilerOptions":{"noLib":true},"files":["main.ts"]}')
+    (root / 'main.ts').write_text('Changed')
+    (root / 'package.json').write_text('{"dependencies":{"pkg":"*"}}')
+    (dep / 'package.json').write_text('{"types":"index.d.ts"}')
+    (dep / 'index.d.ts').write_text('export declare const ChangedBefore: number;')
+    peer = ConfiguredPeer([str(binary), '--lsp', '--stdio'], root, {})
+    rows = []
+    def query(expected):
+        response = peer.request('textDocument/completion', {'textDocument': {'uri': (root / 'main.ts').as_uri()}, 'position': {'line': 0, 'character': 7}})
+        response['items'].sort(key=key)
+        assert {i['label'] for i in response['items'] if i['label'].startswith('Changed')} == expected, response
+        rows.append(['package-invalidation', len(rows), response])
+    def watch(file, kind):
+        peer.send('workspace/didChangeWatchedFiles', {'changes': [{'uri': file.as_uri(), 'type': kind}]})
+    try:
+        peer.request('initialize', {'processId': None, 'rootUri': root.as_uri(), 'capabilities': {
+            'general': {'positionEncodings': [encoding]},
+            'workspace': {'configuration': True, 'didChangeWatchedFiles': {'dynamicRegistration': True}}}})
+        peer.send('initialized', {})
+        peer.send('textDocument/didOpen', {'textDocument': {'uri': (root / 'main.ts').as_uri(), 'languageId': 'typescript', 'version': 1, 'text': 'Changed'}})
+        query({'ChangedBefore'})
+        peer.drain(0.05)
+        # Verify that a real editor can send the next event: do not merely
+        # inject a change for a path the server never subscribed to.
+        patterns = [w['globPattern'] for group in peer.watchers.values() for w in group]
+        assert any(isinstance(p, str) and fnmatch.fnmatchcase(str(dep / 'index.d.ts'), p) for p in patterns), patterns
+        (dep / 'index.d.ts').write_text('export declare const ChangedAfter: number;')
+        watch(dep / 'index.d.ts', 2)
+        query({'ChangedAfter'})
+        (dep / 'index.d.ts').unlink()
+        watch(dep / 'index.d.ts', 3)
+        query(set())
+        (dep / 'index.d.ts').write_text('export declare const ChangedRecreated: number;')
+        watch(dep / 'index.d.ts', 1)
+        query({'ChangedRecreated'})
+        (dep / 'next.d.ts').write_text('export declare const ChangedEntry: number;')
+        (dep / 'package.json').write_text('{"types":"next.d.ts"}')
+        watch(dep / 'package.json', 2)
+        query({'ChangedEntry'})
+        peer.request('shutdown'); peer.send('exit')
+        return rows
+    finally:
+        peer.close()
+
 
 def main():
     with tempfile.TemporaryDirectory(prefix='tsr-l4-') as directory:
@@ -345,6 +495,13 @@ def main():
                     rows.extend(run(ROOT / 'target/phase5' / binary, root, encoding, rich, IMPORT_STATEMENT_CASES, config={'suggest': {'includeCompletionsForImportStatements': True}}))
                     rows.extend(run(ROOT / 'target/phase5' / binary, root, encoding, rich, SNIPPET_CASES, config={'suggest': {'objectLiteralMethodSnippets': {'enabled': True}}}))
                     rows.extend(run(ROOT / 'target/phase5' / binary, root, encoding, rich, CLASS_SNIPPET_CASES, config={'suggest': {'classMemberSnippets': {'enabled': True}}}))
+                for formatting in [
+                    {'indentSize': 2, 'tabSize': 2, 'semicolons': 'remove', 'newLineCharacter': '\r\n'},
+                    {'convertTabsToSpaces': False, 'insertSpaceBeforeFunctionParenthesis': True, 'placeOpenBraceOnNewLineForFunctions': True, 'insertSpaceAfterCommaDelimiter': False, 'insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces': False},
+                ]:
+                    config = {'format': formatting, 'suggest': {'classMemberSnippets': {'enabled': True}, 'objectLiteralMethodSnippets': {'enabled': True}}}
+                    for binary, rows in [('go-lsp', expected), ('../debug/tsrust', actual)]:
+                        rows.extend(run(ROOT / 'target/phase5' / binary, root, encoding, rich, SNIPPET_CASES[:1] + CLASS_SNIPPET_CASES[:2] + ['met/*cursor*/', 'import {} from \"./dep\"; met/*cursor*/'], config=config))
                 for preferences in [
                     {'importModuleSpecifier': 'relative', 'importModuleSpecifierEnding': 'js'},
                     {'importModuleSpecifier': 'non-relative', 'autoImportSpecifierExcludeRegexes': ['^sample$', '/^CONDITIONAL/i']},
@@ -352,6 +509,10 @@ def main():
                 ]:
                     for binary, rows in [('go-lsp', expected), ('../debug/tsrust', actual)]:
                         rows.extend(run(ROOT / 'target/phase5' / binary, package_root, encoding, rich, ['Pkg/*cursor*/'], config={'preferences': preferences}))
+                expected.extend(run_invalidation(ROOT / 'target/phase5/go-lsp', root / 'invalidation', encoding))
+                actual.extend(run_invalidation(ROOT / 'target/debug/tsrust', root / 'invalidation', encoding))
+                expected.extend(run_package_invalidation(ROOT / 'target/phase5/go-lsp', root / 'package-invalidation', encoding))
+                actual.extend(run_package_invalidation(ROOT / 'target/debug/tsrust', root / 'package-invalidation', encoding))
                 if actual != expected:
                     output = ROOT / 'target/phase5/l4-diff'
                     output.mkdir(exist_ok=True)

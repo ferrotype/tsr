@@ -1,7 +1,7 @@
 //! Formatting settings. Upstream keeps them in the language service's utility
-//! package (`ls/lsutil/formatcodeoptions.go`); they live here until that crate
-//! exists. Parsing them from editor configuration and converting to and from
-//! the protocol's options belong to the language service and are not ported.
+//! package (`ls/lsutil/formatcodeoptions.go`). These settings are shared by the
+//! formatter and language service; `tsr_ls::apply_format_settings` reads editor
+//! configuration without coupling the formatter to the protocol.
 
 use tsr_core::Tristate;
 

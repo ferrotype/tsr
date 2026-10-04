@@ -129,6 +129,7 @@ pub struct Session {
     update: Mutex<()>,
     pending: Mutex<Pending>,
     watches: OnceLock<Arc<crate::watch::WatchManager>>,
+    auto_import_watches: Mutex<crate::watch::WatchSet>,
     events: OnceLock<std::sync::mpsc::Sender<SessionEvent>>,
     timers: timers::Timers,
 }
@@ -219,6 +220,7 @@ impl Session {
             update: Mutex::new(()),
             pending: Mutex::default(),
             watches: OnceLock::new(),
+            auto_import_watches: Mutex::default(),
             events: OnceLock::new(),
         })
     }
@@ -229,6 +231,62 @@ impl Session {
             .expect("session snapshot")
             .clone()
             .ok_or(Error::Closed)
+    }
+    /// A completion publishes auxiliary read dependencies after the compiler
+    /// snapshot has been built. Register only caches on the current snapshot;
+    /// an old in-flight completion must not resurrect retired watches.
+    pub fn sync_auto_import_watches(&self) {
+        let Some(manager) = self.watches.get() else {
+            return;
+        };
+        let mut registered = self.auto_import_watches.lock().unwrap();
+        let Ok(snapshot) = self.snapshot() else {
+            return;
+        };
+        let Some(state) = snapshot.state() else {
+            return;
+        };
+        let mut next = crate::watch::WatchSet::new();
+        for (key, project) in &state.projects {
+            let Some(cache) = project.auto_import_cache() else {
+                continue;
+            };
+            let deps = cache.dependencies();
+            if deps.files.is_empty() && deps.directories.is_empty() {
+                continue;
+            }
+            let key = JsString::from_bytes([b"auto-import:".as_slice(), key.as_bytes()].concat());
+            let watch = registered.get(&key).cloned().unwrap_or_else(|| {
+                crate::watch::WatchedFiles::new(
+                    key.clone(),
+                    crate::watch::ALL_CHANGES,
+                    self.options.relative_watch_patterns,
+                )
+            });
+            let patterns = deps
+                .files
+                .into_iter()
+                .map(|p| JsString::from_bytes(crate::watch::literal_pattern(p.as_bytes())))
+                .chain(deps.directories.into_iter().map(|p| {
+                    JsString::from_bytes(
+                        [
+                            crate::watch::literal_pattern(p.as_bytes()).as_slice(),
+                            b"/**",
+                        ]
+                        .concat(),
+                    )
+                }))
+                .collect();
+            next.insert(
+                key,
+                watch.with_input(crate::watch::PatternsAndIgnored {
+                    patterns_inside_workspace: patterns,
+                    ..Default::default()
+                }),
+            );
+        }
+        manager.enqueue(registered.clone(), next.clone());
+        *registered = next;
     }
     pub fn subscribe(&self) -> std::sync::mpsc::Receiver<SessionEvent> {
         let (send, receive) = std::sync::mpsc::channel();
@@ -663,6 +721,7 @@ impl Session {
         if let Some(watches) = self.watches.get() {
             watches.enqueue(old.watches(), next.state().unwrap().watches());
         }
+        self.sync_auto_import_watches();
         if self.events.get().is_some() {
             self.send_event(SessionEvent::Published {
                 previous,

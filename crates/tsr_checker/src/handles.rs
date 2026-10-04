@@ -558,6 +558,17 @@ impl Operation<'_> {
         self.state().symbol(symbol)
     }
 
+    /// The source spelling of private names, otherwise the stored symbol name.
+    pub fn symbol_display_name(&self, symbol: SymbolRef) -> Result<JsString, Error> {
+        let symbol = self.symbol(symbol)?;
+        if let Some(declaration) = symbol.value_declaration() {
+            return Ok(JsString::from_bytes(
+                tsr_ast::symbol_name(&symbol, self.state().ast(declaration)?)?.as_bytes(),
+            ));
+        }
+        Ok(JsString::from_bytes(symbol.name_bytes()))
+    }
+
     pub fn symbol_declarations(
         &self,
         symbol: SymbolRef,

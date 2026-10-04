@@ -931,3 +931,40 @@ fn unopened_dependency_uses_its_containing_project_without_inferred_options() {
         .source_file(b"/src/main.ts")
         .is_some());
 }
+
+#[test]
+fn auxiliary_package_changes_retire_only_the_current_completion_cache() {
+    let (_, session) = setup(
+        &[
+            (
+                "/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true},"files":["main.ts"]}"#,
+            ),
+            ("/main.ts", "export {}"),
+            ("/node_modules/pkg/index.d.ts", "export const Before = 1;"),
+        ],
+        &Counters::new(),
+    );
+    let old = open(&session, "/main.ts", "export {}");
+    let project = old.project_for_file(b"/main.ts").unwrap();
+    let program = project.program().unwrap().clone();
+    let cache = project.auto_import_cache().unwrap();
+    let mut registry = tsr_autoimport::Registry::default();
+    registry
+        .dependencies
+        .files
+        .insert(js("/node_modules/pkg/index.d.ts"));
+    cache.publish(registry);
+    session
+        .did_change_watched_files([tsr_lsproto::FileEvent {
+            uri: uri("/node_modules/pkg/index.d.ts"),
+            r#type: tsr_lsproto::FileChangeType::CHANGED,
+        }])
+        .unwrap();
+    let current = session.snapshot_for_file(&uri("/main.ts")).unwrap();
+    let project = current.project_for_file(b"/main.ts").unwrap();
+    assert!(Arc::ptr_eq(&program, project.program().unwrap()));
+    assert!(cache.is_prepared(), "the retained snapshot was mutated");
+    assert!(!project.auto_import_cache().unwrap().is_prepared());
+    session.close();
+}

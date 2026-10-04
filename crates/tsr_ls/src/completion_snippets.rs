@@ -32,24 +32,21 @@ pub(super) fn settings(
     options: &CompletionOptions,
     syntax: &Syntax<'_>,
 ) -> Result<tsr_format::FormatCodeSettings> {
-    let mut settings = tsr_format::FormatCodeSettings::default();
-    settings.editor.new_line_character = options
-        .newline
-        .as_deref()
-        .unwrap_or("\n")
-        .as_bytes()
-        .to_vec();
+    let mut settings = options.format.clone();
+    if let Some(newline) = &options.newline {
+        settings.editor.new_line_character = newline.as_bytes().to_vec();
+    }
     let mut jsdoc = tsr_ast::EagerJsDocProvider::default();
     let mut file = tsr_format::FormatFile {
         view: syntax.view,
         source: syntax.source,
         jsdoc: &mut jsdoc,
     };
-    settings.semicolons = if file.probably_uses_semicolons()? {
-        tsr_format::SemicolonPreference::Insert
-    } else {
-        tsr_format::SemicolonPreference::Remove
-    };
+    if settings.semicolons == tsr_format::SemicolonPreference::Ignore
+        && !file.probably_uses_semicolons()?
+    {
+        settings.semicolons = tsr_format::SemicolonPreference::Remove;
+    }
     Ok(settings)
 }
 impl LanguageService<'_> {

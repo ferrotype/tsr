@@ -34,6 +34,7 @@ pub use indent::{
 };
 pub use scanner::TextRangeWithKind;
 pub use settings::{EditorSettings, FormatCodeSettings, IndentStyle, SemicolonPreference};
+pub use span::get_indentation_string;
 pub use tsr_astnav::Error;
 pub use util::get_line_start_position_for_position;
 

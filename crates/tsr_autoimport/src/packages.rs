@@ -14,6 +14,7 @@ use tsr_vfs::FileSystem;
 pub struct Package {
     pub name: JsString,
     pub entrypoints: Vec<ResolvedEntrypoint>,
+    paths: Arc<crate::realpaths::PackagePaths>,
 }
 fn directories(mut path: Vec<u8>) -> Vec<Vec<u8>> {
     let mut result = Vec::new();
@@ -77,7 +78,16 @@ pub fn discover(
         for resolution in program.resolutions() {
             let name = &resolution.result.package_id.name;
             if !name.is_empty() {
-                allowed.insert(name.clone());
+                allowed.insert(JsString::from_bytes(
+                    tsr_module::package_name_from_types_package_name(name.as_bytes()),
+                ));
+            }
+        }
+        for name in program.options().types.iter().flatten() {
+            if name.as_bytes() != b"*" {
+                allowed.insert(JsString::from_bytes(
+                    tsr_module::package_name_from_types_package_name(name.as_bytes()),
+                ));
             }
         }
     }
@@ -91,6 +101,9 @@ pub fn discover(
         }
         let mut names = BTreeSet::new();
         for name in host.entries(&modules)?.directories.into_iter().flatten() {
+            if name.is_empty() || name.as_bytes().starts_with(b".") {
+                continue;
+            }
             if name.as_bytes().starts_with(b"@") {
                 for child in host
                     .entries(&path::resolve(&modules, &[name.as_bytes()]))?
@@ -115,6 +128,7 @@ pub fn discover(
                 continue;
             }
             let mut entrypoints = Vec::new();
+            let mut paths = None;
             // The native registry tries @types only when the package has no
             // extractable TypeScript entrypoints (including file exclusions).
             for package_name in [
@@ -126,7 +140,20 @@ pub fn discover(
                     let package = resolver.package_json(&location)?.unwrap_or_else(|| {
                         Arc::new(tsr_module::PackageJson::parse(&location, b"{}"))
                     });
-                    entrypoints.extend(resolver.entrypoints(
+                    let package_paths = Arc::new(crate::realpaths::PackagePaths::new(
+                        host.clone(),
+                        &location,
+                    )?);
+                    let mut package_resolver = Resolver::with_options(
+                        package_paths.wrapped(),
+                        Arc::new(tsr_core::CompilerOptions::default()),
+                        program.current_directory(),
+                        tsr_module::ResolverOptions {
+                            allow_live_host: true,
+                            ..Default::default()
+                        },
+                    )?;
+                    entrypoints.extend(package_resolver.entrypoints(
                         &package,
                         name.as_bytes(),
                         package_name.starts_with(b"@types/")
@@ -143,12 +170,17 @@ pub fn discover(
                             .retain(|entry| !excludes.matches(entry.resolved_file_name.as_bytes()));
                     }
                     if !entrypoints.is_empty() {
+                        paths = Some(package_paths);
                         break;
                     }
                 }
             }
-            if !entrypoints.is_empty() {
-                result.push(Package { name, entrypoints });
+            if let Some(paths) = paths {
+                result.push(Package {
+                    name,
+                    entrypoints,
+                    paths,
+                });
             }
         }
     }
@@ -159,13 +191,12 @@ impl Package {
     pub fn load(
         &self,
         parent: &Program,
-        host: Arc<dyn FileSystem>,
         counters: &tsr_arena::Counters,
     ) -> Result<Arc<Program>, Error> {
         let roots: BTreeSet<_> = self
             .entrypoints
             .iter()
-            .map(|e| JsString::from_bytes(e.symlink_or_realpath()))
+            .map(|e| self.paths.to_symlink(e.symlink_or_realpath()))
             .collect();
         // The pin's aliasResolver has empty compiler options and no default
         // library. Root entrypoints and their imported aliases supply its graph.
@@ -177,7 +208,7 @@ impl Package {
         Ok(Arc::new(Program::load_live(
             tsr_compiler::ProgramOptions {
                 config: tsr_tsoptions::ParsedCommandLine::new(options, roots.into_iter().collect()),
-                host,
+                host: self.paths.wrapped(),
                 current_directory: JsString::from_bytes(parent.current_directory()),
                 default_library_path: JsString::from_bytes(parent.default_library_path()),
                 skip_module_resolution: false,

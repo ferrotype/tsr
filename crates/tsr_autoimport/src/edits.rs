@@ -5,6 +5,7 @@ use tsr_checker::Error;
 use tsr_lsproto as lsp;
 
 pub struct Options<'a> {
+    pub format: &'a tsr_format::FormatCodeSettings,
     pub single_quote: bool,
     pub semicolons: bool,
     pub prefer_type_only: bool,
@@ -105,32 +106,72 @@ pub(crate) fn after_statement(text: &[u8], pos: usize) -> usize {
         pos
     }
 }
+// port: tsc/internal/ls/change/trackerimpl.go:Tracker.getInsertionPositionAtSourceFileTop
 pub(crate) fn top_position(view: AstView<'_>, source: NodeId) -> Result<i64, Error> {
     let file = view.source_file(source)?;
     let text = file.text().as_bytes();
-    let mut pos = 0;
-    if text.starts_with(b"#!") {
-        pos = text
-            .iter()
-            .position(|&b| b == b'\n' || b == b'\r')
-            .unwrap_or(text.len());
-    }
-    for node in view
-        .node_slice(view.node(source)?.statements(view)?)?
-        .iter()
-        .flatten()
-    {
+    let advance = |mut pos: usize| {
+        if text.get(pos) == Some(&b'\r') {
+            pos += 1;
+            if text.get(pos) == Some(&b'\n') {
+                pos += 1;
+            }
+        } else if text.get(pos) == Some(&b'\n') {
+            pos += 1;
+        }
+        pos
+    };
+    let statements = view.node_slice(view.node(source)?.statements(view)?)?;
+    let mut last = None;
+    for node in statements.iter().flatten() {
         let n = view.node(node)?;
         if n.kind() == K::ExpressionStatement
             && n.expression()
                 .is_some_and(|e| view.node(e).is_ok_and(|e| e.kind() == K::StringLiteral))
         {
-            pos = n.end() as usize;
+            last = Some(n.end() as usize);
         } else {
             break;
         }
     }
-    Ok(pos as i64)
+    if let Some(last) = last {
+        return Ok(advance(last) as i64);
+    }
+    let pos = advance(tsr_scanner::get_shebang(text).len());
+    let line = |pos: i64| {
+        tsr_jsstring::scanner_positions::compute_line_of_position(
+            file.ecma_line_map(),
+            pos as isize,
+        )
+    };
+    let first = statements
+        .iter()
+        .flatten()
+        .next()
+        .map(|n| start(view, source, n))
+        .transpose()?;
+    let mut last: Option<tsr_scanner::CommentRange> = None;
+    let mut pinned = false;
+    for comment in tsr_scanner::get_leading_comment_ranges(text, pos as i64) {
+        if tsr_printer::is_pinned_comment(text, &comment)
+            || tsr_printer::is_recognized_triple_slash_comment(text, &comment)
+        {
+            last = Some(comment);
+            pinned = true;
+            continue;
+        }
+        if let Some(last) = &last {
+            if pinned || line(comment.loc.pos()) >= line(last.loc.end()) + 2 {
+                break;
+            }
+        }
+        if first.is_some_and(|first| line(first) < line(comment.loc.end()) + 2) {
+            break;
+        }
+        last = Some(comment);
+        pinned = false;
+    }
+    Ok(last.map_or(pos, |last| advance(last.loc.end() as usize)) as i64)
 }
 
 #[derive(Clone, Copy)]

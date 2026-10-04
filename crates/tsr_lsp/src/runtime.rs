@@ -410,9 +410,8 @@ impl Runtime {
             _ if crate::language_features::handles(method) => {
                 let feature = crate::language_features::Request::decode(method, params)?;
                 let uri = feature.uri();
-                let snapshot = self
-                    .ready()?
-                    .session()
+                let session = self.ready()?.session().clone();
+                let snapshot = session
                     .flush_with_host(Some(uri), host)
                     .map_err(crate::project_error)?;
                 let path = uri.path(
@@ -456,9 +455,14 @@ impl Runtime {
                     .as_ref()
                     .map(ToString::to_string)
                     .unwrap_or_default();
+                let sync_imports = matches!(
+                    &feature,
+                    crate::language_features::Request::Completion(_)
+                        | crate::language_features::Request::ResolveCompletion(_, _)
+                );
                 return Ok(Dispatch::Work(Box::new(move || {
                     let _snapshot = snapshot;
-                    crate::language_features::execute(
+                    let result = crate::language_features::execute(
                         &context,
                         &request_id,
                         project.as_ref(),
@@ -466,7 +470,11 @@ impl Runtime {
                         encoding,
                         &capabilities,
                         &options,
-                    )
+                    );
+                    if sync_imports {
+                        session.sync_auto_import_watches();
+                    }
+                    result
                 })));
             }
             _ if unimplemented_method(method) => {
@@ -771,6 +779,23 @@ impl Runtime {
             ..Default::default()
         };
         if let lsp::Any::Object(sections) = values {
+            if let Some(lsp::Any::Object(editor)) = sections.get("editor") {
+                let mut editor = editor.clone();
+                if !editor.contains_key("indentSize") {
+                    if let Some(value) = editor.get("tabSize").cloned() {
+                        editor.insert("indentSize".into(), value);
+                    }
+                }
+                if !editor.contains_key("convertTabsToSpaces") {
+                    if let Some(value) = editor.get("insertSpaces").cloned() {
+                        editor.insert("convertTabsToSpaces".into(), value);
+                    }
+                }
+                tsr_ls::apply_format_settings(&editor, true, &mut next.completion.format);
+                if let Some(lsp::Any::String(value)) = editor.get("newLineCharacter") {
+                    next.completion.newline = Some(value.clone());
+                }
+            }
             for section in ["javascript", "typescript", "js/ts"] {
                 if let Some(lsp::Any::Object(fields)) = sections.get(section) {
                     for raw in [Some(fields), fields.get("unstable").and_then(object)]
@@ -1223,6 +1248,7 @@ fn apply_completion_preferences(
     options: &mut tsr_ls::CompletionOptions,
     auto_closing: &mut bool,
 ) {
+    tsr_ls::apply_format_settings(fields, raw, &mut options.format);
     let get = |name, path| {
         if raw {
             fields.get(name)

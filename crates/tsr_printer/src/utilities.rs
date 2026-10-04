@@ -82,7 +82,7 @@ fn match_quoted_string(text: &[u8], pos: &mut usize) -> bool {
 /// `/// <reference path="..." />`, `types`, `lib`, `no-default-lib`,
 /// `/// <amd-dependency path="..." />` and `/// <amd-module />`.
 // port: tsc/internal/printer/utilities.go:IsRecognizedTripleSlashComment
-pub(crate) fn is_recognized_triple_slash_comment(text: &[u8], comment: &CommentRange) -> bool {
+pub fn is_recognized_triple_slash_comment(text: &[u8], comment: &CommentRange) -> bool {
     let (comment_pos, comment_end) = (comment.loc.pos(), comment.loc.end());
     if comment.kind == K::SingleLineCommentTrivia
         && comment.loc.len() > 2
@@ -148,7 +148,7 @@ pub(crate) fn is_jsdoc_like_text(text: &[u8], comment: &CommentRange) -> bool {
 }
 
 // port: tsc/internal/printer/utilities.go:IsPinnedComment
-pub(crate) fn is_pinned_comment(text: &[u8], comment: &CommentRange) -> bool {
+pub fn is_pinned_comment(text: &[u8], comment: &CommentRange) -> bool {
     comment.kind == K::MultiLineCommentTrivia
         && comment.loc.len() > 5
         && text[index(comment.loc.pos() + 2)] == b'!'

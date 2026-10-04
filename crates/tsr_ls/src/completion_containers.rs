@@ -24,6 +24,11 @@ impl LanguageService<'_> {
         if matches!(kind, Container::Interface | Container::Constructor) {
             return Ok(Some(Vec::new()));
         }
+        let class_flags = if kind == Container::Class {
+            class_flags(syntax, context, position)?
+        } else {
+            0
+        };
         let view = syntax.view;
         let mut symbols = Vec::new();
         let existing: Vec<tsr_ast::NodeId>;
@@ -83,11 +88,27 @@ impl LanguageService<'_> {
                     tsr_ast::utilities_class::get_class_extends_heritage_element(view, node)?
                         .into_iter()
                         .collect::<Vec<_>>();
-                bases.extend(
-                    tsr_ast::utilities_class::get_implements_heritage_clause_elements(view, node)?,
-                );
+                if class_flags & mf::OVERRIDE == 0 {
+                    bases.extend(
+                        tsr_ast::utilities_class::get_implements_heritage_clause_elements(
+                            view, node,
+                        )?,
+                    );
+                }
+                if class_flags & mf::PRIVATE != 0 {
+                    bases.clear();
+                }
                 for base in bases {
-                    let ty = checker.get_type_at_location(base)?;
+                    let mut ty = checker.get_type_at_location(base)?;
+                    if class_flags & mf::STATIC != 0 {
+                        let Some(symbol) = checker.type_symbol(ty)? else {
+                            continue;
+                        };
+                        ty = checker.get_type_of_symbol_at_location(
+                            checker.symbol_ref(symbol)?,
+                            Some(node),
+                        )?;
+                    }
                     symbols.extend(checker.properties_of_type(ty)?);
                 }
                 existing = view
@@ -135,6 +156,25 @@ impl LanguageService<'_> {
                 continue;
             }
             let read = view.node(id)?;
+            if kind == Container::Class {
+                if !matches!(
+                    read.kind().known(),
+                    Some(
+                        K::PropertyDeclaration
+                            | K::MethodDeclaration
+                            | K::GetAccessor
+                            | K::SetAccessor
+                    )
+                ) {
+                    continue;
+                }
+                let flags = read.modifier_flags(view)?;
+                if flags & mf::PRIVATE != 0
+                    || (flags & mf::STATIC != 0) != (class_flags & mf::STATIC != 0)
+                {
+                    continue;
+                }
+            }
             if matches!(
                 read.kind().known(),
                 Some(K::SpreadAssignment | K::JsxSpreadAttribute)
@@ -173,6 +213,9 @@ impl LanguageService<'_> {
                 continue;
             }
             if kind == Container::Class {
+                if checker.symbol_declarations(symbol)?.is_empty() {
+                    continue;
+                }
                 if let Some(decl) = s.value_declaration() {
                     let read = checker.node(decl)?;
                     if read.modifier_flags(self.view(decl)?)? & mf::PRIVATE != 0
@@ -291,4 +334,46 @@ fn nonpublic(checker: &Operation<'_>, properties: &[tsr_checker::SymbolRef]) -> 
         }
     }
     Ok(false)
+}
+
+// Flags for the member being completed, distinct from the modifiers retained in
+// a generated snippet: a half-typed identifier can itself stand for a modifier.
+fn class_flags(syntax: &mut Syntax<'_>, context: &Context, position: i64) -> Result<u32> {
+    let Some(token) = context.token else {
+        return Ok(0);
+    };
+    let tr = syntax.view.node(token)?;
+    let mut element = tr.parent();
+    if tr.kind() == K::SemicolonToken {
+        element = element.and_then(|n| syntax.view.node(n).ok()?.parent());
+    }
+    let mut flags = if let Some(element) = element {
+        let read = syntax.view.node(element)?;
+        if ast::is_class_element(&read) {
+            read.modifier_flags(syntax.view)?
+        } else {
+            0
+        }
+    } else {
+        0
+    };
+    if tr.kind() == K::Identifier
+        && !(syntax.start(token)? <= position && position <= i64::from(tr.end()))
+    {
+        flags |= match syntax.view.node_text(token)?.as_bytes() {
+            b"private" => mf::PRIVATE,
+            b"static" => mf::STATIC,
+            b"override" => mf::OVERRIDE,
+            _ => 0,
+        };
+    }
+    if element.is_some_and(|n| {
+        syntax
+            .view
+            .node(n)
+            .is_ok_and(|n| n.kind() == K::ClassStaticBlockDeclaration)
+    }) {
+        flags |= mf::STATIC;
+    }
+    Ok(flags)
 }

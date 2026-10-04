@@ -34,6 +34,8 @@ impl LanguageService<'_> {
                 .completion_host
                 .clone()
                 .unwrap_or_else(|| self.program.shared_host());
+            let dependencies = tsr_autoimport::DependencyTracker::default();
+            let host = dependencies.wrap(host);
             let packages = tsr_autoimport::packages::discover(
                 self.program,
                 syntax.file.path(),
@@ -46,7 +48,7 @@ impl LanguageService<'_> {
             for package in packages {
                 self.check_canceled()?;
                 let counters = tsr_arena::Counters::new();
-                let program = package.load(self.program, host.clone(), &counters)?;
+                let program = package.load(self.program, &counters)?;
                 let Some(file) = program.files().first() else {
                     continue;
                 };
@@ -101,6 +103,7 @@ impl LanguageService<'_> {
                     .filtered(|export| !excludes.matches(export.path.as_bytes()));
             }
             registry.set_build_preferences(preferences);
+            registry.dependencies = dependencies.snapshot();
             registry.requested_file = Some(tsr_jsstring::JsString::from_bytes(syntax.file.path()));
             self.auto_imports.publish(registry)
         };
@@ -333,8 +336,11 @@ impl LanguageService<'_> {
         let Some(module) = module else {
             return Ok(None);
         };
-        Ok(checker
-            .try_get_member_in_module_exports_and_properties(export.id.name.as_bytes(), module)?)
+        Ok(tsr_autoimport::lookup_export(
+            checker,
+            module,
+            export.id.name.as_bytes(),
+        )?)
     }
     pub(crate) fn resolve_auto_import(
         &mut self,
@@ -361,17 +367,14 @@ impl LanguageService<'_> {
                     .filter(|p| p.mapped.fidelity.is_exact())
                     .map(|p| i64::from(p.mapped.position))
             });
-        let semicolons = tsr_format::FormatFile {
-            view: syntax.view,
-            source: syntax.source,
-            jsdoc: &mut syntax.docs,
-        }
-        .probably_uses_semicolons()?;
+        let settings = crate::completion_snippets::settings(options, syntax)?;
+        let semicolons = settings.semicolons != tsr_format::SemicolonPreference::Remove;
         let (edits, message) = tsr_autoimport::edits::edits(
             syntax.view,
             syntax.source,
             fix,
             &tsr_autoimport::edits::Options {
+                format: &options.format,
                 usage,
                 semicolons,
                 single_quote: quote,

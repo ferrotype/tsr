@@ -34,6 +34,7 @@ pub struct CompletionOptions {
     pub enable_jsdoc: Option<bool>,
     pub generate_return: Option<bool>,
     pub newline: Option<String>,
+    pub format: tsr_format::FormatCodeSettings,
     pub locale: tsr_locale::Locale,
     pub automatic_optional_chain: Option<bool>,
     pub jsx_attribute_style: Option<String>,
@@ -61,8 +62,8 @@ pub(crate) fn properties(checker: &mut Operation<'_>, ty: TypeRef) -> Result<Vec
     )
 }
 pub(crate) fn symbol_name(checker: &Operation<'_>, symbol: SymbolRef) -> Result<String> {
-    let name = checker.symbol(symbol)?.name_bytes().to_vec();
-    Ok(String::from_utf8_lossy(&name).into_owned())
+    let name = checker.symbol_display_name(symbol)?;
+    Ok(String::from_utf8_lossy(name.as_bytes()).into_owned())
 }
 fn quote(name: &str) -> String {
     String::from_utf8(
@@ -145,7 +146,8 @@ impl LanguageService<'_> {
                 ..Default::default()
             });
         }
-        if syntax.in_comment(position)? {
+        let in_comment = syntax.in_comment(position)?;
+        if in_comment {
             match self.jsdoc_completions(checker, &mut syntax, position, options)? {
                 crate::jsdoc_completions::JsDocCompletion::Code => {}
                 crate::jsdoc_completions::JsDocCompletion::Prose => {
@@ -236,11 +238,14 @@ impl LanguageService<'_> {
         }
         let candidates =
             self.completion_symbols(checker, &mut syntax, &mut context, position, options)?;
-        if candidates.is_empty()
-            && !context.new_identifier
-            && context.filter == Filter::None
-            && context.member.is_none()
-        {
+        let checked = !syntax.file.is_js()
+            || ast::is_check_js_enabled_for_file(&syntax.file, self.program.options());
+        let filter = if context.member.is_some() {
+            Filter::None
+        } else {
+            context.filter
+        };
+        if checked && candidates.is_empty() && !context.new_identifier && filter == Filter::None {
             return Ok(lsp::CompletionItemsOrListOrNull::default());
         }
         let recommended = self.recommended_completion(checker, &mut syntax, &context, position)?;
@@ -307,12 +312,7 @@ impl LanguageService<'_> {
         }
         list.items.extend(method_snippets);
         let js = syntax.file.is_js();
-        let filter = if context.member.is_some() {
-            Filter::None
-        } else {
-            context.filter
-        };
-        for item in keywords::keywords(filter, js) {
+        for item in keywords::keywords(filter, js && !in_comment) {
             let kind = tsr_scanner::string_to_token(item.label.as_bytes());
             if context.type_only && keywords::type_keyword(kind)
                 || !context.type_only && keywords::contextual_expression(&item.label)
@@ -340,6 +340,9 @@ impl LanguageService<'_> {
             position,
             options,
         )?);
+        if !checked {
+            Self::js_completion_entries(&mut syntax, position, &mut names, &mut list)?;
+        }
         if let Some(item) =
             self.switch_case_completion(checker, &mut syntax, &context, position, options)?
         {
@@ -358,6 +361,37 @@ impl LanguageService<'_> {
             list: Some(Box::new(list)),
             ..Default::default()
         })
+    }
+
+    // port: tsc/internal/ls/completions.go:LanguageService.getJSCompletionEntries
+    fn js_completion_entries(
+        syntax: &mut Syntax<'_>,
+        position: i64,
+        names: &mut HashSet<String>,
+        list: &mut lsp::CompletionList,
+    ) -> Result<()> {
+        for (name, pos) in tsr_ast::source_file_tables::get_name_table(
+            syntax.view,
+            &mut syntax.docs,
+            syntax.source,
+        )? {
+            if i64::from(pos) == position
+                || !tsr_scanner::is_identifier_text(&name, tsr_core::LanguageVariant::STANDARD)
+            {
+                continue;
+            }
+            let name = String::from_utf8_lossy(&name).into_owned();
+            if names.insert(name.clone()) {
+                list.items.push(Some(Box::new(lsp::CompletionItem {
+                    label: name,
+                    kind: Some(Box::new(lsp::CompletionItemKind::TEXT)),
+                    sort_text: Some(Box::new("18".into())),
+                    commit_characters: Some(Box::default()),
+                    ..Default::default()
+                })));
+            }
+        }
+        Ok(())
     }
 
     fn completion_trigger(
@@ -771,15 +805,36 @@ impl LanguageService<'_> {
     ) -> Result<Option<lsp::CompletionItem>> {
         let symbol = candidate.symbol;
         let mut name = symbol_name(checker, symbol)?;
+        let class_member = context
+            .container
+            .is_some_and(|(kind, _)| kind == Container::Class);
+        let computed_class_member = class_member
+            && checker
+                .symbol(symbol)?
+                .value_declaration()
+                .and_then(|id| checker.node(id).ok()?.name())
+                .is_some_and(|name| {
+                    checker
+                        .node(name)
+                        .is_ok_and(|n| n.kind() == K::ComputedPropertyName)
+                });
+        if computed_class_member {
+            name =
+                String::from_utf8_lossy(checker.symbol_to_string(symbol)?.as_bytes()).into_owned();
+        }
         if name.is_empty()
-            || name.starts_with("__@")
+            || !computed_class_member && name.starts_with("__@")
             || checker.symbol(symbol)?.flags() & sf::MODULE != 0 && name.starts_with(['\'', '"'])
         {
             return Ok(None);
         }
         let valid =
             tsr_scanner::is_identifier_text(name.as_bytes(), tsr_core::LanguageVariant::STANDARD)
-                || name.starts_with('#');
+                || name.starts_with('#')
+                || computed_class_member;
+        if !valid && class_member {
+            return Ok(None);
+        }
         if !valid && name.starts_with(' ') {
             return Ok(None);
         }

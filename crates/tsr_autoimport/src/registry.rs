@@ -76,6 +76,7 @@ impl Export {
 #[derive(Default, Debug)]
 pub struct Registry {
     pub index: Index<Export>,
+    pub dependencies: crate::Dependencies,
     pub requested_file: Option<JsString>,
     pub(crate) build_key: crate::preferences::BuildKey,
     pub(crate) sources: std::collections::HashMap<JsString, NodeId>,
@@ -165,9 +166,7 @@ impl Registry {
                 }
                 // export= is not included by GetExportsOfModule for value-only
                 // targets. Keep the namespace/default-like import as well.
-                if let Some(symbol) =
-                    checker.try_get_member_in_module_exports_and_properties(b"export=", module)?
-                {
+                if let Some(symbol) = lookup_export(checker, module, b"export=")? {
                     if let Some(export) = extract(
                         program,
                         checker,
@@ -183,6 +182,7 @@ impl Registry {
         }
         Ok(Some(Self {
             index,
+            dependencies: crate::Dependencies::default(),
             sources: crate::cache::sources(program),
             requested_file: None,
             build_key: crate::preferences::BuildKey::default(),
@@ -256,9 +256,7 @@ pub fn export_id_for_symbol(
         b"export=".as_slice(),
         name.as_bytes(),
     ] {
-        if let Some(exported) =
-            checker.try_get_member_in_module_exports_and_properties(name, module)?
-        {
+        if let Some(exported) = lookup_export(checker, module, name)? {
             let exported = checker.skip_alias(exported)?;
             if checker.get_merged_symbol(exported)? == target {
                 return Ok(Some(ExportId {
@@ -269,6 +267,28 @@ pub fn export_id_for_symbol(
         }
     }
     Ok(None)
+}
+
+/// Auto-imports retain the `export=` alias itself. The checker's resolved
+/// module-export table instead contains the target namespace's members, and
+/// is empty for a function-only target.
+pub fn lookup_export(
+    checker: &mut Operation<'_>,
+    module: SymbolRef,
+    name: &[u8],
+) -> Result<Option<SymbolRef>, Error> {
+    if name == b"export=" {
+        let Some(table) = checker.symbol(module)?.exports() else {
+            return Ok(None);
+        };
+        return checker
+            .symbol_table(table)?
+            .get(name)
+            .flatten()
+            .map(|symbol| checker.symbol_ref(symbol))
+            .transpose();
+    }
+    checker.try_get_member_in_module_exports_and_properties(name, module)
 }
 
 fn unusable_name(name: &[u8]) -> bool {

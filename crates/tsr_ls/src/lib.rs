@@ -31,6 +31,8 @@ mod definition;
 mod display_parts;
 mod documentation;
 mod folding;
+mod format_preferences;
+pub use format_preferences::apply_format_settings;
 mod highlights;
 mod hover;
 mod hover_display;

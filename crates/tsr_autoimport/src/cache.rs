@@ -40,11 +40,20 @@ impl Cache {
     }
     /// Like the pin's single-dirty-file fast path, editing the requested file
     /// need not discard exports from unchanged modules it previously imported.
-    /// A config change or a batch of watched changes gets a fresh cache instead.
+    /// Other source changes are checked against the index before reuse.
     pub fn for_update(program: &Program, previous: &Self, dirty: &JsString) -> Self {
+        Self::with_changes(program, previous, Some(dirty))
+    }
+    /// Go's project bucket survives a root-list change when no source or
+    /// dependency resolution changed. `get` still rejects any newly added file.
+    /// The caller must rule out option, package and filesystem changes.
+    pub fn for_root_change(program: &Program, previous: &Self) -> Self {
+        Self::with_changes(program, previous, None)
+    }
+    fn with_changes(program: &Program, previous: &Self, dirty: Option<&JsString>) -> Self {
         let state = previous.state.lock().unwrap();
         let mut changed = state.dirty.clone();
-        changed.insert(dirty.clone());
+        changed.extend(dirty.cloned());
         Self {
             sources: sources(program),
             state: Mutex::new(State {
@@ -87,6 +96,16 @@ impl Cache {
     }
     pub fn is_prepared(&self) -> bool {
         self.state.lock().unwrap().index.is_some()
+    }
+    pub fn dependencies(&self) -> crate::Dependencies {
+        self.state
+            .lock()
+            .unwrap()
+            .index
+            .as_ref()
+            .map_or_else(crate::Dependencies::default, |index| {
+                index.dependencies.clone()
+            })
     }
     pub fn publish(&self, index: Registry) -> Arc<Registry> {
         let index = Arc::new(index);

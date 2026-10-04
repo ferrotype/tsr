@@ -192,6 +192,26 @@ pub fn fixes(
         let Some(literal) = *literal else {
             continue;
         };
+        let Some(mut declaration) = try_get_import_from_module_specifier(view, literal)? else {
+            continue;
+        };
+        if let Some(parent) = view.node(declaration)?.parent() {
+            if tsr_ast::is_variable_declaration_initialized_to_require(view, parent)? {
+                declaration = parent;
+            }
+        }
+        let read = view.node(declaration)?;
+        if !matches!(
+            read.kind().known(),
+            Some(
+                K::VariableDeclaration
+                    | K::ImportDeclaration
+                    | K::ImportEqualsDeclaration
+                    | K::JSDocImportTag
+            )
+        ) {
+            continue;
+        }
         let Some(module) = checker.get_symbol_at_location(literal)? else {
             continue;
         };
@@ -223,23 +243,28 @@ pub fn fixes(
         if !matches {
             continue;
         }
-        let Some(declaration) = try_get_import_from_module_specifier(view, literal)? else {
-            continue;
+        let clause = if matches!(
+            read.kind().known(),
+            Some(K::ImportDeclaration | K::JSDocImportTag)
+        ) {
+            read.import_clause()
+        } else {
+            None
         };
-        let read = view.node(declaration)?;
-        let clause = read.import_clause();
         let binding = clause.and_then(|c| view.node(c).ok()).and_then(|n| {
             n.data_source()
                 .as_import_clause()
                 .and_then(|d| d.named_bindings())
         });
-        let namespace = if read.kind() == K::ImportEqualsDeclaration {
-            read.name()
-        } else {
-            binding
-                .filter(|&b| view.node(b).is_ok_and(|b| b.kind() == K::NamespaceImport))
-                .and_then(|b| view.node(b).ok().and_then(|n| n.name()))
-        };
+        let namespace =
+            if read.kind() == K::ImportEqualsDeclaration || read.kind() == K::VariableDeclaration {
+                read.name()
+                    .filter(|&n| view.node(n).is_ok_and(|r| r.kind() == K::Identifier))
+            } else {
+                binding
+                    .filter(|&b| view.node(b).is_ok_and(|b| b.kind() == K::NamespaceImport))
+                    .and_then(|b| view.node(b).ok().and_then(|n| n.name()))
+            };
         let specifier = String::from_utf8_lossy(view.node_text(literal)?.as_bytes()).into_owned();
         if kind == lsp::ImportKind::NAMED && result.is_empty() && usage.is_some() {
             if let Some(namespace) = namespace {
@@ -266,6 +291,28 @@ pub fn fixes(
         if !matches!(kind, lsp::ImportKind::NAMED | lsp::ImportKind::DEFAULT)
             || read.kind() == K::ImportEqualsDeclaration
         {
+            continue;
+        }
+        if read.kind() == K::VariableDeclaration {
+            if read.name().is_some_and(|n| {
+                view.node(n)
+                    .is_ok_and(|r| r.kind() == K::ObjectBindingPattern)
+            }) {
+                let fix = lsp::AutoImportFix {
+                    kind: lsp::AutoImportFixKind::ADD_TO_EXISTING,
+                    name: name.clone(),
+                    import_kind: kind,
+                    add_as_type_only: as_type,
+                    module_specifier: specifier,
+                    import_index: index as i32,
+                    ..Default::default()
+                };
+                if as_type == lsp::AddAsTypeOnly::NOT_ALLOWED {
+                    result.push(fix);
+                    return Ok(result);
+                }
+                best.get_or_insert(fix);
+            }
             continue;
         }
         let Some(clause) = clause else {

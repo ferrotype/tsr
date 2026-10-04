@@ -900,3 +900,81 @@ fn completion_promise_property_replaces_the_access_with_await() {
         .flatten()
         .any(|item| item.label == "value"));
 }
+
+#[test]
+fn completion_private_names_and_static_inherited_members_use_source_identity() {
+    // Exact native responses are also exercised by completions.py.
+    let list = completion_result(
+        "class C { #private = 1; method() { this./*cursor*/ } }",
+        &CompletionOptions::default(),
+    );
+    let private = list
+        .items
+        .iter()
+        .flatten()
+        .find(|item| item.label == "#private")
+        .unwrap();
+    assert_eq!(
+        private.filter_text.as_deref().map(String::as_str),
+        Some("private")
+    );
+    assert!(private.insert_text.is_none());
+    let options = CompletionOptions {
+        class_member_snippets: true,
+        ..Default::default()
+    };
+    let list = completion_result("class Base { static value = 1; method() {} } class Derived extends Base { static /*cursor*/ }", &options);
+    let value = list
+        .items
+        .iter()
+        .flatten()
+        .find(|item| item.label == "value")
+        .unwrap();
+    assert_eq!(
+        value.insert_text.as_deref().map(String::as_str),
+        Some("static value: number;")
+    );
+    assert_eq!(value.additional_text_edits.as_ref().unwrap().len(), 1);
+    assert!(!list
+        .items
+        .iter()
+        .flatten()
+        .any(|item| item.label == "method"));
+}
+
+#[test]
+fn completion_snippet_formatting_obeys_config() {
+    let mut options = CompletionOptions {
+        object_method_snippets: true,
+        ..Default::default()
+    };
+    apply_format_settings(
+        &std::collections::HashMap::from([
+            (
+                "insertSpaceBeforeFunctionParenthesis".into(),
+                lsp::Any::Boolean(true),
+            ),
+            (
+                "insertSpaceAfterCommaDelimiter".into(),
+                lsp::Any::Boolean(false),
+            ),
+            (
+                "placeOpenBraceOnNewLineForFunctions".into(),
+                lsp::Any::Boolean(true),
+            ),
+        ]),
+        true,
+        &mut options.format,
+    );
+    let list = completion_result("interface Target { method(arg: number, optional?: string): void }; const value: Target = { /*cursor*/ };", &options);
+    let item = list
+        .items
+        .iter()
+        .flatten()
+        .find(|item| item.label == "method(arg, optional)")
+        .unwrap();
+    assert_eq!(
+        item.insert_text.as_deref().map(String::as_str),
+        Some("method (arg,optional)\n{\n},")
+    );
+}

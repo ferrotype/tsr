@@ -17,6 +17,18 @@ mod manager;
 pub use manager::{WatchClient, WatchManager, WatchSet};
 
 pub const ALL_CHANGES: u32 = 7;
+/// A file name in an LSP glob, preserving metacharacters as literal classes.
+pub(crate) fn literal_pattern(path: &[u8]) -> Vec<u8> {
+    let mut pattern = Vec::with_capacity(path.len());
+    for &byte in path {
+        if matches!(byte, b'*' | b'?' | b'[' | b']' | b'{' | b'}') {
+            pattern.extend([b'[', byte, b']']);
+        } else {
+            pattern.push(byte);
+        }
+    }
+    pattern
+}
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct PatternsAndIgnored {
     pub directories_outside_workspace: Vec<JsString>,

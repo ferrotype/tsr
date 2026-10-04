@@ -95,13 +95,14 @@ impl ImportAdder {
         for fix in &self.individual {
             result.extend(edits::edits(view, source, fix, options)?.0);
         }
-        for (index, collection) in &self.existing {
-            result.extend(existing(view, source, *index, collection, options)?);
-        }
         let mut statements = Vec::new();
         for ((module, _), collection) in &self.new {
             for text in new_statements(module, collection, options) {
-                statements.push((module.as_str(), text, collection.require));
+                statements.push((
+                    module.as_str(),
+                    format_statement(&text, options)?,
+                    collection.require,
+                ));
             }
         }
         if !statements.is_empty() {
@@ -121,8 +122,46 @@ impl ImportAdder {
                 joined.push(edit);
             }
         }
+        // Replacements at the same offset remain distinct, as in Tracker.
+        // In particular a multi-line list adds a comma and then a new line.
+        for (index, collection) in &self.existing {
+            joined.extend(existing(view, source, *index, collection, options)?);
+        }
+        joined.sort_by_key(|e| (e.start, e.end));
         Ok(joined)
     }
+}
+
+// New imports have no original source trivia. Format a private parsed fragment
+// with the same production formatter used for generated completion nodes. It
+// never replaces or reformats text belonging to an existing import.
+fn format_statement(text: &str, options: &Options<'_>) -> Result<String, Error> {
+    let file = tsr_parser::parse_source_file(
+        tsr_jsstring::SourceText::from_loaded_bytes(text.as_bytes().to_vec()),
+        tsr_core::ScriptKind::TS,
+        tsr_ast::SourceFileParseOptions {
+            file_name: tsr_jsstring::JsString::from_bytes(b"/autoimport.ts".as_slice()),
+            path: tsr_jsstring::JsString::from_bytes(b"/autoimport.ts".as_slice()),
+            ..Default::default()
+        },
+    )
+    .publish_unbound();
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
+    let mut input = tsr_format::FormatFile {
+        view: file.view(),
+        source: file
+            .root()
+            .ok_or(Error::MissingLink("formatted import source"))?,
+        jsdoc: &mut provider,
+    };
+    let edits = tsr_format::format_document(
+        &mut input,
+        &tsr_format::FormatContext::new(options.format.clone(), options.newline.as_bytes()),
+    )
+    .map_err(format_error)?;
+    let output = tsr_core::apply_bulk_edits(text.as_bytes(), &edits)
+        .expect("formatter returns non-overlapping edits of its own input");
+    Ok(String::from_utf8(output).expect("formatting preserves Unicode source"))
 }
 // port: tsc/internal/ls/autoimport/fix.go:getNewImports
 // port: tsc/internal/ls/autoimport/fix.go:getNewRequires
@@ -380,18 +419,25 @@ pub(crate) fn add_existing(
             .into_iter()
             .chain(named.iter().map(|n| n.name.clone()))
             .collect::<Vec<_>>();
-        if let Some(last) = elements.iter().flatten().last() {
-            result.push(Edit {
-                start: edits::end(view, last)?,
-                end: edits::end(view, last)?,
-                text: format!(", {}", names.join(", ")),
-            });
-        } else {
+        let elements: Vec<_> = elements.iter().flatten().collect();
+        if elements.is_empty() {
             result.push(Edit {
                 start: edits::start(view, source, pattern)?,
                 end: edits::end(view, pattern)?,
-                text: format!("{{ {} }}", names.join(", ")),
+                text: format_bindings(&names.join(", "), o)?,
             });
+        } else {
+            for name in names {
+                result.extend(insert_named_at(
+                    view,
+                    source,
+                    pattern,
+                    &elements,
+                    elements.len(),
+                    &name,
+                    o,
+                )?);
+            }
         }
         return Ok(result);
     }
@@ -467,14 +513,14 @@ pub(crate) fn add_existing(
         additions.sort_by(|a, b| order.compare((a.0.as_bytes(), a.1), (b.0.as_bytes(), b.1)));
         let render = |n: (&str, bool)| format!("{}{}", if n.1 { "type " } else { "" }, n.0);
         if elements.is_empty() {
-            let text = format!(
-                "{{ {} }}",
-                additions
+            let text = format_bindings(
+                &additions
                     .into_iter()
                     .map(render)
                     .collect::<Vec<_>>()
-                    .join(", ")
-            );
+                    .join(", "),
+                o,
+            )?;
             if let Some(binding) = binding {
                 result.push(Edit {
                     start: edits::start(view, source, binding)?,
@@ -500,22 +546,15 @@ pub(crate) fn add_existing(
                 } else {
                     None
                 };
-                let (pos, text) = if let Some(index) = index {
-                    (
-                        edits::start(view, source, elements[index])?,
-                        format!("{}, ", render(name)),
-                    )
-                } else {
-                    (
-                        edits::end(view, *elements.last().unwrap())?,
-                        format!(", {}", render(name)),
-                    )
-                };
-                result.push(Edit {
-                    start: pos,
-                    end: pos,
-                    text,
-                });
+                result.extend(insert_named_at(
+                    view,
+                    source,
+                    binding.expect("existing named imports"),
+                    &elements,
+                    index.unwrap_or(elements.len()),
+                    &render(name),
+                    o,
+                )?);
             }
         }
     }
@@ -540,4 +579,144 @@ pub(crate) fn add_existing(
     }
     result.sort_by_key(|e| (e.start, e.end));
     Ok(result)
+}
+
+// Import-specific use of Tracker.InsertImportSpecifierAtIndex and
+// InsertNodeInListAfter: keep the original trivia and separate replacement
+// records, including the pin's trailing-comment behavior.
+fn insert_named_at(
+    view: AstView<'_>,
+    source: NodeId,
+    binding: NodeId,
+    elements: &[NodeId],
+    index: usize,
+    name: &str,
+    o: &Options<'_>,
+) -> Result<Vec<Edit>, Error> {
+    let file = view.source_file(source)?;
+    let text = file.text().as_bytes();
+    let line = |pos: i64| {
+        tsr_jsstring::scanner_positions::compute_line_of_position(
+            file.ecma_line_map(),
+            pos as isize,
+        )
+    };
+    let insertion = |at, text| Edit {
+        start: at,
+        end: at,
+        text,
+    };
+    if index == 0 {
+        let start = edits::start(view, source, elements[0])?;
+        let import = view
+            .node(binding)?
+            .parent()
+            .and_then(|p| view.node(p).ok()?.parent())
+            .ok_or(Error::MissingLink("named import declaration"))?;
+        let suffix = if line(start) == line(edits::start(view, source, import)?) {
+            ", ".into()
+        } else {
+            let column_start = file.ecma_line_map()[line(start) as usize] as usize;
+            format!(
+                ",{}{}",
+                o.newline,
+                String::from_utf8_lossy(&text[column_start..start as usize])
+            )
+        };
+        return Ok(vec![insertion(start, format!("{name}{suffix}"))]);
+    }
+    let after = elements[index - 1];
+    let end = edits::end(view, after)?;
+    if index < elements.len() {
+        let comma = tsr_scanner::skip_trivia(text, end) as usize;
+        if text.get(comma) != Some(&b',') {
+            return Ok(Vec::new());
+        }
+        let start = tsr_scanner::skip_trivia_ex(
+            text,
+            i64::from(view.node(elements[index])?.pos()),
+            Some(&tsr_scanner::SkipTriviaOptions {
+                stop_after_line_break: false,
+                stop_at_comments: true,
+                ..Default::default()
+            }),
+        );
+        return Ok(vec![insertion(
+            start,
+            format!(
+                "{name},{}",
+                String::from_utf8_lossy(&text[comma + 1..start as usize])
+            ),
+        )]);
+    }
+    let start = edits::start(view, source, after)?;
+    let binding_read = view.node(binding)?;
+    let data = binding_read.data_source();
+    let list = data
+        .as_named_imports()
+        .and_then(|d| d.elements())
+        .or_else(|| data.as_binding_pattern().and_then(|d| d.elements()))
+        .ok_or(Error::MissingLink("import bindings list"))?;
+    let loc = view.list(list)?.loc();
+    let has_comment = tsr_scanner::get_trailing_comment_ranges(text, end)
+        .next()
+        .is_some();
+    let multiline = has_comment
+        || line(loc.pos()) != line(loc.end())
+        || (index > 1 && line(start) != line(edits::start(view, source, elements[index - 2])?));
+    if !multiline {
+        return Ok(vec![insertion(end, format!(", {name}"))]);
+    }
+    let mut separator = String::from(",");
+    // The pinned synthetic comma inherits trailing trivia at end+1.
+    for comment in tsr_scanner::get_trailing_comment_ranges(text, end + 1) {
+        separator.push(' ');
+        separator.push_str(&String::from_utf8_lossy(
+            &text[comment.loc.pos() as usize..comment.loc.end() as usize],
+        ));
+    }
+    let mut at = tsr_scanner::skip_trivia_ex(
+        text,
+        end,
+        Some(&tsr_scanner::SkipTriviaOptions {
+            stop_after_line_break: true,
+            ..Default::default()
+        }),
+    );
+    while at > end && matches!(text[at as usize - 1], b'\n' | b'\r') {
+        at -= 1;
+    }
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
+    let input = tsr_format::FormatFile {
+        view,
+        source,
+        jsdoc: &mut provider,
+    };
+    let line_start = i64::from(file.ecma_line_map()[line(start) as usize]);
+    let column = tsr_format::find_first_non_whitespace_column(&input, line_start, start, o.format)
+        .map_err(format_error)?;
+    let indent = tsr_format::get_indentation_string(column, o.format);
+    Ok(vec![
+        insertion(end, separator),
+        insertion(
+            at,
+            format!(
+                "{}{indent}{name}",
+                o.newline,
+                indent = String::from_utf8_lossy(&indent)
+            ),
+        ),
+    ])
+}
+fn format_bindings(names: &str, o: &Options<'_>) -> Result<String, Error> {
+    let formatted = format_statement(&format!("import {{ {names} }} from \"\";"), o)?;
+    let start = formatted.find('{').expect("formatted named import");
+    let end = formatted.rfind('}').expect("formatted named import");
+    Ok(formatted[start..=end].into())
+}
+fn format_error(error: tsr_format::Error) -> Error {
+    match error {
+        tsr_format::Error::Storage(error) => Error::from(error),
+        tsr_format::Error::Assertion(message) => panic!("{message}"),
+    }
 }

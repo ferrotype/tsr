@@ -168,6 +168,24 @@ impl<'a> ProjectBuilder<'a> {
             (kind, paths)
         });
         for (key, project) in &mut self.projects {
+            if project.auto_import_cache().is_some_and(|cache| {
+                let dependencies = cache.dependencies();
+                self.changes.invalidate_all
+                    || changes.iter().any(|(_, paths)| {
+                        paths.iter().any(|p| {
+                            dependencies.affected(
+                                p.as_bytes(),
+                                self.session.fs.use_case_sensitive_file_names(),
+                            )
+                        })
+                    })
+            }) {
+                // Keep the retained snapshot's cache untouched. Auxiliary
+                // package changes need not force a compiler-program rebuild.
+                project.auto_imports = Some(Arc::new(tsr_autoimport::Cache::new(
+                    project.program().unwrap(),
+                )));
+            }
             let old = project.data().unwrap();
             let mut dirty = old.dirty;
             let mut dirty_file = old.dirty_file.clone();
@@ -429,21 +447,41 @@ impl<'a> ProjectBuilder<'a> {
         } else {
             watch
         };
-        let inherited_auto_imports =
-            dirty_file
-                .as_ref()
-                .filter(|_| !command_changed)
-                .and_then(|dirty| {
-                    self.old
-                        .projects
-                        .get(key)
-                        .and_then(Project::auto_import_cache)
-                        .map(|previous| {
-                            Arc::new(tsr_autoimport::Cache::for_update(
-                                &program, &previous, dirty,
-                            ))
-                        })
-                });
+        // The pin rebuilds its project bucket for added files, not removals
+        // alone. Retain it across a root-list-only config change; package,
+        // option and source changes still invalidate it. Cache::get checks all
+        // remaining source identities and rejects newly added files.
+        let roots_only = command_changed
+            && !self.changes.invalidate_all
+            && self.changes.created.is_empty()
+            && self.changes.deleted.is_empty()
+            && self
+                .changes
+                .changed
+                .iter()
+                .all(|uri| self.configs.path(uri.file_name().as_bytes()) == *key)
+            && old.is_some_and(|old| {
+                !old.dirty
+                    && old.command_line.options == command.options
+                    && old.command_line.project_references == command.project_references
+                    && old.command_line.content_mappers.is_none()
+                    && command.content_mappers.is_none()
+            });
+        let inherited_auto_imports = self
+            .projects
+            .get(key)
+            .and_then(Project::auto_import_cache)
+            .and_then(|previous| {
+                if roots_only {
+                    Some(tsr_autoimport::Cache::for_root_change(&program, &previous))
+                } else {
+                    dirty_file
+                        .as_ref()
+                        .filter(|_| !command_changed)
+                        .map(|dirty| tsr_autoimport::Cache::for_update(&program, &previous, dirty))
+                }
+            })
+            .map(Arc::new);
         let mut project = Project::from_program(
             ProjectData {
                 program_files_watch,
