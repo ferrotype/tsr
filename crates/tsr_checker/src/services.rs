@@ -1822,6 +1822,26 @@ impl Operation<'_> {
         ))
     }
 
+    /// The binder's symbol attached to a declaration (without name resolution).
+    pub fn bound_symbol_of_node(&self, node: NodeId) -> Result<Option<SymbolRef>, Error> {
+        self.state()
+            .node_symbol(node)?
+            .map(|symbol| self.symbol_ref(symbol))
+            .transpose()
+    }
+
+    /// Non-reporting resolution of the program's implicit JSX/helper imports.
+    pub fn implicit_import_symbol(
+        &mut self,
+        source: NodeId,
+        name: &[u8],
+    ) -> Result<Option<SymbolRef>, Error> {
+        let symbol = self
+            .state_mut()
+            .implicit_import_symbol(source, JsString::from_bytes(name))?;
+        self.optional_symbol(symbol)
+    }
+
     // port: tsc/internal/checker/services.go:Checker.SkipAlias
     pub fn skip_alias(&mut self, symbol: SymbolRef) -> Result<SymbolRef, Error> {
         let id = self.check_symbol_ref(symbol)?;

@@ -397,6 +397,22 @@ impl Program {
     pub fn host(&self) -> &dyn FileSystem {
         self.host.as_ref()
     }
+    /// A request-local NoDts resolver over this program's retained host. It
+    /// does not mutate the program's options, loading graph, or resolver cache.
+    pub fn source_definition_resolver(&self) -> Result<Resolver, Error> {
+        let mut options = self.options().clone();
+        options.no_dts_resolution = Tristate::TRUE;
+        Ok(Resolver::with_options(
+            self.host.clone(),
+            Arc::new(options),
+            self.current_directory(),
+            tsr_module::ResolverOptions {
+                allow_live_host: self.host.snapshot_id().is_none(),
+                extra_extensions: self.content_mapper_extensions(),
+                ..Default::default()
+            },
+        )?)
+    }
     /// port: tsc/internal/compiler/program.go:Program.UseCaseSensitiveFileNames
     pub fn use_case_sensitive_file_names(&self) -> bool {
         self.host().use_case_sensitive_file_names()
@@ -459,7 +475,7 @@ impl Program {
     /// for a node of this program).
     pub fn file_of_node(&self, node: NodeId) -> Option<&Arc<ProgramFile>> {
         self.owners
-            .node_file_index(node)
+            .retained_node_file_index(&self.files, node)
             .map(|index| &self.files[index])
     }
     /// Whether `file` may be emitted, as `Program.SourceFileMayBeEmitted`
@@ -1794,7 +1810,7 @@ impl<'a> Loader<'a> {
                     }
                 }
             }
-            self.resolve_imports_and_module_augmentations(&file, &key, &meta, &resolution, kind)?;
+            self.resolve_imports_and_module_augmentations(&file, &key, &meta, &resolution)?;
         }
         // port: tsc/internal/compiler/filesparser.go:parseTask.load
         for supplemental in state.supplemental_file_names() {
@@ -2159,7 +2175,6 @@ impl<'a> Loader<'a> {
         key: &JsString,
         meta: &SourceFileMetaData,
         resolution: &FileResolution,
-        kind: ScriptKind,
     ) -> Result<(), Error> {
         let view = file.bound.view().ast();
         let state = view.source_file(file.source())?;
@@ -2181,21 +2196,9 @@ impl<'a> Loader<'a> {
             false,
         );
         let name = resolution.name.clone();
-        let runtime = if matches!(kind, ScriptKind::JS | ScriptKind::JSX | ScriptKind::TSX) {
-            metadata::jsx_runtime_import(
-                metadata::jsx_implicit_import_base(view, file.source(), resolution.options())?
-                    .as_bytes(),
-                resolution.options(),
-            )
-        } else {
-            JsString::default()
-        };
-        if resolution.options().import_helpers.is_true()
-            && (matches!(kind, ScriptKind::JS | ScriptKind::JSX)
-                || !state.is_declaration_file
-                    && (resolution.options().isolated_modules()
-                        || state.external_module_indicator.is_some()))
-        {
+        let implicit = metadata::implicit_imports(view, file.source(), resolution.options())?;
+        let runtime = implicit.runtime;
+        if implicit.helpers {
             self.resolve_specifier(
                 file,
                 resolution,

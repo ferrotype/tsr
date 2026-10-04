@@ -6,6 +6,7 @@ pub mod connection;
 pub mod content_mappers;
 mod diagnostics;
 pub mod dynamic_queue;
+mod language_features;
 pub mod logger;
 pub mod progress;
 mod recovery;

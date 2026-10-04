@@ -208,6 +208,8 @@ impl NodeBuilder<'_> {
                 } else {
                     b"Array".as_slice()
                 }));
+                self.id_to_symbol
+                    .insert(name, self.checker.types.get(target)?.symbol);
                 let arguments = self.list(vec![element])?;
                 return Ok(self
                     .ast

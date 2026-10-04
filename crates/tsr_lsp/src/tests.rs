@@ -172,7 +172,16 @@ fn initialization_edit_diagnostics_and_shutdown_use_the_real_session() {
             br#"{"configFilePath":"/p/tsconfig.json"}"#
         );
         server.send(Some(Id::int(2)), "textDocument/hover", Some(r#"{"textDocument":{"uri":"file:///p/main.ts"},"position":{"line":0,"character":6}}"#));
-        assert_eq!(server.response(&Id::int(2)).error.unwrap().code, -32601);
+        let response = server.response(&Id::int(2));
+        assert!(response.error.is_none(), "{:?}", response.error);
+        let mut hover = tsr_lsproto::HoverOrNull::default();
+        tsr_json::unmarshal(
+            &response.result.unwrap().0,
+            &mut hover,
+            tsr_json::Options::default(),
+        )
+        .unwrap();
+        assert!(hover.hover.is_some());
         server.send(Some(Id::int(0)), "shutdown", None);
         assert_eq!(server.response(&Id::int(0)).result.unwrap().0, b"null");
         server.send(None, "exit", None);
@@ -400,4 +409,30 @@ fn watched_file_refresh_uses_the_client_capability() {
         }
         assert_eq!(refreshes, usize::from(supported));
     }
+}
+
+#[test]
+fn read_only_features_return_null_for_unmapped_script_kinds() {
+    let server = TestConnection::with_files(&[(b"/p/view.custom", b"content")]);
+    server.initialize("utf-16");
+    for method in [
+        "textDocument/hover",
+        "textDocument/signatureHelp",
+        "textDocument/definition",
+        "textDocument/typeDefinition",
+    ] {
+        let id = Id::string(method);
+        server.send(Some(id.clone()),method,Some(r#"{"textDocument":{"uri":"file:///p/view.custom"},"position":{"line":0,"character":0}}"#));
+        let response = server.response(&id);
+        assert!(response.error.is_none(), "{method}: {:?}", response.error);
+        assert_eq!(response.result.unwrap().0, b"null");
+    }
+    // A method outside the pin's fallback list still reports the missing project.
+    let id = Id::string("selection");
+    server.send(
+        Some(id.clone()),
+        "textDocument/selectionRange",
+        Some(r#"{"textDocument":{"uri":"file:///p/view.custom"},"positions":[]}"#),
+    );
+    assert!(server.response(&id).error.is_some());
 }

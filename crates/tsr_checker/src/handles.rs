@@ -435,13 +435,31 @@ impl Operation<'_> {
     }
 
     pub fn get_symbol_at_location(&mut self, node: NodeId) -> Result<Option<SymbolRef>, Error> {
+        // Public queries can receive lazy JSDoc syntax; binding and checking
+        // use the corresponding reparsed declaration, as GetSymbolAtLocation does.
+        let node = tsr_ast::utilities_containers::get_reparsed_node_for_node(
+            self.state().ast(node)?,
+            Some(node),
+        )?
+        .expect("non-null query node");
         let symbol = self.state_mut().get_symbol_at_location(node)?;
         symbol.map(|symbol| self.symbol_ref(symbol)).transpose()
     }
 
     pub fn get_type_at_location(&mut self, node: NodeId) -> Result<TypeRef, Error> {
+        let node = tsr_ast::utilities_containers::get_reparsed_node_for_node(
+            self.state().ast(node)?,
+            Some(node),
+        )?
+        .expect("non-null query node");
         let ty = self.state_mut().get_type_at_location(node)?;
         Ok(self.type_ref(ty))
+    }
+
+    /// Resolve either a retained program node or a node owned by this checker.
+    /// The read cannot outlive the operation and validates the arena owner.
+    pub fn node(&self, node: NodeId) -> Result<tsr_ast::NodeRead<'_>, Error> {
+        Ok(self.state().ast(node)?.node(node)?)
     }
 
     /// Whether this source node participates in an expression query. The
@@ -460,6 +478,32 @@ impl Operation<'_> {
     pub fn intrinsic_type_name(&self, ty: TypeRef) -> Result<JsString, Error> {
         let ty = self.check_type(ty)?;
         Ok(self.state().types.intrinsic(ty)?.name.clone())
+    }
+
+    /// A literal's `ValueToString` spelling, without an enum's qualified name.
+    pub fn literal_value_text(&self, ty: TypeRef) -> Result<JsString, Error> {
+        let ty = self.check_type(ty)?;
+        Ok(match &self.state().types.literal(ty)?.value {
+            crate::LiteralValue::String(text) => {
+                crate::enums::EnumValue::String(text.clone()).diagnostic_text()
+            }
+            crate::LiteralValue::Number(value) => {
+                crate::enums::EnumValue::Number(*value).diagnostic_text()
+            }
+            crate::LiteralValue::Boolean(value) => JsString::from_bytes(if *value {
+                b"true".as_slice()
+            } else {
+                b"false".as_slice()
+            }),
+            crate::LiteralValue::BigInt(value) => {
+                let mut text = value.to_text();
+                text.push(b'n');
+                JsString::from_bytes(text)
+            }
+            crate::LiteralValue::ComputedEnum => {
+                return Err(Error::Unsupported("ValueToString: computed enum"))
+            }
+        })
     }
 
     // port: tsc/internal/checker/exports.go:Checker.GetDeclaredTypeOfSymbol
@@ -947,6 +991,86 @@ impl Operation<'_> {
             .get(id)?
             .resolved_return_type
             .map(|id| self.type_ref(id)))
+    }
+
+    pub fn signature_flags(&self, s: SignatureRef) -> Result<crate::SignatureFlags, Error> {
+        let id = self.check_signature(s)?;
+        Ok(self.state().signatures.get(id)?.flags)
+    }
+
+    pub fn signature_target(&self, s: SignatureRef) -> Result<Option<SignatureRef>, Error> {
+        let id = self.check_signature(s)?;
+        Ok(self
+            .state()
+            .signatures
+            .get(id)?
+            .target
+            .map(|id| self.signature_ref(id)))
+    }
+
+    pub fn signature_this_parameter(&self, s: SignatureRef) -> Result<Option<SymbolRef>, Error> {
+        let id = self.check_signature(s)?;
+        self.state()
+            .signatures
+            .get(id)?
+            .this_parameter
+            .map(|id| self.symbol_ref(id))
+            .transpose()
+    }
+
+    pub fn tuple_elements(&self, ty: TypeRef) -> Result<Vec<crate::TupleElementInfo>, Error> {
+        let id = self.check_type(ty)?;
+        let state = self.state();
+        Ok(state
+            .types
+            .tuple(state.types.target(id)?)?
+            .element_infos
+            .to_vec())
+    }
+
+    /// Initial fixed length and element flags of a tuple's target. As with the
+    /// other type readers, the operation validates the owner before reading.
+    pub fn tuple_element_flags(
+        &self,
+        ty: TypeRef,
+    ) -> Result<Option<(u32, Vec<crate::ElementFlags>)>, Error> {
+        let id = self.check_type(ty)?;
+        let state = self.state();
+        if !state.is_tuple_type(id)? {
+            return Ok(None);
+        }
+        let tuple = state.types.tuple(state.types.target(id)?)?;
+        Ok(Some((
+            tuple.fixed_length,
+            tuple.element_infos.iter().map(|info| info.flags).collect(),
+        )))
+    }
+
+    pub fn signature_type_parameters(&self, s: SignatureRef) -> Result<Vec<TypeRef>, Error> {
+        let id = self.check_signature(s)?;
+        Ok(self
+            .state()
+            .signatures
+            .get(id)?
+            .type_parameters
+            .as_deref()
+            .unwrap_or(&[])
+            .iter()
+            .map(|&id| self.type_ref(id))
+            .collect())
+    }
+
+    pub fn signature_parameters(&self, s: SignatureRef) -> Result<Vec<SymbolRef>, Error> {
+        let id = self.check_signature(s)?;
+        self.state()
+            .signatures
+            .get(id)?
+            .parameters
+            .as_deref()
+            .unwrap_or(&[])
+            .iter()
+            .map(|&id| self.symbol_ref(id))
+            .collect()
     }
 
     /// The synthetic declaration of a checker-created signature.

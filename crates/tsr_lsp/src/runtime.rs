@@ -59,6 +59,13 @@ struct Settings {
     validation: bool,
     style_warnings: bool,
     config_name: String,
+    exclude_library_symbols: bool,
+    workspace_current_project: bool,
+    maximum_hover_length: usize,
+    prefer_source_definition: bool,
+    inlay: tsr_ls::InlayHintsOptions,
+    inlay_flags: [Option<bool>; 7],
+    code_lens: tsr_ls::CodeLensOptions,
 }
 impl Default for Settings {
     fn default() -> Self {
@@ -67,6 +74,13 @@ impl Default for Settings {
             validation: true,
             style_warnings: true,
             config_name: String::new(),
+            exclude_library_symbols: true,
+            workspace_current_project: false,
+            maximum_hover_length: 500,
+            prefer_source_definition: false,
+            inlay: tsr_ls::InlayHintsOptions::default(),
+            inlay_flags: [None; 7],
+            code_lens: tsr_ls::CodeLensOptions::default(),
         }
     }
 }
@@ -334,6 +348,119 @@ impl Runtime {
                         )?;
                     }
                     client::raw(&result)
+                })));
+            }
+            "workspace/symbol" => {
+                let params: lsp::WorkspaceSymbolParams = crate::decode(params)?;
+                let settings = self.settings.lock().unwrap().clone();
+                let uri = params
+                    .text_document
+                    .as_deref()
+                    .map(|d| &d.uri)
+                    .filter(|_| settings.workspace_current_project);
+                let snapshot = self
+                    .ready()?
+                    .session()
+                    .flush_with_host(uri, host)
+                    .map_err(crate::project_error)?;
+                let path = uri.map(|u| {
+                    u.path(
+                        snapshot
+                            .filesystem()
+                            .unwrap()
+                            .use_case_sensitive_file_names(),
+                    )
+                });
+                let context = context.clone();
+                let encoding = self.options.project.position_encoding;
+                return Ok(Dispatch::Work(Box::new(move || {
+                    let cancellation = tsr_core::CancellationToken::new();
+                    let cancel = cancellation.clone();
+                    struct Stop(tsr_ipc::AfterFuncStop);
+                    impl Drop for Stop {
+                        fn drop(&mut self) {
+                            self.0.stop();
+                        }
+                    }
+                    let _stop = Stop(context.after_func(move || cancel.cancel()));
+                    let programs: Vec<_> = snapshot
+                        .projects()
+                        .into_iter()
+                        .filter_map(|p| p.program().map(AsRef::as_ref))
+                        .filter(|p| {
+                            path.as_ref()
+                                .is_none_or(|path| p.source_file(path.as_bytes()).is_some())
+                        })
+                        .collect();
+                    let response = tsr_ls::workspace_symbols(
+                        &programs,
+                        encoding,
+                        &cancellation,
+                        &params.query,
+                        settings.exclude_library_symbols,
+                    )
+                    .map_err(|e| crate::error(-32603, e.to_string()))?;
+                    client::raw(&response)
+                })));
+            }
+            _ if crate::language_features::handles(method) => {
+                let feature = crate::language_features::Request::decode(method, params)?;
+                let uri = feature.uri();
+                let snapshot = self
+                    .ready()?
+                    .session()
+                    .flush_with_host(Some(uri), host)
+                    .map_err(crate::project_error)?;
+                let path = uri.path(
+                    snapshot
+                        .filesystem()
+                        .unwrap()
+                        .use_case_sensitive_file_names(),
+                );
+                let project = snapshot.project_for_file(path.as_bytes()).cloned();
+                if project.is_none()
+                    && feature.unknown_script_fallback()
+                    && snapshot
+                        .filesystem()
+                        .unwrap()
+                        .get_file(uri.file_name().as_bytes())
+                        .map_err(|e| crate::project_error(e.into()))?
+                        .is_some_and(|file| file.kind() == tsr_core::ScriptKind::UNKNOWN)
+                {
+                    return client::raw(&lsp::Null).map(Dispatch::Ready);
+                }
+                let context = context.clone();
+                let capabilities = self.capabilities.clone();
+                let settings = self.settings.lock().unwrap().clone();
+                let options = crate::language_features::Options {
+                    maximum_hover_length: settings.maximum_hover_length,
+                    prefer_source_definition: settings.prefer_source_definition,
+                    inlay: settings.inlay,
+                    code_lens: settings.code_lens,
+                    lens_command: self
+                        .initialization
+                        .code_lens_show_locations_command_name
+                        .as_deref()
+                        .cloned(),
+                    locale: settings.locale,
+                };
+                let encoding = self.options.project.position_encoding;
+                let request_id = request
+                    .id
+                    .as_ref()
+                    .map(ToString::to_string)
+                    .unwrap_or_default();
+                return Ok(Dispatch::Work(Box::new(move || {
+                    let _snapshot = snapshot;
+                    crate::language_features::execute(
+                        &context,
+                        &request_id,
+                        project.as_ref(),
+                        feature,
+                        encoding,
+                        &capabilities,
+                        &options,
+                    )
                 })));
             }
             _ if unimplemented_method(method) => {
@@ -644,7 +771,24 @@ impl Runtime {
                         .into_iter()
                         .flatten()
                     {
+                        set_bool(
+                            raw.get("preferGoToSourceDefinition"),
+                            &mut next.prefer_source_definition,
+                        );
+                        apply_lens_preferences(raw, true, &mut next.code_lens);
+                        apply_inlay_preferences(raw, true, &mut next.inlay, &mut next.inlay_flags);
                         set_bool(raw.get("validateEnabled"), &mut next.validation);
+                        if let Some(lsp::Any::Number(length)) = raw.get("maximumHoverLength") {
+                            next.maximum_hover_length =
+                                if *length > 0.0 { *length as usize } else { 500 };
+                        }
+                        set_bool(
+                            raw.get("excludeLibrarySymbolsInNavTo"),
+                            &mut next.exclude_library_symbols,
+                        );
+                        if let Some(lsp::Any::String(scope)) = raw.get("workspaceSymbolsScope") {
+                            next.workspace_current_project = scope == "currentProject";
+                        }
                         set_bool(
                             raw.get("reportStyleChecksAsWarnings"),
                             &mut next.style_warnings,
@@ -654,10 +798,24 @@ impl Runtime {
                         }
                     }
                     set_bool(
+                        nested(fields, "preferGoToSourceDefinition"),
+                        &mut next.prefer_source_definition,
+                    );
+                    apply_lens_preferences(fields, false, &mut next.code_lens);
+                    apply_inlay_preferences(fields, false, &mut next.inlay, &mut next.inlay_flags);
+                    set_bool(
                         nested(fields, "validate.enabled")
                             .or_else(|| nested(fields, "validate.enable")),
                         &mut next.validation,
                     );
+                    set_bool(
+                        nested(fields, "workspaceSymbols.excludeLibrarySymbols"),
+                        &mut next.exclude_library_symbols,
+                    );
+                    if let Some(lsp::Any::String(scope)) = nested(fields, "workspaceSymbols.scope")
+                    {
+                        next.workspace_current_project = scope == "currentProject";
+                    }
                     set_bool(
                         fields.get("reportStyleChecksAsWarnings"),
                         &mut next.style_warnings,
@@ -691,6 +849,41 @@ impl Runtime {
             }
         }
         *self.settings.lock().unwrap() = next.clone();
+        if (next.inlay_flags != before.inlay_flags
+            || next.inlay.parameter_names != before.inlay.parameter_names)
+            && self
+                .capabilities
+                .workspace
+                .as_deref()
+                .and_then(|w| w.inlay_hint.as_deref())
+                .and_then(|i| i.refresh_support.as_deref())
+                .copied()
+                .unwrap_or(false)
+        {
+            if let Err(e) = self
+                .client
+                .request_without_waiting("workspace/inlayHint/refresh", RawValue(b"null".to_vec()))
+            {
+                self.logger.send(lsp::MessageType::ERROR, e.message);
+            }
+        }
+        if next.code_lens != before.code_lens
+            && self
+                .capabilities
+                .workspace
+                .as_deref()
+                .and_then(|w| w.code_lens.as_deref())
+                .and_then(|c| c.refresh_support.as_deref())
+                .copied()
+                .unwrap_or(false)
+        {
+            if let Err(e) = self
+                .client
+                .request_without_waiting("workspace/codeLens/refresh", RawValue(b"null".to_vec()))
+            {
+                self.logger.send(lsp::MessageType::ERROR, e.message);
+            }
+        }
         if next.config_name != before.config_name {
             self.server
                 .as_ref()
@@ -773,6 +966,92 @@ fn nested<'a>(fields: &'a HashMap<String, lsp::Any>, path: &str) -> Option<&'a l
 fn set_bool(value: Option<&lsp::Any>, target: &mut bool) {
     if let Some(lsp::Any::Boolean(value)) = value {
         *target = *value;
+    }
+}
+
+// The two user-preference forms share one mapping: unstable/raw fields are
+// applied first, then the editor's nested configuration takes precedence.
+fn apply_inlay_preferences(
+    fields: &HashMap<String, lsp::Any>,
+    raw: bool,
+    options: &mut tsr_ls::InlayHintsOptions,
+    states: &mut [Option<bool>; 7],
+) {
+    let get = |name, path| {
+        if raw {
+            fields.get(name)
+        } else {
+            nested(fields, path)
+        }
+    };
+    if let Some(lsp::Any::String(value)) = get(
+        "includeInlayParameterNameHints",
+        "inlayHints.parameterNames.enabled",
+    ) {
+        options.parameter_names = match value.as_str() {
+            "all" => tsr_ls::ParameterNameHints::All,
+            "literals" => tsr_ls::ParameterNameHints::Literals,
+            _ => tsr_ls::ParameterNameHints::None,
+        };
+    }
+    if let Some(lsp::Any::String(value)) = get("quotePreference", "preferences.quoteStyle") {
+        options.quote = match value.as_str() {
+            "single" => tsr_ls::QuotePreference::Single,
+            "double" => tsr_ls::QuotePreference::Double,
+            _ => tsr_ls::QuotePreference::Auto,
+        };
+    }
+    for (index, (name, path, invert, target)) in [
+        (
+            "includeInlayParameterNameHintsWhenArgumentMatchesName",
+            "inlayHints.parameterNames.suppressWhenArgumentMatchesName",
+            true,
+            &mut options.parameter_names_when_matching,
+        ),
+        (
+            "includeInlayFunctionParameterTypeHints",
+            "inlayHints.parameterTypes.enabled",
+            false,
+            &mut options.parameter_types,
+        ),
+        (
+            "includeInlayVariableTypeHints",
+            "inlayHints.variableTypes.enabled",
+            false,
+            &mut options.variable_types,
+        ),
+        (
+            "includeInlayVariableTypeHintsWhenTypeMatchesName",
+            "inlayHints.variableTypes.suppressWhenTypeMatchesName",
+            true,
+            &mut options.variable_types_when_matching,
+        ),
+        (
+            "includeInlayPropertyDeclarationTypeHints",
+            "inlayHints.propertyDeclarationTypes.enabled",
+            false,
+            &mut options.property_types,
+        ),
+        (
+            "includeInlayFunctionLikeReturnTypeHints",
+            "inlayHints.functionLikeReturnTypes.enabled",
+            false,
+            &mut options.return_types,
+        ),
+        (
+            "includeInlayEnumMemberValueHints",
+            "inlayHints.enumMemberValues.enabled",
+            false,
+            &mut options.enum_values,
+        ),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        if let Some(lsp::Any::Boolean(value)) = get(name, path) {
+            *target = if !raw && invert { !value } else { *value };
+            states[index] = Some(*target);
+        }
     }
 }
 
@@ -861,38 +1140,15 @@ fn unimplemented_method(method: &str) -> bool {
     matches!(
         method,
         "workspace/willRenameFiles"
-            | "textDocument/hover"
-            | "textDocument/definition"
-            | "custom/textDocument/sourceDefinition"
-            | "textDocument/typeDefinition"
-            | "textDocument/signatureHelp"
             | "textDocument/formatting"
             | "textDocument/rangeFormatting"
             | "textDocument/onTypeFormatting"
-            | "textDocument/documentSymbol"
-            | "textDocument/documentHighlight"
-            | "custom/textDocument/multiDocumentHighlight"
-            | "textDocument/selectionRange"
-            | "textDocument/inlayHint"
-            | "textDocument/codeLens"
             | "textDocument/codeAction"
-            | "textDocument/prepareCallHierarchy"
-            | "textDocument/foldingRange"
             | "textDocument/prepareRename"
-            | "textDocument/linkedEditingRange"
             | "textDocument/completion"
             | "textDocument/_vs_onAutoInsert"
-            | "textDocument/references"
-            | "textDocument/_vs_references"
             | "textDocument/rename"
-            | "textDocument/implementation"
-            | "callHierarchy/incomingCalls"
-            | "callHierarchy/outgoingCalls"
-            | "workspace/symbol"
             | "completionItem/resolve"
-            | "codeLens/resolve"
-            | "textDocument/semanticTokens/full"
-            | "textDocument/semanticTokens/range"
             | "custom/runGC"
             | "custom/saveHeapProfile"
             | "custom/saveAllocProfile"
@@ -901,4 +1157,46 @@ fn unimplemented_method(method: &str) -> bool {
             | "custom/initializeAPISession"
             | "custom/setContentMapperContributions"
     )
+}
+
+fn apply_lens_preferences(
+    fields: &HashMap<String, lsp::Any>,
+    raw: bool,
+    options: &mut tsr_ls::CodeLensOptions,
+) {
+    for (name, path, target) in [
+        (
+            "referencesCodeLensEnabled",
+            "referencesCodeLens.enabled",
+            &mut options.references,
+        ),
+        (
+            "implementationsCodeLensEnabled",
+            "implementationsCodeLens.enabled",
+            &mut options.implementations,
+        ),
+        (
+            "referencesCodeLensShowOnAllFunctions",
+            "referencesCodeLens.showOnAllFunctions",
+            &mut options.all_functions,
+        ),
+        (
+            "implementationsCodeLensShowOnInterfaceMethods",
+            "implementationsCodeLens.showOnInterfaceMethods",
+            &mut options.interface_methods,
+        ),
+        (
+            "implementationsCodeLensShowOnAllClassMethods",
+            "implementationsCodeLens.showOnAllClassMethods",
+            &mut options.all_class_methods,
+        ),
+    ] {
+        if let Some(lsp::Any::Boolean(value)) = if raw {
+            fields.get(name)
+        } else {
+            nested(fields, path)
+        } {
+            *target = Some(*value);
+        }
+    }
 }

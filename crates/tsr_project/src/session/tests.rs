@@ -893,3 +893,79 @@ fn untitled_overlays_form_an_inferred_program_and_project_names_follow_go() {
         Some(js("tsconfig.json"))
     );
 }
+
+#[test]
+fn unopened_dependency_uses_its_containing_project_without_inferred_options() {
+    let (_, session) = setup(
+        &[
+            (
+                "/src/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true,"strict":true},"files":["main.ts"]}"#,
+            ),
+            ("/src/main.ts", "import {value} from 'pkg'; value;"),
+            (
+                "/src/node_modules/pkg/index.d.ts",
+                "export declare const value: number;",
+            ),
+        ],
+        &Counters::new(),
+    );
+    let first = open(
+        &session,
+        "/src/main.ts",
+        "import {value} from 'pkg'; value;",
+    );
+    let next = session
+        .snapshot_for_file(&uri("/src/node_modules/pkg/index.d.ts"))
+        .unwrap();
+    assert_eq!(first.id(), next.id());
+    assert!(next.project_by_path(INFERRED_PROJECT_NAME).is_none());
+    let project = next
+        .project_for_file(b"/src/node_modules/pkg/index.d.ts")
+        .unwrap();
+    assert_eq!(project.data().unwrap().name, js("/src/tsconfig.json"));
+    assert!(project.program().unwrap().options().no_lib.is_true());
+    assert!(project
+        .program()
+        .unwrap()
+        .source_file(b"/src/main.ts")
+        .is_some());
+}
+
+#[test]
+fn consumed_config_preference_does_not_block_clean_program_inclusion_reuse() {
+    let (_, session) = setup(
+        &[
+            (
+                "/src/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true},"files":["main.ts"]}"#,
+            ),
+            (
+                "/src/custom.json",
+                r#"{"compilerOptions":{"noLib":true,"strict":true},"files":["main.ts"]}"#,
+            ),
+            ("/src/main.ts", "const value = 1;"),
+        ],
+        &Counters::new(),
+    );
+    let first = session.snapshot_for_file(&uri("/src/main.ts")).unwrap();
+    session
+        .set_custom_config_file_name(js("custom.json"))
+        .unwrap();
+    // Like an update timer, consume newConfig without requesting this closed
+    // document. Go retains its clean project and later GetDefaultProject may
+    // select it by program inclusion, independent of the new config filename.
+    let updated = session.flush(None).unwrap();
+    assert_ne!(first.id(), updated.id());
+    let reused = session.snapshot_for_file(&uri("/src/main.ts")).unwrap();
+    assert_eq!(updated.id(), reused.id());
+    assert_eq!(
+        reused
+            .project_for_file(b"/src/main.ts")
+            .unwrap()
+            .data()
+            .unwrap()
+            .name,
+        js("/src/tsconfig.json")
+    );
+}

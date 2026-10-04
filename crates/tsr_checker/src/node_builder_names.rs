@@ -1042,6 +1042,7 @@ impl NodeBuilder<'_> {
         }
         if index == 0 || can_use_property_access(name.as_bytes()) {
             let identifier = self.ast.new_identifier(name.clone());
+            self.id_to_symbol.insert(identifier, Some(symbol));
             self.emit
                 .add_emit_flags(identifier, tsr_printer::emit_flags::NO_ASCII_ESCAPING);
             self.approximate_length += name.len() + 1;
@@ -1083,6 +1084,7 @@ impl NodeBuilder<'_> {
         } else {
             self.approximate_length += name.len();
             let node = self.ast.new_identifier(name);
+            self.id_to_symbol.insert(node, Some(symbol));
             self.emit
                 .add_emit_flags(node, tsr_printer::emit_flags::NO_ASCII_ESCAPING);
             node
@@ -1623,6 +1625,7 @@ impl NodeBuilder<'_> {
         }
 
         let identifier = self.ast.new_identifier(symbol_name);
+        self.id_to_symbol.insert(identifier, Some(symbol));
         self.emit
             .add_emit_flags(identifier, tsr_printer::emit_flags::NO_ASCII_ESCAPING);
         if index > stopper {

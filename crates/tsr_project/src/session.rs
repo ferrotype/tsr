@@ -463,7 +463,10 @@ impl Session {
         }
         self.pending.lock().expect("session events").custom_name = Some(name);
         drop(current);
-        self.flush(None).map(|_| ())
+        // Keep newConfig pending until the next snapshot update, so its
+        // requesting document participates in default-project invalidation.
+        self.schedule_snapshot_update();
+        Ok(())
     }
     /// Returns the snapshot as well as the selection: callers retain its program,
     /// config and filesystem roots for the complete request.
@@ -526,15 +529,12 @@ impl Session {
                     self.options.current_directory.as_bytes(),
                     self.fs.use_case_sensitive_file_names(),
                 );
-                // A retained containing project is not necessarily this file's
-                // current default after a config-name change. Only an explicit
-                // selection can bypass the request's config-discovery barrier.
+                // Unopened dependencies normally have no explicit default.
+                // Like getSnapshot, use program inclusion before rebuilding;
+                // otherwise a node_modules request creates an inferred project
+                // with different options and loses the importing files.
                 previous
-                    .state()
-                    .unwrap()
-                    .defaults
-                    .get(&path)
-                    .and_then(|key| previous.project_by_path(key.as_bytes()))
+                    .project_for_file(path.as_bytes())
                     .is_some_and(|project| !project.data().unwrap().dirty)
             })
         {

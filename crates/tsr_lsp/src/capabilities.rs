@@ -36,52 +36,18 @@ pub fn initialize(
         .unwrap();
     if let Some(offered) = offered {
         // port: tsc/internal/ls/semantictokens.go:SemanticTokensLegend
-        legend.token_types = [
-            "namespace",
-            "class",
-            "enum",
-            "interface",
-            "struct",
-            "typeParameter",
-            "type",
-            "parameter",
-            "variable",
-            "property",
-            "enumMember",
-            "decorator",
-            "event",
-            "function",
-            "method",
-            "macro",
-            "label",
-            "comment",
-            "string",
-            "keyword",
-            "number",
-            "regexp",
-            "operator",
-        ]
-        .into_iter()
-        .filter(|t| offered.token_types.iter().any(|s| s == t))
-        .map(str::to_owned)
-        .collect();
-        legend.token_modifiers = [
-            "declaration",
-            "definition",
-            "readonly",
-            "static",
-            "deprecated",
-            "abstract",
-            "async",
-            "modification",
-            "documentation",
-            "defaultLibrary",
-            "local",
-        ]
-        .into_iter()
-        .filter(|t| offered.token_modifiers.iter().any(|s| s == t))
-        .map(str::to_owned)
-        .collect();
+        legend.token_types = tsr_ls::TOKEN_TYPES
+            .iter()
+            .copied()
+            .filter(|t| offered.token_types.iter().any(|s| s == t))
+            .map(str::to_owned)
+            .collect();
+        legend.token_modifiers = tsr_ls::TOKEN_MODIFIERS
+            .iter()
+            .copied()
+            .filter(|t| offered.token_modifiers.iter().any(|s| s == t))
+            .map(str::to_owned)
+            .collect();
     }
     lsp::InitializeResult {
         capabilities: Some(Box::new(server)),
