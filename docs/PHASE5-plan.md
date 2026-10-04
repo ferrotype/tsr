@@ -477,6 +477,17 @@ with request/file affinity, cancellation cleanup, accumulated global diagnostics
 and staggered idle eviction. Discarded pools remain usable by retained snapshots.
 Manual-clock and contention-barrier tests exercise these transitions.
 
+L1 review fixes preserve file affinity when a released checker is reacquired
+by request, expand watched directory deletions before resolving aliases, and
+retain dirty-project state across snapshots until the project is requested.
+The latter includes config changes and accumulation of multiple changed files;
+old snapshots keep their programs and unaffected projects keep identity.
+The unused key-only cache `retain` API was removed; program reuse already uses
+`acquire` with the retained file as its fallback. Scheduler waits remain
+cancellation-aware, unlike Go's semaphore wait; the project README and scheduler
+record the resulting potential difference in subsequent slot/type allocation
+order. This documents existing behavior, not a new parity claim.
+
 Config and program watches now follow snapshot updates, with shared registration
 counts, external-directory grouping, URI-relative patterns, per-call deadlines
 and rollback/retry using the original watcher IDs. The client interface runs on

@@ -135,12 +135,6 @@ impl<K: Eq + Hash + Clone, V: Clone> RefCountCache<K, V> {
         };
         result
     }
-    // port: tsc/internal/project/refcountcache.go:RefCountCache.Ref
-    pub fn retain(&self, key: &K) {
-        // A caller must already retain the value (normally through a program).
-        assert!(self.has(key), "cache entry not found");
-        self.acquire(key, || panic!("cache entry not found"));
-    }
     // port: tsc/internal/project/refcountcache.go:RefCountCache.Deref
     pub fn release(&self, key: &K) {
         let Some(entry) = self
@@ -204,7 +198,7 @@ mod tests {
         let a = cache.acquire(&"a", || Arc::new("value"));
         let b = cache.acquire(&"a", || panic!("reuse"));
         assert!(Arc::ptr_eq(&a, &b));
-        cache.retain(&"a");
+        cache.acquire(&"a", || panic!("existing entry must be reused"));
         assert_eq!(cache.reference_count(&"a"), Some(3));
         cache.release(&"a");
         cache.release(&"a");

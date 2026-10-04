@@ -4,6 +4,7 @@ use super::{
 };
 use crate::{
     config::AffectedConfigs,
+    file_change::FileChangeKind,
     overlay::Overlays,
     project::{ProgramUpdateKind, ProjectData, ProjectKind, INFERRED_PROJECT_NAME},
     source_fs::SourceFs,
@@ -71,6 +72,9 @@ impl<'a> ProjectBuilder<'a> {
         }
     }
     pub(super) fn build(mut self, requested: Option<&DocumentUri>) -> Result<Collection, Error> {
+        // Watch batches are consumed once, including changes to projects with
+        // no open files. Keep their dirtiness until a later request rebuilds them.
+        self.mark_projects_dirty();
         let mut files: BTreeMap<_, _> = self
             .overlays
             .iter()
@@ -147,6 +151,68 @@ impl<'a> ProjectBuilder<'a> {
             self.configs.release_project(&key);
         }
         Ok((self.projects, defaults))
+    }
+
+    // port: tsc/internal/project/projectcollectionbuilder.go:ProjectCollectionBuilder.markFilesChanged
+    fn mark_projects_dirty(&mut self) {
+        let changes = [
+            (FileChangeKind::WatchChange, &self.changes.changed),
+            (FileChangeKind::WatchDelete, &self.changes.deleted),
+            (FileChangeKind::WatchCreate, &self.changes.created),
+        ]
+        .map(|(kind, uris)| {
+            let paths: Vec<_> = uris
+                .iter()
+                .map(|uri| self.configs.path(uri.file_name().as_bytes()))
+                .collect();
+            (kind, paths)
+        });
+        for (key, project) in &mut self.projects {
+            let old = project.data().unwrap();
+            let mut dirty = old.dirty;
+            let mut dirty_file = old.dirty_file.clone();
+            if self.changes.invalidate_all || self.affected.projects.contains(key) {
+                dirty = true;
+                dirty_file = None;
+            }
+            'kinds: for (kind, paths) in &changes {
+                if dirty && dirty_file.is_none() {
+                    break;
+                }
+                for path in paths {
+                    if project.contains_file(path.as_bytes()) {
+                        dirty = true;
+                        if *kind == FileChangeKind::WatchDelete
+                            || tsr_tspath::base_name(path.as_bytes()) == b"package.json"
+                        {
+                            dirty_file = None;
+                            break 'kinds;
+                        }
+                        if let Some(previous) = &dirty_file {
+                            if previous != path {
+                                dirty_file = None;
+                                break 'kinds;
+                            }
+                        } else {
+                            dirty_file = Some(path.clone());
+                        }
+                    } else if if *kind == FileChangeKind::WatchCreate {
+                        old.host.seen_file_or_missing_parent_directory(path)
+                    } else {
+                        old.host.seen_file(path)
+                    } {
+                        dirty = true;
+                        dirty_file = None;
+                        break 'kinds;
+                    }
+                }
+            }
+            if dirty != old.dirty || dirty_file != old.dirty_file {
+                let data = Arc::make_mut(project.data.as_mut().unwrap());
+                data.dirty = dirty;
+                data.dirty_file = dirty_file;
+            }
+        }
     }
     fn select_configured(
         &mut self,
@@ -256,33 +322,11 @@ impl<'a> ProjectBuilder<'a> {
         }
         let old = self.old.projects.get(key).and_then(Project::data);
         let command_changed = old.is_none_or(|old| !Arc::ptr_eq(&old.command_line, &command));
-        let relevant = |uri: &DocumentUri| {
-            old.is_some_and(|old| {
-                old.host.seen_file_or_missing_parent_directory(
-                    &self.configs.path(uri.file_name().as_bytes()),
-                ) || old
-                    .program
-                    .source_file(uri.file_name().as_bytes())
-                    .is_some()
-            })
-        };
-        let changed: Vec<_> = self
-            .changes
-            .changed
-            .iter()
-            .filter(|uri| relevant(uri))
-            .collect();
-        let structure = self.changes.invalidate_all
-            || self.affected.projects.contains(key)
-            || self
-                .changes
-                .created
-                .iter()
-                .chain(&self.changes.deleted)
-                .any(relevant);
-        if !command_changed && !structure && changed.is_empty() {
+        let pending = self.projects.get(key).and_then(Project::data);
+        if !command_changed && pending.is_none_or(|data| !data.dirty) {
             return Ok(());
         }
+        let dirty_file = pending.and_then(|data| data.dirty_file.clone());
         let cwd = if kind == ProjectKind::Configured {
             JsString::from_bytes(tsr_tspath::directory(key.as_bytes()))
         } else {
@@ -300,17 +344,13 @@ impl<'a> ProjectBuilder<'a> {
             case_sensitive: self.session.fs.use_case_sensitive_file_names(),
         }));
         let mut reuse = None;
-        if !command_changed && !structure && changed.len() == 1 {
-            reuse = Some(
-                old.unwrap().program.reuse_program(
-                    self.configs
-                        .path(changed[0].file_name().as_bytes())
-                        .as_bytes(),
-                    host.clone(),
-                    &mut cache,
-                    &self.session.counters,
-                )?,
-            );
+        if let Some(path) = dirty_file.filter(|_| !command_changed) {
+            reuse = Some(old.unwrap().program.reuse_program(
+                path.as_bytes(),
+                host.clone(),
+                &mut cache,
+                &self.session.counters,
+            )?);
         }
         let (program, update_kind) =
             if let Some(program) = reuse.as_mut().and_then(|reuse| reuse.program.take()) {
@@ -384,6 +424,8 @@ impl<'a> ProjectBuilder<'a> {
                 update_kind,
                 last_update: self.snapshot_id,
                 host,
+                dirty: false,
+                dirty_file: None,
             },
             &self.session.counters,
             self.session.options.query_checkers,

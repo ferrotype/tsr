@@ -151,7 +151,10 @@ impl CheckerScheduler {
         } else {
             ""
         };
-        // Cancellation wakes a waiter even when no slot has ever been acquired.
+        // Deliberate difference from checkerpool.go: Go's semaphore wait ignores
+        // cancellation. Here a canceled waiter returns without claiming or
+        // initializing a slot, so abandoned requests leave the wait promptly.
+        // Later slot/type allocation order may therefore differ from Go.
         // Registration is outside the state lock: an already-done context calls
         // its after-function immediately.
         let weak = Arc::downgrade(self);
@@ -173,7 +176,7 @@ impl CheckerScheduler {
         }
         let _wake = Stop(wake);
         let mut state = self.state.lock().unwrap();
-        let index = loop {
+        let (index, associate_file) = loop {
             self.pool.generation().validate().map_err(Error::from)?;
             if let Some(error) = context.err() {
                 return Err(AcquireError::Canceled(error));
@@ -193,29 +196,35 @@ impl CheckerScheduler {
                         finishing_same_request = true;
                     }
                     if slot.initialized && !slot.held {
-                        break index;
+                        break (index, false);
                     }
                 } else {
                     state.requests.remove(request);
                 }
             }
             let candidate = match lifetime {
-                CheckerLifetime::Diagnostics => (!state.slots[0].held).then_some(0),
+                CheckerLifetime::Diagnostics => (!state.slots[0].held).then_some((0, false)),
                 CheckerLifetime::Api => {
                     let i = self.pool.query_slots + 1;
-                    (!state.slots[i].held).then_some(i)
+                    (!state.slots[i].held).then_some((i, false))
                 }
                 CheckerLifetime::Temporary => file
                     .and_then(|file| state.files.get(&file).copied())
                     .filter(|&i| state.slots[i].initialized && !state.slots[i].held)
+                    .map(|i| (i, false))
                     .or_else(|| {
                         (1..=self.pool.query_slots)
                             .find(|&i| state.slots[i].initialized && !state.slots[i].held)
+                            .map(|i| (i, true))
                     })
-                    .or_else(|| (1..=self.pool.query_slots).find(|&i| !state.slots[i].held)),
+                    .or_else(|| {
+                        (1..=self.pool.query_slots)
+                            .find(|&i| !state.slots[i].held)
+                            .map(|i| (i, true))
+                    }),
             };
-            if let Some(index) = candidate.filter(|_| !finishing_same_request) {
-                break index;
+            if let Some(selection) = candidate.filter(|_| !finishing_same_request) {
+                break selection;
             }
             let relevant = match lifetime {
                 CheckerLifetime::Diagnostics => 0..1,
@@ -265,7 +274,9 @@ impl CheckerScheduler {
             slot.identity = Some(lease.checker.as_ref().unwrap().owner().identity().clone());
             slot.initializing = None;
             slot.lease = Arc::downgrade(&lease);
-            if let Some(file) = file.filter(|_| lifetime == CheckerLifetime::Temporary) {
+            // getQueryChecker only records a file on the find-or-create path.
+            // Reacquiring by request must leave another file's affinity intact.
+            if let Some(file) = file.filter(|_| associate_file) {
                 state.files.insert(file, index);
             }
             let registration = if !request.is_empty() && !state.requests.contains_key(request) {

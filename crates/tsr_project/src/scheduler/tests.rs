@@ -126,6 +126,38 @@ fn queries_prefer_file_affinity_and_then_an_existing_idle_checker() {
     );
     ctx.cancel();
 }
+
+// getQueryChecker returns immediately after tryReacquireForRequest; a query of
+// another file in that request must not overwrite the file's own association.
+#[test]
+fn request_reacquisition_preserves_the_other_files_checker_affinity() {
+    let (s, _) = setup(2);
+    let a = s.program.files()[0].source();
+    let b = s.program.files()[1].source();
+    let ctx = context();
+    let first = s
+        .acquire(CheckerLifetime::Temporary, Some(a), &ctx, "one")
+        .unwrap();
+    let second = s
+        .acquire(CheckerLifetime::Temporary, Some(b), &ctx, "two")
+        .unwrap();
+    let first_id = first.owner().identity().id();
+    let second_id = second.owner().identity().id();
+    assert_ne!(first_id, second_id);
+    drop(first);
+    drop(second);
+
+    let reacquired = s
+        .acquire(CheckerLifetime::Temporary, Some(b), &ctx, "one")
+        .unwrap();
+    assert_eq!(reacquired.owner().identity().id(), first_id);
+    drop(reacquired);
+    let later = s
+        .acquire(CheckerLifetime::Temporary, Some(b), &ctx, "three")
+        .unwrap();
+    assert_eq!(later.owner().identity().id(), second_id);
+    ctx.cancel();
+}
 // source: tsc/internal/project/checkerpool_test.go:TestCheckerPoolStaggeredIdleCleanup
 // source: tsc/internal/project/checkerpool_test.go:TestCheckerPoolAPICheckerStableIdentity
 #[test]
