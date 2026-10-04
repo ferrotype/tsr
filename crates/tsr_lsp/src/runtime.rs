@@ -59,6 +59,8 @@ struct Settings {
     validation: bool,
     style_warnings: bool,
     config_name: String,
+    exclude_library_symbols: bool,
+    workspace_current_project: bool,
 }
 impl Default for Settings {
     fn default() -> Self {
@@ -67,6 +69,8 @@ impl Default for Settings {
             validation: true,
             style_warnings: true,
             config_name: String::new(),
+            exclude_library_symbols: true,
+            workspace_current_project: false,
         }
     }
 }
@@ -334,6 +338,94 @@ impl Runtime {
                         )?;
                     }
                     client::raw(&result)
+                })));
+            }
+            "workspace/symbol" => {
+                let params: lsp::WorkspaceSymbolParams = crate::decode(params)?;
+                let settings = self.settings.lock().unwrap().clone();
+                let uri = params
+                    .text_document
+                    .as_deref()
+                    .map(|d| &d.uri)
+                    .filter(|_| settings.workspace_current_project);
+                let snapshot = self
+                    .ready()?
+                    .session()
+                    .flush_with_host(uri, host)
+                    .map_err(crate::project_error)?;
+                let path = uri.map(|u| {
+                    u.path(
+                        snapshot
+                            .filesystem()
+                            .unwrap()
+                            .use_case_sensitive_file_names(),
+                    )
+                });
+                let context = context.clone();
+                let encoding = self.options.project.position_encoding;
+                return Ok(Dispatch::Work(Box::new(move || {
+                    let cancellation = tsr_core::CancellationToken::new();
+                    let cancel = cancellation.clone();
+                    struct Stop(tsr_ipc::AfterFuncStop);
+                    impl Drop for Stop {
+                        fn drop(&mut self) {
+                            self.0.stop();
+                        }
+                    }
+                    let _stop = Stop(context.after_func(move || cancel.cancel()));
+                    let programs: Vec<_> = snapshot
+                        .projects()
+                        .into_iter()
+                        .filter_map(|p| p.program().map(AsRef::as_ref))
+                        .filter(|p| {
+                            path.as_ref()
+                                .is_none_or(|path| p.source_file(path.as_bytes()).is_some())
+                        })
+                        .collect();
+                    let response = tsr_ls::workspace_symbols(
+                        &programs,
+                        encoding,
+                        &cancellation,
+                        &params.query,
+                        settings.exclude_library_symbols,
+                    )
+                    .map_err(|e| crate::error(-32603, e.to_string()))?;
+                    client::raw(&response)
+                })));
+            }
+            _ if crate::language_features::handles(method) => {
+                let feature = crate::language_features::Request::decode(method, params)?;
+                let uri = feature.uri();
+                let snapshot = self
+                    .ready()?
+                    .session()
+                    .flush_with_host(Some(uri), host)
+                    .map_err(crate::project_error)?;
+                let path = uri.path(
+                    snapshot
+                        .filesystem()
+                        .unwrap()
+                        .use_case_sensitive_file_names(),
+                );
+                let project = snapshot.project_for_file(path.as_bytes()).cloned();
+                let context = context.clone();
+                let capabilities = self.capabilities.clone();
+                let encoding = self.options.project.position_encoding;
+                let request_id = request
+                    .id
+                    .as_ref()
+                    .map(ToString::to_string)
+                    .unwrap_or_default();
+                return Ok(Dispatch::Work(Box::new(move || {
+                    let _snapshot = snapshot;
+                    crate::language_features::execute(
+                        &context,
+                        &request_id,
+                        project.as_ref(),
+                        feature,
+                        encoding,
+                        &capabilities,
+                    )
                 })));
             }
             _ if unimplemented_method(method) => {
@@ -646,6 +738,13 @@ impl Runtime {
                     {
                         set_bool(raw.get("validateEnabled"), &mut next.validation);
                         set_bool(
+                            raw.get("excludeLibrarySymbolsInNavTo"),
+                            &mut next.exclude_library_symbols,
+                        );
+                        if let Some(lsp::Any::String(scope)) = raw.get("workspaceSymbolsScope") {
+                            next.workspace_current_project = scope == "currentProject";
+                        }
+                        set_bool(
                             raw.get("reportStyleChecksAsWarnings"),
                             &mut next.style_warnings,
                         );
@@ -658,6 +757,14 @@ impl Runtime {
                             .or_else(|| nested(fields, "validate.enable")),
                         &mut next.validation,
                     );
+                    set_bool(
+                        nested(fields, "workspaceSymbols.excludeLibrarySymbols"),
+                        &mut next.exclude_library_symbols,
+                    );
+                    if let Some(lsp::Any::String(scope)) = nested(fields, "workspaceSymbols.scope")
+                    {
+                        next.workspace_current_project = scope == "currentProject";
+                    }
                     set_bool(
                         fields.get("reportStyleChecksAsWarnings"),
                         &mut next.style_warnings,

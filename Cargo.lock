@@ -1191,14 +1191,22 @@ version = "0.2.0"
 name = "tsr_ls"
 version = "0.2.0"
 dependencies = [
+ "stacker",
  "tsr_arena",
  "tsr_ast",
+ "tsr_astnav",
+ "tsr_checker",
  "tsr_compiler",
  "tsr_core",
  "tsr_diagnostics",
  "tsr_jsstring",
  "tsr_locale",
  "tsr_lsproto",
+ "tsr_parser",
+ "tsr_scanner",
+ "tsr_tsoptions",
+ "tsr_tspath",
+ "tsr_vfs",
 ]
 
 [[package]]

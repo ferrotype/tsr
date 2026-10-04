@@ -11,6 +11,9 @@ use tsr_jsstring::JsString;
 #[derive(Default)]
 pub(crate) struct OwnerIndex {
     nodes: HashMap<ArenaId, usize>,
+    // Token/JSDoc arenas can be created after the program is published.
+    // Discover each retained namespace once; core reads remain lock-free.
+    secondary_nodes: std::sync::RwLock<HashMap<ArenaId, usize>>,
     symbols: HashMap<ArenaId, usize>,
     tables: HashMap<ArenaId, usize>,
 }
@@ -18,6 +21,32 @@ impl OwnerIndex {
     /// Finds the retained file owning a node without creating a resolver scope.
     pub(crate) fn node_file_index(&self, node: NodeId) -> Option<usize> {
         self.nodes.get(&node.arena()).copied()
+    }
+
+    pub(crate) fn retained_node_file_index(
+        &self,
+        files: &[std::sync::Arc<ProgramFile>],
+        node: NodeId,
+    ) -> Option<usize> {
+        if let Some(index) = self.node_file_index(node) {
+            return Some(index);
+        }
+        if let Some(&index) = self
+            .secondary_nodes
+            .read()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .get(&node.arena())
+        {
+            return Some(index);
+        }
+        let index = files
+            .iter()
+            .position(|file| file.bound().view().ast().for_node_owner(node).is_ok())?;
+        self.secondary_nodes
+            .write()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .insert(node.arena(), index);
+        Some(index)
     }
 
     pub(crate) fn from_files(files: &[std::sync::Arc<ProgramFile>]) -> Self {
@@ -48,24 +77,14 @@ impl Program {
 }
 impl ResolverHost for ProgramResolverHost<'_> {
     fn ast(&self, node: NodeId) -> Result<AstView<'_>, Error> {
-        let &i = self
-            .program
-            .owners
-            .nodes
-            .get(&node.arena())
-            .ok_or(Error::WrongOwner)?;
-        let view = self.program.files()[i].bound().view().ast();
+        let file = self.program.file_of_node(node).ok_or(Error::WrongOwner)?;
+        let view = file.bound().view().ast().for_node_owner(node)?;
         view.node(node)?;
         Ok(view)
     }
     fn binding(&self, node: NodeId) -> Result<Option<NodeBinding>, Error> {
-        let &i = self
-            .program
-            .owners
-            .nodes
-            .get(&node.arena())
-            .ok_or(Error::WrongOwner)?;
-        self.program.files()[i].bound().view().node_binding(node)
+        let file = self.program.file_of_node(node).ok_or(Error::WrongOwner)?;
+        file.bound().view().node_binding(node)
     }
     fn symbol(&self, symbol: SymbolId) -> Result<SymbolRef<'_>, Error> {
         if symbol.arena() == self.transient.id() {

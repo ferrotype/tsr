@@ -459,7 +459,7 @@ impl Program {
     /// for a node of this program).
     pub fn file_of_node(&self, node: NodeId) -> Option<&Arc<ProgramFile>> {
         self.owners
-            .node_file_index(node)
+            .retained_node_file_index(&self.files, node)
             .map(|index| &self.files[index])
     }
     /// Whether `file` may be emitted, as `Program.SourceFileMayBeEmitted`
