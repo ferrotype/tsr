@@ -15,6 +15,7 @@ mod identifiers;
 mod imports;
 mod js_syntax;
 mod jsdoc;
+pub use jsdoc::get_jsdoc_comment_ranges;
 mod json;
 mod jsx;
 mod lazy_jsdoc;

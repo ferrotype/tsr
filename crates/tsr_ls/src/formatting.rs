@@ -305,3 +305,86 @@ impl LanguageService<'_> {
         self.formatting_edits(projection.script, changes)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    // source: tsc/internal/ls/format_test.go:TestNonOverlappingFormattingRanges
+    #[test]
+    fn formatting_ranges_sort_trim_and_prefer_the_longest() {
+        let program = crate::tests::program(b"/index.ts", b"");
+        let source = program.source_file(b"/index.ts").unwrap().source();
+        for (candidates, expected) in [
+            (vec![(10, 15), (0, 5)], vec![(0, 5), (10, 15)]),
+            (vec![(0, 10), (0, 20)], vec![(0, 20)]),
+            (vec![(5, 15), (0, 20)], vec![(0, 20)]),
+            (vec![(5, 15), (0, 10)], vec![(0, 10), (10, 15)]),
+        ] {
+            let mapped = candidates
+                .into_iter()
+                .map(|(start, end)| MappedRange {
+                    source,
+                    segment: SpanSegment::default(),
+                    range: TextRange::new(start, end),
+                })
+                .collect();
+            assert_eq!(
+                non_overlapping(mapped)
+                    .iter()
+                    .map(|r| (r.range.pos(), r.range.end()))
+                    .collect::<Vec<_>>(),
+                expected,
+            );
+        }
+    }
+
+    // source: tsc/internal/ls/format_test.go:TestGetFormattingEditsAfterKeystroke_EmptyFile
+    // source: tsc/internal/ls/format_test.go:TestGetFormattingEditsAfterKeystroke_SimpleStatement
+    #[test]
+    fn newline_formatting_accepts_empty_files_and_unterminated_statements() {
+        for text in [b"".as_slice(), b"const x = 1"] {
+            let program = crate::tests::program(b"/index.ts", text);
+            let source = program.source_file(b"/index.ts").unwrap().source();
+            let service = LanguageService::new(
+                &program,
+                tsr_jsstring::PositionEncoding::Utf16,
+                tsr_core::CancellationToken::new(),
+            );
+            service
+                .format_changes(
+                    source,
+                    &FormatCodeSettings::default(),
+                    None,
+                    Some((text.len() as i64, "\n")),
+                )
+                .unwrap();
+        }
+    }
+
+    // source: tsc/internal/ls/format_test.go:TestGetFormattingEditsForRange_FunctionBody
+    #[test]
+    fn formatting_function_body_ranges_uses_the_containing_node() {
+        for (text, start, end) in [
+            ("function foo() {\n    return (1  + 2);\n}", 21, 38),
+            ("function\nf() {\n}", 9, 13),
+            ("function f() {\n  \n}", 15, 17),
+            ("function f() {\n}", 15, 15),
+        ] {
+            let program = crate::tests::program(b"/index.ts", text.as_bytes());
+            let source = program.source_file(b"/index.ts").unwrap().source();
+            let service = LanguageService::new(
+                &program,
+                tsr_jsstring::PositionEncoding::Utf16,
+                tsr_core::CancellationToken::new(),
+            );
+            service
+                .format_changes(
+                    source,
+                    &FormatCodeSettings::default(),
+                    Some(TextRange::new(start, end)),
+                    None,
+                )
+                .unwrap();
+        }
+    }
+}

@@ -179,13 +179,6 @@ impl LanguageService<'_> {
             .flatten()
             .collect();
         let declaration = declarations.first().copied();
-        let kind = declaration
-            .map(|d| {
-                self.view(d)
-                    .and_then(|v| Ok(v.node(d)?.kind().known().unwrap_or(K::Unknown)))
-            })
-            .transpose()?
-            .unwrap_or(K::PropertySignature);
         let present = present(syntax, context, position)?;
         let abstract_ = present.flags & mf::ABSTRACT != 0
             && tsr_ast::utilities_class::has_abstract_modifier(syntax.view, class)?;
@@ -234,6 +227,94 @@ impl LanguageService<'_> {
             flags &= !mf::PUBLIC;
         }
         flags |= present.flags;
+        let mut adder = tsr_autoimport::ImportAdder::default();
+        let Some((nodes, roots)) = self.member_nodes(
+            checker,
+            syntax,
+            symbol,
+            class,
+            signature_only,
+            flags,
+            &present.decorators,
+            options,
+            false,
+            None,
+            &tsr_printer::EmitContext::default(),
+            &mut adder,
+        )?
+        else {
+            return Ok(Some(item));
+        };
+        let edits = self.import_adder_edits(syntax, options, &adder)?;
+        if !edits.is_empty() {
+            item.additional_text_edits = Some(Box::new(edits));
+        }
+        let name_text = tsr_ast::JsString::from_bytes(checker.symbol(symbol)?.name_bytes());
+        let text = crate::snippet_printer::print_many(
+            nodes.ast,
+            &roots,
+            &nodes.emit,
+            &syntax.file,
+            &settings(options, syntax)?,
+        )?;
+        if !text.is_empty() {
+            item.insert_text = Some(Box::new(
+                text.join(options.newline.as_deref().unwrap_or("\n")),
+            ));
+        }
+        item.filter_text = Some(Box::new(
+            String::from_utf8_lossy(name_text.as_bytes()).into_owned(),
+        ));
+        item.insert_text_format = options
+            .snippets
+            .then(|| Box::new(lsp::InsertTextFormat::SNIPPET));
+        if let Some(erase) = present.erase {
+            let (range, fidelity) =
+                self.range(syntax.source, erase, tsr_ast::span_map::FEATURE_COMPLETION)?;
+            if fidelity.is_exact() {
+                item.additional_text_edits
+                    .get_or_insert_with(Default::default)
+                    .push(Some(Box::new(lsp::TextEdit {
+                        range,
+                        new_text: String::new(),
+                    })));
+                item.data.as_mut().unwrap().source = "ClassMemberSnippet/".into();
+            }
+        }
+        Ok(Some(item))
+    }
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Member synthesis is shared by completions and fixes with explicit emission policies"
+    )]
+    pub(crate) fn member_nodes(
+        &mut self,
+        checker: &mut Operation<'_>,
+        syntax: &mut Syntax<'_>,
+        symbol: SymbolRef,
+        class: NodeId,
+        signature_only: bool,
+        flags: u32,
+        decorators: &[NodeId],
+        options: &CompletionOptions,
+        method_optional: bool,
+        locale: Option<&tsr_locale::Locale>,
+        emit: &tsr_printer::EmitContext,
+        adder: &mut tsr_autoimport::ImportAdder,
+    ) -> Result<Option<(GeneratedTypeNodes, Vec<NodeId>)>> {
+        let declarations: Vec<_> = checker
+            .symbol_declarations(symbol)?
+            .iter()
+            .flatten()
+            .collect();
+        let declaration = declarations.first().copied();
+        let kind = declaration
+            .map(|d| {
+                self.view(d)
+                    .and_then(|v| Ok(v.node(d)?.kind().known().unwrap_or(K::Unknown)))
+            })
+            .transpose()?
+            .unwrap_or(K::PropertySignature);
         let ty = checker.get_type_of_symbol_at_location(symbol, Some(class))?;
         let ty = checker.get_widened_type(ty)?;
         let optional = checker.symbol(symbol)?.flags() & sf::OPTIONAL != 0;
@@ -254,7 +335,7 @@ impl LanguageService<'_> {
         let mut combination = None;
         if is_method {
             if signatures.is_empty() {
-                return Ok(Some(item));
+                return Ok(None);
             }
             if declarations.len() == 1 {
                 planned.push((signatures[0], !signature_only));
@@ -291,7 +372,7 @@ impl LanguageService<'_> {
             } else {
                 0
             };
-        let mut builder = checker.node_builder();
+        let mut builder = checker.node_builder_with_emit(emit);
         let mut roots = Vec::new();
         for (signature, with_body) in planned {
             if let Some(node) = builder.signature_to_signature_declaration(
@@ -319,29 +400,63 @@ impl LanguageService<'_> {
             None
         };
         let mut nodes = builder.into_syntax();
-        for &decl in declarations.iter().chain(present.decorators.iter()) {
+        for &decl in declarations.iter().chain(decorators.iter()) {
             if let Some(file) = self.program.file_of_node(decl) {
                 nodes.ast.retain_completed(file.bound());
             }
         }
-        let original_name = declaration
+        let mut original_name = declaration
             .map(|d| nodes.ast.view().node(d).map(|n| n.name()))
             .transpose()?
             .flatten();
+        if checker.symbol(symbol)?.check_flags() & tsr_ast::check_flags::MAPPED != 0 {
+            if let Some(name_type) = checker.get_name_type_of_symbol(symbol)? {
+                if let Some(name) = checker.get_property_name_from_type(name_type)? {
+                    original_name = Some(nodes.ast.new_identifier(name));
+                }
+            }
+        }
         let mut result = Vec::new();
         for (root, with_body) in roots {
             let root = nodes.clone_node(Some(root)).unwrap();
-            let name = property_name(&mut nodes, original_name, &name_text);
+            let name = property_name(
+                &mut nodes,
+                original_name,
+                &name_text,
+                options,
+                locale.is_some(),
+            );
             let body = with_body
-                .then(|| body(&mut nodes.ast, &mut nodes.emit, options.snippets))
+                .then(|| member_body(&mut nodes, options, locale))
                 .transpose()?;
+            let question = optional.then(|| nodes.ast.new_token(K::QuestionToken.into()));
+            if syntax.file.is_js() {
+                let parameters: Vec<_> = nodes
+                    .ast
+                    .view()
+                    .node_slice(nodes.ast.view().node(root)?.parameters(nodes.ast.view())?)?
+                    .iter()
+                    .flatten()
+                    .collect();
+                for parameter in parameters {
+                    if let NodeData::ParameterDeclaration(p) =
+                        nodes.ast.node_mut(parameter)?.data_mut()
+                    {
+                        p.question_token = None;
+                    }
+                }
+            }
             let mut read = nodes.ast.node_mut(root)?;
             let NodeData::MethodDeclaration(data) = read.data_mut() else {
                 unreachable!()
             };
             data.name = Some(name);
             data.body = body;
-            data.postfix_token = None;
+            if syntax.file.is_js() {
+                data.type_parameters = None;
+                data.r#type = None;
+            }
+            data.postfix_token = method_optional.then_some(question).flatten();
             result.push(root);
         }
         if !is_method {
@@ -360,11 +475,17 @@ impl LanguageService<'_> {
             };
             for declaration in kinds {
                 let kind = nodes.ast.view().node(declaration)?.kind();
-                let name = property_name(&mut nodes, original_name, &name_text);
+                let name = property_name(
+                    &mut nodes,
+                    original_name,
+                    &name_text,
+                    options,
+                    locale.is_some(),
+                );
                 let ty = nodes.clone_node(type_node);
                 let node = if kind == K::GetAccessor {
                     let b = (!signature_only)
-                        .then(|| body(&mut nodes.ast, &mut nodes.emit, options.snippets))
+                        .then(|| member_body(&mut nodes, options, locale))
                         .transpose()?;
                     nodes.ast.new_get_accessor_declaration(
                         None,
@@ -397,12 +518,12 @@ impl LanguageService<'_> {
                         None,
                         parameter_name,
                         None,
-                        ty,
+                        if syntax.file.is_js() { None } else { ty },
                         None,
                     );
                     let ps = list(&mut nodes.ast, &[Some(p)])?;
                     let b = (!signature_only)
-                        .then(|| body(&mut nodes.ast, &mut nodes.emit, options.snippets))
+                        .then(|| member_body(&mut nodes, options, locale))
                         .transpose()?;
                     nodes.ast.new_set_accessor_declaration(
                         None,
@@ -423,8 +544,15 @@ impl LanguageService<'_> {
             }
         }
         if let Some(combination) = combination {
-            let name = property_name(&mut nodes, original_name, &name_text);
+            let name = property_name(
+                &mut nodes,
+                original_name,
+                &name_text,
+                options,
+                locale.is_some(),
+            );
             let mut parameters = Vec::new();
+            let mut name_counts = std::collections::HashMap::<Vec<u8>, usize>::new();
             for n in 0..combination.count + usize::from(combination.rest) {
                 let name = combination
                     .names
@@ -438,7 +566,17 @@ impl LanguageService<'_> {
                             format!("arg{n}").into_bytes()
                         })
                     });
-                let name = nodes.ast.new_identifier(name);
+                let mut text = name.as_bytes().to_vec();
+                if n < combination.count {
+                    let count = name_counts.entry(text.clone()).or_default();
+                    if *count > 0 {
+                        text.extend_from_slice(count.to_string().as_bytes());
+                    }
+                    *count += 1;
+                }
+                let name = nodes
+                    .ast
+                    .new_identifier(tsr_ast::JsString::from_bytes(text));
                 let question = (n as i32 >= combination.minimum)
                     .then(|| nodes.ast.new_token(K::QuestionToken.into()));
                 let mut ty = nodes.ast.new_keyword_type_node(K::UnknownKeyword.into());
@@ -453,18 +591,24 @@ impl LanguageService<'_> {
                     rest,
                     Some(name),
                     question,
-                    Some(ty),
+                    if syntax.file.is_js() && n < combination.count {
+                        None
+                    } else {
+                        Some(ty)
+                    },
                     None,
                 )));
             }
             let ps = list(&mut nodes.ast, &parameters)?;
             let ty = nodes.clone_node(type_node);
-            let b = body(&mut nodes.ast, &mut nodes.emit, options.snippets)?;
+            let b = member_body(&mut nodes, options, locale)?;
+            let question =
+                (optional && method_optional).then(|| nodes.ast.new_token(K::QuestionToken.into()));
             result.push(nodes.ast.new_method_declaration(
                 None,
                 None,
                 Some(name),
-                None,
+                question,
                 None,
                 Some(ps),
                 ty,
@@ -472,73 +616,37 @@ impl LanguageService<'_> {
                 Some(b),
             ));
         }
-        let mut adder = tsr_autoimport::ImportAdder::default();
-        self.import_generated_types(
-            checker,
-            syntax,
-            &mut nodes,
-            &mut result,
-            options,
-            &mut adder,
-        )?;
-        let edits = self.import_adder_edits(syntax, options, &adder)?;
-        if !edits.is_empty() {
-            item.additional_text_edits = Some(Box::new(edits));
-        }
+        self.import_generated_types(checker, syntax, &mut nodes, &mut result, options, adder)?;
         let count = result.len();
         let mut roots = Vec::new();
         for (index, node) in result.into_iter().enumerate() {
             let mods = modifiers(
                 &mut nodes,
                 flags,
-                if index + 1 == count {
-                    &present.decorators
-                } else {
-                    &[]
-                },
+                if index + 1 == count { decorators } else { &[] },
             )?;
             let node = tsr_ast::utilities_class::replace_modifiers(&mut nodes.ast, node, mods);
             roots.push(node);
         }
-        let text = crate::snippet_printer::print_many(
-            nodes.ast,
-            &roots,
-            &nodes.emit,
-            &syntax.file,
-            &settings(options, syntax)?,
-        )?;
-        if !text.is_empty() {
-            item.insert_text = Some(Box::new(
-                text.join(options.newline.as_deref().unwrap_or("\n")),
-            ));
-        }
-        item.filter_text = Some(Box::new(
-            String::from_utf8_lossy(name_text.as_bytes()).into_owned(),
-        ));
-        item.insert_text_format = options
-            .snippets
-            .then(|| Box::new(lsp::InsertTextFormat::SNIPPET));
-        if let Some(erase) = present.erase {
-            let (range, fidelity) =
-                self.range(syntax.source, erase, tsr_ast::span_map::FEATURE_COMPLETION)?;
-            if fidelity.is_exact() {
-                item.additional_text_edits
-                    .get_or_insert_with(Default::default)
-                    .push(Some(Box::new(lsp::TextEdit {
-                        range,
-                        new_text: String::new(),
-                    })));
-                item.data.as_mut().unwrap().source = "ClassMemberSnippet/".into();
-            }
-        }
-        Ok(Some(item))
+        Ok(Some((nodes, roots)))
     }
 }
 fn property_name(
     nodes: &mut GeneratedTypeNodes,
     original: Option<NodeId>,
     name: &tsr_ast::JsString,
+    options: &CompletionOptions,
+    constructor: bool,
 ) -> NodeId {
+    if constructor && name.as_bytes() == b"constructor" {
+        let flags = if options.quote == crate::QuotePreference::Single {
+            tsr_ast::token_flags::SINGLE_QUOTE
+        } else {
+            0
+        };
+        let literal = nodes.ast.new_string_literal(name.clone(), flags);
+        return nodes.ast.new_computed_property_name(Some(literal));
+    }
     nodes.clone_node(original).unwrap_or_else(|| {
         if tsr_scanner::is_identifier_text(name.as_bytes(), tsr_core::LanguageVariant::STANDARD) {
             nodes.ast.new_identifier(name.clone())
@@ -546,4 +654,31 @@ fn property_name(
             nodes.ast.new_string_literal(name.clone(), 0)
         }
     })
+}
+
+fn member_body(
+    nodes: &mut GeneratedTypeNodes,
+    options: &CompletionOptions,
+    locale: Option<&tsr_locale::Locale>,
+) -> Result<NodeId> {
+    let Some(locale) = locale else {
+        return body(&mut nodes.ast, &mut nodes.emit, options.snippets);
+    };
+    let text = tsr_ast::JsString::from_bytes(
+        tsr_diagnostics::Method_not_implemented.localize(locale, &[]),
+    );
+    let flags = if options.quote == crate::QuotePreference::Single {
+        tsr_ast::token_flags::SINGLE_QUOTE
+    } else {
+        0
+    };
+    let literal = nodes.ast.new_string_literal(text, flags);
+    let args = list(&mut nodes.ast, &[Some(literal)])?;
+    let error = nodes
+        .ast
+        .new_identifier(tsr_ast::JsString::from_bytes(b"Error".as_slice()));
+    let new = nodes.ast.new_new_expression(Some(error), None, Some(args));
+    let throw = nodes.ast.new_throw_statement(Some(new));
+    let statements = list(&mut nodes.ast, &[Some(throw)])?;
+    Ok(nodes.ast.new_block(Some(statements), true))
 }

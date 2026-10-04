@@ -1,6 +1,6 @@
 # tsr_ls
 
-Read-only language services over retained compiler snapshots: hover and classified
+Language services over retained compiler snapshots: hover and classified
 symbol display, references/highlights, definitions/implementations/source maps,
 symbols, signature help, inlay hints, semantic tokens, call hierarchy, code lenses,
 selection ranges, folding and linked editing. It also owns LSP coordinate and
@@ -15,3 +15,9 @@ See [the L3 development checks](../../tools/phase5/lsp/README.md#l3-read-only-fe
 for native comparisons and the remaining cross-project/mapper integration work.
 
 Completion lists, resolve, JSDoc snippets, auto-insert and applied auto-import edits are implemented on the L3 service. See the [L4 record](../../docs/PHASE5-L4.md) for bounded native comparisons and remaining L6/L7 integration.
+
+Editing includes symbol/file rename, document/range/on-type formatting,
+organize imports, and the pinned import, isolated-declaration and interface
+implementation code fixes. Generated edits use private syntax owners; applying
+them is the client's responsibility. See the [L5 record](../../docs/PHASE5-L5.md)
+for native comparisons, mapped-edit safety and remaining integration work.

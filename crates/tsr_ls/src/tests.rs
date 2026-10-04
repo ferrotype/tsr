@@ -1,15 +1,20 @@
 use super::*;
 use std::sync::Arc;
 
-fn program(name: &[u8], text: &[u8]) -> Program {
+pub(super) fn program(name: &[u8], text: &[u8]) -> Program {
+    program_with_options(name, text, tsr_core::CompilerOptions::default())
+}
+
+fn program_with_options(
+    name: &[u8],
+    text: &[u8],
+    mut options: tsr_core::CompilerOptions,
+) -> Program {
     let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
     fs.insert_loaded(name, text);
-    let options = tsr_core::CompilerOptions {
-        no_lib: tsr_core::Tristate::TRUE,
-        allow_js: tsr_core::Tristate::from(name.ends_with(b".js")),
-        check_js: tsr_core::Tristate::from(name.ends_with(b".js")),
-        ..Default::default()
-    };
+    options.no_lib = tsr_core::Tristate::TRUE;
+    options.allow_js = tsr_core::Tristate::from(name.ends_with(b".js"));
+    options.check_js = tsr_core::Tristate::from(name.ends_with(b".js"));
     Program::load(
         tsr_compiler::ProgramOptions {
             config: tsr_tsoptions::ParsedCommandLine::new(
@@ -1112,4 +1117,101 @@ fn formatting_preserves_unicode_coordinates_and_cancellation() {
             Err(Error::Canceled)
         ));
     }
+}
+
+fn apply_fix_all(text: &str, isolated: bool) -> String {
+    let program = Arc::new(program_with_options(
+        b"/index.ts",
+        text.as_bytes(),
+        tsr_core::CompilerOptions {
+            isolated_declarations: tsr_core::Tristate::from(isolated),
+            declaration: tsr_core::Tristate::from(isolated),
+            ..Default::default()
+        },
+    ));
+    let source = program.source_file(b"/index.ts").unwrap().source();
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool.checker_for_file_exclusive(source).unwrap();
+    let cancel = CancellationToken::new();
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        cancel.clone(),
+    );
+    let uri = lsp::DocumentUri("file:///index.ts".into());
+    let params = lsp::CodeActionParams {
+        text_document: lsp::TextDocumentIdentifier { uri: uri.clone() },
+        context: Some(Box::new(lsp::CodeActionContext {
+            only: Some(Box::new(vec![lsp::CodeActionKind(
+                "source.fixAll.ts".into(),
+            )])),
+            ..Default::default()
+        })),
+        ..Default::default()
+    };
+    let result = service
+        .code_actions(
+            &mut checker,
+            &params,
+            &OrganizeOptions::default(),
+            &CompletionOptions::default(),
+            &tsr_locale::DEFAULT,
+        )
+        .unwrap();
+    let actions = result.command_or_code_action_array.unwrap();
+    assert_eq!(actions.len(), 1);
+    let edits = &actions[0]
+        .code_action
+        .as_ref()
+        .unwrap()
+        .edit
+        .as_ref()
+        .unwrap()
+        .changes
+        .as_ref()
+        .unwrap()[&uri];
+    let script = Script::plain(b"/index.ts", text.as_bytes());
+    let changes = edits
+        .iter()
+        .flatten()
+        .map(|edit| tsr_core::TextChange {
+            range: service
+                .converters
+                .from_lsp_range_to_original(&script, &edit.range),
+            new_text: edit.new_text.as_bytes().to_vec(),
+        })
+        .collect::<Vec<_>>();
+    assert_eq!(
+        service.source(source).unwrap().text().as_bytes(),
+        text.as_bytes()
+    );
+    cancel.cancel();
+    assert!(matches!(
+        service.code_actions(
+            &mut checker,
+            &params,
+            &OrganizeOptions::default(),
+            &CompletionOptions::default(),
+            &tsr_locale::DEFAULT,
+        ),
+        Err(Error::Canceled)
+    ));
+    String::from_utf8(tsr_core::apply_bulk_edits(text.as_bytes(), &changes).unwrap()).unwrap()
+}
+
+#[test]
+fn class_fix_all_keeps_member_insertions_before_brace_cleanup() {
+    // Pinned server output, also compared and applied by quick_fixes.py.
+    assert_eq!(
+        apply_fix_all("interface I { x:number; f():void }\nclass C implements I {}\n", false),
+        "interface I { x:number; f():void }\nclass C implements I {\n    x: number;\n    f(): void {\n        throw new Error(\"Method not implemented.\");\n    }\n}\n"
+    );
+}
+
+#[test]
+fn isolated_fix_all_uses_deduplicated_declaration_diagnostics() {
+    assert_eq!(
+        apply_fix_all("export function f() {}\nf.prop=1;\n", true),
+        "export function f(): void {}\nexport declare namespace f {\n    export var prop: number;\n}\nf.prop=1;\n"
+    );
 }

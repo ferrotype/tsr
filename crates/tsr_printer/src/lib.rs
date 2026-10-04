@@ -40,7 +40,8 @@ mod utilities;
 pub use utilities::{is_pinned_comment, is_recognized_triple_slash_comment};
 
 pub use change_tracker_writer::{
-    create_synthetic_source_file, print_and_position_node, ChangeTrackerWriter,
+    create_synthetic_source_file, print_and_position_node, print_and_position_node_in_source,
+    ChangeTrackerWriter,
 };
 pub use emit_context::{
     generated_identifier_flags, get_emit_context, AssignedNameOptions, AutoGenerateId,

@@ -48,6 +48,7 @@ pub(super) fn allowed_endings(
     default_mode: Mode,
     syntax_mode: Mode,
     preference: Option<&str>,
+    old_specifier: &[u8],
 ) -> Vec<Ending> {
     let resolution = options.module_resolution_kind();
     let node_next = MR::NODE16 <= resolution && resolution <= MR::NODE_NEXT;
@@ -64,7 +65,11 @@ pub(super) fn allowed_endings(
             vec![Ending::Js]
         };
     }
-    let preferred = if preference == Some("js") || mode == Mode::ESNEXT && node_next {
+    let preferred = if has_extension(old_specifier, JS) {
+        Ending::Js
+    } else if old_specifier.ends_with(b"/index") {
+        Ending::Index
+    } else if preference == Some("js") || mode == Mode::ESNEXT && node_next {
         if options.allow_importing_ts_extensions()
             && inferred_ending(imports, mode, node_next) != Ending::Js
         {

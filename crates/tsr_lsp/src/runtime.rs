@@ -56,6 +56,7 @@ impl Options {
 #[derive(Clone)]
 struct Settings {
     rename: tsr_ls::RenameOptions,
+    organize: tsr_ls::OrganizeOptions,
     formatting: bool,
     completion: tsr_ls::CompletionOptions,
     auto_closing_tags: bool,
@@ -78,6 +79,7 @@ impl Default for Settings {
             validation: true,
             formatting: true,
             rename: tsr_ls::RenameOptions::default(),
+            organize: tsr_ls::OrganizeOptions::default(),
             style_warnings: true,
             config_name: String::new(),
             exclude_library_symbols: true,
@@ -411,6 +413,37 @@ impl Runtime {
                     client::raw(&response)
                 })));
             }
+            "workspace/willRenameFiles" => {
+                let params: lsp::RenameFilesParams = crate::decode(params)?;
+                if params.files.is_empty() {
+                    return client::raw(&lsp::Null).map(Dispatch::Ready);
+                }
+                let snapshot = self
+                    .ready()?
+                    .session()
+                    .flush_with_host(None, host)
+                    .map_err(crate::project_error)?;
+                let context = context.clone();
+                let capabilities = self.capabilities.clone();
+                let encoding = self.options.project.position_encoding;
+                let options = self.settings.lock().unwrap().completion.clone();
+                let request_id = request
+                    .id
+                    .as_ref()
+                    .map(ToString::to_string)
+                    .unwrap_or_default();
+                return Ok(Dispatch::Work(Box::new(move || {
+                    crate::language_features::file_renames(
+                        &context,
+                        &request_id,
+                        &snapshot,
+                        &params,
+                        encoding,
+                        &capabilities,
+                        &options,
+                    )
+                })));
+            }
             _ if crate::language_features::handles(method) => {
                 let feature = crate::language_features::Request::decode(method, params)?;
                 let uri = feature.uri();
@@ -441,6 +474,7 @@ impl Runtime {
                 let settings = self.settings.lock().unwrap().clone();
                 let options = crate::language_features::Options {
                     rename: settings.rename,
+                    organize: settings.organize.clone(),
                     formatting: settings.formatting,
                     completion: settings.completion,
                     auto_closing_tags: settings.auto_closing_tags,
@@ -822,6 +856,7 @@ impl Runtime {
                         apply_inlay_preferences(raw, true, &mut next.inlay, &mut next.inlay_flags);
                         set_bool(raw.get("validateEnabled"), &mut next.validation);
                         set_bool(raw.get("formatEnabled"), &mut next.formatting);
+                        apply_organize_preferences(raw, true, &mut next.organize);
                         set_bool(
                             raw.get("providePrefixAndSuffixTextForRename"),
                             &mut next.rename.aliases,
@@ -863,6 +898,7 @@ impl Runtime {
                         &mut next.rename.aliases,
                     );
                     apply_lens_preferences(fields, false, &mut next.code_lens);
+                    apply_organize_preferences(fields, false, &mut next.organize);
                     apply_completion_preferences(
                         fields,
                         false,
@@ -1404,4 +1440,72 @@ fn apply_completion_preferences(
     if let Some(lsp::Any::String(value)) = get("newLineCharacter", "format.newLineCharacter") {
         options.newline = Some(value.clone());
     }
+}
+
+fn apply_organize_preferences(
+    fields: &HashMap<String, lsp::Any>,
+    raw: bool,
+    options: &mut tsr_ls::OrganizeOptions,
+) {
+    let get = |key, path| {
+        if raw {
+            fields.get(key)
+        } else {
+            nested(fields, path)
+        }
+    };
+    for (key, path, output) in [
+        (
+            "organizeImportsSort",
+            "preferences.organizeImports.sort",
+            &mut options.sort,
+        ),
+        (
+            "organizeImportsCaseFirst",
+            "preferences.organizeImports.caseFirst",
+            &mut options.case_first,
+        ),
+        (
+            "organizeImportsTypeOrder",
+            "preferences.organizeImports.typeOrder",
+            &mut options.type_order,
+        ),
+    ] {
+        if let Some(lsp::Any::String(value)) = get(key, path) {
+            output.clone_from(value);
+        }
+    }
+    if let Some(lsp::Any::String(value)) = get(
+        "organizeImportsCollation",
+        "preferences.organizeImports.unicodeCollation",
+    ) {
+        options.unicode = value == "unicode";
+    }
+    match get(
+        "organizeImportsIgnoreCase",
+        "preferences.organizeImports.caseSensitivity",
+    ) {
+        Some(lsp::Any::Boolean(value)) if raw => options.ignore_case = Some(*value),
+        Some(lsp::Any::String(value)) if !raw => {
+            options.ignore_case = match value.as_str() {
+                "caseInsensitive" => Some(true),
+                "caseSensitive" => Some(false),
+                _ => None,
+            }
+        }
+        _ => {}
+    }
+    if let Some(lsp::Any::Boolean(value)) = get(
+        "organizeImportsAccentCollation",
+        "preferences.organizeImports.accentCollation",
+    ) {
+        options.accents = Some(*value);
+    }
+    set_bool(
+        get(
+            "organizeImportsNumericCollation",
+            "preferences.organizeImports.numericCollation",
+        ),
+        &mut options.numeric,
+    );
 }

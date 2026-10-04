@@ -5,11 +5,19 @@ use tsr_ipc::Context;
 use tsr_json::RawValue;
 use tsr_lsproto as lsp;
 
+struct Stop(tsr_ipc::AfterFuncStop);
+impl Drop for Stop {
+    fn drop(&mut self) {
+        self.0.stop();
+    }
+}
+
 pub fn handles(method: &str) -> bool {
     matches!(
         method,
         "textDocument/_vs_onAutoInsert"
             | "textDocument/prepareRename"
+            | "textDocument/codeAction"
             | "textDocument/rename"
             | "textDocument/formatting"
             | "textDocument/rangeFormatting"
@@ -41,6 +49,7 @@ pub fn handles(method: &str) -> bool {
     )
 }
 pub enum Request {
+    CodeActions(lsp::CodeActionParams),
     PrepareRename(lsp::PrepareRenameParams),
     Rename(lsp::RenameParams),
     Format(lsp::DocumentFormattingParams),
@@ -88,6 +97,7 @@ impl Request {
             Ok(())
         }
         Ok(match method {
+            "textDocument/codeAction" => Self::CodeActions(crate::decode(params)?),
             "textDocument/prepareRename" => Self::PrepareRename(crate::decode(params)?),
             "textDocument/rename" => Self::Rename(crate::decode(params)?),
             "textDocument/formatting" => {
@@ -189,6 +199,7 @@ impl Request {
     pub fn uri(&self) -> &lsp::DocumentUri {
         match self {
             Self::PrepareRename(p) => &p.text_document.uri,
+            Self::CodeActions(p) => &p.text_document.uri,
             Self::Rename(p) => &p.text_document.uri,
             Self::Format(p) => &p.text_document.uri,
             Self::FormatRange(p) => &p.text_document.uri,
@@ -255,6 +266,7 @@ impl tsr_ls::QueryChecker for RequestChecker<'_> {
 }
 #[derive(Clone)]
 pub struct Options {
+    pub organize: tsr_ls::OrganizeOptions,
     pub rename: tsr_ls::RenameOptions,
     pub formatting: bool,
     pub completion: tsr_ls::CompletionOptions,
@@ -289,12 +301,6 @@ pub fn execute(
         .ok_or_else(|| error(-32603, "project has no program"))?;
     let cancellation = tsr_core::CancellationToken::new();
     let cancel = cancellation.clone();
-    struct Stop(tsr_ipc::AfterFuncStop);
-    impl Drop for Stop {
-        fn drop(&mut self) {
-            self.0.stop();
-        }
-    }
     let _stop = Stop(context.after_func(move || cancel.cancel()));
     let mut service = tsr_ls::LanguageService::new(program, encoding, cancellation);
     if let Some(host) = project.completion_file_system() {
@@ -330,6 +336,7 @@ pub fn execute(
     if matches!(
         request,
         Request::PrepareRename(_)
+            | Request::CodeActions(_)
             | Request::Rename(_)
             | Request::Completion(_)
             | Request::ResolveCompletion(_, _)
@@ -373,6 +380,11 @@ pub fn execute(
         let mut operation = checker
             .operation()
             .map_err(|e| error(-32603, e.to_string()))?;
+        if matches!(&request, Request::CodeActions(_)) {
+            if let Some(cache) = project.auto_import_cache() {
+                service.set_auto_import_cache(cache);
+            }
+        }
         let text_caps = capabilities.text_document.as_deref();
         if matches!(
             &request,
@@ -560,6 +572,19 @@ pub fn execute(
                     .map_err(service_error)?,
             );
         }
+        if let Request::CodeActions(params) = &request {
+            return client::raw(
+                &service
+                    .code_actions(
+                        &mut operation,
+                        params,
+                        &options.organize,
+                        &options.completion,
+                        &options.locale,
+                    )
+                    .map_err(service_error)?,
+            );
+        }
         if matches!(&request, Request::PrepareRename(_) | Request::Rename(_)) {
             let caps = capabilities
                 .workspace
@@ -601,6 +626,40 @@ pub fn execute(
                 );
             }
             if let Request::Rename(p) = &request {
+                let info = service
+                    .rename_info(
+                        &mut operation,
+                        &p.text_document.uri,
+                        &p.position,
+                        &p.new_name,
+                        rename,
+                        &options.locale,
+                    )
+                    .map_err(service_error)?;
+                if let Some((old, new)) = info.file_to_rename.filter(|_| info.can_rename) {
+                    let will_rename = capabilities
+                        .workspace
+                        .as_deref()
+                        .and_then(|w| w.file_operations.as_deref())
+                        .and_then(|o| o.will_rename.as_deref())
+                        .copied()
+                        .unwrap_or(false);
+                    let mut changes = if will_rename {
+                        Vec::new()
+                    } else {
+                        service
+                            .file_rename(
+                                &mut operation,
+                                &old,
+                                &new,
+                                options.completion.auto_import.ending.as_deref(),
+                                &options.completion.format,
+                            )
+                            .map_err(service_error)?
+                    };
+                    changes.push(resource_rename(old, new));
+                    return client::raw(&file_rename_response(changes, rename.document_changes));
+                }
                 return client::raw(
                     &service
                         .rename(&mut operation, p, rename, &options.locale)
@@ -722,6 +781,7 @@ pub fn execute(
             )
         }
         Request::PrepareRename(_)
+        | Request::CodeActions(_)
         | Request::Rename(_)
         | Request::Completion(_)
         | Request::ResolveCompletion(_, _)
@@ -759,4 +819,153 @@ pub fn execute(
             )
         }
     }
+}
+
+fn resource_rename(
+    old_uri: lsp::DocumentUri,
+    new_uri: lsp::DocumentUri,
+) -> lsp::TextDocumentEditOrCreateFileOrRenameFileOrDeleteFile {
+    lsp::TextDocumentEditOrCreateFileOrRenameFileOrDeleteFile {
+        rename_file: Some(Box::new(lsp::RenameFile {
+            old_uri,
+            new_uri,
+            ..Default::default()
+        })),
+        ..Default::default()
+    }
+}
+fn file_rename_response(
+    changes: Vec<lsp::TextDocumentEditOrCreateFileOrRenameFileOrDeleteFile>,
+    document_changes: bool,
+) -> lsp::WorkspaceEditOrNull {
+    if changes.is_empty() {
+        return lsp::WorkspaceEditOrNull::default();
+    }
+    let mut seen_edits = std::collections::HashMap::new();
+    let mut seen_renames = std::collections::HashSet::new();
+    let mut result = Vec::new();
+    for mut change in changes {
+        if let Some(rename) = &change.rename_file {
+            if seen_renames.insert(rename.old_uri.clone()) {
+                result.push(change);
+            }
+        } else if let Some(document) = &mut change.text_document_edit {
+            document.edits.retain(|edit| {
+                let Some(edit) = &edit.text_edit else {
+                    return true;
+                };
+                let key = (
+                    document.text_document.uri.clone(),
+                    edit.range.start.line,
+                    edit.range.start.character,
+                    edit.range.end.line,
+                    edit.range.end.character,
+                );
+                if seen_edits.get(&key) == Some(&edit.new_text) {
+                    return false;
+                }
+                seen_edits.insert(key, edit.new_text.clone());
+                true
+            });
+            if !document.edits.is_empty() {
+                result.push(change);
+            }
+        }
+    }
+    if result.is_empty() {
+        return lsp::WorkspaceEditOrNull::default();
+    }
+    let edit = if document_changes {
+        lsp::WorkspaceEdit {
+            document_changes: Some(Box::new(result)),
+            ..Default::default()
+        }
+    } else {
+        let mut changes: std::collections::HashMap<_, Vec<_>> = std::collections::HashMap::new();
+        for change in result {
+            if let Some(document) = change.text_document_edit {
+                for edit in document.edits {
+                    if let Some(edit) = edit.text_edit {
+                        changes
+                            .entry(document.text_document.uri.clone())
+                            .or_default()
+                            .push(Some(edit));
+                    }
+                }
+            }
+        }
+        lsp::WorkspaceEdit {
+            changes: Some(Box::new(changes)),
+            ..Default::default()
+        }
+    };
+    lsp::WorkspaceEditOrNull {
+        workspace_edit: Some(Box::new(edit)),
+    }
+}
+
+pub fn file_renames(
+    context: &Context,
+    request_id: &str,
+    snapshot: &tsr_project::Snapshot,
+    params: &lsp::RenameFilesParams,
+    encoding: tsr_jsstring::PositionEncoding,
+    capabilities: &lsp::ClientCapabilities,
+    options: &tsr_ls::CompletionOptions,
+) -> Result<RawValue, lsp::ResponseError> {
+    let mut changes = Vec::new();
+    for project in snapshot.projects() {
+        if context.err().is_some() {
+            return Err(crate::canceled());
+        }
+        let (Some(program), Some(scheduler)) = (project.program(), project.scheduler()) else {
+            continue;
+        };
+        let cancellation = tsr_core::CancellationToken::new();
+        let cancel = cancellation.clone();
+        let _stop = Stop(context.after_func(move || cancel.cancel()));
+        let result = (|| {
+            let checker = scheduler
+                .acquire(
+                    tsr_checker::CheckerLifetime::Temporary,
+                    None,
+                    context,
+                    request_id,
+                )
+                .map_err(|e| {
+                    if context.err().is_some() {
+                        crate::canceled()
+                    } else {
+                        error(-32603, e.to_string())
+                    }
+                })?;
+            let mut operation = checker
+                .operation()
+                .map_err(|e| error(-32603, e.to_string()))?;
+            let mut service = tsr_ls::LanguageService::new(program, encoding, cancellation);
+            for file in params.files.iter().flatten() {
+                changes.extend(
+                    service
+                        .file_rename(
+                            &mut operation,
+                            &lsp::DocumentUri(file.old_uri.clone()),
+                            &lsp::DocumentUri(file.new_uri.clone()),
+                            options.auto_import.ending.as_deref(),
+                            &options.format,
+                        )
+                        .map_err(service_error)?,
+                );
+            }
+            Ok::<_, lsp::ResponseError>(())
+        })();
+        result?;
+    }
+    let document_changes = capabilities
+        .workspace
+        .as_deref()
+        .and_then(|w| w.workspace_edit.as_deref())
+        .and_then(|e| e.document_changes.as_deref())
+        .copied()
+        .unwrap_or(false);
+    client::raw(&file_rename_response(changes, document_changes))
 }

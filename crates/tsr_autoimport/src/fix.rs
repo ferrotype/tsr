@@ -167,6 +167,13 @@ pub fn use_require(
     }
     Ok(true)
 }
+#[derive(Default)]
+pub struct Usage {
+    pub type_only: bool,
+    pub jsx: bool,
+    pub position: Option<lsp::Position>,
+}
+
 /// Produces both namespace qualification and import fixes. The caller ranks
 /// equivalent exports, so an existing namespace does not suppress AddNew.
 pub fn fixes(
@@ -174,8 +181,7 @@ pub fn fixes(
     checker: &mut Operation<'_>,
     source: NodeId,
     export: &Export,
-    type_location: bool,
-    usage: Option<lsp::Position>,
+    usage: Usage,
     preferences: &crate::Preferences,
 ) -> Result<Vec<lsp::AutoImportFix>, Error> {
     let file = program
@@ -184,7 +190,9 @@ pub fn fixes(
     let view = file.bound().view().ast();
     let source_file = view.source_file(source)?;
     let kind = import_kind(program, checker, source, export, false)?;
-    let as_type = add_as_type_only(type_location, export, program.options());
+    let as_type = add_as_type_only(usage.type_only, export, program.options());
+    let for_jsx = usage.jsx;
+    let usage = usage.position;
     let name = String::from_utf8_lossy(export.name()).into_owned();
     let mut result = Vec::new();
     let mut best = None;
@@ -398,6 +406,19 @@ pub fn fixes(
             usage_position: usage.map(Box::new),
             ..Default::default()
         }]);
+    }
+    let mut name = name;
+    if for_jsx && !crate::unicode::is_upper(i32::from(export.name()[0])) {
+        if !export.is_renameable() {
+            return Ok(Vec::new());
+        }
+        // The pin reads one byte here, rather than decoding a UTF-8 rune.
+        let upper = tsr_jsstring::helpers::simple_upper_go(i32::from(export.name()[0]));
+        name = format!(
+            "{}{}",
+            char::from_u32(upper as u32).unwrap(),
+            String::from_utf8_lossy(&export.name()[1..])
+        );
     }
     result.push(lsp::AutoImportFix {
         kind: lsp::AutoImportFixKind::ADD_NEW,
