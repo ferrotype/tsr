@@ -44,12 +44,6 @@
       "reason": "Facade re-exporting the public libraries; a plain re-export until the embedding API settles"
     },
     {
-      "name": "tsrust",
-      "manifest": "crates/tsrust/Cargo.toml",
-      "publish": true,
-      "reason": "The compiler command line; installs the tsrust binary"
-    },
-    {
       "name": "tsr_api",
       "manifest": "crates/tsr_api/Cargo.toml",
       "publish": true,
@@ -72,6 +66,12 @@
       "manifest": "crates/tsr_astnav/Cargo.toml",
       "publish": true,
       "reason": "Rust library and its public dependency closure"
+    },
+    {
+      "name": "tsr_autoimport",
+      "manifest": "crates/tsr_autoimport/Cargo.toml",
+      "publish": true,
+      "reason": "Production auto-import index and import edits for Phase 5"
     },
     {
       "name": "tsr_bench",
@@ -296,6 +296,12 @@
       "reason": "Repository-only benchmark, experiment, test or capture tool"
     },
     {
+      "name": "tsr_testrunner",
+      "manifest": "crates/tsr_testrunner/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only port of the pinned compiler and transpile test runners (docs/EVIDENCE-plan.md)"
+    },
+    {
       "name": "tsr_tracing",
       "manifest": "crates/tsr_tracing/Cargo.toml",
       "publish": true,
@@ -344,16 +350,16 @@
       "reason": "Rust library and its public dependency closure"
     },
     {
+      "name": "tsrust",
+      "manifest": "crates/tsrust/Cargo.toml",
+      "publish": true,
+      "reason": "The compiler command line; installs the tsrust binary"
+    },
+    {
       "name": "xtask",
       "manifest": "xtask/Cargo.toml",
       "publish": false,
       "reason": "Repository-only benchmark, experiment, test or capture tool"
-    },
-    {
-      "name": "tsr_testrunner",
-      "manifest": "crates/tsr_testrunner/Cargo.toml",
-      "publish": false,
-      "reason": "Repository-only port of the pinned compiler and transpile test runners (docs/EVIDENCE-plan.md)"
     }
   ]
 }

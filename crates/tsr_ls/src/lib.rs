@@ -1,8 +1,25 @@
 //! Language service operations over a retained compiler snapshot.
+mod auto_imports;
+mod autoinsert;
 mod call_declarations;
 mod call_hierarchy;
 mod call_sites;
 mod code_lens;
+mod completion_containers;
+mod completion_context;
+mod completion_items;
+mod completion_jsx;
+mod completion_keywords;
+mod completion_labels;
+mod completion_literals;
+mod completion_paths;
+mod completions;
+mod jsdoc_completions;
+mod jsdoc_parameters;
+mod jsdoc_template;
+mod string_completions;
+pub use completion_keywords::compare as compare_completion_entries;
+pub use completions::{CompletionOptions, COMPLETION_TRIGGER_CHARACTERS};
 pub mod converters;
 mod definition;
 mod display_parts;
@@ -123,6 +140,8 @@ impl QueryChecker for tsr_checker::Operation<'_> {
 /// checker lease for the entire request; nodes and coordinate maps never cross
 /// into a later snapshot. Syntax-only queries do not acquire a checker.
 pub struct LanguageService<'a> {
+    auto_imports: std::sync::Arc<tsr_autoimport::Cache>,
+    completion_host: Option<std::sync::Arc<dyn tsr_vfs::FileSystem>>,
     program: &'a Program,
     converters: Converters,
     source_maps: source_map::Maps,
@@ -135,6 +154,8 @@ impl<'a> LanguageService<'a> {
         cancellation: CancellationToken,
     ) -> Self {
         Self {
+            auto_imports: std::sync::Arc::new(tsr_autoimport::Cache::new(program)),
+            completion_host: None,
             program,
             converters: Converters::new(encoding),
             source_maps: source_map::Maps::new(),

@@ -55,6 +55,17 @@ pub struct FormatFile<'a, 'p> {
 }
 
 impl<'a> FormatFile<'a, '_> {
+    /// Shared syntax completion boundary, also used by indentation.
+    pub fn position_belongs_to_node(
+        &mut self,
+        node: tsr_arena::NodeId,
+        position: i64,
+    ) -> Result<bool, Error> {
+        lsutil::position_belongs_to_node(self, node, position)
+    }
+    pub fn probably_uses_semicolons(&mut self) -> Result<bool, Error> {
+        lsutil::probably_uses_semicolons(self)
+    }
     pub(crate) fn node(&self, id: tsr_arena::NodeId) -> Result<tsr_ast::NodeRead<'a>, Error> {
         Ok(self.view.node(id)?)
     }

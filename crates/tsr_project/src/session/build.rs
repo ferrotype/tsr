@@ -361,7 +361,7 @@ impl<'a> ProjectBuilder<'a> {
             case_sensitive: self.session.fs.use_case_sensitive_file_names(),
         }));
         let mut reuse = None;
-        if let Some(path) = dirty_file.filter(|_| !command_changed) {
+        if let Some(path) = dirty_file.as_ref().filter(|_| !command_changed) {
             reuse = Some(old.unwrap().program.reuse_program(
                 path.as_bytes(),
                 host.clone(),
@@ -429,7 +429,22 @@ impl<'a> ProjectBuilder<'a> {
         } else {
             watch
         };
-        let project = Project::from_program(
+        let inherited_auto_imports =
+            dirty_file
+                .as_ref()
+                .filter(|_| !command_changed)
+                .and_then(|dirty| {
+                    self.old
+                        .projects
+                        .get(key)
+                        .and_then(Project::auto_import_cache)
+                        .map(|previous| {
+                            Arc::new(tsr_autoimport::Cache::for_update(
+                                &program, &previous, dirty,
+                            ))
+                        })
+                });
+        let mut project = Project::from_program(
             ProjectData {
                 program_files_watch,
                 name: name.clone(),
@@ -448,6 +463,10 @@ impl<'a> ProjectBuilder<'a> {
             &self.session.counters,
             self.session.options.query_checkers,
         );
+        project.completion_host = Some(self.session.fs.clone());
+        if let Some(cache) = inherited_auto_imports {
+            project.auto_imports = Some(cache);
+        }
         self.projects.insert(key.clone(), project);
         Ok(())
     }

@@ -13,6 +13,11 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
+tsr_vfs = { version = "0.2.0", path = "../tsr_vfs" }
+tsr_tsoptions = { version = "0.2.0", path = "../tsr_tsoptions" }
+tsr_autoimport = { version = "0.2.0", path = "../tsr_autoimport" }
+tsr_format = { version = "0.2.0", path = "../tsr_format" }
+tsr_json = { version = "0.2.0", path = "../tsr_json" }
 tsr_module = { version = "0.2.0", path = "../tsr_module" }
 tsr_sourcemap = { version = "0.2.0", path = "../tsr_sourcemap" }
 tsr_diagnostics = { version = "0.2.0", path = "../tsr_diagnostics" }
@@ -36,5 +41,3 @@ tsr_tspath = { version = "0.2.0", path = "../tsr_tspath" }
 workspace = true
 
 [dev-dependencies]
-tsr_tsoptions = { version = "0.2.0", path = "../tsr_tsoptions" }
-tsr_vfs = { version = "0.2.0", path = "../tsr_vfs" }

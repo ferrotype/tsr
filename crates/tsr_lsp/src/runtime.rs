@@ -55,6 +55,8 @@ impl Options {
 }
 #[derive(Clone)]
 struct Settings {
+    completion: tsr_ls::CompletionOptions,
+    auto_closing_tags: bool,
     locale: tsr_locale::Locale,
     validation: bool,
     style_warnings: bool,
@@ -76,6 +78,8 @@ impl Default for Settings {
             config_name: String::new(),
             exclude_library_symbols: true,
             workspace_current_project: false,
+            completion: tsr_ls::CompletionOptions::default(),
+            auto_closing_tags: true,
             maximum_hover_length: 500,
             prefer_source_definition: false,
             inlay: tsr_ls::InlayHintsOptions::default(),
@@ -433,6 +437,8 @@ impl Runtime {
                 let capabilities = self.capabilities.clone();
                 let settings = self.settings.lock().unwrap().clone();
                 let options = crate::language_features::Options {
+                    completion: settings.completion,
+                    auto_closing_tags: settings.auto_closing_tags,
                     maximum_hover_length: settings.maximum_hover_length,
                     prefer_source_definition: settings.prefer_source_definition,
                     inlay: settings.inlay,
@@ -776,6 +782,12 @@ impl Runtime {
                             &mut next.prefer_source_definition,
                         );
                         apply_lens_preferences(raw, true, &mut next.code_lens);
+                        apply_completion_preferences(
+                            raw,
+                            true,
+                            &mut next.completion,
+                            &mut next.auto_closing_tags,
+                        );
                         apply_inlay_preferences(raw, true, &mut next.inlay, &mut next.inlay_flags);
                         set_bool(raw.get("validateEnabled"), &mut next.validation);
                         if let Some(lsp::Any::Number(length)) = raw.get("maximumHoverLength") {
@@ -802,6 +814,12 @@ impl Runtime {
                         &mut next.prefer_source_definition,
                     );
                     apply_lens_preferences(fields, false, &mut next.code_lens);
+                    apply_completion_preferences(
+                        fields,
+                        false,
+                        &mut next.completion,
+                        &mut next.auto_closing_tags,
+                    );
                     apply_inlay_preferences(fields, false, &mut next.inlay, &mut next.inlay_flags);
                     set_bool(
                         nested(fields, "validate.enabled")
@@ -848,6 +866,7 @@ impl Runtime {
                 }
             }
         }
+        next.completion.locale = next.locale.clone();
         *self.settings.lock().unwrap() = next.clone();
         if (next.inlay_flags != before.inlay_flags
             || next.inlay.parameter_names != before.inlay.parameter_names)
@@ -1145,10 +1164,7 @@ fn unimplemented_method(method: &str) -> bool {
             | "textDocument/onTypeFormatting"
             | "textDocument/codeAction"
             | "textDocument/prepareRename"
-            | "textDocument/completion"
-            | "textDocument/_vs_onAutoInsert"
             | "textDocument/rename"
-            | "completionItem/resolve"
             | "custom/runGC"
             | "custom/saveHeapProfile"
             | "custom/saveAllocProfile"
@@ -1198,5 +1214,88 @@ fn apply_lens_preferences(
         } {
             *target = Some(*value);
         }
+    }
+}
+
+fn apply_completion_preferences(
+    fields: &HashMap<String, lsp::Any>,
+    raw: bool,
+    options: &mut tsr_ls::CompletionOptions,
+    auto_closing: &mut bool,
+) {
+    let get = |name, path| {
+        if raw {
+            fields.get(name)
+        } else {
+            nested(fields, path)
+        }
+    };
+    for (name, path, target) in [
+        (
+            "includeCompletionsForModuleExports",
+            "suggest.autoImports",
+            &mut options.module_exports,
+        ),
+        (
+            "includeAutomaticOptionalChainCompletions",
+            "suggest.includeAutomaticOptionalChainCompletions",
+            &mut options.automatic_optional_chain,
+        ),
+        (
+            "completeJSDocs",
+            "suggest.jsdoc.enabled",
+            &mut options.enable_jsdoc,
+        ),
+        (
+            "generateReturnInDocTemplate",
+            "suggest.jsdoc.generateReturns",
+            &mut options.generate_return,
+        ),
+    ] {
+        if let Some(lsp::Any::Boolean(value)) = get(name, path) {
+            *target = Some(*value);
+        }
+    }
+    set_bool(
+        get(
+            "preferTypeOnlyAutoImports",
+            "preferences.preferTypeOnlyAutoImports",
+        ),
+        &mut options.prefer_type_only,
+    );
+    set_bool(
+        get("autoClosingTags", "autoClosingTags.enabled")
+            .or_else(|| (!raw).then(|| fields.get("autoClosingTags")).flatten()),
+        auto_closing,
+    );
+    if !raw && nested(fields, "suggest.jsdoc.enabled").is_none() {
+        if let Some(lsp::Any::Boolean(value)) = nested(fields, "suggest.completeJSDocs") {
+            options.enable_jsdoc = Some(*value);
+        }
+    }
+    if let Some(lsp::Any::String(value)) = get("quotePreference", "preferences.quoteStyle") {
+        options.quote = match value.as_str() {
+            "single" => tsr_ls::QuotePreference::Single,
+            "double" => tsr_ls::QuotePreference::Double,
+            _ => tsr_ls::QuotePreference::Auto,
+        };
+    }
+    if let Some(lsp::Any::String(value)) = get(
+        "jsxAttributeCompletionStyle",
+        "preferences.jsxAttributeCompletionStyle",
+    ) {
+        options.jsx_attribute_style = Some(match value.as_str() {
+            "braces" | "none" => value.clone(),
+            _ => "auto".into(),
+        });
+    }
+    if let Some(lsp::Any::String(value)) = get(
+        "importModuleSpecifierEnding",
+        "preferences.importModuleSpecifierEnding",
+    ) {
+        options.import_module_specifier_ending = Some(value.clone());
+    }
+    if let Some(lsp::Any::String(value)) = get("newLineCharacter", "format.newLineCharacter") {
+        options.newline = Some(value.clone());
     }
 }

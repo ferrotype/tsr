@@ -9,6 +9,7 @@ use tsr_tspath as path;
 mod packages;
 #[path = "module_specifiers_paths.rs"]
 mod paths;
+pub use paths::Ending as ModuleSpecifierEnding;
 use paths::{allowed_endings, ensure_non_module, same_volume_relative, Ending};
 type ModulePath = ModuleSpecifierPath;
 
@@ -91,7 +92,7 @@ impl Generation<'_> {
             &self.imports,
             self.default_mode,
             syntax_mode,
-            self.request_js,
+            self.request_js.then_some("js"),
         )
     }
 
@@ -375,4 +376,89 @@ impl Generation<'_> {
 // port: tsc/internal/modulespecifiers/specifiers.go:ContainsNodeModules
 pub(super) fn contains_node_modules(path: &[u8]) -> bool {
     path.windows(14).any(|part| part == b"/node_modules/")
+}
+
+impl crate::Operation<'_> {
+    /// The existing pinned module-specifier generator, shared by declaration
+    /// display and the language service. The source is checked against this
+    /// operation's immutable program; no path-only owner bypass is introduced.
+    pub fn module_specifier_for_file(
+        &self,
+        source: NodeId,
+        target: &[u8],
+    ) -> Result<JsString, Error> {
+        let state = self.state();
+        let view = state.ast(source)?;
+        let file = view.source_file(source)?;
+        generate(
+            state.program()?.host.as_ref(),
+            source,
+            file.file_name(),
+            target,
+            Mode::NONE,
+            false,
+        )
+    }
+    pub fn import_file_module_formats(
+        &self,
+        source: NodeId,
+    ) -> Result<(tsr_core::ModuleKind, tsr_core::ModuleKind), Error> {
+        let state = self.state();
+        let view = state.ast(source)?;
+        let file = view.source_file(source)?;
+        let host = state.program()?.host.as_ref();
+        Ok((
+            host.get_emit_module_format_of_file(file.file_name())?,
+            host.get_implied_node_format_for_emit(file.file_name())?,
+        ))
+    }
+}
+
+impl crate::Operation<'_> {
+    pub fn import_ending_preferences(
+        &self,
+        source: NodeId,
+        syntax_mode: Mode,
+        preference: Option<&str>,
+    ) -> Result<Vec<ModuleSpecifierEnding>, Error> {
+        let state = self.state();
+        let view = state.ast(source)?;
+        let file = view.source_file(source)?;
+        let host = state.program()?.host.as_ref();
+        let mut imports = Vec::new();
+        for &id in file.imports()?.iter().flatten() {
+            imports.push(Import {
+                text: view.node_text(id)?.into_js_string(),
+                mode: host.get_mode_for_usage_location(file.file_name(), id)?,
+                resolved: None,
+            });
+        }
+        Ok(allowed_endings(
+            host.options(),
+            file.file_name(),
+            &imports,
+            host.get_default_resolution_mode_for_file(file.file_name())?,
+            syntax_mode,
+            preference,
+        ))
+    }
+    pub fn import_usage_resolution_mode(
+        &self,
+        source: NodeId,
+        specifier: NodeId,
+    ) -> Result<Mode, Error> {
+        let state = self.state();
+        let view = state.ast(source)?;
+        view.node(specifier)?;
+        state
+            .program()?
+            .host
+            .get_mode_for_usage_location(view.source_file(source)?.file_name(), specifier)
+    }
+    pub fn import_package_json(
+        &self,
+        path: &[u8],
+    ) -> Result<Option<std::sync::Arc<tsr_module::PackageJson>>, Error> {
+        self.state().program()?.host.get_package_json_info(path)
+    }
 }

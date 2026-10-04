@@ -849,6 +849,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "tsr_autoimport"
+version = "0.2.0"
+dependencies = [
+ "tsr_arena",
+ "tsr_ast",
+ "tsr_checker",
+ "tsr_compiler",
+ "tsr_core",
+ "tsr_jsstring",
+ "tsr_lsproto",
+ "tsr_module",
+ "tsr_parser",
+ "tsr_scanner",
+ "tsr_tspath",
+ "tsr_vfs",
+]
+
+[[package]]
 name = "tsr_bench"
 version = "0.1.0"
 dependencies = [
@@ -1195,10 +1213,13 @@ dependencies = [
  "tsr_arena",
  "tsr_ast",
  "tsr_astnav",
+ "tsr_autoimport",
  "tsr_checker",
  "tsr_compiler",
  "tsr_core",
  "tsr_diagnostics",
+ "tsr_format",
+ "tsr_json",
  "tsr_jsstring",
  "tsr_locale",
  "tsr_lsproto",
@@ -1329,6 +1350,7 @@ version = "0.2.0"
 dependencies = [
  "tsr_arena",
  "tsr_ast",
+ "tsr_autoimport",
  "tsr_checker",
  "tsr_compiler",
  "tsr_core",

@@ -700,3 +700,114 @@ fn source_definition_fast_path_does_not_acquire_a_checker() {
         assert_eq!(locations[0].uri.0, "file:///lib.ts");
     }
 }
+
+fn completion_result(text: &str, options: &CompletionOptions) -> lsp::CompletionList {
+    let offset = text.find("/*cursor*/").unwrap();
+    let text = text.replacen("/*cursor*/", "", 1);
+    let program = Arc::new(program(b"/index.ts", text.as_bytes()));
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool
+        .checker_for_file_exclusive(program.source_file(b"/index.ts").unwrap().source())
+        .unwrap();
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    let prefix = &text[..offset];
+    let line_start = prefix.rfind('\n').map_or(0, |i| i + 1);
+    *service
+        .completion(
+            &mut checker,
+            &lsp::CompletionParams {
+                text_document: lsp::TextDocumentIdentifier {
+                    uri: lsp::DocumentUri("file:///index.ts".into()),
+                },
+                position: lsp::Position {
+                    line: prefix.bytes().filter(|&c| c == b'\n').count() as u32,
+                    character: prefix[line_start..].encode_utf16().count() as u32,
+                },
+                ..Default::default()
+            },
+            options,
+        )
+        .unwrap()
+        .list
+        .unwrap()
+}
+
+#[test]
+fn completion_members_keep_native_sort_keys_kinds_and_utf16_replacement() {
+    // The complete response is compared against the pin by completions.py.
+    let list = completion_result("/*😀*/ interface Item { required: string; optional?: number; method(): void } declare const item: Item; item.op/*cursor*/tional", &CompletionOptions { default_edit_range: true, default_commit_characters: true, commit_characters: true, ..Default::default() });
+    let items = list.items.iter().flatten().collect::<Vec<_>>();
+    assert_eq!(items.len(), 3);
+    for item in items {
+        assert_eq!(item.sort_text.as_deref().unwrap(), "11");
+        assert_eq!(
+            item.kind.as_deref(),
+            Some(if item.label == "method" {
+                &lsp::CompletionItemKind::METHOD
+            } else {
+                &lsp::CompletionItemKind::FIELD
+            })
+        );
+    }
+    let ranges = list
+        .item_defaults
+        .unwrap()
+        .edit_range
+        .unwrap()
+        .edit_range_with_insert_replace
+        .unwrap();
+    assert_eq!(
+        ranges.replace.end.character - ranges.replace.start.character,
+        8
+    );
+    assert_eq!(
+        ranges.insert.end.character - ranges.insert.start.character,
+        2
+    );
+}
+
+#[test]
+fn completion_contextual_properties_do_not_repeat_already_present_members() {
+    let list = completion_result("interface Options { required: string; optional?: number; done: boolean } const opt: Options = { done: true, /*cursor*/ };", &CompletionOptions::default());
+    assert_eq!(
+        list.items
+            .iter()
+            .flatten()
+            .map(|i| i.label.as_str())
+            .collect::<std::collections::BTreeSet<_>>(),
+        ["optional?", "required"].into_iter().collect()
+    );
+}
+
+#[test]
+fn completion_literal_arguments_and_labels_have_native_ordering_groups() {
+    let list = completion_result(
+        "function choose(value: 1 | 2 | 3): void {} choose(/*cursor*/)",
+        &CompletionOptions::default(),
+    );
+    let values: Vec<_> = list
+        .items
+        .iter()
+        .flatten()
+        .filter(|i| i.kind.as_deref() == Some(&lsp::CompletionItemKind::CONSTANT))
+        .map(|i| (i.label.as_str(), i.sort_text.as_deref().unwrap().as_str()))
+        .collect();
+    assert_eq!(values, [("1", "11"), ("2", "11"), ("3", "11")]);
+    let labels = completion_result(
+        "outer: while(true) { inner: while (true) { break /*cursor*/ } }",
+        &CompletionOptions::default(),
+    );
+    assert_eq!(
+        labels
+            .items
+            .iter()
+            .flatten()
+            .map(|i| i.label.as_str())
+            .collect::<Vec<_>>(),
+        ["inner", "outer"]
+    );
+}

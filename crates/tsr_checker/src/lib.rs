@@ -176,6 +176,7 @@ mod module_aliases;
 mod module_augmentations;
 mod module_exports;
 mod module_specifiers;
+pub use module_specifiers::ModuleSpecifierEnding;
 mod module_wrappers;
 mod name_errors;
 mod name_qualified;

@@ -536,7 +536,7 @@ impl LanguageService<'_> {
     }
 }
 // port: tsc/internal/ls/lsutil/utilities.go:GetQuotePreference
-fn single_quote(syntax: &Syntax<'_>, preference: QuotePreference) -> Result<bool> {
+pub(crate) fn single_quote(syntax: &Syntax<'_>, preference: QuotePreference) -> Result<bool> {
     match preference {
         QuotePreference::Single => return Ok(true),
         QuotePreference::Double => return Ok(false),

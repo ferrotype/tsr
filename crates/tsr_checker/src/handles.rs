@@ -506,6 +506,15 @@ impl Operation<'_> {
         })
     }
 
+    /// The decoded value, before the quoting used by type and diagnostic display.
+    pub fn string_literal_value(&self, ty: TypeRef) -> Result<JsString, Error> {
+        let ty = self.check_type(ty)?;
+        match &self.state().types.literal(ty)?.value {
+            crate::LiteralValue::String(text) => Ok(text.clone()),
+            _ => Err(Error::MissingLink("string literal type required")),
+        }
+    }
+
     // port: tsc/internal/checker/exports.go:Checker.GetDeclaredTypeOfSymbol
     pub fn get_declared_type_of_symbol(&mut self, symbol: SymbolRef) -> Result<TypeRef, Error> {
         let symbol = self.check_symbol_ref(symbol)?;

@@ -4,7 +4,7 @@ The 0.2.0 packages are already published. [RELEASE-0.2.0.md](RELEASE-0.2.0.md)
 is their historical record; new crates and facade exports must not be added to
 that release's package count or publish order.
 
-Phase 5 adds `tsr_lsproto`, `tsr_lsp` and `tsr_ls`; the facade exports the protocol
+Phase 5 adds `tsr_lsproto`, `tsr_lsp`, `tsr_ls` and `tsr_autoimport`; the facade exports the protocol
 library. These are
 unreleased changes for the next lockstep release, whose version is not yet
 selected. The development manifests still say 0.2.0; that does not identify
@@ -18,7 +18,8 @@ Before preparing the next registry upload:
    consumer lockfiles as part of that release change.
 2. Verify registry availability and ownership for new package names. Include
    the Phase 5 crates present in the final source tree; `tsr_lsproto` belongs
-   after `tsr_jsonrpc` and before its consumers and the facade. Use the current
+   after `tsr_jsonrpc` and before its consumers and the facade. `tsr_autoimport`
+   follows `tsr_compiler` and precedes `tsr_project` and `tsr_ls`. Use the current
    [package policy and dependency order](../tools/packaging/README.md), not the
    historical 0.2.0 list.
 3. Run package asset and archive verification on the final versioned source,
