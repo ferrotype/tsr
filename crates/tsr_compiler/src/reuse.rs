@@ -7,6 +7,7 @@ use super::{
 use tsr_ast::{AstView, FileReference, SourceFileRead, SyntaxKind};
 
 pub struct ProgramReuse {
+    _source_retention: crate::cache::ProgramRetention,
     pub program: Option<Program>,
     /// Retain the speculative parse through a full fallback load so FileCache
     /// can return that exact owner instead of parsing the changed file twice.
@@ -21,8 +22,10 @@ impl Program {
         cache: &mut FileCache,
         counters: &Counters,
     ) -> Result<ProgramReuse, Error> {
+        let source_retention = cache.begin_program();
         let Some(&index) = self.by_path.get(changed_path) else {
             return Ok(ProgramReuse {
+                _source_retention: source_retention.clone(),
                 program: None,
                 file: None,
             });
@@ -32,6 +35,7 @@ impl Program {
         let (file, supplemental_files) = if old_source.content_mapper().is_empty() {
             let Some(content) = host.read_file(old_source.file_name())? else {
                 return Ok(ProgramReuse {
+                    _source_retention: source_retention.clone(),
                     program: None,
                     file: None,
                 });
@@ -49,6 +53,7 @@ impl Program {
         } else {
             let Some(project) = self.content_mapper_project.as_ref() else {
                 return Ok(ProgramReuse {
+                    _source_retention: source_retention.clone(),
                     program: None,
                     file: None,
                 });
@@ -58,6 +63,7 @@ impl Program {
                 .content_mapper_for_file_name(old_source.file_name())
             else {
                 return Ok(ProgramReuse {
+                    _source_retention: source_retention.clone(),
                     program: None,
                     file: None,
                 });
@@ -72,6 +78,7 @@ impl Program {
                 .expect("mapper belongs to this config");
             let Some(content) = host.read_file(old_source.file_name())? else {
                 return Ok(ProgramReuse {
+                    _source_retention: source_retention.clone(),
                     program: None,
                     file: None,
                 });
@@ -86,6 +93,7 @@ impl Program {
             ) else {
                 // A full loader pass owns mapper failure diagnostics and budgets.
                 return Ok(ProgramReuse {
+                    _source_retention: source_retention.clone(),
                     program: None,
                     file: None,
                 });
@@ -96,6 +104,7 @@ impl Program {
             .is_err()
             {
                 return Ok(ProgramReuse {
+                    _source_retention: source_retention.clone(),
                     program: None,
                     file: None,
                 });
@@ -109,6 +118,7 @@ impl Program {
             (canonical, supplemental)
         };
         let failure = || ProgramReuse {
+            _source_retention: source_retention.clone(),
             program: None,
             file: Some(file.clone()),
         };
@@ -173,7 +183,13 @@ impl Program {
         for (index, file) in replacements {
             files[index] = file;
         }
+        for (index, file) in files.iter().enumerate() {
+            if Arc::ptr_eq(file, &self.files[index]) {
+                cache.retain_project_file(file)?;
+            }
+        }
         let program = Self {
+            _source_retention: source_retention,
             tracing: self.tracing.clone(),
             owners: crate::resolver_host::OwnerIndex::from_files(&files),
             include_reasons: self
@@ -234,6 +250,7 @@ impl Program {
             content_mapper_option_diagnostics: self.content_mapper_option_diagnostics.clone(),
         };
         Ok(ProgramReuse {
+            _source_retention: crate::cache::ProgramRetention::default(),
             program: Some(program),
             file: Some(file),
         })

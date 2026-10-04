@@ -1,0 +1,102 @@
+[
+  {
+    "uri": "file:///path/to/file.ts",
+    "file_hex": "2f706174682f746f2f66696c652e7473"
+  },
+  {
+    "uri": "file://server/share/file.ts",
+    "file_hex": "2f2f7365727665722f73686172652f66696c652e7473"
+  },
+  {
+    "uri": "file:///D%3A/work/utils.ts",
+    "file_hex": "643a2f776f726b2f7574696c732e7473"
+  },
+  {
+    "uri": "file://user:pass@server/a",
+    "file_hex": "2f2f7365727665722f61"
+  },
+  {
+    "uri": "file://host:80/a",
+    "file_hex": "2f2f686f73743a38302f61"
+  },
+  {
+    "uri": "file://host:80:90/a",
+    "file_hex": "2f2f686f73743a38303a39302f61"
+  },
+  {
+    "uri": "file://[fe80::1%25en0]:80/a",
+    "file_hex": "2f2f5b666538303a3a3125656e305d3a38302f61"
+  },
+  {
+    "uri": "file://[::ffff:192.0.2.1]/a",
+    "file_hex": "2f2f5b3a3a666666663a3139322e302e322e315d2f61"
+  },
+  {
+    "uri": "file:///ok?bad%#section",
+    "file_hex": "2f6f6b"
+  },
+  {
+    "uri": "file:///ok#\n",
+    "file_hex": "2f6f6b"
+  },
+  {
+    "uri": "file:///c:/test %25/path",
+    "file_hex": "633a2f7465737420252f70617468"
+  },
+  {
+    "uri": "file:///a%00b",
+    "file_hex": "2f610062"
+  },
+  {
+    "uri": "file:///%FF",
+    "file_hex": "2fff"
+  },
+  {
+    "uri": "untitled://host/a%20b#section",
+    "file_hex": "5e2f756e7469746c65642f686f73742f61253230622373656374696f6e"
+  },
+  {
+    "uri": "bundled:///libs/lib.d.ts",
+    "file_hex": "62756e646c65643a2f2f2f6c6962732f6c69622e642e7473"
+  },
+  {
+    "uri": "file:///bad%",
+    "file_hex": null
+  },
+  {
+    "uri": "file://host:abc/a",
+    "file_hex": null
+  },
+  {
+    "uri": "file://bad host/a",
+    "file_hex": null
+  },
+  {
+    "uri": "file://[invalid]/a",
+    "file_hex": null
+  },
+  {
+    "uri": "file://bad[host]/a",
+    "file_hex": null
+  },
+  {
+    "uri": "file://[[::1]]/a",
+    "file_hex": null
+  },
+  {
+    "uri": "file://[::1%25]/a",
+    "file_hex": null
+  },
+  {
+    "uri": "file:///ok#bad%",
+    "file_hex": null
+  },
+  {
+    "uri": "file:///bad\n",
+    "file_hex": null
+  },
+  {
+    "uri": "untitled://missing-path",
+    "file_hex": null
+  }
+]

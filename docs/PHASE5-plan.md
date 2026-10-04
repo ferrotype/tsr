@@ -454,6 +454,82 @@ not yield semantic passes merely because initialization succeeded.
 is faithful. Do not claim all 85 project tests pass while L6 work remains.
 Protocol-level diagnostics checks are added when L2's publishing path exists.
 
+**Implementation progress:** the L1 branch starts with worker callback reply
+slots (including cancellation, retirement and disconnect), immutable overlays,
+disk snapshots and dependency tracking, copy-on-write maps, the background
+queue and reference-counted parse caches. The compiler now accepts a project
+cache: program loads and reuse own its leases, failed loads release them, and
+escaped ASTs retain syntax independently of those leases. The explicit test
+cache can retain parses across disposed programs. Hashing reuses the workspace's
+`xxhash-rust` implementation of the pin's XXH3-128; the mapped key includes the
+raw hash, transform identity and locale.
+
+The next increment adds the actual session/configuration coordinator, immutable
+project collections, owner-counted extended configs and program roots. Open and
+queued edit/config events construct real programs through the shared parse cache;
+unchanged projects retain identity, compatible edits use the compiler's reuse
+path, and old compiler hosts release their construction builders when frozen.
+Focused tests cover old-snapshot isolation, extended-config disposal, disk-cache
+pruning, overlay language kinds and independent project panic retirement.
+
+The session pool now schedules diagnostics, queries and persistent API checkers,
+with request/file affinity, cancellation cleanup, accumulated global diagnostics
+and staggered idle eviction. Discarded pools remain usable by retained snapshots.
+Manual-clock and contention-barrier tests exercise these transitions.
+
+L1 review fixes preserve file affinity when a released checker is reacquired
+by request, expand watched directory deletions before resolving aliases, and
+retain dirty-project state across snapshots until the project is requested.
+The latter includes config changes and accumulation of multiple changed files;
+old snapshots keep their programs and unaffected projects keep identity.
+The unused key-only cache `retain` API was removed; program reuse already uses
+`acquire` with the retained file as its fallback. Scheduler waits remain
+cancellation-aware, unlike Go's semaphore wait; the project README and scheduler
+record the resulting potential difference in subsequent slot/type allocation
+order. This documents existing behavior, not a new parity claim.
+
+Config and program watches now follow snapshot updates, with shared registration
+counts, external-directory grouping, URI-relative patterns, per-call deadlines
+and rollback/retry using the original watcher IDs. The client interface runs on
+the background queue; real-session tests check publication precedes callbacks and
+text-only edits keep watch identity. Native client registration is connected with
+the server in L2.
+
+Session update and idle-clean timers now use the shared deadline service with
+controlled-clock tests; inferred-options changes publish before acknowledgement.
+Project log sinks and forked collectors are implemented with an injected local
+timestamp formatter. ATA log embedding remains with L6.
+
+The version-3 private endpoint now drives the real `tsr_lsp::Server` and
+`tsr_project::Session`. An ordered worker performs updates while the router
+continues processing filesystem replies, progress and cancellation. Options
+responses wait for the actual application hook; reset retires callbacks and
+joins old session work before admitting the next test. The reset queue slot is
+reserved even at the admission bound.
+
+The state projection is read-only, with identity tokens for the native writer's
+pointer comparisons. `tools/phase5/project/check.py` compares eight successive
+states through the original Go writer, first validating the native projection
+round trip. It also checks identical output in a fresh process and a two-test
+retained-cache batch. This small endpoint sequence takes about 1.3 seconds on
+the development host after builds; it is not a full-suite estimate.
+
+Mapped cache leases retain canonical and supplemental outputs together and
+reconstruct the key from the original input options. Failed construction
+publishes nothing. Real-worker reset tests verify shared library parse reuse,
+changed text/parse-option invalidation, old session/filesystem disposal, and
+isolation of overlays, options, encodings and callbacks. The retained cache is
+an explicit private-test policy; production caches release on the last lease.
+
+The L1 core implementation and focused tests are complete. The test assignment
+and reproduction commands are in `tools/phase5/project/README.md`; this does
+not claim all 85 native project tests or their subcases. L2 owns diagnostics,
+progress publication, capability negotiation and watcher registration; L6 owns
+ATA, mapper execution and cross-project/API project construction. L0's full
+fourslash transport patch remains a separate prerequisite for semantic corpus
+execution: the retained-cache path is enabled and tested in the real private
+endpoint, but the eight-state project adapter is not that complete harness.
+
 ### L2 — server behavior and negotiated conversions
 
 1. Port dispatch, document sync, configuration exchange, diagnostics publishing,

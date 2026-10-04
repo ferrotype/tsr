@@ -1,6 +1,19 @@
 # tsr_project
 
-Checker ownership and project slot lifetimes for tsr.
+Checker ownership, immutable editor/file snapshots and shared parse caches for tsr.
+
+Phase 5 provides configured/inferred sessions, immutable overlays and disk
+snapshots, configuration ownership, parse caches, checker scheduling, project
+watches and controlled update/idle timers. The transport-facing document layer
+lives in `tsr_lsp`; language services and cross-project features follow in the
+later Phase 5 steps.
+
+Checker-slot waits are cancellation-aware: a canceled waiter returns without
+acquiring or creating a checker. The pinned Go scheduler waits on its semaphore
+without observing cancellation, then lets the checker observe it. This deliberate
+difference lets abandoned requests leave the wait promptly, but can change which
+slots later requests use and their type-allocation order. Request affinity itself
+preserves a file's existing checker association, as in Go.
 
 Part of [tsr](https://github.com/ferrotype/tsr), a Rust port of
 the TypeScript compiler. This project is under development; the API and supported

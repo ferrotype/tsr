@@ -4,7 +4,8 @@ The 0.2.0 packages are already published. [RELEASE-0.2.0.md](RELEASE-0.2.0.md)
 is their historical record; new crates and facade exports must not be added to
 that release's package count or publish order.
 
-Phase 5 adds `tsr_lsproto` and exports it through the `tsr` facade. These are
+Phase 5 adds `tsr_lsproto` and `tsr_lsp`; the facade exports the protocol
+library. These are
 unreleased changes for the next lockstep release, whose version is not yet
 selected. The development manifests still say 0.2.0; that does not identify
 this working tree with the immutable published 0.2.0 archives. In particular,

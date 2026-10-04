@@ -70,15 +70,103 @@ pub struct Session {
     update: Option<Update>,
     pending: BTreeMap<String, Pending>,
     streams: Streams,
-    next_callback: u64,
+    callback_ids: crate::bridge::CallbackIds,
     closed: bool,
 }
 impl Session {
+    /// Provisional callbacks for the options hook. On an unsuccessful initial
+    /// update the embedding must retire this router along with its project.
+    pub fn options_callback_router(
+        &self,
+        token: OptionsToken,
+        outgoing: std::sync::mpsc::Sender<Box<RawValue>>,
+    ) -> io::Result<crate::bridge::CallbackRouter> {
+        let update = self
+            .update
+            .as_ref()
+            .filter(|update| update.token == token)
+            .ok_or_else(|| invalid("unknown options completion"))?;
+        let host = match &update.value {
+            UpdateValue::Initialize(config) => &config.host,
+            UpdateValue::Options(_) => {
+                &self
+                    .configuration
+                    .as_ref()
+                    .ok_or_else(|| invalid("uninitialized session"))?
+                    .host
+            }
+        };
+        Ok(crate::bridge::CallbackRouter::new(
+            self.callback_ids.clone(),
+            outgoing,
+            host.clone(),
+        ))
+    }
+    /// A new private-harness test keeps only the callback ID allocator, so a
+    /// late reply from the old test cannot resolve a new test's callback.
+    pub fn reset(&mut self) {
+        let ids = self.callback_ids.clone();
+        *self = Self {
+            callback_ids: ids,
+            ..Self::default()
+        };
+    }
+    pub(crate) fn cancel_host_work(&mut self) -> Vec<Json> {
+        let requests: Vec<_> = self
+            .pending
+            .values()
+            .filter(|pending| !pending.canceled)
+            .map(|pending| pending.request.clone())
+            .collect();
+        let mut frames: Vec<_> = requests
+            .iter()
+            .flat_map(|id| self.interrupt(id, -32800, "session reset"))
+            .collect();
+        frames.extend(self.streams.shutdown());
+        self.pending.clear();
+        frames
+    }
+    /// Attach compiler-worker callbacks to this initialized connection. The
+    /// embedding retains the returned router until it has joined its workers.
+    /// During reset retire it first, then construct another with this session's
+    /// allocator; never replay a reply into a fresh allocator.
+    pub fn callback_router(
+        &self,
+        outgoing: std::sync::mpsc::Sender<Box<RawValue>>,
+    ) -> io::Result<crate::bridge::CallbackRouter> {
+        if self.closed || self.update.is_some() {
+            return Err(invalid("test-host is closed or updating options"));
+        }
+        let configuration = self
+            .configuration
+            .as_ref()
+            .ok_or_else(|| invalid("test-host is not initialized"))?;
+        Ok(crate::bridge::CallbackRouter::new(
+            self.callback_ids.clone(),
+            outgoing,
+            configuration.host.clone(),
+        ))
+    }
+
+    /// Allows the shared connection to route ordinary S11 replies first and
+    /// pass other replies to its worker router (which tolerates late replies).
+    pub fn has_callback(&self, id: &str) -> bool {
+        self.pending.contains_key(id)
+    }
     pub fn is_closed(&self) -> bool {
         self.closed
     }
     pub fn has_pending(&self) -> bool {
         self.update.is_some() || !self.pending.is_empty()
+    }
+    pub(crate) fn request_pending(&self, id: &Id) -> bool {
+        self.update
+            .as_ref()
+            .is_some_and(|update| &update.request == id)
+            || self
+                .pending
+                .values()
+                .any(|pending| &pending.request == id && !pending.canceled)
     }
 
     pub fn pending_options(&self) -> Option<OptionsUpdate<'_>> {
@@ -186,31 +274,8 @@ impl Session {
                 self.notification(&method, params)
             }
         } else {
-            fields(&envelope, &["jsonrpc", "id", "result", "error"])?;
-            let id = string("id").ok_or_else(|| invalid("callback response requires string ID"))?;
-            if envelope.contains_key("result") == envelope.contains_key("error") {
-                return Err(invalid("response requires exactly one result or error"));
-            }
-            if let Some(error) = envelope.get("error") {
-                let error = wire::fields(error).map_err(invalid)?;
-                fields(&error, &["code", "message", "data"])?;
-                if error
-                    .get("code")
-                    .and_then(|v| serde_json::from_str::<i32>(v.get()).ok())
-                    .is_none()
-                    || error
-                        .get("message")
-                        .and_then(|v| serde_json::from_str::<String>(v.get()).ok())
-                        .is_none()
-                {
-                    return Err(invalid("invalid callback error"));
-                }
-            }
-            self.response(
-                &id,
-                envelope.get("result").map(|v| (*v).to_owned()),
-                envelope.get("error").map(|v| (*v).to_owned()),
-            )
+            let reply = crate::protocol::callback_response(&envelope)?;
+            self.response(&reply.id, reply.result, reply.error)
         }
     }
 
@@ -377,11 +442,10 @@ impl Session {
         if self.pending.len() == MAX_PENDING {
             return Err((-32002, "pending callback limit reached".into()));
         }
-        self.next_callback = self
-            .next_callback
-            .checked_add(1)
+        let callback = self
+            .callback_ids
+            .next()
             .ok_or_else(|| (-32002, "callback IDs exhausted".into()))?;
-        let callback = format!("callback:{}", self.next_callback);
         let message = wire!({"jsonrpc":"2.0","id":callback,"method":method,"params":params});
         let begin = progress(request, &callback, "begin");
         if !fits(&message) || !fits(&begin) {

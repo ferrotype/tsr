@@ -1,0 +1,25 @@
+{
+  "files": {
+    "/p/base.json": "{\"compilerOptions\":{\"noLib\":true}}",
+    "/p/tsconfig.json": "{\"extends\":\"./base.json\",\"files\":[\"main.ts\",\"lib.d.ts\"]}",
+    "/p/main.ts": "const x = stable;",
+    "/p/lib.d.ts": "declare const stable: number;"
+  },
+  "actions": [
+    {"kind":"state"},
+    {"kind":"open","file":"/p/main.ts","version":1,"text":"const x = stable;"},
+    {"kind":"state","file":"/p/main.ts"},
+    {"kind":"state","file":"/p/main.ts"},
+    {"kind":"change","file":"/p/main.ts","version":2,"text":"const x = stable + 1;"},
+    {"kind":"state","file":"/p/main.ts"},
+    {"kind":"options","options":{"noLib":true}},
+    {"kind":"open","file":"/other.ts","version":1,"text":"const other = 1;"},
+    {"kind":"state","file":"/other.ts"},
+    {"kind":"options","options":{"noLib":true,"strict":true}},
+    {"kind":"state","file":"/other.ts"},
+    {"kind":"close","file":"/p/main.ts"},
+    {"kind":"state","file":"/other.ts"},
+    {"kind":"open","file":"/last.ts","version":1,"text":"const last = 1;"},
+    {"kind":"state","file":"/last.ts"}
+  ]
+}

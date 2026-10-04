@@ -15,6 +15,8 @@ include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/lice
 [dependencies]
 tsr_json = { version = "0.2.0", path = "../tsr_json" }
 tsr_jsonrpc = { version = "0.2.0", path = "../tsr_jsonrpc" }
+tsr_jsstring = { version = "0.2.0", path = "../tsr_jsstring" }
+tsr_tspath = { version = "0.2.0", path = "../tsr_tspath" }
 
 [lints]
 workspace = true
