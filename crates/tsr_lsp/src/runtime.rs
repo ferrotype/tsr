@@ -62,6 +62,8 @@ struct Settings {
     exclude_library_symbols: bool,
     workspace_current_project: bool,
     maximum_hover_length: usize,
+    inlay: tsr_ls::InlayHintsOptions,
+    inlay_flags: [Option<bool>; 7],
 }
 impl Default for Settings {
     fn default() -> Self {
@@ -73,6 +75,8 @@ impl Default for Settings {
             exclude_library_symbols: true,
             workspace_current_project: false,
             maximum_hover_length: 500,
+            inlay: tsr_ls::InlayHintsOptions::default(),
+            inlay_flags: [None; 7],
         }
     }
 }
@@ -423,7 +427,11 @@ impl Runtime {
                 }
                 let context = context.clone();
                 let capabilities = self.capabilities.clone();
-                let maximum_hover_length = self.settings.lock().unwrap().maximum_hover_length;
+                let settings = self.settings.lock().unwrap().clone();
+                let options = crate::language_features::Options {
+                    maximum_hover_length: settings.maximum_hover_length,
+                    inlay: settings.inlay,
+                };
                 let encoding = self.options.project.position_encoding;
                 let request_id = request
                     .id
@@ -439,7 +447,7 @@ impl Runtime {
                         feature,
                         encoding,
                         &capabilities,
-                        maximum_hover_length,
+                        options,
                     )
                 })));
             }
@@ -751,6 +759,7 @@ impl Runtime {
                         .into_iter()
                         .flatten()
                     {
+                        apply_inlay_preferences(raw, true, &mut next.inlay, &mut next.inlay_flags);
                         set_bool(raw.get("validateEnabled"), &mut next.validation);
                         if let Some(lsp::Any::Number(length)) = raw.get("maximumHoverLength") {
                             next.maximum_hover_length =
@@ -771,6 +780,7 @@ impl Runtime {
                             next.config_name.clone_from(name);
                         }
                     }
+                    apply_inlay_preferences(fields, false, &mut next.inlay, &mut next.inlay_flags);
                     set_bool(
                         nested(fields, "validate.enabled")
                             .or_else(|| nested(fields, "validate.enable")),
@@ -817,6 +827,24 @@ impl Runtime {
             }
         }
         *self.settings.lock().unwrap() = next.clone();
+        if (next.inlay_flags != before.inlay_flags
+            || next.inlay.parameter_names != before.inlay.parameter_names)
+            && self
+                .capabilities
+                .workspace
+                .as_deref()
+                .and_then(|w| w.inlay_hint.as_deref())
+                .and_then(|i| i.refresh_support.as_deref())
+                .copied()
+                .unwrap_or(false)
+        {
+            if let Err(e) = self
+                .client
+                .request_without_waiting("workspace/inlayHint/refresh", RawValue(b"null".to_vec()))
+            {
+                self.logger.send(lsp::MessageType::ERROR, e.message);
+            }
+        }
         if next.config_name != before.config_name {
             self.server
                 .as_ref()
@@ -899,6 +927,92 @@ fn nested<'a>(fields: &'a HashMap<String, lsp::Any>, path: &str) -> Option<&'a l
 fn set_bool(value: Option<&lsp::Any>, target: &mut bool) {
     if let Some(lsp::Any::Boolean(value)) = value {
         *target = *value;
+    }
+}
+
+// The two user-preference forms share one mapping: unstable/raw fields are
+// applied first, then the editor's nested configuration takes precedence.
+fn apply_inlay_preferences(
+    fields: &HashMap<String, lsp::Any>,
+    raw: bool,
+    options: &mut tsr_ls::InlayHintsOptions,
+    states: &mut [Option<bool>; 7],
+) {
+    let get = |name, path| {
+        if raw {
+            fields.get(name)
+        } else {
+            nested(fields, path)
+        }
+    };
+    if let Some(lsp::Any::String(value)) = get(
+        "includeInlayParameterNameHints",
+        "inlayHints.parameterNames.enabled",
+    ) {
+        options.parameter_names = match value.as_str() {
+            "all" => tsr_ls::ParameterNameHints::All,
+            "literals" => tsr_ls::ParameterNameHints::Literals,
+            _ => tsr_ls::ParameterNameHints::None,
+        };
+    }
+    if let Some(lsp::Any::String(value)) = get("quotePreference", "preferences.quoteStyle") {
+        options.quote = match value.as_str() {
+            "single" => tsr_ls::QuotePreference::Single,
+            "double" => tsr_ls::QuotePreference::Double,
+            _ => tsr_ls::QuotePreference::Auto,
+        };
+    }
+    for (index, (name, path, invert, target)) in [
+        (
+            "includeInlayParameterNameHintsWhenArgumentMatchesName",
+            "inlayHints.parameterNames.suppressWhenArgumentMatchesName",
+            true,
+            &mut options.parameter_names_when_matching,
+        ),
+        (
+            "includeInlayFunctionParameterTypeHints",
+            "inlayHints.parameterTypes.enabled",
+            false,
+            &mut options.parameter_types,
+        ),
+        (
+            "includeInlayVariableTypeHints",
+            "inlayHints.variableTypes.enabled",
+            false,
+            &mut options.variable_types,
+        ),
+        (
+            "includeInlayVariableTypeHintsWhenTypeMatchesName",
+            "inlayHints.variableTypes.suppressWhenTypeMatchesName",
+            true,
+            &mut options.variable_types_when_matching,
+        ),
+        (
+            "includeInlayPropertyDeclarationTypeHints",
+            "inlayHints.propertyDeclarationTypes.enabled",
+            false,
+            &mut options.property_types,
+        ),
+        (
+            "includeInlayFunctionLikeReturnTypeHints",
+            "inlayHints.functionLikeReturnTypes.enabled",
+            false,
+            &mut options.return_types,
+        ),
+        (
+            "includeInlayEnumMemberValueHints",
+            "inlayHints.enumMemberValues.enabled",
+            false,
+            &mut options.enum_values,
+        ),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        if let Some(lsp::Any::Boolean(value)) = get(name, path) {
+            *target = if !raw && invert { !value } else { *value };
+            states[index] = Some(*target);
+        }
     }
 }
 

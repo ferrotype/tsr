@@ -11,6 +11,7 @@ pub fn handles(method: &str) -> bool {
         "textDocument/linkedEditingRange"
             | "textDocument/hover"
             | "textDocument/signatureHelp"
+            | "textDocument/inlayHint"
             | "textDocument/selectionRange"
             | "textDocument/foldingRange"
             | "textDocument/semanticTokens/full"
@@ -23,6 +24,7 @@ pub fn handles(method: &str) -> bool {
 pub enum Request {
     Hover(lsp::HoverParams),
     SignatureHelp(lsp::SignatureHelpParams),
+    InlayHints(lsp::InlayHintParams),
     Linked(lsp::LinkedEditingRangeParams),
     Selection(lsp::SelectionRangeParams),
     Folding(lsp::FoldingRangeParams),
@@ -35,6 +37,7 @@ pub enum Request {
 impl Request {
     pub fn decode(method: &str, params: Option<&RawValue>) -> Result<Self, lsp::ResponseError> {
         Ok(match method {
+            "textDocument/inlayHint" => Self::InlayHints(crate::decode(params)?),
             "textDocument/signatureHelp" => Self::SignatureHelp(crate::decode(params)?),
             "textDocument/hover" => Self::Hover(crate::decode(params)?),
             "textDocument/linkedEditingRange" => Self::Linked(crate::decode(params)?),
@@ -58,6 +61,7 @@ impl Request {
     pub fn uri(&self) -> &lsp::DocumentUri {
         match self {
             Self::SignatureHelp(p) => &p.text_document.uri,
+            Self::InlayHints(p) => &p.text_document.uri,
             Self::Hover(p) => &p.text_document.uri,
             Self::Linked(p) => &p.text_document.uri,
             Self::Selection(p) => &p.text_document.uri,
@@ -76,6 +80,11 @@ fn service_error(e: tsr_ls::Error) -> lsp::ResponseError {
         e => error(-32603, e.to_string()),
     }
 }
+#[derive(Clone, Copy)]
+pub struct Options {
+    pub maximum_hover_length: usize,
+    pub inlay: tsr_ls::InlayHintsOptions,
+}
 pub fn execute(
     context: &Context,
     request_id: &str,
@@ -83,7 +92,7 @@ pub fn execute(
     request: Request,
     encoding: tsr_jsstring::PositionEncoding,
     capabilities: &lsp::ClientCapabilities,
-    maximum_hover_length: usize,
+    options: Options,
 ) -> Result<RawValue, lsp::ResponseError> {
     if context.err().is_some() {
         return Err(crate::canceled());
@@ -107,10 +116,14 @@ pub fn execute(
     }
     let _stop = Stop(context.after_func(move || cancel.cancel()));
     let mut service = tsr_ls::LanguageService::new(program, encoding, cancellation);
+    if matches!(request, Request::InlayHints(_)) && !options.inlay.enabled() {
+        return client::raw(&lsp::Null);
+    }
     if matches!(
         request,
         Request::Hover(_)
             | Request::SignatureHelp(_)
+            | Request::InlayHints(_)
             | Request::Semantic(_)
             | Request::SemanticRange(_)
             | Request::Definition(_)
@@ -157,7 +170,7 @@ pub fn execute(
                     .and_then(|c| c.hover_verbosity_level.as_deref())
                     .copied()
                     .unwrap_or(false),
-                maximum_length: maximum_hover_length,
+                maximum_length: options.maximum_hover_length,
             };
             return client::raw(
                 &service
@@ -192,6 +205,13 @@ pub fn execute(
             return client::raw(
                 &service
                     .signature_help(&mut operation, params, &options)
+                    .map_err(service_error)?,
+            );
+        }
+        if let Request::InlayHints(params) = &request {
+            return client::raw(
+                &service
+                    .inlay_hints(&mut operation, params, options.inlay)
                     .map_err(service_error)?,
             );
         }
@@ -266,6 +286,7 @@ pub fn execute(
         }
         Request::Hover(_)
         | Request::SignatureHelp(_)
+        | Request::InlayHints(_)
         | Request::Semantic(_)
         | Request::SemanticRange(_)
         | Request::Definition(_)

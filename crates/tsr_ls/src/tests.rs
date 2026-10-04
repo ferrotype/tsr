@@ -309,3 +309,73 @@ fn signature_middle_rest_respects_null_active_parameter_capability() {
         Some(&3)
     );
 }
+
+#[test]
+fn inlay_parameter_name_links_to_its_declaration() {
+    let text = b"declare function f(value:number):void; f(1);";
+    let program = Arc::new(program(b"/index.ts", text));
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool
+        .checker_for_file_exclusive(program.source_file(b"/index.ts").unwrap().source())
+        .unwrap();
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    let params = lsp::InlayHintParams {
+        text_document: lsp::TextDocumentIdentifier {
+            uri: lsp::DocumentUri("file:///index.ts".into()),
+        },
+        range: lsp::Range {
+            start: lsp::Position::default(),
+            end: lsp::Position {
+                line: 0,
+                character: text.len() as u32,
+            },
+        },
+        ..Default::default()
+    };
+    assert!(service
+        .inlay_hints(&mut checker, &params, InlayHintsOptions::default())
+        .unwrap()
+        .inlay_hints
+        .is_none());
+    let hints = service
+        .inlay_hints(
+            &mut checker,
+            &params,
+            InlayHintsOptions {
+                parameter_names: ParameterNameHints::All,
+                ..Default::default()
+            },
+        )
+        .unwrap()
+        .inlay_hints
+        .unwrap();
+    assert_eq!(hints.len(), 1);
+    let hint = hints[0].as_ref().unwrap();
+    assert_eq!(
+        hint.position,
+        lsp::Position {
+            line: 0,
+            character: 41
+        }
+    );
+    let parts = hint.label.inlay_hint_label_parts.as_ref().unwrap();
+    assert_eq!(
+        parts
+            .iter()
+            .flatten()
+            .map(|p| p.value.as_str())
+            .collect::<Vec<_>>(),
+        ["value", ":"]
+    );
+    let location = parts[0].as_ref().unwrap().location.as_ref().unwrap();
+    assert_eq!(location.uri.0, "file:///index.ts");
+    assert_eq!(
+        (location.range.start.character, location.range.end.character),
+        (19, 24)
+    );
+    assert_eq!(hint.padding_right.as_deref(), Some(&true));
+}
