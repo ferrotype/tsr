@@ -63,6 +63,13 @@ impl<'a> FormatFile<'a, '_> {
     ) -> Result<bool, Error> {
         lsutil::position_belongs_to_node(self, node, position)
     }
+    pub fn position_is_asi_candidate(
+        &mut self,
+        pos: i64,
+        context: tsr_arena::NodeId,
+    ) -> Result<bool, Error> {
+        lsutil::position_is_asi_candidate(pos, context, self)
+    }
     pub fn probably_uses_semicolons(&mut self) -> Result<bool, Error> {
         lsutil::probably_uses_semicolons(self)
     }

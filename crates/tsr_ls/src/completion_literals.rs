@@ -220,7 +220,8 @@ impl LanguageService<'_> {
         } else {
             vec![ty]
         };
-        let single = crate::inlay_hints::single_quote(syntax, options.quote)?;
+        let used =
+            crate::completion_switch::expression_case_values(checker, syntax, context.token)?;
         let mut items = Vec::new();
         let mut seen = HashSet::new();
         for ty in types {
@@ -230,24 +231,12 @@ impl LanguageService<'_> {
             {
                 continue;
             }
-            let label = if flags & tf::STRING_LITERAL != 0 {
-                let value = checker.string_literal_value(ty)?;
-                let ch = if single {
-                    tsr_jsstring::QuoteChar::Single
-                } else {
-                    tsr_jsstring::QuoteChar::Double
-                };
-                let quote = if single { "'" } else { "\"" };
-                format!(
-                    "{quote}{}{quote}",
-                    String::from_utf8_lossy(&tsr_jsstring::escape::escape_string(
-                        value.as_bytes(),
-                        ch
-                    ))
-                )
-            } else {
-                String::from_utf8_lossy(checker.literal_value_text(ty)?.as_bytes()).into_owned()
-            };
+            if let Some(used) = &used {
+                if used.contains(checker, ty)? {
+                    continue;
+                }
+            }
+            let label = Self::completion_literal_label(checker, ty, syntax, options)?;
             if seen.insert(label.clone()) {
                 items.push(Some(Box::new(lsp::CompletionItem {
                     label,
@@ -259,5 +248,28 @@ impl LanguageService<'_> {
             }
         }
         Ok(items)
+    }
+    pub(crate) fn completion_literal_label(
+        checker: &Operation<'_>,
+        ty: TypeRef,
+        syntax: &mut Syntax<'_>,
+        options: &CompletionOptions,
+    ) -> Result<String> {
+        Ok(if checker.type_flags(ty)? & tf::STRING_LITERAL != 0 {
+            let single = crate::inlay_hints::single_quote(syntax, options.quote)?;
+            let value = checker.string_literal_value(ty)?;
+            let ch = if single {
+                tsr_jsstring::QuoteChar::Single
+            } else {
+                tsr_jsstring::QuoteChar::Double
+            };
+            let quote = if single { "'" } else { "\"" };
+            format!(
+                "{quote}{}{quote}",
+                String::from_utf8_lossy(&tsr_jsstring::escape::escape_string(value.as_bytes(), ch))
+            )
+        } else {
+            String::from_utf8_lossy(checker.literal_value_text(ty)?.as_bytes()).into_owned()
+        })
     }
 }

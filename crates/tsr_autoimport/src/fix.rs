@@ -308,10 +308,17 @@ pub fn fixes(
         result.push(fix);
         return Ok(result);
     }
-    let specifier = if export.ambient_module_name().is_empty() {
-        checker.module_specifier_for_file(source, export.module_file_name.as_bytes())?
-    } else {
+    let specifier = if !export.ambient_module_name().is_empty() {
         tsr_jsstring::JsString::from_bytes(export.ambient_module_name())
+    } else if !export.package_name.is_empty() {
+        let Some(specifier) =
+            crate::specifiers::for_package(export, checker, source, program.options())?
+        else {
+            return Ok(result);
+        };
+        specifier
+    } else {
+        checker.module_specifier_for_file(source, export.module_file_name.as_bytes())?
     };
     if source_file.is_js() && export.flags & sf::VALUE == 0 && !export.is_unresolved_alias() {
         return Ok(vec![lsp::AutoImportFix {

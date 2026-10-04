@@ -696,7 +696,7 @@ fn substitute(target: &[u8], subpath: &[u8], pattern: bool) -> Vec<u8> {
     result
 }
 /// port: tsc/internal/module/util.go:ComparePatternKeys
-fn compare_pattern_keys(a: &[u8], b: &[u8]) -> std::cmp::Ordering {
+pub fn compare_pattern_keys(a: &[u8], b: &[u8]) -> std::cmp::Ordering {
     let star_a = a.iter().position(|&c| c == b'*');
     let star_b = b.iter().position(|&c| c == b'*');
     let base_a = star_a.map_or(a.len(), |i| i + 1);

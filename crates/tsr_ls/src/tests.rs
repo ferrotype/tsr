@@ -811,3 +811,92 @@ fn completion_literal_arguments_and_labels_have_native_ordering_groups() {
         ["inner", "outer"]
     );
 }
+
+#[test]
+fn completion_type_parameter_defaults_hide_self_and_later_parameters() {
+    for (source, excluded) in [
+        (
+            "function f<T = /*cursor*/, Later = unknown>() {}",
+            vec!["T", "Later"],
+        ),
+        ("type T<K extends /*cursor*/> = K", vec!["K"]),
+    ] {
+        let list = completion_result(source, &CompletionOptions::default());
+        assert!(list
+            .items
+            .iter()
+            .flatten()
+            .all(|item| !excluded.contains(&item.label.as_str())));
+        assert!(list
+            .items
+            .iter()
+            .flatten()
+            .any(|item| item.label == "string"));
+    }
+}
+
+#[test]
+fn completion_switch_values_are_filtered_and_snippet_preserves_native_order() {
+    let list = completion_result(
+        "declare const state: 'one' | 'two'; switch(state) { case 'one': break; case /*cursor*/ }",
+        &CompletionOptions {
+            snippets: true,
+            ..Default::default()
+        },
+    );
+    assert!(!list
+        .items
+        .iter()
+        .flatten()
+        .any(|item| item.label == "\"one\""));
+    assert!(list
+        .items
+        .iter()
+        .flatten()
+        .any(|item| item.label == "\"two\""));
+    let snippet = list
+        .items
+        .iter()
+        .flatten()
+        .find(|item| item.label == "case \"two\": ...")
+        .unwrap();
+    assert_eq!(
+        snippet.insert_text.as_deref().map(String::as_str),
+        Some("case \"two\":$1")
+    );
+    assert_eq!(snippet.data.as_deref().unwrap().source, "SwitchCases/");
+}
+
+#[test]
+fn completion_promise_property_replaces_the_access_with_await() {
+    let source = "interface Promise<T> {then(onfulfilled: (value: T) => unknown): Promise<unknown>} declare const promised: Promise<{value: number}>; async function f() {promised./*cursor*/}";
+    let list = completion_result(source, &CompletionOptions::default());
+    let item = list
+        .items
+        .iter()
+        .flatten()
+        .find(|item| item.label == "value")
+        .unwrap();
+    let edit = item
+        .text_edit
+        .as_deref()
+        .unwrap()
+        .text_edit
+        .as_deref()
+        .unwrap();
+    assert_eq!(edit.new_text, "(await promised).value");
+    assert_eq!(
+        (edit.range.start.character, edit.range.end.character),
+        (152, 161)
+    );
+    // The same expression outside an await context gets no rewritten property.
+    let list = completion_result(
+        &source.replace("async function", "function"),
+        &CompletionOptions::default(),
+    );
+    assert!(!list
+        .items
+        .iter()
+        .flatten()
+        .any(|item| item.label == "value"));
+}

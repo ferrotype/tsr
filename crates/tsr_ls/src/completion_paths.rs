@@ -6,6 +6,9 @@ use tsr_checker::{ModuleSpecifierEnding as Ending, Operation};
 use tsr_core::{ResolutionMode, TextRange};
 use tsr_lsproto as lsp;
 use tsr_tspath as path;
+#[path = "completion_mappings.rs"]
+mod mappings;
+use mappings::MappingKind;
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum Kind {
@@ -35,6 +38,7 @@ impl Entries {
         }
     }
 }
+#[derive(Clone)]
 struct PathOptions {
     extensions: Vec<Vec<u8>>,
     endings: Vec<Ending>,
@@ -133,7 +137,7 @@ impl LanguageService<'_> {
             .flatten()
             .map(|s| s.as_bytes().to_vec()),
         );
-        if compiler.resolve_json_module() {
+        if node_modules_mode(compiler) && compiler.resolve_json_module() {
             extensions.push(b".json".to_vec());
         }
         Ok(PathOptions {
@@ -190,6 +194,7 @@ impl LanguageService<'_> {
                 &fragment,
                 &directory,
                 &path_options,
+                mode,
                 &mut entries,
             )?;
         }
@@ -260,6 +265,7 @@ impl LanguageService<'_> {
         fragment: &[u8],
         directory: &[u8],
         options: &PathOptions,
+        mode: ResolutionMode,
         result: &mut Entries,
     ) -> Result<()> {
         let fragment_directory = directory_fragment(fragment);
@@ -283,36 +289,19 @@ impl LanguageService<'_> {
         }
         self.typings_path_entries(&fragment_directory, directory, options, result)?;
         if let Some(paths) = &self.program.options().paths {
-            let base = self
-                .program
-                .options()
-                .paths_base_path(self.program.current_directory());
-            for (pattern, targets) in paths {
-                let pattern = pattern.as_bytes();
-                if let Some(star) = pattern.iter().position(|b| *b == b'*') {
-                    let prefix = &pattern[..star];
-                    if let Some(rest) = fragment.strip_prefix(prefix) {
-                        for target in targets.iter().flatten() {
-                            if let Some(target_prefix) = target.as_bytes().strip_suffix(b"*") {
-                                let mapped = [target_prefix, rest].concat();
-                                self.directory_path_entries(&mapped, base, b"", options, result)?;
-                            }
-                        }
-                    } else if prefix.starts_with(fragment) {
-                        result.add(
-                            prefix.strip_suffix(b"/").unwrap_or(prefix).to_vec(),
-                            Kind::Directory,
-                            Vec::new(),
-                        );
-                    }
-                } else if let Some(name) = pattern.strip_prefix(fragment_directory.as_slice()) {
-                    result.add(
-                        name.strip_prefix(b"/").unwrap_or(name).to_vec(),
-                        Kind::Module,
-                        Vec::new(),
-                    );
-                }
-            }
+            self.mapping_entries(
+                paths,
+                fragment,
+                self.program
+                    .options()
+                    .paths_base_path(self.program.current_directory()),
+                options,
+                MappingKind::Paths,
+                result,
+            )?;
+        }
+        if !node_modules_mode(self.program.options()) {
+            return Ok(());
         }
         let mut found = false;
         if fragment_directory.is_empty() {
@@ -336,21 +325,7 @@ impl LanguageService<'_> {
             }
         }
         if !found {
-            let mut ancestor = directory.to_vec();
-            loop {
-                self.directory_path_entries(
-                    fragment,
-                    &path::resolve(&ancestor, &[b"node_modules"]),
-                    b"",
-                    options,
-                    result,
-                )?;
-                let parent = path::directory(&ancestor);
-                if parent == ancestor {
-                    break;
-                }
-                ancestor = parent;
-            }
+            self.package_path_entries(checker, fragment, directory, options, mode, result)?;
         }
         Ok(())
     }
@@ -634,6 +609,13 @@ impl LanguageService<'_> {
             .map(Some)
     }
 }
+fn node_modules_mode(options: &tsr_core::CompilerOptions) -> bool {
+    let kind = options.module_resolution_kind();
+    kind >= tsr_core::ModuleResolutionKind::NODE16
+        && kind <= tsr_core::ModuleResolutionKind::NODE_NEXT
+        || kind == tsr_core::ModuleResolutionKind::BUNDLER
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

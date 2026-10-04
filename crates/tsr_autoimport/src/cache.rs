@@ -65,13 +65,17 @@ impl Cache {
             .index
             .as_ref()
             .filter(|index| {
-                self.sources.iter().all(|(path, id)| {
-                    // New files always require extraction, even the requested file.
-                    index
-                        .sources
-                        .get(path)
-                        .is_some_and(|old| old == id || path.as_bytes() == requested)
-                })
+                index
+                    .requested_file
+                    .as_ref()
+                    .is_none_or(|file| file.as_bytes() == requested)
+                    && self.sources.iter().all(|(path, id)| {
+                        // New files always require extraction, even the requested file.
+                        index
+                            .sources
+                            .get(path)
+                            .is_some_and(|old| old == id || path.as_bytes() == requested)
+                    })
             })
             .cloned())
     }

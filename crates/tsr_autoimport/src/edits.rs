@@ -206,7 +206,10 @@ pub fn edits(
                     format!("{}, ", fix.name),
                 ));
             } else {
-                let typed = data.phase_modifier() != K::TypeKeyword && type_only(fix, options);
+                let typed = (data.phase_modifier() != K::TypeKeyword || promote)
+                    && (fix.add_as_type_only == lsp::AddAsTypeOnly::REQUIRED
+                        || fix.add_as_type_only != lsp::AddAsTypeOnly::NOT_ALLOWED
+                            && options.prefer_type_only);
                 let name = format!("{}{}", if typed { "type " } else { "" }, fix.name);
                 if let Some(binding) = binding {
                     let read = view.node(binding)?;
@@ -222,29 +225,39 @@ pub fn edits(
                             text: format!("{{ {name} }}"),
                         });
                     } else {
-                        let names: Vec<_> = elements
+                        let mut names: Vec<_> = elements
                             .iter()
                             .map(|&e| {
-                                let r = view.node(e)?;
-                                Ok(view
-                                    .node_text(
-                                        r.property_name()
-                                            .or(r.name())
-                                            .ok_or(tsr_arena::Error::InvalidGraph)?,
+                                let read = view.node(e)?;
+                                Ok((
+                                    view.node_text(
+                                        read.name().ok_or(tsr_arena::Error::InvalidGraph)?,
                                     )?
                                     .as_bytes()
-                                    .to_vec())
+                                    .to_vec(),
+                                    read.data_source()
+                                        .as_import_specifier()
+                                        .is_some_and(|d| d.is_type_only()),
+                                ))
                             })
                             .collect::<Result<_, tsr_arena::Error>>()?;
-                        let cmp = |a: &[u8], b: &[u8]| {
-                            tsr_jsstring::compare::compare_case_insensitive(a, b)
-                        };
-                        let sorted = names.windows(2).all(|w| !cmp(&w[0], &w[1]).is_gt());
+                        let (order, sorted) = named_order(&names);
+                        if promote {
+                            for name in &mut names {
+                                name.1 = true;
+                            }
+                        }
+                        let sorted = sorted
+                            && names.windows(2).all(|w| {
+                                !order.compare((&w[0].0, w[0].1), (&w[1].0, w[1].1)).is_gt()
+                            });
                         if let Some(index) = sorted
                             .then(|| {
-                                names
-                                    .iter()
-                                    .position(|n| cmp(fix.name.as_bytes(), n).is_lt())
+                                names.iter().position(|n| {
+                                    order
+                                        .compare((fix.name.as_bytes(), typed), (&n.0, n.1))
+                                        .is_lt()
+                                })
                             })
                             .flatten()
                         {
@@ -340,4 +353,51 @@ fn top_position(view: AstView<'_>, source: NodeId) -> Result<i64, Error> {
         }
     }
     Ok(pos as i64)
+}
+
+#[derive(Clone, Copy)]
+struct NamedOrder {
+    ignore_case: bool,
+    types: u8,
+}
+impl NamedOrder {
+    fn compare(self, a: (&[u8], bool), b: (&[u8], bool)) -> std::cmp::Ordering {
+        let types = match self.types {
+            0 => a.1.cmp(&b.1),
+            2 => b.1.cmp(&a.1),
+            _ => std::cmp::Ordering::Equal,
+        };
+        types.then_with(|| {
+            if self.ignore_case {
+                tsr_jsstring::compare::compare_case_insensitive(a.0, b.0)
+            } else {
+                tsr_jsstring::compare::compare_case_sensitive(a.0, b.0)
+            }
+        })
+    }
+}
+// Detection order from lsutil/organizeimports.go: type-last, inline, type-first;
+// ties prefer case-insensitive. Detect on original specifiers before promotion.
+fn named_order(names: &[(Vec<u8>, bool)]) -> (NamedOrder, bool) {
+    let mixed = names.iter().any(|n| n.1) && names.iter().any(|n| !n.1);
+    let mut best = (
+        usize::MAX,
+        NamedOrder {
+            ignore_case: true,
+            types: 0,
+        },
+    );
+    for types in 0..(if mixed { 3 } else { 1 }) {
+        for ignore_case in [true, false] {
+            let order = NamedOrder { ignore_case, types };
+            let diff = names
+                .windows(2)
+                .filter(|w| order.compare((&w[0].0, w[0].1), (&w[1].0, w[1].1)).is_gt())
+                .count();
+            if diff < best.0 {
+                best = (diff, order);
+            }
+        }
+    }
+    (best.1, best.0 == 0)
 }

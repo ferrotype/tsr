@@ -18,7 +18,26 @@ the changed crates' clippy checks, package policy and `cargo xtask validate`.
 The existing native watcher test requires FSEvents access outside the sandbox.
 There is no LSP adapter in `parity.py` yet; its replay supervisor belongs to L7.
 
-Remaining L4 work includes package discovery and entrypoint filtering, complete
-path-map completion, remaining completion/snippet contexts, preference and
-cache-invalidation cases, and expansion against the assigned native families.
+The second checkpoint adds package discovery and conditional entrypoints,
+`paths`/package-import/exports/`typesVersions` completions, import-clause ordering,
+generic-default filtering, switch-clause snippets, enum recommendations, and
+promise-property conversions. The comparison now matches 260 responses in each
+of the four encoding/capability combinations, including resolve and applied
+imports. Package discovery uses the production resolver and ephemeral programs;
+only names and export metadata enter the snapshot's published index. The pin's
+dependencies/peer-dependencies filter is preserved; dev/optional dependencies
+alone do not admit a package. Ordinary node_modules files are indexed by package
+entrypoints, not duplicated in the program index.
+
+The native nullable-promise conversion currently emits `(await p)?.?.member`.
+The comparison includes this case and preserves the pin's text rather than
+silently repairing it. This is a native behavior observation, not a new approved
+difference.
+
+Focused language-service (30), autoimport (3), and module (5) unit tests pass;
+changed-crate clippy, package policy, formatting, and marker validation pass.
+
+Remaining L4 work includes further completion/snippet contexts, preference and
+cache-invalidation cases, import-adder syntax and batching, and expansion against
+the assigned native families.
 Multi-project discovery and ATA remain L6 dependencies as in the Phase 5 plan.

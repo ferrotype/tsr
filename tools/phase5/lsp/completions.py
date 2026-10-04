@@ -39,6 +39,20 @@ CASES = [
     'import { alpha, /*cursor*/ } from "./dep";',
     'export { /*cursor*/ } from "./dep";',
     'let value = 1 as /*cursor*/',
+    'function func<T = /*cursor*/, Later = unknown>() {}',
+    'type T<K extends /*cursor*/> = K;',
+    'declare const state: "one" | "two"; switch(state) { case "one": break; case /*cursor*/ }',
+    'declare const state: "one" | "two"; switch(state) { /*cursor*/ }',
+    'enum State {One, Two}; declare const state: State; switch(state) { case State.One: break; case /*cursor*/ }',
+    'interface Promise<T> {then(onfulfilled: (value: T) => unknown): Promise<unknown>} declare const promised: Promise<{value: number}>; async function f() {promised./*cursor*/}',
+    'enum State {One, Two}; declare const state: State; switch(state) { case State.One: break; case State./*cursor*/ }',
+    'declare const state: -1 | 0 | 2n | "one"; switch(state) { case -1: break; case 0: break; /*cursor*/ }',
+    'interface Promise<T> {then(onfulfilled: (value: T) => unknown): Promise<unknown>} declare const promised: Promise<{"x-y": number}>; async function f() {const previous=1\n promised./*cursor*/}',
+    'interface Promise<T> {then(onfulfilled: (value: T) => unknown): Promise<unknown>} declare const promised: Promise<{value: number}> | undefined; async function f() { promised./*cursor*/}',
+    'class ClassName {} new /*cursor*/',
+    'function accept<T extends {one: number; two?: string}>(arg: T): T {return arg} accept({/*cursor*/});',
+    'import type { Default } from "./dep"; new De/*cursor*/',
+
     'const object = { alpha: 1, optional: true }; object["/*cursor*/"]',
     'let state: "ready" | "done" = "/*cursor*/";',
     'function choose(state: "ready" | "done"): void {} choose("/*cursor*/")',
@@ -134,7 +148,7 @@ def run(binary, root, encoding, rich, cases=CASES, filename="main.ts", auto_inse
                 result['result']['items'].sort(key=key)
             rows.append(['list', index, result])
             for item in (result.get('result') or {}).get('items', []):
-                if item['label'].rstrip('?') in ['alpha', 'local', 'name', 'optional', 'method', 'Shape', 'Existing', 'string', 'title', 'onClick', 'greet']:
+                if item['label'].startswith(('Pkg', 'case ')) or item['label'].rstrip('?') in ['alpha', 'local', 'name', 'optional', 'method', 'Shape', 'Existing', 'string', 'title', 'onClick', 'greet']:
                     resolved = peer.request('completionItem/resolve', item)
                     rows.append(['resolve', index, item['label'], resolved])
                     if item.get('data', {}).get('autoImport'):
@@ -166,6 +180,51 @@ JS_CASES = [
     '/**/*cursor*/\nfunction greet(name="hi", ...rest) {return name}',
 ]
 
+PACKAGE_CASES = [
+    'Pkg/*cursor*/',
+    'let value: Pkg/*cursor*/',
+    'import { PkgValue } from "sample"; Pkg/*cursor*/',
+    'import type { PkgType } from "sample"; Pkg/*cursor*/',
+    'import value from "conditional//*cursor*/";',
+    'import value from "conditional/features//*cursor*/";',
+    'import value from "#internal//*cursor*/";',
+    'import value from "alias//*cursor*/";',
+    'import value from "ext//*cursor*/";',
+    'import value from "pre/*cursor*/";',
+    'import value from "legacy//*cursor*/";',
+]
+
+def package_fixture(root):
+    root.mkdir()
+    (root / 'tsconfig.json').write_text('{"compilerOptions":{"noLib":true,"module":"nodenext","paths":{"alias/*":["./src/*"],"ext/*":["./src/*.js"],"prefix*end":["./src/pre*.ts"]}},"files":["main.ts"]}')
+    (root / 'main.ts').write_text('')
+    (root / 'package.json').write_text('{"type":"module","dependencies":{"sample":"*","conditional":"*","legacy":"*"},"devDependencies":{"dev-only":"*"},"optionalDependencies":{"optional-only":"*"},"imports":{"#internal/*":"./src/*.js"}}')
+    files = {
+        'sample/package.json': '{"types":"index.d.ts"}',
+        'sample/index.d.ts': 'export declare const PkgValue: number; export interface PkgType { value: number }; export declare class PkgClass {}',
+        'conditional/package.json': '{"exports":{".":{"import":"./esm.d.ts","require":"./cjs.d.cts"},"./feature":"./feature.d.ts","./features/*":"./features/*.d.ts"}}',
+        'conditional/esm.d.ts': 'export declare const PkgImport: number;',
+        'conditional/cjs.d.cts': 'export declare const PkgRequire: number;',
+        'conditional/feature.d.ts': 'export declare const PkgFeature: number;',
+        'conditional/features/first.d.ts': 'export declare const PkgFirst: number;',
+        'legacy/package.json': '{"types":"index.d.ts","typesVersions":{"*":{"*":["types/*"]}}}',
+        'legacy/types/a.d.ts': 'export declare const PkgLegacy: number;',
+        'dev-only/package.json': '{"types":"index.d.ts"}',
+        'dev-only/index.d.ts': 'export declare const PkgDevOnly: number;',
+        'optional-only/package.json': '{"types":"index.d.ts"}',
+        'optional-only/index.d.ts': 'export declare const PkgOptionalOnly: number;',
+        'not-dependency/package.json': '{"types":"index.d.ts"}',
+        'not-dependency/index.d.ts': 'export declare const PkgHidden: number;',
+    }
+    (root / 'src' / 'nested').mkdir(parents=True)
+    (root / 'src' / 'a.ts').write_text('export const value = 1;')
+    (root / 'src' / 'prebuilt.ts').write_text('export const value = 1;')
+    (root / 'src' / 'nested' / 'b.ts').write_text('export const value = 2;')
+    for name, text in files.items():
+        file = root / 'node_modules' / name
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.write_text(text)
+
 def main():
     with tempfile.TemporaryDirectory(prefix='tsr-l4-') as directory:
         root = Path(directory).resolve()
@@ -174,6 +233,8 @@ def main():
         (root / 'jsx.tsx').write_text('')
         (root / 'script.js').write_text('')
         (root / 'dep.ts').write_text('export const alpha = 1; export interface Shape { a: number } export function method() {} export default class Default {}')
+        package_root = root / 'packages'
+        package_fixture(package_root)
         for encoding in ['utf-8', 'utf-16']:
             for rich in [False, True]:
                 expected = run(ROOT / 'target/phase5/go-lsp', root, encoding, rich)
@@ -181,6 +242,8 @@ def main():
                 for cases, name, auto in [(JSX_CASES, 'jsx.tsx', False), (AUTO_CASES, 'jsx.tsx', True), (JS_CASES, 'script.js', False)]:
                     expected.extend(run(ROOT / 'target/phase5/go-lsp', root, encoding, rich, cases, name, auto))
                     actual.extend(run(ROOT / 'target/debug/tsrust', root, encoding, rich, cases, name, auto))
+                expected.extend(run(ROOT / 'target/phase5/go-lsp', package_root, encoding, rich, PACKAGE_CASES))
+                actual.extend(run(ROOT / 'target/debug/tsrust', package_root, encoding, rich, PACKAGE_CASES))
                 if actual != expected:
                     output = ROOT / 'target/phase5/l4-diff'
                     output.mkdir(exist_ok=True)

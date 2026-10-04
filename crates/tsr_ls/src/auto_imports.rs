@@ -19,31 +19,102 @@ impl LanguageService<'_> {
         checker: &mut Operation<'_>,
         syntax: &Syntax<'_>,
     ) -> Result<Arc<Registry>> {
-        let registry =
-            if let Some(registry) = self.auto_imports.get(self.program, syntax.file.path())? {
-                registry
-            } else {
-                let mut registry =
-                    Registry::build(self.program, checker, || self.cancellation.is_canceled())?
-                        .ok_or(crate::Error::Canceled)?;
-                for export in registry.index.entries_mut() {
-                    if let Some(symbol) = self.export_symbol(checker, export)? {
-                        let target = checker.skip_alias(symbol)?;
-                        let location = checker
-                            .symbol_declarations(target)?
-                            .iter()
-                            .flatten()
-                            .next()
-                            .unwrap_or(syntax.source);
-                        export.completion_kind = Some(completion_items::kind(
-                            self.symbol_kind(checker, target, location)?,
-                        ));
-                        export.modifiers = self.symbol_modifiers(checker, target)?;
-                    }
+        let registry = if let Some(registry) =
+            self.auto_imports.get(self.program, syntax.file.path())?
+        {
+            registry
+        } else {
+            let mut registry =
+                Registry::build(self.program, checker, || self.cancellation.is_canceled())?
+                    .ok_or(crate::Error::Canceled)?;
+            self.complete_export_metadata(checker, &mut registry, syntax.source)?;
+            let host = self
+                .completion_host
+                .clone()
+                .unwrap_or_else(|| self.program.shared_host());
+            let packages =
+                tsr_autoimport::packages::discover(self.program, syntax.file.path(), &host, || {
+                    self.cancellation.is_canceled()
+                })
+                .map_err(crate::Error::Compiler)?
+                .ok_or(crate::Error::Canceled)?;
+            for package in packages {
+                self.check_canceled()?;
+                let counters = tsr_arena::Counters::new();
+                let program = package.load(self.program, host.clone(), &counters)?;
+                let Some(file) = program.files().first() else {
+                    continue;
+                };
+                let owner = Arc::new(tsr_checker::CheckerOwner::for_program(
+                    tsr_arena::CheckerIdentity::new(
+                        tsr_arena::Generation::new(&counters),
+                        &counters,
+                    ),
+                    &counters,
+                    Arc::new(tsr_compiler::ProgramCheckerHost::new(program.clone())),
+                )?);
+                let mut checker = owner.operation()?;
+                let mut package_registry = Registry::build_package(&program, &mut checker, || {
+                    self.cancellation.is_canceled()
+                })?
+                .ok_or(crate::Error::Canceled)?;
+                package.retain_entrypoints(&mut package_registry);
+                let service = LanguageService::new(
+                    &program,
+                    tsr_jsstring::PositionEncoding::Utf16,
+                    self.cancellation.clone(),
+                );
+                service.complete_export_metadata(
+                    &mut checker,
+                    &mut package_registry,
+                    file.source(),
+                )?;
+                // Package exports are supplied by this independently scoped
+                // index, including files also loaded by the user's program.
+                let package_paths: std::collections::HashSet<_> = package
+                    .entrypoints
+                    .iter()
+                    .flat_map(|e| {
+                        [
+                            e.resolved_file_name.clone(),
+                            tsr_jsstring::JsString::from_bytes(e.symlink_or_realpath()),
+                        ]
+                    })
+                    .collect();
+                registry.index = registry
+                    .index
+                    .filtered(|e| !package_paths.contains(&e.path));
+                for export in package_registry.index.entries() {
+                    registry.index.insert(export.clone());
                 }
-                self.auto_imports.publish(registry)
-            };
+            }
+            registry.requested_file = Some(tsr_jsstring::JsString::from_bytes(syntax.file.path()));
+            self.auto_imports.publish(registry)
+        };
         Ok(registry)
+    }
+    fn complete_export_metadata(
+        &self,
+        checker: &mut Operation<'_>,
+        registry: &mut Registry,
+        fallback: tsr_ast::NodeId,
+    ) -> Result<()> {
+        for export in registry.index.entries_mut() {
+            if let Some(symbol) = self.export_symbol(checker, export)? {
+                let target = checker.skip_alias(symbol)?;
+                let location = checker
+                    .symbol_declarations(target)?
+                    .iter()
+                    .flatten()
+                    .next()
+                    .unwrap_or(fallback);
+                export.completion_kind = Some(completion_items::kind(
+                    self.symbol_kind(checker, target, location)?,
+                ));
+                export.modifiers = self.symbol_modifiers(checker, target)?;
+            }
+        }
+        Ok(())
     }
     pub(crate) fn auto_import_completions(
         &mut self,

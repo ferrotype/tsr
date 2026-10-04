@@ -13,6 +13,7 @@ mod completion_keywords;
 mod completion_labels;
 mod completion_literals;
 mod completion_paths;
+mod completion_switch;
 mod completions;
 mod jsdoc_completions;
 mod jsdoc_parameters;

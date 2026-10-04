@@ -862,6 +862,7 @@ dependencies = [
  "tsr_module",
  "tsr_parser",
  "tsr_scanner",
+ "tsr_tsoptions",
  "tsr_tspath",
  "tsr_vfs",
 ]
@@ -1219,6 +1220,7 @@ dependencies = [
  "tsr_core",
  "tsr_diagnostics",
  "tsr_format",
+ "tsr_jsnum",
  "tsr_json",
  "tsr_jsstring",
  "tsr_locale",

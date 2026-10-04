@@ -45,6 +45,7 @@ pub(crate) struct Candidate {
     pub sort: &'static str,
     pub nullable: bool,
     pub this_member: bool,
+    pub promise: bool,
 }
 pub(crate) fn properties(checker: &mut Operation<'_>, ty: TypeRef) -> Result<Vec<SymbolRef>> {
     Ok(
@@ -184,11 +185,26 @@ impl LanguageService<'_> {
         {
             return Ok(lsp::CompletionItemsOrListOrNull::default());
         }
+        let recommended = self.recommended_completion(checker, &mut syntax, &context, position)?;
         let mut list = lsp::CompletionList::default();
+        let used_cases =
+            crate::completion_switch::expression_case_values(checker, &syntax, context.token)?;
         let mut names = HashSet::new();
         for candidate in candidates {
             self.check_canceled()?;
-            if let Some(item) = self.completion_symbol_item(
+            if let Some(used) = &used_cases {
+                if checker.symbol(candidate.symbol)?.flags() & sf::ENUM_MEMBER != 0 {
+                    if let Some(decl) = checker.symbol(candidate.symbol)?.value_declaration() {
+                        if checker
+                            .constant_value(decl)?
+                            .is_some_and(|value| used.contains_value(&value))
+                        {
+                            continue;
+                        }
+                    }
+                }
+            }
+            if let Some(mut item) = self.completion_symbol_item(
                 checker,
                 &mut syntax,
                 &context,
@@ -196,6 +212,13 @@ impl LanguageService<'_> {
                 position,
                 options,
             )? {
+                if recommended == Some(candidate.symbol)
+                    || checker.symbol(candidate.symbol)?.flags() & sf::EXPORT_VALUE != 0
+                        && recommended
+                            == Some(checker.get_export_symbol_of_symbol(candidate.symbol)?)
+                {
+                    item.preselect = Some(Box::new(true));
+                }
                 if names.insert(item.label.clone()) {
                     list.items.push(Some(Box::new(item)));
                 }
@@ -234,6 +257,11 @@ impl LanguageService<'_> {
             position,
             options,
         )?);
+        if let Some(item) =
+            self.switch_case_completion(checker, &mut syntax, &context, position, options)?
+        {
+            list.items.push(Some(Box::new(item)));
+        }
         let replacement = self.completion_replacement(&mut syntax, context.location)?;
         items::defaults(
             &mut list,
@@ -374,6 +402,7 @@ impl LanguageService<'_> {
                                 sort: "11",
                                 nullable: false,
                                 this_member: false,
+                                promise: false,
                             });
                         }
                     }
@@ -404,7 +433,27 @@ impl LanguageService<'_> {
                         sort: "11",
                         nullable,
                         this_member: false,
+                        promise: false,
                     });
+                }
+            }
+            if !context.type_only
+                && syntax.view.node(expression)?.flags() & tsr_ast::node_flags::AWAIT_CONTEXT != 0
+            {
+                if let Some(promised) = checker.get_promised_type_of_promise(ty)? {
+                    for symbol in checker.get_apparent_properties(promised)? {
+                        if checker
+                            .is_valid_property_access_for_completions(access, promised, symbol)?
+                        {
+                            candidates.push(Candidate {
+                                symbol,
+                                sort: "11",
+                                nullable,
+                                this_member: false,
+                                promise: true,
+                            });
+                        }
+                    }
                 }
             }
             return Ok(candidates);
@@ -441,6 +490,7 @@ impl LanguageService<'_> {
                     sort: "11",
                     nullable: false,
                     this_member: false,
+                    promise: false,
                 });
             }
         }
@@ -472,6 +522,7 @@ impl LanguageService<'_> {
                 sort: if local { "11" } else { "15" },
                 nullable: false,
                 this_member: false,
+                promise: false,
             });
         }
         if scope != syntax.source {
@@ -483,6 +534,7 @@ impl LanguageService<'_> {
                         sort: "14",
                         nullable: false,
                         this_member: true,
+                        promise: false,
                     });
                 }
             }
@@ -552,16 +604,56 @@ impl LanguageService<'_> {
                 read.kind().known(),
                 Some(K::VariableDeclaration | K::Parameter | K::TypeParameter)
             ) {
-                if let Some(decl) = checker.symbol(symbol)?.value_declaration() {
+                let declaration = match checker.symbol(symbol)?.value_declaration() {
+                    Some(id) => Some(id),
+                    None => checker.symbol_declarations(symbol)?.iter().flatten().next(),
+                };
+                if let Some(decl) = declaration {
                     if read.kind() == K::VariableDeclaration && decl == id {
                         return Ok(false);
                     }
-                    if read.kind() == K::Parameter
-                        && syntax.view.node(decl)?.kind() == K::Parameter
-                        && syntax.view.node(decl)?.parent() == read.parent()
-                        && syntax.view.node(decl)?.pos() >= read.pos()
-                    {
-                        return Ok(false);
+                    // Declarations in other files cannot be later parameters of this list.
+                    if let Ok(dr) = syntax.view.node(decl) {
+                        if read.kind() == K::Parameter && dr.kind() == K::Parameter {
+                            if let Some(list) = read
+                                .parent()
+                                .map(|n| syntax.view.node(n))
+                                .transpose()?
+                                .and_then(|n| n.parameter_list())
+                            {
+                                if dr.pos() >= read.pos()
+                                    && dr.pos() < syntax.view.list(list)?.loc().end() as i32
+                                {
+                                    return Ok(false);
+                                }
+                            }
+                        } else if read.kind() == K::TypeParameter && dr.kind() == K::TypeParameter {
+                            if id == decl
+                                && context.token.is_some_and(|n| {
+                                    syntax
+                                        .view
+                                        .node(n)
+                                        .is_ok_and(|n| n.kind() == K::ExtendsKeyword)
+                                })
+                            {
+                                return Ok(false);
+                            }
+                            if Self::in_type_parameter_default(syntax, context.token)? {
+                                if let Some(parent) = read.parent() {
+                                    let pr = syntax.view.node(parent)?;
+                                    if pr.kind() != K::InferType {
+                                        if let Some(list) = pr.type_parameter_list() {
+                                            if dr.pos() >= read.pos()
+                                                && dr.pos()
+                                                    < syntax.view.list(list)?.loc().end() as i32
+                                            {
+                                                return Ok(false);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 break;
@@ -569,6 +661,21 @@ impl LanguageService<'_> {
             closest = read.parent();
         }
         Ok(true)
+    }
+    // port: tsc/internal/ls/completions.go:isInTypeParameterDefault
+    fn in_type_parameter_default(syntax: &Syntax<'_>, mut node: Option<NodeId>) -> Result<bool> {
+        while let Some(id) = node {
+            let read = syntax.view.node(id)?;
+            let Some(parent) = read.parent() else {
+                break;
+            };
+            let pr = syntax.view.node(parent)?;
+            if let Some(data) = pr.data_source().as_type_parameter_declaration() {
+                return Ok(data.default_type() == Some(id) || read.kind() == K::EqualsToken);
+            }
+            node = Some(parent);
+        }
+        Ok(false)
     }
     pub(crate) fn completion_symbol_item(
         &mut self,
@@ -640,6 +747,70 @@ impl LanguageService<'_> {
                 }));
             }
         }
+        if candidate.promise {
+            if let Some((access, expression)) = context.member {
+                let ar = syntax.view.node(access)?;
+                let preceding = syntax.nav().find_preceding_token(i64::from(ar.pos()))?;
+                let asi = if let Some(token) = preceding {
+                    let tr = syntax.view.node(token)?;
+                    if let Some(parent) = tr.parent() {
+                        tsr_format::FormatFile {
+                            view: syntax.view,
+                            source: syntax.source,
+                            jsdoc: &mut syntax.docs,
+                        }
+                        .position_is_asi_candidate(i64::from(tr.end()), parent)?
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                };
+                let start = syntax.start(expression)? as usize;
+                let expression_text = String::from_utf8_lossy(
+                    &syntax.file.text().as_bytes()
+                        [start..syntax.view.node(expression)?.end() as usize],
+                );
+                let prefix = if asi { ";" } else { "" };
+                if insert.is_empty() {
+                    insert.clone_from(&name);
+                }
+                let separator = if !valid {
+                    ""
+                } else if candidate.nullable {
+                    "?."
+                } else {
+                    "."
+                };
+                // The pin prefixes the promise after nullable conversion; this
+                // deliberately retains its doubled `?.` for nullable promises.
+                insert = format!("{prefix}(await {expression_text}){separator}{insert}");
+                let wrap = ar
+                    .parent()
+                    .filter(|n| {
+                        syntax
+                            .view
+                            .node(*n)
+                            .is_ok_and(|r| r.kind() == K::AwaitExpression)
+                    })
+                    .unwrap_or(expression);
+                let (range, fidelity) = self.range(
+                    syntax.source,
+                    TextRange::new(syntax.start(wrap)?, i64::from(ar.end())),
+                    FEATURE_COMPLETION,
+                )?;
+                if !fidelity.is_exact() {
+                    return Ok(None);
+                }
+                edit = Some(Box::new(lsp::TextEditOrInsertReplaceEdit {
+                    text_edit: Some(Box::new(lsp::TextEdit {
+                        range,
+                        new_text: insert.clone(),
+                    })),
+                    ..Default::default()
+                }));
+            }
+        }
         if context
             .container
             .is_some_and(|(kind, _)| kind == Container::Jsx)
@@ -694,6 +865,27 @@ impl LanguageService<'_> {
                     | crate::symbol_display::ScriptElementKind::String
             ))
         .then(|| Box::new(Vec::new()));
+        let mut type_only_alias = false;
+        if checker.symbol(symbol)?.flags() & sf::VALUE == 0 {
+            if let Some(previous) = context.previous {
+                if !tsr_ast::utilities_modules::is_valid_type_only_alias_use_site(
+                    syntax.view,
+                    previous,
+                )? {
+                    for declaration in checker.symbol_declarations(symbol)?.iter().flatten() {
+                        if let Some(file) = self.program.file_of_node(declaration) {
+                            if tsr_ast::utilities_modules::is_type_only_import_declaration(
+                                file.bound().view().ast(),
+                                declaration,
+                            )? {
+                                type_only_alias = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         Ok(Some(lsp::CompletionItem {
             label,
             kind: Some(Box::new(items::kind(kind))),
@@ -715,6 +907,8 @@ impl LanguageService<'_> {
                 name,
                 source: if candidate.this_member {
                     "ThisProperty/".into()
+                } else if type_only_alias {
+                    "TypeOnlyAlias/".into()
                 } else {
                     String::new()
                 },
@@ -742,6 +936,9 @@ impl LanguageService<'_> {
         let mut syntax = Syntax::new(file.bound().view().ast(), file.source())?;
         if let Some(fix) = data.auto_import.as_deref() {
             return self.resolve_auto_import(item, fix, &mut syntax, options);
+        }
+        if data.source == "SwitchCases/" {
+            return Ok(item);
         }
         let in_comment = syntax.in_comment(i64::from(data.position))?;
         if in_comment

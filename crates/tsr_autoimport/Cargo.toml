@@ -26,5 +26,7 @@ tsr_scanner = { version = "0.2.0", path = "../tsr_scanner" }
 tsr_tspath = { version = "0.2.0", path = "../tsr_tspath" }
 tsr_vfs = { version = "0.2.0", path = "../tsr_vfs" }
 
+tsr_tsoptions = { version = "0.2.0", path = "../tsr_tsoptions" }
+
 [lints]
 workspace = true

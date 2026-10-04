@@ -36,6 +36,7 @@ pub struct Export {
     pub type_only: bool,
     pub path: JsString,
     pub package_name: JsString,
+    pub entrypoints: std::sync::Arc<[tsr_module::ResolvedEntrypoint]>,
     pub completion_kind: Option<tsr_lsproto::CompletionItemKind>,
     pub modifiers: u32,
 }
@@ -75,12 +76,28 @@ impl Export {
 #[derive(Default, Debug)]
 pub struct Registry {
     pub index: Index<Export>,
+    pub requested_file: Option<JsString>,
     pub(crate) sources: std::collections::HashMap<JsString, NodeId>,
 }
 impl Registry {
     pub fn build(
         program: &Program,
         checker: &mut Operation<'_>,
+        canceled: impl Fn() -> bool,
+    ) -> Result<Option<Self>, Error> {
+        Self::build_index(program, checker, false, canceled)
+    }
+    pub fn build_package(
+        program: &Program,
+        checker: &mut Operation<'_>,
+        canceled: impl Fn() -> bool,
+    ) -> Result<Option<Self>, Error> {
+        Self::build_index(program, checker, true, canceled)
+    }
+    fn build_index(
+        program: &Program,
+        checker: &mut Operation<'_>,
+        package: bool,
         canceled: impl Fn() -> bool,
     ) -> Result<Option<Self>, Error> {
         let mut index = Index::default();
@@ -90,7 +107,15 @@ impl Registry {
             }
             let view = file.bound().view().ast();
             let source = view.source_file(file.source())?;
-            if source.is_content_mapper_supplemental() {
+            if source.is_content_mapper_supplemental()
+                || program.default_lib_file(source.path()).is_some()
+                || !package
+                    && source.content_mapper().is_empty()
+                    && source
+                        .file_name()
+                        .windows(b"/node_modules/".len())
+                        .any(|part| part == b"/node_modules/")
+            {
                 continue;
             }
             let path = JsString::from_bytes(source.path());
@@ -158,6 +183,7 @@ impl Registry {
         Ok(Some(Self {
             index,
             sources: crate::cache::sources(program),
+            requested_file: None,
         }))
     }
     pub fn search(&self, importing_path: &[u8], prefix: &[u8]) -> Vec<&Export> {
@@ -261,6 +287,7 @@ fn extract(
         type_only,
         path,
         package_name: JsString::default(),
+        entrypoints: std::sync::Arc::from([]),
         completion_kind: None,
         modifiers: 0,
     };

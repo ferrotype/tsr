@@ -175,6 +175,7 @@ impl LanguageService<'_> {
                         sort: "11",
                         nullable: false,
                         this_member: false,
+                        promise: false,
                     },
                     position,
                     options,

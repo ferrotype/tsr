@@ -196,6 +196,7 @@ impl LanguageService<'_> {
                 },
                 nullable: false,
                 this_member: false,
+                promise: false,
             });
         }
         Ok(Some(candidates))
