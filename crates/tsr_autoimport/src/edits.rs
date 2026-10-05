@@ -6,6 +6,7 @@ use tsr_lsproto as lsp;
 
 pub struct Options<'a> {
     pub format: &'a tsr_format::FormatCodeSettings,
+    pub locale: &'a tsr_locale::Locale,
     pub single_quote: bool,
     pub semicolons: bool,
     pub prefer_type_only: bool,
@@ -47,6 +48,15 @@ pub fn edits(
     options: &Options<'_>,
 ) -> Result<(Vec<Edit>, String), Error> {
     let module = quote_module(&fix.module_specifier, options.single_quote);
+    let description = |message, args: &[&[u8]]| {
+        String::from_utf8_lossy(&tsr_diagnostics::localize(
+            options.locale,
+            Some(message),
+            b"",
+            args,
+        ))
+        .into_owned()
+    };
     match fix.kind {
         lsp::AutoImportFixKind::USE_NAMESPACE | lsp::AutoImportFixKind::JSDOC_TYPE_IMPORT => {
             let usage = options
@@ -57,7 +67,13 @@ pub fn edits(
             } else {
                 format!("import({module}).")
             };
-            let message = format!("Change '{}' to '{prefix}{}'", fix.name, fix.name);
+            let message = description(
+                tsr_diagnostics::Change_0_to_1,
+                &[
+                    fix.name.as_bytes(),
+                    format!("{prefix}{}", fix.name).as_bytes(),
+                ],
+            );
             Ok((vec![Edit::insert(usage, prefix)], message))
         }
         lsp::AutoImportFixKind::ADD_NEW => {
@@ -65,7 +81,10 @@ pub fn edits(
             adder.add(fix.clone(), options.verbatim);
             Ok((
                 adder.edits(view, source, options)?,
-                format!("Add import from \"{}\"", fix.module_specifier),
+                description(
+                    tsr_diagnostics::Add_import_from_0,
+                    &[fix.module_specifier.as_bytes()],
+                ),
             ))
         }
         lsp::AutoImportFixKind::ADD_TO_EXISTING => {
@@ -84,7 +103,10 @@ pub fn edits(
                     &named,
                     options,
                 )?,
-                format!("Update import from \"{}\"", fix.module_specifier),
+                description(
+                    tsr_diagnostics::Update_import_from_0,
+                    &[fix.module_specifier.as_bytes()],
+                ),
             ))
         }
         _ => Err(Error::MissingLink("auto-import edit kind")),

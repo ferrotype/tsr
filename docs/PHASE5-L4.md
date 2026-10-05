@@ -77,8 +77,8 @@ directories, and normalizes explicit `types` names. Pinned realpath, directory
 search, hidden-directory and erroneous-initializer cases have direct tests.
 The package wire fixture includes symlinked re-exports and export-equals functions.
 
-Auxiliary export-program reads now feed both watch registration and cache
-invalidation. The comparison checks a registered watcher before injecting a
+Auxiliary export-program reads feed cache invalidation. Client registrations
+follow the snapshot registry’s node_modules directories (see the review below). The comparison checks a registered watcher before injecting a
 package change, then tests edits, deletion/recreation and package-entrypoint
 changes. New snapshots retire their own cache; retained snapshots keep theirs.
 Project-source edits, exclusion preference changes, closed-file changes and
@@ -86,11 +86,12 @@ root removal are compared as well. The sample matches 647 responses with minimal
 capabilities and 658 with rich capabilities, in each encoding. Every auto-import
 item in this sample is resolved and its edits applied.
 
-One additional config sequence remains assigned to L6's config/registry
-integration: remove an export file from the root list, then replace it with a
-new root. The pin retains the removed file's auto-import bucket in that sequence;
-Rust rebuilds for the new source. This is an observed, unapproved difference,
-not part of the passing sample or a claim of completed config integration.
+One additional config sequence differs: remove an export file from the root
+list, then replace it with a new root. The pin retains the removed file’s
+auto-import bucket when the config and file-create events are batched; Rust
+rebuilds for the new source. The owner approved retaining Rust’s correct
+invalidation on 2026-10-05 (the exact behavior and control are recorded below).
+This remains a raw difference, not a parity pass.
 Multi-project discovery, project-reference redirection, content-mapped packages
 and ATA remain L6 dependencies. Full family replay and its assigned-case counts
 remain L7 work; these bounded comparisons are not a substitute for that gate.
@@ -114,12 +115,12 @@ edit removes their admitting import.
 The final bounded comparison matches **731 minimal-capability and 742
 rich-capability responses in each of UTF-8 and UTF-16**. These include complete
 lists, resolution, applied imports/snippets, and file/package watch updates.
-The explicit remaining config-root replacement sequence has a checked-in
-reproducer: `python3 tools/phase5/lsp/completions.py --config-replacement`.
-It intentionally exits nonzero while Go retains `ChangedDisk` and Rust returns
-`ChangedExtra`; full responses are saved under
-`target/phase5/l4-config-replacement`. It is not an approved difference or part
-of the passing sample.
+The config-root replacement sequence has a checked-in reproducer:
+`python3 tools/phase5/lsp/completions.py --config-replacement`.
+It checks the approved raw difference (Go retains `ChangedDisk`, Rust returns
+`ChangedExtra`) and the matching config-only control; full responses are saved
+under `target/phase5/l4-config-replacement`. It reports the exception separately
+from matching responses and fails if either side’s observed behavior changes.
 
 Focused final tests cover autoimport (14), language service (35), jsstring (4),
 project (85) and LSP (27), with earlier format/printer and generated-AST ownership
@@ -129,6 +130,55 @@ checks retained. Clippy with warnings denied, format, package assets and
 
 L5 still supplies the generic code-action/command dispatcher; completion
 resolution here returns the actual import edits, and the driver applies them.
-L6 supplies multi-project discovery, ATA, content-mapper packages and the named
-config/registry integration. L7 owns complete fourslash replay and the final
+L6 supplies multi-project discovery, ATA and content-mapper packages. L7 owns complete fourslash replay and the final
 acceptance count; this checkpoint does not claim that corpus has passed.
+
+
+## PR review follow-up
+
+String-index-signature member completions now set the new-identifier context
+and suppress default commit characters, including when the property list is
+empty. A dictionary with no named properties returns an empty list rather than
+`null`. The promised-type completion control preserves Go's distinct commit
+characters; the index flag is applied to the receiver type.
+
+Auto-import descriptions use the request locale and the shared diagnostic
+messages for new imports, existing-import updates, namespace qualification and
+JSDoc import types. The French wire comparison covers list, resolve and applied
+edits, with minimal and rich client capabilities in UTF-8 and UTF-16.
+
+The session now has one logical `auto-import` watcher over existing
+node_modules directories in every open file's ancestor chain, with sorted,
+unescaped `/**/*` patterns. The native registry retains unchanged per-glob
+registrations across snapshots, so numeric client registration ids can span
+multiple generations even for that one logical watcher. The comparison checks
+the full active patterns, kinds and name prefix across opening two projects and
+closing one, including a path with `[` and `]`. Auxiliary cache reads remain
+tracked separately. They already included the node_modules root, so the earlier
+claim that invalidation only covered individual read files was too broad.
+
+The root-replacement diagnosis is now specific: when a config update and the
+creation of the new root arrive in one batch, Go rebuilds for the config, then
+rebuilds again after marking the created file dirty. The latter update replaces
+`ProgramUpdateKindNewFiles` with a same-files/clone result. The registry therefore
+does not run `hasNewNonNodeModulesFiles` and retains `ChangedDisk`. Sending only
+the config event returns `ChangedExtra`. Rust returns `ChangedExtra` in both
+cases. The owner approved the narrow difference on 2026-10-05: “Keep Rust’s correct
+invalidation; approve this narrow divergence.” No broader cache or config
+exception is implied. The probe compares the complete control responses,
+requires all earlier actions to match, requires Go's final response to equal
+its preceding retained-bucket response, and Rust's final response to equal the
+matching config-only control. Raw outputs are kept separately; there is no
+normalization or extra passing-case credit. When L7 integrates this replay in
+the common LSP suite, carry this decision into that exact failing entry's
+`approved` field in `status/parity/lsp.json`, as ADR 0004 now requires. The
+retired TOML ledger is not revived and no second approval registry is created.
+
+Focused validation: `cargo test -p tsr_ls -p tsr_autoimport -p tsr_project --lib`
+passes 36 language-service, 15 auto-import and 87 project tests. The changed
+crates plus LSP pass clippy with warnings denied; `cargo xtask validate` passes.
+`python3 tools/phase5/lsp/completions.py --review` compares 64 completion/resolve/
+apply observations, six multi-project watch states and twelve package-watch
+observations against Go. The `--config-replacement` probe separately checks
+30 matching actions and two approved raw differences across those encodings.
+No full corpus or benchmark was run.

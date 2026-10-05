@@ -543,6 +543,10 @@ impl LanguageService<'_> {
                 }
             }
             let mut candidates = Vec::new();
+            if checker.get_string_index_type(ty)?.is_some() {
+                context.new_identifier = true;
+                context.commit = &[];
+            }
             for symbol in checker.get_apparent_properties(ty)? {
                 if checker.is_valid_property_access_for_completions(access, ty, symbol)? {
                     candidates.push(Candidate {

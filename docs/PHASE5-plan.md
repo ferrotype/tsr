@@ -681,8 +681,10 @@ multi-project/ATA behavior has an explicit L6 dependency.
 L4's implementation and bounded native comparisons are recorded in
 [PHASE5-L4.md](PHASE5-L4.md). Completion/resolve and import edits, snippets,
 package discovery and watched dependency invalidation are implemented. The
-record names the remaining L6 config-root replacement discrepancy and the
-multi-project/ATA/mapper dependencies. Full completion/import family replay
+record includes the owner-approved config-root replacement difference
+(2026-10-05: retain Rust’s correct invalidation when Go loses the new-files flag)
+and the remaining multi-project/ATA/mapper dependencies. L7 carries the exact
+replay failure and this approval into `lsp.json`; it remains a raw non-match. Full completion/import family replay
 and its acceptance counts remain L7 work.
 
 ### L5 — edits

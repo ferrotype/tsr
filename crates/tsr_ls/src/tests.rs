@@ -742,6 +742,40 @@ fn completion_result(text: &str, options: &CompletionOptions) -> lsp::Completion
 }
 
 #[test]
+fn completion_string_index_signatures_allow_new_names_without_commit_characters() {
+    for defaults in [false, true] {
+        let options = CompletionOptions {
+            commit_characters: true,
+            default_commit_characters: defaults,
+            ..Default::default()
+        };
+        let empty = completion_result(
+            "declare const item: {[key: string]: number}; item./*cursor*/",
+            &options,
+        );
+        assert!(empty.items.is_empty());
+        let named = completion_result(
+            "declare const item: {[key: string]: number; known: number}; item./*cursor*/",
+            &options,
+        );
+        assert_eq!(named.items.len(), 1);
+        let item = named.items[0].as_ref().unwrap();
+        assert_eq!(item.label, "known");
+        let commit = if defaults {
+            named
+                .item_defaults
+                .as_ref()
+                .unwrap()
+                .commit_characters
+                .as_deref()
+        } else {
+            item.commit_characters.as_deref()
+        };
+        assert_eq!(commit, Some(&Vec::new()));
+    }
+}
+
+#[test]
 fn completion_members_keep_native_sort_keys_kinds_and_utf16_replacement() {
     // The complete response is compared against the pin by completions.py.
     let list = completion_result("/*😀*/ interface Item { required: string; optional?: number; method(): void } declare const item: Item; item.op/*cursor*/tional", &CompletionOptions { default_edit_range: true, default_commit_characters: true, commit_characters: true, ..Default::default() });

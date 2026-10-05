@@ -73,12 +73,13 @@ impl LanguageService<'_> {
                 .and_then(|p| p.first().map(|p| i64::from(p.mapped.position)));
             let settings = crate::completion_snippets::settings(options, &syntax)?;
             let single = crate::inlay_hints::single_quote(&syntax, options.quote)?;
-            let (edits, _) = tsr_autoimport::edits::edits(
+            let (edits, title) = tsr_autoimport::edits::edits(
                 syntax.view,
                 source,
                 &info.fix,
                 &tsr_autoimport::edits::Options {
                     format: &options.format,
+                    locale,
                     usage,
                     single_quote: single,
                     semicolons: settings.semicolons != tsr_format::SemicolonPreference::Remove,
@@ -98,36 +99,6 @@ impl LanguageService<'_> {
             let uri =
                 lsp::DocumentUri::from_file_name(syntax.file.original_file_name()?.as_bytes());
             let edits = changes.edits.get(&uri).cloned().unwrap_or_default();
-            let title = match info.fix.kind {
-                lsp::AutoImportFixKind::ADD_NEW => localized(
-                    tsr_diagnostics::Add_import_from_0,
-                    locale,
-                    &[info.fix.module_specifier.as_bytes()],
-                ),
-                lsp::AutoImportFixKind::ADD_TO_EXISTING => localized(
-                    tsr_diagnostics::Update_import_from_0,
-                    locale,
-                    &[info.fix.module_specifier.as_bytes()],
-                ),
-                _ => {
-                    let prefix = if info.fix.kind == lsp::AutoImportFixKind::USE_NAMESPACE {
-                        format!("{}.", info.fix.namespace_prefix)
-                    } else {
-                        format!(
-                            "import({}).",
-                            tsr_autoimport::edits::quote_module(&info.fix.module_specifier, single)
-                        )
-                    };
-                    localized(
-                        tsr_diagnostics::Change_0_to_1,
-                        locale,
-                        &[
-                            info.fix.name.as_bytes(),
-                            format!("{prefix}{}", info.fix.name).as_bytes(),
-                        ],
-                    )
-                }
-            };
             actions.push(Fix { title, edits });
         }
         Ok(actions)

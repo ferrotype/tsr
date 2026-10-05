@@ -61,8 +61,9 @@ significant.
 The completion regression comparison passes 735 responses with minimal
 capabilities and 746 with rich capabilities, in each encoding. Its formatting
 fixture now keeps the dependency loaded: dropping it had made native results
-depend on background export-index preparation. The explicit L6 config/root
-replacement reproducer remains unchanged. Quote preference probes now use the
+depend on background export-index preparation. The config/root replacement difference is now owner-approved in the L4 record
+(2026-10-05), with a matching config-only control and the raw difference checked
+separately. Quote preference probes now use the
 actual nested setting `preferences.quoteStyle`.
 
 Focused unit tests pass: language service 45, autoimport 14, LSP 27, AST 188,
@@ -81,3 +82,20 @@ L7 owns the complete fourslash runner, client replay expectations and latency
 measurement. There is still no LSP adapter in `parity.py`; bounded comparisons
 are development checks and do not claim full fourslash acceptance. No benchmark
 or full corpus was run for this increment, and no divergence was approved.
+
+
+The L4 review fixes are merged into this branch: string-index completion context,
+localized import descriptions and one snapshot-wide node_modules watch group.
+L5 quick fixes now consume the same localized description as completion
+resolution instead of maintaining a second description formatter. The bounded
+L4 review and config-replacement probes also run on the combined L5 branch;
+French import, namespace, existing-import and generated class-member quick
+fixes are compared separately against the pin.
+
+Merge validation passes 175 focused tests (46 LS, 15 autoimport, 87 project,
+27 LSP, including the native watcher with host access), targeted clippy with
+warnings denied, fmt and `cargo xtask validate`. The bounded L4 regressions and
+approved config/control probes pass on L5; 36 French quick-fix requests match
+Go in UTF-8 and UTF-16 (`quick_fixes.py --case imports --case existing --case
+namespace --case class-imports --locale fr`). No broad corpus or benchmark was
+repeated for this merge.

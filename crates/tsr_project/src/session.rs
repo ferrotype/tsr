@@ -232,9 +232,9 @@ impl Session {
             .clone()
             .ok_or(Error::Closed)
     }
-    /// A completion publishes auxiliary read dependencies after the compiler
-    /// snapshot has been built. Register only caches on the current snapshot;
-    /// an old in-flight completion must not resurrect retired watches.
+    /// Match the snapshot registry's one watcher over existing node_modules
+    /// directories in open files' ancestor chains. Keep auxiliary read tracking
+    /// for cache invalidation, separate from this client-visible watch contract.
     pub fn sync_auto_import_watches(&self) {
         let Some(manager) = self.watches.get() else {
             return;
@@ -246,45 +246,51 @@ impl Session {
         let Some(state) = snapshot.state() else {
             return;
         };
-        let mut next = crate::watch::WatchSet::new();
-        for (key, project) in &state.projects {
-            let Some(cache) = project.auto_import_cache() else {
-                continue;
-            };
-            let deps = cache.dependencies();
-            if deps.files.is_empty() && deps.directories.is_empty() {
+        let key = JsString::from_bytes(b"auto-import".as_slice());
+        let watch = registered.get(&key).cloned().unwrap_or_else(|| {
+            crate::watch::WatchedFiles::new(
+                key.clone(),
+                crate::watch::ALL_CHANGES,
+                self.options.relative_watch_patterns,
+            )
+        });
+        let mut directories = BTreeMap::new();
+        for file in state.fs.overlays().values() {
+            let name = file.file_name().as_bytes();
+            if tsr_tspath::is_dynamic_file_name(name) {
                 continue;
             }
-            let key = JsString::from_bytes([b"auto-import:".as_slice(), key.as_bytes()].concat());
-            let watch = registered.get(&key).cloned().unwrap_or_else(|| {
-                crate::watch::WatchedFiles::new(
-                    key.clone(),
-                    crate::watch::ALL_CHANGES,
-                    self.options.relative_watch_patterns,
-                )
-            });
-            let patterns = deps
-                .files
-                .into_iter()
-                .map(|p| JsString::from_bytes(crate::watch::literal_pattern(p.as_bytes())))
-                .chain(deps.directories.into_iter().map(|p| {
-                    JsString::from_bytes(
-                        [
-                            crate::watch::literal_pattern(p.as_bytes()).as_slice(),
-                            b"/**",
-                        ]
-                        .concat(),
-                    )
-                }))
-                .collect();
-            next.insert(
-                key,
-                watch.with_input(crate::watch::PatternsAndIgnored {
-                    patterns_inside_workspace: patterns,
-                    ..Default::default()
-                }),
-            );
+            let mut directory = name.to_vec();
+            loop {
+                let parent = tsr_tspath::directory(&directory);
+                if parent == directory {
+                    break;
+                }
+                directory = parent;
+                let path = state.fs.path(&directory);
+                if directories.insert(path, directory.clone()).is_some() {
+                    break;
+                }
+            }
         }
+        let mut patterns = Vec::new();
+        for directory in directories.values() {
+            let modules = tsr_tspath::combine(directory, &[b"node_modules"]);
+            // Native DirectoryExists returns false on filesystem errors.
+            if state.fs.directory_exists(&modules).unwrap_or(false) {
+                patterns.push(JsString::from_bytes(
+                    [modules.as_slice(), b"/**/*"].concat(),
+                ));
+            }
+        }
+        patterns.sort();
+        let next = BTreeMap::from([(
+            key,
+            watch.with_input(crate::watch::PatternsAndIgnored {
+                patterns_inside_workspace: patterns,
+                ..Default::default()
+            }),
+        )]);
         manager.enqueue(registered.clone(), next.clone());
         *registered = next;
     }

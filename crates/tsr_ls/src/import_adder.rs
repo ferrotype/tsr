@@ -91,6 +91,7 @@ impl LanguageService<'_> {
             syntax.source,
             &tsr_autoimport::edits::Options {
                 format: &options.format,
+                locale: &options.locale,
                 single_quote: crate::inlay_hints::single_quote(syntax, options.quote)?,
                 semicolons: settings.semicolons != tsr_format::SemicolonPreference::Remove,
                 prefer_type_only: options.prefer_type_only,
