@@ -13,7 +13,7 @@ crate-type = ["cdylib"]
 wasm-bindgen = "=0.2.126"
 serde_json = { version = "1", features = ["preserve_order"] }
 s10_corpus = { path = "../corpus-adapter" }
-tsr_embed = { version = "0.2.0", path = "../../../crates/tsr_embed" }
+tsr_embed = { version = "0.3.0", path = "../../../crates/tsr_embed" }
 
 [lints]
 workspace = true

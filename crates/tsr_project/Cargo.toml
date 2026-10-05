@@ -1,6 +1,6 @@
 [package]
 name = "tsr_project"
-version = "0.2.0"
+version = "0.3.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -13,23 +13,23 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
-tsr_autoimport = { version = "0.2.0", path = "../tsr_autoimport" }
-tsr_ipc = { version = "0.2.0", path = "../tsr_ipc" }
-tsr_tsoptions = { version = "0.2.0", path = "../tsr_tsoptions" }
-tsr_compiler = { version = "0.2.0", path = "../tsr_compiler" }
-tsr_ast = { version = "0.2.0", path = "../tsr_ast" }
-tsr_arena = { version = "0.2.0", path = "../tsr_arena" }
-tsr_checker = { version = "0.2.0", path = "../tsr_checker" }
-tsr_core = { version = "0.2.0", path = "../tsr_core" }
-tsr_jsstring = { version = "0.2.0", path = "../tsr_jsstring" }
-tsr_lsproto = { version = "0.2.0", path = "../tsr_lsproto" }
-tsr_tspath = { version = "0.2.0", path = "../tsr_tspath" }
-tsr_vfs = { version = "0.2.0", path = "../tsr_vfs" }
+tsr_autoimport = { version = "0.3.0", path = "../tsr_autoimport" }
+tsr_ipc = { version = "0.3.0", path = "../tsr_ipc" }
+tsr_tsoptions = { version = "0.3.0", path = "../tsr_tsoptions" }
+tsr_compiler = { version = "0.3.0", path = "../tsr_compiler" }
+tsr_ast = { version = "0.3.0", path = "../tsr_ast" }
+tsr_arena = { version = "0.3.0", path = "../tsr_arena" }
+tsr_checker = { version = "0.3.0", path = "../tsr_checker" }
+tsr_core = { version = "0.3.0", path = "../tsr_core" }
+tsr_jsstring = { version = "0.3.0", path = "../tsr_jsstring" }
+tsr_lsproto = { version = "0.3.0", path = "../tsr_lsproto" }
+tsr_tspath = { version = "0.3.0", path = "../tsr_tspath" }
+tsr_vfs = { version = "0.3.0", path = "../tsr_vfs" }
 xxhash-rust = { version = "0.8.15", features = ["xxh3"] }
 
 [dev-dependencies]
-tsr_parser = { version = "0.2.0", path = "../tsr_parser" }
-tsr_arena = { version = "0.2.0", path = "../tsr_arena", features = ["harness"] }
+tsr_parser = { version = "0.3.0", path = "../tsr_parser" }
+tsr_arena = { version = "0.3.0", path = "../tsr_arena", features = ["harness"] }
 
 [lints]
 workspace = true

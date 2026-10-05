@@ -1,6 +1,6 @@
 [package]
 name = "tsr_jsonrpc"
-version = "0.2.0"
+version = "0.3.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -13,8 +13,8 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
-tsr_json = { version = "0.2.0", path = "../tsr_json" }
-tsr_jsstring = { version = "0.2.0", path = "../tsr_jsstring" }
+tsr_json = { version = "0.3.0", path = "../tsr_json" }
+tsr_jsstring = { version = "0.3.0", path = "../tsr_jsstring" }
 
 [lints]
 workspace = true

@@ -12,7 +12,7 @@ command-line layers are not re-exported.
 
 ```toml
 [dependencies]
-tsr = "0.2.0"
+tsr = "0.3.0"
 ```
 
 For application integration, start with `tsr::embed`
