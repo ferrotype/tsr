@@ -242,15 +242,37 @@ fn write_rows(arguments: &Arguments) -> Result<(), String> {
         let result = run_scenario(scenario);
         *rows[index].lock().unwrap_or_else(PoisonError::into_inner) = Some(result);
     };
-    std::thread::scope(|scope| {
+    let spawn_error = std::thread::scope(|scope| {
+        let mut workers = Vec::new();
+        let mut spawn_error = None;
         for _ in 0..arguments.jobs.min(selected.len()) {
-            std::thread::Builder::new()
+            let spawned = std::thread::Builder::new()
                 .name("phase4-scenario".into())
                 .stack_size(tsr_core::workgroup::RESERVED_STACK)
-                .spawn_scoped(scope, worker)
-                .expect("a scenario thread starts");
+                .spawn_scoped(scope, worker);
+            match spawned {
+                Ok(handle) => workers.push(handle),
+                Err(error) => {
+                    // The run fails: started workers stop after their current
+                    // scenarios.
+                    next.store(selected.len(), Ordering::Relaxed);
+                    spawn_error = Some(error);
+                    break;
+                }
+            }
         }
+        // Joined, not dropped, even when a later spawn fails, as the work
+        // group joins its workers: detaching a finished thread on a reserved
+        // stack can fault in glibc.
+        let panics: Vec<_> = workers.into_iter().filter_map(|w| w.join().err()).collect();
+        if let Some(payload) = panics.into_iter().next() {
+            std::panic::resume_unwind(payload);
+        }
+        spawn_error
     });
+    if let Some(error) = spawn_error {
+        return Err(format!("spawning a scenario thread: {error}"));
+    }
 
     let mut lines = Vec::new();
     let mut by_state: BTreeMap<String, BTreeMap<String, usize>> = BTreeMap::new();
