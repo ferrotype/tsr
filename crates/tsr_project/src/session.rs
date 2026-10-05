@@ -129,6 +129,7 @@ pub struct Session {
     update: Mutex<()>,
     pending: Mutex<Pending>,
     watches: OnceLock<Arc<crate::watch::WatchManager>>,
+    auto_import_watches: Mutex<crate::watch::WatchSet>,
     events: OnceLock<std::sync::mpsc::Sender<SessionEvent>>,
     timers: timers::Timers,
 }
@@ -219,6 +220,7 @@ impl Session {
             update: Mutex::new(()),
             pending: Mutex::default(),
             watches: OnceLock::new(),
+            auto_import_watches: Mutex::default(),
             events: OnceLock::new(),
         })
     }
@@ -229,6 +231,68 @@ impl Session {
             .expect("session snapshot")
             .clone()
             .ok_or(Error::Closed)
+    }
+    /// Match the snapshot registry's one watcher over existing node_modules
+    /// directories in open files' ancestor chains. Keep auxiliary read tracking
+    /// for cache invalidation, separate from this client-visible watch contract.
+    pub fn sync_auto_import_watches(&self) {
+        let Some(manager) = self.watches.get() else {
+            return;
+        };
+        let mut registered = self.auto_import_watches.lock().unwrap();
+        let Ok(snapshot) = self.snapshot() else {
+            return;
+        };
+        let Some(state) = snapshot.state() else {
+            return;
+        };
+        let key = JsString::from_bytes(b"auto-import".as_slice());
+        let watch = registered.get(&key).cloned().unwrap_or_else(|| {
+            crate::watch::WatchedFiles::new(
+                key.clone(),
+                crate::watch::ALL_CHANGES,
+                self.options.relative_watch_patterns,
+            )
+        });
+        let mut directories = BTreeMap::new();
+        for file in state.fs.overlays().values() {
+            let name = file.file_name().as_bytes();
+            if tsr_tspath::is_dynamic_file_name(name) {
+                continue;
+            }
+            let mut directory = name.to_vec();
+            loop {
+                let parent = tsr_tspath::directory(&directory);
+                if parent == directory {
+                    break;
+                }
+                directory = parent;
+                let path = state.fs.path(&directory);
+                if directories.insert(path, directory.clone()).is_some() {
+                    break;
+                }
+            }
+        }
+        let mut patterns = Vec::new();
+        for directory in directories.values() {
+            let modules = tsr_tspath::combine(directory, &[b"node_modules"]);
+            // Native DirectoryExists returns false on filesystem errors.
+            if state.fs.directory_exists(&modules).unwrap_or(false) {
+                patterns.push(JsString::from_bytes(
+                    [modules.as_slice(), b"/**/*"].concat(),
+                ));
+            }
+        }
+        patterns.sort();
+        let next = BTreeMap::from([(
+            key,
+            watch.with_input(crate::watch::PatternsAndIgnored {
+                patterns_inside_workspace: patterns,
+                ..Default::default()
+            }),
+        )]);
+        manager.enqueue(registered.clone(), next.clone());
+        *registered = next;
     }
     pub fn subscribe(&self) -> std::sync::mpsc::Receiver<SessionEvent> {
         let (send, receive) = std::sync::mpsc::channel();
@@ -661,6 +725,7 @@ impl Session {
         if let Some(watches) = self.watches.get() {
             watches.enqueue(old.watches(), next.state().unwrap().watches());
         }
+        self.sync_auto_import_watches();
         if self.events.get().is_some() {
             self.send_event(SessionEvent::Published {
                 previous,

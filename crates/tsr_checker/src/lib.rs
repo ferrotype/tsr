@@ -176,6 +176,7 @@ mod module_aliases;
 mod module_augmentations;
 mod module_exports;
 mod module_specifiers;
+pub use module_specifiers::ModuleSpecifierEnding;
 mod module_wrappers;
 mod name_errors;
 mod name_qualified;
@@ -273,7 +274,7 @@ pub mod storage_pilot;
 pub use emit_resolver_js::TypeReferenceSerializationKind;
 pub use exports::{IndexInfoParts, IndexInfoRef, TypePredicateParts, TypePredicateRef};
 pub use flags::*;
-pub use handles::BuilderRequest;
+pub use handles::{BuilderRequest, GeneratedTypeNodes};
 #[cfg(feature = "relation-probe")]
 pub use handles::{LiteralShape, SignatureShape};
 pub use handles::{

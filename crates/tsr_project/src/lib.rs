@@ -308,6 +308,8 @@ impl PooledChecker {
 /// editing/rebuilding creates a new Project with a separate pool generation.
 #[derive(Clone)]
 pub struct Project {
+    auto_imports: Option<Arc<tsr_autoimport::Cache>>,
+    completion_host: Option<Arc<dyn tsr_vfs::FileSystem>>,
     pool: Arc<CheckerPool>,
     scheduler: Option<Arc<scheduler::CheckerScheduler>>,
     data: Option<Arc<project::ProjectData>>,
@@ -315,10 +317,18 @@ pub struct Project {
 impl Project {
     pub fn new(pool: Arc<CheckerPool>) -> Self {
         Self {
+            auto_imports: None,
+            completion_host: None,
             pool,
             data: None,
             scheduler: None,
         }
+    }
+    pub fn completion_file_system(&self) -> Option<Arc<dyn tsr_vfs::FileSystem>> {
+        self.completion_host.clone()
+    }
+    pub fn auto_import_cache(&self) -> Option<Arc<tsr_autoimport::Cache>> {
+        self.auto_imports.clone()
     }
     pub fn pool(&self) -> &Arc<CheckerPool> {
         &self.pool

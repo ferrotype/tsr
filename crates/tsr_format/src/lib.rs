@@ -34,6 +34,7 @@ pub use indent::{
 };
 pub use scanner::TextRangeWithKind;
 pub use settings::{EditorSettings, FormatCodeSettings, IndentStyle, SemicolonPreference};
+pub use span::get_indentation_string;
 pub use tsr_astnav::Error;
 pub use util::get_line_start_position_for_position;
 
@@ -55,6 +56,24 @@ pub struct FormatFile<'a, 'p> {
 }
 
 impl<'a> FormatFile<'a, '_> {
+    /// Shared syntax completion boundary, also used by indentation.
+    pub fn position_belongs_to_node(
+        &mut self,
+        node: tsr_arena::NodeId,
+        position: i64,
+    ) -> Result<bool, Error> {
+        lsutil::position_belongs_to_node(self, node, position)
+    }
+    pub fn position_is_asi_candidate(
+        &mut self,
+        pos: i64,
+        context: tsr_arena::NodeId,
+    ) -> Result<bool, Error> {
+        lsutil::position_is_asi_candidate(pos, context, self)
+    }
+    pub fn probably_uses_semicolons(&mut self) -> Result<bool, Error> {
+        lsutil::probably_uses_semicolons(self)
+    }
     pub(crate) fn node(&self, id: tsr_arena::NodeId) -> Result<tsr_ast::NodeRead<'a>, Error> {
         Ok(self.view.node(id)?)
     }
@@ -109,3 +128,6 @@ impl<'a> FormatFile<'a, '_> {
 
 #[cfg(test)]
 mod tests;
+
+/// Shared syntax helper used by formatter and language-service recovery.
+pub use lsutil::get_last_token;

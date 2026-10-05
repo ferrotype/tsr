@@ -91,7 +91,7 @@ pub(crate) fn get_last_child(
 }
 
 // port: tsc/internal/ls/lsutil/children.go:GetLastToken
-pub(crate) fn get_last_token(
+pub fn get_last_token(
     file: &mut FormatFile<'_, '_>,
     node: Option<NodeId>,
 ) -> Result<Option<NodeId>, Error> {
@@ -599,4 +599,61 @@ fn node_ends_with(file: &mut FormatFile<'_, '_>, node: NodeId, expected: K) -> R
 // port: tsc/internal/ls/lsutil/completednode.go:hasChildOfKind
 fn has_child_of_kind(file: &mut FormatFile<'_, '_>, node: NodeId, kind: K) -> Result<bool, Error> {
     Ok(file.navigator().find_child_of_kind(node, kind)?.is_some())
+}
+
+// port: tsc/internal/ls/lsutil/utilities.go:ProbablyUsesSemicolons
+pub(crate) fn probably_uses_semicolons(file: &mut FormatFile<'_, '_>) -> Result<bool, Error> {
+    let mut with = 0;
+    let mut without = 0;
+    let mut pending = vec![file.source];
+    while let Some(node) = pending.pop() {
+        let read = file.node(node)?;
+        if read.flags() & node_flags::REPARSED != 0 {
+            continue;
+        }
+        let kind = read.kind().known();
+        if syntax_requires_trailing_semicolon_or_asi(kind) {
+            if get_last_token(file, Some(node))?
+                .is_some_and(|id| file.node(id).is_ok_and(|n| n.kind() == K::SemicolonToken))
+            {
+                with += 1;
+            } else {
+                without += 1;
+            }
+        } else if syntax_requires_trailing_comma_or_semicolon_or_asi(kind) {
+            if let Some(last) = get_last_token(file, Some(node))? {
+                let read = file.node(last)?;
+                if read.kind() == K::SemicolonToken {
+                    with += 1;
+                } else if read.kind() != K::CommaToken {
+                    let end = i64::from(read.end());
+                    let start = file.token_pos(last)?;
+                    let next = tsr_scanner::skip_trivia(
+                        file.view.source_file(file.source)?.text().as_bytes(),
+                        end,
+                    );
+                    if file.line_of(start)? != file.line_of(next)? {
+                        without += 1;
+                    }
+                }
+            }
+        }
+        if with + without >= 5 {
+            break;
+        }
+        let mut children = Vec::new();
+        for child in tsr_astnav::visit_each_child(file.view, node)? {
+            match child {
+                tsr_astnav::Visit::Node(id) => children.push(id),
+                tsr_astnav::Visit::List(list) => children.extend(
+                    file.view
+                        .node_slice(file.view.list(list)?.nodes())?
+                        .iter()
+                        .flatten(),
+                ),
+            }
+        }
+        pending.extend(children.into_iter().rev());
+    }
+    Ok(with == 0 && without <= 1 || without == 0 || with * 5 > without)
 }

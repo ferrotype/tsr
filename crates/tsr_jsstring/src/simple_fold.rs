@@ -31,3 +31,26 @@ pub fn equal_fold(mut left: &[u8], mut right: &[u8]) -> bool {
     }
     left.is_empty() && right.is_empty()
 }
+
+/// Additional scalars in the pinned Go SimpleFold cycles intersecting a set of
+/// sorted, disjoint inclusive ranges. Regex consumers must fold before negation.
+pub fn simple_fold_additions(ranges: &[(u32, u32)]) -> Vec<u32> {
+    let contains = |rune| {
+        let n = ranges.partition_point(|&(lo, _)| lo <= rune);
+        n != 0 && rune <= ranges[n - 1].1
+    };
+    let mut result = Vec::new();
+    for &(rune, _) in crate::go_fold_generated::SIMPLE_FOLD {
+        if !contains(rune) {
+            continue;
+        }
+        let mut next = simple_fold(rune as i32) as u32;
+        while next != rune {
+            if !contains(next) {
+                result.push(next);
+            }
+            next = simple_fold(next as i32) as u32;
+        }
+    }
+    result
+}

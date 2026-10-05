@@ -1,6 +1,6 @@
 # Rust package preparation
 
-The publication policy includes 45 public packages (43 libraries, the
+The publication policy includes 48 public packages (46 libraries, the
 `tsrust` command line and the `tsr` facade) and 12 private
 packages, all named explicitly in [packages.json](packages.json). The workspace
 defaults to `publish = false`. This policy and the dependency order below track
@@ -97,9 +97,9 @@ package READMEs state the Rust 1.96 minimum, and package metadata includes searc
 keywords and the compiler category.
 
 28 libraries were published at `0.1.0` on 2026-09-20 from tag `v0.1.0`
-(`039226a`). The public packages are released together at one version; the next
-release is `0.2.0`, and [docs/RELEASE-0.2.0.md](../../docs/RELEASE-0.2.0.md) is
-its checklist. crates.io's
+(`039226a`). The public packages are released together at one version; the published `0.2.0` release has its historical record in
+[docs/RELEASE-0.2.0.md](../../docs/RELEASE-0.2.0.md). The next release follows
+[RELEASE-next.md](../../docs/RELEASE-next.md). crates.io's
 [limiter](https://github.com/rust-lang/crates.io/blob/main/src/rate_limiter.rs)
 allows five new crates in a burst and replenishes one slot per ten minutes;
 updates to existing crates have a separate allowance (a burst of 30, then one
@@ -148,17 +148,18 @@ goes last:
 34. `tsr_tracing`
 35. `tsr_embed`
 36. `tsr_incremental`
-37. `tsr_project`
-38. `tsr_ls`
-39. `tsr_lsp`
-40. `tsr_transpile`
-41. `tsr_api`
-42. `tsr_tsc`
-43. `tsr_wasm`
-44. `tsr_build`
-45. `tsr_execute`
-46. `tsrust`
-47. `tsr`
+37. `tsr_autoimport`
+38. `tsr_project`
+39. `tsr_ls`
+40. `tsr_lsp`
+41. `tsr_transpile`
+42. `tsr_api`
+43. `tsr_tsc`
+44. `tsr_wasm`
+45. `tsr_build`
+46. `tsr_execute`
+47. `tsrust`
+48. `tsr`
 
 ## Package policy
 
@@ -174,6 +175,7 @@ goes last:
 | `tsr_api` | Prepared | Rust library and its public dependency closure |
 | `tsr_arena` | Prepared | Rust library and its public dependency closure |
 | `tsr_ast` | Prepared | Rust library and its public dependency closure |
+| `tsr_autoimport` | Prepared | Production auto-import index and import edits for Phase 5 |
 | `tsr_astnav` | Prepared | Rust library and its public dependency closure |
 | `tsr_bench` | Private | Repository-only benchmark, experiment, test or capture tool |
 | `tsr_binder` | Prepared | Rust library and its public dependency closure |

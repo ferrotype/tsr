@@ -50,6 +50,8 @@ impl Project {
             std::time::Duration::ZERO,
         );
         Self {
+            completion_host: None,
+            auto_imports: Some(Arc::new(tsr_autoimport::Cache::new(&data.program))),
             pool,
             scheduler: Some(scheduler),
             data: Some(Arc::new(data)),

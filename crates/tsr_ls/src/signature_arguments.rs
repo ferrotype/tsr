@@ -93,7 +93,7 @@ impl Syntax<'_> {
         Ok(first)
     }
     // port: tsc/internal/ls/signaturehelp.go:getImmediatelyContainingArgumentInfo
-    fn immediate_argument(
+    pub(crate) fn immediate_argument(
         &mut self,
         node: NodeId,
         position: i64,

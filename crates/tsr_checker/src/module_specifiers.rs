@@ -9,6 +9,7 @@ use tsr_tspath as path;
 mod packages;
 #[path = "module_specifiers_paths.rs"]
 mod paths;
+pub use paths::Ending as ModuleSpecifierEnding;
 use paths::{allowed_endings, ensure_non_module, same_volume_relative, Ending};
 type ModulePath = ModuleSpecifierPath;
 
@@ -23,7 +24,19 @@ pub(super) struct Generation<'a> {
     imports: Vec<Import>,
     default_mode: Mode,
     mode: Mode,
-    request_js: bool,
+    preference: Preferences<'a>,
+}
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Relativity {
+    Shortest,
+    Relative,
+    NonRelative,
+    ProjectRelative,
+}
+struct Preferences<'a> {
+    relative: Relativity,
+    ending: Option<&'a str>,
+    excluded: &'a dyn Fn(&[u8]) -> bool,
 }
 
 // port: tsc/internal/modulespecifiers/specifiers.go:GetModuleSpecifiersForFileWithInfo
@@ -35,6 +48,28 @@ pub(crate) fn generate(
     override_mode: Mode,
     request_js: bool,
 ) -> Result<JsString, Error> {
+    generate_with_preferences(
+        host,
+        importer,
+        file,
+        target,
+        override_mode,
+        Preferences {
+            relative: Relativity::ProjectRelative,
+            ending: request_js.then_some("js"),
+            excluded: &|_| false,
+        },
+    )?
+    .ok_or(Error::MissingLink("GetModuleSpecifiers returned no paths"))
+}
+fn generate_with_preferences(
+    host: &dyn CheckerHost,
+    importer: NodeId,
+    file: &[u8],
+    target: &[u8],
+    override_mode: Mode,
+    preference: Preferences<'_>,
+) -> Result<Option<JsString>, Error> {
     let owner = host
         .get_source_file(file)
         .ok_or(Error::MissingLink("module specifier importing source"))?;
@@ -66,15 +101,11 @@ pub(crate) fn generate(
         imports,
         default_mode,
         mode,
-        request_js,
+        preference,
     };
     let module_paths = generation.sorted_paths(host.get_module_specifier_paths(file, target)?);
     let result = generation.compute(&module_paths)?;
-    result
-        .into_iter()
-        .next()
-        .map(JsString::from_bytes)
-        .ok_or(Error::MissingLink("GetModuleSpecifiers returned no paths"))
+    Ok(result.into_iter().next().map(JsString::from_bytes))
 }
 
 impl Generation<'_> {
@@ -91,7 +122,7 @@ impl Generation<'_> {
             &self.imports,
             self.default_mode,
             syntax_mode,
-            self.request_js,
+            self.preference.ending,
         )
     }
 
@@ -184,6 +215,11 @@ impl Generation<'_> {
                 })
             });
             if let Some(existing) = existing {
+                if self.preference.relative == Relativity::NonRelative
+                    && path::is_relative(existing.text.as_bytes())
+                {
+                    continue;
+                }
                 if existing.mode != self.mode
                     && existing.mode != Mode::NONE
                     && self.mode != Mode::NONE
@@ -206,7 +242,7 @@ impl Generation<'_> {
             } else {
                 vec![]
             };
-            if !package.is_empty() {
+            if !package.is_empty() && !(self.preference.excluded)(&package) {
                 packages.push(package.clone());
                 if candidate.is_redirect {
                     return Ok(packages);
@@ -216,7 +252,7 @@ impl Generation<'_> {
                 candidate.file_name.as_bytes(),
                 candidate.is_redirect || !package.is_empty(),
             )?;
-            if local.is_empty() {
+            if local.is_empty() || (self.preference.excluded)(&local) {
                 continue;
             }
             if candidate.is_redirect {
@@ -266,7 +302,9 @@ impl Generation<'_> {
                 &endings,
             )?;
         }
-        if options.paths.is_none() && !options.resolve_package_json_imports() {
+        if options.paths.is_none() && !options.resolve_package_json_imports()
+            || self.preference.relative == Relativity::Relative
+        {
             return Ok(if paths_only { vec![] } else { relative });
         }
         let base = path::absolute(
@@ -304,10 +342,21 @@ impl Generation<'_> {
         if non_relative.is_empty() {
             return Ok(relative);
         }
-        // Declaration emit requests ProjectRelative, which maps to
-        // ExternalNonRelative: a paths/imports spelling wins across project or
-        // package boundaries and a relative spelling wins inside either.
-        if !path::is_relative(&non_relative) {
+        let relative_excluded = (self.preference.excluded)(&relative);
+        let non_relative_excluded = (self.preference.excluded)(&non_relative);
+        if !relative_excluded && non_relative_excluded {
+            return Ok(relative);
+        }
+        if relative_excluded && !non_relative_excluded {
+            return Ok(non_relative);
+        }
+        if self.preference.relative == Relativity::NonRelative && !path::is_relative(&non_relative)
+        {
+            return Ok(non_relative);
+        }
+        if self.preference.relative == Relativity::ProjectRelative
+            && !path::is_relative(&non_relative)
+        {
             let project = if options.config_file_path.is_empty() {
                 self.host.get_current_directory().to_vec()
             } else {
@@ -375,4 +424,121 @@ impl Generation<'_> {
 // port: tsc/internal/modulespecifiers/specifiers.go:ContainsNodeModules
 pub(super) fn contains_node_modules(path: &[u8]) -> bool {
     path.windows(14).any(|part| part == b"/node_modules/")
+}
+
+impl crate::Operation<'_> {
+    /// The existing pinned module-specifier generator, shared by declaration
+    /// display and the language service. The source is checked against this
+    /// operation's immutable program; no path-only owner bypass is introduced.
+    pub fn module_specifier_for_file(
+        &self,
+        source: NodeId,
+        target: &[u8],
+    ) -> Result<JsString, Error> {
+        let state = self.state();
+        let view = state.ast(source)?;
+        let file = view.source_file(source)?;
+        generate(
+            state.program()?.host.as_ref(),
+            source,
+            file.file_name(),
+            target,
+            Mode::NONE,
+            false,
+        )
+    }
+    /// Auto-import ranking shares the declaration path generator, with the
+    /// request's relative/ending preferences and specifier exclusion predicate.
+    pub fn module_specifier_for_auto_import(
+        &self,
+        source: NodeId,
+        target: &[u8],
+        relative: Option<&str>,
+        ending: Option<&str>,
+        excluded: &dyn Fn(&[u8]) -> bool,
+    ) -> Result<Option<JsString>, Error> {
+        let state = self.state();
+        let view = state.ast(source)?;
+        let file = view.source_file(source)?;
+        let relative = match relative {
+            Some("relative") => Relativity::Relative,
+            Some("non-relative") => Relativity::NonRelative,
+            Some("project-relative") => Relativity::ProjectRelative,
+            _ => Relativity::Shortest,
+        };
+        generate_with_preferences(
+            state.program()?.host.as_ref(),
+            source,
+            file.file_name(),
+            target,
+            Mode::NONE,
+            Preferences {
+                relative,
+                ending,
+                excluded,
+            },
+        )
+    }
+    pub fn import_file_module_formats(
+        &self,
+        source: NodeId,
+    ) -> Result<(tsr_core::ModuleKind, tsr_core::ModuleKind), Error> {
+        let state = self.state();
+        let view = state.ast(source)?;
+        let file = view.source_file(source)?;
+        let host = state.program()?.host.as_ref();
+        Ok((
+            host.get_emit_module_format_of_file(file.file_name())?,
+            host.get_implied_node_format_for_emit(file.file_name())?,
+        ))
+    }
+}
+
+impl crate::Operation<'_> {
+    pub fn import_ending_preferences(
+        &self,
+        source: NodeId,
+        syntax_mode: Mode,
+        preference: Option<&str>,
+    ) -> Result<Vec<ModuleSpecifierEnding>, Error> {
+        let state = self.state();
+        let view = state.ast(source)?;
+        let file = view.source_file(source)?;
+        let host = state.program()?.host.as_ref();
+        let mut imports = Vec::new();
+        for &id in file.imports()?.iter().flatten() {
+            imports.push(Import {
+                text: view.node_text(id)?.into_js_string(),
+                mode: host.get_mode_for_usage_location(file.file_name(), id)?,
+                resolved: None,
+            });
+        }
+        Ok(allowed_endings(
+            host.options(),
+            file.file_name(),
+            &imports,
+            host.get_default_resolution_mode_for_file(file.file_name())?,
+            syntax_mode,
+            preference,
+        ))
+    }
+    pub fn import_usage_resolution_mode(
+        &self,
+        source: NodeId,
+        specifier: NodeId,
+    ) -> Result<Mode, Error> {
+        let state = self.state();
+        let view = state.ast(source)?;
+        view.node(specifier)?;
+        state
+            .program()?
+            .host
+            .get_mode_for_usage_location(view.source_file(source)?.file_name(), specifier)
+    }
+    pub fn import_package_json(
+        &self,
+        path: &[u8],
+    ) -> Result<Option<std::sync::Arc<tsr_module::PackageJson>>, Error> {
+        self.state().program()?.host.get_package_json_info(path)
+    }
 }

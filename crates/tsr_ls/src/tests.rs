@@ -700,3 +700,396 @@ fn source_definition_fast_path_does_not_acquire_a_checker() {
         assert_eq!(locations[0].uri.0, "file:///lib.ts");
     }
 }
+
+fn completion_result(text: &str, options: &CompletionOptions) -> lsp::CompletionList {
+    let offset = text.find("/*cursor*/").unwrap();
+    let text = text.replacen("/*cursor*/", "", 1);
+    let program = Arc::new(program(b"/index.ts", text.as_bytes()));
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool
+        .checker_for_file_exclusive(program.source_file(b"/index.ts").unwrap().source())
+        .unwrap();
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    let prefix = &text[..offset];
+    let line_start = prefix.rfind('\n').map_or(0, |i| i + 1);
+    *service
+        .completion(
+            &mut checker,
+            &lsp::CompletionParams {
+                text_document: lsp::TextDocumentIdentifier {
+                    uri: lsp::DocumentUri("file:///index.ts".into()),
+                },
+                position: lsp::Position {
+                    line: prefix.bytes().filter(|&c| c == b'\n').count() as u32,
+                    character: prefix[line_start..].encode_utf16().count() as u32,
+                },
+                ..Default::default()
+            },
+            options,
+        )
+        .unwrap()
+        .list
+        .unwrap()
+}
+
+#[test]
+fn completion_string_index_signatures_allow_new_names_without_commit_characters() {
+    for defaults in [false, true] {
+        let options = CompletionOptions {
+            commit_characters: true,
+            default_commit_characters: defaults,
+            ..Default::default()
+        };
+        let empty = completion_result(
+            "declare const item: {[key: string]: number}; item./*cursor*/",
+            &options,
+        );
+        assert!(empty.items.is_empty());
+        let named = completion_result(
+            "declare const item: {[key: string]: number; known: number}; item./*cursor*/",
+            &options,
+        );
+        assert_eq!(named.items.len(), 1);
+        let item = named.items[0].as_ref().unwrap();
+        assert_eq!(item.label, "known");
+        let commit = if defaults {
+            named
+                .item_defaults
+                .as_ref()
+                .unwrap()
+                .commit_characters
+                .as_deref()
+        } else {
+            item.commit_characters.as_deref()
+        };
+        assert_eq!(commit, Some(&Vec::new()));
+    }
+}
+
+#[test]
+fn completion_members_keep_native_sort_keys_kinds_and_utf16_replacement() {
+    // The complete response is compared against the pin by completions.py.
+    let list = completion_result("/*😀*/ interface Item { required: string; optional?: number; method(): void } declare const item: Item; item.op/*cursor*/tional", &CompletionOptions { default_edit_range: true, default_commit_characters: true, commit_characters: true, ..Default::default() });
+    let items = list.items.iter().flatten().collect::<Vec<_>>();
+    assert_eq!(items.len(), 3);
+    for item in items {
+        assert_eq!(item.sort_text.as_deref().unwrap(), "11");
+        assert_eq!(
+            item.kind.as_deref(),
+            Some(if item.label == "method" {
+                &lsp::CompletionItemKind::METHOD
+            } else {
+                &lsp::CompletionItemKind::FIELD
+            })
+        );
+    }
+    let ranges = list
+        .item_defaults
+        .unwrap()
+        .edit_range
+        .unwrap()
+        .edit_range_with_insert_replace
+        .unwrap();
+    assert_eq!(
+        ranges.replace.end.character - ranges.replace.start.character,
+        8
+    );
+    assert_eq!(
+        ranges.insert.end.character - ranges.insert.start.character,
+        2
+    );
+}
+
+#[test]
+fn completion_contextual_properties_do_not_repeat_already_present_members() {
+    let list = completion_result("interface Options { required: string; optional?: number; done: boolean } const opt: Options = { done: true, /*cursor*/ };", &CompletionOptions::default());
+    assert_eq!(
+        list.items
+            .iter()
+            .flatten()
+            .map(|i| i.label.as_str())
+            .collect::<std::collections::BTreeSet<_>>(),
+        ["optional?", "required"].into_iter().collect()
+    );
+}
+
+#[test]
+fn completion_literal_arguments_and_labels_have_native_ordering_groups() {
+    let list = completion_result(
+        "function choose(value: 1 | 2 | 3): void {} choose(/*cursor*/)",
+        &CompletionOptions::default(),
+    );
+    let values: Vec<_> = list
+        .items
+        .iter()
+        .flatten()
+        .filter(|i| i.kind.as_deref() == Some(&lsp::CompletionItemKind::CONSTANT))
+        .map(|i| (i.label.as_str(), i.sort_text.as_deref().unwrap().as_str()))
+        .collect();
+    assert_eq!(values, [("1", "11"), ("2", "11"), ("3", "11")]);
+    let labels = completion_result(
+        "outer: while(true) { inner: while (true) { break /*cursor*/ } }",
+        &CompletionOptions::default(),
+    );
+    assert_eq!(
+        labels
+            .items
+            .iter()
+            .flatten()
+            .map(|i| i.label.as_str())
+            .collect::<Vec<_>>(),
+        ["inner", "outer"]
+    );
+}
+
+#[test]
+fn completion_type_parameter_defaults_hide_self_and_later_parameters() {
+    for (source, excluded) in [
+        (
+            "function f<T = /*cursor*/, Later = unknown>() {}",
+            vec!["T", "Later"],
+        ),
+        ("type T<K extends /*cursor*/> = K", vec!["K"]),
+    ] {
+        let list = completion_result(source, &CompletionOptions::default());
+        assert!(list
+            .items
+            .iter()
+            .flatten()
+            .all(|item| !excluded.contains(&item.label.as_str())));
+        assert!(list
+            .items
+            .iter()
+            .flatten()
+            .any(|item| item.label == "string"));
+    }
+}
+
+#[test]
+fn completion_indexed_unions_omit_other_literal_constituents() {
+    for source in [
+        "type T = { one: number; two: string }; type Key = T[\"one\" | \"/*cursor*/\"];",
+        "type T = { one: number; two: string }; type Key = T[(\"one\" | \"/*cursor*/\")];",
+        "type T<K extends \"one\" | \"two\"> = K; type Key = T<\"one\" | \"/*cursor*/\">;",
+    ] {
+        let list = completion_result(source, &CompletionOptions::default());
+        let names: Vec<_> = list
+            .items
+            .iter()
+            .flatten()
+            .map(|item| item.label.as_str())
+            .collect();
+        assert_eq!(names, ["two"], "{source}");
+    }
+}
+
+#[test]
+fn completion_empty_contextual_members_fall_back_and_numeric_edits_keep_native_spelling() {
+    let list = completion_result("type Shape = {kind: \"one\"; a: number} | {kind: \"two\"; b: string}; const item: Shape = {kind: \"one\", /*cursor*/};", &CompletionOptions::default());
+    assert!(list
+        .items
+        .iter()
+        .flatten()
+        .any(|item| item.label == "globalThis"));
+    assert!(list
+        .items
+        .iter()
+        .flatten()
+        .any(|item| item.label == "const"));
+    let list = completion_result("declare const object: {123: number; \"١word\": string; \"²word\": boolean}; object./*cursor*/", &CompletionOptions::default());
+    for (label, expected) in [
+        ("123", "[123]"),
+        ("١word", "[١word]"),
+        ("²word", "[\"²word\"]"),
+    ] {
+        let item = list
+            .items
+            .iter()
+            .flatten()
+            .find(|item| item.label == label)
+            .unwrap();
+        assert_eq!(
+            item.insert_text.as_deref().map(String::as_str),
+            Some(expected)
+        );
+        assert_eq!(
+            item.text_edit
+                .as_ref()
+                .unwrap()
+                .text_edit
+                .as_ref()
+                .unwrap()
+                .new_text,
+            expected
+        );
+    }
+}
+
+#[test]
+fn local_export_completions_use_locals_and_deprioritize_existing_exports() {
+    let list = completion_result(
+        "export const first = 1; const second = 2; export { /*cursor*/ };",
+        &CompletionOptions::default(),
+    );
+    let items: Vec<_> = list
+        .items
+        .iter()
+        .flatten()
+        .filter(|item| item.kind.as_deref() != Some(&lsp::CompletionItemKind::KEYWORD))
+        .collect();
+    assert_eq!(items.len(), 2);
+    assert!(items
+        .iter()
+        .any(|item| item.label == "first"
+            && item.sort_text.as_deref().map(String::as_str) == Some("12")));
+    assert!(items.iter().any(|item| item.label == "second"
+        && item.sort_text.as_deref().map(String::as_str) == Some("11")));
+}
+
+#[test]
+fn completion_switch_values_are_filtered_and_snippet_preserves_native_order() {
+    let list = completion_result(
+        "declare const state: 'one' | 'two'; switch(state) { case 'one': break; case /*cursor*/ }",
+        &CompletionOptions {
+            snippets: true,
+            ..Default::default()
+        },
+    );
+    assert!(!list
+        .items
+        .iter()
+        .flatten()
+        .any(|item| item.label == "\"one\""));
+    assert!(list
+        .items
+        .iter()
+        .flatten()
+        .any(|item| item.label == "\"two\""));
+    let snippet = list
+        .items
+        .iter()
+        .flatten()
+        .find(|item| item.label == "case \"two\": ...")
+        .unwrap();
+    assert_eq!(
+        snippet.insert_text.as_deref().map(String::as_str),
+        Some("case \"two\":$1")
+    );
+    assert_eq!(snippet.data.as_deref().unwrap().source, "SwitchCases/");
+}
+
+#[test]
+fn completion_promise_property_replaces_the_access_with_await() {
+    let source = "interface Promise<T> {then(onfulfilled: (value: T) => unknown): Promise<unknown>} declare const promised: Promise<{value: number}>; async function f() {promised./*cursor*/}";
+    let list = completion_result(source, &CompletionOptions::default());
+    let item = list
+        .items
+        .iter()
+        .flatten()
+        .find(|item| item.label == "value")
+        .unwrap();
+    let edit = item
+        .text_edit
+        .as_deref()
+        .unwrap()
+        .text_edit
+        .as_deref()
+        .unwrap();
+    assert_eq!(edit.new_text, "(await promised).value");
+    assert_eq!(
+        (edit.range.start.character, edit.range.end.character),
+        (152, 161)
+    );
+    // The same expression outside an await context gets no rewritten property.
+    let list = completion_result(
+        &source.replace("async function", "function"),
+        &CompletionOptions::default(),
+    );
+    assert!(!list
+        .items
+        .iter()
+        .flatten()
+        .any(|item| item.label == "value"));
+}
+
+#[test]
+fn completion_private_names_and_static_inherited_members_use_source_identity() {
+    // Exact native responses are also exercised by completions.py.
+    let list = completion_result(
+        "class C { #private = 1; method() { this./*cursor*/ } }",
+        &CompletionOptions::default(),
+    );
+    let private = list
+        .items
+        .iter()
+        .flatten()
+        .find(|item| item.label == "#private")
+        .unwrap();
+    assert_eq!(
+        private.filter_text.as_deref().map(String::as_str),
+        Some("private")
+    );
+    assert!(private.insert_text.is_none());
+    let options = CompletionOptions {
+        class_member_snippets: true,
+        ..Default::default()
+    };
+    let list = completion_result("class Base { static value = 1; method() {} } class Derived extends Base { static /*cursor*/ }", &options);
+    let value = list
+        .items
+        .iter()
+        .flatten()
+        .find(|item| item.label == "value")
+        .unwrap();
+    assert_eq!(
+        value.insert_text.as_deref().map(String::as_str),
+        Some("static value: number;")
+    );
+    assert_eq!(value.additional_text_edits.as_ref().unwrap().len(), 1);
+    assert!(!list
+        .items
+        .iter()
+        .flatten()
+        .any(|item| item.label == "method"));
+}
+
+#[test]
+fn completion_snippet_formatting_obeys_config() {
+    let mut options = CompletionOptions {
+        object_method_snippets: true,
+        ..Default::default()
+    };
+    apply_format_settings(
+        &std::collections::HashMap::from([
+            (
+                "insertSpaceBeforeFunctionParenthesis".into(),
+                lsp::Any::Boolean(true),
+            ),
+            (
+                "insertSpaceAfterCommaDelimiter".into(),
+                lsp::Any::Boolean(false),
+            ),
+            (
+                "placeOpenBraceOnNewLineForFunctions".into(),
+                lsp::Any::Boolean(true),
+            ),
+        ]),
+        true,
+        &mut options.format,
+    );
+    let list = completion_result("interface Target { method(arg: number, optional?: string): void }; const value: Target = { /*cursor*/ };", &options);
+    let item = list
+        .items
+        .iter()
+        .flatten()
+        .find(|item| item.label == "method(arg, optional)")
+        .unwrap();
+    assert_eq!(
+        item.insert_text.as_deref().map(String::as_str),
+        Some("method (arg,optional)\n{\n},")
+    );
+}

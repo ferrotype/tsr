@@ -13,3 +13,5 @@ converted using the negotiated UTF-8/UTF-16 encoding and content-map projections
 
 See [the L3 development checks](../../tools/phase5/lsp/README.md#l3-read-only-features)
 for native comparisons and the remaining cross-project/mapper integration work.
+
+Completion lists, resolve, JSDoc snippets, auto-insert and applied auto-import edits are implemented on the L3 service. See the [L4 record](../../docs/PHASE5-L4.md) for bounded native comparisons and remaining L6/L7 integration.

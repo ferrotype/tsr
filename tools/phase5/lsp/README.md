@@ -1,8 +1,8 @@
-# Language server development checks (L2 and L3)
+# Language server development checks (L2–L4)
 
 L2 connects the generated protocol to production project sessions and compiler
 diagnostics. `tsrust --lsp --stdio` and the private version-3 endpoint use the
-same runtime. Unported L4–L6 service methods return a named `-32601` error; their pinned
+same runtime. Unported L5–L6 service methods return a named `-32601` error; their pinned
 capabilities remain declared so the protocol surface does not drift during the
 port. This is not a complete editor server yet.
 
@@ -151,9 +151,40 @@ The relevant preference parsing/reset and refresh behavior is exercised through
 the ordinary wire; editing/auto-import preferences and the full preference
 roundtrip belong to their L4/L5 consumers.
 
+## L4 completions and auto-imports
+
+`completions.py` uses the same Go executable and actual Rust server as the
+read-only scripts. It compares all response fields; only completion lists are
+sorted with the pinned fourslash sortText/name comparator. It resolves the
+returned items, applies import edits and snippet insertions, and checks the
+resulting contents against Go. It covers member/contextual/literal/JSX and
+JSDoc completions, snippets, auto-insert, local and package candidates, package
+conditions/paths/typesVersions, Unicode/quote/format preferences, and cache
+invalidation after document, dependency and package-entrypoint changes.
+The dependency test verifies watch registration before injecting its events.
+
+```sh
+cargo build -p tsrust --bin tsrust
+python3 tools/phase5/lsp/completions.py
+cargo test -p tsr_autoimport -p tsr_ls -p tsr_jsstring -p tsr_project -p tsr_lsp --lib
+```
+
+The bounded sample matches 731 responses with minimal capabilities and 742
+with rich capabilities in each of UTF-8 and UTF-16. Direct tests also exercise
+export-index ordering, Go regexp syntax/folding, symlink identity, import edit
+coalescing, explicit generated-AST ownership and retained-snapshot isolation.
+See [the implementation record](../../../docs/PHASE5-L4.md) for checkpoint details.
+
+A separate L6 config/registry sequence is deliberately not folded into those
+passing counts. `python3 tools/phase5/lsp/completions.py --config-replacement`
+removes a root and then replaces it with another export source; it records the
+full responses and exits nonzero on the existing difference (Go retains the
+removed export bucket, Rust rebuilds it). Its output goes to
+`target/phase5/l4-config-replacement`. No allow-list approval is claimed.
+
 ## Remaining Phase 5 boundaries
 
-L4 owns completions and auto-imports. L5 owns rename, edits/formatting and code
+L4 implements completion and auto-import requests. L5 owns rename, edits/formatting and code
 fixes. L6 owns project-tree loading and searching across referenced projects,
 workspace discovery beyond loaded projects, reverse declaration-map lookup into
 other project programs, content-mapper execution/installation, ATA and the API
@@ -167,3 +198,20 @@ pending for L7. These development comparisons and direct tests confer no
 `status/parity/lsp.json` corpus credit. Native pprof is Phase 7. Rust backtraces
 follow the sanitizer's unknown-frame policy and are empty in telemetry; local
 error logs retain the diagnostic backtrace.
+
+
+L4 review regressions can be run separately from the larger development matrix:
+
+```sh
+python3 tools/phase5/lsp/completions.py --review
+python3 tools/phase5/lsp/completions.py --config-replacement
+```
+
+The first compares string-index completion context, French import descriptions,
+full node_modules watcher payloads across two projects, and package invalidation.
+The second reports matching config-only responses separately from the
+owner-approved combined config/create difference: Rust replaces removed roots,
+while the pinned Go registry retains its old export bucket. It checks the entire
+response against the corresponding control and keeps raw outputs under
+`target/phase5/l4-config-replacement`; it does not count the exception as parity.
+The approval and its precise scope are in `docs/PHASE5-L4.md`.

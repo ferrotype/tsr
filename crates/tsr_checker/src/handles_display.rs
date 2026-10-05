@@ -11,6 +11,29 @@ pub struct TypeNodeBuilder<'operation> {
     builder: crate::node_builder::NodeBuilder<'operation>,
 }
 
+/// Generated syntax transferred out of an explicit (never cached) builder.
+/// Owning the AST lets an edit transform its private nodes without aliasing a
+/// subsequent checker query. Source dependencies remain retained by the AST.
+pub struct GeneratedTypeNodes {
+    pub ast: tsr_ast::AstBuilder,
+    pub emit: tsr_printer::EmitContext,
+    pub identifier_symbols: std::collections::HashMap<NodeId, super::SymbolRef>,
+}
+
+impl GeneratedTypeNodes {
+    /// A private editable clone, including the printer's flags and symbol map.
+    pub fn clone_node(&mut self, node: Option<NodeId>) -> Option<NodeId> {
+        let side_tables = std::cell::RefCell::new((&mut self.emit, &mut self.identifier_symbols));
+        tsr_ast::deep_clone_node_with(&mut self.ast, node, &|cloned, original| {
+            let mut tables = side_tables.borrow_mut();
+            tables.0.set_original(cloned, original);
+            if let Some(symbol) = tables.1.get(&original).copied() {
+                tables.1.insert(cloned, symbol);
+            }
+        })
+    }
+}
+
 impl Operation<'_> {
     // port: tsc/internal/checker/printer.go:Checker.TypeToString
     /// The context-free display with `TypeToString`'s default flags.
@@ -118,6 +141,30 @@ pub struct BuilderRequest {
 }
 
 impl TypeNodeBuilder<'_> {
+    pub fn into_syntax(self) -> GeneratedTypeNodes {
+        let identifier_symbols = self
+            .builder
+            .id_to_symbol
+            .iter()
+            .filter_map(|(&node, &symbol)| {
+                symbol.map(|id| {
+                    (
+                        node,
+                        super::SymbolRef {
+                            owner: self.owner,
+                            id,
+                        },
+                    )
+                })
+            })
+            .collect();
+        GeneratedTypeNodes {
+            ast: self.builder.ast,
+            emit: self.builder.emit,
+            identifier_symbols,
+        }
+    }
+
     fn check_owner(&self, owner: ArenaId) -> Result<(), Error> {
         if owner != self.owner {
             return Err(tsr_arena::Error::WrongOwner.into());

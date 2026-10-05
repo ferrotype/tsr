@@ -392,6 +392,15 @@ impl Program {
     pub fn options(&self) -> &CompilerOptions {
         &self.options
     }
+    pub fn common_source_directory(&self) -> Result<Vec<u8>, tsr_arena::Error> {
+        crate::output_paths::common_source_directory(self)
+    }
+
+    /// Retains the program's filesystem for an operation-owned auxiliary loader.
+    pub fn shared_host(&self) -> Arc<dyn FileSystem> {
+        self.host.clone()
+    }
+
     /// The pin's compiler host reduces to the loading file system here.
     /// port: tsc/internal/compiler/program.go:Program.Host
     pub fn host(&self) -> &dyn FileSystem {

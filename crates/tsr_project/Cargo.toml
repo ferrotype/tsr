@@ -13,6 +13,7 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
+tsr_autoimport = { version = "0.2.0", path = "../tsr_autoimport" }
 tsr_ipc = { version = "0.2.0", path = "../tsr_ipc" }
 tsr_tsoptions = { version = "0.2.0", path = "../tsr_tsoptions" }
 tsr_compiler = { version = "0.2.0", path = "../tsr_compiler" }

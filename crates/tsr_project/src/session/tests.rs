@@ -933,6 +933,43 @@ fn unopened_dependency_uses_its_containing_project_without_inferred_options() {
 }
 
 #[test]
+fn auxiliary_package_changes_retire_only_the_current_completion_cache() {
+    let (_, session) = setup(
+        &[
+            (
+                "/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true},"files":["main.ts"]}"#,
+            ),
+            ("/main.ts", "export {}"),
+            ("/node_modules/pkg/index.d.ts", "export const Before = 1;"),
+        ],
+        &Counters::new(),
+    );
+    let old = open(&session, "/main.ts", "export {}");
+    let project = old.project_for_file(b"/main.ts").unwrap();
+    let program = project.program().unwrap().clone();
+    let cache = project.auto_import_cache().unwrap();
+    let mut registry = tsr_autoimport::Registry::default();
+    registry
+        .dependencies
+        .files
+        .insert(js("/node_modules/pkg/index.d.ts"));
+    cache.publish(registry);
+    session
+        .did_change_watched_files([tsr_lsproto::FileEvent {
+            uri: uri("/node_modules/pkg/index.d.ts"),
+            r#type: tsr_lsproto::FileChangeType::CHANGED,
+        }])
+        .unwrap();
+    let current = session.snapshot_for_file(&uri("/main.ts")).unwrap();
+    let project = current.project_for_file(b"/main.ts").unwrap();
+    assert!(Arc::ptr_eq(&program, project.program().unwrap()));
+    assert!(cache.is_prepared(), "the retained snapshot was mutated");
+    assert!(!project.auto_import_cache().unwrap().is_prepared());
+    session.close();
+}
+
+#[test]
 fn consumed_config_preference_does_not_block_clean_program_inclusion_reuse() {
     let (_, session) = setup(
         &[
@@ -968,4 +1005,69 @@ fn consumed_config_preference_does_not_block_clean_program_inclusion_reuse() {
             .name,
         js("/src/tsconfig.json")
     );
+}
+
+#[test]
+fn auto_import_watches_cover_open_projects_with_one_unescaped_directory_set() {
+    struct Client;
+    impl crate::watch::WatchClient for Client {
+        fn watch_files(
+            &self,
+            _: &tsr_ipc::Context,
+            _: &JsString,
+            _: &crate::watch::Watcher,
+        ) -> Result<(), String> {
+            Ok(())
+        }
+        fn unwatch_files(&self, _: &tsr_ipc::Context, _: &JsString) -> Result<(), String> {
+            Ok(())
+        }
+    }
+    let (_, session) = setup(
+        &[
+            (
+                "/a[one]/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true},"files":["main.ts"]}"#,
+            ),
+            ("/a[one]/main.ts", ""),
+            (
+                "/a[one]/node_modules/unused/index.d.ts",
+                "export const value: number;",
+            ),
+            (
+                "/b/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true},"files":["main.ts"]}"#,
+            ),
+            ("/b/main.ts", ""),
+            (
+                "/b/node_modules/unused/index.d.ts",
+                "export const other: number;",
+            ),
+        ],
+        &Counters::new(),
+    );
+    let session = session.with_watch_client(Arc::new(Client));
+    open(&session, "/a[one]/main.ts", "");
+    open(&session, "/b/main.ts", "");
+    let patterns = || {
+        let watches = session.auto_import_watches.lock().unwrap();
+        assert_eq!(watches.len(), 1);
+        let watchers = watches.get(b"auto-import".as_slice()).unwrap().watchers();
+        assert!(watchers.id.as_bytes().starts_with(b"auto-import watcher "));
+        watchers
+            .iter()
+            .map(|w| (w.pattern.clone(), w.kind))
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(
+        patterns(),
+        vec![
+            (js("/a[one]/node_modules/**/*"), 7),
+            (js("/b/node_modules/**/*"), 7)
+        ]
+    );
+    session.did_close_file(uri("/a[one]/main.ts")).unwrap();
+    session.snapshot_for_file(&uri("/b/main.ts")).unwrap();
+    assert_eq!(patterns(), vec![(js("/b/node_modules/**/*"), 7)]);
+    session.close();
 }

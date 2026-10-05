@@ -1,13 +1,38 @@
 //! Language service operations over a retained compiler snapshot.
+mod auto_imports;
+mod autoinsert;
 mod call_declarations;
 mod call_hierarchy;
 mod call_sites;
 mod code_lens;
+mod completion_class_snippets;
+mod completion_containers;
+mod completion_context;
+mod completion_imports;
+mod completion_items;
+mod completion_jsx;
+mod completion_keywords;
+mod completion_labels;
+mod completion_literals;
+mod completion_paths;
+mod completion_snippets;
+mod completion_switch;
+mod completions;
+mod import_adder;
+mod jsdoc_completions;
+mod jsdoc_parameters;
+mod jsdoc_template;
+mod snippet_printer;
+mod string_completions;
+pub use completion_keywords::compare as compare_completion_entries;
+pub use completions::{CompletionOptions, COMPLETION_TRIGGER_CHARACTERS};
 pub mod converters;
 mod definition;
 mod display_parts;
 mod documentation;
 mod folding;
+mod format_preferences;
+pub use format_preferences::apply_format_settings;
 mod highlights;
 mod hover;
 mod hover_display;
@@ -55,8 +80,14 @@ pub enum Error {
     Checker(tsr_checker::Error),
     Navigation(tsr_astnav::Error),
     Printer(tsr_printer::Error),
+    Edits(tsr_core::UnappliableEdits),
     Canceled,
     MissingFile(String),
+}
+impl From<tsr_core::UnappliableEdits> for Error {
+    fn from(value: tsr_core::UnappliableEdits) -> Self {
+        Self::Edits(value)
+    }
 }
 impl From<tsr_printer::Error> for Error {
     fn from(value: tsr_printer::Error) -> Self {
@@ -90,6 +121,7 @@ impl std::fmt::Display for Error {
             Self::Checker(e) => e.fmt(f),
             Self::Navigation(e) => e.fmt(f),
             Self::Printer(e) => e.fmt(f),
+            Self::Edits(e) => write!(f, "unappliable snippet edits: {e:?}"),
             Self::Canceled => f.write_str("request canceled"),
             Self::MissingFile(name) => write!(f, "file not found: {name}"),
         }
@@ -123,6 +155,8 @@ impl QueryChecker for tsr_checker::Operation<'_> {
 /// checker lease for the entire request; nodes and coordinate maps never cross
 /// into a later snapshot. Syntax-only queries do not acquire a checker.
 pub struct LanguageService<'a> {
+    auto_imports: std::sync::Arc<tsr_autoimport::Cache>,
+    completion_host: Option<std::sync::Arc<dyn tsr_vfs::FileSystem>>,
     program: &'a Program,
     converters: Converters,
     source_maps: source_map::Maps,
@@ -135,6 +169,8 @@ impl<'a> LanguageService<'a> {
         cancellation: CancellationToken,
     ) -> Self {
         Self {
+            auto_imports: std::sync::Arc::new(tsr_autoimport::Cache::new(program)),
+            completion_host: None,
             program,
             converters: Converters::new(encoding),
             source_maps: source_map::Maps::new(),

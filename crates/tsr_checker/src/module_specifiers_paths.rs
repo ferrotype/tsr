@@ -3,8 +3,8 @@ use super::{Error, Generation, Import};
 use tsr_core::{CompilerOptions, ModuleResolutionKind as MR, ResolutionMode as Mode};
 use tsr_tspath as path;
 
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub(super) enum Ending {
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Ending {
     Minimal,
     Index,
     Js,
@@ -47,7 +47,7 @@ pub(super) fn allowed_endings(
     imports: &[Import],
     default_mode: Mode,
     syntax_mode: Mode,
-    request_js: bool,
+    preference: Option<&str>,
 ) -> Vec<Ending> {
     let resolution = options.module_resolution_kind();
     let node_next = MR::NODE16 <= resolution && resolution <= MR::NODE_NEXT;
@@ -64,7 +64,7 @@ pub(super) fn allowed_endings(
             vec![Ending::Js]
         };
     }
-    let preferred = if request_js || mode == Mode::ESNEXT && node_next {
+    let preferred = if preference == Some("js") || mode == Mode::ESNEXT && node_next {
         if options.allow_importing_ts_extensions()
             && inferred_ending(imports, mode, node_next) != Ending::Js
         {
@@ -72,6 +72,10 @@ pub(super) fn allowed_endings(
         } else {
             Ending::Js
         }
+    } else if preference == Some("minimal") {
+        Ending::Minimal
+    } else if preference == Some("index") {
+        Ending::Index
     } else if options.allow_importing_ts_extensions() {
         inferred_ending(imports, mode, node_next)
     } else {

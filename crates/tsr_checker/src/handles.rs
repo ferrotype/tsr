@@ -22,7 +22,7 @@ use tsr_jsnum::{Number, PseudoBigInt};
 
 #[path = "handles_display.rs"]
 mod display;
-pub use display::{BuilderRequest, TypeNodeBuilder};
+pub use display::{BuilderRequest, GeneratedTypeNodes, TypeNodeBuilder};
 
 #[cfg(feature = "recursion-probe")]
 #[path = "handles_c2_probe.rs"]
@@ -506,6 +506,15 @@ impl Operation<'_> {
         })
     }
 
+    /// The decoded value, before the quoting used by type and diagnostic display.
+    pub fn string_literal_value(&self, ty: TypeRef) -> Result<JsString, Error> {
+        let ty = self.check_type(ty)?;
+        match &self.state().types.literal(ty)?.value {
+            crate::LiteralValue::String(text) => Ok(text.clone()),
+            _ => Err(Error::MissingLink("string literal type required")),
+        }
+    }
+
     // port: tsc/internal/checker/exports.go:Checker.GetDeclaredTypeOfSymbol
     pub fn get_declared_type_of_symbol(&mut self, symbol: SymbolRef) -> Result<TypeRef, Error> {
         let symbol = self.check_symbol_ref(symbol)?;
@@ -547,6 +556,17 @@ impl Operation<'_> {
     pub fn symbol(&self, symbol: SymbolRef) -> Result<tsr_ast::SymbolRef<'_>, Error> {
         let symbol = self.check_symbol_ref(symbol)?;
         self.state().symbol(symbol)
+    }
+
+    /// The source spelling of private names, otherwise the stored symbol name.
+    pub fn symbol_display_name(&self, symbol: SymbolRef) -> Result<JsString, Error> {
+        let symbol = self.symbol(symbol)?;
+        if let Some(declaration) = symbol.value_declaration() {
+            return Ok(JsString::from_bytes(
+                tsr_ast::symbol_name(&symbol, self.state().ast(declaration)?)?.as_bytes(),
+            ));
+        }
+        Ok(JsString::from_bytes(symbol.name_bytes()))
     }
 
     pub fn symbol_declarations(
@@ -1058,6 +1078,13 @@ impl Operation<'_> {
             .iter()
             .map(|&id| self.type_ref(id))
             .collect())
+    }
+
+    /// Stored arity, matching Signature.MinArgumentCount (without forcing the
+    /// separate effective minimum-argument-count calculation).
+    pub fn signature_min_argument_count(&self, signature: SignatureRef) -> Result<i32, Error> {
+        let id = self.check_signature(signature)?;
+        Ok(self.state().signatures.get(id)?.min_argument_count)
     }
 
     pub fn signature_parameters(&self, s: SignatureRef) -> Result<Vec<SymbolRef>, Error> {

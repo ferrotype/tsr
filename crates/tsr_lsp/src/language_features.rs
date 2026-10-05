@@ -8,7 +8,10 @@ use tsr_lsproto as lsp;
 pub fn handles(method: &str) -> bool {
     matches!(
         method,
-        "textDocument/linkedEditingRange"
+        "textDocument/_vs_onAutoInsert"
+            | "textDocument/completion"
+            | "completionItem/resolve"
+            | "textDocument/linkedEditingRange"
             | "textDocument/hover"
             | "textDocument/signatureHelp"
             | "textDocument/inlayHint"
@@ -33,6 +36,9 @@ pub fn handles(method: &str) -> bool {
     )
 }
 pub enum Request {
+    AutoInsert(lsp::VSOnAutoInsertParams),
+    Completion(lsp::CompletionParams),
+    ResolveCompletion(lsp::CompletionItem, lsp::DocumentUri),
     Hover(lsp::HoverParams),
     SignatureHelp(lsp::SignatureHelpParams),
     InlayHints(lsp::InlayHintParams),
@@ -59,6 +65,17 @@ pub enum Request {
 impl Request {
     pub fn decode(method: &str, params: Option<&RawValue>) -> Result<Self, lsp::ResponseError> {
         Ok(match method {
+            "textDocument/_vs_onAutoInsert" => Self::AutoInsert(crate::decode(params)?),
+            "textDocument/completion" => Self::Completion(crate::decode(params)?),
+            "completionItem/resolve" => {
+                let item: lsp::CompletionItem = crate::decode(params)?;
+                let data = item
+                    .data
+                    .as_deref()
+                    .ok_or_else(|| error(-32603, "completion item data is nil"))?;
+                let uri = lsp::DocumentUri::from_file_name(data.file_name.as_bytes());
+                Self::ResolveCompletion(item, uri)
+            }
             "textDocument/codeLens" => Self::CodeLenses(crate::decode(params)?),
             "codeLens/resolve" => {
                 let lens: lsp::CodeLens = crate::decode(params)?;
@@ -119,7 +136,8 @@ impl Request {
     pub fn unknown_script_fallback(&self) -> bool {
         matches!(
             self,
-            Self::Hover(_)
+            Self::Completion(_)
+                | Self::Hover(_)
                 | Self::SignatureHelp(_)
                 | Self::SourceDefinition(_)
                 | Self::Definition(_)
@@ -130,6 +148,9 @@ impl Request {
     }
     pub fn uri(&self) -> &lsp::DocumentUri {
         match self {
+            Self::AutoInsert(p) => &p.vs_text_document.uri,
+            Self::Completion(p) => &p.text_document.uri,
+            Self::ResolveCompletion(_, uri) => uri,
             Self::SignatureHelp(p) => &p.text_document.uri,
             Self::InlayHints(p) => &p.text_document.uri,
             Self::CodeLenses(p) => &p.text_document.uri,
@@ -189,6 +210,8 @@ impl tsr_ls::QueryChecker for RequestChecker<'_> {
 }
 #[derive(Clone)]
 pub struct Options {
+    pub completion: tsr_ls::CompletionOptions,
+    pub auto_closing_tags: bool,
     pub maximum_hover_length: usize,
     pub prefer_source_definition: bool,
     pub inlay: tsr_ls::InlayHintsOptions,
@@ -227,6 +250,9 @@ pub fn execute(
     }
     let _stop = Stop(context.after_func(move || cancel.cancel()));
     let mut service = tsr_ls::LanguageService::new(program, encoding, cancellation);
+    if let Some(host) = project.completion_file_system() {
+        service.set_completion_file_system(host);
+    }
     if matches!(request, Request::InlayHints(_)) && !options.inlay.enabled() {
         return client::raw(&lsp::Null);
     }
@@ -256,7 +282,9 @@ pub fn execute(
     }
     if matches!(
         request,
-        Request::Hover(_)
+        Request::Completion(_)
+            | Request::ResolveCompletion(_, _)
+            | Request::Hover(_)
             | Request::SignatureHelp(_)
             | Request::InlayHints(_)
             | Request::ResolveLens(_)
@@ -297,6 +325,59 @@ pub fn execute(
             .operation()
             .map_err(|e| error(-32603, e.to_string()))?;
         let text_caps = capabilities.text_document.as_deref();
+        if matches!(
+            &request,
+            Request::Completion(_) | Request::ResolveCompletion(_, _)
+        ) {
+            if let Some(cache) = project.auto_import_cache() {
+                service.set_auto_import_cache(cache);
+            }
+            let caps = text_caps.and_then(|c| c.completion.as_deref());
+            let item = caps.and_then(|c| c.completion_item.as_deref());
+            let defaults = caps
+                .and_then(|c| c.completion_list.as_deref())
+                .and_then(|c| c.item_defaults.as_deref());
+            let supports = |name: &str| defaults.is_some_and(|d| d.iter().any(|s| s == name));
+            let options = tsr_ls::CompletionOptions {
+                snippets: item
+                    .and_then(|i| i.snippet_support.as_deref())
+                    .copied()
+                    .unwrap_or(false),
+                commit_characters: item
+                    .and_then(|i| i.commit_characters_support.as_deref())
+                    .copied()
+                    .unwrap_or(false),
+                insert_replace: item
+                    .and_then(|i| i.insert_replace_support.as_deref())
+                    .copied()
+                    .unwrap_or(false),
+                label_details: item
+                    .and_then(|i| i.label_details_support.as_deref())
+                    .copied()
+                    .unwrap_or(false),
+                default_commit_characters: supports("commitCharacters"),
+                default_edit_range: supports("editRange"),
+                markdown: item
+                    .and_then(|i| i.documentation_format.as_deref())
+                    .and_then(|v| v.first())
+                    .is_some_and(|m| m.0 == lsp::MarkupKind::MARKDOWN),
+                ..options.completion.clone()
+            };
+            return match &request {
+                Request::Completion(params) => client::raw(
+                    &service
+                        .completion(&mut operation, params, &options)
+                        .map_err(service_error)?,
+                ),
+                Request::ResolveCompletion(item, _) => client::raw(
+                    &service
+                        .resolve_completion(&mut operation, item.clone(), &options)
+                        .map_err(service_error)?,
+                ),
+                _ => unreachable!(),
+            };
+        }
+
         if let Request::Hover(params) = &request {
             let content = text_caps
                 .and_then(|c| c.hover.as_deref())
@@ -494,6 +575,11 @@ pub fn execute(
         );
     }
     match request {
+        Request::AutoInsert(p) => client::raw(
+            &service
+                .auto_insert(&p, options.auto_closing_tags)
+                .map_err(service_error)?,
+        ),
         Request::CodeLenses(p) => client::raw(
             &service
                 .code_lenses(&p, options.code_lens)
@@ -523,7 +609,9 @@ pub fn execute(
                     .map_err(service_error)?,
             )
         }
-        Request::Hover(_)
+        Request::Completion(_)
+        | Request::ResolveCompletion(_, _)
+        | Request::Hover(_)
         | Request::SignatureHelp(_)
         | Request::InlayHints(_)
         | Request::ResolveLens(_)
