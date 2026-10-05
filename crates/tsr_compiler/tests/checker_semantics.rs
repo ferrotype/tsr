@@ -1116,6 +1116,40 @@ fn compound_constituents_are_checked_even_after_reduction_and_on_retry() {
 }
 
 #[test]
+fn merged_unique_symbol_properties_keep_their_identity_across_files() {
+    // The pinned checker merges these declarations without TS2717, in either
+    // file order, while rejecting both assignments between distinct symbols.
+    let declarations = b"interface SymbolConstructor { readonly dispose: unique symbol; readonly asyncDispose: unique symbol; }";
+    let source = b"declare const symbols: SymbolConstructor;\ninterface OtherSymbols { readonly dispose: unique symbol; }\ndeclare const other: OtherSymbols;\nconst same: typeof symbols.dispose = symbols.dispose;\nconst differentProperty: typeof symbols.dispose = symbols.asyncDispose;\nconst differentSymbol: typeof symbols.dispose = other.dispose;\n";
+    let orders: [[&[u8]; 2]; 2] = [[b"/lib.d.ts", b"/node.d.ts"], [b"/node.d.ts", b"/lib.d.ts"]];
+    for paths in orders {
+        let (owner, program, _) = fixture_files(
+            b"/main.ts",
+            &[
+                (b"/main.ts", source),
+                (paths[0], declarations),
+                (paths[1], declarations),
+            ],
+            options(),
+        );
+        let mut op = owner.operation().unwrap();
+        for path in paths.into_iter().rev() {
+            let diagnostics = op
+                .semantic_diagnostics(program.file(path).unwrap().source())
+                .unwrap();
+            assert!(diagnostics.is_empty(), "{path:?}: {diagnostics:?}");
+        }
+        let diagnostics = op
+            .semantic_diagnostics(program.file(b"/main.ts").unwrap().source())
+            .unwrap();
+        assert_eq!(
+            diagnostics.iter().map(|d| d.code).collect::<Vec<_>>(),
+            vec![2322, 2322]
+        );
+    }
+}
+
+#[test]
 fn a_unique_symbol_widens_in_a_mutable_object_literal_location() {
     // Upstream widens a unique symbol outside its const-like declaration, so a
     // later declaration serialization never reaches an inaccessible one.
