@@ -1,4 +1,9 @@
 //! Language service operations over a retained compiler snapshot.
+mod api;
+mod crossproject;
+pub use crossproject::{
+    CrossProjectDefinition, CrossProjectPosition, CrossProjectSearchOptions, CrossProjectTargets,
+};
 mod auto_imports;
 mod autoinsert;
 mod call_declarations;
@@ -109,6 +114,7 @@ pub enum Error {
     Edits(tsr_core::UnappliableEdits),
     Canceled,
     MissingFile(String),
+    MissingSourceFile(String),
 }
 impl From<tsr_core::UnappliableEdits> for Error {
     fn from(value: tsr_core::UnappliableEdits) -> Self {
@@ -150,6 +156,7 @@ impl std::fmt::Display for Error {
             Self::Edits(e) => write!(f, "unappliable snippet edits: {e:?}"),
             Self::Canceled => f.write_str("request canceled"),
             Self::MissingFile(name) => write!(f, "file not found: {name}"),
+            Self::MissingSourceFile(name) => write!(f, "source file not found: {name}"),
         }
     }
 }

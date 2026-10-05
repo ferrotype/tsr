@@ -13,7 +13,7 @@ use tsr_sourcemap::{DocumentPosition, DocumentPositionMapper, EcmaLineInfo, Host
 
 pub(crate) type Maps = HashMap<Vec<u8>, Option<DocumentPositionMapper>>;
 
-struct MapHost<'a>(&'a tsr_compiler::Program);
+pub(crate) struct MapHost<'a>(pub(crate) &'a tsr_compiler::Program);
 impl Host for MapHost<'_> {
     fn use_case_sensitive_file_names(&self) -> bool {
         self.0.use_case_sensitive_file_names()
@@ -44,7 +44,7 @@ impl Host for MapHost<'_> {
 impl LanguageService<'_> {
     // port: tsc/internal/ls/source_map.go:LanguageService.tryGetSourcePosition
     // port: tsc/internal/ls/source_map.go:LanguageService.tryGetSourcePositionWorker
-    pub(crate) fn source_position(&mut self, name: &[u8], pos: i64) -> Option<DocumentPosition> {
+    pub fn source_position(&mut self, name: &[u8], pos: i64) -> Option<DocumentPosition> {
         let mut current = DocumentPosition {
             file_name: JsString::from_bytes(name),
             pos: pos as isize,
@@ -78,6 +78,43 @@ impl LanguageService<'_> {
                 .read_file(current.file_name.as_bytes())
                 .is_some())
         .then_some(current)
+    }
+
+    /// Maps a source byte offset to its declaration output. Referenced sources
+    /// already included through editor redirection stay in their source project.
+    // port: tsc/internal/ls/source_map.go:LanguageService.tryGetGeneratedPosition
+    // port: tsc/internal/ls/source_map.go:LanguageService.tryGetGeneratedPositionWorker
+    pub fn generated_position(
+        &mut self,
+        name: &[u8],
+        byte_position: i64,
+    ) -> Option<DocumentPosition> {
+        if tsr_tspath::is_declaration_file_name(name)
+            || self.program.source_file(name).is_none()
+            || self.program.is_source_from_project_reference(
+                tsr_tspath::to_path(
+                    name,
+                    self.program.current_directory(),
+                    self.program.use_case_sensitive_file_names(),
+                )
+                .as_bytes(),
+            )
+        {
+            return None;
+        }
+        let declaration = self.program.declaration_output_name(name).ok()?;
+        let mapper = self
+            .source_maps
+            .entry(declaration.clone())
+            .or_insert_with(|| {
+                tsr_sourcemap::get_document_position_mapper(&MapHost(self.program), &declaration)
+            });
+        let generated = mapper.as_ref()?.get_generated_position(&DocumentPosition {
+            file_name: JsString::from_bytes(name),
+            pos: byte_position as isize,
+        })?;
+        MapHost(self.program).read_file(generated.file_name.as_bytes())?;
+        Some(generated)
     }
 
     // port: tsc/internal/ls/source_map.go:LanguageService.getMappedLocation
@@ -148,5 +185,59 @@ impl LanguageService<'_> {
             },
             fidelity,
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tsr_core::{CancellationToken, CompilerOptions, Tristate};
+
+    #[test]
+    fn generated_position_uses_declaration_dir_and_requires_loaded_source() {
+        let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
+        fs.insert_loaded(b"/src/index.ts", b"export const value = 1;".as_slice());
+        fs.insert_loaded(
+            b"/types/index.d.ts",
+            b"export declare const value: number;\n//# sourceMappingURL=index.d.ts.map".as_slice(),
+        );
+        fs.insert_loaded(b"/types/index.d.ts.map", br#"{"version":3,"file":"index.d.ts","sources":["../src/index.ts"],"names":[],"mappings":"qBAAa"}"#.as_slice());
+        let program = tsr_compiler::Program::load(
+            tsr_compiler::ProgramOptions {
+                config: tsr_tsoptions::ParsedCommandLine::new(
+                    CompilerOptions {
+                        no_lib: Tristate::TRUE,
+                        root_dir: JsString::from_bytes(b"/src".as_slice()),
+                        out_dir: JsString::from_bytes(b"/out".as_slice()),
+                        declaration_dir: JsString::from_bytes(b"/types".as_slice()),
+                        ..Default::default()
+                    },
+                    vec![JsString::from_bytes(b"/src/index.ts".as_slice())],
+                ),
+                host: Arc::new(fs.finish()),
+                current_directory: JsString::from_bytes(b"/".as_slice()),
+                default_library_path: JsString::default(),
+                skip_module_resolution: false,
+                single_threaded: Tristate::TRUE,
+            },
+            &mut tsr_compiler::FileCache::new(),
+            &tsr_arena::Counters::new(),
+        )
+        .unwrap();
+        let mut service = LanguageService::new(
+            &program,
+            tsr_jsstring::PositionEncoding::Utf16,
+            CancellationToken::new(),
+        );
+        let generated = service.generated_position(b"/src/index.ts", 13).unwrap();
+        assert_eq!(generated.file_name.as_bytes(), b"/types/index.d.ts");
+        assert_eq!(generated.pos, 21);
+        let source = service.source_position(b"/types/index.d.ts", 21).unwrap();
+        assert_eq!(source.file_name.as_bytes(), b"/src/index.ts");
+        assert_eq!(source.pos, 13);
+        assert!(service
+            .generated_position(b"/types/index.d.ts", 21)
+            .is_none());
+        assert!(service.generated_position(b"/not-loaded.ts", 0).is_none());
     }
 }

@@ -380,7 +380,7 @@ impl Connection {
             let project = fields.remove("project").ok_or_else(|| {
                 protocol::invalid("version 3 initialization requires project options")
             })?;
-            let (options, progress_delay) = match ProjectOptions::parse(project) {
+            let (mut options, progress_delay) = match ProjectOptions::parse(project) {
                 Ok(value) => value,
                 Err(message) => return self.send(protocol::failure(&id, -32602, &message, None)),
             };
@@ -417,11 +417,12 @@ impl Connection {
                         .options_callback_router(token, self.output.clone())?,
                 );
                 let bridge = self.bridge.as_ref().unwrap();
+                options.mapper_spawner = Some(bridge.mapper_spawner());
                 let (base, _) = bridge.filesystem();
                 let (fs, cancel) = bridge.filesystem();
                 return self.enqueue(
                     Action::Initialize {
-                        options,
+                        options: Box::new(options),
                         progress_delay,
                         compiler,
                         host: Arc::new(base),
@@ -556,6 +557,11 @@ impl Connection {
                 .map_or(Completion::Notification, Completion::Request);
             let (fs, cancel) = self.bridge.as_ref().unwrap().filesystem();
             return self.enqueue(action, Arc::new(fs), Arc::new(cancel), id, completion);
+        }
+        if let (Some(method), Some(bridge)) = (method, &self.bridge) {
+            if method.starts_with("test/stream") && bridge.mapper_notification(method, params)? {
+                return Ok(());
+            }
         }
         // S11's plugin streams and host methods continue on this connection.
         for response in self.session.receive(&message)? {

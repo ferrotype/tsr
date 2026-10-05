@@ -52,6 +52,7 @@ impl From<BridgeError> for Error {
 struct Pending {
     request: Arc<AtomicBool>,
     reply: Sender<Result<Value, BridgeError>>,
+    mapper_spawn: bool,
 }
 #[derive(Default)]
 struct State {
@@ -62,6 +63,7 @@ struct Shared {
     ids: CallbackIds,
     outgoing: Sender<Json>,
     state: Mutex<State>,
+    mappers: Arc<crate::mapper_streams::Streams>,
 }
 
 /// Owned by the input router, never by a worker. Dropping it disconnects all
@@ -75,6 +77,7 @@ impl CallbackRouter {
         Self {
             shared: Arc::new(Shared {
                 ids,
+                mappers: Arc::new(crate::mapper_streams::Streams::new(outgoing.clone())),
                 outgoing,
                 state: Mutex::new(State::default()),
             }),
@@ -107,11 +110,39 @@ impl CallbackRouter {
             .pending
             .remove(id);
         if let Some(pending) = pending {
+            let result = if pending.mapper_spawn {
+                result.and_then(|value| {
+                    if value.as_object().is_none_or(|fields| fields.len() != 1) {
+                        return Err(BridgeError::InvalidReply);
+                    }
+                    let name = value
+                        .get("stream")
+                        .and_then(Value::as_str)
+                        .ok_or(BridgeError::InvalidReply)?;
+                    self.shared
+                        .mappers
+                        .open(name)
+                        .map_err(|_| BridgeError::InvalidReply)?;
+                    Ok(value)
+                })
+            } else {
+                result
+            };
             let _ = pending.reply.send(result);
             true
         } else {
             false
         }
+    }
+    pub fn mapper_spawner(&self) -> Arc<dyn tsr_contentmapper::Spawner> {
+        let (callbacks, _) = self.filesystem();
+        Arc::new(crate::mapper_streams::Spawner::new(
+            callbacks,
+            self.shared.mappers.clone(),
+        ))
+    }
+    pub fn mapper_notification(&self, method: &str, params: &RawValue) -> std::io::Result<bool> {
+        self.shared.mappers.notification(method, params)
     }
     pub fn pending_count(&self) -> usize {
         self.shared
@@ -134,6 +165,7 @@ impl Drop for CallbackRouter {
 }
 impl Shared {
     fn stop(&self, error: BridgeError) {
+        self.mappers.close_all();
         let pending = {
             let mut state = self.state.lock().expect("callback state poisoned");
             state.stopped.get_or_insert(error);
@@ -191,6 +223,40 @@ pub struct CallbackFs {
     request: Arc<AtomicBool>,
 }
 impl CallbackFs {
+    pub(crate) fn spawn_mapper(&self, params: &RawValue) -> Result<Value, BridgeError> {
+        let receiver = {
+            let mut state = self.shared.state.lock().expect("callback state poisoned");
+            if let Some(error) = state.stopped {
+                return Err(error);
+            }
+            if state.pending.len() >= 64 {
+                return Err(BridgeError::TooManyPending);
+            }
+            let id = self.shared.ids.next().ok_or(BridgeError::Retired)?;
+            let frame =
+                wire!({"jsonrpc":"2.0", "id":id, "method":"testhost/spawnPlugin", "params":params});
+            if !fits(&frame) {
+                return Err(BridgeError::InvalidReply);
+            }
+            let (reply, receiver) = mpsc::channel();
+            state.pending.insert(
+                id.clone(),
+                Pending {
+                    request: self.request.clone(),
+                    reply,
+                    mapper_spawn: true,
+                },
+            );
+            if self.shared.outgoing.send(frame).is_err() {
+                state.pending.remove(&id);
+                drop(state);
+                self.shared.stop(BridgeError::Disconnected);
+                return Err(BridgeError::Disconnected);
+            }
+            receiver
+        };
+        receiver.recv().map_err(|_| BridgeError::Disconnected)?
+    }
     fn call(&self, operation: &str, path: &[u8]) -> Result<Value, Error> {
         let path = std::str::from_utf8(path).map_err(|_| Error::InvalidPath)?;
         let receiver = {
@@ -226,6 +292,7 @@ impl CallbackFs {
                 Pending {
                     request: self.request.clone(),
                     reply,
+                    mapper_spawn: false,
                 },
             );
             // Unbounded mpsc send only queues a frame. Holding the short state

@@ -729,6 +729,12 @@ must not leave an external child or leased bundle behind.
 passes; transport LSP cases pass. Replay variants still being prepared in L7
 remain explicit pending cases, not claimed complete here.
 
+L6 implementation and focused checks are recorded in
+[PHASE5-L6.md](PHASE5-L6.md): project-reference source hosts, delayed/reference
+trees, cross-project requests, retained API handles, ATA, mapper lifecycle and
+S11 execution are integrated. Full retained replay and latency remain L7; the
+focused tests do not claim the entire native project/fourslash inventory.
+
 ### L7 — residuals, replay and latency
 
 1. Fix remaining fourslash failures by shared cause and then individual case.

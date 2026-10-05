@@ -1,3 +1,4 @@
+mod resources;
 use super::*;
 use crate::project::{ProgramUpdateKind, INFERRED_PROJECT_NAME};
 use tsr_core::{ScriptKind, Tristate};

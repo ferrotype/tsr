@@ -130,8 +130,7 @@ impl SourceFileCache for ParseCache {
     }
 }
 
-/// The mapper cache owns a complete bundle under one key. Its production
-/// mapper caller arrives in L6; the ordinary parse cache never admits one.
+/// The mapper cache owns a complete bound bundle under one key.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct ContentMappedParseCacheKey {
     file_name: JsString,
@@ -175,10 +174,7 @@ impl ContentMappedParseCacheKey {
     }
 }
 
-pub struct ContentMappedSourceFiles {
-    pub canonical: Arc<ProgramFile>,
-    pub supplemental: Vec<Arc<ProgramFile>>,
-}
+pub use tsr_compiler::MappedProgramFiles as ContentMappedSourceFiles;
 pub struct ContentMappedParseCache {
     entries: RefCountCache<ContentMappedParseCacheKey, Arc<ContentMappedSourceFiles>>,
 }
@@ -213,6 +209,78 @@ impl ContentMappedParseCache {
             key: key.clone(),
             files,
         })
+    }
+    pub fn acquire_mapped(
+        self: &Arc<Self>,
+        request: &tsr_compiler::MappedSourceFileRequest<'_>,
+        locale: &str,
+    ) -> tsr_compiler::MappedFileResult<tsr_compiler::CachedMappedProgramFiles> {
+        let identity = match request.project.identity(request.mapper_index) {
+            Ok(identity) => identity,
+            Err(error) => {
+                return Ok(Err(tsr_contentmapper::transform_error(
+                    tsr_contentmapper::TransformErrorKind::Project,
+                    Some(error),
+                )));
+            }
+        };
+        let key = ContentMappedParseCacheKey::new(
+            request.options,
+            xxhash_rust::xxh3::xxh3_128(request.content),
+            xxhash_rust::xxh3::xxh3_128(identity.as_bytes()),
+            locale,
+        );
+        enum Failure {
+            Compiler(Error),
+            Mapper(tsr_contentmapper::Error),
+        }
+        let files = self.entries.acquire_or_error(&key, || {
+            request
+                .transform(Some(tsr_ast::SourceHash {
+                    hi: (key.hash >> 64) as u64,
+                    lo: key.hash as u64,
+                }))
+                .map_err(Failure::Compiler)?
+                .map_err(Failure::Mapper)
+        });
+        match files {
+            Ok(files) => Ok(Ok(tsr_compiler::CachedMappedProgramFiles {
+                files: files.clone(),
+                retention: Box::new(ContentMappedLease {
+                    cache: self.clone(),
+                    key,
+                    files,
+                }),
+            })),
+            Err(Failure::Compiler(error)) => Err(error),
+            Err(Failure::Mapper(error)) => Ok(Err(error)),
+        }
+    }
+    pub fn retain(
+        self: &Arc<Self>,
+        file: &Arc<ProgramFile>,
+    ) -> Result<Box<dyn Send + Sync>, Error> {
+        let source = file.bound().view().source_file()?;
+        if source.is_content_mapper_supplemental() || source.is_content_mapper_failure_stub() {
+            return Ok(Box::new(()));
+        }
+        let key = ContentMappedParseCacheKey::from_file(file)?;
+        let files = self.entries.acquire_or_error(&key, || {
+            Err(Error::Unsupported(
+                "mapped program reuse requires a live bundle-cache entry",
+            ))
+        })?;
+        let lease = ContentMappedLease {
+            cache: self.clone(),
+            key,
+            files,
+        };
+        if lease.files.canonical.source() != file.source() {
+            return Err(Error::Unsupported(
+                "mapped program reuse across different bundle-cache identities",
+            ));
+        }
+        Ok(Box::new(lease))
     }
 }
 pub struct ContentMappedLease {

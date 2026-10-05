@@ -333,23 +333,26 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
     pub(crate) fn append(&mut self, node: NodeId, symbol: SymbolRef) -> Result<()> {
         self.append_kind(node, symbol, EntryKind::Node)
     }
+    fn reference_group(&mut self, symbol: SymbolRef) -> &mut ReferenceGroup {
+        let index = self
+            .result
+            .iter()
+            .position(|group| group.kind == DefinitionKind::Symbol && group.symbol == Some(symbol))
+            .unwrap_or_else(|| {
+                self.result.push(ReferenceGroup {
+                    kind: DefinitionKind::Symbol,
+                    symbol: Some(symbol),
+                    node: None,
+                    entries: Vec::new(),
+                });
+                self.result.len() - 1
+            });
+        &mut self.result[index]
+    }
     fn append_kind(&mut self, node: NodeId, symbol: SymbolRef, kind: EntryKind) -> Result<()> {
         let mut entry = self.entry(node)?;
         entry.kind = kind;
-        if let Some(group) = self
-            .result
-            .iter_mut()
-            .find(|g| g.kind == DefinitionKind::Symbol && g.symbol == Some(symbol))
-        {
-            group.entries.push(entry);
-        } else {
-            self.result.push(ReferenceGroup {
-                kind: DefinitionKind::Symbol,
-                symbol: Some(symbol),
-                node: None,
-                entries: vec![entry],
-            });
-        }
+        self.reference_group(symbol).entries.push(entry);
         Ok(())
     }
     // port: tsc/internal/ls/findallreferences.go:refState.addReference
@@ -358,8 +361,11 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
     }
     fn add_kind(&mut self, node: NodeId, symbol: SymbolRef, kind: EntryKind) -> Result<()> {
         if self.options.implementations {
+            // The definition survives even when this project has no local
+            // implementation. Cross-project discovery still needs that symbol.
+            self.reference_group(symbol);
             for n in self.implementation_nodes(node)? {
-                self.append(n, symbol)?;
+                self.append_kind(n, symbol, kind)?;
             }
         } else {
             self.append_kind(node, symbol, kind)?;

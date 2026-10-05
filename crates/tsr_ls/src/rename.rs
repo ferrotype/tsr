@@ -48,7 +48,7 @@ fn refused(message: &tsr_diagnostics::Message, locale: &tsr_locale::Locale) -> R
     }
 }
 // port: tsc/internal/ls/rename.go:nodeIsEligibleForRename
-fn eligible(view: tsr_ast::AstView<'_>, node: NodeId) -> Result<bool> {
+pub(crate) fn eligible(view: tsr_ast::AstView<'_>, node: NodeId) -> Result<bool> {
     Ok(match view.node(node)?.kind().known() {
         Some(
             K::Identifier

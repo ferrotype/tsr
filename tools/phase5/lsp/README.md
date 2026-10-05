@@ -1,8 +1,8 @@
-# Language server development checks (L2–L5)
+# Language server development checks (L2–L6)
 
 L2 connects the generated protocol to production project sessions and compiler
 diagnostics. `tsrust --lsp --stdio` and the private version-3 endpoint use the
-same runtime. Unported L6 service methods return a named `-32601` error; their pinned
+same runtime. Any unported service method returns a named `-32601` error; its pinned
 capabilities remain declared so the protocol surface does not drift during the
 port. This is not a complete editor server yet.
 
@@ -76,7 +76,7 @@ files, or claim semantic corpus passes.
 | `server_test.go` outgoing queue, shutdown, serialization failure | `tests`, `rpc_client::tests`, private endpoint tests: the reader remains available during reverse calls; cancellation and shutdown settle waiting work; bad serialization fails one request |
 | Server recovery and logger internals | `recovery::tests`, `logger::tests`: subsequent work survives a panic; telemetry is opt-in and redacts unknown frames; filtering and stderr fallback |
 | `stack_sanitizer_test.go` | All three committed native sanitizer baselines plus unknown-frame redaction |
-| `server_contentmapper_internal_test.go` parsing | Contribution identity, options, duplicate extension casing, manifest/extension/cwd/compiler-option validation. Installation, mapper tracing and execution remain L6 |
+| `server_contentmapper_internal_test.go` parsing | Contribution identity, options, duplicate extension casing, manifest/extension/cwd/compiler-option validation. L6 adds production host installation, trace-gated logging and stream execution; see the L6 record |
 | `lspwatcher_test.go` fake backend | Registration/removal, overflow/kind filtering, missing ancestor promotion, atomic creation race, termination and recreation, synthetic depth, stale callbacks after ID reuse, close during blocked registration and late-subscription disposal |
 | `lspwatcher_test.go` real backend | Missing directory followed by creation and descendant change, on a fast-recursive native backend |
 | `lsconv/converters_test.go` | Invalid bytes, UTF-8/UTF-16, CRLF/U+2028, feature ranges, canonical/supplemental source identity and complete source-file projection expansion. URI tests remain in L0 and position algorithms retain S04 coverage |
@@ -251,3 +251,20 @@ cargo fmt --all
 The generator reads the pinned module graph without editing the upstream tree.
 The generated data supports the pin's comparison algorithm; it is not a new
 locale-dependent ICU collation implementation.
+
+## L6 project trees, ATA and mappers
+
+See [the implementation record](../../../docs/PHASE5-L6.md). The focused native
+project runner opens only a declaration-owner project, then exercises requests
+that must discover unopened consumers in both position encodings:
+
+```sh
+python3 tools/phase5/lsp/projects.py
+python3 tools/phase5/project/check.py
+python3 tools/phase5/lsp/check.py --tests '^TestSetContentMapperContributionsBeforeDidOpen$'
+```
+
+The client test uses S11 streams and the real mapper host. It leaves the pinned
+client's assertions intact. ATA unit tests inject an npm executor; no ordinary
+check installs packages from a registry. The real npm integration test is
+explicitly ignored and requires an opt-in manual run.

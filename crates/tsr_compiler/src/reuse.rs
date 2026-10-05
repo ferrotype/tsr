@@ -83,14 +83,19 @@ impl Program {
                     file: None,
                 });
             };
-            let Ok(parsed) = tsr_contentmapper::transform_and_parse(
-                old_source.parse_options(),
-                content.text.as_bytes(),
-                mapper,
-                mapper_index,
-                project.as_ref(),
-                counters,
-            ) else {
+            let Ok(files) = cache.acquire_mapped(
+                &crate::MappedSourceFileRequest {
+                    options: &old_source.content_mapper_parse_options(),
+                    content: content.text.as_bytes(),
+                    mapper,
+                    mapper_index,
+                    project: project.as_ref(),
+                    counters,
+                    tracing: self.tracing.as_ref(),
+                },
+                host.as_ref(),
+            )?
+            else {
                 // A full loader pass owns mapper failure diagnostics and budgets.
                 return Ok(ProgramReuse {
                     _source_retention: source_retention.clone(),
@@ -98,24 +103,7 @@ impl Program {
                     file: None,
                 });
             };
-            if tsr_contentmapper::check_supplemental_file_name_collisions(&parsed, &mut |name| {
-                host.file_exists(name).unwrap_or(false)
-            })
-            .is_err()
-            {
-                return Ok(ProgramReuse {
-                    _source_retention: source_retention.clone(),
-                    program: None,
-                    file: None,
-                });
-            }
-            let canonical = super::bind(parsed.canonical, self.tracing.as_ref())?;
-            let supplemental = parsed
-                .supplemental
-                .into_iter()
-                .map(|file| super::bind(file, self.tracing.as_ref()))
-                .collect::<Result<Vec<_>, _>>()?;
-            (canonical, supplemental)
+            (files.canonical.clone(), files.supplemental.clone())
         };
         let failure = || ProgramReuse {
             _source_retention: source_retention.clone(),
@@ -216,7 +204,10 @@ impl Program {
                 self.package_resolver
                     .lock()
                     .unwrap_or_else(std::sync::PoisonError::into_inner)
-                    .fork_for_host(host.clone()),
+                    .fork_for_host(
+                        self.references
+                            .resolution_host_for_snapshot(&host, &self.cwd),
+                    ),
             ),
             include_explanations: IncludeExplanations::default(),
             diagnostic_snapshot: crate::program_diagnostics::ProgramDiagnostics::default(),
@@ -235,6 +226,7 @@ impl Program {
             default_lib_files: self.default_lib_files.clone(),
             missing: self.missing.clone(),
             resolutions: self.resolutions.clone(),
+            unresolved_imports: self.unresolved_imports.clone(),
             type_resolutions: self.type_resolutions.clone(),
             loader_diagnostics: self.loader_diagnostics.clone(),
             processing_diagnostics: self

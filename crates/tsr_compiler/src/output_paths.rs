@@ -204,6 +204,13 @@ pub(crate) fn module_specifier_output_name(
 }
 
 impl Program {
+    /// Declaration output identity independent of emit flags. Language-service
+    /// reverse source maps use the same worker as actual declaration emission.
+    pub fn declaration_output_name(&self, file_name: &[u8]) -> Result<Vec<u8>, tsr_arena::Error> {
+        let common = self.common_source_directory()?;
+        Ok(module_specifier_output_name(file_name, self, &common, true))
+    }
+
     /// The files whose JavaScript `Program.Emit` transforms, in program order:
     /// the emitted files with a JavaScript output path that `noEmit` and the
     /// blocked outputs leave in place, as `emitter.emitJSFile` selects them.

@@ -212,12 +212,17 @@ func (d *projectionDecoder) decode(t *testing.T, data stateData, fs vfs.FS) *wir
 			files = append(files, old)
 		}
 		key := string(p.Program)
-		program := d.programs[key]
-		if program == nil {
-			program = &wireProgram{files}
-			d.programs[key] = program
-		} else if !slices.Equal(program.files, files) {
-			t.Fatal("program identity reused for different files")
+		var program *wireProgram
+		if key != "null" && key != `"0x0"` {
+			program = d.programs[key]
+			if program == nil {
+				program = &wireProgram{files}
+				d.programs[key] = program
+			} else if !slices.Equal(program.files, files) {
+				t.Fatal("program identity reused for different files")
+			}
+		} else if len(files) != 0 {
+			t.Fatal("delayed project has source files")
 		}
 		c.projects = append(c.projects, &wireProject{p.Name, program})
 	}

@@ -101,9 +101,7 @@ pub struct TypeResolution {
     pub result: ResolvedTypeReferenceDirective,
 }
 /// Published only after every required operation succeeds. This contains loader,
-/// bind and option-verification results. Content-mapper execution, the editor's
-/// source-of-reference mode and checker construction remain explicit
-/// unsupported boundaries.
+/// bind and option-verification results.
 pub struct Program {
     _source_retention: crate::cache::ProgramRetention,
     tracing: Option<Arc<dyn TraceSink>>,
@@ -138,6 +136,7 @@ pub struct Program {
     default_lib_files: BTreeMap<JsString, LibFile>,
     missing: Vec<JsString>,
     resolutions: Vec<Resolution>,
+    unresolved_imports: OnceLock<BTreeSet<JsString>>,
     type_resolutions: Vec<TypeResolution>,
     loader_diagnostics: Vec<Diagnostic>,
     /// Collection's processing diagnostics in the pin's order, converted when
@@ -159,6 +158,7 @@ pub struct Program {
 /// program retains the returned configuration owners.
 #[derive(Default)]
 pub struct ProgramHostServices<'a> {
+    pub typings_location: JsString,
     pub content_mapper_project: Option<Arc<dyn tsr_contentmapper::Project>>,
     pub tracing: Option<Arc<dyn TraceSink>>,
     pub resolved_project_references: Option<&'a dyn ResolvedProjectReferenceProvider>,
@@ -235,8 +235,7 @@ impl Program {
     }
     /// `load` for a host that asks for the source of each project reference
     /// instead of its built output (the pin's `UseSourceOfProjectReference`).
-    /// That mode is the editor's; a program whose references have outputs is
-    /// rejected unless `disableSourceOfProjectReferenceRedirect` is set.
+    /// `disableSourceOfProjectReferenceRedirect` restores output loading.
     pub fn load_with_source_of_project_reference(
         options: ProgramOptions,
         use_source_of_project_reference: bool,
@@ -266,14 +265,23 @@ impl Program {
     ) -> Result<Self, Error> {
         Loader::new(options, None, cache, counters, true, false)?.run()
     }
-    /// Session loading uses the editor's source-of-reference mode. The existing
-    /// explicit faking-host boundary remains until that host is supplied.
+    /// Session loading uses the editor's source-of-reference mode.
     pub fn load_live_for_project(
         options: ProgramOptions,
         cache: &mut FileCache,
         counters: &Counters,
     ) -> Result<Self, Error> {
         Loader::new(options, None, cache, counters, true, true)?.run()
+    }
+    /// Session loading with its mapper project and retained reference configs.
+    /// The caller keeps the live host stable throughout construction.
+    pub fn load_live_for_project_with_host_services(
+        options: ProgramOptions,
+        services: ProgramHostServices<'_>,
+        cache: &mut FileCache,
+        counters: &Counters,
+    ) -> Result<Self, Error> {
+        Loader::new_with_services(options, services, cache, counters, true, true)?.run()
     }
     pub fn is_source_from_project_reference(&self, path: &[u8]) -> bool {
         self.references.is_source_from_project_reference(path)
@@ -537,6 +545,37 @@ impl Program {
     pub fn missing_files(&self) -> &[JsString] {
         &self.missing
     }
+    // port: tsc/internal/compiler/program.go:Program.GetUnresolvedImports
+    pub fn unresolved_imports(&self) -> &BTreeSet<JsString> {
+        self.unresolved_imports.get_or_init(|| {
+            self.resolutions
+                .iter()
+                .filter(|resolution| {
+                    (!resolution.result.is_resolved()
+                        || !matches!(
+                            resolution.result.extension.as_bytes(),
+                            b".ts"
+                                | b".tsx"
+                                | b".d.ts"
+                                | b".cts"
+                                | b".d.cts"
+                                | b".mts"
+                                | b".d.mts"
+                                | b".json"
+                        ))
+                        && !tsr_module::is_relative(resolution.name.as_bytes())
+                })
+                .map(|resolution| resolution.name.clone())
+                .collect()
+        })
+    }
+    pub fn global_typings_cache_location(&self) -> JsString {
+        self.package_resolver
+            .lock()
+            .expect("retained package resolver poisoned")
+            .typings_location()
+            .clone()
+    }
     pub fn resolutions(&self) -> &[Resolution] {
         &self.resolutions
     }
@@ -582,6 +621,22 @@ impl Program {
             .range_resolved_project_reference(&self.config, &mut |path, config, parent, index| {
                 f(path.as_bytes(), config, parent, index)
             })
+    }
+    pub fn resolved_project_references(&self) -> impl Iterator<Item = Option<&ParsedCommandLine>> {
+        self.references.resolved_project_references()
+    }
+
+    pub fn range_resolved_project_reference_in_child_config(
+        &self,
+        child: &ParsedCommandLine,
+        mut f: impl FnMut(&[u8], Option<&ParsedCommandLine>, &ParsedCommandLine, usize) -> bool,
+    ) -> bool {
+        self.references
+            .range_resolved_project_reference_in_child_config(
+                &self.config,
+                child,
+                &mut |path, config, parent, index| f(path.as_bytes(), config, parent, index),
+            )
     }
     /// The options a file was loaded with: its project reference's when it is
     /// that reference's source or output, otherwise the program's.
@@ -749,8 +804,7 @@ fn can_use_project_reference_source(
 }
 /// Builds the mapper every program has, reading the referenced configs when
 /// there are any. The source-of-reference mode swaps in a declaration-faking
-/// resolution host when references have outputs; that host is the editor's
-/// and is an explicit boundary here.
+/// resolution host when references have outputs.
 /// port: tsc/internal/compiler/fileloader.go:fileLoader.addProjectReferenceTasks
 fn add_project_reference_tasks(
     config: &ParsedCommandLine,
@@ -770,11 +824,6 @@ fn add_project_reference_tasks(
         .with_tracing(tracing)
         .with_reference_provider(reference_provider)
         .parse(references, config.config_file.as_ref())?;
-    if can_use_source && mapper.has_outputs() {
-        return Err(Error::Unsupported(
-            "project-reference source redirection (newProjectReferenceDtsFakingHost)",
-        ));
-    }
     Ok(mapper)
 }
 impl<'a> Loader<'a> {
@@ -830,6 +879,7 @@ impl<'a> Loader<'a> {
             content_mapper_project,
             tracing,
             resolved_project_references,
+            typings_location,
         } = services;
         let content_mappers = crate::content_mapped::ContentMapperState::new(
             content_mapper_project,
@@ -837,7 +887,7 @@ impl<'a> Loader<'a> {
         );
         let can_use_project_reference_source =
             can_use_project_reference_source(use_source_of_project_reference, &input.config);
-        let references = add_project_reference_tasks(
+        let mut references = add_project_reference_tasks(
             &input.config,
             can_use_project_reference_source,
             &input.host,
@@ -848,12 +898,13 @@ impl<'a> Loader<'a> {
         )?;
         let options = Arc::new(input.config.options.clone());
         let resolver = Resolver::with_options(
-            input.host.clone(),
+            references.resolution_host(&input.host),
             options.clone(),
             input.current_directory.as_bytes(),
             tsr_module::ResolverOptions {
                 allow_live_host,
                 extra_extensions: content_mappers.extensions.clone(),
+                typings_location,
                 ..Default::default()
             },
         )?;
@@ -1185,6 +1236,7 @@ impl<'a> Loader<'a> {
             default_lib_files,
             missing: collected.missing,
             resolutions: self.resolutions,
+            unresolved_imports: OnceLock::new(),
             type_resolutions: self.type_resolutions,
             loader_diagnostics: self.diagnostics,
             processing_diagnostics: collected.processing,
@@ -1372,7 +1424,11 @@ impl<'a> Loader<'a> {
             Default::default,
             false,
         );
-        let names = self.resolver.automatic_type_directive_names()?;
+        let names = tsr_module::automatic_type_directive_names(
+            &self.options,
+            self.host.as_ref(),
+            self.cwd.as_bytes(),
+        )?;
         let directory = if self.options.config_file_path.is_empty() {
             self.cwd.as_bytes().to_vec()
         } else {
@@ -1727,7 +1783,7 @@ impl<'a> Loader<'a> {
             self.skip_resolution,
         )?;
         let file = match supplemental {
-            Some(parsed) => Some(bind(parsed, self.tracing.as_ref())?),
+            Some(file) => Some(file),
             None => self.parse_source_file(&name, &key, &meta, kind)?,
         };
         let Some(file) = file else {
@@ -1930,17 +1986,18 @@ impl<'a> Loader<'a> {
                 return Ok(Some(bind(file, self.tracing.as_ref())?));
             }
         };
-        for file in files.supplemental {
+        for file in &files.supplemental {
             let name = file
+                .bound()
                 .view()
-                .source_file(file.root())?
+                .source_file()?
                 .parse_options()
                 .file_name
                 .clone();
             let key = self.to_path(name.as_bytes());
-            self.content_mappers.supplementals.insert(key, file);
+            self.content_mappers.supplementals.insert(key, file.clone());
         }
-        Ok(Some(bind(files.canonical, self.tracing.as_ref())?))
+        Ok(Some(files.canonical.clone()))
     }
     /// The host's transform of one content-mapped file, with the collision
     /// check on its supplemental names.
@@ -1950,7 +2007,7 @@ impl<'a> Loader<'a> {
         options: &SourceFileParseOptions,
         mapper: &tsr_tsoptions::config_mappers::ContentMapper,
         index: usize,
-    ) -> Result<Result<Option<tsr_contentmapper::SourceFiles>, tsr_contentmapper::Error>, Error>
+    ) -> Result<Result<Option<Arc<crate::MappedProgramFiles>>, tsr_contentmapper::Error>, Error>
     {
         let Some(project) = self.content_mappers.project.clone() else {
             // ErrProjectUnavailable
@@ -1961,23 +2018,20 @@ impl<'a> Loader<'a> {
         let Some(content) = self.host.read_file(options.file_name.as_bytes())? else {
             return Ok(Ok(None));
         };
-        let files = match tsr_contentmapper::transform_and_parse(
-            options,
-            content.text.as_bytes(),
-            mapper,
-            index,
-            project.as_ref(),
-            self.counters,
-        ) {
-            Ok(files) => files,
-            Err(error) => return Ok(Err(error)),
-        };
-        let host = self.host.clone();
-        let mut exists = |name: &[u8]| host.file_exists(name).unwrap_or(false);
-        Ok(
-            tsr_contentmapper::check_supplemental_file_name_collisions(&files, &mut exists)
-                .map(|()| Some(files)),
-        )
+        self.cache
+            .acquire_mapped(
+                &crate::MappedSourceFileRequest {
+                    options,
+                    content: content.text.as_bytes(),
+                    mapper,
+                    mapper_index: index,
+                    project: project.as_ref(),
+                    counters: self.counters,
+                    tracing: self.tracing.as_ref(),
+                },
+                self.host.as_ref(),
+            )
+            .map(|result| result.map(Some))
     }
     /// port: tsc/internal/compiler/fileloader.go:fileLoader.getContentMapperTransformIdentity
     fn content_mapper_transform_identity(

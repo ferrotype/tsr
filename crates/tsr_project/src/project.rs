@@ -22,6 +22,11 @@ pub enum ProgramUpdateKind {
 
 #[derive(Clone)]
 pub struct ProjectData {
+    pub installed_typings_info: Option<Arc<crate::ata::TypingsInfo>>,
+    pub typings_files: Vec<JsString>,
+    pub typings_watch: Option<Arc<crate::watch::WatchedFiles>>,
+    pub content_mapper_watch: Arc<crate::watch::WatchedFiles>,
+    pub content_mapper_watched_files: std::collections::BTreeSet<JsString>,
     pub program_files_watch: Arc<crate::watch::WatchedFiles>,
     pub name: JsString,
     pub path: JsString,

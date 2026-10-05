@@ -13,9 +13,9 @@ use crate::{
     Snapshot,
 };
 use std::{
-    collections::{BTreeMap, BTreeSet},
+    collections::BTreeMap,
     sync::{
-        atomic::{AtomicU64, Ordering},
+        atomic::{AtomicBool, AtomicU64, Ordering},
         Arc, Mutex, OnceLock, RwLock,
     },
 };
@@ -25,6 +25,8 @@ use tsr_jsstring::{JsString, PositionEncoding};
 use tsr_lsproto::{DocumentUri, LanguageKind, TextDocumentContentChangePartialOrWholeDocument};
 use tsr_vfs::FileSystem;
 
+mod api;
+mod ata;
 mod build;
 #[cfg(test)]
 mod tests;
@@ -36,6 +38,13 @@ pub struct SessionOptions {
     pub default_library_path: JsString,
     pub position_encoding: PositionEncoding,
     pub run_external_code: bool,
+    pub background_context: tsr_ipc::Context,
+    pub typings_location: JsString,
+    pub npm_executor: Option<Arc<dyn crate::ata::NpmExecutor>>,
+    pub disable_automatic_type_acquisition: bool,
+    pub mapper_spawner: Option<Arc<dyn tsr_contentmapper::Spawner>>,
+    pub mapper_logger: Option<tsr_contentmapper::Logger>,
+    pub locale: tsr_locale::Locale,
     pub query_checkers: usize,
     pub relative_watch_patterns: bool,
     pub debounce_delay: std::time::Duration,
@@ -46,6 +55,10 @@ pub struct SessionOptions {
 /// invokes no client code under the session's update lock. The receiver owns
 /// delivery; snapshots retain all files used to format the notifications.
 pub enum SessionEvent {
+    InstallingTypes {
+        name: JsString,
+        finished: bool,
+    },
     ProjectLoading {
         name: JsString,
         finished: bool,
@@ -67,6 +80,13 @@ impl Default for SessionOptions {
             default_library_path: JsString::from_bytes(b"/".as_slice()),
             position_encoding: PositionEncoding::Utf16,
             run_external_code: false,
+            background_context: tsr_ipc::Context::background(),
+            typings_location: JsString::default(),
+            npm_executor: None,
+            disable_automatic_type_acquisition: false,
+            mapper_spawner: None,
+            mapper_logger: None,
+            locale: tsr_locale::Locale::default(),
             query_checkers: 3,
             relative_watch_patterns: false,
             debounce_delay: std::time::Duration::ZERO,
@@ -107,18 +127,32 @@ impl std::error::Error for Error {}
 
 #[derive(Default)]
 struct Pending {
+    mapper_locale_changed: bool,
+    ata_changes: BTreeMap<JsString, ata::AtaChange>,
+    ata_changed: bool,
     changes: Vec<FileChange>,
     inferred: Option<Arc<CompilerOptions>>,
     custom_name: Option<JsString>,
+    contributions: Option<Arc<crate::content_mappers::Contributions>>,
 }
 impl Pending {
     fn is_empty(&self) -> bool {
-        self.changes.is_empty() && self.inferred.is_none() && self.custom_name.is_none()
+        self.ata_changes.is_empty()
+            && !self.ata_changed
+            && !self.mapper_locale_changed
+            && self.changes.is_empty()
+            && self.inferred.is_none()
+            && self.custom_name.is_none()
+            && self.contributions.is_none()
     }
 }
 
 pub struct Session {
+    ata: ata::BackgroundAta,
+    ata_disabled: AtomicBool,
     options: SessionOptions,
+    mapper_host: Option<crate::content_mappers::MapperHost>,
+    context: tsr_ipc::Context,
     fs: Arc<dyn FileSystem>,
     counters: Counters,
     parse_cache: Arc<ParseCache>,
@@ -202,12 +236,28 @@ impl Session {
             fs: SnapshotFs::empty(fs.clone(), options.current_directory.clone()),
             configs: Arc::new(ConfigFileRegistry::default()),
             projects: BTreeMap::new(),
+            delayed_projects: BTreeMap::new(),
             defaults: BTreeMap::new(),
+            contributions: Arc::new(crate::content_mappers::Contributions::default()),
+            api_state: crate::api::ApiState::default(),
+            api_error: None,
             inferred_options: None,
             config_ownership: Arc::new(ConfigOwnership::new(extended_cache.clone(), id)),
             _programs: Vec::new(),
         };
+        let context = options.background_context.with_cancel();
+        let mapper_host = crate::content_mappers::MapperHost::new(
+            options.run_external_code,
+            options.mapper_spawner.clone(),
+            &context,
+            options.locale.clone(),
+            options.mapper_logger.clone(),
+        );
         Arc::new_cyclic(|weak| Self {
+            ata: ata::BackgroundAta::new(weak.clone(), &options, fs.clone()),
+            ata_disabled: AtomicBool::new(options.disable_automatic_type_acquisition),
+            mapper_host,
+            context,
             timers: timers::Timers::new(weak.clone(), clock),
             options,
             fs,
@@ -326,9 +376,17 @@ impl Session {
     }
     pub fn wait_for_background_tasks(&self) {
         self.timers.wait();
+        self.ata.wait();
+        self.timers.wait();
         if let Some(watches) = self.watches.get() {
             watches.wait();
         }
+    }
+    pub(super) fn enqueue_background(
+        &self,
+        task: impl FnOnce(tsr_core::CancellationToken) + Send + 'static,
+    ) -> bool {
+        self.timers.enqueue(task)
     }
     pub fn take_background_errors(&self) -> Vec<Error> {
         self.timers.take_errors()
@@ -364,9 +422,16 @@ impl Session {
                         ),
                     );
         if change.kind == FileChangeKind::Change {
-            // Ordinary document edits trigger client-side diagnostic pulls.
-            // Content-mapped document refreshes are connected in L6.
-            self.timers.cancel(timers::Kind::DiagnosticsRefresh);
+            let (extensions, _) = snapshot.state().unwrap().mapper_watch_state();
+            if tsr_tspath::file_extension_is_one_of(change.uri.file_name().as_bytes(), &extensions)
+            {
+                self.timers.schedule(
+                    timers::Kind::DiagnosticsRefresh,
+                    self.options.debounce_delay,
+                );
+            } else {
+                self.timers.cancel(timers::Kind::DiagnosticsRefresh);
+            }
         }
         self.pending
             .lock()
@@ -388,6 +453,7 @@ impl Session {
     ) -> Result<(), Error> {
         let snapshot = self.snapshot()?;
         let state = snapshot.state().unwrap();
+        let (mapper_extensions, mapper_watched_files) = state.mapper_watch_state();
         let mut pending = Vec::new();
         let mut relevant = false;
         let mut config = false;
@@ -404,7 +470,9 @@ impl Session {
                 self.options.current_directory.as_bytes(),
                 self.fs.use_case_sensitive_file_names(),
             );
-            config |= state.configs.configs.contains_key(&path);
+            config |=
+                state.configs.configs.contains_key(&path) || mapper_watched_files.contains(&path);
+            relevant |= mapper_watched_files.contains(&path);
             if !relevant {
                 let path = tsr_tspath::remove_trailing_directory_separator(path.as_bytes());
                 let ext = path
@@ -423,7 +491,7 @@ impl Session {
                 } else {
                     relevant = crate::snapshot_fs::has_relevant_extension(path);
                 }
-                // Content-mapper extensions and watched files are connected in L6.
+                relevant |= tsr_tspath::file_extension_is_one_of(path, &mapper_extensions);
             }
             pending.push(FileChange::new(kind, event.uri));
         }
@@ -534,6 +602,35 @@ impl Session {
     }
     /// Returns the snapshot as well as the selection: callers retain its program,
     /// config and filesystem roots for the complete request.
+    // port: tsc/internal/project/session.go:Session.SetContentMapperContributions
+    pub fn set_content_mapper_contributions(
+        &self,
+        contributions: crate::content_mappers::Contributions,
+        documents: Vec<DocumentUri>,
+    ) -> Result<Snapshot, Error> {
+        if !self.options.run_external_code {
+            return self.snapshot();
+        }
+        self.pending.lock().expect("session events").contributions = Some(Arc::new(contributions));
+        self.flush_resources(
+            &crate::api::ResourceRequest {
+                configured_documents: documents,
+                ..Default::default()
+            },
+            self.fs.clone(),
+        )
+    }
+    pub fn set_locale(&self, locale: tsr_locale::Locale) {
+        if let Some(host) = &self.mapper_host {
+            if host.locale() != locale.to_string() {
+                host.set_locale(locale);
+                self.pending
+                    .lock()
+                    .expect("session events")
+                    .mapper_locale_changed = true;
+            }
+        }
+    }
     pub fn snapshot_for_file(&self, uri: &DocumentUri) -> Result<Snapshot, Error> {
         let snapshot = self.flush(Some(uri))?;
         let path = tsr_tspath::to_path(
@@ -565,6 +662,43 @@ impl Session {
         timer: Option<(timers::Kind, u64)>,
         host: Arc<dyn FileSystem>,
     ) -> Result<Snapshot, Error> {
+        let resources = requested.cloned().map_or_else(
+            crate::api::ResourceRequest::default,
+            crate::api::ResourceRequest::document,
+        );
+        self.update_snapshot(&resources, clean_disk, timer, host)
+    }
+    pub fn flush_resources(
+        &self,
+        resources: &crate::api::ResourceRequest,
+        host: Arc<dyn FileSystem>,
+    ) -> Result<Snapshot, Error> {
+        self.update_snapshot(resources, false, None, host)
+    }
+    // port: tsc/internal/project/api.go:Session.APIUpdate
+    pub fn api_update(
+        &self,
+        changes: FileChangeSummary,
+        request: crate::api::ApiSnapshotRequest,
+    ) -> Result<crate::api::ApiUpdate, Error> {
+        let snapshot = self.flush_resources(
+            &crate::api::ResourceRequest {
+                api: Some(request),
+                watch_changes: changes,
+                ..Default::default()
+            },
+            self.fs.clone(),
+        )?;
+        let error = snapshot.state().unwrap().api_error.clone();
+        Ok(crate::api::ApiUpdate { snapshot, error })
+    }
+    fn update_snapshot(
+        &self,
+        resources: &crate::api::ResourceRequest,
+        clean_disk: bool,
+        timer: Option<(timers::Kind, u64)>,
+        host: Arc<dyn FileSystem>,
+    ) -> Result<Snapshot, Error> {
         // Serialize construction, while current-snapshot reads and notification
         // admission remain available during a synchronous filesystem callback.
         let _update = self
@@ -587,7 +721,8 @@ impl Session {
         let pending = std::mem::take(&mut *self.pending.lock().expect("session events"));
         if !clean_disk
             && pending.is_empty()
-            && requested.is_none_or(|uri| {
+            && !resources.needs_update()
+            && resources.documents.iter().all(|uri| {
                 let path = tsr_tspath::to_path(
                     uri.file_name().as_bytes(),
                     self.options.current_directory.as_bytes(),
@@ -616,13 +751,17 @@ impl Session {
         )
         .with_overlays(old.fs.overlays().clone());
         let mut changes = overlays.process_changes(&pending.changes)?;
+        if pending.mapper_locale_changed || pending.ata_changed || !pending.ata_changes.is_empty() {
+            changes.invalidate_all = true;
+        }
+        changes.merge_watch_changes(&resources.watch_changes);
         let fs = Arc::new(SnapshotFsBuilder::with_host(
             old.fs.clone(),
             overlays.overlays().clone(),
             host,
         ));
-        // Content-mapper extensions and watched files are connected in L6.
-        fs.filter_watch_events(&mut changes, &[], &BTreeSet::new());
+        let (mapper_extensions, mapper_watched) = old.mapper_watch_state();
+        fs.filter_watch_events(&mut changes, &mapper_extensions, &mapper_watched);
         old.fs.expand_realpath_aliases(&mut changes);
         fs.mark_dirty_files(&mut changes)?;
         fs.convert_open_and_close(&mut changes)?;
@@ -650,6 +789,10 @@ impl Session {
             .inferred
             .clone()
             .or_else(|| old.inferred_options.clone());
+        let contributions = pending
+            .contributions
+            .clone()
+            .unwrap_or_else(|| old.contributions.clone());
         let builder = build::ProjectBuilder::new(
             self,
             old,
@@ -661,9 +804,17 @@ impl Session {
                 changes: &changes,
                 affected: &affected,
                 inferred_options: inferred_options.clone(),
+                contributions: contributions.clone(),
+                ata_changes: &pending.ata_changes,
             },
         );
-        let (projects, defaults) = builder.build(requested)?;
+        let build::BuildOutput {
+            projects,
+            delayed_projects,
+            defaults,
+            api_state,
+            api_error,
+        } = builder.build(resources)?;
         configs.cleanup();
         let configs = configs.finalize();
         let clean = changes.opened.is_some()
@@ -699,7 +850,11 @@ impl Session {
             fs,
             configs,
             projects,
+            delayed_projects,
             defaults,
+            contributions,
+            api_state,
+            api_error,
             inferred_options,
             config_ownership: ownership,
             _programs: programs,
@@ -726,6 +881,7 @@ impl Session {
             watches.enqueue(old.watches(), next.state().unwrap().watches());
         }
         self.sync_auto_import_watches();
+        self.trigger_ata(&next);
         if self.events.get().is_some() {
             self.send_event(SessionEvent::Published {
                 previous,
@@ -736,6 +892,8 @@ impl Session {
     }
     // port: tsc/internal/project/session.go:Session.Close
     pub fn close(&self) {
+        self.context.cancel();
+        self.ata.cancel(true);
         let update = self
             .update
             .lock()
@@ -750,8 +908,14 @@ impl Session {
         }
         *self.pending.lock().expect("session events") = Pending::default();
         drop(snapshot);
+        self.context.cancel();
+        self.ata.cancel(true);
+        if let Some(mapper) = &self.mapper_host {
+            mapper.close();
+        }
         self.timers.stop();
         drop(update);
+        self.ata.wait();
         self.timers.wait();
         if let Some(watches) = self.watches.get() {
             watches.close();
@@ -761,6 +925,9 @@ impl Session {
 }
 impl Drop for Session {
     fn drop(&mut self) {
+        self.context.cancel();
+        self.ata.cancel(true);
+        self.ata.wait();
         self.timers.stop();
         if let Some(watches) = self.watches.get() {
             watches.stop();
@@ -775,10 +942,18 @@ impl Drop for PendingTransaction<'_> {
     fn drop(&mut self) {
         if let Some(mut failed) = self.pending.take() {
             let mut queued = self.session.pending.lock().expect("session events");
+            for (key, change) in failed.ata_changes {
+                queued.ata_changes.entry(key).or_insert(change);
+            }
+            queued.ata_changed |= failed.ata_changed;
+            queued.mapper_locale_changed |= failed.mapper_locale_changed;
             failed.changes.append(&mut queued.changes);
             queued.changes = failed.changes;
             if queued.inferred.is_none() {
                 queued.inferred = failed.inferred;
+            }
+            if queued.contributions.is_none() {
+                queued.contributions = failed.contributions;
             }
             if queued.custom_name.is_none() {
                 queued.custom_name = failed.custom_name;

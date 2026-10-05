@@ -5,8 +5,10 @@ Checker ownership, immutable editor/file snapshots and shared parse caches for t
 Phase 5 provides configured/inferred sessions, immutable overlays and disk
 snapshots, configuration ownership, parse caches, checker scheduling, project
 watches and controlled update/idle timers. The transport-facing document layer
-lives in `tsr_lsp`; language services and cross-project features follow in the
-later Phase 5 steps.
+lives in `tsr_lsp`. Project-tree requests discover unopened consumers, while
+API project/file opens retain their own references independently of editor
+buffers. Sessions also own automatic type acquisition and content-mapper hosts;
+old snapshots retain programs and mapper leases across updates.
 
 Checker-slot waits are cancellation-aware: a canceled waiter returns without
 acquiring or creating a checker. The pinned Go scheduler waits on its semaphore

@@ -48,6 +48,7 @@ pub fn handles(method: &str) -> bool {
             | "textDocument/typeDefinition"
     )
 }
+#[derive(Clone)]
 pub enum Request {
     CodeActions(lsp::CodeActionParams),
     PrepareRename(lsp::PrepareRenameParams),
@@ -189,10 +190,11 @@ impl Request {
             Self::Completion(_)
                 | Self::Hover(_)
                 | Self::SignatureHelp(_)
-                | Self::SourceDefinition(_)
                 | Self::Definition(_)
                 | Self::TypeDefinition(_)
                 | Self::References(_)
+                | Self::Rename(_)
+                | Self::Highlights(_)
                 | Self::Implementation(_)
         )
     }
@@ -229,7 +231,7 @@ impl Request {
         }
     }
 }
-fn service_error(e: tsr_ls::Error) -> lsp::ResponseError {
+pub(crate) fn service_error(e: tsr_ls::Error) -> lsp::ResponseError {
     match e {
         tsr_ls::Error::Canceled => crate::canceled(),
         e => error(-32603, e.to_string()),

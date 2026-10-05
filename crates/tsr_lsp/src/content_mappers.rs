@@ -1,14 +1,9 @@
-//! Validation of editor-contributed mapper declarations. Execution and project
-//! installation belong to L6; parsing never launches an external process.
+//! Validate editor declarations before atomically installing their contributions.
 use std::collections::HashSet;
 use tsr_jsstring::JsString;
 use tsr_lsproto as lsp;
+pub use tsr_project::content_mappers::Contributions;
 use tsr_tsoptions::config_mappers::{ContentMapper, MapperManifest};
-#[derive(Default, Debug)]
-pub struct Contributions {
-    pub mappers: Vec<ContentMapper>,
-    pub extensions: Vec<String>,
-}
 // port: tsc/internal/lsp/server.go:parseContentMapperContributions
 pub fn parse(
     values: &[Option<Box<lsp::ContentMapperContribution>>],
@@ -49,7 +44,9 @@ pub fn parse(
                 .get(option.as_bytes())
                 .is_none()
             {
-                return Err(format!("content mapper contribution {identity:?} requests unknown compiler option {option:?}"));
+                return Err(format!(
+                    "content mapper contribution {identity:?} requests unknown compiler option {option:?}"
+                ));
             }
         }
         for extension in &value.extensions {

@@ -10,18 +10,59 @@ use std::{
 use tsr_core::CompilerOptions;
 use tsr_jsstring::JsString;
 
+/// A configured project discovered while walking solution ancestors. Its
+/// configuration and program are loaded only when a resource request needs it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct DelayedProject {
+    pub name: JsString,
+    pub path: JsString,
+    pub potential_project_references: BTreeSet<JsString>,
+}
+
 pub(crate) struct SessionSnapshot {
     pub id: u64,
     pub parent: u64,
     pub fs: Arc<SnapshotFs>,
     pub configs: Arc<ConfigFileRegistry>,
     pub projects: BTreeMap<JsString, Project>,
+    pub delayed_projects: BTreeMap<JsString, DelayedProject>,
     pub defaults: BTreeMap<JsString, JsString>,
+    pub contributions: Arc<crate::content_mappers::Contributions>,
+    pub api_state: crate::api::ApiState,
+    pub api_error: Option<JsString>,
     pub inferred_options: Option<Arc<CompilerOptions>>,
     pub config_ownership: Arc<ConfigOwnership>,
     pub _programs: Vec<ProgramReference>,
 }
 impl SessionSnapshot {
+    pub(crate) fn mapper_watch_state(
+        &self,
+    ) -> (Vec<JsString>, std::collections::BTreeSet<JsString>) {
+        let mut extensions: Vec<_> = self
+            .contributions
+            .extensions
+            .iter()
+            .map(|e| JsString::from_bytes(e.as_bytes()))
+            .collect();
+        for config in self
+            .configs
+            .configs
+            .values()
+            .filter_map(|c| c.command_line.as_ref())
+        {
+            extensions.extend(config.content_mapper_extensions());
+        }
+        extensions.sort();
+        extensions.dedup();
+        let files = self
+            .projects
+            .values()
+            .filter_map(|p| p.data())
+            .flat_map(|data| data.content_mapper_watched_files.iter().cloned())
+            .collect();
+        (extensions, files)
+    }
+
     pub(crate) fn watches(&self) -> crate::watch::WatchSet {
         self.configs
             .configs
@@ -40,6 +81,20 @@ impl SessionSnapshot {
                     project.data().unwrap().program_files_watch.clone(),
                 )
             }))
+            .chain(self.projects.iter().map(|(path, project)| {
+                (
+                    JsString::from_bytes([b"mapper:".as_slice(), path.as_bytes()].concat()),
+                    project.data().unwrap().content_mapper_watch.clone(),
+                )
+            }))
+            .chain(self.projects.iter().filter_map(|(path, project)| {
+                project.data().unwrap().typings_watch.as_ref().map(|watch| {
+                    (
+                        JsString::from_bytes([b"typings:".as_slice(), path.as_bytes()].concat()),
+                        watch.clone(),
+                    )
+                })
+            }))
             .collect()
     }
 }
@@ -53,6 +108,10 @@ pub struct Snapshot {
     root: Root,
 }
 impl Snapshot {
+    pub fn content_mapper_extensions(&self) -> Vec<JsString> {
+        self.state()
+            .map_or_else(Vec::new, |state| state.mapper_watch_state().0)
+    }
     /// An embedding snapshot can own one project without a language-server session.
     pub fn new(project: Project) -> Self {
         Self {
@@ -112,6 +171,14 @@ impl Snapshot {
                 projects
             }
         }
+    }
+    /// Ancestor projects whose command lines and programs have not been loaded.
+    pub fn delayed_projects(&self) -> Vec<&DelayedProject> {
+        self.state().map_or_else(Vec::new, |state| {
+            let mut projects: Vec<_> = state.delayed_projects.values().collect();
+            projects.sort_by(|a, b| a.name.cmp(&b.name));
+            projects
+        })
     }
     pub fn project_by_path(&self, path: &[u8]) -> Option<&Project> {
         self.state()?.projects.get(path)

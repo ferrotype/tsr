@@ -138,6 +138,9 @@ impl Timers {
         };
         drop(previous);
     }
+    pub(super) fn enqueue(&self, task: impl FnOnce(CancellationToken) + Send + 'static) -> bool {
+        self.queue.enqueue(self.token.clone(), task)
+    }
     pub(super) fn wait(&self) {
         self.queue.wait();
     }

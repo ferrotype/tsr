@@ -145,21 +145,22 @@ fn parsed_project_references_load_the_referenced_configs() {
 }
 
 #[test]
-fn source_of_project_reference_mode_with_outputs_is_an_explicit_boundary() {
-    let text = br#"{"compilerOptions":{"noLib":true},"files":["main.ts"],"references":[{"path":"./referenced"}]}"#;
+fn source_of_project_reference_mode_loads_sources_and_honors_disabling() {
+    let text = br#"{"compilerOptions":{"noLib":true},"files":["main.ts","referenced/a.d.ts"],"references":[{"path":"./referenced"}]}"#;
     let (config, host) = parsed_with(text, false, REFERENCED);
     let counters = Counters::new();
-    assert!(matches!(
-        Program::load_with_source_of_project_reference(
+    {
+        let program = Program::load_with_source_of_project_reference(
             options(config, host),
             true,
             &mut FileCache::new(),
             &counters,
-        ),
-        Err(Error::Unsupported(
-            "project-reference source redirection (newProjectReferenceDtsFakingHost)"
-        ))
-    ));
+        )
+        .unwrap();
+        assert!(program.file(b"/src/referenced/a.ts").is_some());
+        assert!(program.file(b"/src/referenced/a.d.ts").is_none());
+        assert!(program.is_source_from_project_reference(b"/src/referenced/a.ts"));
+    }
     assert_eq!(counters.snapshot(), Counts::default());
 
     // Disabling the redirect makes the requested mode load the outputs.
@@ -260,4 +261,44 @@ fn empty_references_and_mappers_preserve_normal_loading() {
     config.content_mappers = Some(Vec::new());
     let program = load(config, host, &Counters::new()).unwrap();
     assert!(program.file(b"/src/main.ts").is_some());
+}
+
+#[test]
+fn source_reference_reuse_keeps_the_declaration_resolution_host() {
+    let files: &[(&[u8], &[u8])] = &[
+        (
+            b"/src/ref/tsconfig.json",
+            br#"{"compilerOptions":{"composite":true,"outDir":"types"},"files":["a.ts"]}"#,
+        ),
+        (b"/src/ref/a.ts", b"export const value = 1;"),
+        (
+            b"/src/main.ts",
+            b"import { value } from './ref/types/a'; export { value };",
+        ),
+    ];
+    let text = br#"{"compilerOptions":{"noLib":true},"files":["main.ts"],"references":[{"path":"./ref"}]}"#;
+    let (config, host) = parsed_with(text, false, files);
+    let fs = host.0.clone();
+    let mut cache = FileCache::new();
+    let counters = Counters::new();
+    let program = Program::load_with_source_of_project_reference(
+        options(config, host),
+        true,
+        &mut cache,
+        &counters,
+    )
+    .unwrap();
+    let reused = program
+        .reuse_program(b"/src/main.ts", fs, &mut cache, &counters)
+        .unwrap()
+        .program
+        .unwrap();
+    assert!(reused
+        .package_resolver
+        .lock()
+        .unwrap()
+        .host()
+        .file_exists(b"/src/ref/types/a.d.ts")
+        .unwrap());
+    assert!(reused.source_file(b"/src/ref/a.ts").is_some());
 }

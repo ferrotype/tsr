@@ -1,10 +1,10 @@
 //! Project-reference loading: reading every referenced config once and the file
 //! mapper that sends a referenced project's sources to their built declarations.
 //! The mapper answers loader and program queries; the loader applies the
-//! redirects. The editor's source-of-reference mode (Phase 5) is not ported.
+//! redirects, including the editor's source-of-reference mode.
 use crate::Error;
 use std::{
-    collections::{BTreeMap, HashSet},
+    collections::{BTreeMap, BTreeSet, HashSet},
     convert::Infallible,
     sync::{Arc, Mutex},
 };
@@ -168,7 +168,8 @@ pub(crate) struct ProjectReferenceFileMapper {
     config_to_project_reference: BTreeMap<JsString, Option<usize>>,
     references_in_config_file: BTreeMap<JsString, Vec<JsString>>,
     source_to_project_reference: BTreeMap<JsString, Arc<ReferenceFile>>,
-    output_dts_to_project_reference: BTreeMap<JsString, Arc<ReferenceFile>>,
+    output_dts_to_project_reference: Arc<BTreeMap<JsString, Arc<ReferenceFile>>>,
+    dts_directories: Arc<BTreeSet<path::Path>>,
     realpath_dts_to_source: Mutex<BTreeMap<JsString, Option<Arc<ReferenceFile>>>>,
 }
 
@@ -191,6 +192,7 @@ impl ProjectReferenceFileMapper {
             references_in_config_file: self.references_in_config_file.clone(),
             source_to_project_reference: self.source_to_project_reference.clone(),
             output_dts_to_project_reference: self.output_dts_to_project_reference.clone(),
+            dts_directories: self.dts_directories.clone(),
             realpath_dts_to_source: Mutex::new(
                 self.realpath_dts_to_source
                     .lock()
@@ -214,7 +216,8 @@ impl ProjectReferenceFileMapper {
             config_to_project_reference: BTreeMap::new(),
             references_in_config_file: BTreeMap::new(),
             source_to_project_reference: BTreeMap::new(),
-            output_dts_to_project_reference: BTreeMap::new(),
+            output_dts_to_project_reference: Arc::new(BTreeMap::new()),
+            dts_directories: Arc::new(BTreeSet::new()),
             realpath_dts_to_source: Mutex::new(BTreeMap::new()),
         }
     }
@@ -226,6 +229,50 @@ impl ProjectReferenceFileMapper {
 
     pub(crate) fn has_outputs(&self) -> bool {
         !self.output_dts_to_project_reference.is_empty()
+    }
+
+    /// Resolution and preserved-symlink lookups share the faked declaration
+    /// identities. Parsing still reads the original host after redirecting to
+    /// source. The immutable output index is shared without retaining a loader
+    /// or forming a host-to-mapper ownership cycle.
+    pub(crate) fn resolution_host(
+        &mut self,
+        original: &Arc<dyn FileSystem>,
+    ) -> Arc<dyn FileSystem> {
+        if !self.can_use_source || !self.has_outputs() {
+            return original.clone();
+        }
+        let cwd = self
+            .loader
+            .as_ref()
+            .expect("parsed reference outputs have a loader")
+            .cwd
+            .clone();
+        let host = self.resolution_host_for_snapshot(original, &cwd);
+        self.loader
+            .as_mut()
+            .expect("parsed reference outputs have a loader")
+            .fs = host.clone();
+        host
+    }
+
+    pub(crate) fn resolution_host_for_snapshot(
+        &self,
+        original: &Arc<dyn FileSystem>,
+        cwd: &JsString,
+    ) -> Arc<dyn FileSystem> {
+        if !self.can_use_source || !self.has_outputs() {
+            return original.clone();
+        }
+        let host: Arc<dyn FileSystem> = Arc::new(tsr_vfs::cached::CachedFs::new(Arc::new(
+            crate::project_reference_host::ProjectReferenceDtsFakingHost::new(
+                original.clone(),
+                cwd.clone(),
+                self.output_dts_to_project_reference.clone(),
+                self.dts_directories.clone(),
+            ),
+        )));
+        host
     }
 
     /// Whether any referenced source can be redirected to an output. Without
@@ -255,8 +302,6 @@ impl ProjectReferenceFileMapper {
         file_name: &[u8],
     ) -> Result<Option<JsString>, tsr_vfs::Error> {
         if self.can_use_source {
-            // The source-of-reference branch. Loading rejects this mode while
-            // any output exists, so both lookups are empty here.
             let source = match self.project_reference_from_output_dts(path) {
                 Some(found) => Some(found.clone()),
                 None => self.source_to_dts_if_symlink(path, file_name)?,
@@ -483,6 +528,44 @@ impl ProjectReferenceFileMapper {
         self.range_resolved_reference_worker(references, f, root, &mut seen)
     }
 
+    /// port: tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.getResolvedProjectReferences
+    pub(crate) fn resolved_project_references(
+        &self,
+    ) -> impl Iterator<Item = Option<&ParsedCommandLine>> {
+        self.references_in_config_file
+            .get(&self.root_config_path)
+            .into_iter()
+            .flatten()
+            .map(|path| {
+                self.config_to_project_reference
+                    .get(path)
+                    .copied()
+                    .flatten()
+                    .map(|index| self.configs[index].as_ref())
+            })
+    }
+
+    /// Visits the child's descendants, excluding the child itself, as the
+    /// project's tree-loading filter requires.
+    /// port: tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedProjectReferenceInChildConfig
+    pub(crate) fn range_resolved_project_reference_in_child_config(
+        &self,
+        root: &ParsedCommandLine,
+        child: &ParsedCommandLine,
+        f: &mut ReferenceVisitor<'_>,
+    ) -> bool {
+        let Some(config_file) = child.config_file.as_ref() else {
+            return false;
+        };
+        let child_path = root_config_path(Some(config_file));
+        let mut seen = HashSet::from([child_path.clone()]);
+        let references = self
+            .references_in_config_file
+            .get(&child_path)
+            .map_or(&[][..], Vec::as_slice);
+        self.range_resolved_reference_worker(references, f, root, &mut seen)
+    }
+
     /// Preorder, visiting each config path once; a child's parent is the
     /// config that references it.
     /// port: tsc/internal/compiler/projectreferencefilemapper.go:projectReferenceFileMapper.rangeResolvedReferenceWorker
@@ -687,8 +770,6 @@ impl<'a> ProjectReferenceParser<'a> {
         self.mapper
             .references_in_config_file
             .insert(root, references);
-        // The pin installs the source-of-reference host here when that mode has
-        // outputs; the loader rejects that combination instead.
     }
 
     /// Parent maps are copied before children, so a child overwrites its
@@ -727,12 +808,25 @@ impl<'a> ProjectReferenceParser<'a> {
                             .insert(key.clone(), reference_file(&entry, index));
                     }
                     for (key, entry) in config.output_dts_to_project_reference() {
-                        self.mapper
-                            .output_dts_to_project_reference
+                        Arc::get_mut(&mut self.mapper.output_dts_to_project_reference)
+                            .expect("reference outputs are private until parsing finishes")
                             .insert(key.clone(), reference_file(&entry, index));
                     }
-                    // Declaration directories feed only the source-of-reference
-                    // host, which this port does not construct.
+                    if self.mapper.can_use_source {
+                        let dir = if config.options.declaration_dir.is_empty() {
+                            &config.options.out_dir
+                        } else {
+                            &config.options.declaration_dir
+                        };
+                        if !dir.is_empty() {
+                            let directory = self.to_path(dir.as_bytes()).into();
+                            Arc::get_mut(&mut self.mapper.dts_directories)
+                                .expect(
+                                    "declaration directories are private until parsing finishes",
+                                )
+                                .insert(directory);
+                        }
+                    }
                 }
             }
             let sub_tasks = self.tasks[task].sub_tasks.clone();
