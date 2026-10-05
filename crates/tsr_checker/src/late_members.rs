@@ -558,7 +558,7 @@ impl CheckerState {
             _ => false,
         };
         let symbol = if valid {
-            self.raw_declaration_symbol(node)?
+            self.get_symbol_of_declaration(node)?
         } else {
             None
         };

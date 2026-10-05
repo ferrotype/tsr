@@ -1,15 +1,20 @@
 use super::*;
 use std::sync::Arc;
 
-fn program(name: &[u8], text: &[u8]) -> Program {
+pub(super) fn program(name: &[u8], text: &[u8]) -> Program {
+    program_with_options(name, text, tsr_core::CompilerOptions::default())
+}
+
+fn program_with_options(
+    name: &[u8],
+    text: &[u8],
+    mut options: tsr_core::CompilerOptions,
+) -> Program {
     let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
     fs.insert_loaded(name, text);
-    let options = tsr_core::CompilerOptions {
-        no_lib: tsr_core::Tristate::TRUE,
-        allow_js: tsr_core::Tristate::from(name.ends_with(b".js")),
-        check_js: tsr_core::Tristate::from(name.ends_with(b".js")),
-        ..Default::default()
-    };
+    options.no_lib = tsr_core::Tristate::TRUE;
+    options.allow_js = tsr_core::Tristate::from(name.ends_with(b".js"));
+    options.check_js = tsr_core::Tristate::from(name.ends_with(b".js"));
     Program::load(
         tsr_compiler::ProgramOptions {
             config: tsr_tsoptions::ParsedCommandLine::new(
@@ -1091,5 +1096,188 @@ fn completion_snippet_formatting_obeys_config() {
     assert_eq!(
         item.insert_text.as_deref().map(String::as_str),
         Some("method (arg,optional)\n{\n},")
+    );
+}
+
+#[test]
+fn formatting_preserves_unicode_coordinates_and_cancellation() {
+    let text = "/*😀*/ const x={one:1};\r\n";
+    let program = program(b"/index.ts", text.as_bytes());
+    for encoding in [
+        tsr_jsstring::PositionEncoding::Utf8,
+        tsr_jsstring::PositionEncoding::Utf16,
+    ] {
+        let cancel = CancellationToken::new();
+        let mut service = LanguageService::new(&program, encoding, cancel.clone());
+        let params = lsp::DocumentFormattingParams {
+            text_document: lsp::TextDocumentIdentifier {
+                uri: lsp::DocumentUri("file:///index.ts".into()),
+            },
+            options: Some(Box::new(lsp::FormattingOptions {
+                tab_size: 2,
+                insert_spaces: true,
+                ..Default::default()
+            })),
+            ..Default::default()
+        };
+        let edits = service
+            .format_document(&params, &tsr_format::FormatCodeSettings::default(), true)
+            .unwrap()
+            .text_edits
+            .unwrap();
+        let script = Script::plain(b"/index.ts", text.as_bytes());
+        let edits = edits
+            .iter()
+            .flatten()
+            .map(|edit| tsr_core::TextChange {
+                range: service
+                    .converters
+                    .from_lsp_range_to_original(&script, &edit.range),
+                new_text: edit.new_text.as_bytes().to_vec(),
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(
+            tsr_core::apply_bulk_edits(text.as_bytes(), &edits).unwrap(),
+            "/*😀*/ const x = { one: 1 };\r\n".as_bytes()
+        );
+        assert!(service
+            .format_document(&params, &tsr_format::FormatCodeSettings::default(), false)
+            .unwrap()
+            .text_edits
+            .is_none());
+        cancel.cancel();
+        assert!(matches!(
+            service.format_document(&params, &tsr_format::FormatCodeSettings::default(), true),
+            Err(Error::Canceled)
+        ));
+    }
+}
+
+fn apply_fix_all(text: &str, isolated: bool) -> String {
+    let program = Arc::new(program_with_options(
+        b"/index.ts",
+        text.as_bytes(),
+        tsr_core::CompilerOptions {
+            isolated_declarations: tsr_core::Tristate::from(isolated),
+            declaration: tsr_core::Tristate::from(isolated),
+            ..Default::default()
+        },
+    ));
+    let source = program.source_file(b"/index.ts").unwrap().source();
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool.checker_for_file_exclusive(source).unwrap();
+    let cancel = CancellationToken::new();
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        cancel.clone(),
+    );
+    let uri = lsp::DocumentUri("file:///index.ts".into());
+    let params = lsp::CodeActionParams {
+        text_document: lsp::TextDocumentIdentifier { uri: uri.clone() },
+        context: Some(Box::new(lsp::CodeActionContext {
+            only: Some(Box::new(vec![lsp::CodeActionKind(
+                "source.fixAll.ts".into(),
+            )])),
+            ..Default::default()
+        })),
+        ..Default::default()
+    };
+    let result = service
+        .code_actions(
+            &mut checker,
+            &params,
+            &OrganizeOptions::default(),
+            &CompletionOptions::default(),
+            &tsr_locale::DEFAULT,
+        )
+        .unwrap();
+    let actions = result.command_or_code_action_array.unwrap();
+    assert_eq!(actions.len(), 1);
+    let edits = &actions[0]
+        .code_action
+        .as_ref()
+        .unwrap()
+        .edit
+        .as_ref()
+        .unwrap()
+        .changes
+        .as_ref()
+        .unwrap()[&uri];
+    let script = Script::plain(b"/index.ts", text.as_bytes());
+    let changes = edits
+        .iter()
+        .flatten()
+        .map(|edit| tsr_core::TextChange {
+            range: service
+                .converters
+                .from_lsp_range_to_original(&script, &edit.range),
+            new_text: edit.new_text.as_bytes().to_vec(),
+        })
+        .collect::<Vec<_>>();
+    assert_eq!(
+        service.source(source).unwrap().text().as_bytes(),
+        text.as_bytes()
+    );
+    cancel.cancel();
+    assert!(matches!(
+        service.code_actions(
+            &mut checker,
+            &params,
+            &OrganizeOptions::default(),
+            &CompletionOptions::default(),
+            &tsr_locale::DEFAULT,
+        ),
+        Err(Error::Canceled)
+    ));
+    String::from_utf8(tsr_core::apply_bulk_edits(text.as_bytes(), &changes).unwrap()).unwrap()
+}
+
+#[test]
+fn class_fix_all_keeps_member_insertions_before_brace_cleanup() {
+    // Pinned server output, also compared and applied by quick_fixes.py.
+    assert_eq!(
+        apply_fix_all("interface I { x:number; f():void }\nclass C implements I {}\n", false),
+        "interface I { x:number; f():void }\nclass C implements I {\n    x: number;\n    f(): void {\n        throw new Error(\"Method not implemented.\");\n    }\n}\n"
+    );
+}
+
+#[test]
+fn intersected_interfaces_generate_one_getter_and_one_setter() {
+    // Pinned Go pairs accessors instead of emitting every intersected declaration.
+    let output = apply_fix_all(
+        "interface A { get x(): number; set x(value: number); }\ninterface B { get x(): number; set x(value: number); }\ntype Both=A&B;\nclass C implements Both {}\n",
+        false,
+    );
+    let class = output.split("class C implements Both").nth(1).unwrap();
+    assert_eq!(class.matches("get x()").count(), 1, "{output}");
+    assert_eq!(class.matches("set x(").count(), 1, "{output}");
+}
+
+#[test]
+fn member_fixes_keep_existing_indentation_after_leading_trivia() {
+    assert_eq!(
+        apply_fix_all("class C implements I {\n  existing() {}\n}\ninterface I { foo(): void; }\n", false),
+        "class C implements I {\n  foo(): void {\n      throw new Error(\"Method not implemented.\");\n  }\n  existing() {}\n}\ninterface I { foo(): void; }\n"
+    );
+}
+
+#[test]
+fn member_fix_bodies_infer_single_quotes_from_imports() {
+    let output = apply_fix_all(
+        "import 'dependency';\ninterface I { foo(): void; }\nclass C implements I {}\n",
+        false,
+    );
+    assert!(
+        output.contains("throw new Error('Method not implemented.');"),
+        "{output}"
+    );
+}
+
+#[test]
+fn isolated_fix_all_uses_deduplicated_declaration_diagnostics() {
+    assert_eq!(
+        apply_fix_all("export function f() {}\nf.prop=1;\n", true),
+        "export function f(): void {}\nexport declare namespace f {\n    export var prop: number;\n}\nf.prop=1;\n"
     );
 }

@@ -24,8 +24,8 @@ fn is_jsdoc_like_text(text: &[u8]) -> bool {
     text.len() >= 4 && text[1] == b'*' && text[2] == b'*' && text[3] != b'/'
 }
 /// port: tsc/internal/parser/utilities.go:GetJSDocCommentRanges
-pub(crate) fn get_jsdoc_comment_ranges(
-    factory: &impl ParserFactory,
+pub fn get_jsdoc_comment_ranges(
+    factory: &impl tsr_ast::RuntimeFactory,
     mut ranges: Vec<CommentRange>,
     node: NodeId,
     text: &[u8],

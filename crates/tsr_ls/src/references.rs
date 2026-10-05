@@ -21,8 +21,16 @@ pub(crate) enum DefinitionKind {
     This,
     String,
 }
+#[derive(Clone, Copy, Default, PartialEq, Eq)]
+pub(crate) enum EntryKind {
+    #[default]
+    Node,
+    LocalFoundProperty,
+    PropertyFoundLocal,
+}
 #[derive(Clone)]
 pub(crate) struct ReferenceEntry {
+    pub kind: EntryKind,
     pub node: Option<NodeId>,
     pub context: Option<NodeId>,
     pub source: NodeId,
@@ -39,6 +47,8 @@ pub(crate) struct ReferenceGroup {
 pub(crate) struct ReferenceOptions {
     pub implementations: bool,
     pub adjust: bool,
+    pub rename: bool,
+    pub aliases: bool,
 }
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub(crate) enum From {
@@ -95,6 +105,7 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
         let context = h::entry_context(self.l.view(node)?, node)?;
         let node = n.name().unwrap_or(node);
         Ok(ReferenceEntry {
+            kind: EntryKind::Node,
             node: Some(node),
             context,
             source: self.source_of(node)?,
@@ -123,7 +134,11 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
     }
     // port: tsc/internal/ls/findallreferences.go:getReferencedSymbolsForSymbol
     pub fn search_symbol(&mut self, symbol: SymbolRef, node: Option<NodeId>) -> Result<()> {
-        self.meaning = self.search_meaning(node, symbol)?;
+        self.meaning = if self.options.rename {
+            pos::semantic_meaning::ALL
+        } else {
+            self.search_meaning(node, symbol)?
+        };
         self.special = if let Some(node) = node {
             let view = self.l.view(node)?;
             let n = view.node(node)?;
@@ -153,7 +168,9 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
                 .parent()
                 .filter(|p| view.node(*p).is_ok_and(|p| p.kind() == K::ExportSpecifier))
             {
-                target = self.export_local(node, symbol, parent)?;
+                if !(self.options.rename && self.options.aliases) {
+                    target = self.export_local(node, symbol, parent)?;
+                }
             } else {
                 for decl in h::declarations(self.c, symbol)? {
                     let v = self.l.view(decl)?;
@@ -178,6 +195,20 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
                 }
             }
         }
+        if self.options.rename && self.options.aliases {
+            for declaration in h::declarations(self.c, target)? {
+                if self.c.node(declaration)?.kind() == K::ExportSpecifier {
+                    let name = self
+                        .c
+                        .node(declaration)?
+                        .name()
+                        .ok_or(tsr_arena::Error::InvalidGraph)?;
+                    let search =
+                        self.create_search(symbol, node, From::Unknown, None, Vec::new())?;
+                    return self.at_export(name, target, declaration, &search, true, true);
+                }
+            }
+        }
         if let Some(node) = node {
             if self.c.node(node)?.kind() == K::DefaultKeyword
                 && self.c.symbol(target)?.name_bytes() == b"default"
@@ -197,7 +228,7 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
         let symbols = if let Some(node) = node {
             self.related_candidates(target, node, !self.options.implementations, &[], None)?
                 .into_iter()
-                .map(|(s, _)| s)
+                .map(|(s, _, _)| s)
                 .collect()
         } else {
             vec![target]
@@ -248,7 +279,7 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
                     }
                 }
             }
-            let mut bytes = self.c.symbol(named)?.name_bytes().to_vec();
+            let mut bytes = self.c.symbol_display_name(named)?.as_bytes().to_vec();
             if bytes.first() == Some(&b'"') && bytes.last() == Some(&b'"') {
                 bytes = bytes[1..bytes.len() - 1].to_vec();
             }
@@ -300,7 +331,11 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
     }
     // port: tsc/internal/ls/findallreferences.go:refState.referenceAdder
     pub(crate) fn append(&mut self, node: NodeId, symbol: SymbolRef) -> Result<()> {
-        let entry = self.entry(node)?;
+        self.append_kind(node, symbol, EntryKind::Node)
+    }
+    fn append_kind(&mut self, node: NodeId, symbol: SymbolRef, kind: EntryKind) -> Result<()> {
+        let mut entry = self.entry(node)?;
+        entry.kind = kind;
         if let Some(group) = self
             .result
             .iter_mut()
@@ -319,12 +354,15 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
     }
     // port: tsc/internal/ls/findallreferences.go:refState.addReference
     pub(crate) fn add(&mut self, node: NodeId, symbol: SymbolRef) -> Result<()> {
+        self.add_kind(node, symbol, EntryKind::Node)
+    }
+    fn add_kind(&mut self, node: NodeId, symbol: SymbolRef, kind: EntryKind) -> Result<()> {
         if self.options.implementations {
             for n in self.implementation_nodes(node)? {
                 self.append(n, symbol)?;
             }
         } else {
-            self.append(node, symbol)?;
+            self.append_kind(node, symbol, kind)?;
         }
         Ok(())
     }
@@ -373,6 +411,9 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
     // port: tsc/internal/ls/findallreferences.go:refState.getReferencesAtLocation
     fn at_location(&mut self, node: NodeId, search: &Search, add: bool) -> Result<()> {
         let view = self.l.view(node)?;
+        if self.options.rename && view.node(node)?.kind() == K::DefaultKeyword {
+            return Ok(());
+        }
         if meaning::meaning(view, node, self.c)? & self.meaning == 0 {
             return Ok(());
         }
@@ -387,18 +428,18 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
             return Ok(());
         }
         if p.kind() == K::ExportSpecifier {
-            return self.at_export(node, symbol, parent, search, add);
+            return self.at_export(node, symbol, parent, search, add, false);
         }
         let mut related = None;
         let candidates =
             self.related_candidates(symbol, node, true, &search.parents, Some(&search.symbols))?;
-        for (test, found) in candidates {
+        for (test, found, kind) in candidates {
             if search.symbols.contains(&test) {
-                related = Some(found);
+                related = Some((found, kind));
                 break;
             }
         }
-        let Some(related) = related else {
+        let Some((related, kind)) = related else {
             if self.c.symbol(symbol)?.flags() & sf::TRANSIENT == 0 {
                 if let Some(decl) = self.c.symbol(symbol)?.value_declaration() {
                     if let Some(s) = self.c.get_shorthand_assignment_value_symbol(Some(decl))? {
@@ -417,7 +458,7 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
             "class" => self.class_references(node, related, search, add)?,
             _ => {
                 if add {
-                    self.add(node, related)?;
+                    self.add_kind(node, related, kind)?;
                 }
             }
         }
@@ -556,6 +597,9 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
     ) -> Result<()> {
         if add {
             self.add(node, symbol)?;
+        }
+        if self.options.rename {
+            return Ok(());
         }
         let view = self.l.view(node)?;
         let Some(class) = view
@@ -804,6 +848,7 @@ impl LanguageService<'_> {
                 ReferenceOptions {
                     implementations: true,
                     adjust: true,
+                    ..Default::default()
                 },
             );
             for group in state.for_node(node, pos)? {

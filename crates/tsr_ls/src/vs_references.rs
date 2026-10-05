@@ -142,6 +142,7 @@ impl LanguageService<'_> {
                 };
                 let node = c.node(node)?.name().unwrap_or(node);
                 let entry = ReferenceEntry {
+                    kind: crate::references::EntryKind::Node,
                     node: Some(node),
                     context: None,
                     range: None,

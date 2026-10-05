@@ -117,6 +117,17 @@ impl Operation<'_> {
             builder: crate::node_builder::NodeBuilder::new(self.state_mut(), 0),
         }
     }
+    /// Use an editing transaction's shared metadata while keeping the new
+    /// builder's syntax owner private. The caller retains its generated graph.
+    pub fn node_builder_with_emit(
+        &mut self,
+        emit: &tsr_printer::EmitContext,
+    ) -> TypeNodeBuilder<'_> {
+        TypeNodeBuilder {
+            owner: self.checker(),
+            builder: crate::node_builder::NodeBuilder::with_emit(self.state_mut(), 0, emit.clone()),
+        }
+    }
 
     /// `TypeToStringEx` with an explicit enclosing declaration. The declaration
     /// must belong to a source retained by this checker. `None` is the native

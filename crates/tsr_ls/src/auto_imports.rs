@@ -216,8 +216,11 @@ impl LanguageService<'_> {
                 checker,
                 syntax.source,
                 export,
-                context.type_only,
-                Some(usage_range.start.clone()),
+                tsr_autoimport::fix::Usage {
+                    type_only: context.type_only,
+                    position: Some(usage_range.start.clone()),
+                    ..Default::default()
+                },
                 &options.auto_import,
             )? {
                 groups.entry(key.clone()).or_default().push((export, fix));
@@ -382,11 +385,7 @@ impl LanguageService<'_> {
                 single_quote: quote,
                 prefer_type_only: options.prefer_type_only,
                 verbatim: self.program.options().verbatim_module_syntax.is_true(),
-                newline: options
-                    .newline
-                    .as_deref()
-                    .filter(|s| !s.is_empty())
-                    .unwrap_or("\n"),
+                newline: self.program.options().new_line.as_str(),
             },
         )?;
         let mut result = Vec::new();
@@ -418,7 +417,7 @@ pub(crate) fn rank(a: &lsp::AutoImportFix, b: &lsp::AutoImportFix) -> std::cmp::
             .cmp(&b.module_specifier.bytes().filter(|&b| b == b'/').count())
     })
 }
-fn compare(a: &lsp::AutoImportFix, b: &lsp::AutoImportFix) -> std::cmp::Ordering {
+pub(crate) fn compare(a: &lsp::AutoImportFix, b: &lsp::AutoImportFix) -> std::cmp::Ordering {
     rank(a, b)
         .then_with(|| {
             b.module_specifier

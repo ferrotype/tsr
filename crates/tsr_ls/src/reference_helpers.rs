@@ -3,7 +3,7 @@ use crate::{
     definition::{ancestor, object_literal_element},
     documentation::list,
     meaning,
-    references::SearchState,
+    references::{EntryKind, SearchState},
     syntax::Syntax,
     Result,
 };
@@ -561,11 +561,23 @@ impl SearchState<'_, '_, '_> {
         bases: bool,
         parents: &[SymbolRef],
         wanted: Option<&[SymbolRef]>,
-    ) -> Result<Vec<(SymbolRef, SymbolRef)>> {
+    ) -> Result<Vec<(SymbolRef, SymbolRef, EntryKind)>> {
         let view = self.l.view(node)?;
         let n = view.node(node)?;
         let mut result = Vec::new();
+        let populate_rename = wanted.is_none() && self.options.rename;
+        let only_at_location = if wanted.is_none() {
+            !(self.options.rename && self.options.aliases)
+        } else {
+            !self.options.rename || self.options.aliases
+        };
         if let Some(element) = object_literal_element(view, node)? {
+            if populate_rename {
+                if let Some(value) = self.c.get_shorthand_assignment_value_symbol(n.parent())? {
+                    result.push((value, value, EntryKind::LocalFoundProperty));
+                    return Ok(result);
+                }
+            }
             if let Some(context) = self
                 .c
                 .get_contextual_type(view.node(element)?.parent().unwrap(), 0)?
@@ -574,7 +586,14 @@ impl SearchState<'_, '_, '_> {
                     .c
                     .get_property_symbols_from_contextual_type(element, context, true)?
                 {
-                    if self.related_roots(sym, bases, parents, wanted, &mut result)? {
+                    if self.related_roots(
+                        sym,
+                        bases,
+                        parents,
+                        wanted,
+                        &mut result,
+                        EntryKind::PropertyFoundLocal,
+                    )? {
                         return Ok(result);
                     }
                 }
@@ -583,13 +602,13 @@ impl SearchState<'_, '_, '_> {
                 .c
                 .get_property_symbol_of_destructuring_assignment(node)?
             {
-                if push_related(&mut result, wanted, sym, sym) {
+                if push_related(&mut result, wanted, sym, sym, EntryKind::PropertyFoundLocal) {
                     return Ok(result);
                 }
             }
             if let Some(p) = n.parent() {
                 if let Some(sym) = self.c.get_shorthand_assignment_value_symbol(Some(p))? {
-                    if push_related(&mut result, wanted, sym, sym) {
+                    if push_related(&mut result, wanted, sym, sym, EntryKind::LocalFoundProperty) {
                         return Ok(result);
                     }
                 }
@@ -600,12 +619,12 @@ impl SearchState<'_, '_, '_> {
                 && self.c.symbol(symbol)?.flags() & sf::ALIAS != 0
             {
                 let alias = self.c.get_aliased_symbol(symbol)?;
-                if push_related(&mut result, wanted, alias, alias) {
+                if push_related(&mut result, wanted, alias, alias, EntryKind::Node) {
                     return Ok(result);
                 }
             }
         }
-        if self.related_roots(symbol, bases, parents, wanted, &mut result)? {
+        if self.related_roots(symbol, bases, parents, wanted, &mut result, EntryKind::Node)? {
             return Ok(result);
         }
         if let Some(decl) = self.c.symbol(symbol)?.value_declaration() {
@@ -628,27 +647,47 @@ impl SearchState<'_, '_, '_> {
                 } else {
                     param
                 };
-                self.related_roots(other, bases, parents, wanted, &mut result)?;
+                self.related_roots(other, bases, parents, wanted, &mut result, EntryKind::Node)?;
                 return Ok(result);
             }
         }
         for decl in declarations(self.c, symbol)? {
-            if self.c.node(decl)?.kind() == K::ExportSpecifier {
+            if self.c.node(decl)?.kind() == K::ExportSpecifier
+                && (!populate_rename || self.c.node(decl)?.property_name().is_none())
+            {
                 if let Some(local) = self.c.get_export_specifier_local_target_symbol(decl)? {
-                    if push_related(&mut result, wanted, local, local) {
+                    if push_related(&mut result, wanted, local, local, EntryKind::Node) {
                         return Ok(result);
                     }
                 }
                 break;
             }
         }
-        if let Some(parent) = n.parent() {
-            if binding_without_property(view, parent)? {
-                if let Some(sym) = self.binding_property(parent)? {
-                    if self.related_roots(sym, bases, parents, wanted, &mut result)? {
-                        return Ok(result);
-                    }
+        let element = if !populate_rename && only_at_location {
+            n.parent()
+                .filter(|p| binding_without_property(view, *p).unwrap_or(false))
+        } else if !populate_rename || only_at_location {
+            let mut found = None;
+            for decl in declarations(self.c, symbol)? {
+                if binding_without_property(self.l.view(decl)?, decl)? {
+                    found = Some(decl);
+                    break;
                 }
+            }
+            found
+        } else {
+            None
+        };
+        if let Some(element) = element {
+            if let Some(sym) = self.binding_property(element)? {
+                self.related_roots(
+                    sym,
+                    bases,
+                    parents,
+                    wanted,
+                    &mut result,
+                    EntryKind::PropertyFoundLocal,
+                )?;
             }
         }
         Ok(result)
@@ -659,7 +698,8 @@ impl SearchState<'_, '_, '_> {
         bases: bool,
         parents: &[SymbolRef],
         wanted: Option<&[SymbolRef]>,
-        out: &mut Vec<(SymbolRef, SymbolRef)>,
+        out: &mut Vec<(SymbolRef, SymbolRef, EntryKind)>,
+        kind: EntryKind,
     ) -> Result<bool> {
         for root in self.c.get_root_symbols(symbol)? {
             let found =
@@ -668,7 +708,7 @@ impl SearchState<'_, '_, '_> {
                 } else {
                     symbol
                 };
-            if push_related(out, wanted, root, found) {
+            if push_related(out, wanted, root, found, kind) {
                 return Ok(true);
             }
             if bases {
@@ -688,7 +728,7 @@ impl SearchState<'_, '_, '_> {
                     let name = self.c.symbol(root)?.name_bytes().to_vec();
                     for base in self.base_properties(parent, &name)? {
                         if self.static_symbol(symbol)? == self.static_symbol(base)?
-                            && push_related(out, wanted, base, found)
+                            && push_related(out, wanted, base, found, kind)
                         {
                             return Ok(true);
                         }
@@ -787,18 +827,19 @@ impl SearchState<'_, '_, '_> {
 // Finding a reference must stop at the first related symbol. Continuing through
 // contextual/base symbols would unnecessarily resolve types after a direct hit.
 fn push_related(
-    out: &mut Vec<(SymbolRef, SymbolRef)>,
+    out: &mut Vec<(SymbolRef, SymbolRef, EntryKind)>,
     wanted: Option<&[SymbolRef]>,
     test: SymbolRef,
     found: SymbolRef,
+    kind: EntryKind,
 ) -> bool {
     if let Some(wanted) = wanted {
         if wanted.contains(&test) {
-            out.push((test, found));
+            out.push((test, found, kind));
             return true;
         }
     } else {
-        out.push((test, found));
+        out.push((test, found, kind));
     }
     false
 }

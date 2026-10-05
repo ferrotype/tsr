@@ -3,9 +3,9 @@
 //! built on it (`tsc/internal/printer/syntheticfile.go`).
 //!
 //! Upstream assigns the recorded positions to a clone of the tree, so that the
-//! caller's node can be printed again. The one caller here prints a tree it
-//! decoded for that request and drops it afterwards, so the positions are
-//! assigned in place and no second tree is built.
+//! caller's node can be printed again. Callers here supply a private tree:
+//! the editing tracker clones each fragment before assigning its positions,
+//! and the printer probe owns its decoded tree. Published nodes stay unchanged.
 
 use crate::emit_text_writer::decode_last_rune;
 use crate::{EmitContext, EmitTextWriter, Error, Printer, PrinterOptions, TextWriter};
@@ -292,12 +292,24 @@ impl EmitTextWriter for ChangeTrackerWriter {
 }
 
 /// Prints a synthesized node with the change tracker's options, trims the
-/// trailing new line, and assigns the printed positions to the tree. No source
-/// file is passed: the one caller has none.
-// port: tsc/internal/printer/syntheticfile.go:PrintAndPositionNode
+/// trailing new line, and assigns the printed positions to the tree.
 pub fn print_and_position_node(
     builder: &mut AstBuilder,
     node: NodeId,
+    new_line: &[u8],
+    indent_size: isize,
+    emit_context: &EmitContext,
+) -> Result<Vec<u8>, Error> {
+    print_and_position_node_in_source(builder, node, None, new_line, indent_size, emit_context)
+}
+
+/// The editing service passes the original source so the printer can preserve
+/// comments and source spellings while positioning a private generated tree.
+// port: tsc/internal/printer/syntheticfile.go:PrintAndPositionNode
+pub fn print_and_position_node_in_source(
+    builder: &mut AstBuilder,
+    node: NodeId,
+    source: Option<NodeId>,
     new_line: &[u8],
     indent_size: isize,
     emit_context: &EmitContext,
@@ -318,7 +330,7 @@ pub fn print_and_position_node(
         },
         emit_context,
     );
-    printer.write(builder.view(), node, None, &mut writer, None)?;
+    printer.write(builder.view(), node, source, &mut writer, None)?;
     let mut text = writer.text().to_vec();
     if !new_line.is_empty() && text.ends_with(new_line) {
         text.truncate(text.len() - new_line.len());

@@ -1273,3 +1273,56 @@ impl CheckerState {
 }
 
 use crate::TypeId;
+
+impl Operation<'_> {
+    /// Trailing defaults that can be elided by an editing type annotation.
+    // port: tsc/internal/ls/codeactions_fixmissingtypeannotation.go:endOfRequiredTypeParameters
+    pub fn required_reference_arguments(&mut self, ty: TypeRef) -> Result<Option<usize>, Error> {
+        let id = self.check_type(ty)?;
+        if self.state().types.get(id)?.object_flags & crate::object_flags::REFERENCE == 0 {
+            return Ok(None);
+        }
+        let target = self.state().types.target(id)?;
+        if !matches!(
+            self.state().types.get(target)?.kind(),
+            crate::TypeKind::Interface | crate::TypeKind::Tuple
+        ) {
+            return Ok(None);
+        }
+        let interface = self.state().types.interface(target)?;
+        let parameters = self.type_refs(interface.type_parameters());
+        let outer = interface.outer_type_parameter_count as usize;
+        let arguments = self.get_type_arguments(ty)?;
+        for cutoff in 0..arguments.len() {
+            if cutoff < outer || cutoff >= parameters.len() {
+                continue;
+            }
+            let parameter = self.check_type(parameters[cutoff])?;
+            let Some(symbol) = self.state().types.get(parameter)?.symbol else {
+                continue;
+            };
+            let symbol = self.symbol_ref(symbol)?;
+            let mut default = false;
+            for node in self.symbol_declarations(symbol)?.iter().flatten() {
+                if self
+                    .node(node)?
+                    .data_source()
+                    .as_type_parameter_declaration()
+                    .is_some_and(|d| d.default_type().is_some())
+                {
+                    default = true;
+                    break;
+                }
+            }
+            if !default {
+                continue;
+            }
+            let filled =
+                self.fill_missing_type_arguments(&arguments[..cutoff], &parameters, cutoff, false)?;
+            if filled.iter().zip(&arguments).all(|(a, b)| a == b) {
+                return Ok(Some(cutoff));
+            }
+        }
+        Ok(Some(arguments.len()))
+    }
+}

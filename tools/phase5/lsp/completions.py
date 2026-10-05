@@ -642,11 +642,15 @@ def main():
                 ]:
                     config = {'format': formatting, 'suggest': {'classMemberSnippets': {'enabled': True}, 'objectLiteralMethodSnippets': {'enabled': True}}}
                     for binary, rows in [('go-lsp', expected), ('../debug/tsrust', actual)]:
-                        rows.extend(run(ROOT / 'target/phase5' / binary, root, encoding, rich, SNIPPET_CASES[:1] + CLASS_SNIPPET_CASES[:2] + ['met/*cursor*/', 'import {} from \"./dep\"; met/*cursor*/'], config=config))
+                        # Keep dep loaded while testing formatting. Dropping the
+                        # preceding base import makes Go's result depend on whether
+                        # its background registry warmed before that edit; registry
+                        # retention has its own explicit L6 sequence below.
+                        rows.extend(run(ROOT / 'target/phase5' / binary, root, encoding, rich, SNIPPET_CASES[:1] + CLASS_SNIPPET_CASES[:2] + ['import { ImportedBase } from "./base"; met/*cursor*/', 'import {} from \"./dep\"; met/*cursor*/'], config=config))
                 for preference in ['single', 'double', 'auto']:
                     cases = ['declare const object: {"a-b": number; "123word": number}; object./*cursor*/', "const first = 'single'; declare const object: {\"a-b\": number}; object./*cursor*/"]
                     for binary, rows in [('go-lsp', expected), ('../debug/tsrust', actual)]:
-                        rows.extend(run(ROOT / 'target/phase5' / binary, root, encoding, rich, cases, config={'preferences': {'quotePreference': preference}}))
+                        rows.extend(run(ROOT / 'target/phase5' / binary, root, encoding, rich, cases, config={'preferences': {'quoteStyle': preference}}))
                 for preferences in [
                     {'importModuleSpecifier': 'relative', 'importModuleSpecifierEnding': 'js'},
                     {'importModuleSpecifier': 'non-relative', 'autoImportSpecifierExcludeRegexes': ['^sample$', '/^CONDITIONAL/i']},

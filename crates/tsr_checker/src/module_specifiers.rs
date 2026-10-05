@@ -13,6 +13,14 @@ pub use paths::Ending as ModuleSpecifierEnding;
 use paths::{allowed_endings, ensure_non_module, same_volume_relative, Ending};
 type ModulePath = ModuleSpecifierPath;
 
+/// Request preferences for a file move, including the existing exclusion matcher.
+#[derive(Clone, Copy)]
+pub struct ModuleSpecifierPreferences<'a> {
+    pub relative: Option<&'a str>,
+    pub ending: Option<&'a str>,
+    pub excluded: &'a dyn Fn(&[u8]) -> bool,
+}
+
 pub(super) struct Import {
     text: JsString,
     mode: Mode,
@@ -20,6 +28,9 @@ pub(super) struct Import {
 }
 pub(super) struct Generation<'a> {
     host: &'a dyn CheckerHost,
+    /// Original source name: declaration-file status determines allowed extensions.
+    source_file: &'a [u8],
+    /// Current location, which may differ from the source name during a file move.
     file: &'a [u8],
     imports: Vec<Import>,
     default_mode: Mode,
@@ -33,10 +44,21 @@ enum Relativity {
     NonRelative,
     ProjectRelative,
 }
+impl Relativity {
+    fn from_preference(value: Option<&str>) -> Self {
+        match value {
+            Some("relative") => Self::Relative,
+            Some("non-relative") => Self::NonRelative,
+            Some("project-relative") => Self::ProjectRelative,
+            _ => Self::Shortest,
+        }
+    }
+}
 struct Preferences<'a> {
     relative: Relativity,
     ending: Option<&'a str>,
     excluded: &'a dyn Fn(&[u8]) -> bool,
+    old_specifier: &'a [u8],
 }
 
 // port: tsc/internal/modulespecifiers/specifiers.go:GetModuleSpecifiersForFileWithInfo
@@ -58,6 +80,7 @@ pub(crate) fn generate(
             relative: Relativity::ProjectRelative,
             ending: request_js.then_some("js"),
             excluded: &|_| false,
+            old_specifier: b"",
         },
     )?
     .ok_or(Error::MissingLink("GetModuleSpecifiers returned no paths"))
@@ -97,6 +120,7 @@ fn generate_with_preferences(
     }
     let generation = Generation {
         host,
+        source_file: file,
         file,
         imports,
         default_mode,
@@ -116,13 +140,17 @@ impl Generation<'_> {
         self.host.use_case_sensitive_file_names()
     }
     fn endings(&self, syntax_mode: Mode) -> Vec<Ending> {
+        self.endings_for(syntax_mode, self.preference.old_specifier)
+    }
+    fn endings_for(&self, syntax_mode: Mode, old_specifier: &[u8]) -> Vec<Ending> {
         allowed_endings(
             self.options(),
-            self.file,
+            self.source_file,
             &self.imports,
             self.default_mode,
             syntax_mode,
             self.preference.ending,
+            old_specifier,
         )
     }
 
@@ -427,6 +455,90 @@ pub(super) fn contains_node_modules(path: &[u8]) -> bool {
 }
 
 impl crate::Operation<'_> {
+    /// Recompute a specifier after a file move using the original source's
+    /// resolution mode and preferences, but the importing file's new location.
+    // port: tsc/internal/modulespecifiers/specifiers.go:UpdateModuleSpecifier
+    pub fn update_module_specifier(
+        &self,
+        source: NodeId,
+        importing_file: &[u8],
+        old_specifier: NodeId,
+        target: &[u8],
+        preferences: ModuleSpecifierPreferences<'_>,
+    ) -> Result<JsString, Error> {
+        let state = self.state();
+        let view = state.ast(source)?;
+        let source_file = view.source_file(source)?;
+        let host = state.program()?.host.as_ref();
+        let old = view.node_text(old_specifier)?.into_js_string();
+        let default_mode = host.get_default_resolution_mode_for_file(source_file.file_name())?;
+        let override_mode =
+            host.get_mode_for_usage_location(source_file.file_name(), old_specifier)?;
+        let mut imports = Vec::new();
+        for &id in source_file.imports()?.iter().flatten() {
+            imports.push(Import {
+                text: view.node_text(id)?.into_js_string(),
+                mode: host.get_mode_for_usage_location(source_file.file_name(), id)?,
+                resolved: None,
+            });
+        }
+        let generation = Generation {
+            host,
+            source_file: source_file.file_name(),
+            file: importing_file,
+            imports,
+            default_mode,
+            mode: if override_mode == Mode::NONE {
+                default_mode
+            } else {
+                override_mode
+            },
+            preference: Preferences {
+                relative: if old.as_bytes().is_empty() {
+                    Relativity::from_preference(preferences.relative)
+                } else if path::is_external_module_name_relative(old.as_bytes()) {
+                    Relativity::Relative
+                } else {
+                    Relativity::NonRelative
+                },
+                ending: preferences.ending,
+                excluded: preferences.excluded,
+                old_specifier: old.as_bytes(),
+            },
+        };
+        let paths =
+            generation.sorted_paths(host.get_module_specifier_paths(importing_file, target)?);
+        for candidate in &paths {
+            let name = generation.node_module_specifier(candidate)?;
+            if !name.is_empty() {
+                return Ok(JsString::from_bytes(name));
+            }
+        }
+        Ok(JsString::from_bytes(
+            generation.local_specifier(target, false)?,
+        ))
+    }
+
+    pub fn resolved_import_file(
+        &self,
+        source: NodeId,
+        specifier: NodeId,
+    ) -> Result<Option<JsString>, Error> {
+        let state = self.state();
+        let view = state.ast(source)?;
+        let file = view.source_file(source)?;
+        let host = state.program()?.host.as_ref();
+        let mode = host.get_mode_for_usage_location(file.file_name(), specifier)?;
+        Ok(host
+            .get_resolved_module(
+                file.file_name(),
+                view.node_text(specifier)?.as_bytes(),
+                mode,
+            )?
+            .filter(|module| module.is_resolved())
+            .map(|module| module.resolved_file_name.clone()))
+    }
+
     /// The existing pinned module-specifier generator, shared by declaration
     /// display and the language service. The source is checked against this
     /// operation's immutable program; no path-only owner bypass is introduced.
@@ -460,12 +572,7 @@ impl crate::Operation<'_> {
         let state = self.state();
         let view = state.ast(source)?;
         let file = view.source_file(source)?;
-        let relative = match relative {
-            Some("relative") => Relativity::Relative,
-            Some("non-relative") => Relativity::NonRelative,
-            Some("project-relative") => Relativity::ProjectRelative,
-            _ => Relativity::Shortest,
-        };
+        let relative = Relativity::from_preference(relative);
         generate_with_preferences(
             state.program()?.host.as_ref(),
             source,
@@ -476,6 +583,7 @@ impl crate::Operation<'_> {
                 relative,
                 ending,
                 excluded,
+                old_specifier: b"",
             },
         )
     }
@@ -520,6 +628,7 @@ impl crate::Operation<'_> {
             host.get_default_resolution_mode_for_file(file.file_name())?,
             syntax_mode,
             preference,
+            b"",
         ))
     }
     pub fn import_usage_resolution_mode(

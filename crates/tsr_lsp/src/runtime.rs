@@ -55,6 +55,9 @@ impl Options {
 }
 #[derive(Clone)]
 struct Settings {
+    rename: tsr_ls::RenameOptions,
+    organize: tsr_ls::OrganizeOptions,
+    formatting: bool,
     completion: tsr_ls::CompletionOptions,
     auto_closing_tags: bool,
     locale: tsr_locale::Locale,
@@ -74,6 +77,9 @@ impl Default for Settings {
         Self {
             locale: tsr_locale::Locale::default(),
             validation: true,
+            formatting: true,
+            rename: tsr_ls::RenameOptions::default(),
+            organize: tsr_ls::OrganizeOptions::default(),
             style_warnings: true,
             config_name: String::new(),
             exclude_library_symbols: true,
@@ -407,6 +413,37 @@ impl Runtime {
                     client::raw(&response)
                 })));
             }
+            "workspace/willRenameFiles" => {
+                let params: lsp::RenameFilesParams = crate::decode(params)?;
+                if params.files.is_empty() {
+                    return client::raw(&lsp::Null).map(Dispatch::Ready);
+                }
+                let snapshot = self
+                    .ready()?
+                    .session()
+                    .flush_with_host(None, host)
+                    .map_err(crate::project_error)?;
+                let context = context.clone();
+                let capabilities = self.capabilities.clone();
+                let encoding = self.options.project.position_encoding;
+                let options = self.settings.lock().unwrap().completion.clone();
+                let request_id = request
+                    .id
+                    .as_ref()
+                    .map(ToString::to_string)
+                    .unwrap_or_default();
+                return Ok(Dispatch::Work(Box::new(move || {
+                    crate::language_features::file_renames(
+                        &context,
+                        &request_id,
+                        &snapshot,
+                        &params,
+                        encoding,
+                        &capabilities,
+                        &options,
+                    )
+                })));
+            }
             _ if crate::language_features::handles(method) => {
                 let feature = crate::language_features::Request::decode(method, params)?;
                 let uri = feature.uri();
@@ -436,6 +473,9 @@ impl Runtime {
                 let capabilities = self.capabilities.clone();
                 let settings = self.settings.lock().unwrap().clone();
                 let options = crate::language_features::Options {
+                    rename: settings.rename,
+                    organize: settings.organize.clone(),
+                    formatting: settings.formatting,
                     completion: settings.completion,
                     auto_closing_tags: settings.auto_closing_tags,
                     maximum_hover_length: settings.maximum_hover_length,
@@ -815,6 +855,16 @@ impl Runtime {
                         );
                         apply_inlay_preferences(raw, true, &mut next.inlay, &mut next.inlay_flags);
                         set_bool(raw.get("validateEnabled"), &mut next.validation);
+                        set_bool(raw.get("formatEnabled"), &mut next.formatting);
+                        apply_organize_preferences(raw, true, &mut next.organize);
+                        set_bool(
+                            raw.get("providePrefixAndSuffixTextForRename"),
+                            &mut next.rename.aliases,
+                        );
+                        set_bool(
+                            raw.get("allowRenameOfImportPath"),
+                            &mut next.rename.import_paths,
+                        );
                         if let Some(lsp::Any::Number(length)) = raw.get("maximumHoverLength") {
                             next.maximum_hover_length =
                                 if *length > 0.0 { *length as usize } else { 500 };
@@ -838,7 +888,17 @@ impl Runtime {
                         nested(fields, "preferGoToSourceDefinition"),
                         &mut next.prefer_source_definition,
                     );
+                    set_bool(
+                        nested(fields, "format.enabled")
+                            .or_else(|| nested(fields, "format.enable")),
+                        &mut next.formatting,
+                    );
+                    set_bool(
+                        nested(fields, "preferences.useAliasesForRenames"),
+                        &mut next.rename.aliases,
+                    );
                     apply_lens_preferences(fields, false, &mut next.code_lens);
+                    apply_organize_preferences(fields, false, &mut next.organize);
                     apply_completion_preferences(
                         fields,
                         false,
@@ -1039,11 +1099,7 @@ fn apply_inlay_preferences(
         };
     }
     if let Some(lsp::Any::String(value)) = get("quotePreference", "preferences.quoteStyle") {
-        options.quote = match value.as_str() {
-            "single" => tsr_ls::QuotePreference::Single,
-            "double" => tsr_ls::QuotePreference::Double,
-            _ => tsr_ls::QuotePreference::Auto,
-        };
+        options.quote = parse_quote_preference(value);
     }
     for (index, (name, path, invert, target)) in [
         (
@@ -1183,14 +1239,7 @@ fn refresh_diagnostics(
 fn unimplemented_method(method: &str) -> bool {
     matches!(
         method,
-        "workspace/willRenameFiles"
-            | "textDocument/formatting"
-            | "textDocument/rangeFormatting"
-            | "textDocument/onTypeFormatting"
-            | "textDocument/codeAction"
-            | "textDocument/prepareRename"
-            | "textDocument/rename"
-            | "custom/runGC"
+        "custom/runGC"
             | "custom/saveHeapProfile"
             | "custom/saveAllocProfile"
             | "custom/startCPUProfile"
@@ -1239,6 +1288,14 @@ fn apply_lens_preferences(
         } {
             *target = Some(*value);
         }
+    }
+}
+
+fn parse_quote_preference(value: &str) -> tsr_ls::QuotePreference {
+    match tsr_jsstring::helpers::to_lower_go(value.as_bytes()).as_slice() {
+        b"single" => tsr_ls::QuotePreference::Single,
+        b"double" => tsr_ls::QuotePreference::Double,
+        _ => tsr_ls::QuotePreference::Auto,
     }
 }
 
@@ -1300,11 +1357,7 @@ fn apply_completion_preferences(
         }
     }
     if let Some(lsp::Any::String(value)) = get("quotePreference", "preferences.quoteStyle") {
-        options.quote = match value.as_str() {
-            "single" => tsr_ls::QuotePreference::Single,
-            "double" => tsr_ls::QuotePreference::Double,
-            _ => tsr_ls::QuotePreference::Auto,
-        };
+        options.quote = parse_quote_preference(value);
     }
     if let Some(lsp::Any::String(value)) = get(
         "jsxAttributeCompletionStyle",
@@ -1319,13 +1372,29 @@ fn apply_completion_preferences(
         "importModuleSpecifierEnding",
         "preferences.importModuleSpecifierEnding",
     ) {
-        options.auto_import.ending = Some(value.clone());
+        options.auto_import.ending = Some(
+            match tsr_jsstring::helpers::to_lower_go(value.as_bytes()).as_slice() {
+                b"minimal" => "minimal",
+                b"index" => "index",
+                b"js" => "js",
+                _ => "auto",
+            }
+            .into(),
+        );
     }
     if let Some(lsp::Any::String(value)) = get(
         "importModuleSpecifierPreference",
         "preferences.importModuleSpecifier",
     ) {
-        options.auto_import.module_specifier = Some(value.clone());
+        options.auto_import.module_specifier = Some(
+            match tsr_jsstring::helpers::to_lower_go(value.as_bytes()).as_slice() {
+                b"project-relative" => "project-relative",
+                b"relative" => "relative",
+                b"non-relative" => "non-relative",
+                _ => "shortest",
+            }
+            .into(),
+        );
     }
     if let Some(lsp::Any::Boolean(value)) = get(
         "autoImportEntrypointDirectorySearch",
@@ -1379,5 +1448,154 @@ fn apply_completion_preferences(
     }
     if let Some(lsp::Any::String(value)) = get("newLineCharacter", "format.newLineCharacter") {
         options.newline = Some(value.clone());
+    }
+}
+
+fn apply_organize_preferences(
+    fields: &HashMap<String, lsp::Any>,
+    raw: bool,
+    options: &mut tsr_ls::OrganizeOptions,
+) {
+    let get = |key, path| {
+        if raw {
+            fields.get(key)
+        } else {
+            nested(fields, path)
+        }
+    };
+    for (key, path, output) in [
+        (
+            "organizeImportsSort",
+            "preferences.organizeImports.sort",
+            &mut options.sort,
+        ),
+        (
+            "organizeImportsCaseFirst",
+            "preferences.organizeImports.caseFirst",
+            &mut options.case_first,
+        ),
+        (
+            "organizeImportsTypeOrder",
+            "preferences.organizeImports.typeOrder",
+            &mut options.type_order,
+        ),
+    ] {
+        if let Some(lsp::Any::String(value)) = get(key, path) {
+            output.clone_from(value);
+        }
+    }
+    if let Some(lsp::Any::String(value)) = get(
+        "organizeImportsCollation",
+        "preferences.organizeImports.unicodeCollation",
+    ) {
+        options.unicode = tsr_jsstring::helpers::to_lower_go(value.as_bytes()) == b"unicode";
+    }
+    match get(
+        "organizeImportsIgnoreCase",
+        "preferences.organizeImports.caseSensitivity",
+    ) {
+        Some(lsp::Any::Boolean(value)) => options.ignore_case = Some(*value),
+        Some(lsp::Any::String(value)) if !raw => {
+            options.ignore_case =
+                match tsr_jsstring::helpers::to_lower_go(value.as_bytes()).as_slice() {
+                    b"caseinsensitive" => Some(true),
+                    b"casesensitive" => Some(false),
+                    _ => None,
+                }
+        }
+        _ => {}
+    }
+    if let Some(lsp::Any::Boolean(value)) = get(
+        "organizeImportsAccentCollation",
+        "preferences.organizeImports.accentCollation",
+    ) {
+        options.accents = Some(*value);
+    }
+    set_bool(
+        get(
+            "organizeImportsNumericCollation",
+            "preferences.organizeImports.numericCollation",
+        ),
+        &mut options.numeric,
+    );
+}
+
+#[cfg(test)]
+mod preference_tests {
+    use super::*;
+
+    #[test]
+    fn quote_and_module_preferences_use_go_unicode_lowercasing() {
+        use tsr_ls::QuotePreference::{Auto, Double, Single};
+        for (quote, ending, relative, expected_quote, expected_ending, expected_relative) in [
+            ("DoUbLe", "JS", "Relative", Double, "js", "relative"),
+            (
+                "SİNGLE",
+                "MİNİMAL",
+                "NON-RELATİVE",
+                Single,
+                "minimal",
+                "non-relative",
+            ),
+            (
+                "AUTO",
+                "INDEX",
+                "PROJECT-RELATIVE",
+                Auto,
+                "index",
+                "project-relative",
+            ),
+            ("unknown", "unknown", "unknown", Auto, "auto", "shortest"),
+        ] {
+            for raw in [false, true] {
+                let json = if raw {
+                    format!(
+                        r#"{{"quotePreference":"{quote}","importModuleSpecifierEnding":"{ending}","importModuleSpecifierPreference":"{relative}"}}"#
+                    )
+                } else {
+                    format!(
+                        r#"{{"preferences":{{"quoteStyle":"{quote}","importModuleSpecifierEnding":"{ending}","importModuleSpecifier":"{relative}"}}}}"#
+                    )
+                };
+                let mut fields = HashMap::<String, lsp::Any>::new();
+                tsr_json::unmarshal(json.as_bytes(), &mut fields, tsr_json::Options::default())
+                    .unwrap();
+                let mut options = tsr_ls::CompletionOptions::default();
+                let mut auto_closing = false;
+                apply_completion_preferences(&fields, raw, &mut options, &mut auto_closing);
+                assert_eq!(options.quote, expected_quote);
+                assert_eq!(options.auto_import.ending.as_deref(), Some(expected_ending));
+                assert_eq!(
+                    options.auto_import.module_specifier.as_deref(),
+                    Some(expected_relative)
+                );
+                let mut hints = tsr_ls::InlayHintsOptions::default();
+                apply_inlay_preferences(&fields, raw, &mut hints, &mut [None; 7]);
+                assert_eq!(hints.quote, expected_quote);
+            }
+        }
+    }
+
+    #[test]
+    fn organize_config_accepts_boolean_and_case_insensitive_values() {
+        for (case, expected) in [
+            ("true", Some(true)),
+            ("false", Some(false)),
+            ("\"CASEINSENSITIVE\"", Some(true)),
+            ("\"caseİnsensitive\"", Some(true)),
+            ("\"CASESENSITIVE\"", Some(false)),
+            ("\"AUTO\"", None),
+        ] {
+            let json = format!(
+                r#"{{"preferences":{{"organizeImports":{{"unicodeCollation":"UNİCODE","caseSensitivity":{case}}}}}}}"#
+            );
+            let mut fields = HashMap::<String, lsp::Any>::new();
+            tsr_json::unmarshal(json.as_bytes(), &mut fields, tsr_json::Options::default())
+                .unwrap();
+            let mut options = tsr_ls::OrganizeOptions::default();
+            apply_organize_preferences(&fields, false, &mut options);
+            assert!(options.unicode);
+            assert_eq!(options.ignore_case, expected);
+        }
     }
 }

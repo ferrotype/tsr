@@ -702,6 +702,15 @@ changes where the pin rejects them, non-BMP identifiers, CRLF and cancellation.
 **Exit:** assigned edit behavior and unit tests pass; retained exceptions
 require the same explicit disposition as other feature work.
 
+L5's implementation and validation are recorded in
+[PHASE5-L5.md](PHASE5-L5.md). The ordinary server and private endpoint share
+rename, file moves, formatting, organize imports and all three pinned code-fix
+providers. Direct tests cover the pin's formatting, path-updater and change
+tracker regressions; bounded native comparisons check exact edits and applied
+contents. Cross-project discovery/mapper lifecycle remain L6, and complete
+fourslash/replay acceptance remains L7. These comparisons do not declare that
+corpus passed.
+
 ### L6 — cross-project, ATA and mapper completion
 
 Finish `crossproject.go`, project-reference source redirection and

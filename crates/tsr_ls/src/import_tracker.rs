@@ -435,8 +435,13 @@ impl SearchState<'_, '_, '_> {
                         } else {
                             n.name()
                         } {
-                            if let Some(symbol) = self.c.get_symbol_at_location(location)? {
-                                searches.push((location, symbol));
+                            if !self.options.rename
+                                || view.node_text(location)?.as_bytes() == name
+                                || view.node_text(location)?.as_bytes() == b"default"
+                            {
+                                if let Some(symbol) = self.c.get_symbol_at_location(location)? {
+                                    searches.push((location, symbol));
+                                }
                             }
                         }
                     }
@@ -489,8 +494,15 @@ impl SearchState<'_, '_, '_> {
                         match view.node(b)?.kind().known() {
                             Some(K::NamespaceImport) if info.kind == ExportKind::Equals => {
                                 if let Some(location) = view.node(b)?.name() {
-                                    if let Some(symbol) = self.c.get_symbol_at_location(location)? {
-                                        searches.push((location, symbol));
+                                    if !self.options.rename
+                                        || view.node_text(location)?.as_bytes() == name
+                                        || view.node_text(location)?.as_bytes() == b"default"
+                                    {
+                                        if let Some(symbol) =
+                                            self.c.get_symbol_at_location(location)?
+                                        {
+                                            searches.push((location, symbol));
+                                        }
                                     }
                                 }
                             }
@@ -513,8 +525,14 @@ impl SearchState<'_, '_, '_> {
                         if text.as_bytes() == name
                             || info.kind != ExportKind::Named && text.as_bytes() == b"default"
                         {
-                            if e.property_name().is_some() {
+                            if e.property_name().is_some()
+                                || (self.options.rename
+                                    && view.node_text(location)?.as_bytes() != name)
+                            {
                                 singles.push(original);
+                            }
+                            if self.options.rename && view.node_text(location)?.as_bytes() != name {
+                                continue;
                             }
                             if let Some(symbol) = self.c.get_symbol_at_location(location)? {
                                 searches.push((location, symbol));
@@ -523,6 +541,13 @@ impl SearchState<'_, '_, '_> {
                     }
                 }
                 if let Some(location) = default_import {
+                    let exported_name = self
+                        .create_search(symbol, None, From::Unknown, None, Vec::new())?
+                        .text;
+                    if self.options.rename && view.node_text(location)?.as_bytes() != exported_name
+                    {
+                        continue;
+                    }
                     if let Some(symbol) = self.c.get_symbol_at_location(location)? {
                         searches.push((location, symbol));
                     }
@@ -539,7 +564,9 @@ impl SearchState<'_, '_, '_> {
                 let source = self.source_of(node)?;
                 self.in_container(source, source, &search, true)?;
             }
-            if info.kind != ExportKind::Equals {
+            if info.kind != ExportKind::Equals
+                && !(self.options.rename && info.kind == ExportKind::Default)
+            {
                 let text = (info.kind == ExportKind::Default).then(|| b"default".to_vec());
                 let search = self.create_search(symbol, None, From::Export, text, Vec::new())?;
                 for source in imports.indirect {
@@ -550,6 +577,23 @@ impl SearchState<'_, '_, '_> {
         })
     }
     fn append_single(&mut self, node: NodeId, symbol: SymbolRef) -> Result<()> {
+        if self.options.rename {
+            let view = self.l.view(node)?;
+            let n = view.node(node)?;
+            let specifier = n.parent().is_some_and(|p| {
+                view.node(p).is_ok_and(|p| {
+                    matches!(
+                        p.kind().known(),
+                        Some(K::ImportSpecifier | K::ExportSpecifier)
+                    )
+                })
+            });
+            if (n.kind() != K::Identifier && !specifier)
+                || (specifier && view.node_text(node)?.as_bytes() == b"default")
+            {
+                return Ok(());
+            }
+        }
         self.append(node, symbol)
     }
     // port: tsc/internal/ls/importTracker.go:getExportInfo
@@ -568,6 +612,7 @@ impl SearchState<'_, '_, '_> {
         specifier: NodeId,
         search: &Search,
         add: bool,
+        always: bool,
     ) -> Result<()> {
         let view = self.l.view(node)?;
         let n = view.node(specifier)?;
@@ -578,18 +623,18 @@ impl SearchState<'_, '_, '_> {
             .ok_or(tsr_arena::Error::InvalidGraph)?;
         let module = view.node(decl)?.module_specifier();
         let local = self.export_local(node, symbol, specifier)?;
-        if !search.symbols.contains(&local) {
+        if !always && !search.symbols.contains(&local) {
             return Ok(());
         }
         if n.property_name().is_none() {
-            if add {
+            if add && !(self.options.rename && view.node_text(name)?.as_bytes() == b"default") {
                 self.add(node, local)?;
             }
         } else if n.property_name() == Some(node) {
             if add && module.is_none() {
                 self.add(node, local)?;
             }
-            if add && self.seen_exports.insert(name) {
+            if add && !self.options.rename && self.seen_exports.insert(name) {
                 if let Some(exported) = self.c.bound_symbol_of_node(specifier)? {
                     self.add(name, exported)?;
                 }
@@ -604,12 +649,18 @@ impl SearchState<'_, '_, '_> {
         } else {
             ExportKind::Named
         };
-        if let Some(exported) = self.c.bound_symbol_of_node(specifier)? {
-            if let Some(info) = self.export_info(exported, kind)? {
-                self.imports_of_export(exported, info)?;
+        if !(self.options.rename && self.options.aliases) || always {
+            if let Some(exported) = self.c.bound_symbol_of_node(specifier)? {
+                if let Some(info) = self.export_info(exported, kind)? {
+                    self.imports_of_export(exported, info)?;
+                }
             }
         }
-        if search.from != From::Export && module.is_some() && n.property_name().is_none() {
+        if search.from != From::Export
+            && module.is_some()
+            && n.property_name().is_none()
+            && !(self.options.rename && self.options.aliases)
+        {
             if let Some(imported) = self.c.get_export_specifier_local_target_symbol(specifier)? {
                 self.search_imported(imported)?;
             }
@@ -796,7 +847,7 @@ impl SearchState<'_, '_, '_> {
         if let Some((symbol, info)) = export {
             return self.imports_of_export(symbol, info);
         }
-        if search.from == From::Export {
+        if search.from == From::Export || (self.options.rename && self.options.aliases) {
             return Ok(());
         }
         let is_import = match p.kind().known() {

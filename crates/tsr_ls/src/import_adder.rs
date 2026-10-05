@@ -1,4 +1,4 @@
-//! Checker handles are used only while this completion request holds its lease.
+//! Checker handles are used only while the completion or editing request holds its lease.
 use crate::{syntax::Syntax, CompletionOptions, LanguageService, Result};
 use tsr_ast::{span_map::FEATURE_COMPLETION, NodeId};
 use tsr_autoimport::ImportAdder;
@@ -45,8 +45,10 @@ impl LanguageService<'_> {
                     checker,
                     syntax.source,
                     export,
-                    true,
-                    None,
+                    tsr_autoimport::fix::Usage {
+                        type_only: true,
+                        ..Default::default()
+                    },
                     &options.auto_import,
                 )?);
             }
@@ -63,6 +65,23 @@ impl LanguageService<'_> {
         options: &CompletionOptions,
         adder: &ImportAdder,
     ) -> Result<Vec<Option<Box<lsp::TextEdit>>>> {
+        self.map_import_adder_edits(syntax, options, adder, Some(FEATURE_COMPLETION))
+    }
+    pub(crate) fn import_adder_action_edits(
+        &mut self,
+        syntax: &Syntax<'_>,
+        options: &CompletionOptions,
+        adder: &ImportAdder,
+    ) -> Result<Vec<Option<Box<lsp::TextEdit>>>> {
+        self.map_import_adder_edits(syntax, options, adder, None)
+    }
+    fn map_import_adder_edits(
+        &mut self,
+        syntax: &Syntax<'_>,
+        options: &CompletionOptions,
+        adder: &ImportAdder,
+        feature: Option<i32>,
+    ) -> Result<Vec<Option<Box<lsp::TextEdit>>>> {
         if !adder.has_fixes() {
             return Ok(Vec::new());
         }
@@ -77,17 +96,17 @@ impl LanguageService<'_> {
                 semicolons: settings.semicolons != tsr_format::SemicolonPreference::Remove,
                 prefer_type_only: options.prefer_type_only,
                 verbatim: self.program.options().verbatim_module_syntax.is_true(),
-                newline: options.newline.as_deref().unwrap_or("\n"),
+                newline: self.program.options().new_line.as_str(),
                 usage: None,
             },
         )?;
         let mut result = Vec::new();
         for edit in edits {
-            let (range, fidelity) = self.range(
-                syntax.source,
-                tsr_core::TextRange::new(edit.start, edit.end),
-                FEATURE_COMPLETION,
-            )?;
+            let range = tsr_core::TextRange::new(edit.start, edit.end);
+            let (range, fidelity) = match feature {
+                Some(feature) => self.range(syntax.source, range, feature)?,
+                None => self.unrestricted_range(syntax.source, range)?,
+            };
             if !fidelity.is_exact() {
                 return Ok(Vec::new());
             }

@@ -1,8 +1,8 @@
-# Language server development checks (L2–L4)
+# Language server development checks (L2–L5)
 
 L2 connects the generated protocol to production project sessions and compiler
 diagnostics. `tsrust --lsp --stdio` and the private version-3 endpoint use the
-same runtime. Unported L5–L6 service methods return a named `-32601` error; their pinned
+same runtime. Unported L6 service methods return a named `-32601` error; their pinned
 capabilities remain declared so the protocol surface does not drift during the
 port. This is not a complete editor server yet.
 
@@ -215,3 +215,39 @@ while the pinned Go registry retains its old export bucket. It checks the entire
 response against the corresponding control and keeps raw outputs under
 `target/phase5/l4-config-replacement`; it does not count the exception as parity.
 The approval and its precise scope are in `docs/PHASE5-L4.md`.
+
+## L5 editing
+
+The shared language service now supplies symbol/file rename, formatting,
+organize imports and the pin's three code-fix providers. See
+[the implementation record](../../../docs/PHASE5-L5.md) for ownership and
+remaining L6/L7 integration.
+
+```sh
+cargo build -p tsrust --bin tsrust
+python3 tools/phase5/lsp/edits.py
+python3 tools/phase5/lsp/file_edits.py
+python3 tools/phase5/lsp/actions.py
+python3 tools/phase5/lsp/quick_fixes.py
+python3 tools/phase5/lsp/quick_fixes.py --config '{"preferences":{"quoteStyle":"single"},"format":{"indentSize":2,"tabSize":2,"semicolons":"remove","newLineCharacter":"\r\n"}}'
+python3 tools/phase5/lsp/quick_fixes.py --locale de --case class-properties --case isolated-expando --case imports
+```
+
+`quick_fixes.py` accepts repeated `--case` and `--encoding` selectors. It sends
+native diagnostics verbatim to both servers, compares all code-action fields,
+and applies every workspace edit. Only the outer action array is sorted,
+because Go iterates its fix-all provider map; each edit array retains its order.
+`actions.py` exercises direct, nested and unstable organize-import preferences.
+`file_edits.py` checks changes-only, document-edit and resource-rename client
+capabilities, including configuration includes and comment placement.
+
+Generate the organize-import Unicode tables from the pinned Go toolchain:
+
+```sh
+(cd upstream/tsc && GOTOOLCHAIN=local GOWORK=off GOFLAGS=-mod=readonly go run ../../tools/phase5/lsp/unicode.go) > crates/tsr_ls/src/organize_unicode.rs
+cargo fmt --all
+```
+
+The generator reads the pinned module graph without editing the upstream tree.
+The generated data supports the pin's comparison algorithm; it is not a new
+locale-dependent ICU collation implementation.

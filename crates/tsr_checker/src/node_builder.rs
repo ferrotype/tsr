@@ -134,7 +134,7 @@ impl<'a> NodeBuilder<'a> {
         Self::with_emit(checker, flags, EmitContext::new())
     }
 
-    fn with_emit(
+    pub(crate) fn with_emit(
         checker: &'a mut CheckerState,
         flags: tsr_nodebuilder::Flags,
         emit: EmitContext,

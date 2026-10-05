@@ -543,11 +543,13 @@ fn require_destructuring_uses_its_variable_declaration_and_applies_the_fix() {
         &mut checker,
         file.source(),
         export,
-        false,
-        Some(lsp::Position {
-            line: 0,
-            character: 35,
-        }),
+        crate::fix::Usage {
+            position: Some(lsp::Position {
+                line: 0,
+                character: 35,
+            }),
+            ..Default::default()
+        },
         &Preferences::default(),
     )
     .unwrap();

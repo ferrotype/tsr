@@ -1,14 +1,27 @@
-//! Read-only request execution over the snapshot selected at dispatch. Parsing
+//! Request execution over the snapshot selected at dispatch. Parsing
 //! and project updates happen before this boundary; worker work retains both.
 use crate::{client, error};
 use tsr_ipc::Context;
 use tsr_json::RawValue;
 use tsr_lsproto as lsp;
 
+struct Stop(tsr_ipc::AfterFuncStop);
+impl Drop for Stop {
+    fn drop(&mut self) {
+        self.0.stop();
+    }
+}
+
 pub fn handles(method: &str) -> bool {
     matches!(
         method,
         "textDocument/_vs_onAutoInsert"
+            | "textDocument/prepareRename"
+            | "textDocument/codeAction"
+            | "textDocument/rename"
+            | "textDocument/formatting"
+            | "textDocument/rangeFormatting"
+            | "textDocument/onTypeFormatting"
             | "textDocument/completion"
             | "completionItem/resolve"
             | "textDocument/linkedEditingRange"
@@ -36,6 +49,12 @@ pub fn handles(method: &str) -> bool {
     )
 }
 pub enum Request {
+    CodeActions(lsp::CodeActionParams),
+    PrepareRename(lsp::PrepareRenameParams),
+    Rename(lsp::RenameParams),
+    Format(lsp::DocumentFormattingParams),
+    FormatRange(lsp::DocumentRangeFormattingParams),
+    FormatType(lsp::DocumentOnTypeFormattingParams),
     AutoInsert(lsp::VSOnAutoInsertParams),
     Completion(lsp::CompletionParams),
     ResolveCompletion(lsp::CompletionItem, lsp::DocumentUri),
@@ -64,7 +83,38 @@ pub enum Request {
 }
 impl Request {
     pub fn decode(method: &str, params: Option<&RawValue>) -> Result<Self, lsp::ResponseError> {
+        // These pointer-valued protocol fields may decode as null, but the
+        // formatter requires settings. Refuse before entering the service.
+        fn format_options(
+            options: Option<&lsp::FormattingOptions>,
+        ) -> Result<(), lsp::ResponseError> {
+            if options.is_none() {
+                return Err(crate::coded_error(
+                    lsp::ErrorCode::INVALID_PARAMS,
+                    Some("missing formatting options"),
+                ));
+            }
+            Ok(())
+        }
         Ok(match method {
+            "textDocument/codeAction" => Self::CodeActions(crate::decode(params)?),
+            "textDocument/prepareRename" => Self::PrepareRename(crate::decode(params)?),
+            "textDocument/rename" => Self::Rename(crate::decode(params)?),
+            "textDocument/formatting" => {
+                let p: lsp::DocumentFormattingParams = crate::decode(params)?;
+                format_options(p.options.as_deref())?;
+                Self::Format(p)
+            }
+            "textDocument/rangeFormatting" => {
+                let p: lsp::DocumentRangeFormattingParams = crate::decode(params)?;
+                format_options(p.options.as_deref())?;
+                Self::FormatRange(p)
+            }
+            "textDocument/onTypeFormatting" => {
+                let p: lsp::DocumentOnTypeFormattingParams = crate::decode(params)?;
+                format_options(p.options.as_deref())?;
+                Self::FormatType(p)
+            }
             "textDocument/_vs_onAutoInsert" => Self::AutoInsert(crate::decode(params)?),
             "textDocument/completion" => Self::Completion(crate::decode(params)?),
             "completionItem/resolve" => {
@@ -148,6 +198,12 @@ impl Request {
     }
     pub fn uri(&self) -> &lsp::DocumentUri {
         match self {
+            Self::PrepareRename(p) => &p.text_document.uri,
+            Self::CodeActions(p) => &p.text_document.uri,
+            Self::Rename(p) => &p.text_document.uri,
+            Self::Format(p) => &p.text_document.uri,
+            Self::FormatRange(p) => &p.text_document.uri,
+            Self::FormatType(p) => &p.text_document.uri,
             Self::AutoInsert(p) => &p.vs_text_document.uri,
             Self::Completion(p) => &p.text_document.uri,
             Self::ResolveCompletion(_, uri) => uri,
@@ -210,6 +266,9 @@ impl tsr_ls::QueryChecker for RequestChecker<'_> {
 }
 #[derive(Clone)]
 pub struct Options {
+    pub organize: tsr_ls::OrganizeOptions,
+    pub rename: tsr_ls::RenameOptions,
+    pub formatting: bool,
     pub completion: tsr_ls::CompletionOptions,
     pub auto_closing_tags: bool,
     pub maximum_hover_length: usize,
@@ -242,12 +301,6 @@ pub fn execute(
         .ok_or_else(|| error(-32603, "project has no program"))?;
     let cancellation = tsr_core::CancellationToken::new();
     let cancel = cancellation.clone();
-    struct Stop(tsr_ipc::AfterFuncStop);
-    impl Drop for Stop {
-        fn drop(&mut self) {
-            self.0.stop();
-        }
-    }
     let _stop = Stop(context.after_func(move || cancel.cancel()));
     let mut service = tsr_ls::LanguageService::new(program, encoding, cancellation);
     if let Some(host) = project.completion_file_system() {
@@ -282,7 +335,10 @@ pub fn execute(
     }
     if matches!(
         request,
-        Request::Completion(_)
+        Request::PrepareRename(_)
+            | Request::CodeActions(_)
+            | Request::Rename(_)
+            | Request::Completion(_)
             | Request::ResolveCompletion(_, _)
             | Request::Hover(_)
             | Request::SignatureHelp(_)
@@ -324,6 +380,11 @@ pub fn execute(
         let mut operation = checker
             .operation()
             .map_err(|e| error(-32603, e.to_string()))?;
+        if matches!(&request, Request::CodeActions(_)) {
+            if let Some(cache) = project.auto_import_cache() {
+                service.set_auto_import_cache(cache);
+            }
+        }
         let text_caps = capabilities.text_document.as_deref();
         if matches!(
             &request,
@@ -511,6 +572,101 @@ pub fn execute(
                     .map_err(service_error)?,
             );
         }
+        if let Request::CodeActions(params) = &request {
+            return client::raw(
+                &service
+                    .code_actions(
+                        &mut operation,
+                        params,
+                        &options.organize,
+                        &options.completion,
+                        &options.locale,
+                    )
+                    .map_err(service_error)?,
+            );
+        }
+        if matches!(&request, Request::PrepareRename(_) | Request::Rename(_)) {
+            let caps = capabilities
+                .workspace
+                .as_deref()
+                .and_then(|c| c.workspace_edit.as_deref());
+            let rename = tsr_ls::RenameOptions {
+                document_changes: caps
+                    .and_then(|c| c.document_changes.as_deref())
+                    .copied()
+                    .unwrap_or(false),
+                rename_resources: caps
+                    .and_then(|c| c.resource_operations.as_deref())
+                    .is_some_and(|r| r.iter().any(|r| r.0 == "rename")),
+                quote: options.completion.quote,
+                ..options.rename
+            };
+            if let Request::PrepareRename(p) = &request {
+                let info = service
+                    .rename_info(
+                        &mut operation,
+                        &p.text_document.uri,
+                        &p.position,
+                        "",
+                        rename,
+                        &options.locale,
+                    )
+                    .map_err(service_error)?;
+                if !info.can_rename {
+                    return Err(error(-32803, info.error));
+                }
+                return client::raw(
+                    &lsp::RangeOrPrepareRenamePlaceholderOrPrepareRenameDefaultBehaviorOrNull {
+                        prepare_rename_placeholder: Some(Box::new(lsp::PrepareRenamePlaceholder {
+                            range: info.range,
+                            placeholder: info.name,
+                        })),
+                        ..Default::default()
+                    },
+                );
+            }
+            if let Request::Rename(p) = &request {
+                let info = service
+                    .rename_info(
+                        &mut operation,
+                        &p.text_document.uri,
+                        &p.position,
+                        &p.new_name,
+                        rename,
+                        &options.locale,
+                    )
+                    .map_err(service_error)?;
+                if let Some((old, new)) = info.file_to_rename.filter(|_| info.can_rename) {
+                    let will_rename = capabilities
+                        .workspace
+                        .as_deref()
+                        .and_then(|w| w.file_operations.as_deref())
+                        .and_then(|o| o.will_rename.as_deref())
+                        .copied()
+                        .unwrap_or(false);
+                    let mut changes = if will_rename {
+                        Vec::new()
+                    } else {
+                        service
+                            .file_rename(
+                                &mut operation,
+                                &old,
+                                &new,
+                                &options.completion.auto_import,
+                                &options.completion.format,
+                            )
+                            .map_err(service_error)?
+                    };
+                    changes.push(resource_rename(old, new));
+                    return client::raw(&file_rename_response(changes, rename.document_changes));
+                }
+                return client::raw(
+                    &service
+                        .rename(&mut operation, p, rename, &options.locale)
+                        .map_err(service_error)?,
+                );
+            }
+        }
         if let Request::References(params) = &request {
             return client::raw(
                 &service
@@ -575,6 +731,21 @@ pub fn execute(
         );
     }
     match request {
+        Request::Format(p) => client::raw(
+            &service
+                .format_document(&p, &options.completion.format, options.formatting)
+                .map_err(service_error)?,
+        ),
+        Request::FormatRange(p) => client::raw(
+            &service
+                .format_range(&p, &options.completion.format, options.formatting)
+                .map_err(service_error)?,
+        ),
+        Request::FormatType(p) => client::raw(
+            &service
+                .format_on_type(&p, &options.completion.format, options.formatting)
+                .map_err(service_error)?,
+        ),
         Request::AutoInsert(p) => client::raw(
             &service
                 .auto_insert(&p, options.auto_closing_tags)
@@ -609,7 +780,10 @@ pub fn execute(
                     .map_err(service_error)?,
             )
         }
-        Request::Completion(_)
+        Request::PrepareRename(_)
+        | Request::CodeActions(_)
+        | Request::Rename(_)
+        | Request::Completion(_)
         | Request::ResolveCompletion(_, _)
         | Request::Hover(_)
         | Request::SignatureHelp(_)
@@ -645,4 +819,153 @@ pub fn execute(
             )
         }
     }
+}
+
+fn resource_rename(
+    old_uri: lsp::DocumentUri,
+    new_uri: lsp::DocumentUri,
+) -> lsp::TextDocumentEditOrCreateFileOrRenameFileOrDeleteFile {
+    lsp::TextDocumentEditOrCreateFileOrRenameFileOrDeleteFile {
+        rename_file: Some(Box::new(lsp::RenameFile {
+            old_uri,
+            new_uri,
+            ..Default::default()
+        })),
+        ..Default::default()
+    }
+}
+fn file_rename_response(
+    changes: Vec<lsp::TextDocumentEditOrCreateFileOrRenameFileOrDeleteFile>,
+    document_changes: bool,
+) -> lsp::WorkspaceEditOrNull {
+    if changes.is_empty() {
+        return lsp::WorkspaceEditOrNull::default();
+    }
+    let mut seen_edits = std::collections::HashMap::new();
+    let mut seen_renames = std::collections::HashSet::new();
+    let mut result = Vec::new();
+    for mut change in changes {
+        if let Some(rename) = &change.rename_file {
+            if seen_renames.insert(rename.old_uri.clone()) {
+                result.push(change);
+            }
+        } else if let Some(document) = &mut change.text_document_edit {
+            document.edits.retain(|edit| {
+                let Some(edit) = &edit.text_edit else {
+                    return true;
+                };
+                let key = (
+                    document.text_document.uri.clone(),
+                    edit.range.start.line,
+                    edit.range.start.character,
+                    edit.range.end.line,
+                    edit.range.end.character,
+                );
+                if seen_edits.get(&key) == Some(&edit.new_text) {
+                    return false;
+                }
+                seen_edits.insert(key, edit.new_text.clone());
+                true
+            });
+            if !document.edits.is_empty() {
+                result.push(change);
+            }
+        }
+    }
+    if result.is_empty() {
+        return lsp::WorkspaceEditOrNull::default();
+    }
+    let edit = if document_changes {
+        lsp::WorkspaceEdit {
+            document_changes: Some(Box::new(result)),
+            ..Default::default()
+        }
+    } else {
+        let mut changes: std::collections::HashMap<_, Vec<_>> = std::collections::HashMap::new();
+        for change in result {
+            if let Some(document) = change.text_document_edit {
+                for edit in document.edits {
+                    if let Some(edit) = edit.text_edit {
+                        changes
+                            .entry(document.text_document.uri.clone())
+                            .or_default()
+                            .push(Some(edit));
+                    }
+                }
+            }
+        }
+        lsp::WorkspaceEdit {
+            changes: Some(Box::new(changes)),
+            ..Default::default()
+        }
+    };
+    lsp::WorkspaceEditOrNull {
+        workspace_edit: Some(Box::new(edit)),
+    }
+}
+
+pub fn file_renames(
+    context: &Context,
+    request_id: &str,
+    snapshot: &tsr_project::Snapshot,
+    params: &lsp::RenameFilesParams,
+    encoding: tsr_jsstring::PositionEncoding,
+    capabilities: &lsp::ClientCapabilities,
+    options: &tsr_ls::CompletionOptions,
+) -> Result<RawValue, lsp::ResponseError> {
+    let mut changes = Vec::new();
+    for project in snapshot.projects() {
+        if context.err().is_some() {
+            return Err(crate::canceled());
+        }
+        let (Some(program), Some(scheduler)) = (project.program(), project.scheduler()) else {
+            continue;
+        };
+        let cancellation = tsr_core::CancellationToken::new();
+        let cancel = cancellation.clone();
+        let _stop = Stop(context.after_func(move || cancel.cancel()));
+        let result = (|| {
+            let checker = scheduler
+                .acquire(
+                    tsr_checker::CheckerLifetime::Temporary,
+                    None,
+                    context,
+                    request_id,
+                )
+                .map_err(|e| {
+                    if context.err().is_some() {
+                        crate::canceled()
+                    } else {
+                        error(-32603, e.to_string())
+                    }
+                })?;
+            let mut operation = checker
+                .operation()
+                .map_err(|e| error(-32603, e.to_string()))?;
+            let mut service = tsr_ls::LanguageService::new(program, encoding, cancellation);
+            for file in params.files.iter().flatten() {
+                changes.extend(
+                    service
+                        .file_rename(
+                            &mut operation,
+                            &lsp::DocumentUri(file.old_uri.clone()),
+                            &lsp::DocumentUri(file.new_uri.clone()),
+                            &options.auto_import,
+                            &options.format,
+                        )
+                        .map_err(service_error)?,
+                );
+            }
+            Ok::<_, lsp::ResponseError>(())
+        })();
+        result?;
+    }
+    let document_changes = capabilities
+        .workspace
+        .as_deref()
+        .and_then(|w| w.workspace_edit.as_deref())
+        .and_then(|e| e.document_changes.as_deref())
+        .copied()
+        .unwrap_or(false);
+    client::raw(&file_rename_response(changes, document_changes))
 }

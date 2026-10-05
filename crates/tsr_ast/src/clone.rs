@@ -109,6 +109,15 @@ pub fn deep_clone_node_with(
         visitor.visit_node(node)
     })
 }
+/// Clone into a private owner without discarding source ranges. Editing
+/// printers need those ranges until comments have been emitted; assigning
+/// output positions must then affect only this private copy.
+pub fn deep_clone_preserving_ranges(
+    factory: &mut dyn RuntimeFactory,
+    node: Option<NodeId>,
+) -> Option<NodeId> {
+    with_deep_clone(factory, false, None, |visitor| visitor.visit_node(node))
+}
 // port: tsc/internal/ast/deepclone.go:NodeFactory.DeepCloneReparse
 pub fn deep_clone_reparse(
     factory: &mut dyn RuntimeFactory,
