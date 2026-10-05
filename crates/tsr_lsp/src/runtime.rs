@@ -1099,11 +1099,7 @@ fn apply_inlay_preferences(
         };
     }
     if let Some(lsp::Any::String(value)) = get("quotePreference", "preferences.quoteStyle") {
-        options.quote = match value.as_str() {
-            "single" => tsr_ls::QuotePreference::Single,
-            "double" => tsr_ls::QuotePreference::Double,
-            _ => tsr_ls::QuotePreference::Auto,
-        };
+        options.quote = parse_quote_preference(value);
     }
     for (index, (name, path, invert, target)) in [
         (
@@ -1295,6 +1291,14 @@ fn apply_lens_preferences(
     }
 }
 
+fn parse_quote_preference(value: &str) -> tsr_ls::QuotePreference {
+    match tsr_jsstring::helpers::to_lower_go(value.as_bytes()).as_slice() {
+        b"single" => tsr_ls::QuotePreference::Single,
+        b"double" => tsr_ls::QuotePreference::Double,
+        _ => tsr_ls::QuotePreference::Auto,
+    }
+}
+
 fn apply_completion_preferences(
     fields: &HashMap<String, lsp::Any>,
     raw: bool,
@@ -1353,11 +1357,7 @@ fn apply_completion_preferences(
         }
     }
     if let Some(lsp::Any::String(value)) = get("quotePreference", "preferences.quoteStyle") {
-        options.quote = match value.as_str() {
-            "single" => tsr_ls::QuotePreference::Single,
-            "double" => tsr_ls::QuotePreference::Double,
-            _ => tsr_ls::QuotePreference::Auto,
-        };
+        options.quote = parse_quote_preference(value);
     }
     if let Some(lsp::Any::String(value)) = get(
         "jsxAttributeCompletionStyle",
@@ -1372,13 +1372,29 @@ fn apply_completion_preferences(
         "importModuleSpecifierEnding",
         "preferences.importModuleSpecifierEnding",
     ) {
-        options.auto_import.ending = Some(value.clone());
+        options.auto_import.ending = Some(
+            match tsr_jsstring::helpers::to_lower_go(value.as_bytes()).as_slice() {
+                b"minimal" => "minimal",
+                b"index" => "index",
+                b"js" => "js",
+                _ => "auto",
+            }
+            .into(),
+        );
     }
     if let Some(lsp::Any::String(value)) = get(
         "importModuleSpecifierPreference",
         "preferences.importModuleSpecifier",
     ) {
-        options.auto_import.module_specifier = Some(value.clone());
+        options.auto_import.module_specifier = Some(
+            match tsr_jsstring::helpers::to_lower_go(value.as_bytes()).as_slice() {
+                b"project-relative" => "project-relative",
+                b"relative" => "relative",
+                b"non-relative" => "non-relative",
+                _ => "shortest",
+            }
+            .into(),
+        );
     }
     if let Some(lsp::Any::Boolean(value)) = get(
         "autoImportEntrypointDirectorySearch",
@@ -1507,6 +1523,58 @@ fn apply_organize_preferences(
 #[cfg(test)]
 mod preference_tests {
     use super::*;
+
+    #[test]
+    fn quote_and_module_preferences_use_go_unicode_lowercasing() {
+        use tsr_ls::QuotePreference::{Auto, Double, Single};
+        for (quote, ending, relative, expected_quote, expected_ending, expected_relative) in [
+            ("DoUbLe", "JS", "Relative", Double, "js", "relative"),
+            (
+                "SİNGLE",
+                "MİNİMAL",
+                "NON-RELATİVE",
+                Single,
+                "minimal",
+                "non-relative",
+            ),
+            (
+                "AUTO",
+                "INDEX",
+                "PROJECT-RELATIVE",
+                Auto,
+                "index",
+                "project-relative",
+            ),
+            ("unknown", "unknown", "unknown", Auto, "auto", "shortest"),
+        ] {
+            for raw in [false, true] {
+                let json = if raw {
+                    format!(
+                        r#"{{"quotePreference":"{quote}","importModuleSpecifierEnding":"{ending}","importModuleSpecifierPreference":"{relative}"}}"#
+                    )
+                } else {
+                    format!(
+                        r#"{{"preferences":{{"quoteStyle":"{quote}","importModuleSpecifierEnding":"{ending}","importModuleSpecifier":"{relative}"}}}}"#
+                    )
+                };
+                let mut fields = HashMap::<String, lsp::Any>::new();
+                tsr_json::unmarshal(json.as_bytes(), &mut fields, tsr_json::Options::default())
+                    .unwrap();
+                let mut options = tsr_ls::CompletionOptions::default();
+                let mut auto_closing = false;
+                apply_completion_preferences(&fields, raw, &mut options, &mut auto_closing);
+                assert_eq!(options.quote, expected_quote);
+                assert_eq!(options.auto_import.ending.as_deref(), Some(expected_ending));
+                assert_eq!(
+                    options.auto_import.module_specifier.as_deref(),
+                    Some(expected_relative)
+                );
+                let mut hints = tsr_ls::InlayHintsOptions::default();
+                apply_inlay_preferences(&fields, raw, &mut hints, &mut [None; 7]);
+                assert_eq!(hints.quote, expected_quote);
+            }
+        }
+    }
 
     #[test]
     fn organize_config_accepts_boolean_and_case_insensitive_values() {

@@ -114,6 +114,23 @@ checker doctests; changed-crate clippy with warnings denied, formatting and
 once while the differential servers were active; the serial crate-test run
 passed without changing or disabling it.
 
+The follow-up review fixes normalize quote style, module-specifier preference and
+ending with pinned Go Unicode lowercasing, for both raw and nested settings.
+Completions and inlay hints share the quote parser. Import insertion now detects
+trailing comments after Unicode single-line whitespace, while stopping at line
+breaks and malformed UTF-8. The NBSP and em-space repros and mixed-case quote
+repro differed before the fix. Afterward, 220 native quick-fix requests across
+five preference combinations and 132 file-move comparisons match in UTF-8 and
+UTF-16. The quick-fix selection is `class-inferred-quotes`, `class-imports`,
+`imports-with-paths`, `promote-nbsp-comment` and `promote-em-space-comment`, with
+type order `first`; the `(quoteStyle, importModuleSpecifier,
+importModuleSpecifierEnding)` combinations are `(DoUbLe, Relative, JS)`,
+`(DOUBLE, Relative, JS)`, `(double, relative, js)`, `(auto, shortest, auto)` and
+`(SİNGLE, NON-RELATİVE, MİNİMAL)`.
+The affected crate tests pass (58 LS, 29 LSP), including raw/nested preference
+normalization and Unicode comment-boundary regressions. Clippy with warnings
+denied, formatting and marker validation also pass.
+
 ## Remaining Phase 5 work
 
 L6 still owns cross-project orchestration, project-reference discovery, ATA,

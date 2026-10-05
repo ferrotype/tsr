@@ -14,6 +14,7 @@ from read_only import position
 # That separates editing fidelity from the checker's diagnostic production.
 CASES = [
     ('imports', 'a; z; new D(); let x: Shape;\n', {}),
+    ('imports-with-paths', 'a; z; new D(); let x: Shape;\n', {'baseUrl':'.','paths':{'@app/*':['*']}}),
     ('existing', 'import { a } from "./dep";\nz; a;\n', {}),
     ('namespace', 'import * as dep from "./dep";\na; z;\n', {}),
     ('promote-specifier', 'import { type D, type Shape } from "./dep";\nnew D();\n', {}),
@@ -40,6 +41,8 @@ CASES = [
     ('class-inferred-quotes', "import {a} from './dep';\ninterface I {foo():void}\nclass C implements I {}\na;\n", {}),
     ('promote-indent', 'import {\n    type D,\n \ta\n} from "./dep";\nnew D(); a;\n', {}),
     ('promote-unicode-indent', 'import {\n    type D,\n\u2003a\n} from "./dep";\nnew D(); a;\n', {}),
+    ('promote-nbsp-comment', 'import {type D, a\u00a0/*keep*/ } from "./dep"; new D();\n', {}),
+    ('promote-em-space-comment', 'import {type D, a\u2003/*keep*/ } from "./dep"; new D();\n', {}),
     ('class-accessors', 'interface Shape { get x(): number; set x(value: number); constructor(): void } class C implements Shape {}', {}),
     ('class-generic', 'interface Shape { method<T extends {x: number} = {x: number}>(value: T): T } class C implements Shape {}', {}),
     ('class-existing', 'class Base {public x=1; protected y=2; private z=3} interface Shape {x:number; y:number; z:number} class C extends Base implements Shape {z=1}', {}),

@@ -309,11 +309,7 @@ impl NodeTracker<'_> {
             let previous = syntax.start(nodes[index - 1])?;
             multiline = line_start(&syntax.file, previous) != after_line;
         }
-        let has_comment = text[end as usize..]
-            .iter()
-            .copied()
-            .find(|b| !matches!(b, b' ' | b'\t' | 0x0b | 0x0c))
-            .is_some_and(|b| b == b'/');
+        let has_comment = has_comments_before_line_break(text, end as usize);
         multiline |= has_comment || !syntax.same_line(list.loc().pos(), list.loc().end());
         if multiline {
             self.raw
@@ -491,6 +487,19 @@ impl NodeTracker<'_> {
         Ok(())
     }
 }
+// port: tsc/internal/ls/change/trackerimpl.go:hasCommentsBeforeLineBreak
+fn has_comments_before_line_break(text: &[u8], start: usize) -> bool {
+    let mut remaining = &text[start..];
+    while !remaining.is_empty() {
+        let (ch, width) = tsr_jsstring::wtf8::decode_utf8(remaining);
+        if !tsr_scanner::is_white_space_single_line(ch) {
+            return ch == i32::from(b'/');
+        }
+        remaining = &remaining[width..];
+    }
+    false
+}
+
 fn members(view: tsr_ast::AstView<'_>, node: NodeId) -> Result<Option<NodeListId>> {
     let node = view.node(node)?;
     Ok(if node.kind() == K::ObjectLiteralExpression {
@@ -516,4 +525,31 @@ fn indentation_column(text: &[u8], line_start: i64, member_start: i64, tab_size:
         };
     }
     column
+}
+
+#[cfg(test)]
+mod tests {
+    use super::has_comments_before_line_break;
+
+    #[test]
+    fn trailing_comments_skip_single_line_unicode_space_only() {
+        for whitespace in [
+            "",
+            " \t\u{b}\u{c}",
+            "\u{85}",
+            "\u{a0}",
+            "\u{2003}",
+            "\u{200b}",
+            "\u{feff}",
+        ] {
+            let text = format!("name{whitespace}/*keep*/");
+            assert!(has_comments_before_line_break(text.as_bytes(), 4));
+        }
+        for preceding in ["\n", "\r\n", "\u{2028}", "\u{2029}", "other"] {
+            let text = format!("name {preceding} /*later*/");
+            assert!(!has_comments_before_line_break(text.as_bytes(), 4));
+        }
+        assert!(!has_comments_before_line_break(b"name \xff /*later*/", 4));
+        assert!(!has_comments_before_line_break(b"name", 4));
+    }
 }

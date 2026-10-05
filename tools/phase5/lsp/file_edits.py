@@ -30,6 +30,8 @@ CASES = [
 ]
 
 PREFERENCE_CASES = [
+    ({'main.ts': 'import {x} from "./dep"; x;', 'dep.ts': 'export const x=1'},
+     'dep.ts', 'renamed.ts', {}, {'preferences': {'importModuleSpecifierEnding': 'JS'}}, {}),
     ({'main.ts': 'import {x} from "@app/dep"; x;', 'src/dep.ts': 'export const x=1'},
      'src/dep.ts', 'src/renamed.ts', {'baseUrl': '.', 'paths': {'@app/*': ['src/*']}},
      {'preferences': {'autoImportSpecifierExcludeRegexes': ['^@app/']}}, {}),
