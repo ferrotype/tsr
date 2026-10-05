@@ -358,9 +358,7 @@ impl CheckerHost for ProgramCheckerHost {
             .map(|package| package.directory.clone()))
     }
     fn get_global_typings_cache_location(&self) -> Result<tsr_jsstring::JsString, Error> {
-        // ProgramOptions has no global typings-cache input and Resolver::new
-        // constructs no global cache. Package-local @types remains supported.
-        Ok(tsr_jsstring::JsString::default())
+        Ok(self.program.global_typings_cache_location())
     }
     fn get_output_js_file_name(&self, file: &[u8]) -> Result<tsr_jsstring::JsString, Error> {
         Ok(tsr_jsstring::JsString::from_bytes(

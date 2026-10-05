@@ -214,6 +214,9 @@ impl Resolver {
             type_cache: BTreeMap::new(),
         })
     }
+    pub fn typings_location(&self) -> &JsString {
+        &self.typings_location
+    }
     pub fn take_trace(&mut self) -> Vec<crate::DiagAndArgs> {
         self.tracer.take()
     }

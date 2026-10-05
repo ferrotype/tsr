@@ -10,6 +10,7 @@ use tsr_ipc::Context;
 use tsr_jsstring::JsString;
 use tsr_lsp::{connection::Connection, dynamic_queue::DynamicQueue, runtime::Options};
 mod flags;
+mod npm;
 use flags::parse as flags;
 
 // port: tsc/cmd/tsc/lsp.go:runLSP
@@ -57,6 +58,17 @@ pub fn run(args: &[JsString]) -> i32 {
         },
         fs,
     );
+    let system = match crate::system::OsSystem::new() {
+        Ok(system) => Arc::new(system),
+        Err(error) => {
+            eprintln!("{error}");
+            return 1;
+        }
+    };
+    options.project.mapper_spawner = Some(system);
+    options.project.npm_executor = Some(Arc::new(npm::NativeNpm));
+    options.project.typings_location =
+        JsString::from_bytes(tsr_vfs::os::global_typings_cache_location());
     options.parent_process = parent_watchdog(&context, parent);
     let outgoing: DynamicQueue<tsr_json::RawValue> = DynamicQueue::new();
     let output_queue = outgoing.clone();

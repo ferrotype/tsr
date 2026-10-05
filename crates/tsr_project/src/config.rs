@@ -214,7 +214,9 @@ impl ConfigRegistryBuilder {
         }
         let path = self.path(file);
         let Some(entry) = self.names.get(&path) else {
-            return Ok(JsString::default());
+            // API-opened and request-only files have no editor overlay and do
+            // not populate this cache, but still search ancestor configurations.
+            return self.compute_config_file_name(config.as_bytes(), true);
         };
         if let Some(result) = entry.ancestors.get(config) {
             return Ok(result.clone());

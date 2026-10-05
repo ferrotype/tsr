@@ -62,7 +62,8 @@ first session, matching `SetCompilerOptionsForInferredProjects` at the pin.
   only in this test worker. Callback IDs never restart, so late replies cannot
   satisfy the next test's calls.
 - S11 filesystem callbacks and plugin streams share the connection. The plugin
-  stream transport is available; connecting it to project transforms is L6.
+  stream transport feeds the production mapper host; transforms can wait while
+  the independent reader pumps stream data, credits and callback responses.
   `test/state` retains its existing version-2 **host descriptor** schema and is
   not the project snapshot. It can be answered while the project worker waits.
 - `$/cancelRequest` cancels that operation's filesystem scope. Host progress is
@@ -91,9 +92,7 @@ into one state transition test; their count is not a count of native tests.
 | Untitled inferred projects and display names | session tests: actual text/program membership and project names; reference/definition results remain L3, ATA imports remain L6 |
 | Private bridge/reset | testhost bridge/project_host tests: several blocked callbacks, out-of-order replies, progress, cancellation, disconnect, late responses, full-queue reset and real session/cache isolation |
 
-`TestPushDiagnostics`, `TestProgressNotifications` and custom-config diagnostic
-refresh assertions belong to L2. Auto-import filesystem paths, project-reference
-faking, API synthetic project construction, mapper execution tests and ATA
-belong to L6. These assignments leave those features visible as unfinished;
-they are not skipped results counted as passes. The core tests do not certify
-all subcases of the native project suite.
+L6 adds project-reference faking, API snapshot construction, mapper execution
+and ATA tests. Their exact scope and native checks are in
+[the L6 record](../../../docs/PHASE5-L6.md). The core tests do not certify all
+subcases of the native project suite or L7's full fourslash replay.

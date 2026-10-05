@@ -48,6 +48,7 @@ pub fn handles(method: &str) -> bool {
             | "textDocument/typeDefinition"
     )
 }
+#[derive(Clone)]
 pub enum Request {
     CodeActions(lsp::CodeActionParams),
     PrepareRename(lsp::PrepareRenameParams),
@@ -63,6 +64,11 @@ pub enum Request {
     InlayHints(lsp::InlayHintParams),
     CodeLenses(lsp::CodeLensParams),
     ResolveLens(lsp::CodeLens),
+    // Internal stages of cross-project requests, never wire methods.
+    LensLocations(lsp::CodeLens),
+    LensImplementations(lsp::ImplementationParams),
+    IncomingPositions(Box<lsp::CallHierarchyItem>),
+    IncomingAt(lsp::TextDocumentPositionParams),
     CallPrepare(lsp::CallHierarchyPrepareParams),
     CallIncoming(Box<lsp::CallHierarchyItem>),
     CallOutgoing(Box<lsp::CallHierarchyItem>),
@@ -189,10 +195,11 @@ impl Request {
             Self::Completion(_)
                 | Self::Hover(_)
                 | Self::SignatureHelp(_)
-                | Self::SourceDefinition(_)
                 | Self::Definition(_)
                 | Self::TypeDefinition(_)
                 | Self::References(_)
+                | Self::Rename(_)
+                | Self::Highlights(_)
                 | Self::Implementation(_)
         )
     }
@@ -210,13 +217,16 @@ impl Request {
             Self::SignatureHelp(p) => &p.text_document.uri,
             Self::InlayHints(p) => &p.text_document.uri,
             Self::CodeLenses(p) => &p.text_document.uri,
-            Self::ResolveLens(p) => &p.data.as_ref().expect("validated code lens data").uri,
+            Self::ResolveLens(p) | Self::LensLocations(p) => {
+                &p.data.as_ref().expect("validated code lens data").uri
+            }
             Self::CallPrepare(p) => &p.text_document.uri,
-            Self::CallIncoming(p) | Self::CallOutgoing(p) => &p.uri,
+            Self::CallIncoming(p) | Self::CallOutgoing(p) | Self::IncomingPositions(p) => &p.uri,
             Self::Highlights(p) => &p.text_document.uri,
             Self::MultiHighlights(p) => &p.text_document.uri,
             Self::References(p) | Self::VSReferences(p) => &p.text_document.uri,
-            Self::Implementation(p) => &p.text_document.uri,
+            Self::Implementation(p) | Self::LensImplementations(p) => &p.text_document.uri,
+            Self::IncomingAt(p) => &p.text_document.uri,
             Self::Hover(p) => &p.text_document.uri,
             Self::Linked(p) => &p.text_document.uri,
             Self::Selection(p) => &p.text_document.uri,
@@ -229,7 +239,7 @@ impl Request {
         }
     }
 }
-fn service_error(e: tsr_ls::Error) -> lsp::ResponseError {
+pub(crate) fn service_error(e: tsr_ls::Error) -> lsp::ResponseError {
     match e {
         tsr_ls::Error::Canceled => crate::canceled(),
         e => error(-32603, e.to_string()),
@@ -287,6 +297,54 @@ pub fn execute(
     capabilities: &lsp::ClientCapabilities,
     options: &Options,
 ) -> Result<RawValue, lsp::ResponseError> {
+    execute_impl(
+        context,
+        request_id,
+        project,
+        request,
+        encoding,
+        capabilities,
+        options,
+        false,
+    )
+    .map(|(response, _)| response)
+}
+
+pub(crate) fn execute_with_targets(
+    context: &Context,
+    request_id: &str,
+    project: Option<&tsr_project::Project>,
+    request: Request,
+    encoding: tsr_jsstring::PositionEncoding,
+    capabilities: &lsp::ClientCapabilities,
+    options: &Options,
+) -> Result<(RawValue, tsr_ls::CrossProjectTargets), lsp::ResponseError> {
+    execute_impl(
+        context,
+        request_id,
+        project,
+        request,
+        encoding,
+        capabilities,
+        options,
+        true,
+    )
+}
+
+#[allow(
+    clippy::too_many_arguments,
+    reason = "request context plus routing collection policy"
+)]
+fn execute_impl(
+    context: &Context,
+    request_id: &str,
+    project: Option<&tsr_project::Project>,
+    request: Request,
+    encoding: tsr_jsstring::PositionEncoding,
+    capabilities: &lsp::ClientCapabilities,
+    options: &Options,
+    collect_targets: bool,
+) -> Result<(RawValue, tsr_ls::CrossProjectTargets), lsp::ResponseError> {
     if context.err().is_some() {
         return Err(crate::canceled());
     }
@@ -303,6 +361,34 @@ pub fn execute(
     let cancel = cancellation.clone();
     let _stop = Stop(context.after_func(move || cancel.cancel()));
     let mut service = tsr_ls::LanguageService::new(program, encoding, cancellation);
+    let query = |service: &mut tsr_ls::LanguageService<'_>| {
+        execute_request(
+            context,
+            request_id,
+            project,
+            request,
+            capabilities,
+            options,
+            service,
+        )
+    };
+    if collect_targets {
+        service.with_cross_project_targets(query)
+    } else {
+        query(&mut service).map(|response| (response, tsr_ls::CrossProjectTargets::default()))
+    }
+}
+
+fn execute_request(
+    context: &Context,
+    request_id: &str,
+    project: &tsr_project::Project,
+    request: Request,
+    capabilities: &lsp::ClientCapabilities,
+    options: &Options,
+    service: &mut tsr_ls::LanguageService<'_>,
+) -> Result<RawValue, lsp::ResponseError> {
+    let program = project.program().expect("validated project program");
     if let Some(host) = project.completion_file_system() {
         service.set_completion_file_system(host);
     }
@@ -344,6 +430,10 @@ pub fn execute(
             | Request::SignatureHelp(_)
             | Request::InlayHints(_)
             | Request::ResolveLens(_)
+            | Request::LensLocations(_)
+            | Request::LensImplementations(_)
+            | Request::IncomingPositions(_)
+            | Request::IncomingAt(_)
             | Request::CallPrepare(_)
             | Request::CallIncoming(_)
             | Request::CallOutgoing(_)
@@ -499,6 +589,42 @@ pub fn execute(
             return client::raw(
                 &service
                     .inlay_hints(&mut operation, params, options.inlay)
+                    .map_err(service_error)?,
+            );
+        }
+        if let Request::LensLocations(lens) = &request {
+            let locations = service
+                .code_lens_locations(&mut operation, lens)
+                .map_err(service_error)?;
+            return client::raw(&lsp::LocationsOrNull {
+                locations: Some(Box::new(locations)),
+            });
+        }
+        if let Request::LensImplementations(params) = &request {
+            return client::raw(
+                &service
+                    .implementations_with_options(&mut operation, params, false, true)
+                    .map_err(service_error)?,
+            );
+        }
+        if let Request::IncomingPositions(item) = &request {
+            let positions = service
+                .incoming_call_positions(&mut operation, item)
+                .map_err(service_error)?;
+            return client::raw(
+                &positions
+                    .into_iter()
+                    .map(|p| lsp::TextDocumentPositionParams {
+                        text_document: lsp::TextDocumentIdentifier { uri: p.uri },
+                        position: p.position,
+                    })
+                    .collect::<Vec<_>>(),
+            );
+        }
+        if let Request::IncomingAt(params) = &request {
+            return client::raw(
+                &service
+                    .incoming_calls_at(&mut operation, &params.text_document.uri, &params.position)
                     .map_err(service_error)?,
             );
         }
@@ -789,6 +915,10 @@ pub fn execute(
         | Request::SignatureHelp(_)
         | Request::InlayHints(_)
         | Request::ResolveLens(_)
+        | Request::LensLocations(_)
+        | Request::LensImplementations(_)
+        | Request::IncomingPositions(_)
+        | Request::IncomingAt(_)
         | Request::CallPrepare(_)
         | Request::CallIncoming(_)
         | Request::CallOutgoing(_)

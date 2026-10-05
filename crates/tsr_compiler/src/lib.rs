@@ -37,6 +37,7 @@ pub use program_emit::{
     EmitOptions, EmitResult, FileDiagnostics, ProgramLike, SourceMapEmitResult, WriteFile,
     WriteFileData,
 };
+mod project_reference_host;
 mod project_references;
 pub use project_references::{CompilerConfigHost, ResolvedProjectReferenceProvider};
 mod syntactic_diagnostics;
@@ -46,7 +47,8 @@ mod loader;
 mod metadata;
 mod resolver_host;
 pub use cache::{
-    CachedProgramFile, FileCache, ProgramFile, SharedSourceFileCache, SourceFileCache,
+    CachedMappedProgramFiles, CachedProgramFile, FileCache, MappedFileResult, MappedProgramFiles,
+    MappedSourceFileRequest, ProgramFile, SharedSourceFileCache, SourceFileCache,
 };
 pub use checker_host::ProgramCheckerHost;
 pub use loader::{

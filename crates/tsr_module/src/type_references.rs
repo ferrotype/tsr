@@ -417,68 +417,6 @@ impl Resolver {
             peer_dependencies: JsString::from_bytes(peers),
         })
     }
-    /// port: tsc/internal/module/resolver.go:GetAutomaticTypeDirectiveNames
-    pub fn automatic_type_directive_names(&mut self) -> Result<Vec<JsString>, Error> {
-        let options = self.options.clone();
-        if !options.uses_wildcard_types() {
-            return Ok(options.types.clone().unwrap_or_default());
-        }
-        let (roots, _) = effective_type_roots(&options, self.cwd.as_bytes());
-        let mut wildcard = Vec::new();
-        for root in roots {
-            if !self.host.directory_exists(root.as_bytes())? {
-                continue;
-            }
-            for entry in self
-                .host
-                .entries(root.as_bytes())?
-                .directories
-                .into_iter()
-                .flatten()
-            {
-                let normalized = path::normalize(entry.as_bytes());
-                // GetAutomaticTypeDirectiveNames reads the package directly;
-                // it does not populate the resolver's package information cache.
-                let package_path = path::combine(root.as_bytes(), &[&normalized, b"package.json"]);
-                let not_needed = if self.host.file_exists(&package_path)? {
-                    let content = self.host.read_file(&package_path)?;
-                    let parsed = crate::package_json::parse(
-                        content
-                            .as_ref()
-                            .map_or(b"".as_slice(), |file| file.text.as_bytes()),
-                    );
-                    parsed
-                        .fields
-                        .field("typings")
-                        .is_some_and(|field| field.state.null)
-                } else {
-                    false
-                };
-                if not_needed {
-                    continue;
-                }
-                let name = path::base_name(&normalized);
-                if !name.starts_with(b".") {
-                    wildcard.push(JsString::from_bytes(name));
-                }
-            }
-        }
-        let mut result = Vec::new();
-        let mut seen = BTreeSet::new();
-        for name in options.types.iter().flatten() {
-            let names = if name.as_bytes() == b"*" {
-                wildcard.as_slice()
-            } else {
-                std::slice::from_ref(name)
-            };
-            for name in names {
-                if seen.insert(name.clone()) {
-                    result.push(name.clone());
-                }
-            }
-        }
-        Ok(result)
-    }
 }
 impl Resolver {
     fn type_candidate(&mut self, root: &[u8], name: &[u8]) -> Vec<u8> {
@@ -507,4 +445,71 @@ impl Resolver {
 fn node_module_directory(file: &[u8]) -> Option<Vec<u8>> {
     let directory = crate::parse_node_module_from_path(file, false);
     (!directory.is_empty()).then_some(directory)
+}
+
+/// Discovers automatic types on the compiler's source host. This is separate
+/// from a resolver's host, which may advertise unbuilt project declarations.
+/// port: tsc/internal/module/resolver.go:GetAutomaticTypeDirectiveNames
+pub fn automatic_type_directive_names(
+    options: &CompilerOptions,
+    host: &dyn tsr_vfs::FileSystem,
+    cwd: &[u8],
+) -> Result<Vec<JsString>, Error> {
+    if !options.uses_wildcard_types() {
+        return Ok(options.types.clone().unwrap_or_default());
+    }
+    let (roots, _) = effective_type_roots(options, cwd);
+    let mut wildcard = Vec::new();
+    for root in roots {
+        if !host.directory_exists(root.as_bytes())? {
+            continue;
+        }
+        for entry in host
+            .entries(root.as_bytes())?
+            .directories
+            .into_iter()
+            .flatten()
+        {
+            let normalized = path::normalize(entry.as_bytes());
+            // GetAutomaticTypeDirectiveNames reads the package directly;
+            // it does not populate the resolver's package information cache.
+            let package_path = path::combine(root.as_bytes(), &[&normalized, b"package.json"]);
+            let not_needed = if host.file_exists(&package_path)? {
+                let content = host.read_file(&package_path)?;
+                let parsed = crate::package_json::parse(
+                    content
+                        .as_ref()
+                        .map_or(b"".as_slice(), |file| file.text.as_bytes()),
+                );
+                parsed
+                    .fields
+                    .field("typings")
+                    .is_some_and(|field| field.state.null)
+            } else {
+                false
+            };
+            if not_needed {
+                continue;
+            }
+            let name = path::base_name(&normalized);
+            if !name.starts_with(b".") {
+                wildcard.push(JsString::from_bytes(name));
+            }
+        }
+    }
+    let mut result = Vec::new();
+    let mut seen = BTreeSet::new();
+    for name in options.types.iter().flatten() {
+        let names = if name.as_bytes() == b"*" {
+            wildcard.as_slice()
+        } else {
+            std::slice::from_ref(name)
+        };
+        for name in names {
+            if seen.insert(name.clone()) {
+                result.push(name.clone());
+            }
+        }
+    }
+    Ok(result)
 }

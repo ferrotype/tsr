@@ -3,7 +3,10 @@
     "/p/base.json": "{\"compilerOptions\":{\"noLib\":true}}",
     "/p/tsconfig.json": "{\"extends\":\"./base.json\",\"files\":[\"main.ts\",\"lib.d.ts\"]}",
     "/p/main.ts": "const x = stable;",
-    "/p/lib.d.ts": "declare const stable: number;"
+    "/p/lib.d.ts": "declare const stable: number;",
+    "/solution/tsconfig.json": "{\"files\":[],\"references\":[{\"path\":\"./a\"}]}",
+    "/solution/a/tsconfig.json": "{\"compilerOptions\":{\"noLib\":true,\"composite\":true},\"files\":[\"a.ts\"]}",
+    "/solution/a/a.ts": "export interface Service {}"
   },
   "actions": [
     {"kind":"state"},
@@ -20,6 +23,10 @@
     {"kind":"close","file":"/p/main.ts"},
     {"kind":"state","file":"/other.ts"},
     {"kind":"open","file":"/last.ts","version":1,"text":"const last = 1;"},
+    {"kind":"state","file":"/last.ts"},
+    {"kind":"open","file":"/solution/a/a.ts","version":1,"text":"export interface Service {}"},
+    {"kind":"state","file":"/solution/a/a.ts"},
+    {"kind":"close","file":"/solution/a/a.ts"},
     {"kind":"state","file":"/last.ts"}
   ]
 }

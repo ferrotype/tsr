@@ -12,10 +12,14 @@ use tsr_jsstring::{JsString, SourceText};
 #[derive(Debug)]
 pub struct ProgramFile {
     pub(crate) bound: CompletedFile,
+    mapped_bundle: Option<Arc<[CompletedFile]>>,
 }
 impl ProgramFile {
     pub(crate) fn new(bound: CompletedFile) -> Self {
-        Self { bound }
+        Self {
+            bound,
+            mapped_bundle: None,
+        }
     }
     pub fn bound(&self) -> &CompletedFile {
         &self.bound
@@ -88,12 +92,112 @@ pub struct CachedProgramFile {
     pub file: Arc<ProgramFile>,
     pub retention: Box<dyn Send + Sync>,
 }
+/// All bound outputs of one transform. Every escaped member retains the entire
+/// syntax bundle, independently of its cache lease and without a Program cycle.
+pub struct MappedProgramFiles {
+    pub canonical: Arc<ProgramFile>,
+    pub supplemental: Vec<Arc<ProgramFile>>,
+}
+impl MappedProgramFiles {
+    pub fn bind(
+        parsed: tsr_contentmapper::SourceFiles,
+        tracing: Option<&Arc<dyn tsr_checker::TraceSink>>,
+        hash: Option<tsr_ast::SourceHash>,
+    ) -> Result<Self, Error> {
+        let canonical = ProgramFile::bind_parsed(parsed.canonical, tracing, hash)?;
+        let supplemental = parsed
+            .supplemental
+            .into_iter()
+            .map(|file| ProgramFile::bind_parsed(file, tracing, hash))
+            .collect::<Result<Vec<_>, _>>()?;
+        let bundle: Arc<[CompletedFile]> = std::iter::once(&canonical)
+            .chain(&supplemental)
+            .map(|file| file.bound.clone())
+            .collect();
+        let retain = |mut file: Arc<ProgramFile>| {
+            Arc::get_mut(&mut file)
+                .expect("newly bound mapper output has not been published")
+                .mapped_bundle = Some(bundle.clone());
+            file
+        };
+        Ok(Self {
+            canonical: retain(canonical),
+            supplemental: supplemental.into_iter().map(retain).collect(),
+        })
+    }
+    pub fn check_collisions(
+        &self,
+        host: &dyn tsr_vfs::FileSystem,
+    ) -> Result<(), tsr_contentmapper::Error> {
+        for file in &self.supplemental {
+            let source = file
+                .bound()
+                .view()
+                .source_file()
+                .map_err(|error| tsr_contentmapper::Error::Message(format!("{error:?}")))?;
+            if host.file_exists(source.file_name()).unwrap_or(false) {
+                return Err(tsr_contentmapper::Error::SupplementalFileCollision(
+                    JsString::from_bytes(source.file_name()),
+                ));
+            }
+        }
+        Ok(())
+    }
+}
+pub struct CachedMappedProgramFiles {
+    pub files: Arc<MappedProgramFiles>,
+    pub retention: Box<dyn Send + Sync>,
+}
+pub struct MappedSourceFileRequest<'a> {
+    pub options: &'a SourceFileParseOptions,
+    pub content: &'a [u8],
+    pub mapper: &'a tsr_tsoptions::config_mappers::ContentMapper,
+    pub mapper_index: usize,
+    pub project: &'a dyn tsr_contentmapper::Project,
+    pub counters: &'a Counters,
+    pub tracing: Option<&'a Arc<dyn tsr_checker::TraceSink>>,
+}
+pub type MappedFileResult<T> = Result<Result<T, tsr_contentmapper::Error>, Error>;
+impl MappedSourceFileRequest<'_> {
+    pub fn transform(
+        &self,
+        hash: Option<tsr_ast::SourceHash>,
+    ) -> MappedFileResult<Arc<MappedProgramFiles>> {
+        let parsed = match tsr_contentmapper::transform_and_parse(
+            self.options,
+            self.content,
+            self.mapper,
+            self.mapper_index,
+            self.project,
+            self.counters,
+        ) {
+            Ok(parsed) => parsed,
+            Err(error) => return Ok(Err(error)),
+        };
+        Ok(Ok(Arc::new(MappedProgramFiles::bind(
+            parsed,
+            self.tracing,
+            hash,
+        )?)))
+    }
+}
 type RetainedSources = Mutex<Vec<Box<dyn Send + Sync>>>;
 #[derive(Clone, Default)]
 pub(crate) struct ProgramRetention {
     _sources: Option<Arc<RetainedSources>>,
 }
 pub trait SourceFileCache: Send + Sync {
+    fn acquire_mapped(
+        &self,
+        request: &MappedSourceFileRequest<'_>,
+    ) -> MappedFileResult<CachedMappedProgramFiles> {
+        Ok(request
+            .transform(None)?
+            .map(|files| CachedMappedProgramFiles {
+                files,
+                retention: Box::new(()),
+            }))
+    }
     /// Editor overlays can supply a language independently of the file suffix.
     fn script_kind(&self, name: &[u8]) -> ScriptKind {
         ScriptKind::ensure_from_file_name(name)
@@ -204,6 +308,36 @@ impl FileCache {
                 .push(lease);
         }
         Ok(())
+    }
+    pub(crate) fn acquire_mapped(
+        &self,
+        request: &MappedSourceFileRequest<'_>,
+        host: &dyn tsr_vfs::FileSystem,
+    ) -> MappedFileResult<Arc<MappedProgramFiles>> {
+        let acquired = match &self.project {
+            Some(cache) => cache.acquire_mapped(request)?,
+            None => request
+                .transform(None)?
+                .map(|files| CachedMappedProgramFiles {
+                    files,
+                    retention: Box::new(()),
+                }),
+        };
+        let acquired = match acquired {
+            Ok(acquired) => acquired,
+            Err(error) => return Ok(Err(error)),
+        };
+        // A collision is filesystem-dependent and must be checked even on cache hits.
+        if let Err(error) = acquired.files.check_collisions(host) {
+            return Ok(Err(error));
+        }
+        if let Some(retention) = self.project_retention.upgrade() {
+            retention
+                .lock()
+                .expect("program retention poisoned")
+                .push(acquired.retention);
+        }
+        Ok(Ok(acquired.files))
     }
     pub(crate) fn begin_program(&mut self) -> ProgramRetention {
         let retention = self

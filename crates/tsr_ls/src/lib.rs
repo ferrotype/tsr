@@ -1,4 +1,7 @@
 //! Language service operations over a retained compiler snapshot.
+mod api;
+mod crossproject;
+pub use crossproject::{CrossProjectDefinition, CrossProjectPosition, CrossProjectTargets};
 mod auto_imports;
 mod autoinsert;
 mod call_declarations;
@@ -109,6 +112,7 @@ pub enum Error {
     Edits(tsr_core::UnappliableEdits),
     Canceled,
     MissingFile(String),
+    MissingSourceFile(String),
 }
 impl From<tsr_core::UnappliableEdits> for Error {
     fn from(value: tsr_core::UnappliableEdits) -> Self {
@@ -150,6 +154,7 @@ impl std::fmt::Display for Error {
             Self::Edits(e) => write!(f, "unappliable snippet edits: {e:?}"),
             Self::Canceled => f.write_str("request canceled"),
             Self::MissingFile(name) => write!(f, "file not found: {name}"),
+            Self::MissingSourceFile(name) => write!(f, "source file not found: {name}"),
         }
     }
 }
@@ -187,6 +192,9 @@ pub struct LanguageService<'a> {
     converters: Converters,
     source_maps: source_map::Maps,
     cancellation: CancellationToken,
+    cross_project_targets: Option<CrossProjectTargets>,
+    #[cfg(test)]
+    reference_search_count: usize,
 }
 impl<'a> LanguageService<'a> {
     pub fn new(
@@ -201,6 +209,9 @@ impl<'a> LanguageService<'a> {
             converters: Converters::new(encoding),
             source_maps: source_map::Maps::new(),
             cancellation,
+            cross_project_targets: None,
+            #[cfg(test)]
+            reference_search_count: 0,
         }
     }
     fn check_canceled(&self) -> Result<()> {

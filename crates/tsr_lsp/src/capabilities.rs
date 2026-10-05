@@ -2,7 +2,8 @@ use tsr_jsstring::PositionEncoding;
 use tsr_lsproto as lsp;
 
 // The literal is the pin's capability declaration, decoded through the same
-// typed codec as its tests. L3–L6 handlers still refuse their named features.
+// typed codec as its tests. Full feature/replay acceptance is tracked separately
+// from capability encoding.
 pub fn initialize(
     caps: &lsp::ClientCapabilities,
     encoding: PositionEncoding,

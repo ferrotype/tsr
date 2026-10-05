@@ -1,6 +1,7 @@
+mod resources;
 use super::{
-    Arc, BTreeMap, CompilerOptions, ConfigRegistryBuilder, Counters, DocumentUri, Error,
-    FileChangeSummary, JsString, ParseCache, Session, SessionSnapshot, SnapshotFsBuilder,
+    Arc, BTreeMap, CompilerOptions, ConfigRegistryBuilder, Counters, Error, FileChangeSummary,
+    JsString, ParseCache, Session, SessionSnapshot, SnapshotFsBuilder,
 };
 use crate::{
     config::AffectedConfigs,
@@ -28,19 +29,30 @@ pub(super) struct ProjectBuilder<'a> {
     affected: &'a AffectedConfigs,
     configs: &'a mut ConfigRegistryBuilder,
     inferred_options: Option<Arc<CompilerOptions>>,
+    contributions: Arc<crate::content_mappers::Contributions>,
     projects: BTreeMap<JsString, Project>,
+    delayed_projects: BTreeMap<JsString, crate::DelayedProject>,
     updated: BTreeSet<JsString>,
     keep: BTreeSet<JsString>,
+    api_state: crate::api::ApiState,
 }
 pub(super) struct BuildInput<'a> {
+    pub ata_changes: &'a BTreeMap<JsString, super::ata::AtaChange>,
     pub snapshot_id: u64,
     pub fs: Arc<SnapshotFsBuilder>,
     pub overlays: Overlays,
     pub changes: &'a FileChangeSummary,
     pub affected: &'a AffectedConfigs,
     pub inferred_options: Option<Arc<CompilerOptions>>,
+    pub contributions: Arc<crate::content_mappers::Contributions>,
 }
-type Collection = (BTreeMap<JsString, Project>, BTreeMap<JsString, JsString>);
+pub(super) struct BuildOutput {
+    pub projects: BTreeMap<JsString, Project>,
+    pub delayed_projects: BTreeMap<JsString, crate::DelayedProject>,
+    pub defaults: BTreeMap<JsString, JsString>,
+    pub api_state: crate::api::ApiState,
+    pub api_error: Option<JsString>,
+}
 impl<'a> ProjectBuilder<'a> {
     pub(super) fn new(
         session: &'a Session,
@@ -55,7 +67,36 @@ impl<'a> ProjectBuilder<'a> {
             changes,
             affected,
             inferred_options,
+            contributions,
+            ata_changes,
         } = input;
+        let mut projects = old.projects.clone();
+        for (key, change) in ata_changes {
+            if let Some(project) = projects.get_mut(key) {
+                let data = Arc::make_mut(project.data.as_mut().expect("session project"));
+                if !data.compute_typings_info().equals(&change.info) {
+                    continue;
+                }
+                data.installed_typings_info = Some(change.info.clone());
+                data.typings_files.clone_from(&change.result.typings_files);
+                let watch = data.typings_watch.clone().unwrap_or_else(|| {
+                    crate::watch::WatchedFiles::new(
+                        JsString::from_bytes(b"typings installer files".as_slice()),
+                        crate::watch::ALL_CHANGES,
+                        session.options.relative_watch_patterns,
+                    )
+                });
+                data.typings_watch = Some(watch.with_input(super::ata::typings_watch_patterns(
+                    &change.result.files_to_watch,
+                    session.options.typings_location.as_bytes(),
+                    session.options.current_directory.as_bytes(),
+                    data.current_directory.as_bytes(),
+                    session.fs.use_case_sensitive_file_names(),
+                )));
+                data.dirty = true;
+                data.dirty_file = None;
+            }
+        }
         Self {
             session,
             old,
@@ -66,21 +107,36 @@ impl<'a> ProjectBuilder<'a> {
             affected,
             configs,
             inferred_options,
-            projects: old.projects.clone(),
+            contributions,
+            projects,
+            delayed_projects: old.delayed_projects.clone(),
             updated: BTreeSet::new(),
             keep: BTreeSet::new(),
+            api_state: old.api_state.clone(),
         }
     }
-    pub(super) fn build(mut self, requested: Option<&DocumentUri>) -> Result<Collection, Error> {
+    pub(super) fn build(
+        mut self,
+        request: &crate::api::ResourceRequest,
+    ) -> Result<BuildOutput, Error> {
         // Watch batches are consumed once, including changes to projects with
         // no open files. Keep their dirtiness until a later request rebuilds them.
         self.mark_projects_dirty();
+        let api_error = self.handle_api_request(request.api.as_ref())?;
         let mut files: BTreeMap<_, _> = self
             .overlays
             .iter()
             .map(|(key, file)| (key.clone(), (file.file_name().clone(), file.kind())))
             .collect();
-        if let Some(uri) = requested {
+        for (path, file) in &self.api_state.files {
+            files.entry(path.clone()).or_insert_with(|| {
+                (
+                    file.name.clone(),
+                    ScriptKind::from_file_name(file.name.as_bytes()),
+                )
+            });
+        }
+        for uri in &request.documents {
             let name = uri.file_name();
             let path = self.configs.path(name.as_bytes());
             files.entry(path).or_insert_with(|| {
@@ -91,19 +147,25 @@ impl<'a> ProjectBuilder<'a> {
         let mut defaults = BTreeMap::new();
         let mut inferred_roots = Vec::new();
         for (path, (name, _kind)) in files {
-            if !tsr_tspath::is_dynamic_file_name(name.as_bytes())
-                && ScriptKind::from_file_name(name.as_bytes()) == ScriptKind::UNKNOWN
-                && (!self.overlays.contains_key(&path)
-                    || tsr_tspath::has_extension(name.as_bytes()))
-            {
-                continue;
+            if !tsr_tspath::is_dynamic_file_name(name.as_bytes()) {
+                if let Some(project) = self.select_configured(&name, &path)? {
+                    defaults.insert(path, project);
+                    continue;
+                }
+                if ScriptKind::from_file_name(name.as_bytes()) == ScriptKind::UNKNOWN
+                    && (!self.overlays.contains_key(&path)
+                        || tsr_tspath::has_extension(name.as_bytes()))
+                    && !self
+                        .contributions
+                        .extensions
+                        .iter()
+                        .any(|ext| name.as_bytes().ends_with(ext.as_bytes()))
+                {
+                    continue;
+                }
             }
-            if let Some(project) = self.select_configured(&name, &path)? {
-                defaults.insert(path, project);
-            } else {
-                inferred_roots.push(name);
-                defaults.insert(path, JsString::from_bytes(INFERRED_PROJECT_NAME));
-            }
+            inferred_roots.push(name);
+            defaults.insert(path, JsString::from_bytes(INFERRED_PROJECT_NAME));
         }
         inferred_roots.sort();
         if !inferred_roots.is_empty() {
@@ -115,23 +177,38 @@ impl<'a> ProjectBuilder<'a> {
                 _ => false,
             };
             let command = old
-                .filter(|old| same_options && old.command_line.root_file_names == inferred_roots)
+                .filter(|old| {
+                    same_options
+                        && Arc::ptr_eq(&self.contributions, &self.old.contributions)
+                        && old.command_line.root_file_names == inferred_roots
+                })
                 .map_or_else(
                     || {
-                        Arc::new(ParsedCommandLine::new(
+                        let mut command = ParsedCommandLine::new(
                             self.inferred_options
                                 .as_deref()
                                 .cloned()
                                 .unwrap_or_else(default_inferred_options),
                             inferred_roots,
-                        ))
+                        );
+                        if !self.contributions.mappers.is_empty() {
+                            command.content_mappers = Some(self.contributions.mappers.clone());
+                        }
+                        Arc::new(command)
                     },
                     |old| old.command_line.clone(),
                 );
             self.update_project(&key, &key, ProjectKind::Inferred, command)?;
             self.keep.insert(key);
         }
-        let cleanup = self.changes.opened.is_some() || self.changes.reopened.is_some();
+        self.load_resources(request)?;
+        self.keep.extend(self.api_state.projects.keys().cloned());
+        let cleanup = self.changes.opened.is_some()
+            || self.changes.reopened.is_some()
+            || request
+                .api
+                .as_ref()
+                .is_some_and(|api| api.open_files.is_some() || api.close_files.is_some());
         if !cleanup {
             self.keep.extend(
                 self.projects
@@ -139,7 +216,10 @@ impl<'a> ProjectBuilder<'a> {
                     .filter(|key| key.as_bytes() != INFERRED_PROJECT_NAME)
                     .cloned(),
             );
+            self.keep.extend(self.delayed_projects.keys().cloned());
         }
+        self.delayed_projects
+            .retain(|key, _| self.keep.contains(key));
         let removed: Vec<_> = self
             .projects
             .keys()
@@ -150,7 +230,13 @@ impl<'a> ProjectBuilder<'a> {
             self.projects.remove(&key);
             self.configs.release_project(&key);
         }
-        Ok((self.projects, defaults))
+        Ok(BuildOutput {
+            projects: self.projects,
+            delayed_projects: self.delayed_projects,
+            defaults,
+            api_state: self.api_state,
+            api_error,
+        })
     }
 
     // port: tsc/internal/project/projectcollectionbuilder.go:ProjectCollectionBuilder.markFilesChanged
@@ -189,6 +275,21 @@ impl<'a> ProjectBuilder<'a> {
             let old = project.data().unwrap();
             let mut dirty = old.dirty;
             let mut dirty_file = old.dirty_file.clone();
+            if self.session.mapper_host.is_some()
+                && !old.content_mapper_watched_files.is_empty()
+                && (self.changes.invalidate_all
+                    || changes.iter().any(|(_, paths)| {
+                        paths
+                            .iter()
+                            .any(|path| old.content_mapper_watched_files.contains(path))
+                    }))
+            {
+                if let Some(project) = old.program.content_mapper_project() {
+                    let _ = project.refresh();
+                }
+                dirty = true;
+                dirty_file = None;
+            }
             if self.changes.invalidate_all || self.affected.projects.contains(key) {
                 dirty = true;
                 dirty_file = None;
@@ -291,8 +392,9 @@ impl<'a> ProjectBuilder<'a> {
                             .unwrap()
                             .is_source_from_project_reference(path.as_bytes())
                         {
-                            self.configs
-                                .retain_file_configs(path, &chain.into_iter().collect());
+                            let retained = chain.into_iter().collect();
+                            self.discover_ancestor_projects(file, path, &key)?;
+                            self.configs.retain_file_configs(path, &retained);
                             return Ok(Some(key));
                         }
                         fallback.get_or_insert(key.clone());
@@ -327,6 +429,9 @@ impl<'a> ProjectBuilder<'a> {
                 .cloned(),
         );
         self.configs.retain_file_configs(path, &retained);
+        if let Some(key) = &fallback {
+            self.discover_ancestor_projects(file, path, key)?;
+        }
         Ok(fallback)
     }
     fn update_project(
@@ -339,6 +444,7 @@ impl<'a> ProjectBuilder<'a> {
         if !self.updated.insert(key.clone()) {
             return Ok(());
         }
+        self.delayed_projects.remove(key);
         let old = self.old.projects.get(key).and_then(Project::data);
         let command_changed = old.is_none_or(|old| !Arc::ptr_eq(&old.command_line, &command));
         let pending = self.projects.get(key).and_then(Project::data);
@@ -346,6 +452,23 @@ impl<'a> ProjectBuilder<'a> {
             return Ok(());
         }
         let dirty_file = pending.and_then(|data| data.dirty_file.clone());
+        let installed_typings_info = pending.and_then(|data| data.installed_typings_info.clone());
+        let typings_files = pending.map_or_else(Vec::new, |data| data.typings_files.clone());
+        let typings_watch = pending.and_then(|data| data.typings_watch.clone());
+        let ata_enabled = !self
+            .session
+            .ata_disabled
+            .load(std::sync::atomic::Ordering::Acquire)
+            && super::ata::type_acquisition(kind, &command)
+                .enable
+                .is_true();
+        let mut program_command = (*command).clone();
+        if ata_enabled {
+            program_command
+                .root_file_names
+                .extend(typings_files.iter().cloned());
+        }
+
         let display = if kind == ProjectKind::Configured {
             tsr_tspath::convert_to_relative_path(
                 name.as_bytes(),
@@ -368,6 +491,12 @@ impl<'a> ProjectBuilder<'a> {
         ));
         let mut cache = FileCache::for_project(Arc::new(OverlayParses {
             shared: self.session.parse_cache.clone(),
+            mapped: self.session.mapped_parse_cache.clone(),
+            locale: self
+                .session
+                .mapper_host
+                .as_ref()
+                .map_or_else(String::new, crate::content_mappers::MapperHost::locale),
             overlays: self.overlays.clone(),
             cwd: self.session.options.current_directory.clone(),
             case_sensitive: self.session.fs.use_case_sensitive_file_names(),
@@ -388,14 +517,27 @@ impl<'a> ProjectBuilder<'a> {
                 host.inherit_dependencies(&old.unwrap().host);
                 (program, ProgramUpdateKind::Cloned)
             } else {
-                let program = Program::load_live_for_project(
+                let program = Program::load_live_for_project_with_host_services(
                     ProgramOptions {
-                        config: (*command).clone(),
+                        config: program_command,
                         host: host.clone(),
                         current_directory: cwd.clone(),
                         default_library_path: self.session.options.default_library_path.clone(),
                         skip_module_resolution: false,
                         single_threaded: Tristate::UNKNOWN,
+                    },
+                    tsr_compiler::ProgramHostServices {
+                        typings_location: if ata_enabled {
+                            self.session.options.typings_location.clone()
+                        } else {
+                            JsString::default()
+                        },
+                        content_mapper_project: self
+                            .session
+                            .mapper_host
+                            .as_ref()
+                            .and_then(|host| host.project(&command)),
+                        ..Default::default()
                     },
                     &mut cache,
                     &self.session.counters,
@@ -418,6 +560,43 @@ impl<'a> ProjectBuilder<'a> {
                 )
             };
         host.disable_tracking();
+        let has_mapped_files = program.files().iter().any(|file| {
+            file.bound()
+                .view()
+                .source_file()
+                .is_ok_and(|source| !source.content_mapper().is_empty())
+        });
+        let mapper_paths = crate::content_mappers::watched_files(
+            &command,
+            if has_mapped_files {
+                program.content_mapper_project()
+            } else {
+                None
+            },
+        );
+        let content_mapper_watched_files = mapper_paths
+            .into_iter()
+            .map(|path| self.configs.path(path.as_bytes()))
+            .collect();
+        let mapper_watch = old.map_or_else(
+            || {
+                crate::watch::WatchedFiles::new(
+                    JsString::from_bytes(
+                        [b"content mapper files for ".as_slice(), key.as_bytes()].concat(),
+                    ),
+                    crate::watch::ALL_CHANGES,
+                    self.session.options.relative_watch_patterns,
+                )
+            },
+            |old| old.content_mapper_watch.clone(),
+        );
+        let content_mapper_watch = mapper_watch.with_input(crate::watch::resolution_patterns(
+            &content_mapper_watched_files,
+            self.session.options.current_directory.as_bytes(),
+            self.session.options.default_library_path.as_bytes(),
+            cwd.as_bytes(),
+            self.session.fs.use_case_sensitive_file_names(),
+        ));
         let watch = old.map_or_else(
             || {
                 crate::watch::WatchedFiles::new(
@@ -478,6 +657,11 @@ impl<'a> ProjectBuilder<'a> {
             .map(Arc::new);
         let mut project = Project::from_program(
             ProjectData {
+                installed_typings_info,
+                typings_files,
+                typings_watch,
+                content_mapper_watch,
+                content_mapper_watched_files,
                 program_files_watch,
                 name: name.clone(),
                 path: key.clone(),
@@ -542,6 +726,8 @@ fn default_inferred_options() -> CompilerOptions {
 }
 struct OverlayParses {
     shared: Arc<ParseCache>,
+    mapped: Arc<crate::parse_cache::ContentMappedParseCache>,
+    locale: String,
     overlays: Overlays,
     cwd: JsString,
     case_sensitive: bool,
@@ -570,7 +756,23 @@ impl SourceFileCache for OverlayParses {
     ) -> Result<CachedProgramFile, tsr_compiler::Error> {
         self.shared.acquire(text, kind, options, counters, tracing)
     }
+    fn acquire_mapped(
+        &self,
+        request: &tsr_compiler::MappedSourceFileRequest<'_>,
+    ) -> tsr_compiler::MappedFileResult<tsr_compiler::CachedMappedProgramFiles> {
+        self.mapped.acquire_mapped(request, &self.locale)
+    }
     fn retain(&self, file: &Arc<ProgramFile>) -> Result<Box<dyn Send + Sync>, tsr_compiler::Error> {
-        self.shared.retain(file)
+        if file
+            .bound()
+            .view()
+            .source_file()?
+            .content_mapper()
+            .is_empty()
+        {
+            self.shared.retain(file)
+        } else {
+            self.mapped.retain(file)
+        }
     }
 }

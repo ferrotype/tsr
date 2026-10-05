@@ -60,6 +60,22 @@ impl Projection {
             }
             projects.push(json!({"name":text(data.name.as_bytes())?, "program":self.programs.id(&data.program), "files":files}));
         }
+        for project in snapshot.delayed_projects() {
+            projects
+                .push(json!({"name":text(project.name.as_bytes())?, "program":null, "files":[]}));
+        }
+        projects.sort_by(|a, b| {
+            let a = a["name"].as_str().expect("project name");
+            let b = b["name"].as_str().expect("project name");
+            (
+                a.as_bytes() == tsr_project::project::INFERRED_PROJECT_NAME,
+                a,
+            )
+                .cmp(&(
+                    b.as_bytes() == tsr_project::project::INFERRED_PROJECT_NAME,
+                    b,
+                ))
+        });
         let fs = snapshot.filesystem().ok_or("missing session filesystem")?;
         let mut open = Vec::new();
         for (path, file) in fs.overlays().iter() {

@@ -457,7 +457,7 @@ fn semantic_reference_search_observes_cancellation() {
     ));
 }
 
-fn source_map_program(map: &[u8]) -> Program {
+pub(super) fn source_map_program(map: &[u8]) -> Program {
     let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
     fs.insert_loaded(
         b"/index.ts",

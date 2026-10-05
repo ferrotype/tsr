@@ -4,7 +4,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::Arc;
 use tsr_ast::span_map::{MappingError, MappingErrorKind};
-use tsr_ast::{Diagnostic, NodeId, ParsedFile};
+use tsr_ast::{Diagnostic, NodeId};
 use tsr_contentmapper::{
     DiagnosticDirectiveErrorKind, Error, InitializeErrorKind, Project, ProjectErrorKind,
     TransformErrorKind,
@@ -36,7 +36,7 @@ pub(crate) struct ContentMapperState {
     pub diagnostics: Vec<Diagnostic>,
     /// Supplemental files parsed with their canonical file, by path, until
     /// their own tasks load them.
-    pub supplementals: BTreeMap<JsString, ParsedFile>,
+    pub supplementals: BTreeMap<JsString, Arc<crate::ProgramFile>>,
 }
 
 impl ContentMapperState {
@@ -109,7 +109,7 @@ pub(crate) fn transform_diagnostic(file: NodeId, label: &JsString, error: &Error
                             label,
                             d::The_content_mapper_selected_unsupported_position_encoding_0,
                             vec![text(initialize.position_encoding.as_str())],
-                        )
+                        );
                     }
                     InitializeErrorKind::EmptyDiagnosticSource => {
                         return transform_diagnostic_chain(
@@ -117,7 +117,7 @@ pub(crate) fn transform_diagnostic(file: NodeId, label: &JsString, error: &Error
                             label,
                             d::The_content_mapper_diagnostic_source_must_not_be_empty,
                             Vec::new(),
-                        )
+                        );
                     }
                     InitializeErrorKind::ReservedDiagnosticSource => {
                         return transform_diagnostic_chain(
@@ -125,7 +125,7 @@ pub(crate) fn transform_diagnostic(file: NodeId, label: &JsString, error: &Error
                             label,
                             d::The_content_mapper_diagnostic_source_0_is_reserved_by_TypeScript,
                             vec![text(&initialize.diagnostic_source)],
-                        )
+                        );
                     }
                     _ => {}
                 }

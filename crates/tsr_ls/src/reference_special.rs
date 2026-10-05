@@ -21,6 +21,10 @@ impl SearchState<'_, '_, '_> {
         position: i64,
     ) -> Result<Vec<ReferenceGroup>> {
         self.l.check_canceled()?;
+        #[cfg(test)]
+        {
+            self.l.reference_search_count += 1;
+        }
         if self.options.adjust {
             node =
                 crate::meaning::adjusted_location(self.l.view(node)?, node, self.options.rename)?;

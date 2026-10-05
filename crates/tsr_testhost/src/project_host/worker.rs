@@ -13,7 +13,7 @@ use tsr_vfs::FileSystem;
 
 pub(super) enum Action {
     Initialize {
-        options: SessionOptions,
+        options: Box<SessionOptions>,
         progress_delay: std::time::Duration,
         compiler: CompilerOptions,
         host: Arc<dyn FileSystem>,
@@ -98,6 +98,7 @@ impl Worker {
                 compiler,
                 host,
             } => {
+                let options = *options;
                 if self.server.is_some() {
                     return Err("project session already initialized".into());
                 }
@@ -287,10 +288,10 @@ mod tests {
             .run(
                 Action::Initialize {
                     progress_delay: std::time::Duration::ZERO,
-                    options: SessionOptions {
+                    options: Box::new(SessionOptions {
                         position_encoding: encoding,
                         ..Default::default()
-                    },
+                    }),
                     compiler: CompilerOptions {
                         no_lib: Tristate::TRUE,
                         strict: Tristate::from(strict),

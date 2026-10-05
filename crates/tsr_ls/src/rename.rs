@@ -48,7 +48,7 @@ fn refused(message: &tsr_diagnostics::Message, locale: &tsr_locale::Locale) -> R
     }
 }
 // port: tsc/internal/ls/rename.go:nodeIsEligibleForRename
-fn eligible(view: tsr_ast::AstView<'_>, node: NodeId) -> Result<bool> {
+pub(crate) fn eligible(view: tsr_ast::AstView<'_>, node: NodeId) -> Result<bool> {
     Ok(match view.node(node)?.kind().known() {
         Some(
             K::Identifier
@@ -378,6 +378,7 @@ impl LanguageService<'_> {
                 },
             );
             for group in state.for_node(original, i64::from(mapped.mapped.position))? {
+                self.record_cross_project_group(c, &group)?;
                 for entry in group.entries {
                     self.check_canceled()?;
                     if let Some(node) = entry.node {

@@ -62,6 +62,7 @@ struct Settings {
     auto_closing_tags: bool,
     locale: tsr_locale::Locale,
     validation: bool,
+    disable_automatic_type_acquisition: bool,
     style_warnings: bool,
     config_name: String,
     exclude_library_symbols: bool,
@@ -77,6 +78,7 @@ impl Default for Settings {
         Self {
             locale: tsr_locale::Locale::default(),
             validation: true,
+            disable_automatic_type_acquisition: false,
             formatting: true,
             rename: tsr_ls::RenameOptions::default(),
             organize: tsr_ls::OrganizeOptions::default(),
@@ -95,6 +97,7 @@ impl Default for Settings {
     }
 }
 pub struct Runtime {
+    mapper_registrations: Arc<crate::mapper_registrations::MapperRegistrations>,
     options: Options,
     context: Context,
     client: Arc<dyn Client>,
@@ -119,6 +122,7 @@ impl Runtime {
     ) -> Self {
         let logger = Arc::new(Logger::new(client.clone(), context.clone(), stderr));
         Self {
+            mapper_registrations: Arc::default(),
             recovery: crate::recovery::Recovery::new(client.clone(), logger.clone()),
             logger,
             options,
@@ -225,6 +229,37 @@ impl Runtime {
                 let _: lsp::NoParams = crate::decode(params)?;
                 self.close();
                 self.shutdown = true;
+            }
+            "custom/setContentMapperContributions" => {
+                let params: lsp::SetContentMapperContributionsParams = crate::decode(params)?;
+                let parsed = crate::content_mappers::parse(&params.contributions)
+                    .map_err(|e| crate::invalid(&e))?;
+                self.ready()?
+                    .session()
+                    .set_content_mapper_contributions(
+                        tsr_project::content_mappers::Contributions {
+                            mappers: parsed.mappers,
+                            extensions: parsed.extensions,
+                        },
+                        params
+                            .open_documents
+                            .into_iter()
+                            .map(|document| document.uri)
+                            .collect(),
+                    )
+                    .map_err(crate::project_error)?;
+                // The contribution update succeeds independently of a client
+                // refusing dynamic registration, as in the pinned server.
+                let _ = self.mapper_registrations.update(
+                    self.client.as_ref(),
+                    context,
+                    &self.capabilities,
+                    &self
+                        .ready()?
+                        .session()
+                        .snapshot()
+                        .map_err(crate::project_error)?,
+                );
             }
             "$/setTrace" => {
                 let _: lsp::SetTraceParams = crate::decode(params)?;
@@ -421,7 +456,19 @@ impl Runtime {
                 let snapshot = self
                     .ready()?
                     .session()
-                    .flush_with_host(None, host)
+                    .flush_resources(
+                        &tsr_project::api::ResourceRequest {
+                            documents: params
+                                .files
+                                .iter()
+                                .flatten()
+                                .map(|f| lsp::DocumentUri(f.old_uri.clone()))
+                                .collect(),
+                            project_tree: Some(tsr_project::api::ProjectTreeRequest::All),
+                            ..Default::default()
+                        },
+                        host,
+                    )
                     .map_err(crate::project_error)?;
                 let context = context.clone();
                 let capabilities = self.capabilities.clone();
@@ -449,7 +496,7 @@ impl Runtime {
                 let uri = feature.uri();
                 let session = self.ready()?.session().clone();
                 let snapshot = session
-                    .flush_with_host(Some(uri), host)
+                    .flush_with_host(Some(uri), host.clone())
                     .map_err(crate::project_error)?;
                 let path = uri.path(
                     snapshot
@@ -501,16 +548,29 @@ impl Runtime {
                         | crate::language_features::Request::ResolveCompletion(_, _)
                 );
                 return Ok(Dispatch::Work(Box::new(move || {
-                    let _snapshot = snapshot;
-                    let result = crate::language_features::execute(
-                        &context,
-                        &request_id,
-                        project.as_ref(),
-                        feature,
-                        encoding,
-                        &capabilities,
-                        &options,
-                    );
+                    let result = if feature.crosses_projects() && project.is_some() {
+                        crate::crossproject::execute(
+                            &context,
+                            &request_id,
+                            &session,
+                            &host,
+                            &snapshot,
+                            &feature,
+                            encoding,
+                            &capabilities,
+                            &options,
+                        )
+                    } else {
+                        crate::language_features::execute(
+                            &context,
+                            &request_id,
+                            project.as_ref(),
+                            feature,
+                            encoding,
+                            &capabilities,
+                            &options,
+                        )
+                    };
                     if sync_imports {
                         session.sync_auto_import_watches();
                     }
@@ -574,6 +634,7 @@ impl Runtime {
             .as_deref()
             .map(|l| tsr_locale::Locale::parse(l).0)
             .unwrap_or_default();
+        self.options.project.locale = locale.clone();
         self.settings.lock().unwrap().locale = locale;
         if let Some(callback) = &self.options.parent_process {
             if let Some(pid) = params.process_id.integer.as_deref() {
@@ -647,11 +708,18 @@ impl Runtime {
         );
         self.options.project.debounce_delay = Duration::from_millis(500);
         self.options.project.logger = tsr_project::logging::Logger::from_sink(self.logger.clone());
+        let logger = self.logger.clone();
+        self.options.project.mapper_logger = Some(Arc::new(move |message| {
+            if logger.is_tracing() {
+                logger.send(lsp::MessageType::INFO, message);
+            }
+        }));
         self.options.project.relative_watch_patterns = workspace
             .and_then(|w| w.did_change_watched_files.as_deref())
             .and_then(|w| w.relative_pattern_support.as_deref())
             .copied()
             .unwrap_or(false);
+        self.options.project.background_context = self.context.clone();
         if self.server.is_none() {
             let caches = || tsr_project::ref_count_cache::RefCountCacheOptions::default();
             let session = Session::with_caches(
@@ -739,6 +807,7 @@ impl Runtime {
         Ok(())
     }
     fn start_observer(&mut self) {
+        let context = self.context.clone();
         let receive = self.server.as_ref().unwrap().session().subscribe();
         let client = self.client.clone();
         let settings = self.settings.clone();
@@ -768,13 +837,27 @@ impl Runtime {
                 )
             });
         let logger = self.logger.clone();
+        let mapper_registrations = self.mapper_registrations.clone();
         self.observer = Some(std::thread::spawn(move || {
             while let Ok(event) = receive.recv() {
                 let settings = settings.lock().unwrap().clone();
+                if let SessionEvent::Published { current, .. } = &event {
+                    let _ = mapper_registrations.update(client.as_ref(), &context, &caps, current);
+                }
                 match event {
-                    SessionEvent::ProjectLoading { name, finished } => {
+                    event @ (SessionEvent::ProjectLoading { .. }
+                    | SessionEvent::InstallingTypes { .. }) => {
                         if let Some(progress) = &progress {
-                            let message = tsr_diagnostics::Project_0.localize(
+                            let (name, finished, diagnostic) = match event {
+                                SessionEvent::ProjectLoading { name, finished } => {
+                                    (name, finished, tsr_diagnostics::Project_0)
+                                }
+                                SessionEvent::InstallingTypes { name, finished } => {
+                                    (name, finished, tsr_diagnostics::Installing_types_for_0)
+                                }
+                                _ => unreachable!(),
+                            };
+                            let message = diagnostic.localize(
                                 &settings.locale,
                                 &[tsr_diagnostics::Argument::Bytes(name.as_bytes().to_vec())],
                             );
@@ -818,8 +901,18 @@ impl Runtime {
             locale: before.locale.clone(),
             ..Default::default()
         };
+        let mut deprecated_disable_ata = None;
+        let mut enable_ata = None;
         if let lsp::Any::Object(sections) = values {
             if let Some(lsp::Any::Object(editor)) = sections.get("editor") {
+                set_ata_preference(
+                    editor.get("disableAutomaticTypeAcquisition"),
+                    &mut deprecated_disable_ata,
+                );
+                set_ata_preference(
+                    editor.get("automaticTypeAcquisitionEnabled"),
+                    &mut enable_ata,
+                );
                 let mut editor = editor.clone();
                 if !editor.contains_key("indentSize") {
                     if let Some(value) = editor.get("tabSize").cloned() {
@@ -842,6 +935,14 @@ impl Runtime {
                         .into_iter()
                         .flatten()
                     {
+                        set_ata_preference(
+                            raw.get("disableAutomaticTypeAcquisition"),
+                            &mut deprecated_disable_ata,
+                        );
+                        set_ata_preference(
+                            raw.get("automaticTypeAcquisitionEnabled"),
+                            &mut enable_ata,
+                        );
                         set_bool(
                             raw.get("preferGoToSourceDefinition"),
                             &mut next.prefer_source_definition,
@@ -884,6 +985,14 @@ impl Runtime {
                             next.config_name.clone_from(name);
                         }
                     }
+                    set_ata_preference(
+                        fields.get("disableAutomaticTypeAcquisition"),
+                        &mut deprecated_disable_ata,
+                    );
+                    set_ata_preference(
+                        nested(fields, "tsserver.automaticTypeAcquisition.enabled"),
+                        &mut enable_ata,
+                    );
                     set_bool(
                         nested(fields, "preferGoToSourceDefinition"),
                         &mut next.prefer_source_definition,
@@ -951,7 +1060,20 @@ impl Runtime {
                 }
             }
         }
+        next.disable_automatic_type_acquisition =
+            enable_ata.map_or(deprecated_disable_ata.unwrap_or(false), |value| !value);
+        if next.disable_automatic_type_acquisition != before.disable_automatic_type_acquisition {
+            if let Some(server) = &self.server {
+                server
+                    .session()
+                    .set_disable_automatic_type_acquisition(next.disable_automatic_type_acquisition)
+                    .map_err(crate::project_error)?;
+            }
+        }
         next.completion.locale = next.locale.clone();
+        if let Some(server) = &self.server {
+            server.session().set_locale(next.locale.clone());
+        }
         *self.settings.lock().unwrap() = next.clone();
         if (next.inlay_flags != before.inlay_flags
             || next.inlay.parameter_names != before.inlay.parameter_names)
@@ -1070,6 +1192,16 @@ fn nested<'a>(fields: &'a HashMap<String, lsp::Any>, path: &str) -> Option<&'a l
 fn set_bool(value: Option<&lsp::Any>, target: &mut bool) {
     if let Some(lsp::Any::Boolean(value)) = value {
         *target = *value;
+    }
+}
+
+fn set_ata_preference(value: Option<&lsp::Any>, target: &mut Option<bool>) {
+    // The pin's tristate parser ignores null but resets other invalid values
+    // to Unknown, allowing the deprecated setting or default to take effect.
+    match value {
+        Some(lsp::Any::Boolean(value)) => *target = Some(*value),
+        None | Some(lsp::Any::Null) => {}
+        Some(_) => *target = None,
     }
 }
 
@@ -1245,7 +1377,6 @@ fn unimplemented_method(method: &str) -> bool {
             | "custom/startCPUProfile"
             | "custom/stopCPUProfile"
             | "custom/initializeAPISession"
-            | "custom/setContentMapperContributions"
     )
 }
 
@@ -1523,6 +1654,101 @@ fn apply_organize_preferences(
 #[cfg(test)]
 mod preference_tests {
     use super::*;
+
+    #[test]
+    fn automatic_type_acquisition_configuration_preserves_unified_precedence() {
+        let context = Context::background();
+        let client = crate::rpc_client::RpcClient::new(context.clone(), Arc::new(|_| Ok(())));
+        let fs = Arc::new(tsr_vfs::MemoryBuilder::new(b"/", true).finish());
+        let mut runtime = Runtime::new(
+            Options::new(SessionOptions::default(), fs),
+            context,
+            client,
+            Box::new(std::io::sink()),
+        );
+        // Matches ParseUserPreferences: explicit unified enablement wins over
+        // the deprecated inverse flag, including across configuration sections.
+        for (json, disabled) in [
+            (
+                r#"{"typescript":{"disableAutomaticTypeAcquisition":true}}"#,
+                true,
+            ),
+            (
+                r#"{"js/ts":{"tsserver":{"automaticTypeAcquisition":{"enabled":false}}}}"#,
+                true,
+            ),
+            (
+                r#"{"typescript":{"disableAutomaticTypeAcquisition":true},"js/ts":{"tsserver":{"automaticTypeAcquisition":{"enabled":true}}}}"#,
+                false,
+            ),
+            (
+                r#"{"js/ts":{"unstable":{"automaticTypeAcquisitionEnabled":false},"tsserver":{"automaticTypeAcquisition":{"enabled":true}}}}"#,
+                false,
+            ),
+            (
+                r#"{"js/ts":{"automaticTypeAcquisitionEnabled":false,"disableAutomaticTypeAcquisition":false}}"#,
+                true,
+            ),
+            (
+                r#"{"js/ts":{"automaticTypeAcquisitionEnabled":true,"disableAutomaticTypeAcquisition":true}}"#,
+                false,
+            ),
+            (
+                r#"{"editor":{"automaticTypeAcquisitionEnabled":false}}"#,
+                true,
+            ),
+            (
+                r#"{"editor":{"disableAutomaticTypeAcquisition":true},"javascript":{"disableAutomaticTypeAcquisition":false}}"#,
+                false,
+            ),
+            (
+                r#"{"javascript":{"automaticTypeAcquisitionEnabled":false},"js/ts":{"automaticTypeAcquisitionEnabled":"invalid"}}"#,
+                false,
+            ),
+            (
+                r#"{"js/ts":{"automaticTypeAcquisitionEnabled":false,"unstable":{"automaticTypeAcquisitionEnabled":7}}}"#,
+                false,
+            ),
+            (
+                r#"{"typescript":{"disableAutomaticTypeAcquisition":true},"js/ts":{"automaticTypeAcquisitionEnabled":true,"tsserver":{"automaticTypeAcquisition":{"enabled":[]}}}}"#,
+                true,
+            ),
+            (
+                r#"{"javascript":{"disableAutomaticTypeAcquisition":true},"js/ts":{"disableAutomaticTypeAcquisition":{}}}"#,
+                false,
+            ),
+            (
+                r#"{"javascript":{"automaticTypeAcquisitionEnabled":false},"js/ts":{"automaticTypeAcquisitionEnabled":null}}"#,
+                true,
+            ),
+            (
+                r#"{"js/ts":{"automaticTypeAcquisitionEnabled":false,"tsserver":{"automaticTypeAcquisition":{"enabled":null}}}}"#,
+                true,
+            ),
+            (
+                r#"{"typescript":{"disableAutomaticTypeAcquisition":true},"js/ts":{"disableAutomaticTypeAcquisition":null}}"#,
+                true,
+            ),
+            (
+                r#"{"typescript":{"disableAutomaticTypeAcquisition":true}}"#,
+                true,
+            ),
+            ("{}", false),
+        ] {
+            let mut value = lsp::Any::default();
+            tsr_json::unmarshal(json.as_bytes(), &mut value, tsr_json::Options::default()).unwrap();
+            runtime.apply_settings(&value).unwrap();
+            assert_eq!(
+                runtime
+                    .settings
+                    .lock()
+                    .unwrap()
+                    .disable_automatic_type_acquisition,
+                disabled,
+                "{json}"
+            );
+        }
+    }
 
     #[test]
     fn quote_and_module_preferences_use_go_unicode_lowercasing() {

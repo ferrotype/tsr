@@ -81,6 +81,7 @@ impl LanguageService<'_> {
             )
             .for_node(original, i64::from(mapped.mapped.position))?;
             for group in groups {
+                self.record_cross_project_group(c, &group)?;
                 let (node, display) = match group.kind {
                     DefinitionKind::Symbol => {
                         let Some(symbol) = group.symbol else { continue };

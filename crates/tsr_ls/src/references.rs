@@ -333,23 +333,26 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
     pub(crate) fn append(&mut self, node: NodeId, symbol: SymbolRef) -> Result<()> {
         self.append_kind(node, symbol, EntryKind::Node)
     }
+    fn reference_group(&mut self, symbol: SymbolRef) -> &mut ReferenceGroup {
+        let index = self
+            .result
+            .iter()
+            .position(|group| group.kind == DefinitionKind::Symbol && group.symbol == Some(symbol))
+            .unwrap_or_else(|| {
+                self.result.push(ReferenceGroup {
+                    kind: DefinitionKind::Symbol,
+                    symbol: Some(symbol),
+                    node: None,
+                    entries: Vec::new(),
+                });
+                self.result.len() - 1
+            });
+        &mut self.result[index]
+    }
     fn append_kind(&mut self, node: NodeId, symbol: SymbolRef, kind: EntryKind) -> Result<()> {
         let mut entry = self.entry(node)?;
         entry.kind = kind;
-        if let Some(group) = self
-            .result
-            .iter_mut()
-            .find(|g| g.kind == DefinitionKind::Symbol && g.symbol == Some(symbol))
-        {
-            group.entries.push(entry);
-        } else {
-            self.result.push(ReferenceGroup {
-                kind: DefinitionKind::Symbol,
-                symbol: Some(symbol),
-                node: None,
-                entries: vec![entry],
-            });
-        }
+        self.reference_group(symbol).entries.push(entry);
         Ok(())
     }
     // port: tsc/internal/ls/findallreferences.go:refState.addReference
@@ -358,8 +361,11 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
     }
     fn add_kind(&mut self, node: NodeId, symbol: SymbolRef, kind: EntryKind) -> Result<()> {
         if self.options.implementations {
+            // The definition survives even when this project has no local
+            // implementation. Cross-project discovery still needs that symbol.
+            self.reference_group(symbol);
             for n in self.implementation_nodes(node)? {
-                self.append(n, symbol)?;
+                self.append_kind(n, symbol, kind)?;
             }
         } else {
             self.append_kind(node, symbol, kind)?;
@@ -785,6 +791,7 @@ impl LanguageService<'_> {
             );
             let groups = state.for_node(node, i64::from(mapped.mapped.position))?;
             for group in groups {
+                self.record_cross_project_group(c, &group)?;
                 for entry in group.entries {
                     if !params
                         .context
@@ -852,6 +859,7 @@ impl LanguageService<'_> {
                 },
             );
             for group in state.for_node(node, pos)? {
+                self.record_cross_project_group(c, &group)?;
                 for entry in group.entries {
                     if let Some(node) = entry.node {
                         if seen.insert(node) {
@@ -870,6 +878,16 @@ impl LanguageService<'_> {
         c: &mut Operation<'_>,
         params: &lsp::ImplementationParams,
         links: bool,
+    ) -> Result<lsp::LocationOrLocationsOrDefinitionLinksOrNull> {
+        self.implementations_with_options(c, params, links, false)
+    }
+
+    pub fn implementations_with_options(
+        &mut self,
+        c: &mut Operation<'_>,
+        params: &lsp::ImplementationParams,
+        links: bool,
+        drop_origin: bool,
     ) -> Result<lsp::LocationOrLocationsOrDefinitionLinksOrNull> {
         let source = self.file(&params.text_document.uri)?;
         let mapped = self.converters.from_lsp_position_for_source_file(
@@ -892,7 +910,18 @@ impl LanguageService<'_> {
                 continue;
             }
             for entry in self.implementation_entries(c, node, i64::from(mapped.mapped.position))? {
-                if entry.node.is_some_and(|n| seen.insert(n)) {
+                if let Some(node) = entry.node {
+                    if !seen.insert(node) {
+                        continue;
+                    }
+                    if drop_origin {
+                        let location = c.node(node)?;
+                        if location.pos() <= mapped.mapped.position
+                            && mapped.mapped.position <= location.end()
+                        {
+                            continue;
+                        }
+                    }
                     entries.push(entry);
                 }
             }

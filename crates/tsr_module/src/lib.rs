@@ -14,7 +14,8 @@ mod paths;
 pub mod symlinks;
 mod type_references;
 pub use type_references::{
-    effective_type_roots, ResolvedTypeReferenceDirective, INFERRED_TYPES_CONTAINING_FILE,
+    automatic_type_directive_names, effective_type_roots, ResolvedTypeReferenceDirective,
+    INFERRED_TYPES_CONTAINING_FILE,
 };
 
 mod package_maps;

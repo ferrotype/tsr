@@ -2,9 +2,12 @@
 //! checker slots retain ADR 0012 generation and panic-retirement semantics.
 #![forbid(unsafe_code)]
 
+pub mod api;
+pub mod ata;
 pub mod background;
 mod clock;
 pub mod config;
+pub mod content_mappers;
 pub mod dirty;
 pub mod extended_config;
 pub mod file_change;
@@ -17,7 +20,7 @@ pub mod project;
 pub mod scheduler;
 pub mod session;
 mod snapshot;
-pub use snapshot::Snapshot;
+pub use snapshot::{DelayedProject, Snapshot};
 pub mod ref_count_cache;
 pub mod snapshot_fs;
 pub mod source_fs;

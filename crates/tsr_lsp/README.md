@@ -5,9 +5,11 @@ initialization, document synchronization, inferred options and configuration,
 pull and push diagnostics, cancellation, progress, logging, watcher registration
 and a native watcher fallback. `tsrust --lsp --stdio` uses this library.
 
-The advertised pinned capabilities are the final protocol contract. Feature
-handlers assigned to Phase 5 L3–L6 currently return a named method-not-implemented
-error. This is not yet a complete editor language server.
+Language services include navigation, completion, editing, cross-project
+references/rename/implementation and incoming calls. Sessions integrate project
+reference source redirects, automatic type acquisition and content-mapper
+processes. Phase 5 L7 still owns full fourslash/replay coverage and latency work;
+the advertised capabilities are not a claim that those remaining checks pass.
 
 Cancellation targets requests once dispatch starts, as in the pin; queued IDs
 are still reserved. Watch events from either transport schedule one debounced,
