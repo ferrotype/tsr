@@ -1243,6 +1243,38 @@ fn class_fix_all_keeps_member_insertions_before_brace_cleanup() {
 }
 
 #[test]
+fn intersected_interfaces_generate_one_getter_and_one_setter() {
+    // Pinned Go pairs accessors instead of emitting every intersected declaration.
+    let output = apply_fix_all(
+        "interface A { get x(): number; set x(value: number); }\ninterface B { get x(): number; set x(value: number); }\ntype Both=A&B;\nclass C implements Both {}\n",
+        false,
+    );
+    let class = output.split("class C implements Both").nth(1).unwrap();
+    assert_eq!(class.matches("get x()").count(), 1, "{output}");
+    assert_eq!(class.matches("set x(").count(), 1, "{output}");
+}
+
+#[test]
+fn member_fixes_keep_existing_indentation_after_leading_trivia() {
+    assert_eq!(
+        apply_fix_all("class C implements I {\n  existing() {}\n}\ninterface I { foo(): void; }\n", false),
+        "class C implements I {\n  foo(): void {\n      throw new Error(\"Method not implemented.\");\n  }\n  existing() {}\n}\ninterface I { foo(): void; }\n"
+    );
+}
+
+#[test]
+fn member_fix_bodies_infer_single_quotes_from_imports() {
+    let output = apply_fix_all(
+        "import 'dependency';\ninterface I { foo(): void; }\nclass C implements I {}\n",
+        false,
+    );
+    assert!(
+        output.contains("throw new Error('Method not implemented.');"),
+        "{output}"
+    );
+}
+
+#[test]
 fn isolated_fix_all_uses_deduplicated_declaration_diagnostics() {
     assert_eq!(
         apply_fix_all("export function f() {}\nf.prop=1;\n", true),

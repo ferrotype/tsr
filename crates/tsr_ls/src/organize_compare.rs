@@ -109,23 +109,26 @@ impl Comparers {
 }
 impl OrganizeOptions {
     fn explicit(&self) -> bool {
-        !self.sort.is_empty() && self.sort != "auto"
+        self.explicit_order().is_some()
+    }
+    fn explicit_order(&self) -> Option<(Mode, bool)> {
+        match tsr_jsstring::helpers::to_lower_go(self.sort.as_bytes()).as_slice() {
+            b"ordinal" => Some((Mode::Ordinal, false)),
+            b"ordinalignorecase" => Some((Mode::Ordinal, true)),
+            b"natural" => Some((Mode::Natural, false)),
+            b"naturalignorecase" => Some((Mode::Natural, true)),
+            _ => None,
+        }
     }
     fn comparer(&self, ignore: bool) -> Comparer {
-        let (mode, ignore) = match self.sort.as_str() {
-            "ordinal" => (Mode::Ordinal, false),
-            "ordinalIgnoreCase" => (Mode::Ordinal, true),
-            "natural" => (Mode::Natural, false),
-            "naturalIgnoreCase" => (Mode::Natural, true),
-            _ => (
-                if self.unicode {
-                    Mode::Unicode
-                } else {
-                    Mode::Ordinal
-                },
-                ignore,
-            ),
-        };
+        let (mode, ignore) = self.explicit_order().unwrap_or((
+            if self.unicode {
+                Mode::Unicode
+            } else {
+                Mode::Ordinal
+            },
+            ignore,
+        ));
         Comparer {
             mode,
             ignore,
@@ -216,7 +219,9 @@ impl OrganizeOptions {
         });
         let mut result = Comparers {
             modules: best_module,
-            names: self.comparer(false),
+            // With no named imports to detect from, Go supplies a nil comparer.
+            // The caller rebuilds it with only TypeOrder, so collation is ordinal.
+            names: Self::default().comparer(false),
             types: types[0],
         };
         if self.explicit() || self.ignore_case.is_some() {

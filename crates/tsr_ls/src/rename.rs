@@ -120,7 +120,7 @@ impl LanguageService<'_> {
                 return Ok(Some(refused(reason, locale)));
             }
             if ast::is_string_literal_like(&n)
-                && modules::import_from_module_specifier(view, node)?.is_some()
+                && modules::try_get_import_from_module_specifier(view, node)?.is_some()
             {
                 return if options.import_paths {
                     self.rename_module(c, source, node, symbol, new_name, options, locale)
@@ -384,7 +384,7 @@ impl LanguageService<'_> {
                         let view = self.view(node)?;
                         if !options.import_paths
                             && ast::is_string_literal_like(&view.node(node)?)
-                            && modules::import_from_module_specifier(view, node)?.is_some()
+                            && modules::try_get_import_from_module_specifier(view, node)?.is_some()
                         {
                             continue;
                         }

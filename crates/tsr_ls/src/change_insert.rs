@@ -318,8 +318,17 @@ impl NodeTracker<'_> {
         if multiline {
             self.raw
                 .replace_text(source, TextRange::new(end, end), separator.into());
-            let indentation =
-                indentation_column(text, after_line, after_start, self.settings.editor.tab_size);
+            let file = tsr_format::FormatFile {
+                view: syntax.view,
+                source,
+                jsdoc: &mut syntax.docs,
+            };
+            let indentation = tsr_format::find_first_non_whitespace_column(
+                &file,
+                after_line,
+                after_start,
+                &self.settings,
+            )?;
             let mut pos = skip_trivia_ex(
                 text,
                 end,
@@ -373,18 +382,20 @@ impl NodeTracker<'_> {
         };
         let list = view.list(list)?;
         let members: Vec<_> = view.node_slice(list.nodes())?.iter().flatten().collect();
-        let tab_size = self.settings.editor.tab_size.max(1);
+        let tab_size = if self.settings.editor.tab_size <= 0 {
+            4
+        } else {
+            self.settings.editor.tab_size
+        };
         let mut indentation = -1;
         let mut last = container;
         for &member in &members {
-            if syntax.same_line(
-                i64::from(view.node(last)?.pos()),
-                i64::from(view.node(member)?.pos()),
-            ) {
+            let last_start = syntax.start(last)?;
+            let start = syntax.start(member)?;
+            if syntax.same_line(last_start, start) {
                 indentation = -1;
                 break;
             }
-            let start = syntax.start(member)?;
             let column = indentation_column(
                 syntax.file.text().as_bytes(),
                 line_start(&syntax.file, start),
@@ -404,11 +415,7 @@ impl NodeTracker<'_> {
                 syntax.file.text().as_bytes(),
                 line_start(&syntax.file, start),
                 start,
-                if self.settings.editor.tab_size <= 0 {
-                    4
-                } else {
-                    self.settings.editor.tab_size
-                },
+                tab_size,
             )
             .max(0)
                 + if self.settings.editor.indent_size <= 0 {

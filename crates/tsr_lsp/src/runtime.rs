@@ -1243,14 +1243,7 @@ fn refresh_diagnostics(
 fn unimplemented_method(method: &str) -> bool {
     matches!(
         method,
-        "workspace/willRenameFiles"
-            | "textDocument/formatting"
-            | "textDocument/rangeFormatting"
-            | "textDocument/onTypeFormatting"
-            | "textDocument/codeAction"
-            | "textDocument/prepareRename"
-            | "textDocument/rename"
-            | "custom/runGC"
+        "custom/runGC"
             | "custom/saveHeapProfile"
             | "custom/saveAllocProfile"
             | "custom/startCPUProfile"
@@ -1479,19 +1472,20 @@ fn apply_organize_preferences(
         "organizeImportsCollation",
         "preferences.organizeImports.unicodeCollation",
     ) {
-        options.unicode = value == "unicode";
+        options.unicode = tsr_jsstring::helpers::to_lower_go(value.as_bytes()) == b"unicode";
     }
     match get(
         "organizeImportsIgnoreCase",
         "preferences.organizeImports.caseSensitivity",
     ) {
-        Some(lsp::Any::Boolean(value)) if raw => options.ignore_case = Some(*value),
+        Some(lsp::Any::Boolean(value)) => options.ignore_case = Some(*value),
         Some(lsp::Any::String(value)) if !raw => {
-            options.ignore_case = match value.as_str() {
-                "caseInsensitive" => Some(true),
-                "caseSensitive" => Some(false),
-                _ => None,
-            }
+            options.ignore_case =
+                match tsr_jsstring::helpers::to_lower_go(value.as_bytes()).as_slice() {
+                    b"caseinsensitive" => Some(true),
+                    b"casesensitive" => Some(false),
+                    _ => None,
+                }
         }
         _ => {}
     }
@@ -1508,4 +1502,32 @@ fn apply_organize_preferences(
         ),
         &mut options.numeric,
     );
+}
+
+#[cfg(test)]
+mod preference_tests {
+    use super::*;
+
+    #[test]
+    fn organize_config_accepts_boolean_and_case_insensitive_values() {
+        for (case, expected) in [
+            ("true", Some(true)),
+            ("false", Some(false)),
+            ("\"CASEINSENSITIVE\"", Some(true)),
+            ("\"caseİnsensitive\"", Some(true)),
+            ("\"CASESENSITIVE\"", Some(false)),
+            ("\"AUTO\"", None),
+        ] {
+            let json = format!(
+                r#"{{"preferences":{{"organizeImports":{{"unicodeCollation":"UNİCODE","caseSensitivity":{case}}}}}}}"#
+            );
+            let mut fields = HashMap::<String, lsp::Any>::new();
+            tsr_json::unmarshal(json.as_bytes(), &mut fields, tsr_json::Options::default())
+                .unwrap();
+            let mut options = tsr_ls::OrganizeOptions::default();
+            apply_organize_preferences(&fields, false, &mut options);
+            assert!(options.unicode);
+            assert_eq!(options.ignore_case, expected);
+        }
+    }
 }

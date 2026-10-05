@@ -27,6 +27,9 @@ FORMAT_CASES = [
 ]
 
 RENAME_CASES = [
+    'const obj = { "/*rename*/foo-bar": 1 }; obj["foo-bar"];',
+    'interface I { "/*rename*/foo": number; } const obj: I={foo:1};',
+
     '/*😀*/ const /*rename*/value = 1; const object = {value}; object.value;',
     'const value = 1; const object = {/*rename*/value}; object.value;',
     'const value = 1; const object = {value}; object./*rename*/value;',

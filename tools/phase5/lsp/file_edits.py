@@ -29,8 +29,26 @@ CASES = [
 
 ]
 
-def run(binary, root, files, old, new, encoding, document_changes, will_rename):
-    peer = ConfiguredPeer([str(binary), '--lsp', '--stdio'], root, {})
+PREFERENCE_CASES = [
+    ({'main.ts': 'import {x} from "@app/dep"; x;', 'src/dep.ts': 'export const x=1'},
+     'src/dep.ts', 'src/renamed.ts', {'baseUrl': '.', 'paths': {'@app/*': ['src/*']}},
+     {'preferences': {'autoImportSpecifierExcludeRegexes': ['^@app/']}}, {}),
+    ({'main.ts': 'import {x} from "<root>/src/dep"; x;', 'src/dep.ts': 'export const x=1'},
+     'src/dep.ts', 'src/renamed.ts', {'baseUrl': '.', 'paths': {'@app/*': ['src/*']}}, {}, {}),
+    ({'main.ts': 'import {x} from "./b/src/lib/index"; import "b"; x;',
+      'b/src/lib/index.ts': 'export const x=1', 'b/package.json': '{"name":"b","main":"./src/lib/index.ts"}'},
+     'b/src/lib/index.ts', 'b/src/other/index.ts', {}, {}, {'node_modules/b': 'b'}),
+    ({'main.ts': 'import {x} from "./b/src/y.js"; import "b"; x;',
+      'b/src/y.ts': 'export const x=1', 'b/package.json': '{"name":"b","main":"./src/y.ts"}'},
+     'b/src/y.ts', 'b/src/z.ts', {}, {'preferences': {'importModuleSpecifierEnding': 'minimal'}}, {'node_modules/b': 'b'}),
+    *[({'main.ts': 'export {};', old: 'export type T = import("./dep.ts").T;',
+        'dep.ts': 'export interface T {x:number}', 'package.json': '{"type":"module"}'},
+       old, new, {'module': 'nodenext', 'moduleResolution': 'nodenext'}, {}, {})
+      for old, new in [('entry.d.ts', 'entry.ts'), ('entry.ts', 'entry.d.ts')]],
+]
+
+def run(binary, root, files, old, new, encoding, document_changes, will_rename, config=None):
+    peer = ConfiguredPeer([str(binary), '--lsp', '--stdio'], root, config or {})
     try:
         peer.request('initialize', {'processId': None, 'rootUri': root.as_uri(), 'capabilities': {
             'general': {'positionEncodings': [encoding]}, 'workspace': {'configuration': True,
@@ -70,17 +88,21 @@ def main():
     p.add_argument('--go', type=Path, default=ROOT/'target/phase5/go-lsp')
     args = p.parse_args()
     count = 0
-    for index, (files, old, new, options) in enumerate(CASES):
+    cases = [(*case, {}, {}) for case in CASES] + PREFERENCE_CASES
+    for index, (files, old, new, options, config, links) in enumerate(cases):
         with tempfile.TemporaryDirectory(prefix='tsr-l5-file-') as directory:
             root = Path(directory).resolve()
-            files = dict(files)
+            files = {name: text.replace('<root>', str(root)) for name, text in files.items()}
             files['tsconfig.json'] = files.get('tsconfig.json') or json.dumps({'compilerOptions': {'noLib': True, **options}, 'files': ['main.ts', *[f for f in files if f != 'main.ts' and f.endswith('.ts')]]}, indent=2)
             for name, text in files.items():
                 (root/name).parent.mkdir(parents=True, exist_ok=True)
                 (root/name).write_text(text)
+            for name, target in links.items():
+                (root/name).parent.mkdir(parents=True, exist_ok=True)
+                (root/name).symlink_to(root/target, target_is_directory=True)
             for encoding in ['utf-8', 'utf-16']:
                 for document_changes, will_rename in [(False, False), (True, False), (True, True)]:
-                    go, rust = [run(b, root, files, old, new, encoding, document_changes, will_rename) for b in [args.go, args.rust]]
+                    go, rust = [run(b, root, files, old, new, encoding, document_changes, will_rename, config) for b in [args.go, args.rust]]
                     if go != rust:
                         print(index, old, new, encoding, document_changes, will_rename)
                         print('\n'.join(difflib.unified_diff(json.dumps(go, indent=2).splitlines(), json.dumps(rust, indent=2).splitlines(), fromfile='Go', tofile='Rust')))

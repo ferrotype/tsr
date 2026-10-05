@@ -73,11 +73,57 @@ fix-all output that catches insertion-order and duplicate-diagnostic bugs.
 Three focused compiler variants retain all 27 comparisons. Changed-crate
 clippy with warnings denied, formatting and `cargo xtask validate` pass.
 
+## PR review fixes
+
+Quoted-property rename now uses the non-panicking module-specifier predicate.
+Export-equals rename follows the pin's name guard for namespace and import-equals
+aliases, preserving differently named imports and reexports. Interface-member
+generation selects one accessor pair, uses trivia-free positions for indentation,
+and infers quote style for generated names, types and method bodies. Multiline
+import insertion uses the formatter's Unicode and tab handling, including zero
+tab size.
+
+File moves carry exclusion patterns and relative-path preferences into the
+production specifier generator. Rooted and empty old specifiers, package-path
+endings, and the unresolved relative fallback follow the pin. Extension eligibility
+uses the original importer name when moving between `.d.ts` and `.ts`. Organize
+imports uses ordinal name ordering when there are no named imports to infer from;
+preference parsing uses Go's Unicode lowercasing and accepts boolean case
+sensitivity. Empty mapped formatting results serialize as `[]`. The implemented
+editing methods have been removed from the interim unsupported-method list.
+
+The expanded native checks pass:
+
+| Command under `tools/phase5/lsp` | Compared observations |
+| --- | ---: |
+| `edits.py`: formatting / rename | 168 / 104 |
+| `actions.py`: 18 fixtures, 18 settings, 3 actions, 2 encodings | 1,944 |
+| `quick_fixes.py`: default settings | 314 |
+| `quick_fixes.py --case promote-indent --case promote-unicode-indent --config '{"format":{"tabSize":0},"preferences":{"organizeImports":{"typeOrder":"first"}}}'` | 12 |
+| `file_edits.py`: moves, preferences and package symlinks | 126 |
+
+Four focused compiler variants also pass all 36 subtests: declaration import
+extensions, subpath reexports, enum import-equals references and NodeNext
+extensionless package mains. These use a freshly built `tsr-testrunner` through
+`parity.py run compiler --id`; targeted runs are development checks, so no full
+expectation file was accepted or regenerated.
+
+Final local checks pass: 78 checker tests, 57 LS tests, 28 LSP tests and two
+checker doctests; changed-crate clippy with warnings denied, formatting and
+`cargo xtask validate`. The native FSEvents test needs host access and timed out
+once while the differential servers were active; the serial crate-test run
+passed without changing or disabling it.
+
 ## Remaining Phase 5 work
 
 L6 still owns cross-project orchestration, project-reference discovery, ATA,
 mapper process/lifecycle integration and the recorded config/registry sequence.
 The local editing algorithms and mapping tests do not certify those paths.
+In particular, a client without `workspace.willRenameFiles` currently receives
+file-move edits from its default project only. L6 must share the project-tree
+loading and all-project traversal used by the pin's file-rename worker. The
+ordinary `willRenameFiles` loop over all loaded projects is intentional: Go
+also traverses every project after loading project trees.
 L7 owns the complete fourslash runner, client replay expectations and latency
 measurement. There is still no LSP adapter in `parity.py`; bounded comparisons
 are development checks and do not claim full fourslash acceptance. No benchmark

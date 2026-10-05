@@ -90,6 +90,37 @@ fn program() -> Program {
 }
 
 #[test]
+fn mapped_formatting_without_edits_returns_an_empty_array() {
+    let p = program();
+    let mut service = LanguageService::new(&p, PositionEncoding::Utf16, CancellationToken::new());
+    let result = service
+        .format_document(
+            &tsr_lsproto::DocumentFormattingParams {
+                text_document: tsr_lsproto::TextDocumentIdentifier {
+                    uri: tsr_lsproto::DocumentUri("file:///virtual1.ts".into()),
+                },
+                options: Some(Box::new(tsr_lsproto::FormattingOptions {
+                    tab_size: 4,
+                    insert_spaces: true,
+                    ..Default::default()
+                })),
+                ..Default::default()
+            },
+            &tsr_format::FormatCodeSettings::default(),
+            true,
+        )
+        .unwrap();
+    assert!(result
+        .text_edits
+        .as_ref()
+        .is_some_and(|edits| edits.is_empty()));
+    assert_eq!(
+        tsr_json::marshal(&result, tsr_json::Options::default()).unwrap(),
+        b"[]"
+    );
+}
+
+#[test]
 fn mapped_edits_sort_in_original_coordinates_and_drop_the_whole_ambiguous_file() {
     let p = program();
     let a = p.source_file(b"/virtual1.ts").unwrap().source();

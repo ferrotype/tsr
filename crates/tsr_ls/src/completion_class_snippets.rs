@@ -302,6 +302,7 @@ impl LanguageService<'_> {
         emit: &tsr_printer::EmitContext,
         adder: &mut tsr_autoimport::ImportAdder,
     ) -> Result<Option<(GeneratedTypeNodes, Vec<NodeId>)>> {
+        let single_quote = crate::inlay_hints::single_quote(syntax, options.quote)?;
         let declarations: Vec<_> = checker
             .symbol_declarations(symbol)?
             .iter()
@@ -367,7 +368,7 @@ impl LanguageService<'_> {
             }
         }
         let builder_flags = nf::NO_TRUNCATION
-            | if options.quote == crate::QuotePreference::Single {
+            | if single_quote {
                 nf::USE_SINGLE_QUOTES_FOR_STRING_LITERAL_TYPE
             } else {
                 0
@@ -423,11 +424,11 @@ impl LanguageService<'_> {
                 &mut nodes,
                 original_name,
                 &name_text,
-                options,
+                single_quote,
                 locale.is_some(),
             );
             let body = with_body
-                .then(|| member_body(&mut nodes, options, locale))
+                .then(|| member_body(&mut nodes, options, single_quote, locale))
                 .transpose()?;
             let question = optional.then(|| nodes.ast.new_token(K::QuestionToken.into()));
             if syntax.file.is_js() {
@@ -461,14 +462,15 @@ impl LanguageService<'_> {
         }
         if !is_method {
             let kinds = if matches!(kind, K::GetAccessor | K::SetAccessor) {
-                declarations
-                    .iter()
-                    .copied()
-                    .filter(|&d| {
-                        nodes.ast.view().node(d).is_ok_and(|r| {
-                            matches!(r.kind().known(), Some(K::GetAccessor | K::SetAccessor))
-                        })
-                    })
+                let accessors = tsr_ast::utilities_class::get_all_accessor_declarations(
+                    nodes.ast.view(),
+                    &declarations,
+                    declaration.expect("accessor declaration"),
+                )?;
+                accessors
+                    .first_accessor
+                    .into_iter()
+                    .chain(accessors.second_accessor)
                     .collect()
             } else {
                 vec![declaration.unwrap_or(class)]
@@ -479,13 +481,13 @@ impl LanguageService<'_> {
                     &mut nodes,
                     original_name,
                     &name_text,
-                    options,
+                    single_quote,
                     locale.is_some(),
                 );
                 let ty = nodes.clone_node(type_node);
                 let node = if kind == K::GetAccessor {
                     let b = (!signature_only)
-                        .then(|| member_body(&mut nodes, options, locale))
+                        .then(|| member_body(&mut nodes, options, single_quote, locale))
                         .transpose()?;
                     nodes.ast.new_get_accessor_declaration(
                         None,
@@ -523,7 +525,7 @@ impl LanguageService<'_> {
                     );
                     let ps = list(&mut nodes.ast, &[Some(p)])?;
                     let b = (!signature_only)
-                        .then(|| member_body(&mut nodes, options, locale))
+                        .then(|| member_body(&mut nodes, options, single_quote, locale))
                         .transpose()?;
                     nodes.ast.new_set_accessor_declaration(
                         None,
@@ -548,7 +550,7 @@ impl LanguageService<'_> {
                 &mut nodes,
                 original_name,
                 &name_text,
-                options,
+                single_quote,
                 locale.is_some(),
             );
             let mut parameters = Vec::new();
@@ -601,7 +603,7 @@ impl LanguageService<'_> {
             }
             let ps = list(&mut nodes.ast, &parameters)?;
             let ty = nodes.clone_node(type_node);
-            let b = member_body(&mut nodes, options, locale)?;
+            let b = member_body(&mut nodes, options, single_quote, locale)?;
             let question =
                 (optional && method_optional).then(|| nodes.ast.new_token(K::QuestionToken.into()));
             result.push(nodes.ast.new_method_declaration(
@@ -635,11 +637,11 @@ fn property_name(
     nodes: &mut GeneratedTypeNodes,
     original: Option<NodeId>,
     name: &tsr_ast::JsString,
-    options: &CompletionOptions,
+    single_quote: bool,
     constructor: bool,
 ) -> NodeId {
     if constructor && name.as_bytes() == b"constructor" {
-        let flags = if options.quote == crate::QuotePreference::Single {
+        let flags = if single_quote {
             tsr_ast::token_flags::SINGLE_QUOTE
         } else {
             0
@@ -659,6 +661,7 @@ fn property_name(
 fn member_body(
     nodes: &mut GeneratedTypeNodes,
     options: &CompletionOptions,
+    single_quote: bool,
     locale: Option<&tsr_locale::Locale>,
 ) -> Result<NodeId> {
     let Some(locale) = locale else {
@@ -667,7 +670,7 @@ fn member_body(
     let text = tsr_ast::JsString::from_bytes(
         tsr_diagnostics::Method_not_implemented.localize(locale, &[]),
     );
-    let flags = if options.quote == crate::QuotePreference::Single {
+    let flags = if single_quote {
         tsr_ast::token_flags::SINGLE_QUOTE
     } else {
         0

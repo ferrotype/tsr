@@ -435,8 +435,13 @@ impl SearchState<'_, '_, '_> {
                         } else {
                             n.name()
                         } {
-                            if let Some(symbol) = self.c.get_symbol_at_location(location)? {
-                                searches.push((location, symbol));
+                            if !self.options.rename
+                                || view.node_text(location)?.as_bytes() == name
+                                || view.node_text(location)?.as_bytes() == b"default"
+                            {
+                                if let Some(symbol) = self.c.get_symbol_at_location(location)? {
+                                    searches.push((location, symbol));
+                                }
                             }
                         }
                     }
@@ -489,8 +494,15 @@ impl SearchState<'_, '_, '_> {
                         match view.node(b)?.kind().known() {
                             Some(K::NamespaceImport) if info.kind == ExportKind::Equals => {
                                 if let Some(location) = view.node(b)?.name() {
-                                    if let Some(symbol) = self.c.get_symbol_at_location(location)? {
-                                        searches.push((location, symbol));
+                                    if !self.options.rename
+                                        || view.node_text(location)?.as_bytes() == name
+                                        || view.node_text(location)?.as_bytes() == b"default"
+                                    {
+                                        if let Some(symbol) =
+                                            self.c.get_symbol_at_location(location)?
+                                        {
+                                            searches.push((location, symbol));
+                                        }
                                     }
                                 }
                             }

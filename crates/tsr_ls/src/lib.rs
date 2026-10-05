@@ -32,6 +32,8 @@ mod completion_paths;
 mod completion_snippets;
 mod completion_switch;
 mod completions;
+#[cfg(test)]
+mod edit_tests;
 mod file_rename;
 mod import_adder;
 mod jsdoc_completions;

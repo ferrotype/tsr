@@ -652,7 +652,7 @@ pub fn execute(
                                 &mut operation,
                                 &old,
                                 &new,
-                                options.completion.auto_import.ending.as_deref(),
+                                &options.completion.auto_import,
                                 &options.completion.format,
                             )
                             .map_err(service_error)?
@@ -950,7 +950,7 @@ pub fn file_renames(
                             &mut operation,
                             &lsp::DocumentUri(file.old_uri.clone()),
                             &lsp::DocumentUri(file.new_uri.clone()),
-                            options.auto_import.ending.as_deref(),
+                            &options.auto_import,
                             &options.format,
                         )
                         .map_err(service_error)?,

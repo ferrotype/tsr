@@ -11,6 +11,11 @@ from edits import apply
 from interop import ROOT
 
 ORGANIZE = [
+    'export { b, B, a } from "./dep";\n',
+    'declare module "pkg" { import { b, B, a } from "./dep"; export {b, B, a}; }\n',
+    'import { a, B, c } from "./dep";\na;B;c;\n',
+    'import { B, a, c } from "./dep";\na;B;c;\n',
+
     'import {z, a as local, a} from "./dep";\nimport D from "./dep";\na; z; local; D;\n',
     '// header\nimport {z, /* comment */ a, unused} from "./dep";\n// middle\nimport {a as local} from "./dep";\nz; a; local;\n',
     'import {unused} from "./dep";\nconst x = 1;\n',
@@ -61,10 +66,17 @@ def main():
         root=Path(directory).resolve()
         (root/'tsconfig.json').write_text('{"compilerOptions":{"noLib":true,"module":"esnext"},"files":["main.ts","dep.ts"]}')
         (root/'main.ts').write_text('')
-        (root/'dep.ts').write_text('export const a=1, z=2, unused=3; export default class D{}; export interface Shape {}')
+        (root/'dep.ts').write_text('export const a=1, b=2, B=3, c=4, z=2, unused=3; export default class D{}; export interface Shape {}')
         count=0
         for encoding in ['utf-8','utf-16']:
-            for config in [{}, {'organizeImportsSort':'ordinal'}, {'organizeImportsSort':'natural'},
+            for config in [{}, {'preferences':{'organizeImports':{'unicodeCollation':'unicode'}}},
+                           {'preferences':{'organizeImports':{'unicodeCollation':'UNICODE'}}},
+                           {'preferences':{'organizeImports':{'sort':'ORDINALIGNORECASE'}}},
+                           {'preferences':{'organizeImports':{'sort':'ordİnalIgnoreCase'}}},
+                           {'preferences':{'organizeImports':{'unicodeCollation':'UNİCODE','caseSensitivity':'caseİnsensitive'}}},
+                           {'preferences':{'organizeImports':{'sort':'unknown'}}},
+                           {'preferences':{'organizeImports':{'caseSensitivity':True}}},
+                           {'preferences':{'organizeImports':{'caseSensitivity':'CASEINSENSITIVE'}}}, {'organizeImportsSort':'ordinal'}, {'organizeImportsSort':'natural'},
                            {'organizeImportsSort':'naturalIgnoreCase'}, {'organizeImportsCollation':'unicode','organizeImportsNumericCollation':True},
                            {'organizeImportsCollation':'unicode','organizeImportsAccentCollation':False,'organizeImportsCaseFirst':'upper'},
                            {'organizeImportsTypeOrder':'first'},

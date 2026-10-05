@@ -60,10 +60,16 @@ impl LanguageService<'_> {
         c: &mut Operation<'_>,
         old: &lsp::DocumentUri,
         new: &lsp::DocumentUri,
-        ending: Option<&str>,
+        preferences: &tsr_autoimport::Preferences,
         format: &tsr_format::FormatCodeSettings,
     ) -> Result<Vec<lsp::TextDocumentEditOrCreateFileOrRenameFileOrDeleteFile>> {
         self.check_canceled()?;
+        let excluded = |specifier: &[u8]| preferences.excludes(specifier);
+        let specifier_preferences = tsr_checker::ModuleSpecifierPreferences {
+            relative: preferences.module_specifier.as_deref(),
+            ending: preferences.ending.as_deref(),
+            excluded: &excluded,
+        };
         let old = old.file_name();
         let new = new.file_name();
         let updater = PathUpdater {
@@ -73,7 +79,7 @@ impl LanguageService<'_> {
         };
         let mut tracker = NodeTracker::new(self.program, format);
         self.update_config_paths(&mut tracker, &updater)?;
-        self.update_import_paths(c, &mut tracker.raw, &updater, ending)?;
+        self.update_import_paths(c, &mut tracker.raw, &updater, specifier_preferences)?;
         let mut result = Vec::new();
         if path::is_declaration_file_name(old.as_bytes())
             && path::is_declaration_file_name(new.as_bytes())
@@ -106,7 +112,7 @@ impl LanguageService<'_> {
         c: &mut Operation<'_>,
         tracker: &mut Tracker,
         updater: &PathUpdater<'_>,
-        ending: Option<&str>,
+        specifier_preferences: tsr_checker::ModuleSpecifierPreferences<'_>,
     ) -> Result<()> {
         let mut moved = Vec::new();
         for file in self.program.files() {
@@ -177,7 +183,7 @@ impl LanguageService<'_> {
                             new_from,
                             *import,
                             new_target.as_deref().unwrap_or(target.as_bytes()),
-                            ending,
+                            specifier_preferences,
                         )?
                         .as_bytes()
                         .to_vec(),
@@ -190,18 +196,21 @@ impl LanguageService<'_> {
                             new_from,
                             *import,
                             old_name.file_name(),
-                            ending,
+                            specifier_preferences,
                         )?;
                         if old != old_spec {
                             continue;
                         }
-                        new_spec = Some(
-                            c.update_module_specifier(
-                                source_id, new_from, *import, new_name, ending,
-                            )?
-                            .as_bytes()
-                            .to_vec(),
-                        );
+                        let updated = c.update_module_specifier(
+                            source_id,
+                            new_from,
+                            *import,
+                            new_name,
+                            specifier_preferences,
+                        )?;
+                        if !updated.as_bytes().is_empty() && updated != old_spec {
+                            new_spec = Some(updated.as_bytes().to_vec());
+                        }
                         break;
                     }
                     if new_spec.is_none()
@@ -214,7 +223,9 @@ impl LanguageService<'_> {
                         ));
                     }
                 }
-                if let Some(new) = new_spec.filter(|new| new != old_spec.as_bytes()) {
+                if let Some(new) =
+                    new_spec.filter(|new| !new.is_empty() && new != old_spec.as_bytes())
+                {
                     tracker.replace_text(
                         source_id,
                         TextRange::new(

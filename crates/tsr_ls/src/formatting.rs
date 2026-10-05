@@ -53,7 +53,9 @@ impl LanguageService<'_> {
             self.check_canceled()?;
             let (range, fidelity) = self.unrestricted_range(source, change.range)?;
             if !fidelity.is_exact() {
-                return Ok(lsp::TextEditsOrNull::default());
+                return Ok(lsp::TextEditsOrNull {
+                    text_edits: Some(Box::default()),
+                });
             }
             // Formatter edits contain only whitespace, line endings and punctuation.
             edits.push(Some(Box::new(lsp::TextEdit {
@@ -177,8 +179,9 @@ impl LanguageService<'_> {
                 ))
         });
         Ok(lsp::TextEditsOrNull {
-            text_edits: (!edits.is_empty())
-                .then(|| Box::new(edits.into_iter().map(|edit| Some(Box::new(edit))).collect())),
+            text_edits: Some(Box::new(
+                edits.into_iter().map(|edit| Some(Box::new(edit))).collect(),
+            )),
         })
     }
 

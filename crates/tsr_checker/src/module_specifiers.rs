@@ -13,6 +13,14 @@ pub use paths::Ending as ModuleSpecifierEnding;
 use paths::{allowed_endings, ensure_non_module, same_volume_relative, Ending};
 type ModulePath = ModuleSpecifierPath;
 
+/// Request preferences for a file move, including the existing exclusion matcher.
+#[derive(Clone, Copy)]
+pub struct ModuleSpecifierPreferences<'a> {
+    pub relative: Option<&'a str>,
+    pub ending: Option<&'a str>,
+    pub excluded: &'a dyn Fn(&[u8]) -> bool,
+}
+
 pub(super) struct Import {
     text: JsString,
     mode: Mode,
@@ -20,6 +28,9 @@ pub(super) struct Import {
 }
 pub(super) struct Generation<'a> {
     host: &'a dyn CheckerHost,
+    /// Original source name: declaration-file status determines allowed extensions.
+    source_file: &'a [u8],
+    /// Current location, which may differ from the source name during a file move.
     file: &'a [u8],
     imports: Vec<Import>,
     default_mode: Mode,
@@ -32,6 +43,16 @@ enum Relativity {
     Relative,
     NonRelative,
     ProjectRelative,
+}
+impl Relativity {
+    fn from_preference(value: Option<&str>) -> Self {
+        match value {
+            Some("relative") => Self::Relative,
+            Some("non-relative") => Self::NonRelative,
+            Some("project-relative") => Self::ProjectRelative,
+            _ => Self::Shortest,
+        }
+    }
 }
 struct Preferences<'a> {
     relative: Relativity,
@@ -99,6 +120,7 @@ fn generate_with_preferences(
     }
     let generation = Generation {
         host,
+        source_file: file,
         file,
         imports,
         default_mode,
@@ -118,14 +140,17 @@ impl Generation<'_> {
         self.host.use_case_sensitive_file_names()
     }
     fn endings(&self, syntax_mode: Mode) -> Vec<Ending> {
+        self.endings_for(syntax_mode, self.preference.old_specifier)
+    }
+    fn endings_for(&self, syntax_mode: Mode, old_specifier: &[u8]) -> Vec<Ending> {
         allowed_endings(
             self.options(),
-            self.file,
+            self.source_file,
             &self.imports,
             self.default_mode,
             syntax_mode,
             self.preference.ending,
-            self.preference.old_specifier,
+            old_specifier,
         )
     }
 
@@ -439,7 +464,7 @@ impl crate::Operation<'_> {
         importing_file: &[u8],
         old_specifier: NodeId,
         target: &[u8],
-        ending: Option<&str>,
+        preferences: ModuleSpecifierPreferences<'_>,
     ) -> Result<JsString, Error> {
         let state = self.state();
         let view = state.ast(source)?;
@@ -459,6 +484,7 @@ impl crate::Operation<'_> {
         }
         let generation = Generation {
             host,
+            source_file: source_file.file_name(),
             file: importing_file,
             imports,
             default_mode,
@@ -468,13 +494,15 @@ impl crate::Operation<'_> {
                 override_mode
             },
             preference: Preferences {
-                relative: if path::is_relative(old.as_bytes()) {
+                relative: if old.as_bytes().is_empty() {
+                    Relativity::from_preference(preferences.relative)
+                } else if path::is_external_module_name_relative(old.as_bytes()) {
                     Relativity::Relative
                 } else {
                     Relativity::NonRelative
                 },
-                ending,
-                excluded: &|_| false,
+                ending: preferences.ending,
+                excluded: preferences.excluded,
                 old_specifier: old.as_bytes(),
             },
         };
@@ -544,12 +572,7 @@ impl crate::Operation<'_> {
         let state = self.state();
         let view = state.ast(source)?;
         let file = view.source_file(source)?;
-        let relative = match relative {
-            Some("relative") => Relativity::Relative,
-            Some("non-relative") => Relativity::NonRelative,
-            Some("project-relative") => Relativity::ProjectRelative,
-            _ => Relativity::Shortest,
-        };
+        let relative = Relativity::from_preference(relative);
         generate_with_preferences(
             state.program()?.host.as_ref(),
             source,

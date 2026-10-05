@@ -141,7 +141,8 @@ impl Generation<'_> {
         let Some(parts) = node_module_parts(file) else {
             return Ok(vec![]);
         };
-        let endings = self.endings(Mode::NONE);
+        // Package names rebuild preferences without the previous local spelling.
+        let endings = self.endings_for(Mode::NONE, b"");
         let mut root_cursor = parts.package_root;
         let mut first_file = Vec::new();
         let (specifier, is_root) = loop {
