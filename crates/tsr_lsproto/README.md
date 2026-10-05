@@ -4,8 +4,7 @@ Language Server Protocol types and Corsa extensions resolved by the pinned Go
 implementation's generator, with strict JSON codecs on `tsr_json` and JSON-RPC
 framing provided by `tsr_jsonrpc`.
 
-Requires Rust 1.96 or newer. Unreleased; scheduled for the next tsr lockstep release.
-The published 0.2.0 packages do not include this crate.
+Requires Rust 1.96 or newer. First released in tsr 0.3.0.
 
 From the repository, regenerate with `cargo xtask gen lsproto`, or check drift
 with `cargo xtask gen lsproto --check`. This requires the pinned Node version

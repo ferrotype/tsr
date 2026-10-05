@@ -8,15 +8,15 @@ publish = false
 description = "S08 feasibility prototype: a relater over stable reference-counted type cells with interior mutability, measured against the ID-based production checker in P7"
 
 [dependencies]
-tsr_arena = { version = "0.2.0", path = "../../../crates/tsr_arena" }
-tsr_ast = { version = "0.2.0", path = "../../../crates/tsr_ast" }
-tsr_binder = { version = "0.2.0", path = "../../../crates/tsr_binder" }
-tsr_core = { version = "0.2.0", path = "../../../crates/tsr_core" }
-tsr_diagnostics = { version = "0.2.0", path = "../../../crates/tsr_diagnostics" }
-tsr_jsnum = { version = "0.2.0", path = "../../../crates/tsr_jsnum" }
-tsr_jsstring = { version = "0.2.0", path = "../../../crates/tsr_jsstring" }
-tsr_scanner = { version = "0.2.0", path = "../../../crates/tsr_scanner" }
-tsr_parser = { version = "0.2.0", path = "../../../crates/tsr_parser" }
+tsr_arena = { version = "0.3.0", path = "../../../crates/tsr_arena" }
+tsr_ast = { version = "0.3.0", path = "../../../crates/tsr_ast" }
+tsr_binder = { version = "0.3.0", path = "../../../crates/tsr_binder" }
+tsr_core = { version = "0.3.0", path = "../../../crates/tsr_core" }
+tsr_diagnostics = { version = "0.3.0", path = "../../../crates/tsr_diagnostics" }
+tsr_jsnum = { version = "0.3.0", path = "../../../crates/tsr_jsnum" }
+tsr_jsstring = { version = "0.3.0", path = "../../../crates/tsr_jsstring" }
+tsr_scanner = { version = "0.3.0", path = "../../../crates/tsr_scanner" }
+tsr_parser = { version = "0.3.0", path = "../../../crates/tsr_parser" }
 
 [lints]
 workspace = true

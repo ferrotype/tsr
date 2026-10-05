@@ -1,6 +1,6 @@
 [package]
 name = "tsr_tsoptions"
-version = "0.2.0"
+version = "0.3.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -18,20 +18,20 @@ default = []
 harness = []
 
 [dependencies]
-tsr_glob = { version = "0.2.0", path = "../tsr_glob" }
-tsr_locale = { version = "0.2.0", path = "../tsr_locale" }
-tsr_json = { path = "../tsr_json", version = "0.2.0" }
+tsr_glob = { version = "0.3.0", path = "../tsr_glob" }
+tsr_locale = { version = "0.3.0", path = "../tsr_locale" }
+tsr_json = { path = "../tsr_json", version = "0.3.0" }
 stacker = "=0.1.25"
-tsr_jsnum = { version = "0.2.0", path = "../tsr_jsnum" }
-tsr_ast = { version = "0.2.0", path = "../tsr_ast" }
-tsr_parser = { version = "0.2.0", path = "../tsr_parser" }
-tsr_scanner = { version = "0.2.0", path = "../tsr_scanner" }
-tsr_vfs = { version = "0.2.0", path = "../tsr_vfs" }
-tsr_core = { version = "0.2.0", path = "../tsr_core" }
-tsr_tspath = { version = "0.2.0", path = "../tsr_tspath" }
-tsr_bundled = { version = "0.2.0", path = "../tsr_bundled" }
-tsr_diagnostics = { version = "0.2.0", path = "../tsr_diagnostics" }
-tsr_jsstring = { version = "0.2.0", path = "../tsr_jsstring" }
+tsr_jsnum = { version = "0.3.0", path = "../tsr_jsnum" }
+tsr_ast = { version = "0.3.0", path = "../tsr_ast" }
+tsr_parser = { version = "0.3.0", path = "../tsr_parser" }
+tsr_scanner = { version = "0.3.0", path = "../tsr_scanner" }
+tsr_vfs = { version = "0.3.0", path = "../tsr_vfs" }
+tsr_core = { version = "0.3.0", path = "../tsr_core" }
+tsr_tspath = { version = "0.3.0", path = "../tsr_tspath" }
+tsr_bundled = { version = "0.3.0", path = "../tsr_bundled" }
+tsr_diagnostics = { version = "0.3.0", path = "../tsr_diagnostics" }
+tsr_jsstring = { version = "0.3.0", path = "../tsr_jsstring" }
 serde_json = { version = "1", features = ["preserve_order"] }
 
 [lints]

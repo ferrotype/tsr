@@ -10,17 +10,17 @@ publish = false
 [workspace]
 
 [dependencies]
-tsr_embed = { version = "0.2.0", path = "../../../crates/tsr_embed" }
+tsr_embed = { version = "0.3.0", path = "../../../crates/tsr_embed" }
 s10_corpus = { version = "0.1.0", path = "../corpus-adapter" }
 serde_json = { version = "1", features = ["preserve_order"] }
 
 [dev-dependencies]
-tsr_arena = { version = "0.2.0", path = "../../../crates/tsr_arena" }
-tsr_checker = { version = "0.2.0", path = "../../../crates/tsr_checker" }
-tsr_core = { version = "0.2.0", path = "../../../crates/tsr_core" }
-tsr_jsstring = { version = "0.2.0", path = "../../../crates/tsr_jsstring" }
-tsr_tsoptions = { version = "0.2.0", path = "../../../crates/tsr_tsoptions" }
-tsr_vfs = { version = "0.2.0", path = "../../../crates/tsr_vfs" }
+tsr_arena = { version = "0.3.0", path = "../../../crates/tsr_arena" }
+tsr_checker = { version = "0.3.0", path = "../../../crates/tsr_checker" }
+tsr_core = { version = "0.3.0", path = "../../../crates/tsr_core" }
+tsr_jsstring = { version = "0.3.0", path = "../../../crates/tsr_jsstring" }
+tsr_tsoptions = { version = "0.3.0", path = "../../../crates/tsr_tsoptions" }
+tsr_vfs = { version = "0.3.0", path = "../../../crates/tsr_vfs" }
 
 [profile.release]
 lto = "fat"
