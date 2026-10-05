@@ -29,8 +29,9 @@ fn independent_go_trace_callbacks_and_typed_arguments() {
                 content.as_str().unwrap().as_bytes().to_vec(),
             );
         }
-        let options = tsr_tsoptions::raw::compiler_options(&request["options"]).unwrap();
-        let mut resolver = Resolver::new(Arc::new(files.finish()), Arc::new(options), cwd).unwrap();
+        let options = Arc::new(tsr_tsoptions::raw::compiler_options(&request["options"]).unwrap());
+        let host = Arc::new(files.finish());
+        let mut resolver = Resolver::new(host.clone(), options.clone(), cwd).unwrap();
         let mut previous: Option<Arc<crate::PackageJson>> = None;
         for (index, operation) in request["operations"].as_array().unwrap().iter().enumerate() {
             let name = operation["name"].as_str().unwrap().as_bytes();
@@ -40,7 +41,7 @@ fn independent_go_trace_callbacks_and_typed_arguments() {
             let mut observed_package = Value::Null;
             match operation["kind"].as_str().unwrap() {
                 "automatic" => {
-                    resolver.automatic_type_directive_names().unwrap();
+                    crate::automatic_type_directive_names(&options, host.as_ref(), cwd).unwrap();
                 }
                 "metadata" => {
                     if let Some(entry) = resolver.package_scope(name).unwrap() {

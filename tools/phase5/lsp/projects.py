@@ -20,12 +20,16 @@ SOURCES = {
     'b/b.ts': 'import {shared, Service} from "../a/a";\nexport function callerB() { shared(); }\nexport class B implements Service { run() {} }\n',
     'c/c.ts': 'import {shared, Service} from "../a/a";\nexport function callerC() { shared(); }\nexport class C implements Service { run() {} }\n',
 }
+SOURCES['a/a.ts'] += 'export declare function overloaded(x: string): void;\nexport const separator = 0;\nexport declare function overloaded(x: number): void;\n'
+SOURCES['b/b.ts'] += 'import {overloaded} from "../a/a";\nexport function overloadedB() { overloaded("x"); overloaded(1); }\n'
+SOURCES['c/c.ts'] += 'import {overloaded} from "../a/a";\nexport function overloadedC() { overloaded(2); }\n'
+
 
 
 def run(binary, root, encoding, method):
-    peer = ConfiguredPeer([str(binary), '--lsp', '--stdio'], root, {'tsserver': {'automaticTypeAcquisition': {'enabled': False}}})
+    peer = ConfiguredPeer([str(binary), '--lsp', '--stdio'], root, {'tsserver': {'automaticTypeAcquisition': {'enabled': False}}, 'referencesCodeLensEnabled': True, 'implementationsCodeLensEnabled': True})
     try:
-        peer.request('initialize', {'processId': None, 'rootUri': root.as_uri(), 'capabilities': {
+        peer.request('initialize', {'processId': None, 'rootUri': root.as_uri(), 'initializationOptions': {'codeLensShowLocationsCommandName': 'editor.showReferences'}, 'capabilities': {
             'general': {'positionEncodings': [encoding]},
             'textDocument': {'implementation': {'linkSupport': True}},
             'workspace': {'configuration': True, 'workspaceEdit': {'documentChanges': True, 'resourceOperations': ['rename']}}
@@ -45,13 +49,24 @@ def run(binary, root, encoding, method):
             params['newName'] = 'renamed'
         elif method == 'textDocument/implementation':
             params['position'] = position(text, text.index('Service'), encoding)
-        elif method == 'callHierarchy/incomingCalls':
+        elif method in ('callHierarchy/incomingCalls', 'overloadedIncoming'):
+            if method == 'overloadedIncoming':
+                params['position'] = position(text, text.index('overloaded'), encoding)
             items = peer.request('textDocument/prepareCallHierarchy', params)
             assert items, items
+            if method == 'overloadedIncoming':
+                assert len(items) == 2, items
             params = {'item': items[0]}
         elif method == 'workspace/willRenameFiles':
             params = {'files': [{'oldUri': uri, 'newUri': (root/'a/new.ts').as_uri()}]}
-        result = peer.request('textDocument/rename' if method == 'moduleRename' else method, params)
+        if method in ('referenceLens', 'implementationLens'):
+            lenses = peer.request('textDocument/codeLens', {'textDocument': {'uri': uri}})
+            kind = 'references' if method == 'referenceLens' else 'implementations'
+            # shared() and Service are the first exported declaration of each kind.
+            lens = next(lens for lens in lenses if lens['data']['kind'] == kind)
+            result = peer.request('codeLens/resolve', lens)
+        else:
+            result = peer.request('textDocument/rename' if method == 'moduleRename' else 'callHierarchy/incomingCalls' if method == 'overloadedIncoming' else method, params)
         peer.request('shutdown'); peer.send('exit')
         return result
     finally:
@@ -62,8 +77,13 @@ def canonical(response, method):
     # Go's cross-project worker map has no inter-project enumeration order.
     # Preserve all payloads and edit ordering; canonicalize only that map's
     # collection order (IDs in VS references are deliberately not covered here).
-    if isinstance(response, list):
+    # Incoming callers are explicitly sorted per declaration by Go, then
+    # merged in declaration order. That order is part of this comparison.
+    if isinstance(response, list) and method not in ('callHierarchy/incomingCalls', 'overloadedIncoming'):
         return sorted(response, key=lambda item: json.dumps(item, sort_keys=True))
+    if isinstance(response, dict) and response.get('command', {}).get('arguments'):
+        arguments = response['command']['arguments']
+        return {**response, 'command': {**response['command'], 'arguments': [*arguments[:2], sorted(arguments[2], key=lambda item: json.dumps(item, sort_keys=True))]}}
     if isinstance(response, dict) and 'documentChanges' in response:
         return {**response, 'documentChanges': sorted(response['documentChanges'], key=lambda item: json.dumps(item, sort_keys=True))}
     return response
@@ -92,7 +112,7 @@ def main():
             project = name[0]
             (root/project/'tsconfig.json').write_text(json.dumps({'compilerOptions': {'composite': True, 'noLib': True}, 'files': [project+'.ts'], **({'references': [{'path': '../a'}]} if project != 'a' else {})}))
         for encoding in args.encoding or ['utf-8', 'utf-16']:
-            for method in args.method or ['textDocument/references', 'textDocument/rename', 'textDocument/implementation', 'callHierarchy/incomingCalls', 'workspace/willRenameFiles', 'moduleRename']:
+            for method in args.method or ['textDocument/references', 'textDocument/rename', 'textDocument/implementation', 'callHierarchy/incomingCalls', 'workspace/willRenameFiles', 'moduleRename', 'referenceLens', 'implementationLens', 'overloadedIncoming']:
                 native = canonical(run(args.go, root, encoding, method), method)
                 rust = canonical(run(args.rust, root, encoding, method), method)
                 if native != rust:

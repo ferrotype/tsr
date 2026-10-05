@@ -90,16 +90,16 @@ impl LanguageService<'_> {
             call_hierarchy_items: (!items.is_empty()).then(|| Box::new(items)),
         })
     }
-    fn incoming_sites(&mut self, c: &mut Operation<'_>, declaration: NodeId) -> Result<Vec<Site>> {
+    fn incoming_reference(&mut self, declaration: NodeId) -> Result<Option<(NodeId, NodeId, i64)>> {
         let view = self.view(declaration)?;
         if matches!(
             view.node(declaration)?.kind().known(),
             Some(K::SourceFile | K::ModuleDeclaration | K::ClassStaticBlockDeclaration)
         ) {
-            return Ok(Vec::new());
+            return Ok(None);
         }
         let Some(node) = decl::reference(view, declaration)? else {
-            return Ok(Vec::new());
+            return Ok(None);
         };
         let source = ast::get_source_file_of_node(view, Some(node))?
             .ok_or(tsr_arena::Error::InvalidGraph)?;
@@ -109,8 +109,24 @@ impl LanguageService<'_> {
             .1
             .is_none()
         {
-            return Ok(Vec::new());
+            return Ok(None);
         }
+        Ok(Some((source, node, start)))
+    }
+
+    fn incoming_sites(&mut self, c: &mut Operation<'_>, declaration: NodeId) -> Result<Vec<Site>> {
+        let Some((_, node, start)) = self.incoming_reference(declaration)? else {
+            return Ok(Vec::new());
+        };
+        self.incoming_sites_at(c, node, start)
+    }
+
+    fn incoming_sites_at(
+        &mut self,
+        c: &mut Operation<'_>,
+        node: NodeId,
+        start: i64,
+    ) -> Result<Vec<Site>> {
         let files = self.program.files().iter().map(|f| f.source()).collect();
         let groups = SearchState::new(
             self,
@@ -124,6 +140,7 @@ impl LanguageService<'_> {
         .for_node(node, start)?;
         let mut sites = Vec::new();
         for group in groups {
+            self.record_cross_project_group(c, &group)?;
             for entry in group.entries {
                 let Some(node) = entry.node else { continue };
                 let view = self.view(node)?;
@@ -229,6 +246,68 @@ impl LanguageService<'_> {
         }
         Ok(calls)
     }
+    /// Expand declarations before starting one cross-project search per declaration.
+    pub fn incoming_call_positions(
+        &mut self,
+        c: &mut Operation<'_>,
+        item: &lsp::CallHierarchyItem,
+    ) -> Result<Vec<crate::CrossProjectPosition>> {
+        let Some(file) = self.program.source_file(item.uri.file_name().as_bytes()) else {
+            return Ok(Vec::new());
+        };
+        let mut positions = Vec::new();
+        for declaration in
+            self.call_declarations(c, file.source(), &item.selection_range.start, true)?
+        {
+            if let Some((source, _, start)) = self.incoming_reference(declaration)? {
+                if let Some(position) = self.position_in_source(source, start)? {
+                    positions.push(position);
+                }
+            }
+        }
+        Ok(positions)
+    }
+
+    /// Convert the reference groups directly; do not resolve declarations again.
+    pub fn incoming_calls_at(
+        &mut self,
+        c: &mut Operation<'_>,
+        uri: &lsp::DocumentUri,
+        position: &lsp::Position,
+    ) -> Result<lsp::CallHierarchyIncomingCallsOrNull> {
+        let source = self.file(uri)?;
+        let positions = self.converters.from_lsp_position_for_source_file(
+            self.program,
+            source,
+            position,
+            tsr_ast::span_map::FEATURE_REFERENCES,
+        )?;
+        let mut sites = Vec::new();
+        for mapped in positions {
+            if !mapped.mapped.fidelity.is_single_segment() {
+                continue;
+            }
+            let start = i64::from(mapped.mapped.position);
+            let node = Syntax::new(self.view(mapped.script)?, mapped.script)?
+                .nav()
+                .get_touching_property_name(start)?;
+            sites.extend(self.incoming_sites_at(c, node, start)?);
+        }
+        let calls = self
+            .grouped_calls(c, sites)?
+            .into_iter()
+            .map(|(item, ranges)| {
+                Some(Box::new(lsp::CallHierarchyIncomingCall {
+                    from: Some(Box::new(item)),
+                    from_ranges: ranges,
+                }))
+            })
+            .collect::<Vec<_>>();
+        Ok(lsp::CallHierarchyIncomingCallsOrNull {
+            call_hierarchy_incoming_calls: (!calls.is_empty()).then(|| Box::new(calls)),
+        })
+    }
+
     // port: tsc/internal/ls/callhierarchy.go:LanguageService.ProvideCallHierarchyIncomingCalls
     pub fn incoming_calls(
         &mut self,

@@ -30,14 +30,16 @@ impl Request {
                 | Self::Implementation(_)
                 | Self::Rename(_)
                 | Self::CallIncoming(_)
+                | Self::ResolveLens(_)
         )
     }
     fn position(&self) -> &lsp::Position {
         match self {
             Self::References(p) | Self::VSReferences(p) => &p.position,
-            Self::Implementation(p) => &p.position,
+            Self::Implementation(p) | Self::LensImplementations(p) => &p.position,
             Self::Rename(p) => &p.position,
-            Self::CallIncoming(p) => &p.selection_range.start,
+            Self::IncomingAt(p) => &p.position,
+            Self::LensLocations(p) => &p.range.start,
             _ => unreachable!("cross-project request"),
         }
     }
@@ -48,7 +50,7 @@ impl Request {
                 p.text_document.uri = uri;
                 p.position = position;
             }
-            Self::Implementation(p) => {
+            Self::Implementation(p) | Self::LensImplementations(p) => {
                 p.text_document.uri = uri;
                 p.position = position;
             }
@@ -56,9 +58,29 @@ impl Request {
                 p.text_document.uri = uri;
                 p.position = position;
             }
-            Self::CallIncoming(p) => {
-                p.uri = uri;
-                p.selection_range.start = position;
+            Self::IncomingAt(p) => {
+                p.text_document.uri = uri;
+                p.position = position;
+            }
+            Self::LensLocations(lens) => {
+                return if lens.data.as_ref().expect("validated lens").kind.0
+                    == lsp::CodeLensKind::IMPLEMENTATIONS
+                {
+                    Self::LensImplementations(lsp::ImplementationParams {
+                        text_document: lsp::TextDocumentIdentifier { uri },
+                        position,
+                        ..Default::default()
+                    })
+                } else {
+                    Self::References(lsp::ReferenceParams {
+                        text_document: lsp::TextDocumentIdentifier { uri },
+                        position,
+                        context: Some(Box::new(lsp::ReferenceContext {
+                            include_declaration: false,
+                        })),
+                        ..Default::default()
+                    })
+                };
             }
             _ => unreachable!("cross-project request"),
         }
@@ -90,15 +112,6 @@ pub(crate) fn execute(
     capabilities: &lsp::ClientCapabilities,
     options: &Options,
 ) -> Result<RawValue> {
-    let cancellation = tsr_core::CancellationToken::new();
-    let cancel = cancellation.clone();
-    struct Stop(tsr_ipc::AfterFuncStop);
-    impl Drop for Stop {
-        fn drop(&mut self) {
-            self.0.stop();
-        }
-    }
-    let _stop = Stop(context.after_func(move || cancel.cancel()));
     let path = request.uri().path(
         initial
             .filesystem()
@@ -108,8 +121,97 @@ pub(crate) fn execute(
     let default = initial
         .project_for_file(path.as_bytes())
         .ok_or_else(|| crate::error(-32603, "no default project"))?;
-    let mut default_result = if matches!(request, Request::Rename(_)) {
-        Some(language_features::execute(
+    if let Request::CallIncoming(item) = request {
+        let positions = language_features::execute(
+            context,
+            request_id,
+            Some(default),
+            Request::IncomingPositions(item.clone()),
+            encoding,
+            capabilities,
+            options,
+        )?;
+        let mut results = Vec::new();
+        for position in decode::<Vec<lsp::TextDocumentPositionParams>>(&positions)? {
+            let result = execute_search(
+                context,
+                request_id,
+                session,
+                host,
+                initial,
+                default,
+                path.as_bytes(),
+                &Request::IncomingAt(position),
+                encoding,
+                capabilities,
+                options,
+            )?;
+            results.push(decode::<lsp::CallHierarchyIncomingCallsOrNull>(&result)?);
+        }
+        return client::raw(&merge_incoming_declarations(results));
+    }
+    if let Request::ResolveLens(lens) = request {
+        let result = execute_search(
+            context,
+            request_id,
+            session,
+            host,
+            initial,
+            default,
+            path.as_bytes(),
+            &Request::LensLocations(lens.clone()),
+            encoding,
+            capabilities,
+            options,
+        )?;
+        let locations = decode::<lsp::LocationsOrNull>(&result)?
+            .locations
+            .map(|v| *v)
+            .unwrap_or_default();
+        return client::raw(
+            &tsr_ls::LanguageService::code_lens_result(
+                lens.clone(),
+                &locations,
+                options.lens_command.as_deref(),
+                &options.locale,
+            )
+            .map_err(language_features::service_error)?,
+        );
+    }
+    execute_search(
+        context,
+        request_id,
+        session,
+        host,
+        initial,
+        default,
+        path.as_bytes(),
+        request,
+        encoding,
+        capabilities,
+        options,
+    )
+}
+
+#[allow(
+    clippy::too_many_arguments,
+    reason = "retain the initial project and routing context through declaration searches"
+)]
+fn execute_search(
+    context: &Context,
+    request_id: &str,
+    session: &Session,
+    host: &Arc<dyn FileSystem>,
+    initial: &Snapshot,
+    default: &tsr_project::Project,
+    initial_path: &[u8],
+    request: &Request,
+    encoding: PositionEncoding,
+    capabilities: &lsp::ClientCapabilities,
+    options: &Options,
+) -> Result<RawValue> {
+    let mut default_result = if matches!(request, Request::Rename(_) | Request::LensLocations(_)) {
+        Some(language_features::execute_with_targets(
             context,
             request_id,
             Some(default),
@@ -121,7 +223,10 @@ pub(crate) fn execute(
     } else {
         None
     };
-    if let Some(result) = &default_result {
+    if let Some((result, _)) = default_result
+        .as_ref()
+        .filter(|_| matches!(request, Request::Rename(_)))
+    {
         let edit = decode::<lsp::WorkspaceEditOrNull>(result)?;
         let moved = edit
             .workspace_edit
@@ -191,7 +296,7 @@ pub(crate) fn execute(
         initial
             .projects()
             .into_iter()
-            .filter(|p| p.contains_file(path.as_bytes())),
+            .filter(|p| p.contains_file(initial_path)),
     ) {
         let key = project.data().unwrap().path.clone();
         if enqueued.insert(key.clone()) {
@@ -233,44 +338,33 @@ pub(crate) fn execute(
             else {
                 continue;
             };
-            let program = project.program().unwrap();
-            let targets = {
-                let file = program
-                    .source_file(work.uri.file_name().as_bytes())
-                    .unwrap();
-                let checker = project
-                    .scheduler()
-                    .unwrap()
-                    .acquire(
-                        tsr_checker::CheckerLifetime::Temporary,
-                        Some(file.source()),
+            let (result, targets) = if work.project == default_id {
+                if let Some(result) = default_result.take() {
+                    result
+                } else {
+                    language_features::execute_with_targets(
                         context,
                         request_id,
-                    )
-                    .map_err(|e| match e {
-                        tsr_project::scheduler::AcquireError::Canceled(_) => crate::canceled(),
-                        tsr_project::scheduler::AcquireError::Checker(e) => {
-                            crate::error(-32603, e.to_string())
-                        }
-                    })?;
-                let mut operation = checker
-                    .operation()
-                    .map_err(|e| crate::error(-32603, e.to_string()))?;
-                let mut service =
-                    tsr_ls::LanguageService::new(program, encoding, cancellation.clone());
-                service
-                    .cross_project_targets_with_options(
-                        &mut operation,
-                        &work.uri,
-                        &work.position,
-                        tsr_ls::CrossProjectSearchOptions {
-                            rename: matches!(request, Request::Rename(_)),
-                            implementations: matches!(request, Request::Implementation(_)),
-                            aliases: options.rename.aliases,
-                        },
-                    )
-                    .map_err(language_features::service_error)?
+                        Some(project),
+                        request.at(work.uri, work.position),
+                        encoding,
+                        capabilities,
+                        options,
+                    )?
+                }
+            } else {
+                language_features::execute_with_targets(
+                    context,
+                    request_id,
+                    Some(project),
+                    request.at(work.uri, work.position),
+                    encoding,
+                    capabilities,
+                    options,
+                )?
             };
+            // execute_with_targets has released its checker lease. Project
+            // discovery below may safely load programs and acquire checkers.
             if work.project == default_id && definition.is_none() {
                 definition = targets.default_definition;
             }
@@ -302,31 +396,6 @@ pub(crate) fn execute(
                     }
                 }
             }
-            let result = if work.project == default_id {
-                if let Some(result) = default_result.take() {
-                    result
-                } else {
-                    language_features::execute(
-                        context,
-                        request_id,
-                        Some(project),
-                        request.at(work.uri, work.position),
-                        encoding,
-                        capabilities,
-                        options,
-                    )?
-                }
-            } else {
-                language_features::execute(
-                    context,
-                    request_id,
-                    Some(project),
-                    request.at(work.uri, work.position),
-                    encoding,
-                    capabilities,
-                    options,
-                )?
-            };
             results.push((work.project, work.original, result));
         }
         if context.err().is_some() {
@@ -408,7 +477,7 @@ fn location_key(location: &lsp::Location) -> (lsp::DocumentUri, RangeKey) {
 
 fn combine(request: &Request, results: &[RawValue]) -> Result<RawValue> {
     match request {
-        Request::References(_) => {
+        Request::References(_) | Request::LensLocations(_) => {
             let mut seen = HashSet::new();
             let mut values = Vec::new();
             for result in results {
@@ -451,7 +520,7 @@ fn combine(request: &Request, results: &[RawValue]) -> Result<RawValue> {
                 vs_reference_items: Some(Box::new(values)),
             })
         }
-        Request::Implementation(_) => {
+        Request::Implementation(_) | Request::LensImplementations(_) => {
             let values = results
                 .iter()
                 .map(decode::<lsp::LocationOrLocationsOrDefinitionLinksOrNull>)
@@ -495,7 +564,7 @@ fn combine(request: &Request, results: &[RawValue]) -> Result<RawValue> {
             }
         }
         Request::Rename(_) => combine_rename(results),
-        Request::CallIncoming(_) => {
+        Request::IncomingAt(_) => {
             let mut seen = HashSet::new();
             let mut values = Vec::new();
             for result in results {
@@ -531,6 +600,42 @@ fn combine(request: &Request, results: &[RawValue]) -> Result<RawValue> {
             })
         }
         _ => unreachable!("cross-project result"),
+    }
+}
+
+// Go combines projects first (first project wins for a caller), then combines
+// declaration responses by selection range, preserving order and unique ranges.
+fn merge_incoming_declarations(
+    results: Vec<lsp::CallHierarchyIncomingCallsOrNull>,
+) -> lsp::CallHierarchyIncomingCallsOrNull {
+    let mut values: Vec<Option<Box<lsp::CallHierarchyIncomingCall>>> = Vec::new();
+    let mut indices = HashMap::<_, usize>::new();
+    for result in results {
+        for call in result
+            .call_hierarchy_incoming_calls
+            .into_iter()
+            .flat_map(|v| *v)
+            .flatten()
+        {
+            let Some(from) = &call.from else {
+                continue;
+            };
+            let key = (from.uri.clone(), range_key(&from.selection_range));
+            if let Some(&index) = indices.get(&key) {
+                let existing = values[index].as_mut().expect("recorded caller");
+                for range in call.from_ranges {
+                    if !existing.from_ranges.contains(&range) {
+                        existing.from_ranges.push(range);
+                    }
+                }
+            } else {
+                indices.insert(key, values.len());
+                values.push(Some(call));
+            }
+        }
+    }
+    lsp::CallHierarchyIncomingCallsOrNull {
+        call_hierarchy_incoming_calls: (!values.is_empty()).then(|| Box::new(values)),
     }
 }
 
@@ -583,9 +688,82 @@ mod tests {
         RawValue(text.as_bytes().to_vec())
     }
     #[test]
+    fn incoming_declarations_preserve_order_and_merge_unique_ranges() {
+        fn call(uri: &str, start: u32, ranges: &[u32]) -> lsp::CallHierarchyIncomingCall {
+            lsp::CallHierarchyIncomingCall {
+                from: Some(Box::new(lsp::CallHierarchyItem {
+                    uri: lsp::DocumentUri(uri.into()),
+                    selection_range: lsp::Range {
+                        start: lsp::Position {
+                            line: start,
+                            character: 1,
+                        },
+                        end: lsp::Position {
+                            line: start,
+                            character: 2,
+                        },
+                    },
+                    ..Default::default()
+                })),
+                from_ranges: ranges
+                    .iter()
+                    .map(|&line| lsp::Range {
+                        start: lsp::Position { line, character: 3 },
+                        end: lsp::Position { line, character: 4 },
+                    })
+                    .collect(),
+            }
+        }
+        let result = merge_incoming_declarations(vec![
+            lsp::CallHierarchyIncomingCallsOrNull {
+                call_hierarchy_incoming_calls: Some(Box::new(vec![Some(Box::new(call(
+                    "file:///z.ts",
+                    0,
+                    &[2, 3],
+                )))])),
+            },
+            lsp::CallHierarchyIncomingCallsOrNull {
+                call_hierarchy_incoming_calls: Some(Box::new(vec![
+                    Some(Box::new(call("file:///a.ts", 0, &[1]))),
+                    Some(Box::new(call("file:///z.ts", 0, &[3, 4]))),
+                    Some(Box::new(call("file:///z.ts", 10, &[11]))),
+                ])),
+            },
+        ]);
+        let calls = result.call_hierarchy_incoming_calls.unwrap();
+        assert_eq!(calls.len(), 3);
+        assert_eq!(
+            calls[0].as_ref().unwrap().from.as_ref().unwrap().uri.0,
+            "file:///z.ts"
+        );
+        assert_eq!(
+            calls[0]
+                .as_ref()
+                .unwrap()
+                .from_ranges
+                .iter()
+                .map(|r| r.start.line)
+                .collect::<Vec<_>>(),
+            [2, 3, 4]
+        );
+        assert_eq!(
+            calls[2]
+                .as_ref()
+                .unwrap()
+                .from
+                .as_ref()
+                .unwrap()
+                .selection_range
+                .start
+                .line,
+            10
+        );
+    }
+
+    #[test]
     fn incoming_calls_without_callers_are_null_across_projects() {
         let result = combine(
-            &Request::CallIncoming(Box::default()),
+            &Request::IncomingAt(lsp::TextDocumentPositionParams::default()),
             &[raw("null"), raw("null")],
         )
         .unwrap();

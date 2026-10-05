@@ -436,3 +436,40 @@ fn read_only_features_return_null_for_unmapped_script_kinds() {
     );
     assert!(server.response(&id).error.is_some());
 }
+
+#[test]
+fn contribution_update_succeeds_when_client_refuses_registration() {
+    let server = TestConnection::new();
+    server.send(Some(Id::int(1)), "initialize", Some(r#"{"processId":null,"rootUri":"file:///p","capabilities":{"textDocument":{"synchronization":{"dynamicRegistration":true},"hover":{"dynamicRegistration":true}}}}"#));
+    assert!(server.response(&Id::int(1)).error.is_none());
+    server.send(None, "initialized", Some("{}"));
+    server.send(Some(Id::int(2)), "custom/setContentMapperContributions", Some(r#"{"contributions":[{"contributorId":"test.mapper","extensions":[".vue"],"inferredProjectContribution":{"manifest":{"name":"test mapper","exec":["mapper"]}}}],"openDocuments":[]}"#));
+    let mut refused = false;
+    loop {
+        let raw = server
+            .receive
+            .recv_timeout(Duration::from_secs(15))
+            .unwrap();
+        let mut message = Message::default();
+        tsr_json::unmarshal(&raw.0, &mut message, tsr_json::Options::default()).unwrap();
+        if message.is_response() && message.id == Some(Id::int(2)) {
+            assert!(refused, "must exercise failed registration");
+            assert!(message.error.is_none(), "{:?}", message.error);
+            assert_eq!(message.result.unwrap().0, b"null");
+            break;
+        }
+        if message.is_request() {
+            let reject = message.method == "client/registerCapability";
+            refused |= reject;
+            server
+                .input
+                .receive(Message {
+                    id: message.id,
+                    error: reject.then(|| crate::error(-32603, "registration refused")),
+                    result: (!reject).then(|| RawValue(b"null".to_vec())),
+                    ..Default::default()
+                })
+                .unwrap();
+        }
+    }
+}

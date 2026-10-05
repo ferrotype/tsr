@@ -248,7 +248,9 @@ impl Runtime {
                             .collect(),
                     )
                     .map_err(crate::project_error)?;
-                self.mapper_registrations.update(
+                // The contribution update succeeds independently of a client
+                // refusing dynamic registration, as in the pinned server.
+                let _ = self.mapper_registrations.update(
                     self.client.as_ref(),
                     context,
                     &self.capabilities,
@@ -257,7 +259,7 @@ impl Runtime {
                         .session()
                         .snapshot()
                         .map_err(crate::project_error)?,
-                )?;
+                );
             }
             "$/setTrace" => {
                 let _: lsp::SetTraceParams = crate::decode(params)?;

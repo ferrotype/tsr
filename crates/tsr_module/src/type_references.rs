@@ -417,9 +417,6 @@ impl Resolver {
             peer_dependencies: JsString::from_bytes(peers),
         })
     }
-    pub fn automatic_type_directive_names(&mut self) -> Result<Vec<JsString>, Error> {
-        automatic_type_directive_names(&self.options, self.host.as_ref(), self.cwd.as_bytes())
-    }
 }
 impl Resolver {
     fn type_candidate(&mut self, root: &[u8], name: &[u8]) -> Vec<u8> {

@@ -1,9 +1,7 @@
 //! Language service operations over a retained compiler snapshot.
 mod api;
 mod crossproject;
-pub use crossproject::{
-    CrossProjectDefinition, CrossProjectPosition, CrossProjectSearchOptions, CrossProjectTargets,
-};
+pub use crossproject::{CrossProjectDefinition, CrossProjectPosition, CrossProjectTargets};
 mod auto_imports;
 mod autoinsert;
 mod call_declarations;
@@ -194,6 +192,9 @@ pub struct LanguageService<'a> {
     converters: Converters,
     source_maps: source_map::Maps,
     cancellation: CancellationToken,
+    cross_project_targets: Option<CrossProjectTargets>,
+    #[cfg(test)]
+    reference_search_count: usize,
 }
 impl<'a> LanguageService<'a> {
     pub fn new(
@@ -208,6 +209,9 @@ impl<'a> LanguageService<'a> {
             converters: Converters::new(encoding),
             source_maps: source_map::Maps::new(),
             cancellation,
+            cross_project_targets: None,
+            #[cfg(test)]
+            reference_search_count: 0,
         }
     }
     fn check_canceled(&self) -> Result<()> {

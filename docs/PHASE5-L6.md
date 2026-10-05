@@ -15,9 +15,9 @@ checks below are complete. Full fourslash/replay acceptance remains L7.
    discover configured projects without manufacturing inferred projects. API
    project/file opens have separate reference counts from editor overlays.
    Retained snapshots keep their programs after a later close or rebuild.
-3. Route references, implementations, rename, VS references and incoming calls
-   across projects. Start with the default and containing projects, follow
-   original declaration positions, then load relevant reference trees. Preserve
+3. Route references, implementations, rename, VS references, incoming calls and
+   code-lens resolution across projects. Start with the default and containing
+   projects, follow original declaration positions, then load relevant reference trees. Preserve
    default-project result preference and the pin's per-response deduplication.
    Release the checker before loading a new snapshot. File moves load all trees,
    including the fallback for clients without `workspace/willRenameFiles`.
@@ -70,12 +70,17 @@ native-client comparisons and direct unit ports.
   sandbox-only run cannot start its stream. Checker work is released before
   loading another project and API results retain their owning checker generation.
 - The live project runner matches pinned Go on references, rename,
-  implementations, incoming calls, `willRenameFiles` and module-rename fallback:
-  six fresh-server scenarios in UTF-8 and UTF-16. Only unordered inter-project
+  implementations, incoming calls (including nonadjacent overload declarations),
+  `willRenameFiles`, module-rename fallback, and reference/implementation lenses:
+  nine fresh-server scenarios in UTF-8 and UTF-16. Only unordered inter-project
   collections are normalized; edit arrays and each result's fields are retained.
+  Incoming-call order and each caller's ranges are compared without sorting.
   The runner explicitly disables ATA, so these comparisons cannot install npm
   packages. Implementation-only searches retain empty local definition groups;
   an empty serialized result cannot hide another project's definition links.
+- The single-project code-lens runner matches 90 response/refresh observations
+  in each encoding, covering setting changes, edits and overloads as well as
+  reference and implementation commands.
 - Ten snapshot states match the original Go state writer byte for byte, in both
   a fresh process and two retained-cache test repetitions. This includes delayed
   ancestor projects, which appear without parsing their configurations yet.
@@ -101,6 +106,20 @@ search group retention, alias preferences during expansion, incoming-call order,
 late cancellation, delayed-tree traversal, and ATA preference precedence. There
 is no new parity exception or second approval registry. Existing owner-approved
 L2 lifecycle safeguards and the L4 config-root difference are unchanged.
+
+The follow-up review removed the separate routing search: each feature derives
+its response and expansion positions from the same reference groups under one
+checker lease. Tests count the search and verify declaration names for export
+assignments, assigned anonymous functions/classes and JS property declarations.
+Code lenses combine all projects before constructing their title and command.
+Incoming calls search once per declaration, deduplicate projects by caller range,
+then merge declarations by caller selection range and unique call ranges.
+
+Obsolete or disabled ATA installs finish their shared-cache writes; their stale
+results are still rejected, and session close still cancels and joins installs.
+Client registration rejection no longer fails contribution updates, matching
+Go. The unused resolver method that enumerated through a declaration-faking
+host was removed; automatic type discovery uses the original filesystem helper.
 
 ## Remaining Phase 5 work
 

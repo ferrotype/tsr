@@ -791,6 +791,7 @@ impl LanguageService<'_> {
             );
             let groups = state.for_node(node, i64::from(mapped.mapped.position))?;
             for group in groups {
+                self.record_cross_project_group(c, &group)?;
                 for entry in group.entries {
                     if !params
                         .context
@@ -858,6 +859,7 @@ impl LanguageService<'_> {
                 },
             );
             for group in state.for_node(node, pos)? {
+                self.record_cross_project_group(c, &group)?;
                 for entry in group.entries {
                     if let Some(node) = entry.node {
                         if seen.insert(node) {
@@ -876,6 +878,16 @@ impl LanguageService<'_> {
         c: &mut Operation<'_>,
         params: &lsp::ImplementationParams,
         links: bool,
+    ) -> Result<lsp::LocationOrLocationsOrDefinitionLinksOrNull> {
+        self.implementations_with_options(c, params, links, false)
+    }
+
+    pub fn implementations_with_options(
+        &mut self,
+        c: &mut Operation<'_>,
+        params: &lsp::ImplementationParams,
+        links: bool,
+        drop_origin: bool,
     ) -> Result<lsp::LocationOrLocationsOrDefinitionLinksOrNull> {
         let source = self.file(&params.text_document.uri)?;
         let mapped = self.converters.from_lsp_position_for_source_file(
@@ -898,7 +910,18 @@ impl LanguageService<'_> {
                 continue;
             }
             for entry in self.implementation_entries(c, node, i64::from(mapped.mapped.position))? {
-                if entry.node.is_some_and(|n| seen.insert(n)) {
+                if let Some(node) = entry.node {
+                    if !seen.insert(node) {
+                        continue;
+                    }
+                    if drop_origin {
+                        let location = c.node(node)?;
+                        if location.pos() <= mapped.mapped.position
+                            && mapped.mapped.position <= location.end()
+                        {
+                            continue;
+                        }
+                    }
                     entries.push(entry);
                 }
             }

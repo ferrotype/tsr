@@ -378,6 +378,7 @@ impl LanguageService<'_> {
                 },
             );
             for group in state.for_node(original, i64::from(mapped.mapped.position))? {
+                self.record_cross_project_group(c, &group)?;
                 for entry in group.entries {
                     self.check_canceled()?;
                     if let Some(node) = entry.node {

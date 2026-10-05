@@ -3,17 +3,12 @@
 use crate::{
     converters::Script,
     reference_helpers,
-    references::{DefinitionKind, ReferenceGroup, ReferenceOptions, SearchState},
+    references::{DefinitionKind, ReferenceGroup},
     source_map::MapHost,
     syntax::Syntax,
     LanguageService, Result,
 };
-use std::collections::{HashSet, VecDeque};
-use tsr_ast::{
-    modifier_flags,
-    span_map::{FEATURE_IMPLEMENTATION, FEATURE_REFERENCES, FEATURE_RENAME},
-    utilities, NodeId, SyntaxKind as K,
-};
+use tsr_ast::{modifier_flags, utilities, NodeId, SyntaxKind as K};
 use tsr_checker::Operation;
 use tsr_lsproto as lsp;
 use tsr_printer::emit_resolver::DeclarationEmitResolver;
@@ -32,12 +27,14 @@ pub struct CrossProjectDefinition {
     pub generated: Option<CrossProjectPosition>,
 }
 
+#[cfg(test)]
 #[derive(Clone, Copy, Debug)]
-pub struct CrossProjectSearchOptions {
+struct CrossProjectSearchOptions {
     pub rename: bool,
     pub implementations: bool,
     pub aliases: bool,
 }
+#[cfg(test)]
 impl Default for CrossProjectSearchOptions {
     fn default() -> Self {
         Self {
@@ -55,12 +52,45 @@ pub struct CrossProjectTargets {
 }
 
 impl LanguageService<'_> {
+    /// Derive routing and the response from the same search and checker lease.
+    /// Only file positions escape; group symbols remain inside the operation.
+    pub fn with_cross_project_targets<T, E>(
+        &mut self,
+        query: impl FnOnce(&mut Self) -> std::result::Result<T, E>,
+    ) -> std::result::Result<(T, CrossProjectTargets), E> {
+        assert!(
+            self.cross_project_targets.is_none(),
+            "nested cross-project search"
+        );
+        self.cross_project_targets = Some(CrossProjectTargets::default());
+        let result = query(self);
+        let targets = self.cross_project_targets.take().expect("search targets");
+        result.map(|response| (response, targets))
+    }
+
+    pub(crate) fn record_cross_project_group(
+        &mut self,
+        checker: &mut Operation<'_>,
+        group: &ReferenceGroup,
+    ) -> Result<()> {
+        let Some(mut targets) = self.cross_project_targets.take() else {
+            return Ok(());
+        };
+        let result = (|| {
+            if targets.default_definition.is_none() {
+                targets.default_definition = self.non_local_definition(checker, group)?;
+            }
+            self.original_definition_locations(checker, group, &mut targets.original_positions)
+        })();
+        self.cross_project_targets = Some(targets);
+        result
+    }
+
     /// Finds the first visible definition and all original definition positions
     /// in reference-group order. The coordinator uses the default definition
     /// only for the default project and follows originals from every project.
-    // port: tsc/internal/ls/findallreferences.go:LanguageService.provideSymbolsAndEntries
-    // port: tsc/internal/ls/findallreferences.go:LanguageService.provideSymbolsAndEntriesAtPosition
-    pub fn cross_project_targets(
+    #[cfg(test)]
+    fn cross_project_targets(
         &mut self,
         checker: &mut Operation<'_>,
         uri: &lsp::DocumentUri,
@@ -80,98 +110,54 @@ impl LanguageService<'_> {
         )
     }
 
-    pub fn cross_project_targets_with_options(
+    #[cfg(test)]
+    fn cross_project_targets_with_options(
         &mut self,
         checker: &mut Operation<'_>,
         uri: &lsp::DocumentUri,
         position: &lsp::Position,
         options: CrossProjectSearchOptions,
     ) -> Result<CrossProjectTargets> {
-        let CrossProjectSearchOptions {
-            rename,
-            implementations,
-            aliases,
-        } = options;
-        self.check_canceled()?;
-        let source = self.file(uri)?;
-        let feature = if implementations {
-            FEATURE_IMPLEMENTATION
-        } else if rename {
-            FEATURE_RENAME
-        } else {
-            FEATURE_REFERENCES
-        };
-        let positions = self.converters.from_lsp_position_for_source_file(
-            self.program,
-            source,
-            position,
-            feature,
-        )?;
-        let files = self
-            .program
-            .files()
-            .iter()
-            .map(|file| file.source())
-            .collect::<Vec<_>>();
-        let options = ReferenceOptions {
-            implementations,
-            rename,
-            adjust: true,
-            aliases,
-        };
-        let mut targets = CrossProjectTargets::default();
-        for mapped in positions {
-            if !mapped.mapped.fidelity.is_single_segment() {
-                continue;
+        self.with_cross_project_targets(|service| {
+            let text_document = lsp::TextDocumentIdentifier { uri: uri.clone() };
+            if options.implementations {
+                service.implementations(
+                    checker,
+                    &lsp::ImplementationParams {
+                        text_document,
+                        position: position.clone(),
+                        ..Default::default()
+                    },
+                    false,
+                )?;
+            } else if options.rename {
+                service.rename(
+                    checker,
+                    &lsp::RenameParams {
+                        text_document,
+                        position: position.clone(),
+                        new_name: "renamed".into(),
+                        ..Default::default()
+                    },
+                    crate::RenameOptions {
+                        aliases: options.aliases,
+                        ..Default::default()
+                    },
+                    &tsr_locale::Locale::default(),
+                )?;
+            } else {
+                service.references(
+                    checker,
+                    &lsp::ReferenceParams {
+                        text_document,
+                        position: position.clone(),
+                        ..Default::default()
+                    },
+                )?;
             }
-            let mut syntax = Syntax::new(self.view(mapped.script)?, mapped.script)?;
-            let position = i64::from(mapped.mapped.position);
-            let mut node = syntax.nav().get_touching_property_name(position)?;
-            if rename {
-                node = crate::meaning::adjusted_location(syntax.view, node, true)?;
-            }
-            if rename && !crate::rename::eligible(syntax.view, node)?
-                || implementations && node == mapped.script
-            {
-                continue;
-            }
-            let mut queue = VecDeque::from([(node, position)]);
-            let mut seen_nodes = HashSet::new();
-            let mut seen_definitions = HashSet::new();
-            while let Some((node, position)) = queue.pop_front() {
-                self.check_canceled()?;
-                let groups = SearchState::new(self, checker, files.clone(), options)
-                    .for_node(node, position)?;
-                for group in groups {
-                    if implementations {
-                        let mut new_references = false;
-                        for entry in &group.entries {
-                            if let Some(node) = entry.node {
-                                if seen_nodes.insert(node) {
-                                    new_references = true;
-                                    queue.push_back((node, i64::from(checker.node(node)?.pos())));
-                                }
-                            }
-                        }
-                        if !new_references && !seen_definitions.insert(group.symbol) {
-                            continue;
-                        }
-                    }
-                    if targets.default_definition.is_none() {
-                        targets.default_definition = self.non_local_definition(checker, &group)?;
-                    }
-                    self.original_definition_locations(
-                        checker,
-                        &group,
-                        &mut targets.original_positions,
-                    )?;
-                }
-                if !implementations {
-                    break;
-                }
-            }
-        }
-        Ok(targets)
+            Ok::<_, crate::Error>(())
+        })
+        .map(|((), targets)| targets)
     }
 
     fn declaration_position(&mut self, declaration: NodeId) -> Result<(NodeId, i64)> {
@@ -180,11 +166,12 @@ impl LanguageService<'_> {
             .file_of_node(declaration)
             .ok_or(tsr_arena::Error::WrongOwner)?;
         let mut syntax = Syntax::new(file.bound().view().ast(), file.source())?;
-        let name = syntax.view.node(declaration)?.name().unwrap_or(declaration);
+        let name = tsr_ast::get_name_of_declaration(syntax.view, Some(declaration))?
+            .unwrap_or(declaration);
         Ok((file.source(), syntax.reference_range(name, None)?.pos()))
     }
 
-    fn position_in_source(
+    pub(crate) fn position_in_source(
         &mut self,
         source: NodeId,
         position: i64,
@@ -399,6 +386,114 @@ mod tests {
                 options,
             )
             .unwrap()
+    }
+
+    #[test]
+    fn routing_reuses_the_response_search_and_resets_after_error() {
+        let program = Arc::new(crate::tests::program(
+            b"/index.ts",
+            b"export const value = 1; value;",
+        ));
+        let source = program.files()[0].source();
+        let pool =
+            tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+        let mut checker = pool.checker_for_file_exclusive(source).unwrap();
+        let mut service = LanguageService::new(
+            &program,
+            tsr_jsstring::PositionEncoding::Utf16,
+            CancellationToken::new(),
+        );
+        let params = lsp::ReferenceParams {
+            text_document: lsp::TextDocumentIdentifier {
+                uri: lsp::DocumentUri("file:///index.ts".into()),
+            },
+            position: lsp::Position {
+                line: 0,
+                character: 24,
+            },
+            context: Some(Box::new(lsp::ReferenceContext {
+                include_declaration: true,
+            })),
+            ..Default::default()
+        };
+        let (response, targets) = service
+            .with_cross_project_targets(|service| service.references(&mut checker, &params))
+            .unwrap();
+        assert_eq!(service.reference_search_count, 1);
+        assert_eq!(response.locations.unwrap().len(), 2);
+        assert_eq!(
+            targets
+                .default_definition
+                .unwrap()
+                .position
+                .position
+                .character,
+            13
+        );
+        assert!(service
+            .with_cross_project_targets(|_| Err::<(), _>("failed"))
+            .is_err());
+        let ((), targets) = service
+            .with_cross_project_targets(|_| Ok::<_, ()>(()))
+            .unwrap();
+        assert!(targets.default_definition.is_none());
+    }
+
+    #[test]
+    fn declaration_positions_use_assignment_and_expression_names() {
+        for (text, marker, kind, expected) in [
+            (
+                "const named = 1; export default named;",
+                "named;",
+                K::ExportAssignment,
+                "named;",
+            ),
+            (
+                "const named = function() {};",
+                "function",
+                K::FunctionExpression,
+                "named",
+            ),
+            (
+                "const Named = class {};",
+                "class",
+                K::ClassExpression,
+                "Named",
+            ),
+            (
+                "exports.member = function() {};",
+                "exports",
+                K::BinaryExpression,
+                "member",
+            ),
+            (
+                "Object.defineProperty(exports, 'member', {value: 1});",
+                "Object",
+                K::CallExpression,
+                "'member'",
+            ),
+        ] {
+            let program = crate::tests::program(b"/index.js", text.as_bytes());
+            let source = program.files()[0].source();
+            let mut service = LanguageService::new(
+                &program,
+                tsr_jsstring::PositionEncoding::Utf16,
+                CancellationToken::new(),
+            );
+            let view = service.view(source).unwrap();
+            let mut syntax = Syntax::new(view, source).unwrap();
+            let mut node = syntax
+                .nav()
+                .get_touching_property_name(text.find(marker).unwrap() as i64)
+                .unwrap();
+            while view.node(node).unwrap().kind() != kind {
+                node = view.node(node).unwrap().parent().expect(text);
+            }
+            let (_, position) = service.declaration_position(node).unwrap();
+            // String-literal reference ranges exclude their opening quote.
+            let expected = text.rfind(expected).unwrap() + usize::from(expected.starts_with('\''));
+            assert_eq!(position, expected as i64, "{text}");
+        }
     }
 
     #[test]

@@ -134,7 +134,7 @@ impl BackgroundAta {
                 continue;
             }
             let context = session.context.with_cancel();
-            let (id, obsolete) = {
+            let id = {
                 let mut jobs = self.shared.jobs.lock().expect("ATA jobs");
                 if jobs.closed {
                     return;
@@ -146,12 +146,6 @@ impl BackgroundAta {
                 }) {
                     continue;
                 }
-                let obsolete: Vec<_> = jobs
-                    .running
-                    .values()
-                    .filter(|job| job.project == data.path)
-                    .map(|job| job.context.clone())
-                    .collect();
                 let id = jobs.next;
                 jobs.next = jobs.next.checked_add(1).expect("ATA job identity overflow");
                 jobs.running.insert(
@@ -162,11 +156,11 @@ impl BackgroundAta {
                         context: context.clone(),
                     },
                 );
-                (id, obsolete)
+                id
             };
-            for context in obsolete {
-                context.cancel();
-            }
+            // npm mutates the shared cache. Let obsolete installs finish;
+            // receive_typings rejects their results against current inputs.
+            // Only session shutdown cancels a running process.
             let shared = self.shared.clone();
             let weak = self.session.clone();
             let installer = installer.clone();
@@ -368,9 +362,6 @@ impl Session {
         }
         self.pending.lock().expect("session events").ata_changed = true;
         drop(current);
-        if disabled {
-            self.ata.cancel(false);
-        }
         self.flush(None)?;
         self.send_event(SessionEvent::DiagnosticsRefresh {
             cancellation: tsr_core::CancellationToken::new(),

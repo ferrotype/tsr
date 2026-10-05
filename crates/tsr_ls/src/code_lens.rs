@@ -205,10 +205,19 @@ impl LanguageService<'_> {
     pub fn resolve_code_lens(
         &mut self,
         c: &mut Operation<'_>,
-        mut lens: lsp::CodeLens,
+        lens: lsp::CodeLens,
         command: Option<&str>,
         locale: &tsr_locale::Locale,
     ) -> Result<lsp::CodeLens> {
+        let locations = self.code_lens_locations(c, &lens)?;
+        Self::code_lens_result(lens, &locations, command, locale)
+    }
+
+    pub fn code_lens_locations(
+        &mut self,
+        c: &mut Operation<'_>,
+        lens: &lsp::CodeLens,
+    ) -> Result<Vec<lsp::Location>> {
         let data = lens.data.as_deref().ok_or(tsr_arena::Error::InvalidGraph)?;
         let mut source = self.file(&data.uri)?;
         if let Some(&index) = data.supplemental_file_index.as_deref() {
@@ -251,6 +260,7 @@ impl LanguageService<'_> {
             )
             .for_node(node, i64::from(data.position))?;
             for group in groups {
+                self.record_cross_project_group(c, &group)?;
                 for entry in group.entries {
                     if let (Some(node), Some(symbol)) = (entry.node, group.symbol) {
                         if is_declaration(
@@ -281,6 +291,18 @@ impl LanguageService<'_> {
                 }
             }
         }
+        Ok(locations)
+    }
+
+    /// Finalize a lens after all projects' locations have been combined.
+    pub fn code_lens_result(
+        mut lens: lsp::CodeLens,
+        locations: &[lsp::Location],
+        command: Option<&str>,
+        locale: &tsr_locale::Locale,
+    ) -> Result<lsp::CodeLens> {
+        let data = lens.data.as_deref().ok_or(tsr_arena::Error::InvalidGraph)?;
+        let implementation = data.kind.0 == lsp::CodeLensKind::IMPLEMENTATIONS;
         use tsr_diagnostics as d;
         let message = match (implementation, locations.len() == 1) {
             (true, true) => d::X_1_implementation,

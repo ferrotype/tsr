@@ -538,3 +538,75 @@ fn pinned_unresolved_node_and_scoped_imports_are_installed_together() {
     }
     session.close();
 }
+
+#[test]
+fn obsolete_and_disabled_installs_finish_until_session_closes() {
+    let fs: Arc<dyn FileSystem> = Arc::new(tsr_vfs::MemoryBuilder::new(b"/", false).finish());
+    let (started, receive) = std::sync::mpsc::channel();
+    let session = Session::new(
+        SessionOptions {
+            typings_location: js("/cache"),
+            npm_executor: Some(Arc::new(BlockingNpm(started))),
+            ..Default::default()
+        },
+        fs,
+        &Counters::default(),
+    );
+    session
+        .did_open_file(
+            uri("/app.js"),
+            1,
+            js("require('first');"),
+            LanguageKind("javascript".into()),
+        )
+        .unwrap();
+    receive
+        .recv_timeout(std::time::Duration::from_secs(5))
+        .unwrap();
+    let original = session
+        .ata
+        .shared
+        .jobs
+        .lock()
+        .unwrap()
+        .running
+        .values()
+        .next()
+        .unwrap()
+        .context
+        .clone();
+    session
+        .did_change_file(
+            uri("/app.js"),
+            2,
+            vec![
+                tsr_lsproto::TextDocumentContentChangePartialOrWholeDocument {
+                    whole_document: Some(Box::new(
+                        tsr_lsproto::TextDocumentContentChangeWholeDocument {
+                            text: "require('second');".into(),
+                        },
+                    )),
+                    ..Default::default()
+                },
+            ],
+        )
+        .unwrap();
+    session.snapshot_for_file(&uri("/app.js")).unwrap();
+    assert!(
+        session.ata.shared.jobs.lock().unwrap().running.len() >= 2,
+        "changed inputs enqueue a replacement"
+    );
+    assert!(
+        original.err().is_none(),
+        "obsolete install must finish cache writes"
+    );
+    session
+        .set_disable_automatic_type_acquisition(true)
+        .unwrap();
+    assert!(original.err().is_none(), "disabling ATA must not kill npm");
+    session.close();
+    assert!(
+        original.err().is_some(),
+        "session close still cancels and joins"
+    );
+}
