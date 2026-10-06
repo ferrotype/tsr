@@ -1074,6 +1074,14 @@ impl Runtime {
         if let Some(server) = &self.server {
             server.session().set_locale(next.locale.clone());
         }
+        if next.validation != before.validation {
+            self.server
+                .as_ref()
+                .unwrap()
+                .session()
+                .set_validation_enabled(next.validation)
+                .map_err(crate::project_error)?;
+        }
         *self.settings.lock().unwrap() = next.clone();
         if (next.inlay_flags != before.inlay_flags
             || next.inlay.parameter_names != before.inlay.parameter_names)
@@ -1123,37 +1131,6 @@ impl Runtime {
             || next.config_name != before.config_name
         {
             refresh_diagnostics(self.client.as_ref(), &self.capabilities)?;
-            if next.validation != before.validation
-                && !self
-                    .initialization
-                    .disable_push_diagnostics
-                    .as_deref()
-                    .copied()
-                    .unwrap_or(false)
-            {
-                let snapshot = self
-                    .server
-                    .as_ref()
-                    .unwrap()
-                    .session()
-                    .snapshot()
-                    .map_err(crate::project_error)?;
-                let options = diagnostics::options(&self.capabilities, next.locale, false, false);
-                let open = diagnostics::open_projects(&snapshot);
-                for project in snapshot.projects() {
-                    if project.data().unwrap().kind == tsr_project::project::ProjectKind::Configured
-                        && open.contains(project.data().unwrap().path.as_bytes())
-                    {
-                        diagnostics::publish_project(
-                            self.client.as_ref(),
-                            project,
-                            self.options.project.position_encoding,
-                            &options,
-                            next.validation,
-                        )?;
-                    }
-                }
-            }
         }
         Ok(())
     }

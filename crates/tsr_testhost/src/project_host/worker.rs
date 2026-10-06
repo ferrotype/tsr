@@ -28,6 +28,7 @@ pub(super) enum Action {
         context: tsr_ipc::Context,
     },
     State,
+    Barrier,
     Reset,
 }
 pub(super) struct Worker {
@@ -235,6 +236,7 @@ impl Worker {
                 }
                 Ok(raw(&()))
             }
+            Action::Barrier => Ok(raw(&())),
             Action::State => {
                 let snapshot = self
                     .active_server()

@@ -470,3 +470,7 @@ impl LanguageService<'_> {
         Ok(())
     }
 }
+
+#[cfg(test)]
+#[path = "completion_mapping_tests.rs"]
+mod tests;

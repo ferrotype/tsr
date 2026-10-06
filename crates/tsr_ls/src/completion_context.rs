@@ -346,6 +346,38 @@ impl Context {
         let pr = syntax.view.node(parent)?;
         let kind = pr.kind().known().unwrap_or(K::Unknown);
         let tk = keyword(syntax, token)?;
+        if matches!(read.kind().known(), Some(K::DotToken | K::QuestionDotToken)) {
+            match kind {
+                K::PropertyAccessExpression => {
+                    let leftmost = tsr_ast::utilities_middle::get_leftmost_access_expression(
+                        syntax.view,
+                        parent,
+                    )?;
+                    if tsr_ast::node_is_missing(Some(&syntax.view.node(leftmost)?)) {
+                        return Ok(true);
+                    }
+                    let expression = pr.expression().ok_or(tsr_arena::Error::InvalidGraph)?;
+                    let expression_read = syntax.view.node(expression)?;
+                    if (expression_read.kind() == K::CallExpression
+                        || ast::is_function_like(Some(&expression_read)))
+                        && expression_read.end() == read.pos()
+                        && syntax
+                            .token_children(expression)?
+                            .last()
+                            .map(|id| syntax.view.node(*id).map(|read| read.kind()))
+                            .transpose()?
+                            != Some(K::CloseParenToken.into())
+                    {
+                        // An incomplete call/function before a dot is often the
+                        // parser recovering a spread argument, as in Math.min(.).
+                        return Ok(true);
+                    }
+                }
+                K::QualifiedName | K::ModuleDeclaration | K::ImportType | K::MetaProperty => {}
+                // No left-hand expression: a stray dot or an unfinished spread.
+                _ => return Ok(true),
+            }
+        }
         // A contextual modifier parsed as a property name still starts a
         // class-member completion (for example `public |` or `abstract |`).
         if self
@@ -432,3 +464,7 @@ impl Context {
             ) && (self.token != self.previous || position > i64::from(read.end()))))
     }
 }
+
+#[cfg(test)]
+#[path = "completion_context_tests.rs"]
+mod tests;

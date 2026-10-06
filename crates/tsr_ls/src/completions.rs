@@ -151,13 +151,13 @@ impl LanguageService<'_> {
             match self.jsdoc_completions(checker, &mut syntax, position, options)? {
                 crate::jsdoc_completions::JsDocCompletion::Code => {}
                 crate::jsdoc_completions::JsDocCompletion::Prose => {
-                    return Ok(lsp::CompletionItemsOrListOrNull::default())
+                    return Ok(lsp::CompletionItemsOrListOrNull::default());
                 }
                 crate::jsdoc_completions::JsDocCompletion::List(list) => {
                     return Ok(lsp::CompletionItemsOrListOrNull {
                         list: Some(Box::new(list)),
                         ..Default::default()
-                    })
+                    });
                 }
             }
             context.type_only = true;
@@ -494,6 +494,29 @@ impl LanguageService<'_> {
         }
         Ok(())
     }
+    // port: tsc/internal/ls/completions.go:isStaticProperty
+    fn property_completion_sort(
+        &self,
+        checker: &Operation<'_>,
+        symbol: SymbolRef,
+    ) -> Result<&'static str> {
+        if let Some(declaration) = checker.symbol(symbol)?.value_declaration() {
+            let view = self.view(declaration)?;
+            let read = view.node(declaration)?;
+            if read.modifier_flags(view)? & tsr_ast::modifier_flags::STATIC != 0 {
+                if let Some(parent) = read.parent() {
+                    if matches!(
+                        view.node(parent)?.kind().known(),
+                        Some(K::ClassDeclaration | K::ClassExpression)
+                    ) {
+                        return Ok("10");
+                    }
+                }
+            }
+        }
+        Ok("11")
+    }
+
     fn completion_symbols(
         &self,
         checker: &mut Operation<'_>,
@@ -506,17 +529,41 @@ impl LanguageService<'_> {
             if let Some(symbol) = checker.get_symbol_at_location(expression)? {
                 let symbol = checker.skip_alias(symbol)?;
                 if checker.symbol(symbol)?.flags() & (sf::MODULE | sf::ENUM) != 0 {
+                    let namespace_name = syntax.view.node(access)?.kind() == K::ModuleDeclaration;
+                    if namespace_name {
+                        context.new_identifier = true;
+                        context.commit = &[];
+                    }
                     let mut candidates = Vec::new();
                     for symbol in checker.get_exports_of_module(symbol)? {
                         let name = checker.symbol(symbol)?.name_bytes().to_vec().clone();
-                        if context.type_only
-                            && Self::completion_type_symbol(checker, symbol, &mut HashSet::new())?
-                            || !context.type_only
-                                && checker.is_valid_property_access(access, &name)?
-                        {
+                        let valid = if namespace_name {
+                            // Dotted namespace declarations offer only namespace members
+                            // declared elsewhere, not the declaration being completed.
+                            // A ModuleDeclaration is not a property-access checker input.
+                            let mut declared_elsewhere = false;
+                            if checker.symbol(symbol)?.flags() & sf::NAMESPACE != 0 {
+                                for declaration in
+                                    checker.symbol_declarations(symbol)?.iter().flatten()
+                                {
+                                    if self.view(declaration)?.node(declaration)?.parent()
+                                        != Some(access)
+                                    {
+                                        declared_elsewhere = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            declared_elsewhere
+                        } else if context.type_only {
+                            Self::completion_type_symbol(checker, symbol, &mut HashSet::new())?
+                        } else {
+                            checker.is_valid_property_access(access, &name)?
+                        };
+                        if valid {
                             candidates.push(Candidate {
                                 symbol,
-                                sort: "11",
+                                sort: self.property_completion_sort(checker, symbol)?,
                                 nullable: false,
                                 this_member: false,
                                 promise: false,
@@ -551,7 +598,7 @@ impl LanguageService<'_> {
                 if checker.is_valid_property_access_for_completions(access, ty, symbol)? {
                     candidates.push(Candidate {
                         symbol,
-                        sort: "11",
+                        sort: self.property_completion_sort(checker, symbol)?,
                         nullable,
                         this_member: false,
                         promise: false,
@@ -568,7 +615,7 @@ impl LanguageService<'_> {
                         {
                             candidates.push(Candidate {
                                 symbol,
-                                sort: "11",
+                                sort: self.property_completion_sort(checker, symbol)?,
                                 nullable,
                                 this_member: false,
                                 promise: true,
@@ -1006,7 +1053,7 @@ impl LanguageService<'_> {
             if insert.is_empty() {
                 insert.clone_from(&name);
             }
-            if filter.is_empty() {
+            if filter.is_empty() || snippet {
                 filter.clone_from(&name);
             }
             label.push('?');
@@ -1256,3 +1303,11 @@ fn quote_property_name(
         ))
     }
 }
+
+#[cfg(test)]
+#[path = "completion_item_tests.rs"]
+mod tests;
+
+#[cfg(test)]
+#[path = "completion_namespace_tests.rs"]
+mod namespace_tests;

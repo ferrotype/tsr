@@ -703,7 +703,13 @@ impl LanguageService<'_> {
                         )
                     };
                 // port: tsc/internal/ls/symbols.go:isPrototypeExpando
-                if let Some(name) = tsr_ast::get_element_or_property_access_name(view, function)? {
+                let access_name = if tsr_ast::utilities::is_access_expression(&view.node(function)?)
+                {
+                    tsr_ast::get_element_or_property_access_name(view, function)?
+                } else {
+                    None
+                };
+                if let Some(name) = access_name {
                     if view.node_text(name)?.as_bytes() == b"prototype" {
                         function = view
                             .node(function)?

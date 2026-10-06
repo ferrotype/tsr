@@ -369,6 +369,13 @@ impl ConfigRegistryBuilder {
             self.change(&key, |entry| entry.retaining_projects.remove(project));
         }
     }
+    pub(crate) fn retain_project_configs(&mut self, project: &JsString, keep: &BTreeSet<JsString>) {
+        for key in self.configs.keys() {
+            if !keep.contains(&key) {
+                self.change(&key, |entry| entry.retaining_projects.remove(project));
+            }
+        }
+    }
     // port: tsc/internal/project/configfileregistrybuilder.go:configFileRegistryBuilder.didCloseFile
     pub fn close_file(&mut self, path: &JsString) {
         self.names.remove(path);

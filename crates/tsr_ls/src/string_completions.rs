@@ -104,15 +104,30 @@ fn literal_type_context(
     Ok((parent, argument, used))
 }
 
+#[derive(Default)]
+struct PropertyCompletions {
+    applicable: bool,
+    symbols: Vec<SymbolRef>,
+    has_index_signature: bool,
+}
+
 impl LanguageService<'_> {
     pub(crate) fn string_completion_symbols(
         checker: &mut Operation<'_>,
         syntax: &Syntax<'_>,
         literal: NodeId,
     ) -> Result<Vec<SymbolRef>> {
+        Ok(Self::string_property_completions(checker, syntax, literal)?.symbols)
+    }
+
+    fn string_property_completions(
+        checker: &mut Operation<'_>,
+        syntax: &Syntax<'_>,
+        literal: NodeId,
+    ) -> Result<PropertyCompletions> {
         let view = syntax.view;
         let Some(parent) = view.node(literal)?.parent() else {
-            return Ok(Vec::new());
+            return Ok(PropertyCompletions::default());
         };
         let pr = view.node(parent)?;
         let mut ty = None;
@@ -162,14 +177,25 @@ impl LanguageService<'_> {
             }
             _ => {}
         }
-        let Some(ty) = ty else { return Ok(Vec::new()) };
-        crate::completions::properties(checker, ty)?
+        let Some(ty) = ty else {
+            return Ok(PropertyCompletions::default());
+        };
+        // `in` suggestions are exhaustive property names even for indexed types.
+        let has_index_signature = pr.kind() != K::BinaryExpression
+            && (checker.get_string_index_type(ty)?.is_some()
+                || checker.get_number_index_type(ty)?.is_some());
+        let symbols = crate::completions::properties(checker, ty)?
             .into_iter()
             .filter_map(|symbol| match checker.symbol(symbol) {
                 Ok(read) => (!used.contains(read.name_bytes())).then_some(Ok(symbol)),
                 Err(error) => Some(Err(error.into())),
             })
-            .collect()
+            .collect::<Result<Vec<_>>>()?;
+        Ok(PropertyCompletions {
+            applicable: true,
+            symbols,
+            has_index_signature,
+        })
     }
     #[allow(
         clippy::if_not_else,
@@ -189,8 +215,10 @@ impl LanguageService<'_> {
                 .map(Some);
         }
         let view = syntax.view;
-        let symbols = Self::string_completion_symbols(checker, syntax, literal)?;
-        let from_properties = !symbols.is_empty();
+        let properties = Self::string_property_completions(checker, syntax, literal)?;
+        let symbols = properties.symbols;
+        let from_properties = properties.applicable;
+        let mut new_identifier = from_properties && properties.has_index_signature;
         let read = view.node(literal)?;
         let mut list = lsp::CompletionList::default();
         let mut end = i64::from(read.end()) - 1;
@@ -209,7 +237,7 @@ impl LanguageService<'_> {
             )?;
             fidelity.is_exact().then_some(range)
         };
-        if !symbols.is_empty() {
+        if from_properties {
             let context = Context {
                 location: syntax.source,
                 token: Some(literal),
@@ -266,10 +294,22 @@ impl LanguageService<'_> {
                         for sig in checker.get_candidate_signatures_for_string_literal_completions(
                             parent, literal,
                         )? {
+                            if checker.signature_flags(sig)?
+                                & tsr_checker::signature_flags::HAS_REST_PARAMETER
+                                == 0
+                                && args.len() > checker.signature_parameters(sig)?.len()
+                            {
+                                continue;
+                            }
                             let ty = checker.get_type_parameter_at_position(sig, index)?;
+                            new_identifier |= checker.type_flags(ty)? & tf::STRING != 0;
                             string_types(checker, ty, &mut seen, &mut types)?;
                         }
                     }
+                }
+                if types.is_empty() {
+                    // A signature result exists only when it supplies literals.
+                    new_identifier = false;
                 }
                 if pr.kind() == K::LiteralType {
                     let (_, argument, used) = literal_type_context(syntax, parent)?;
@@ -328,9 +368,13 @@ impl LanguageService<'_> {
             options,
             &cursor.start,
             if from_properties { replacement } else { None },
-            ALL,
+            if new_identifier { &[] } else { ALL },
         );
         self.completion_data(syntax.source, position, &mut list)?;
         Ok(Some(list))
     }
 }
+
+#[cfg(test)]
+#[path = "string_completion_tests.rs"]
+mod tests;

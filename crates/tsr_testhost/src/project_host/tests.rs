@@ -338,3 +338,56 @@ fn inferred_options_between_initialize_and_initialized_reach_the_first_program()
     let mut peer = peer;
     peer.join.take().unwrap().join().unwrap().unwrap();
 }
+
+#[test]
+fn fifo_barrier_drains_notifications_without_changing_project_identities() {
+    let peer = Peer::new();
+    peer.initialize(&[]);
+    peer.open();
+    let before = peer.state(2);
+    peer.request(3, "test/barrier", json!({}));
+    assert_eq!(peer.until(3)["result"], Value::Null);
+    assert_eq!(
+        before,
+        peer.state(4),
+        "the fence must not alter snapshot identities"
+    );
+    for version in 2..130 {
+        peer.notify("textDocument/didChange",json!({"textDocument":{"uri":"file:///main.ts","version":version},"contentChanges":[{"text":format!("const x = stable + {version};")}]}));
+        if version % 32 == 0 {
+            peer.request(version, "test/barrier", json!({}));
+            let result = peer.until(version);
+            assert!(result.get("error").is_none(), "{result}");
+        }
+    }
+    peer.request(200, "test/barrier", json!({}));
+    assert!(peer.until(200).get("error").is_none());
+    let after = peer.state(201);
+    assert_eq!(after, peer.state(202));
+    peer.finish();
+}
+
+#[test]
+fn fifo_barrier_keeps_callback_replies_routable_and_preserves_host_metadata() {
+    let peer = Peer::new();
+    peer.initialize(&["readFile"]);
+    peer.open();
+    peer.request(2, "test/projectState", json!({}));
+    let callback = peer.next();
+    assert_eq!(callback["method"], "readFile");
+    peer.request(3, "test/barrier", json!({}));
+    // The FIFO fence cannot finish until the earlier snapshot's callback is
+    // answered; the connection router must still accept that nested reply.
+    peer.reply(&callback["id"]);
+    let snapshot = peer.until(2);
+    assert!(snapshot.get("error").is_none(), "{snapshot}");
+    let fence = peer.until(3);
+    assert!(fence.get("error").is_none(), "{fence}");
+    peer.request(4, "test/state", json!({}));
+    let before = peer.until(4)["result"].clone();
+    peer.request(5, "test/barrier", json!({}));
+    assert!(peer.until(5).get("error").is_none());
+    peer.request(6, "test/state", json!({}));
+    assert_eq!(before, peer.until(6)["result"]);
+    peer.finish();
+}

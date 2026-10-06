@@ -343,7 +343,9 @@ impl Resolver {
                     {
                         let combined = substitute(target, subpath, pattern);
                         let mut directory = scope.directory.as_bytes().to_vec();
-                        directory.push(b'/');
+                        if !directory.ends_with(b"/") {
+                            directory.push(b'/');
+                        }
                         trace!(
                             self,
                             diagnostics::Using_0_subpath_1_with_target_2,

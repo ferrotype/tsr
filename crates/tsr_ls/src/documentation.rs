@@ -590,13 +590,14 @@ impl LanguageService<'_> {
                         .trim_matches(' ')
                         .to_owned();
                     if let Some(name) = read.name() {
-                        let name_text = view.node_text(name)?;
                         if view.node(name)?.kind() == K::Identifier
-                            && matches!(name_text.as_bytes(), b"http" | b"https")
+                            && matches!(view.node_text(name)?.as_bytes(), b"http" | b"https")
                             && text.starts_with("://")
                         {
-                            let link =
-                                format!("{}{text}", String::from_utf8_lossy(name_text.as_bytes()));
+                            let link = format!(
+                                "{}{text}",
+                                String::from_utf8_lossy(view.node_text(name)?.as_bytes())
+                            );
                             let (uri, label) = if let Some(pos) = link.find([' ', '|']) {
                                 let label = comment_prefix(&link[pos..]);
                                 (

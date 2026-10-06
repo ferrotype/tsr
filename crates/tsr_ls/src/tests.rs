@@ -1328,3 +1328,42 @@ fn relative_module_completion_preserves_filesystem_root() {
         .flatten()
         .any(|item| item.label == "dep"));
 }
+
+#[test]
+fn js_expando_document_symbols_accept_identifier_receivers() {
+    let program = program(
+        b"/index.js",
+        b"function F() {}\nF.value = function() {};\nF.prototype.method = function() {};\n",
+    );
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    let result = service
+        .document_symbols(&lsp::DocumentUri("file:///index.js".into()), true)
+        .unwrap();
+    let symbols = result.document_symbols.unwrap();
+    let function = symbols
+        .iter()
+        .flatten()
+        .find(|symbol| symbol.name == "F")
+        .unwrap();
+    let children = function.children.as_ref().unwrap();
+    assert!(children
+        .iter()
+        .flatten()
+        .any(|symbol| symbol.name == "value"));
+    assert!(children
+        .iter()
+        .flatten()
+        .any(|symbol| symbol.name == "method"));
+}
+
+#[test]
+fn hover_formats_qualified_jsdoc_links_without_reading_literal_text() {
+    let source = b"/** Use {@linkcode Unknown.member} instead. */ function m() {} m";
+    let hover = hover_result(source, (source.len() - 1) as u32, false);
+    let value = hover.contents.markup_content.unwrap().value;
+    assert!(value.contains("`Unknown.member`"), "{value}");
+}

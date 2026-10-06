@@ -219,6 +219,17 @@ pub fn published(
     enabled: bool,
 ) -> Result<(), lsp::ResponseError> {
     let old_open = open_projects(previous);
+    if !current.validation_enabled() {
+        if previous.validation_enabled() {
+            for project in previous.projects() {
+                let data = project.data().unwrap();
+                if data.kind == ProjectKind::Configured && old_open.contains(data.path.as_bytes()) {
+                    publish_project(client, project, encoding, options, false)?;
+                }
+            }
+        }
+        return Ok(());
+    }
     let new_open = open_projects(current);
     for project in current.projects() {
         let data = project.data().unwrap();
@@ -320,6 +331,112 @@ mod tests {
             Ok(self.0.view().source_file(id)?)
         }
     }
+    #[test]
+    fn validation_changes_publish_once_at_the_snapshot_boundary() {
+        use std::sync::{Arc, Mutex};
+        use tsr_project::session::{Session, SessionOptions};
+        struct Publications(Mutex<Vec<lsp::PublishDiagnosticsParams>>);
+        impl Client for Publications {
+            fn notify(
+                &self,
+                method: &str,
+                params: tsr_json::RawValue,
+            ) -> Result<(), lsp::ResponseError> {
+                assert_eq!(method, "textDocument/publishDiagnostics");
+                let mut publication = lsp::PublishDiagnosticsParams::default();
+                tsr_json::unmarshal(&params.0, &mut publication, tsr_json::Options::default())
+                    .unwrap();
+                self.0.lock().unwrap().push(publication);
+                Ok(())
+            }
+            fn request(
+                &self,
+                _: &Context,
+                _: &str,
+                _: tsr_json::RawValue,
+            ) -> Result<tsr_json::RawValue, lsp::ResponseError> {
+                unreachable!("publishing diagnostics does not make requests")
+            }
+            fn request_without_waiting(
+                &self,
+                _: &str,
+                _: tsr_json::RawValue,
+            ) -> Result<(), lsp::ResponseError> {
+                unreachable!("publishing diagnostics does not make requests")
+            }
+        }
+        let mut files = tsr_vfs::MemoryBuilder::new(b"/", true);
+        files.insert_loaded(
+            b"/p/tsconfig.json",
+            br#"{"compilerOptions":{"noLib":true},"files":["main.ts","other.ts"]}"#.as_slice(),
+        );
+        files.insert_loaded(b"/p/main.ts", b"const main = 1;".as_slice());
+        files.insert_loaded(b"/p/other.ts", b"const other = 2;".as_slice());
+        let session = Session::new(
+            SessionOptions::default(),
+            Arc::new(files.finish()),
+            &tsr_arena::Counters::new(),
+        );
+        let uri = lsp::DocumentUri::from_file_name(b"/p/main.ts");
+        let enabled = session
+            .did_open_file(
+                uri.clone(),
+                1,
+                JsString::from_bytes(b"const main = 1;".as_slice()),
+                lsp::LanguageKind("typescript".into()),
+            )
+            .unwrap();
+        session.set_validation_enabled(false).unwrap();
+        // Configuration is staged. Already retained snapshots cannot observe it.
+        assert!(enabled.validation_enabled());
+        assert_eq!(session.snapshot().unwrap().id(), enabled.id());
+        let disabled = session.flush(Some(&uri)).unwrap();
+        assert!(!disabled.validation_enabled());
+        let client = Publications(Mutex::new(Vec::new()));
+        let options = DiagnosticOptions::default();
+        published(
+            &client,
+            &enabled,
+            &disabled,
+            tsr_jsstring::PositionEncoding::Utf16,
+            &options,
+            false,
+        )
+        .unwrap();
+        let publications = client.0.lock().unwrap();
+        assert_eq!(publications.len(), 1);
+        assert_eq!(
+            publications[0].uri,
+            lsp::DocumentUri::from_file_name(b"/p/tsconfig.json")
+        );
+        assert!(publications[0].diagnostics.is_empty());
+        drop(publications);
+        // Another snapshot while disabled must not emit another empty list,
+        // even if the live setting has subsequently been re-enabled.
+        let still_disabled = session
+            .did_open_file(
+                lsp::DocumentUri::from_file_name(b"/p/other.ts"),
+                1,
+                JsString::from_bytes(b"const other = 2;".as_slice()),
+                lsp::LanguageKind("typescript".into()),
+            )
+            .unwrap();
+        session.set_validation_enabled(true).unwrap();
+        published(
+            &client,
+            &disabled,
+            &still_disabled,
+            tsr_jsstring::PositionEncoding::Utf16,
+            &options,
+            true,
+        )
+        .unwrap();
+        assert_eq!(client.0.lock().unwrap().len(), 1);
+        assert!(!still_disabled.validation_enabled());
+        assert!(session.flush(Some(&uri)).unwrap().validation_enabled());
+        session.close();
+    }
+
     #[test]
     fn synthesized_errors_aggregate_but_mapper_reports_keep_original_ranges() {
         let mut builder = AstBuilder::new(SourceText::default(), &tsr_arena::Counters::new());

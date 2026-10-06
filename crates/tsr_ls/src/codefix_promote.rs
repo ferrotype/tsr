@@ -68,7 +68,7 @@ impl LanguageService<'_> {
                     let module = view
                         .node(import)?
                         .module_specifier()
-                        .map(|n| view.node_text(n).map(|s| s.as_bytes().to_vec()))
+                        .map(|n| promoted_module_text(syntax, n))
                         .transpose()?
                         .unwrap_or_default();
                     // The native promotion fix leaves its protocol Name unset.
@@ -97,18 +97,23 @@ impl LanguageService<'_> {
                 scan.scan();
                 scan.scan();
                 delete_type_keyword(&mut tracker, syntax, scan.token_start());
+                drop(scan);
                 let data = read.data_source();
                 let reference = data
                     .as_import_equals_declaration()
                     .and_then(|d| d.module_reference())
                     .unwrap();
                 let r = view.node(reference)?;
-                let module = r.expression().unwrap_or(reference);
-                let name = view.node_text(module)?;
+                let module = if r.kind() == K::ExternalModuleReference {
+                    r.expression().unwrap_or(reference)
+                } else {
+                    reference
+                };
+                let name = promoted_module_text(syntax, module)?;
                 let title = localized(
                     tsr_diagnostics::Remove_type_from_import_declaration_from_0,
                     locale,
-                    &[name.as_bytes()],
+                    &[&name],
                 );
                 let changes = tracker.finish(self)?;
                 if !changes.unmappable.is_empty() {
@@ -163,7 +168,7 @@ impl LanguageService<'_> {
         let module = view
             .node(import)?
             .module_specifier()
-            .map(|n| view.node_text(n).map(|s| s.as_bytes().to_vec()))
+            .map(|n| promoted_module_text(syntax, n))
             .transpose()?
             .unwrap_or_default();
         let title = localized(
@@ -228,4 +233,20 @@ impl NodeTracker<'_> {
             self.insert_before(source, elements[0], new, blank, Leading::None)
         }
     }
+}
+
+// port: tsc/internal/ls/autoimport/fix.go:getModuleSpecifierText
+fn promoted_module_text(syntax: &mut Syntax<'_>, node: NodeId) -> Result<Vec<u8>> {
+    let read = syntax.view.node(node)?;
+    if matches!(
+        read.kind().known(),
+        Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral)
+    ) {
+        return Ok(syntax.view.node_text(node)?.as_bytes().to_vec());
+    }
+    // Error-recovery imports can contain arbitrary expressions. Like
+    // scanner.GetTextOfNode, retain their source spelling in the fix title.
+    let end = read.end() as usize;
+    let start = syntax.start(node)? as usize;
+    Ok(syntax.file.text().as_bytes()[start..end].to_vec())
 }

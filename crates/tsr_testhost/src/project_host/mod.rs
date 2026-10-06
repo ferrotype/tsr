@@ -511,6 +511,37 @@ impl Connection {
                 completion,
             );
         }
+        // A private FIFO fence provides transport backpressure without reading
+        // a snapshot or changing production LSP/session state.
+        if method == Some("test/barrier") {
+            let Some(id) = id else {
+                return Err(protocol::invalid("barrier requires a request ID"));
+            };
+            if protocol::empty(params).is_err() {
+                return self.send(protocol::failure(
+                    &id,
+                    -32602,
+                    "expected empty barrier parameters",
+                    None,
+                ));
+            }
+            if !self.initialized || self.session.pending_options().is_some() {
+                return self.send(protocol::failure(
+                    &id,
+                    -32002,
+                    "project session is not ready",
+                    None,
+                ));
+            }
+            let (fs, cancel) = self.bridge.as_ref().unwrap().filesystem();
+            return self.enqueue(
+                Action::Barrier,
+                Arc::new(fs),
+                Arc::new(cancel),
+                Some(id.clone()),
+                Completion::Request(id),
+            );
+        }
         if method == Some("test/projectState")
             || method.is_some_and(|m| {
                 m.starts_with("textDocument/") || m == "workspace/didChangeWatchedFiles"

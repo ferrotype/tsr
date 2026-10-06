@@ -123,11 +123,39 @@ impl<'a> ProjectBuilder<'a> {
         // no open files. Keep their dirtiness until a later request rebuilds them.
         self.mark_projects_dirty();
         let api_error = self.handle_api_request(request.api.as_ref())?;
+        let cleanup = self.changes.opened.is_some()
+            || self.changes.reopened.is_some()
+            || request
+                .api
+                .as_ref()
+                .is_some_and(|api| api.open_files.is_some() || api.close_files.is_some());
         let mut files: BTreeMap<_, _> = self
             .overlays
             .iter()
             .map(|(key, file)| (key.clone(), (file.file_name().clone(), file.kind())))
             .collect();
+        if !cleanup {
+            if let Some(old) = self
+                .old
+                .projects
+                .get(&JsString::from_bytes(INFERRED_PROJECT_NAME))
+                .and_then(Project::data)
+            {
+                for name in &old.command_line.root_file_names {
+                    if self
+                        .changes
+                        .closed
+                        .contains(&tsr_lsproto::DocumentUri::from_file_name(name.as_bytes()))
+                    {
+                        continue;
+                    }
+                    let path = self.configs.path(name.as_bytes());
+                    files.entry(path).or_insert_with(|| {
+                        (name.clone(), ScriptKind::from_file_name(name.as_bytes()))
+                    });
+                }
+            }
+        }
         for (path, file) in &self.api_state.files {
             files.entry(path.clone()).or_insert_with(|| {
                 (
@@ -203,12 +231,6 @@ impl<'a> ProjectBuilder<'a> {
         }
         self.load_resources(request)?;
         self.keep.extend(self.api_state.projects.keys().cloned());
-        let cleanup = self.changes.opened.is_some()
-            || self.changes.reopened.is_some()
-            || request
-                .api
-                .as_ref()
-                .is_some_and(|api| api.open_files.is_some() || api.close_files.is_some());
         if !cleanup {
             self.keep.extend(
                 self.projects
@@ -217,6 +239,21 @@ impl<'a> ProjectBuilder<'a> {
                     .cloned(),
             );
             self.keep.extend(self.delayed_projects.keys().cloned());
+        }
+        // The default project's loaded references remain live across another
+        // file open, including references of an already-loaded ancestor.
+        if cleanup {
+            for key in self.keep.clone() {
+                if let Some(program) = self.projects.get(&key).and_then(Project::program) {
+                    program.range_resolved_project_reference(|path, _, _, _| {
+                        let reference = self.configs.path(path);
+                        if self.projects.contains_key(&reference) {
+                            self.keep.insert(reference);
+                        }
+                        true
+                    });
+                }
+            }
         }
         self.delayed_projects
             .retain(|key, _| self.keep.contains(key));
@@ -655,6 +692,23 @@ impl<'a> ProjectBuilder<'a> {
                 }
             })
             .map(Arc::new);
+        // Compiler reference resolution uses the program host; mirror its
+        // ownership edges into the session registry, including transitive
+        // references. Release only dropped edges so unchanged entries retain
+        // their identity across a program rebuild.
+        let mut retained_configs = BTreeSet::from([key.clone()]);
+        let mut reference_names = Vec::new();
+        program.range_resolved_project_reference(|path, config, _, _| {
+            if let Some(config) = config {
+                retained_configs.insert(self.configs.path(path));
+                reference_names.push(config.config_name());
+            }
+            true
+        });
+        for reference in reference_names {
+            self.configs.acquire_for_project(&reference, key)?;
+        }
+        self.configs.retain_project_configs(key, &retained_configs);
         let mut project = Project::from_program(
             ProjectData {
                 installed_typings_info,

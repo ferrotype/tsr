@@ -97,11 +97,12 @@ impl ImportAdder {
         }
         let mut statements = Vec::new();
         for ((module, _), collection) in &self.new {
-            for text in new_statements(module, collection, options) {
+            for (text, order) in new_statements(module, collection, options) {
                 statements.push((
                     module.as_str(),
                     format_statement(&text, options)?,
                     collection.require,
+                    order,
                 ));
             }
         }
@@ -163,9 +164,51 @@ fn format_statement(text: &str, options: &Options<'_>) -> Result<String, Error> 
         .expect("formatter returns non-overlapping edits of its own input");
     Ok(String::from_utf8(output).expect("formatting preserves Unicode source"))
 }
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum ImportOrder {
+    SideEffect,
+    TypeOnly,
+    Namespace,
+    Default,
+    Named,
+    ImportEquals,
+    Require,
+}
+
+// Same module names are ordered by import syntax at the pin; named imports
+// precede import-equals declarations even when they refer to the same module.
+fn import_order(view: AstView<'_>, id: NodeId) -> Result<ImportOrder, Error> {
+    let read = view.node(id)?;
+    if read.kind() == K::ImportEqualsDeclaration {
+        return Ok(ImportOrder::ImportEquals);
+    }
+    let Some(clause) = read.import_clause() else {
+        return Ok(ImportOrder::SideEffect);
+    };
+    let clause = view.node(clause)?;
+    let data = clause.data_source();
+    let clause_data = data
+        .as_import_clause()
+        .ok_or(Error::MissingLink("import clause"))?;
+    Ok(if clause.is_type_only() {
+        ImportOrder::TypeOnly
+    } else if clause_data
+        .named_bindings()
+        .map(|id| view.node(id).map(|n| n.kind() == K::NamespaceImport))
+        .transpose()?
+        .unwrap_or(false)
+    {
+        ImportOrder::Namespace
+    } else if clause.name().is_some() {
+        ImportOrder::Default
+    } else {
+        ImportOrder::Named
+    })
+}
+
 // port: tsc/internal/ls/autoimport/fix.go:getNewImports
 // port: tsc/internal/ls/autoimport/fix.go:getNewRequires
-fn new_statements(module: &str, c: &Collection, o: &Options<'_>) -> Vec<String> {
+fn new_statements(module: &str, c: &Collection, o: &Options<'_>) -> Vec<(String, ImportOrder)> {
     let module = edits::quote_module(module, o.single_quote);
     let mut result = Vec::new();
     if c.default.is_some() || !c.named.is_empty() {
@@ -183,7 +226,10 @@ fn new_statements(module: &str, c: &Collection, o: &Options<'_>) -> Vec<String> 
                 .chain(c.named.keys().cloned())
                 .collect::<Vec<_>>()
                 .join(", ");
-            result.push(format!("const {{ {names} }} = require({module})"));
+            result.push((
+                format!("const {{ {names} }} = require({module})"),
+                ImportOrder::Require,
+            ));
         } else {
             let mut names = String::new();
             if let Some(default) = &c.default {
@@ -215,9 +261,18 @@ fn new_statements(module: &str, c: &Collection, o: &Options<'_>) -> Vec<String> 
                     .join(", ");
                 names.push_str(&format!("{{ {named} }}"));
             }
-            result.push(format!(
-                "import {}{names} from {module}",
-                if typed { "type " } else { "" }
+            result.push((
+                format!(
+                    "import {}{names} from {module}",
+                    if typed { "type " } else { "" }
+                ),
+                if typed {
+                    ImportOrder::TypeOnly
+                } else if c.default.is_some() {
+                    ImportOrder::Default
+                } else {
+                    ImportOrder::Named
+                },
             ));
         }
     }
@@ -230,15 +285,28 @@ fn new_statements(module: &str, c: &Collection, o: &Options<'_>) -> Vec<String> 
             ""
         };
         result.push(if c.require {
-            format!("const {} = require({module})", b.name)
+            (
+                format!("const {} = require({module})", b.name),
+                ImportOrder::Require,
+            )
         } else if b.import_kind == lsp::ImportKind::COMMON_JS {
-            format!("import {typed}{} = require({module})", b.name)
+            (
+                format!("import {typed}{} = require({module})", b.name),
+                ImportOrder::ImportEquals,
+            )
         } else {
-            format!("import {typed}* as {} from {module}", b.name)
+            (
+                format!("import {typed}* as {} from {module}", b.name),
+                if typed.is_empty() {
+                    ImportOrder::Namespace
+                } else {
+                    ImportOrder::TypeOnly
+                },
+            )
         });
     }
     if o.semicolons {
-        for statement in &mut result {
+        for (statement, _) in &mut result {
             statement.push(';');
         }
     }
@@ -248,7 +316,7 @@ fn new_statements(module: &str, c: &Collection, o: &Options<'_>) -> Vec<String> 
 fn insert_statements(
     view: AstView<'_>,
     source: NodeId,
-    mut new: Vec<(&str, String, bool)>,
+    mut new: Vec<(&str, String, bool, ImportOrder)>,
     o: &Options<'_>,
 ) -> Result<Vec<Edit>, Error> {
     let file = view.source_file(source)?;
@@ -288,7 +356,11 @@ fn insert_statements(
                         .flatten()
                         .next()
                     {
-                        old.push((id, view.node_text(arg)?.as_bytes().to_vec()));
+                        old.push((
+                            id,
+                            view.node_text(arg)?.as_bytes().to_vec(),
+                            ImportOrder::Require,
+                        ));
                     }
                 }
             }
@@ -296,19 +368,21 @@ fn insert_statements(
             read.kind().known(),
             Some(K::ImportDeclaration | K::ImportEqualsDeclaration)
         ) {
-            let literal = read.module_specifier().or_else(|| {
-                read.data_source()
-                    .as_import_equals_declaration()
-                    .and_then(|d| d.module_reference())
-                    .and_then(|n| view.node(n).ok()?.expression())
-            });
+            // ImportEqualsDeclaration stores its external module name under
+            // ModuleReference, not ModuleSpecifier. The shared utility selects
+            // the accessor by kind and skips internal aliases such as A = B.C.
+            let literal = tsr_ast::utilities_modules::get_external_module_name(view, id)?;
             if let Some(literal) = literal {
-                old.push((id, view.node_text(literal)?.as_bytes().to_vec()));
+                old.push((
+                    id,
+                    view.node_text(literal)?.as_bytes().to_vec(),
+                    import_order(view, id)?,
+                ));
             }
         }
     }
     let compare = |a: &[u8], b: &[u8]| tsr_jsstring::compare::compare_case_insensitive(a, b);
-    new.sort_by(|a, b| compare(a.0.as_bytes(), b.0.as_bytes()));
+    new.sort_by(|a, b| compare(a.0.as_bytes(), b.0.as_bytes()).then(a.3.cmp(&b.3)));
     if old.is_empty() {
         let pos = edits::top_position(view, source)?;
         let prefix = if pos != 0 { o.newline } else { "" };
@@ -333,13 +407,18 @@ fn insert_statements(
             ),
         }]);
     }
-    let sorted = old.windows(2).all(|w| !compare(&w[0].1, &w[1].1).is_gt());
+    let sorted = old
+        .windows(2)
+        .all(|w| !compare(&w[0].1, &w[1].1).then(w[0].2.cmp(&w[1].2)).is_gt());
     let mut result = Vec::new();
-    for (module, statement, _) in new {
+    for (module, statement, _, order) in new {
         let next = sorted
             .then(|| {
-                old.iter()
-                    .position(|(_, s)| compare(module.as_bytes(), s).is_lt())
+                old.iter().position(|(_, s, old_order)| {
+                    compare(module.as_bytes(), s)
+                        .then(order.cmp(old_order))
+                        .is_lt()
+                })
             })
             .flatten();
         let (pos, prefix) = if let Some(0) = next {
@@ -718,5 +797,105 @@ fn format_error(error: tsr_format::Error) -> Error {
     match error {
         tsr_format::Error::Storage(error) => Error::from(error),
         tsr_format::Error::Assertion(message) => panic!("{message}"),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn add_import(text: &str, module: &str, name: &str, kind: lsp::ImportKind) -> String {
+        let file = tsr_parser::parse_source_file(
+            tsr_jsstring::SourceText::from_loaded_bytes(text.as_bytes().to_vec()),
+            tsr_core::ScriptKind::TS,
+            tsr_ast::SourceFileParseOptions {
+                file_name: tsr_jsstring::JsString::from_bytes(b"/main.ts".as_slice()),
+                path: tsr_jsstring::JsString::from_bytes(b"/main.ts".as_slice()),
+                ..Default::default()
+            },
+        )
+        .publish_unbound();
+        let mut adder = ImportAdder::default();
+        adder.add(
+            lsp::AutoImportFix {
+                kind: lsp::AutoImportFixKind::ADD_NEW,
+                import_kind: kind,
+                module_specifier: module.into(),
+                name: name.into(),
+                ..Default::default()
+            },
+            false,
+        );
+        let changes = adder
+            .edits(
+                file.view(),
+                file.root().unwrap(),
+                &Options {
+                    format: &tsr_format::FormatCodeSettings::default(),
+                    locale: &tsr_locale::DEFAULT,
+                    single_quote: true,
+                    semicolons: true,
+                    prefer_type_only: false,
+                    verbatim: false,
+                    newline: "\n",
+                    usage: None,
+                },
+            )
+            .unwrap();
+        let mut result = text.to_owned();
+        for change in changes.into_iter().rev() {
+            result.replace_range(change.start as usize..change.end as usize, &change.text);
+        }
+        result
+    }
+
+    #[test]
+    fn new_imports_select_external_import_equals_module_reference() {
+        // Native TestImportNameCodeFixNewImportFileQuoteStyle2 insertion.
+        assert_eq!(
+            add_import(
+                "import m2 = require('./module2');\n\nf1();",
+                "./module1",
+                "f1",
+                lsp::ImportKind::NAMED,
+            ),
+            "import { f1 } from './module1';\nimport m2 = require('./module2');\n\nf1();",
+        );
+        // Native TestImportNameCodeFixNewImportExportEqualsCommonJSInteropOn:
+        // both a pure import-equals list and one mixed with an ES import.
+        for prefix in ["", "import es from 'es';\n"] {
+            let text = format!("{prefix}import bar = require('bar');\n\nfoo");
+            assert_eq!(
+                add_import(&text, "foo", "foo", lsp::ImportKind::COMMON_JS),
+                format!(
+                    "{prefix}import bar = require('bar');\nimport foo = require('foo');\n\nfoo"
+                ),
+            );
+        }
+    }
+
+    #[test]
+    fn named_import_precedes_same_module_import_equals() {
+        // The new-import alternative in TestImportNameCodeFixExistingImportEquals0
+        // scans the existing import-equals declaration before placing the edit.
+        let result = add_import(
+            "import ns = require('ambient-module');\nvar x = v1 + 5;",
+            "ambient-module",
+            "v1",
+            lsp::ImportKind::NAMED,
+        );
+        assert_eq!(
+            result,
+            "import { v1 } from 'ambient-module';\nimport ns = require('ambient-module');\nvar x = v1 + 5;"
+        );
+    }
+
+    #[test]
+    fn internal_import_equals_alias_has_no_external_module_name() {
+        let text = "import Alias = Namespace.Member;\n\nvalue;";
+        assert_eq!(
+            add_import(text, "./dep", "value", lsp::ImportKind::NAMED),
+            "import { value } from './dep';\n\nimport Alias = Namespace.Member;\n\nvalue;",
+        );
     }
 }
