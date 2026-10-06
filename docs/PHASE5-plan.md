@@ -789,36 +789,49 @@ All correctness runs use the existing common parity tool or `cargo test`.
 `status/parity/fourslash.json` and `lsp.json` are the only end-to-end failing
 sets; their `approved` fields are the only retained-divergence approvals.
 
+Owner authorization, 2026-10-06: the owner accepted L7 section 2 items 1–3.
+Count the tests the pinned Go run executes, retain pinned skips visibly, require
+only owner-approved differences at closure, and cause-label initial failing
+entries without approving them. This authorizes the counting and bookkeeping
+policy, not any particular residual difference.
+
 | Required result | How it is checked |
 | --- | --- |
-| At least 99.5% semantic fourslash passes | The pinned 4,548 top-level test functions, discovered and checked in L0, run against Rust. Count distinct tests with any nonpassing required outcome, not failing subtest entries; at this pin the maximum is 22 |
+| At least 99.5% semantic fourslash passes | Discover the compiled pinned roster (source audit: 4,547 functions, excluding TestMain). N is the tests executed without a skip in the same native Go run. Count distinct nonpassing tests; len(F) <= floor(0.005 * N). N and its limit require runtime measurement |
 | Fourslash assertions and baseline bytes | Keep every assertion outcome and baseline subtest in the expectation file. The 1,749 references are checked by the pin's writers; none is dropped to improve the percentage |
 | Project and internal LSP/related unit tests | Rust ports against production components pass under `cargo test`; the L0 routing document accounts for every pinned test including subpackages |
-| Client-driven LSP and replay | `lsp.json` is empty at closure; the client/assertions execute against Rust, and replay responses match |
+| Client-driven LSP and replay | `lsp.json` holds only owner-approved retained differences at closure; the client/assertions execute against Rust, and replay responses match |
 | Synchronous bridge | Integration tests cover blocked workers, callbacks, cancellation, progress, disconnect and cleanup |
 | Ownership | Production session/snapshot/project/bundle lifetime and panic-retirement tests pass; test-cache retention is distinguished from leaks |
 | Request latency | The existing perf workflow/tool records the paired L7 scenarios; no scenario regresses against Go without a separate owner decision |
 | Port completion and build quality | All Phase 5 production work is ported or explicitly accounted for; ordinary CI and `cargo xtask validate` pass |
 
-Let `N` be the pinned top-level fourslash test count, and `F` the set of those
-test IDs with any failed required assertion/baseline, crash, timeout, missing
-implementation or unresolved skip. Closure requires
-`(N - len(F)) / N >= 0.995`; with `N = 4548`, `len(F) <= 22`.
-One test with three failed baseline subtests contributes **one** to `F`, but
-all three failing entries remain visible. Approval does not remove the test
-from `F`. A skipped test is not a semantic pass: L0 identifies pinned skips,
-and any unresolved skipped test remains in `F` unless the owner separately
-changes the scope. The harness must also fail on unexpected/new skips;
+Let `N` be the number of pinned top-level fourslash tests that execute without
+skipping when the same test binary runs against the Go server. The Go run is the
+authority; the source roster and estimated conditional skips do not establish N.
+Let `F` be those IDs with any failed required assertion/baseline, crash, timeout,
+missing implementation, missing result or Rust skip absent from the Go run.
+Closure requires `(N - len(F)) / N >= 0.995`, equivalently
+`len(F) <= floor(0.005 * N)`. No measured denominator is recorded by this policy.
+One test with three failed baselines contributes **one** to `F`, while all three
+entries remain visible. Approval does not remove the test from `F`. Pinned Go
+skips stay visible with their native reasons and remain outside N and F; they
+are not semantic passes. An unexpected/new Rust skip fails the test;
 `parity.py`'s generic acceptance of a `skip` row is not sufficient here.
 
 The adapter supplies the exact parent-test mapping for baseline/subtest IDs;
 the report must not infer parents by an arbitrary number of slashes. Add
-focused counting tests: several failures in one test; 22 versus 23 distinct
-failing tests; an approved failure; a missing result; and a skipped test.
+focused counting tests: several failures in one test; the computed limit versus
+limit plus one; an approved failure; a missing result; a pinned skip; and an
+unexpected/new Rust skip.
 Use runner output/common summaries for this count, not another committed
 metric file. Do not add fabricated failures to the expectation file for an
 unobserved behavior difference: first add a witness that exposes it, or
 state the untested limitation without claiming it passed.
+
+Initial accepted failing sets use shared-cause labels as reasons and leave
+`approved` empty. Acceptance records the exact observed set; it grants no
+retained-divergence approval.
 
 Each final retained failing entry names the native behavior, Rust behavior
 and reason and carries the owner's approval. Green intermediate CI only

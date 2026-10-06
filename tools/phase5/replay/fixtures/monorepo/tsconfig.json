@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noLib": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext"
+  },
+  "typeAcquisition": {
+    "enable": false
+  },
+  "include": [
+    "src/**/*"
+  ]
+}

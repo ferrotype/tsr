@@ -31,6 +31,7 @@ import shutil
 import subprocess
 import sys
 import time
+import threading
 
 ROOT = Path(__file__).resolve().parent.parent
 PARITY = ROOT / "status/parity"
@@ -44,6 +45,7 @@ class Suite:
     binary: str
     arguments: tuple[str, ...]
     timeout: int
+    batch: bool = False
 
 
 # `arguments` precede `list` / `run --id ID --local DIR` on the runner's command line.
@@ -51,6 +53,8 @@ class Suite:
 # variants (the union/intersection stress tests) take about a minute alone on a
 # fast core and several on a shared 4-vCPU runner.
 SUITES = {
+    "fourslash": Suite("", "", (), 120, batch=True),
+    "lsp": Suite("", "", (), 120, batch=True),
     "compiler": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "single"), 600),
     "compiler-concurrent": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "concurrent"), 600),
     "transpile": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "transpile"), 60),
@@ -84,6 +88,9 @@ def runner_path(suite, explicit=None):
     """The suite's runner binary: --runner PATH as given, else the executable
     Cargo reports for the release build, which honors CARGO_TARGET_DIR and
     .cargo/config (a fresh build is a no-op that still reports the path)."""
+    if SUITES[suite].batch:
+        import phase5_parity
+        return phase5_parity.prepare(suite, explicit)
     if explicit:
         return Path(explicit).resolve()
     command = ["cargo", "build", "--release", "--locked", "-p", SUITES[suite].package,
@@ -105,6 +112,9 @@ def runner_command(suite, runner, *rest):
 
 
 def list_variants(suite, runner):
+    if SUITES[suite].batch:
+        import phase5_parity
+        return phase5_parity.adapter().list_variants(suite, runner)
     completed = subprocess.run(runner_command(suite, runner, "list"), cwd=ROOT, check=True,
                                capture_output=True, text=True)
     variants = sorted(set(line for line in completed.stdout.splitlines() if line.strip()))
@@ -156,7 +166,10 @@ def run_variant(suite, runner, variant, local, timeout):
 def run(args):
     suite = args.suite
     runner = runner_path(suite, args.runner)
-    variants = args.id or list_variants(suite, runner)
+    roster = list_variants(suite, runner) if not args.id or SUITES[suite].batch else None
+    variants = args.id or roster
+    if args.id and SUITES[suite].batch and (len(set(variants)) != len(variants) or not set(variants) <= set(roster)):
+        sys.exit("unknown or duplicate selected variant")
     selected, (index, count) = shard(variants, args.shard)
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
@@ -168,25 +181,49 @@ def run(args):
     shutil.rmtree(local, ignore_errors=True)
     local.mkdir(parents=True, exist_ok=True)
     timeout = args.timeout or SUITES[suite].timeout
-    jobs = args.jobs or os.cpu_count() or 1
+    jobs = args.jobs or (min(4, os.cpu_count() or 1) if SUITES[suite].batch else os.cpu_count() or 1)
+    if jobs < 1:
+        sys.exit("--jobs must be positive")
     meta = {"suite": suite, "pin": pin(), "shard": [index, count], "total": len(variants),
             "selected": len(selected), "variants": selected, "partial": bool(args.id), "jobs": jobs,
             "timeout": timeout,
             "host": {"system": platform.system(), "machine": platform.machine(), "cpus": os.cpu_count()},
             "started": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+    if SUITES[suite].batch:
+        meta["native_selection"] = {key: runner[key] for key in ("goos", "goarch", "compiled_sources")}
     counts = dict.fromkeys(STATES, 0)
     slowest = []
     with (output / "results.ndjson").open("w") as results, ThreadPoolExecutor(jobs) as pool:
-        futures = {pool.submit(run_variant, suite, runner, variant, local, timeout): variant for variant in selected}
-        for done, future in enumerate(as_completed(futures), 1):
-            rows, elapsed = future.result()
-            slowest = sorted(slowest + [(elapsed, futures[future])], reverse=True)[:5]
-            for row in rows:
-                counts[row["state"]] += 1
-                results.write(json.dumps(row, ensure_ascii=False) + "\n")
-            if done % 500 == 0 or done == len(selected):
-                print(f"{done}/{len(selected)} variants; sub-tests pass {counts['pass']} fail {counts['fail']} "
-                      f"skip {counts['skip']}", file=sys.stderr)
+        if SUITES[suite].batch:
+            import phase5_parity
+            lock = threading.Lock()
+            finished = 0
+            def publish(rows):
+                nonlocal finished
+                with lock:
+                    for row in rows:
+                        counts[row["state"]] += 1
+                        results.write(json.dumps(row, ensure_ascii=False) + "\n")
+                    results.flush()
+                    finished += 1
+                    if finished % 100 == 0 or finished == len(selected):
+                        print(f"{finished}/{len(selected)} tests; {counts}", file=sys.stderr)
+            futures = [pool.submit(phase5_parity.run_group, suite, runner, selected[j::jobs],
+                                   local / str(j), timeout, publish) for j in range(min(jobs, len(selected)))]
+            for future in as_completed(futures):
+                timings = future.result()
+                slowest = sorted(slowest + [(seconds, name) for name, seconds in timings.items()], reverse=True)[:5]
+        else:
+            futures = {pool.submit(run_variant, suite, runner, variant, local, timeout): variant for variant in selected}
+            for done, future in enumerate(as_completed(futures), 1):
+                rows, elapsed = future.result()
+                slowest = sorted(slowest + [(elapsed, futures[future])], reverse=True)[:5]
+                for row in rows:
+                    counts[row["state"]] += 1
+                    results.write(json.dumps(row, ensure_ascii=False) + "\n")
+                if done % 500 == 0 or done == len(selected):
+                    print(f"{done}/{len(selected)} variants; sub-tests pass {counts['pass']} fail {counts['fail']} "
+                          f"skip {counts['skip']}", file=sys.stderr)
     meta["finished"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     meta["counts"] = counts
     meta["slowest"] = [{"variant": variant, "seconds": round(seconds, 1)} for seconds, variant in slowest]
@@ -194,11 +231,15 @@ def run(args):
     print(json.dumps({"suite": suite, **meta["counts"], "variants": len(selected)}))
 
 
-def variant_of(row_id, selected):
+def variant_of(row_id, selected, parent=None):
     """The selected variant a result id belongs to: the id itself (a crash or a
     deadline fails the whole variant) or the id without its sub-test suffix.
     Variant ids themselves contain slashes (`tsc/commandLine/help.js`), so
     membership decides, not the number of segments."""
+    if parent is not None:
+        if parent in selected and (row_id == parent or row_id.startswith(parent + "/")):
+            return parent
+        return "invalid-parent:" + row_id
     if row_id in selected:
         return row_id
     variant = row_id.rsplit("/", 1)[0]
@@ -211,7 +252,11 @@ def complete(directory, meta, rows):
     selected = set(meta["variants"])
     answered = {}
     for row in rows:
-        answered.setdefault(variant_of(row["id"], selected), []).append(row["id"])
+        answered.setdefault(variant_of(row["id"], selected, row.get("parent")), []).append(row["id"])
+    if meta["suite"] in ("fourslash", "lsp"):
+        roots = {row["id"] for row in rows if row["id"] == row.get("parent") and row.get("native_state") in STATES}
+        if roots != selected or any("parent" not in row for row in rows):
+            sys.exit(f"{directory}: missing explicit terminal parent/native state")
     missing = sorted(selected - set(answered))
     strangers = sorted(set(answered) - selected)
     duplicates = sorted(key for ids in answered.values() for key in set(ids) if ids.count(key) > 1)
@@ -235,6 +280,10 @@ def merge(suite, directories):
         metas.append(meta)
         rows.extend(shard_rows)
         variants.extend(meta["variants"])
+    if suite in ("fourslash", "lsp"):
+        selections = {json.dumps(meta.get("native_selection"), sort_keys=True) for meta in metas}
+        if len(selections) != 1 or "null" in selections:
+            sys.exit("the result directories disagree on native host/source selection")
     counts = {meta["shard"][1] for meta in metas}
     pins = {meta["pin"] for meta in metas}
     totals = {meta["total"] for meta in metas}
@@ -261,6 +310,13 @@ def summary(expectation, meta, rows, new_failures, now_passing):
     counts = {state: sum(1 for row in rows if row["state"] == state) for state in STATES}
     lines = [f"suite {expectation['suite']}: {meta['total']} variants; sub-tests pass {counts['pass']}, "
              f"skip {counts['skip']}, fail {counts['fail']} ({approved} approved)"]
+    if expectation['suite'] == 'fourslash':
+        import phase5_parity
+        gate = phase5_parity.counts(rows)
+        ratio = 100 * (gate['executed'] - gate['failing']) / gate['executed'] if gate['executed'] else 0
+        lines.append(f"native executed N={gate['executed']}; pinned skips={gate['native_skips']}; "
+                     f"failing parents F={gate['failing']} (closure limit {gate['limit']}); {ratio:.3f}% pass; "
+                     f"native reference failures={gate['reference_failures']}")
     if new_failures:
         lines.append(f"{len(new_failures)} new failure(s) not named in status/parity/{expectation['suite']}.json:")
         lines.extend(f"  {key}: {failing[key].get('reason', '')}".rstrip(": ") for key in new_failures)
@@ -321,7 +377,7 @@ def main(argv=None):
         command.add_argument("suite", choices=sorted(SUITES))
         command.set_defaults(function=function)
         if name in ("list", "run"):
-            command.add_argument("--runner", help="a prebuilt runner binary to use instead of building one")
+            command.add_argument("--runner", help="a prebuilt runner binary, or a Phase 5 prepared.json, instead of building")
         if name == "run":
             command.add_argument("--output", required=True)
             command.add_argument("--shard", help="i/n: this shard of the sorted variant list")

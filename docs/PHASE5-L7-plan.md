@@ -1,14 +1,24 @@
 # Phase 5 L7: acceptance path, residuals, replay and latency
 
-Status: **proposed** (2026-10-05); the decisions of section 2 are open.
+Status: **implementation started** (2026-10-06); the owner approved section 2 items 1–3 on 2026-10-06; the other acceptance
+decisions remain open.
 Checkpoint L7 of the [Phase 5 plan](PHASE5-plan.md). Planning reference: `main`
-at `3dbc11d9` (L0 to L5 merged, 0.3.0 released), with L6 in progress on
-`codex/phase5-l6`. Upstream remains Corsa
+at `ef456f65` (L0 to L6 merged, 0.3.0 released). Work is on
+`codex/phase5-l7`. Upstream remains Corsa
 `1f70213d4922b434345f639b441681e470c7cfc1`.
 
 Written by Claude (Fable) with Codex (Astra): Claude drafted it, Astra
 supplied the implementation state and reviewed the draft. The corpus counts
 were checked by both against the pin unless a row says otherwise.
+
+2026-10-06 update: this retains the proposed plan drafted against `3dbc11d9`
+and corrects verified stale facts after L6 merged as `ef456f65`. Current agent
+allocation follows the user's authorization. On 2026-10-06 the owner explicitly
+approved section 2 items 1–3: count tests the native Go run executes, keep pinned
+skips visible, retain only owner-approved differences at closure, and give
+initial failing entries shared-cause reasons with no approval. This is approval
+of that policy, not of specific residuals; N is not yet measured. Other decisions
+and unmeasured estimates remain proposals.
 
 ## 1. What L7 has to deliver
 
@@ -17,8 +27,9 @@ add replay fixtures and a Go-against-Rust replay comparison, add the `lsp`
 latency workload, and apply PLAN's no-regression rule. Its exit is section 5's
 count, passing replay and the latency result.
 
-L7 is larger than that text, because the acceptance path L0 was to build does
-not exist yet. Checked on `main` and on the L6 branch:
+L7 is larger than that text, because the acceptance path L0 was to build was
+not complete at the original planning reference. The table records that initial
+audit; implementation is now in progress:
 
 | L0 item | State |
 | --- | --- |
@@ -37,7 +48,7 @@ L5 records all say they carry no corpus credit.
 What does exist and is reused: the version-3 private endpoint
 `phase5_testserver` over the production `tsr_lsp` server, with the reset
 barrier and the retained parse cache (L1); the `test/projectState` projection
-and its eight-state check through the original Go writer
+and its ten-state check through the original Go writer
 (`tools/phase5/project/`); the callback file system and options staging; an
 ordinary stdio client that drives the pinned Go command, `tsrust --lsp` and the
 private endpoint on the same files (`tools/phase5/lsp/interop.py`).
@@ -63,13 +74,14 @@ own per-baseline result (L7.1).
 
 The skip count matters for the gate. Section 5 of the Phase 5 plan sets
 `N = 4548` and keeps every unresolved skip in `F`, with `len(F) <= 22`. With at
-least 386 pinned skips that rule cannot be met by any implementation. This is
-owner decision 1 below.
+least 386 pinned skips the original rule cannot be met by any implementation.
+Owner decision 1 below replaces its denominator; the source estimate is not a
+measured Go execution count.
 
 ## 2. Decisions for the owner
 
-1. **The fourslash denominator.** The pin itself does not run 386 of its
-   tests, so there is no Go outcome to match for them. Recommended: count the
+1. **The fourslash denominator — approved 2026-10-06.** The pin itself does not run 386 of its
+   tests, so there is no Go outcome to match for them. Approved: count the
    tests the pin executes. `N` is the number of test functions that do not
    skip when the same test binary runs against the Go server (about 4,130:
    4,547 less 386 less the 31 conditional skips), and `F` is the set of those
@@ -78,12 +90,12 @@ owner decision 1 below.
    skips stay visible as `skip` rows with the pin's reason, and a skip the Go
    run does not have is a failure. The alternative, `N = 4547` with skips
    outside `F`, allows 22.
-2. **Approved entries in `lsp.json`.** Section 5 says `lsp.json` is empty at
+2. **Approved entries in `lsp.json` — approved 2026-10-06.** Section 5 says `lsp.json` is empty at
    closure, but the L4 record carries an owner-approved replay difference
    (config-root replacement, 2026-10-05) "into `lsp.json`" as a raw non-match.
-   Recommended: `lsp.json` holds only owner-approved entries at closure.
-3. **Wording of the first accepted sets.** `parity.py accept` creates both
-   expectation files with, at first, a large failing set. Recommended: the
+   Approved: `lsp.json` holds only owner-approved entries at closure.
+3. **Wording of the first accepted sets — approved 2026-10-06.** `parity.py accept` creates both
+   expectation files with, at first, a large failing set. Approved: the
    implementing agent writes each `reason` as a shared-cause label from the
    triage (L7.3), leaves `approved` empty, and the owner words the reasons of
    the final retained entries only.
@@ -102,24 +114,26 @@ owner decision 1 below.
    Recommended: the agents run sample captures (three pairs) while building
    the workload; the twenty-pair run of record is the owner's, on the host
    class `thresholds.toml` is authorized for.
-6. **The split between the two agents** (section 5), and whether L7 is one
+6. **The branch and pull request split:** whether L7 is one
    branch or three pull requests (harness, replay and latency, residuals).
+   The user-approved current agent allocation is in section 5.
    Recommended: three, because the first two touch no production crate and
    can merge while residual work continues.
 7. **Profiling and API commands.** `custom/runGC` and the heap and CPU profile
    commands answer `-32601`, and `tsrust --lsp -pprofDir` is refused; the L2
    record names native pprof a Phase 7 boundary. Recommended: they do not
    block Phase 5 closure, and a suite case that observes one keeps its actual
-   outcome. `custom/initializeAPISession` is L6's API bridge and is not
-   deferred by this.
+   outcome. `custom/initializeAPISession`'s wire handshake belongs to the Phase 6
+   API per the accepted L6 record; L6 supplies its retained project/symbol/type
+   primitives. Its observed outcome remains visible in any suite case.
 8. **CI runner class and shard count** for the two new suites, once L7.2 has
    a measurement.
 
 ## 3. Work items
 
-Items are numbered L7.1 to L7.8. L7.1 to L7.3 are the L0 debt and gate
-everything else in the fourslash track. L7.5 and L7.6 depend on nothing but
-L6's merge and run in parallel with it.
+The seven work items are numbered L7.1 to L7.7. L7.1 to L7.3 are the L0 debt
+and gate everything else in the fourslash track. L7.5 and L7.6 are independent
+of that harness track now that L6 has merged.
 
 ### L7.1 The fourslash transport patch
 
@@ -222,7 +236,9 @@ through it.
 2. Run the client-driven `internal/lsp` tests the same way into `lsp.json`:
    `server_completion`, `server_contentmapper`, `server_progress`,
    `server_projectinfo`, `server_projectreference_updates`,
-   `server_semantictokens` and the client parts of `server_test`.
+   `server_semantictokens`. The three `server_test.go` tests access Go server
+   internals directly; their route is a Rust observation port, not the carried
+   LSP client.
 3. Group the failures by cause: harness, crash or deadline, unimplemented
    handler, shared behavior difference, baseline bytes by writer, single
    cases. The grouping is a throwaway script over `results.ndjson`; its output
@@ -231,10 +247,12 @@ through it.
 4. Write `docs/PHASE5-tests.md` from the test binaries' own lists: every
    pinned test of `project`, `lsp`, `ls` and their subpackages with its route
    (a suite id, or the Rust test that ports it). Tests still unported are
-   listed as work, not as passes. Known before the audit: the 15 project
-   content-mapper tests, the four `project/ata` test files,
-   `TestSetContentMapperContributionsBeforeDidOpen` and
-   `TestReferencesAfterAncestorProjectConfigDeletion1`, all L6's to finish.
+   listed as work, not as passes. L6 already added project content-mapper and
+   ATA observation ports and the carried
+   `TestSetContentMapperContributionsBeforeDidOpen` check. Its cross-project
+   development scenarios cover ancestor/config changes, but do not establish
+   the pinned `TestReferencesAfterAncestorProjectConfigDeletion1` outcome.
+   Exact routes and residual gaps remain this audit's responsibility.
 
 ### L7.4 Residual fixes
 
@@ -261,13 +279,13 @@ implementing and reviewing L2 to L5 and from L6's scope, not measurements:
 
 | Cause | Exposure | Depends on |
 | --- | --- | --- |
-| State projection fidelity (`Session().Snapshot()` through `test/projectState`) | 26 tests | L7.1; the eight-state check covers a fraction of what these tests read |
-| Mapper lifecycle, execution and streams | 55 tests | L6 (contributions are parsed but execution is not wired on `main`) |
+| State projection fidelity (`Session().Snapshot()` through `test/projectState`) | 26 tests | L7.1; the ten-state check covers a fraction of what these tests read |
+| Mapper lifecycle, execution and streams | 55 tests | L6 execution/installation is merged; full mapper corpus remains unrun |
 | `@tsc` prebuilt outputs and project references | 8 tests | L6, and the fixture setup staying in Go |
 | Cross-project search, project-reference redirection, workspace discovery | dozens, inside references (362), rename (148), definitions (225 + 69 + 38) and auto-imports (231) | L6 |
 | Code-fix long tail | inside the 270 code-fix tests; L5 compared bounded samples only | L7.4 |
 | Completion long tail | inside the 1,111 completion tests; L4 compared about 740 responses per encoding | L7.4 |
-| Handlers that answer `-32601` by name: `custom/runGC`, the heap and CPU profile commands, `custom/initializeAPISession`, `custom/setContentMapperContributions` | any test that sends them | L6 for the last two; decision 7 for the rest |
+| Handlers that answer `-32601` by name: `custom/runGC`, the heap and CPU profile commands, `custom/initializeAPISession` | any test that sends them | Phase 6 API for the wire handshake; decision 7 for profiling/GC. `custom/setContentMapperContributions` is implemented by merged L6 |
 
 One documented difference has no approval yet and may surface as an ordering
 difference: scheduler waits are cancellation-aware in Rust and not in Go, which
@@ -373,22 +391,26 @@ L6 merge ──┬─> L7.1 ─> L7.2 ─> L7.3 ─> L7.4 ───────�
            └─> L7.6 (capture, samples) ─> run of record ┘
 ```
 
-L7.1 and L7.2 touch only `tools/`, `scripts/` and CI, so they can start before
-L6 merges. L7.4 starts from L6's merged state. The latency run of record is
+L7.1 and L7.2 touch only `tools/`, `scripts/` and CI, so they could start before
+L6 merged. L7.4 starts from L6's merged state (`ef456f65`). The latency run of record is
 taken last, on the commit that meets the correctness count.
 
 ## 5. Who does what
 
-A proposal for decision 6. Before the first run the tracks share no files,
-and neither agent edits `tsr_lsp`'s runtime or the project code for L7.
+The user authorized Sol agents for noncoding and less-critical coding support.
+The root agent owns integration, shared harness contracts, production residual
+fixes, validation and the final acceptance report. Support agents have disjoint
+file ownership; the table is the current allocation, not a dispatch to a separate
+Claude session. The branch-versus-PR decision in section 2 remains open.
 
-| Track | Work | Proposed |
+| Track | Work | Current allocation |
 | --- | --- | --- |
-| Acceptance | L7.1, L7.2, L7.3: `tools/phase5/harness/`, `scripts/parity.py`, CI, the first run and its triage | Claude, starting now, while Astra finishes L6 |
-| Replay and latency tooling | L7.5, L7.6: `tools/phase5/replay/`, `tools/phase5/perf/`, `scripts/perf.py`, `perf.yml` | Astra, after L6 merges |
-| Residuals | L7.4: fixes in `tsr_ls`, `tsr_lsp`, `tsr_project`, `tsr_autoimport` and the compiler crates | Both, after the triage: causes are assigned by crate and module so two fixes never edit the same one. The default, not a commitment: Astra takes the project, mapper and cross-project causes, Claude the service long tail |
+| Acceptance | L7.1, L7.2, L7.3: `tools/phase5/harness/`, `scripts/parity.py`, CI, the first run and its triage | Root integration; Sol support for the routing inventory/documentation |
+| Replay and latency tooling | L7.5, L7.6: `tools/phase5/replay/`, `tools/phase5/perf/`, `scripts/perf.py`, `perf.yml` | Root integration; scoped Sol support for tooling |
+| Residuals | L7.4: fixes in `tsr_ls`, `tsr_lsp`, `tsr_project`, `tsr_autoimport` and the compiler crates | Root after triage; any delegated fixes receive explicit crate/module ownership |
 
-Each reviews the other's pull requests.
+The root reviews delegated changes before integration. No separate Claude
+session or additional pull request is implied by this allocation.
 
 ## 6. Exit
 
