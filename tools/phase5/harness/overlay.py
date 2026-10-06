@@ -58,6 +58,19 @@ def create(stage, *, include_l2_fixture=False):
         target.write_text(text)
         replacements[str(UPSTREAM / relative)] = str(target)
 
+    # The pin derives fixture roots from runtime.Caller's build-host path.
+    # Downloaded binaries need an explicit checkout root; unset keeps Go intact.
+    path = "internal/repo/paths.go"
+    repo = (UPSTREAM / path).read_text()
+    repo = replace_once(repo, "var rootPath = sync.OnceValue(func() string {", """var rootPath = sync.OnceValue(func() string {
+ if root := os.Getenv("TSR_UPSTREAM_ROOT"); root != "" {
+  if !filepath.IsAbs(root) { panic("TSR_UPSTREAM_ROOT must be absolute") }
+  info, err := os.Stat(filepath.Join(root, "go.mod"))
+  if err != nil || !info.Mode().IsRegular() { panic("TSR_UPSTREAM_ROOT must contain go.mod") }
+  return filepath.Clean(root)
+ }""")
+    install(path, repo)
+
     path = "internal/testutil/lsptestutil/lspclient.go"
     client = (UPSTREAM / path).read_text()
     client = replace_once(client, '"io"', '"io"\n "os"')
@@ -65,6 +78,7 @@ def create(stage, *, include_l2_fixture=False):
     anchor = "func NewLSPClient(t *testing.T, serverOpts lsp.ServerOptions, onServerRequest ServerRequestHandler) (*LSPClient, func() error) {"
     client = replace_once(client, anchor, anchor + '\n if os.Getenv("TSR_LSP_SERVER") != "" { return newRustClient(t,serverOpts,onServerRequest) }')
     client = replace_once(client, "server := lsp.NewServer(&serverOpts)", 'if os.Getenv("TSR_LSP_SERVER") != "" { panic("native server reached in Rust mode") }\n server := lsp.NewServer(&serverOpts)')
+    client = replace_once(client, "if err := c.writeToServer(msg); err != nil {", "if rustWriteNotification(t, c, msg) { return }\n if err := c.writeToServer(msg); err != nil {")
     install(path, client)
     for name in ("rust_client.go", "rust_mappers.go"):
         replacements[str(UPSTREAM / "internal/testutil/lsptestutil" / name)] = str(HERE / name)

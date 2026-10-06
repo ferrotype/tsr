@@ -5,7 +5,8 @@
 # rust-tests:   the workspace's tests in six shards (checker, compiler ×4, the rest).
 # script-tests: the Python tests, their output kept in an artifact.
 # msrv:         the locked workspace compiles on the declared minimum Rust.
-# runner:       builds the suite runner once in release and hands the binary to the shards.
+# runner:       builds the compiler suite runner once for its shards.
+# phase5-runner: builds both Go assertion binaries, test2json and one Rust server.
 # parity:       one job per suite shard; each runs its share of the pin's tests and
 #               uploads its results.
 # parity-check: merges the shards and compares the failing set with
@@ -193,6 +194,34 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
+  phase5-runner:
+    name: build the Phase 5 harness
+    runs-on: ${{ vars.PARITY_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Install the pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: phase5-runner-release
+      - name: Read the Go pin
+        id: go
+        run: echo "version=$(python3 -c "import tomllib;print(tomllib.load(open('data/s04/toolchains.toml','rb'))['go'].removeprefix('go'))")" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ steps.go.outputs.version }}
+          cache-dependency-path: upstream/tsc/go.sum
+      - name: Build the assertion binaries and shared transport tools
+        run: python3 tools/phase5/harness/bundle.py prepare --stage target/phase5-ci-build --output target/phase5-ci
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase5-harness
+          path: target/phase5-ci
+          retention-days: 1
+          if-no-files-found: error
+
   parity:
     name: ${{ matrix.suite }} ${{ matrix.shard }}
     needs: runner
@@ -230,9 +259,44 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
+  phase5-parity:
+    name: ${{ matrix.suite }} ${{ matrix.shard }}
+    needs: phase5-runner
+    strategy:
+      fail-fast: false
+      matrix:
+        # Initial measured bring-up uses four retained fourslash workers.
+        # LSP client tests keep one fresh process per test.
+        include:
+          - { suite: fourslash, shard: 1/4 }
+          - { suite: fourslash, shard: 2/4 }
+          - { suite: fourslash, shard: 3/4 }
+          - { suite: fourslash, shard: 4/4 }
+          - { suite: lsp, shard: 1/1 }
+    runs-on: ${{ vars.PARITY_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: phase5-harness
+          path: phase5-runner
+      - name: Relocate the prepared metadata and restore executable permissions
+        run: python3 tools/phase5/harness/bundle.py relocate --bundle phase5-runner
+      - name: Run the shard
+        run: python3 scripts/parity.py run "${{ matrix.suite }}" --runner "phase5-runner/${{ matrix.suite }}.prepared.json" --shard "${{ matrix.shard }}" --jobs 1 --output "results/${{ matrix.suite }}/$(echo '${{ matrix.shard }}' | tr / -)"
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: parity-${{ matrix.suite }}-${{ strategy.job-index }}
+          path: results
+          retention-days: 7
+          if-no-files-found: error
+
   parity-check:
     name: parity check
-    needs: parity
+    needs: [parity, phase5-parity]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
@@ -245,7 +309,7 @@ jobs:
       - name: Compare with the expectation files
         run: |
           status=0
-          for suite in compiler compiler-concurrent transpile; do
+          for suite in compiler compiler-concurrent transpile fourslash lsp; do
             python3 scripts/parity.py check "$suite" --results results/"$suite"/* || status=1
           done
           exit "$status"

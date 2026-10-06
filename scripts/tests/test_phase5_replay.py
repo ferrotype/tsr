@@ -10,6 +10,34 @@ spec.loader.exec_module(replay)
 
 
 class ReplayTests(unittest.TestCase):
+    def test_notification_wait_preserves_every_message_and_checks_uri(self):
+        import queue
+        peer = replay.Peer.__new__(replay.Peer)
+        peer.queue, peer.traffic = queue.Queue(), []
+        first = {'method': 'textDocument/publishDiagnostics', 'params': {'uri': 'file:///p/a', 'diagnostics': [22]}}
+        other = {'method': 'textDocument/publishDiagnostics', 'params': {'uri': 'file:///p/b', 'diagnostics': []}}
+        second = {'method': 'textDocument/publishDiagnostics', 'params': {'uri': 'file:///p/a', 'diagnostics': [32]}}
+        peer.traffic.append(first)
+        peer.queue.put(other)
+        peer.queue.put(second)
+        peer.await_notification('textDocument/publishDiagnostics', {'uri': 'file:///p/a'}, 2)
+        self.assertEqual(peer.traffic, [first, other, second])
+        with self.assertRaises(TimeoutError):
+            peer.await_notification('textDocument/publishDiagnostics', {'uri': 'file:///p/a'}, 3, timeout=.001)
+        peer.queue.put({'id': 1, 'result': None})
+        with self.assertRaisesRegex(ValueError, 'Unexpected response'):
+            peer.await_notification('textDocument/publishDiagnostics', {'uri': 'file:///p/a'}, 3)
+
+    def test_notification_wait_uses_only_declared_root_normalization(self):
+        import queue
+        peer = replay.Peer.__new__(replay.Peer)
+        peer.queue, peer.traffic = queue.Queue(), []
+        message = {'method': 'textDocument/publishDiagnostics', 'params': {'uri': 'file:///tmp/p/tsconfig.json'}}
+        peer.queue.put(message)
+        peer.await_notification(message['method'], {'uri': '@PROJECT_ROOT_URI@/tsconfig.json'}, 1,
+                                replacements=[('file:///tmp/p', '@PROJECT_ROOT_URI@')])
+        self.assertEqual(peer.traffic, [message])
+
     def test_exact_comparison_witnesses(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory)

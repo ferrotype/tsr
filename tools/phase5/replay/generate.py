@@ -57,6 +57,11 @@ def generate():
         uri = '@PROJECT_ROOT_URI@/' + document
         query = {'textDocument': {'uri': uri}, 'position': {'$position': 'symbol'}}
         steps = []
+        waits = []
+        config_uri = '@PROJECT_ROOT_URI@/' + ('app/tsconfig.json' if name == 'references' else 'tsconfig.json')
+        def wait_for_diagnostics(count):
+            waits.append({'after': len(steps) - 1, 'method': 'textDocument/publishDiagnostics',
+                          'params': {'uri': config_uri}, 'count': count})
         def send(kind, method, params=None):
             step = {'kind': kind, 'method': method}
             if params is not None:
@@ -65,7 +70,9 @@ def generate():
         send('request', 'initialize', {'processId': None, 'initializationOptions': {'logVerbosity': 5}, 'rootUri': '@PROJECT_ROOT_URI@', 'capabilities': {'general': {'positionEncodings': ['@ENCODING@']}, 'textDocument': {'diagnostic': {}, 'completion': {'completionItem': {'resolveSupport': {'properties': ['documentation', 'detail']}}}}, 'workspace': {'configuration': True}}})
         send('notification', 'initialized', {})
         send('notification', 'textDocument/didOpen', {'textDocument': {'uri': uri, 'languageId': 'javascript' if js else 'typescript', 'version': 1, 'text': text}})
+        wait_for_diagnostics(1)
         send('request', 'textDocument/diagnostic', {'textDocument': {'uri': uri}})
+        wait_for_diagnostics(2)
         send('request', 'textDocument/completion', {'textDocument': {'uri': uri}, 'position': {'line': len(text.splitlines()) - 1, 'character': 4}})
         send('request', 'completionItem/resolve', {'$response': 2})
         for method in ('hover', 'definition', 'references', 'rename'):
@@ -83,10 +90,11 @@ def generate():
         changed_source = 'core/value0.ts' if name == 'references' else f'src/value0.{extension}'
         send('notification', 'workspace/didChangeWatchedFiles', {'changes': [{'uri': '@PROJECT_ROOT_URI@/tsconfig.json', 'type': 2}, {'uri': '@PROJECT_ROOT_URI@/' + changed_source, 'type': 2}]})
         send('request', 'textDocument/diagnostic', {'textDocument': {'uri': uri}})
+        wait_for_diagnostics(3)
         send('notification', 'textDocument/didClose', {'textDocument': {'uri': uri}})
         send('request', 'shutdown')
         send('notification', 'exit')
-        write(HOME / 'sessions' / f'{name}.jsonl', '\n'.join(json.dumps(row) for row in [{'fixture': name, 'projectRoot': '@PROJECT_ROOT@', 'projectRootUri': '@PROJECT_ROOT_URI@', 'positions': {'symbol': {'utf-8': {'line': 2, 'character': len('/*😀*/ an'.encode('utf-8'))}, 'utf-16': {'line': 2, 'character': len('/*😀*/ an'.encode('utf-16-le')) // 2}}}, 'mutations': [{'before': mutation_position, 'path': 'tsconfig.json', 'text': json.dumps({**json.loads((base / 'tsconfig.json').read_text()), 'compileOnSave': True}) + '\n'}, {'before': mutation_position, 'path': changed_source, 'text': 'export const value0 = 9;\n'}]}, *steps]) + '\n')
+        write(HOME / 'sessions' / f'{name}.jsonl', '\n'.join(json.dumps(row) for row in [{'fixture': name, 'notification_waits': waits, 'projectRoot': '@PROJECT_ROOT@', 'projectRootUri': '@PROJECT_ROOT_URI@', 'positions': {'symbol': {'utf-8': {'line': 2, 'character': len('/*😀*/ an'.encode('utf-8'))}, 'utf-16': {'line': 2, 'character': len('/*😀*/ an'.encode('utf-16-le')) // 2}}}, 'mutations': [{'before': mutation_position, 'path': 'tsconfig.json', 'text': json.dumps({**json.loads((base / 'tsconfig.json').read_text()), 'compileOnSave': True}) + '\n'}, {'before': mutation_position, 'path': changed_source, 'text': 'export const value0 = 9;\n'}]}, *steps]) + '\n')
 
 if __name__ == '__main__':
     generate()

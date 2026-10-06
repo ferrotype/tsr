@@ -69,7 +69,7 @@ def _source_selection(go, suite, stage):
     return dict(compiled_sources=sources, goos=host['GOOS'], goarch=host['GOARCH'])
 
 
-def prepare(suite, stage, release=True):
+def prepare(suite, stage, release=True, *, prebuilt_server=None, prebuilt_test2json=None):
     """Build once outside test deadlines; return serializable absolute paths."""
     if suite not in PACKAGES:
         raise ValueError(f'unknown suite: {suite}')
@@ -84,20 +84,31 @@ def prepare(suite, stage, release=True):
     selection = _source_selection(go, suite, stage)
     subprocess.run([go, 'test', '-overlay', str(patch), '-c', '-o', str(binary),
                     './internal/' + PACKAGES[suite]], cwd=upstream, env=env, check=True)
-    subprocess.run([go, 'build', '-o', str(test2json), 'cmd/test2json'], cwd=upstream, env=env, check=True)
-    command = ['cargo', 'build', '--locked', '-p', 'tsr_testhost', '--bin', 'phase5_testserver', '--message-format=json']
-    if release:
-        command.append('--release')
-    result = subprocess.run(command, cwd=ROOT, check=True, stdout=subprocess.PIPE, text=True)
-    artifacts = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
-    servers = [item['executable'] for item in artifacts
-               if item.get('reason') == 'compiler-artifact'
-               and item.get('target', {}).get('name') == 'phase5_testserver'
-               and item.get('executable')]
-    if len(servers) != 1:
-        raise RuntimeError(f'expected one private server artifact, got {servers}')
+    if prebuilt_test2json is None:
+        subprocess.run([go, 'build', '-o', str(test2json), 'cmd/test2json'], cwd=upstream, env=env, check=True)
+    else:
+        test2json = Path(prebuilt_test2json).resolve()
+        if not test2json.is_file():
+            raise ValueError('prebuilt test2json is missing')
+    if prebuilt_server is None:
+        command = ['cargo', 'build', '--locked', '-p', 'tsr_testhost', '--bin', 'phase5_testserver', '--message-format=json']
+        if release:
+            command.append('--release')
+        result = subprocess.run(command, cwd=ROOT, check=True, stdout=subprocess.PIPE, text=True)
+        artifacts = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
+        servers = [item['executable'] for item in artifacts
+                   if item.get('reason') == 'compiler-artifact'
+                   and item.get('target', {}).get('name') == 'phase5_testserver'
+                   and item.get('executable')]
+        if len(servers) != 1:
+            raise RuntimeError(f'expected one private server artifact, got {servers}')
+        server = Path(servers[0]).resolve()
+    else:
+        server = Path(prebuilt_server).resolve()
+        if not server.is_file():
+            raise ValueError('prebuilt private server is missing')
     prepared = dict(suite=suite, stage=str(stage), go=go, binary=str(binary),
-                    test2json=str(test2json), server=str(Path(servers[0]).resolve()), cwd=str(upstream))
+                    test2json=str(test2json), server=str(server), cwd=str(upstream))
     prepared.update(selection)
     # Validate the compiled roster before saving reusable preparation metadata.
     list_variants(suite, prepared)
@@ -139,8 +150,9 @@ def list_variants(suite, prepared):
 def _runtime_env(prepared, local, native):
     env = _go_env(prepared['stage'])
     # An inherited transport or fault selector must not contaminate native runs.
-    for key in ('TSR_LSP_SERVER', 'TSR_FAULT', 'TSR_BASELINE_LOCAL', 'TSGO_BASELINE_TRACKING_DIR'):
+    for key in ('TSR_LSP_SERVER', 'TSR_FAULT', 'TSR_BASELINE_LOCAL', 'TSGO_BASELINE_TRACKING_DIR', 'TSR_UPSTREAM_ROOT'):
         env.pop(key, None)
+    env['TSR_UPSTREAM_ROOT'] = prepared['cwd']
     if not native:
         env['TSR_LSP_SERVER'] = prepared['server']
     if local is not None:

@@ -17,7 +17,8 @@ allocation follows the user's authorization. On 2026-10-06 the owner explicitly
 approved section 2 items 1–3: count tests the native Go run executes, keep pinned
 skips visible, retain only owner-approved differences at closure, and give
 initial failing entries shared-cause reasons with no approval. This is approval
-of that policy, not of specific residuals; N is not yet measured. Other decisions
+of that policy, not of specific residuals. The first complete Darwin run measured
+N = 4,117 with 417 runtime skips; see PHASE5-L7.md. Other decisions
 and unmeasured estimates remain proposals.
 
 ## 1. What L7 has to deliver
@@ -142,7 +143,7 @@ construction in `check.py` move there, so `internal/lsp` and
 `internal/fourslash` share one patch; `check.py` keeps running its five tests
 through it.
 
-1. **Overlay, by anchored replacement.** Three pinned files are replaced in a
+1. **Overlay, by anchored replacement.** Four pinned files are replaced in a
    `go test -overlay`, each by a patch that fails when its anchor does not
    occur exactly once:
    - `internal/testutil/lsptestutil/lspclient.go`: transport selection, and
@@ -157,16 +158,26 @@ through it.
      `TestMain`) that emits the baseline's path and whether it matched, is new,
      was deleted or could not be written, before control returns to the test.
 
+   - `internal/repo/paths.go`: an explicit validated `TSR_UPSTREAM_ROOT` override
+     for relocating the built test binaries into CI shard checkouts; native
+     source discovery remains the fallback.
+
    `fourslash.go` needs no patch while the interface keeps the call shape of
    `InitComplete()`. No file under `internal/fourslash/tests` and no assertion
    is touched; a test asserts that.
-2. **Worker session.** One `phase5_testserver` per Go test process. A session
+2. **Worker session.** One retained `phase5_testserver` per Go test process,
+   with independent temporary servers for overlapping clients owned by the same
+   `testing.T`. The pin includes tests that defer closing several `NewFourslash`
+   clients and return to an earlier client (`completionsObjectLiteralMethod3`);
+   resetting or replacing that earlier session would change its assertions.
+   Temporary servers live only until their client's bounded cleanup completes,
+   and never replace the retained worker or share files, options or callbacks.
+   Different test owners still cannot attach concurrently. A session
    belongs to one `NewFourslash` call, which in six files is a nested parallel
    sub-test, not the top-level test; no top-level function opens a session
    before `t.Parallel()`. The caller attaches when `NewLSPClient` runs and
    releases on close with `test/reset`;
-   a lease mutex makes a second concurrent attach a harness failure rather
-   than a shared session. A lost connection or a reset that misses its
+   the lease guard rejects concurrent attachment by a different test owner. A lost connection or a reset that misses its
    deadline fails the active test, kills the server and starts a clean one
    for the next test. The fourslash package's Go `parseCache` is ignored in
    Rust mode; the server's retained cache is the only one.

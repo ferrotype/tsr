@@ -11,6 +11,7 @@ import tempfile
 import subprocess
 import threading
 import math
+import time
 
 ROOT = Path(__file__).resolve().parents[3]
 HOME = Path(__file__).resolve().parent
@@ -131,8 +132,13 @@ def exact_equal(left, right):
 
 
 class Peer(interop.Peer):
-    def __init__(self, command, cwd):
-        self.process = subprocess.Popen(command, cwd=cwd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    def __init__(self, command, cwd, stderr_path=None):
+        self.stderr_file = open(stderr_path, 'w+b') if stderr_path else tempfile.TemporaryFile()
+        try:
+            self.process = subprocess.Popen(command, cwd=cwd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=self.stderr_file)
+        except BaseException:
+            self.stderr_file.close()
+            raise
         self.queue = queue.Queue()
         self.id = 0
         self.traffic = []
@@ -160,14 +166,45 @@ class Peer(interop.Peer):
             self.respond(message)
 
     def close(self):
-        super().close()
-        for stream in (self.process.stdin, self.process.stdout, self.process.stderr):
-            stream.close()
+        try:
+            super().close()
+        finally:
+            for stream in (self.process.stdin, self.process.stdout, self.stderr_file):
+                stream.close()
+
+    def stderr_text(self):
+        self.stderr_file.seek(0)
+        return self.stderr_file.read().decode(errors='replace')
 
     def exchange(self, method, params=None, *, params_present=True):
         self.id += 1
         self.write({'id': self.id, 'method': method, **({'params': params} if params_present else {})})
         return self.await_response()
+
+    def await_notification(self, method, params, count, timeout=20, replacements=()):
+        """Synchronize the client without deleting or coalescing server traffic."""
+        if type(count) is not int or count < 1 or not isinstance(params, dict):
+            raise ValueError('Notification wait requires positive count and object params')
+        def matches(message):
+            message = substitute(message, replacements)
+            return ('id' not in message and message.get('method') == method
+                    and isinstance(message.get('params'), dict)
+                    and all(key in message['params'] and exact_equal(value, message['params'][key])
+                            for key, value in params.items()))
+        deadline = time.monotonic() + timeout
+        while sum(matches(message) for message in self.traffic) < count:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError(f'Notification wait expired: {method} #{count}')
+            try:
+                message = self.queue.get(timeout=remaining)
+            except queue.Empty as error:
+                raise TimeoutError(f'Notification wait expired: {method} #{count}') from error
+            if isinstance(message, Exception):
+                raise message
+            if 'method' not in message:
+                raise ValueError(f'Unexpected response during notification wait: {message!r}')
+            self.respond(message)
 
     def respond(self, value):
         self.traffic.append(value)
@@ -182,11 +219,15 @@ class Peer(interop.Peer):
             self.write({'id': value['id'], 'result': result})
 
 
-def normalize(raw, cwd):
+def root_replacements(cwd):
     replacements = [(cwd.as_uri(), '@PROJECT_ROOT_URI@'), (str(cwd), '@PROJECT_ROOT@')]
     if os.path.exists(str(cwd).lower()) and Path(str(cwd).lower()).samefile(cwd):
         replacements.extend([(cwd.as_uri().lower(), '@PROJECT_ROOT_URI@'), (str(cwd).lower(), '@PROJECT_ROOT@')])
-    value = substitute(raw, replacements)
+    return replacements
+
+
+def normalize(raw, cwd):
+    value = substitute(raw, root_replacements(cwd))
     value.pop('wire_frames', None)
     value.pop('received', None)  # Raw duplicates the correlated streams; retain it only in raw.json.
     for response in value['responses']:
@@ -235,6 +276,13 @@ def apply_mutations(cwd, mutations, position):
 def run(session, command, output, encoding='utf-16', fixture_root=None):
     lines = [strict_json(line) for line in session.read_text().splitlines() if line.strip()]
     header, steps = lines[0], lines[1:]
+    for wait in header.get('notification_waits', []):
+        if (set(wait) != {'after', 'method', 'params', 'count'}
+                or type(wait['after']) is not int or not 0 <= wait['after'] < len(steps)
+                or not isinstance(wait['method'], str) or not wait['method']
+                or not isinstance(wait['params'], dict)
+                or type(wait['count']) is not int or wait['count'] < 1):
+            raise ValueError('Invalid notification wait schedule')
     fixture = fixture_root or HOME / 'fixtures' / header['fixture']
     output.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='tsr-replay-') as directory:
@@ -244,8 +292,8 @@ def run(session, command, output, encoding='utf-16', fixture_root=None):
         for path in cwd.rglob('*'):
             if path.is_symlink() and not path.resolve().is_relative_to(cwd):
                 raise ValueError(f'Fixture symlink escapes root: {path}')
-        peer = Peer(command, cwd)
-        raw = {'encoding': encoding, 'responses': [], 'traffic': peer.traffic, 'received': peer.received, 'executed': peer.sent, 'wire_frames': peer.wire_frames}
+        peer = Peer(command, cwd, output / 'stderr.log')
+        raw = {'encoding': encoding, 'responses': [], 'traffic': peer.traffic, 'received': peer.received, 'executed': peer.sent, 'wire_frames': peer.wire_frames, 'waits': header.get('notification_waits', [])}
         try:
             for position, step in enumerate(steps):
                 apply_mutations(cwd, header.get('mutations', []), position)
@@ -268,9 +316,12 @@ def run(session, command, output, encoding='utf-16', fixture_root=None):
                     peer.write({'method': message['method'], **({'params': params} if 'params' in message else {})})
                 else:
                     raise ValueError(f'Unsupported session kind: {message["kind"]}')
+                for wait in header.get('notification_waits', []):
+                    if wait['after'] == position:
+                        peer.await_notification(wait['method'], wait['params'], wait['count'], replacements=root_replacements(cwd))
             peer.process.stdin.close()
             if peer.process.wait(timeout=20) != 0:
-                raise RuntimeError(peer.process.stderr.read().decode())
+                raise RuntimeError(peer.stderr_text())
             # EOF is a reader sentinel, not server traffic. Drain all frames emitted before exit.
             peer.thread.join(timeout=2)
             if peer.thread.is_alive():
@@ -287,8 +338,10 @@ def run(session, command, output, encoding='utf-16', fixture_root=None):
                     raise ValueError(f'Unanswered server request after exit: {message!r}')
                 peer.respond(message)
         finally:
-            (output / 'raw.json').write_text(json.dumps(raw, indent=2, ensure_ascii=False) + '\n')
-            peer.close()
+            try:
+                (output / 'raw.json').write_text(json.dumps(raw, indent=2, ensure_ascii=False) + '\n')
+            finally:
+                peer.close()
         transcript = normalize(raw, cwd)
         (output / 'transcript.json').write_text(json.dumps(transcript, indent=2, ensure_ascii=False) + '\n')
         return transcript

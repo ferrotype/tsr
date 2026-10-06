@@ -3,10 +3,36 @@
 `overlay.py` leaves upstream files untouched. The compiled test binary contains
 all pinned assertions. With `TSR_LSP_SERVER` unset it calls Go's server; with it
 set, the client uses the private Rust endpoint. Fourslash retains one Rust
-process across sequential sessions and resets it before reattachment. A broken
+process across sequential sessions and resets it before reattachment. Pinned
+cases that keep multiple clients alive under the same `testing.T` receive
+independent temporary servers for the additional clients; these close with the
+client and preserve the primary session. Different test owners cannot attach
+concurrently. A broken
 reset retires the worker. The original mapper spawner still handles mapper
 requests. Project-state rendering uses the original writer with the checked
 projection decoder from `tools/phase5/project`.
+
+The transport applies FIFO backpressure after each 32 client notifications
+through `test/barrier`. This private action does not read a snapshot or change
+session state. It keeps the existing 64-operation endpoint bound intact. The
+client waits after releasing its write mutex so filesystem and mapper callback
+replies can progress while earlier notifications drain.
+
+Four pinned files receive anchored access patches: `lsptestutil/lspclient.go`
+selects the transport, `fourslash/statebaseline.go` reads the state projection,
+`baseline/baseline.go` reports comparison outcomes, and `repo/paths.go` accepts
+`TSR_UPSTREAM_ROOT` for downloaded test binaries. The last patch replaces the
+build host's absolute fixture root with the execution checkout; it requires an
+absolute path containing `go.mod`. Without that variable, the original Go root
+lookup remains intact. No test or reference baseline is overlaid.
+
+CI builds both Go assertion binaries, `test2json` and one release Rust server in
+`phase5-runner`, then uploads a bundle. `bundle.py relocate` verifies executable
+hashes, restores permissions and writes prepared manifests for the destination
+checkout. Shards need the binaries and submodule fixture files; the pinned Go
+installation is confined to the build job. Four fourslash shards each use one
+retained worker, and the LSP shard uses fresh processes per test. Their merged
+results are checked against the existing suite expectation files.
 
 Prepare once, outside test deadlines (the command reports Cargo's executable,
 including a custom `CARGO_TARGET_DIR`):

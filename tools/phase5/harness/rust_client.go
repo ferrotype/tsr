@@ -37,7 +37,10 @@ type rustWorker struct {
 	exited chan struct{}
 }
 
-var rustLease sync.Mutex
+var rustOwnerMu sync.Mutex
+var rustOwner *testing.T
+var rustClients int
+var rustPrimaryAttached bool
 var retainedWorker *rustWorker
 
 // The worker reader outlives clients. A client router ends at the reset barrier,
@@ -102,9 +105,11 @@ func (w *rustWorker) retire() {
 }
 
 type rustServer struct {
-	ready  chan struct{}
-	client *LSPClient
-	t      *testing.T
+	notificationMu sync.Mutex
+	notifications  int
+	ready          chan struct{}
+	client         *LSPClient
+	t              *testing.T
 }
 
 func (s *rustServer) InitComplete() <-chan struct{} { return s.ready }
@@ -119,6 +124,26 @@ func (s *rustServer) request(method string, params any) *lsproto.ResponseMessage
 }
 func (s *rustServer) ProjectState(t *testing.T) json.Value {
 	return s.request("test/projectState", map[string]any{}).Result.(json.Value)
+}
+
+// Called from WriteMsg after JSON validation. Its mutex is independent of
+// writeToServer's mutex: callback replies can be sent while the fence waits.
+func rustWriteNotification(t *testing.T, client *LSPClient, message *lsproto.Message) bool {
+	server, rust := client.Server.(*rustServer)
+	if !rust || message.Kind != jsonrpc.MessageKindNotification {
+		return false
+	}
+	server.notificationMu.Lock()
+	defer server.notificationMu.Unlock()
+	if err := client.writeToServer(message); err != nil {
+		t.Fatalf("failed to write message: %v", err)
+	}
+	server.notifications++
+	if server.notifications == 32 {
+		server.request("test/barrier", map[string]any{})
+		server.notifications = 0
+	}
+	return true
 }
 
 // Access-only helper used by the carried state writer; native servers keep the
@@ -231,10 +256,35 @@ func (r *rustReader) Read() (*lsproto.Message, error) {
 }
 func newRustClient(t *testing.T, opts lsp.ServerOptions, handler ServerRequestHandler) (*LSPClient, func() error) {
 	t.Helper()
-	if !rustLease.TryLock() {
-		t.Fatal("concurrent private sessions: run with -test.parallel=1")
+	rustOwnerMu.Lock()
+	if rustOwner != nil && rustOwner != t {
+		rustOwnerMu.Unlock()
+		t.Fatal("concurrent private test owners: run with -test.parallel=1")
 	}
-	worker := retainedWorker
+	// Some pinned tests retain several NewFourslash clients and later return
+	// to an earlier one. Those sessions require independent servers.
+	temporary := rustPrimaryAttached
+	rustOwner = t
+	rustClients++
+	if !temporary {
+		rustPrimaryAttached = true
+	}
+	rustOwnerMu.Unlock()
+	releaseLease := func() {
+		rustOwnerMu.Lock()
+		defer rustOwnerMu.Unlock()
+		rustClients--
+		if !temporary {
+			rustPrimaryAttached = false
+		}
+		if rustClients == 0 {
+			rustOwner = nil
+		}
+	}
+	var worker *rustWorker
+	if !temporary {
+		worker = retainedWorker
+	}
 	if worker != nil {
 		worker.mu.Lock()
 		failed := worker.err != nil
@@ -248,10 +298,12 @@ func newRustClient(t *testing.T, opts lsp.ServerOptions, handler ServerRequestHa
 		var err error
 		worker, err = startRustWorker()
 		if err != nil {
-			rustLease.Unlock()
+			releaseLease()
 			t.Fatal(err)
 		}
-		retainedWorker = worker
+		if !temporary {
+			retainedWorker = worker
+		}
 	}
 	session := &rustSession{frames: make(chan rustFrame, 64), done: make(chan struct{})}
 	worker.mu.Lock()
@@ -367,7 +419,9 @@ func newRustClient(t *testing.T, opts lsp.ServerOptions, handler ServerRequestHa
 			endSession()
 			if closeError != nil {
 				worker.retire()
-				retainedWorker = nil
+				if !temporary {
+					retainedWorker = nil
+				}
 			}
 			worker.mu.Lock()
 			worker.active = nil
@@ -385,9 +439,14 @@ func newRustClient(t *testing.T, opts lsp.ServerOptions, handler ServerRequestHa
 			}
 			if closeError != nil {
 				worker.retire()
-				retainedWorker = nil
+				if !temporary {
+					retainedWorker = nil
+				}
 			}
-			rustLease.Unlock()
+			if temporary && closeError == nil {
+				worker.retire()
+			}
+			releaseLease()
 		})
 		return closeError
 	}

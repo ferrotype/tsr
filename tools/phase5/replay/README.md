@@ -59,16 +59,22 @@ Sessions request supported initialization log verbosity 5 (errors only). Logs
 remain compared exactly; informational performance logs are prevented at source.
 The completion scenario asks for a single object property because the pin’s global
 completion array order varied between repeated Go captures. Arrays are never sorted.
-Two tiny Go captures per fixture compared equally. One references attempt exited
-with `context canceled`; a second pair completed and compared equally. The checkjs
-Go/Rust request results and non-diagnostic traffic matched in the bounded checkjs
-capture, but pushed config diagnostics differed: Go published 32 diagnostics twice;
-Rust published 22, then 32, then two empty lists. Rust’s first publication lacked
-ten missing-global-type diagnostics (code 2318). An enabled-validation control
-also differed (Go counts 32/32/32, Rust 22/32/22/32), separating accumulated-global
-publication timing from validation clearing. Raw mismatches are retained and block
-accepted expectations until reviewed. After strict reader/comparator changes, one
-additional Go checkjs pair matched with executed-message comparison enabled.
-After the dependency/Unicode fixture updates, repeated Go captures matched for
-all three fixtures in both UTF-8 and UTF-16. This harness
-is supporting evidence, not full corpus credit or a parity acceptance claim.
+The header's `notification_waits` schedule waits for the configured project's
+first publication after open, the accumulated-global publication after the first
+pull, and validation clearing after the disabled pull. This is client scheduling,
+not output normalization: all notifications, their contents and their order remain
+compared. Waiting applies the same verified scratch-root normalization as replay;
+it never case-folds document paths independently. A missing publication times out.
+
+The initial unsynchronized check-JS captures differed: Go published counts 32/32,
+while Rust published 22/32/0/0. A direct native probe waiting after open observes
+22, then 32 after checking: the first-count difference was background scheduling,
+not missing global diagnostics. Rust did also clear twice; validation is now
+captured with each immutable project snapshot, matching the pin's publication
+transition. The synchronized fixture observes 22/32/0 on both runtimes.
+
+After these changes all three fixtures compare equally in UTF-8 and UTF-16 on
+both native and Rust servers. Raw stderr is retained separately without a bounded
+pipe that can block the server. Raw-output failures still retire the child. This
+is bounded replay verification, not a quiet-host latency result or full corpus
+closure.
