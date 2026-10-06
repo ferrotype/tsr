@@ -47,14 +47,6 @@
       "reason": "auto-import-baseline-symptom",
       "detail": "fourslash/autoImports/autoImportDefaultPascalCaseReexportCaseInsensitive.baseline.md: -import ChargerHeader from \"../components\"; | +import chargerheader from \"../components\"; | +```tsx | +import ChargerHeader from \"../components/ChargerHeader\";"
     },
-    "fourslash/TestAutoImportFileExcludePatterns": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/autoImports/autoImportFileExcludePatterns.baseline.md has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestAutoImportFileExcludePatterns/baseline/TestAutoImportFileExcludePatterns/fourslash%2FautoImports%2FautoImportFileExcludePatterns.baseline.md": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "fourslash/autoImports/autoImportFileExcludePatterns.baseline.md: -import { mySymbol } from \"./foo\"; | +import { mySymbol } from \"./foo\""
-    },
     "fourslash/TestAutoImportModuleAugmentation": {
       "reason": "auto-import-baseline-symptom",
       "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/autoImports/autoImportModuleAugmentation.baseline.md has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
@@ -90,14 +82,6 @@
     "fourslash/TestAutoImportRelativePathToMonorepoPackage": {
       "reason": "import-action-selection-or-edit-symptom",
       "detail": "autoImportRelativePathToMonorepoPackage_test.go:35: Module specifier mismatch at index 0. | Expected: [./packages/utils/dist/index.js] | Actual: [./packages/app/node_modules/utils/dist/index.js]"
-    },
-    "fourslash/TestAutoImportSpecifierExcludeRegexes": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/autoImports/autoImportSpecifierExcludeRegexes.baseline.md has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestAutoImportSpecifierExcludeRegexes/baseline/TestAutoImportSpecifierExcludeRegexes/fourslash%2FautoImports%2FautoImportSpecifierExcludeRegexes.baseline.md": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "fourslash/autoImports/autoImportSpecifierExcludeRegexes.baseline.md: -import { mySymbol } from \"./foo\"; | +import { mySymbol } from \"./foo\""
     },
     "fourslash/TestAutoImportSymlinkedMonorepo": {
       "reason": "auto-import-baseline-symptom",
@@ -155,14 +139,6 @@
       "reason": "import-action-selection-or-edit-symptom",
       "detail": "autoImportTypeImport5_test.go:44: assertion failed: | --- expected | +++ actual | @@ -1,3 +1,3 @@ | -import { type x, type X, type Y, type Z } from \"./exports1\"; | +import { type X, type x, type Y, type Z } from \"./exports1\"; | const foo: x;"
     },
-    "fourslash/TestCallHierarchyAcrossProject": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/callHierarchyAcrossProject.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestCallHierarchyAcrossProject/baseline/TestCallHierarchyAcrossProject/fourslash%2Fstate%2FcallHierarchyAcrossProject.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/callHierarchyAcrossProject.baseline: -      /projects/container/tsconfig.json                 | -      /projects/container/tsconfig.json        | -  [/projects/container/lib/tsconfig.json] *modified* | -    RetainingProjects: *modified*"
-    },
     "fourslash/TestClassMemberCompletionKeepsNameFallback": {
       "reason": "completion-items-or-fields-symptom",
       "detail": "fourslash.go:1526: At marker 'a': Includes completion item mismatch for label value: | &lsproto.CompletionItem{ | ... // 3 ignored and 7 identical fields | - \tInsertText:       &\"public value: string;\", | + \tInsertText:       &\"value\", | InsertTextFormat: nil, | InsertTextMode:   nil,"
@@ -186,14 +162,6 @@
     "fourslash/TestCodeFixClassImplementInterfacePropertyFromParentConstructorFunction": {
       "reason": "code-fix-edit-or-availability-symptom",
       "detail": "codeFixClassImplementInterfacePropertyFromParentConstructorFunction_test.go:20: Expected no code fixes, but got: [Implement interface 'A']"
-    },
-    "fourslash/TestCodeLensAcrossProjects": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/codeLensAcrossProjects.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestCodeLensAcrossProjects/baseline/TestCodeLensAcrossProjects/fourslash%2Fstate%2FcodeLensAcrossProjects.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/codeLensAcrossProjects.baseline: -      /projects/container/tsconfig.json                 | -      /projects/container/tsconfig.json        | -  [/projects/container/lib/tsconfig.json] *modified* | -    RetainingProjects: *modified*"
     },
     "fourslash/TestCompletionAfterNewline2": {
       "reason": "completion-context-eligibility-symptom",
@@ -247,14 +215,6 @@
       "reason": "completion-items-or-fields-symptom",
       "detail": "fourslash.go:1556: At marker '1': Completion item mismatch for label await: | &lsproto.CompletionItem{ | ... // 3 ignored and 7 identical fields | - \tInsertText:       nil, | + \tInsertText:       &\"await as await_\", | InsertTextFormat: nil, | InsertTextMode:   nil,"
     },
-    "fourslash/TestCompletionInTernaryConditional": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1507: At marker '1': Label 'Foo' not found in actual items."
-    },
-    "fourslash/TestCompletionListAfterClassExtends": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1502: At marker '': Label 'Bleah' not found in actual items."
-    },
     "fourslash/TestCompletionListAfterPropertyName": {
       "reason": "completion-context-eligibility-symptom",
       "detail": "fourslash.go:1356: At marker 'inConstructorParameterAfterModifier': Expected completion list but got nil."
@@ -279,10 +239,6 @@
       "reason": "completion-items-or-fields-symptom",
       "detail": "fourslash.go:1426: At marker '': Expected 3 exact completion items but got 2."
     },
-    "fourslash/TestCompletionListForUnicodeEscapeName": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1502: At marker '3': Label 'C' not found in actual items."
-    },
     "fourslash/TestCompletionListInExportClause01": {
       "reason": "completion-context-eligibility-symptom",
       "detail": "fourslash.go:1364: At marker '7': Expected nil completion list but got non-nil:   any( | - \t&lsproto.CompletionList{ | - \t\tItemDefaults: &lsproto.CompletionItemDefaults{CommitCharacters: &[]string{\".\", \",\", \";\"}}, | - \t\tItems: []*lsproto.CompletionItem{ | - \t\t\t&{ | - \t\t\t\tLabel:    \"type\", | - \t\t\t\tKind:     s\"Keyword\","
@@ -295,53 +251,9 @@
       "reason": "completion-context-eligibility-symptom",
       "detail": "fourslash.go:1356: At marker '8': Expected completion list but got nil."
     },
-    "fourslash/TestCompletionListInObjectBindingPattern13": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1426: At marker '': Expected 2 exact completion items but got 3."
-    },
-    "fourslash/TestCompletionListInObjectBindingPattern14": {
-      "reason": "completion-context-eligibility-symptom",
-      "detail": "fourslash.go:1364: At marker '': Expected nil completion list but got non-nil:   any( | - \t&lsproto.CompletionList{ | - \t\tItemDefaults: &lsproto.CompletionItemDefaults{ | - \t\t\tCommitCharacters: &[]string{\".\", \",\", \";\"}, | - \t\t\tEditRange:        &lsproto.RangeOrEditRangeWithInsertReplace{EditRangeWithInsertReplace: &lsproto.EditRangeWithInsertReplace{...}}, | - \t\t}, | - \t\tItems: []*lsproto.CompletionItem{"
-    },
-    "fourslash/TestCompletionListInObjectBindingPattern15": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1492: At marker '2': Additional completions found but not included in 'unsorted': length | toString | apply | arguments | call | name | �@hasInstance@22"
-    },
     "fourslash/TestCompletionListInTemplateLiteralPartsNegatives1": {
       "reason": "completion-context-eligibility-symptom",
       "detail": "fourslash.go:1364: At marker '0': Expected nil completion list but got non-nil:   any( | - \t&lsproto.CompletionList{ | - \t\tItemDefaults: &lsproto.CompletionItemDefaults{CommitCharacters: &[]string{\".\", \",\", \";\"}}, | - \t\tItems: []*lsproto.CompletionItem{ | - \t\t\t&{ | - \t\t\t\tLabel:    \"AbortController\", | - \t\t\t\tKind:     s\"Variable\","
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter1": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1449: At marker '': Label 'one' not found in actual items."
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter10": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1449: At marker '0': Label 'one' not found in actual items."
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter11": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1449: At marker '0': Label 'one' not found in actual items."
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter12": {
-      "reason": "completion-commit-characters-symptom",
-      "detail": "fourslash.go:1385: At marker '0': ItemDefaults mismatch: CommitCharacters mismatch:: | &[]string{ | - \t\".\", | - \t\",\", | - \t\";\", | }"
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter13": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1449: At marker '0': Label 'one' not found in actual items."
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter14": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1449: At marker '0': Label 'one' not found in actual items."
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter15": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1449: At marker '0': Label 'one' not found in actual items."
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter16": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1449: At marker '0': Label 'one' not found in actual items."
     },
     "fourslash/TestCompletionListInTypeLiteralInTypeParameter17": {
       "reason": "completion-items-or-fields-symptom",
@@ -351,10 +263,6 @@
       "reason": "completion-context-eligibility-symptom",
       "detail": "fourslash.go:1356: At marker '0': Expected completion list but got nil."
     },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter2": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1426: At marker '': Expected 2 exact completion items but got 1."
-    },
     "fourslash/TestCompletionListInTypeLiteralInTypeParameter20": {
       "reason": "completion-context-eligibility-symptom",
       "detail": "fourslash.go:1356: At marker '0': Expected completion list but got nil."
@@ -362,30 +270,6 @@
     "fourslash/TestCompletionListInTypeLiteralInTypeParameter21": {
       "reason": "completion-items-or-fields-symptom",
       "detail": "fourslash.go:1502: At marker '0': Label '\"one\"' not found in actual items."
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter3": {
-      "reason": "completion-commit-characters-symptom",
-      "detail": "fourslash.go:1385: At marker '': ItemDefaults mismatch: CommitCharacters mismatch:: | &[]string{ | - \t\".\", | - \t\",\", | - \t\";\", | }"
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter4": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1552: At marker '': Label mismatch: | string( | - \t\"readonly\", | + \t\"two\", | )"
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter5": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1426: At marker '': Expected 2 exact completion items but got 1."
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter6": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1426: At marker '': Expected 2 exact completion items but got 1."
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter7": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1552: At marker '': Label mismatch: | string( | - \t\"readonly\", | + \t\"three\", | )"
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter8": {
-      "reason": "completion-commit-characters-symptom",
-      "detail": "fourslash.go:1385: At marker '4': ItemDefaults mismatch: CommitCharacters mismatch:: | &[]string{ | - \t\".\", | - \t\",\", | - \t\";\", | }"
     },
     "fourslash/TestCompletionListInTypeParameterOfClassExpression1": {
       "reason": "completion-context-eligibility-symptom",
@@ -402,10 +286,6 @@
     "fourslash/TestCompletionListObjectMembersInTypeLocationWithTypeof": {
       "reason": "completion-items-or-fields-symptom",
       "detail": "fourslash.go:1526: At marker '2': Includes completion item mismatch for label dance: | &lsproto.CompletionItem{ | ... // 3 ignored and 7 identical fields | - \tInsertText:       &\"?.dance\", | + \tInsertText:       nil, | InsertTextFormat: nil, | InsertTextMode:   nil,"
-    },
-    "fourslash/TestCompletionListOnParamInClass": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1502: At marker '': Label 'encoder' not found in actual items."
     },
     "fourslash/TestCompletionsAfterJSDoc": {
       "reason": "completion-commit-characters-symptom",
@@ -519,217 +399,25 @@
       "reason": "completion-items-or-fields-symptom",
       "detail": "fourslash.go:1426: At marker '': Expected 1 exact completion items but got 2."
     },
-    "fourslash/TestCompletionsWrappedClass": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1426: At marker 'a': Expected 2 exact completion items but got 3."
-    },
-    "fourslash/TestContentMapperAutoImportAfterSynthesizedSupplementalPrefix": {
-      "reason": "completion-context-eligibility-symptom",
-      "detail": "fourslash.go:1356: At marker '': Expected completion list but got nil."
-    },
-    "fourslash/TestContentMapperAutoImportAtHoistedImportBoundary": {
-      "reason": "completion-code-action-edit-symptom",
-      "detail": "contentMapperAutoImports_test.go:306: assertion failed: | --- f.getScriptInfo(f.activeFilename).content | +++ options.NewFileContent | @@ -1,5 +1,5 @@ | <script·lang=\"ts\"> | ··import·{·helper·}·from·\"./aaa\"; | -import·{·existing·}·from·\"./dep\";"
-    },
-    "fourslash/TestContentMapperAutoImportsAfterSynthesizedHeader": {
-      "reason": "other-assertion-symptom",
-      "detail": "contentMapperAutoImports_test.go:141: Code action 'helper' from source './dep' not found."
-    },
-    "fourslash/TestContentMapperCompletionEditRange": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1502: At marker 'completion': Label 'foo' not found in actual items."
-    },
-    "fourslash/TestContentMapperFormatsEachSupplementalVerbatimRange": {
-      "reason": "mapper-formatting-edit-symptom",
-      "detail": "contentMapperEditSafety_test.go:342: assertion failed: | --- actualContent | +++ expectedContent | @@ -1,3 +1,3 @@ | -function·first(){return·1;} | -function·second(){return·2;} | +function·first()·{·return·1;·}"
-    },
-    "fourslash/TestContentMapperFormatsOnlyFirstOverlappingProjection": {
-      "reason": "mapper-formatting-edit-symptom",
-      "detail": "contentMapperEditSafety_test.go:378: assertion failed: | --- actualContent | +++ expectedContent | @@ -1,4 +1,4 @@ | function·first()·{·return·1;·} | function·second()·{·return·2;·} | -function·third(){return·3;}"
-    },
-    "fourslash/TestContentMapperFormatsSupplementalOriginalSelection": {
-      "reason": "mapper-formatting-edit-symptom",
-      "detail": "contentMapperEditSafety_test.go:403: assertion failed: | --- actualContent | +++ expectedContent | @@ -1,3 +1,3 @@ | function·first(){return·1;} | -function·second(){return·2;} | +function·second()·{·return·2;·}"
-    },
-    "fourslash/TestContentMapperFormatsSupplementalVerbatimRange": {
-      "reason": "mapper-formatting-edit-symptom",
-      "detail": "contentMapperEditSafety_test.go:288: assertion failed: | --- actualContent | +++ expectedContent | @@ -1,4 +1,4 @@ | -function·outer(){ | -const·value={a:1}; | +function·outer()·{"
-    },
-    "fourslash/TestContentMapperSupplementalAutoImports": {
-      "reason": "completion-context-eligibility-symptom",
-      "detail": "fourslash.go:1356: At marker '': Expected completion list but got nil."
-    },
-    "fourslash/TestContentMapperSupplementalCodeLens": {
-      "reason": "navigation-or-display-baseline-symptom",
-      "detail": "fourslash.go:2682: Expected at least one code lens in any open file, but got none."
-    },
-    "fourslash/TestContentMapperSupplementalCodeLens/baseline/TestContentMapperSupplementalCodeLens/fourslash%2FcodeLenses%2FcontentMapperSupplementalCodeLens.baseline.jsonc": {
-      "reason": "navigation-or-display-baseline-symptom",
-      "detail": "Native observation missing from Rust execution; parent group navigation-or-display-baseline-symptom. No Rust baseline bytes produced for fourslash/codeLenses/contentMapperSupplementalCodeLens.baseline.jsonc"
-    },
-    "fourslash/TestContentMapperSupplementalDefinition": {
-      "reason": "navigation-or-display-baseline-symptom",
-      "detail": "fourslash.go:4182: Expected hover result at marker 'use' but got nil | baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/goToDefinition/contentMapperSupplementalDefinition.baseline.jsonc has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestContentMapperSupplementalDefinition/baseline/TestContentMapperSupplementalDefinition/fourslash%2FfindAllReferences%2FcontentMapperSupplementalDefinition.baseline.jsonc": {
-      "reason": "navigation-or-display-baseline-symptom",
-      "detail": "Native observation missing from Rust execution; parent group navigation-or-display-baseline-symptom. No Rust baseline bytes produced for fourslash/findAllReferences/contentMapperSupplementalDefinition.baseline.jsonc"
-    },
-    "fourslash/TestContentMapperSupplementalDefinition/baseline/TestContentMapperSupplementalDefinition/fourslash%2FgoToDefinition%2FcontentMapperSupplementalDefinition.baseline.jsonc": {
-      "reason": "navigation-or-display-baseline-symptom",
-      "detail": "fourslash/goToDefinition/contentMapperSupplementalDefinition.baseline.jsonc: -// <|const [|supplementalValue|] = 1;|> | +// const supplementalValue = 1;"
-    },
-    "fourslash/TestContentMapperSupplementalDocumentSymbols": {
-      "reason": "navigation-or-display-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/documentSymbols/contentMapperSupplementalDocumentSymbols.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestContentMapperSupplementalDocumentSymbols/baseline/TestContentMapperSupplementalDocumentSymbols/fourslash%2FdocumentSymbols%2FcontentMapperSupplementalDocumentSymbols.baseline": {
-      "reason": "navigation-or-display-baseline-symptom",
-      "detail": "fourslash/documentSymbols/contentMapperSupplementalDocumentSymbols.baseline: -// === /app.astro === | -// <|export function [|{| name: supplementalSymbol, kind: Function |}supplementalSymbol|]() {}|> | -//  | +"
-    },
-    "fourslash/TestContentMapperSupplementalFoldingRanges": {
-      "reason": "folding-range-symptom",
-      "detail": "Failed enclosing test; diagnostic retained in raw result/event output."
-    },
-    "fourslash/TestContentMapperSupplementalHoverJSDocLink": {
-      "reason": "hover-result-symptom",
-      "detail": "fourslash.go:4182: Expected hover result at marker 'hover' but got nil"
-    },
-    "fourslash/TestContentMapperSupplementalImplementationCodeLens": {
-      "reason": "navigation-or-display-baseline-symptom",
-      "detail": "fourslash.go:2682: Expected at least one code lens in any open file, but got none."
-    },
-    "fourslash/TestContentMapperSupplementalImplementationCodeLens/baseline/TestContentMapperSupplementalImplementationCodeLens/fourslash%2FcodeLenses%2FcontentMapperSupplementalImplementationCodeLens.baseline.jsonc": {
-      "reason": "navigation-or-display-baseline-symptom",
-      "detail": "Native observation missing from Rust execution; parent group navigation-or-display-baseline-symptom. No Rust baseline bytes produced for fourslash/codeLenses/contentMapperSupplementalImplementationCodeLens.baseline.jsonc"
-    },
-    "fourslash/TestContentMapperSupplementalSignatureHelpJSDocLink": {
-      "reason": "other-assertion-symptom",
-      "detail": "contentMapperSignatureHelp_test.go:70: At marker 'call': Could not get signature help"
-    },
-    "fourslash/TestCorreuptedTryExpressionsDontCrashGettingOutlineSpans": {
-      "reason": "folding-range-symptom",
-      "detail": "Failed enclosing test; diagnostic retained in raw result/event output."
-    },
     "fourslash/TestDeclarationMapTestCasesForMaps": {
       "reason": "project-state-retention-baseline-symptom",
       "detail": "Failed enclosing test; diagnostic retained in raw result/event output."
-    },
-    "fourslash/TestDeclarationMapTestCasesForMaps/baseline/TestDeclarationMapTestCasesForMaps%2FTestDeclarationMapsFindAllRefs/fourslash%2Fstate%2FdeclarationMapsFindAllRefs.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/declarationMapsFindAllRefs.baseline: +Projects:: | +  [/a/tsconfig.json]  | +    /a/a.ts   | +  [/dev/null/inferred] *deleted*"
     },
     "fourslash/TestDeclarationMapTestCasesForMaps/baseline/TestDeclarationMapTestCasesForMaps%2FTestDeclarationMapsFindAllRefsStartingAtDefinition/fourslash%2Fstate%2FdeclarationMapsFindAllRefsStartingAtDefinition.baseline": {
       "reason": "project-state-retention-baseline-symptom",
       "detail": "fourslash/state/declarationMapsFindAllRefsStartingAtDefinition.baseline: +Projects:: | +  [/a/tsconfig.json]  | +    /a/a.ts   | +  [/dev/null/inferred] *modified*"
     },
-    "fourslash/TestDeclarationMapTestCasesForMaps/baseline/TestDeclarationMapTestCasesForMaps%2FTestDeclarationMapsFindAllRefsTargetDoesNotExist/fourslash%2Fstate%2FdeclarationMapsFindAllRefsTargetDoesNotExist.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/declarationMapsFindAllRefsTargetDoesNotExist.baseline: +Projects:: | +  [/dev/null/inferred] *deleted* | +    /a/bin/a.d.ts   | +    /b/bin/b.d.ts  "
-    },
-    "fourslash/TestDeclarationMapTestCasesForMaps/baseline/TestDeclarationMapTestCasesForMaps%2FTestDeclarationMapsRename/fourslash%2Fstate%2FdeclarationMapsRename.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/declarationMapsRename.baseline: +Projects:: | +  [/a/tsconfig.json]  | +    /a/a.ts   | +  [/dev/null/inferred] *deleted*"
-    },
     "fourslash/TestDeclarationMapTestCasesForMaps/baseline/TestDeclarationMapTestCasesForMaps%2FTestDeclarationMapsRenameStartingAtDefinition/fourslash%2Fstate%2FdeclarationMapsRenameStartingAtDefinition.baseline": {
       "reason": "project-state-retention-baseline-symptom",
       "detail": "fourslash/state/declarationMapsRenameStartingAtDefinition.baseline: +Projects:: | +  [/a/tsconfig.json]  | +    /a/a.ts   | +  [/dev/null/inferred] *modified*"
-    },
-    "fourslash/TestDeclarationMapTestCasesForMaps/baseline/TestDeclarationMapTestCasesForMaps%2FTestDeclarationMapsRenameTargetDoesNotExist/fourslash%2Fstate%2FdeclarationMapsRenameTargetDoesNotExist.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/declarationMapsRenameTargetDoesNotExist.baseline: +Projects:: | +  [/dev/null/inferred] *deleted* | +    /a/bin/a.d.ts   | +    /b/bin/b.d.ts  "
-    },
-    "fourslash/TestDeclarationMapTestCasesForMaps/subtest/TestDeclarationMapsFindAllRefs": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/declarationMapsFindAllRefs.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
     },
     "fourslash/TestDeclarationMapTestCasesForMaps/subtest/TestDeclarationMapsFindAllRefsStartingAtDefinition": {
       "reason": "project-state-retention-baseline-symptom",
       "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/declarationMapsFindAllRefsStartingAtDefinition.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
     },
-    "fourslash/TestDeclarationMapTestCasesForMaps/subtest/TestDeclarationMapsFindAllRefsTargetDoesNotExist": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/declarationMapsFindAllRefsTargetDoesNotExist.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestDeclarationMapTestCasesForMaps/subtest/TestDeclarationMapsRename": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/declarationMapsRename.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
     "fourslash/TestDeclarationMapTestCasesForMaps/subtest/TestDeclarationMapsRenameStartingAtDefinition": {
       "reason": "project-state-retention-baseline-symptom",
       "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/declarationMapsRenameStartingAtDefinition.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestDeclarationMapTestCasesForMaps/subtest/TestDeclarationMapsRenameTargetDoesNotExist": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/declarationMapsRenameTargetDoesNotExist.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestDeclarationMapsRename": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "Failed enclosing test; diagnostic retained in raw result/event output."
-    },
-    "fourslash/TestDeclarationMapsRename/baseline/TestDeclarationMapsRename%2FTestDeclarationMapsRenameWithDisableSourceOfProjectReferenceRedirect/fourslash%2Fstate%2FdeclarationMapsRenameWithDisableSourceOfProjectReferenceRedirect.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/declarationMapsRenameWithDisableSourceOfProjectReferenceRedirect.baseline: -  [/myproject/dependency/tsconfig.json] *modified* | -    RetainingProjects: *modified* | +  [/myproject/dependency/tsconfig.json]  | +    RetainingProjects:"
-    },
-    "fourslash/TestDeclarationMapsRename/baseline/TestDeclarationMapsRename%2FTestDeclarationMapsRenameWithDisableSourceOfProjectReferenceRedirectEdit/fourslash%2Fstate%2FdeclarationMapsRenameWithDisableSourceOfProjectReferenceRedirectEdit.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/declarationMapsRenameWithDisableSourceOfProjectReferenceRedirectEdit.baseline: -  [/myproject/dependency/tsconfig.json] *modified* | -    RetainingProjects: *modified* | +  [/myproject/dependency/tsconfig.json]  | +    RetainingProjects:"
-    },
-    "fourslash/TestDeclarationMapsRename/baseline/TestDeclarationMapsRename%2FTestDeclarationMapsRenameWithProjectReferences/fourslash%2Fstate%2FdeclarationMapsRenameWithProjectReferences.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/declarationMapsRenameWithProjectReferences.baseline: -  [/myproject/dependency/tsconfig.json] *modified* | -    RetainingProjects: *modified* | -      /myproject/dependency/tsconfig.json   | -      /myproject/main/tsconfig.json        *new*"
-    },
-    "fourslash/TestDeclarationMapsRename/baseline/TestDeclarationMapsRename%2FTestDeclarationMapsRenameWithProjectReferencesEdit/fourslash%2Fstate%2FdeclarationMapsRenameWithProjectReferencesEdit.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/declarationMapsRenameWithProjectReferencesEdit.baseline: -  [/myproject/dependency/tsconfig.json] *modified* | -    RetainingProjects: *modified* | +  [/myproject/dependency/tsconfig.json]  | +    RetainingProjects:"
-    },
-    "fourslash/TestDeclarationMapsRename/baseline/TestDeclarationMapsRename%2FTestDeclarationMapsRenameWithSourceMaps/fourslash%2Fstate%2FdeclarationMapsRenameWithSourceMaps.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/declarationMapsRenameWithSourceMaps.baseline: -  [/myproject/dependency/tsconfig.json] *modified* | -    RetainingProjects: *modified* | -      /myproject/dependency/tsconfig.json   | -      /myproject/tsconfig.json             *new*"
-    },
-    "fourslash/TestDeclarationMapsRename/baseline/TestDeclarationMapsRename%2FTestDeclarationMapsRenameWithSourceMapsEdit/fourslash%2Fstate%2FdeclarationMapsRenameWithSourceMapsEdit.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/declarationMapsRenameWithSourceMapsEdit.baseline: -  [/myproject/dependency/tsconfig.json] *modified* | -    RetainingProjects: *modified* | +  [/myproject/dependency/tsconfig.json]  | +    RetainingProjects:"
-    },
-    "fourslash/TestDeclarationMapsRename/baseline/TestDeclarationMapsRename%2FTestDeclarationMapsRenameWithSourceMapsNotSolution/fourslash%2Fstate%2FdeclarationMapsRenameWithSourceMapsNotSolution.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/declarationMapsRenameWithSourceMapsNotSolution.baseline: -  [/myproject/dependency/tsconfig.json] *modified* | -    RetainingProjects: *modified* | +  [/myproject/dependency/tsconfig.json]  | +    RetainingProjects:"
-    },
-    "fourslash/TestDeclarationMapsRename/baseline/TestDeclarationMapsRename%2FTestDeclarationMapsRenameWithSourceMapsNotSolutionEdit/fourslash%2Fstate%2FdeclarationMapsRenameWithSourceMapsNotSolutionEdit.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/declarationMapsRenameWithSourceMapsNotSolutionEdit.baseline: -  [/myproject/dependency/tsconfig.json] *modified* | -    RetainingProjects: *modified* | +  [/myproject/dependency/tsconfig.json]  | +    RetainingProjects:"
-    },
-    "fourslash/TestDeclarationMapsRename/subtest/TestDeclarationMapsRenameWithDisableSourceOfProjectReferenceRedirect": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/declarationMapsRenameWithDisableSourceOfProjectReferenceRedirect.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestDeclarationMapsRename/subtest/TestDeclarationMapsRenameWithDisableSourceOfProjectReferenceRedirectEdit": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/declarationMapsRenameWithDisableSourceOfProjectReferenceRedirectEdit.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestDeclarationMapsRename/subtest/TestDeclarationMapsRenameWithProjectReferences": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/declarationMapsRenameWithProjectReferences.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestDeclarationMapsRename/subtest/TestDeclarationMapsRenameWithProjectReferencesEdit": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/declarationMapsRenameWithProjectReferencesEdit.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestDeclarationMapsRename/subtest/TestDeclarationMapsRenameWithSourceMaps": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/declarationMapsRenameWithSourceMaps.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestDeclarationMapsRename/subtest/TestDeclarationMapsRenameWithSourceMapsEdit": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/declarationMapsRenameWithSourceMapsEdit.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestDeclarationMapsRename/subtest/TestDeclarationMapsRenameWithSourceMapsNotSolution": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/declarationMapsRenameWithSourceMapsNotSolution.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestDeclarationMapsRename/subtest/TestDeclarationMapsRenameWithSourceMapsNotSolutionEdit": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/declarationMapsRenameWithSourceMapsNotSolutionEdit.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
     },
     "fourslash/TestDeclarationMapsWorkspaceSymbols": {
       "reason": "project-state-retention-baseline-symptom",
@@ -799,14 +487,6 @@
       "reason": "project-state-retention-baseline-symptom",
       "detail": "fourslash/state/findAllRefsOpenFileInConfiguredProjectThatWillBeRemoved.baseline: +Config:: | +  [/myproject/playground/tsconfig.json] *modified* | +    RetainingProjects: | +      /myproject/playground/tsconfig.json  "
     },
-    "fourslash/TestFindAllRefsProjectWithOwnFilesReferencingFileFromReferencedProject": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/findAllRefsProjectWithOwnFilesReferencingFileFromReferencedProject.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestFindAllRefsProjectWithOwnFilesReferencingFileFromReferencedProject/baseline/TestFindAllRefsProjectWithOwnFilesReferencingFileFromReferencedProject/fourslash%2Fstate%2FfindAllRefsProjectWithOwnFilesReferencingFileFromReferencedProject.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/findAllRefsProjectWithOwnFilesReferencingFileFromReferencedProject.baseline: -      /myproject/tsconfig.json       | -      /myproject/tsconfig.json       | +Config:: | +  [/dummy/tsconfig.json] *modified*"
-    },
     "fourslash/TestFindAllRefsSolutionReferencingDefaultProjectDirectly": {
       "reason": "project-state-retention-baseline-symptom",
       "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/findAllRefsSolutionReferencingDefaultProjectDirectly.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
@@ -874,26 +554,6 @@
     "fourslash/TestGoToImplementationNoCrashTripleSlashRef2/baseline/TestGoToImplementationNoCrashTripleSlashRef2/fourslash%2FgoToImplementation%2FgoToImplementationNoCrashTripleSlashRef2.baseline.jsonc": {
       "reason": "navigation-or-display-baseline-symptom",
       "detail": "fourslash/goToImplementation/goToImplementationNoCrashTripleSlashRef2.baseline.jsonc: - | -// === /node_modules/excalidraw/index.d.ts === | -// /// <reference types=\"[|react|]\" /> | -// "
-    },
-    "fourslash/TestImplementationsAcrossProjects": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/implementationsAcrossProjects.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestImplementationsAcrossProjects/baseline/TestImplementationsAcrossProjects/fourslash%2Fstate%2FimplementationsAcrossProjects.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/implementationsAcrossProjects.baseline: -      /projects/container/tsconfig.json                 | -      /projects/container/tsconfig.json        | -  [/projects/container/lib/tsconfig.json] *modified* | -    RetainingProjects: *modified*"
-    },
-    "fourslash/TestImportFixAfterIndentedImport": {
-      "reason": "completion-code-action-edit-symptom",
-      "detail": "importFixIndentedStatements_test.go:65: assertion failed: | --- f.getScriptInfo(f.activeFilename).content | +++ options.NewFileContent | @@ -1,5 +1,5 @@ | //·header | ··import·{·existing·}·from·\"./aaa\"; | -import·{·helper·}·from·\"./zzz\";"
-    },
-    "fourslash/TestImportFixBeforeIndentedImport": {
-      "reason": "completion-code-action-edit-symptom",
-      "detail": "importFixIndentedStatements_test.go:36: assertion failed: | --- f.getScriptInfo(f.activeFilename).content | +++ options.NewFileContent | @@ -1,5 +1,5 @@ | //·header | ··import·{·helper·}·from·\"./aaa\"; | -import·{·existing·}·from·\"./dep\";"
-    },
-    "fourslash/TestImportFixBeforeIndentedImportWithCarriageReturns": {
-      "reason": "completion-code-action-edit-symptom",
-      "detail": "importFixIndentedStatements_test.go:95: assertion failed: | --- f.getScriptInfo(f.activeFilename).content | +++ options.NewFileContent | @@ -1,2 +1,2 @@ | //·header↵··import·{·helper·}·from·\"./aaa\"; | -import·{·existing·}·from·\"./dep\";↵··const·value·=·help;↵ | +··import·{·existing·}·from·\"./dep\";↵··const·value·=·help;↵"
     },
     "fourslash/TestImportNameCodeFixNewImportAllowSyntheticDefaultImports0": {
       "reason": "code-fix-edit-or-availability-symptom",
@@ -1027,26 +687,6 @@
       "reason": "completion-items-or-fields-symptom",
       "detail": "fourslash.go:1426: At marker '2': Expected 11 exact completion items but got 4."
     },
-    "fourslash/TestNavigationBarWellKnownSymbolExpando": {
-      "reason": "navigation-or-display-baseline-symptom",
-      "detail": "fourslash.go:5806: At position /navigationBarWellKnownSymbolExpando.ts(Ln 0, Col 0): textDocument/documentSymbol request returned error: [-32603]: Ast(InvalidGraph)"
-    },
-    "fourslash/TestNavigationBarWellKnownSymbolExpando/baseline/TestNavigationBarWellKnownSymbolExpando/fourslash%2FdocumentSymbols%2FnavigationBarWellKnownSymbolExpando.baseline": {
-      "reason": "navigation-or-display-baseline-symptom",
-      "detail": "Native observation missing from Rust execution; parent group navigation-or-display-baseline-symptom. No Rust baseline bytes produced for fourslash/documentSymbols/navigationBarWellKnownSymbolExpando.baseline"
-    },
-    "fourslash/TestPathCompletionsTypesVersionsWildcard3": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1449: At marker '': Label 'blah' not found in actual items."
-    },
-    "fourslash/TestPathCompletionsTypesVersionsWildcard5": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1449: At marker '': Label 'blah' not found in actual items."
-    },
-    "fourslash/TestPathCompletionsTypesVersionsWildcard6": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1449: At marker '': Label 'blah' not found in actual items."
-    },
     "fourslash/TestReferencesIsAvailableThroughGlobalNoCrash": {
       "reason": "navigation-or-display-baseline-symptom",
       "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/findAllReferences/referencesIsAvailableThroughGlobalNoCrash.baseline.jsonc has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
@@ -1054,14 +694,6 @@
     "fourslash/TestReferencesIsAvailableThroughGlobalNoCrash/baseline/TestReferencesIsAvailableThroughGlobalNoCrash/fourslash%2FfindAllReferences%2FreferencesIsAvailableThroughGlobalNoCrash.baseline.jsonc": {
       "reason": "navigation-or-display-baseline-symptom",
       "detail": "fourslash/findAllReferences/referencesIsAvailableThroughGlobalNoCrash.baseline.jsonc: -// export as namespace debug; | +// export as namespace [|debug|];"
-    },
-    "fourslash/TestRenameAncestorProjectRefMangement": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/renameAncestorProjectRefMangement.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestRenameAncestorProjectRefMangement/baseline/TestRenameAncestorProjectRefMangement/fourslash%2Fstate%2FrenameAncestorProjectRefMangement.baseline": {
-      "reason": "project-state-retention-baseline-symptom",
-      "detail": "fourslash/state/renameAncestorProjectRefMangement.baseline: -  [/projects/container/lib/tsconfig.json] *new* | -    RetainingProjects: | -      /projects/container/compositeExec/tsconfig.json   | -  [/projects/container/lib/tsconfig.json] "
     },
     "fourslash/TestRenameJsDocImportTag": {
       "reason": "navigation-or-display-baseline-symptom",

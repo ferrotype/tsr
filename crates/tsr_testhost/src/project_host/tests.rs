@@ -391,3 +391,19 @@ fn fifo_barrier_keeps_callback_replies_routable_and_preserves_host_metadata() {
     assert_eq!(before, peer.until(6)["result"]);
     peer.finish();
 }
+
+#[test]
+fn published_state_endpoint_observes_without_consuming_pending_work() {
+    let peer = Peer::new();
+    peer.initialize(&[]);
+    peer.open();
+    let first = peer.state(2);
+    peer.edit();
+    peer.request(3, "test/publishedProjectState", json!({}));
+    let observed = peer.until(3);
+    assert!(observed.get("error").is_none(), "{observed}");
+    assert_eq!(observed["result"], first);
+    let updated = peer.state(4);
+    assert_ne!(updated, first, "the explicit flush must still see the edit");
+    peer.finish();
+}

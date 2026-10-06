@@ -90,7 +90,15 @@ impl LanguageService<'_> {
             )?;
             let mut tracker = crate::change::Tracker::default();
             for edit in edits {
-                tracker.replace_text(source, TextRange::new(edit.start, edit.end), edit.text);
+                let range = TextRange::new(edit.start, edit.end);
+                let text = crate::change_nodes::reindent(
+                    &syntax.file,
+                    range,
+                    &crate::change_nodes::NodeOptions::default(),
+                    self.program.options().new_line.as_str(),
+                    edit.text,
+                );
+                tracker.replace_text(source, range, text);
             }
             let changes = tracker.finish(self)?;
             if !changes.unmappable.is_empty() {

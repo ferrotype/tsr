@@ -1333,7 +1333,7 @@ fn relative_module_completion_preserves_filesystem_root() {
 fn js_expando_document_symbols_accept_identifier_receivers() {
     let program = program(
         b"/index.js",
-        b"function F() {}\nF.value = function() {};\nF.prototype.method = function() {};\n",
+        b"function F() {}\nF.value = function() {};\nF.prototype.method = function() {};\nF[Symbol.iterator] = function() {};\n",
     );
     let mut service = LanguageService::new(
         &program,
@@ -1358,6 +1358,10 @@ fn js_expando_document_symbols_accept_identifier_receivers() {
         .iter()
         .flatten()
         .any(|symbol| symbol.name == "method"));
+    assert!(children
+        .iter()
+        .flatten()
+        .any(|symbol| symbol.name == "Symbol.iterator"));
 }
 
 #[test]

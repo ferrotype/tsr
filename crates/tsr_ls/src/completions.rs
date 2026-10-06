@@ -13,6 +13,7 @@ use tsr_ast::{
     span_map::FEATURE_COMPLETION, symbol_flags as sf, utilities as ast, NodeId, SyntaxKind as K,
 };
 use tsr_checker::{Operation, SymbolRef, TypeRef, VerbosityContext};
+use tsr_compiler::diagnostic_writer::DiagnosticSources;
 use tsr_core::TextRange;
 use tsr_lsproto as lsp;
 use tsr_printer::EmitTextWriter;
@@ -93,6 +94,25 @@ impl LanguageService<'_> {
         };
         let source = projection.script;
         let position = i64::from(projection.mapped.position);
+        let mut response = self.completion_worker(checker, params, options, source, position)?;
+        if let Some(list) = response.list.as_deref_mut() {
+            self.completion_data(source, position, list)?;
+            if self.source(source)?.span_map().is_some() {
+                let mut syntax = Syntax::new(self.view(source)?, source)?;
+                self.filter_content_mapped_auto_imports(&mut syntax, options, list)?;
+            }
+        }
+        Ok(response)
+    }
+
+    fn completion_worker(
+        &mut self,
+        checker: &mut Operation<'_>,
+        params: &lsp::CompletionParams,
+        options: &CompletionOptions,
+        source: NodeId,
+        position: i64,
+    ) -> Result<lsp::CompletionItemsOrListOrNull> {
         let mut syntax = Syntax::new(self.view(source)?, source)?;
         if options.module_exports != Some(false) && self.auto_imports.is_prepared() {
             self.prepare_auto_imports(checker, &syntax, &options.auto_import)?;
@@ -163,10 +183,9 @@ impl LanguageService<'_> {
             context.type_only = true;
             context.filter = Filter::Type;
         }
-        if let Some(mut list) =
+        if let Some(list) =
             self.closing_tag_completion(&mut syntax, &context, &params.position, options)?
         {
-            self.completion_data(source, position, &mut list)?;
             return Ok(lsp::CompletionItemsOrListOrNull {
                 list: Some(Box::new(list)),
                 ..Default::default()
@@ -218,7 +237,6 @@ impl LanguageService<'_> {
                     crate::completion_context::ALL
                 },
             );
-            self.completion_data(source, position, &mut list)?;
             return Ok(lsp::CompletionItemsOrListOrNull {
                 list: Some(Box::new(list)),
                 ..Default::default()
@@ -227,10 +245,9 @@ impl LanguageService<'_> {
         if context.blocked(&syntax, position)? {
             return Ok(lsp::CompletionItemsOrListOrNull::default());
         }
-        if let Some(mut list) =
+        if let Some(list) =
             self.label_completions(&mut syntax, &context, &params.position, options)?
         {
-            self.completion_data(source, position, &mut list)?;
             return Ok(lsp::CompletionItemsOrListOrNull {
                 list: (!list.items.is_empty()).then(|| Box::new(list)),
                 ..Default::default()
@@ -356,7 +373,6 @@ impl LanguageService<'_> {
             replacement,
             context.commit,
         );
-        self.completion_data(source, position, &mut list)?;
         Ok(lsp::CompletionItemsOrListOrNull {
             list: Some(Box::new(list)),
             ..Default::default()
@@ -472,6 +488,50 @@ impl LanguageService<'_> {
         )?;
         Ok(fidelity.is_exact().then_some(range))
     }
+    // port: tsc/internal/ls/completions.go:supplementalFileIndex
+    pub(crate) fn completion_source_index(&self, source: NodeId) -> Result<Option<Box<i32>>> {
+        let file = self.source(source)?;
+        let canonical = if let Some(canonical) = file.canonical_source_file() {
+            Some(canonical)
+        } else {
+            file.canonical_file_name()
+                .map(|name| {
+                    self.program
+                        .source_file(name.as_bytes())
+                        .map(tsr_compiler::ProgramFile::source)
+                        .ok_or(tsr_arena::Error::InvalidGraph)
+                })
+                .transpose()?
+        };
+        let Some(canonical) = canonical else {
+            return Ok(None);
+        };
+        let index = self
+            .program
+            .supplemental_sources(canonical)?
+            .iter()
+            .position(|&id| id == source)
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
+        Ok(Some(Box::new(index as i32)))
+    }
+
+    // port: tsc/internal/ls/completions.go:sourceFileForSupplementalFileIndex
+    pub fn completion_source(&self, data: &lsp::CompletionItemData) -> Result<NodeId> {
+        let file = self
+            .program
+            .source_file(data.file_name.as_bytes())
+            .ok_or_else(|| crate::Error::MissingFile(data.file_name.clone()))?;
+        if let Some(&index) = data.supplemental_file_index.as_deref() {
+            let sources = self.program.supplemental_sources(file.source())?;
+            return usize::try_from(index)
+                .ok()
+                .and_then(|index| sources.get(index))
+                .copied()
+                .ok_or(crate::Error::MissingSupplementalFile(index));
+        }
+        Ok(file.source())
+    }
+
     // port: tsc/internal/ls/completions.go:ensureItemData
     pub(crate) fn completion_data(
         &self,
@@ -482,12 +542,14 @@ impl LanguageService<'_> {
         let file_name =
             String::from_utf8_lossy(self.source(source)?.original_file_name()?.as_bytes())
                 .into_owned();
+        let supplemental_file_index = self.completion_source_index(source)?;
         for item in list.items.iter_mut().flatten() {
             item.data.get_or_insert_with(|| {
                 Box::new(lsp::CompletionItemData {
                     file_name: file_name.clone(),
                     position: position as i32,
                     name: item.label.clone(),
+                    supplemental_file_index: supplemental_file_index.clone(),
                     ..Default::default()
                 })
             });
@@ -626,6 +688,10 @@ impl LanguageService<'_> {
             }
             return Ok(candidates);
         }
+        if let Some(candidates) = Self::completion_type_argument_members(checker, syntax, context)?
+        {
+            return Ok(candidates);
+        }
         if let Some(candidates) = self.completion_container(checker, syntax, context, position)? {
             return Ok(candidates);
         }
@@ -665,7 +731,16 @@ impl LanguageService<'_> {
             }
         }
         for symbol in checker.get_symbols_in_scope(scope, meaning)? {
-            let flags = checker.get_symbol_flags(symbol)?;
+            // Pin shouldIncludeSymbol preserves the local declaration meaning
+            // and the exported/aliased target meaning of a scope symbol.
+            let origin = checker.skip_alias(symbol)?;
+            let mut flags = checker.symbol(symbol)?.flags() | checker.symbol(origin)?.flags();
+            if let Some(export) = checker.symbol(origin)?.export_symbol() {
+                flags |= checker.symbol(checker.symbol_ref(export)?)?.flags();
+            }
+            if checker.symbol(symbol)?.flags() & sf::ALIAS != 0 {
+                flags |= checker.get_symbol_flags(symbol)?;
+            }
             if context.type_only {
                 if !Self::completion_type_symbol(checker, symbol, &mut HashSet::new())? {
                     continue;
@@ -718,9 +793,15 @@ impl LanguageService<'_> {
     ) -> Result<bool> {
         let mut pending = vec![symbol];
         while let Some(symbol) = pending.pop() {
-            let symbol = checker.skip_alias(symbol)?;
             if !seen.insert(symbol) {
                 continue;
+            }
+            // Aliases may merge with declarations. Test the local symbol too,
+            // rather than discarding its meanings when following the target.
+            let export = checker.get_export_symbol_of_symbol(symbol)?;
+            let target = checker.skip_alias(export)?;
+            if target != symbol {
+                pending.push(target);
             }
             let flags = checker.symbol(symbol)?.flags();
             if flags & sf::TYPE != 0 || checker.is_unknown_symbol(symbol)? {
@@ -892,9 +973,12 @@ impl LanguageService<'_> {
             return Ok(None);
         }
         if !valid
-            && context
-                .container
-                .is_some_and(|(kind, _)| matches!(kind, Container::Object | Container::Class))
+            && context.container.is_some_and(|(kind, _)| {
+                matches!(
+                    kind,
+                    Container::Object | Container::TypeLiteral | Container::Class
+                )
+            })
         {
             name = quote(&name);
         }
@@ -1045,7 +1129,11 @@ impl LanguageService<'_> {
             || context.container.is_some_and(|(kind, _)| {
                 matches!(
                     kind,
-                    Container::Object | Container::Binding | Container::Class | Container::Jsx
+                    Container::Object
+                        | Container::TypeLiteral
+                        | Container::Binding
+                        | Container::Class
+                        | Container::Jsx
                 )
             }))
             && modifiers & modifiers::OPTIONAL != 0
@@ -1111,6 +1199,7 @@ impl LanguageService<'_> {
             tags: deprecated.then(|| Box::new(vec![lsp::CompletionItemTag::DEPRECATED])),
             commit_characters: commit,
             data: Some(Box::new(lsp::CompletionItemData {
+                supplemental_file_index: self.completion_source_index(syntax.source)?,
                 file_name: String::from_utf8_lossy(syntax.file.original_file_name()?.as_bytes())
                     .into_owned(),
                 position: position as i32,
@@ -1139,11 +1228,8 @@ impl LanguageService<'_> {
             .as_deref()
             .ok_or(tsr_arena::Error::InvalidGraph)?
             .clone();
-        let file = self
-            .program
-            .source_file(data.file_name.as_bytes())
-            .ok_or_else(|| crate::Error::MissingFile(data.file_name.clone()))?;
-        let mut syntax = Syntax::new(file.bound().view().ast(), file.source())?;
+        let source = self.completion_source(&data)?;
+        let mut syntax = Syntax::new(self.view(source)?, source)?;
         if data.is_import_statement_completion {
             return Ok(item);
         }
@@ -1208,14 +1294,15 @@ impl LanguageService<'_> {
             options,
         )? {
             let mut name = symbol_name(checker, candidate.symbol)?;
-            if context
-                .container
-                .is_some_and(|(kind, _)| matches!(kind, Container::Object | Container::Class))
-                && !tsr_scanner::is_identifier_text(
-                    name.as_bytes(),
-                    tsr_core::LanguageVariant::STANDARD,
+            if context.container.is_some_and(|(kind, _)| {
+                matches!(
+                    kind,
+                    Container::Object | Container::TypeLiteral | Container::Class
                 )
-            {
+            }) && !tsr_scanner::is_identifier_text(
+                name.as_bytes(),
+                tsr_core::LanguageVariant::STANDARD,
+            ) {
                 name = quote(&name);
             }
             if name != data.name {

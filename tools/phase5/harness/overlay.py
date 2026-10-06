@@ -22,6 +22,13 @@ def state_adapter():
     last = types.index("type wireFile")
     types = types[:first] + types[last:]
     render = source[source.index("func renderProjection("):source.index("func TestRustProjectStateNative(")]
+    # The pin's open-file table comes from the fourslash client's immediate
+    # bookkeeping, while projects/configs come from the published snapshot.
+    render = replace_once(render, """\twriter.openFiles = map[string]struct{}{}
+\tfor _, f := range data.Open {
+\t\twriter.openFiles[f.Name] = struct{}{}
+\t}
+""", "")
     original = (UPSTREAM / "internal/fourslash/statebaseline.go").read_text()
     methods = original[original.index("func (f *FourslashTest) printProjectsDiff"):]
     methods = methods.replace("(f *FourslashTest)", "(f *projectionWriter)")
@@ -96,6 +103,7 @@ def create(stage, *, include_l2_fixture=False):
  }
  var data stateData
  assert.NilError(t,json.Unmarshal(raw,&data))
+ f.stateBaseline.rustWriter.openFiles = f.openFiles
  fmt.Fprint(w,renderProjection(t,f.stateBaseline.rustWriter,f.stateBaseline.rustDecoder,data))
  return
 }

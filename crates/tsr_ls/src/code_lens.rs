@@ -10,6 +10,7 @@ use tsr_ast::{
     utilities as ast, AstView, NodeId, SyntaxKind as K,
 };
 use tsr_checker::Operation;
+use tsr_compiler::diagnostic_writer::DiagnosticSources;
 use tsr_lsproto as lsp;
 
 /// Optional booleans preserve the native settings refresh distinction between
@@ -103,14 +104,13 @@ impl LanguageService<'_> {
             return Ok(lsp::CodeLensesOrNull::default());
         }
         let source = self.file(&params.text_document.uri)?;
-        let file = self.source(source)?;
         let sources = std::iter::once((source, None))
             .chain(
-                file.supplemental_source_files()?
-                    .iter()
-                    .flatten()
+                self.program
+                    .supplemental_sources(source)?
+                    .into_iter()
                     .enumerate()
-                    .map(|(i, n)| (*n, Some(i as i32))),
+                    .map(|(i, n)| (n, Some(i as i32))),
             )
             .collect::<Vec<_>>();
         let mut result = Vec::new();
@@ -222,11 +222,10 @@ impl LanguageService<'_> {
         let mut source = self.file(&data.uri)?;
         if let Some(&index) = data.supplemental_file_index.as_deref() {
             source = self
-                .source(source)?
-                .supplemental_source_files()?
+                .program
+                .supplemental_sources(source)?
                 .get(index as usize)
                 .copied()
-                .flatten()
                 .ok_or(tsr_arena::Error::InvalidSlot)?;
         }
         let node = Syntax::new(self.view(source)?, source)?

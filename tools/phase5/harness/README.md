@@ -10,7 +10,11 @@ client and preserve the primary session. Different test owners cannot attach
 concurrently. A broken
 reset retires the worker. The original mapper spawner still handles mapper
 requests. Project-state rendering uses the original writer with the checked
-projection decoder from `tools/phase5/project`.
+projection decoder from `tools/phase5/project`. The carried state writer reads
+`test/publishedProjectState`, which observes the current published snapshot without
+flushing pending edits/closes, and retains the native client's immediate open-file
+map. The pre-existing `test/projectState` endpoint still flushes explicitly for
+its development clients.
 
 The transport applies FIFO backpressure after each 32 client notifications
 through `test/barrier`. This private action does not read a snapshot or change

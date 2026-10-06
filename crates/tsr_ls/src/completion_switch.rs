@@ -346,6 +346,7 @@ impl LanguageService<'_> {
                 .snippets
                 .then(|| Box::new(lsp::InsertTextFormat::SNIPPET)),
             data: Some(Box::new(lsp::CompletionItemData {
+                supplemental_file_index: self.completion_source_index(syntax.source)?,
                 file_name: String::from_utf8_lossy(syntax.file.original_file_name()?.as_bytes())
                     .into_owned(),
                 position: position as i32,

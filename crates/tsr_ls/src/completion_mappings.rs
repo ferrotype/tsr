@@ -419,11 +419,7 @@ impl LanguageService<'_> {
                             let prefix = [package_dir.as_slice(), b"/"].concat();
                             let relative =
                                 resolved.strip_prefix(prefix.as_slice()).unwrap_or_default();
-                            let relative = if relative.is_empty() {
-                                Vec::new()
-                            } else {
-                                [relative, b"/"].concat()
-                            };
+                            let relative = relative.to_vec();
                             redirected = self.mapping_entries(
                                 paths,
                                 &relative,

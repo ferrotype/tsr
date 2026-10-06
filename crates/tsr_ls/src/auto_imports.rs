@@ -263,6 +263,7 @@ impl LanguageService<'_> {
                 tags: (modifiers & crate::symbol_display::modifiers::DEPRECATED != 0)
                     .then(|| Box::new(vec![lsp::CompletionItemTag::DEPRECATED])),
                 data: Some(Box::new(lsp::CompletionItemData {
+                    supplemental_file_index: self.completion_source_index(syntax.source)?,
                     name,
                     position: position as i32,
                     file_name: String::from_utf8_lossy(
@@ -272,7 +273,6 @@ impl LanguageService<'_> {
                     source: fix.module_specifier.clone(),
                     is_import_statement_completion: statement.is_some(),
                     auto_import: Some(Box::new(fix.clone())),
-                    ..Default::default()
                 })),
                 ..Default::default()
             };
@@ -346,6 +346,38 @@ impl LanguageService<'_> {
             export.id.name.as_bytes(),
         )?)
     }
+    // port: tsc/internal/ls/completions.go:LanguageService.filterContentMappedAutoImports
+    pub(crate) fn filter_content_mapped_auto_imports(
+        &mut self,
+        syntax: &mut Syntax<'_>,
+        options: &CompletionOptions,
+        list: &mut lsp::CompletionList,
+    ) -> Result<()> {
+        let mut filtered = Vec::with_capacity(list.items.len());
+        for item in std::mem::take(&mut list.items) {
+            let Some(mut item) = item else {
+                filtered.push(None);
+                continue;
+            };
+            let Some(fix) = item
+                .data
+                .as_deref()
+                .and_then(|d| d.auto_import.as_deref())
+                .cloned()
+            else {
+                filtered.push(Some(item));
+                continue;
+            };
+            item.additional_text_edits = None;
+            let item = self.resolve_auto_import(*item, &fix, syntax, options)?;
+            if item.additional_text_edits.is_some() {
+                filtered.push(Some(Box::new(item)));
+            }
+        }
+        list.items = filtered;
+        Ok(())
+    }
+
     pub(crate) fn resolve_auto_import(
         &mut self,
         mut item: lsp::CompletionItem,
@@ -390,17 +422,20 @@ impl LanguageService<'_> {
         )?;
         let mut result = Vec::new();
         for edit in edits {
-            let (range, fidelity) = self.range(
-                syntax.source,
-                tsr_core::TextRange::new(edit.start, edit.end),
-                FEATURE_COMPLETION,
-            )?;
+            let text_range = tsr_core::TextRange::new(edit.start, edit.end);
+            let (range, fidelity) = self.unrestricted_range(syntax.source, text_range)?;
             if !fidelity.is_exact() {
                 return Ok(item);
             }
             result.push(Some(Box::new(lsp::TextEdit {
                 range,
-                new_text: edit.text,
+                new_text: crate::change_nodes::reindent(
+                    &syntax.file,
+                    text_range,
+                    &crate::change_nodes::NodeOptions::default(),
+                    self.program.options().new_line.as_str(),
+                    edit.text,
+                ),
             })));
         }
         item.additional_text_edits = Some(Box::new(result));

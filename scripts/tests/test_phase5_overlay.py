@@ -54,3 +54,12 @@ class OverlayTests(unittest.TestCase):
         expected = source[source.index('func (f *FourslashTest) printProjectsDiff'):]
         expected = expected.replace('(f *FourslashTest)', '(f *projectionWriter)').replace('snapshot *project.Snapshot', 'snapshot *wireSnapshot').replace('*compiler.Program', '*wireProgram').replace('map[string]projectInfo', 'map[string]*wireProgram')
         self.assertTrue(overlay.state_adapter().endswith(expected))
+
+    def test_state_observation_uses_fourslash_open_files_without_replacing_writer(self):
+        adapter = overlay.state_adapter()
+        self.assertNotIn('writer.openFiles = map[string]struct{}{}', adapter)
+        self.assertNotIn('writer.openFiles[f.Name] = struct{}{}', adapter)
+        with tempfile.TemporaryDirectory() as tmp:
+            patches = json.loads(overlay.create(tmp).read_text())['Replace']
+            state = Path(patches[str(overlay.UPSTREAM / 'internal/fourslash/statebaseline.go')]).read_text()
+        self.assertIn('f.stateBaseline.rustWriter.openFiles = f.openFiles', state)

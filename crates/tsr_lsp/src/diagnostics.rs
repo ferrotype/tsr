@@ -3,6 +3,7 @@ use crate::{
     error,
 };
 use std::collections::BTreeSet;
+use tsr_compiler::diagnostic_writer::DiagnosticSources;
 use tsr_ipc::Context;
 use tsr_ls::converters::{Converters, DiagnosticOptions};
 use tsr_lsproto as lsp;
@@ -97,15 +98,8 @@ pub fn document(
         .map_err(|e| error(-32603, e.to_string()))?;
     let run = || -> Result<Vec<tsr_ast::Diagnostic>, tsr_compiler::Error> {
         let mut diagnostics = Vec::new();
-        let source = file.bound().view().source_file()?;
         let ids: Vec<_> = std::iter::once(file.source())
-            .chain(
-                source
-                    .supplemental_source_files()?
-                    .iter()
-                    .flatten()
-                    .copied(),
-            )
+            .chain(program.supplemental_sources(file.source())?)
             .collect();
         for id in ids {
             let file = program.files().iter().find(|f| f.source() == id).ok_or(

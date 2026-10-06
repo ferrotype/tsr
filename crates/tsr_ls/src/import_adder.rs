@@ -103,6 +103,13 @@ impl LanguageService<'_> {
         let mut result = Vec::new();
         for edit in edits {
             let range = tsr_core::TextRange::new(edit.start, edit.end);
+            let text = crate::change_nodes::reindent(
+                &syntax.file,
+                range,
+                &crate::change_nodes::NodeOptions::default(),
+                self.program.options().new_line.as_str(),
+                edit.text,
+            );
             let (range, fidelity) = match feature {
                 Some(feature) => self.range(syntax.source, range, feature)?,
                 None => self.unrestricted_range(syntax.source, range)?,
@@ -112,7 +119,7 @@ impl LanguageService<'_> {
             }
             result.push(Some(Box::new(lsp::TextEdit {
                 range,
-                new_text: edit.text,
+                new_text: text,
             })));
         }
         Ok(result)

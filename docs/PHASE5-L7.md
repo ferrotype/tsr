@@ -199,10 +199,19 @@ The unchanged native suite was rerun after each release build:
 | `full-03` | 275 | 391 | — | — |
 | `full-04` | 249 | 354 | 26 | 0 |
 | `full-05` | 207 | 275 | 42 | 0 |
+| `full-06` | 180 | 243 | 27 | 0 |
+| `full-07` | 152 | 183 | 28 | 0 |
+| `full-08` | 152 | 183 | 0 | 0 |
 
 N remains 4,117 with 417 native skips and no native failures. The current raw
-failure set is 275 rows over 207 parents, with zero approvals; Phase 5's limit
-remains 20 parents. The 13-test LSP client suite still passes in full.
+failure set is 183 rows over 152 parents, with zero approvals; Phase 5's limit
+remains 20 parents. The 13-test LSP client suite still passes in full (`lsp-03`). `full-08` also
+includes the reviewed constraint-completion guard: callable type-literal members
+cannot acquire object-literal method-body snippets or their sort priority.
+The final batch passes 102 LS unit tests, 20 auto-import tests, the 39 LSP tests
+(the native FSEvents case rerun outside the sandbox), mapped compiler ownership
+checks, testhost regressions, affected-crate clippy and marker validation.
+Thirty-one focused Python tests pass, including the exact-marker regression.
 
 Implemented corrections include overlapping fourslash sessions and notification
 backpressure in the private adapter; root package-path resolution; guarded AST
@@ -216,7 +225,28 @@ these mechanisms independently of the unchanged native suite.
 The CI bundle builds the two native assertion binaries and private Rust server
 once, then runs four fourslash shards and one LSP shard. It relocates the native
 repository root explicitly so source-path discovery does not retain the build
-checkout. This wiring is locally tested; hosted CI is still to run.
+checkout. Hosted CI has passed all four fourslash shards, the LSP shard and their parity
+join at `b031d767`. The unrelated script-test failure on moved historical Rust
+line anchors is corrected by validating exact operation identities, files and
+marker multiplicities; no historical capture is regenerated for line movement.
+
+The next production batch resolves supplemental sources through the retained
+program, including separately owned mapper outputs; all 55 content-mapper tests
+pass in `full-07`. Completion payloads retain their supplemental index through
+resolve. Mapped auto-imports advance past generated headers, map every edit
+exactly and eagerly remove unsafe candidates. Shared indentation handling
+preserves original mapped indentation. Generic type-argument constraints and
+binding patterns now use their native completion-property rules, exported local
+symbols retain both declaration and export meanings, typesVersions wildcards do
+not introduce duplicate separators, imports keep printer semicolons unless
+explicitly removed, expando symbols support computed names, and malformed
+finally blocks retain their zero-width folding span.
+
+The state-baseline adapter now observes the published snapshot without flushing
+pending edits or closes, while the original Go writer uses its own immediate
+open-file map. The existing explicit flush endpoint retains its previous
+behavior. This removes observation-induced state differences without changing
+production scheduling. Focused tests cover the non-mutating observation.
 
 The latency capture and `perf.py lsp` adapter are implemented and tested with
 fake framed servers. They do not constitute a real performance result. Fixture

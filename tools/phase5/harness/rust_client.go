@@ -123,7 +123,7 @@ func (s *rustServer) request(method string, params any) *lsproto.ResponseMessage
 	return response
 }
 func (s *rustServer) ProjectState(t *testing.T) json.Value {
-	return s.request("test/projectState", map[string]any{}).Result.(json.Value)
+	return s.request("test/publishedProjectState", map[string]any{}).Result.(json.Value)
 }
 
 // Called from WriteMsg after JSON validation. Its mutex is independent of

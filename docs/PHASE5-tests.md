@@ -61,6 +61,30 @@ remain runtime evidence work. The L7 planning reference predates those ports.
 Its custom API-session
 wire claim also conflicts with the L6 record, which assigns that handshake to Phase 6.
 
+Bounded direct-test audit (2026-10-06): exact assignments below compare assertions,
+not Rust test names. The queue FIFO and four glob-root cases match their native
+observations. Cancellation and real watcher routes retain explicit missing
+observations. These assignments do not claim tests were run in this audit.
+Remaining WORK rows are the concrete L7/L8 assignment backlog; source-reference
+rows still require subcase review and runtime evidence before acceptance credit.
+
+Unassigned or partial direct-test observations: **120**.
+Each WORK row below identifies its native test and source; the counts do not
+include source-reference rows whose exact subcase review is still pending.
+
+| Package | WORK rows |
+| --- | ---: |
+| `ls` | 1 |
+| `ls/autoimport` | 3 |
+| `ls/lsconv` | 1 |
+| `ls/lsutil` | 12 |
+| `lsp` | 14 |
+| `lsp/lsproto` | 29 |
+| `lsp/lspwatcher` | 14 |
+| `project` | 43 |
+| `project/dirty` | 1 |
+| `project/logging` | 2 |
+
 | Pinned test | Source | Route / evidence | Skip call in source region |
 | --- | --- | --- | --- |
 | `fourslash/tests/Test*` (4,547 functions) | `upstream/tsc/internal/fourslash/tests/*_test.go` | `fourslash/<TestName>`; enumerate all ids with the CLI JSON output | runtime authority |
@@ -156,9 +180,9 @@ wire claim also conflicts with the L6 record, which assigns that handshake to Ph
 | `project/TestGetPathComponentsForWatching` | `upstream/tsc/internal/project/watch_test.go:9` | Rust source references: crates/tsr_project/src/watch/tests.rs:5 |  |
 | `project/TestNilWatchedFilesClone` | `upstream/tsc/internal/project/watch_test.go:22` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `project/TestUpdateWatchTimeoutAndRollback` | `upstream/tsc/internal/project/watchtimeout_test.go:18` | Rust source references: crates/tsr_project/src/watch/manager.rs:186 | yes |
-| `lsp/TestDynamicQueueFIFO` | `upstream/tsc/internal/lsp/dynamic_queue_test.go:9` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `lsp/TestDynamicQueueGetCancellation` | `upstream/tsc/internal/lsp/dynamic_queue_test.go:32` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `lsp/TestDynamicQueuePutCancellationWhileStateUnavailable` | `upstream/tsc/internal/lsp/dynamic_queue_test.go:48` | WORK: exact native-test-to-Rust-test assignment unverified |  |
+| `lsp/TestDynamicQueueFIFO` | `upstream/tsc/internal/lsp/dynamic_queue_test.go:9` | Exact observation assignment: crates/tsr_lsp/src/dynamic_queue.rs:105 (fifo_and_canceled_operations_preserve_remaining_items); same ordered 0..1000 put/get assertions; execution not certified here |  |
+| `lsp/TestDynamicQueueGetCancellation` | `upstream/tsc/internal/lsp/dynamic_queue_test.go:32` | WORK: crates/tsr_lsp/src/dynamic_queue.rs:105 observes pre-canceled get error; native additionally asserts returned zero value (Rust Result has no accompanying value); explicit representation correspondence remains to document |  |
+| `lsp/TestDynamicQueuePutCancellationWhileStateUnavailable` | `upstream/tsc/internal/lsp/dynamic_queue_test.go:48` | WORK: crates/tsr_lsp/src/dynamic_queue.rs:121 tests cancellation of a full bounded writer; native holds the internal queue state unavailable, then releases it and verifies a subsequent put/get of 2; that exact observation is missing |  |
 | `lsp/lsproto/TestBaseReader` | `upstream/tsc/internal/lsp/lsproto/baseproto_test.go:12` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `lsp/lsproto/TestBaseReaderMultipleReads` | `upstream/tsc/internal/lsp/lsproto/baseproto_test.go:81` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `lsp/lsproto/TestBaseWriter` | `upstream/tsc/internal/lsp/lsproto/baseproto_test.go:108` | WORK: exact native-test-to-Rust-test assignment unverified |  |
@@ -188,12 +212,12 @@ wire claim also conflicts with the L6 record, which assigns that handshake to Ph
 | `lsp/lsproto/TestStrictnessNotObject` | `upstream/tsc/internal/lsp/lsproto/lsp_json_test.go:973` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `lsp/lsproto/TestUnmarshalParamsRequiresParams` | `upstream/tsc/internal/lsp/lsproto/lsp_json_test.go:983` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `lsp/lsproto/TestUnmarshalCompletionItem` | `upstream/tsc/internal/lsp/lsproto/lsp_test.go:10` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `lsp/lspwatcher/TestWatcher_CreateChangeDelete` | `upstream/tsc/internal/lsp/lspwatcher/lspwatcher_test.go:33` | WORK: exact native-test-to-Rust-test assignment unverified |  |
+| `lsp/lspwatcher/TestWatcher_CreateChangeDelete` | `upstream/tsc/internal/lsp/lspwatcher/lspwatcher_test.go:33` | WORK: crates/tsr_lsp/src/watcher/tests.rs:348 observes real-backend missing-directory promotion; native existing-root changed/deleted notifications and unregistration are not asserted by that test |  |
 | `lsp/lspwatcher/TestWatcher_KindFilter` | `upstream/tsc/internal/lsp/lspwatcher/lspwatcher_test.go:100` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `lsp/lspwatcher/TestRootFromGlob` | `upstream/tsc/internal/lsp/lspwatcher/lspwatcher_test.go:150` | WORK: exact native-test-to-Rust-test assignment unverified |  |
+| `lsp/lspwatcher/TestRootFromGlob` | `upstream/tsc/internal/lsp/lspwatcher/lspwatcher_test.go:150` | Exact observation assignment: crates/tsr_lsp/src/watcher/tests.rs:215 (roots_from_pinned_globs); all four pinned inputs and expected roots match; execution not certified here |  |
 | `lsp/lspwatcher/TestWatcher_BookkeepingAndOverflow` | `upstream/tsc/internal/lsp/lspwatcher/lspwatcher_test.go:245` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `lsp/lspwatcher/TestWatcher_NonRecursiveGlobIsNotRecursive` | `upstream/tsc/internal/lsp/lspwatcher/lspwatcher_test.go:299` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `lsp/lspwatcher/TestWatcher_RealBackend_MissingThenCreate` | `upstream/tsc/internal/lsp/lspwatcher/lspwatcher_test.go:333` | WORK: exact native-test-to-Rust-test assignment unverified |  |
+| `lsp/lspwatcher/TestWatcher_RealBackend_MissingThenCreate` | `upstream/tsc/internal/lsp/lspwatcher/lspwatcher_test.go:333` | WORK: crates/tsr_lsp/src/watcher/tests.rs:348 is related real-backend coverage, but returns without observation when fast recursive backend is absent; compare all native event/path expectations before exact assignment |  |
 | `lsp/lspwatcher/TestWatcher_MissingDirectoryTracksAncestor` | `upstream/tsc/internal/lsp/lspwatcher/lspwatcher_test.go:393` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `lsp/lspwatcher/TestWatcher_MissingDirectoryPromotesOnCreate` | `upstream/tsc/internal/lsp/lspwatcher/lspwatcher_test.go:429` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `lsp/lspwatcher/TestWatcher_MultiLevelDescend` | `upstream/tsc/internal/lsp/lspwatcher/lspwatcher_test.go:493` | WORK: exact native-test-to-Rust-test assignment unverified |  |
@@ -243,10 +267,10 @@ wire claim also conflicts with the L6 record, which assigns that handshake to Ph
 | `ls/change/TestTextEditsConflictAtSameInsertionPointAcrossProjections` | `upstream/tsc/internal/ls/change/trackerimpl_test.go:9` | Rust source references: crates/tsr_ls/src/change.rs:128 |  |
 | `ls/TestCreatePathUpdaterCaseFoldingShrinksOldPath` | `upstream/tsc/internal/ls/file_rename_test.go:45` | Rust source references: crates/tsr_ls/src/file_rename.rs:402 |  |
 | `ls/TestImplementationsWorklistDoesNotBlowUp` | `upstream/tsc/internal/ls/findallreferences_test.go:34` | Rust source references: crates/tsr_ls/src/tests.rs:390 |  |
-| `ls/TestNonOverlappingFormattingRanges` | `upstream/tsc/internal/ls/format_test.go:15` | Rust source references: crates/tsr_ls/src/formatting.rs:315 |  |
-| `ls/TestGetFormattingEditsAfterKeystroke_EmptyFile` | `upstream/tsc/internal/ls/format_test.go:59` | Rust source references: crates/tsr_ls/src/formatting.rs:344 |  |
-| `ls/TestGetFormattingEditsAfterKeystroke_SimpleStatement` | `upstream/tsc/internal/ls/format_test.go:89` | Rust source references: crates/tsr_ls/src/formatting.rs:345 |  |
-| `ls/TestGetFormattingEditsForRange_FunctionBody` | `upstream/tsc/internal/ls/format_test.go:120` | Rust source references: crates/tsr_ls/src/formatting.rs:367 |  |
+| `ls/TestNonOverlappingFormattingRanges` | `upstream/tsc/internal/ls/format_test.go:15` | Rust source references: crates/tsr_ls/src/formatting.rs:310 |  |
+| `ls/TestGetFormattingEditsAfterKeystroke_EmptyFile` | `upstream/tsc/internal/ls/format_test.go:59` | Rust source references: crates/tsr_ls/src/formatting.rs:339 |  |
+| `ls/TestGetFormattingEditsAfterKeystroke_SimpleStatement` | `upstream/tsc/internal/ls/format_test.go:89` | Rust source references: crates/tsr_ls/src/formatting.rs:340 |  |
+| `ls/TestGetFormattingEditsForRange_FunctionBody` | `upstream/tsc/internal/ls/format_test.go:120` | Rust source references: crates/tsr_ls/src/formatting.rs:362 |  |
 | `ls/lsconv/TestDocumentURIToFileName` | `upstream/tsc/internal/ls/lsconv/converters_test.go:20` | Rust source references: crates/tsr_lsproto/src/uri.rs:215 |  |
 | `ls/lsconv/TestFileNameToDocumentURI` | `upstream/tsc/internal/ls/lsconv/converters_test.go:58` | Rust source references: crates/tsr_lsproto/src/uri.rs:255 |  |
 | `ls/lsconv/TestConvertersSourceFileProjectionExpansion` | `upstream/tsc/internal/ls/lsconv/converters_test.go:121` | Rust source references: crates/tsr_ls/src/converters/tests.rs:116 |  |

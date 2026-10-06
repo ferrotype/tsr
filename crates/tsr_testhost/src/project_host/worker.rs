@@ -28,6 +28,7 @@ pub(super) enum Action {
         context: tsr_ipc::Context,
     },
     State,
+    PublishedState,
     Barrier,
     Reset,
 }
@@ -243,6 +244,15 @@ impl Worker {
                     .ok_or("project session is not initialized")?
                     .snapshot(request_host)
                     .map_err(|e| e.message)?;
+                self.projection.read(&snapshot).map(|v| raw(&v))
+            }
+            Action::PublishedState => {
+                let snapshot = self
+                    .active_server()
+                    .ok_or("project session is not initialized")?
+                    .session()
+                    .snapshot()
+                    .map_err(|e| e.to_string())?;
                 self.projection.read(&snapshot).map(|v| raw(&v))
             }
             Action::Reset => unreachable!(),
@@ -494,5 +504,82 @@ mod tests {
         drop(worker);
         assert!(cached_library.upgrade().is_none());
         assert_eq!(counters.snapshot(), baseline);
+    }
+    #[test]
+    fn state_observation_does_not_flush_pending_edits_or_closes() {
+        let mut worker = Worker::new();
+        let fs = host("declare const shared: number;");
+        initialize(&mut worker, &fs, PositionEncoding::Utf16, false, false);
+        open(&mut worker, &fs, "/main.ts");
+        let before = worker.run(Action::PublishedState, fs.clone()).unwrap();
+        let published = worker
+            .active_server()
+            .unwrap()
+            .session()
+            .snapshot()
+            .unwrap();
+        notification(
+            &mut worker,
+            &fs,
+            "textDocument/didChange",
+            &json!({
+                "textDocument":{"uri":"file:///main.ts","version":2},
+                "contentChanges":[{"text":"const changed = 2;"}]
+            }),
+        );
+        let observed = worker.run(Action::PublishedState, fs.clone()).unwrap();
+        assert_eq!(before.get(), observed.get());
+        assert_eq!(
+            published.id(),
+            worker
+                .active_server()
+                .unwrap()
+                .session()
+                .snapshot()
+                .unwrap()
+                .id()
+        );
+        let updated = worker
+            .active_server()
+            .unwrap()
+            .snapshot(fs.clone())
+            .unwrap();
+        assert_ne!(published.id(), updated.id());
+        assert_eq!(
+            updated
+                .project()
+                .program()
+                .unwrap()
+                .source_file(b"/main.ts")
+                .unwrap()
+                .bound()
+                .view()
+                .source_file()
+                .unwrap()
+                .text()
+                .as_bytes(),
+            b"const changed = 2;"
+        );
+        let before_close = worker.run(Action::PublishedState, fs.clone()).unwrap();
+        notification(
+            &mut worker,
+            &fs,
+            "textDocument/didClose",
+            &json!({"textDocument":{"uri":"file:///main.ts"}}),
+        );
+        assert_eq!(
+            before_close.get(),
+            worker
+                .run(Action::PublishedState, fs.clone())
+                .unwrap()
+                .get()
+        );
+        let closed = worker
+            .active_server()
+            .unwrap()
+            .snapshot(fs.clone())
+            .unwrap();
+        assert!(closed.filesystem().unwrap().overlays().is_empty());
+        assert!(!published.filesystem().unwrap().overlays().is_empty());
     }
 }

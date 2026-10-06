@@ -542,11 +542,12 @@ impl Connection {
                 Completion::Request(id),
             );
         }
-        if method == Some("test/projectState")
-            || method.is_some_and(|m| {
-                m.starts_with("textDocument/") || m == "workspace/didChangeWatchedFiles"
-            })
-        {
+        if matches!(
+            method,
+            Some("test/projectState" | "test/publishedProjectState")
+        ) || method.is_some_and(|m| {
+            m.starts_with("textDocument/") || m == "workspace/didChangeWatchedFiles"
+        }) {
             if !self.initialized || self.session.pending_options().is_some() {
                 if let Some(id) = id {
                     self.send(protocol::failure(
@@ -562,13 +563,20 @@ impl Connection {
                 }
                 return Ok(());
             }
-            let action = if method == Some("test/projectState") {
+            let action = if matches!(
+                method,
+                Some("test/projectState" | "test/publishedProjectState")
+            ) {
                 if id.is_none() || protocol::empty(params).is_err() {
                     return Err(protocol::invalid(
                         "projectState requires a request with empty params",
                     ));
                 }
-                Action::State
+                if method == Some("test/publishedProjectState") {
+                    Action::PublishedState
+                } else {
+                    Action::State
+                }
             } else {
                 if let Some(id) = id {
                     return self.send(protocol::failure(

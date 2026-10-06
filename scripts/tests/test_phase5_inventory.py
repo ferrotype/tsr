@@ -32,6 +32,15 @@ class InventoryTests(unittest.TestCase):
         self.assertEqual(completion['route'], 'lsp/TestCompletionAfterFileClose')
         self.assertIn('Compiled rosters checked in this generation: **none**', inventory.markdown(rows, []))
 
+    def test_bounded_direct_audit_keeps_partial_observations_as_work(self):
+        rows = {(row['package'], row['name']): row for row in inventory.collect(ROOT)}
+        self.assertTrue(set(inventory.DIRECT_AUDIT) <= rows.keys())
+        self.assertTrue(rows['lsp', 'TestDynamicQueueFIFO']['route'].startswith('Exact observation assignment:'))
+        self.assertTrue(rows['lsp/lspwatcher', 'TestRootFromGlob']['route'].startswith('Exact observation assignment:'))
+        for name in ('TestDynamicQueueGetCancellation', 'TestDynamicQueuePutCancellationWhileStateUnavailable'):
+            self.assertTrue(rows['lsp', name]['route'].startswith('WORK:'))
+        self.assertIn('changed/deleted', rows['lsp/lspwatcher', 'TestWatcher_CreateChangeDelete']['route'])
+
 
 if __name__ == '__main__':
     unittest.main()

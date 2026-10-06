@@ -1,6 +1,7 @@
 //! LSP formatting over the production formatter and exact source projections.
 use crate::{syntax::Syntax, LanguageService, Result, Script};
 use tsr_ast::{span_map, NodeId, SpanSegment};
+use tsr_compiler::diagnostic_writer::DiagnosticSources;
 use tsr_core::{TextChange, TextRange};
 use tsr_format::{FormatCodeSettings, FormatContext, FormatFile};
 use tsr_lsproto as lsp;
@@ -113,13 +114,7 @@ impl LanguageService<'_> {
         range: TextRange,
     ) -> Result<lsp::TextEditsOrNull> {
         let mut sources = vec![source];
-        sources.extend(
-            self.source(source)?
-                .supplemental_source_files()?
-                .iter()
-                .flatten()
-                .copied(),
-        );
+        sources.extend(self.program.supplemental_sources(source)?);
         let mut candidates = Vec::new();
         for source in sources {
             let file = self.source(source)?;

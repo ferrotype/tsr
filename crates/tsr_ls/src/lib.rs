@@ -2,6 +2,8 @@
 mod api;
 mod crossproject;
 pub use crossproject::{CrossProjectDefinition, CrossProjectPosition, CrossProjectTargets};
+#[cfg(test)]
+mod auto_import_mapped_tests;
 mod auto_imports;
 mod autoinsert;
 mod call_declarations;
@@ -31,6 +33,8 @@ mod completion_jsx;
 mod completion_keywords;
 mod completion_labels;
 mod completion_literals;
+#[cfg(test)]
+mod completion_mapped_tests;
 mod completion_paths;
 mod completion_snippets;
 mod completion_switch;
@@ -113,6 +117,7 @@ pub enum Error {
     Canceled,
     MissingFile(String),
     MissingSourceFile(String),
+    MissingSupplementalFile(i32),
 }
 impl From<tsr_core::UnappliableEdits> for Error {
     fn from(value: tsr_core::UnappliableEdits) -> Self {
@@ -155,6 +160,9 @@ impl std::fmt::Display for Error {
             Self::Canceled => f.write_str("request canceled"),
             Self::MissingFile(name) => write!(f, "file not found: {name}"),
             Self::MissingSourceFile(name) => write!(f, "source file not found: {name}"),
+            Self::MissingSupplementalFile(index) => {
+                write!(f, "supplemental source file index not found: {index}")
+            }
         }
     }
 }

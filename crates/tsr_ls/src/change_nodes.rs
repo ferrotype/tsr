@@ -310,7 +310,7 @@ pub(crate) fn line_start(source: &tsr_ast::SourceFileRead<'_>, pos: i64) -> i64 
     )
 }
 // port: tsc/internal/ls/change/trackerimpl.go:Tracker.reindentInsertedLines
-fn reindent(
+pub(crate) fn reindent(
     source: &tsr_ast::SourceFileRead<'_>,
     range: TextRange,
     options: &NodeOptions,

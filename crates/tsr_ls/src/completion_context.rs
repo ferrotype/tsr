@@ -23,6 +23,7 @@ pub(crate) enum Container {
     Binding,
     Class,
     Interface,
+    TypeLiteral,
     Imports,
     Exports,
     Constructor,
@@ -300,7 +301,10 @@ impl Context {
             };
             new_identifier = matches!(
                 kind,
-                Container::Class | Container::Interface | Container::Constructor
+                Container::Class
+                    | Container::Interface
+                    | Container::TypeLiteral
+                    | Container::Constructor
             );
             commit = if new_identifier { &[] } else { ALL };
         }
@@ -468,3 +472,7 @@ impl Context {
 #[cfg(test)]
 #[path = "completion_context_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "completion_scope_tests.rs"]
+mod scope_tests;

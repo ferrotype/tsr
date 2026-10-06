@@ -303,15 +303,8 @@ impl Converters {
         file: tsr_ast::NodeId,
         mut convert: impl FnMut(&mut Self, &Script<'_>) -> Vec<T>,
     ) -> Result<Vec<Projection<T>>, tsr_compiler::Error> {
-        let canonical = sources.diagnostic_source(file)?;
         let ids: Vec<_> = std::iter::once(file)
-            .chain(
-                canonical
-                    .supplemental_source_files()?
-                    .iter()
-                    .flatten()
-                    .copied(),
-            )
+            .chain(sources.supplemental_sources(file)?)
             .collect();
         let mut result = Vec::new();
         for id in ids {

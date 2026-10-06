@@ -305,10 +305,11 @@ fn new_statements(module: &str, c: &Collection, o: &Options<'_>) -> Vec<(String,
             )
         });
     }
-    if o.semicolons {
-        for (statement, _) in &mut result {
-            statement.push(';');
-        }
+    // The pinned printer emits statement terminators before the tracker formats
+    // the generated node. Auto-detected writing settings affect indentation;
+    // only the original formatter preferences may remove this semicolon.
+    for (statement, _) in &mut result {
+        statement.push(';');
     }
     result
 }
@@ -384,8 +385,24 @@ fn insert_statements(
     let compare = |a: &[u8], b: &[u8]| tsr_jsstring::compare::compare_case_insensitive(a, b);
     new.sort_by(|a, b| compare(a.0.as_bytes(), b.0.as_bytes()).then(a.3.cmp(&b.3)));
     if old.is_empty() {
-        let pos = edits::top_position(view, source)?;
-        let prefix = if pos != 0 { o.newline } else { "" };
+        let mut pos = edits::top_position(view, source)?;
+        let mut original_pos = pos;
+        // InsertAtTopOfFile advances beyond synthesized mapper headers to the
+        // first writable span, using original coordinates for leading trivia.
+        if let Some(map) = file.span_map() {
+            for segment in map.segments() {
+                if segment.kind != tsr_ast::span_map::KIND_VERBATIM
+                    || i64::from(segment.virtual_end) <= pos
+                {
+                    continue;
+                }
+                pos = pos.max(i64::from(segment.virtual_start));
+                original_pos =
+                    i64::from(segment.original_start) + pos - i64::from(segment.virtual_start);
+                break;
+            }
+        }
+        let prefix = if original_pos != 0 { o.newline } else { "" };
         let extra = if text
             .get(pos as usize)
             .is_some_and(|b| matches!(b, b'\n' | b'\r'))
@@ -899,3 +916,7 @@ mod tests {
         );
     }
 }
+
+#[cfg(test)]
+#[path = "import_semicolon_tests.rs"]
+mod semicolon_tests;
