@@ -276,7 +276,9 @@ impl Runtime {
             }
             "workspace/didChangeConfiguration" => {
                 let value: lsp::DidChangeConfigurationParams = crate::decode(params)?;
-                if matches!(value.settings, lsp::Any::Object(_)) {
+                // The pin configures its session here. Before `initialized`
+                // there is none, and the notification has no effect.
+                if self.server.is_some() && matches!(value.settings, lsp::Any::Object(_)) {
                     self.apply_settings(&value.settings)?;
                 }
             }
@@ -1079,16 +1081,16 @@ impl Runtime {
             }
         }
         next.completion.locale = next.locale.clone();
+        // Import edits order added specifiers by the organize-imports settings.
+        next.completion.organize = next.organize.clone();
         if let Some(server) = &self.server {
             server.session().set_locale(next.locale.clone());
-        }
-        if next.validation != before.validation {
-            self.server
-                .as_ref()
-                .unwrap()
-                .session()
-                .set_validation_enabled(next.validation)
-                .map_err(crate::project_error)?;
+            if next.validation != before.validation {
+                server
+                    .session()
+                    .set_validation_enabled(next.validation)
+                    .map_err(crate::project_error)?;
+            }
         }
         *self.settings.lock().unwrap() = next.clone();
         if (next.inlay_flags != before.inlay_flags

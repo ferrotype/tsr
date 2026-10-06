@@ -3,209 +3,17 @@
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "total": 4534,
   "failing": {
-    "fourslash/TestAutoImportCssModule": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1507: At marker '': Label 'myClass' not found in actual items."
-    },
-    "fourslash/TestAutoImportDefaultPascalCaseReexportCaseInsensitive": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/autoImports/autoImportDefaultPascalCaseReexportCaseInsensitive.baseline.md has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestAutoImportDefaultPascalCaseReexportCaseInsensitive/baseline/TestAutoImportDefaultPascalCaseReexportCaseInsensitive/fourslash%2FautoImports%2FautoImportDefaultPascalCaseReexportCaseInsensitive.baseline.md": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "fourslash/autoImports/autoImportDefaultPascalCaseReexportCaseInsensitive.baseline.md: -import ChargerHeader from \"../components\"; | +import chargerheader from \"../components\"; | +```tsx | +import ChargerHeader from \"../components/ChargerHeader\";"
-    },
-    "fourslash/TestAutoImportModuleAugmentation": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/autoImports/autoImportModuleAugmentation.baseline.md has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestAutoImportModuleAugmentation/baseline/TestAutoImportModuleAugmentation/fourslash%2FautoImports%2FautoImportModuleAugmentation.baseline.md": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "fourslash/autoImports/autoImportModuleAugmentation.baseline.md: -``````ts | -import { Foo } from \"./a\"; | - | -Foo"
-    },
-    "fourslash/TestAutoImportProvider7": {
-      "reason": "completion-code-action-edit-symptom",
-      "detail": "autoImportProvider7_test.go:64: assertion failed: | --- f.getScriptInfo(f.activeFilename).content | +++ options.NewFileContent | @@ -1,4 +1,2 @@ | - | - | import·{·MyClass·}·from·\"mylib\";"
-    },
-    "fourslash/TestAutoImportProvider8": {
-      "reason": "completion-code-action-edit-symptom",
-      "detail": "autoImportProvider8_test.go:64: assertion failed: | --- f.getScriptInfo(f.activeFilename).content | +++ options.NewFileContent | @@ -1,4 +1,2 @@ | - | - | import·{·MyClass·}·from·\"mylib\";"
-    },
-    "fourslash/TestAutoImportReExportFromAmbientModule": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1507: At marker '': Label 'accessSync' not found in actual items."
-    },
-    "fourslash/TestAutoImportReexportOfCrossPackageAugmentation": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/autoImports/autoImportReexportOfCrossPackageAugmentation.baseline.md has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestAutoImportReexportOfCrossPackageAugmentation/baseline/TestAutoImportReexportOfCrossPackageAugmentation/fourslash%2FautoImports%2FautoImportReexportOfCrossPackageAugmentation.baseline.md": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "fourslash/autoImports/autoImportReexportOfCrossPackageAugmentation.baseline.md: -```ts | -import { uniqueFunction } from \"@vitest/expect\"; | - | -uniqueFunction"
-    },
-    "fourslash/TestAutoImportRelativePathToMonorepoPackage": {
-      "reason": "import-action-selection-or-edit-symptom",
-      "detail": "autoImportRelativePathToMonorepoPackage_test.go:35: Module specifier mismatch at index 0. | Expected: [./packages/utils/dist/index.js] | Actual: [./packages/app/node_modules/utils/dist/index.js]"
-    },
-    "fourslash/TestAutoImportSymlinkedMonorepo": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/autoImports/autoImportSymlinkedMonorepo.baseline.md has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestAutoImportSymlinkedMonorepo/baseline/TestAutoImportSymlinkedMonorepo/fourslash%2FautoImports%2FautoImportSymlinkedMonorepo.baseline.md": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "fourslash/autoImports/autoImportSymlinkedMonorepo.baseline.md: -import { projectBFunction, projectBValue } from \"project-b\"; | +import { projectBValue } from \"project-b\"; | +import { projectBFunction } from \"project-b\";"
-    },
-    "fourslash/TestAutoImportSymlinkedMonorepoProjectReferences": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/autoImports/autoImportSymlinkedMonorepoProjectReferences.baseline.md has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestAutoImportSymlinkedMonorepoProjectReferences/baseline/TestAutoImportSymlinkedMonorepoProjectReferences/fourslash%2FautoImports%2FautoImportSymlinkedMonorepoProjectReferences.baseline.md": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "fourslash/autoImports/autoImportSymlinkedMonorepoProjectReferences.baseline.md: +```ts | +import { projectBValue } from \"project-b\"; | +import { projectBFunction } from \"project-b\"; | +console.log(projectBValue);"
-    },
-    "fourslash/TestAutoImportSymlinkedMonorepoProjectReferencesNoPkgExports": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/autoImports/autoImportSymlinkedMonorepoProjectReferencesNoPkgExports.baseline.md has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestAutoImportSymlinkedMonorepoProjectReferencesNoPkgExports/baseline/TestAutoImportSymlinkedMonorepoProjectReferencesNoPkgExports/fourslash%2FautoImports%2FautoImportSymlinkedMonorepoProjectReferencesNoPkgExports.baseline.md": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "fourslash/autoImports/autoImportSymlinkedMonorepoProjectReferencesNoPkgExports.baseline.md: +```ts | +import { projectBValue } from \"project-b\"; | +import { projectBFunction } from \"project-b\"; | +console.log(projectBValue);"
-    },
-    "fourslash/TestAutoImportSymlinkedMonorepoReexport": {
-      "reason": "import-action-selection-or-edit-symptom",
-      "detail": "autoImportSymlinkedMonorepoReexport_test.go:81: Expected 2 import fixes, got 4: | import { projectBValue } from \"project-b\"; | import { projectBFunction } from \"project-b\"; | console.log(projectBValue); | projectBFunction | -------------------- | import { projectBValue } from \"project-b\";"
-    },
-    "fourslash/TestAutoImportSymlinkedMonorepoSourceUpdate": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/autoImports/autoImportSymlinkedMonorepoSourceUpdate.baseline.md has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestAutoImportSymlinkedMonorepoSourceUpdate/baseline/TestAutoImportSymlinkedMonorepoSourceUpdate/fourslash%2FautoImports%2FautoImportSymlinkedMonorepoSourceUpdate.baseline.md": {
-      "reason": "auto-import-baseline-symptom",
-      "detail": "fourslash/autoImports/autoImportSymlinkedMonorepoSourceUpdate.baseline.md: + | +"
-    },
-    "fourslash/TestAutoImportTransitiveLeak": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1542: At marker 'fooCompletion': Label 'fooInternal' should not be in actual items but was found."
-    },
-    "fourslash/TestAutoImportTypeImport1": {
-      "reason": "import-action-selection-or-edit-symptom",
-      "detail": "autoImportTypeImport1_test.go:28: assertion failed: | --- expected | +++ actual | @@ -1,3 +1,3 @@ | -import { A, D, type C, type B } from './foo'; | +import { A, D, type B, type C } from './foo'; | const b: B | C;"
-    },
-    "fourslash/TestAutoImportTypeImport2": {
-      "reason": "import-action-selection-or-edit-symptom",
-      "detail": "autoImportTypeImport2_test.go:33: assertion failed: | --- expected | +++ actual | @@ -1,3 +1,3 @@ | -import { A, type C, D, type B } from './foo'; | +import { A, type B, type C, D } from './foo'; | const b: B | C;"
-    },
-    "fourslash/TestAutoImportTypeImport3": {
-      "reason": "import-action-selection-or-edit-symptom",
-      "detail": "autoImportTypeImport3_test.go:33: assertion failed: | --- expected | +++ actual | @@ -1,3 +1,3 @@ | -import { A, type B, type C, D } from './foo'; | +import { A, D, type B, type C } from './foo'; | const b: B | C;"
-    },
-    "fourslash/TestAutoImportTypeImport5": {
-      "reason": "import-action-selection-or-edit-symptom",
-      "detail": "autoImportTypeImport5_test.go:44: assertion failed: | --- expected | +++ actual | @@ -1,3 +1,3 @@ | -import { type x, type X, type Y, type Z } from \"./exports1\"; | +import { type X, type x, type Y, type Z } from \"./exports1\"; | const foo: x;"
-    },
-    "fourslash/TestClassMembersAfterConstAssertionInitializer": {
-      "reason": "completion-context-eligibility-symptom",
-      "detail": "fourslash.go:1356: At marker '': Expected completion list but got nil."
-    },
-    "fourslash/TestCompletionFilterText3": {
-      "reason": "completion-filter-text-symptom",
-      "detail": "fourslash.go:1526: At marker '5': Includes completion item mismatch for label a bc: | FilterText mismatch: | &string( | - \t\".a bc\", | + \t\"?.a bc\", | )"
-    },
-    "fourslash/TestCompletionForComputedStringProperties": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1556: At marker '': Completion item mismatch for label p2: | &lsproto.CompletionItem{ | ... // 3 ignored and 7 identical fields | - \tInsertText:       nil, | + \tInsertText:       &\"[p2]\", | InsertTextFormat: nil, | InsertTextMode:   nil,"
-    },
-    "fourslash/TestCompletionForStringLiteral13": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1426: At marker '1': Expected 0 exact completion items but got 1."
-    },
-    "fourslash/TestCompletionImportAttributes": {
-      "reason": "completion-context-eligibility-symptom",
-      "detail": "fourslash.go:1364: At marker 'attr': Expected nil completion list but got non-nil:   any( | - \t&lsproto.CompletionList{ | - \t\tItemDefaults: &lsproto.CompletionItemDefaults{CommitCharacters: &[]string{\".\", \",\", \";\"}}, | - \t\tItems: []*lsproto.CompletionItem{ | - \t\t\t&{ | - \t\t\t\tLabel:    \"yadda1\", | - \t\t\t\tKind:     s\"Variable\","
-    },
-    "fourslash/TestCompletionInChecks1": {
-      "reason": "completion-context-eligibility-symptom",
-      "detail": "fourslash.go:1356: At marker '2': Expected completion list but got nil."
-    },
-    "fourslash/TestCompletionInNamedImportLocation": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1556: At marker '1': Completion item mismatch for label await: | &lsproto.CompletionItem{ | ... // 3 ignored and 7 identical fields | - \tInsertText:       nil, | + \tInsertText:       &\"await as await_\", | InsertTextFormat: nil, | InsertTextMode:   nil,"
-    },
     "fourslash/TestCompletionListAtIdentifierDefinitionLocations_destructuring": {
       "reason": "completion-context-eligibility-symptom",
       "detail": "fourslash.go:1364: At marker 'variable4': Expected nil completion list but got non-nil:   any( | - \t&lsproto.CompletionList{ | - \t\tItemDefaults: &lsproto.CompletionItemDefaults{ | - \t\t\tCommitCharacters: &[]string{\".\", \",\", \";\"}, | - \t\t\tEditRange:        &lsproto.RangeOrEditRangeWithInsertReplace{EditRangeWithInsertReplace: &lsproto.EditRangeWithInsertReplace{...}}, | - \t\t}, | - \t\tItems: []*lsproto.CompletionItem{"
-    },
-    "fourslash/TestCompletionListForExportEquals": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1426: At marker '': Expected 3 exact completion items but got 2."
-    },
-    "fourslash/TestCompletionListInExportClause01": {
-      "reason": "completion-context-eligibility-symptom",
-      "detail": "fourslash.go:1364: At marker '7': Expected nil completion list but got non-nil:   any( | - \t&lsproto.CompletionList{ | - \t\tItemDefaults: &lsproto.CompletionItemDefaults{CommitCharacters: &[]string{\".\", \",\", \";\"}}, | - \t\tItems: []*lsproto.CompletionItem{ | - \t\t\t&{ | - \t\t\t\tLabel:    \"type\", | - \t\t\t\tKind:     s\"Keyword\","
-    },
-    "fourslash/TestCompletionListInExtendsClause": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1554: At marker '1': Label mismatch: | string( | - \t\"apply\", | + \t\"staticMethod\", | )"
-    },
-    "fourslash/TestCompletionListInImportClause01": {
-      "reason": "completion-context-eligibility-symptom",
-      "detail": "fourslash.go:1356: At marker '8': Expected completion list but got nil."
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter17": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1502: At marker '0': Label '\"one\"' not found in actual items."
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter18": {
-      "reason": "completion-context-eligibility-symptom",
-      "detail": "fourslash.go:1356: At marker '0': Expected completion list but got nil."
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter20": {
-      "reason": "completion-context-eligibility-symptom",
-      "detail": "fourslash.go:1356: At marker '0': Expected completion list but got nil."
-    },
-    "fourslash/TestCompletionListInTypeLiteralInTypeParameter21": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1502: At marker '0': Label '\"one\"' not found in actual items."
     },
     "fourslash/TestCompletionListInUnclosedIndexSignature02": {
       "reason": "completion-items-or-fields-symptom",
       "detail": "fourslash.go:1502: At marker '1': Label 'foo' not found in actual items."
     },
-    "fourslash/TestCompletionListInUnclosedTypeArguments": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1502: At marker '1a': Label 'Type' not found in actual items."
-    },
-    "fourslash/TestCompletionListObjectMembersInTypeLocationWithTypeof": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1526: At marker '2': Includes completion item mismatch for label dance: | &lsproto.CompletionItem{ | ... // 3 ignored and 7 identical fields | - \tInsertText:       &\"?.dance\", | + \tInsertText:       nil, | InsertTextFormat: nil, | InsertTextMode:   nil,"
-    },
-    "fourslash/TestCompletionsAssertKeyword": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1507: At marker '0': Label 'assert' not found in actual items."
-    },
-    "fourslash/TestCompletionsAtGenericTypeArguments": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1426: At marker '1': Expected 141 exact completion items but got 112."
-    },
-    "fourslash/TestCompletionsForContextualConstraintTypeInJsDoc": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1502: At marker '1': Label '\"hello\"' not found in actual items."
-    },
-    "fourslash/TestCompletionsGeneratorFunctions": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1426: At marker 'c': Expected 1 exact completion items but got 1063."
-    },
     "fourslash/TestCompletionsImport_addToNamedWithDifferentCacheValue": {
       "reason": "completion-items-or-fields-symptom",
       "detail": "fourslash.go:1526: At marker '1': No completion item match for label MyClass (multiple candidates found): | ModuleSpecifier mismatch | ModuleSpecifier mismatch | ModuleSpecifier mismatch"
-    },
-    "fourslash/TestCompletionsImport_augmentation": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1507: At marker '': Label 'bar' not found in actual items."
-    },
-    "fourslash/TestCompletionsImport_default_alreadyExistedWithRename": {
-      "reason": "completion-code-action-edit-symptom",
-      "detail": "completionsImport_default_alreadyExistedWithRename_test.go:46: assertion failed: | --- f.getScriptInfo(f.activeFilename).content | +++ options.NewFileContent | @@ -1,3 +1,3 @@ | +import·foo·from·\"./a\"; | import·f_o_o·from·\"./a\"; | -import·foo·from·\"./a\";"
     },
     "fourslash/TestCompletionsImport_default_reExport": {
       "reason": "completion-items-or-fields-symptom",
@@ -219,29 +27,9 @@
       "reason": "completion-items-or-fields-symptom",
       "detail": "fourslash.go:1426: At marker '': Expected 70 exact completion items but got 68."
     },
-    "fourslash/TestCompletionsImport_umdModules2_moduleExports": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1526: At marker '1': Includes completion item mismatch for label classNames: | Mismatch in auto-import data presence"
-    },
     "fourslash/TestCompletionsJSDocNoCrash3": {
       "reason": "completion-items-or-fields-symptom",
       "detail": "fourslash.go:1426: At marker '': Expected 1 exact completion items but got 20."
-    },
-    "fourslash/TestCompletionsOverridingProperties2": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1526: At marker '': Includes completion item mismatch for label prop: | &lsproto.CompletionItem{ | ... // 3 ignored and 7 identical fields | InsertText:       nil, | - \tInsertTextFormat: s\"Snippet\", | + \tInsertTextFormat: nil, | InsertTextMode:   nil,"
-    },
-    "fourslash/TestCompletionsOverridingProperties3": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1526: At marker '': Includes completion item mismatch for label prop: | &lsproto.CompletionItem{ | ... // 3 ignored and 7 identical fields | InsertText:       nil, | - \tInsertTextFormat: s\"Snippet\", | + \tInsertTextFormat: nil, | InsertTextMode:   nil,"
-    },
-    "fourslash/TestCompletionsSymbolMembers": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1554: At marker 'i': Label mismatch: | string( | - \t\"�@s@1775\", | + \t\"s\", | )"
-    },
-    "fourslash/TestCompletionsUniqueSymbol1": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1426: At marker '': Expected 1 exact completion items but got 2."
     },
     "fourslash/TestDeclarationMapTestCasesForMaps": {
       "reason": "project-state-retention-baseline-symptom",
@@ -262,10 +50,6 @@
     "fourslash/TestDeclarationMapTestCasesForMaps/subtest/TestDeclarationMapsRenameStartingAtDefinition": {
       "reason": "project-state-retention-baseline-symptom",
       "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/state/declarationMapsRenameStartingAtDefinition.baseline has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
-    },
-    "fourslash/TestExhaustiveCaseCompletionsUntitledImportedEnum": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1526: At marker '': Includes completion item mismatch for label case Status.Active: ...: | AdditionalTextEdits mismatch: | (*[]*lsproto.TextEdit)( | - \t&{&{NewText: \"import { Status } from \\\"/home/src/project/enums\\\";\\n\\n\"}}, | + \tnil, | )"
     },
     "fourslash/TestFindAllRefsForDefaultExport02": {
       "reason": "navigation-or-display-baseline-symptom",
@@ -319,14 +103,6 @@
       "reason": "other-assertion-symptom",
       "detail": "getEditsForFileRename_cssImport4_test.go:31: assertion failed: import styles from \"./app.css\"; (script.content string) != import styles from \"./app2.css\"; (expectedContent string): File content after rename did not match expected content for /a.ts."
     },
-    "fourslash/TestGetJavaScriptCompletions11": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1507: At marker '': Label 'toExponential' not found in actual items."
-    },
-    "fourslash/TestGetJavaScriptCompletions21": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1426: At marker '': Expected 1 exact completion items but got 2."
-    },
     "fourslash/TestGoToImplementationNoCrashTripleSlashRef2": {
       "reason": "navigation-or-display-baseline-symptom",
       "detail": "baseline.go:87: the baseline file /Users/cristian/git/ts-rust/upstream/tsc/testdata/baselines/reference/fourslash/goToImplementation/goToImplementationNoCrashTripleSlashRef2.baseline.jsonc has changed. (Run `hereby baseline-accept` if the new baseline is correct.)"
@@ -334,18 +110,6 @@
     "fourslash/TestGoToImplementationNoCrashTripleSlashRef2/baseline/TestGoToImplementationNoCrashTripleSlashRef2/fourslash%2FgoToImplementation%2FgoToImplementationNoCrashTripleSlashRef2.baseline.jsonc": {
       "reason": "navigation-or-display-baseline-symptom",
       "detail": "fourslash/goToImplementation/goToImplementationNoCrashTripleSlashRef2.baseline.jsonc: - | -// === /node_modules/excalidraw/index.d.ts === | -// /// <reference types=\"[|react|]\" /> | -// "
-    },
-    "fourslash/TestImportNameCodeFixNewImportAllowSyntheticDefaultImports0": {
-      "reason": "code-fix-edit-or-availability-symptom",
-      "detail": "importNameCodeFixNewImportAllowSyntheticDefaultImports0_test.go:23: No codefixes returned."
-    },
-    "fourslash/TestImportNameCodeFix_all2": {
-      "reason": "other-assertion-symptom",
-      "detail": "importNameCodeFix_all2_test.go:24: assertion failed: | --- options.NewFileContent | +++ actual | @@ -1,2 +1,4 @@ | + | + | import·{·homedir·}·from·\"./os\";"
-    },
-    "fourslash/TestImportNameCodeFix_importType2": {
-      "reason": "import-action-selection-or-edit-symptom",
-      "detail": "importNameCodeFix_importType2_test.go:41: assertion failed: | --- expected | +++ actual | @@ -1,3 +1,3 @@ | +import·{·someValue·}·from·\"./exports1.js\"; | import·type·SomeType·from·\"./exports1.js\"; | -import·{·someValue·}·from·\"./exports1.js\";"
     },
     "fourslash/TestInlayHintsInteractiveTemplateLiteralTypes": {
       "reason": "navigation-or-display-baseline-symptom",
@@ -355,29 +119,9 @@
       "reason": "navigation-or-display-baseline-symptom",
       "detail": "fourslash/inlayHints/inlayHintsInteractiveTemplateLiteralTypes.baseline: +    }, | +    { | +      \"value\": \"\" | +      \"value\": \"\""
     },
-    "fourslash/TestJavascriptModulesTypeImportAsValue": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1542: At marker '': Label 'Pet' should not be in actual items but was found."
-    },
     "fourslash/TestJsdocTypedefTagTypeExpressionCompletion": {
       "reason": "completion-items-or-fields-symptom",
       "detail": "fourslash.go:1426: At marker 'valueMemberOfFoo': Expected 9 exact completion items but got 2."
-    },
-    "fourslash/TestJsxAttributeCompletionStyleAuto": {
-      "reason": "completion-filter-text-symptom",
-      "detail": "fourslash.go:1556: At marker '': Completion item mismatch for label prop_h?: | FilterText mismatch: | &string( | - \t`prop_h=\"$1\"`, | + \t\"prop_h\", | )"
-    },
-    "fourslash/TestMemberListInWithBlock2": {
-      "reason": "completion-context-eligibility-symptom",
-      "detail": "fourslash.go:1364: At marker '1': Expected nil completion list but got non-nil:   any( | - \t&lsproto.CompletionList{ | - \t\tItemDefaults: &lsproto.CompletionItemDefaults{CommitCharacters: &[]string{}}, | - \t\tItems: []*lsproto.CompletionItem{ | - \t\t\t&{ | - \t\t\t\tLabel:    \"abstract\", | - \t\t\t\tKind:     s\"Keyword\","
-    },
-    "fourslash/TestStringLiteralCompletionsInJsxAttributeInitializer": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1542: At marker '4': Label '\"somethingelse\"' should not be in actual items but was found."
-    },
-    "fourslash/TestSwitchCompletions": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1542: At marker '3': Label 'bar' should not be in actual items but was found."
     },
     "fourslash/TestTransitiveExportImports2": {
       "reason": "navigation-or-display-baseline-symptom",
@@ -386,10 +130,6 @@
     "fourslash/TestTransitiveExportImports2/baseline/TestTransitiveExportImports2/fourslash%2FfindRenameLocations%2FtransitiveExportImports2.baseline.jsonc": {
       "reason": "navigation-or-display-baseline-symptom",
       "detail": "fourslash/findRenameLocations/transitiveExportImports2.baseline.jsonc: -// export import B = [|ARENAME|]; | -// B.x; | +// export import [|BRENAME|] = [|ARENAME|]; | +// [|BRENAME|].x;"
-    },
-    "fourslash/TestTripleSlashRefPathCompletionHiddenFile": {
-      "reason": "completion-items-or-fields-symptom",
-      "detail": "fourslash.go:1426: At marker '0': Expected 1 exact completion items but got 2."
     }
   }
 }

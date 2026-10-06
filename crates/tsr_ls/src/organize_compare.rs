@@ -137,6 +137,39 @@ impl OrganizeOptions {
             upper: self.case_first == "upper",
         }
     }
+    /// The comparers and type orders that import edits test when they add
+    /// named specifiers to an existing import.
+    // port: tsc/internal/ls/lsutil/organizeimports.go:GetDetectionLists
+    // port: tsc/internal/ls/lsutil/organizeimports.go:ResolveOrganizeImportsSort
+    pub(crate) fn specifier_preferences(&self) -> tsr_autoimport::edits::SpecifierPreferences {
+        use tsr_autoimport::edits::TypeOrder as Order;
+        let fixed_sort = self.explicit() || self.ignore_case.is_some();
+        let comparers = if fixed_sort {
+            vec![self.comparer(self.ignore_case.unwrap_or(false))]
+        } else {
+            vec![self.comparer(true), self.comparer(false)]
+        };
+        let type_order = match self.type_order.as_str() {
+            "first" => Some(Order::First),
+            "inline" => Some(Order::Inline),
+            "last" => Some(Order::Last),
+            _ => None,
+        };
+        tsr_autoimport::edits::SpecifierPreferences {
+            comparers: comparers
+                .into_iter()
+                .map(|comparer| -> tsr_autoimport::edits::StringComparer {
+                    std::sync::Arc::new(move |a: &[u8], b: &[u8]| comparer.compare(a, b))
+                })
+                .collect(),
+            type_orders: type_order.map_or_else(
+                || vec![Order::Last, Order::Inline, Order::First],
+                |order| vec![order],
+            ),
+            type_order,
+            detect: !fixed_sort || type_order.is_none(),
+        }
+    }
     // port: tsc/internal/ls/lsutil/organizeimports.go:GetDetectionLists
     #[allow(
         clippy::if_not_else,

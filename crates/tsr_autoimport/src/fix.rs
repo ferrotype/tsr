@@ -415,7 +415,7 @@ pub fn fixes_with_info(
             tsr_jsstring::JsString::from_bytes(export.ambient_module_name()),
             ModuleSpecifierKind::Ambient,
         )
-    } else if !export.package_name.is_empty() {
+    } else if !export.package_name.is_empty() && !export.entrypoints.is_empty() {
         let Some(specifier) = crate::specifiers::for_package(
             export,
             checker,

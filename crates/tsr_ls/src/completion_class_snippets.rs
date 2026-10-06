@@ -170,7 +170,10 @@ impl LanguageService<'_> {
         let Some((Container::Class, class)) = context.container else {
             return Ok(Some(item));
         };
-        if !options.class_member_snippets || syntax.file.is_js() {
+        if !options.class_member_snippets
+            || syntax.file.is_js()
+            || !class_like_member_completion(checker, syntax, context.location, symbol)?
+        {
             return Ok(Some(item));
         }
         let declarations: Vec<_> = checker
@@ -721,3 +724,48 @@ fn member_body(
 #[cfg(test)]
 #[path = "completion_class_snippets_tests.rs"]
 mod tests;
+
+// port: tsc/internal/ls/completions.go:isClassLikeMemberCompletion
+fn class_like_member_completion(
+    checker: &Operation<'_>,
+    syntax: &mut Syntax<'_>,
+    location: tsr_ast::NodeId,
+    symbol: SymbolRef,
+) -> Result<bool> {
+    if checker.symbol(symbol)?.flags() & (sf::CLASS_MEMBER & sf::ENUM_MEMBER_EXCLUDES) == 0 {
+        return Ok(false);
+    }
+    let view = syntax.view;
+    let read = view.node(location)?;
+    if tsr_ast::utilities::is_class_like(&read) {
+        return Ok(true);
+    }
+    let Some(parent) = read.parent() else {
+        return Ok(false);
+    };
+    let parent_read = view.node(parent)?;
+    if read.kind() == tsr_ast::SyntaxKind::SyntaxList
+        && tsr_ast::utilities::is_class_like(&parent_read)
+    {
+        return Ok(true);
+    }
+    let Some(grandparent) = parent_read.parent() else {
+        return Ok(false);
+    };
+    if !tsr_ast::utilities::is_class_element(&parent_read)
+        || parent_read.name() != Some(location)
+        || !tsr_ast::utilities::is_class_like(&view.node(grandparent)?)
+    {
+        return Ok(false);
+    }
+    // The member is still only a name: `class C { m| }`.
+    let last = tsr_format::get_last_token(
+        &mut tsr_format::FormatFile {
+            view,
+            source: syntax.source,
+            jsdoc: &mut syntax.docs,
+        },
+        Some(parent),
+    )?;
+    Ok(last == Some(location))
+}

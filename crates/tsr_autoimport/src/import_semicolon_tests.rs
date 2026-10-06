@@ -41,6 +41,7 @@ fn added_import(preference: tsr_format::SemicolonPreference, require: bool) -> S
                 verbatim: false,
                 newline: "\n",
                 usage: None,
+                specifiers: &crate::edits::SpecifierPreferences::default(),
             },
         )
         .unwrap();

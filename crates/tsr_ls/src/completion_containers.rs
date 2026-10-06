@@ -76,6 +76,7 @@ impl LanguageService<'_> {
                     nullable: false,
                     this_member: false,
                     promise: false,
+                    symbol_member: false,
                 });
             }
         }
@@ -131,6 +132,14 @@ impl LanguageService<'_> {
                     Some(checker.get_type_at_location(node)?)
                 };
                 let Some(ty) = ty else {
+                    // An object literal in a with statement has no completions.
+                    if kind == Container::Object
+                        && view.node(node)?.flags() & tsr_ast::node_flags::IN_WITH_STATEMENT != 0
+                    {
+                        context.filter = Filter::None;
+                        context.new_identifier = false;
+                        return Ok(Some(Vec::new()));
+                    }
                     context.container = None;
                     context.filter = Filter::All;
                     context.new_identifier = true;
@@ -222,7 +231,7 @@ impl LanguageService<'_> {
                 }
                 if let Some(specifier) = specifier {
                     if let Some(module) = checker.get_symbol_at_location(specifier)? {
-                        symbols = checker.get_exports_of_module(module)?;
+                        symbols = checker.get_exports_and_properties_of_module(module)?;
                     }
                 } else if kind == Container::Exports {
                     return self
@@ -330,7 +339,12 @@ impl LanguageService<'_> {
                 nullable: false,
                 this_member: false,
                 promise: false,
+                symbol_member: false,
             });
+        }
+        if candidates.is_empty() && matches!(kind, Container::Imports | Container::Exports) {
+            // With nothing else to import, `type` is not offered either.
+            context.filter = Filter::None;
         }
         Ok(Some(candidates))
     }
@@ -385,6 +399,7 @@ impl LanguageService<'_> {
                         nullable: false,
                         this_member: false,
                         promise: false,
+                        symbol_member: false,
                     })
                 })
             })
@@ -555,7 +570,7 @@ fn class_flags(syntax: &mut Syntax<'_>, context: &Context, position: i64) -> Res
 }
 
 // port: tsc/internal/ls/completions.go:getConstraintOfTypeArgumentProperty
-fn type_argument_property_constraint(
+pub(crate) fn type_argument_property_constraint(
     checker: &mut Operation<'_>,
     syntax: &Syntax<'_>,
     node: Option<tsr_ast::NodeId>,

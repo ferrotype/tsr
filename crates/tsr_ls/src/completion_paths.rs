@@ -233,10 +233,12 @@ impl LanguageService<'_> {
                 .unwrap_or(usize::MAX)
         });
         for name in files {
-            if !options
-                .extensions
-                .iter()
-                .any(|ext| name.as_bytes().ends_with(ext))
+            // The pin's `./*` include pattern never matches a dot-file.
+            if name.as_bytes().starts_with(b".")
+                || !options
+                    .extensions
+                    .iter()
+                    .any(|ext| name.as_bytes().ends_with(ext))
             {
                 continue;
             }

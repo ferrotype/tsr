@@ -1,4 +1,5 @@
 use crate::index::{Index, Named};
+use std::collections::HashSet;
 use tsr_ast::{
     modifier_flags as mf, symbol_flags as sf, utilities as ast, NodeId, SyntaxKind as K,
 };
@@ -104,28 +105,45 @@ impl Registry {
         canceled: impl Fn() -> bool,
     ) -> Result<Option<Self>, Error> {
         let mut index = Index::default();
+        let symlinked = if package {
+            HashSet::new()
+        } else {
+            symlinked_from_node_modules(program, checker)?
+        };
         for file in program.files() {
             if canceled() {
                 return Ok(None);
             }
             let view = file.bound().view().ast();
             let source = view.source_file(file.source())?;
+            // Ordinary node_modules files, and files reached through a
+            // node_modules symlink, are indexed with their packages.
             if source.is_content_mapper_supplemental()
                 || program.default_lib_file(source.path()).is_some()
                 || !package
                     && source.content_mapper().is_empty()
-                    && source
+                    && (source
                         .file_name()
                         .windows(b"/node_modules/".len())
                         .any(|part| part == b"/node_modules/")
+                        || symlinked.contains(source.path()))
             {
                 continue;
             }
             let path = JsString::from_bytes(source.path());
             let filename = JsString::from_bytes(source.file_name());
             let mut modules = Vec::new();
+            let mut augmentations = Vec::new();
             if let Some(module) = checker.bound_symbol_of_node(file.source())? {
-                modules.push((module, path.clone(), filename.clone()));
+                // Package files use their realpath as the module identity, so
+                // a symlinked package matches imports resolved to real files.
+                let module_id = if package {
+                    real_module_path(program, source.file_name())
+                } else {
+                    path.clone()
+                };
+                modules.push((module, module_id, filename.clone()));
+                augmentations = module_augmentations(program, file)?;
             } else {
                 for statement in view
                     .node_slice(view.node(file.source())?.statements(view)?)?
@@ -180,7 +198,7 @@ impl Registry {
                         let parent = checker.symbol_ref(parent)?;
                         let parent = checker.get_merged_symbol(parent)?;
                         if checker.symbol(parent)?.is_external_module() {
-                            if let Some(target) = export_id_for_symbol(program, checker, symbol)? {
+                            if let Some(target) = export_id(program, checker, symbol, package)? {
                                 if target.module != export.id.module {
                                     export.syntax = ExportSyntax::Star;
                                     export.target = Some(target);
@@ -211,6 +229,32 @@ impl Registry {
                     }
                 }
             }
+            for (declaration, module_id, module_file_name) in augmentations {
+                let Some(module) = checker.bound_symbol_of_node(declaration)? else {
+                    continue;
+                };
+                let Some(table) = checker.symbol(module)?.exports() else {
+                    continue;
+                };
+                let symbols: Vec<_> = checker.symbol_table(table)?.symbols().flatten().collect();
+                for symbol in symbols {
+                    if canceled() {
+                        return Ok(None);
+                    }
+                    let symbol = checker.symbol_ref(symbol)?;
+                    if let Some(export) = extract(
+                        program,
+                        checker,
+                        symbol,
+                        module_id.clone(),
+                        module_file_name.clone(),
+                        path.clone(),
+                        None,
+                    )? {
+                        index.insert(export);
+                    }
+                }
+            }
         }
         Ok(Some(Self {
             index,
@@ -232,12 +276,244 @@ impl Registry {
             .collect()
     }
 }
+/// Program files outside the project directory that a symlink exposes under
+/// node_modules.
+// port: tsc/internal/ls/autoimport/registry.go:hasSymlinkToNodeModules
+fn symlinked_from_node_modules(
+    program: &Program,
+    checker: &Operation<'_>,
+) -> Result<HashSet<Vec<u8>>, Error> {
+    let mut result = HashSet::new();
+    let Some(symlinks) = checker.symlink_cache()? else {
+        return Ok(result);
+    };
+    let root = tsr_tspath::Path::from(tsr_tspath::to_path(
+        program.current_directory(),
+        program.current_directory(),
+        program.use_case_sensitive_file_names(),
+    ));
+    let through_node_modules = |links: &tsr_module::symlinks::SymlinkSet| {
+        let mut found = false;
+        links.range(|link| {
+            found = link
+                .windows(b"/node_modules/".len())
+                .any(|part| part == b"/node_modules/");
+            !found
+        });
+        found
+    };
+    for file in program.files() {
+        let view = file.bound().view().ast();
+        let source = view.source_file(file.source())?;
+        let path = tsr_tspath::Path::from_bytes(source.path());
+        if root.contains_path(&path) {
+            continue;
+        }
+        let mut found = symlinks
+            .files_by_realpath()
+            .load(&path)
+            .is_some_and(|links| through_node_modules(&links));
+        if !found {
+            tsr_tspath::for_each_ancestor_directory_path(&path, |directory| {
+                found = symlinks
+                    .directories_by_realpath()
+                    .load(&directory.ensure_trailing_directory_separator())
+                    .is_some_and(|links| through_node_modules(&links));
+                ((), found)
+            });
+        }
+        if found {
+            result.insert(source.path().to_vec());
+        }
+    }
+    Ok(result)
+}
+/// A module file's non-global augmentations, each with the module ID and file
+/// name of the module it augments. Relative names use the augmented file's
+/// path; ambient names are their own IDs.
+// port: tsc/internal/ls/autoimport/extract.go:exportExtractor.extractFromModule
+pub fn module_augmentations(
+    program: &Program,
+    file: &tsr_compiler::ProgramFile,
+) -> Result<Vec<(NodeId, JsString, JsString)>, Error> {
+    let view = file.bound().view().ast();
+    let source = view.source_file(file.source())?;
+    let mut result = Vec::new();
+    for &name in source.module_augmentations()?.iter().flatten() {
+        let Some(declaration) = view.node(name)?.parent() else {
+            continue;
+        };
+        if tsr_ast::utilities::is_global_scope_augmentation(&view.node(declaration)?) {
+            continue;
+        }
+        let text = view.node_text(name)?.into_js_string();
+        if !tsr_tspath::is_external_module_name_relative(text.as_bytes()) {
+            result.push((declaration, text, JsString::default()));
+            continue;
+        }
+        // The pin's extractor re-resolves the name in CommonJS mode; this uses
+        // the program's retained resolution of the same augmentation name.
+        let resolved = program
+            .resolved_module_from_specifier(file, name)
+            .map_err(|error| match error {
+                tsr_compiler::Error::Checker(error) => error,
+                tsr_compiler::Error::Ast(error) => Error::from(error),
+                _ => Error::MissingLink("module augmentation resolution"),
+            })?
+            .filter(|module| module.is_resolved())
+            .map(|module| module.resolved_file_name.clone());
+        let file_name = resolved.unwrap_or_else(|| {
+            JsString::from_bytes(tsr_tspath::normalize(&tsr_tspath::combine(
+                &tsr_tspath::directory(source.file_name()),
+                &[text.as_bytes()],
+            )))
+        });
+        let module = tsr_tspath::to_path(
+            file_name.as_bytes(),
+            program.current_directory(),
+            program.use_case_sensitive_file_names(),
+        );
+        result.push((declaration, module, file_name));
+    }
+    Ok(result)
+}
+
+/// The export a symbol is reached through, built without the index: a UMD
+/// global is in no module's exports table.
+// port: tsc/internal/ls/autoimport/export.go:SymbolToExport
+pub fn symbol_to_export(
+    program: &Program,
+    checker: &mut Operation<'_>,
+    symbol: SymbolRef,
+) -> Result<Option<Export>, Error> {
+    if let Some(parent) = checker.symbol(symbol)?.parent() {
+        let parent = checker.symbol_ref(parent)?;
+        if checker.symbol(parent)?.is_external_module() {
+            let Some((module, file_name, path)) = module_of_symbol(program, checker, parent)?
+            else {
+                return Ok(None);
+            };
+            return extract(program, checker, symbol, module, file_name, path, None);
+        }
+    }
+    let Some(declaration) = checker.symbol_declarations(symbol)?.iter().flatten().next() else {
+        return Ok(None);
+    };
+    let Some(file) = program.file_of_node(declaration) else {
+        return Ok(None);
+    };
+    let Some(module) = checker.bound_symbol_of_node(file.source())? else {
+        return Ok(None);
+    };
+    let module = checker.get_merged_symbol(module)?;
+    let source = file.bound().view().ast().source_file(file.source())?;
+    let path = JsString::from_bytes(source.path());
+    let file_name = JsString::from_bytes(source.file_name());
+    let target = checker.skip_alias(symbol)?;
+    let target = checker.get_merged_symbol(target)?;
+    let name = JsString::from_bytes(checker.symbol(symbol)?.name_bytes());
+    for name in [
+        b"default".as_slice(),
+        b"export=".as_slice(),
+        name.as_bytes(),
+    ] {
+        if let Some(exported) = lookup_export(checker, module, name)? {
+            let resolved = checker.skip_alias(exported)?;
+            if checker.get_merged_symbol(resolved)? == target {
+                return extract(
+                    program,
+                    checker,
+                    exported,
+                    path.clone(),
+                    file_name,
+                    path,
+                    None,
+                );
+            }
+        }
+    }
+    Ok(None)
+}
+
+/// A module symbol's ID, file name and declaring file path.
+// port: tsc/internal/ls/autoimport/util.go:tryGetModuleIDAndFileNameOfModuleSymbol
+fn module_of_symbol(
+    program: &Program,
+    checker: &mut Operation<'_>,
+    module: SymbolRef,
+) -> Result<Option<(JsString, JsString, JsString)>, Error> {
+    for declaration in checker.symbol_declarations(module)?.iter().flatten() {
+        let Some(file) = program.file_of_node(declaration) else {
+            continue;
+        };
+        let view = file.bound().view().ast();
+        if tsr_ast::utilities_modules::is_external_module_augmentation(view, declaration)?
+            || tsr_ast::utilities::is_global_scope_augmentation(&view.node(declaration)?)
+        {
+            continue;
+        }
+        let source = view.source_file(file.source())?;
+        let path = JsString::from_bytes(source.path());
+        let read = view.node(declaration)?;
+        if read.kind() == K::SourceFile {
+            return Ok(Some((
+                path.clone(),
+                JsString::from_bytes(source.file_name()),
+                path,
+            )));
+        }
+        if let Some(name) = read
+            .name()
+            .filter(|&id| view.node(id).is_ok_and(|n| n.kind() == K::StringLiteral))
+        {
+            return Ok(Some((
+                view.node_text(name)?.into_js_string(),
+                JsString::default(),
+                path,
+            )));
+        }
+        return Ok(None);
+    }
+    Ok(None)
+}
+
 // port: tsc/internal/ls/autoimport/export.go:SymbolToExport
 pub fn export_id_for_symbol(
     program: &Program,
     checker: &mut Operation<'_>,
     symbol: SymbolRef,
 ) -> Result<Option<ExportId>, Error> {
+    export_id(program, checker, symbol, false)
+}
+
+/// The module identity of a package file: its realpath's canonical path.
+// port: tsc/internal/ls/autoimport/extract.go:symbolExtractor.getModuleID
+fn real_module_path(program: &Program, file_name: &[u8]) -> JsString {
+    let real = program
+        .host()
+        .realpath(file_name)
+        .unwrap_or_else(|_| JsString::from_bytes(file_name));
+    tsr_tspath::to_path(
+        real.as_bytes(),
+        program.current_directory(),
+        program.use_case_sensitive_file_names(),
+    )
+}
+
+// port: tsc/internal/ls/autoimport/extract.go:symbolExtractor.getModuleIDForSymbol
+fn export_id(
+    program: &Program,
+    checker: &mut Operation<'_>,
+    symbol: SymbolRef,
+    realpath: bool,
+) -> Result<Option<ExportId>, Error> {
+    let module_path = |source: &tsr_ast::SourceFileRead<'_>| {
+        if realpath {
+            real_module_path(program, source.file_name())
+        } else {
+            JsString::from_bytes(source.path())
+        }
+    };
     let read = checker.symbol(symbol)?;
     if let Some(parent) = read.parent() {
         let parent = checker.symbol_ref(parent)?;
@@ -254,7 +530,7 @@ pub fn export_id_for_symbol(
                 }
                 let d = view.node(declaration)?;
                 let module = if d.kind() == K::SourceFile {
-                    JsString::from_bytes(view.source_file(declaration)?.path())
+                    module_path(&view.source_file(declaration)?)
                 } else if let Some(name) = d
                     .name()
                     .filter(|&id| view.node(id).is_ok_and(|n| n.kind() == K::StringLiteral))
@@ -293,7 +569,7 @@ pub fn export_id_for_symbol(
             let exported = checker.skip_alias(exported)?;
             if checker.get_merged_symbol(exported)? == target {
                 return Ok(Some(ExportId {
-                    module: JsString::from_bytes(file.bound().view().source_file()?.path()),
+                    module: module_path(&file.bound().view().source_file()?),
                     name: JsString::from_bytes(name),
                 }));
             }
@@ -395,8 +671,13 @@ fn extract(
                 ),
             })
     };
-    let mut local_name = JsString::default();
-    if matches!(name.as_bytes(), b"default" | b"export=") {
+    // A UMD global is imported as its module's export=, under the global name.
+    let (name, mut local_name) = if syntax == ExportSyntax::Umd {
+        (JsString::from_bytes(b"export=".as_slice()), name)
+    } else {
+        (name, JsString::default())
+    };
+    if syntax != ExportSyntax::Umd && matches!(name.as_bytes(), b"default" | b"export=") {
         local_name = declaration_name(program, &declarations)?;
         if unusable_name(local_name.as_bytes()) {
             if let Some(target) = &target_id {
@@ -412,15 +693,33 @@ fn extract(
             local_name = declaration_name(program, &declarations)?;
         }
         if unusable_name(local_name.as_bytes()) {
-            let file = target_id
-                .as_ref()
-                .map_or(module_file_name.as_bytes(), |id| id.module.as_bytes());
-            let file = if file.is_empty() {
-                module.as_bytes()
+            // The target's file name keeps the casing a folded path loses.
+            // port: tsc/internal/ls/autoimport/extract.go:fileNameForDefaultExportName
+            let target_file = if target == symbol {
+                None
             } else {
-                file
+                checker
+                    .symbol_declarations(target)?
+                    .iter()
+                    .flatten()
+                    .next()
+                    .and_then(|declaration| program.file_of_node(declaration))
+                    .map(|file| {
+                        let view = file.bound().view().ast();
+                        view.source_file(file.source())
+                            .map(|source| JsString::from_bytes(source.file_name()))
+                    })
+                    .transpose()?
+                    .filter(|name| !name.is_empty())
             };
-            local_name = JsString::from_bytes(module_identifier(file));
+            let file = target_file.unwrap_or_else(|| {
+                if module_file_name.is_empty() {
+                    module.clone()
+                } else {
+                    module_file_name.clone()
+                }
+            });
+            local_name = JsString::from_bytes(module_identifier(file.as_bytes()));
         }
     }
     let type_only = checker.get_type_only_alias_declaration(symbol)?.is_some();

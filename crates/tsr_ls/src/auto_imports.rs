@@ -46,54 +46,61 @@ impl LanguageService<'_> {
             )
             .map_err(crate::Error::Compiler)?
             .ok_or(crate::Error::Canceled)?;
+            let mut ambient: HashMap<_, Vec<_>> = HashMap::new();
+            let mut retries = Vec::new();
             for package in packages {
                 self.check_canceled()?;
-                let counters = tsr_arena::Counters::new();
-                let program = package.load(self.program, &counters)?;
-                let Some(file) = program.files().first() else {
+                let Some((program, mut package_registry)) = self.package_registry(&package, &[])?
+                else {
                     continue;
                 };
-                let owner = Arc::new(tsr_checker::CheckerOwner::for_program(
-                    tsr_arena::CheckerIdentity::new(
-                        tsr_arena::Generation::new(&counters),
-                        &counters,
-                    ),
-                    &counters,
-                    Arc::new(tsr_compiler::ProgramCheckerHost::new(program.clone())),
-                )?);
-                let mut checker = owner.operation()?;
-                let mut package_registry = Registry::build_package(&program, &mut checker, || {
-                    self.cancellation.is_canceled()
-                })?
-                .ok_or(crate::Error::Canceled)?;
-                package.retain_entrypoints(&mut package_registry);
-                let service = LanguageService::new(
-                    &program,
-                    tsr_jsstring::PositionEncoding::Utf16,
-                    self.cancellation.clone(),
-                );
-                service.complete_export_metadata(
-                    &mut checker,
-                    &mut package_registry,
-                    file.source(),
-                )?;
+                // A root that re-exports from an unresolved bare name keeps no
+                // exports until a second pass finds that name declared as an
+                // ambient module by another package.
+                let failed = package.failed_ambient_lookups(&program)?;
+                let failed_files: std::collections::HashSet<_> =
+                    failed.iter().map(|(file, _)| file.clone()).collect();
+                package_registry.index = package_registry
+                    .index
+                    .filtered(|e| !failed_files.contains(&e.path));
+                for (name, file) in package.ambient_modules(&program)? {
+                    ambient.entry(name).or_default().push(file);
+                }
                 // Package exports are supplied by this independently scoped
                 // index, including files also loaded by the user's program.
-                let package_paths: std::collections::HashSet<_> = package
-                    .entrypoints
-                    .iter()
-                    .flat_map(|e| {
-                        [
-                            e.resolved_file_name.clone(),
-                            tsr_jsstring::JsString::from_bytes(e.symlink_or_realpath()),
-                        ]
-                    })
-                    .collect();
+                let package_paths: std::collections::HashSet<_> =
+                    package.root_file_names().cloned().collect();
                 registry.index = registry
                     .index
                     .filtered(|e| !package_paths.contains(&e.path));
                 for export in package_registry.index.entries() {
                     registry.index.insert(export.clone());
+                }
+                if !failed.is_empty() {
+                    retries.push((package, failed_files, failed));
+                }
+            }
+            // Pin registryBuilder.updateIndexes: the second pass over failed ambient lookups.
+            for (package, failed_files, failed) in retries {
+                self.check_canceled()?;
+                let mut roots = Vec::new();
+                for name in failed.iter().flat_map(|(_, names)| names) {
+                    for file in ambient.get(name).into_iter().flatten() {
+                        if !roots.contains(file) {
+                            roots.push(file.clone());
+                        }
+                    }
+                }
+                if roots.is_empty() {
+                    continue;
+                }
+                let Some((_, package_registry)) = self.package_registry(&package, &roots)? else {
+                    continue;
+                };
+                for export in package_registry.index.entries() {
+                    if failed_files.contains(&export.path) {
+                        registry.index.insert(export.clone());
+                    }
                 }
             }
             if let Some(excludes) =
@@ -109,6 +116,35 @@ impl LanguageService<'_> {
             self.auto_imports.publish(registry)
         };
         Ok(registry)
+    }
+    /// A package's exports from its own program, with `extra` roots loaded.
+    fn package_registry(
+        &self,
+        package: &tsr_autoimport::packages::Package,
+        extra: &[tsr_jsstring::JsString],
+    ) -> Result<Option<(Arc<tsr_compiler::Program>, Registry)>> {
+        let counters = tsr_arena::Counters::new();
+        let program = package.load_with(self.program, &counters, extra)?;
+        let Some(file) = program.files().first() else {
+            return Ok(None);
+        };
+        let owner = Arc::new(tsr_checker::CheckerOwner::for_program(
+            tsr_arena::CheckerIdentity::new(tsr_arena::Generation::new(&counters), &counters),
+            &counters,
+            Arc::new(tsr_compiler::ProgramCheckerHost::new(program.clone())),
+        )?);
+        let mut checker = owner.operation()?;
+        let mut registry =
+            Registry::build_package(&program, &mut checker, || self.cancellation.is_canceled())?
+                .ok_or(crate::Error::Canceled)?;
+        package.retain_entrypoints(&mut registry);
+        let service = LanguageService::new(
+            &program,
+            tsr_jsstring::PositionEncoding::Utf16,
+            self.cancellation.clone(),
+        );
+        service.complete_export_metadata(&mut checker, &mut registry, file.source())?;
+        Ok(Some((program, registry)))
     }
     fn complete_export_metadata(
         &self,
@@ -346,14 +382,31 @@ impl LanguageService<'_> {
         } else {
             None
         };
-        let Some(module) = module else {
+        let name = export.id.name.as_bytes();
+        if let Some(module) = module {
+            if let Some(symbol) = tsr_autoimport::lookup_export(checker, module, name)? {
+                return Ok(Some(symbol));
+            }
+        }
+        // An augmentation's export is its declaration's own, as extracted.
+        let Some(file) = self.program.file(export.path.as_bytes()) else {
             return Ok(None);
         };
-        Ok(tsr_autoimport::lookup_export(
-            checker,
-            module,
-            export.id.name.as_bytes(),
-        )?)
+        for (declaration, module, _) in tsr_autoimport::module_augmentations(self.program, file)? {
+            if module != export.id.module {
+                continue;
+            }
+            let Some(augmentation) = checker.bound_symbol_of_node(declaration)? else {
+                continue;
+            };
+            let Some(table) = checker.symbol(augmentation)?.exports() else {
+                continue;
+            };
+            if let Some(symbol) = checker.symbol_table(table)?.get(name).flatten() {
+                return Ok(Some(checker.symbol_ref(symbol)?));
+            }
+        }
+        Ok(None)
     }
     // port: tsc/internal/ls/completions.go:LanguageService.filterContentMappedAutoImports
     pub(crate) fn filter_content_mapped_auto_imports(
@@ -427,6 +480,7 @@ impl LanguageService<'_> {
                 prefer_type_only: options.prefer_type_only,
                 verbatim: self.program.options().verbatim_module_syntax.is_true(),
                 newline: self.program.options().new_line.as_str(),
+                specifiers: &options.organize.specifier_preferences(),
             },
         )?;
         let mut result = Vec::new();

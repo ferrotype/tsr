@@ -258,6 +258,7 @@ impl LanguageService<'_> {
                 if flags
                     & (tsr_checker::type_flags::STRING_LIKE | tsr_checker::type_flags::UNDEFINED)
                     == 0
+                    && !string_and_empty_object(checker, ty)?
                 {
                     strings = false;
                 }
@@ -277,4 +278,28 @@ impl LanguageService<'_> {
         }
         Ok(braces.then(|| format!("{}={{$1}}", name.replace('$', "\\$"))))
     }
+}
+
+/// `string & {}`, which keeps literal completions from reducing to `string`.
+// port: tsc/internal/ls/completions.go:isStringAndEmptyAnonymousObjectIntersection
+fn string_and_empty_object(
+    checker: &mut tsr_checker::Operation<'_>,
+    ty: tsr_checker::TypeRef,
+) -> crate::Result<bool> {
+    use tsr_checker::type_flags as tf;
+    if checker.type_flags(ty)? & tf::INTERSECTION == 0 {
+        return Ok(false);
+    }
+    let parts = checker.constituents(ty)?;
+    let [first, second] = parts[..] else {
+        return Ok(false);
+    };
+    for (string, object) in [(first, second), (second, first)] {
+        if checker.type_flags(string)? & tf::STRING != 0
+            && checker.is_empty_anonymous_object_type(object)?
+        {
+            return Ok(true);
+        }
+    }
+    Ok(false)
 }

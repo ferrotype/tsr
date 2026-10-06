@@ -133,6 +133,7 @@ fn batched_bindings_share_clause_promotion_and_keep_existing_aliases() {
                 verbatim: false,
                 newline: "\n",
                 usage: None,
+                specifiers: &edits::SpecifierPreferences::default(),
             },
         )
         .unwrap();
@@ -173,6 +174,7 @@ fn empty_bindings_and_default_imports_are_coalesced_once() {
                     verbatim: false,
                     newline: "\n",
                     usage: None,
+                    specifiers: &edits::SpecifierPreferences::default(),
                 },
             )
             .unwrap();
@@ -318,6 +320,7 @@ fn import_edits_preserve_multiline_ranges_and_native_comment_behavior() {
                 verbatim: false,
                 newline: "\n",
                 usage: None,
+                specifiers: &edits::SpecifierPreferences::default(),
             },
         )
         .unwrap();
@@ -619,6 +622,7 @@ fn require_destructuring_uses_its_variable_declaration_and_applies_the_fix() {
             verbatim: false,
             newline: "\n",
             usage: Some(35),
+            specifiers: &edits::SpecifierPreferences::default(),
         },
     )
     .unwrap();
@@ -675,9 +679,29 @@ fn auto_import_descriptions_use_the_request_locale() {
                 verbatim: false,
                 newline: "\n",
                 usage: Some(source.rfind("method").unwrap() as i64),
+                specifiers: &edits::SpecifierPreferences::default(),
             },
         )
         .unwrap();
         assert_eq!(message, expected);
     }
+}
+
+#[test]
+fn module_augmentation_exports_use_the_augmented_module() {
+    let p = Arc::new(program(
+        b"export {};\ndeclare module './dep' {\n    export const bar = 0;\n}\n",
+        b"export const foo = 0;",
+        &mut FileCache::new(),
+    ));
+    let pool = tsr_compiler::CompilerCheckerPool::new(p.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool
+        .checker_for_file_exclusive(p.source_file(b"/dep.ts").unwrap().source())
+        .unwrap();
+    let registry = Registry::build(&p, &mut checker, || false)
+        .unwrap()
+        .unwrap();
+    let exports = registry.index.find(b"bar", true);
+    assert_eq!(exports.len(), 1, "{:?}", registry.index.entries());
+    assert_eq!(exports[0].id.module.as_bytes(), b"/dep.ts");
 }

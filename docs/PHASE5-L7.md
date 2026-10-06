@@ -317,14 +317,64 @@ approval, a decision about the first-diagnostics metric (the pin only pushes
 unversioned config diagnostics), threshold registration and the quiet-host run
 remain outstanding.
 
+## Closing batch
+
+`target/phase5/harness/full-12` finishes at **19 failing parents / 32 failing
+rows**, down from 77 / 97 in `full-11`: 58 formerly failing parents now pass and
+no previously passing parent fails. N remains 4,117 with 417 native skips, so
+the closure limit of 20 is met. No residual is approved. The LSP client suite
+passes all 13 tests in `lsp-05`, and the compiler suite shows no difference
+from its expectation file.
+
+Import edits now follow the pin's specifier ordering: named-import insertion
+detects case sensitivity and type-only placement with the native comparers and
+binary insertion, module insertion compares raw specifiers (internal
+import-equals included), and a top-of-file import skips a line break only after
+a shebang. The auto-import index extracts module-augmentation exports under the
+augmented module and resolves them from their own declarations. Package exports
+use realpath module identities. A referenced project's declaration output is
+extracted from its source, with entrypoint specifiers still keyed by the
+original file. Program files reached through a `node_modules` symlink outside
+the project directory belong to package indexes. Re-exports of ambient modules
+get the native second pass. UMD import fixes build their `export=` export from
+the symbol. Anonymous default exports take the target file's spelling.
+Auto-import specifiers skip `node_modules` paths and keep the
+realpath-relative candidate.
+
+Completion now ports the pin's type-only and blocker rules for JS value
+locations, unclosed type arguments, type queries, `with` statements, import
+attributes, `import { type | }`, generator members, `as const` property
+termination and the `assert` keyword. String literal completion walks
+parentheses, drops private members and used `case` values, and uses
+type-argument property constraints, which also supply literal completions.
+Computed symbol members offer their first accessible name. Named imports alias
+keyword exports, and class member snippets require the native location. Path
+completions hide dot-files, and optional-chain filter text keeps `?.`. JSX
+attributes quote `string & {}` unions. UMD globals yield to auto-imports in
+module files. Untitled files get no exhaustive-case imports. The runtime no
+longer unwraps a missing server on `didChangeConfiguration`.
+
+Workspace clippy with warnings denied, formatting, `cargo xtask validate`, and
+the tsr_ls (124), tsr_autoimport (32), tsr_lsp (40), tsr_checker (77) and
+tsr_testhost (37) unit tests pass. A prepared harness must be rebuilt after
+`tools/phase5/harness` changes: a build that predated the last harness commits
+produced 53 false failures against the current server.
+
+The 19 residual parents are eight completion cases (destructuring definition
+locations, an unclosed index signature, two JSDoc type expressions and four
+auto-import completion lists) and eleven navigation/project-state cases
+(declaration maps, six find-all-references state baselines, transitive
+export references, implementation search through a triple-slash reference,
+interactive template-literal inlay hints and a CSS import rename).
+
 ## Still to complete
 
-Work is paused at the owner's request after this validated batch. Resume with
-the 77 residual parents: completion contexts and fields, auto-import discovery
-and type-only selection, and the smaller navigation/project-state tail. The
-closure limit is still 20, and any retained failures require owner approval.
-Remaining direct-test routes, CI validation and latency decisions/measurement
-also remain open. No agents or measurement jobs were left running.
+The closure limit is met at 19 failing parents. The retained differences
+require owner approval, and the owner words their final entries. Remaining
+direct-test routes, CI validation and latency decisions/measurement also remain
+open. The macOS run of the L6 npm cancellation test is timing-sensitive: its
+50 ms deadline can expire before the shell prints its process id. No agents or
+measurement jobs were left running.
 The measured N above
 belongs to that compiled native run; a new platform, binary or skip set requires
 its own native execution rather than reusing the source count.

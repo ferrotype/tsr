@@ -126,9 +126,16 @@ impl LanguageService<'_> {
         literal: NodeId,
     ) -> Result<PropertyCompletions> {
         let view = syntax.view;
-        let Some(parent) = view.node(literal)?.parent() else {
+        let Some(mut parent) = view.node(literal)?.parent() else {
             return Ok(PropertyCompletions::default());
         };
+        // port: tsc/internal/ls/string_completions.go:walkUpParentheses
+        while view.node(parent)?.kind() == K::ParenthesizedExpression {
+            let Some(next) = view.node(parent)?.parent() else {
+                break;
+            };
+            parent = next;
+        }
         let pr = view.node(parent)?;
         let mut ty = None;
         let mut used = HashSet::new();
@@ -184,13 +191,43 @@ impl LanguageService<'_> {
         let has_index_signature = pr.kind() != K::BinaryExpression
             && (checker.get_string_index_type(ty)?.is_some()
                 || checker.get_number_index_type(ty)?.is_some());
-        let symbols = crate::completions::properties(checker, ty)?
+        let mut symbols = crate::completions::properties(checker, ty)?
             .into_iter()
             .filter_map(|symbol| match checker.symbol(symbol) {
                 Ok(read) => (!used.contains(read.name_bytes())).then_some(Ok(symbol)),
                 Err(error) => Some(Err(error.into())),
             })
             .collect::<Result<Vec<_>>>()?;
+        if pr.kind() != K::PropertyAssignment {
+            // Neither `in` nor an element access reaches a private identifier member.
+            let mut kept = Vec::with_capacity(symbols.len());
+            for symbol in symbols {
+                // port: tsc/internal/ast/utilities.go:IsPrivateIdentifierClassElementDeclaration
+                let private = match checker.symbol(symbol)?.value_declaration() {
+                    Some(declaration) => {
+                        let read = checker.node(declaration)?;
+                        matches!(
+                            read.kind().known(),
+                            Some(
+                                K::PropertyDeclaration
+                                    | K::MethodDeclaration
+                                    | K::GetAccessor
+                                    | K::SetAccessor
+                            )
+                        ) && read.name().is_some_and(|name| {
+                            checker
+                                .node(name)
+                                .is_ok_and(|n| n.kind() == K::PrivateIdentifier)
+                        })
+                    }
+                    None => false,
+                };
+                if !private {
+                    kept.push(symbol);
+                }
+            }
+            symbols = kept;
+        }
         Ok(PropertyCompletions {
             applicable: true,
             symbols,
@@ -260,6 +297,7 @@ impl LanguageService<'_> {
                         nullable: false,
                         this_member: false,
                         promise: false,
+                        symbol_member: false,
                     },
                     position,
                     options,
@@ -312,17 +350,43 @@ impl LanguageService<'_> {
                     new_identifier = false;
                 }
                 if pr.kind() == K::LiteralType {
-                    let (_, argument, used) = literal_type_context(syntax, parent)?;
+                    let (grandparent, argument, used) = literal_type_context(syntax, parent)?;
                     seen.extend(used);
-                    if let Some(ty) = checker.get_type_argument_constraint(argument)? {
+                    // A property signature's literal takes the property's type
+                    // in the type argument's constraint.
+                    let constraint = if grandparent.is_some_and(|id| {
+                        view.node(id)
+                            .is_ok_and(|n| n.kind() == K::PropertySignature)
+                    }) {
+                        crate::completion_containers::type_argument_property_constraint(
+                            checker,
+                            syntax,
+                            grandparent,
+                        )?
+                    } else {
+                        checker.get_type_argument_constraint(argument)?
+                    };
+                    if let Some(ty) = constraint {
                         string_types(checker, ty, &mut seen, &mut types)?;
                     }
                 }
             }
-            for flags in [cf::IGNORE_NODE_INFERENCES, cf::NONE] {
+            // A case clause offers its switch type's literals that no other
+            // clause already uses.
+            let cases =
+                crate::completion_switch::expression_case_values(checker, syntax, Some(literal))?;
+            let flag_set: &[u32] = if cases.is_some() {
+                &[cf::IGNORE_NODE_INFERENCES]
+            } else {
+                &[cf::IGNORE_NODE_INFERENCES, cf::NONE]
+            };
+            for &flags in flag_set {
                 if let Some(ty) = syntax.contextual_type_from_parent(literal, checker, flags)? {
                     string_types(checker, ty, &mut seen, &mut types)?;
                 }
+            }
+            if let Some(cases) = &cases {
+                types.retain(|value| !cases.contains_string(value));
             }
             if types.is_empty() {
                 return Ok(None);

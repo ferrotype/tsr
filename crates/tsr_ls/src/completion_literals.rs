@@ -209,10 +209,24 @@ impl LanguageService<'_> {
         let Some(previous) = context.previous else {
             return Ok(Vec::new());
         };
-        if ast::is_string_literal_like(&syntax.view.node(previous)?) || context.member.is_some() {
+        // No literal is expected after a string or where a JSX attribute name goes.
+        if ast::is_string_literal_like(&syntax.view.node(previous)?)
+            || context.member.is_some()
+            || context
+                .container
+                .is_some_and(|(kind, _)| kind == crate::completion_context::Container::Jsx)
+        {
             return Ok(Vec::new());
         }
-        let Some(ty) = syntax.completion_context_type(previous, position, checker)? else {
+        let ty = match syntax.completion_context_type(previous, position, checker)? {
+            Some(ty) => Some(ty),
+            None => crate::completion_containers::type_argument_property_constraint(
+                checker,
+                syntax,
+                Some(previous),
+            )?,
+        };
+        let Some(ty) = ty else {
             return Ok(Vec::new());
         };
         let types = if checker.type_flags(ty)? & tf::UNION != 0 {

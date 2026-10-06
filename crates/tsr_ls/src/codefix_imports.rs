@@ -86,6 +86,7 @@ impl LanguageService<'_> {
                     prefer_type_only: options.prefer_type_only,
                     verbatim: self.program.options().verbatim_module_syntax.is_true(),
                     newline: self.program.options().new_line.as_str(),
+                    specifiers: &options.organize.specifier_preferences(),
                 },
             )?;
             let mut tracker = crate::change::Tracker::default();
@@ -271,32 +272,29 @@ impl LanguageService<'_> {
         }
         let mut infos = Vec::new();
         if code == 2686 {
-            if let Some(symbol) = umd_symbol(c, syntax, token)? {
-                let id = tsr_autoimport::export_id_for_symbol(self.program, c, symbol)?;
-                for export in registry
-                    .index
-                    .entries()
-                    .iter()
-                    .filter(|e| Some(&e.id) == id.as_ref())
-                {
-                    for fix in tsr_autoimport::fix::fixes_with_info(
-                        self.program,
-                        c,
-                        syntax.source,
-                        export,
-                        tsr_autoimport::fix::Usage {
-                            type_only: type_site,
-                            ..Default::default()
-                        },
-                        &options.auto_import,
-                    )? {
-                        infos.push(Info {
-                            fix,
-                            alias: None,
-                            namespace: false,
-                            name: Vec::new(),
-                        });
-                    }
+            // The pin builds the UMD export from the symbol, outside the index.
+            if let Some(export) = umd_symbol(c, syntax, token)?
+                .map(|symbol| tsr_autoimport::symbol_to_export(self.program, c, symbol))
+                .transpose()?
+                .flatten()
+            {
+                for fix in tsr_autoimport::fix::fixes_with_info(
+                    self.program,
+                    c,
+                    syntax.source,
+                    &export,
+                    tsr_autoimport::fix::Usage {
+                        type_only: type_site,
+                        ..Default::default()
+                    },
+                    &options.auto_import,
+                )? {
+                    infos.push(Info {
+                        fix,
+                        alias: None,
+                        namespace: false,
+                        name: Vec::new(),
+                    });
                 }
             }
         } else {

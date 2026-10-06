@@ -106,6 +106,7 @@ impl LanguageService<'_> {
                 verbatim: self.program.options().verbatim_module_syntax.is_true(),
                 newline: self.program.options().new_line.as_str(),
                 usage: None,
+                specifiers: &options.organize.specifier_preferences(),
             },
         )?;
         let mut result = Vec::new();

@@ -508,7 +508,10 @@ impl Syntax<'_> {
         Ok(false)
     }
     // port: tsc/internal/ls/utilities.go:getPossibleTypeArgumentsInfo
-    fn possible_type_arguments(&mut self, mut token: NodeId) -> Result<Option<(NodeId, usize)>> {
+    pub(crate) fn possible_type_arguments(
+        &mut self,
+        mut token: NodeId,
+    ) -> Result<Option<(NodeId, usize)>> {
         if !self.file.text().as_bytes().contains(&b'<') {
             return Ok(None);
         }
