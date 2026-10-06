@@ -1281,3 +1281,50 @@ fn isolated_fix_all_uses_deduplicated_declaration_diagnostics() {
         "export function f(): void {}\nexport declare namespace f {\n    export var prop: number;\n}\nf.prop=1;\n"
     );
 }
+
+// Root-directory imports in the pin's module-specifier ending and mapper tests
+// must enumerate `/`, not strip it into the empty path rejected by the Go FS.
+#[test]
+fn relative_module_completion_preserves_filesystem_root() {
+    let program = Arc::new(program(b"/index.ts", b"import {} from \"./\";"));
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool
+        .checker_for_file_exclusive(program.source_file(b"/index.ts").unwrap().source())
+        .unwrap();
+    let files = tsr_vfs::vfstest::from_map(
+        &std::collections::BTreeMap::from([(
+            b"/dep.ts".to_vec(),
+            tsr_vfs::vfstest::InputFile::Text(b"export const value = 1;".to_vec()),
+        )]),
+        true,
+    );
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    service.set_completion_file_system(Arc::new(tsr_vfs::iovfs::from(Arc::new(files), true)));
+    let result = service
+        .completion(
+            &mut checker,
+            &lsp::CompletionParams {
+                text_document: lsp::TextDocumentIdentifier {
+                    uri: lsp::DocumentUri("file:///index.ts".into()),
+                },
+                position: lsp::Position {
+                    line: 0,
+                    character: 18,
+                },
+                ..Default::default()
+            },
+            &CompletionOptions::default(),
+        )
+        .unwrap();
+    assert!(result
+        .list
+        .unwrap()
+        .items
+        .iter()
+        .flatten()
+        .any(|item| item.label == "dep"));
+}

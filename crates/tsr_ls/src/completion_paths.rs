@@ -211,7 +211,9 @@ impl LanguageService<'_> {
         self.check_canceled()?;
         let fragment = directory_fragment(fragment);
         let directory = path::resolve(base, &[if fragment.is_empty() { b"." } else { &fragment }]);
-        let directory = path::remove_trailing_directory_separator(&directory);
+        // ResolvePath already returns the directory spelling used by the pin.
+        // Removing its separator turns the filesystem root `/` into an empty path.
+        let directory = directory.as_slice();
         let fs = self.completion_file_system();
         if !fs
             .directory_exists(directory)
