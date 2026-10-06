@@ -203,6 +203,24 @@ impl LanguageService<'_> {
                 continue;
             }
             let declaration = c.symbol_declarations(symbol)?.iter().flatten().next();
+            // missingMemberFixer.createMemberFromSymbol emits only these
+            // declaration kinds. A parameter property is not synthesized as
+            // a property declaration by the pinned implement-interface fix.
+            if let Some(d) = declaration {
+                if !matches!(
+                    self.view(d)?.node(d)?.kind().known(),
+                    Some(
+                        K::PropertySignature
+                            | K::PropertyDeclaration
+                            | K::GetAccessor
+                            | K::SetAccessor
+                            | K::MethodSignature
+                            | K::MethodDeclaration
+                    )
+                ) {
+                    continue;
+                }
+            }
             let mut modifiers = flags & mf::STATIC;
             if flags & mf::PUBLIC != 0 {
                 modifiers |= mf::PUBLIC;
@@ -243,6 +261,10 @@ impl LanguageService<'_> {
         Ok(())
     }
 }
+
+#[cfg(test)]
+#[path = "codefix_class_tests.rs"]
+mod tests;
 fn insert_member(
     t: &mut NodeTracker<'_>,
     source: NodeId,

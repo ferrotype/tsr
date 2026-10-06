@@ -168,7 +168,14 @@ impl Context {
         }
         let mut type_only = positions::is_part_of_type_node(syntax.view, location)?;
         if let Some((access, _)) = member {
-            type_only |= positions::is_part_of_type_node(syntax.view, access)?;
+            let read = syntax.view.node(access)?;
+            type_only = if let Some(import) = read.data_source().as_import_type_node() {
+                // A literal import type is syntactically a type node even for
+                // `typeof import("module").`, whose members are runtime values.
+                !import.is_type_of()
+            } else {
+                type_only || positions::is_part_of_type_node(syntax.view, access)?
+            };
         }
         if let Some(id) = token {
             let read = syntax.view.node(id)?;
@@ -476,3 +483,7 @@ mod tests;
 #[cfg(test)]
 #[path = "completion_scope_tests.rs"]
 mod scope_tests;
+
+#[cfg(test)]
+#[path = "completion_import_type_tests.rs"]
+mod import_type_tests;

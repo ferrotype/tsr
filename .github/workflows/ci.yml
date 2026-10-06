@@ -215,6 +215,14 @@ jobs:
           cache-dependency-path: upstream/tsc/go.sum
       - name: Build the assertion binaries and shared transport tools
         run: python3 tools/phase5/harness/bundle.py prepare --stage target/phase5-ci-build --output target/phase5-ci
+      - name: Build ordinary CLIs for bounded replay
+        run: python3 scripts/phase5_replay_ci.py prepare --output target/phase5-replay-binaries
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase5-replay-binaries
+          path: target/phase5-replay-binaries
+          retention-days: 1
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:
           name: phase5-harness
@@ -286,6 +294,21 @@ jobs:
         run: python3 tools/phase5/harness/bundle.py relocate --bundle phase5-runner
       - name: Run the shard
         run: python3 scripts/parity.py run "${{ matrix.suite }}" --runner "phase5-runner/${{ matrix.suite }}.prepared.json" --shard "${{ matrix.shard }}" --jobs 1 --output "results/${{ matrix.suite }}/$(echo '${{ matrix.shard }}' | tr / -)"
+      - uses: actions/download-artifact@v4
+        if: ${{ !cancelled() && matrix.suite == 'lsp' }}
+        with:
+          name: phase5-replay-binaries
+          path: phase5-replay-binaries
+      - name: Compare bounded replays in both encodings
+        if: ${{ !cancelled() && matrix.suite == 'lsp' }}
+        run: python3 scripts/phase5_replay_ci.py run --binaries phase5-replay-binaries --output replay-results
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && matrix.suite == 'lsp' }}
+        with:
+          name: phase5-replay-results
+          path: replay-results
+          retention-days: 7
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:

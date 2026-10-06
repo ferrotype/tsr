@@ -419,7 +419,12 @@ impl LanguageService<'_> {
         }
         let mut result = Vec::new();
         for (root, with_body) in roots {
-            let root = nodes.clone_node(Some(root)).unwrap();
+            // Code fixes rebuild the method shell while preserving reused
+            // signature children and their same-source comment ranges, as
+            // missingMemberFixer.createSignatureDeclarationFromSignature does.
+            // The transferred builder owns these generated parameters; no
+            // source or checker-cached node is mutated here.
+            let root = tsr_ast::clone_node(&mut nodes.ast, root);
             let name = property_name(
                 &mut nodes,
                 original_name,

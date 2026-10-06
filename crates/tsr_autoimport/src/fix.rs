@@ -118,7 +118,9 @@ fn syntax_indicators(program: &Program, source: NodeId) -> Result<(bool, bool), 
             }
         }
     }
-    Ok((esm.is_some(), cjs))
+    // Under Force, a SourceFile indicator marks module treatment, not ESM
+    // syntax. Only the declarations found above establish an ESM preference.
+    Ok((false, cjs))
 }
 // port: tsc/internal/ls/autoimport/fix.go:View.computeShouldUseRequire
 pub fn use_require(

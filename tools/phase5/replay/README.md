@@ -2,8 +2,8 @@
 
 `python3 tools/phase5/replay/replay.py list` lists the three session ids.
 `generate.py` recreates the committed fixtures and newline-delimited sessions.
-All dependencies are local; automatic type acquisition is disabled. No command
-builds a server, uses npm, or reads a dependency outside the copied fixture.
+All dependencies are local; automatic type acquisition is disabled. The replay
+runner never builds a server, uses npm, or reads dependencies outside the copied fixture.
 References has three composite projects with declaration maps enabled; all twenty
 core dependency files are explicitly included and re-exported through core/index; checkjs
 has JSDoc and a CommonJS dependency; monorepo has a relative package symlink,
@@ -24,6 +24,19 @@ params and server-request replies), and incoming frame headers/body hex. The
 normalized transcript binds the executed messages as well as all server results.
 Select `--encoding
 utf-8` or `--encoding utf-16` (default). CI integration must run both separately.
+
+CI builds the ordinary pinned Go `cmd/tsc` and Rust `tsrust` executables once
+in the existing `phase5-runner` job, using its pinned Go setup and Rust release
+cache. This adds one native CLI build and one Rust CLI link/build; the latter
+reuses dependencies compiled for the private assertion server. No build timing
+or performance claim is inferred. Only the LSP shard downloads these binaries
+and invokes `scripts/phase5_replay_ci.py run`, covering all three sessions in
+both encodings against fresh native and Rust processes. Any capture error or
+comparison mismatch fails that job. The `phase5-replay-results` artifact retains
+raw transcripts, stderr, comparison files and the six-case summary on failures;
+it is separate from the functional parity expectation artifacts. The helper's
+`prepare --output DIR` builds the executables; `run --binaries DIR --output DIR`
+only executes the bounded matrix and restores downloaded executable permissions.
 
 The first session line names the fixture and project placeholders. Subsequent
 lines follow pinned `{kind, method, params}` format. One explicit scripted

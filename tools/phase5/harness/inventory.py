@@ -12,6 +12,80 @@ TEST = re.compile(r'^func (Test\w+)\(\w+ \*testing\.T\)\s*\{', re.M)
 
 # Reviewed assertions, not name similarity or protocol-family coverage.
 DIRECT_AUDIT = {
+    ('project', 'TestCheckerPoolDiagnosticsRouting'):
+        'WORK: crates/tsr_project/src/scheduler/tests.rs:164 checks slot 0 eviction, but does not compare acquired diagnostics identity with the slot-0 identity',
+    ('project', 'TestCheckerPoolQueryRouting'):
+        'WORK: crates/tsr_project/src/scheduler/tests.rs:103 checks an idle query index 1, but not acquired identity exclusion from diagnostics slot 0',
+    ('project', 'TestCheckerPoolRequestAffinity'):
+        'Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:73 (requests_reuse_across_nested_calls_and_releases_but_not_categories): held nested request and cross-release identity equality; source audit only, execution not certified here',
+    ('project', 'TestCheckerPoolIdleCleanup'):
+        'Assigned observation (source audit, not executed): crates/tsr_project/src/scheduler/tests.rs:164 observes released diagnostics slot disposal and fresh query identity after its configured idle interval; independent per-category observations cover idle eviction without requiring identical timeout values',
+    ('project', 'TestCheckerPoolFileAssociationCleanup'):
+        'WORK: no test asserts file association exists before idle disposal and is removed after its configured deadline',
+    ('project', 'TestCheckerPoolMinCheckers'):
+        'WORK: no scheduler test supplies MaxCheckers=1 and asserts normalized maximum and slot count are both 2',
+    ('project', 'TestCheckerPoolDefaultIdleTimeout'):
+        'WORK: setup always supplies 10 seconds; no zero-timeout input and 30-second default assertion',
+    ('project', 'TestCheckerPoolQueryContention'):
+        'Assigned observation (source audit, not executed): crates/tsr_project/src/scheduler/tests.rs:230 observes a distinct request blocked on the only held query slot and successful acquisition after release; prior request affinity adds coverage without weakening the contention invariant',
+    ('project', 'TestCheckerPoolDiagnosticsContention'):
+        'WORK: crates/tsr_project/src/scheduler/tests.rs:230 blocks a query, not a second diagnostics request; native blocked diagnostics, independent query and subsequent diagnostics unblock sequence is missing',
+    ('project', 'TestCheckerPoolCanceledCheckerDisposal'):
+        'Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:267 (canceled_checkers_and_their_associations_are_disposed_in_all_categories): canceled diagnostic operation marks query checker canceled, release replaces identity with a usable checker; Rust also tests diagnostics/API categories; source audit only, execution not certified here',
+    ('project', 'TestCheckerPoolRequestAssociationCleanupOnDisposal'):
+        'Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:267: cancellable named request association is empty after canceled-checker release; native one association is represented by empty Rust request map; source audit only, execution not certified here',
+    ('project', 'TestCheckerPoolRequestAssociationCleanupOnContextDone'):
+        'Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:73: request association persists after release and is empty synchronously after request-context cancellation; source audit only, execution not certified here',
+    ('project', 'TestCheckerPoolDiagnosticsRecreatedAfterIdleDisposal'):
+        'Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:164: released diagnostics slot becomes uninitialized at its idle deadline and next acquisition has a fresh identity; source audit only, execution not certified here',
+    ('project', 'TestCheckerPoolCrossReleaseAffinityWithContention'):
+        'Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:230: A releases the only query slot, B holds it, A reacquisition reaches contention and returns A identity after B release; source audit only, execution not certified here',
+    ('project', 'TestCheckerPoolLifetimeMismatchIgnoresAssociation'):
+        'WORK: crates/tsr_project/src/scheduler/tests.rs:73 tests temporary-to-diagnostics while temporary remains held; native diagnostics-to-temporary after diagnostics release and explicit slot-0 exclusion are missing',
+    ('project', 'TestCheckerPoolNoRequestID'):
+        'WORK: no test performs two released successful acquisitions with an empty request ID (unscoped_reentry tests held operation failure instead)',
+    ('project', 'TestCheckerPoolDiagnosticsCrossReleaseAffinity'):
+        'WORK: no test reacquires diagnostics with the same cancellable request before timeout and asserts slot-0 identity equality',
+    ('project', 'TestCheckerPoolDiscardKeepsIdleCheckers'):
+        'WORK: crates/tsr_project/src/scheduler/tests.rs:198 discards with query held; native both idle at discard, stopped cleanup timer and immediate identity assertions are missing',
+    ('project', 'TestCheckerPoolDiscardHeldCheckerSurvivesRelease'):
+        'Assigned observation (source audit, not executed): crates/tsr_project/src/scheduler/tests.rs:198 holds query across discard, releases it and advances beyond idle timeout; same unique checker identity on reacquisition demonstrates uninterrupted survival through discard and release',
+    ('project', 'TestCheckerPoolDiscardStillFunctional'):
+        'WORK: crates/tsr_project/src/scheduler/tests.rs:198 reuses preexisting checkers; native discard-before-first-acquisition creates a fresh query, checks index and reuses it under a different request ID',
+    ('project', 'TestCheckerPoolDiagnosticsCheckerStableIdentity'):
+        'WORK: no before-timeout diagnostics identity equality under two different request IDs',
+    ('project', 'TestCheckerPoolDiagnosticsCheckerSurvivesDiscard'):
+        'Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:198: released diagnostics identity survives discard and delayed reacquisition; Rust additionally invokes a late cleanup callback and advances 100 seconds; source audit only, execution not certified here',
+    ('project', 'TestCheckerPoolDiagnosticsCheckerIndependentFromQuery'):
+        'Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:73 and 230: simultaneously held diagnostics and temporary checkers have distinct identities; source audit only, execution not certified here',
+    ('project', 'TestCheckerPoolAPICheckerStableIdentity'):
+        'Assigned observation (source audit, not executed): crates/tsr_project/src/scheduler/tests.rs:164 releases API checker, advances beyond the idle timeout and reacquires the same unique identity; this covers API identity preservation across release and idle time',
+    ('project', 'TestCheckerPoolAPICheckerSurvivesDiscard'):
+        'WORK: crates/tsr_project/src/scheduler/tests.rs:198 never acquires API; no persistent-checker identity and reacquisition assertions after discard',
+    ('project', 'TestCheckerPoolAllThreeIndependent'):
+        'WORK: crates/tsr_project/src/scheduler/tests.rs:164 holds all categories but never asserts all three pairwise-distinct identities',
+    ('project', 'TestCheckerPoolFileAffinity'):
+        'Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:103 (queries_prefer_file_affinity_and_then_an_existing_idle_checker): same file under different named requests returns the same released checker; source audit only, execution not certified here',
+    ('project', 'TestCheckerPoolMultipleConcurrentQueryCheckers'):
+        'WORK: crates/tsr_project/src/scheduler/tests.rs:103 holds only two query checkers; native three pairwise-distinct checkers, diagnostics-slot exclusion and blocked fourth/unblock sequence are missing',
+    ('project', 'TestCheckerPoolDoubleReleaseSafe'):
+        'WORK: Rust consuming Drop cannot express native repeated release callback; explicit representation correspondence and post-double-release successful acquisition remain to document',
+    ('project', 'TestCheckerPoolDefaultMaxCheckers'):
+        'WORK: no zero-MaxCheckers input asserting maximum 4, four slots and query capacity 3',
+    ('project', 'TestCheckerPoolStaggeredIdleCleanup'):
+        'WORK: crates/tsr_project/src/scheduler/tests.rs:344 proves staggered per-slot expiry at configured deadlines, but does not assert both slots remain initialized after second release and before either deadline (native observes that at t=6); differing timeout values and unused slot capacity are not gaps',
+    ('project', 'TestCheckerPoolDiscardIdempotent'):
+        'Assigned observation (source audit, not executed): crates/tsr_project/src/scheduler/tests.rs:198 calls discard twice and successfully reacquires existing diagnostics/query identities after release and elapsed time; stable unique identities demonstrate preservation and pool usability',
+    ('project', 'TestCheckerPoolGetGlobalDiagnosticsEmpty'):
+        'Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:296 (globals_accumulate_once_and_survive_disposal): global diagnostic collection is empty before any checker acquisition; both fixtures use noLib; source audit only, execution not certified here',
+    ('project', 'TestCheckerPoolTakeNewGlobalDiagnostics'):
+        'WORK: crates/tsr_project/src/scheduler/tests.rs:296 checks reset/stable globals after acquisition, but native executes query diagnostics twice on the same file under distinct requests before checking flag stability',
+    ('project', 'TestCheckerPoolAPICheckerDisposedOnCancel'):
+        'WORK: crates/tsr_project/src/scheduler/tests.rs:267 covers canceled API replacement and a usable next operation; independent immediate persistent-slot absence assertion is missing',
+    ('project', 'TestCheckerPoolNonCancelableContextNoAffinity'):
+        'Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:73: background context with nonempty ignored-name succeeds and does not grow request-association map; source audit only, execution not certified here',
+    ('project', 'TestCheckerPoolCleanupAfterDiscardIsNoop'):
+        'WORK: crates/tsr_project/src/scheduler/tests.rs:198 simulates a late cleanup callback and preserves checker identities, but does not assert cleanup timer remains absent (no re-arm)',
     ('lsp', 'TestDynamicQueueFIFO'):
         'Exact observation assignment: crates/tsr_lsp/src/dynamic_queue.rs:105 '
         '(fifo_and_canceled_operations_preserve_remaining_items); same ordered 0..1000 put/get assertions; execution not certified here',
@@ -146,7 +220,11 @@ def markdown(rows: list[dict], verified: list[str]) -> str:
              'wire claim also conflicts with the L6 record, which assigns that handshake to Phase 6.', '',
               'Bounded direct-test audit (2026-10-06): exact assignments below compare assertions,',
               'not Rust test names. The queue FIFO and four glob-root cases match their native',
-              'observations. Cancellation and real watcher routes retain explicit missing',
+              'observations. The checkerpool audit assigns matching lifecycle observations and names',
+              'missing independent slot, timer, category, cancellation and capacity assertions.',
+              'Configured timeout or unused capacity differences alone do not create WORK.',
+              'Assigned observations are source comparisons, not execution evidence.',
+              'Cancellation and real watcher routes retain missing',
               'observations. These assignments do not claim tests were run in this audit.',
               'Remaining WORK rows are the concrete L7/L8 assignment backlog; source-reference',
               'rows still require subcase review and runtime evidence before acceptance credit.', '',

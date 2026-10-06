@@ -546,3 +546,45 @@ fn inferred_resource_roots_survive_close_until_the_next_open_cleanup() {
         [js("/generated/a.d.ts"), js("/user.ts")]
     );
 }
+
+#[test]
+fn requested_unowned_solution_configs_survive_until_open_file_cleanup() {
+    let (_, session) = setup(
+        &[
+            (
+                "/solution/tsconfig.json",
+                r#"{"files":[],"references":[{"path":"./child"}],"compilerOptions":{"disableReferencedProjectLoad":true}}"#,
+            ),
+            (
+                "/solution/child/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true,"composite":true},"files":["main.ts"]}"#,
+            ),
+            ("/solution/child/main.ts", "export const value = 1;"),
+        ],
+        &Counters::new(),
+    );
+    let looked_up = session
+        .flush_resources(
+            &ResourceRequest {
+                configured_documents: vec![uri("/solution/other.ts")],
+                ..Default::default()
+            },
+            session.fs.clone(),
+        )
+        .unwrap();
+    let key = js("/solution/tsconfig.json");
+    let config = looked_up
+        .configs()
+        .unwrap()
+        .configs
+        .get(&key)
+        .expect("request lookup must publish the parsed solution config");
+    assert!(config.retaining_projects.is_empty());
+    assert!(config.retaining_open_files.is_empty());
+    let clean = open(&session, "/unrelated.ts", "const unrelated = 1;");
+    assert!(!clean.configs().unwrap().configs.contains_key(&key));
+    assert!(
+        looked_up.configs().unwrap().configs.contains_key(&key),
+        "retained snapshot keeps the original registry"
+    );
+}

@@ -198,6 +198,33 @@ impl<'a> NodeTracker<'a> {
                 ast.retain_file(generated.clone());
                 let node =
                     tsr_ast::deep_clone_preserving_ranges(&mut ast, Some(node)).expect("edit root");
+                // Native edits print these generated nodes directly. Our
+                // private fragment clone must also retain output-only comments;
+                // ordinary factory cloning intentionally does not copy them.
+                let emit = std::cell::RefCell::new(self.emit.clone());
+                let transfer = |visitor: &mut tsr_ast::NodeVisitor<'_>, node: Option<NodeId>| {
+                    let node = node?;
+                    {
+                        let mut emit = emit.borrow_mut();
+                        if let Some(original) = emit.original(node) {
+                            let leading = emit.synthetic_leading_comments(original);
+                            let trailing = emit.synthetic_trailing_comments(original);
+                            if !leading.is_empty() {
+                                emit.set_synthetic_leading_comments(node, leading);
+                            }
+                            if !trailing.is_empty() {
+                                emit.set_synthetic_trailing_comments(node, trailing);
+                            }
+                        }
+                    }
+                    visitor.visit_each_child(Some(node))
+                };
+                tsr_ast::NodeVisitor::new(
+                    Some(&transfer),
+                    Some(&mut ast),
+                    tsr_ast::NodeVisitorHooks::default(),
+                )
+                .visit_node(Some(node));
                 let text = tsr_printer::print_and_position_node_in_source(
                     &mut ast,
                     node,

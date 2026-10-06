@@ -831,7 +831,19 @@ impl Session {
             api_state,
             api_error,
         } = builder.build(resources)?;
-        configs.cleanup();
+        // The pin cleans unowned registry entries when recomputing the open
+        // project set, not when merely loading resources for an LS request.
+        // Such lookups may intentionally publish parsed solution configs that
+        // have no project/open-file retainer yet.
+        if changes.opened.is_some()
+            || changes.reopened.is_some()
+            || resources
+                .api
+                .as_ref()
+                .is_some_and(|api| api.open_files.is_some() || api.close_files.is_some())
+        {
+            configs.cleanup();
+        }
         let configs = configs.finalize();
         let clean = changes.opened.is_some()
             || changes.reopened.is_some()

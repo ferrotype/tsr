@@ -203,7 +203,7 @@ The unchanged native suite was rerun after each release build:
 | `full-07` | 152 | 183 | 28 | 0 |
 | `full-08` | 152 | 183 | 0 | 0 |
 
-N remains 4,117 with 417 native skips and no native failures. The current raw
+N remains 4,117 with 417 native skips and no native failures. At `full-08` the raw
 failure set is 183 rows over 152 parents, with zero approvals; Phase 5's limit
 remains 20 parents. The 13-test LSP client suite still passes in full (`lsp-03`). `full-08` also
 includes the reviewed constraint-completion guard: callable type-literal members
@@ -248,6 +248,41 @@ open-file map. The existing explicit flush endpoint retains its previous
 behavior. This removes observation-induced state differences without changing
 production scheduling. Focused tests cover the non-mutating observation.
 
+## Completion, import and project follow-up
+
+`target/phase5/harness/full-09` reduces failures from 152 to **108 parents**
+(134 failing rows), fixing 44 previously failing parents with no regression.
+All 4,117 native-executed tests still complete; the 417 native skips and closure
+limit of 20 remain unchanged. No residual receives approval. The separate
+LSP client suite passes all 13 tests in `lsp-04`.
+
+This batch restores explicit import-completion `insertText`, value properties
+of namespaces merged with classes/objects, public hash-named property edits,
+and runtime members of `typeof import`. CommonJS object exports now contribute
+the exact property forms indexed by Go; forced module detection no longer
+masquerades as ESM syntax when selecting `require`. Import insertion groups
+package names before relative names and preserves non-header leading comments.
+The native suite verifies the affected CommonJS, import, quote-style and
+import-type cases, including the already-existing controls.
+
+Implement-interface generation excludes constructor parameter declarations,
+preserves signature-child ranges, and carries synthetic elision comments into
+private printer fragments. All four previously failing implement-interface
+tests pass. Global workspace-symbol queries load referenced projects; ordinary
+resource lookups retain solution configurations until the native cleanup point.
+JSDoc rename inspects the reparsed import declaration. Focused tests cover the
+ownership, scope and cleanup distinctions; 115 LS unit tests, 26 auto-import
+tests and affected-crate clippy pass.
+
+CI now routes all three bounded replay fixtures in both encodings through the
+LSP shard. Ordinary native/Rust CLIs are built once and shared as an artifact;
+raw replay transcripts and mismatches are uploaded even after failure. Local
+execution through this CI helper passes all six fixture/encoding combinations
+against the ordinary Go and Rust CLIs in `target/phase5/replay/current`.
+Direct checkerpool-test routing is audited separately: equivalent timeout/capacity
+parameter choices do not create artificial gaps, while missing independent
+assertions remain named. The source audit is not an execution result.
+
 The latency capture and `perf.py lsp` adapter are implemented and tested with
 fake framed servers. They do not constitute a real performance result. Fixture
 approval, a decision about the first-diagnostics metric (the pin only pushes
@@ -257,7 +292,7 @@ remain outstanding.
 ## Still to complete
 
 The initial full fourslash run and exact failing set are recorded above.
-Residual fixes, final approved retained sets, direct-test routing, CI validation,
-replay CI routing and the latency workload remain in progress. The measured N above
+Residual fixes, final approved retained sets, direct-test routing, CI validation
+and the latency workload remain in progress. The measured N above
 belongs to that compiled native run; a new platform, binary or skip set requires
 its own native execution rather than reusing the source count.

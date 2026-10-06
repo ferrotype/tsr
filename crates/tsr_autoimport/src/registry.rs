@@ -150,33 +150,49 @@ impl Registry {
                 }
             }
             for (module, module_id, module_file_name) in modules {
-                for symbol in checker.get_exports_of_module(module)? {
+                let mut symbols = checker.get_exports_of_module(module)?;
+                // The resolved exports table may omit the export= assignment.
+                if let Some(symbol) = lookup_export(checker, module, b"export=")? {
+                    if !symbols.contains(&symbol) {
+                        symbols.push(symbol);
+                    }
+                }
+                for symbol in symbols {
                     if canceled() {
                         return Ok(None);
                     }
-                    if let Some(export) = extract(
+                    let Some(export) = extract(
                         program,
                         checker,
                         symbol,
                         module_id.clone(),
                         module_file_name.clone(),
                         path.clone(),
-                    )? {
-                        index.insert(export);
-                    }
-                }
-                // export= is not included by GetExportsOfModule for value-only
-                // targets. Keep the namespace/default-like import as well.
-                if let Some(symbol) = lookup_export(checker, module, b"export=")? {
-                    if let Some(export) = extract(
-                        program,
-                        checker,
-                        symbol,
-                        module_id.clone(),
-                        module_file_name.clone(),
-                        path.clone(),
-                    )? {
-                        index.insert(export);
+                        None,
+                    )?
+                    else {
+                        continue;
+                    };
+                    let object_exports = export.syntax == ExportSyntax::CommonJsModuleExports
+                        && export.target.is_none();
+                    index.insert(export);
+                    if object_exports {
+                        for member in commonjs_object_members(program, checker, symbol)? {
+                            if canceled() {
+                                return Ok(None);
+                            }
+                            if let Some(export) = extract(
+                                program,
+                                checker,
+                                member,
+                                module_id.clone(),
+                                module_file_name.clone(),
+                                path.clone(),
+                                Some(ExportSyntax::CommonJsModuleExports),
+                            )? {
+                                index.insert(export);
+                            }
+                        }
                     }
                 }
             }
@@ -306,6 +322,7 @@ fn extract(
     module: JsString,
     module_file_name: JsString,
     path: JsString,
+    inherited_syntax: Option<ExportSyntax>,
 ) -> Result<Option<Export>, Error> {
     if checker.symbol(symbol)?.flags() & sf::PROTOTYPE != 0 {
         return Ok(None);
@@ -316,7 +333,11 @@ fn extract(
         .iter()
         .flatten()
         .collect();
-    let syntax = syntax(program, &declarations)?;
+    let syntax = if let Some(syntax) = inherited_syntax {
+        syntax
+    } else {
+        syntax(program, &declarations)?
+    };
     // The native extractor first uses the binder's non-reporting resolver.
     // Preserve that result's flags (including an export-value local) instead
     // of eagerly replacing it with the checker's exported target.
@@ -584,3 +605,64 @@ pub fn module_identifier(file: &[u8]) -> Vec<u8> {
     }
     result
 }
+
+// Pin symbolExtractor.extractInto's CommonJSModuleExports object-literal branch.
+fn commonjs_object_members(
+    program: &Program,
+    checker: &Operation<'_>,
+    symbol: SymbolRef,
+) -> Result<Vec<SymbolRef>, Error> {
+    let Some(declaration) = checker.symbol_declarations(symbol)?.iter().flatten().next() else {
+        return Ok(Vec::new());
+    };
+    let Some(expression) = checker
+        .node(declaration)?
+        .data_source()
+        .as_binary_expression()
+        .and_then(|read| read.right())
+    else {
+        return Ok(Vec::new());
+    };
+    let file = program
+        .file_of_node(expression)
+        .ok_or(Error::MissingLink("CommonJS export object owner"))?;
+    let view = file.bound().view().ast();
+    let read = view.node(expression)?;
+    if read.kind() != K::ObjectLiteralExpression {
+        return Ok(Vec::new());
+    }
+    let mut names = Vec::new();
+    for property in view.node_slice(read.properties(view)?)?.iter().flatten() {
+        let read = view.node(property)?;
+        let Some(name) = read.name() else { continue };
+        if read.kind() == K::ShorthandPropertyAssignment
+            || read.kind() == K::PropertyAssignment && view.node(name)?.kind() == K::Identifier
+        {
+            names.push(name);
+        }
+    }
+    if names.is_empty() {
+        return Ok(Vec::new());
+    }
+    let object = checker
+        .bound_symbol_of_node(expression)?
+        .ok_or(Error::MissingLink("CommonJS export object symbol"))?;
+    let members = checker
+        .symbol(object)?
+        .members()
+        .ok_or(Error::MissingLink("CommonJS export object members"))?;
+    let members = checker.symbol_table(members)?;
+    let mut result = Vec::with_capacity(names.len());
+    for name in names {
+        let member = members
+            .get(view.node_text(name)?.as_bytes())
+            .flatten()
+            .ok_or(Error::MissingLink("CommonJS export property member"))?;
+        result.push(checker.symbol_ref(member)?);
+    }
+    Ok(result)
+}
+
+#[cfg(test)]
+#[path = "registry_commonjs_tests.rs"]
+mod commonjs_tests;

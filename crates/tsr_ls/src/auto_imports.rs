@@ -308,6 +308,10 @@ impl LanguageService<'_> {
                 if !fidelity.is_exact() {
                     continue;
                 }
+                // getCompletionItem keeps InsertText when the replacement edit
+                // is already explicit; setItemDefaults only clears it when it
+                // synthesizes an edit itself.
+                item.insert_text = Some(Box::new(text.clone()));
                 item.text_edit = Some(Box::new(lsp::TextEditOrInsertReplaceEdit {
                     text_edit: Some(Box::new(lsp::TextEdit {
                         range,

@@ -63,12 +63,16 @@ wire claim also conflicts with the L6 record, which assigns that handshake to Ph
 
 Bounded direct-test audit (2026-10-06): exact assignments below compare assertions,
 not Rust test names. The queue FIFO and four glob-root cases match their native
-observations. Cancellation and real watcher routes retain explicit missing
+observations. The checkerpool audit assigns matching lifecycle observations and names
+missing independent slot, timer, category, cancellation and capacity assertions.
+Configured timeout or unused capacity differences alone do not create WORK.
+Assigned observations are source comparisons, not execution evidence.
+Cancellation and real watcher routes retain missing
 observations. These assignments do not claim tests were run in this audit.
 Remaining WORK rows are the concrete L7/L8 assignment backlog; source-reference
 rows still require subcase review and runtime evidence before acceptance credit.
 
-Unassigned or partial direct-test observations: **120**.
+Unassigned or partial direct-test observations: **116**.
 Each WORK row below identifies its native test and source; the counts do not
 include source-reference rows whose exact subcase review is still pending.
 
@@ -81,7 +85,7 @@ include source-reference rows whose exact subcase review is still pending.
 | `lsp` | 14 |
 | `lsp/lsproto` | 29 |
 | `lsp/lspwatcher` | 14 |
-| `project` | 43 |
+| `project` | 39 |
 | `project/dirty` | 1 |
 | `project/logging` | 2 |
 
@@ -94,43 +98,43 @@ include source-reference rows whose exact subcase review is still pending.
 | `project/ata/TestValidatePackageName` | `upstream/tsc/internal/project/ata/validatepackagename_test.go:11` | Rust observation port: tsr_project::ata::tests::pinned_package_name_validation |  |
 | `project/background/TestQueue` | `upstream/tsc/internal/project/background/queue_test.go:13` | Rust source references: crates/tsr_project/src/background.rs:93 |  |
 | `project/TestBulkCacheInvalidation` | `upstream/tsc/internal/project/bulkcache_test.go:16` | WORK: exact native-test-to-Rust-test assignment unverified | yes |
-| `project/TestCheckerPoolDiagnosticsRouting` | `upstream/tsc/internal/project/checkerpool_test.go:59` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolQueryRouting` | `upstream/tsc/internal/project/checkerpool_test.go:72` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolRequestAffinity` | `upstream/tsc/internal/project/checkerpool_test.go:87` | Rust source references: crates/tsr_project/src/scheduler/tests.rs:70 |  |
-| `project/TestCheckerPoolIdleCleanup` | `upstream/tsc/internal/project/checkerpool_test.go:113` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolFileAssociationCleanup` | `upstream/tsc/internal/project/checkerpool_test.go:166` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolMinCheckers` | `upstream/tsc/internal/project/checkerpool_test.go:204` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolDefaultIdleTimeout` | `upstream/tsc/internal/project/checkerpool_test.go:212` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolQueryContention` | `upstream/tsc/internal/project/checkerpool_test.go:219` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolDiagnosticsContention` | `upstream/tsc/internal/project/checkerpool_test.go:258` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolCanceledCheckerDisposal` | `upstream/tsc/internal/project/checkerpool_test.go:303` | Rust source references: crates/tsr_project/src/scheduler/tests.rs:264 |  |
-| `project/TestCheckerPoolRequestAssociationCleanupOnDisposal` | `upstream/tsc/internal/project/checkerpool_test.go:339` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolRequestAssociationCleanupOnContextDone` | `upstream/tsc/internal/project/checkerpool_test.go:375` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolDiagnosticsRecreatedAfterIdleDisposal` | `upstream/tsc/internal/project/checkerpool_test.go:412` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolCrossReleaseAffinityWithContention` | `upstream/tsc/internal/project/checkerpool_test.go:448` | Rust source references: crates/tsr_project/src/scheduler/tests.rs:228 |  |
-| `project/TestCheckerPoolLifetimeMismatchIgnoresAssociation` | `upstream/tsc/internal/project/checkerpool_test.go:502` | Rust source references: crates/tsr_project/src/scheduler/tests.rs:71 |  |
-| `project/TestCheckerPoolNoRequestID` | `upstream/tsc/internal/project/checkerpool_test.go:543` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolDiagnosticsCrossReleaseAffinity` | `upstream/tsc/internal/project/checkerpool_test.go:561` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolDiscardKeepsIdleCheckers` | `upstream/tsc/internal/project/checkerpool_test.go:589` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolDiscardHeldCheckerSurvivesRelease` | `upstream/tsc/internal/project/checkerpool_test.go:646` | Rust source references: crates/tsr_project/src/scheduler/tests.rs:195 |  |
-| `project/TestCheckerPoolDiscardStillFunctional` | `upstream/tsc/internal/project/checkerpool_test.go:699` | Rust source references: crates/tsr_project/src/scheduler/tests.rs:196 |  |
-| `project/TestCheckerPoolDiagnosticsCheckerStableIdentity` | `upstream/tsc/internal/project/checkerpool_test.go:745` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolDiagnosticsCheckerSurvivesDiscard` | `upstream/tsc/internal/project/checkerpool_test.go:772` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolDiagnosticsCheckerIndependentFromQuery` | `upstream/tsc/internal/project/checkerpool_test.go:806` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolAPICheckerStableIdentity` | `upstream/tsc/internal/project/checkerpool_test.go:833` | Rust source references: crates/tsr_project/src/scheduler/tests.rs:162 |  |
-| `project/TestCheckerPoolAPICheckerSurvivesDiscard` | `upstream/tsc/internal/project/checkerpool_test.go:862` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolAllThreeIndependent` | `upstream/tsc/internal/project/checkerpool_test.go:889` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolFileAffinity` | `upstream/tsc/internal/project/checkerpool_test.go:919` | Rust source references: crates/tsr_project/src/scheduler/tests.rs:100 |  |
-| `project/TestCheckerPoolMultipleConcurrentQueryCheckers` | `upstream/tsc/internal/project/checkerpool_test.go:949` | Rust source references: crates/tsr_project/src/scheduler/tests.rs:101 |  |
-| `project/TestCheckerPoolDoubleReleaseSafe` | `upstream/tsc/internal/project/checkerpool_test.go:1010` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolDefaultMaxCheckers` | `upstream/tsc/internal/project/checkerpool_test.go:1032` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolStaggeredIdleCleanup` | `upstream/tsc/internal/project/checkerpool_test.go:1041` | Rust source references: crates/tsr_project/src/scheduler/tests.rs:161, crates/tsr_project/src/scheduler/tests.rs:342 |  |
-| `project/TestCheckerPoolDiscardIdempotent` | `upstream/tsc/internal/project/checkerpool_test.go:1106` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolGetGlobalDiagnosticsEmpty` | `upstream/tsc/internal/project/checkerpool_test.go:1149` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolTakeNewGlobalDiagnostics` | `upstream/tsc/internal/project/checkerpool_test.go:1158` | Rust source references: crates/tsr_project/src/scheduler/tests.rs:294 |  |
-| `project/TestCheckerPoolAPICheckerDisposedOnCancel` | `upstream/tsc/internal/project/checkerpool_test.go:1195` | Rust source references: crates/tsr_project/src/scheduler/tests.rs:265 |  |
-| `project/TestCheckerPoolNonCancelableContextNoAffinity` | `upstream/tsc/internal/project/checkerpool_test.go:1232` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestCheckerPoolCleanupAfterDiscardIsNoop` | `upstream/tsc/internal/project/checkerpool_test.go:1260` | WORK: exact native-test-to-Rust-test assignment unverified |  |
+| `project/TestCheckerPoolDiagnosticsRouting` | `upstream/tsc/internal/project/checkerpool_test.go:59` | WORK: crates/tsr_project/src/scheduler/tests.rs:164 checks slot 0 eviction, but does not compare acquired diagnostics identity with the slot-0 identity |  |
+| `project/TestCheckerPoolQueryRouting` | `upstream/tsc/internal/project/checkerpool_test.go:72` | WORK: crates/tsr_project/src/scheduler/tests.rs:103 checks an idle query index 1, but not acquired identity exclusion from diagnostics slot 0 |  |
+| `project/TestCheckerPoolRequestAffinity` | `upstream/tsc/internal/project/checkerpool_test.go:87` | Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:73 (requests_reuse_across_nested_calls_and_releases_but_not_categories): held nested request and cross-release identity equality; source audit only, execution not certified here |  |
+| `project/TestCheckerPoolIdleCleanup` | `upstream/tsc/internal/project/checkerpool_test.go:113` | Assigned observation (source audit, not executed): crates/tsr_project/src/scheduler/tests.rs:164 observes released diagnostics slot disposal and fresh query identity after its configured idle interval; independent per-category observations cover idle eviction without requiring identical timeout values |  |
+| `project/TestCheckerPoolFileAssociationCleanup` | `upstream/tsc/internal/project/checkerpool_test.go:166` | WORK: no test asserts file association exists before idle disposal and is removed after its configured deadline |  |
+| `project/TestCheckerPoolMinCheckers` | `upstream/tsc/internal/project/checkerpool_test.go:204` | WORK: no scheduler test supplies MaxCheckers=1 and asserts normalized maximum and slot count are both 2 |  |
+| `project/TestCheckerPoolDefaultIdleTimeout` | `upstream/tsc/internal/project/checkerpool_test.go:212` | WORK: setup always supplies 10 seconds; no zero-timeout input and 30-second default assertion |  |
+| `project/TestCheckerPoolQueryContention` | `upstream/tsc/internal/project/checkerpool_test.go:219` | Assigned observation (source audit, not executed): crates/tsr_project/src/scheduler/tests.rs:230 observes a distinct request blocked on the only held query slot and successful acquisition after release; prior request affinity adds coverage without weakening the contention invariant |  |
+| `project/TestCheckerPoolDiagnosticsContention` | `upstream/tsc/internal/project/checkerpool_test.go:258` | WORK: crates/tsr_project/src/scheduler/tests.rs:230 blocks a query, not a second diagnostics request; native blocked diagnostics, independent query and subsequent diagnostics unblock sequence is missing |  |
+| `project/TestCheckerPoolCanceledCheckerDisposal` | `upstream/tsc/internal/project/checkerpool_test.go:303` | Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:267 (canceled_checkers_and_their_associations_are_disposed_in_all_categories): canceled diagnostic operation marks query checker canceled, release replaces identity with a usable checker; Rust also tests diagnostics/API categories; source audit only, execution not certified here |  |
+| `project/TestCheckerPoolRequestAssociationCleanupOnDisposal` | `upstream/tsc/internal/project/checkerpool_test.go:339` | Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:267: cancellable named request association is empty after canceled-checker release; native one association is represented by empty Rust request map; source audit only, execution not certified here |  |
+| `project/TestCheckerPoolRequestAssociationCleanupOnContextDone` | `upstream/tsc/internal/project/checkerpool_test.go:375` | Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:73: request association persists after release and is empty synchronously after request-context cancellation; source audit only, execution not certified here |  |
+| `project/TestCheckerPoolDiagnosticsRecreatedAfterIdleDisposal` | `upstream/tsc/internal/project/checkerpool_test.go:412` | Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:164: released diagnostics slot becomes uninitialized at its idle deadline and next acquisition has a fresh identity; source audit only, execution not certified here |  |
+| `project/TestCheckerPoolCrossReleaseAffinityWithContention` | `upstream/tsc/internal/project/checkerpool_test.go:448` | Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:230: A releases the only query slot, B holds it, A reacquisition reaches contention and returns A identity after B release; source audit only, execution not certified here |  |
+| `project/TestCheckerPoolLifetimeMismatchIgnoresAssociation` | `upstream/tsc/internal/project/checkerpool_test.go:502` | WORK: crates/tsr_project/src/scheduler/tests.rs:73 tests temporary-to-diagnostics while temporary remains held; native diagnostics-to-temporary after diagnostics release and explicit slot-0 exclusion are missing |  |
+| `project/TestCheckerPoolNoRequestID` | `upstream/tsc/internal/project/checkerpool_test.go:543` | WORK: no test performs two released successful acquisitions with an empty request ID (unscoped_reentry tests held operation failure instead) |  |
+| `project/TestCheckerPoolDiagnosticsCrossReleaseAffinity` | `upstream/tsc/internal/project/checkerpool_test.go:561` | WORK: no test reacquires diagnostics with the same cancellable request before timeout and asserts slot-0 identity equality |  |
+| `project/TestCheckerPoolDiscardKeepsIdleCheckers` | `upstream/tsc/internal/project/checkerpool_test.go:589` | WORK: crates/tsr_project/src/scheduler/tests.rs:198 discards with query held; native both idle at discard, stopped cleanup timer and immediate identity assertions are missing |  |
+| `project/TestCheckerPoolDiscardHeldCheckerSurvivesRelease` | `upstream/tsc/internal/project/checkerpool_test.go:646` | Assigned observation (source audit, not executed): crates/tsr_project/src/scheduler/tests.rs:198 holds query across discard, releases it and advances beyond idle timeout; same unique checker identity on reacquisition demonstrates uninterrupted survival through discard and release |  |
+| `project/TestCheckerPoolDiscardStillFunctional` | `upstream/tsc/internal/project/checkerpool_test.go:699` | WORK: crates/tsr_project/src/scheduler/tests.rs:198 reuses preexisting checkers; native discard-before-first-acquisition creates a fresh query, checks index and reuses it under a different request ID |  |
+| `project/TestCheckerPoolDiagnosticsCheckerStableIdentity` | `upstream/tsc/internal/project/checkerpool_test.go:745` | WORK: no before-timeout diagnostics identity equality under two different request IDs |  |
+| `project/TestCheckerPoolDiagnosticsCheckerSurvivesDiscard` | `upstream/tsc/internal/project/checkerpool_test.go:772` | Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:198: released diagnostics identity survives discard and delayed reacquisition; Rust additionally invokes a late cleanup callback and advances 100 seconds; source audit only, execution not certified here |  |
+| `project/TestCheckerPoolDiagnosticsCheckerIndependentFromQuery` | `upstream/tsc/internal/project/checkerpool_test.go:806` | Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:73 and 230: simultaneously held diagnostics and temporary checkers have distinct identities; source audit only, execution not certified here |  |
+| `project/TestCheckerPoolAPICheckerStableIdentity` | `upstream/tsc/internal/project/checkerpool_test.go:833` | Assigned observation (source audit, not executed): crates/tsr_project/src/scheduler/tests.rs:164 releases API checker, advances beyond the idle timeout and reacquires the same unique identity; this covers API identity preservation across release and idle time |  |
+| `project/TestCheckerPoolAPICheckerSurvivesDiscard` | `upstream/tsc/internal/project/checkerpool_test.go:862` | WORK: crates/tsr_project/src/scheduler/tests.rs:198 never acquires API; no persistent-checker identity and reacquisition assertions after discard |  |
+| `project/TestCheckerPoolAllThreeIndependent` | `upstream/tsc/internal/project/checkerpool_test.go:889` | WORK: crates/tsr_project/src/scheduler/tests.rs:164 holds all categories but never asserts all three pairwise-distinct identities |  |
+| `project/TestCheckerPoolFileAffinity` | `upstream/tsc/internal/project/checkerpool_test.go:919` | Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:103 (queries_prefer_file_affinity_and_then_an_existing_idle_checker): same file under different named requests returns the same released checker; source audit only, execution not certified here |  |
+| `project/TestCheckerPoolMultipleConcurrentQueryCheckers` | `upstream/tsc/internal/project/checkerpool_test.go:949` | WORK: crates/tsr_project/src/scheduler/tests.rs:103 holds only two query checkers; native three pairwise-distinct checkers, diagnostics-slot exclusion and blocked fourth/unblock sequence are missing |  |
+| `project/TestCheckerPoolDoubleReleaseSafe` | `upstream/tsc/internal/project/checkerpool_test.go:1010` | WORK: Rust consuming Drop cannot express native repeated release callback; explicit representation correspondence and post-double-release successful acquisition remain to document |  |
+| `project/TestCheckerPoolDefaultMaxCheckers` | `upstream/tsc/internal/project/checkerpool_test.go:1032` | WORK: no zero-MaxCheckers input asserting maximum 4, four slots and query capacity 3 |  |
+| `project/TestCheckerPoolStaggeredIdleCleanup` | `upstream/tsc/internal/project/checkerpool_test.go:1041` | WORK: crates/tsr_project/src/scheduler/tests.rs:344 proves staggered per-slot expiry at configured deadlines, but does not assert both slots remain initialized after second release and before either deadline (native observes that at t=6); differing timeout values and unused slot capacity are not gaps |  |
+| `project/TestCheckerPoolDiscardIdempotent` | `upstream/tsc/internal/project/checkerpool_test.go:1106` | Assigned observation (source audit, not executed): crates/tsr_project/src/scheduler/tests.rs:198 calls discard twice and successfully reacquires existing diagnostics/query identities after release and elapsed time; stable unique identities demonstrate preservation and pool usability |  |
+| `project/TestCheckerPoolGetGlobalDiagnosticsEmpty` | `upstream/tsc/internal/project/checkerpool_test.go:1149` | Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:296 (globals_accumulate_once_and_survive_disposal): global diagnostic collection is empty before any checker acquisition; both fixtures use noLib; source audit only, execution not certified here |  |
+| `project/TestCheckerPoolTakeNewGlobalDiagnostics` | `upstream/tsc/internal/project/checkerpool_test.go:1158` | WORK: crates/tsr_project/src/scheduler/tests.rs:296 checks reset/stable globals after acquisition, but native executes query diagnostics twice on the same file under distinct requests before checking flag stability |  |
+| `project/TestCheckerPoolAPICheckerDisposedOnCancel` | `upstream/tsc/internal/project/checkerpool_test.go:1195` | WORK: crates/tsr_project/src/scheduler/tests.rs:267 covers canceled API replacement and a usable next operation; independent immediate persistent-slot absence assertion is missing |  |
+| `project/TestCheckerPoolNonCancelableContextNoAffinity` | `upstream/tsc/internal/project/checkerpool_test.go:1232` | Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:73: background context with nonempty ignored-name succeeds and does not grow request-association map; source audit only, execution not certified here |  |
+| `project/TestCheckerPoolCleanupAfterDiscardIsNoop` | `upstream/tsc/internal/project/checkerpool_test.go:1260` | WORK: crates/tsr_project/src/scheduler/tests.rs:198 simulates a late cleanup callback and preserves checker identities, but does not assert cleanup timer remains absent (no re-arm) |  |
 | `project/TestConfigFileChanges` | `upstream/tsc/internal/project/configfilechanges_test.go:14` | Rust source references: crates/tsr_project/src/config/tests.rs:189, crates/tsr_project/src/session/tests.rs:344 | yes |
 | `project/TestContentMapperInProject` | `upstream/tsc/internal/project/contentmapper_test.go:53` | Rust source references: crates/tsr_project/src/content_mappers/tests.rs:299, crates/tsr_project/src/content_mappers/tests.rs:70 |  |
 | `project/TestContentMapperPackageManifestChangeReloadsConfig` | `upstream/tsc/internal/project/contentmapper_test.go:215` | Rust source references: crates/tsr_project/src/content_mappers/tests.rs:537 |  |
@@ -253,17 +257,17 @@ include source-reference rows whose exact subcase review is still pending.
 | `lsp/TestSanitizedDebugStackTraceCompletionsRequest` | `upstream/tsc/internal/lsp/stack_sanitizer_test.go:13` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `lsp/TestSanitizedReleaseStackTraceCompletionsRequest` | `upstream/tsc/internal/lsp/stack_sanitizer_test.go:49` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `lsp/TestSanitizedStackTraceDefeatsVSCodeGenericSecretRegex` | `upstream/tsc/internal/lsp/stack_sanitizer_test.go:106` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `ls/autoimport/TestAliasResolverGetDiagnosticsDoesNotPanic` | `upstream/tsc/internal/ls/autoimport/aliasresolver_crash_test.go:44` | Rust source references: crates/tsr_autoimport/src/tests.rs:280 |  |
+| `ls/autoimport/TestAliasResolverGetDiagnosticsDoesNotPanic` | `upstream/tsc/internal/ls/autoimport/aliasresolver_crash_test.go:44` | Rust source references: crates/tsr_autoimport/src/tests.rs:329 |  |
 | `ls/autoimport/TestIndexClone` | `upstream/tsc/internal/ls/autoimport/index_test.go:16` | Rust source references: crates/tsr_autoimport/src/index.rs:180 |  |
 | `ls/autoimport/TestRegistryLifecycle` | `upstream/tsc/internal/ls/autoimport/registry_test.go:25` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `ls/autoimport/TestContentMappedNodeModulesFileUsesProjectBucket` | `upstream/tsc/internal/ls/autoimport/registry_test.go:958` | WORK: exact native-test-to-Rust-test assignment unverified | yes |
-| `ls/autoimport/TestHiddenDirectoriesInNodeModules` | `upstream/tsc/internal/ls/autoimport/registry_test.go:1005` | Rust source references: crates/tsr_autoimport/src/tests.rs:369 |  |
-| `ls/autoimport/TestAutoImportEntrypointDirectorySearch` | `upstream/tsc/internal/ls/autoimport/registry_test.go:1090` | Rust source references: crates/tsr_autoimport/src/tests.rs:370 |  |
+| `ls/autoimport/TestHiddenDirectoriesInNodeModules` | `upstream/tsc/internal/ls/autoimport/registry_test.go:1005` | Rust source references: crates/tsr_autoimport/src/tests.rs:418 |  |
+| `ls/autoimport/TestAutoImportEntrypointDirectorySearch` | `upstream/tsc/internal/ls/autoimport/registry_test.go:1090` | Rust source references: crates/tsr_autoimport/src/tests.rs:419 |  |
 | `ls/autoimport/TestUpdateIndexesConcurrentMapSafety` | `upstream/tsc/internal/ls/autoimport/registry_test.go:1239` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `ls/autoimport/TestWordIndices` | `upstream/tsc/internal/ls/autoimport/util_test.go:11` | Rust source references: crates/tsr_autoimport/src/index.rs:204 |  |
-| `ls/autoimport/TestGetPackageRealpathFuncs_FollowsNodeModulesSymlinks` | `upstream/tsc/internal/ls/autoimport/util_test.go:100` | Rust source references: crates/tsr_autoimport/src/tests.rs:303 |  |
-| `ls/autoimport/TestGetPackageRealpathFuncs_DuplicateCacheKeys` | `upstream/tsc/internal/ls/autoimport/util_test.go:155` | Rust source references: crates/tsr_autoimport/src/tests.rs:304 |  |
-| `ls/autoimport/TestGetPackageRealpathFuncs_NonSymlinkedPackageWithSymlinkedDeps` | `upstream/tsc/internal/ls/autoimport/util_test.go:195` | Rust source references: crates/tsr_autoimport/src/tests.rs:305 |  |
+| `ls/autoimport/TestGetPackageRealpathFuncs_FollowsNodeModulesSymlinks` | `upstream/tsc/internal/ls/autoimport/util_test.go:100` | Rust source references: crates/tsr_autoimport/src/tests.rs:352 |  |
+| `ls/autoimport/TestGetPackageRealpathFuncs_DuplicateCacheKeys` | `upstream/tsc/internal/ls/autoimport/util_test.go:155` | Rust source references: crates/tsr_autoimport/src/tests.rs:353 |  |
+| `ls/autoimport/TestGetPackageRealpathFuncs_NonSymlinkedPackageWithSymlinkedDeps` | `upstream/tsc/internal/ls/autoimport/util_test.go:195` | Rust source references: crates/tsr_autoimport/src/tests.rs:354 |  |
 | `ls/change/TestTextEditsConflictAtSameInsertionPointAcrossProjections` | `upstream/tsc/internal/ls/change/trackerimpl_test.go:9` | Rust source references: crates/tsr_ls/src/change.rs:128 |  |
 | `ls/TestCreatePathUpdaterCaseFoldingShrinksOldPath` | `upstream/tsc/internal/ls/file_rename_test.go:45` | Rust source references: crates/tsr_ls/src/file_rename.rs:402 |  |
 | `ls/TestImplementationsWorklistDoesNotBlowUp` | `upstream/tsc/internal/ls/findallreferences_test.go:34` | Rust source references: crates/tsr_ls/src/tests.rs:390 |  |

@@ -56,6 +56,55 @@ fn apply(text: &str, edits: Vec<edits::Edit>) -> String {
     }
     result
 }
+
+#[test]
+fn forced_module_indicator_does_not_override_commonjs_syntax() {
+    use tsr_core::{CompilerOptions, ModuleDetectionKind, ModuleKind, Tristate};
+    // TestAutoImportCJSWithModuleDetectionForce: the synthetic module marker
+    // must not make an existing require() ambiguous with ESM syntax.
+    for (text, expected) in [
+        ("const path = require('path');\nLIB_VERSION", true),
+        ("export const value = 1;\nLIB_VERSION", false),
+        ("LIB_VERSION", false),
+    ] {
+        let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
+        fs.insert_loaded(b"/main.js", text.as_bytes());
+        let program = Arc::new(
+            Program::load(
+                ProgramOptions {
+                    config: tsr_tsoptions::ParsedCommandLine::new(
+                        CompilerOptions {
+                            no_lib: Tristate::TRUE,
+                            allow_js: Tristate::TRUE,
+                            module: ModuleKind::PRESERVE,
+                            module_detection: ModuleDetectionKind::FORCE,
+                            config_file_path: JsString::from_bytes(b"/tsconfig.json".as_slice()),
+                            ..Default::default()
+                        },
+                        vec![JsString::from_bytes(b"/main.js".as_slice())],
+                    ),
+                    host: Arc::new(fs.finish()),
+                    current_directory: JsString::from_bytes(b"/".as_slice()),
+                    default_library_path: JsString::from_bytes(b"/".as_slice()),
+                    skip_module_resolution: false,
+                    single_threaded: Tristate::TRUE,
+                },
+                &mut FileCache::new(),
+                &tsr_arena::Counters::new(),
+            )
+            .unwrap(),
+        );
+        let source = program.source_file(b"/main.js").unwrap().source();
+        let pool =
+            tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+        let checker = pool.checker_for_file_exclusive(source).unwrap();
+        assert_eq!(
+            crate::fix::use_require(&program, &checker, source).unwrap(),
+            expected,
+            "{text}"
+        );
+    }
+}
 #[test]
 fn batched_bindings_share_clause_promotion_and_keep_existing_aliases() {
     // The pin promotes the clause once, preserving the existing names as

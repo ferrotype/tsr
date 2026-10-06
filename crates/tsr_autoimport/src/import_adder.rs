@@ -382,7 +382,17 @@ fn insert_statements(
             }
         }
     }
-    let compare = |a: &[u8], b: &[u8]| tsr_jsstring::compare::compare_case_insensitive(a, b);
+    // CompareModuleSpecifiers groups external names before relative names,
+    // independently of the string collation used within each group.
+    let compare = |a: &[u8], b: &[u8]| {
+        a.is_empty()
+            .cmp(&b.is_empty())
+            .then_with(|| {
+                tsr_tspath::is_external_module_name_relative(a)
+                    .cmp(&tsr_tspath::is_external_module_name_relative(b))
+            })
+            .then_with(|| tsr_jsstring::compare::compare_case_insensitive(a, b))
+    };
     new.sort_by(|a, b| compare(a.0.as_bytes(), b.0.as_bytes()).then(a.3.cmp(&b.3)));
     if old.is_empty() {
         let mut pos = edits::top_position(view, source)?;
@@ -439,7 +449,7 @@ fn insert_statements(
             })
             .flatten();
         let (pos, prefix) = if let Some(0) = next {
-            (edits::start(view, source, old[0].0)?, "")
+            (before_first_import(view, source, old[0].0)?, "")
         } else {
             let prev = old[next.unwrap_or(old.len()) - 1].0;
             let end = edits::end(view, prev)? as usize;
@@ -455,6 +465,40 @@ fn insert_statements(
         });
     }
     Ok(result)
+}
+
+fn before_first_import(view: AstView<'_>, source: NodeId, import: NodeId) -> Result<i64, Error> {
+    let start = edits::start(view, source, import)?;
+    let first = view
+        .node_slice(view.node(source)?.statements(view)?)?
+        .first()
+        .flatten();
+    if first == Some(import) {
+        // A top-of-file import leaves its header comments above the insertion.
+        return Ok(start);
+    }
+    // Otherwise InsertNodeBefore uses LeadingTriviaOptionNone: retain the
+    // import's own leading comments beside it, after the newly inserted node.
+    let file = view.source_file(source)?;
+    let lines = file.ecma_line_map();
+    let line = |position: i64| {
+        tsr_jsstring::scanner_positions::compute_line_of_position(lines, position as isize) as usize
+    };
+    let full_start = i64::from(view.node(import)?.pos());
+    let full_line = line(full_start);
+    if full_start == start || full_line == line(start) {
+        return Ok(start);
+    }
+    let next_line = i64::from(lines[full_line + usize::from(full_start > 0)]);
+    let before_comments = tsr_scanner::skip_trivia_ex(
+        file.text().as_bytes(),
+        next_line,
+        Some(&tsr_scanner::SkipTriviaOptions {
+            stop_at_comments: true,
+            ..Default::default()
+        }),
+    );
+    Ok(i64::from(lines[line(before_comments)]))
 }
 
 fn existing(
@@ -905,6 +949,53 @@ mod tests {
             result,
             "import { v1 } from 'ambient-module';\nimport ns = require('ambient-module');\nvar x = v1 + 5;"
         );
+    }
+
+    #[test]
+    fn import_insertion_groups_packages_before_relative_paths() {
+        // TestAutoImportQuoteDetection and TestCompletionsImport_require retain
+        // the existing package import before the newly inserted relative one.
+        assert_eq!(
+            add_import(
+                "import {} from 'node:path';\n\nfo",
+                "./a",
+                "foo",
+                lsp::ImportKind::NAMED
+            ),
+            "import {} from 'node:path';\nimport { foo } from './a';\n\nfo",
+        );
+        assert_eq!(
+            add_import(
+                "import { z } from './a';\nfoo",
+                "z-package",
+                "foo",
+                lsp::ImportKind::NAMED
+            ),
+            "import { foo } from 'z-package';\nimport { z } from './a';\nfoo",
+        );
+        // The same ranking is used to detect unsorted existing imports: do not
+        // reorder that list, and append the new import at its end.
+        assert_eq!(
+            add_import(
+                "import { a } from './a';\nimport { z } from 'z';\nfoo",
+                "b",
+                "foo",
+                lsp::ImportKind::NAMED
+            ),
+            "import { a } from './a';\nimport { z } from 'z';\nimport { foo } from 'b';\nfoo",
+        );
+    }
+
+    #[test]
+    fn import_insertion_distinguishes_header_from_import_comments() {
+        // Native TestImportNameCodeFix_HeaderComment2 keeps the non-header
+        // comment attached to its existing import; the top-level header stays.
+        for (prefix, expected) in [
+            ("/* header */\n\n", "/* header */\n\n// import comment\nimport { foo } from './a';\nimport { bar } from './b';\nfoo;"),
+            ("/* header */\n\nconst value = 1;\n\n", "/* header */\n\nconst value = 1;\n\nimport { foo } from './a';\n// import comment\nimport { bar } from './b';\nfoo;"),
+        ] {
+            assert_eq!(add_import(&format!("{prefix}// import comment\nimport {{ bar }} from './b';\nfoo;"), "./a", "foo", lsp::ImportKind::NAMED), expected);
+        }
     }
 
     #[test]

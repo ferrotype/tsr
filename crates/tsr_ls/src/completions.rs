@@ -588,6 +588,8 @@ impl LanguageService<'_> {
         options: &CompletionOptions,
     ) -> Result<Vec<Candidate>> {
         if let Some((access, expression)) = context.member {
+            let mut candidates = Vec::new();
+            let mut merged_value_type = None;
             if let Some(symbol) = checker.get_symbol_at_location(expression)? {
                 let symbol = checker.skip_alias(symbol)?;
                 if checker.symbol(symbol)?.flags() & (sf::MODULE | sf::ENUM) != 0 {
@@ -596,7 +598,6 @@ impl LanguageService<'_> {
                         context.new_identifier = true;
                         context.commit = &[];
                     }
-                    let mut candidates = Vec::new();
                     for symbol in checker.get_exports_of_module(symbol)? {
                         let name = checker.symbol(symbol)?.name_bytes().to_vec().clone();
                         let valid = if namespace_name {
@@ -632,11 +633,34 @@ impl LanguageService<'_> {
                             });
                         }
                     }
-                    return Ok(candidates);
+                    let mut merged_with_value = false;
+                    if !context.type_only && !namespace_name {
+                        for declaration in checker.symbol_declarations(symbol)?.iter().flatten() {
+                            if !matches!(
+                                checker.node(declaration)?.kind().known(),
+                                Some(K::SourceFile | K::ModuleDeclaration | K::EnumDeclaration)
+                            ) {
+                                merged_with_value = true;
+                                break;
+                            }
+                        }
+                    }
+                    if !merged_with_value {
+                        return Ok(candidates);
+                    }
+                    // Pin getTypeScriptMemberSymbols adds the value type's
+                    // properties after namespace exports, including inherited
+                    // static members of a merged class.
+                    merged_value_type =
+                        Some(checker.get_type_of_symbol_at_location(symbol, Some(expression))?);
                 }
             }
-            checker.try_get_this_type_at_ex(expression, false, None)?;
-            let ty = checker.get_type_at_location(expression)?;
+            let ty = if let Some(ty) = merged_value_type {
+                ty
+            } else {
+                checker.try_get_this_type_at_ex(expression, false, None)?;
+                checker.get_type_at_location(expression)?
+            };
             let mut ty = checker.get_non_optional_type(ty)?;
             let mut nullable = false;
             if checker.is_nullable_type(ty)? {
@@ -651,7 +675,6 @@ impl LanguageService<'_> {
                     nullable = !question;
                 }
             }
-            let mut candidates = Vec::new();
             if checker.get_string_index_type(ty)?.is_some() {
                 context.new_identifier = true;
                 context.commit = &[];
@@ -962,9 +985,21 @@ impl LanguageService<'_> {
         {
             return Ok(None);
         }
+        let private_identifier = if name.starts_with('#') {
+            if let Some(declaration) = checker.symbol(symbol)?.value_declaration() {
+                ast::is_private_identifier_class_element_declaration(
+                    self.view(declaration)?,
+                    declaration,
+                )?
+            } else {
+                false
+            }
+        } else {
+            false
+        };
         let valid =
             tsr_scanner::is_identifier_text(name.as_bytes(), tsr_core::LanguageVariant::STANDARD)
-                || name.starts_with('#')
+                || private_identifier
                 || computed_class_member;
         if !valid && class_member {
             return Ok(None);
@@ -1398,3 +1433,7 @@ mod tests;
 #[cfg(test)]
 #[path = "completion_namespace_tests.rs"]
 mod namespace_tests;
+
+#[cfg(test)]
+#[path = "completion_property_access_tests.rs"]
+mod property_access_tests;

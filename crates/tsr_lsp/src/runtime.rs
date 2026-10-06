@@ -403,11 +403,19 @@ impl Runtime {
                     .as_deref()
                     .map(|d| &d.uri)
                     .filter(|_| settings.workspace_current_project);
-                let snapshot = self
-                    .ready()?
-                    .session()
-                    .flush_with_host(uri, host)
-                    .map_err(crate::project_error)?;
+                let session = self.ready()?.session();
+                let snapshot = if let Some(uri) = uri {
+                    session.flush_with_host(Some(uri), host)
+                } else {
+                    session.flush_resources(
+                        &tsr_project::api::ResourceRequest {
+                            project_tree: Some(tsr_project::api::ProjectTreeRequest::All),
+                            ..Default::default()
+                        },
+                        host,
+                    )
+                }
+                .map_err(crate::project_error)?;
                 let path = uri.map(|u| {
                     u.path(
                         snapshot
@@ -1802,3 +1810,7 @@ mod preference_tests {
         }
     }
 }
+
+#[cfg(test)]
+#[path = "workspace_symbol_tests.rs"]
+mod workspace_symbol_tests;

@@ -97,3 +97,38 @@ fn nested_namespace_comments_do_not_take_property_access_path() {
         assert!(labels(&list).is_empty());
     }
 }
+
+#[test]
+fn namespace_merged_with_object_preserves_type_and_value_members() {
+    let prefix = "namespace N { export type T = number; } const N = { m() {} }; ";
+    assert_eq!(
+        labels(&complete(&format!("{prefix}let value: N.|;"))),
+        ["T"]
+    );
+    assert_eq!(labels(&complete(&format!("{prefix}N.|;"))), ["m"]);
+}
+
+#[test]
+fn namespace_merged_with_class_offers_inherited_static_members() {
+    let prefix =
+        "class C { static m() {} } class D extends C {} namespace D { export type T = number; } ";
+    assert_eq!(
+        labels(&complete(&format!("{prefix}let value: D.|;"))),
+        ["T"]
+    );
+    let list = complete(&format!("{prefix}D.|;"));
+    assert_eq!(labels(&list), ["prototype", "m"]);
+    let method = list
+        .items
+        .iter()
+        .flatten()
+        .find(|item| item.label == "m")
+        .unwrap();
+    assert_eq!(method.sort_text.as_deref().map(String::as_str), Some("10"));
+}
+
+#[test]
+fn ordinary_namespace_exports_remain_available_without_duplicates() {
+    let list = complete("class N { static m() {} } namespace N { export const own = 1; } N.|;");
+    assert_eq!(labels(&list), ["prototype", "own", "m"]);
+}
