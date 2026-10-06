@@ -183,7 +183,7 @@ impl LanguageService<'_> {
             .filter(|i| i.kind.as_deref() != Some(&lsp::CompletionItemKind::KEYWORD))
             .map(|i| i.label.as_str())
             .collect();
-        let mut groups: HashMap<_, Vec<(&Export, lsp::AutoImportFix)>> = HashMap::new();
+        let mut groups: HashMap<_, Vec<(&Export, tsr_autoimport::fix::Fix)>> = HashMap::new();
         for export in registry.search(syntax.file.path(), &prefix) {
             self.check_canceled()?;
             if shadowed.contains(String::from_utf8_lossy(export.name()).as_ref()) {
@@ -211,7 +211,7 @@ impl LanguageService<'_> {
                 export.ambient_module_name().to_vec(),
                 export.package_name.clone(),
             );
-            for fix in tsr_autoimport::fix::fixes(
+            for fix in tsr_autoimport::fix::fixes_with_info(
                 self.program,
                 checker,
                 syntax.source,
@@ -226,19 +226,24 @@ impl LanguageService<'_> {
                 groups.entry(key.clone()).or_default().push((export, fix));
             }
         }
+        let ranking = tsr_autoimport::ranking::Ranking::new(
+            self.program,
+            syntax.source,
+            &options.auto_import,
+        )?;
         let mut chosen = Vec::new();
         for mut group in groups.into_values() {
-            group.sort_by(|a, b| rank(&a.1, &b.1));
+            group.sort_by(|a, b| ranking.rank(&a.1, &b.1));
             if let Some((_, best)) = group.first() {
                 let count = group
                     .iter()
-                    .take_while(|(_, fix)| rank(fix, best).is_eq())
+                    .take_while(|(_, fix)| ranking.rank(fix, best).is_eq())
                     .count();
                 group.truncate(count);
                 chosen.extend(group);
             }
         }
-        chosen.sort_by(|a, b| compare(&a.1, &b.1));
+        chosen.sort_by(|a, b| ranking.compare(&a.1, &b.1));
         for (export, fix) in chosen {
             let Some(kind) = export.completion_kind else {
                 continue;
@@ -272,7 +277,7 @@ impl LanguageService<'_> {
                     .into_owned(),
                     source: fix.module_specifier.clone(),
                     is_import_statement_completion: statement.is_some(),
-                    auto_import: Some(Box::new(fix.clone())),
+                    auto_import: Some(Box::new(fix.protocol.clone())),
                 })),
                 ..Default::default()
             };
@@ -446,23 +451,4 @@ impl LanguageService<'_> {
         item.detail = Some(Box::new(message));
         Ok(item)
     }
-}
-pub(crate) fn rank(a: &lsp::AutoImportFix, b: &lsp::AutoImportFix) -> std::cmp::Ordering {
-    a.kind.0.cmp(&b.kind.0).then_with(|| {
-        a.module_specifier
-            .bytes()
-            .filter(|&b| b == b'/')
-            .count()
-            .cmp(&b.module_specifier.bytes().filter(|&b| b == b'/').count())
-    })
-}
-pub(crate) fn compare(a: &lsp::AutoImportFix, b: &lsp::AutoImportFix) -> std::cmp::Ordering {
-    rank(a, b)
-        .then_with(|| {
-            b.module_specifier
-                .starts_with("./")
-                .cmp(&a.module_specifier.starts_with("./"))
-        })
-        .then_with(|| a.module_specifier.cmp(&b.module_specifier))
-        .then_with(|| a.import_kind.0.cmp(&b.import_kind.0))
 }

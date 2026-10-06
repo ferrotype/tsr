@@ -242,7 +242,7 @@ impl LanguageService<'_> {
                 ..Default::default()
             });
         }
-        if context.blocked(&syntax, position)? {
+        if context.blocked(&mut syntax, position)? {
             return Ok(lsp::CompletionItemsOrListOrNull::default());
         }
         if let Some(list) =

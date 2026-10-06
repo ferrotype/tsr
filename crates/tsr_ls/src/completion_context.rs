@@ -4,7 +4,13 @@ use crate::{
     syntax::Syntax,
     Result,
 };
-use tsr_ast::{utilities as ast, utilities_positions as positions, NodeId, SyntaxKind as K};
+use tsr_ast::{
+    utilities as ast, utilities_middle as middle, utilities_positions as positions, NodeId,
+    SyntaxKind as K,
+};
+
+#[path = "completion_context_containers.rs"]
+mod containers;
 
 pub(crate) struct Context {
     pub location: NodeId,
@@ -267,6 +273,35 @@ impl Context {
             }
         }
         if member.is_none() {
+            if container.is_some_and(|(kind, _)| kind == Container::Constructor) {
+                // Native constructor-parameter completion takes precedence over
+                // the containing class, including an unterminated class at EOF.
+            } else if let Some(target) = containers::object_type(syntax, token, location, position)?
+            {
+                container = Some((
+                    if ast::is_class_like(&syntax.view.node(target)?) {
+                        Container::Class
+                    } else {
+                        Container::Interface
+                    },
+                    target,
+                ));
+            } else if matches!(
+                container,
+                Some((Container::Class | Container::Interface, _))
+            ) {
+                container = None;
+            }
+            if let Some(token) = token {
+                if containers::constructor_parameter(syntax, token)? {
+                    let parameter = syntax.view.node(token)?.parent().unwrap();
+                    container = syntax
+                        .view
+                        .node(parameter)?
+                        .parent()
+                        .map(|constructor| (Container::Constructor, constructor));
+                }
+            }
             let mut jsx_token = token;
             if let Some(id) = jsx_token {
                 if let Some(parent) = syntax.view.node(id)?.parent() {
@@ -348,11 +383,22 @@ impl Context {
             commit,
         })
     }
-    pub fn blocked(&self, syntax: &Syntax<'_>, position: i64) -> Result<bool> {
+    pub fn blocked(&self, syntax: &mut Syntax<'_>, position: i64) -> Result<bool> {
         let Some(token) = self.token else {
             return Ok(false);
         };
         let read = syntax.view.node(token)?;
+        // The regexp end still belongs to its flags; string/template ends only
+        // block when the literal is unterminated (native completion blocker).
+        let regexp = read.kind() == K::RegularExpressionLiteral;
+        if ((regexp || middle::is_string_text_containing_node(&read))
+            && i64::from(read.pos()) < position
+            && position < i64::from(read.end()))
+            || (position == i64::from(read.end())
+                && (regexp || middle::is_unterminated_literal(&read)))
+        {
+            return Ok(true);
+        }
         let parent = read.parent().unwrap_or(syntax.source);
         let pr = syntax.view.node(parent)?;
         let kind = pr.kind().known().unwrap_or(K::Unknown);
@@ -407,7 +453,7 @@ impl Context {
             return Ok(true);
         }
         let function = ast::is_function_like_kind(pr.kind()) && kind != K::Constructor;
-        let certain = match tk {
+        let certain = match read.kind().known().unwrap_or(K::Unknown) {
             K::CommaToken => {
                 matches!(
                     kind,
@@ -419,6 +465,12 @@ impl Context {
                         | K::ArrayBindingPattern
                         | K::TypeAliasDeclaration
                 ) || function
+                    || (ast::is_class_like(&pr)
+                        && pr
+                            .type_parameter_list()
+                            .map(|list| syntax.view.list(list).map(|list| list.loc().end()))
+                            .transpose()?
+                            .is_some_and(|end| end >= i64::from(read.pos())))
             }
             K::DotToken | K::OpenBracketToken => kind == K::ArrayBindingPattern,
             K::ColonToken => kind == K::BindingElement,
@@ -433,7 +485,18 @@ impl Context {
                         | K::TypeAliasDeclaration
                 ) || ast::is_function_like_kind(pr.kind())
             }
-            K::DotDotDotToken => kind == K::Parameter,
+            K::DotDotDotToken => {
+                kind == K::Parameter
+                    || pr
+                        .parent()
+                        .map(|id| syntax.view.node(id).map(|node| node.kind()))
+                        .transpose()?
+                        == Some(K::ArrayBindingPattern.into())
+            }
+            K::PublicKeyword | K::PrivateKeyword | K::ProtectedKeyword => {
+                kind == K::Parameter && !containers::constructor_parameter(syntax, token)?
+            }
+            K::GetKeyword | K::SetKeyword => !containers::from_object_type(syntax, token)?,
             K::AsKeyword => matches!(
                 kind,
                 K::ImportSpecifier | K::ExportSpecifier | K::NamespaceImport
@@ -463,6 +526,35 @@ impl Context {
                 }
                 node = read.parent();
             }
+        }
+        if containers::constructor_parameter(syntax, token)?
+            && (read.kind() != K::Identifier
+                || middle::is_parameter_property_modifier(tk.into())
+                || (syntax.start(token)? <= position && position <= i64::from(read.end())))
+        {
+            return Ok(false);
+        }
+        if class_keyword(tk) && containers::from_object_type(syntax, token)? {
+            return Ok(false);
+        }
+        if matches!(
+            tk,
+            K::AbstractKeyword
+                | K::ClassKeyword
+                | K::DeclareKeyword
+                | K::EnumKeyword
+                | K::FunctionKeyword
+                | K::InterfaceKeyword
+                | K::LetKeyword
+                | K::PrivateKeyword
+                | K::ProtectedKeyword
+                | K::PublicKeyword
+                | K::StaticKeyword
+                | K::VarKeyword
+                | K::ConstKeyword
+        ) || (tk == K::AsyncKeyword && kind == K::PropertyDeclaration)
+        {
+            return Ok(true);
         }
         Ok(positions::is_declaration_name(syntax.view, token)?
             && !matches!(kind, K::ShorthandPropertyAssignment | K::JsxAttribute)

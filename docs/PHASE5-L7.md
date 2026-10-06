@@ -283,6 +283,34 @@ Direct checkerpool-test routing is audited separately: equivalent timeout/capaci
 parameter choices do not create artificial gaps, while missing independent
 assertions remain named. The source audit is not an execution result.
 
+## Final batch before the requested pause
+
+Auto-import ranking now retains the pinned module-specifier provenance and
+export-star origin through candidate selection, including barrel-cycle and
+Node-core style preferences. Only the original protocol fields are serialized.
+Completion blockers include regexp flags and template text, object-type member
+containers follow the native syntax rules, and constructor parameter modifiers
+remain available without treating declaration names as expression slots.
+Class snippets keep the name fallback for unsupported declaration shapes,
+retain decorators, and identify signature import edits as snippet actions.
+Constructor references follow `extends`, not `implements`; UMD namespace
+aliases follow the native merged-symbol condition.
+
+The combined LS suite passes 124 tests, auto-import passes 31, and scheduler
+passes 18. Seven new scheduler tests supply the previously missing independent
+category, capacity, timer, cancellation and discard assertions. The direct-test
+inventory records their exact observations and Rust API correspondence; it does
+not turn source inspection into native execution credit. Affected-crate clippy,
+seven inventory/replay script tests, formatting and `cargo xtask validate` pass.
+
+`target/phase5/harness/full-11` finishes this batch at **77 failing parents / 97
+failing rows**, down from 108 / 134 in `full-09`: 31 formerly failing parents
+now pass and no previously passing parent fails. An intermediate run caught
+optional-label filter text and constructor-at-EOF regressions; both were fixed
+and given focused tests before the final comparison. The original native
+denominator remains 4,117 executed tests with 417 skips. The exact residual set
+is in `status/parity/fourslash.json`; no difference was approved.
+
 The latency capture and `perf.py lsp` adapter are implemented and tested with
 fake framed servers. They do not constitute a real performance result. Fixture
 approval, a decision about the first-diagnostics metric (the pin only pushes
@@ -291,8 +319,12 @@ remain outstanding.
 
 ## Still to complete
 
-The initial full fourslash run and exact failing set are recorded above.
-Residual fixes, final approved retained sets, direct-test routing, CI validation
-and the latency workload remain in progress. The measured N above
+Work is paused at the owner's request after this validated batch. Resume with
+the 77 residual parents: completion contexts and fields, auto-import discovery
+and type-only selection, and the smaller navigation/project-state tail. The
+closure limit is still 20, and any retained failures require owner approval.
+Remaining direct-test routes, CI validation and latency decisions/measurement
+also remain open. No agents or measurement jobs were left running.
+The measured N above
 belongs to that compiled native run; a new platform, binary or skip set requires
 its own native execution rather than reusing the source count.

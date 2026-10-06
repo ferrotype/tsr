@@ -10,6 +10,7 @@ pub mod fix;
 pub mod index;
 mod package_names;
 pub mod packages;
+pub mod ranking;
 mod realpaths;
 mod registry;
 pub mod specifiers;

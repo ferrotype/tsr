@@ -161,7 +161,7 @@ impl Registry {
                     if canceled() {
                         return Ok(None);
                     }
-                    let Some(export) = extract(
+                    let Some(mut export) = extract(
                         program,
                         checker,
                         symbol,
@@ -173,6 +173,21 @@ impl Registry {
                     else {
                         continue;
                     };
+                    // GetExportsOfModule forwards export-star symbols unchanged.
+                    // The pin assigns their original external-module parent as
+                    // the target even when SkipAlias returns the same symbol.
+                    if let Some(parent) = checker.symbol(symbol)?.parent() {
+                        let parent = checker.symbol_ref(parent)?;
+                        let parent = checker.get_merged_symbol(parent)?;
+                        if checker.symbol(parent)?.is_external_module() {
+                            if let Some(target) = export_id_for_symbol(program, checker, symbol)? {
+                                if target.module != export.id.module {
+                                    export.syntax = ExportSyntax::Star;
+                                    export.target = Some(target);
+                                }
+                            }
+                        }
+                    }
                     let object_exports = export.syntax == ExportSyntax::CommonJsModuleExports
                         && export.target.is_none();
                     index.insert(export);

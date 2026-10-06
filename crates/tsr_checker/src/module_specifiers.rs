@@ -61,6 +61,22 @@ struct Preferences<'a> {
     old_specifier: &'a [u8],
 }
 
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum ModuleSpecifierKind {
+    #[default]
+    None,
+    Ambient,
+    NodeModules,
+    Paths,
+    Redirect,
+    Relative,
+}
+#[derive(Clone, Debug)]
+pub struct ModuleSpecifierResult {
+    pub specifier: JsString,
+    pub kind: ModuleSpecifierKind,
+}
+
 // port: tsc/internal/modulespecifiers/specifiers.go:GetModuleSpecifiersForFileWithInfo
 pub(crate) fn generate(
     host: &dyn CheckerHost,
@@ -83,6 +99,7 @@ pub(crate) fn generate(
             old_specifier: b"",
         },
     )?
+    .map(|result| result.specifier)
     .ok_or(Error::MissingLink("GetModuleSpecifiers returned no paths"))
 }
 fn generate_with_preferences(
@@ -92,7 +109,7 @@ fn generate_with_preferences(
     target: &[u8],
     override_mode: Mode,
     preference: Preferences<'_>,
-) -> Result<Option<JsString>, Error> {
+) -> Result<Option<ModuleSpecifierResult>, Error> {
     let owner = host
         .get_source_file(file)
         .ok_or(Error::MissingLink("module specifier importing source"))?;
@@ -128,8 +145,14 @@ fn generate_with_preferences(
         preference,
     };
     let module_paths = generation.sorted_paths(host.get_module_specifier_paths(file, target)?);
-    let result = generation.compute(&module_paths)?;
-    Ok(result.into_iter().next().map(JsString::from_bytes))
+    let (result, kind) = generation.compute(&module_paths)?;
+    Ok(result
+        .into_iter()
+        .next()
+        .map(|specifier| ModuleSpecifierResult {
+            specifier: JsString::from_bytes(specifier),
+            kind,
+        }))
 }
 
 impl Generation<'_> {
@@ -224,7 +247,7 @@ impl Generation<'_> {
     }
 
     // port: tsc/internal/modulespecifiers/specifiers.go:computeModuleSpecifiers
-    fn compute(&self, paths: &[ModulePath]) -> Result<Vec<Vec<u8>>, Error> {
+    fn compute(&self, paths: &[ModulePath]) -> Result<(Vec<Vec<u8>>, ModuleSpecifierKind), Error> {
         for candidate in paths {
             let target = path::to_path(
                 candidate.file_name.as_bytes(),
@@ -255,7 +278,10 @@ impl Generation<'_> {
                     continue;
                 }
                 if !existing.text.is_empty() {
-                    return Ok(vec![existing.text.as_bytes().to_vec()]);
+                    return Ok((
+                        vec![existing.text.as_bytes().to_vec()],
+                        ModuleSpecifierKind::None,
+                    ));
                 }
             }
         }
@@ -273,7 +299,7 @@ impl Generation<'_> {
             if !package.is_empty() && !(self.preference.excluded)(&package) {
                 packages.push(package.clone());
                 if candidate.is_redirect {
-                    return Ok(packages);
+                    return Ok((packages, ModuleSpecifierKind::NodeModules));
                 }
             }
             let local = self.local_specifier(
@@ -296,13 +322,13 @@ impl Generation<'_> {
             }
         }
         if !mapped.is_empty() {
-            Ok(mapped)
+            Ok((mapped, ModuleSpecifierKind::Paths))
         } else if !redirects.is_empty() {
-            Ok(redirects)
+            Ok((redirects, ModuleSpecifierKind::Redirect))
         } else if !packages.is_empty() {
-            Ok(packages)
+            Ok((packages, ModuleSpecifierKind::NodeModules))
         } else {
-            Ok(relative)
+            Ok((relative, ModuleSpecifierKind::Relative))
         }
     }
 
@@ -568,7 +594,7 @@ impl crate::Operation<'_> {
         relative: Option<&str>,
         ending: Option<&str>,
         excluded: &dyn Fn(&[u8]) -> bool,
-    ) -> Result<Option<JsString>, Error> {
+    ) -> Result<Option<ModuleSpecifierResult>, Error> {
         let state = self.state();
         let view = state.ast(source)?;
         let file = view.source_file(source)?;

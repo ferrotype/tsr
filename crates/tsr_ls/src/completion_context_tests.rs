@@ -33,7 +33,11 @@ fn complete(name: &[u8], text: &str) -> lsp::CompletionItemsOrListOrNull {
                 },
                 ..Default::default()
             },
-            &CompletionOptions::default(),
+            &CompletionOptions {
+                commit_characters: true,
+                default_commit_characters: true,
+                ..Default::default()
+            },
         )
         .unwrap()
 }
@@ -80,4 +84,91 @@ fn complete_call_and_real_member_access_still_offer_properties() {
             ["value"]
         );
     }
+}
+
+#[test]
+fn literal_text_and_regex_flags_block_completion_but_expression_trivia_does_not() {
+    // Native isInStringOrRegularExpressionOrTemplateLiteral includes the end of
+    // a regexp because the user may still be entering its flags.
+    for text in [
+        "const known = 1; const expression = /ab|c/;",
+        "const known = 1; const expression = /abc/|;",
+        "const known = 1; const expression = /abc/g|;",
+        "const known = 1; const template = `a|b`;",
+        "const known = 1; const template = `a${known}b|c`;",
+        "const known = 1; const template = `unfinished|",
+    ] {
+        assert!(complete(b"/a.ts", text).list.is_none(), "{text}");
+    }
+    for text in [
+        "const known = 1; const expression = /abc/; |",
+        "const known = 1; const template = `a${|}`;",
+    ] {
+        let list = complete(b"/a.ts", text).list.unwrap();
+        assert!(
+            list.items
+                .iter()
+                .flatten()
+                .any(|item| item.label == "known"),
+            "{text}"
+        );
+    }
+}
+
+#[test]
+fn interface_member_slots_keep_member_keywords_and_no_commit_characters() {
+    for text in [
+        "interface I { /** JSDoc */ |foo(): void; }",
+        "interface I { m(): void; fo| }",
+        "type T = { fo| };",
+        "interface I { f; |",
+    ] {
+        let list = complete(b"/a.ts", text).list.unwrap();
+        assert_eq!(
+            list.items
+                .iter()
+                .flatten()
+                .map(|item| item.label.as_str())
+                .collect::<Vec<_>>(),
+            ["readonly"],
+            "{text}"
+        );
+        assert_eq!(
+            list.item_defaults.unwrap().commit_characters.as_deref(),
+            Some(&Vec::new()),
+            "{text}"
+        );
+    }
+}
+
+#[test]
+fn declaration_name_slots_block_and_constructor_modifiers_remain_available() {
+    for text in [
+        "class C<T, |",
+        "const C = class D<T, |",
+        "var [x, ...z|",
+        "const x = 1 as const |",
+    ] {
+        assert!(complete(b"/a.ts", text).list.is_none(), "{text}");
+    }
+    for text in [
+        "class C { constructor(public |",
+        "class C { constructor(public a|",
+        "class C { constructor(a|",
+    ] {
+        let list = complete(b"/a.ts", text).list.unwrap();
+        assert!(
+            list.items
+                .iter()
+                .flatten()
+                .any(|item| item.label == "readonly"),
+            "{text}"
+        );
+    }
+    let list = complete(b"/a.ts", "const x = 1 as const\n|").list.unwrap();
+    assert!(list.items.iter().flatten().any(|item| item.label == "x"));
+    let list = complete(b"/a.ts", "class C { constructor(private a, |")
+        .list
+        .unwrap();
+    assert_eq!(list.items.len(), 5);
 }

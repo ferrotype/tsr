@@ -66,7 +66,7 @@ fn present(syntax: &mut Syntax<'_>, context: &Context, position: i64) -> Result<
         .flatten()
     {
         let mr = syntax.view.node(modifier)?;
-        result.flags |= tsr_ast::modifier_to_flag(mr.kind());
+        result.flags |= tsr_ast::modifier_to_flag(mr.kind()) & mf::MODIFIER;
         if mr.kind() == K::Decorator {
             result.decorators.push(modifier);
         }
@@ -227,6 +227,14 @@ impl LanguageService<'_> {
             flags &= !mf::PUBLIC;
         }
         flags |= present.flags;
+        // The label may have an optional `?` suffix; the native snippet name
+        // is the original completion name, including computed-name spelling.
+        let name = item
+            .data
+            .as_ref()
+            .ok_or(tsr_arena::Error::InvalidGraph)?
+            .name
+            .clone();
         let mut adder = tsr_autoimport::ImportAdder::default();
         let Some((nodes, roots)) = self.member_nodes(
             checker,
@@ -243,13 +251,17 @@ impl LanguageService<'_> {
             &mut adder,
         )?
         else {
+            item.insert_text = Some(Box::new(name.clone()));
+            item.filter_text = Some(Box::new(name));
+            item.insert_text_format = options
+                .snippets
+                .then(|| Box::new(lsp::InsertTextFormat::SNIPPET));
             return Ok(Some(item));
         };
         let edits = self.import_adder_edits(syntax, options, &adder)?;
         if !edits.is_empty() {
             item.additional_text_edits = Some(Box::new(edits));
         }
-        let name_text = tsr_ast::JsString::from_bytes(checker.symbol(symbol)?.name_bytes());
         let text = crate::snippet_printer::print_many(
             nodes.ast,
             &roots,
@@ -262,9 +274,7 @@ impl LanguageService<'_> {
                 text.join(options.newline.as_deref().unwrap_or("\n")),
             ));
         }
-        item.filter_text = Some(Box::new(
-            String::from_utf8_lossy(name_text.as_bytes()).into_owned(),
-        ));
+        item.filter_text = Some(Box::new(name));
         item.insert_text_format = options
             .snippets
             .then(|| Box::new(lsp::InsertTextFormat::SNIPPET));
@@ -278,8 +288,14 @@ impl LanguageService<'_> {
                         range,
                         new_text: String::new(),
                     })));
-                item.data.as_mut().unwrap().source = "ClassMemberSnippet/".into();
             }
+        }
+        if item
+            .additional_text_edits
+            .as_ref()
+            .is_some_and(|edits| !edits.is_empty())
+        {
+            item.data.as_mut().unwrap().source = "ClassMemberSnippet/".into();
         }
         Ok(Some(item))
     }
@@ -316,6 +332,17 @@ impl LanguageService<'_> {
             })
             .transpose()?
             .unwrap_or(K::PropertySignature);
+        if !matches!(
+            kind,
+            K::PropertySignature
+                | K::PropertyDeclaration
+                | K::GetAccessor
+                | K::SetAccessor
+                | K::MethodSignature
+                | K::MethodDeclaration
+        ) {
+            return Ok(None);
+        }
         let ty = checker.get_type_of_symbol_at_location(symbol, Some(class))?;
         let ty = checker.get_widened_type(ty)?;
         let optional = checker.symbol(symbol)?.flags() & sf::OPTIONAL != 0;
@@ -690,3 +717,7 @@ fn member_body(
     let statements = list(&mut nodes.ast, &[Some(throw)])?;
     Ok(nodes.ast.new_block(Some(statements), true))
 }
+
+#[cfg(test)]
+#[path = "completion_class_snippets_tests.rs"]
+mod tests;

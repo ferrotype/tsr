@@ -654,7 +654,13 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
         let class = if ast::is_class_like(&view.node(parent)?) {
             Some(parent)
         } else {
-            h::heritage_container(view, node)?
+            // Constructor inheritance follows `extends`, never `implements`.
+            // Pin tryGetClassByExtendingIdentifier first climbs qualified access.
+            let target = tsr_ast::utilities_middle::climb_past_property_access(view, node)?;
+            match view.node(target)?.parent() {
+                Some(parent) => tsr_ast::utilities_class::try_get_class_extending_expression_with_type_arguments(view, parent)?,
+                None => None,
+            }
         };
         let Some(class) = class.filter(|id| view.node(*id).is_ok_and(|n| ast::is_class_like(&n)))
         else {
@@ -717,6 +723,10 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
         Ok(())
     }
 }
+
+#[cfg(test)]
+#[path = "reference_constructor_tests.rs"]
+mod constructor_tests;
 impl LanguageService<'_> {
     pub(crate) fn entry_write(&self, entry: &ReferenceEntry) -> Result<bool> {
         let Some(node) = entry.node else {

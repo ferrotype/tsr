@@ -10,7 +10,7 @@ use tsr_core::TextRange;
 use tsr_lsproto as lsp;
 
 struct Info {
-    fix: lsp::AutoImportFix,
+    fix: tsr_autoimport::fix::Fix,
     alias: Option<NodeId>,
     namespace: bool,
     name: Vec<u8>,
@@ -176,7 +176,7 @@ impl LanguageService<'_> {
                 individual.replace_text(source, TextRange::new(start, start), prefix);
             } else {
                 adder.add(
-                    info.fix,
+                    info.fix.protocol,
                     self.program.options().verbatim_module_syntax.is_true(),
                 );
             }
@@ -241,7 +241,7 @@ impl LanguageService<'_> {
                             .is_some_and(|f| f.source() == syntax.source)
                         {
                             infos.push(Info {
-                                fix: lsp::AutoImportFix::default(),
+                                fix: tsr_autoimport::fix::Fix::default(),
                                 alias: Some(alias),
                                 namespace: false,
                                 name,
@@ -279,7 +279,7 @@ impl LanguageService<'_> {
                     .iter()
                     .filter(|e| Some(&e.id) == id.as_ref())
                 {
-                    for fix in tsr_autoimport::fix::fixes(
+                    for fix in tsr_autoimport::fix::fixes_with_info(
                         self.program,
                         c,
                         syntax.source,
@@ -310,7 +310,7 @@ impl LanguageService<'_> {
                     if jsx && export.name() != name && !export.is_renameable() {
                         continue;
                     }
-                    for fix in tsr_autoimport::fix::fixes(
+                    for fix in tsr_autoimport::fix::fixes_with_info(
                         self.program,
                         c,
                         syntax.source,
@@ -332,10 +332,15 @@ impl LanguageService<'_> {
                 }
             }
         }
+        let ranking = tsr_autoimport::ranking::Ranking::new(
+            self.program,
+            syntax.source,
+            &options.auto_import,
+        )?;
         infos.sort_by(|a, b| {
             a.namespace
                 .cmp(&b.namespace)
-                .then_with(|| crate::auto_imports::compare(&a.fix, &b.fix))
+                .then_with(|| ranking.compare(&a.fix, &b.fix))
         });
         Ok(infos)
     }
