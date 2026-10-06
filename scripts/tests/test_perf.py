@@ -329,6 +329,72 @@ class CheckTests(TemporaryPerf):
                 self.assertIn("thresholds.toml", err)
 
 
+class LspTests(TemporaryPerf):
+    def measurement(self, pairs=20, ratio=0.8):
+        return dict(samples={runtime: {name: [100 * (ratio if runtime == 'rust' else 1)] * pairs
+                                       for name in perf.LSP_SCENARIOS} for runtime in ('go', 'rust')},
+                    smoke=False, correctness_matched=True, host=HOST, revision=REVISION,
+                    recorded_at='2026-10-06T00:00:00Z', metadata={'fixture': 'pending-example'})
+
+    def test_matched_pairs_recompute_and_record_uncertainty(self):
+        measurement = perf.lsp_measurement(self.measurement())
+        document = perf.run_document('lsp', measurement)
+        self.assertEqual(set(document['ratios']), set(perf.LSP_SCENARIOS))
+        self.assertTrue(all(ratio == 0.8 for ratio in document['ratios'].values()))
+        self.assertEqual(document['metadata']['fixture'], 'pending-example')
+        self.assertEqual(document['summaries']['hover']['bootstrap']['lower'], 0.8)
+        self.assertFalse(document['summaries']['hover']['needs_more'])
+        self.assertTrue(all(row[3] == 'pass' for row in perf.compare(document, dict.fromkeys(perf.LSP_SCENARIOS, 1.0))))
+
+    def test_inconclusive_requires_extension_then_owner_review(self):
+        for pairs, action in ((20, 'extend once to 40 pairs'), (40, 'requires owner review')):
+            with self.subTest(pairs=pairs):
+                document = perf.run_document('lsp', perf.lsp_measurement(self.measurement(pairs, ratio=1.0)))
+                rows = perf.compare(document, dict.fromkeys(perf.LSP_SCENARIOS, 1.0))
+                self.assertTrue(all(row[3] == 'inconclusive' for row in rows))
+                lines = perf.report_lines('lsp', document, 'example.json', rows)
+                self.assertIn(action, '\n'.join(lines))
+                self.assertIn('95% interval', perf.summary_markdown(lines, rows, document))
+                self.assertEqual(document['summaries']['hover']['needs_more'], pairs == 20)
+        path = perf.write_run(document, self.perf)
+        self.thresholds_text = '[lsp]\n' + ''.join(f'{name}=1.0\n' for name in perf.LSP_SCENARIOS)
+        (self.perf / 'thresholds.toml').write_text(self.thresholds_text)
+        code, output, _ = self.main('check', 'lsp', '--run', str(path))
+        self.assertEqual(code, 1)
+        self.assertIn('inconclusive', output)
+
+    def test_smoke_mismatch_and_incomplete_pairs_are_not_runs(self):
+        for field, value in (('smoke', True), ('correctness_matched', False)):
+            measurement = self.measurement()
+            measurement[field] = value
+            with self.assertRaisesRegex(ValueError, 'correctness-matched'):
+                perf.lsp_measurement(measurement)
+        for pairs in (3, 19, 21, 39):
+            with self.assertRaisesRegex(ValueError, '20 or 40'):
+                perf.lsp_measurement(self.measurement(pairs))
+        measurement = self.measurement()
+        measurement['samples']['rust']['hover'].pop()
+        with self.assertRaisesRegex(ValueError, 'complete matched pairs'):
+            perf.lsp_measurement(measurement)
+
+    def test_absent_interval_or_unconfigured_threshold_cannot_pass(self):
+        document = perf.run_document('lsp', perf.lsp_measurement(self.measurement()))
+        del document['summaries']['hover']
+        rows = perf.compare(document, dict.fromkeys(perf.LSP_SCENARIOS, 1.0))
+        self.assertIn(('hover', 0.8, 1.0, 'missing'), rows)
+        path = perf.write_run(document, self.perf)
+        code, _, error = self.main('check', 'lsp', '--run', str(path))
+        self.assertEqual(code, 1)
+        self.assertIn('explicitly name all five scenarios', error)
+
+    def test_sample_count_override_preserves_original_defaults(self):
+        from s07_benchmark_stats import ratio_summary
+        with self.assertRaises(ValueError):
+            ratio_summary([100] * 20, [80] * 20)
+        self.assertEqual(ratio_summary([100] * 20, [80] * 20, accepted_counts=(20, 40))['ratio'], 0.8)
+        self.assertEqual(ratio_summary([100] * 7, [80] * 7)['ratio'], 0.8)
+
+
 class CommittedFiles(unittest.TestCase):
     def test_thresholds_file(self):
         tables = perf.read_thresholds()
@@ -350,7 +416,7 @@ class CommittedFiles(unittest.TestCase):
             for run, path in perf.runs(workload):
                 found += 1
                 with self.subTest(path=path.name):
-                    self.assertEqual(set(run), RUN_KEYS)
+                    self.assertEqual(set(run), RUN_KEYS | ({"summaries", "metadata"} & set(run) if workload == "lsp" else set()))
                     self.assertEqual(run["workload"], workload)
                     self.assertEqual(perf.run_path(perf.PERF, run), path)
                     self.assertRegex(run["revision"], r"^[0-9a-f]{40}$")
@@ -362,7 +428,7 @@ class CommittedFiles(unittest.TestCase):
                     for runtime, lists in run["samples"].items():
                         self.assertIn(runtime, ("rust", "go"))
                         self.assertEqual(set(lists), set(run["samples"]["rust"]))
-                        self.assertTrue(all(len(values) == 7 for values in lists.values()))
+                        self.assertTrue(all(len(values) in ((20, 40) if workload == "lsp" else (7,)) for values in lists.values()))
                     rows = perf.compare(run, thresholds.get(workload, {}))
                     self.assertFalse([row for row in rows if row[3] in ("miss", "missing")])
         self.assertGreaterEqual(found, 2)

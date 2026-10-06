@@ -25,10 +25,13 @@ Workloads, and the harness commands that make their captures:
   checker     the frozen checker query workload and per-type footprint
               (ADR 0022): scripts/s08_checkerbench.py build, then capture
               (target/s08/checkerbench)
+  lsp         five request/diagnostic latency scenarios with matched 20/40 pairs:
+              tools/phase5/latency/capture.py (target/phase5/latency)
 """
 from __future__ import annotations
 
 import argparse
+import importlib
 from dataclasses import dataclass
 from datetime import datetime, timezone
 import json
@@ -142,9 +145,53 @@ def read_checker(capture, args):
     return {**checker_measurement(result), "recorded_at": finished}
 
 
+# ---------------------------------------------------------------- LSP latency
+
+LSP_SCENARIOS = ('first_diagnostics', 'completion', 'hover', 'references', 'rename')
+
+
+def lsp_measurement(result):
+    """Recompute all latency statistics from a validated complete capture."""
+    from s07_benchmark_stats import ratio_summary
+    if result.get('smoke') is not False or result.get('correctness_matched') is not True:
+        raise ValueError('lsp: requires a nonsmoke, correctness-matched capture')
+    samples = result['samples']
+    if set(samples) != {'go', 'rust'} or any(set(samples[runtime]) != set(LSP_SCENARIOS)
+                                           for runtime in ('go', 'rust')):
+        raise ValueError('lsp: requires exactly the five scenarios for both runtimes')
+    lengths = {len(samples[runtime][name]) for runtime in ('go', 'rust') for name in LSP_SCENARIOS}
+    if len(lengths) != 1 or lengths.pop() not in (20, 40):
+        raise ValueError('lsp: requires 20 or 40 complete matched pairs for every scenario')
+    summaries = {}
+    for name in LSP_SCENARIOS:
+        summaries[name] = ratio_summary(samples['go'][name], samples['rust'][name],
+                                       timing=True, threshold=1.0, accepted_counts=(20, 40))
+        interval = summaries[name]['bootstrap']
+        inconclusive = interval['lower'] <= 1.0 <= interval['upper']
+        summaries[name]['needs_more'] = inconclusive and summaries[name]['samples_per_runtime'] == 20
+        summaries[name]['inconclusive'] = inconclusive
+    measurement = dict(ratios={name: summary['ratio'] for name, summary in summaries.items()},
+                       samples=samples, summaries=summaries, host=result['host'],
+                       revision=result['revision'], recorded_at=result['recorded_at'])
+    if 'metadata' in result:
+        measurement['metadata'] = result['metadata']
+    return measurement
+
+
+def read_lsp(capture, args):
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    try:
+        module = importlib.import_module('tools.phase5.latency.capture')
+    except ModuleNotFoundError as error:
+        raise ValueError('lsp: latency capture adapter is unavailable') from error
+    return lsp_measurement(module.read_capture(capture.resolve()))
+
+
 WORKLOADS = {
     "parse-bind": Workload("target/s07-benchmark", read_parse_bind),
     "checker": Workload("target/s08/checkerbench", read_checker),
+    "lsp": Workload("target/phase5/latency", read_lsp),
 }
 
 
@@ -186,7 +233,7 @@ def run_document(workload, measurement, label=None, revision=None, recorded_at=N
     if bad:
         raise ValueError(f"{workload}: ratios that are not finite numbers: {', '.join(bad)}")
     when = recorded_at or measurement.get("recorded_at")
-    return {
+    document = {
         "workload": workload,
         "pin": pin(),
         "revision": revision or measurement.get("revision") or head(),
@@ -195,6 +242,10 @@ def run_document(workload, measurement, label=None, revision=None, recorded_at=N
         "ratios": {name: ratios[name] for name in sorted(ratios)},
         "samples": measurement["samples"],
     }
+    for optional in ("summaries", "metadata"):
+        if optional in measurement:
+            document[optional] = measurement[optional]
+    return document
 
 
 def dumps(value, depth=0):
@@ -269,6 +320,15 @@ def compare(run, thresholds):
             status = ""
         elif value is None:
             status = "missing"
+        elif run.get('workload') == 'lsp':
+            interval = run.get('summaries', {}).get(name, {}).get('bootstrap', {})
+            lower, upper = interval.get('lower'), interval.get('upper')
+            if not finite(lower) or not finite(upper) or not 0 < lower <= upper:
+                status = 'missing'
+            elif lower <= limit <= upper:
+                status = 'inconclusive'
+            else:
+                status = 'pass' if value <= limit else 'miss'
         else:
             status = "pass" if value <= limit else "miss"
         rows.append((name, value, limit, status))
@@ -288,13 +348,29 @@ def report_lines(workload, run, path, rows):
         shown = "—" if value is None else f"{value:.4f}"
         bound = "" if limit is None else f"<= {limit}"
         lines.append(f"  {name:<{width}}  {shown:>8}  {bound:<8}  {status}".rstrip())
+    if workload == 'lsp':
+        for name, _, _, status in rows:
+            summary = run.get('summaries', {}).get(name, {})
+            interval = summary.get('bootstrap', {})
+            if finite(interval.get('lower')) and finite(interval.get('upper')):
+                lines.append(f"  {name}: 95% interval [{interval['lower']:.4f}, {interval['upper']:.4f}], "
+                             f"{summary.get('samples_per_runtime', '?')} pairs")
+            if status == 'inconclusive':
+                action = 'extend once to 40 pairs' if summary.get('samples_per_runtime') == 20 else 'requires owner review after 40 pairs'
+                lines.append(f"  {name}: inconclusive; {action}")
     misses = [row for row in rows if row[3] in ("miss", "missing")]
-    lines.append(f"{len(misses)} of {sum(1 for row in rows if row[2] is not None)} thresholds missed")
+    lines.append(f"{len(misses)} of {sum(1 for row in rows if row[2] is not None)} thresholds missed"
+                 + (f"; {sum(row[3] == 'inconclusive' for row in rows)} inconclusive" if workload == 'lsp' else ''))
     return lines
 
 
-def summary_markdown(lines, rows):
+def summary_markdown(lines, rows, run=None):
     head, tail = lines[:-len(rows) - 1], lines[-1]
+    if run and run.get('workload') == 'lsp':
+        # LSP text includes uncertainty details after the scalar ratio rows.
+        first_ratio = next((index for index, line in enumerate(lines) if line.startswith('  ')), len(lines) - 1)
+        head = lines[:first_ratio]
+        tail = '\n\n'.join(lines[first_ratio + len(rows):])
     table = ["| Ratio (Rust / Go) | Value | Threshold | |", "|---|---:|---:|---|"]
     for name, value, limit, status in rows:
         table.append(f"| `{name}` | {'—' if value is None else f'{value:.4f}'} | "
@@ -313,14 +389,17 @@ def check(args):
         if not found:
             sys.exit(f"no runs under {PERF / args.workload}")
         run, path = found[-1]
-    rows = compare(run, read_thresholds().get(args.workload, {}))
+    thresholds = read_thresholds().get(args.workload, {})
+    if args.workload == 'lsp' and set(thresholds) != set(LSP_SCENARIOS):
+        raise ValueError('lsp: thresholds must explicitly name all five scenarios')
+    rows = compare(run, thresholds)
     lines = report_lines(args.workload, run, path, rows)
     print("\n".join(lines))
     step_summary = os.environ.get("GITHUB_STEP_SUMMARY")
     if step_summary:
         with open(step_summary, "a") as handle:
-            handle.write(summary_markdown(lines, rows))
-    if any(row[3] in ("miss", "missing") for row in rows):
+            handle.write(summary_markdown(lines, rows, run))
+    if any(row[3] in ("miss", "missing", "inconclusive") for row in rows):
         sys.exit(1)
 
 
