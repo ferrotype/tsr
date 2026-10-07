@@ -3,6 +3,7 @@
 //! handles, and the type-to-syntax conversions. Each runs on the project's
 //! API checker through `setup_checker`.
 //! port: tsc/internal/api/session.go
+use super::checker_responses::literal_value_json;
 use super::diagnostics::DiagnosticKind;
 use super::handles::{resolve_node_handle, touching_property_name, CheckerSetup, Committed};
 use super::responses::base64_standard;
@@ -33,6 +34,8 @@ impl ApiSession {
         let data = self.snapshot_data(snapshot)?;
         let setup = data.setup_checker(project)?;
         let mut operation = setup.registry.operation()?;
+        #[cfg(feature = "fault-injection")]
+        self.trip_fault(snapshot);
         let value = query(&setup, &mut operation)?;
         setup.commit(&value)
     }
@@ -49,6 +52,8 @@ impl ApiSession {
         let data = self.snapshot_data(snapshot)?;
         let setup = data.setup_checker(project)?;
         let mut operation = setup.registry.operation()?;
+        #[cfg(feature = "fault-injection")]
+        self.trip_fault(snapshot);
         let response = query(&setup, &mut operation)?;
         let _gate = setup.registry.gate()?;
         Ok(response)
@@ -376,11 +381,19 @@ impl ApiSession {
                 p.symbol,
                 |op, symbol| Ok(op.symbol(symbol).map_err(checker_error)?.parent()),
             )?),
+            // The pin answers the merged export symbol, or the symbol itself
+            // when it has none (`GetExportSymbolOfSymbol`), never null.
             Params::GetExportSymbolOfSymbol(p) => Response::json(self.symbol_property(
                 p.snapshot,
                 &p.project,
                 p.symbol,
-                |op, symbol| Ok(op.symbol(symbol).map_err(checker_error)?.export_symbol()),
+                |op, symbol| {
+                    Ok(Some(
+                        op.get_export_symbol_of_symbol(symbol)
+                            .map_err(checker_error)?
+                            .id(),
+                    ))
+                },
             )?),
             Params::GetMembersOfSymbol(p) => Response::json(self.symbol_table_property(
                 p.snapshot,
@@ -1146,6 +1159,31 @@ impl ApiSession {
             }
             Params::GetCompletionsAtPosition(p) => {
                 Response::json(self.handle_get_completions_at_position(&p)?)
+            }
+            Params::GetJSDocTags(p) => Response::json(self.handle_get_jsdoc_tags(&p)?),
+            Params::GetDocumentationComment(p) => {
+                Response::json(self.handle_get_documentation_comment(&p)?)
+            }
+            Params::GetSignatureUsages(p) => Response::json(self.handle_get_signature_usages(&p)?),
+            Params::GetImportAdderEdits(p) => {
+                Response::json(self.handle_get_import_adder_edits(&p)?)
+            }
+            // port: tsc/internal/api/session.go:Session.handleGetConstantValue
+            Params::GetConstantValue(p) => {
+                Response::json(self.with_checker(p.snapshot, &p.project, |setup, op| {
+                    let node = resolve_node_handle(setup.program, &p.location)?;
+                    let value = op.constant_value(node).map_err(checker_error)?;
+                    Ok(value.and_then(|value| {
+                        literal_value_json(&match value {
+                            tsr_printer::emit_resolver::ConstantValue::Number(number) => {
+                                tsr_checker::LiteralValue::Number(number)
+                            }
+                            tsr_printer::emit_resolver::ConstantValue::String(text) => {
+                                tsr_checker::LiteralValue::String(text)
+                            }
+                        })
+                    }))
+                })?)
             }
             Params::GetReferencedSymbolsForNode(p) => {
                 Response::json(self.handle_get_referenced_symbols_for_node(&p)?)

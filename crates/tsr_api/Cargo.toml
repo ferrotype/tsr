@@ -38,6 +38,11 @@ tsr_tsoptions = { version = "0.3.0", path = "../tsr_tsoptions" }
 tsr_tspath = { version = "0.3.0", path = "../tsr_tspath" }
 tsr_vfs = { version = "0.3.0", path = "../tsr_vfs" }
 
+[features]
+# A test-only control for the Phase 6 panic witness: the private test
+# server arms a panic in the next checker operation of a named snapshot.
+fault-injection = []
+
 [dev-dependencies]
 tsr_arena = { version = "0.3.0", path = "../tsr_arena", features = ["harness"] }
 tsr_bundled = { version = "0.3.0", path = "../tsr_bundled" }

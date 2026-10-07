@@ -49,3 +49,29 @@ diff "$SCRATCH/native.jsonl" "$SCRATCH/rust.jsonl"
 
 Node is the pin's (`upstream/package.json`, `volta.node`); the pinned client
 is imported by path, so no install is needed for this script.
+
+## The real-client panic witness (`panic-witness.mts`)
+
+`phase5_testserver --api` (crate `tsr_testhost`, built with `tsr_api`'s
+`fault-injection` feature) serves the production API session behind the pin's
+`api` flags with one test-only control, `testhost/faultNextCheckerOperation`
+`{"snapshot": n}`, which makes the next checker operation of that snapshot
+panic inside its operation. The script drives the untouched asynchronous
+client against it: two snapshots sharing a project's checker pool and a
+second project on its own pool; the fault on one snapshot; then the
+panicking request fails with the connection's `panic:` error, both
+snapshots' old handles are rejected (`the checker generation has retired`),
+the other pool keeps answering, a file change rebuilds the project on a
+fresh pool whose snapshot answers, a released snapshot's handle reports
+`snapshot N not found`, and a reconnect answers. With `--native` the same
+script runs against the pinned binary without the fault and shows the
+ordinary error forms.
+
+```sh
+cargo build --release -p tsr_testhost --bin phase5_testserver
+node --conditions @typescript/source tools/phase6/wire/panic-witness.mts target/release/phase5_testserver
+node --conditions @typescript/source tools/phase6/wire/panic-witness.mts target/phase6/binaries/native-lsp --native
+```
+
+Each run prints one JSON line per step and a `verdict`; the exit code is the
+verdict.

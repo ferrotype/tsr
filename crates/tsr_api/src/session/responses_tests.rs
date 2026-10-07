@@ -104,3 +104,55 @@ fn base64_follows_go_std_encoding() {
     assert_eq!(base64_decode("Y!Jj"), Err(1), "an illegal byte");
     assert_eq!(base64_decode("YQ=Y"), Err(2), "incomplete padding");
 }
+
+/// Ports `TestToAPITextEditsUsesOriginalCoordinates` of
+/// tsc/internal/api/session_textedit_test.go: the edit's LSP position is
+/// read against the original text's line starts and reported as UTF-16
+/// offsets.
+#[test]
+fn text_edits_use_original_coordinates() {
+    use super::service::to_api_text_edits;
+    let edits = vec![tsr_lsproto::TextEdit {
+        range: tsr_lsproto::Range {
+            start: tsr_lsproto::Position {
+                line: 1,
+                character: 1,
+            },
+            end: tsr_lsproto::Position {
+                line: 1,
+                character: 2,
+            },
+        },
+        new_text: "x".into(),
+    }];
+    let converted = to_api_text_edits("😀\nabc".as_bytes(), &edits).expect("edits inside the text");
+    assert_eq!(converted.len(), 1);
+    assert_eq!(
+        (
+            converted[0].pos,
+            converted[0].end,
+            converted[0].new_text.as_str()
+        ),
+        (4, 5, "x")
+    );
+    assert!(
+        to_api_text_edits(
+            b"abc",
+            &[tsr_lsproto::TextEdit {
+                range: tsr_lsproto::Range {
+                    start: tsr_lsproto::Position {
+                        line: 3,
+                        character: 0
+                    },
+                    end: tsr_lsproto::Position {
+                        line: 3,
+                        character: 0
+                    },
+                },
+                new_text: String::new(),
+            }]
+        )
+        .is_none(),
+        "an edit outside the text makes the result null"
+    );
+}

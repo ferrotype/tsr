@@ -1,5 +1,6 @@
 //! Test-only transport for injected hosts. No compiler or language service runs here.
 //! See docs/S11.md for the versioned, deliberately bounded protocol.
+pub mod api_witness;
 pub mod bridge;
 mod configuration;
 mod filesystem;
