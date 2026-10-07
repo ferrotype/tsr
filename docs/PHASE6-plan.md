@@ -120,10 +120,13 @@ Two facts make the harness small. The pin ignores `/built`, and
 `getExePath()` resolves `upstream/built/local/tsc` when the package runs from
 the repository; `ast.test.ts:573` even spells that path out. Placing a binary
 there needs no patch to the pinned client, and placing the Go binary built
-from the pin gives the native run. The suites need no `npm install`: the
-package self-references through its `exports`, `vscode-jsonrpc` is vendored,
-and the pin's Volta Node (24.20.0, which CI already installs for the LSP
-generator) runs the TypeScript sources directly. Tests use the repository root
+from the pin gives the native run. The package self-references through its
+`exports`, `vscode-jsonrpc` is vendored, and the pin's Volta Node (24.20.0,
+which CI already installs for the LSP generator) runs the TypeScript sources
+directly; but the two `api.test.ts` files import the bench module, which
+imports the workspace's `tinybench` and `typescript`, so the pin's lockfile
+is installed first (`npm ci --ignore-scripts` in `upstream/`, into the
+ignored `node_modules`; A0 found this on its first run). Tests use the repository root
 as `cwd` and read `tsc/testdata/fixtures` from the real file system under
 their virtual one. The placement is one shared path, so native and Rust runs
 of a file are serialized, and any later sharding on one machine isolates its
@@ -139,8 +142,7 @@ objects and become Rust tests, routed in `docs/PHASE6-tests.md`.
 The four benchmark files (`tinybench`) contain no assertions. PLAN's
 "correctness assertions exercised by benchmark cases" therefore means: each
 bench case runs to completion against Rust in single-iteration mode; its
-timing is Phase 7's. They need the pin's root `node_modules` (`typescript`,
-`tinybench`), which the suites do not.
+timing is Phase 7's. They use the same installed `node_modules` as the suites.
 
 ## 3. Architecture decisions
 
@@ -246,7 +248,8 @@ timing is Phase 7's. They need the pin's root `node_modules` (`typescript`,
   changes, and `parity.py run jsapi --id jsapi/<file>` for the test files a
   change touches. CI runs the full `jsapi` suite on every PR; a local full run
   is for the initial acceptance and for integration doubt, not for every
-  commit. No `npm install` in PR CI.
+  commit. PR CI installs the pin's locked dependencies for the `jsapi` suite
+  and never runs the benchmarks.
 - **Expectation files.** Each PR runs `parity.py accept jsapi` so
   `status/parity/jsapi.json` is exact for the commit; reasons are cause
   labels, `approved` stays empty until the owner words a retained entry.
@@ -321,7 +324,8 @@ response constructors), `cmd/tsc/api.go` (82), the client test corpus.
    `rust-lsp` is `tsrust`), renamed to a phase-neutral name in passing.
 5. **CI.** A `jsapi` job in `ci.yml`: Node from the pin's `volta` entry,
    the prepared binaries from the existing `phase5-runner` artifact, the
-   suite in one shard (measure before sharding), results uploaded,
+   suite in one shard (measure before sharding) after `npm ci
+   --ignore-scripts` in the pin's root, cached on its lockfile, results uploaded,
    `parity-check` extended to `jsapi`. The Node test runner's per-file process
    model is kept; `--test-concurrency` starts at 1 and is raised only after
    a measurement.
@@ -708,7 +712,7 @@ terminal event; a native skip; a Rust-only skip.
 | Symbol identity across checkers: a retained symbol imports only into a lease of its exact owner, and merged symbols are checker-local | The two-kind registry key of decision 4; the `symbol identity across projects` family in A2's exit |
 | Pagination byte accounting | Port the arithmetic literally; the client tests check page cuts and oversized single responses (A4) |
 | Position and text conversions | UTF-16 request positions and byte ranges convert at the edge (ADR 0013); the `textedit` test and the client's position tests cover it |
-| Node and the test runner | Node from the pin's `volta`, no `npm install` for the suites, the reporter checked against a fake test file, concurrency raised only after measurement |
+| Node and the test runner | Node from the pin's `volta`, the pin's lockfile installed once per checkout, the reporter checked against a fake test file, concurrency raised only after measurement |
 | A0's placeholder server hides a transport bug behind "not implemented" | A1 replaces it; the goldens and the `API` family distinguish transport from method failures |
 
 ## 8. Decisions
@@ -724,7 +728,8 @@ Accepted by the owner on 2026-10-07:
 4. **The `jsapi` suite and its denominator**: the pinned client's test cases,
    N from the native Go run of the same command, native skips visible.
 5. **Benchmarks** run once in single-iteration mode as A5's correctness
-   smoke, locally or by dispatch; PR CI never runs them.
+   smoke, locally or by dispatch; PR CI never runs them. The `jsapi` suite
+   itself needs the pin's `npm ci`, found in A0; that install is in PR CI.
 6. **The API-over-LSP handshake** lands in A1.
 7. **`snapshothost.go`** and `cmd/tsc/api.go` move to Phase 6 in the ledger.
 8. **One pull request per checkpoint** against `main`.
