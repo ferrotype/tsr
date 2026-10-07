@@ -1,11 +1,13 @@
 # Phase 5 L7: acceptance path, residuals, replay and latency
 
-Status: **correctness and replay pass; measured latency misses all five gates** (2026-10-07).
+Status: **complete; remaining performance work assigned to Phase 7** (2026-10-07).
 All 4,117 native-executed fourslash tests, 13 LSP tests and six ordinary-CLI
 replays pass. The owner approved section 2 items 1–3 on 2026-10-06 and
 authorized the TypeScript/pull-diagnostics latency run on 2026-10-07.
 The twenty-pair run is recorded; all five 95% ratio intervals are above 1.0.
-L7 is not closed. See the results and host limitations in PHASE5-L7.md.
+The owner subsequently closed L7 and moved all remaining performance work and
+acceptance to Phase 7. The ratios and 1.0 targets are unchanged. See the results
+and host limitations in PHASE5-L7.md.
 Checkpoint L7 of the [Phase 5 plan](PHASE5-plan.md). Planning reference: `main`
 at `ef456f65` (L0 to L6 merged, 0.3.0 released). Work is on
 `codex/phase5-l7`. Upstream remains Corsa
@@ -29,8 +31,9 @@ and unmeasured estimates remain proposals.
 
 The Phase 5 plan gives L7 five items: fix the remaining fourslash failures,
 add replay fixtures and a Go-against-Rust replay comparison, add the `lsp`
-latency workload, and apply PLAN's no-regression rule. Its exit is section 5's
-count, passing replay and the latency result.
+latency workload, and record its comparison with Go. Under the owner decision
+of 2026-10-07, its exit is the correctness count, passing replay and recorded
+latency baseline; performance optimization and acceptance belong to Phase 7.
 
 L7 is larger than that text, because the acceptance path L0 was to build was
 not complete at the original planning reference. The table records that initial
@@ -127,8 +130,8 @@ measured Go execution count.
    the smoke verifies the measurement path and response parity. Extend once
    to forty under L7.6.4. Keep builds and other agent tests out of the timed
    batch and record background-load limitations. Choosing and running this
-   workload requires no further approval; accepting a regression or changing
-   the thresholds remains a separate owner decision.
+   workload requires no further approval. The subsequent owner decision below
+   transfers remaining performance work without changing the thresholds.
 6. **The branch and pull request split — implemented.** The owner requested
    the draft PR and continued implementation on it: `codex/phase5-l7`, #103.
    Harness, production fixes, replay and latency tooling remain together.
@@ -365,7 +368,12 @@ reduce a session; they are for crash triage and are not used here.
    variants of the `lsp` suite. A session also runs once in UTF-16.
 5. **Witness.** Changing one response in an expected file fails the variant.
 
-### L7.6 Latency
+### L7.6 Latency — measurement complete; follow-up in Phase 7
+
+Owner decision, 2026-10-07: close L7 with the recorded twenty-pair result and
+move all remaining performance work and acceptance to Phase 7. The protocol
+and measurement rules below remain available for that work. Measured misses
+remain misses; they no longer block this checkpoint.
 
 1. **Capture** `tools/phase5/latency/capture.py` drives the pinned Go command and
    a release `tsrust --lsp --stdio` on the same local fixture copy (decision
@@ -396,9 +404,9 @@ reduce a session; they are for crash triage and are not used here.
 4. **Reading the result.** A scenario passes when its ratio is at or below
    1.0. When the interval around a ratio includes 1.0 the scenario is
    inconclusive: extend the samples once, to forty pairs, and report it to the
-   owner if it stays so. A measured regression is profiled and fixed, or
-   goes to the owner as a separate decision. Results are reported against Go
-   first, each scenario with its ratio.
+   owner if it stays so. Phase 7 owns profiling, fixing and accepting measured
+   regressions under the 2026-10-07 decision. Results are reported against Go
+   first, each scenario with its ratio; L7 closure needs no further capture.
 5. **Where to look first** if a scenario is slow (Astra's suspicion, not a
    profile): the snapshot and project clone before work is dispatched
    (`tsr_lsp/src/runtime.rs`), checker acquisition per semantic request
@@ -447,8 +455,8 @@ session or additional pull request is implied by this allocation.
   decision 1 holds with every retained entry approved.
 - `lsp.json` satisfies decision 2; the replay variants pass.
 - The harness witnesses of L7.1 and the script tests of L7.2 pass.
-- The latency run is recorded and no scenario regresses against Go without an
-  owner decision.
+- The latency run is recorded, with its measured misses and remaining work
+  assigned to Phase 7 under the owner decision of 2026-10-07.
 - `docs/PHASE5-tests.md` and `docs/PHASE5-L7.md` are written.
 
 ## 7. Risks

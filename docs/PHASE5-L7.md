@@ -1,5 +1,9 @@
 # L7 implementation record
 
+Status: **complete** (2026-10-07). The owner closed L7 and moved all remaining
+performance work and acceptance to Phase 7. Correctness and replay pass;
+the latency results below remain unchanged, including all five misses.
+
 Work started on `codex/phase5-l7` after L6 merged. The owner approved the
 acceptance rules in [the plan](PHASE5-L7-plan.md#2-decisions-for-the-owner) on
 2026-10-06. No new individual difference is approved by this record.
@@ -475,11 +479,28 @@ correctness commit `8fed54f1`, including all fourslash, LSP, compiler,
 concurrent compiler, transpile and native CLI jobs. No production Rust changed
 for this capture.
 
-## Still to complete
+## Closure and Phase 7 performance work
 
-L7's correctness, replay and measurement work is complete, but its latency exit
-condition fails. Closing it requires performance fixes with a new paired run,
-or a separate owner decision accepting the measured differences. The first
-profiling target is the open/load/check path: it accounts for the largest
-absolute gap, 89.2 ms. These end-to-end timings do not yet attribute that gap
-to project loading, checker construction, checking or protocol work.
+Owner decision, 2026-10-07: "you can close this one we can move all performance
+related stuff to Phase 7." L7 is complete on its correctness, replay and
+recorded measurement. The decision moves the performance acceptance boundary;
+it does not turn the five measured misses into passes or relax their 1.0
+targets. No further benchmark is needed for L7 or Phase 5 closure.
+
+[Phase 7](../PLAN.md#phase-7-hardening-webassembly-embedding-cut-over) owns
+profiling, optimization, further paired captures and performance acceptance
+for all five scenarios. The first profiling target is the open/load/check
+path: it accounts for the largest absolute gap, 89.2 ms. These end-to-end
+timings do not yet attribute that gap to project loading, checker construction,
+checking or protocol work. The record and raw artifacts above are the starting
+baseline; the same fixture, response comparison and host limitations apply.
+
+L8 remains the Phase 5 closure checkpoint, including the 93 direct-test WORK
+assignments, port-completion review and documentation. Those correctness and
+coverage tasks have not moved to Phase 7.
+
+The closure also corrects a CI assertion that required every committed
+performance record to pass and only accepted whole-second `Z` timestamps.
+Recorded misses and precise UTC capture timestamps are valid; incomplete
+ratios/intervals still fail validation, and `perf.py check` still returns 1
+for a measured miss. All 45 focused latency/performance tests pass.

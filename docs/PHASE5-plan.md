@@ -1,6 +1,8 @@
 # Phase 5: language service, project system, LSP server
 
-Status: **amended after PR #82 review** (2026-10-03).
+Status: **L7 complete; L8 closure remains** (2026-10-07).
+The owner moved all remaining performance work and acceptance to Phase 7 on
+2026-10-07. Existing measurements and numerical targets remain unchanged.
 The detailed implementation plan for [PLAN Phase 5](../PLAN.md#phase-5-language-service-project-system-lsp-server).
 Its checkpoints carry their own work items, witnesses and exit checks;
 production implementation starts at L0.
@@ -25,8 +27,9 @@ formatting), and the LSP 3.17 server with its request queue, progress,
 cancellation, logging and watcher registration. This is PLAN's Phase 5 gate:
 "At least 99.5 percent fourslash with a triaged allow-list; project and LSP
 suites; synchronous filesystem bridge cancellation/progress with blocked
-workers; replay corpus; no request-latency regression against Go on the
-benchmarking editor scenarios."
+workers; replay corpus." Remaining performance work and acceptance are Phase 7
+under the owner decision of 2026-10-07; recorded latency misses do not block
+Phase 5.
 
 The starting point is Phase 4's exit: programs load, check and emit; the
 checker pool, cancellation and generation retirement exist; the command line,
@@ -765,15 +768,16 @@ focused tests do not claim the entire native project/fourslash inventory.
    diagnostics uses a fresh process/cache; other scenarios use identical
    initialization and warmup actions on each runtime. Retain raw samples,
    host, revision and per-scenario ratios in `status/perf/lsp/`.
-5. Apply PLAN's no-request-latency-regression requirement: compare each
-   scenario's Rust/Go median to 1.0, report variability, and resolve an
-   inconclusive/noisy result before claiming closure. A measured regression
-   needs a fix or a separate owner decision; do not turn it into a report-only
-   requirement. This run is not required after each commit or in PR CI.
+5. Record each scenario's Rust/Go median and variability against the existing
+   1.0 target. Owner decision, 2026-10-07: the completed twenty-pair run closes
+   L7's measurement work; profiling, fixes, further captures and performance
+   acceptance move to Phase 7. Preserve the measured misses and targets.
+   No further benchmark run is required to close L7 or Phase 5.
 
-**Exit:** section 5's correctness count holds, replay comparisons pass, and
-request latency meets PLAN. There is no additional Phase 5 memory budget;
-retained memory is reported for Phase 7.
+**Exit — complete 2026-10-07:** section 5's correctness count holds, replay
+comparisons pass, and the latency baseline is recorded with the outstanding
+performance work assigned to Phase 7. There is no additional Phase 5 memory
+budget; retained-memory work also belongs to Phase 7.
 
 ### L8 — closure
 
@@ -795,6 +799,11 @@ only owner-approved differences at closure, and cause-label initial failing
 entries without approving them. This authorizes the counting and bookkeeping
 policy, not any particular residual difference.
 
+Owner decision, 2026-10-07: close L7 and move all remaining performance work
+and acceptance to Phase 7. This changes when the performance targets apply,
+not their values or the measured results. L8's correctness, direct-test and
+port-completion work remains in Phase 5.
+
 | Required result | How it is checked |
 | --- | --- |
 | At least 99.5% semantic fourslash passes | Discover the compiled pinned roster (source audit: 4,547 functions, excluding TestMain). N is the tests executed without a skip in the same native Go run. Count distinct nonpassing tests; len(F) <= floor(0.005 * N). N and its limit require runtime measurement |
@@ -803,7 +812,7 @@ policy, not any particular residual difference.
 | Client-driven LSP and replay | `lsp.json` holds only owner-approved retained differences at closure; the client/assertions execute against Rust, and replay responses match |
 | Synchronous bridge | Integration tests cover blocked workers, callbacks, cancellation, progress, disconnect and cleanup |
 | Ownership | Production session/snapshot/project/bundle lifetime and panic-retirement tests pass; test-cache retention is distinguished from leaks |
-| Request latency | The existing perf workflow/tool records the paired L7 scenarios; no scenario regresses against Go without a separate owner decision |
+| Latency baseline and Phase 7 assignment | The twenty-pair L7 run is recorded with its actual misses; profiling, optimization, further captures and target acceptance belong to Phase 7 by the owner decision of 2026-10-07 |
 | Port completion and build quality | All Phase 5 production work is ported or explicitly accounted for; ordinary CI and `cargo xtask validate` pass |
 
 Let `N` be the number of pinned top-level fourslash tests that execute without
@@ -906,9 +915,10 @@ without waiting for historical runs or owner-recorded editor sessions.
 9. **Harness ownership:** the Go fourslash parser/renderer stays in use; a
    Rust runner is deferred to Phase 7. Required state/lifecycle transport
    adapters and every production service operation are implemented here.
-10. **Latency:** the five scenarios in L7, twenty paired repetitions,
-    dispatch/local measurement once the service works. PLAN's no-regression
-    exit remains; there is no additional Phase 5 memory threshold.
+10. **Latency — amended by owner 2026-10-07:** L7's five scenarios and twenty
+    paired repetitions are recorded. All remaining performance work and
+    acceptance move to Phase 7; the no-regression targets and measured misses
+    remain unchanged. There is no additional Phase 5 memory threshold.
 11. **Dependencies:** the normalization dependency anticipated by ADR 0017;
     otherwise reuse current dependencies. JSON uses `tsr_json`; msgpack is
     Phase 6. Bring any additional dependency choice to the owner with reasons.

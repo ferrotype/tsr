@@ -5,6 +5,11 @@ pinned TypeScript/pull-diagnostics scenario below and authorized execution on
 2026-10-07. No dependencies are downloaded, no binaries are built, and no fixture
 is silently substituted for the supplied selection.
 
+L7 is complete. After the twenty-pair run, the owner moved all remaining
+performance work and acceptance to Phase 7 (2026-10-07). The recorded ratios
+and numerical targets remain unchanged; no further latency run blocks L7 or
+Phase 5 closure.
+
 ```
 python3 tools/phase5/latency/capture.py \
   --fixture /absolute/local/fixture --scenario /absolute/scenario.json \
@@ -149,8 +154,8 @@ Set `GOGC=100` for captures on the authorized host. The binaries are
 response parity, then record twenty pairs on the authorized host. Record with
 `python3 scripts/perf.py record lsp --capture /absolute/capture --label 'owner host'`
 and compare with `python3 scripts/perf.py check lsp`. The five `[lsp]` thresholds
-are 1.0, as required by L7.6.3's no-regression rule. Authorization to measure
-does not approve a regression or change that registered limit.
+remain 1.0. Their performance acceptance now belongs to Phase 7 under the
+owner's 2026-10-07 decision; the measurement is not reclassified as a pass.
 
 The dispatch-only `perf.yml` offers `lsp`, requiring explicit prepared fixture
 and scenario paths. It builds the two ordinary binaries, records twenty or forty

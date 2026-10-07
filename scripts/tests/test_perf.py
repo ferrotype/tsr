@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import copy
+from datetime import datetime, timedelta
 import io
 import json
 import os
@@ -346,6 +347,21 @@ class LspTests(TemporaryPerf):
         self.assertFalse(document['summaries']['hover']['needs_more'])
         self.assertTrue(all(row[3] == 'pass' for row in perf.compare(document, dict.fromkeys(perf.LSP_SCENARIOS, 1.0))))
 
+    def test_measured_miss_is_recorded_faithfully_and_check_still_fails(self):
+        captured = self.measurement(ratio=2.0)
+        captured['recorded_at'] = '2026-10-07T05:06:35.795361+00:00'
+        document = perf.run_document('lsp', perf.lsp_measurement(captured))
+        self.assertEqual(document['recorded_at'], captured['recorded_at'])
+        self.assertEqual(document['samples'], captured['samples'])
+        self.assertTrue(all(value == 2.0 for value in document['ratios'].values()))
+        self.assertTrue(all(row[3] == 'miss' for row in perf.compare(document, dict.fromkeys(perf.LSP_SCENARIOS, 1.0))))
+        path = perf.write_run(document, self.perf)
+        self.assertEqual(json.loads(path.read_text()), document)
+        (self.perf / 'thresholds.toml').write_text('[lsp]\n' + ''.join(f'{name}=1.0\n' for name in perf.LSP_SCENARIOS))
+        code, output, _ = self.main('check', 'lsp', '--run', str(path))
+        self.assertEqual(code, 1)
+        self.assertIn('5 of 5 thresholds missed', output)
+
     def test_inconclusive_requires_extension_then_owner_review(self):
         for pairs, action in ((20, 'extend once to 40 pairs'), (40, 'requires owner review')):
             with self.subTest(pairs=pairs):
@@ -396,6 +412,19 @@ class LspTests(TemporaryPerf):
 
 
 class CommittedFiles(unittest.TestCase):
+    def assert_utc_timestamp(self, value):
+        parsed = datetime.fromisoformat(value)
+        self.assertIsNotNone(parsed.tzinfo, 'Recorded timestamp requires a timezone')
+        self.assertEqual(parsed.utcoffset(), timedelta(0), 'Recorded timestamp must be UTC')
+
+    def test_capture_utc_timestamp_precision_and_timezone_are_preserved(self):
+        for value in ('2026-10-07T05:06:35Z', '2026-10-07T05:06:35.795361+00:00'):
+            with self.subTest(value=value):
+                self.assert_utc_timestamp(value)
+        for value in ('2026-10-07T05:06:35', '2026-10-07T05:06:35+03:00'):
+            with self.subTest(value=value), self.assertRaises(AssertionError):
+                self.assert_utc_timestamp(value)
+
     def test_thresholds_file(self):
         tables = perf.read_thresholds()
         self.assertEqual(tables, {
@@ -410,7 +439,7 @@ class CommittedFiles(unittest.TestCase):
         from s07_benchmark_measure import e6_thresholds
         self.assertEqual(e6_thresholds(), {"1": 1.25, "8": 1.45})
 
-    def test_committed_runs_have_the_rendered_format_and_pass(self):
+    def test_committed_runs_have_rendered_format_and_complete_threshold_data(self):
         found = 0
         thresholds = perf.read_thresholds()
         for workload in perf.WORKLOADS:
@@ -422,7 +451,7 @@ class CommittedFiles(unittest.TestCase):
                     self.assertEqual(perf.run_path(perf.PERF, run), path)
                     self.assertRegex(run["revision"], r"^[0-9a-f]{40}$")
                     self.assertRegex(run["pin"], r"^[0-9a-f]{40}$")
-                    self.assertRegex(run["recorded_at"], r"^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$")
+                    self.assert_utc_timestamp(run["recorded_at"])
                     self.assertEqual(set(run["host"]), {"os", "arch", "cpus", "label"})
                     self.assertTrue(run["ratios"] and all(perf.finite(v) for v in run["ratios"].values()))
                     self.assertEqual(path.read_text(), perf.dumps(run) + "\n")
@@ -431,7 +460,9 @@ class CommittedFiles(unittest.TestCase):
                         self.assertEqual(set(lists), set(run["samples"]["rust"]))
                         self.assertTrue(all(len(values) in ((20, 40) if workload == "lsp" else (7,)) for values in lists.values()))
                     rows = perf.compare(run, thresholds.get(workload, {}))
-                    self.assertFalse([row for row in rows if row[3] in ("miss", "missing")])
+                    # Recorded misses remain evidence; perf.check reports failure.
+                    # The committed-data check still rejects absent ratios/intervals.
+                    self.assertFalse([row for row in rows if row[3] == "missing"])
         self.assertGreaterEqual(found, 2)
 
     def test_carried_over_parse_bind_samples_reproduce_the_ratios(self):
