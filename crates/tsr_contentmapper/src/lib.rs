@@ -9,7 +9,6 @@
 mod host;
 mod host_impl;
 mod mapper;
-mod options_json;
 mod protocol;
 mod transform;
 
@@ -27,10 +26,12 @@ pub use mapper::{
     declared_json, diagnostic_name, hex, identity, is_supported_virtual_extension,
     marshal_declared_options, transform_identity,
 };
-pub use options_json::{marshal_compiler_options, option_json, CompilerOptionsJson, OptionValue};
 pub use protocol::*;
 pub use transform::{
     check_supplemental_file_name_collisions, parse_result, transform_and_parse, SourceFiles,
+};
+pub use tsr_tsoptions::options_json::{
+    marshal_compiler_options, option_json, CompilerOptionsJson, OptionValue,
 };
 
 #[cfg(test)]

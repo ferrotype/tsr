@@ -836,17 +836,25 @@ dependencies = [
 name = "tsr_api"
 version = "0.3.0"
 dependencies = [
+ "serde",
  "serde_json",
  "tsr_arena",
  "tsr_ast",
  "tsr_checker",
+ "tsr_contentmapper",
  "tsr_core",
  "tsr_encoder",
  "tsr_format",
+ "tsr_ipc",
+ "tsr_json",
+ "tsr_jsonrpc",
  "tsr_jsstring",
+ "tsr_lsproto",
  "tsr_parser",
  "tsr_printer",
  "tsr_project",
+ "tsr_tsoptions",
+ "tsr_tspath",
 ]
 
 [[package]]
@@ -1662,6 +1670,7 @@ dependencies = [
  "libc",
  "mimalloc",
  "rustix",
+ "tsr_api",
  "tsr_bundled",
  "tsr_contentmapper",
  "tsr_core",

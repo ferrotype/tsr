@@ -6,6 +6,7 @@
 
 mod formatting;
 mod printing;
+pub mod proto;
 pub use formatting::{format_decoded_for_insertion, format_node_for_insertion, FormatError};
 pub use printing::{print_node, PrintError, PrintNodeOptions};
 

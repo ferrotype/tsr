@@ -257,6 +257,7 @@ impl ParsedCommandLine {
         }
     }
 }
+pub mod options_json;
 pub mod raw;
 
 mod config_value;

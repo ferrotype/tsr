@@ -1,10 +1,10 @@
 //! A resolved content mapper's identities (`contentmapper.go`). The mapper
 //! itself is `tsr_tsoptions`' resolved `ContentMapper`, whose declaration and
 //! manifest the config parse fills in.
-use crate::options_json::option_json;
 use tsr_core::CompilerOptions;
 use tsr_jsstring::JsString;
 use tsr_tsoptions::config_mappers::ContentMapper;
+use tsr_tsoptions::options_json::option_json;
 
 /// The extensions a mapper's output may have.
 const SUPPORTED_VIRTUAL_EXTENSIONS: &[&[u8]] = &[

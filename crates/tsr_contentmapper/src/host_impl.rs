@@ -9,7 +9,6 @@ use crate::host::{
 use crate::mapper::{
     diagnostic_name, hex, identity, is_supported_virtual_extension, transform_identity,
 };
-use crate::options_json::marshal_compiler_options;
 use crate::protocol::{
     CloseProjectParams, DiagnosticDirectives, InitializeParams, InitializeResult, MappedOutput,
     OpenProjectParams, OpenProjectResult, PositionEncoding, TransformParams,
@@ -30,6 +29,7 @@ use tsr_jsonrpc::{Id, Message, RequestMessage, ResponseError, ResponseMessage};
 use tsr_jsstring::JsString;
 use tsr_locale::Locale;
 use tsr_tsoptions::config_mappers::ContentMapper;
+use tsr_tsoptions::options_json::marshal_compiler_options;
 
 const INITIALIZE_TIMEOUT_SECONDS: i32 = 5;
 const INITIALIZE_TIMEOUT: Duration = Duration::from_secs(5);

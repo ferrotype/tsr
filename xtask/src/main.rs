@@ -451,7 +451,7 @@ fn report(c: &Coverage) -> ExitCode {
     }
 }
 
-const USAGE: &str = "usage: cargo xtask gen [--check | --verify] | gen lsproto [--check] | validate | status [--out DIR]";
+const USAGE: &str = "usage: cargo xtask gen [--check | --verify] | gen lsproto [--check] | gen api [--check] | validate | status [--out DIR]";
 
 fn main() -> ExitCode {
     let args: Vec<String> = std::env::args().skip(1).collect();

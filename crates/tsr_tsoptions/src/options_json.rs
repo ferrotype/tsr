@@ -332,3 +332,255 @@ mod tests {
         assert_eq!(option_json(&options, "notAnOption").unwrap(), None);
     }
 }
+
+/// Decodes one option by its JSON name, as json v2 decodes the struct field
+/// the name selects; names that are not options are skipped.
+type Setter = fn(&mut CompilerOptions, &mut tsr_json::Decoder<'_>) -> Result<(), Error>;
+
+fn set_tristate(target: &mut Tristate, input: &mut tsr_json::Decoder<'_>) -> Result<(), Error> {
+    use tsr_json::Decode as _;
+    target.decode(input)
+}
+fn set_string(target: &mut JsString, input: &mut tsr_json::Decoder<'_>) -> Result<(), Error> {
+    input.value(target)
+}
+/// A JSON null is a nil slice; an array, even empty, is a non-nil one.
+fn set_strings(
+    target: &mut Option<Vec<JsString>>,
+    input: &mut tsr_json::Decoder<'_>,
+) -> Result<(), Error> {
+    input.value(target)
+}
+fn set_int(target: &mut i32, input: &mut tsr_json::Decoder<'_>) -> Result<(), Error> {
+    input.value(target)
+}
+/// Go `*int`: null leaves the option unset.
+fn set_optional_int(
+    target: &mut Option<isize>,
+    input: &mut tsr_json::Decoder<'_>,
+) -> Result<(), Error> {
+    input.value(target)
+}
+fn set_paths(
+    target: &mut Option<tsr_core::compiler_options::PathMappings>,
+    input: &mut tsr_json::Decoder<'_>,
+) -> Result<(), Error> {
+    if input.peek_kind() == tsr_json::Kind::Null {
+        input.read_token()?;
+        *target = None;
+        return Ok(());
+    }
+    let mut paths = tsr_core::compiler_options::PathMappings::default();
+    input.object(|key, input| {
+        let mut value: Option<Vec<JsString>> = None;
+        input.value(&mut value)?;
+        if paths.insert(JsString::from_bytes(key), value).is_some() {
+            return Err(Error::Message(format!(
+                "duplicate name {:?} in object",
+                String::from_utf8_lossy(key)
+            )));
+        }
+        Ok(())
+    })?;
+    *target = Some(paths);
+    Ok(())
+}
+
+macro_rules! setters {
+    ($( $name:literal => $kind:ident $field:ident ),* $(,)?) => {
+        const SETTERS: &[(&str, Setter)] = &[
+            $( ($name, |o, input| setters!(@set $kind, o.$field, input)), )*
+        ];
+    };
+    (@set tristate, $target:expr, $input:expr) => { set_tristate(&mut $target, $input) };
+    (@set string, $target:expr, $input:expr) => { set_string(&mut $target, $input) };
+    (@set strings, $target:expr, $input:expr) => { set_strings(&mut $target, $input) };
+    (@set enumeration, $target:expr, $input:expr) => { set_int(&mut $target.0, $input) };
+    (@set optional_int, $target:expr, $input:expr) => { set_optional_int(&mut $target, $input) };
+    (@set paths, $target:expr, $input:expr) => { set_paths(&mut $target, $input) };
+}
+
+setters!(
+    "allowJs" => tristate allow_js,
+    "allowArbitraryExtensions" => tristate allow_arbitrary_extensions,
+    "allowImportingTsExtensions" => tristate allow_importing_ts_extensions,
+    "allowNonTsExtensions" => tristate allow_non_ts_extensions,
+    "allowUmdGlobalAccess" => tristate allow_umd_global_access,
+    "allowUnreachableCode" => tristate allow_unreachable_code,
+    "allowUnusedLabels" => tristate allow_unused_labels,
+    "assumeChangesOnlyAffectDirectDependencies" => tristate assume_changes_only_affect_direct_dependencies,
+    "checkJs" => tristate check_js,
+    "customConditions" => strings custom_conditions,
+    "composite" => tristate composite,
+    "emitDeclarationOnly" => tristate emit_declaration_only,
+    "emitBOM" => tristate emit_bom,
+    "emitDecoratorMetadata" => tristate emit_decorator_metadata,
+    "declaration" => tristate declaration,
+    "declarationDir" => string declaration_dir,
+    "declarationMap" => tristate declaration_map,
+    "deduplicatePackages" => tristate deduplicate_packages,
+    "disableSizeLimit" => tristate disable_size_limit,
+    "disableSourceOfProjectReferenceRedirect" => tristate disable_source_of_project_reference_redirect,
+    "disableSolutionSearching" => tristate disable_solution_searching,
+    "disableReferencedProjectLoad" => tristate disable_referenced_project_load,
+    "erasableSyntaxOnly" => tristate erasable_syntax_only,
+    "exactOptionalPropertyTypes" => tristate exact_optional_property_types,
+    "experimentalDecorators" => tristate experimental_decorators,
+    "forceConsistentCasingInFileNames" => tristate force_consistent_casing_in_file_names,
+    "isolatedModules" => tristate isolated_modules,
+    "isolatedDeclarations" => tristate isolated_declarations,
+    "ignoreConfig" => tristate ignore_config,
+    "ignoreDeprecations" => string ignore_deprecations,
+    "importHelpers" => tristate import_helpers,
+    "inlineSourceMap" => tristate inline_source_map,
+    "inlineSources" => tristate inline_sources,
+    "init" => tristate init,
+    "incremental" => tristate incremental,
+    "jsx" => enumeration jsx,
+    "jsxFactory" => string jsx_factory,
+    "jsxFragmentFactory" => string jsx_fragment_factory,
+    "jsxImportSource" => string jsx_import_source,
+    "lib" => strings lib,
+    "libReplacement" => tristate lib_replacement,
+    "locale" => string locale,
+    "mapRoot" => string map_root,
+    "module" => enumeration module,
+    "moduleResolution" => enumeration module_resolution,
+    "moduleSuffixes" => strings module_suffixes,
+    "moduleDetection" => enumeration module_detection,
+    "newLine" => enumeration new_line,
+    "noEmit" => tristate no_emit,
+    "noCheck" => tristate no_check,
+    "noErrorTruncation" => tristate no_error_truncation,
+    "noFallthroughCasesInSwitch" => tristate no_fallthrough_cases_in_switch,
+    "noImplicitAny" => tristate no_implicit_any,
+    "noImplicitThis" => tristate no_implicit_this,
+    "noImplicitReturns" => tristate no_implicit_returns,
+    "noEmitHelpers" => tristate no_emit_helpers,
+    "noLib" => tristate no_lib,
+    "noPropertyAccessFromIndexSignature" => tristate no_property_access_from_index_signature,
+    "noUncheckedIndexedAccess" => tristate no_unchecked_indexed_access,
+    "noEmitOnError" => tristate no_emit_on_error,
+    "noUnusedLocals" => tristate no_unused_locals,
+    "noUnusedParameters" => tristate no_unused_parameters,
+    "noResolve" => tristate no_resolve,
+    "noImplicitOverride" => tristate no_implicit_override,
+    "noUncheckedSideEffectImports" => tristate no_unchecked_side_effect_imports,
+    "outDir" => string out_dir,
+    "paths" => paths paths,
+    "preserveConstEnums" => tristate preserve_const_enums,
+    "preserveSymlinks" => tristate preserve_symlinks,
+    "project" => string project,
+    "resolveJsonModule" => tristate resolve_json_module,
+    "resolvePackageJsonExports" => tristate resolve_package_json_exports,
+    "resolvePackageJsonImports" => tristate resolve_package_json_imports,
+    "removeComments" => tristate remove_comments,
+    "rewriteRelativeImportExtensions" => tristate rewrite_relative_import_extensions,
+    "reactNamespace" => string react_namespace,
+    "rootDir" => string root_dir,
+    "rootDirs" => strings root_dirs,
+    "skipLibCheck" => tristate skip_lib_check,
+    "stableTypeOrdering" => tristate stable_type_ordering,
+    "strict" => tristate strict,
+    "strictBindCallApply" => tristate strict_bind_call_apply,
+    "strictBuiltinIteratorReturn" => tristate strict_builtin_iterator_return,
+    "strictFunctionTypes" => tristate strict_function_types,
+    "strictNullChecks" => tristate strict_null_checks,
+    "strictPropertyInitialization" => tristate strict_property_initialization,
+    "stripInternal" => tristate strip_internal,
+    "skipDefaultLibCheck" => tristate skip_default_lib_check,
+    "sourceMap" => tristate source_map,
+    "sourceRoot" => string source_root,
+    "suppressOutputPathCheck" => tristate suppress_output_path_check,
+    "target" => enumeration target,
+    "traceResolution" => tristate trace_resolution,
+    "tsBuildInfoFile" => string ts_build_info_file,
+    "typeRoots" => strings type_roots,
+    "types" => strings types,
+    "useDefineForClassFields" => tristate use_define_for_class_fields,
+    "useUnknownInCatchVariables" => tristate use_unknown_in_catch_variables,
+    "verbatimModuleSyntax" => tristate verbatim_module_syntax,
+    "maxNodeModuleJsDepth" => optional_int max_node_module_js_depth,
+    "allowSyntheticDefaultImports" => tristate allow_synthetic_default_imports,
+    "alwaysStrict" => tristate always_strict,
+    "baseUrl" => string base_url,
+    "downlevelIteration" => tristate downlevel_iteration,
+    "esModuleInterop" => tristate es_module_interop,
+    "outFile" => string out_file,
+    "configFilePath" => string config_file_path,
+    "noDtsResolution" => tristate no_dts_resolution,
+    "pathsBasePath" => string paths_base_path,
+    "diagnostics" => tristate diagnostics,
+    "extendedDiagnostics" => tristate extended_diagnostics,
+    "generateCpuProfile" => string generate_cpu_profile,
+    "generateTrace" => string generate_trace,
+    "listEmittedFiles" => tristate list_emitted_files,
+    "listFiles" => tristate list_files,
+    "explainFiles" => tristate explain_files,
+    "listFilesOnly" => tristate list_files_only,
+    "noEmitForJsFiles" => tristate no_emit_for_js_files,
+    "preserveWatchOutput" => tristate preserve_watch_output,
+    "pretty" => tristate pretty,
+    "version" => tristate version,
+    "watch" => tristate watch,
+    "showConfig" => tristate show_config,
+    "build" => tristate build,
+    "help" => tristate help,
+    "all" => tristate all,
+    "runExternalCode" => tristate run_external_code,
+    "pprofDir" => string pprof_dir,
+    "singleThreaded" => tristate single_threaded,
+    "quiet" => tristate quiet,
+    "checkers" => optional_int checkers,
+);
+
+/// `json.Unmarshal` into `core.CompilerOptions`: a null is the zero value,
+/// unknown names are skipped, each known name decodes into its field.
+pub fn decode_compiler_options(
+    options: &mut CompilerOptions,
+    input: &mut tsr_json::Decoder<'_>,
+) -> Result<(), Error> {
+    if input.peek_kind() == tsr_json::Kind::Null {
+        input.read_token()?;
+        *options = CompilerOptions::default();
+        return Ok(());
+    }
+    input.object(
+        |name, input| match SETTERS.iter().find(|(json, _)| json.as_bytes() == name) {
+            Some((_, set)) => set(options, input),
+            None => input.skip_value(),
+        },
+    )
+}
+
+#[cfg(test)]
+mod decode_tests {
+    use super::*;
+
+    #[test]
+    fn setters_cover_every_encoded_field() {
+        let encoded: Vec<_> = FIELDS.iter().map(|(name, _)| *name).collect();
+        let decoded: Vec<_> = SETTERS.iter().map(|(name, _)| *name).collect();
+        assert_eq!(encoded, decoded);
+    }
+
+    #[test]
+    fn decoded_options_round_trip_through_the_encoder() {
+        let text = br#"{"allowJs":true,"strict":false,"target":99,"lib":[],"paths":{"@a/*":["src/*"],"b":null},"maxNodeModuleJsDepth":2,"unknownOption":1,"customConditions":null}"#;
+        let mut options = CompilerOptions::default();
+        decode_compiler_options(&mut options, &mut tsr_json::Decoder::from_slice(text)).unwrap();
+        assert_eq!(options.allow_js, Tristate::TRUE);
+        assert_eq!(options.strict, Tristate::FALSE);
+        assert_eq!(options.target.0, 99);
+        assert_eq!(options.lib, Some(Vec::new()));
+        assert_eq!(options.max_node_module_js_depth, Some(2));
+        assert_eq!(options.custom_conditions, None);
+        assert_eq!(
+            marshal_compiler_options(&options).unwrap(),
+            br#"{"allowJs":true,"lib":[],"paths":{"@a/*":["src/*"],"b":null},"strict":false,"target":99,"maxNodeModuleJsDepth":2}"#
+        );
+        let mut again = options.clone();
+        decode_compiler_options(&mut again, &mut tsr_json::Decoder::from_slice(b"null")).unwrap();
+        assert_eq!(again, CompilerOptions::default());
+    }
+}
