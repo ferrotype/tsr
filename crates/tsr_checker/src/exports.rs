@@ -724,11 +724,20 @@ impl Operation<'_> {
         signature: SignatureRef,
     ) -> Result<TypeRef, Error> {
         let signature = self.check_signature(signature)?;
+        let any = self.state().builtins.any_type;
+        let Some(rest) = self.state_mut().rest_parameter_type(signature)? else {
+            return Ok(self.type_ref(any));
+        };
+        // The pin reads the element type: a tuple's rest element, then the
+        // numeric index type. The tuple slice helper is not ported, so a
+        // tuple rest parameter answers its numeric index type directly.
+        let number = self.state().builtins.number_type;
         let state = self.state_mut();
-        let ty = state
-            .rest_parameter_type(signature)?
-            .unwrap_or(state.builtins.any_type);
-        Ok(self.type_ref(ty))
+        let element = match state.index_info_of_type(rest, number)? {
+            Some(info) => state.signatures.index_info(info)?.value_type,
+            None => any,
+        };
+        Ok(self.type_ref(element))
     }
 
     // port: tsc/internal/checker/exports.go:Checker.GetTypeArguments
