@@ -31,6 +31,21 @@ import sys
 ROOT = Path(__file__).resolve().parents[3]
 CWD_PLACEHOLDER = '<cwd>'
 TIMING_KEYS = ('processingTimeMs', 'totalProcessingTimeMs', 'timestamp')
+# The one host-dependent response value: `initialize` reports the file
+# system's case sensitivity, so a golden recorded on macOS says `false`
+# where a Linux runner must say `true`. The comparison expects the running
+# host's value, never the recording host's.
+HOST_KEYS = ('useCaseSensitiveFileNames',)
+
+
+def host_case_sensitive(directory):
+    """Whether `directory`'s file system distinguishes case, probed the way
+    the servers do: a file written in one case is looked up in the other."""
+    import tempfile
+    with tempfile.TemporaryDirectory(dir=directory) as temp:
+        probe = Path(temp) / 'CaseProbe'
+        probe.write_text('')
+        return not (Path(temp) / 'caseprobe').exists()
 
 # The pin's message types of protocol_msgpack.go.
 REQUEST, CALL_RESPONSE, CALL_ERROR, RESPONSE, ERROR, CALL = 1, 2, 3, 4, 5, 6
@@ -206,25 +221,28 @@ def run_script(binary, protocol, cwd, timeout=30):
     trailing = process.stdout.read()
     stderr = process.stderr.read().decode(errors='replace')
     return {'protocol': protocol, 'cwd': str(cwd), 'steps': steps, 'exit': process.returncode,
-            'stderr': stderr, 'trailing': trailing.hex()}
+            'stderr': stderr, 'trailing': trailing.hex(), 'case_sensitive': host_case_sensitive(cwd)}
 
 
 # --- comparison ------------------------------------------------------------
 
-def normalize_value(value, cwd):
+def normalize_value(value, cwd, host=None):
+    """`host` is the running host's case sensitivity, substituted into a
+    golden's host-dependent values; `None` keeps the value as observed."""
     if isinstance(value, dict):
-        return {key: (0 if key in TIMING_KEYS else normalize_value(item, cwd)) for key, item in value.items()}
+        return {key: (0 if key in TIMING_KEYS else host if key in HOST_KEYS and host is not None
+                      else normalize_value(item, cwd, host)) for key, item in value.items()}
     if isinstance(value, list):
-        return [normalize_value(item, cwd) for item in value]
+        return [normalize_value(item, cwd, host) for item in value]
     if isinstance(value, str) and cwd and value == cwd:
         return CWD_PLACEHOLDER
     return value
 
 
-def payload_value(payload, cwd):
+def payload_value(payload, cwd, host=None):
     """The JSON value of a payload, or the raw bytes when it is not JSON."""
     try:
-        return normalize_value(json.loads(payload.decode()), cwd)
+        return normalize_value(json.loads(payload.decode()), cwd, host)
     except (UnicodeDecodeError, ValueError):
         return payload.hex()
 
@@ -240,7 +258,7 @@ class Bytes:
         return chunk
 
 
-def describe_sync(raw, cwd):
+def describe_sync(raw, cwd, host=None):
     message_type, method, payload, _ = read_tuple(Bytes(raw))
     framing = raw[:len(raw) - len(payload)]
     # The payload marker's size bytes depend on the payload length, which may
@@ -248,7 +266,7 @@ def describe_sync(raw, cwd):
     marker_at = len(framing) - framing_marker_offset(framing)
     return {'type': message_type, 'method': method,
             'framing': framing[:marker_at].hex() + f' bin{framing[marker_at]:02x}',
-            'payload': payload_value(payload, cwd)}
+            'payload': payload_value(payload, cwd, host)}
 
 
 def framing_marker_offset(framing):
@@ -259,20 +277,20 @@ def framing_marker_offset(framing):
     raise ValueError('no payload marker in framing')
 
 
-def describe_async(raw, cwd):
+def describe_async(raw, cwd, host=None):
     headers, body, _ = read_frame(Bytes(raw))
     names = [header.partition(':')[0].strip() for header in headers]
-    return {'headers': names, 'body': payload_value(body, cwd)}
+    return {'headers': names, 'body': payload_value(body, cwd, host)}
 
 
-def describe(step, protocol, cwd):
+def describe(step, protocol, cwd, host=None):
     if 'received' not in step:
         return {'error': step.get('error')}
     raw = bytes.fromhex(step['received'])
     if not raw:
         return {'received': '', 'error': step.get('error')}
     try:
-        return describe_sync(raw, cwd) if protocol == 'sync' else describe_async(raw, cwd)
+        return describe_sync(raw, cwd, host) if protocol == 'sync' else describe_async(raw, cwd, host)
     except (EOFError, ValueError) as error:
         return {'undecodable': raw.hex(), 'error': str(error)}
 
@@ -285,7 +303,8 @@ def compare(golden, actual):
         if expected is None:
             differences.append((step['name'], 'no golden step', None, step))
             continue
-        want = describe(expected, golden['protocol'], golden['cwd'])
+        # The golden's host-dependent values are read as this host's.
+        want = describe(expected, golden['protocol'], golden['cwd'], actual.get('case_sensitive'))
         got = describe(step, actual['protocol'], actual['cwd'])
         if want != got:
             differences.append((step['name'], 'frames differ', want, got))

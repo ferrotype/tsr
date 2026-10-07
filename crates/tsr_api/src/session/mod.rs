@@ -116,6 +116,39 @@ struct Entry {
     data: Arc<SnapshotData>,
     refs: usize,
 }
+
+/// A snapshot reference held for one request (the pin's deferred release).
+struct RetainedSnapshot<'a> {
+    session: &'a ApiSession,
+    handle: SnapshotId,
+    data: Arc<SnapshotData>,
+}
+impl Drop for RetainedSnapshot<'_> {
+    fn drop(&mut self) {
+        let _ = self.session.release_snapshot(self.handle);
+    }
+}
+
+/// Test hooks on the request path, per thread so parallel tests do not see
+/// each other's.
+#[cfg(test)]
+pub(super) mod hooks {
+    use std::cell::RefCell;
+    thread_local! {
+        static BEFORE_COMMIT: RefCell<Option<Box<dyn Fn()>>> = const { RefCell::new(None) };
+    }
+    /// Runs `hook` on this thread before every response commitment.
+    pub fn set_before_commit(hook: Option<Box<dyn Fn()>>) {
+        BEFORE_COMMIT.with(|slot| *slot.borrow_mut() = hook);
+    }
+    pub fn before_commit() {
+        BEFORE_COMMIT.with(|slot| {
+            if let Some(hook) = slot.borrow().as_ref() {
+                hook();
+            }
+        });
+    }
+}
 #[derive(Default)]
 struct Snapshots {
     by_handle: HashMap<u64, Entry>,
@@ -405,13 +438,20 @@ impl ApiSession {
 
     /// Pins a snapshot while an operation derives from it.
     /// port: tsc/internal/api/session.go:Session.retainSnapshotData
-    fn retain_snapshot_data(&self, handle: SnapshotId) -> SessionResult<Arc<SnapshotData>> {
+    /// Takes a reference on a snapshot for the rest of a request; the guard
+    /// releases it on return and on unwinding alike, as the pin's deferred
+    /// release does when a file-system callback panics mid-derivation.
+    fn retain_snapshot(&self, handle: SnapshotId) -> SessionResult<RetainedSnapshot<'_>> {
         let mut snapshots = self.snapshots.lock().expect("snapshots");
         let Some(entry) = snapshots.by_handle.get_mut(&handle.0) else {
             return Err(client_error(format!("snapshot {} not found", handle.0)));
         };
         entry.refs += 1;
-        Ok(entry.data.clone())
+        Ok(RetainedSnapshot {
+            session: self,
+            handle,
+            data: entry.data.clone(),
+        })
     }
 
     /// A snapshot with one file's content overridden; it never becomes the
@@ -421,24 +461,20 @@ impl ApiSession {
         &self,
         params: &UpdateTemporarySnapshotParams,
     ) -> SessionResult<UpdateSnapshotResponse> {
-        let base = self.retain_snapshot_data(params.snapshot)?;
-        let result = (|| {
-            let uri = params.file.to_uri(self.current_directory().as_bytes());
-            let snapshot = self
-                .project
-                .clone_with_temporary_file(
-                    &base.snapshot,
-                    &uri,
-                    JsString::from_bytes(params.new_text.as_bytes()),
-                )
-                .map_err(|error| {
-                    client_error(format!("failed to update temporary snapshot: {error}"))
-                })?;
-            let (data, _) = self.store_snapshot(snapshot, false);
-            Ok(update_snapshot_response(&data, Some(&base.snapshot)))
-        })();
-        let _ = self.release_snapshot(params.snapshot);
-        result
+        let base = self.retain_snapshot(params.snapshot)?;
+        let uri = params.file.to_uri(self.current_directory().as_bytes());
+        let snapshot = self
+            .project
+            .clone_with_temporary_file(
+                &base.data.snapshot,
+                &uri,
+                JsString::from_bytes(params.new_text.as_bytes()),
+            )
+            .map_err(|error| {
+                client_error(format!("failed to update temporary snapshot: {error}"))
+            })?;
+        let (data, _) = self.store_snapshot(snapshot, false);
+        Ok(update_snapshot_response(&data, Some(&base.data.snapshot)))
     }
 
     /// port: tsc/internal/api/session.go:Session.handleCreateProgram
@@ -458,12 +494,11 @@ impl ApiSession {
         let mut retained = None;
         let mut old_project = None;
         if let Some(old) = &params.old_program {
-            let data = self.retain_snapshot_data(old.snapshot)?;
-            retained = Some((old.snapshot, data));
+            retained = Some(self.retain_snapshot(old.snapshot)?);
             old_project = Some(old.project.clone());
         }
         let result = (|| {
-            let old = retained.as_ref().map(|(_, data)| data);
+            let old = retained.as_ref().map(|retained| &retained.data);
             let old_project = match (old, &old_project) {
                 (Some(data), Some(handle)) => Some(data.project(handle)?.clone()),
                 _ => None,
@@ -525,9 +560,7 @@ impl ApiSession {
                 project: Some(Box::new(project)),
             })
         })();
-        if let Some((handle, _)) = retained {
-            let _ = self.release_snapshot(handle);
-        }
+        drop(retained);
         result
     }
 

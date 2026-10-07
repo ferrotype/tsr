@@ -204,8 +204,8 @@ impl StdioServer {
             self.options.collect_timing,
             ctx,
         );
-        let _ = transport.close();
         session.close();
+        let _ = transport.close();
         result
     }
 }
@@ -232,7 +232,7 @@ pub fn serve(
         Arc::new(conn)
     };
     if let Some(callbacks) = callbacks {
-        callbacks.set_connection(ctx.clone(), conn.clone());
+        callbacks.set_connection(ctx.clone(), &conn);
     }
     conn.run(ctx)
 }
@@ -424,13 +424,13 @@ mod tests {
         let base = Arc::new(tsr_vfs::MemoryBuilder::new(b"/", true).finish());
         let fs = Arc::new(CallbackFs::new(base, &["readFile".to_string()]).unwrap());
         let protocol = MessagePackProtocol::new(stream.reader, stream.writer);
-        let conn = Arc::new(tsr_ipc::SyncConn::with_closer(
+        let conn: Arc<dyn Conn> = Arc::new(tsr_ipc::SyncConn::with_closer(
             Some(stream.closer),
             protocol,
             Arc::new(Fanout(fs.clone())),
         ));
         let ctx = Context::background();
-        fs.set_connection(ctx.clone(), conn.clone());
+        fs.set_connection(ctx.clone(), &conn);
         let server = {
             let conn = conn.clone();
             let ctx = ctx.clone();
@@ -465,6 +465,46 @@ mod tests {
         );
         drop(client);
         server.join().unwrap().unwrap();
+    }
+
+    /// A finished callback-enabled connection leaves no cycle: the callback
+    /// file system holds the connection weakly, so when `serve` returns the
+    /// connection, its handler and the session are dropped even while the
+    /// file system (owned by the project session in production) lives on.
+    #[test]
+    fn a_served_connection_is_dropped_with_its_session_when_callbacks_are_enabled() {
+        let (mut client, stream) = pair();
+        let base = Arc::new(tsr_vfs::MemoryBuilder::new(b"/", true).finish());
+        let fs = Arc::new(CallbackFs::new(base, &["readFile".to_string()]).unwrap());
+        let session: Arc<dyn Session> =
+            Arc::new(Skeleton::new(JsString::from_bytes(b"/".as_slice()), true));
+        let weak_session = Arc::downgrade(&session);
+        let server = {
+            let fs = fs.clone();
+            std::thread::spawn(move || {
+                serve(
+                    stream,
+                    session,
+                    Some(fs),
+                    false,
+                    false,
+                    &Context::background(),
+                )
+            })
+        };
+        write_tuple(&mut client, REQUEST, "ping", b"");
+        let (kind, method, payload) = read_tuple(&mut client);
+        assert_eq!(
+            (kind, method.as_str(), payload.as_slice()),
+            (RESPONSE, "ping", &b"\"pong\""[..])
+        );
+        drop(client);
+        server.join().unwrap().unwrap();
+        assert!(
+            weak_session.upgrade().is_none(),
+            "the session is dropped once the connection ends while the file system lives"
+        );
+        drop(fs);
     }
 
     /// The plan's disconnect witness: the client closes while its request is

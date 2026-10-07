@@ -133,6 +133,43 @@ and the A4 features (`printNode`, `emit`, diagnostics, completions,
 `batchRequests`). `test/async/api.test.ts` still ends at the per-file
 deadline for the reason recorded in A1.
 
+## Exit families deferred to A3 and A4
+
+The plan's A2 exit names the `API`, `Snapshot`, `Multiple snapshots`,
+`Source file caching`, `runWithTemporaryFileUpdate`,
+`getDefaultProjectForFile` and `readFile callback semantics` families. At
+the A2 head they still had failing cases: the ones checked fail on A3 and
+A4 calls (`getTypeAtPosition`, `getSymbolAtPosition`,
+`getSemanticDiagnostics`), so they close with those checkpoints (A3 closed
+the checker calls; A4 the diagnostics, after which the `createProgram` and
+`runWithTemporaryFileUpdate` cases pass). Three A2 items moved with them:
+the handle registries and their witnesses (A3), the E3 panic case through
+`tsr_api::Session` (the review fixes after A4, with A5's real-client
+witness), and `clone_with_auto_imports` (A4 found no Rust counterpart: the
+language service builds the registry on demand from the project's cache).
+
+## Review fixes after A4
+
+- A diagnostic resolves its file through the view that owns the node: a
+  config the root extends, or another file named by related information,
+  keeps its `fileName`, UTF-16 positions and source lines (the A2 head
+  dropped them when the node was outside the one view the caller passed).
+- `computeSnapshotChanges` diffs a project without a program as an empty
+  file set, as the pin does: when a program goes away every old file is
+  reported deleted.
+- Client-facing errors use the `Display` text of the underlying error
+  (`err.Error()` in the pin), not the `Debug` form.
+- A temporary snapshot's and `createProgram`'s base references are
+  released by a guard that also runs on unwinding (the pin's deferred
+  release).
+- The callback file system holds its connection weakly, so a finished
+  callback-enabled connection, its session and transport are dropped;
+  `writeFile` before the connection is set is the pin's error, not a panic.
+- For later: `build_program` never marks file changes (the pin's
+  `DidChangeFiles` in `cloneForProgram`). It is correct today because a
+  fresh `ParsedCommandLine` always marks the seeded project dirty; program
+  reuse must mark the seeded project too.
+
 ## Known differences left for later checkpoints
 
 - `createProgram` with an `oldProgram` loads the program afresh rather than

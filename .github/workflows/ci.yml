@@ -357,7 +357,9 @@ jobs:
       - name: Compare the wire goldens
         run: python3 tools/phase6/wire/capture.py compare --binary phase5-replay-binaries/rust-lsp --golden tools/phase6/wire/golden
       - name: Run the API session handshake against both servers
+        shell: bash
         run: |
+          set -euo pipefail
           node --conditions @typescript/source tools/phase6/wire/handshake.mts phase5-replay-binaries/native-lsp | grep -v server-message > native.jsonl
           node --conditions @typescript/source tools/phase6/wire/handshake.mts phase5-replay-binaries/rust-lsp | grep -v server-message > rust.jsonl
           diff native.jsonl rust.jsonl

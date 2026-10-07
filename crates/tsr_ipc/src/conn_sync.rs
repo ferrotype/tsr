@@ -144,7 +144,14 @@ impl Conn for SyncConn {
             if let Some(error) = ctx.err() {
                 break Err(Error::Context(error));
             }
-            let message = match self.protocol.read_message() {
+            // The read holds the connection lock, as the pin's does: a call
+            // from another thread queues behind it instead of racing it for
+            // the next inbound message.
+            let read = {
+                let _io = self.io.lock().expect("sync io");
+                self.protocol.read_message()
+            };
+            let message = match read {
                 Ok(message) => message,
                 Err(error) if error.is_eof() => break Ok(()),
                 Err(error) => break Err(error),
@@ -157,9 +164,13 @@ impl Conn for SyncConn {
                 let _ =
                     self.handler
                         .handle_notification(ctx, &message.method, message.params_bytes());
+            } else {
+                // Responses are read inline by `call`; one here is a protocol
+                // error that ends the connection.
+                break Err(Error::Message(
+                    "ipc: unexpected response message in sync connection".into(),
+                ));
             }
-            // A response outside a call is the pin's silent drop: the reply
-            // slot that would have taken it is gone.
         };
         if let Some(closer) = &self.closer {
             let _ = closer.close();
@@ -327,6 +338,187 @@ mod tests {
         fn write_error(&self, _: Option<&Id>, _: &ResponseError) -> Result<(), Error> {
             Ok(())
         }
+    }
+
+    /// A protocol whose inbound messages the test feeds: `read_message`
+    /// waits for the next one, a call's reply is queued as the client would
+    /// answer it, and closing ends the stream.
+    struct Fed {
+        inbound: Mutex<std::collections::VecDeque<Message>>,
+        arrived: std::sync::Condvar,
+        writes: Mutex<Vec<String>>,
+        closed: std::sync::atomic::AtomicBool,
+    }
+    impl Fed {
+        fn new() -> Arc<Self> {
+            Arc::new(Self {
+                inbound: Mutex::new(std::collections::VecDeque::new()),
+                arrived: std::sync::Condvar::new(),
+                writes: Mutex::new(Vec::new()),
+                closed: std::sync::atomic::AtomicBool::new(false),
+            })
+        }
+        fn feed(&self, message: Message) {
+            self.inbound.lock().unwrap().push_back(message);
+            self.arrived.notify_all();
+        }
+        fn close(&self) {
+            self.closed.store(true, Ordering::SeqCst);
+            self.arrived.notify_all();
+        }
+    }
+    impl Protocol for Fed {
+        fn read_message(&self) -> Result<Message, Error> {
+            let mut inbound = self.inbound.lock().unwrap();
+            loop {
+                if let Some(message) = inbound.pop_front() {
+                    return Ok(message);
+                }
+                if self.closed.load(Ordering::SeqCst) {
+                    return Err(Error::Framing(Arc::new(tsr_jsonrpc::FramingError::Eof)));
+                }
+                inbound = self.arrived.wait(inbound).unwrap();
+            }
+        }
+        fn write_request(
+            &self,
+            id: &Id,
+            method: &str,
+            _: Option<&dyn Encode>,
+        ) -> Result<(), Error> {
+            self.writes.lock().unwrap().push(format!("call {method}"));
+            self.feed(Message {
+                id: Some(id.clone()),
+                result: Some(RawValue(format!("\"{method}\"").into_bytes())),
+                ..Default::default()
+            });
+            Ok(())
+        }
+        fn write_notification(&self, _: &str, _: Option<&dyn Encode>) -> Result<(), Error> {
+            Ok(())
+        }
+        fn write_response(&self, id: Option<&Id>, _: Option<&dyn Encode>) -> Result<(), Error> {
+            self.writes.lock().unwrap().push(format!(
+                "response {}",
+                id.map(ToString::to_string).unwrap_or_default()
+            ));
+            Ok(())
+        }
+        fn write_error(&self, _: Option<&Id>, _: &ResponseError) -> Result<(), Error> {
+            Ok(())
+        }
+    }
+
+    /// The main read and a call from another thread serialize on the
+    /// connection lock, as in the pin: a callback issued off the request
+    /// thread while the loop waits for the next request gets its own reply,
+    /// which the loop never consumes.
+    #[test]
+    fn a_call_off_the_request_thread_queues_behind_the_main_read() {
+        struct Spawning {
+            conn: std::sync::OnceLock<std::sync::Weak<SyncConn>>,
+            reply: Arc<Mutex<Option<RawValue>>>,
+            done: Arc<(Mutex<bool>, std::sync::Condvar)>,
+        }
+        impl Handler for Spawning {
+            fn handle_request(&self, _: &Context, method: &str, _: &[u8]) -> HandlerResult {
+                if method == "spawn" {
+                    let conn = self.conn.get().unwrap().upgrade().unwrap();
+                    let reply = self.reply.clone();
+                    let done = self.done.clone();
+                    std::thread::spawn(move || {
+                        // The loop is back in its read by now and holds the
+                        // connection lock; this call waits for it.
+                        std::thread::sleep(std::time::Duration::from_millis(50));
+                        let got = conn.call(&Context::background(), "readFile", &"x").unwrap();
+                        *reply.lock().unwrap() = Some(got);
+                        *done.0.lock().unwrap() = true;
+                        done.1.notify_all();
+                    });
+                    return Ok(Some(Response::json("spawned".to_string())));
+                }
+                // The second request releases the lock to the waiting call
+                // and does not return before that call is answered.
+                let mut finished = self.done.0.lock().unwrap();
+                while !*finished {
+                    finished = self.done.1.wait(finished).unwrap();
+                }
+                Ok(Some(Response::json("second".to_string())))
+            }
+            fn handle_notification(
+                &self,
+                _: &Context,
+                _: &str,
+                _: &[u8],
+            ) -> Result<(), HandlerError> {
+                Ok(())
+            }
+        }
+        let protocol = Fed::new();
+        let handler = Arc::new(Spawning {
+            conn: std::sync::OnceLock::new(),
+            reply: Arc::new(Mutex::new(None)),
+            done: Arc::new((Mutex::new(false), std::sync::Condvar::new())),
+        });
+        let conn = Arc::new(SyncConn::with_closer(
+            None,
+            protocol.clone(),
+            handler.clone(),
+        ));
+        handler.conn.set(Arc::downgrade(&conn)).ok().unwrap();
+        let request = |id: i32, method: &str| Message {
+            id: Some(Id::int(id)),
+            method: method.into(),
+            ..Default::default()
+        };
+        protocol.feed(request(1, "spawn"));
+        let server = {
+            let conn = conn.clone();
+            std::thread::spawn(move || conn.run(&Context::background()))
+        };
+        std::thread::sleep(std::time::Duration::from_millis(150));
+        protocol.feed(request(2, "second"));
+        {
+            let (lock, signal) = &*handler.done;
+            let mut finished = lock.lock().unwrap();
+            while !*finished {
+                finished = signal.wait(finished).unwrap();
+            }
+        }
+        protocol.close();
+        server.join().unwrap().unwrap();
+        assert_eq!(
+            handler
+                .reply
+                .lock()
+                .unwrap()
+                .as_ref()
+                .map(|reply| reply.0.clone()),
+            Some(b"\"readFile\"".to_vec()),
+            "the call's reply reached the calling thread"
+        );
+        assert_eq!(
+            *protocol.writes.lock().unwrap(),
+            vec!["response 1", "call readFile", "response 2"]
+        );
+    }
+
+    /// A response arriving outside a call ends the connection with the
+    /// pin's error; calls read their replies inline.
+    #[test]
+    fn a_stray_response_ends_the_connection() {
+        let protocol = Fed::new();
+        protocol.feed(Message {
+            id: Some(Id::int(7)),
+            result: Some(RawValue(b"null".to_vec())),
+            ..Default::default()
+        });
+        let conn = SyncConn::with_closer(None, protocol, Arc::new(NoOp));
+        let error = conn.run(&Context::background()).unwrap_err();
+        assert_eq!(
+            error.to_string(),
+            "ipc: unexpected response message in sync connection"
+        );
     }
 
     #[test]

@@ -61,7 +61,7 @@ impl ApiSession {
                 config: Some(tsr_json::RawValue(b"{}".to_vec())),
                 error: Some(Box::new(diagnostic_response(
                     &cannot_read_file(&config_file_name),
-                    None,
+                    &|_| None,
                 ))),
             };
         };
@@ -75,10 +75,9 @@ impl ApiSession {
                 .ok()
                 .map(tsr_json::RawValue),
             error: parsed.diagnostics.first().map(|diagnostic| {
-                Box::new(diagnostic_response(
-                    diagnostic,
-                    Some(parsed.source.file.view()),
-                ))
+                Box::new(diagnostic_response(diagnostic, &|_| {
+                    Some(parsed.source.file.view())
+                }))
             }),
         }
     }
@@ -213,13 +212,14 @@ fn transpile_output(
     };
     // Diagnostics name files of the transpilation's own program.
     let program: &Arc<tsr_compiler::Program> = &output.program;
-    let view = program
-        .files()
-        .first()
-        .map(|file| file.bound().view().ast());
+    let resolve = |node: tsr_ast::NodeId| {
+        program
+            .file_of_node(node)
+            .map(|file| file.bound().view().ast())
+    };
     Ok(TranspileOutputResponse {
         output_text: text(output.output_text.as_bytes()),
-        diagnostics: diagnostic_responses(&output.diagnostics, view),
+        diagnostics: diagnostic_responses(&output.diagnostics, &resolve),
         source_map_text: text(output.source_map_text.as_bytes()),
     })
 }

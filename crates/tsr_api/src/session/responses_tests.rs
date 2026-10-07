@@ -50,7 +50,7 @@ fn diagnostic_response_includes_formatting_context() {
         tsr_diagnostics::Expression_expected,
         Vec::new(),
     );
-    let response = diagnostic_response(&diagnostic, Some(file.view()));
+    let response = diagnostic_response(&diagnostic, &|_| Some(file.view()));
     assert_eq!((response.pos, response.end), (9, 10));
     assert_eq!(response.file_name, "/unicode.ts");
     assert_eq!(response.text, "Expression expected.");
@@ -72,7 +72,7 @@ fn diagnostic_response_truncates_long_formatting_context() {
         tsr_diagnostics::Expression_expected,
         Vec::new(),
     );
-    let response = diagnostic_response(&diagnostic, Some(file.view()));
+    let response = diagnostic_response(&diagnostic, &|_| Some(file.view()));
     assert_eq!(
         positions(&response),
         (
@@ -86,4 +86,21 @@ fn diagnostic_response_truncates_long_formatting_context() {
             ]
         )
     );
+}
+
+/// `base64_decode` follows Go's `StdEncoding.DecodeString`, which the pin's
+/// `printNode` and `formatNodeForInsertion` call: newlines are skipped,
+/// padding may only end the input, and the error names the offending byte.
+#[test]
+fn base64_follows_go_std_encoding() {
+    use super::responses::base64_decode;
+    assert_eq!(base64_decode("YWJj"), Ok(b"abc".to_vec()));
+    assert_eq!(base64_decode("YW\r\nJj"), Ok(b"abc".to_vec()));
+    assert_eq!(base64_decode("YQ==\r\n"), Ok(b"a".to_vec()));
+    assert_eq!(base64_decode("YWI="), Ok(b"ab".to_vec()));
+    assert_eq!(base64_decode(""), Ok(Vec::new()));
+    assert_eq!(base64_decode("YQ==Yg=="), Err(4), "data after padding");
+    assert_eq!(base64_decode("YQ"), Err(0), "missing padding");
+    assert_eq!(base64_decode("Y!Jj"), Err(1), "an illegal byte");
+    assert_eq!(base64_decode("YQ=Y"), Err(2), "incomplete padding");
 }

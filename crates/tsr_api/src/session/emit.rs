@@ -170,8 +170,11 @@ impl ApiSession {
             .ok_or_else(|| {
                 client_error(format!("source file not found: {}", params.file.display()))
             })?;
-        let encoded = base64_decode(&params.data)
-            .ok_or_else(|| client_error("invalid base64 data: illegal base64 data"))?;
+        let encoded = base64_decode(&params.data).map_err(|at| {
+            client_error(format!(
+                "invalid base64 data: illegal base64 data at input byte {at}"
+            ))
+        })?;
         let view = file.bound().view().ast();
         let source = view
             .source_file(file.source())
