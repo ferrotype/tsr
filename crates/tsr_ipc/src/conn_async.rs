@@ -254,8 +254,13 @@ impl AsyncConn {
         }
         let written = match result {
             Err(error) => self.write_error(id, error.to_string()),
-            Ok(result) => {
-                self.write_response(id, result.as_deref().map(|result| result as &dyn Encode))
+            Ok(None) => self.write_response(id, None),
+            Ok(Some(crate::Response::Json(value))) => {
+                self.write_response(id, Some(value.as_ref() as &dyn Encode))
+            }
+            Ok(Some(crate::Response::Binary(bytes))) => {
+                let _write = self.0.write.lock().expect("write lock");
+                self.0.protocol.write_binary_response(id, &bytes)
             }
         };
         written.map_err(|error| {
@@ -274,7 +279,7 @@ impl AsyncConn {
     }
 }
 
-fn panic_text(payload: &(dyn std::any::Any + Send)) -> String {
+pub fn panic_text(payload: &(dyn std::any::Any + Send)) -> String {
     payload
         .downcast_ref::<&str>()
         .map(|text| (*text).to_owned())

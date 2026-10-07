@@ -30,3 +30,16 @@ skip the native run does not have fails, a case the native run did not
 observe fails, and a native failure fails the file. `parity.py check jsapi`
 prints the case counts; closure requires `status/parity/jsapi.json` to hold
 only owner-approved entries.
+
+## Failure labels
+
+A failing case's `reason` is computed by `runner.classify` from the client's
+error text: `server: not implemented: <method>` or `server: <the server's
+error>` when the Rust server rejected a method by name, `cancelled by parent`
+when node cancelled the case, and `assertion failed` otherwise. The labels
+are mechanical, so `parity.py accept` needs no worded reasons and the
+expectation file shows each checkpoint's progress by label.
+
+A case that fails before closing its API can leave node's worker waiting;
+the per-file deadline ends it. `--test-force-exit` is not used: it ends the
+worker before its event stream to the parent is drained and loses cases.

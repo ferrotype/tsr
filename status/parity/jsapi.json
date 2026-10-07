@@ -50,10 +50,6 @@
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/async/api.test.ts/API > createProgram rejects file changes without an old program": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: The input did not match the regular expression /fileChanges requires an oldProgram/. Input:"
-    },
     "jsapi/test/async/api.test.ts/API > createProgram updates an old program with file changes": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
@@ -65,10 +61,6 @@
     "jsapi/test/async/api.test.ts/API > createProgram updates roots when given an old program": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > disposal handles concurrent initialization": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: The input did not match the regular expression /Client is closed/. Input:"
     },
     "jsapi/test/async/api.test.ts/API > disposes": {
       "reason": "server: not implemented: initialize",
@@ -1181,10 +1173,6 @@
     "jsapi/test/sync/api.test.ts/API > createProgram rejects an inactive or foreign old program": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > createProgram rejects file changes without an old program": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: The input did not match the regular expression /fileChanges requires an oldProgram/. Input:"
     },
     "jsapi/test/sync/api.test.ts/API > createProgram updates an old program with file changes": {
       "reason": "server: not implemented: initialize",

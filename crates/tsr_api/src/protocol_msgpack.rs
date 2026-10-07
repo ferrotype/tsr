@@ -109,11 +109,6 @@ impl MessagePackProtocol {
         writer.flush()?;
         Ok(())
     }
-
-    /// A response whose payload is not JSON (the pin's `RawBinary`).
-    pub fn write_binary_response(&self, id: Option<&Id>, payload: &[u8]) -> Result<(), Error> {
-        self.write_tuple(MessageType::Response, &id_method(id), payload)
-    }
 }
 
 fn id_method(id: Option<&Id>) -> String {
@@ -230,6 +225,11 @@ impl Protocol for MessagePackProtocol {
 
     fn write_error(&self, id: Option<&Id>, error: &ResponseError) -> Result<(), Error> {
         self.write_tuple(MessageType::Error, &id_method(id), error.message.as_bytes())
+    }
+
+    /// A response whose payload is not JSON (the pin's `RawBinary`).
+    fn write_binary_response(&self, id: Option<&Id>, payload: &[u8]) -> Result<(), Error> {
+        self.write_tuple(MessageType::Response, &id_method(id), payload)
     }
 }
 

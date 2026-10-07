@@ -4,6 +4,7 @@
 //! never appear in serialized response bytes.
 #![forbid(unsafe_code)]
 
+pub mod callbackfs;
 mod formatting;
 mod printing;
 pub mod proto;

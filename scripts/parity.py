@@ -55,7 +55,7 @@ class Suite:
 SUITES = {
     "fourslash": Suite("", "", (), 120, batch=True),
     "lsp": Suite("", "", (), 120, batch=True),
-    "jsapi": Suite("", "", (), 600, batch=True),
+    "jsapi": Suite("", "", (), 180, batch=True),
     "compiler": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "single"), 600),
     "compiler-concurrent": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "concurrent"), 600),
     "transpile": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "transpile"), 60),

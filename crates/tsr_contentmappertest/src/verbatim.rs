@@ -17,7 +17,7 @@ impl MapperHandler for Verbatim {
     // port: tsc/internal/testutil/contentmappertest/verbatim.go:moduleVerbatimHandler.HandleRequest
     fn handle_request(&self, _: &Context, method: &str, params: &[u8]) -> HandlerResult {
         match method {
-            METHOD_INITIALIZE => Ok(Some(Box::new(initialize_result("mapper")))),
+            METHOD_INITIALIZE => Ok(Some(tsr_ipc::Response::json(initialize_result("mapper")))),
             METHOD_TRANSFORM => {
                 let mut params_value = TransformParams::default();
                 tsr_json::unmarshal(params, &mut params_value, tsr_json::Options::default())?;
@@ -25,7 +25,7 @@ impl MapperHandler for Verbatim {
                 if self.module {
                     mapped_output.extension = ".mts".into();
                 }
-                Ok(Some(Box::new(TransformResultMessage {
+                Ok(Some(tsr_ipc::Response::json(TransformResultMessage {
                     output: mapped_output,
                     ..TransformResultMessage::default()
                 })))
@@ -74,7 +74,7 @@ impl MapperHandler for DynamicVerbatim {
                 } else {
                     Vec::new()
                 };
-                Ok(Some(Box::new(OpenProjectResult {
+                Ok(Some(tsr_ipc::Response::json(OpenProjectResult {
                     config_identity: String::from_utf8(identity)?,
                     watched_files: vec![String::from_utf8(tsr_tspath::combine(
                         &directory,
@@ -109,11 +109,11 @@ impl MapperHandler for Synthesizing {
     // port: tsc/internal/testutil/contentmappertest/synthesizing.go:synthesizingHandler.HandleRequest
     fn handle_request(&self, _: &Context, method: &str, params: &[u8]) -> HandlerResult {
         match method {
-            METHOD_INITIALIZE => Ok(Some(Box::new(initialize_result("mapper")))),
+            METHOD_INITIALIZE => Ok(Some(tsr_ipc::Response::json(initialize_result("mapper")))),
             METHOD_TRANSFORM => {
                 let mut p = TransformParams::default();
                 tsr_json::unmarshal(params, &mut p, tsr_json::Options::default())?;
-                Ok(Some(Box::new(TransformResultMessage {
+                Ok(Some(tsr_ipc::Response::json(TransformResultMessage {
                     output: MappedOutput {
                         text: "export const el = jsxRuntime(Widget);\n".into(),
                         extension: ".ts".into(),

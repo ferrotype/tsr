@@ -62,7 +62,9 @@ impl MapperHandler for Handler {
     /// port: tsc/internal/testutil/contentmappertest/transforming.go:Handler.HandleRequest
     fn handle_request(&self, _: &Context, method: &str, params: &[u8]) -> HandlerResult {
         match method {
-            METHOD_INITIALIZE => Ok(Some(Box::new(initialize_result(DIAGNOSTIC_SOURCE)))),
+            METHOD_INITIALIZE => Ok(Some(tsr_ipc::Response::json(initialize_result(
+                DIAGNOSTIC_SOURCE,
+            )))),
             METHOD_TRANSFORM => {
                 let mut params_value = TransformParams::default();
                 tsr_json::unmarshal(params, &mut params_value, tsr_json::Options::default())?;
@@ -82,7 +84,7 @@ impl MapperHandler for Handler {
                 };
                 let (text, mappings, diagnostics, diagnostic_directives) =
                     transform(&params_value.content, &options)?;
-                Ok(Some(Box::new(TransformResultMessage {
+                Ok(Some(tsr_ipc::Response::json(TransformResultMessage {
                     output: MappedOutput {
                         text,
                         extension: mapped_extension(&params_value.content),

@@ -855,6 +855,7 @@ dependencies = [
  "tsr_project",
  "tsr_tsoptions",
  "tsr_tspath",
+ "tsr_vfs",
 ]
 
 [[package]]
@@ -1293,6 +1294,7 @@ dependencies = [
 name = "tsr_lsp"
 version = "0.3.0"
 dependencies = [
+ "tsr_api",
  "tsr_arena",
  "tsr_ast",
  "tsr_checker",

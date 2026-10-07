@@ -113,7 +113,23 @@ impl From<crate::ContextError> for Error {
 pub type HandlerError = Box<dyn std::error::Error + Send + Sync>;
 
 /// A handler's successful result: `None` is a nil result.
-pub type HandlerResult = Result<Option<Box<dyn Encode + Send>>, HandlerError>;
+pub type HandlerResult = Result<Option<Response>, HandlerError>;
+
+/// What a handler answers: a JSON value, or bytes the synchronous msgpack
+/// protocol writes verbatim (the pin's `RawBinary`, never seen by JSON-RPC).
+pub enum Response {
+    Json(Box<dyn Encode + Send>),
+    Binary(Vec<u8>),
+}
+impl Response {
+    pub fn json(value: impl Encode + Send + 'static) -> Self {
+        Self::Json(Box::new(value))
+    }
+    #[must_use]
+    pub fn binary(bytes: Vec<u8>) -> Self {
+        Self::Binary(bytes)
+    }
+}
 
 /// Processes incoming requests and notifications.
 pub trait Handler: Send + Sync {

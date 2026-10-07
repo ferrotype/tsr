@@ -351,6 +351,16 @@ jobs:
           python3 tools/phase6/jsapi/runner.py prepare --prepared target/phase6/parity/jsapi --binaries phase5-replay-binaries
       - name: Run the suite
         run: python3 scripts/parity.py run jsapi --runner target/phase6/parity/jsapi/prepared.json --output results/jsapi/1-1
+      # The Phase 6 wire witnesses: the Rust server's frames against the
+      # pin's recorded goldens, and the LSP-hosted session handshake with the
+      # untouched client against both servers.
+      - name: Compare the wire goldens
+        run: python3 tools/phase6/wire/capture.py compare --binary phase5-replay-binaries/rust-lsp --golden tools/phase6/wire/golden
+      - name: Run the API session handshake against both servers
+        run: |
+          node --conditions @typescript/source tools/phase6/wire/handshake.mts phase5-replay-binaries/native-lsp | grep -v server-message > native.jsonl
+          node --conditions @typescript/source tools/phase6/wire/handshake.mts phase5-replay-binaries/rust-lsp | grep -v server-message > rust.jsonl
+          diff native.jsonl rust.jsonl
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
