@@ -1,4 +1,5 @@
 import importlib.util
+import copy
 import json
 from pathlib import Path
 import sys
@@ -29,6 +30,9 @@ while True:
         sys.stdout.buffer.write(f"Content-Length: {len(body)}\\r\\n\\r\\n".encode() + body)
         sys.stdout.buffer.flush()
     if message.get("method") == "exit": sys.exit(0)
+    if message.get("method") == "shutdown" and "params" in message:
+        emit({"id":message["id"],"error":{"code":-32602,"message":"shutdown requires absent params"}})
+        continue
     if message.get("method") == "textDocument/didOpen":
         doc = message["params"]["textDocument"]
         for uri, version in [(doc["uri"] + ".other", doc["version"]), (doc["uri"], doc["version"] - 1), (doc["uri"], doc["version"])]:
@@ -55,6 +59,37 @@ def scenario():
 
 
 class LatencyTests(unittest.TestCase):
+    def test_completion_client_sort_preserves_payloads_ties_and_other_arrays(self):
+        def transcript(items):
+            return {'responses': [
+                {'method': 'textDocument/completion', 'message': {'result': {'items': items, 'isIncomplete': False}}},
+                {'method': 'textDocument/references', 'message': {'result': [{'uri': 'b'}, {'uri': 'a'}]}}],
+                'server_notifications': [{'params': {'items': ['b', 'a']}}]}
+        items = [{'label': 'a', 'sortText': '1', 'data': {'payload': 1}},
+                 {'label': 'b', 'sortText': '2', 'data': {'payload': 2}}]
+        expected = latency.normalize_completion_order(transcript(copy.deepcopy(items)))
+        shuffled = latency.normalize_completion_order(transcript(copy.deepcopy(items[::-1])))
+        self.assertTrue(latency.replay.exact_equal(expected, shuffled))
+        self.assertEqual(shuffled['responses'][1]['message']['result'], [{'uri': 'b'}, {'uri': 'a'}])
+        self.assertEqual(shuffled['server_notifications'][0]['params']['items'], ['b', 'a'])
+        for mutation in ('sortText', 'payload', 'removed', 'duplicated', 'other_array'):
+            changed = transcript(copy.deepcopy(items))
+            values = changed['responses'][0]['message']['result']['items']
+            if mutation == 'sortText': values[0]['sortText'] = '0'
+            elif mutation == 'payload': values[0]['data']['payload'] = 99
+            elif mutation == 'removed': values.pop()
+            elif mutation == 'duplicated': values.append(copy.deepcopy(values[0]))
+            else: changed['responses'][1]['message']['result'].reverse()
+            with self.subTest(mutation=mutation):
+                self.assertFalse(latency.replay.exact_equal(expected, latency.normalize_completion_order(changed)))
+        tied = [{'label': 'same', 'sortText': '1', 'data': 1}, {'label': 'same', 'sortText': '1', 'data': 2}]
+        self.assertFalse(latency.replay.exact_equal(
+            latency.normalize_completion_order(transcript(copy.deepcopy(tied))),
+            latency.normalize_completion_order(transcript(copy.deepcopy(tied[::-1])))))
+        fallback = transcript([{'label': 'b'}, {'label': 'a'}])
+        latency.normalize_completion_order(fallback)
+        self.assertEqual(fallback['responses'][0]['message']['result']['items'], [{'label': 'a'}, {'label': 'b'}])
+
     def test_offline_dependencies_require_lock_integrity_and_safe_members(self):
         import base64
         import hashlib
@@ -119,6 +154,8 @@ class LatencyTests(unittest.TestCase):
                 latency.read_capture(base / 'capture/samples.json')
             raw = json.loads((base / 'capture/pair-00/go/raw.json').read_text())
             self.assertEqual(len([m for m in raw['received'] if m.get('method') == 'textDocument/publishDiagnostics']), 3)
+            shutdown = next(message for message in raw['executed'] if message.get('method') == 'shutdown')
+            self.assertNotIn('params', shutdown)
 
     def test_mismatch_excludes_both_runtime_samples_and_retains_evidence(self):
         with tempfile.TemporaryDirectory() as directory:

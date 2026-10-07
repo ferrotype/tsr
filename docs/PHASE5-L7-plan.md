@@ -2,8 +2,9 @@
 
 Status: **correctness and replay pass; latency pending** (2026-10-07).
 All 4,117 native-executed fourslash tests, 13 LSP tests and six ordinary-CLI
-replays pass. The owner approved section 2 items 1–3 on 2026-10-06;
-the fixture/pull-metric decision and real latency run remain outstanding.
+replays pass. The owner approved section 2 items 1–3 on 2026-10-06 and
+authorized the TypeScript/pull-diagnostics latency run on 2026-10-07.
+The real latency result remains outstanding.
 Checkpoint L7 of the [Phase 5 plan](PHASE5-plan.md). Planning reference: `main`
 at `ef456f65` (L0 to L6 merged, 0.3.0 released). Work is on
 `codex/phase5-l7`. Upstream remains Corsa
@@ -102,8 +103,8 @@ measured Go execution count.
    implementing agent writes each `reason` as a shared-cause label from the
    triage (L7.3), leaves `approved` empty, and the owner words the reasons of
    the final retained entries only.
-4. **The latency fixture and first-diagnostics protocol — awaiting approval.**
-   Recommended: the TypeScript package the pin itself carries,
+4. **The latency fixture and first-diagnostics protocol — selected 2026-10-07.**
+   The owner authorized proceeding with the TypeScript package the pin carries,
    `upstream/packages/typescript` (beside `upstream/tsc`, not inside it;
    `src` is 108 files and 35,292 lines, strict, composite, `module: node16`).
    The source and fixed query positions were verified against the pin on
@@ -112,19 +113,21 @@ measured Go execution count.
    archives against the pinned lock, and records its one config overlay:
    `customConditions: ["@typescript/source"]`. The concrete scenario is
    `tools/phase5/latency/proposals/typescript-pull.json`.
-   The pin does not publish versioned source diagnostics, so the proposed
+   The pin does not publish versioned source diagnostics, so the selected
    metric is didOpen write through completion of the immediately following
    full `textDocument/diagnostic` response. This includes loading, checking
    and the pull exchange; it is not a source-push latency measurement.
-   Neither fixture nor this protocol substitution is approved yet.
    The alternatives are a vendored snapshot of an external
    package with its provenance, or a hand-written multi-project fixture,
    which is easier to reason about and too small to measure references or
    rename meaningfully.
-5. **Who records the latency run.** The quiet-host captures are the owner's.
-   Recommended: the agents run sample captures (three pairs) while building
-   the workload; the twenty-pair run of record is the owner's, on the host
-   class `thresholds.toml` is authorized for.
+5. **Who records the latency run — authorized 2026-10-07.** The owner asked
+   Codex to run three smoke pairs, followed by twenty pairs on this host if
+   the smoke verifies the measurement path and response parity. Extend once
+   to forty under L7.6.4. Keep builds and other agent tests out of the timed
+   batch and record background-load limitations. Choosing and running this
+   workload requires no further approval; accepting a regression or changing
+   the thresholds remains a separate owner decision.
 6. **The branch and pull request split — implemented.** The owner requested
    the draft PR and continued implementation on it: `codex/phase5-l7`, #103.
    Harness, production fixes, replay and latency tooling remain together.
@@ -380,6 +383,10 @@ reduce a session; they are for crash triage and are not used here.
    Every measured response is also compared between the runtimes; a pair that
    disagrees is recorded, fails the workload as a correctness mismatch and
    is left out of the latency statistics.
+   Completion items are stably ordered by `(sortText or label, label)` outside
+   the clocks: the pin leaves this sorting to clients and also sorts in its
+   fourslash comparator. All fields, duplicates and equal-key relative order
+   remain compared, and raw wire order is retained. Other arrays remain ordered.
 3. **Record.** Twenty pairs; raw samples, host, revision and the per-scenario
    ratio of medians with its spread go to `status/perf/lsp/` through
    `perf.py record lsp`. `thresholds.toml` gains `[lsp]` with the five ratios

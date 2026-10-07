@@ -21,6 +21,30 @@ replay = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(replay)
 METRICS = ('first_diagnostics', 'completion', 'hover', 'references', 'rename')
 METHODS = {name: 'textDocument/' + name for name in METRICS[1:]}
+COMPARISON_RULE = 'completion-client-order-v1'
+
+
+def normalize_completion_order(transcript):
+    """Apply client completion ordering only to the normalized latency transcript."""
+    # Pin: upstream/tsc/internal/ls/completions.go:3829-3840 leaves non-tie
+    # ordering to editors; internal/fourslash/fourslash.go:1343 uses a stable
+    # client sort. Exact (sortText or label, label) keys suffice for this ASCII
+    # scenario. Python's stable sort retains wire order for equal keys; every
+    # item field and every other response/notification array stays unchanged.
+    def key(item):
+        if not isinstance(item, dict) or not isinstance(item.get('label'), str):
+            raise ValueError('Completion ordering requires an item with a string label')
+        if 'sortText' in item and not isinstance(item['sortText'], str):
+            raise ValueError('Completion ordering requires string sortText when present')
+        return (item.get('sortText') or item['label'], item['label'])
+    for response in transcript['responses']:
+        if response['method'] != 'textDocument/completion':
+            continue
+        result = response['message'].get('result')
+        items = result.get('items') if isinstance(result, dict) else result
+        if isinstance(items, list):
+            items.sort(key=key)
+    return transcript
 
 
 class TimedStream:
@@ -207,12 +231,12 @@ def run_runtime(command, cwd, scenario, output):
     measurements = {}
     substitutions = [('@PROJECT_ROOT_URI@', cwd.as_uri()), ('@PROJECT_ROOT@', str(cwd))]
     expanded = replay.substitute(scenario, substitutions)
-    def request(name, method, params, measured=False):
+    def request(name, method, params, measured=False, *, params_present=True):
         if measured:
             response, elapsed = peer.measured_request(method, params)
             measurements[name] = elapsed
         else:
-            response = peer.exchange(method, params)
+            response = peer.exchange(method, params, params_present=params_present)
             if 'error' in response:
                 raise RuntimeError(f'Warmup request failed: {response}')
         raw['responses'].append({'position': len(raw['responses']), 'method': method, 'name': name, 'message': response})
@@ -252,7 +276,7 @@ def run_runtime(command, cwd, scenario, output):
         peer.write({'method': 'textDocument/didChange', 'params': expanded['edit']})
         for name in METRICS[1:]:
             request(name, METHODS[name], expanded['requests'][name], measured=True)
-        request('shutdown', 'shutdown', None)
+        request('shutdown', 'shutdown', None, params_present=False)
         peer.write({'method': 'exit'})
         peer.process.stdin.close()
         if peer.process.wait(timeout=20) != 0:
@@ -269,7 +293,7 @@ def run_runtime(command, cwd, scenario, output):
             if 'method' not in message or 'id' in message:
                 raise ValueError('Unexpected pending response/request after exit')
             peer.respond(message)
-        return measurements, replay.normalize(raw, cwd)
+        return measurements, normalize_completion_order(replay.normalize(raw, cwd))
     finally:
         try:
             (output / 'raw.json').write_text(json.dumps(raw, indent=2, ensure_ascii=False) + '\n')
@@ -324,7 +348,7 @@ def capture(fixture, scenario, commands, pairs, output, smoke=False, extend=None
               'host': {'os': platform.system().lower(), 'architecture': platform.machine(), 'cpu_capacity': os.cpu_count(), 'hostname': platform.node()},
               'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'recorded_at': datetime.now(timezone.utc).isoformat(),
-              'metadata': {'fixture_sha256': identity(fixture), 'scenario': scenario, 'scenario_sha256': hashlib.sha256(json.dumps(scenario, sort_keys=True).encode()).hexdigest(), 'first_diagnostics_mode': diagnostic_mode(scenario), 'commands': commands, 'binaries': binaries}}
+              'metadata': {'fixture_sha256': identity(fixture), 'scenario': scenario, 'scenario_sha256': hashlib.sha256(json.dumps(scenario, sort_keys=True).encode()).hexdigest(), 'first_diagnostics_mode': diagnostic_mode(scenario), 'comparison_rules': [COMPARISON_RULE], 'commands': commands, 'binaries': binaries}}
     start_index = 0
     try:
         if extend is not None:

@@ -1,8 +1,9 @@
 # L7 latency capture
 
-This command supplies tooling, not a performance result. The owner still chooses
-and approves the latency fixture. No dependencies are downloaded, no binaries are
-built, and no fixture is silently substituted for the owner's selection.
+This command measures explicitly supplied fixtures. The owner selected the
+pinned TypeScript/pull-diagnostics scenario below and authorized execution on
+2026-10-07. No dependencies are downloaded, no binaries are built, and no fixture
+is silently substituted for the supplied selection.
 
 ```
 python3 tools/phase5/latency/capture.py \
@@ -13,8 +14,8 @@ python3 tools/phase5/latency/capture.py \
 ```
 
 A smoke capture permits 1 or 3 pairs and is never accepted as a performance
-record. A run of record permits 20 or 40 pairs; the quiet-host run belongs to the
-owner. Every pair uses fresh runtime processes and identical restored fixture
+record. A run of record permits 20 or 40 pairs on the authorized host, without
+concurrent builds or agent tests. Every pair uses fresh runtime processes and identical restored fixture
 bytes at the same copied root; runtime order alternates Go/Rust then Rust/Go.
 Fresh process means a cold server cache, not an assertion about OS page cache.
 All fixture symlinks must be relative and resolve inside the supplied fixture;
@@ -69,7 +70,14 @@ pipe that can stall the server. Raw-artifact write errors still retire the proce
 Normalized correctness comparison reuses replay's exact typed
 comparison, root/id correlation and per-document diagnostic streams. It includes
 initialize/warmup/shutdown responses and executed client messages, as well as
-measured responses. Any mismatch retains both transcripts under `pair-NN/mismatch`,
+measured responses. The latency comparison stably orders completion items by
+`(sortText or label, label)`: the pin explicitly leaves that sorting to editors
+(`completions.go:3829`), and its fourslash comparator sorts completion items too
+(`fourslash.go:1343`). Native smoke processes return different item orders.
+Every field, duplicate and relative order of equal-key items remains compared;
+other response arrays remain ordered. Raw frames retain the original order.
+This normalization is outside the clocks and does not change the replay suite.
+Any mismatch retains both transcripts under `pair-NN/mismatch`,
 fails the command and excludes both runtimes' samples from that pair. No failed
 pair is replaced. Protocol failures/timeouts preserve raw evidence and fail the
 capture. Samples from matched pairs remain visible even if another pair fails.
@@ -96,19 +104,21 @@ Focused verification uses fake framed servers only: fresh alternating processes,
 correctness rejection, URI/version diagnostic selection, and smoke/partial or
 inconsistent record rejection. These checks provide no latency-fixture credit.
 
-The supplied tool supports both diagnostic protocols; accepting pull as L7's
-metric remains an owner decision. At the pin, the only pushed diagnostic construction found in the
+The supplied tool supports both diagnostic protocols; pull is L7's selected
+metric. At the pin, the only pushed diagnostic construction found in the
 pinned project/LSP implementation is `session.go:1935`, publishing a config URI
 without a version. This cannot satisfy the required opened-source URI/version
-predicate. No production latency capture has been run.
+predicate. Actual capture results are recorded in `docs/PHASE5-L7.md`.
 
-## Proposed pinned fixture, ready for review
+## Selected pinned fixture
 
 `proposals/typescript-pull.json` fixes UTF-16 positions in the pin's
 `upstream/packages/typescript/src/ast/utils.ts`: warm-up on the `SyntaxKind`
 import, one space inserted at line 0, enum-member completion after `SyntaxKind.`,
-and hover/references/rename on the imported `Node` type. Source inspection
-verifies these positions, not response parity or meaningful measured results.
+and hover/references/rename on the imported `Node` type. Native smoke responses
+contain 386 enum completions, 1,066 reference locations, a `Node` interface hover
+and four local import-alias rename edits. Rename measures that local alias,
+not a package-wide type rename. The first full diagnostic report is empty.
 The package has 108 source files / 35,292 source lines and already carries its
 vscode-jsonrpc declarations. Its only added declaration dependencies are
 `@types/node` 22.20.1 and its `undici-types` 6.21.0 dependency, fixed by
@@ -130,17 +140,17 @@ python3 tools/phase5/latency/prepare.py \
   --output /absolute/typescript-latency-fixture
 ```
 
-After fixture and pull-metric approval, use that fixture with the proposed
+Use that fixture with the selected
 scenario in the capture command above. Build the ordinary binaries once, outside
 the measured clocks, with
 `python3 scripts/phase5_replay_ci.py prepare --output target/phase5/latency/binaries`.
 Set `GOGC=100` for captures on the authorized host. The binaries are
 `native-lsp` and `rust-lsp` in that directory. Run three smoke pairs to establish
-response parity, then the owner records twenty pairs on a quiet host. Record with
+response parity, then record twenty pairs on the authorized host. Record with
 `python3 scripts/perf.py record lsp --capture /absolute/capture --label 'owner host'`
 and compare with `python3 scripts/perf.py check lsp`. The five `[lsp]` thresholds
-are 1.0, as required by L7.6.3's no-regression rule. Fixture and pull-metric
-approval remain separate from that registered limit.
+are 1.0, as required by L7.6.3's no-regression rule. Authorization to measure
+does not approve a regression or change that registered limit.
 
 The dispatch-only `perf.yml` offers `lsp`, requiring explicit prepared fixture
 and scenario paths. It builds the two ordinary binaries, records twenty or forty

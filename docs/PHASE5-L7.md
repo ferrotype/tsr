@@ -418,11 +418,30 @@ are the plan's existing 1.0 values. The concrete TypeScript fixture and fixed
 queries are prepared for review; dependency archives were checked against the
 pinned lock. This is preparation, not a performance result.
 
+## Latency smoke, 2026-10-07
+
+The authorized TypeScript/pull scenario passes all three fresh-process smoke
+pairs in `target/phase5/latency/smoke-03`. Both runtimes return 386 enum
+completion items, 1,066 reference locations, a `Node` interface hover, four
+local import-alias rename edits and an empty full source diagnostic report.
+All remaining correlated traffic also matches. These three pairs are excluded
+from the run of record.
+
+Two harness corrections preceded this smoke. Shutdown must omit `params`:
+the pin rejects explicit `null`. Completion wire order is native-process
+dependent, so the latency comparator now stably orders items by
+`(sortText or label, label)`, as the pin's editor contract and fourslash sorting
+require. It preserves all fields, duplicates and equal-key order; raw frames
+remain unchanged, and other arrays stay ordered. The rejected `smoke-01` and
+`smoke-02` artifacts remain available. Regression tests reject changed payloads,
+sort keys, item counts, tie order and changes to other response arrays.
+
 ## Still to complete
 
-L7's remaining acceptance work is latency: owner approval of the proposed
-fixture and pull-diagnostics metric (plan section 2, decision 4), three smoke
-pairs, then the owner's quiet-host twenty-pair run and any measured fixes.
-No performance run has been recorded and L7 is not declared closed. The
-correctness commit still needs its own CI result; CI passed on the preceding
-`2b2cf026` head.
+L7's remaining acceptance work is latency. On 2026-10-07 the owner authorized
+the proposed fixture and pull-diagnostics metric (plan section 2, decision 4),
+three smoke pairs, then the twenty-pair run and any measured fixes. Smoke is
+complete; the run of record is next.
+No performance run has been recorded and L7 is not declared closed. CI passed
+on the correctness commit `8fed54f1`, including all fourslash, LSP, compiler,
+concurrent compiler, transpile and native CLI jobs.
