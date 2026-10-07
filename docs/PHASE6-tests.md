@@ -28,7 +28,7 @@ denominator and the native skip set.
 
 ## Direct Go tests of `internal/api`
 
-56 tests; **49** still routed to work. `WORK (A<n>)` names the checkpoint that
+56 tests; **36** still routed to work. `WORK (A<n>)` names the checkpoint that
 owes the port or its equivalent-coverage explanation.
 
 | Pinned test | Source | Route |
@@ -60,23 +60,23 @@ owes the port or its equivalent-coverage explanation.
 | `api/encoder/TestBuildNodeIndexTableMatchesEncode` | `upstream/tsc/internal/api/encoder/encoder_test.go:112` | WORK (A5: the two api baselines through a Rust encoder comparison) |
 | `api/TestJSONValueToAny` | `upstream/tsc/internal/api/jsonvalue_test.go:13` | WORK (A2 follow-up): the JSON value conversion of parseJsonConfigFileContent |
 | `api/TestDocumentIdentifierUnmarshalJSON` | `upstream/tsc/internal/api/proto_test.go:16` | crates/tsr_api/src/proto/tests.rs pinned_wire_fixtures_hold: the five document-identifier fixtures of the S03 export are the same inputs |
-| `api/TestNewDiagnosticResponseIncludesFormattingContext` | `upstream/tsc/internal/api/proto_test.go:67` | WORK (A4): diagnostic responses |
-| `api/TestNewDiagnosticResponseTruncatesLongFormattingContext` | `upstream/tsc/internal/api/proto_test.go:88` | WORK (A4): diagnostic responses |
+| `api/TestNewDiagnosticResponseIncludesFormattingContext` | `upstream/tsc/internal/api/proto_test.go:67` | crates/tsr_api/src/session/responses_tests.rs diagnostic_response_includes_formatting_context |
+| `api/TestNewDiagnosticResponseTruncatesLongFormattingContext` | `upstream/tsc/internal/api/proto_test.go:88` | crates/tsr_api/src/session/responses_tests.rs diagnostic_response_truncates_long_formatting_context |
 | `api/TestStandaloneSessionUsesSnapshotHostWithoutProjectSession` | `upstream/tsc/internal/api/session_apistate_test.go:15` | crates/tsr_api/src/session/tests.rs a_standalone_session_updates_snapshots_over_its_own_project_session and create_program_builds_one_synthetic_project_from_explicit_roots (snapshot ids are not compared: the Rust counter is process-wide) |
 | `api/TestSessionTracksAndReleasesAPIRefs` | `upstream/tsc/internal/api/session_apistate_test.go:57` | crates/tsr_api/src/session/tests.rs project_opens_are_idempotent_and_closes_release_only_held_refs (the standalone session; the shared project session case is A3) |
 | `api/TestUpdateSnapshotResponseSkipsUnloadedAncestorProject` | `upstream/tsc/internal/api/session_apistate_test.go:242` | WORK (A3) |
-| `api/TestHandleBatchRequests` | `upstream/tsc/internal/api/session_batch_test.go:13` | WORK (A4) |
-| `api/TestHandleBatchRequestsRecoversPerRequestPanics` | `upstream/tsc/internal/api/session_batch_test.go:38` | WORK (A4) |
-| `api/TestBatchResponseEncodesEmptyResult` | `upstream/tsc/internal/api/session_batch_test.go:56` | WORK (A4) |
-| `api/TestHandleBatchRequestsPaginatesResponses` | `upstream/tsc/internal/api/session_batch_test.go:64` | WORK (A4) |
-| `api/TestHandleBatchRequestsAllowsOversizedSingleResponse` | `upstream/tsc/internal/api/session_batch_test.go:107` | WORK (A4) |
-| `api/TestHandleBatchRequestsPageLimitIsRequestScoped` | `upstream/tsc/internal/api/session_batch_test.go:124` | WORK (A4) |
-| `api/TestHandleBatchRequestsRejectsInvalidContinuationToken` | `upstream/tsc/internal/api/session_batch_test.go:151` | WORK (A4) |
-| `api/TestHandleBatchRequestsRejectsNestedBatch` | `upstream/tsc/internal/api/session_batch_test.go:163` | WORK (A4) |
-| `api/TestCompletionSymbolTypeIsResolvable` | `upstream/tsc/internal/api/session_completion_test.go:25` | WORK (A4) |
-| `api/TestCompletionOnInferredProject` | `upstream/tsc/internal/api/session_completion_test.go:98` | WORK (A4) |
-| `api/TestCompletionRetriesWithAutoImports` | `upstream/tsc/internal/api/session_completion_test.go:140` | WORK (A4) |
-| `api/TestCreateProgram` | `upstream/tsc/internal/api/session_createprogram_test.go:15` | crates/tsr_api/src/session/tests.rs create_program_builds_one_synthetic_project_from_explicit_roots (without semantic diagnostics until A4) |
+| `api/TestHandleBatchRequests` | `upstream/tsc/internal/api/session_batch_test.go:13` | crates/tsr_api/src/session/service_tests.rs batch_items_answer_individually |
+| `api/TestHandleBatchRequestsRecoversPerRequestPanics` | `upstream/tsc/internal/api/session_batch_test.go:38` | crates/tsr_api/src/session/service_tests.rs batch_items_report_panics_alone (the type-kind refusal the pin panics on) |
+| `api/TestBatchResponseEncodesEmptyResult` | `upstream/tsc/internal/api/session_batch_test.go:56` | crates/tsr_api/src/session/batch.rs empty_results_encode_as_empty_arrays |
+| `api/TestHandleBatchRequestsPaginatesResponses` | `upstream/tsc/internal/api/session_batch_test.go:64` | crates/tsr_api/src/session/service_tests.rs batch_pages_respect_the_byte_limit |
+| `api/TestHandleBatchRequestsAllowsOversizedSingleResponse` | `upstream/tsc/internal/api/session_batch_test.go:107` | crates/tsr_api/src/session/service_tests.rs batch_pages_respect_the_byte_limit (the oversized item) |
+| `api/TestHandleBatchRequestsPageLimitIsRequestScoped` | `upstream/tsc/internal/api/session_batch_test.go:124` | crates/tsr_api/src/session/service_tests.rs batch_pages_respect_the_byte_limit (the limited and unlimited pair) |
+| `api/TestHandleBatchRequestsRejectsInvalidContinuationToken` | `upstream/tsc/internal/api/session_batch_test.go:151` | crates/tsr_api/src/session/service_tests.rs batch_pages_respect_the_byte_limit (the tail) |
+| `api/TestHandleBatchRequestsRejectsNestedBatch` | `upstream/tsc/internal/api/session_batch_test.go:163` | crates/tsr_api/src/session/service_tests.rs batch_items_answer_individually (the nested item) |
+| `api/TestCompletionSymbolTypeIsResolvable` | `upstream/tsc/internal/api/session_completion_test.go:25` | crates/tsr_api/src/session/service_tests.rs completions_carry_resolvable_symbols (the library limited to es5) |
+| `api/TestCompletionOnInferredProject` | `upstream/tsc/internal/api/session_completion_test.go:98` | crates/tsr_api/src/session/service_tests.rs completions_answer_on_an_inferred_project |
+| `api/TestCompletionRetriesWithAutoImports` | `upstream/tsc/internal/api/session_completion_test.go:140` | crates/tsr_api/src/session/service_tests.rs completions_include_module_exports (no retry: the service builds the registry on demand) |
+| `api/TestCreateProgram` | `upstream/tsc/internal/api/session_createprogram_test.go:15` | crates/tsr_api/src/session/tests.rs create_program_builds_one_synthetic_project_from_explicit_roots and service_tests.rs create_program_returns_the_client_config_diagnostics (semantic diagnostics are the diagnostics methods' cases) |
 | `api/TestCreateProgramWithNoRootFiles` | `upstream/tsc/internal/api/session_createprogram_test.go:116` | WORK (A3) |
 | `api/TestCreateProgramFileChangesRequireOldProgram` | `upstream/tsc/internal/api/session_createprogram_test.go:142` | crates/tsr_api/src/session/tests.rs create_program_builds_one_synthetic_project_from_explicit_roots (the error text) |
 | `api/TestCreateProgramRemovesAllRootFiles` | `upstream/tsc/internal/api/session_createprogram_test.go:160` | WORK (A3) |
@@ -84,11 +84,11 @@ owes the port or its equivalent-coverage explanation.
 | `api/TestCreateProgramReusesProgram` | `upstream/tsc/internal/api/session_createprogram_test.go:249` | WORK (A3) |
 | `api/TestCreateProgramProjectReferencesAndReuse` | `upstream/tsc/internal/api/session_createprogram_test.go:320` | WORK (A3) |
 | `api/TestCreateProgramFromConfiguredProgramDoesNotRetainOtherProjects` | `upstream/tsc/internal/api/session_createprogram_test.go:396` | WORK (A3) |
-| `api/TestUpdateTemporarySnapshot` | `upstream/tsc/internal/api/session_temporary_test.go:17` | crates/tsr_api/src/session/tests.rs a_temporary_snapshot_overrides_one_file_without_advancing_the_latest (file text instead of semantic diagnostics until A4) |
+| `api/TestUpdateTemporarySnapshot` | `upstream/tsc/internal/api/session_temporary_test.go:17` | crates/tsr_api/src/session/tests.rs a_temporary_snapshot_overrides_one_file_without_advancing_the_latest (file text instead of semantic diagnostics; the diagnostics methods have their own cases in service_tests.rs) |
 | `api/TestUpdateTemporarySnapshotAddsUnopenedFile` | `upstream/tsc/internal/api/session_temporary_test.go:103` | WORK (A3) |
 | `api/TestUpdateTemporarySnapshotRejectsUnsupportedExtension` | `upstream/tsc/internal/api/session_temporary_test.go:142` | crates/tsr_api/src/session/tests.rs a_temporary_snapshot_overrides_one_file_without_advancing_the_latest (the tail) |
 | `api/TestUpdateTemporarySnapshotUsesClientSnapshotAsBase` | `upstream/tsc/internal/api/session_temporary_test.go:165` | WORK (A3) |
-| `api/TestToAPITextEditsUsesOriginalCoordinates` | `upstream/tsc/internal/api/session_textedit_test.go:14` | WORK (A4) |
+| `api/TestToAPITextEditsUsesOriginalCoordinates` | `upstream/tsc/internal/api/session_textedit_test.go:14` | WORK (A4 follow-up): the import adder and its text edits |
 
 ## Baselines
 

@@ -6,13 +6,21 @@
 //! current snapshot is the compatibility snapshot of the linear
 //! `updateSnapshot` chain, and `api_update` is `CloneSnapshot` over it.
 //! port: tsc/internal/api/session.go
+mod batch;
 mod checker;
 mod checker_responses;
 #[cfg(test)]
 mod checker_tests;
 mod config;
+mod diagnostics;
+mod emit;
 pub mod handles;
 pub mod responses;
+#[cfg(test)]
+mod responses_tests;
+mod service;
+#[cfg(test)]
+mod service_tests;
 mod sources;
 #[cfg(test)]
 mod tests;
@@ -44,6 +52,9 @@ pub enum SessionError {
     InvalidRequest(String),
     /// An error without a class, as the pin's `fmt.Errorf` without `%w`.
     Other(String),
+    /// `panic: <message>`: a failure the pin reaches by panicking, which a
+    /// batch item reports under this prefix.
+    Panic(String),
 }
 impl std::fmt::Display for SessionError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -51,6 +62,7 @@ impl std::fmt::Display for SessionError {
             Self::Client(message) => write!(f, "api: client error: {message}"),
             Self::InvalidRequest(message) => write!(f, "api: invalid request: {message}"),
             Self::Other(message) => f.write_str(message),
+            Self::Panic(message) => write!(f, "panic: {message}"),
         }
     }
 }
@@ -60,6 +72,20 @@ pub type SessionResult<T> = Result<T, SessionError>;
 
 pub(super) fn client_error(message: impl Into<String>) -> SessionError {
     SessionError::Client(message.into())
+}
+
+/// A checker failure as the pin reports it. The pin reaches a type-kind
+/// mismatch (`AsTypeReference` on an intrinsic type) by panicking, which a
+/// batch item reports as `panic: …`; the Rust accessor refuses it with
+/// `Error::UnexpectedType`, which takes the same prefix.
+pub(super) fn checker_error<E: std::fmt::Display + std::any::Any>(error: E) -> SessionError {
+    let message = format!("{error}");
+    if let Some(tsr_checker::Error::UnexpectedType { .. }) =
+        (&error as &dyn std::any::Any).downcast_ref::<tsr_checker::Error>()
+    {
+        return SessionError::Panic(message);
+    }
+    SessionError::Other(message)
 }
 
 /// A snapshot the session holds for its clients, with the registries the
@@ -114,6 +140,9 @@ pub struct ApiSession {
     snapshots: Mutex<Snapshots>,
     /// The pin's `updateMu`: serializes updates and the ref tracking.
     open: Mutex<OpenRefs>,
+    /// Remaining pages of paginated batch responses by continuation token.
+    batch_pages: Mutex<HashMap<String, Vec<tsr_json::RawValue>>>,
+    next_batch_page: std::sync::atomic::AtomicU64,
     closed: AtomicBool,
 }
 
@@ -142,6 +171,8 @@ impl ApiSession {
             use_binary_responses: AtomicBool::new(false),
             snapshots: Mutex::default(),
             open: Mutex::default(),
+            batch_pages: Mutex::default(),
+            next_batch_page: std::sync::atomic::AtomicU64::new(0),
             closed: AtomicBool::new(false),
         }
     }
@@ -551,8 +582,21 @@ impl ApiSession {
         }
     }
 
-    fn dispatch(&self, method: &str, payload: &[u8]) -> Result<Option<Response>, HandlerError> {
+    pub(super) fn dispatch(
+        &self,
+        ctx: &Context,
+        method: &str,
+        payload: &[u8],
+    ) -> Result<Option<Response>, HandlerError> {
         match method {
+            // The batch decodes its own items: an unknown method inside one is
+            // answered in that item, not refused for the whole request.
+            "batchRequests" => {
+                return self
+                    .handle_batch_requests(ctx, payload)
+                    .map(Some)
+                    .map_err(Into::into)
+            }
             "echo" => {
                 return Ok(Some(if self.binary() {
                     Response::binary(payload.to_vec())
@@ -563,6 +607,19 @@ impl ApiSession {
             "ping" => return Ok(Some(Response::json("pong".to_string()))),
             _ => {}
         }
+        // The pin distinguishes a nil file list from an empty one: an omitted
+        // `files` means every file (diagnostics) or is refused (selected
+        // emit), while `[]` names no file.
+        let files_named = matches!(
+            method,
+            "getSyntacticDiagnostics"
+                | "getBindDiagnostics"
+                | "getSemanticDiagnostics"
+                | "getSuggestionDiagnostics"
+                | "getDeclarationDiagnostics"
+                | "getJavaScriptEmit"
+                | "getDeclarationEmit"
+        ) && diagnostics::names_files(payload);
         let Some(known) = Method::from_wire(method) else {
             return Err(crate::server::unsupported(method));
         };
@@ -622,7 +679,7 @@ impl ApiSession {
                     .map(Some)
                     .map_err(Into::into)
             }
-            other => return self.dispatch_checker(other, method),
+            other => return self.dispatch_checker(ctx, other, method, files_named),
         };
         Ok(Some(response))
     }
@@ -657,8 +714,8 @@ impl Session for ApiSession {
         &self.id
     }
     /// port: tsc/internal/api/session.go:Session.HandleRequest
-    fn handle_request(&self, _ctx: &Context, method: &str, params: &[u8]) -> HandlerResult {
-        self.dispatch(method, params)
+    fn handle_request(&self, ctx: &Context, method: &str, params: &[u8]) -> HandlerResult {
+        self.dispatch(ctx, method, params)
     }
     fn set_binary_responses(&self, enabled: bool) {
         self.use_binary_responses.store(enabled, Ordering::Relaxed);
@@ -670,6 +727,7 @@ impl Session for ApiSession {
         }
         self.release_open_refs();
         self.snapshots.lock().expect("snapshots").by_handle.clear();
+        self.batch_pages.lock().expect("batch pages").clear();
         if self.standalone {
             self.project.close();
         }

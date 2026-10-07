@@ -22,15 +22,38 @@ ROUTES = {
     ('api', 'TestSessionTracksAndReleasesAPIRefs'):
         'crates/tsr_api/src/session/tests.rs project_opens_are_idempotent_and_closes_release_only_held_refs (the standalone session; the shared project session case is A3)',
     ('api', 'TestUpdateTemporarySnapshot'):
-        'crates/tsr_api/src/session/tests.rs a_temporary_snapshot_overrides_one_file_without_advancing_the_latest (file text instead of semantic diagnostics until A4)',
+        'crates/tsr_api/src/session/tests.rs a_temporary_snapshot_overrides_one_file_without_advancing_the_latest (file text instead of semantic diagnostics; the diagnostics methods have their own cases in service_tests.rs)',
     ('api', 'TestUpdateTemporarySnapshotRejectsUnsupportedExtension'):
         'crates/tsr_api/src/session/tests.rs a_temporary_snapshot_overrides_one_file_without_advancing_the_latest (the tail)',
     ('api', 'TestCreateProgram'):
-        'crates/tsr_api/src/session/tests.rs create_program_builds_one_synthetic_project_from_explicit_roots (without semantic diagnostics until A4)',
+        'crates/tsr_api/src/session/tests.rs create_program_builds_one_synthetic_project_from_explicit_roots and service_tests.rs create_program_returns_the_client_config_diagnostics (semantic diagnostics are the diagnostics methods\' cases)',
     ('api', 'TestCreateProgramFileChangesRequireOldProgram'):
         'crates/tsr_api/src/session/tests.rs create_program_builds_one_synthetic_project_from_explicit_roots (the error text)',
-    ('api', 'TestNewDiagnosticResponseIncludesFormattingContext'): 'WORK (A4): diagnostic responses',
-    ('api', 'TestNewDiagnosticResponseTruncatesLongFormattingContext'): 'WORK (A4): diagnostic responses',
+    ('api', 'TestNewDiagnosticResponseIncludesFormattingContext'):
+        'crates/tsr_api/src/session/responses_tests.rs diagnostic_response_includes_formatting_context',
+    ('api', 'TestNewDiagnosticResponseTruncatesLongFormattingContext'):
+        'crates/tsr_api/src/session/responses_tests.rs diagnostic_response_truncates_long_formatting_context',
+    ('api', 'TestHandleBatchRequests'): 'crates/tsr_api/src/session/service_tests.rs batch_items_answer_individually',
+    ('api', 'TestHandleBatchRequestsRejectsNestedBatch'):
+        'crates/tsr_api/src/session/service_tests.rs batch_items_answer_individually (the nested item)',
+    ('api', 'TestHandleBatchRequestsRecoversPerRequestPanics'):
+        'crates/tsr_api/src/session/service_tests.rs batch_items_report_panics_alone (the type-kind refusal the pin panics on)',
+    ('api', 'TestBatchResponseEncodesEmptyResult'): 'crates/tsr_api/src/session/batch.rs empty_results_encode_as_empty_arrays',
+    ('api', 'TestHandleBatchRequestsPaginatesResponses'):
+        'crates/tsr_api/src/session/service_tests.rs batch_pages_respect_the_byte_limit',
+    ('api', 'TestHandleBatchRequestsAllowsOversizedSingleResponse'):
+        'crates/tsr_api/src/session/service_tests.rs batch_pages_respect_the_byte_limit (the oversized item)',
+    ('api', 'TestHandleBatchRequestsPageLimitIsRequestScoped'):
+        'crates/tsr_api/src/session/service_tests.rs batch_pages_respect_the_byte_limit (the limited and unlimited pair)',
+    ('api', 'TestHandleBatchRequestsRejectsInvalidContinuationToken'):
+        'crates/tsr_api/src/session/service_tests.rs batch_pages_respect_the_byte_limit (the tail)',
+    ('api', 'TestCompletionSymbolTypeIsResolvable'):
+        'crates/tsr_api/src/session/service_tests.rs completions_carry_resolvable_symbols (the library limited to es5)',
+    ('api', 'TestCompletionOnInferredProject'):
+        'crates/tsr_api/src/session/service_tests.rs completions_answer_on_an_inferred_project',
+    ('api', 'TestCompletionRetriesWithAutoImports'):
+        'crates/tsr_api/src/session/service_tests.rs completions_include_module_exports (no retry: the service builds the registry on demand)',
+    ('api', 'TestToAPITextEditsUsesOriginalCoordinates'): 'WORK (A4 follow-up): the import adder and its text edits',
 }
 CHECKPOINTS = {
     'session_batch_test.go': 'A4', 'session_completion_test.go': 'A4', 'session_textedit_test.go': 'A4',
