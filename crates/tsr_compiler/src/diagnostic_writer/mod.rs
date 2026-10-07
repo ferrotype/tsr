@@ -341,6 +341,9 @@ pub trait DiagnosticSources {
     /// Supplemental projections in mapper order, resolved by their retained
     /// owner. A single-arena source can use node links; a Program overrides
     /// this for mapped files parsed into independent arenas.
+    /// Implementations retaining those files must likewise override this:
+    /// the default rejects names without node links instead of silently
+    /// dropping projections it cannot resolve.
     fn supplemental_sources(&self, id: NodeId) -> Result<Vec<NodeId>> {
         let source = self.diagnostic_source(id)?;
         let nodes: Vec<_> = source

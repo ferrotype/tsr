@@ -21,6 +21,12 @@ through `test/barrier`. This private action does not read a snapshot or change
 session state. It keeps the existing 64-operation endpoint bound intact. The
 client waits after releasing its write mutex so filesystem and mapper callback
 replies can progress while earlier notifications drain.
+The interval is half the endpoint's capacity, leaving room for the fence and
+other queued work; 32 is a conservative transport choice, not a Go semantic
+requirement. Unlike Go's in-process client, this fence waits for the ordered
+worker, so an edit burst crossing a fence can hide a `didChange`/following-request
+ordering bug at that boundary. These runs do not prove unfenced scheduling;
+ordinary-CLI replay and queue tests provide separate ordering observations.
 
 Four pinned files receive anchored access patches: `lsptestutil/lspclient.go`
 selects the transport, `fourslash/statebaseline.go` reads the state projection,
@@ -55,6 +61,9 @@ standalone tool. Baselines and tracking output go under the selected output,
 never into the submodule. Builds honor the shared Go cache.
 
 `lsp` uses the explicit client-test routes listed in `docs/PHASE5-tests.md`.
+The pinned inventory test requires those derived routes to equal the runner's
+explicit client-test set, so a newly routed test cannot be silently filtered out
+after a pin update.
 Each client test starts a fresh test process. Direct server-internal tests and
 recorded replay cases retain their separate documented routes; they do not
 receive corpus credit from a client-test run.

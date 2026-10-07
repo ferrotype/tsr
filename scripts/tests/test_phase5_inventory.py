@@ -4,6 +4,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
+from tools.phase5.harness import runner
+
 ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location('phase5_inventory', ROOT / 'tools/phase5/harness/inventory.py')
 inventory = importlib.util.module_from_spec(spec)
@@ -30,6 +32,8 @@ class InventoryTests(unittest.TestCase):
         self.assertEqual(sum(row['tsc_prebuild'] for row in fs), 8)
         completion = next(row for row in rows if row['name'] == 'TestCompletionAfterFileClose')
         self.assertEqual(completion['route'], 'lsp/TestCompletionAfterFileClose')
+        self.assertEqual(runner.LSP_TESTS, {row['name'] for row in rows
+                         if row['package'] == 'lsp' and row['route'] == f"lsp/{row['name']}"})
         self.assertIn('Compiled rosters checked in this generation: **none**', inventory.markdown(rows, []))
 
     def test_bounded_direct_audit_keeps_partial_observations_as_work(self):

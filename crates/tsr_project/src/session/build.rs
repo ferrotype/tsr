@@ -439,6 +439,11 @@ impl<'a> ProjectBuilder<'a> {
     }
     // GetDefaultProject's program-inclusion fallback also covers dependencies
     // under node_modules, where nearest-config discovery deliberately stops.
+    // The pin's ProjectCollectionBuilder.findDefaultConfiguredProject sorts
+    // config paths before findDefaultConfiguredProjectFromProgramInclusion;
+    // BTreeMap iteration preserves that first-containing-project tie-break.
+    // One direct inclusion wins; zero or multiple direct inclusions use that
+    // sorted fallback (or None if no project contains the file).
     // Ambiguous direct candidates continue through normal config discovery.
     fn configured_project_containing(&self, path: &JsString) -> (Option<JsString>, bool) {
         let mut containing = Vec::new();
