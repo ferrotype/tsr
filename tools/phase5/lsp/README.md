@@ -268,3 +268,5 @@ The client test uses S11 streams and the real mapper host. It leaves the pinned
 client's assertions intact. ATA unit tests inject an npm executor; no ordinary
 check installs packages from a registry. The real npm integration test is
 explicitly ignored and requires an opt-in manual run.
+
+The native client checks now share `tools/phase5/harness/overlay.py` and its retained transport with fourslash. `check.py` remains the five-test L2 development entry point.

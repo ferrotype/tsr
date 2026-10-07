@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noLib": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true
+  },
+  "files": [
+    "index.ts",
+    "value0.ts",
+    "value1.ts",
+    "value2.ts",
+    "value3.ts",
+    "value4.ts",
+    "value5.ts",
+    "value6.ts",
+    "value7.ts",
+    "value8.ts",
+    "value9.ts",
+    "value10.ts",
+    "value11.ts",
+    "value12.ts",
+    "value13.ts",
+    "value14.ts",
+    "value15.ts",
+    "value16.ts",
+    "value17.ts",
+    "value18.ts",
+    "value19.ts"
+  ],
+  "references": [],
+  "typeAcquisition": {
+    "enable": false
+  }
+}

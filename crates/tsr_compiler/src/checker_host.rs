@@ -357,6 +357,9 @@ impl CheckerHost for ProgramCheckerHost {
             .package_scope_untraced(dir)?
             .map(|package| package.directory.clone()))
     }
+    fn symlink_cache(&self) -> Result<Option<&tsr_module::symlinks::KnownSymlinks>, Error> {
+        self.known_symlinks().map(Some)
+    }
     fn get_global_typings_cache_location(&self) -> Result<tsr_jsstring::JsString, Error> {
         Ok(self.program.global_typings_cache_location())
     }

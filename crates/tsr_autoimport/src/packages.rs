@@ -14,6 +14,9 @@ use tsr_vfs::FileSystem;
 pub struct Package {
     pub name: JsString,
     pub entrypoints: Vec<ResolvedEntrypoint>,
+    /// The extracted files as (symlink or realpath, realpath). A referenced
+    /// project's declaration output is replaced by the source it was built from.
+    roots: Vec<(JsString, JsString)>,
     paths: Arc<crate::realpaths::PackagePaths>,
 }
 fn directories(mut path: Vec<u8>) -> Vec<Vec<u8>> {
@@ -161,9 +164,28 @@ pub fn discover(
                 }
             }
             if let Some(paths) = paths {
+                // port: tsc/internal/ls/autoimport/registry.go:registryBuilder.extractPackage
+                let roots = entrypoints
+                    .iter()
+                    .map(|entry| {
+                        let output = path::to_path(
+                            entry.resolved_file_name.as_bytes(),
+                            program.current_directory(),
+                            program.use_case_sensitive_file_names(),
+                        );
+                        match program.project_reference_source_of_output_dts(output.as_bytes()) {
+                            Some(source) => (paths.to_symlink(source.as_bytes()), source.clone()),
+                            None => (
+                                JsString::from_bytes(entry.symlink_or_realpath()),
+                                entry.resolved_file_name.clone(),
+                            ),
+                        }
+                    })
+                    .collect();
                 result.push(Package {
                     name,
                     entrypoints,
+                    roots,
                     paths,
                 });
             }
@@ -173,16 +195,93 @@ pub fn discover(
 }
 
 impl Package {
+    /// The extracted files' names, symlinked and real.
+    pub fn root_file_names(&self) -> impl Iterator<Item = &JsString> {
+        self.roots.iter().flat_map(|(file, real)| [file, real])
+    }
+    /// Root files that re-export from a bare module name the package program
+    /// could not resolve, by path, with those names. The pin's alias resolver
+    /// records these as failed ambient module lookups.
+    // port: tsc/internal/ls/autoimport/aliasresolver.go:aliasResolver.GetResolvedModule
+    pub fn failed_ambient_lookups(
+        &self,
+        program: &Program,
+    ) -> Result<Vec<(JsString, Vec<JsString>)>, Error> {
+        let mut result = Vec::new();
+        for file in self.loaded_roots() {
+            let Some(file) = program.source_file(file.as_bytes()) else {
+                continue;
+            };
+            let view = file.bound().view().ast();
+            let mut names = Vec::new();
+            for statement in view
+                .node_slice(view.node(file.source())?.statements(view)?)?
+                .iter()
+                .flatten()
+            {
+                let read = view.node(statement)?;
+                if read.kind() != tsr_ast::SyntaxKind::ExportDeclaration {
+                    continue;
+                }
+                let Some(specifier) = read.module_specifier() else {
+                    continue;
+                };
+                let name = view.node_text(specifier)?.into_js_string();
+                if path::is_relative(name.as_bytes()) || names.contains(&name) {
+                    continue;
+                }
+                if !program
+                    .resolved_module_from_specifier(file, specifier)?
+                    .is_some_and(tsr_module::ResolvedModule::is_resolved)
+                {
+                    names.push(name);
+                }
+            }
+            if !names.is_empty() {
+                let source = view.source_file(file.source())?;
+                result.push((JsString::from_bytes(source.path()), names));
+            }
+        }
+        Ok(result)
+    }
+    /// The ambient module names the root files declare, with each file name.
+    pub fn ambient_modules(&self, program: &Program) -> Result<Vec<(JsString, JsString)>, Error> {
+        let mut result = Vec::new();
+        for file in self.loaded_roots() {
+            let Some(file) = program.source_file(file.as_bytes()) else {
+                continue;
+            };
+            let view = file.bound().view().ast();
+            let source = view.source_file(file.source())?;
+            for name in source.ambient_module_names()?.iter() {
+                result.push((name.clone(), JsString::from_bytes(source.file_name())));
+            }
+        }
+        Ok(result)
+    }
+    fn loaded_roots(&self) -> BTreeSet<JsString> {
+        self.roots
+            .iter()
+            .map(|(file, _)| self.paths.to_symlink(file.as_bytes()))
+            .collect()
+    }
     pub fn load(
         &self,
         parent: &Program,
         counters: &tsr_arena::Counters,
     ) -> Result<Arc<Program>, Error> {
-        let roots: BTreeSet<_> = self
-            .entrypoints
-            .iter()
-            .map(|e| self.paths.to_symlink(e.symlink_or_realpath()))
-            .collect();
+        self.load_with(parent, counters, &[])
+    }
+    /// The package program with `extra` roots, such as files declaring ambient
+    /// modules the package re-exports.
+    pub fn load_with(
+        &self,
+        parent: &Program,
+        counters: &tsr_arena::Counters,
+        extra: &[JsString],
+    ) -> Result<Arc<Program>, Error> {
+        let mut roots = self.loaded_roots();
+        roots.extend(extra.iter().cloned());
         // The pin's aliasResolver has empty compiler options and no default
         // library. Root entrypoints and their imported aliases supply its graph.
         let options = tsr_core::CompilerOptions {
@@ -217,12 +316,23 @@ impl Package {
                     .push(entry.clone());
             }
         }
+        let roots: BTreeSet<&[u8]> = self
+            .roots
+            .iter()
+            .flat_map(|(file, real)| [file.as_bytes(), real.as_bytes()])
+            .collect();
         registry.index = registry
             .index
-            .filtered(|export| paths.contains_key(export.path.as_bytes()));
+            .filtered(|export| roots.contains(export.path.as_bytes()));
+        // Entrypoints are keyed by their own files. A source standing in for a
+        // referenced project's output has none unless another entrypoint names it.
         for export in registry.index.entries_mut() {
             export.package_name = self.name.clone();
-            export.entrypoints = paths.get(export.path.as_bytes()).unwrap().clone().into();
+            export.entrypoints = paths
+                .get(export.path.as_bytes())
+                .cloned()
+                .unwrap_or_default()
+                .into();
         }
     }
 }

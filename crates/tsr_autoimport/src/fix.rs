@@ -1,3 +1,28 @@
+use tsr_checker::ModuleSpecifierKind;
+
+/// Internal ranking provenance; only `protocol` is serialized.
+#[derive(Clone, Debug, Default)]
+pub struct Fix {
+    pub protocol: lsp::AutoImportFix,
+    pub module_specifier_kind: ModuleSpecifierKind,
+    pub is_re_export: bool,
+    pub module_file_name: tsr_jsstring::JsString,
+}
+impl std::ops::Deref for Fix {
+    type Target = lsp::AutoImportFix;
+    fn deref(&self) -> &Self::Target {
+        &self.protocol
+    }
+}
+impl From<lsp::AutoImportFix> for Fix {
+    fn from(protocol: lsp::AutoImportFix) -> Self {
+        Self {
+            protocol,
+            ..Default::default()
+        }
+    }
+}
+
 use crate::{index::Named, Export, ExportSyntax};
 use tsr_ast::{
     symbol_flags as sf, utilities_modules::try_get_import_from_module_specifier, NodeId,
@@ -118,7 +143,9 @@ fn syntax_indicators(program: &Program, source: NodeId) -> Result<(bool, bool), 
             }
         }
     }
-    Ok((esm.is_some(), cjs))
+    // Under Force, a SourceFile indicator marks module treatment, not ESM
+    // syntax. Only the declarations found above establish an ESM preference.
+    Ok((false, cjs))
 }
 // port: tsc/internal/ls/autoimport/fix.go:View.computeShouldUseRequire
 pub fn use_require(
@@ -184,6 +211,22 @@ pub fn fixes(
     usage: Usage,
     preferences: &crate::Preferences,
 ) -> Result<Vec<lsp::AutoImportFix>, Error> {
+    Ok(
+        fixes_with_info(program, checker, source, export, usage, preferences)?
+            .into_iter()
+            .map(|fix| fix.protocol)
+            .collect(),
+    )
+}
+
+pub fn fixes_with_info(
+    program: &Program,
+    checker: &mut Operation<'_>,
+    source: NodeId,
+    export: &Export,
+    usage: Usage,
+    preferences: &crate::Preferences,
+) -> Result<Vec<Fix>, Error> {
     let file = program
         .file_of_node(source)
         .ok_or(Error::MissingLink("auto-import source"))?;
@@ -276,20 +319,23 @@ pub fn fixes(
         let specifier = String::from_utf8_lossy(view.node_text(literal)?.as_bytes()).into_owned();
         if kind == lsp::ImportKind::NAMED && result.is_empty() && usage.is_some() {
             if let Some(namespace) = namespace {
-                result.push(lsp::AutoImportFix {
-                    kind: lsp::AutoImportFixKind::USE_NAMESPACE,
-                    name: name.clone(),
-                    import_kind: lsp::ImportKind::NAMESPACE,
-                    module_specifier: specifier.clone(),
-                    add_as_type_only: lsp::AddAsTypeOnly::ALLOWED,
-                    import_index: index as i32,
-                    usage_position: usage.clone().map(Box::new),
-                    namespace_prefix: String::from_utf8_lossy(
-                        view.node_text(namespace)?.as_bytes(),
-                    )
-                    .into_owned(),
-                    ..Default::default()
-                });
+                result.push(
+                    lsp::AutoImportFix {
+                        kind: lsp::AutoImportFixKind::USE_NAMESPACE,
+                        name: name.clone(),
+                        import_kind: lsp::ImportKind::NAMESPACE,
+                        module_specifier: specifier.clone(),
+                        add_as_type_only: lsp::AddAsTypeOnly::ALLOWED,
+                        import_index: index as i32,
+                        usage_position: usage.clone().map(Box::new),
+                        namespace_prefix: String::from_utf8_lossy(
+                            view.node_text(namespace)?.as_bytes(),
+                        )
+                        .into_owned(),
+                        ..Default::default()
+                    }
+                    .into(),
+                );
             }
         }
         if source_file.is_js() && export.flags & sf::VALUE == 0 && read.kind() != K::JSDocImportTag
@@ -316,7 +362,7 @@ pub fn fixes(
                     ..Default::default()
                 };
                 if as_type == lsp::AddAsTypeOnly::NOT_ALLOWED {
-                    result.push(fix);
+                    result.push(fix.into());
                     return Ok(result);
                 }
                 best.get_or_insert(fix);
@@ -355,18 +401,21 @@ pub fn fixes(
         if (as_type != lsp::AddAsTypeOnly::NOT_ALLOWED && type_only)
             || (as_type == lsp::AddAsTypeOnly::NOT_ALLOWED && !type_only)
         {
-            result.push(fix);
+            result.push(fix.into());
             return Ok(result);
         }
         best.get_or_insert(fix);
     }
     if let Some(fix) = best {
-        result.push(fix);
+        result.push(fix.into());
         return Ok(result);
     }
-    let specifier = if !export.ambient_module_name().is_empty() {
-        tsr_jsstring::JsString::from_bytes(export.ambient_module_name())
-    } else if !export.package_name.is_empty() {
+    let (specifier, specifier_kind) = if !export.ambient_module_name().is_empty() {
+        (
+            tsr_jsstring::JsString::from_bytes(export.ambient_module_name()),
+            ModuleSpecifierKind::Ambient,
+        )
+    } else if !export.package_name.is_empty() && !export.entrypoints.is_empty() {
         let Some(specifier) = crate::specifiers::for_package(
             export,
             checker,
@@ -377,7 +426,7 @@ pub fn fixes(
         else {
             return Ok(result);
         };
-        specifier
+        (specifier, ModuleSpecifierKind::NodeModules)
     } else {
         let Some(specifier) = checker.module_specifier_for_auto_import(
             source,
@@ -389,7 +438,7 @@ pub fn fixes(
         else {
             return Ok(result);
         };
-        specifier
+        (specifier.specifier, specifier.kind)
     };
     if preferences.excludes(specifier.as_bytes()) {
         return Ok(result);
@@ -399,12 +448,20 @@ pub fn fixes(
         && !export.is_unresolved_alias()
         && usage.is_some()
     {
-        return Ok(vec![lsp::AutoImportFix {
-            kind: lsp::AutoImportFixKind::JSDOC_TYPE_IMPORT,
-            name,
-            module_specifier: String::from_utf8_lossy(specifier.as_bytes()).into_owned(),
-            usage_position: usage.map(Box::new),
-            ..Default::default()
+        return Ok(vec![Fix {
+            protocol: lsp::AutoImportFix {
+                kind: lsp::AutoImportFixKind::JSDOC_TYPE_IMPORT,
+                name,
+                module_specifier: String::from_utf8_lossy(specifier.as_bytes()).into_owned(),
+                usage_position: usage.map(Box::new),
+                ..Default::default()
+            },
+            module_specifier_kind: specifier_kind,
+            is_re_export: export
+                .target
+                .as_ref()
+                .is_some_and(|target| target.module != export.id.module),
+            module_file_name: export.module_file_name.clone(),
         }]);
     }
     let mut name = name;
@@ -420,14 +477,22 @@ pub fn fixes(
             String::from_utf8_lossy(&export.name()[1..])
         );
     }
-    result.push(lsp::AutoImportFix {
-        kind: lsp::AutoImportFixKind::ADD_NEW,
-        name,
-        import_kind: kind,
-        add_as_type_only: as_type,
-        module_specifier: String::from_utf8_lossy(specifier.as_bytes()).into_owned(),
-        use_require: use_require(program, checker, source)?,
-        ..Default::default()
+    result.push(Fix {
+        protocol: lsp::AutoImportFix {
+            kind: lsp::AutoImportFixKind::ADD_NEW,
+            name,
+            import_kind: kind,
+            add_as_type_only: as_type,
+            module_specifier: String::from_utf8_lossy(specifier.as_bytes()).into_owned(),
+            use_require: use_require(program, checker, source)?,
+            ..Default::default()
+        },
+        module_specifier_kind: specifier_kind,
+        is_re_export: export
+            .target
+            .as_ref()
+            .is_some_and(|target| target.module != export.id.module),
+        module_file_name: export.module_file_name.clone(),
     });
     Ok(result)
 }

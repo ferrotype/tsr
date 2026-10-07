@@ -361,3 +361,230 @@ fn a_later_release_does_not_postpone_an_earlier_deadline() {
     assert!(!s.state.lock().unwrap().slots[2].initialized);
     ctx.cancel();
 }
+
+#[test]
+fn category_routing_defaults_and_minimum_capacity_match_native_observations() {
+    let defaults = crate::session::SessionOptions::default();
+    assert_eq!(defaults.query_checkers, 3);
+    for queries in [1, defaults.query_checkers] {
+        let (s, clock) = setup(queries);
+        let s =
+            CheckerScheduler::with_clock(s.pool.clone(), s.program.clone(), Duration::ZERO, clock);
+        assert_eq!(s.idle_timeout, Duration::from_secs(30));
+        assert_eq!(s.pool.query_slots, queries);
+        // Native MaxCheckers counts diagnostics plus queries; Rust also stores API.
+        assert_eq!(s.state.lock().unwrap().slots.len(), queries + 2);
+        let diag = take(&s, CheckerLifetime::Diagnostics, &context(), "diag");
+        let query = take(&s, CheckerLifetime::Temporary, &context(), "query");
+        let api = take(&s, CheckerLifetime::Api, &Context::background(), "");
+        assert_eq!(diag.0.index, 0);
+        assert!((1..=queries).contains(&query.0.index));
+        assert_eq!(api.0.index, queries + 1);
+        assert_ne!(diag.owner().identity().id(), query.owner().identity().id());
+        assert_ne!(diag.owner().identity().id(), api.owner().identity().id());
+        assert_ne!(query.owner().identity().id(), api.owner().identity().id());
+    }
+}
+
+#[test]
+fn saturated_query_and_diagnostics_categories_wait_independently() {
+    let (s, _) = setup(3);
+    let ctx = context();
+    let mut queries: Vec<_> = (0..3)
+        .map(|i| take(&s, CheckerLifetime::Temporary, &ctx, &format!("q{i}")))
+        .collect();
+    for (i, a) in queries.iter().enumerate() {
+        assert!(a.0.index > 0);
+        for b in &queries[i + 1..] {
+            assert_ne!(a.owner().identity().id(), b.owner().identity().id());
+        }
+    }
+    std::thread::scope(|scope| {
+        let worker = scope.spawn(|| take(&s, CheckerLifetime::Temporary, &ctx, "fourth"));
+        wait_until_contended(&s);
+        let diag = take(&s, CheckerLifetime::Diagnostics, &ctx, "diag");
+        drop(queries.pop());
+        assert!(worker.join().unwrap().0.index > 0);
+        drop(diag);
+    });
+    drop(queries);
+    let diag = take(&s, CheckerLifetime::Diagnostics, &ctx, "first-diag");
+    std::thread::scope(|scope| {
+        let worker = scope.spawn(|| take(&s, CheckerLifetime::Diagnostics, &ctx, "second-diag"));
+        wait_until_contended(&s);
+        let query = take(&s, CheckerLifetime::Temporary, &ctx, "independent-query");
+        assert_ne!(diag.owner().identity().id(), query.owner().identity().id());
+        drop(diag);
+        assert_eq!(worker.join().unwrap().0.index, 0);
+    });
+    ctx.cancel();
+}
+
+#[test]
+fn diagnostics_affinity_survives_release_and_lifetime_changes_ignore_it() {
+    let (s, _) = setup(3);
+    let ctx = context();
+    let first = take(&s, CheckerLifetime::Diagnostics, &ctx, "same");
+    let identity = first.owner().identity().id();
+    drop(first);
+    let again = take(&s, CheckerLifetime::Diagnostics, &ctx, "same");
+    assert_eq!(again.owner().identity().id(), identity);
+    drop(again);
+    let distinct_request = take(&s, CheckerLifetime::Diagnostics, &ctx, "different");
+    assert_eq!(distinct_request.owner().identity().id(), identity);
+    drop(distinct_request);
+    let query = take(&s, CheckerLifetime::Temporary, &ctx, "same");
+    assert!(query.0.index > 0);
+    assert_ne!(query.owner().identity().id(), identity);
+    drop(query);
+    for _ in 0..2 {
+        drop(take(
+            &s,
+            CheckerLifetime::Temporary,
+            &Context::background(),
+            "",
+        ));
+    }
+    ctx.cancel();
+}
+
+#[test]
+fn idle_disposal_removes_file_associations_and_staggered_slots_survive_before_deadline() {
+    let (s, clock) = setup(3);
+    let ctx = context();
+    let file = s.program.files()[0].source();
+    let first = s
+        .acquire(CheckerLifetime::Temporary, Some(file), &ctx, "first")
+        .unwrap();
+    let second = take(&s, CheckerLifetime::Temporary, &ctx, "second");
+    let a = first.0.index;
+    let b = second.0.index;
+    assert_eq!(s.state.lock().unwrap().files.get(&file), Some(&a));
+    drop(first);
+    clock.advance(Duration::from_secs(6));
+    drop(second);
+    {
+        let state = s.state.lock().unwrap();
+        assert!(state.slots[a].initialized && state.slots[b].initialized);
+    }
+    clock.advance(Duration::from_secs(11));
+    let state = s.state.lock().unwrap();
+    assert!(!state.slots[a].initialized && !state.slots[b].initialized);
+    assert!(!state.files.contains_key(&file));
+    drop(state);
+    ctx.cancel();
+}
+
+#[test]
+fn discard_keeps_idle_and_api_checkers_and_never_rearms_cleanup() {
+    let (s, clock) = setup(3);
+    let ctx = context();
+    let mut identities = Vec::new();
+    for purpose in [
+        CheckerLifetime::Diagnostics,
+        CheckerLifetime::Temporary,
+        CheckerLifetime::Api,
+    ] {
+        let checker = take(&s, purpose, &ctx, "existing");
+        identities.push((purpose, checker.0.index, checker.owner().identity().id()));
+        drop(checker);
+    }
+    let epoch = s.state.lock().unwrap().timer_epoch;
+    assert!(s.state.lock().unwrap().timer.is_some());
+    s.discard();
+    s.discard();
+    s.cleanup(epoch);
+    {
+        let state = s.state.lock().unwrap();
+        assert!(state.timer.is_none());
+        assert!(state.timer_deadline.is_none());
+        for &(_, index, id) in &identities {
+            assert!(state.slots[index].initialized);
+            assert_eq!(state.slots[index].identity.as_ref().unwrap().id(), id);
+        }
+    }
+    clock.advance(Duration::from_mins(1));
+    for (purpose, _, id) in identities {
+        let checker = take(&s, purpose, &ctx, "reacquired");
+        assert_eq!(checker.owner().identity().id(), id);
+        drop(checker);
+    }
+    assert!(s.state.lock().unwrap().timer.is_none());
+    ctx.cancel();
+
+    let (fresh, _) = setup(1);
+    fresh.discard();
+    let first = take(
+        &fresh,
+        CheckerLifetime::Temporary,
+        &Context::background(),
+        "",
+    );
+    let id = first.owner().identity().id();
+    assert_eq!(first.0.index, 1);
+    drop(first);
+    assert_eq!(
+        take(
+            &fresh,
+            CheckerLifetime::Temporary,
+            &Context::background(),
+            ""
+        )
+        .owner()
+        .identity()
+        .id(),
+        id
+    );
+}
+
+#[test]
+fn canceled_api_release_clears_slot_and_nested_handles_release_once() {
+    let (s, _) = setup(1);
+    let api = take(&s, CheckerLifetime::Api, &Context::background(), "");
+    let index = api.0.index;
+    let token = tsr_core::CancellationToken::new();
+    token.cancel();
+    api.operation()
+        .unwrap()
+        .semantic_diagnostics_cancellable(s.program.files()[0].source(), &token)
+        .unwrap();
+    assert!(api.owner().was_canceled());
+    drop(api);
+    assert!(!s.state.lock().unwrap().slots[index].initialized);
+    assert!(s.state.lock().unwrap().slots[index].identity.is_none());
+    let first = take(&s, CheckerLifetime::Temporary, &Context::background(), "");
+    let nested = first.clone();
+    let index = first.0.index;
+    drop(first);
+    assert!(s.state.lock().unwrap().slots[index].held);
+    drop(nested);
+    assert!(!s.state.lock().unwrap().slots[index].held);
+    drop(take(
+        &s,
+        CheckerLifetime::Temporary,
+        &Context::background(),
+        "",
+    ));
+}
+
+#[test]
+fn query_diagnostics_merge_globals_once_across_distinct_requests() {
+    let (s, _) = setup(3);
+    let ctx = context();
+    assert!(!s.take_new_global_diagnostics());
+    let file = s.program.files()[0].source();
+    for (request, changed) in [("first", true), ("second", false)] {
+        let checker = s
+            .acquire(CheckerLifetime::Temporary, Some(file), &ctx, request)
+            .unwrap();
+        checker
+            .operation()
+            .unwrap()
+            .semantic_diagnostics(file)
+            .unwrap();
+        drop(checker);
+        assert_eq!(s.take_new_global_diagnostics(), changed);
+        assert!(!s.take_new_global_diagnostics());
+    }
+    ctx.cancel();
+}

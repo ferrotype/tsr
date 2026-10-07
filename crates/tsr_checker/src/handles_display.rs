@@ -434,6 +434,12 @@ impl TypeNodeBuilder<'_> {
             .filter_map(|(&node, &symbol)| symbol.map(|s| (node, s)))
     }
 
+    /// Retain a source arena needed when printing generated nodes with that
+    /// source file's text and formatting context.
+    pub fn retain_source_node(&mut self, node: NodeId) -> Result<(), Error> {
+        self.builder.retain_source_node(node)
+    }
+
     pub fn view(&self) -> AstView<'_> {
         self.builder.ast.view()
     }

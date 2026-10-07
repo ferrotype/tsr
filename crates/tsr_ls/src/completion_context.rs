@@ -4,7 +4,13 @@ use crate::{
     syntax::Syntax,
     Result,
 };
-use tsr_ast::{utilities as ast, utilities_positions as positions, NodeId, SyntaxKind as K};
+use tsr_ast::{
+    utilities as ast, utilities_middle as middle, utilities_positions as positions, NodeId,
+    SyntaxKind as K,
+};
+
+#[path = "completion_context_containers.rs"]
+mod containers;
 
 pub(crate) struct Context {
     pub location: NodeId,
@@ -23,6 +29,7 @@ pub(crate) enum Container {
     Binding,
     Class,
     Interface,
+    TypeLiteral,
     Imports,
     Exports,
     Constructor,
@@ -141,6 +148,42 @@ pub(crate) fn commits(
 }
 
 impl Context {
+    /// An unclosed `f<` before a generic signature makes the location
+    /// type-only, as the pin's isTypeOnlyCompletion does.
+    pub fn refine_type_arguments(
+        &mut self,
+        syntax: &mut Syntax<'_>,
+        checker: &mut tsr_checker::Operation<'_>,
+    ) -> Result<()> {
+        let Some(token) = self.token else {
+            return Ok(());
+        };
+        if self.type_only {
+            return Ok(());
+        }
+        // port: tsc/internal/ls/completions.go:isContextTokenValueLocation
+        let read = syntax.view.node(token)?;
+        let parent = read
+            .parent()
+            .map(|id| syntax.view.node(id).map(|n| n.kind()))
+            .transpose()?;
+        if read.kind() == K::TypeOfKeyword
+            && matches!(
+                parent.and_then(tsr_ast::NodeKind::known),
+                Some(K::TypeQuery | K::TypeOfExpression)
+            )
+            || read.kind() == K::AssertsKeyword && parent == Some(K::TypePredicate.into())
+        {
+            return Ok(());
+        }
+        if possibly_type_argument_position(syntax, checker, token)? {
+            self.type_only = true;
+            if self.filter == Filter::All {
+                self.filter = Filter::Type;
+            }
+        }
+        Ok(())
+    }
     pub fn collect(syntax: &mut Syntax<'_>, position: i64) -> Result<Self> {
         let (token, previous) = relevant(syntax, position)?;
         let mut location = syntax.nav().get_touching_property_name(position)?;
@@ -167,7 +210,14 @@ impl Context {
         }
         let mut type_only = positions::is_part_of_type_node(syntax.view, location)?;
         if let Some((access, _)) = member {
-            type_only |= positions::is_part_of_type_node(syntax.view, access)?;
+            let read = syntax.view.node(access)?;
+            type_only = if let Some(import) = read.data_source().as_import_type_node() {
+                // A literal import type is syntactically a type node even for
+                // `typeof import("module").`, whose members are runtime values.
+                !import.is_type_of()
+            } else {
+                type_only || positions::is_part_of_type_node(syntax.view, access)?
+            };
         }
         if let Some(id) = token {
             let read = syntax.view.node(id)?;
@@ -228,6 +278,25 @@ impl Context {
                 }
             } else if class_keyword(keyword(syntax, id)?) {
                 target = pr.parent();
+            } else if read.kind() == K::AsteriskToken
+                && pr.kind() == K::MethodDeclaration
+                && pr.parent().is_some_and(|id| {
+                    syntax
+                        .view
+                        .node(id)
+                        .is_ok_and(|n| n.kind() == K::ObjectLiteralExpression)
+                })
+            {
+                // `{ *| }`: a generator method of the object literal.
+                target = pr.parent();
+            } else if type_keyword_token(syntax, id)?
+                && matches!(
+                    pr.kind().known(),
+                    Some(K::ImportSpecifier | K::ExportSpecifier)
+                )
+            {
+                // `import { type | }`: the specifier's named imports or exports.
+                target = pr.parent();
             }
             if let Some(target) = target {
                 container = match syntax.view.node(target)?.kind().known() {
@@ -259,6 +328,35 @@ impl Context {
             }
         }
         if member.is_none() {
+            if container.is_some_and(|(kind, _)| kind == Container::Constructor) {
+                // Native constructor-parameter completion takes precedence over
+                // the containing class, including an unterminated class at EOF.
+            } else if let Some(target) = containers::object_type(syntax, token, location, position)?
+            {
+                container = Some((
+                    if ast::is_class_like(&syntax.view.node(target)?) {
+                        Container::Class
+                    } else {
+                        Container::Interface
+                    },
+                    target,
+                ));
+            } else if matches!(
+                container,
+                Some((Container::Class | Container::Interface, _))
+            ) {
+                container = None;
+            }
+            if let Some(token) = token {
+                if containers::constructor_parameter(syntax, token)? {
+                    let parameter = syntax.view.node(token)?.parent().unwrap();
+                    container = syntax
+                        .view
+                        .node(parameter)?
+                        .parent()
+                        .map(|constructor| (Container::Constructor, constructor));
+                }
+            }
             let mut jsx_token = token;
             if let Some(id) = jsx_token {
                 if let Some(parent) = syntax.view.node(id)?.parent() {
@@ -291,16 +389,31 @@ impl Context {
             node = read.parent();
         }
         if let Some((kind, _)) = container {
+            let after_type = match token {
+                Some(token) => type_keyword_token(syntax, token)?,
+                None => false,
+            };
+            let after_asterisk = match token {
+                Some(token) => syntax.view.node(token)?.kind() == K::AsteriskToken,
+                None => false,
+            };
             filter = match kind {
+                // A generator member takes no modifier keywords.
+                Container::Class | Container::Interface if after_asterisk => Filter::None,
                 Container::Class => Filter::Class,
                 Container::Interface => Filter::Interface,
                 Container::Constructor => Filter::ConstructorParameter,
+                // `type` is offered at `import { |`, not after it.
+                Container::Imports | Container::Exports if after_type => Filter::None,
                 Container::Imports | Container::Exports => Filter::TypeKeyword,
                 _ => Filter::None,
             };
             new_identifier = matches!(
                 kind,
-                Container::Class | Container::Interface | Container::Constructor
+                Container::Class
+                    | Container::Interface
+                    | Container::TypeLiteral
+                    | Container::Constructor
             );
             commit = if new_identifier { &[] } else { ALL };
         }
@@ -337,15 +450,63 @@ impl Context {
             commit,
         })
     }
-    pub fn blocked(&self, syntax: &Syntax<'_>, position: i64) -> Result<bool> {
+    pub fn blocked(
+        &self,
+        syntax: &mut Syntax<'_>,
+        checker: &mut tsr_checker::Operation<'_>,
+        position: i64,
+    ) -> Result<bool> {
         let Some(token) = self.token else {
             return Ok(false);
         };
         let read = syntax.view.node(token)?;
+        // The regexp end still belongs to its flags; string/template ends only
+        // block when the literal is unterminated (native completion blocker).
+        let regexp = read.kind() == K::RegularExpressionLiteral;
+        if ((regexp || middle::is_string_text_containing_node(&read))
+            && i64::from(read.pos()) < position
+            && position < i64::from(read.end()))
+            || (position == i64::from(read.end())
+                && (regexp || middle::is_unterminated_literal(&read)))
+        {
+            return Ok(true);
+        }
         let parent = read.parent().unwrap_or(syntax.source);
         let pr = syntax.view.node(parent)?;
         let kind = pr.kind().known().unwrap_or(K::Unknown);
         let tk = keyword(syntax, token)?;
+        if matches!(read.kind().known(), Some(K::DotToken | K::QuestionDotToken)) {
+            match kind {
+                K::PropertyAccessExpression => {
+                    let leftmost = tsr_ast::utilities_middle::get_leftmost_access_expression(
+                        syntax.view,
+                        parent,
+                    )?;
+                    if tsr_ast::node_is_missing(Some(&syntax.view.node(leftmost)?)) {
+                        return Ok(true);
+                    }
+                    let expression = pr.expression().ok_or(tsr_arena::Error::InvalidGraph)?;
+                    let expression_read = syntax.view.node(expression)?;
+                    if (expression_read.kind() == K::CallExpression
+                        || ast::is_function_like(Some(&expression_read)))
+                        && expression_read.end() == read.pos()
+                        && syntax
+                            .token_children(expression)?
+                            .last()
+                            .map(|id| syntax.view.node(*id).map(|read| read.kind()))
+                            .transpose()?
+                            != Some(K::CloseParenToken.into())
+                    {
+                        // An incomplete call/function before a dot is often the
+                        // parser recovering a spread argument, as in Math.min(.).
+                        return Ok(true);
+                    }
+                }
+                K::QualifiedName | K::ModuleDeclaration | K::ImportType | K::MetaProperty => {}
+                // No left-hand expression: a stray dot or an unfinished spread.
+                _ => return Ok(true),
+            }
+        }
         // A contextual modifier parsed as a property name still starts a
         // class-member completion (for example `public |` or `abstract |`).
         if self
@@ -363,19 +524,34 @@ impl Context {
         {
             return Ok(true);
         }
+        if read.kind() == K::Identifier
+            && matches!(kind, K::ImportSpecifier | K::ExportSpecifier)
+            && pr.name() == Some(token)
+            && syntax.view.node_text(token)?.as_bytes() == b"type"
+        {
+            // import { type | }
+            return Ok(false);
+        }
         let function = ast::is_function_like_kind(pr.kind()) && kind != K::Constructor;
-        let certain = match tk {
+        let certain = match read.kind().known().unwrap_or(K::Unknown) {
             K::CommaToken => {
                 matches!(
                     kind,
                     K::VariableDeclaration
-                        | K::VariableDeclarationList
                         | K::VariableStatement
                         | K::EnumDeclaration
                         | K::InterfaceDeclaration
                         | K::ArrayBindingPattern
                         | K::TypeAliasDeclaration
-                ) || function
+                ) || kind == K::VariableDeclarationList
+                    && !possibly_type_argument_position(syntax, checker, token)?
+                    || function
+                    || (ast::is_class_like(&pr)
+                        && pr
+                            .type_parameter_list()
+                            .map(|list| syntax.view.list(list).map(|list| list.loc().end()))
+                            .transpose()?
+                            .is_some_and(|end| end >= i64::from(read.pos())))
             }
             K::DotToken | K::OpenBracketToken => kind == K::ArrayBindingPattern,
             K::ColonToken => kind == K::BindingElement,
@@ -390,7 +566,18 @@ impl Context {
                         | K::TypeAliasDeclaration
                 ) || ast::is_function_like_kind(pr.kind())
             }
-            K::DotDotDotToken => kind == K::Parameter,
+            K::DotDotDotToken => {
+                kind == K::Parameter
+                    || pr
+                        .parent()
+                        .map(|id| syntax.view.node(id).map(|node| node.kind()))
+                        .transpose()?
+                        == Some(K::ArrayBindingPattern.into())
+            }
+            K::PublicKeyword | K::PrivateKeyword | K::ProtectedKeyword => {
+                kind == K::Parameter && !containers::constructor_parameter(syntax, token)?
+            }
+            K::GetKeyword | K::SetKeyword => !containers::from_object_type(syntax, token)?,
             K::AsKeyword => matches!(
                 kind,
                 K::ImportSpecifier | K::ExportSpecifier | K::NamespaceImport
@@ -421,6 +608,88 @@ impl Context {
                 node = read.parent();
             }
         }
+        if containers::constructor_parameter(syntax, token)?
+            && (read.kind() != K::Identifier
+                || middle::is_parameter_property_modifier(tk.into())
+                || (syntax.start(token)? <= position && position <= i64::from(read.end())))
+        {
+            return Ok(false);
+        }
+        if class_keyword(tk) && containers::from_object_type(syntax, token)? {
+            return Ok(false);
+        }
+        if matches!(
+            tk,
+            K::AbstractKeyword
+                | K::ClassKeyword
+                | K::DeclareKeyword
+                | K::EnumKeyword
+                | K::FunctionKeyword
+                | K::InterfaceKeyword
+                | K::LetKeyword
+                | K::PrivateKeyword
+                | K::ProtectedKeyword
+                | K::PublicKeyword
+                | K::StaticKeyword
+                | K::VarKeyword
+        ) || (tk == K::AsyncKeyword && kind == K::PropertyDeclaration)
+        {
+            return Ok(true);
+        }
+        // A class member may follow a property declaration that a semicolon
+        // or a line break terminates.
+        let terminated = |end: i64| {
+            read.kind() != K::EqualsToken
+                && (read.kind() == K::SemicolonToken
+                    || !syntax.same_line(i64::from(read.end()), end))
+        };
+        let ancestor = |test: &dyn Fn(&tsr_ast::NodeRead<'_>) -> bool| -> Result<Option<NodeId>> {
+            let mut node = Some(parent);
+            while let Some(id) = node {
+                let read = syntax.view.node(id)?;
+                if test(&read) {
+                    return Ok(Some(id));
+                }
+                node = read.parent();
+            }
+            Ok(None)
+        };
+        if ancestor(&|read| ast::is_class_like(read))?.is_some()
+            && self.token == self.previous
+            && terminated(position)
+        {
+            return Ok(false);
+        }
+        if let (Some(property), Some(previous)) = (
+            ancestor(&|read| read.kind() == K::PropertyDeclaration)?,
+            self.previous
+                .filter(|&previous| Some(previous) != self.token),
+        ) {
+            let previous_read = syntax.view.node(previous)?;
+            let class_member = previous_read
+                .parent()
+                .and_then(|id| syntax.view.node(id).ok()?.parent())
+                .is_some_and(|id| {
+                    syntax
+                        .view
+                        .node(id)
+                        .is_ok_and(|read| ast::is_class_like(&read))
+                });
+            if class_member && position <= i64::from(previous_read.end()) {
+                if terminated(i64::from(previous_read.end())) {
+                    return Ok(false);
+                }
+                let property = syntax.view.node(property)?;
+                if read.kind() != K::EqualsToken
+                    && (property.initializer().is_some() || property.type_node().is_some())
+                {
+                    return Ok(true);
+                }
+            }
+        }
+        if tk == K::ConstKeyword {
+            return Ok(true);
+        }
         Ok(positions::is_declaration_name(syntax.view, token)?
             && !matches!(kind, K::ShorthandPropertyAssignment | K::JsxAttribute)
             && !(matches!(
@@ -432,3 +701,64 @@ impl Context {
             ) && (self.token != self.previous || position > i64::from(read.end()))))
     }
 }
+
+// port: tsc/internal/ls/completions.go:isPossiblyTypeArgumentPosition
+fn possibly_type_argument_position(
+    syntax: &mut Syntax<'_>,
+    checker: &mut tsr_checker::Operation<'_>,
+    mut token: NodeId,
+) -> Result<bool> {
+    loop {
+        let Some((called, count)) = syntax.possible_type_arguments(token)? else {
+            return Ok(false);
+        };
+        if positions::is_part_of_type_node(syntax.view, called)? {
+            return Ok(true);
+        }
+        // port: tsc/internal/ls/utilities.go:getPossibleGenericSignatures
+        let mut ty = checker.get_type_at_location(called)?;
+        let parent = syntax.view.node(called)?.parent();
+        let parent = parent.map(|id| syntax.view.node(id)).transpose()?;
+        if let Some(parent) = parent.as_ref().filter(|p| ast::is_optional_chain(*p)) {
+            ty = if ast::is_optional_chain_root(parent) {
+                checker.get_non_nullable_type(ty)?
+            } else {
+                checker.get_non_optional_type(ty)?
+            };
+        }
+        let kind = if parent
+            .as_ref()
+            .is_some_and(|p| p.kind() == K::NewExpression)
+        {
+            tsr_checker::SignatureKind::Construct
+        } else {
+            tsr_checker::SignatureKind::Call
+        };
+        for signature in checker.get_signatures_of_type(ty, kind)? {
+            let parameters = checker.signature_type_parameters(signature)?.len();
+            if parameters > 0 && parameters >= count {
+                return Ok(true);
+            }
+        }
+        token = called;
+    }
+}
+
+// port: tsc/internal/ls/completions.go:isTypeKeywordTokenOrIdentifier
+fn type_keyword_token(syntax: &Syntax<'_>, token: NodeId) -> Result<bool> {
+    let read = syntax.view.node(token)?;
+    Ok(read.kind() == K::TypeKeyword
+        || read.kind() == K::Identifier && syntax.view.node_text(token)?.as_bytes() == b"type")
+}
+
+#[cfg(test)]
+#[path = "completion_context_tests.rs"]
+mod tests;
+
+#[cfg(test)]
+#[path = "completion_scope_tests.rs"]
+mod scope_tests;
+
+#[cfg(test)]
+#[path = "completion_import_type_tests.rs"]
+mod import_type_tests;

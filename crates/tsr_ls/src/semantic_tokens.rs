@@ -4,6 +4,7 @@ use tsr_ast::{
     utilities_middle, utilities_positions, AstView, NodeId, SyntaxKind as K,
 };
 use tsr_checker::{type_flags as tf, Operation, SymbolRef};
+use tsr_compiler::diagnostic_writer::DiagnosticSources;
 use tsr_core::TextRange;
 use tsr_lsproto as lsp;
 
@@ -253,9 +254,8 @@ impl LanguageService<'_> {
                 .map(|p| (p.script, p.mapped.span))
                 .collect()
         } else {
-            let file = self.source(source)?;
             std::iter::once(source)
-                .chain(file.supplemental_source_files()?.iter().flatten().copied())
+                .chain(self.program.supplemental_sources(source)?)
                 .map(|id| {
                     let read = self.view(id)?.node(id)?;
                     Ok((

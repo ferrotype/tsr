@@ -18,6 +18,8 @@
 #                       working tree (`clean: false`): actions/checkout would
 #                       otherwise delete ignored files, target/ included, and
 #                       with them that capture and the warm build.
+#           lsp         an explicitly supplied hermetic fixture and fixed scenario;
+#                       no fixture dependencies are fetched during measurement.
 #
 # The job writes one status/perf/<workload>/<run>.json with `scripts/perf.py
 # record` and uploads it as an artifact; committing it is a separate, manual step.
@@ -39,6 +41,26 @@ on:
         options:
           - parse-bind
           - checker
+          - lsp
+      lsp-fixture:
+        description: 'lsp only: prepared local hermetic fixture path on the runner'
+        type: string
+        default: ''
+      lsp-scenario:
+        description: 'lsp only: approved fixed scenario JSON path on the runner'
+        type: string
+        default: ''
+      lsp-pairs:
+        description: 'lsp only: complete matched pairs'
+        type: choice
+        default: '20'
+        options:
+          - '20'
+          - '40'
+      lsp-extend:
+        description: 'lsp only: original matched 20-pair capture to preserve when extending to 40'
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -52,6 +74,11 @@ env:
   CARGO_TERM_COLOR: always
   RUNS_ON: ${{ inputs.runs-on }}
   WORKLOAD: ${{ inputs.workload }}
+  LSP_FIXTURE: ${{ inputs.lsp-fixture }}
+  LSP_SCENARIO: ${{ inputs.lsp-scenario }}
+  LSP_PAIRS: ${{ inputs.lsp-pairs }}
+  LSP_EXTEND: ${{ inputs.lsp-extend }}
+  LSP_CAPTURE: target/phase5/latency/capture-${{ github.run_id }}
 
 defaults:
   run:
@@ -122,6 +149,44 @@ jobs:
       - name: Record the run
         if: inputs.workload == 'checker'
         run: python3 scripts/perf.py record checker --capture target/s08/checkerbench --label "github $RUNS_ON" | tee target/perf-record.txt
+
+      # lsp: select the fixture explicitly and prepare the binaries outside the clocks.
+      - name: Require the prepared latency fixture and scenario
+        if: inputs.workload == 'lsp'
+        run: |
+          if [ -z "$LSP_FIXTURE" ] || [ ! -d "$LSP_FIXTURE" ] || [ -z "$LSP_SCENARIO" ] || [ ! -f "$LSP_SCENARIO" ]; then
+            echo "::error::lsp requires explicit paths to a prepared hermetic fixture and an approved fixed scenario JSON; this dispatch does not install dependencies or select a fixture."
+            exit 1
+          fi
+      - name: Build the ordinary LSP binaries
+        if: inputs.workload == 'lsp'
+        run: python3 scripts/phase5_replay_ci.py prepare --output target/phase5/latency/binaries
+      - name: Capture LSP latency
+        if: inputs.workload == 'lsp'
+        env:
+          GOGC: '100'
+        run: |
+          lsp_go_command=$(python3 -c 'import json;from pathlib import Path;print(json.dumps([str(Path("target/phase5/latency/binaries/native-lsp").resolve()),"--lsp","--stdio"]))')
+          lsp_rust_command=$(python3 -c 'import json;from pathlib import Path;print(json.dumps([str(Path("target/phase5/latency/binaries/rust-lsp").resolve()),"--lsp","--stdio"]))')
+          lsp_extension_args=()
+          if [ -n "$LSP_EXTEND" ]; then
+            lsp_extension_args=(--extend "$LSP_EXTEND")
+          fi
+          python3 tools/phase5/latency/capture.py \
+            --fixture "$LSP_FIXTURE" --scenario "$LSP_SCENARIO" \
+            --go-command "$lsp_go_command" --rust-command "$lsp_rust_command" \
+            --pairs "$LSP_PAIRS" --output "$LSP_CAPTURE" "${lsp_extension_args[@]}"
+      - name: Upload the raw LSP capture
+        if: always() && inputs.workload == 'lsp'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lsp-latency-raw-${{ github.run_id }}
+          path: ${{ env.LSP_CAPTURE }}
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Record the LSP run
+        if: inputs.workload == 'lsp'
+        run: python3 scripts/perf.py record lsp --capture "$LSP_CAPTURE" --label "github $RUNS_ON" | tee target/perf-record.txt
 
       - name: Locate the run file
         id: run

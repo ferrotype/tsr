@@ -101,6 +101,54 @@ fn custom_precedence_same_directory_ancestors_and_search_boundary() {
     );
 }
 
+#[test]
+fn searched_configs_follow_the_nearest_chain_not_other_cached_ancestors() {
+    let (_, empty, overlays) = setup(&[
+        ("/project/src/tsconfig.json", "{}"),
+        ("/project/tsconfig.json", "{}"),
+        ("/else/tsconfig.json", "{}"),
+        ("/tsconfig.json", "{}"),
+    ]);
+    let fs = Arc::new(SnapshotFsBuilder::new(empty, overlays.clone()));
+    let owner = Arc::new(ConfigOwnership::new(Arc::default(), 1));
+    let mut b = builder(Arc::default(), fs, overlays, "", owner);
+    let file = js("/project/src/main.ts");
+    assert!(b.searched_config_names(&file).is_empty());
+    assert_eq!(
+        b.config_file_name(file.as_bytes()).unwrap(),
+        js("/project/src/tsconfig.json")
+    );
+    assert_eq!(
+        b.ancestor_config_file_name(file.as_bytes(), &js("/project/src/tsconfig.json"))
+            .unwrap(),
+        js("/project/tsconfig.json")
+    );
+    assert_eq!(
+        b.ancestor_config_file_name(file.as_bytes(), &js("/project/tsconfig.json"))
+            .unwrap(),
+        js("/tsconfig.json")
+    );
+    // A referenced default project may cache an ancestor outside the chain
+    // rooted at the file's nearest config. Cleanup must not retain it.
+    assert_eq!(
+        b.ancestor_config_file_name(file.as_bytes(), &js("/else/src/tsconfig.json"))
+            .unwrap(),
+        js("/else/tsconfig.json")
+    );
+    assert!(b
+        .ancestor_config_file_name(file.as_bytes(), &js("/tsconfig.json"))
+        .unwrap()
+        .is_empty());
+    assert_eq!(
+        b.searched_config_names(&file),
+        vec![
+            js("/project/src/tsconfig.json"),
+            js("/project/tsconfig.json"),
+            js("/tsconfig.json"),
+        ]
+    );
+}
+
 // Pinned TestExtendedConfigCacheOwnership: multi-extends shares one ancestor;
 // retained snapshots retain their old syntax after the ancestor changes.
 #[test]

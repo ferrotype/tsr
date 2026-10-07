@@ -511,11 +511,43 @@ impl Connection {
                 completion,
             );
         }
-        if method == Some("test/projectState")
-            || method.is_some_and(|m| {
-                m.starts_with("textDocument/") || m == "workspace/didChangeWatchedFiles"
-            })
-        {
+        // A private FIFO fence provides transport backpressure without reading
+        // a snapshot or changing production LSP/session state.
+        if method == Some("test/barrier") {
+            let Some(id) = id else {
+                return Err(protocol::invalid("barrier requires a request ID"));
+            };
+            if protocol::empty(params).is_err() {
+                return self.send(protocol::failure(
+                    &id,
+                    -32602,
+                    "expected empty barrier parameters",
+                    None,
+                ));
+            }
+            if !self.initialized || self.session.pending_options().is_some() {
+                return self.send(protocol::failure(
+                    &id,
+                    -32002,
+                    "project session is not ready",
+                    None,
+                ));
+            }
+            let (fs, cancel) = self.bridge.as_ref().unwrap().filesystem();
+            return self.enqueue(
+                Action::Barrier,
+                Arc::new(fs),
+                Arc::new(cancel),
+                Some(id.clone()),
+                Completion::Request(id),
+            );
+        }
+        if matches!(
+            method,
+            Some("test/projectState" | "test/publishedProjectState")
+        ) || method.is_some_and(|m| {
+            m.starts_with("textDocument/") || m == "workspace/didChangeWatchedFiles"
+        }) {
             if !self.initialized || self.session.pending_options().is_some() {
                 if let Some(id) = id {
                     self.send(protocol::failure(
@@ -531,13 +563,20 @@ impl Connection {
                 }
                 return Ok(());
             }
-            let action = if method == Some("test/projectState") {
+            let action = if matches!(
+                method,
+                Some("test/projectState" | "test/publishedProjectState")
+            ) {
                 if id.is_none() || protocol::empty(params).is_err() {
                     return Err(protocol::invalid(
                         "projectState requires a request with empty params",
                     ));
                 }
-                Action::State
+                if method == Some("test/publishedProjectState") {
+                    Action::PublishedState
+                } else {
+                    Action::State
+                }
             } else {
                 if let Some(id) = id {
                     return self.send(protocol::failure(

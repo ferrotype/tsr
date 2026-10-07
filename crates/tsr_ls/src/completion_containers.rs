@@ -11,6 +11,82 @@ use tsr_ast::{modifier_flags as mf, symbol_flags as sf, utilities as ast, Syntax
 use tsr_checker::{context_flags as cf, Operation};
 
 impl LanguageService<'_> {
+    // port: tsc/internal/ls/completions.go:tryGetTypeLiteralNode
+    fn completion_type_literal(
+        syntax: &Syntax<'_>,
+        token: Option<tsr_ast::NodeId>,
+    ) -> Result<Option<tsr_ast::NodeId>> {
+        let Some(token) = token else { return Ok(None) };
+        let read = syntax.view.node(token)?;
+        let Some(parent) = read.parent() else {
+            return Ok(None);
+        };
+        let parent_read = syntax.view.node(parent)?;
+        Ok(match read.kind().known() {
+            Some(K::OpenBraceToken) if parent_read.kind() == K::TypeLiteral => Some(parent),
+            Some(K::SemicolonToken | K::CommaToken | K::Identifier)
+                if parent_read.kind() == K::PropertySignature =>
+            {
+                parent_read.parent().filter(|id| {
+                    syntax
+                        .view
+                        .node(*id)
+                        .is_ok_and(|read| read.kind() == K::TypeLiteral)
+                })
+            }
+            _ => None,
+        })
+    }
+
+    // Pin getCompletionData: tryGetObjectTypeLiteralInTypeArgumentCompletionSymbols closure.
+    pub(crate) fn completion_type_argument_members(
+        checker: &mut Operation<'_>,
+        syntax: &Syntax<'_>,
+        context: &mut Context,
+    ) -> Result<Option<Vec<Candidate>>> {
+        let Some(node) = Self::completion_type_literal(syntax, context.token)? else {
+            return Ok(None);
+        };
+        let container = syntax
+            .view
+            .node(node)?
+            .parent()
+            .filter(|id| {
+                syntax
+                    .view
+                    .node(*id)
+                    .is_ok_and(|read| read.kind() == K::IntersectionType)
+            })
+            .unwrap_or(node);
+        let Some(expected) = type_argument_property_constraint(checker, syntax, Some(container))?
+        else {
+            return Ok(None);
+        };
+        let actual = checker.get_type_from_type_node(container)?;
+        let mut existing = HashSet::new();
+        for symbol in properties(checker, actual)? {
+            existing.insert(checker.symbol(symbol)?.name_bytes().to_vec());
+        }
+        let mut candidates = Vec::new();
+        for symbol in properties(checker, expected)? {
+            if !existing.contains(checker.symbol(symbol)?.name_bytes()) {
+                candidates.push(Candidate {
+                    symbol,
+                    sort: "11",
+                    nullable: false,
+                    this_member: false,
+                    promise: false,
+                    symbol_member: false,
+                });
+            }
+        }
+        context.container = Some((Container::TypeLiteral, node));
+        context.filter = Filter::None;
+        context.new_identifier = true;
+        context.commit = &[];
+        Ok(Some(candidates))
+    }
+
     pub(crate) fn completion_container(
         &self,
         checker: &mut Operation<'_>,
@@ -53,9 +129,22 @@ impl LanguageService<'_> {
                 let ty = if kind == Container::Object {
                     object_contextual_type(checker, syntax, node)?
                 } else {
+                    if !binding_has_source_type(checker, syntax, node)? {
+                        context.filter = Filter::None;
+                        context.new_identifier = false;
+                        return Ok(Some(Vec::new()));
+                    }
                     Some(checker.get_type_at_location(node)?)
                 };
                 let Some(ty) = ty else {
+                    // An object literal in a with statement has no completions.
+                    if kind == Container::Object
+                        && view.node(node)?.flags() & tsr_ast::node_flags::IN_WITH_STATEMENT != 0
+                    {
+                        context.filter = Filter::None;
+                        context.new_identifier = false;
+                        return Ok(Some(Vec::new()));
+                    }
                     context.container = None;
                     context.filter = Filter::All;
                     context.new_identifier = true;
@@ -76,7 +165,13 @@ impl LanguageService<'_> {
                     }
                 } else {
                     context.new_identifier = false;
-                    symbols = properties(checker, ty)?;
+                    // Pin object binding completions use only actual type properties,
+                    // including only members accessible at the destructuring site.
+                    for symbol in checker.properties_of_type(ty)? {
+                        if checker.is_property_accessible(node, false, false, ty, symbol)? {
+                            symbols.push(symbol);
+                        }
+                    }
                 }
                 existing = if kind == Container::Object {
                     view.node_slice(view.node(node)?.properties(view)?)?
@@ -141,7 +236,7 @@ impl LanguageService<'_> {
                 }
                 if let Some(specifier) = specifier {
                     if let Some(module) = checker.get_symbol_at_location(specifier)? {
-                        symbols = checker.get_exports_of_module(module)?;
+                        symbols = checker.get_exports_and_properties_of_module(module)?;
                     }
                 } else if kind == Container::Exports {
                     return self
@@ -154,7 +249,9 @@ impl LanguageService<'_> {
                     .flatten()
                     .collect();
             }
-            Container::Constructor | Container::Interface => unreachable!(),
+            Container::Constructor | Container::Interface | Container::TypeLiteral => {
+                unreachable!()
+            }
         }
         let mut names = HashSet::new();
         let mut spread = HashSet::new();
@@ -247,7 +344,12 @@ impl LanguageService<'_> {
                 nullable: false,
                 this_member: false,
                 promise: false,
+                symbol_member: false,
             });
+        }
+        if candidates.is_empty() && matches!(kind, Container::Imports | Container::Exports) {
+            // With nothing else to import, `type` is not offered either.
+            context.filter = Filter::None;
         }
         Ok(Some(candidates))
     }
@@ -302,6 +404,7 @@ impl LanguageService<'_> {
                         nullable: false,
                         this_member: false,
                         promise: false,
+                        symbol_member: false,
                     })
                 })
             })
@@ -469,4 +572,121 @@ fn class_flags(syntax: &mut Syntax<'_>, context: &Context, position: i64) -> Res
         flags |= mf::STATIC;
     }
     Ok(flags)
+}
+
+// port: tsc/internal/ls/completions.go:getConstraintOfTypeArgumentProperty
+pub(crate) fn type_argument_property_constraint(
+    checker: &mut Operation<'_>,
+    syntax: &Syntax<'_>,
+    node: Option<tsr_ast::NodeId>,
+) -> Result<Option<tsr_checker::TypeRef>> {
+    let mut ancestors = Vec::new();
+    let mut current = node;
+    let mut constraint = None;
+    while let Some(node) = current {
+        let read = syntax.view.node(node)?;
+        if ast::is_type_node(&read) {
+            if let Some(expected) = checker.get_type_argument_constraint(node)? {
+                constraint = Some(expected);
+                break;
+            }
+        }
+        ancestors.push(node);
+        current = read.parent();
+    }
+    // The pin checks each ancestor before applying the child transformations
+    // while returning. Keep that order without growing the native stack.
+    for node in ancestors.into_iter().rev() {
+        let Some(expected) = constraint else {
+            return Ok(None);
+        };
+        let read = syntax.view.node(node)?;
+        constraint = match read.kind().known() {
+            Some(K::PropertySignature) => {
+                let reparsed = tsr_ast::utilities_containers::get_reparsed_node_for_node(
+                    syntax.view,
+                    Some(node),
+                )?
+                .unwrap_or(node);
+                let name = if let Some(symbol) = checker.bound_symbol_of_node(reparsed)? {
+                    Some(checker.symbol(symbol)?.name_bytes().to_vec())
+                } else if let Some(name) = syntax.view.node(reparsed)?.name() {
+                    tsr_ast::utilities_targets::try_get_text_of_property_name(syntax.view, name)?
+                } else {
+                    None
+                };
+                let Some(name) = name else { return Ok(None) };
+                checker.get_type_of_property_of_contextual_type(expected, &name)?
+            }
+            Some(K::ColonToken)
+                if read.parent().is_some_and(|id| {
+                    syntax
+                        .view
+                        .node(id)
+                        .is_ok_and(|read| read.kind() == K::PropertySignature)
+                }) =>
+            {
+                Some(expected)
+            }
+            Some(K::IntersectionType | K::TypeLiteral | K::UnionType) => Some(expected),
+            Some(K::OpenBracketToken) => checker.get_element_type_of_array_type(expected)?,
+            _ => None,
+        };
+    }
+    Ok(constraint)
+}
+
+#[cfg(test)]
+#[path = "completion_constraint_tests.rs"]
+mod completion_constraint_tests;
+
+#[cfg(test)]
+#[path = "completion_binding_tests.rs"]
+mod completion_binding_tests;
+
+// Pin getCompletionData: object-binding canGetType excludes the pattern's own shape.
+fn binding_has_source_type(
+    checker: &mut Operation<'_>,
+    syntax: &Syntax<'_>,
+    pattern: tsr_ast::NodeId,
+) -> Result<bool> {
+    let view = syntax.view;
+    let root = ast::get_root_declaration(
+        view,
+        view.node(pattern)?
+            .parent()
+            .ok_or(tsr_arena::Error::InvalidGraph)?,
+    )?;
+    let read = view.node(root)?;
+    if read.initializer().is_some()
+        || tsr_ast::utilities_targets::get_type_annotation_node(view, root)?.is_some()
+        || read
+            .parent()
+            .and_then(|parent| view.node(parent).ok()?.parent())
+            .is_some_and(|parent| {
+                view.node(parent)
+                    .is_ok_and(|node| node.kind() == K::ForOfStatement)
+            })
+    {
+        return Ok(true);
+    }
+    if read.kind() == K::Parameter {
+        if let Some(function) = read.parent() {
+            let read = view.node(function)?;
+            if ast::is_expression_kind(read.kind()) {
+                return Ok(checker.get_contextual_type(function, cf::NONE)?.is_some());
+            }
+            if matches!(
+                read.kind().known(),
+                Some(K::MethodDeclaration | K::SetAccessor)
+            ) {
+                if let Some(object) = read.parent() {
+                    if ast::is_expression_kind(view.node(object)?.kind()) {
+                        return Ok(checker.get_contextual_type(object, cf::NONE)?.is_some());
+                    }
+                }
+            }
+        }
+    }
+    Ok(false)
 }

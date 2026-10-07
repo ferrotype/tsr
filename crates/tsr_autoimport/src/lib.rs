@@ -10,12 +10,16 @@ pub mod fix;
 pub mod index;
 mod package_names;
 pub mod packages;
+pub mod ranking;
 mod realpaths;
 mod registry;
 pub mod specifiers;
 pub mod type_nodes;
 mod unicode;
-pub use registry::{export_id_for_symbol, lookup_export, Export, ExportId, ExportSyntax, Registry};
+pub use registry::{
+    export_id_for_symbol, lookup_export, module_augmentations, symbol_to_export, Export, ExportId,
+    ExportSyntax, Registry,
+};
 
 pub mod preferences;
 pub use preferences::Preferences;

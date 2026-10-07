@@ -10,7 +10,7 @@ use tsr_core::TextRange;
 use tsr_lsproto as lsp;
 
 struct Info {
-    fix: lsp::AutoImportFix,
+    fix: tsr_autoimport::fix::Fix,
     alias: Option<NodeId>,
     namespace: bool,
     name: Vec<u8>,
@@ -86,11 +86,20 @@ impl LanguageService<'_> {
                     prefer_type_only: options.prefer_type_only,
                     verbatim: self.program.options().verbatim_module_syntax.is_true(),
                     newline: self.program.options().new_line.as_str(),
+                    specifiers: &options.organize.specifier_preferences(),
                 },
             )?;
             let mut tracker = crate::change::Tracker::default();
             for edit in edits {
-                tracker.replace_text(source, TextRange::new(edit.start, edit.end), edit.text);
+                let range = TextRange::new(edit.start, edit.end);
+                let text = crate::change_nodes::reindent(
+                    &syntax.file,
+                    range,
+                    &crate::change_nodes::NodeOptions::default(),
+                    self.program.options().new_line.as_str(),
+                    edit.text,
+                );
+                tracker.replace_text(source, range, text);
             }
             let changes = tracker.finish(self)?;
             if !changes.unmappable.is_empty() {
@@ -168,7 +177,7 @@ impl LanguageService<'_> {
                 individual.replace_text(source, TextRange::new(start, start), prefix);
             } else {
                 adder.add(
-                    info.fix,
+                    info.fix.protocol,
                     self.program.options().verbatim_module_syntax.is_true(),
                 );
             }
@@ -233,7 +242,7 @@ impl LanguageService<'_> {
                             .is_some_and(|f| f.source() == syntax.source)
                         {
                             infos.push(Info {
-                                fix: lsp::AutoImportFix::default(),
+                                fix: tsr_autoimport::fix::Fix::default(),
                                 alias: Some(alias),
                                 namespace: false,
                                 name,
@@ -263,32 +272,29 @@ impl LanguageService<'_> {
         }
         let mut infos = Vec::new();
         if code == 2686 {
-            if let Some(symbol) = umd_symbol(c, syntax, token)? {
-                let id = tsr_autoimport::export_id_for_symbol(self.program, c, symbol)?;
-                for export in registry
-                    .index
-                    .entries()
-                    .iter()
-                    .filter(|e| Some(&e.id) == id.as_ref())
-                {
-                    for fix in tsr_autoimport::fix::fixes(
-                        self.program,
-                        c,
-                        syntax.source,
-                        export,
-                        tsr_autoimport::fix::Usage {
-                            type_only: type_site,
-                            ..Default::default()
-                        },
-                        &options.auto_import,
-                    )? {
-                        infos.push(Info {
-                            fix,
-                            alias: None,
-                            namespace: false,
-                            name: Vec::new(),
-                        });
-                    }
+            // The pin builds the UMD export from the symbol, outside the index.
+            if let Some(export) = umd_symbol(c, syntax, token)?
+                .map(|symbol| tsr_autoimport::symbol_to_export(self.program, c, symbol))
+                .transpose()?
+                .flatten()
+            {
+                for fix in tsr_autoimport::fix::fixes_with_info(
+                    self.program,
+                    c,
+                    syntax.source,
+                    &export,
+                    tsr_autoimport::fix::Usage {
+                        type_only: type_site,
+                        ..Default::default()
+                    },
+                    &options.auto_import,
+                )? {
+                    infos.push(Info {
+                        fix,
+                        alias: None,
+                        namespace: false,
+                        name: Vec::new(),
+                    });
                 }
             }
         } else {
@@ -302,7 +308,7 @@ impl LanguageService<'_> {
                     if jsx && export.name() != name && !export.is_renameable() {
                         continue;
                     }
-                    for fix in tsr_autoimport::fix::fixes(
+                    for fix in tsr_autoimport::fix::fixes_with_info(
                         self.program,
                         c,
                         syntax.source,
@@ -324,10 +330,15 @@ impl LanguageService<'_> {
                 }
             }
         }
+        let ranking = tsr_autoimport::ranking::Ranking::new(
+            self.program,
+            syntax.source,
+            &options.auto_import,
+        )?;
         infos.sort_by(|a, b| {
             a.namespace
                 .cmp(&b.namespace)
-                .then_with(|| crate::auto_imports::compare(&a.fix, &b.fix))
+                .then_with(|| ranking.compare(&a.fix, &b.fix))
         });
         Ok(infos)
     }

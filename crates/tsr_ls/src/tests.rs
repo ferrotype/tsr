@@ -1281,3 +1281,277 @@ fn isolated_fix_all_uses_deduplicated_declaration_diagnostics() {
         "export function f(): void {}\nexport declare namespace f {\n    export var prop: number;\n}\nf.prop=1;\n"
     );
 }
+
+// Root-directory imports in the pin's module-specifier ending and mapper tests
+// must enumerate `/`, not strip it into the empty path rejected by the Go FS.
+#[test]
+fn relative_module_completion_preserves_filesystem_root() {
+    let program = Arc::new(program(b"/index.ts", b"import {} from \"./\";"));
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool
+        .checker_for_file_exclusive(program.source_file(b"/index.ts").unwrap().source())
+        .unwrap();
+    let files = tsr_vfs::vfstest::from_map(
+        &std::collections::BTreeMap::from([(
+            b"/dep.ts".to_vec(),
+            tsr_vfs::vfstest::InputFile::Text(b"export const value = 1;".to_vec()),
+        )]),
+        true,
+    );
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    service.set_completion_file_system(Arc::new(tsr_vfs::iovfs::from(Arc::new(files), true)));
+    let result = service
+        .completion(
+            &mut checker,
+            &lsp::CompletionParams {
+                text_document: lsp::TextDocumentIdentifier {
+                    uri: lsp::DocumentUri("file:///index.ts".into()),
+                },
+                position: lsp::Position {
+                    line: 0,
+                    character: 18,
+                },
+                ..Default::default()
+            },
+            &CompletionOptions::default(),
+        )
+        .unwrap();
+    assert!(result
+        .list
+        .unwrap()
+        .items
+        .iter()
+        .flatten()
+        .any(|item| item.label == "dep"));
+}
+
+#[test]
+fn js_expando_document_symbols_accept_identifier_receivers() {
+    let program = program(
+        b"/index.js",
+        b"function F() {}\nF.value = function() {};\nF.prototype.method = function() {};\nF[Symbol.iterator] = function() {};\n",
+    );
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    let result = service
+        .document_symbols(&lsp::DocumentUri("file:///index.js".into()), true)
+        .unwrap();
+    let symbols = result.document_symbols.unwrap();
+    let function = symbols
+        .iter()
+        .flatten()
+        .find(|symbol| symbol.name == "F")
+        .unwrap();
+    let children = function.children.as_ref().unwrap();
+    assert!(children
+        .iter()
+        .flatten()
+        .any(|symbol| symbol.name == "value"));
+    assert!(children
+        .iter()
+        .flatten()
+        .any(|symbol| symbol.name == "method"));
+    assert!(children
+        .iter()
+        .flatten()
+        .any(|symbol| symbol.name == "Symbol.iterator"));
+}
+
+#[test]
+fn hover_formats_qualified_jsdoc_links_without_reading_literal_text() {
+    let source = b"/** Use {@linkcode Unknown.member} instead. */ function m() {} m";
+    let hover = hover_result(source, (source.len() - 1) as u32, false);
+    let value = hover.contents.markup_content.unwrap().value;
+    assert!(value.contains("`Unknown.member`"), "{value}");
+}
+
+#[test]
+fn template_literal_inlay_parts_do_not_insert_empty_separators() {
+    let text = b"declare function f(): `${string},${string}`; const value = f();";
+    let program = Arc::new(program(b"/index.ts", text));
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool
+        .checker_for_file_exclusive(program.source_file(b"/index.ts").unwrap().source())
+        .unwrap();
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    let hints = service
+        .inlay_hints(
+            &mut checker,
+            &lsp::InlayHintParams {
+                text_document: lsp::TextDocumentIdentifier {
+                    uri: lsp::DocumentUri("file:///index.ts".into()),
+                },
+                range: lsp::Range {
+                    start: lsp::Position::default(),
+                    end: lsp::Position {
+                        line: 0,
+                        character: text.len() as u32,
+                    },
+                },
+                ..Default::default()
+            },
+            InlayHintsOptions {
+                variable_types: true,
+                ..Default::default()
+            },
+        )
+        .unwrap()
+        .inlay_hints
+        .unwrap();
+    let parts = hints[0]
+        .as_ref()
+        .unwrap()
+        .label
+        .inlay_hint_label_parts
+        .as_ref()
+        .unwrap();
+    assert_eq!(
+        parts
+            .iter()
+            .flatten()
+            .map(|part| part.value.as_str())
+            .collect::<Vec<_>>(),
+        [": ", "`${", "string", "},${", "string", "}`"]
+    );
+}
+
+#[test]
+fn uninstantiated_namespace_beside_default_function_references_itself() {
+    let text = b"export default function F() {} namespace F {}";
+    let program = Arc::new(program(b"/index.ts", text));
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool
+        .checker_for_file_exclusive(program.source_file(b"/index.ts").unwrap().source())
+        .unwrap();
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    let locations = service
+        .references(
+            &mut checker,
+            &lsp::ReferenceParams {
+                text_document: lsp::TextDocumentIdentifier {
+                    uri: lsp::DocumentUri("file:///index.ts".into()),
+                },
+                position: lsp::Position {
+                    line: 0,
+                    character: 41,
+                },
+                context: Some(Box::new(lsp::ReferenceContext {
+                    include_declaration: true,
+                })),
+                ..Default::default()
+            },
+        )
+        .unwrap()
+        .locations
+        .unwrap();
+    assert_eq!(locations.len(), 1, "{locations:?}");
+    assert_eq!(locations[0].range.start.character, 41);
+}
+
+// Source: TestFindAllReferencesUmdModuleAsGlobalConst, module-specifier query.
+#[test]
+fn umd_namespace_import_does_not_expand_to_its_reexported_module_specifier() {
+    use tsr_jsstring::JsString;
+    let global = "import * as _THREE from 'three'; declare global { const THREE: typeof _THREE; }";
+    let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
+    for (name, text) in [
+        (
+            "/node_modules/@types/three/three-core.d.ts",
+            "export class Vector3 { x: number; y: number; }",
+        ),
+        (
+            "/node_modules/@types/three/index.d.ts",
+            "export * from \"./three-core\"; export as namespace THREE;",
+        ),
+        ("/typings/global.d.ts", global),
+        (
+            "/src/index.ts",
+            "export const a = {}; let v = new THREE.Vector2();",
+        ),
+    ] {
+        fs.insert_loaded(name.as_bytes(), text.as_bytes());
+    }
+    let program = Arc::new(
+        Program::load(
+            tsr_compiler::ProgramOptions {
+                config: tsr_tsoptions::ParsedCommandLine::new(
+                    tsr_core::CompilerOptions {
+                        no_lib: tsr_core::Tristate::TRUE,
+                        es_module_interop: tsr_core::Tristate::TRUE,
+                        module: tsr_core::ModuleKind::ES2015,
+                        target: tsr_core::ScriptTarget::ES2015,
+                        types: Some(vec![JsString::from_bytes(b"three".as_slice())]),
+                        ..Default::default()
+                    },
+                    [
+                        b"/src/index.ts".as_slice(),
+                        b"/typings/global.d.ts".as_slice(),
+                    ]
+                    .map(JsString::from_bytes)
+                    .to_vec(),
+                ),
+                host: Arc::new(fs.finish()),
+                current_directory: JsString::from_bytes(b"/".as_slice()),
+                default_library_path: JsString::from_bytes(b"/".as_slice()),
+                skip_module_resolution: false,
+                single_threaded: tsr_core::Tristate::TRUE,
+            },
+            &mut tsr_compiler::FileCache::new(),
+            &tsr_arena::Counters::new(),
+        )
+        .unwrap(),
+    );
+    let pool = tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool
+        .checker_for_file_exclusive(
+            program
+                .source_file(b"/typings/global.d.ts")
+                .unwrap()
+                .source(),
+        )
+        .unwrap();
+    let mut service = LanguageService::new(
+        &program,
+        tsr_jsstring::PositionEncoding::Utf16,
+        CancellationToken::new(),
+    );
+    let locations = service
+        .references(
+            &mut checker,
+            &lsp::ReferenceParams {
+                text_document: lsp::TextDocumentIdentifier {
+                    uri: lsp::DocumentUri("file:///typings/global.d.ts".into()),
+                },
+                position: lsp::Position {
+                    line: 0,
+                    character: 25,
+                },
+                context: Some(Box::new(lsp::ReferenceContext {
+                    include_declaration: true,
+                })),
+                ..Default::default()
+            },
+        )
+        .unwrap()
+        .locations
+        .unwrap();
+    assert_eq!(locations.len(), 1, "{locations:?}");
+    assert_eq!(locations[0].uri.0, "file:///typings/global.d.ts");
+    assert_eq!(locations[0].range.start.character, 25);
+    assert_eq!(locations[0].range.end.character, 30);
+}

@@ -276,7 +276,9 @@ impl Runtime {
             }
             "workspace/didChangeConfiguration" => {
                 let value: lsp::DidChangeConfigurationParams = crate::decode(params)?;
-                if matches!(value.settings, lsp::Any::Object(_)) {
+                // The pin configures its session here. Before `initialized`
+                // there is none, and the notification has no effect.
+                if self.server.is_some() && matches!(value.settings, lsp::Any::Object(_)) {
                     self.apply_settings(&value.settings)?;
                 }
             }
@@ -403,11 +405,19 @@ impl Runtime {
                     .as_deref()
                     .map(|d| &d.uri)
                     .filter(|_| settings.workspace_current_project);
-                let snapshot = self
-                    .ready()?
-                    .session()
-                    .flush_with_host(uri, host)
-                    .map_err(crate::project_error)?;
+                let session = self.ready()?.session();
+                let snapshot = if let Some(uri) = uri {
+                    session.flush_with_host(Some(uri), host)
+                } else {
+                    session.flush_resources(
+                        &tsr_project::api::ResourceRequest {
+                            project_tree: Some(tsr_project::api::ProjectTreeRequest::All),
+                            ..Default::default()
+                        },
+                        host,
+                    )
+                }
+                .map_err(crate::project_error)?;
                 let path = uri.map(|u| {
                     u.path(
                         snapshot
@@ -1071,8 +1081,16 @@ impl Runtime {
             }
         }
         next.completion.locale = next.locale.clone();
+        // Import edits order added specifiers by the organize-imports settings.
+        next.completion.organize = next.organize.clone();
         if let Some(server) = &self.server {
             server.session().set_locale(next.locale.clone());
+            if next.validation != before.validation {
+                server
+                    .session()
+                    .set_validation_enabled(next.validation)
+                    .map_err(crate::project_error)?;
+            }
         }
         *self.settings.lock().unwrap() = next.clone();
         if (next.inlay_flags != before.inlay_flags
@@ -1123,37 +1141,6 @@ impl Runtime {
             || next.config_name != before.config_name
         {
             refresh_diagnostics(self.client.as_ref(), &self.capabilities)?;
-            if next.validation != before.validation
-                && !self
-                    .initialization
-                    .disable_push_diagnostics
-                    .as_deref()
-                    .copied()
-                    .unwrap_or(false)
-            {
-                let snapshot = self
-                    .server
-                    .as_ref()
-                    .unwrap()
-                    .session()
-                    .snapshot()
-                    .map_err(crate::project_error)?;
-                let options = diagnostics::options(&self.capabilities, next.locale, false, false);
-                let open = diagnostics::open_projects(&snapshot);
-                for project in snapshot.projects() {
-                    if project.data().unwrap().kind == tsr_project::project::ProjectKind::Configured
-                        && open.contains(project.data().unwrap().path.as_bytes())
-                    {
-                        diagnostics::publish_project(
-                            self.client.as_ref(),
-                            project,
-                            self.options.project.position_encoding,
-                            &options,
-                            next.validation,
-                        )?;
-                    }
-                }
-            }
         }
         Ok(())
     }
@@ -1825,3 +1812,7 @@ mod preference_tests {
         }
     }
 }
+
+#[cfg(test)]
+#[path = "workspace_symbol_tests.rs"]
+mod workspace_symbol_tests;

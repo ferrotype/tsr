@@ -156,6 +156,17 @@ impl ProjectBuilder<'_> {
             self.select_configured(&name, &path)?;
         }
         for key in &request.projects {
+            // The inferred project is built from its roots above. Its name
+            // is an identity, not a config file that can be acquired.
+            if self
+                .projects
+                .get(key)
+                .and_then(Project::data)
+                .is_some_and(|data| data.kind == ProjectKind::Inferred)
+            {
+                self.keep.insert(key.clone());
+                continue;
+            }
             if let Some(name) = self
                 .projects
                 .get(key)

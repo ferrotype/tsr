@@ -14,6 +14,25 @@ use tsr_ast::{
 };
 use tsr_checker::{Operation, SymbolRef, TypeRef};
 
+// Source: findallreferences.go:getMergedAliasedSymbolOfNamespaceExportDeclaration.
+pub(crate) fn merged_namespace_export_alias(
+    view: AstView<'_>,
+    node: NodeId,
+    symbol: SymbolRef,
+    checker: &mut Operation<'_>,
+) -> Result<Option<SymbolRef>> {
+    if !view.node(node)?.parent().is_some_and(|parent| {
+        view.node(parent)
+            .is_ok_and(|read| read.kind() == K::NamespaceExportDeclaration)
+    }) || checker.symbol(symbol)?.flags() & sf::ALIAS == 0
+    {
+        return Ok(None);
+    }
+    let alias = checker.get_aliased_symbol(symbol)?;
+    let merged = checker.get_merged_symbol(alias)?;
+    Ok((alias != merged).then_some(merged))
+}
+
 // port: tsc/internal/ls/findallreferences.go:getContextNodeForNodeEntry
 pub(crate) fn entry_context(view: AstView<'_>, node: NodeId) -> Result<Option<NodeId>> {
     use crate::definition::context_node;
@@ -614,14 +633,9 @@ impl SearchState<'_, '_, '_> {
                 }
             }
         }
-        if let Some(p) = n.parent() {
-            if view.node(p)?.kind() == K::NamespaceExportDeclaration
-                && self.c.symbol(symbol)?.flags() & sf::ALIAS != 0
-            {
-                let alias = self.c.get_aliased_symbol(symbol)?;
-                if push_related(&mut result, wanted, alias, alias, EntryKind::Node) {
-                    return Ok(result);
-                }
+        if let Some(alias) = merged_namespace_export_alias(view, node, symbol, self.c)? {
+            if push_related(&mut result, wanted, alias, alias, EntryKind::Node) {
+                return Ok(result);
             }
         }
         if self.related_roots(symbol, bases, parents, wanted, &mut result, EntryKind::Node)? {

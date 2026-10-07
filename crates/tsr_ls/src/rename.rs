@@ -434,6 +434,8 @@ impl LanguageService<'_> {
             return Ok(text.into());
         };
         let view = self.view(node)?;
+        let node = tsr_ast::utilities_containers::get_reparsed_node_for_node(view, Some(node))?
+            .unwrap_or(node);
         let n = view.node(node)?;
         let Some(parent) = n.parent() else {
             return Ok(text.into());
@@ -537,5 +539,48 @@ fn deduplicate(edits: Vec<(lsp::DocumentUri, lsp::TextEdit)>) -> lsp::WorkspaceE
             changes: Some(Box::new(changes)),
             ..Default::default()
         })),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::Arc;
+
+    #[test]
+    fn jsdoc_import_alias_rename_uses_reparsed_import_specifier() {
+        let text = b"/** @import { A } from './missing'; */\n/** @param {A} value */\nfunction f(value) {}";
+        let program = Arc::new(crate::tests::program(b"/index.js", text));
+        let source = program.source_file(b"/index.js").unwrap().source();
+        let pool =
+            tsr_compiler::CompilerCheckerPool::new(program.clone(), &tsr_arena::Counters::new());
+        let mut checker = pool.checker_for_file_exclusive(source).unwrap();
+        let service = LanguageService::new(
+            &program,
+            tsr_jsstring::PositionEncoding::Utf16,
+            crate::CancellationToken::new(),
+        );
+        let mut syntax = Syntax::new(service.view(source).unwrap(), source).unwrap();
+        let imported = syntax.nav().get_touching_property_name(14).unwrap();
+        let original = syntax.nav().get_touching_property_name(51).unwrap();
+        let entry = ReferenceEntry {
+            kind: EntryKind::Node,
+            node: Some(imported),
+            context: None,
+            source,
+            range: None,
+        };
+        assert_eq!(
+            service
+                .rename_text(&mut checker, original, &entry, "ARENAME", false, true)
+                .unwrap(),
+            "A as ARENAME"
+        );
+        assert_eq!(
+            service
+                .rename_text(&mut checker, original, &entry, "ARENAME", false, false)
+                .unwrap(),
+            "ARENAME"
+        );
     }
 }

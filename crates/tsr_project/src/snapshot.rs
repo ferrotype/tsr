@@ -31,6 +31,7 @@ pub(crate) struct SessionSnapshot {
     pub api_state: crate::api::ApiState,
     pub api_error: Option<JsString>,
     pub inferred_options: Option<Arc<CompilerOptions>>,
+    pub validation_enabled: bool,
     pub config_ownership: Arc<ConfigOwnership>,
     pub _programs: Vec<ProgramReference>,
 }
@@ -108,6 +109,10 @@ pub struct Snapshot {
     root: Root,
 }
 impl Snapshot {
+    /// Validation policy captured with the projects, independent of later configuration.
+    pub fn validation_enabled(&self) -> bool {
+        self.state().is_none_or(|state| state.validation_enabled)
+    }
     pub fn content_mapper_extensions(&self) -> Vec<JsString> {
         self.state()
             .map_or_else(Vec::new, |state| state.mapper_watch_state().0)

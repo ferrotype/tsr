@@ -117,6 +117,21 @@ mod tests {
         }
     }
 
+    // Source: TestDynamicQueuePutCancellationWhileStateUnavailable.
+    #[test]
+    fn canceled_put_does_not_acquire_unavailable_state_or_publish_an_item() {
+        let queue = DynamicQueue::new();
+        let context = Context::background().with_cancel();
+        context.cancel();
+        // The native test removes the queue state from its channel. Holding
+        // the Rust state mutex represents the same unavailable state.
+        let state = queue.0.items.lock().unwrap();
+        assert_eq!(queue.put(&context, 1), Err(ContextError::Canceled));
+        drop(state);
+        queue.put(&Context::background(), 2).unwrap();
+        assert_eq!(queue.get(&Context::background()), Ok(2));
+    }
+
     #[test]
     fn cancellation_unblocks_an_empty_reader_and_a_full_writer() {
         for put in [false, true] {

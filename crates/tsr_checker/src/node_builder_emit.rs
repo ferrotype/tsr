@@ -138,7 +138,7 @@ impl NodeBuilder<'_> {
         Ok(result)
     }
 
-    pub(super) fn retain_source_node(&mut self, node: NodeId) -> Result<(), Error> {
+    pub(crate) fn retain_source_node(&mut self, node: NodeId) -> Result<(), Error> {
         let source =
             tsr_ast::utilities::get_source_file_of_node(self.checker.ast(node)?, Some(node))?
                 .ok_or(Error::MissingLink("serialization source owner"))?;

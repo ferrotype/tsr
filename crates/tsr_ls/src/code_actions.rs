@@ -1,6 +1,7 @@
 use crate::{CompletionOptions, LanguageService, OrganizeMode, OrganizeOptions, Result};
 use tsr_ast::NodeId;
 use tsr_checker::Operation;
+use tsr_compiler::diagnostic_writer::DiagnosticSources;
 use tsr_lsproto as lsp;
 
 impl LanguageService<'_> {
@@ -215,14 +216,7 @@ impl LanguageService<'_> {
         source: NodeId,
     ) -> Result<Vec<tsr_ast::Diagnostic>> {
         let mut diagnostics = Vec::new();
-        let source_file = self.source(source)?;
-        for id in std::iter::once(source).chain(
-            source_file
-                .supplemental_source_files()?
-                .iter()
-                .flatten()
-                .copied(),
-        ) {
+        for id in std::iter::once(source).chain(self.program.supplemental_sources(source)?) {
             self.check_canceled()?;
             let file = self
                 .program

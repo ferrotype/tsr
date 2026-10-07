@@ -21,6 +21,11 @@ impl LanguageService<'_> {
             return Ok(());
         }
         let registry = self.prepare_auto_imports(checker, syntax, &options.auto_import)?;
+        let ranking = tsr_autoimport::ranking::Ranking::new(
+            self.program,
+            syntax.source,
+            &options.auto_import,
+        )?;
         let mut targets = std::collections::HashSet::<SymbolRef>::new();
         for symbol in symbols {
             let symbol = checker.skip_alias(symbol)?;
@@ -40,7 +45,7 @@ impl LanguageService<'_> {
                 .filter(|e| e.id == id && e.id.module.as_bytes() != syntax.file.path())
             {
                 self.check_canceled()?;
-                fixes.extend(tsr_autoimport::fix::fixes(
+                fixes.extend(tsr_autoimport::fix::fixes_with_info(
                     self.program,
                     checker,
                     syntax.source,
@@ -52,9 +57,12 @@ impl LanguageService<'_> {
                     &options.auto_import,
                 )?);
             }
-            fixes.sort_by(crate::auto_imports::rank);
+            fixes.sort_by(|a, b| ranking.rank(a, b));
             if let Some(fix) = fixes.into_iter().next() {
-                adder.add(fix, self.program.options().verbatim_module_syntax.is_true());
+                adder.add(
+                    fix.protocol,
+                    self.program.options().verbatim_module_syntax.is_true(),
+                );
             }
         }
         Ok(())
@@ -98,11 +106,19 @@ impl LanguageService<'_> {
                 verbatim: self.program.options().verbatim_module_syntax.is_true(),
                 newline: self.program.options().new_line.as_str(),
                 usage: None,
+                specifiers: &options.organize.specifier_preferences(),
             },
         )?;
         let mut result = Vec::new();
         for edit in edits {
             let range = tsr_core::TextRange::new(edit.start, edit.end);
+            let text = crate::change_nodes::reindent(
+                &syntax.file,
+                range,
+                &crate::change_nodes::NodeOptions::default(),
+                self.program.options().new_line.as_str(),
+                edit.text,
+            );
             let (range, fidelity) = match feature {
                 Some(feature) => self.range(syntax.source, range, feature)?,
                 None => self.unrestricted_range(syntax.source, range)?,
@@ -112,7 +128,7 @@ impl LanguageService<'_> {
             }
             result.push(Some(Box::new(lsp::TextEdit {
                 range,
-                new_text: edit.text,
+                new_text: text,
             })));
         }
         Ok(result)

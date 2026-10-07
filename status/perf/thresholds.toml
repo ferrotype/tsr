@@ -21,3 +21,13 @@ allocated_bytes = 0.85         # ADR 0021 (re-based from 0.7), confirmed by ADR 
 
 [checker]
 type_footprint = 0.85          # ADR 0022, re-based from 0.80
+
+# Phase 7 targets retained from L7.6.3: each LSP scenario must not regress
+# against the pinned Go server. Owner decision 2026-10-07 moved performance
+# work and acceptance to Phase 7; L7 is closed with the measured baseline.
+[lsp]
+first_diagnostics = 1.0
+completion = 1.0
+hover = 1.0
+references = 1.0
+rename = 1.0

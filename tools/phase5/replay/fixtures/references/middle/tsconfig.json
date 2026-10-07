@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noLib": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true
+  },
+  "files": [
+    "index.ts"
+  ],
+  "references": [
+    {
+      "path": "../core"
+    }
+  ],
+  "typeAcquisition": {
+    "enable": false
+  }
+}

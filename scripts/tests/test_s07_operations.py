@@ -1,5 +1,6 @@
 """Reject incomplete, stale and self-consistently reduced operation inventories."""
 import copy
+from collections import Counter
 from contextlib import redirect_stderr, redirect_stdout
 import io
 import json
@@ -24,20 +25,42 @@ class OperationMatrixTests(unittest.TestCase):
         self.assertEqual(len(result), 6)
         self.assertEqual(sum(row['required_generated_functions'] for row in result), 2)
 
-    def test_committed_rust_mapping_lines_still_name_the_source_marker(self):
+    def assert_rust_mappings_present(self, document, read_source):
         files = {}
-        for identifier, function in self.document['functions'].items():
+        for identifier, function in document['functions'].items():
+            expected_files = Counter(mapping['file'] for mapping in function['rust_mappings'])
             for mapping in function['rust_mappings']:
                 path = mapping['file']
                 if path not in files:
-                    files[path] = (ROOT / path).read_text().splitlines()
+                    files[path] = Counter(re.findall(
+                        r'^\s*///?\s*port:\s+(tsc/\S+)\s*$', read_source(path), re.MULTILINE))
                 with self.subTest(identifier=identifier, path=path):
-                    line = mapping['line']
-                    self.assertGreaterEqual(line, 1)
-                    self.assertLessEqual(line, len(files[path]))
-                    markers = re.findall(r'\bport:\s+(tsc/\S+)', files[path][line - 1])
-                    self.assertIn(identifier, markers,
-                                  'source formatting moved an anchor: regenerate the operation inventory')
+                    self.assertGreaterEqual(mapping['line'], 1)
+                    self.assertEqual(files[path][identifier], expected_files[path],
+                                     'recorded Rust source marker count differs in its mapped file')
+
+    def test_committed_rust_mappings_still_name_the_source_marker(self):
+        # Rust lines record navigation locations at the inventory's freeze.
+        # Harmless Rust edits can move them without changing the pinned Go
+        # operation boundary or invalidating its accepted fingerprint.
+        self.assert_rust_mappings_present(self.document, lambda path: (ROOT / path).read_text())
+
+    def test_rust_mapping_survives_line_movement_but_requires_same_file_marker(self):
+        identifier = 'tsc/internal/module/util.go:ComparePatternKeys'
+        document = {'functions': {identifier: {'rust_mappings': [{'file': 'mapped.rs', 'line': 1}]}}}
+        self.assert_rust_mappings_present(document, lambda _: '\n\n// port: ' + identifier + '\n')
+        # subTest records assertion failures instead of raising, so exercise
+        # missing markers through an isolated TestCase result.
+        case = OperationMatrixTests('test_committed_rust_mappings_still_name_the_source_marker')
+        case.document = document
+        for source in ('', '// port: tsc/other.go:Other\n',
+                       '// documentation mentions port: ' + identifier + '\n',
+                       '// port: ' + identifier + 'Extra\n',
+                       ('// port: ' + identifier + '\n') * 2):
+            with patch.object(Path, 'read_text', return_value=source):
+                result = unittest.TestResult()
+                case.run(result)
+            self.assertEqual(len(result.failures), 1)
 
     def test_committed_subset_review_covers_current_operation_inventory(self):
         # A valid regenerated inventory can still invalidate the accepted subset

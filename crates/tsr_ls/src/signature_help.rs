@@ -91,6 +91,7 @@ fn display(
     classified: bool,
 ) -> Result<DisplayParts> {
     let mut builder = c.node_builder();
+    builder.retain_source_node(source)?;
     let request = BuilderRequest {
         enclosing: Some(enclosing),
         flags: BUILDER_FLAGS,
@@ -371,7 +372,14 @@ impl LanguageService<'_> {
         let mut symbol = if let Invocation::Contextual { symbol, .. } = info.invocation {
             symbol
         } else {
-            let syntax = Syntax::new(self.view(source)?, source)?;
+            // JS fallback may render a signature found in another source file.
+            // Invocation nodes still belong to the request's source arena.
+            let invocation_source = self
+                .program
+                .file_of_node(enclosing)
+                .ok_or(tsr_arena::Error::InvalidGraph)?
+                .source();
+            let syntax = Syntax::new(self.view(enclosing)?, invocation_source)?;
             match info.invocation.expression(&syntax)? {
                 Some(expr) => c.get_symbol_at_location(expr)?,
                 None => None,
@@ -624,3 +632,7 @@ impl LanguageService<'_> {
         Ok(markup(text, &options.format))
     }
 }
+
+#[cfg(test)]
+#[path = "signature_help_tests.rs"]
+mod tests;

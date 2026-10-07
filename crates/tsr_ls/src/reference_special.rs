@@ -13,6 +13,10 @@ use tsr_ast::{
 };
 use tsr_checker::SymbolRef;
 
+#[cfg(test)]
+#[path = "reference_namespace_tests.rs"]
+mod namespace_tests;
+
 impl SearchState<'_, '_, '_> {
     // port: tsc/internal/ls/findallreferences.go:LanguageService.getReferencedSymbolsForNode
     pub(crate) fn for_node(
@@ -72,15 +76,7 @@ impl SearchState<'_, '_, '_> {
         if !groups.is_empty() && self.c.symbol(symbol)?.flags() & sf::TRANSIENT == 0 {
             return Ok(groups);
         }
-        let alias = if n.parent().is_some_and(|p| {
-            view.node(p)
-                .is_ok_and(|n| n.kind() == K::NamespaceExportDeclaration)
-        }) && self.c.symbol(symbol)?.flags() & sf::ALIAS != 0
-        {
-            Some(self.c.get_aliased_symbol(symbol)?)
-        } else {
-            None
-        };
+        let alias = h::merged_namespace_export_alias(view, node, symbol, self.c)?;
         self.search_symbol(symbol, Some(node))?;
         let result = std::mem::take(&mut self.result);
         self.merge_groups(&mut groups, result)?;

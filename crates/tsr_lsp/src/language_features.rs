@@ -452,12 +452,19 @@ fn execute_request(
         let file = program
             .source_file(uri.file_name().as_bytes())
             .ok_or_else(|| error(-32603, "file is not in the project"))?;
+        let checker_source = if let Request::ResolveCompletion(item, _) = &request {
+            service
+                .completion_source(item.data.as_deref().expect("decoded completion item data"))
+                .map_err(service_error)?
+        } else {
+            file.source()
+        };
         let checker = project
             .scheduler()
             .unwrap()
             .acquire(
                 tsr_checker::CheckerLifetime::Temporary,
-                Some(file.source()),
+                Some(checker_source),
                 context,
                 request_id,
             )

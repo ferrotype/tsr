@@ -369,6 +369,13 @@ impl ConfigRegistryBuilder {
             self.change(&key, |entry| entry.retaining_projects.remove(project));
         }
     }
+    pub(crate) fn retain_project_configs(&mut self, project: &JsString, keep: &BTreeSet<JsString>) {
+        for key in self.configs.keys() {
+            if !keep.contains(&key) {
+                self.change(&key, |entry| entry.retaining_projects.remove(project));
+            }
+        }
+    }
     // port: tsc/internal/project/configfileregistrybuilder.go:configFileRegistryBuilder.didCloseFile
     pub fn close_file(&mut self, path: &JsString) {
         self.names.remove(path);
@@ -376,12 +383,28 @@ impl ConfigRegistryBuilder {
             self.change(&key, |entry| entry.retaining_open_files.remove(path));
         }
     }
-    pub(crate) fn retain_file_configs(&mut self, file: &JsString, keep: &BTreeSet<JsString>) {
-        for key in self.configs.keys() {
-            if !keep.contains(&key) {
-                self.change(&key, |entry| entry.retaining_open_files.remove(file));
-            }
+    pub(crate) fn existing_config(&self, path: &JsString) -> Option<Arc<ParsedCommandLine>> {
+        self.configs.get(path)?.command_line.clone()
+    }
+
+    pub(crate) fn custom_name_changed(&self) -> bool {
+        self.custom_name != self.base.custom_config_file_name
+    }
+
+    pub(crate) fn searched_config_names(&self, file: &JsString) -> Vec<JsString> {
+        let Some(names) = self.names.get(file) else {
+            return Vec::new();
+        };
+        let mut result = Vec::new();
+        let mut current = &names.nearest;
+        while !current.is_empty() {
+            result.push(current.clone());
+            let Some(ancestor) = names.ancestors.get(current) else {
+                break;
+            };
+            current = ancestor;
         }
+        result
     }
     fn mark_config_changed(&mut self, path: &JsString, affected: &mut AffectedConfigs) {
         self.change(path, |entry| {

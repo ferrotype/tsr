@@ -1,151 +1,21 @@
-// Carried test transport for the pinned lsptestutil package. No compiler,
-// expected result, rendering, or assertion is replaced.
+// Shared S11 mapper tunnel for the carried native test client.
 package lsptestutil
 
 import (
-	"context"
 	"encoding/base64"
 	"fmt"
-	"io"
-	"os"
-	"os/exec"
-	"sync"
-	"testing"
-
-	"github.com/microsoft/TypeScript/tsc/internal/core"
 	"github.com/microsoft/TypeScript/tsc/internal/json"
 	"github.com/microsoft/TypeScript/tsc/internal/jsonrpc"
-	"github.com/microsoft/TypeScript/tsc/internal/lsp"
 	"github.com/microsoft/TypeScript/tsc/internal/lsp/lsproto"
-	"gotest.tools/v3/assert"
+	"io"
+	"sync"
 )
-
-type rustServer struct {
-	ready  chan struct{}
-	client *LSPClient
-	t      *testing.T
-}
-
-func (s *rustServer) InitComplete() <-chan struct{} { return s.ready }
-func (s *rustServer) SetCompilerOptionsForInferredProjects(_ context.Context, options *core.CompilerOptions) {
-	id := jsonrpc.NewIDString("test-options")
-	request := (&lsproto.RequestMessage{ID: id, Method: "test/setOptions", Params: map[string]any{"options": options}})
-	response, ok := s.client.SendRequestWorker(s.t, request, id)
-	assert.Assert(s.t, ok && response.Error == nil, "inferred options failed: %v", response)
-}
-
-type rustReader struct {
-	mappers *rustMappers
-	lsp.Reader
-	ready chan struct{}
-	once  sync.Once
-}
-
-func (r *rustReader) Read() (*lsproto.Message, error) {
-	for {
-		msg, err := r.Reader.Read()
-		if err != nil {
-			return msg, err
-		}
-		if msg.Kind == jsonrpc.MessageKindNotification && msg.AsRequest().Method == "testhost/lspInitialized" {
-			r.once.Do(func() { close(r.ready) })
-			continue
-		}
-		if msg.Kind == jsonrpc.MessageKindNotification {
-			if consumed, err := r.mappers.notification(msg.AsRequest()); consumed || err != nil {
-				if err != nil {
-					return nil, err
-				}
-				continue
-			}
-		}
-		return msg, nil
-	}
-}
-func newRustClient(t *testing.T, opts lsp.ServerOptions, handler ServerRequestHandler) (*LSPClient, func() error) {
-	t.Helper()
-	cmd := exec.Command(os.Getenv("TSR_LSP_SERVER"), "--stdio")
-	in, err := cmd.StdinPipe()
-	assert.NilError(t, err)
-	out, err := cmd.StdoutPipe()
-	assert.NilError(t, err)
-	cmd.Stderr = opts.Err
-	assert.NilError(t, cmd.Start())
-	ctx, cancel := context.WithCancel(t.Context())
-	ready := make(chan struct{})
-	server := &rustServer{ready: ready, t: t}
-	mappers := &rustMappers{streams: make(map[string]*rustMapperStream), spawn: opts.Spawn}
-	callback := func(ctx context.Context, req *lsproto.RequestMessage) *lsproto.ResponseMessage {
-		if req.Method == "testhost/spawnPlugin" {
-			return mappers.open(req)
-		}
-		var path string
-		var value any
-		if req.Method == "readFile" || req.Method == "fileExists" || req.Method == "directoryExists" || req.Method == "getAccessibleEntries" || req.Method == "realpath" {
-			data, err := json.Marshal(req.Params)
-			assert.NilError(t, err)
-			assert.NilError(t, json.Unmarshal(data, &path))
-			switch req.Method {
-			case "readFile":
-				text, ok := opts.FS.ReadFile(path)
-				value = map[string]any{}
-				if ok {
-					value = map[string]any{"content": text}
-				}
-			case "fileExists":
-				value = opts.FS.FileExists(path)
-			case "directoryExists":
-				value = opts.FS.DirectoryExists(path)
-			case "realpath":
-				value = opts.FS.Realpath(path)
-			case "getAccessibleEntries":
-				entries := opts.FS.GetAccessibleEntries(path)
-				value = map[string]any{"files": append([]string{}, entries.Files...), "directories": append([]string{}, entries.Directories...)}
-			}
-			return &lsproto.ResponseMessage{ID: req.ID, JSONRPC: req.JSONRPC, Result: value}
-		}
-		if handler != nil {
-			return handler(ctx, req)
-		}
-		return nil
-	}
-	client := &LSPClient{Server: server, inputWriter: lsp.ToWriter(in), outputReader: &rustReader{Reader: lsp.ToReader(out), ready: ready, mappers: mappers}, pendingRequests: make(map[jsonrpc.ID]chan *lsproto.ResponseMessage), onServerRequest: callback, ctx: ctx}
-	server.client = client
-	mappers.client = client
-	done := make(chan error, 1)
-	go func() { done <- client.MessageRouter(ctx) }()
-	cleanup := func() error {
-		mappers.close()
-		cancel()
-		_ = in.Close()
-		err := cmd.Wait()
-		routerErr := <-done
-		if err != nil {
-			return fmt.Errorf("private server: %w", err)
-		}
-		return routerErr
-	}
-	// Register cleanup before any assertion can fail during the handshake.
-	t.Cleanup(func() {
-		if cmd.ProcessState == nil {
-			_ = cleanup()
-		}
-	})
-	id := jsonrpc.NewIDString("test-init")
-	req := (&lsproto.RequestMessage{ID: id, Method: "test/initialize", Params: map[string]any{
-		"version": 3, "caseSensitive": opts.FS.UseCaseSensitiveFileNames(), "base": map[string]string{}, "symlinks": map[string]string{}, "plugins": []string{}, "options": map[string]any{},
-		"callbacks": []string{"readFile", "fileExists", "directoryExists", "getAccessibleEntries", "realpath"},
-		"project":   map[string]any{"currentDirectory": opts.Cwd, "defaultLibraryPath": opts.DefaultLibraryPath, "positionEncoding": "utf-16", "progressDelayNanos": int64(opts.ProgressDelay)},
-	}})
-	response, ok := client.SendRequestWorker(t, req, id)
-	assert.Assert(t, ok && response.Error == nil, "private initialization: %v", response)
-	return client, cleanup
-}
 
 // rustMappers carries the existing S11 byte tunnel. The mapper implementation
 // remains opts.Spawn, including native test mappers and their assertions.
 type rustMappers struct {
 	mu      sync.Mutex
+	pumps   sync.WaitGroup
 	streams map[string]*rustMapperStream
 	next    int
 	closed  bool
@@ -166,6 +36,11 @@ type rustMapperStream struct {
 }
 
 func (m *rustMappers) notify(method string, params any) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if m.closed {
+		return io.ErrClosedPipe
+	}
 	return m.client.writeToServer((&lsproto.RequestMessage{Method: lsproto.Method(method), Params: params}).Message())
 }
 func (m *rustMappers) open(req *lsproto.RequestMessage) *lsproto.ResponseMessage {
@@ -242,21 +117,34 @@ func (m *rustMappers) notification(req *lsproto.RequestMessage) (bool, error) {
 		} else if params.Channel != "stdout" {
 			return true, fmt.Errorf("bad stream channel")
 		}
+		m.mu.Lock()
+		if m.closed {
+			m.mu.Unlock()
+			return true, nil
+		}
 		stream.mu.Lock()
 		if !stream.closed {
 			stream.credits[channel] += params.Bytes
 		}
-		start := !stream.started
+		start := !stream.started && !stream.closed
 		stream.started = true
 		stream.ready.Broadcast()
 		stream.mu.Unlock()
 		if start {
+			m.pumps.Add(3)
+		}
+		m.mu.Unlock()
+		if start {
 			if err = m.notify("test/streamCredit", map[string]any{"stream": params.Stream, "bytes": 65536}); err != nil {
+				m.pumps.Done()
+				m.pumps.Done()
+				m.pumps.Done()
 				return true, err
 			}
-			go m.pump(params.Stream, stream, 0, stream.process)
-			go m.pump(params.Stream, stream, 1, stream.errors)
+			go func() { defer m.pumps.Done(); m.pump(params.Stream, stream, 0, stream.process) }()
+			go func() { defer m.pumps.Done(); m.pump(params.Stream, stream, 1, stream.errors) }()
 			go func() {
+				defer m.pumps.Done()
 				for {
 					select {
 					case bytes := <-stream.input:
@@ -337,9 +225,14 @@ func (m *rustMappers) closeStream(stream *rustMapperStream) {
 }
 func (m *rustMappers) close() {
 	m.mu.Lock()
-	defer m.mu.Unlock()
 	m.closed = true
+	streams := make([]*rustMapperStream, 0, len(m.streams))
 	for _, stream := range m.streams {
+		streams = append(streams, stream)
+	}
+	m.mu.Unlock()
+	for _, stream := range streams {
 		m.closeStream(stream)
 	}
+	m.pumps.Wait()
 }

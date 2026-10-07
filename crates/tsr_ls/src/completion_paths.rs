@@ -211,7 +211,9 @@ impl LanguageService<'_> {
         self.check_canceled()?;
         let fragment = directory_fragment(fragment);
         let directory = path::resolve(base, &[if fragment.is_empty() { b"." } else { &fragment }]);
-        let directory = path::remove_trailing_directory_separator(&directory);
+        // ResolvePath already returns the directory spelling used by the pin.
+        // Removing its separator turns the filesystem root `/` into an empty path.
+        let directory = directory.as_slice();
         let fs = self.completion_file_system();
         if !fs
             .directory_exists(directory)
@@ -231,10 +233,12 @@ impl LanguageService<'_> {
                 .unwrap_or(usize::MAX)
         });
         for name in files {
-            if !options
-                .extensions
-                .iter()
-                .any(|ext| name.as_bytes().ends_with(ext))
+            // The pin's `./*` include pattern never matches a dot-file.
+            if name.as_bytes().starts_with(b".")
+                || !options
+                    .extensions
+                    .iter()
+                    .any(|ext| name.as_bytes().ends_with(ext))
             {
                 continue;
             }

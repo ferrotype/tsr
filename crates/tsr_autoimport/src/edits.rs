@@ -13,6 +13,212 @@ pub struct Options<'a> {
     pub verbatim: bool,
     pub newline: &'a str,
     pub usage: Option<i64>,
+    pub specifiers: &'a SpecifierPreferences,
+}
+
+/// A configured organize-imports string comparer.
+pub type StringComparer = std::sync::Arc<dyn Fn(&[u8], &[u8]) -> std::cmp::Ordering + Send + Sync>;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TypeOrder {
+    Last,
+    Inline,
+    First,
+}
+impl TypeOrder {
+    fn index(self) -> usize {
+        match self {
+            Self::Last => 0,
+            Self::Inline => 1,
+            Self::First => 2,
+        }
+    }
+}
+
+/// The organize-imports preferences that select a named-specifier comparer.
+/// The language service derives them from the user's settings.
+// port: tsc/internal/ls/lsutil/organizeimports.go:GetDetectionLists
+#[derive(Clone)]
+pub struct SpecifierPreferences {
+    /// `comparersToTest`; the first is the comparer used without detection.
+    pub comparers: Vec<StringComparer>,
+    /// `typeOrdersToTest`.
+    pub type_orders: Vec<TypeOrder>,
+    /// The configured type order, or `None` for `auto`.
+    pub type_order: Option<TypeOrder>,
+    /// Whether the resolved sort or the type order is `auto`.
+    pub detect: bool,
+}
+impl Default for SpecifierPreferences {
+    fn default() -> Self {
+        Self {
+            comparers: vec![
+                std::sync::Arc::new(tsr_jsstring::compare::compare_case_insensitive_eslint),
+                std::sync::Arc::new(tsr_jsstring::compare::compare_case_sensitive),
+            ],
+            type_orders: vec![TypeOrder::Last, TypeOrder::Inline, TypeOrder::First],
+            type_order: None,
+            detect: true,
+        }
+    }
+}
+
+/// A named import or export specifier: its local name and type-only marker.
+pub(crate) type Specifier = (Vec<u8>, bool);
+
+#[derive(Clone)]
+pub(crate) struct SpecifierOrder {
+    compare: StringComparer,
+    types: TypeOrder,
+}
+impl SpecifierOrder {
+    // port: tsc/internal/ls/lsutil/organizeimports.go:compareImportOrExportSpecifiers
+    pub(crate) fn compare(&self, a: (&[u8], bool), b: (&[u8], bool)) -> std::cmp::Ordering {
+        let types = match self.types {
+            TypeOrder::First => b.1.cmp(&a.1),
+            TypeOrder::Inline => std::cmp::Ordering::Equal,
+            TypeOrder::Last => a.1.cmp(&b.1),
+        };
+        types.then_with(|| (self.compare)(a.0, b.0))
+    }
+    fn unsorted_pairs(&self, list: &[Specifier]) -> usize {
+        list.windows(2)
+            .filter(|w| self.compare((&w[0].0, w[0].1), (&w[1].0, w[1].1)).is_gt())
+            .count()
+    }
+}
+
+// port: tsc/internal/ls/lsutil/organizeimports.go:detectNamedImportOrganizationBySort
+fn detect_named(
+    lists: &[Vec<Specifier>],
+    p: &SpecifierPreferences,
+) -> Option<(SpecifierOrder, bool)> {
+    let lists: Vec<_> = lists.iter().filter(|list| !list.is_empty()).collect();
+    if lists.is_empty() {
+        return None;
+    }
+    let mixed = lists
+        .iter()
+        .any(|list| list.iter().any(|s| s.1) && list.iter().any(|s| !s.1));
+    if !mixed || p.type_orders.is_empty() {
+        // detectCaseSensitivityBySort over the names alone.
+        let mut best: Option<(usize, &StringComparer)> = None;
+        for comparer in &p.comparers {
+            let diff = lists
+                .iter()
+                .filter(|list| list.len() > 1)
+                .map(|list| {
+                    list.windows(2)
+                        .filter(|w| comparer(&w[0].0, &w[1].0).is_gt())
+                        .count()
+                })
+                .sum();
+            if best.is_none_or(|(old, _)| diff < old) {
+                best = Some((diff, comparer));
+            }
+        }
+        let (diff, comparer) = best?;
+        let types = if p.type_orders.len() == 1 {
+            p.type_orders[0]
+        } else {
+            TypeOrder::Last
+        };
+        return Some((
+            SpecifierOrder {
+                compare: comparer.clone(),
+                types,
+            },
+            diff == 0,
+        ));
+    }
+    let mut best_diff = [usize::MAX; 3];
+    let mut best_comparer = [
+        p.comparers[0].clone(),
+        p.comparers[0].clone(),
+        p.comparers[0].clone(),
+    ];
+    for comparer in &p.comparers {
+        let mut current = [0; 3];
+        for list in &lists {
+            for &types in &p.type_orders {
+                let order = SpecifierOrder {
+                    compare: comparer.clone(),
+                    types,
+                };
+                current[types.index()] += order.unsorted_pairs(list);
+            }
+        }
+        for &types in &p.type_orders {
+            if current[types.index()] < best_diff[types.index()] {
+                best_diff[types.index()] = current[types.index()];
+                best_comparer[types.index()] = comparer.clone();
+            }
+        }
+    }
+    let chosen = p
+        .type_orders
+        .iter()
+        .copied()
+        .find(|best| {
+            p.type_orders
+                .iter()
+                .all(|test| best_diff[test.index()] >= best_diff[best.index()])
+        })
+        .unwrap_or(TypeOrder::Last);
+    Some((
+        SpecifierOrder {
+            compare: best_comparer[chosen.index()].clone(),
+            types: chosen,
+        },
+        best_diff[chosen.index()] == 0,
+    ))
+}
+
+/// The comparer for new named specifiers and whether the existing ones are
+/// sorted by it (`None` when no detection ran). `declaration` is `None` when
+/// the clause does not belong to an import declaration.
+// port: tsc/internal/ls/lsutil/organizeimports.go:GetNamedImportSpecifierComparerWithDetection
+pub(crate) fn specifier_order(
+    p: &SpecifierPreferences,
+    declaration: Option<&[Specifier]>,
+    file: impl FnOnce() -> Result<Vec<Vec<Specifier>>, Error>,
+) -> Result<(SpecifierOrder, Option<bool>), Error> {
+    let initial = SpecifierOrder {
+        compare: p.comparers[0].clone(),
+        types: p.type_order.unwrap_or(TypeOrder::Last),
+    };
+    if p.detect {
+        if let Some(declaration) = declaration {
+            let detected = match detect_named(&[declaration.to_vec()], p) {
+                Some(detected) => Some(detected),
+                None => detect_named(&file()?, p),
+            };
+            if let Some((order, sorted)) = detected {
+                return Ok((order, Some(sorted)));
+            }
+        }
+    }
+    Ok((initial, None))
+}
+
+// port: tsc/internal/ls/lsutil/organizeimports.go:GetImportSpecifierInsertionIndex
+pub(crate) fn specifier_insertion_index(
+    sorted: &[Specifier],
+    new: (&[u8], bool),
+    order: &SpecifierOrder,
+) -> usize {
+    // core.BinarySearchUniqueFunc: an equal element yields its own index.
+    let (mut low, mut high) = (0_isize, sorted.len() as isize - 1);
+    while low <= high {
+        let middle = low + ((high - low) >> 1);
+        let value = &sorted[middle as usize];
+        match order.compare((&value.0, value.1), new) {
+            std::cmp::Ordering::Less => low = middle + 1,
+            std::cmp::Ordering::Greater => high = middle - 1,
+            std::cmp::Ordering::Equal => return middle as usize,
+        }
+    }
+    low as usize
 }
 #[derive(Debug, PartialEq, Eq)]
 pub struct Edit {
@@ -159,7 +365,10 @@ pub(crate) fn top_position(view: AstView<'_>, source: NodeId) -> Result<i64, Err
     if let Some(last) = last {
         return Ok(advance(last) as i64);
     }
-    let pos = advance(tsr_scanner::get_shebang(text).len());
+    // Only a shebang line is followed past its line break; a file that starts
+    // with an empty line keeps the insertion at offset zero.
+    let shebang = tsr_scanner::get_shebang(text).len();
+    let pos = if shebang == 0 { 0 } else { advance(shebang) };
     let line = |pos: i64| {
         tsr_jsstring::scanner_positions::compute_line_of_position(
             file.ecma_line_map(),
@@ -194,53 +403,6 @@ pub(crate) fn top_position(view: AstView<'_>, source: NodeId) -> Result<i64, Err
         pinned = false;
     }
     Ok(last.map_or(pos, |last| advance(last.loc.end() as usize)) as i64)
-}
-
-#[derive(Clone, Copy)]
-pub(crate) struct NamedOrder {
-    ignore_case: bool,
-    types: u8,
-}
-impl NamedOrder {
-    pub(crate) fn compare(self, a: (&[u8], bool), b: (&[u8], bool)) -> std::cmp::Ordering {
-        let types = match self.types {
-            0 => a.1.cmp(&b.1),
-            2 => b.1.cmp(&a.1),
-            _ => std::cmp::Ordering::Equal,
-        };
-        types.then_with(|| {
-            if self.ignore_case {
-                tsr_jsstring::compare::compare_case_insensitive(a.0, b.0)
-            } else {
-                tsr_jsstring::compare::compare_case_sensitive(a.0, b.0)
-            }
-        })
-    }
-}
-// Detection order from lsutil/organizeimports.go: type-last, inline, type-first;
-// ties prefer case-insensitive. Detect on original specifiers before promotion.
-pub(crate) fn named_order(names: &[(Vec<u8>, bool)]) -> (NamedOrder, bool) {
-    let mixed = names.iter().any(|n| n.1) && names.iter().any(|n| !n.1);
-    let mut best = (
-        usize::MAX,
-        NamedOrder {
-            ignore_case: true,
-            types: 0,
-        },
-    );
-    for types in 0..(if mixed { 3 } else { 1 }) {
-        for ignore_case in [true, false] {
-            let order = NamedOrder { ignore_case, types };
-            let diff = names
-                .windows(2)
-                .filter(|w| order.compare((&w[0].0, w[0].1), (&w[1].0, w[1].1)).is_gt())
-                .count();
-            if diff < best.0 {
-                best = (diff, order);
-            }
-        }
-    }
-    (best.1, best.0 == 0)
 }
 
 pub fn quote_module(name: &str, single: bool) -> String {

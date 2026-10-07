@@ -27,6 +27,10 @@ impl CaseValues {
             }
         }
     }
+    pub(crate) fn contains_string(&self, value: &str) -> bool {
+        self.strings
+            .contains(&tsr_jsstring::JsString::from_bytes(value.as_bytes()))
+    }
     pub(crate) fn contains_value(&self, value: &ConstantValue) -> bool {
         match value {
             ConstantValue::String(value) => self.strings.contains(value),
@@ -335,7 +339,13 @@ impl LanguageService<'_> {
             })
             .collect::<Vec<_>>()
             .join(newline);
-        let edits = self.import_adder_edits(syntax, options, &adder)?;
+        // The pin has no import adder in an untitled file; references are
+        // still rewritten, but nothing is imported.
+        let edits = if tsr_tspath::is_dynamic_file_name(syntax.file.file_name()) {
+            Vec::new()
+        } else {
+            self.import_adder_edits(syntax, options, &adder)?
+        };
         Ok(Some(lsp::CompletionItem {
             additional_text_edits: (!edits.is_empty()).then(|| Box::new(edits)),
             label: label.clone(),
@@ -346,6 +356,7 @@ impl LanguageService<'_> {
                 .snippets
                 .then(|| Box::new(lsp::InsertTextFormat::SNIPPET)),
             data: Some(Box::new(lsp::CompletionItemData {
+                supplemental_file_index: self.completion_source_index(syntax.source)?,
                 file_name: String::from_utf8_lossy(syntax.file.original_file_name()?.as_bytes())
                     .into_owned(),
                 position: position as i32,

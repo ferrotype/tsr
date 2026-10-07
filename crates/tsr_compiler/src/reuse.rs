@@ -560,6 +560,7 @@ mod tests {
 #[cfg(test)]
 mod mapped_tests {
     use super::*;
+    use crate::diagnostic_writer::DiagnosticSources;
     use crate::ProgramOptions;
     use std::sync::Mutex;
     use tsr_binder::name_resolver::ResolverHost;
@@ -688,6 +689,29 @@ mod mapped_tests {
             .unwrap()
             .program
             .expect("mapped edit retains its graph");
+        for program in [&old, &new] {
+            let canonical = program.source_file(b"/src/main.box").unwrap().source();
+            let supplemental = program.source_file(b"/src/main.box.0.ts").unwrap().source();
+            // Parsed mapper outputs have independent arenas, so the source's
+            // node list is empty. The retained Program resolves the name link.
+            assert!(program
+                .diagnostic_source(canonical)
+                .unwrap()
+                .supplemental_source_files()
+                .unwrap()
+                .is_empty());
+            assert_eq!(
+                program.supplemental_sources(canonical).unwrap(),
+                vec![supplemental]
+            );
+            assert!(program
+                .supplemental_sources(supplemental)
+                .unwrap()
+                .is_empty());
+        }
+        assert!(new
+            .supplemental_sources(old.source_file(b"/src/main.box").unwrap().source())
+            .is_err());
         for name in [b"/src/main.box".as_slice(), b"/src/main.box.0.ts"] {
             let before = old.source_file(name).unwrap();
             let after = new.source_file(name).unwrap();

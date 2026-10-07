@@ -9,9 +9,12 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import sys
 import tomllib
 ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT / 'tools/phase5/harness'))
+import overlay as harness_overlay
 TESTS = '^(TestInitializeCodeActionKinds|TestProjectInfoConfiguredProject|TestProjectInfoInferredProject|TestProgressNotificationsEndToEnd|TestL2InferredOptionsAndDocumentSync)$'
 
 def build_rust_server():
@@ -39,17 +42,8 @@ def main():
         raise SystemExit(f'put {expected} on PATH')
     server = build_rust_server()
     upstream = ROOT / 'upstream/tsc'
-    source = upstream / 'internal/testutil/lsptestutil/lspclient.go'
-    native = source.read_text()
-    patched = native.replace('"io"', '"io"\n"os"', 1).replace('Server       *lsp.Server', 'Server       interface { InitComplete() <-chan struct{}; SetCompilerOptionsForInferredProjects(context.Context, *core.CompilerOptions) }', 1)
-    anchor = 'func NewLSPClient(t *testing.T, serverOpts lsp.ServerOptions, onServerRequest ServerRequestHandler) (*LSPClient, func() error) {'
-    assert patched.count(anchor) == 1
-    patched = patched.replace(anchor, anchor + '\nif os.Getenv("TSR_LSP_SERVER") != "" {return newRustClient(t,serverOpts,onServerRequest)}', 1)
     with tempfile.TemporaryDirectory(prefix='tsr-l2-client-') as tmp:
-        stage = Path(tmp)
-        (stage / 'lspclient.go').write_text(patched)
-        overlay = stage / 'overlay.json'
-        overlay.write_text(json.dumps({'Replace': {str(source): str(stage / 'lspclient.go'), str(source.parent / 'rust_client.go'): str(HERE / 'rust_client.go'), str(upstream / 'internal/lsp/l2_options_sync_test.go'): str(HERE / 'options_sync_test.go')}}))
+        overlay = harness_overlay.create(Path(tmp), include_l2_fixture=True)
         binary = ROOT / 'target/phase5/lsp-client-tests'
         binary.parent.mkdir(exist_ok=True)
         subprocess.run([go, 'test', '-overlay', str(overlay), '-c', '-o', str(binary), './internal/lsp'], cwd=upstream, env=env, check=True, timeout=300)

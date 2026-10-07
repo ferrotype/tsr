@@ -66,7 +66,7 @@ fn present(syntax: &mut Syntax<'_>, context: &Context, position: i64) -> Result<
         .flatten()
     {
         let mr = syntax.view.node(modifier)?;
-        result.flags |= tsr_ast::modifier_to_flag(mr.kind());
+        result.flags |= tsr_ast::modifier_to_flag(mr.kind()) & mf::MODIFIER;
         if mr.kind() == K::Decorator {
             result.decorators.push(modifier);
         }
@@ -170,7 +170,10 @@ impl LanguageService<'_> {
         let Some((Container::Class, class)) = context.container else {
             return Ok(Some(item));
         };
-        if !options.class_member_snippets || syntax.file.is_js() {
+        if !options.class_member_snippets
+            || syntax.file.is_js()
+            || !class_like_member_completion(checker, syntax, context.location, symbol)?
+        {
             return Ok(Some(item));
         }
         let declarations: Vec<_> = checker
@@ -227,6 +230,14 @@ impl LanguageService<'_> {
             flags &= !mf::PUBLIC;
         }
         flags |= present.flags;
+        // The label may have an optional `?` suffix; the native snippet name
+        // is the original completion name, including computed-name spelling.
+        let name = item
+            .data
+            .as_ref()
+            .ok_or(tsr_arena::Error::InvalidGraph)?
+            .name
+            .clone();
         let mut adder = tsr_autoimport::ImportAdder::default();
         let Some((nodes, roots)) = self.member_nodes(
             checker,
@@ -243,13 +254,17 @@ impl LanguageService<'_> {
             &mut adder,
         )?
         else {
+            item.insert_text = Some(Box::new(name.clone()));
+            item.filter_text = Some(Box::new(name));
+            item.insert_text_format = options
+                .snippets
+                .then(|| Box::new(lsp::InsertTextFormat::SNIPPET));
             return Ok(Some(item));
         };
         let edits = self.import_adder_edits(syntax, options, &adder)?;
         if !edits.is_empty() {
             item.additional_text_edits = Some(Box::new(edits));
         }
-        let name_text = tsr_ast::JsString::from_bytes(checker.symbol(symbol)?.name_bytes());
         let text = crate::snippet_printer::print_many(
             nodes.ast,
             &roots,
@@ -262,9 +277,7 @@ impl LanguageService<'_> {
                 text.join(options.newline.as_deref().unwrap_or("\n")),
             ));
         }
-        item.filter_text = Some(Box::new(
-            String::from_utf8_lossy(name_text.as_bytes()).into_owned(),
-        ));
+        item.filter_text = Some(Box::new(name));
         item.insert_text_format = options
             .snippets
             .then(|| Box::new(lsp::InsertTextFormat::SNIPPET));
@@ -278,8 +291,14 @@ impl LanguageService<'_> {
                         range,
                         new_text: String::new(),
                     })));
-                item.data.as_mut().unwrap().source = "ClassMemberSnippet/".into();
             }
+        }
+        if item
+            .additional_text_edits
+            .as_ref()
+            .is_some_and(|edits| !edits.is_empty())
+        {
+            item.data.as_mut().unwrap().source = "ClassMemberSnippet/".into();
         }
         Ok(Some(item))
     }
@@ -316,6 +335,17 @@ impl LanguageService<'_> {
             })
             .transpose()?
             .unwrap_or(K::PropertySignature);
+        if !matches!(
+            kind,
+            K::PropertySignature
+                | K::PropertyDeclaration
+                | K::GetAccessor
+                | K::SetAccessor
+                | K::MethodSignature
+                | K::MethodDeclaration
+        ) {
+            return Ok(None);
+        }
         let ty = checker.get_type_of_symbol_at_location(symbol, Some(class))?;
         let ty = checker.get_widened_type(ty)?;
         let optional = checker.symbol(symbol)?.flags() & sf::OPTIONAL != 0;
@@ -419,7 +449,12 @@ impl LanguageService<'_> {
         }
         let mut result = Vec::new();
         for (root, with_body) in roots {
-            let root = nodes.clone_node(Some(root)).unwrap();
+            // Code fixes rebuild the method shell while preserving reused
+            // signature children and their same-source comment ranges, as
+            // missingMemberFixer.createSignatureDeclarationFromSignature does.
+            // The transferred builder owns these generated parameters; no
+            // source or checker-cached node is mutated here.
+            let root = tsr_ast::clone_node(&mut nodes.ast, root);
             let name = property_name(
                 &mut nodes,
                 original_name,
@@ -684,4 +719,53 @@ fn member_body(
     let throw = nodes.ast.new_throw_statement(Some(new));
     let statements = list(&mut nodes.ast, &[Some(throw)])?;
     Ok(nodes.ast.new_block(Some(statements), true))
+}
+
+#[cfg(test)]
+#[path = "completion_class_snippets_tests.rs"]
+mod tests;
+
+// port: tsc/internal/ls/completions.go:isClassLikeMemberCompletion
+fn class_like_member_completion(
+    checker: &Operation<'_>,
+    syntax: &mut Syntax<'_>,
+    location: tsr_ast::NodeId,
+    symbol: SymbolRef,
+) -> Result<bool> {
+    if checker.symbol(symbol)?.flags() & (sf::CLASS_MEMBER & sf::ENUM_MEMBER_EXCLUDES) == 0 {
+        return Ok(false);
+    }
+    let view = syntax.view;
+    let read = view.node(location)?;
+    if tsr_ast::utilities::is_class_like(&read) {
+        return Ok(true);
+    }
+    let Some(parent) = read.parent() else {
+        return Ok(false);
+    };
+    let parent_read = view.node(parent)?;
+    if read.kind() == tsr_ast::SyntaxKind::SyntaxList
+        && tsr_ast::utilities::is_class_like(&parent_read)
+    {
+        return Ok(true);
+    }
+    let Some(grandparent) = parent_read.parent() else {
+        return Ok(false);
+    };
+    if !tsr_ast::utilities::is_class_element(&parent_read)
+        || parent_read.name() != Some(location)
+        || !tsr_ast::utilities::is_class_like(&view.node(grandparent)?)
+    {
+        return Ok(false);
+    }
+    // The member is still only a name: `class C { m| }`.
+    let last = tsr_format::get_last_token(
+        &mut tsr_format::FormatFile {
+            view,
+            source: syntax.source,
+            jsdoc: &mut syntax.docs,
+        },
+        Some(parent),
+    )?;
+    Ok(last == Some(location))
 }

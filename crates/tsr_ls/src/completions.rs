@@ -13,6 +13,7 @@ use tsr_ast::{
     span_map::FEATURE_COMPLETION, symbol_flags as sf, utilities as ast, NodeId, SyntaxKind as K,
 };
 use tsr_checker::{Operation, SymbolRef, TypeRef, VerbosityContext};
+use tsr_compiler::diagnostic_writer::DiagnosticSources;
 use tsr_core::TextRange;
 use tsr_lsproto as lsp;
 use tsr_printer::EmitTextWriter;
@@ -42,6 +43,8 @@ pub struct CompletionOptions {
     pub import_statements: Option<bool>,
     pub class_member_snippets: bool,
     pub object_method_snippets: bool,
+    /// Organize-imports settings, which order specifiers added by import edits.
+    pub organize: crate::OrganizeOptions,
 }
 
 pub(crate) struct Candidate {
@@ -50,6 +53,8 @@ pub(crate) struct Candidate {
     pub nullable: bool,
     pub this_member: bool,
     pub promise: bool,
+    /// The accessible name a computed symbol property starts with, as `[N]`.
+    pub symbol_member: bool,
 }
 pub(crate) fn properties(checker: &mut Operation<'_>, ty: TypeRef) -> Result<Vec<SymbolRef>> {
     Ok(
@@ -93,11 +98,31 @@ impl LanguageService<'_> {
         };
         let source = projection.script;
         let position = i64::from(projection.mapped.position);
+        let mut response = self.completion_worker(checker, params, options, source, position)?;
+        if let Some(list) = response.list.as_deref_mut() {
+            self.completion_data(source, position, list)?;
+            if self.source(source)?.span_map().is_some() {
+                let mut syntax = Syntax::new(self.view(source)?, source)?;
+                self.filter_content_mapped_auto_imports(&mut syntax, options, list)?;
+            }
+        }
+        Ok(response)
+    }
+
+    fn completion_worker(
+        &mut self,
+        checker: &mut Operation<'_>,
+        params: &lsp::CompletionParams,
+        options: &CompletionOptions,
+        source: NodeId,
+        position: i64,
+    ) -> Result<lsp::CompletionItemsOrListOrNull> {
         let mut syntax = Syntax::new(self.view(source)?, source)?;
         if options.module_exports != Some(false) && self.auto_imports.is_prepared() {
             self.prepare_auto_imports(checker, &syntax, &options.auto_import)?;
         }
         let mut context = Context::collect(&mut syntax, position)?;
+        context.refine_type_arguments(&mut syntax, checker)?;
         let in_string =
             crate::string_completions::in_string(&mut syntax, context.previous, position)?;
         if let Some(trigger) = params
@@ -151,22 +176,23 @@ impl LanguageService<'_> {
             match self.jsdoc_completions(checker, &mut syntax, position, options)? {
                 crate::jsdoc_completions::JsDocCompletion::Code => {}
                 crate::jsdoc_completions::JsDocCompletion::Prose => {
-                    return Ok(lsp::CompletionItemsOrListOrNull::default())
+                    return Ok(lsp::CompletionItemsOrListOrNull::default());
                 }
                 crate::jsdoc_completions::JsDocCompletion::List(list) => {
                     return Ok(lsp::CompletionItemsOrListOrNull {
                         list: Some(Box::new(list)),
                         ..Default::default()
-                    })
+                    });
                 }
             }
             context.type_only = true;
-            context.filter = Filter::Type;
+            if context.container.is_none() {
+                context.filter = Filter::Type;
+            }
         }
-        if let Some(mut list) =
+        if let Some(list) =
             self.closing_tag_completion(&mut syntax, &context, &params.position, options)?
         {
-            self.completion_data(source, position, &mut list)?;
             return Ok(lsp::CompletionItemsOrListOrNull {
                 list: Some(Box::new(list)),
                 ..Default::default()
@@ -196,6 +222,7 @@ impl LanguageService<'_> {
                     options,
                     &mut list,
                     Some(&import_info),
+                    &HashSet::new(),
                 )?;
             }
             let replacement = if import_info.keyword_only {
@@ -218,19 +245,17 @@ impl LanguageService<'_> {
                     crate::completion_context::ALL
                 },
             );
-            self.completion_data(source, position, &mut list)?;
             return Ok(lsp::CompletionItemsOrListOrNull {
                 list: Some(Box::new(list)),
                 ..Default::default()
             });
         }
-        if context.blocked(&syntax, position)? {
+        if context.blocked(&mut syntax, checker, position)? {
             return Ok(lsp::CompletionItemsOrListOrNull::default());
         }
-        if let Some(mut list) =
+        if let Some(list) =
             self.label_completions(&mut syntax, &context, &params.position, options)?
         {
-            self.completion_data(source, position, &mut list)?;
             return Ok(lsp::CompletionItemsOrListOrNull {
                 list: (!list.items.is_empty()).then(|| Box::new(list)),
                 ..Default::default()
@@ -253,9 +278,16 @@ impl LanguageService<'_> {
         let used_cases =
             crate::completion_switch::expression_case_values(checker, &syntax, context.token)?;
         let mut names = HashSet::new();
+        let mut shadowed_names = HashSet::new();
         let mut method_snippets = Vec::new();
+        let js_file = syntax.file.is_js();
         for candidate in candidates {
             self.check_canceled()?;
+            // In a JS value location, symbols that seem type-only are skipped.
+            if js_file && !context.type_only && Self::appears_type_only(checker, candidate.symbol)?
+            {
+                continue;
+            }
             if let Some(used) = &used_cases {
                 if checker.symbol(candidate.symbol)?.flags() & sf::ENUM_MEMBER != 0 {
                     if let Some(decl) = checker.symbol(candidate.symbol)?.value_declaration() {
@@ -306,6 +338,19 @@ impl LanguageService<'_> {
                     continue;
                 };
                 if names.insert(item.label.clone()) {
+                    let symbol = checker.symbol(candidate.symbol)?;
+                    let local = checker
+                        .symbol_declarations(candidate.symbol)?
+                        .iter()
+                        .flatten()
+                        .any(|decl| {
+                            self.program
+                                .file_of_node(decl)
+                                .is_some_and(|file| file.source() == syntax.source)
+                        });
+                    if !candidate.this_member && (symbol.parent().is_some() || local) {
+                        shadowed_names.insert(item.label.clone());
+                    }
                     list.items.push(Some(Box::new(item)));
                 }
             }
@@ -322,6 +367,11 @@ impl LanguageService<'_> {
                 list.items.push(Some(Box::new(item)));
             }
         }
+        if Self::assert_keyword_position(&syntax, context.token, position)?
+            && names.insert("assert".into())
+        {
+            list.items.push(Some(Box::new(keywords::keyword("assert"))));
+        }
         if context.member.is_none() && context.container.is_none() {
             self.auto_import_completions(
                 checker,
@@ -331,6 +381,7 @@ impl LanguageService<'_> {
                 options,
                 &mut list,
                 None,
+                &shadowed_names,
             )?;
         }
         list.items.extend(Self::literal_completions(
@@ -340,6 +391,7 @@ impl LanguageService<'_> {
             position,
             options,
         )?);
+        names.extend(list.items.iter().flatten().map(|item| item.label.clone()));
         if !checked {
             Self::js_completion_entries(&mut syntax, position, &mut names, &mut list)?;
         }
@@ -356,7 +408,6 @@ impl LanguageService<'_> {
             replacement,
             context.commit,
         );
-        self.completion_data(source, position, &mut list)?;
         Ok(lsp::CompletionItemsOrListOrNull {
             list: Some(Box::new(list)),
             ..Default::default()
@@ -472,6 +523,50 @@ impl LanguageService<'_> {
         )?;
         Ok(fidelity.is_exact().then_some(range))
     }
+    // port: tsc/internal/ls/completions.go:supplementalFileIndex
+    pub(crate) fn completion_source_index(&self, source: NodeId) -> Result<Option<Box<i32>>> {
+        let file = self.source(source)?;
+        let canonical = if let Some(canonical) = file.canonical_source_file() {
+            Some(canonical)
+        } else {
+            file.canonical_file_name()
+                .map(|name| {
+                    self.program
+                        .source_file(name.as_bytes())
+                        .map(tsr_compiler::ProgramFile::source)
+                        .ok_or(tsr_arena::Error::InvalidGraph)
+                })
+                .transpose()?
+        };
+        let Some(canonical) = canonical else {
+            return Ok(None);
+        };
+        let index = self
+            .program
+            .supplemental_sources(canonical)?
+            .iter()
+            .position(|&id| id == source)
+            .ok_or(tsr_arena::Error::InvalidGraph)?;
+        Ok(Some(Box::new(index as i32)))
+    }
+
+    // port: tsc/internal/ls/completions.go:sourceFileForSupplementalFileIndex
+    pub fn completion_source(&self, data: &lsp::CompletionItemData) -> Result<NodeId> {
+        let file = self
+            .program
+            .source_file(data.file_name.as_bytes())
+            .ok_or_else(|| crate::Error::MissingFile(data.file_name.clone()))?;
+        if let Some(&index) = data.supplemental_file_index.as_deref() {
+            let sources = self.program.supplemental_sources(file.source())?;
+            return usize::try_from(index)
+                .ok()
+                .and_then(|index| sources.get(index))
+                .copied()
+                .ok_or(crate::Error::MissingSupplementalFile(index));
+        }
+        Ok(file.source())
+    }
+
     // port: tsc/internal/ls/completions.go:ensureItemData
     pub(crate) fn completion_data(
         &self,
@@ -482,18 +577,43 @@ impl LanguageService<'_> {
         let file_name =
             String::from_utf8_lossy(self.source(source)?.original_file_name()?.as_bytes())
                 .into_owned();
+        let supplemental_file_index = self.completion_source_index(source)?;
         for item in list.items.iter_mut().flatten() {
             item.data.get_or_insert_with(|| {
                 Box::new(lsp::CompletionItemData {
                     file_name: file_name.clone(),
                     position: position as i32,
                     name: item.label.clone(),
+                    supplemental_file_index: supplemental_file_index.clone(),
                     ..Default::default()
                 })
             });
         }
         Ok(())
     }
+    // port: tsc/internal/ls/completions.go:isStaticProperty
+    fn property_completion_sort(
+        &self,
+        checker: &Operation<'_>,
+        symbol: SymbolRef,
+    ) -> Result<&'static str> {
+        if let Some(declaration) = checker.symbol(symbol)?.value_declaration() {
+            let view = self.view(declaration)?;
+            let read = view.node(declaration)?;
+            if read.modifier_flags(view)? & tsr_ast::modifier_flags::STATIC != 0 {
+                if let Some(parent) = read.parent() {
+                    if matches!(
+                        view.node(parent)?.kind().known(),
+                        Some(K::ClassDeclaration | K::ClassExpression)
+                    ) {
+                        return Ok("10");
+                    }
+                }
+            }
+        }
+        Ok("11")
+    }
+
     fn completion_symbols(
         &self,
         checker: &mut Operation<'_>,
@@ -503,34 +623,95 @@ impl LanguageService<'_> {
         options: &CompletionOptions,
     ) -> Result<Vec<Candidate>> {
         if let Some((access, expression)) = context.member {
+            let mut candidates = Vec::new();
+            let mut merged_value_type = None;
             if let Some(symbol) = checker.get_symbol_at_location(expression)? {
                 let symbol = checker.skip_alias(symbol)?;
                 if checker.symbol(symbol)?.flags() & (sf::MODULE | sf::ENUM) != 0 {
-                    let mut candidates = Vec::new();
+                    let namespace_name = syntax.view.node(access)?.kind() == K::ModuleDeclaration;
+                    if namespace_name {
+                        context.new_identifier = true;
+                        context.commit = &[];
+                    }
                     for symbol in checker.get_exports_of_module(symbol)? {
                         let name = checker.symbol(symbol)?.name_bytes().to_vec().clone();
-                        if context.type_only
-                            && Self::completion_type_symbol(checker, symbol, &mut HashSet::new())?
-                            || !context.type_only
-                                && checker.is_valid_property_access(access, &name)?
-                        {
+                        let valid = if namespace_name {
+                            // Dotted namespace declarations offer only namespace members
+                            // declared elsewhere, not the declaration being completed.
+                            // A ModuleDeclaration is not a property-access checker input.
+                            let mut declared_elsewhere = false;
+                            if checker.symbol(symbol)?.flags() & sf::NAMESPACE != 0 {
+                                for declaration in
+                                    checker.symbol_declarations(symbol)?.iter().flatten()
+                                {
+                                    if self.view(declaration)?.node(declaration)?.parent()
+                                        != Some(access)
+                                    {
+                                        declared_elsewhere = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            declared_elsewhere
+                        } else if context.type_only {
+                            Self::completion_type_symbol(checker, symbol, &mut HashSet::new())?
+                        } else {
+                            checker.is_valid_property_access(access, &name)?
+                        };
+                        if valid {
                             candidates.push(Candidate {
                                 symbol,
-                                sort: "11",
+                                sort: self.property_completion_sort(checker, symbol)?,
                                 nullable: false,
                                 this_member: false,
                                 promise: false,
+                                symbol_member: false,
                             });
                         }
                     }
-                    return Ok(candidates);
+                    let mut merged_with_value = false;
+                    if !context.type_only && !namespace_name {
+                        for declaration in checker.symbol_declarations(symbol)?.iter().flatten() {
+                            if !matches!(
+                                checker.node(declaration)?.kind().known(),
+                                Some(K::SourceFile | K::ModuleDeclaration | K::EnumDeclaration)
+                            ) {
+                                merged_with_value = true;
+                                break;
+                            }
+                        }
+                    }
+                    if !merged_with_value {
+                        return Ok(candidates);
+                    }
+                    // Pin getTypeScriptMemberSymbols adds the value type's
+                    // properties after namespace exports, including inherited
+                    // static members of a merged class.
+                    merged_value_type =
+                        Some(checker.get_type_of_symbol_at_location(symbol, Some(expression))?);
                 }
             }
-            checker.try_get_this_type_at_ex(expression, false, None)?;
-            let ty = checker.get_type_at_location(expression)?;
+            // A type location takes the value type's properties only inside a
+            // type query.
+            if merged_value_type.is_none()
+                && context.type_only
+                && !in_type_query(syntax.view, expression)?
+            {
+                return Ok(candidates);
+            }
+            let ty = if let Some(ty) = merged_value_type {
+                ty
+            } else {
+                checker.try_get_this_type_at_ex(expression, false, None)?;
+                checker.get_type_at_location(expression)?
+            };
             let mut ty = checker.get_non_optional_type(ty)?;
             let mut nullable = false;
-            if checker.is_nullable_type(ty)? {
+            if context.type_only {
+                // A type query in a type location reads the non-nullable type
+                // without optional chaining.
+                ty = checker.get_non_nullable_type(ty)?;
+            } else if checker.is_nullable_type(ty)? {
                 let question = context.token.is_some_and(|id| {
                     syntax
                         .view
@@ -542,19 +723,56 @@ impl LanguageService<'_> {
                     nullable = !question;
                 }
             }
-            let mut candidates = Vec::new();
             if checker.get_string_index_type(ty)?.is_some() {
                 context.new_identifier = true;
                 context.commit = &[];
             }
-            for symbol in checker.get_apparent_properties(ty)? {
+            let mut seen_members = HashSet::new();
+            let checked = !syntax.file.is_js()
+                || ast::is_check_js_enabled_for_file(&syntax.file, self.program.options());
+            // An unchecked JS file offers every member of a union's types.
+            let properties =
+                if !checked && checker.type_flags(ty)? & tsr_checker::type_flags::UNION != 0 {
+                    let types = checker.constituents(ty)?;
+                    checker.get_all_possible_properties_of_types(&types)?
+                } else {
+                    checker.get_apparent_properties(ty)?
+                };
+            for symbol in properties {
                 if checker.is_valid_property_access_for_completions(access, ty, symbol)? {
+                    if !checked {
+                        candidates.push(Candidate {
+                            symbol,
+                            sort: self.property_completion_sort(checker, symbol)?,
+                            nullable,
+                            this_member: false,
+                            promise: false,
+                            symbol_member: false,
+                        });
+                        continue;
+                    }
+                    // A computed symbol property is offered through the first
+                    // accessible name of its key, such as `N` for `[N.sym]`.
+                    if let Some(first) = self.computed_member(checker, context.token, symbol)? {
+                        if seen_members.insert(first) {
+                            candidates.push(Candidate {
+                                symbol: first,
+                                sort: "15",
+                                nullable,
+                                this_member: false,
+                                promise: false,
+                                symbol_member: true,
+                            });
+                        }
+                        continue;
+                    }
                     candidates.push(Candidate {
                         symbol,
-                        sort: "11",
+                        sort: self.property_completion_sort(checker, symbol)?,
                         nullable,
                         this_member: false,
                         promise: false,
+                        symbol_member: false,
                     });
                 }
             }
@@ -568,10 +786,11 @@ impl LanguageService<'_> {
                         {
                             candidates.push(Candidate {
                                 symbol,
-                                sort: "11",
+                                sort: self.property_completion_sort(checker, symbol)?,
                                 nullable,
                                 this_member: false,
                                 promise: true,
+                                symbol_member: false,
                             });
                         }
                     }
@@ -579,7 +798,14 @@ impl LanguageService<'_> {
             }
             return Ok(candidates);
         }
+        if let Some(candidates) = Self::completion_type_argument_members(checker, syntax, context)?
+        {
+            return Ok(candidates);
+        }
         if let Some(candidates) = self.completion_container(checker, syntax, context, position)? {
+            return Ok(candidates);
+        }
+        if let Some(candidates) = Self::import_attribute_completions(checker, syntax, context)? {
             return Ok(candidates);
         }
         (context.new_identifier, context.commit) =
@@ -614,11 +840,21 @@ impl LanguageService<'_> {
                     nullable: false,
                     this_member: false,
                     promise: false,
+                    symbol_member: false,
                 });
             }
         }
         for symbol in checker.get_symbols_in_scope(scope, meaning)? {
-            let flags = checker.get_symbol_flags(symbol)?;
+            // Pin shouldIncludeSymbol preserves the local declaration meaning
+            // and the exported/aliased target meaning of a scope symbol.
+            let origin = checker.skip_alias(symbol)?;
+            let mut flags = checker.symbol(symbol)?.flags() | checker.symbol(origin)?.flags();
+            if let Some(export) = checker.symbol(origin)?.export_symbol() {
+                flags |= checker.symbol(checker.symbol_ref(export)?)?.flags();
+            }
+            if checker.symbol(symbol)?.flags() & sf::ALIAS != 0 {
+                flags |= checker.get_symbol_flags(symbol)?;
+            }
             if context.type_only {
                 if !Self::completion_type_symbol(checker, symbol, &mut HashSet::new())? {
                     continue;
@@ -640,12 +876,27 @@ impl LanguageService<'_> {
                     break;
                 }
             }
+            // A module file reaches a UMD global through an import, so the
+            // auto-import suggestion replaces the global.
+            if !local
+                && origin != symbol
+                && syntax.file.external_module_indicator.is_some()
+                && !self.program.options().allow_umd_global_access.is_true()
+            {
+                if let Some(parent) = checker.symbol(symbol)?.parent() {
+                    let parent = checker.symbol_ref(parent)?;
+                    if checker.symbol(parent)?.is_external_module() {
+                        continue;
+                    }
+                }
+            }
             result.push(Candidate {
                 symbol,
                 sort: if local { "11" } else { "15" },
                 nullable: false,
                 this_member: false,
                 promise: false,
+                symbol_member: false,
             });
         }
         if scope != syntax.source {
@@ -658,11 +909,168 @@ impl LanguageService<'_> {
                         nullable: false,
                         this_member: true,
                         promise: false,
+                        symbol_member: false,
                     });
                 }
             }
         }
         Ok(result)
+    }
+    /// The first name accessible at `token` in a property's computed key, if
+    /// the property has one and any name of the key is accessible.
+    // Pin getCompletionData: addPropertySymbol closure.
+    fn computed_member(
+        &self,
+        checker: &mut Operation<'_>,
+        token: Option<tsr_ast::NodeId>,
+        symbol: SymbolRef,
+    ) -> Result<Option<SymbolRef>> {
+        let mut computed = None;
+        for declaration in checker.symbol_declarations(symbol)?.iter().flatten() {
+            let name =
+                tsr_ast::get_name_of_declaration(self.view(declaration)?, Some(declaration))?;
+            if let Some(name) = name.filter(|&n| {
+                checker
+                    .node(n)
+                    .is_ok_and(|r| r.kind() == K::ComputedPropertyName)
+            }) {
+                computed = Some(name);
+                break;
+            }
+        }
+        let Some(computed) = computed else {
+            return Ok(None);
+        };
+        // port: tsc/internal/ls/completions.go:getLeftMostName
+        let mut left = checker.node(computed)?.expression();
+        while let Some(id) = left {
+            match checker.node(id)?.kind().known() {
+                Some(K::Identifier) => break,
+                Some(K::PropertyAccessExpression) => left = checker.node(id)?.expression(),
+                _ => left = None,
+            }
+        }
+        let Some(left) = left else {
+            return Ok(None);
+        };
+        let Some(name_symbol) = checker.get_symbol_at_location(left)? else {
+            return Ok(None);
+        };
+        // port: tsc/internal/ls/completions.go:getFirstSymbolInChain
+        let mut current = name_symbol;
+        loop {
+            let chain = checker.get_accessible_symbol_chain(current, token, sf::ALL, false)?;
+            if let Some(&first) = chain.first() {
+                return Ok(Some(first));
+            }
+            let Some(parent) = checker.symbol(current)?.parent() else {
+                return Ok(None);
+            };
+            let parent = checker.symbol_ref(parent)?;
+            let module = checker
+                .symbol_declarations(parent)?
+                .iter()
+                .flatten()
+                .any(|d| checker.node(d).is_ok_and(|r| r.kind() == K::SourceFile));
+            if module {
+                return Ok(Some(current));
+            }
+            current = parent;
+        }
+    }
+    /// An import attributes clause may follow an import's or re-export's
+    /// module specifier on the same line.
+    // port: tsc/internal/ls/completions.go:getContextualKeywords
+    fn assert_keyword_position(
+        syntax: &Syntax<'_>,
+        token: Option<tsr_ast::NodeId>,
+        position: i64,
+    ) -> Result<bool> {
+        let Some(token) = token else {
+            return Ok(false);
+        };
+        let read = syntax.view.node(token)?;
+        let Some(parent) = read.parent() else {
+            return Ok(false);
+        };
+        let pr = syntax.view.node(parent)?;
+        Ok(matches!(
+            pr.kind().known(),
+            Some(K::ImportDeclaration | K::ExportDeclaration)
+        ) && pr.module_specifier() == Some(token)
+            && syntax.same_line(i64::from(read.end()), position))
+    }
+    // Pin getCompletionData: tryGetImportAttributesCompletionSymbols closure.
+    fn import_attribute_completions(
+        checker: &mut Operation<'_>,
+        syntax: &Syntax<'_>,
+        context: &mut Context,
+    ) -> Result<Option<Vec<Candidate>>> {
+        let Some(token) = context.token else {
+            return Ok(None);
+        };
+        let view = syntax.view;
+        let read = view.node(token)?;
+        let attributes = match read.kind().known() {
+            Some(K::OpenBraceToken | K::CommaToken) => read.parent(),
+            Some(K::ColonToken) => read
+                .parent()
+                .and_then(|parent| view.node(parent).ok()?.parent()),
+            _ => None,
+        };
+        let Some(attributes) =
+            attributes.filter(|&id| view.node(id).is_ok_and(|n| n.kind() == K::ImportAttributes))
+        else {
+            return Ok(None);
+        };
+        let mut existing = HashSet::new();
+        let list = view
+            .node(attributes)?
+            .data_source()
+            .as_import_attributes()
+            .and_then(|data| data.attributes());
+        if let Some(list) = list {
+            for element in view.node_slice(view.list(list)?.nodes())?.iter().flatten() {
+                if let Some(name) = view.node(element)?.name() {
+                    existing.insert(view.node_text(name)?.as_bytes().to_vec());
+                }
+            }
+        }
+        let ty = checker.get_type_at_location(attributes)?;
+        let mut candidates = Vec::new();
+        for symbol in checker.get_apparent_properties(ty)? {
+            if !existing.contains(checker.symbol(symbol)?.name_bytes()) {
+                candidates.push(Candidate {
+                    symbol,
+                    sort: "11",
+                    nullable: false,
+                    this_member: false,
+                    promise: false,
+                    symbol_member: false,
+                });
+            }
+        }
+        context.filter = Filter::None;
+        context.new_identifier = false;
+        Ok(Some(candidates))
+    }
+    // port: tsc/internal/ls/completions.go:symbolAppearsToBeTypeOnly
+    fn appears_type_only(checker: &mut Operation<'_>, symbol: SymbolRef) -> Result<bool> {
+        let target = checker.skip_alias(symbol)?;
+        let mut flags = checker.symbol(target)?.flags();
+        if let Some(export) = checker.symbol(target)?.export_symbol() {
+            flags |= checker.symbol(checker.symbol_ref(export)?)?.flags();
+        }
+        if flags & sf::VALUE != 0 {
+            return Ok(false);
+        }
+        let first = checker.symbol_declarations(symbol)?.iter().flatten().next();
+        Ok(match first {
+            Some(declaration) => {
+                !ast::is_in_js_file(Some(&checker.node(declaration)?)) || flags & sf::TYPE != 0
+            }
+            None => true,
+        })
     }
     fn completion_type_symbol(
         checker: &mut Operation<'_>,
@@ -671,9 +1079,15 @@ impl LanguageService<'_> {
     ) -> Result<bool> {
         let mut pending = vec![symbol];
         while let Some(symbol) = pending.pop() {
-            let symbol = checker.skip_alias(symbol)?;
             if !seen.insert(symbol) {
                 continue;
+            }
+            // Aliases may merge with declarations. Test the local symbol too,
+            // rather than discarding its meanings when following the target.
+            let export = checker.get_export_symbol_of_symbol(symbol)?;
+            let target = checker.skip_alias(export)?;
+            if target != symbol {
+                pending.push(target);
             }
             let flags = checker.symbol(symbol)?.flags();
             if flags & sf::TYPE != 0 || checker.is_unknown_symbol(symbol)? {
@@ -710,6 +1124,12 @@ impl LanguageService<'_> {
                 }
                 if parameters
                     && matches!(read.kind().known(), Some(K::Parameter | K::TypeParameter))
+                    && !read.parent().is_some_and(|parent| {
+                        syntax
+                            .view
+                            .node(parent)
+                            .is_ok_and(|node| node.kind() == K::IndexSignature)
+                    })
                     || !parameters && read.kind() == K::VariableDeclaration
                 {
                     closest = Some(id);
@@ -828,15 +1248,30 @@ impl LanguageService<'_> {
             name =
                 String::from_utf8_lossy(checker.symbol_to_string(symbol)?.as_bytes()).into_owned();
         }
+        // A unique symbol's property has an internal `\xFE@` name.
+        // port: tsc/internal/checker/utilities.go:IsKnownSymbol
+        let known_symbol = checker.symbol(symbol)?.name_bytes().starts_with(b"\xFE@");
         if name.is_empty()
-            || !computed_class_member && name.starts_with("__@")
+            || !computed_class_member && (name.starts_with("__@") || known_symbol)
             || checker.symbol(symbol)?.flags() & sf::MODULE != 0 && name.starts_with(['\'', '"'])
         {
             return Ok(None);
         }
+        let private_identifier = if name.starts_with('#') {
+            if let Some(declaration) = checker.symbol(symbol)?.value_declaration() {
+                ast::is_private_identifier_class_element_declaration(
+                    self.view(declaration)?,
+                    declaration,
+                )?
+            } else {
+                false
+            }
+        } else {
+            false
+        };
         let valid =
             tsr_scanner::is_identifier_text(name.as_bytes(), tsr_core::LanguageVariant::STANDARD)
-                || name.starts_with('#')
+                || private_identifier
                 || computed_class_member;
         if !valid && class_member {
             return Ok(None);
@@ -845,9 +1280,12 @@ impl LanguageService<'_> {
             return Ok(None);
         }
         if !valid
-            && context
-                .container
-                .is_some_and(|(kind, _)| matches!(kind, Container::Object | Container::Class))
+            && context.container.is_some_and(|(kind, _)| {
+                matches!(
+                    kind,
+                    Container::Object | Container::TypeLiteral | Container::Class
+                )
+            })
         {
             name = quote(&name);
         }
@@ -864,8 +1302,10 @@ impl LanguageService<'_> {
                 )
             };
         } else if let Some((access, _)) = context.member {
-            if !valid || candidate.nullable {
-                insert = if valid {
+            if !valid || candidate.nullable || candidate.symbol_member {
+                insert = if candidate.symbol_member && valid {
+                    format!("[{name}]")
+                } else if valid {
                     name.clone()
                 } else {
                     format!("[{}]", quote_property_name(&name, syntax, options.quote)?)
@@ -976,6 +1416,27 @@ impl LanguageService<'_> {
                 snippet = true;
             }
         }
+        if let Some(named) = ast::find_ancestor(syntax.view, Some(context.location), |node| {
+            matches!(node.kind().known(), Some(K::NamedImports | K::NamedExports))
+        })? {
+            let imports = syntax.view.node(named)?.kind() == K::NamedImports;
+            if !tsr_scanner::is_identifier_text(
+                name.as_bytes(),
+                tsr_core::LanguageVariant::STANDARD,
+            ) {
+                insert = quote_property_name(&name, syntax, options.quote)?;
+                if imports && !followed_by_alias(syntax.file.text().as_bytes(), position) {
+                    insert = format!("{insert} as {}", identifier_for_arbitrary_string(&name));
+                }
+            } else if imports {
+                let token = tsr_scanner::string_to_token(name.as_bytes());
+                if token == K::AwaitKeyword
+                    || tsr_ast::utilities_tail::is_non_contextual_keyword(token.into())
+                {
+                    insert = format!("{name} as {name}_");
+                }
+            }
+        }
         let kind = self.symbol_kind(checker, symbol, context.location)?;
         let modifiers = self.symbol_modifiers(checker, symbol)?;
         let bytes = syntax.file.text().as_bytes();
@@ -987,7 +1448,10 @@ impl LanguageService<'_> {
         {
             word -= 1;
         }
-        let dot = if word > 0 && bytes[word - 1] == b'.' {
+        // port: tsc/internal/ls/completions.go:getDotAccessor
+        let dot = if bytes[..word].ends_with(b"?.") {
+            "?."
+        } else if bytes[..word].ends_with(b".") {
             "."
         } else {
             ""
@@ -998,7 +1462,11 @@ impl LanguageService<'_> {
             || context.container.is_some_and(|(kind, _)| {
                 matches!(
                     kind,
-                    Container::Object | Container::Binding | Container::Class | Container::Jsx
+                    Container::Object
+                        | Container::TypeLiteral
+                        | Container::Binding
+                        | Container::Class
+                        | Container::Jsx
                 )
             }))
             && modifiers & modifiers::OPTIONAL != 0
@@ -1006,7 +1474,7 @@ impl LanguageService<'_> {
             if insert.is_empty() {
                 insert.clone_from(&name);
             }
-            if filter.is_empty() {
+            if filter.is_empty() || snippet {
                 filter.clone_from(&name);
             }
             label.push('?');
@@ -1064,6 +1532,7 @@ impl LanguageService<'_> {
             tags: deprecated.then(|| Box::new(vec![lsp::CompletionItemTag::DEPRECATED])),
             commit_characters: commit,
             data: Some(Box::new(lsp::CompletionItemData {
+                supplemental_file_index: self.completion_source_index(syntax.source)?,
                 file_name: String::from_utf8_lossy(syntax.file.original_file_name()?.as_bytes())
                     .into_owned(),
                 position: position as i32,
@@ -1092,11 +1561,8 @@ impl LanguageService<'_> {
             .as_deref()
             .ok_or(tsr_arena::Error::InvalidGraph)?
             .clone();
-        let file = self
-            .program
-            .source_file(data.file_name.as_bytes())
-            .ok_or_else(|| crate::Error::MissingFile(data.file_name.clone()))?;
-        let mut syntax = Syntax::new(file.bound().view().ast(), file.source())?;
+        let source = self.completion_source(&data)?;
+        let mut syntax = Syntax::new(self.view(source)?, source)?;
         if data.is_import_statement_completion {
             return Ok(item);
         }
@@ -1119,6 +1585,7 @@ impl LanguageService<'_> {
             return Ok(item);
         }
         let mut context = Context::collect(&mut syntax, i64::from(data.position))?;
+        context.refine_type_arguments(&mut syntax, checker)?;
         if let Some(literal) = crate::string_completions::in_string(
             &mut syntax,
             context.previous,
@@ -1161,14 +1628,15 @@ impl LanguageService<'_> {
             options,
         )? {
             let mut name = symbol_name(checker, candidate.symbol)?;
-            if context
-                .container
-                .is_some_and(|(kind, _)| matches!(kind, Container::Object | Container::Class))
-                && !tsr_scanner::is_identifier_text(
-                    name.as_bytes(),
-                    tsr_core::LanguageVariant::STANDARD,
+            if context.container.is_some_and(|(kind, _)| {
+                matches!(
+                    kind,
+                    Container::Object | Container::TypeLiteral | Container::Class
                 )
-            {
+            }) && !tsr_scanner::is_identifier_text(
+                name.as_bytes(),
+                tsr_core::LanguageVariant::STANDARD,
+            ) {
                 name = quote(&name);
             }
             if name != data.name {
@@ -1256,3 +1724,86 @@ fn quote_property_name(
         ))
     }
 }
+
+#[cfg(test)]
+#[path = "completion_item_tests.rs"]
+mod tests;
+
+#[cfg(test)]
+#[path = "completion_namespace_tests.rs"]
+mod namespace_tests;
+
+#[cfg(test)]
+#[path = "completion_property_access_tests.rs"]
+mod property_access_tests;
+
+// port: tsc/internal/checker/utilities.go:IsInTypeQuery
+fn in_type_query(view: tsr_ast::AstView<'_>, node: tsr_ast::NodeId) -> Result<bool> {
+    let mut current = Some(node);
+    while let Some(id) = current {
+        let read = view.node(id)?;
+        match read.kind().known() {
+            Some(K::TypeQuery) => return Ok(true),
+            Some(K::Identifier | K::QualifiedName) => current = read.parent(),
+            _ => return Ok(false),
+        }
+    }
+    Ok(false)
+}
+
+/// `{ ^here as name }`: the import already names its local binding.
+fn followed_by_alias(text: &[u8], position: i64) -> bool {
+    let skip = |at: usize| tsr_scanner::skip_trivia(text, at as i64) as usize;
+    let at = skip(position.max(0) as usize);
+    let word_end = |at: usize| {
+        let mut end = at;
+        while end < text.len()
+            && (text[end].is_ascii_alphanumeric()
+                || matches!(text[end], b'_' | b'$')
+                || text[end] >= 128)
+        {
+            end += 1;
+        }
+        end
+    };
+    let end = word_end(at);
+    if &text[at..end] != b"as" {
+        return false;
+    }
+    let next = skip(end);
+    word_end(next) > next && !text[next].is_ascii_digit()
+}
+
+// port: tsc/internal/ls/completions.go:generateIdentifierForArbitraryString
+fn identifier_for_arbitrary_string(text: &str) -> String {
+    let mut needs_underscore = false;
+    let mut identifier = String::new();
+    for (index, ch) in text.char_indices() {
+        let valid = if index == 0 {
+            tsr_scanner::is_identifier_start(ch as i32)
+        } else {
+            tsr_scanner::is_identifier_part(ch as i32)
+        };
+        if valid {
+            if needs_underscore {
+                identifier.push('_');
+            }
+            identifier.push(ch);
+            needs_underscore = false;
+        } else {
+            needs_underscore = true;
+        }
+    }
+    if needs_underscore {
+        identifier.push('_');
+    }
+    if identifier.is_empty() {
+        "_".into()
+    } else {
+        identifier
+    }
+}
+
+#[cfg(test)]
+#[path = "completion_residual_tests.rs"]
+mod residual_tests;

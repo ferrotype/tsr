@@ -130,6 +130,11 @@ pub trait CheckerHost: Send + Sync {
         dir: &[u8],
     ) -> Result<Option<JsString>, Error>;
     fn get_global_typings_cache_location(&self) -> Result<JsString, Error>;
+    /// The program's known symlinks (the pin's Program.GetSymlinkCache), when
+    /// the host records them.
+    fn symlink_cache(&self) -> Result<Option<&tsr_module::symlinks::KnownSymlinks>, Error> {
+        Ok(None)
+    }
     fn get_output_js_file_name(&self, file: &[u8]) -> Result<JsString, Error>;
     fn get_output_declaration_file_name(&self, file: &[u8]) -> Result<JsString, Error>;
     fn common_source_directory(&self) -> Result<&[u8], Error>;

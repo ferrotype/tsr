@@ -337,6 +337,28 @@ pub fn flattened(d: &Diagnostic, new_line: &[u8]) -> Result<Vec<u8>> {
 /// must fail; implementations never guess a file from a path or slot number.
 pub trait DiagnosticSources {
     fn diagnostic_source(&self, id: NodeId) -> Result<SourceFileRead<'_>>;
+
+    /// Supplemental projections in mapper order, resolved by their retained
+    /// owner. A single-arena source can use node links; a Program overrides
+    /// this for mapped files parsed into independent arenas.
+    /// Implementations retaining those files must likewise override this:
+    /// the default rejects names without node links instead of silently
+    /// dropping projections it cannot resolve.
+    fn supplemental_sources(&self, id: NodeId) -> Result<Vec<NodeId>> {
+        let source = self.diagnostic_source(id)?;
+        let nodes: Vec<_> = source
+            .supplemental_source_files()?
+            .iter()
+            .flatten()
+            .copied()
+            .collect();
+        if nodes.is_empty() && !source.supplemental_file_names().is_empty() {
+            return Err(crate::Error::Unsupported(
+                "supplemental source owner lookup",
+            ));
+        }
+        Ok(nodes)
+    }
 }
 impl DiagnosticSources for Program {
     fn diagnostic_source(&self, id: NodeId) -> Result<SourceFileRead<'_>> {
@@ -348,6 +370,28 @@ impl DiagnosticSources for Program {
             .node_file_index(id)
             .ok_or(tsr_arena::Error::WrongOwner)?;
         Ok(self.files()[index].bound().view().ast().source_file(id)?)
+    }
+
+    fn supplemental_sources(&self, id: NodeId) -> Result<Vec<NodeId>> {
+        let source = self.diagnostic_source(id)?;
+        let nodes: Vec<_> = source
+            .supplemental_source_files()?
+            .iter()
+            .flatten()
+            .copied()
+            .collect();
+        if !nodes.is_empty() {
+            return Ok(nodes);
+        }
+        source
+            .supplemental_file_names()
+            .iter()
+            .map(|name| {
+                self.source_file(name.as_bytes())
+                    .map(crate::ProgramFile::source)
+                    .ok_or(crate::Error::Unsupported("missing supplemental source"))
+            })
+            .collect()
     }
 }
 impl DiagnosticSources for tsr_tsoptions::ParsedCommandLine {

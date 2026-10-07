@@ -2,6 +2,52 @@ use super::*;
 use crate::api::{ApiSnapshotRequest, ProjectTreeRequest, ResourceRequest};
 
 #[test]
+fn opening_a_referenced_project_defers_the_other_open_projects_rebuild() {
+    let main = "export const main = 1;";
+    let core = "export const core = 1;";
+    let (_, session) = setup(
+        &[
+            (
+                "/main/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true,"composite":true},"references":[{"path":"../core"}]}"#,
+            ),
+            ("/main/main.ts", main),
+            (
+                "/core/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true,"composite":true}}"#,
+            ),
+            ("/core/core.ts", core),
+        ],
+        &Counters::new(),
+    );
+    let first = open(&session, "/main/main.ts", main);
+    let initial = first.project_by_path(b"/main/tsconfig.json").unwrap();
+    let second = open(&session, "/core/core.ts", core);
+    let retained = second.project_by_path(b"/main/tsconfig.json").unwrap();
+    assert!(Arc::ptr_eq(
+        initial.program().unwrap(),
+        retained.program().unwrap()
+    ));
+    assert!(retained.data().unwrap().dirty);
+
+    let searched = session
+        .flush_resources(
+            &ResourceRequest {
+                project_tree: Some(ProjectTreeRequest::All),
+                ..Default::default()
+            },
+            session.fs.clone(),
+        )
+        .unwrap();
+    let refreshed = searched.project_by_path(b"/main/tsconfig.json").unwrap();
+    assert!(!refreshed.data().unwrap().dirty);
+    assert!(!Arc::ptr_eq(
+        initial.program().unwrap(),
+        refreshed.program().unwrap()
+    ));
+}
+
+#[test]
 fn api_opens_are_counted_and_do_not_replace_editor_overlays() {
     let (_fs, session) = setup(
         &[
@@ -267,6 +313,11 @@ fn ancestor_projects_are_delayed_without_parsing_their_configs() {
                 r#"{"compilerOptions":{"noLib":true,"composite":true},"files":["a.ts"]}"#,
             ),
             ("/a/a.ts", "export const a = 1;"),
+            (
+                "/temp/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true}}"#,
+            ),
+            ("/temp/temp.ts", "export const temp = 1;"),
         ],
         &Counters::new(),
     );
@@ -281,6 +332,16 @@ fn ancestor_projects_are_delayed_without_parsing_their_configs() {
     );
     assert!(delayed.project_by_path(b"/tsconfig.json").is_none());
     assert!(!delayed
+        .configs()
+        .unwrap()
+        .configs
+        .contains_key(&js("/tsconfig.json")));
+    // Opening another file runs cleanup, which must retain the first open
+    // file's delayed ancestor without loading its program or config.
+    let retained = open(&session, "/temp/temp.ts", "export const temp = 1;");
+    assert_eq!(retained.delayed_projects().len(), 1);
+    assert_eq!(retained.delayed_projects()[0].name, ancestor.name);
+    assert!(!retained
         .configs()
         .unwrap()
         .configs
@@ -391,4 +452,343 @@ fn closing_an_api_project_does_not_retain_it_for_another_projects_overlay() {
         .snapshot;
     assert!(closed.project_by_path(b"/b/tsconfig.json").is_none());
     assert!(closed.project_by_path(b"/a/tsconfig.json").is_some());
+}
+
+#[test]
+fn loaded_ancestor_references_survive_an_unrelated_open_and_retain_configs() {
+    let (_, session) = setup(
+        &[
+            (
+                "/tsconfig.json",
+                r#"{"files":[],"references":[{"path":"./a"},{"path":"./b"}]}"#,
+            ),
+            (
+                "/a/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true,"composite":true},"files":["a.ts"]}"#,
+            ),
+            ("/a/a.ts", "export const a = 1;"),
+            (
+                "/b/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true,"composite":true},"files":["b.ts"],"references":[{"path":"../a"}]}"#,
+            ),
+            ("/b/b.ts", "import { a } from '../a/a'; a;"),
+            ("/other/main.ts", "export const other = 1;"),
+        ],
+        &Counters::new(),
+    );
+    open(&session, "/a/a.ts", "export const a = 1;");
+    let loaded = session
+        .flush_resources(
+            &ResourceRequest {
+                project_tree: Some(ProjectTreeRequest::All),
+                ..Default::default()
+            },
+            session.fs.clone(),
+        )
+        .unwrap();
+    let config = &loaded.configs().unwrap().configs[&js("/a/tsconfig.json")];
+    assert_eq!(
+        config.retaining_projects,
+        std::collections::BTreeSet::from([
+            js("/a/tsconfig.json"),
+            js("/b/tsconfig.json"),
+            js("/tsconfig.json")
+        ])
+    );
+    let later = open(&session, "/other/main.ts", "export const other = 1;");
+    assert!(later.project_by_path(b"/b/tsconfig.json").is_some());
+    assert_eq!(
+        later.configs().unwrap().configs[&js("/a/tsconfig.json")].retaining_projects,
+        config.retaining_projects
+    );
+}
+
+#[test]
+fn rebuilt_program_releases_only_dropped_reference_config_ownership() {
+    let (fs, session) = setup(
+        &[
+            (
+                "/a/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true,"composite":true},"files":["a.ts"]}"#,
+            ),
+            ("/a/a.ts", "export const a = 1;"),
+            (
+                "/b/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true,"composite":true},"files":["b.ts"],"references":[{"path":"../a"}]}"#,
+            ),
+            ("/b/b.ts", "export const b = 1;"),
+        ],
+        &Counters::new(),
+    );
+    open(&session, "/a/a.ts", "export const a = 1;");
+    let before = open(&session, "/b/b.ts", "export const b = 1;");
+    assert!(before.configs().unwrap().configs[&js("/a/tsconfig.json")]
+        .retaining_projects
+        .contains(&js("/b/tsconfig.json")));
+    fs.write_file(
+        b"b/tsconfig.json",
+        br#"{"compilerOptions":{"noLib":true,"composite":true},"files":["b.ts"]}"#,
+        0o644,
+    )
+    .unwrap();
+    session
+        .enqueue(FileChange::new(
+            FileChangeKind::WatchChange,
+            uri("/b/tsconfig.json"),
+        ))
+        .unwrap();
+    let after = session.flush(Some(&uri("/b/b.ts"))).unwrap();
+    assert_eq!(
+        after.configs().unwrap().configs[&js("/a/tsconfig.json")].retaining_projects,
+        std::collections::BTreeSet::from([js("/a/tsconfig.json")])
+    );
+    assert!(
+        before.configs().unwrap().configs[&js("/a/tsconfig.json")]
+            .retaining_projects
+            .contains(&js("/b/tsconfig.json")),
+        "retained snapshots must keep their previous edges"
+    );
+}
+
+#[test]
+fn inferred_resource_roots_survive_close_until_the_next_open_cleanup() {
+    let (_, session) = setup(
+        &[
+            ("/user.ts", "const user = 1;"),
+            ("/generated/a.d.ts", "export const a: number;"),
+        ],
+        &Counters::new(),
+    );
+    session
+        .set_inferred_options(CompilerOptions {
+            no_lib: Tristate::TRUE,
+            ..Default::default()
+        })
+        .unwrap();
+    open(&session, "/user.ts", "const user = 1;");
+    let retained = session
+        .flush_resources(
+            &ResourceRequest {
+                documents: vec![uri("/generated/a.d.ts")],
+                ..Default::default()
+            },
+            session.fs.clone(),
+        )
+        .unwrap();
+    session.did_close_file(uri("/user.ts")).unwrap();
+    let closed = session.flush(None).unwrap();
+    let roots = &closed
+        .project_by_path(INFERRED_PROJECT_NAME)
+        .unwrap()
+        .data()
+        .unwrap()
+        .command_line
+        .root_file_names;
+    assert_eq!(roots, &[js("/generated/a.d.ts")]);
+    let reopened = open(&session, "/other.ts", "const other = 1;");
+    assert_eq!(
+        reopened
+            .project_by_path(INFERRED_PROJECT_NAME)
+            .unwrap()
+            .data()
+            .unwrap()
+            .command_line
+            .root_file_names,
+        [js("/other.ts")]
+    );
+    assert_eq!(
+        retained
+            .project_by_path(INFERRED_PROJECT_NAME)
+            .unwrap()
+            .data()
+            .unwrap()
+            .command_line
+            .root_file_names,
+        [js("/generated/a.d.ts"), js("/user.ts")]
+    );
+}
+
+#[test]
+fn requested_unowned_solution_configs_survive_until_open_file_cleanup() {
+    let (_, session) = setup(
+        &[
+            (
+                "/solution/tsconfig.json",
+                r#"{"files":[],"references":[{"path":"./child"}],"compilerOptions":{"disableReferencedProjectLoad":true}}"#,
+            ),
+            (
+                "/solution/child/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true,"composite":true},"files":["main.ts"]}"#,
+            ),
+            ("/solution/child/main.ts", "export const value = 1;"),
+        ],
+        &Counters::new(),
+    );
+    let looked_up = session
+        .flush_resources(
+            &ResourceRequest {
+                configured_documents: vec![uri("/solution/other.ts")],
+                ..Default::default()
+            },
+            session.fs.clone(),
+        )
+        .unwrap();
+    let key = js("/solution/tsconfig.json");
+    let config = looked_up
+        .configs()
+        .unwrap()
+        .configs
+        .get(&key)
+        .expect("request lookup must publish the parsed solution config");
+    assert!(config.retaining_projects.is_empty());
+    assert!(config.retaining_open_files.is_empty());
+    let clean = open(&session, "/unrelated.ts", "const unrelated = 1;");
+    assert!(!clean.configs().unwrap().configs.contains_key(&key));
+    assert!(
+        looked_up.configs().unwrap().configs.contains_key(&key),
+        "retained snapshot keeps the original registry"
+    );
+}
+
+#[test]
+fn loading_an_inferred_project_resource_does_not_parse_its_identity_as_a_config() {
+    let (_fs, session) = setup(&[("/main.ts", "export const value = 1;")], &Counters::new());
+    let first = open(&session, "/main.ts", "export const value = 1;");
+    let key = JsString::from_bytes(crate::project::INFERRED_PROJECT_NAME);
+    let project = first.project_by_path(key.as_bytes()).unwrap();
+    let next = session
+        .flush_resources(
+            &ResourceRequest {
+                projects: [key.clone()].into(),
+                ..Default::default()
+            },
+            session.fs.clone(),
+        )
+        .unwrap();
+    assert!(Arc::ptr_eq(
+        project.program().unwrap(),
+        next.project_by_path(key.as_bytes())
+            .unwrap()
+            .program()
+            .unwrap()
+    ));
+    assert!(!next.state().unwrap().configs.configs.contains_key(&key));
+}
+
+#[test]
+fn selecting_an_ancestor_retains_the_loaded_nearest_project() {
+    let (_fs, session) = setup(
+        &[
+            ("/p/tsconfig.json", r#"{"compilerOptions":{"noLib":true}}"#),
+            (
+                "/p/sub/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true},"include":["src"]}"#,
+            ),
+            ("/p/sub/src/source.ts", "export const source = 1;"),
+            ("/p/sub/tests/spec.ts", "export const test = 1;"),
+        ],
+        &Counters::new(),
+    );
+    let snapshot = open(&session, "/p/sub/tests/spec.ts", "export const test = 1;");
+    assert_eq!(
+        snapshot
+            .project_for_file(b"/p/sub/tests/spec.ts")
+            .unwrap()
+            .data()
+            .unwrap()
+            .path,
+        js("/p/tsconfig.json")
+    );
+    assert!(snapshot.project_by_path(b"/p/sub/tsconfig.json").is_some());
+    assert!(
+        snapshot.state().unwrap().configs.configs[&js("/p/sub/tsconfig.json")]
+            .retaining_open_files
+            .contains(&js("/p/sub/tests/spec.ts"))
+    );
+}
+
+#[test]
+fn config_search_retains_visited_siblings_outside_the_selected_reference_path() {
+    let (_fs, session) = setup(
+        &[
+            (
+                "/p/tsconfig.json",
+                r#"{"files":[],"references":[{"path":"./first.json"},{"path":"./second.json"}]}"#,
+            ),
+            (
+                "/p/first.json",
+                r#"{"files":[],"references":[{"path":"./source.json"}]}"#,
+            ),
+            (
+                "/p/second.json",
+                r#"{"files":[],"references":[{"path":"./source.json"}]}"#,
+            ),
+            (
+                "/p/source.json",
+                r#"{"compilerOptions":{"noLib":true,"composite":true},"files":["main.ts"]}"#,
+            ),
+            ("/p/main.ts", "export const value = 1;"),
+        ],
+        &Counters::new(),
+    );
+    let snapshot = open(&session, "/p/main.ts", "export const value = 1;");
+    assert_eq!(
+        snapshot
+            .project_for_file(b"/p/main.ts")
+            .unwrap()
+            .data()
+            .unwrap()
+            .path,
+        js("/p/source.json")
+    );
+    for name in ["/p/first.json", "/p/second.json"] {
+        assert!(
+            snapshot.state().unwrap().configs.configs[&js(name)]
+                .retaining_open_files
+                .contains(&js("/p/main.ts")),
+            "{name}"
+        );
+    }
+}
+
+#[test]
+fn opening_a_direct_project_replaces_an_existing_reference_redirect_default() {
+    let source = "export const source = 1;";
+    let other = "export const other = 1;";
+    let (_, session) = setup(
+        &[
+            (
+                "/p/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true,"disableReferencedProjectLoad":true},"files":["main.ts"],"references":[{"path":"./core"}]}"#,
+            ),
+            (
+                "/p/main.ts",
+                "import { source } from './source'; export { source };",
+            ),
+            ("/p/source.ts", source),
+            (
+                "/p/core/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true,"composite":true,"rootDir":".."},"files":["../source.ts","other.ts"]}"#,
+            ),
+            ("/p/core/other.ts", other),
+        ],
+        &Counters::new(),
+    );
+    let first = open(&session, "/p/source.ts", source);
+    let initial = first.project_for_file(b"/p/source.ts").unwrap();
+    assert_eq!(initial.data().unwrap().path, js("/p/tsconfig.json"));
+    assert!(initial
+        .program()
+        .unwrap()
+        .is_source_from_project_reference(b"/p/source.ts"));
+    assert!(first.project_by_path(b"/p/core/tsconfig.json").is_none());
+
+    let second = open(&session, "/p/core/other.ts", other);
+    let direct = second.project_for_file(b"/p/source.ts").unwrap();
+    assert_eq!(direct.data().unwrap().path, js("/p/core/tsconfig.json"));
+    assert!(!direct
+        .program()
+        .unwrap()
+        .is_source_from_project_reference(b"/p/source.ts"));
+    assert_eq!(initial.data().unwrap().path, js("/p/tsconfig.json"));
 }

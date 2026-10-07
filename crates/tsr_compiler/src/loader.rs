@@ -675,6 +675,12 @@ impl Program {
             .project_reference_from_output_dts(path)
             .map(|file| self.references.config(file.config))
     }
+    /// The source file a referenced project's declaration output stands for.
+    pub fn project_reference_source_of_output_dts(&self, path: &[u8]) -> Option<&JsString> {
+        self.references
+            .project_reference_from_output_dts(path)
+            .map(|file| &file.source)
+    }
     /// The output that replaced a referenced project's source, if any (the
     /// pin's Program.GetParseFileRedirect, a checker accessor).
     /// port: tsc/internal/compiler/program.go:Program.GetParseFileRedirect

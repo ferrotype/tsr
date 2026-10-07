@@ -1,5 +1,6 @@
 use crate::{syntax::Syntax, LanguageService, Result};
 use tsr_ast::{node_flags, span_map::FEATURE_FOLDING_RANGES, utilities, NodeId, SyntaxKind as K};
+use tsr_compiler::diagnostic_writer::DiagnosticSources;
 use tsr_core::TextRange;
 use tsr_lsproto as lsp;
 
@@ -33,9 +34,8 @@ impl LanguageService<'_> {
         options: FoldingOptions,
     ) -> Result<lsp::FoldingRangesOrNull> {
         let source = self.file(uri)?;
-        let file = self.source(source)?;
         let files: Vec<_> = std::iter::once(source)
-            .chain(file.supplemental_source_files()?.iter().flatten().copied())
+            .chain(self.program.supplemental_sources(source)?)
             .collect();
         let mut result = Vec::new();
         for source in files {
@@ -392,8 +392,26 @@ impl LanguageService<'_> {
         let mut full_start = true;
         let tokens_node = node;
         let mut explicit_open = None;
+        let mut standalone_fallback = false;
         match read.kind().known() {
             Some(K::Block) => {
+                if parent_kind == Some(K::TryStatement) {
+                    let data = parent
+                        .as_ref()
+                        .unwrap()
+                        .data_source()
+                        .as_try_statement()
+                        .unwrap();
+                    if data.try_block() != Some(node) {
+                        if data.finally_block() == Some(node) {
+                            // The pin falls through to a standalone range if a
+                            // recovered finally block has no brace tokens.
+                            standalone_fallback = true;
+                        } else {
+                            return self.fold(syntax.source, start, end, "", "", options);
+                        }
+                    }
+                }
                 if utilities::is_function_like(parent.as_ref()) {
                     let parent = parent.as_ref().unwrap();
                     let params: Vec<_> = view
@@ -594,7 +612,11 @@ impl LanguageService<'_> {
         };
         let close = syntax.nav().find_child_of_kind(tokens_node, close_kind)?;
         let (Some(open), Some(close)) = (open, close) else {
-            return Ok(None);
+            return if standalone_fallback {
+                self.fold(syntax.source, start, end, "", "", options)
+            } else {
+                Ok(None)
+            };
         };
         if matches!(
             read.kind().known(),
@@ -620,3 +642,7 @@ impl LanguageService<'_> {
         )
     }
 }
+
+#[cfg(test)]
+#[path = "folding_tests.rs"]
+mod tests;

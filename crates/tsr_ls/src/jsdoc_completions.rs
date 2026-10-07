@@ -271,7 +271,18 @@ impl LanguageService<'_> {
                     };
                     if let Some(expression) = expression {
                         let e = syntax.view.node(expression)?;
-                        if syntax.start(expression)? <= position && position <= i64::from(e.end()) {
+                        if syntax.start(expression)? <= position
+                            && position <= i64::from(e.end())
+                            && !tsr_ast::utilities_positions::is_declaration_name(
+                                syntax.view,
+                                token,
+                            )?
+                            && !(syntax.view.node(token)?.parent().is_some_and(|parent| {
+                                syntax.view.node(parent).is_ok_and(|node| {
+                                    node.kind() == K::JSDocPropertyTag && node.name() == Some(token)
+                                })
+                            }))
+                        {
                             return Ok(JsDocCompletion::Code);
                         }
                     }

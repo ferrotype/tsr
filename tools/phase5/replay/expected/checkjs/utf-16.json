@@ -1,0 +1,1629 @@
+{
+  "encoding": "utf-16",
+  "responses": [
+    {
+      "position": 0,
+      "method": "initialize",
+      "message": {
+        "jsonrpc": "2.0",
+        "result": {
+          "capabilities": {
+            "positionEncoding": "utf-16",
+            "textDocumentSync": {
+              "openClose": true,
+              "change": 2,
+              "save": true
+            },
+            "completionProvider": {
+              "triggerCharacters": [
+                ".",
+                "\"",
+                "'",
+                "`",
+                "/",
+                "@",
+                "<",
+                "#",
+                " ",
+                "*"
+              ],
+              "resolveProvider": true,
+              "completionItem": {
+                "labelDetailsSupport": true
+              }
+            },
+            "hoverProvider": true,
+            "signatureHelpProvider": {
+              "triggerCharacters": [
+                "(",
+                ",",
+                "<"
+              ],
+              "retriggerCharacters": [
+                ")"
+              ]
+            },
+            "definitionProvider": true,
+            "typeDefinitionProvider": true,
+            "implementationProvider": true,
+            "referencesProvider": true,
+            "documentHighlightProvider": true,
+            "documentSymbolProvider": true,
+            "codeActionProvider": {
+              "codeActionKinds": [
+                "quickfix",
+                "source.organizeImports.ts",
+                "source.removeUnusedImports.ts",
+                "source.sortImports.ts",
+                "source.fixAll.ts"
+              ]
+            },
+            "codeLensProvider": {
+              "resolveProvider": true
+            },
+            "workspaceSymbolProvider": true,
+            "documentFormattingProvider": true,
+            "documentRangeFormattingProvider": true,
+            "documentOnTypeFormattingProvider": {
+              "firstTriggerCharacter": "{",
+              "moreTriggerCharacter": [
+                "}",
+                ";",
+                "\n"
+              ]
+            },
+            "renameProvider": {
+              "prepareProvider": true
+            },
+            "foldingRangeProvider": true,
+            "selectionRangeProvider": true,
+            "callHierarchyProvider": true,
+            "linkedEditingRangeProvider": true,
+            "semanticTokensProvider": {
+              "legend": {
+                "tokenTypes": [],
+                "tokenModifiers": []
+              },
+              "range": true,
+              "full": true
+            },
+            "inlayHintProvider": true,
+            "diagnosticProvider": {
+              "identifier": "typescript",
+              "interFileDependencies": true,
+              "workspaceDiagnostics": false
+            },
+            "workspace": {
+              "fileOperations": {
+                "willRename": {
+                  "filters": [
+                    {
+                      "scheme": "file",
+                      "pattern": {
+                        "glob": "**/*.{ts,tsx,js,jsx,cts,cjs,mts,mjs,json}"
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "experimental": {
+              "customSourceDefinitionProvider": true,
+              "customMultiDocumentHighlightProvider": true
+            },
+            "_vs_onAutoInsertProvider": {
+              "_vs_triggerCharacters": [
+                ">"
+              ]
+            },
+            "_vs_referencesProvider": true
+          },
+          "serverInfo": {
+            "name": "typescript",
+            "version": "7.1.0-dev"
+          }
+        }
+      }
+    },
+    {
+      "position": 3,
+      "method": "textDocument/diagnostic",
+      "message": {
+        "jsonrpc": "2.0",
+        "result": {
+          "kind": "full",
+          "items": []
+        }
+      }
+    },
+    {
+      "position": 4,
+      "method": "textDocument/completion",
+      "message": {
+        "jsonrpc": "2.0",
+        "result": {
+          "isIncomplete": false,
+          "items": [
+            {
+              "label": "value",
+              "kind": 5,
+              "sortText": "11",
+              "data": {
+                "fileName": "@PROJECT_ROOT@/src/main.js",
+                "position": 131,
+                "name": "value"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "position": 5,
+      "method": "completionItem/resolve",
+      "message": {
+        "jsonrpc": "2.0",
+        "result": {
+          "label": "value",
+          "kind": 5,
+          "detail": "(property) value: number",
+          "sortText": "11",
+          "data": {
+            "fileName": "@PROJECT_ROOT@/src/main.js",
+            "position": 131,
+            "name": "value"
+          }
+        }
+      }
+    },
+    {
+      "position": 6,
+      "method": "textDocument/hover",
+      "message": {
+        "jsonrpc": "2.0",
+        "result": {
+          "contents": {
+            "kind": "plaintext",
+            "value": "const answer: number"
+          },
+          "range": {
+            "start": {
+              "line": 2,
+              "character": 7
+            },
+            "end": {
+              "line": 2,
+              "character": 13
+            }
+          }
+        }
+      }
+    },
+    {
+      "position": 7,
+      "method": "textDocument/definition",
+      "message": {
+        "jsonrpc": "2.0",
+        "result": [
+          {
+            "uri": "@PROJECT_ROOT_URI@/src/main.js",
+            "range": {
+              "start": {
+                "line": 1,
+                "character": 13
+              },
+              "end": {
+                "line": 1,
+                "character": 19
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "position": 8,
+      "method": "textDocument/references",
+      "message": {
+        "jsonrpc": "2.0",
+        "result": [
+          {
+            "uri": "@PROJECT_ROOT_URI@/src/main.js",
+            "range": {
+              "start": {
+                "line": 1,
+                "character": 13
+              },
+              "end": {
+                "line": 1,
+                "character": 19
+              }
+            }
+          },
+          {
+            "uri": "@PROJECT_ROOT_URI@/src/main.js",
+            "range": {
+              "start": {
+                "line": 2,
+                "character": 7
+              },
+              "end": {
+                "line": 2,
+                "character": 13
+              }
+            }
+          },
+          {
+            "uri": "@PROJECT_ROOT_URI@/src/main.js",
+            "range": {
+              "start": {
+                "line": 3,
+                "character": 28
+              },
+              "end": {
+                "line": 3,
+                "character": 34
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "position": 9,
+      "method": "textDocument/rename",
+      "message": {
+        "jsonrpc": "2.0",
+        "result": {
+          "changes": {
+            "@PROJECT_ROOT_URI@/src/main.js": [
+              {
+                "range": {
+                  "start": {
+                    "line": 1,
+                    "character": 13
+                  },
+                  "end": {
+                    "line": 1,
+                    "character": 19
+                  }
+                },
+                "newText": "renamedAnswer"
+              },
+              {
+                "range": {
+                  "start": {
+                    "line": 2,
+                    "character": 7
+                  },
+                  "end": {
+                    "line": 2,
+                    "character": 13
+                  }
+                },
+                "newText": "renamedAnswer"
+              },
+              {
+                "range": {
+                  "start": {
+                    "line": 3,
+                    "character": 28
+                  },
+                  "end": {
+                    "line": 3,
+                    "character": 34
+                  }
+                },
+                "newText": "renamedAnswer"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "position": 10,
+      "method": "textDocument/codeAction",
+      "message": {
+        "jsonrpc": "2.0",
+        "result": [
+          {
+            "title": "Organize Imports",
+            "kind": "source.organizeImports.ts",
+            "edit": {
+              "changes": {
+                "@PROJECT_ROOT_URI@/src/main.js": [
+                  {
+                    "range": {
+                      "start": {
+                        "line": 0,
+                        "character": 0
+                      },
+                      "end": {
+                        "line": 1,
+                        "character": 0
+                      }
+                    },
+                    "newText": "import { value0 } from \"./value0.js\";\n"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "position": 11,
+      "method": "textDocument/formatting",
+      "message": {
+        "jsonrpc": "2.0",
+        "result": []
+      }
+    },
+    {
+      "position": 15,
+      "method": "textDocument/diagnostic",
+      "message": {
+        "jsonrpc": "2.0",
+        "result": {
+          "kind": "full",
+          "items": []
+        }
+      }
+    },
+    {
+      "position": 17,
+      "method": "shutdown",
+      "message": {
+        "jsonrpc": "2.0",
+        "result": null
+      }
+    }
+  ],
+  "executed": [
+    {
+      "jsonrpc": "2.0",
+      "id": 0,
+      "method": "initialize",
+      "params": {
+        "processId": null,
+        "initializationOptions": {
+          "logVerbosity": 5
+        },
+        "rootUri": "@PROJECT_ROOT_URI@",
+        "capabilities": {
+          "general": {
+            "positionEncodings": [
+              "utf-16"
+            ]
+          },
+          "textDocument": {
+            "diagnostic": {},
+            "completion": {
+              "completionItem": {
+                "resolveSupport": {
+                  "properties": [
+                    "documentation",
+                    "detail"
+                  ]
+                }
+              }
+            }
+          },
+          "workspace": {
+            "configuration": true
+          }
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "initialized",
+      "params": {}
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/didOpen",
+      "params": {
+        "textDocument": {
+          "uri": "@PROJECT_ROOT_URI@/src/main.js",
+          "languageId": "javascript",
+          "version": 1,
+          "text": "import { value0 } from \"./value0.js\";\nexport const answer = value0 + 1;\n/*😀*/ answer;\nexport const box = { value: answer };\nbox.value;\n"
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "result": [
+        {},
+        {},
+        {},
+        {}
+      ]
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 4,
+      "result": null
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 5,
+      "method": "textDocument/diagnostic",
+      "params": {
+        "textDocument": {
+          "uri": "@PROJECT_ROOT_URI@/src/main.js"
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 6,
+      "method": "textDocument/completion",
+      "params": {
+        "textDocument": {
+          "uri": "@PROJECT_ROOT_URI@/src/main.js"
+        },
+        "position": {
+          "line": 4,
+          "character": 4
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 7,
+      "method": "completionItem/resolve",
+      "params": {
+        "label": "value",
+        "kind": 5,
+        "sortText": "11",
+        "data": {
+          "fileName": "@PROJECT_ROOT@/src/main.js",
+          "position": 131,
+          "name": "value"
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 8,
+      "method": "textDocument/hover",
+      "params": {
+        "textDocument": {
+          "uri": "@PROJECT_ROOT_URI@/src/main.js"
+        },
+        "position": {
+          "line": 2,
+          "character": 9
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 9,
+      "method": "textDocument/definition",
+      "params": {
+        "textDocument": {
+          "uri": "@PROJECT_ROOT_URI@/src/main.js"
+        },
+        "position": {
+          "line": 2,
+          "character": 9
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 10,
+      "method": "textDocument/references",
+      "params": {
+        "textDocument": {
+          "uri": "@PROJECT_ROOT_URI@/src/main.js"
+        },
+        "position": {
+          "line": 2,
+          "character": 9
+        },
+        "context": {
+          "includeDeclaration": true
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 11,
+      "method": "textDocument/rename",
+      "params": {
+        "textDocument": {
+          "uri": "@PROJECT_ROOT_URI@/src/main.js"
+        },
+        "position": {
+          "line": 2,
+          "character": 9
+        },
+        "newName": "renamedAnswer"
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 12,
+      "method": "textDocument/codeAction",
+      "params": {
+        "textDocument": {
+          "uri": "@PROJECT_ROOT_URI@/src/main.js"
+        },
+        "range": {
+          "start": {
+            "line": 2,
+            "character": 9
+          },
+          "end": {
+            "line": 2,
+            "character": 9
+          }
+        },
+        "context": {
+          "diagnostics": [],
+          "only": [
+            "source.organizeImports"
+          ]
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 13,
+      "method": "textDocument/formatting",
+      "params": {
+        "textDocument": {
+          "uri": "@PROJECT_ROOT_URI@/src/main.js"
+        },
+        "options": {
+          "tabSize": 2,
+          "insertSpaces": true
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/didChange",
+      "params": {
+        "textDocument": {
+          "uri": "@PROJECT_ROOT_URI@/src/main.js",
+          "version": 2
+        },
+        "contentChanges": [
+          {
+            "text": "import { value0 } from \"./value0.js\";\nexport const answer = value0 + 1;\n/*😀*/ answer;\nexport const box = { value: answer };\nbox.value;\n// edited\n"
+          }
+        ]
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "workspace/didChangeConfiguration",
+      "params": {
+        "settings": {
+          "js/ts": {
+            "validate": {
+              "enabled": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "workspace/didChangeWatchedFiles",
+      "params": {
+        "changes": [
+          {
+            "uri": "@PROJECT_ROOT_URI@/tsconfig.json",
+            "type": 2
+          },
+          {
+            "uri": "@PROJECT_ROOT_URI@/src/value0.js",
+            "type": 2
+          }
+        ]
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 17,
+      "method": "textDocument/diagnostic",
+      "params": {
+        "textDocument": {
+          "uri": "@PROJECT_ROOT_URI@/src/main.js"
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/didClose",
+      "params": {
+        "textDocument": {
+          "uri": "@PROJECT_ROOT_URI@/src/main.js"
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 19,
+      "method": "shutdown"
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "exit"
+    }
+  ],
+  "waits": [
+    {
+      "after": 2,
+      "method": "textDocument/publishDiagnostics",
+      "params": {
+        "uri": "@PROJECT_ROOT_URI@/tsconfig.json"
+      },
+      "count": 1
+    },
+    {
+      "after": 3,
+      "method": "textDocument/publishDiagnostics",
+      "params": {
+        "uri": "@PROJECT_ROOT_URI@/tsconfig.json"
+      },
+      "count": 2
+    },
+    {
+      "after": 15,
+      "method": "textDocument/publishDiagnostics",
+      "params": {
+        "uri": "@PROJECT_ROOT_URI@/tsconfig.json"
+      },
+      "count": 3
+    }
+  ],
+  "server_requests": [
+    {
+      "jsonrpc": "2.0",
+      "id": 0,
+      "method": "workspace/configuration",
+      "params": {
+        "items": [
+          {
+            "section": "js/ts"
+          },
+          {
+            "section": "typescript"
+          },
+          {
+            "section": "javascript"
+          },
+          {
+            "section": "editor"
+          }
+        ]
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "client/registerCapability",
+      "params": {
+        "registrations": [
+          {
+            "id": "typescript-config-watch-id",
+            "method": "workspace/didChangeConfiguration",
+            "registerOptions": {
+              "section": [
+                "js/ts",
+                "typescript",
+                "javascript",
+                "editor"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "server_notifications": [],
+  "diagnostics": {
+    "@PROJECT_ROOT_URI@/tsconfig.json": [
+      {
+        "jsonrpc": "2.0",
+        "method": "textDocument/publishDiagnostics",
+        "params": {
+          "uri": "@PROJECT_ROOT_URI@/tsconfig.json",
+          "diagnostics": [
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/dependency.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/main.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value0.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value1.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value10.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value11.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value12.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value13.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value14.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value15.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value16.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value17.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value18.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value19.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value2.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value3.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value4.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value5.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value6.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value7.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value8.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value9.js' because it would overwrite input file."
+            }
+          ]
+        }
+      },
+      {
+        "jsonrpc": "2.0",
+        "method": "textDocument/publishDiagnostics",
+        "params": {
+          "uri": "@PROJECT_ROOT_URI@/tsconfig.json",
+          "diagnostics": [
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/dependency.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/main.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value0.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value1.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value10.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value11.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value12.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value13.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value14.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value15.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value16.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value17.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value18.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value19.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value2.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value3.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value4.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value5.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value6.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value7.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value8.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 5055,
+              "source": "ts",
+              "message": "Cannot write file '@PROJECT_ROOT@/src/value9.js' because it would overwrite input file."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 2318,
+              "source": "ts",
+              "message": "Cannot find global type 'Array'."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 2318,
+              "source": "ts",
+              "message": "Cannot find global type 'Boolean'."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 2318,
+              "source": "ts",
+              "message": "Cannot find global type 'CallableFunction'."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 2318,
+              "source": "ts",
+              "message": "Cannot find global type 'Function'."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 2318,
+              "source": "ts",
+              "message": "Cannot find global type 'IArguments'."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 2318,
+              "source": "ts",
+              "message": "Cannot find global type 'NewableFunction'."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 2318,
+              "source": "ts",
+              "message": "Cannot find global type 'Number'."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 2318,
+              "source": "ts",
+              "message": "Cannot find global type 'Object'."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 2318,
+              "source": "ts",
+              "message": "Cannot find global type 'RegExp'."
+            },
+            {
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 0,
+                  "character": 0
+                }
+              },
+              "severity": 1,
+              "code": 2318,
+              "source": "ts",
+              "message": "Cannot find global type 'String'."
+            }
+          ]
+        }
+      },
+      {
+        "jsonrpc": "2.0",
+        "method": "textDocument/publishDiagnostics",
+        "params": {
+          "uri": "@PROJECT_ROOT_URI@/tsconfig.json",
+          "diagnostics": []
+        }
+      }
+    ]
+  }
+}

@@ -133,6 +133,7 @@ struct Pending {
     changes: Vec<FileChange>,
     inferred: Option<Arc<CompilerOptions>>,
     custom_name: Option<JsString>,
+    validation_enabled: Option<bool>,
     contributions: Option<Arc<crate::content_mappers::Contributions>>,
 }
 impl Pending {
@@ -143,6 +144,7 @@ impl Pending {
             && self.changes.is_empty()
             && self.inferred.is_none()
             && self.custom_name.is_none()
+            && self.validation_enabled.is_none()
             && self.contributions.is_none()
     }
 }
@@ -242,6 +244,7 @@ impl Session {
             api_state: crate::api::ApiState::default(),
             api_error: None,
             inferred_options: None,
+            validation_enabled: true,
             config_ownership: Arc::new(ConfigOwnership::new(extended_cache.clone(), id)),
             _programs: Vec::new(),
         };
@@ -588,6 +591,19 @@ impl Session {
         }
         result
     }
+    /// Like Configure, stage the publication policy for the next snapshot.
+    /// A configuration notification does not itself publish program diagnostics.
+    pub fn set_validation_enabled(&self, enabled: bool) -> Result<(), Error> {
+        let current = self.snapshot.read().expect("session snapshot");
+        if current.is_none() {
+            return Err(Error::Closed);
+        }
+        self.pending
+            .lock()
+            .expect("session events")
+            .validation_enabled = Some(enabled);
+        Ok(())
+    }
     pub fn set_custom_config_file_name(&self, name: JsString) -> Result<(), Error> {
         let current = self.snapshot.read().expect("session snapshot");
         if current.is_none() {
@@ -815,7 +831,19 @@ impl Session {
             api_state,
             api_error,
         } = builder.build(resources)?;
-        configs.cleanup();
+        // The pin cleans unowned registry entries when recomputing the open
+        // project set, not when merely loading resources for an LS request.
+        // Such lookups may intentionally publish parsed solution configs that
+        // have no project/open-file retainer yet.
+        if changes.opened.is_some()
+            || changes.reopened.is_some()
+            || resources
+                .api
+                .as_ref()
+                .is_some_and(|api| api.open_files.is_some() || api.close_files.is_some())
+        {
+            configs.cleanup();
+        }
         let configs = configs.finalize();
         let clean = changes.opened.is_some()
             || changes.reopened.is_some()
@@ -856,6 +884,7 @@ impl Session {
             api_state,
             api_error,
             inferred_options,
+            validation_enabled: pending.validation_enabled.unwrap_or(old.validation_enabled),
             config_ownership: ownership,
             _programs: programs,
         });
@@ -954,6 +983,9 @@ impl Drop for PendingTransaction<'_> {
             }
             if queued.contributions.is_none() {
                 queued.contributions = failed.contributions;
+            }
+            if queued.validation_enabled.is_none() {
+                queued.validation_enabled = failed.validation_enabled;
             }
             if queued.custom_name.is_none() {
                 queued.custom_name = failed.custom_name;

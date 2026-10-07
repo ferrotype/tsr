@@ -4,6 +4,7 @@ use tsr_ast::{
     modifier_flags, node_flags, source_file_tables, span_map::FEATURE_DOCUMENT_SYMBOLS, utilities,
     AstView, JSDeclarationKind as J, JsDocProvider, NodeId, SyntaxKind as K,
 };
+use tsr_compiler::diagnostic_writer::DiagnosticSources;
 use tsr_core::TextRange;
 use tsr_lsproto as lsp;
 
@@ -392,9 +393,8 @@ impl LanguageService<'_> {
         hierarchical: bool,
     ) -> Result<lsp::SymbolInformationsOrDocumentSymbolsOrNull> {
         let source = self.file(uri)?;
-        let file = self.source(source)?;
         let files: Vec<_> = std::iter::once(source)
-            .chain(file.supplemental_source_files()?.iter().flatten().copied())
+            .chain(self.program.supplemental_sources(source)?)
             .collect();
         let mut symbols = Vec::new();
         let mut seen = HashSet::new();
@@ -683,8 +683,18 @@ impl LanguageService<'_> {
                     if let Some(binary) = read.data_source().as_binary_expression() {
                         let target = binary.left().ok_or(tsr_arena::Error::InvalidGraph)?;
                         let target_read = view.node(target)?;
-                        let property = tsr_ast::get_element_or_property_access_name(view, target)?
-                            .ok_or(tsr_arena::Error::InvalidGraph)?;
+                        // Unlike the static-name helper, an expando's display
+                        // name can be an arbitrary element-access expression
+                        // (for example Symbol.iterator).
+                        let property = if target_read.kind() == K::PropertyAccessExpression {
+                            target_read.name()
+                        } else {
+                            target_read
+                                .data_source()
+                                .as_element_access_expression()
+                                .and_then(|data| data.argument_expression())
+                        }
+                        .ok_or(tsr_arena::Error::InvalidGraph)?;
                         (
                             target,
                             target_read
@@ -703,7 +713,13 @@ impl LanguageService<'_> {
                         )
                     };
                 // port: tsc/internal/ls/symbols.go:isPrototypeExpando
-                if let Some(name) = tsr_ast::get_element_or_property_access_name(view, function)? {
+                let access_name = if tsr_ast::utilities::is_access_expression(&view.node(function)?)
+                {
+                    tsr_ast::get_element_or_property_access_name(view, function)?
+                } else {
+                    None
+                };
+                if let Some(name) = access_name {
                     if view.node_text(name)?.as_bytes() == b"prototype" {
                         function = view
                             .node(function)?

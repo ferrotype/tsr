@@ -18,14 +18,19 @@ def relative_mad(values):
     return median([abs(value - middle) for value in values]) / middle
 
 
-def ratio_summary(go, rust, timing=False, threshold=1.0):
-    """`threshold` is the timing criterion the upper bootstrap bound is judged against (ADR 0021)."""
+def ratio_summary(go, rust, timing=False, threshold=1.0, *, accepted_counts=(7, 14, 21)):
+    """Upper-bound timing criterion (ADR 0021); defaults preserve S07 sampling.
+
+    Other workloads must explicitly provide their accepted complete batch counts.
+    """
     sample_values(go)
     sample_values(rust)
     if type(threshold) not in {int, float} or not math.isfinite(threshold) or threshold <= 0:
         raise ValueError("timing threshold must be a positive finite ratio")
-    if len(go) != len(rust) or len(go) not in {7, 14, 21}:
-        raise ValueError("S07 requires equal complete batches of 7, 14 or 21 samples")
+    if not accepted_counts or any(type(count) is not int or count <= 0 for count in accepted_counts):
+        raise ValueError("accepted sample counts must be positive integers")
+    if len(go) != len(rust) or len(go) not in accepted_counts:
+        raise ValueError(f"requires equal complete batches with sample counts {tuple(accepted_counts)}")
     summary = {"samples_per_runtime": len(go), "go_median": median(go), "rust_median": median(rust),
                "ratio": median(rust) / median(go), "go_relative_mad": relative_mad(go), "rust_relative_mad": relative_mad(rust)}
     if timing:
@@ -36,5 +41,5 @@ def ratio_summary(go, rust, timing=False, threshold=1.0):
                                 "resamples": RESAMPLES, "confidence": 0.95,
                                 "lower": ratios[249], "upper": ratios[9749], "threshold": threshold}
         summary["stable"] = summary["go_relative_mad"] <= 0.05 and summary["rust_relative_mad"] <= 0.05 and ratios[9749] <= threshold
-        summary["needs_more"] = len(go) < 21 and (ratios[249] <= threshold < ratios[9749] or summary["go_relative_mad"] > 0.05 or summary["rust_relative_mad"] > 0.05)
+        summary["needs_more"] = len(go) < max(accepted_counts) and (ratios[249] <= threshold < ratios[9749] or summary["go_relative_mad"] > 0.05 or summary["rust_relative_mad"] > 0.05)
     return summary

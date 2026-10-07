@@ -1,0 +1,46 @@
+{
+  "encoding": "utf-16",
+  "open": {
+    "path": "src/ast/utils.ts",
+    "languageId": "typescript",
+    "version": 1
+  },
+  "first_diagnostics": {
+    "mode": "pull",
+    "params": {
+      "textDocument": {"uri": "@PROJECT_ROOT_URI@/src/ast/utils.ts"}
+    }
+  },
+  "warmup_hover": {
+    "textDocument": {"uri": "@PROJECT_ROOT_URI@/src/ast/utils.ts"},
+    "position": {"line": 1, "character": 10}
+  },
+  "edit": {
+    "textDocument": {"uri": "@PROJECT_ROOT_URI@/src/ast/utils.ts", "version": 2},
+    "contentChanges": [{
+      "range": {"start": {"line": 0, "character": 0}, "end": {"line": 0, "character": 0}},
+      "text": " "
+    }]
+  },
+  "requests": {
+    "completion": {
+      "textDocument": {"uri": "@PROJECT_ROOT_URI@/src/ast/utils.ts"},
+      "position": {"line": 21, "character": 39},
+      "context": {"triggerKind": 1}
+    },
+    "hover": {
+      "textDocument": {"uri": "@PROJECT_ROOT_URI@/src/ast/utils.ts"},
+      "position": {"line": 9, "character": 15}
+    },
+    "references": {
+      "textDocument": {"uri": "@PROJECT_ROOT_URI@/src/ast/utils.ts"},
+      "position": {"line": 9, "character": 15},
+      "context": {"includeDeclaration": true}
+    },
+    "rename": {
+      "textDocument": {"uri": "@PROJECT_ROOT_URI@/src/ast/utils.ts"},
+      "position": {"line": 9, "character": 15},
+      "newName": "LatencyNode"
+    }
+  }
+}

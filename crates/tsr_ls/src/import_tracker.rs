@@ -801,7 +801,8 @@ impl SearchState<'_, '_, '_> {
                         .module_reference()
                         == Some(node)
                 {
-                    if search.from != From::Export {
+                    if search.from != From::Export && !(self.options.rename && self.options.aliases)
+                    {
                         if let Some(name) = view.node(decl)?.name() {
                             if let Some(symbol) = self.c.get_symbol_at_location(name)? {
                                 self.search_imported(symbol)?;

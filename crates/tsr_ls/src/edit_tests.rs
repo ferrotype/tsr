@@ -52,6 +52,73 @@ fn apply(text: &str, edits: impl IntoIterator<Item = lsp::TextEdit>) -> String {
 }
 
 #[test]
+fn import_statement_completion_retains_insert_text_with_explicit_edit() {
+    // Pinned TestImportStatementCompletions_noSnippet checks both fields.
+    let p = program(
+        &[
+            ("/mod.ts", "export const foo = 0;"),
+            ("/main.ts", "import f"),
+        ],
+        CompilerOptions::default(),
+    );
+    let source = p.source_file(b"/main.ts").unwrap().source();
+    let pool = tsr_compiler::CompilerCheckerPool::new(p.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool.checker_for_file_exclusive(source).unwrap();
+    let mut service = LanguageService::new(&p, PositionEncoding::Utf16, CancellationToken::new());
+    for default_edit_range in [false, true] {
+        let result = service
+            .completion(
+                &mut checker,
+                &lsp::CompletionParams {
+                    text_document: lsp::TextDocumentIdentifier {
+                        uri: lsp::DocumentUri("file:///main.ts".into()),
+                    },
+                    position: lsp::Position {
+                        line: 0,
+                        character: 8,
+                    },
+                    ..Default::default()
+                },
+                &CompletionOptions {
+                    import_statements: Some(true),
+                    default_edit_range,
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+        let item = result
+            .list
+            .as_ref()
+            .unwrap()
+            .items
+            .iter()
+            .flatten()
+            .find(|item| item.label == "foo")
+            .unwrap();
+        assert_eq!(
+            item.insert_text.as_deref().map(String::as_str),
+            Some("import { foo } from \"./mod\";")
+        );
+        let edit = item.text_edit.as_ref().unwrap().text_edit.as_ref().unwrap();
+        assert_eq!(edit.new_text, "import { foo } from \"./mod\";");
+        assert_eq!(
+            edit.range.start,
+            lsp::Position {
+                line: 0,
+                character: 0
+            }
+        );
+        assert_eq!(
+            edit.range.end,
+            lsp::Position {
+                line: 0,
+                character: 8
+            }
+        );
+    }
+}
+
+#[test]
 fn quoted_property_rename_keeps_the_checker_usable() {
     let text = "const obj = { \"foo-bar\": 1 }; obj[\"foo-bar\"];";
     let p = program(&[("/main.ts", text)], CompilerOptions::default());
@@ -425,4 +492,90 @@ fn type_only_promotion_handles_zero_tab_size_and_unicode_indentation() {
             format!("import {{\n    a,\n{expected_indent}D\n}} from \"./dep\";\nnew D(); a;\n")
         );
     }
+}
+
+#[test]
+fn internal_import_alias_keeps_its_name_when_renaming_the_target() {
+    let files = [
+        ("/a.ts", "namespace A { export const x = 0; }"),
+        ("/b.ts", "export import B = A; B.x;"),
+        ("/c.ts", "import { B } from \"./b\";"),
+    ];
+    let p = program(&files, CompilerOptions::default());
+    let pool = tsr_compiler::CompilerCheckerPool::new(p.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool
+        .checker_for_file_exclusive(p.source_file(b"/a.ts").unwrap().source())
+        .unwrap();
+    let mut service = LanguageService::new(&p, PositionEncoding::Utf16, CancellationToken::new());
+    let result = service
+        .rename(
+            &mut checker,
+            &lsp::RenameParams {
+                text_document: lsp::TextDocumentIdentifier {
+                    uri: lsp::DocumentUri("file:///a.ts".into()),
+                },
+                position: lsp::Position {
+                    line: 0,
+                    character: 10,
+                },
+                new_name: "Changed".into(),
+                ..Default::default()
+            },
+            RenameOptions::default(),
+            &tsr_locale::DEFAULT,
+        )
+        .unwrap();
+    let changes = result.workspace_edit.unwrap().changes.unwrap();
+    assert_eq!(changes.len(), 2);
+    let edits = changes
+        .get(&lsp::DocumentUri("file:///b.ts".into()))
+        .unwrap()
+        .iter()
+        .flatten()
+        .map(|edit| (**edit).clone());
+    assert_eq!(apply(files[1].1, edits), "export import B = Changed; B.x;");
+}
+
+#[test]
+fn implementation_of_a_module_includes_its_type_reference_directive() {
+    let files = [
+        (
+            "/node_modules/@types/react/index.d.ts",
+            "export type JSX = {};",
+        ),
+        (
+            "/node_modules/excalidraw/index.d.ts",
+            "/// <reference types=\"react\" />",
+        ),
+        ("/main.ts", "import type { JSX } from \"react\";"),
+    ];
+    let p = program(&files, CompilerOptions::default());
+    let pool = tsr_compiler::CompilerCheckerPool::new(p.clone(), &tsr_arena::Counters::new());
+    let mut checker = pool
+        .checker_for_file_exclusive(p.source_file(b"/main.ts").unwrap().source())
+        .unwrap();
+    let mut service = LanguageService::new(&p, PositionEncoding::Utf16, CancellationToken::new());
+    let result = service
+        .implementations(
+            &mut checker,
+            &lsp::ImplementationParams {
+                text_document: lsp::TextDocumentIdentifier {
+                    uri: lsp::DocumentUri("file:///main.ts".into()),
+                },
+                position: lsp::Position {
+                    line: 0,
+                    character: files[2].1.find("react").unwrap() as u32,
+                },
+                ..Default::default()
+            },
+            false,
+        )
+        .unwrap()
+        .locations
+        .unwrap();
+    assert_eq!(result.len(), 2, "{result:?}");
+    assert!(result.iter().any(|location| location.uri.0
+        == "file:///node_modules/excalidraw/index.d.ts"
+        && location.range.start.character == 22
+        && location.range.end.character == 27));
 }
