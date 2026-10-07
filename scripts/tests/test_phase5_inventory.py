@@ -38,7 +38,11 @@ class InventoryTests(unittest.TestCase):
         self.assertTrue(rows['lsp', 'TestDynamicQueueFIFO']['route'].startswith('Exact observation assignment:'))
         self.assertTrue(rows['lsp/lspwatcher', 'TestRootFromGlob']['route'].startswith('Exact observation assignment:'))
         for name in ('TestDynamicQueueGetCancellation', 'TestDynamicQueuePutCancellationWhileStateUnavailable'):
-            self.assertTrue(rows['lsp', name]['route'].startswith('WORK:'))
+            self.assertTrue(rows['lsp', name]['route'].startswith('Exact observation assignment:'))
+            self.assertIn('source audit only, execution not certified here', rows['lsp', name]['route'])
+        self.assertIn('Rust Result::Err carries no item', rows['lsp', 'TestDynamicQueueGetCancellation']['route'])
+        self.assertIn('subsequent put/get returns 2', rows['lsp', 'TestDynamicQueuePutCancellationWhileStateUnavailable']['route'])
+        self.assertTrue(rows['lsp/lspwatcher', 'TestWatcher_CreateChangeDelete']['route'].startswith('WORK:'))
         self.assertIn('changed/deleted', rows['lsp/lspwatcher', 'TestWatcher_CreateChangeDelete']['route'])
 
 

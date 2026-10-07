@@ -69,12 +69,13 @@ to focused scheduler tests. Native-to-Rust API representation is recorded
 for total-checker options and ownership-based release.
 Configured timeout or unused capacity differences alone do not create WORK.
 Assigned observations are source comparisons, not execution evidence.
-Cancellation and real watcher routes retain missing
-observations. These assignments do not claim tests were run in this audit.
+Queue cancellation includes unavailable-state and subsequent-item observations;
+real watcher routes retain missing observations. These assignments do not claim
+tests were run in this audit.
 Remaining WORK rows are the concrete L7/L8 assignment backlog; source-reference
 rows still require subcase review and runtime evidence before acceptance credit.
 
-Unassigned or partial direct-test observations: **95**.
+Unassigned or partial direct-test observations: **93**.
 Each WORK row below identifies its native test and source; the counts do not
 include source-reference rows whose exact subcase review is still pending.
 
@@ -84,7 +85,7 @@ include source-reference rows whose exact subcase review is still pending.
 | `ls/autoimport` | 3 |
 | `ls/lsconv` | 1 |
 | `ls/lsutil` | 12 |
-| `lsp` | 14 |
+| `lsp` | 12 |
 | `lsp/lsproto` | 29 |
 | `lsp/lspwatcher` | 14 |
 | `project` | 18 |
@@ -137,7 +138,7 @@ include source-reference rows whose exact subcase review is still pending.
 | `project/TestCheckerPoolAPICheckerDisposedOnCancel` | `upstream/tsc/internal/project/checkerpool_test.go:1195` | Assigned observation (source audit): crates/tsr_project/src/scheduler/tests.rs:541: canceled API release leaves persistent slot uninitialized with no retained identity; existing cancellation test covers fresh usable replacement; focused scheduler execution reported separately, no native producer run in this audit |  |
 | `project/TestCheckerPoolNonCancelableContextNoAffinity` | `upstream/tsc/internal/project/checkerpool_test.go:1232` | Exact observation assignment: crates/tsr_project/src/scheduler/tests.rs:73: background context with nonempty ignored-name succeeds and does not grow request-association map; source audit only, execution not certified here |  |
 | `project/TestCheckerPoolCleanupAfterDiscardIsNoop` | `upstream/tsc/internal/project/checkerpool_test.go:1260` | Assigned observation (source audit): crates/tsr_project/src/scheduler/tests.rs:479: late cleanup callback preserves existing checkers and leaves timer/deadline absent; post-discard releases do not rearm timer; focused scheduler execution reported separately, no native producer run in this audit |  |
-| `project/TestConfigFileChanges` | `upstream/tsc/internal/project/configfilechanges_test.go:14` | Rust source references: crates/tsr_project/src/config/tests.rs:189, crates/tsr_project/src/session/tests.rs:344 | yes |
+| `project/TestConfigFileChanges` | `upstream/tsc/internal/project/configfilechanges_test.go:14` | Rust source references: crates/tsr_project/src/config/tests.rs:237, crates/tsr_project/src/session/tests.rs:344 | yes |
 | `project/TestContentMapperInProject` | `upstream/tsc/internal/project/contentmapper_test.go:53` | Rust source references: crates/tsr_project/src/content_mappers/tests.rs:299, crates/tsr_project/src/content_mappers/tests.rs:70 |  |
 | `project/TestContentMapperPackageManifestChangeReloadsConfig` | `upstream/tsc/internal/project/contentmapper_test.go:215` | Rust source references: crates/tsr_project/src/content_mappers/tests.rs:537 |  |
 | `project/TestContentMapperSupplementalFileClonedOnEdit` | `upstream/tsc/internal/project/contentmapper_test.go:286` | Rust source references: crates/tsr_project/src/content_mappers/tests.rs:435 |  |
@@ -155,7 +156,7 @@ include source-reference rows whose exact subcase review is still pending.
 | `project/TestContentMapperCreatedFileAdoptedByConfiguredProject` | `upstream/tsc/internal/project/contentmapper_test.go:955` | Rust source references: crates/tsr_project/src/content_mappers/tests.rs:538 |  |
 | `project/TestCustomConfigFileName` | `upstream/tsc/internal/project/customconfigfilename_test.go:15` | Rust source references: crates/tsr_project/src/config/tests.rs:51, crates/tsr_project/src/session/tests.rs:756 | yes |
 | `project/dirty/TestSyncMapProxyFor` | `upstream/tsc/internal/project/dirty/syncmap_test.go:19` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `project/TestExtendedConfigCacheOwnership` | `upstream/tsc/internal/project/extendedconfigcache_test.go:59` | Rust source references: crates/tsr_project/src/config/tests.rs:104 | yes |
+| `project/TestExtendedConfigCacheOwnership` | `upstream/tsc/internal/project/extendedconfigcache_test.go:59` | Rust source references: crates/tsr_project/src/config/tests.rs:152 | yes |
 | `project/logging/TestLogTreeImplementsLogger` | `upstream/tsc/internal/project/logging/logtree_test.go:12` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `project/logging/TestLogTree` | `upstream/tsc/internal/project/logging/logtree_test.go:17` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `project/TestProcessChanges` | `upstream/tsc/internal/project/overlayfs_test.go:13` | Rust source references: crates/tsr_project/src/overlay/tests.rs:135, crates/tsr_project/src/overlay/tests.rs:42, crates/tsr_project/src/overlay/tests.rs:63, crates/tsr_project/src/overlay/tests.rs:96 |  |
@@ -187,8 +188,8 @@ include source-reference rows whose exact subcase review is still pending.
 | `project/TestNilWatchedFilesClone` | `upstream/tsc/internal/project/watch_test.go:22` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `project/TestUpdateWatchTimeoutAndRollback` | `upstream/tsc/internal/project/watchtimeout_test.go:18` | Rust source references: crates/tsr_project/src/watch/manager.rs:186 | yes |
 | `lsp/TestDynamicQueueFIFO` | `upstream/tsc/internal/lsp/dynamic_queue_test.go:9` | Exact observation assignment: crates/tsr_lsp/src/dynamic_queue.rs:105 (fifo_and_canceled_operations_preserve_remaining_items); same ordered 0..1000 put/get assertions; execution not certified here |  |
-| `lsp/TestDynamicQueueGetCancellation` | `upstream/tsc/internal/lsp/dynamic_queue_test.go:32` | WORK: crates/tsr_lsp/src/dynamic_queue.rs:105 observes pre-canceled get error; native additionally asserts returned zero value (Rust Result has no accompanying value); explicit representation correspondence remains to document |  |
-| `lsp/TestDynamicQueuePutCancellationWhileStateUnavailable` | `upstream/tsc/internal/lsp/dynamic_queue_test.go:48` | WORK: crates/tsr_lsp/src/dynamic_queue.rs:121 tests cancellation of a full bounded writer; native holds the internal queue state unavailable, then releases it and verifies a subsequent put/get of 2; that exact observation is missing |  |
+| `lsp/TestDynamicQueueGetCancellation` | `upstream/tsc/internal/lsp/dynamic_queue_test.go:32` | Exact observation assignment: crates/tsr_lsp/src/dynamic_queue.rs:105 observes pre-canceled get error; native returns zero alongside the cancellation error; Rust Result::Err carries no item, representing the same unsuccessful read; source audit only, execution not certified here |  |
+| `lsp/TestDynamicQueuePutCancellationWhileStateUnavailable` | `upstream/tsc/internal/lsp/dynamic_queue_test.go:48` | Exact observation assignment: crates/tsr_lsp/src/dynamic_queue.rs:122 (canceled_put_does_not_acquire_unavailable_state_or_publish_an_item): held state mutex represents native state removed from its channel; pre-canceled put returns an error while state remains unavailable, then subsequent put/get returns 2; source audit only, execution not certified here |  |
 | `lsp/lsproto/TestBaseReader` | `upstream/tsc/internal/lsp/lsproto/baseproto_test.go:12` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `lsp/lsproto/TestBaseReaderMultipleReads` | `upstream/tsc/internal/lsp/lsproto/baseproto_test.go:81` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `lsp/lsproto/TestBaseWriter` | `upstream/tsc/internal/lsp/lsproto/baseproto_test.go:108` | WORK: exact native-test-to-Rust-test assignment unverified |  |
@@ -259,17 +260,17 @@ include source-reference rows whose exact subcase review is still pending.
 | `lsp/TestSanitizedDebugStackTraceCompletionsRequest` | `upstream/tsc/internal/lsp/stack_sanitizer_test.go:13` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `lsp/TestSanitizedReleaseStackTraceCompletionsRequest` | `upstream/tsc/internal/lsp/stack_sanitizer_test.go:49` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `lsp/TestSanitizedStackTraceDefeatsVSCodeGenericSecretRegex` | `upstream/tsc/internal/lsp/stack_sanitizer_test.go:106` | WORK: exact native-test-to-Rust-test assignment unverified |  |
-| `ls/autoimport/TestAliasResolverGetDiagnosticsDoesNotPanic` | `upstream/tsc/internal/ls/autoimport/aliasresolver_crash_test.go:44` | Rust source references: crates/tsr_autoimport/src/tests.rs:329 |  |
+| `ls/autoimport/TestAliasResolverGetDiagnosticsDoesNotPanic` | `upstream/tsc/internal/ls/autoimport/aliasresolver_crash_test.go:44` | Rust source references: crates/tsr_autoimport/src/tests.rs:332 |  |
 | `ls/autoimport/TestIndexClone` | `upstream/tsc/internal/ls/autoimport/index_test.go:16` | Rust source references: crates/tsr_autoimport/src/index.rs:180 |  |
 | `ls/autoimport/TestRegistryLifecycle` | `upstream/tsc/internal/ls/autoimport/registry_test.go:25` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `ls/autoimport/TestContentMappedNodeModulesFileUsesProjectBucket` | `upstream/tsc/internal/ls/autoimport/registry_test.go:958` | WORK: exact native-test-to-Rust-test assignment unverified | yes |
-| `ls/autoimport/TestHiddenDirectoriesInNodeModules` | `upstream/tsc/internal/ls/autoimport/registry_test.go:1005` | Rust source references: crates/tsr_autoimport/src/tests.rs:418 |  |
-| `ls/autoimport/TestAutoImportEntrypointDirectorySearch` | `upstream/tsc/internal/ls/autoimport/registry_test.go:1090` | Rust source references: crates/tsr_autoimport/src/tests.rs:419 |  |
+| `ls/autoimport/TestHiddenDirectoriesInNodeModules` | `upstream/tsc/internal/ls/autoimport/registry_test.go:1005` | Rust source references: crates/tsr_autoimport/src/tests.rs:421 |  |
+| `ls/autoimport/TestAutoImportEntrypointDirectorySearch` | `upstream/tsc/internal/ls/autoimport/registry_test.go:1090` | Rust source references: crates/tsr_autoimport/src/tests.rs:422 |  |
 | `ls/autoimport/TestUpdateIndexesConcurrentMapSafety` | `upstream/tsc/internal/ls/autoimport/registry_test.go:1239` | WORK: exact native-test-to-Rust-test assignment unverified |  |
 | `ls/autoimport/TestWordIndices` | `upstream/tsc/internal/ls/autoimport/util_test.go:11` | Rust source references: crates/tsr_autoimport/src/index.rs:204 |  |
-| `ls/autoimport/TestGetPackageRealpathFuncs_FollowsNodeModulesSymlinks` | `upstream/tsc/internal/ls/autoimport/util_test.go:100` | Rust source references: crates/tsr_autoimport/src/tests.rs:352 |  |
-| `ls/autoimport/TestGetPackageRealpathFuncs_DuplicateCacheKeys` | `upstream/tsc/internal/ls/autoimport/util_test.go:155` | Rust source references: crates/tsr_autoimport/src/tests.rs:353 |  |
-| `ls/autoimport/TestGetPackageRealpathFuncs_NonSymlinkedPackageWithSymlinkedDeps` | `upstream/tsc/internal/ls/autoimport/util_test.go:195` | Rust source references: crates/tsr_autoimport/src/tests.rs:354 |  |
+| `ls/autoimport/TestGetPackageRealpathFuncs_FollowsNodeModulesSymlinks` | `upstream/tsc/internal/ls/autoimport/util_test.go:100` | Rust source references: crates/tsr_autoimport/src/tests.rs:355 |  |
+| `ls/autoimport/TestGetPackageRealpathFuncs_DuplicateCacheKeys` | `upstream/tsc/internal/ls/autoimport/util_test.go:155` | Rust source references: crates/tsr_autoimport/src/tests.rs:356 |  |
+| `ls/autoimport/TestGetPackageRealpathFuncs_NonSymlinkedPackageWithSymlinkedDeps` | `upstream/tsc/internal/ls/autoimport/util_test.go:195` | Rust source references: crates/tsr_autoimport/src/tests.rs:357 |  |
 | `ls/change/TestTextEditsConflictAtSameInsertionPointAcrossProjections` | `upstream/tsc/internal/ls/change/trackerimpl_test.go:9` | Rust source references: crates/tsr_ls/src/change.rs:128 |  |
 | `ls/TestCreatePathUpdaterCaseFoldingShrinksOldPath` | `upstream/tsc/internal/ls/file_rename_test.go:45` | Rust source references: crates/tsr_ls/src/file_rename.rs:402 |  |
 | `ls/TestImplementationsWorklistDoesNotBlowUp` | `upstream/tsc/internal/ls/findallreferences_test.go:34` | Rust source references: crates/tsr_ls/src/tests.rs:390 |  |

@@ -186,7 +186,9 @@ impl LanguageService<'_> {
                 }
             }
             context.type_only = true;
-            context.filter = Filter::Type;
+            if context.container.is_none() {
+                context.filter = Filter::Type;
+            }
         }
         if let Some(list) =
             self.closing_tag_completion(&mut syntax, &context, &params.position, options)?
@@ -220,6 +222,7 @@ impl LanguageService<'_> {
                     options,
                     &mut list,
                     Some(&import_info),
+                    &HashSet::new(),
                 )?;
             }
             let replacement = if import_info.keyword_only {
@@ -275,6 +278,7 @@ impl LanguageService<'_> {
         let used_cases =
             crate::completion_switch::expression_case_values(checker, &syntax, context.token)?;
         let mut names = HashSet::new();
+        let mut shadowed_names = HashSet::new();
         let mut method_snippets = Vec::new();
         let js_file = syntax.file.is_js();
         for candidate in candidates {
@@ -334,6 +338,19 @@ impl LanguageService<'_> {
                     continue;
                 };
                 if names.insert(item.label.clone()) {
+                    let symbol = checker.symbol(candidate.symbol)?;
+                    let local = checker
+                        .symbol_declarations(candidate.symbol)?
+                        .iter()
+                        .flatten()
+                        .any(|decl| {
+                            self.program
+                                .file_of_node(decl)
+                                .is_some_and(|file| file.source() == syntax.source)
+                        });
+                    if !candidate.this_member && (symbol.parent().is_some() || local) {
+                        shadowed_names.insert(item.label.clone());
+                    }
                     list.items.push(Some(Box::new(item)));
                 }
             }
@@ -364,6 +381,7 @@ impl LanguageService<'_> {
                 options,
                 &mut list,
                 None,
+                &shadowed_names,
             )?;
         }
         list.items.extend(Self::literal_completions(
@@ -373,6 +391,7 @@ impl LanguageService<'_> {
             position,
             options,
         )?);
+        names.extend(list.items.iter().flatten().map(|item| item.label.clone()));
         if !checked {
             Self::js_completion_entries(&mut syntax, position, &mut names, &mut list)?;
         }
@@ -1105,6 +1124,12 @@ impl LanguageService<'_> {
                 }
                 if parameters
                     && matches!(read.kind().known(), Some(K::Parameter | K::TypeParameter))
+                    && !read.parent().is_some_and(|parent| {
+                        syntax
+                            .view
+                            .node(parent)
+                            .is_ok_and(|node| node.kind() == K::IndexSignature)
+                    })
                     || !parameters && read.kind() == K::VariableDeclaration
                 {
                     closest = Some(id);
@@ -1778,3 +1803,7 @@ fn identifier_for_arbitrary_string(text: &str) -> String {
         identifier
     }
 }
+
+#[cfg(test)]
+#[path = "completion_residual_tests.rs"]
+mod residual_tests;

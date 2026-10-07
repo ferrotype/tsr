@@ -129,6 +129,11 @@ impl LanguageService<'_> {
                 let ty = if kind == Container::Object {
                     object_contextual_type(checker, syntax, node)?
                 } else {
+                    if !binding_has_source_type(checker, syntax, node)? {
+                        context.filter = Filter::None;
+                        context.new_identifier = false;
+                        return Ok(Some(Vec::new()));
+                    }
                     Some(checker.get_type_at_location(node)?)
                 };
                 let Some(ty) = ty else {
@@ -638,3 +643,50 @@ mod completion_constraint_tests;
 #[cfg(test)]
 #[path = "completion_binding_tests.rs"]
 mod completion_binding_tests;
+
+// Pin getCompletionData: object-binding canGetType excludes the pattern's own shape.
+fn binding_has_source_type(
+    checker: &mut Operation<'_>,
+    syntax: &Syntax<'_>,
+    pattern: tsr_ast::NodeId,
+) -> Result<bool> {
+    let view = syntax.view;
+    let root = ast::get_root_declaration(
+        view,
+        view.node(pattern)?
+            .parent()
+            .ok_or(tsr_arena::Error::InvalidGraph)?,
+    )?;
+    let read = view.node(root)?;
+    if read.initializer().is_some()
+        || tsr_ast::utilities_targets::get_type_annotation_node(view, root)?.is_some()
+        || read
+            .parent()
+            .and_then(|parent| view.node(parent).ok()?.parent())
+            .is_some_and(|parent| {
+                view.node(parent)
+                    .is_ok_and(|node| node.kind() == K::ForOfStatement)
+            })
+    {
+        return Ok(true);
+    }
+    if read.kind() == K::Parameter {
+        if let Some(function) = read.parent() {
+            let read = view.node(function)?;
+            if ast::is_expression_kind(read.kind()) {
+                return Ok(checker.get_contextual_type(function, cf::NONE)?.is_some());
+            }
+            if matches!(
+                read.kind().known(),
+                Some(K::MethodDeclaration | K::SetAccessor)
+            ) {
+                if let Some(object) = read.parent() {
+                    if ast::is_expression_kind(view.node(object)?.kind()) {
+                        return Ok(checker.get_contextual_type(object, cf::NONE)?.is_some());
+                    }
+                }
+            }
+        }
+    }
+    Ok(false)
+}

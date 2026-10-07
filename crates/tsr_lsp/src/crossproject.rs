@@ -235,6 +235,10 @@ fn execute_search(
             .and_then(|changes| {
                 changes
                     .iter()
+                    // Single-project dispatch appends the requested move
+                    // after associated resource moves (for example CSS).
+                    // Recompute across projects for that original file.
+                    .rev()
                     .find_map(|change| change.rename_file.as_deref())
             });
         if let Some(moved) = moved {
@@ -806,6 +810,210 @@ mod tests {
             edit.changes.unwrap()[&lsp::DocumentUri("file:///a.ts".into())].len(),
             1
         );
+    }
+
+    // Source: TestGetEditsForFileRename_cssImport4.
+    #[test]
+    fn css_import_rename_keeps_the_declaration_and_associated_resource_moves() {
+        let text = "import styles from \"./app.css\";";
+        let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
+        for (path, content) in [
+            (
+                "/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true,"allowArbitraryExtensions":true}}"#,
+            ),
+            ("/a.ts", text),
+            ("/app.css", ".cookie-banner { display: none; }"),
+            (
+                "/app.d.css.ts",
+                "declare const css: { cookieBanner: string; }; export default css;",
+            ),
+        ] {
+            fs.insert_loaded(path.as_bytes(), content.as_bytes());
+        }
+        let host: Arc<dyn FileSystem> = Arc::new(fs.finish());
+        let session = Session::new(
+            tsr_project::session::SessionOptions::default(),
+            host.clone(),
+            &tsr_arena::Counters::new(),
+        );
+        let uri = lsp::DocumentUri("file:///a.ts".into());
+        let snapshot = session
+            .did_open_file(
+                uri.clone(),
+                1,
+                JsString::from_bytes(text.as_bytes()),
+                lsp::LanguageKind("typescript".into()),
+            )
+            .unwrap();
+        let request = Request::Rename(lsp::RenameParams {
+            text_document: lsp::TextDocumentIdentifier { uri },
+            position: lsp::Position {
+                line: 0,
+                character: 22,
+            },
+            new_name: "app2.css".into(),
+            ..Default::default()
+        });
+        let options = Options {
+            organize: tsr_ls::OrganizeOptions::default(),
+            rename: tsr_ls::RenameOptions::default(),
+            formatting: false,
+            completion: tsr_ls::CompletionOptions::default(),
+            auto_closing_tags: false,
+            maximum_hover_length: 0,
+            prefer_source_definition: false,
+            inlay: tsr_ls::InlayHintsOptions::default(),
+            code_lens: tsr_ls::CodeLensOptions::default(),
+            lens_command: None,
+            locale: tsr_locale::Locale::default(),
+        };
+        for will_rename in [false, true] {
+            let capabilities = decode::<lsp::ClientCapabilities>(&raw(&format!(
+                r#"{{"workspace":{{"workspaceEdit":{{"documentChanges":true,"resourceOperations":["rename"]}},"fileOperations":{{"willRename":{will_rename}}}}}}}"#
+            )))
+            .unwrap();
+            let result = execute(
+                &Context::background(),
+                "css-rename",
+                &session,
+                &host,
+                &snapshot,
+                &request,
+                PositionEncoding::Utf16,
+                &capabilities,
+                &options,
+            )
+            .unwrap();
+            let changes = decode::<lsp::WorkspaceEditOrNull>(&result)
+                .unwrap()
+                .workspace_edit
+                .unwrap()
+                .document_changes
+                .unwrap();
+            let moves: Vec<_> = changes
+                .iter()
+                .filter_map(|change| change.rename_file.as_ref())
+                .map(|rename| (rename.old_uri.0.as_str(), rename.new_uri.0.as_str()))
+                .collect();
+            let declaration = ("file:///app.d.css.ts", "file:///app2.d.css.ts");
+            if will_rename {
+                assert_eq!(moves, [declaration]);
+                assert_eq!(changes.len(), 1);
+            } else {
+                assert_eq!(
+                    moves,
+                    [("file:///app.css", "file:///app2.css"), declaration]
+                );
+                let edits: Vec<_> = changes
+                    .iter()
+                    .filter_map(|change| change.text_document_edit.as_ref())
+                    .collect();
+                assert_eq!(edits.len(), 1);
+                assert_eq!(edits[0].text_document.uri.0, "file:///a.ts");
+                assert_eq!(edits[0].edits.len(), 1);
+                assert_eq!(
+                    edits[0].edits[0].text_edit.as_ref().unwrap().new_text,
+                    "./app2.css"
+                );
+            }
+        }
+        session.close();
+    }
+
+    // Source: TestFindAllReferencesUmdModuleAsGlobalConst, first two opens.
+    #[test]
+    fn opening_a_umd_package_then_its_consumer_keeps_module_references_local() {
+        let index = "export * from \"./three-core\";\nexport as namespace THREE;";
+        let global =
+            "import * as _THREE from 'three';\ndeclare global { const THREE: typeof _THREE; }";
+        let mut fs = tsr_vfs::MemoryBuilder::new(b"/", true);
+        for (name, text) in [
+            (
+                "/node_modules/@types/three/three-core.d.ts",
+                "export class Vector3 { x: number; y: number; }",
+            ),
+            ("/node_modules/@types/three/index.d.ts", index),
+            ("/typings/global.d.ts", global),
+            (
+                "/src/index.ts",
+                "export const a = {};\nlet v = new THREE.Vector2();",
+            ),
+            (
+                "/tsconfig.json",
+                r#"{"compilerOptions":{"noLib":true,"esModuleInterop":true,"module":"es6","target":"es6","allowJs":true,"skipLibCheck":true,"typeRoots":["node_modules/@types/"],"types":["three"]},"files":["/src/index.ts","typings/global.d.ts"]}"#,
+            ),
+        ] {
+            fs.insert_loaded(name.as_bytes(), text.as_bytes());
+        }
+        let host: Arc<dyn FileSystem> = Arc::new(fs.finish());
+        let session = Session::new(
+            tsr_project::session::SessionOptions::default(),
+            host.clone(),
+            &tsr_arena::Counters::new(),
+        );
+        let options = Options {
+            organize: tsr_ls::OrganizeOptions::default(),
+            rename: tsr_ls::RenameOptions::default(),
+            formatting: false,
+            completion: tsr_ls::CompletionOptions::default(),
+            auto_closing_tags: false,
+            maximum_hover_length: 0,
+            prefer_source_definition: false,
+            inlay: tsr_ls::InlayHintsOptions::default(),
+            code_lens: tsr_ls::CodeLensOptions::default(),
+            lens_command: None,
+            locale: tsr_locale::Locale::default(),
+        };
+        for (name, text, line, character) in [
+            ("/node_modules/@types/three/index.d.ts", index, 1, 20),
+            ("/typings/global.d.ts", global, 0, 25),
+        ] {
+            let uri = lsp::DocumentUri::from_file_name(name.as_bytes());
+            let snapshot = session
+                .did_open_file(
+                    uri.clone(),
+                    1,
+                    JsString::from_bytes(text.as_bytes()),
+                    lsp::LanguageKind("typescript".into()),
+                )
+                .unwrap();
+            let request = Request::References(lsp::ReferenceParams {
+                text_document: lsp::TextDocumentIdentifier { uri },
+                position: lsp::Position { line, character },
+                context: Some(Box::new(lsp::ReferenceContext {
+                    include_declaration: true,
+                })),
+                ..Default::default()
+            });
+            let result = execute(
+                &Context::background(),
+                "umd-references",
+                &session,
+                &host,
+                &snapshot,
+                &request,
+                PositionEncoding::Utf16,
+                &lsp::ClientCapabilities::default(),
+                &options,
+            )
+            .unwrap();
+            let locations = decode::<lsp::LocationsOrNull>(&result)
+                .unwrap()
+                .locations
+                .unwrap();
+            assert_eq!(locations.len(), 1, "{name}: {locations:?}");
+            assert_eq!(locations[0].uri.file_name().as_bytes(), name.as_bytes());
+            assert_eq!(locations[0].range.start, lsp::Position { line, character });
+            assert_eq!(
+                locations[0].range.end,
+                lsp::Position {
+                    line,
+                    character: character + 5
+                }
+            );
+        }
+        session.close();
     }
     #[test]
     fn visual_studio_reference_ids_are_unique_and_repoint_definitions() {

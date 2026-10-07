@@ -14,6 +14,7 @@ from tools.phase5.replay import replay
 
 SESSIONS = ('checkjs', 'monorepo', 'references')
 ENCODINGS = ('utf-8', 'utf-16')
+EXPECTED = replay.HOME / 'expected'
 
 
 def prepare(output):
@@ -34,8 +35,9 @@ def prepare(output):
     shutil.copy2(executables[0], output / 'rust-lsp')
 
 
-def run_matrix(binaries, output):
+def run_matrix(binaries, output, expected_root=EXPECTED):
     binaries, output = Path(binaries).resolve(), Path(output).resolve()
+    expected_root = Path(expected_root)
     commands = {}
     for runtime in ('native', 'rust'):
         executable = binaries / f'{runtime}-lsp'
@@ -49,6 +51,11 @@ def run_matrix(binaries, output):
         for encoding in ENCODINGS:
             case = output / session / encoding
             transcripts, errors = {}, {}
+            expected = None
+            try:
+                expected = replay.strict_json((expected_root / session / f'{encoding}.json').read_text())
+            except Exception as error:
+                errors['expected'] = f'{type(error).__name__}: {error}'
             for runtime in ('native', 'rust'):
                 local = case / runtime
                 local.mkdir(parents=True, exist_ok=True)
@@ -58,9 +65,16 @@ def run_matrix(binaries, output):
                 except Exception as error:
                     errors[runtime] = f'{type(error).__name__}: {error}'
                     (local / 'error.txt').write_text(errors[runtime] + '\n')
-            matched = not errors and replay.compare(
+            live_matched = all(runtime in transcripts for runtime in ('native', 'rust')) and replay.compare(
                 transcripts['native'], transcripts['rust'], case / 'mismatch')
-            row = dict(session=session, encoding=encoding, matched=matched, errors=errors)
+            expected_matched = {
+                runtime: expected is not None and runtime in transcripts and replay.compare(
+                    expected, transcripts[runtime], case / 'expected-mismatch' / runtime)
+                for runtime in ('native', 'rust')
+            }
+            matched = not errors and live_matched and all(expected_matched.values())
+            row = dict(session=session, encoding=encoding, matched=matched,
+                       live_matched=live_matched, expected_matched=expected_matched, errors=errors)
             rows.append(row)
             print(json.dumps(row), flush=True)
     (output / 'summary.json').write_text(json.dumps(rows, indent=2) + '\n')

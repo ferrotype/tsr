@@ -174,9 +174,76 @@ impl<'a> ProjectBuilder<'a> {
         }
         let mut defaults = BTreeMap::new();
         let mut inferred_roots = Vec::new();
+        let opened = self
+            .changes
+            .opened
+            .as_ref()
+            .or(self.changes.reopened.as_ref())
+            .map(|uri| self.configs.path(uri.file_name().as_bytes()));
+        // The open event loads its project before cleanup considers existing
+        // overlays. That project can now contain a formerly inferred file.
+        let opened_project = if let Some((path, (name, _))) = opened
+            .as_ref()
+            .and_then(|path| files.get_key_value(path))
+            .filter(|(_, (name, _))| !tsr_tspath::is_dynamic_file_name(name.as_bytes()))
+        {
+            self.select_configured(name, path)?
+        } else {
+            None
+        };
         for (path, (name, _kind)) in files {
             if !tsr_tspath::is_dynamic_file_name(name.as_bytes()) {
-                if let Some(project) = self.select_configured(&name, &path)? {
+                // DidChangeFiles ensures the newly opened file's project.
+                // Cleanup only retains other open files' existing projects;
+                // it must not eagerly rebuild their dirty programs. A later
+                // file/project-tree request performs that update.
+                let retained = if opened.as_ref() == Some(&path) && opened_project.is_some() {
+                    opened_project.clone()
+                } else if opened.is_some()
+                    && !self.changes.invalidate_all
+                    && !self.configs.custom_name_changed()
+                    && !self.affected.files.contains(&path)
+                    && request.api.is_none()
+                    && !request
+                        .documents
+                        .iter()
+                        .any(|uri| self.configs.path(uri.file_name().as_bytes()) == path)
+                {
+                    let (project, ambiguous) = self.configured_project_containing(&path);
+                    if ambiguous {
+                        None
+                    } else {
+                        project
+                    }
+                } else {
+                    None
+                };
+                let selected = if let Some(key) = retained {
+                    self.keep.insert(key.clone());
+                    Some(key)
+                } else {
+                    let project = self
+                        .select_configured(&name, &path)?
+                        .or_else(|| self.configured_project_containing(&path).0);
+                    if let Some(key) = &project {
+                        self.keep.insert(key.clone());
+                    }
+                    project
+                };
+                if let Some(project) = selected {
+                    if cleanup {
+                        // Like cleanupConfiguredProjects, retain loaded and
+                        // delayed nearest/ancestor configs even when they did
+                        // not contain the file and selection continued upward.
+                        for config in self.configs.searched_config_names(&path) {
+                            let key = self.configs.path(config.as_bytes());
+                            if self.projects.contains_key(&key)
+                                || self.delayed_projects.contains_key(&key)
+                            {
+                                self.keep.insert(key);
+                            }
+                        }
+                    }
                     defaults.insert(path, project);
                     continue;
                 }
@@ -370,6 +437,34 @@ impl<'a> ProjectBuilder<'a> {
             }
         }
     }
+    // GetDefaultProject's program-inclusion fallback also covers dependencies
+    // under node_modules, where nearest-config discovery deliberately stops.
+    // Ambiguous direct candidates continue through normal config discovery.
+    fn configured_project_containing(&self, path: &JsString) -> (Option<JsString>, bool) {
+        let mut containing = Vec::new();
+        let mut direct = Vec::new();
+        for (key, project) in &self.projects {
+            if key.as_bytes() == INFERRED_PROJECT_NAME || !project.contains_file(path.as_bytes()) {
+                continue;
+            }
+            containing.push(key);
+            if !project
+                .program()
+                .unwrap()
+                .is_source_from_project_reference(path.as_bytes())
+            {
+                direct.push(key);
+            }
+        }
+        if direct.len() == 1 {
+            return (Some(direct[0].clone()), false);
+        }
+        (
+            containing.first().map(|key| (*key).clone()),
+            direct.len() > 1,
+        )
+    }
+
     fn select_configured(
         &mut self,
         file: &JsString,
@@ -389,10 +484,7 @@ impl<'a> ProjectBuilder<'a> {
                 let command = if create {
                     self.configs.acquire_for_file(&name, path)?
                 } else {
-                    self.projects
-                        .get(&key)
-                        .and_then(Project::data)
-                        .map(|p| p.command_line.clone())
+                    self.configs.existing_config(&key)
                 };
                 let Some(command) = command else {
                     continue;
@@ -429,9 +521,7 @@ impl<'a> ProjectBuilder<'a> {
                             .unwrap()
                             .is_source_from_project_reference(path.as_bytes())
                         {
-                            let retained = chain.into_iter().collect();
                             self.discover_ancestor_projects(file, path, &key)?;
-                            self.configs.retain_file_configs(path, &retained);
                             return Ok(Some(key));
                         }
                         fallback.get_or_insert(key.clone());
@@ -465,7 +555,6 @@ impl<'a> ProjectBuilder<'a> {
                 .filter(|key| self.projects.contains_key(*key))
                 .cloned(),
         );
-        self.configs.retain_file_configs(path, &retained);
         if let Some(key) = &fallback {
             self.discover_ancestor_projects(file, path, key)?;
         }

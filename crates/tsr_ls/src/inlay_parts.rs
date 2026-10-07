@@ -25,7 +25,7 @@ fn parts(
     separator: &'static str,
 ) -> Result<()> {
     for (i, node) in list(view, ids)?.into_iter().enumerate() {
-        if i > 0 {
+        if i > 0 && !separator.is_empty() {
             out.push(Task::Text(separator));
         }
         push(out, Some(node));

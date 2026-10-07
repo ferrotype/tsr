@@ -90,11 +90,11 @@ DIRECT_AUDIT = {
         'Exact observation assignment: crates/tsr_lsp/src/dynamic_queue.rs:105 '
         '(fifo_and_canceled_operations_preserve_remaining_items); same ordered 0..1000 put/get assertions; execution not certified here',
     ('lsp', 'TestDynamicQueueGetCancellation'):
-        'WORK: crates/tsr_lsp/src/dynamic_queue.rs:105 observes pre-canceled get error; '
-        'native additionally asserts returned zero value (Rust Result has no accompanying value); explicit representation correspondence remains to document',
+        'Exact observation assignment: crates/tsr_lsp/src/dynamic_queue.rs:105 observes pre-canceled get error; '
+        'native returns zero alongside the cancellation error; Rust Result::Err carries no item, representing the same unsuccessful read; source audit only, execution not certified here',
     ('lsp', 'TestDynamicQueuePutCancellationWhileStateUnavailable'):
-        'WORK: crates/tsr_lsp/src/dynamic_queue.rs:121 tests cancellation of a full bounded writer; '
-        'native holds the internal queue state unavailable, then releases it and verifies a subsequent put/get of 2; that exact observation is missing',
+        'Exact observation assignment: crates/tsr_lsp/src/dynamic_queue.rs:122 '
+        '(canceled_put_does_not_acquire_unavailable_state_or_publish_an_item): held state mutex represents native state removed from its channel; pre-canceled put returns an error while state remains unavailable, then subsequent put/get returns 2; source audit only, execution not certified here',
     ('lsp/lspwatcher', 'TestRootFromGlob'):
         'Exact observation assignment: crates/tsr_lsp/src/watcher/tests.rs:215 '
         '(roots_from_pinned_globs); all four pinned inputs and expected roots match; execution not certified here',
@@ -226,8 +226,9 @@ def markdown(rows: list[dict], verified: list[str]) -> str:
               'for total-checker options and ownership-based release.',
               'Configured timeout or unused capacity differences alone do not create WORK.',
               'Assigned observations are source comparisons, not execution evidence.',
-              'Cancellation and real watcher routes retain missing',
-              'observations. These assignments do not claim tests were run in this audit.',
+              'Queue cancellation includes unavailable-state and subsequent-item observations;',
+              'real watcher routes retain missing observations. These assignments do not claim',
+              'tests were run in this audit.',
               'Remaining WORK rows are the concrete L7/L8 assignment backlog; source-reference',
               'rows still require subcase review and runtime evidence before acceptance credit.', '',
               f'Unassigned or partial direct-test observations: **{sum(work_counts.values())}**.',

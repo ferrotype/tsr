@@ -1,7 +1,9 @@
 # Phase 5 L7: acceptance path, residuals, replay and latency
 
-Status: **implementation started** (2026-10-06); the owner approved section 2 items 1–3 on 2026-10-06; the other acceptance
-decisions remain open.
+Status: **correctness and replay pass; latency pending** (2026-10-07).
+All 4,117 native-executed fourslash tests, 13 LSP tests and six ordinary-CLI
+replays pass. The owner approved section 2 items 1–3 on 2026-10-06;
+the fixture/pull-metric decision and real latency run remain outstanding.
 Checkpoint L7 of the [Phase 5 plan](PHASE5-plan.md). Planning reference: `main`
 at `ef456f65` (L0 to L6 merged, 0.3.0 released). Work is on
 `codex/phase5-l7`. Upstream remains Corsa
@@ -40,13 +42,13 @@ audit; implementation is now in progress:
 | `fourslash` and `lsp` suites in CI (item 7) | Absent |
 | The first full run and its accepted failing set (item 8) | Never run. `status/parity/fourslash.json` and `lsp.json` do not exist |
 
-So no fourslash test has run against the Rust server. What is known about
-parity comes from the bounded native comparisons of L2 to L5
+At that initial reference, no fourslash test had run against the Rust server.
+The known parity results came from the bounded native comparisons of L2 to L5
 (`tools/phase5/lsp/*.py`, some 20,000 matching responses over hand-written
 cases) and from the direct unit tests. Those are development checks; the L2 to
 L5 records all say they carry no corpus credit.
 
-What does exist and is reused: the version-3 private endpoint
+The existing foundation reused here is the version-3 private endpoint
 `phase5_testserver` over the production `tsr_lsp` server, with the reset
 barrier and the retained parse cache (L1); the `test/projectState` projection
 and its ten-state check through the original Go writer
@@ -100,14 +102,22 @@ measured Go execution count.
    implementing agent writes each `reason` as a shared-cause label from the
    triage (L7.3), leaves `approved` empty, and the owner words the reasons of
    the final retained entries only.
-4. **The latency fixture.** Recommended: the TypeScript package the pin
-   itself carries, `upstream/packages/typescript` (beside `upstream/tsc`, not
-   inside it; `src` is 108 files and 35,292 lines, strict, composite,
-   `module: node16`), copied from the submodule by the capture with a small
-   checked-in overlay for its one missing dependency (`@types/node`). It is
-   fixed by the pin and is real code. Astra's review looked for it under
-   `upstream/tsc` and did not find it, so this recommendation has not had its
-   second check. The alternatives are a vendored snapshot of an external
+4. **The latency fixture and first-diagnostics protocol — awaiting approval.**
+   Recommended: the TypeScript package the pin itself carries,
+   `upstream/packages/typescript` (beside `upstream/tsc`, not inside it;
+   `src` is 108 files and 35,292 lines, strict, composite, `module: node16`).
+   The source and fixed query positions were verified against the pin on
+   2026-10-07. `tools/phase5/latency/prepare.py` exports that exact Git tree,
+   verifies caller-supplied `@types/node` 22.20.1 and `undici-types` 6.21.0
+   archives against the pinned lock, and records its one config overlay:
+   `customConditions: ["@typescript/source"]`. The concrete scenario is
+   `tools/phase5/latency/proposals/typescript-pull.json`.
+   The pin does not publish versioned source diagnostics, so the proposed
+   metric is didOpen write through completion of the immediately following
+   full `textDocument/diagnostic` response. This includes loading, checking
+   and the pull exchange; it is not a source-push latency measurement.
+   Neither fixture nor this protocol substitution is approved yet.
+   The alternatives are a vendored snapshot of an external
    package with its provenance, or a hand-written multi-project fixture,
    which is easier to reason about and too small to measure references or
    rename meaningfully.
@@ -115,11 +125,9 @@ measured Go execution count.
    Recommended: the agents run sample captures (three pairs) while building
    the workload; the twenty-pair run of record is the owner's, on the host
    class `thresholds.toml` is authorized for.
-6. **The branch and pull request split:** whether L7 is one
-   branch or three pull requests (harness, replay and latency, residuals).
-   The user-approved current agent allocation is in section 5.
-   Recommended: three, because the first two touch no production crate and
-   can merge while residual work continues.
+6. **The branch and pull request split — implemented.** The owner requested
+   the draft PR and continued implementation on it: `codex/phase5-l7`, #103.
+   Harness, production fixes, replay and latency tooling remain together.
 7. **Profiling and API commands.** `custom/runGC` and the heap and CPU profile
    commands answer `-32601`, and `tsrust --lsp -pprofDir` is refused; the L2
    record names native pprof a Phase 7 boundary. Recommended: they do not
@@ -127,8 +135,10 @@ measured Go execution count.
    outcome. `custom/initializeAPISession`'s wire handshake belongs to the Phase 6
    API per the accepted L6 record; L6 supplies its retained project/symbol/type
    primitives. Its observed outcome remains visible in any suite case.
-8. **CI runner class and shard count** for the two new suites, once L7.2 has
-   a measurement.
+8. **CI runner class and shard count — implemented.** Four fourslash shards
+   and one LSP/replay shard use the existing `PARITY_RUNNER` choice, defaulting
+   to `ubuntu-latest`. All shards and their join passed on `2b2cf026`.
+   Subsequent changes still require their own CI result.
 
 ## 3. Work items
 
@@ -353,7 +363,7 @@ reduce a session; they are for crash triage and are not used here.
 
 ### L7.6 Latency
 
-1. **Capture** `tools/phase5/perf/capture.py` drives the pinned Go command and
+1. **Capture** `tools/phase5/latency/capture.py` drives the pinned Go command and
    a release `tsrust --lsp --stdio` on the same local fixture copy (decision
    4), with no test-host callbacks. A repetition is one fresh process per
    runtime; the order of the two runtimes alternates between repetitions.
@@ -412,12 +422,12 @@ The user authorized Sol agents for noncoding and less-critical coding support.
 The root agent owns integration, shared harness contracts, production residual
 fixes, validation and the final acceptance report. Support agents have disjoint
 file ownership; the table is the current allocation, not a dispatch to a separate
-Claude session. The branch-versus-PR decision in section 2 remains open.
+Claude session. The work is integrated in PR #103.
 
 | Track | Work | Current allocation |
 | --- | --- | --- |
 | Acceptance | L7.1, L7.2, L7.3: `tools/phase5/harness/`, `scripts/parity.py`, CI, the first run and its triage | Root integration; Sol support for the routing inventory/documentation |
-| Replay and latency tooling | L7.5, L7.6: `tools/phase5/replay/`, `tools/phase5/perf/`, `scripts/perf.py`, `perf.yml` | Root integration; scoped Sol support for tooling |
+| Replay and latency tooling | L7.5, L7.6: `tools/phase5/replay/`, `tools/phase5/latency/`, `scripts/perf.py`, `perf.yml` | Root integration; scoped Sol support for tooling |
 | Residuals | L7.4: fixes in `tsr_ls`, `tsr_lsp`, `tsr_project`, `tsr_autoimport` and the compiler crates | Root after triage; any delegated fixes receive explicit crate/module ownership |
 
 The root reviews delegated changes before integration. No separate Claude

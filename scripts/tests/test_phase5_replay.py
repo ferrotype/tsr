@@ -10,6 +10,17 @@ spec.loader.exec_module(replay)
 
 
 class ReplayTests(unittest.TestCase):
+    def test_notification_stream_cannot_extend_response_deadline(self):
+        import queue
+        from unittest import mock
+        peer = object.__new__(replay.Peer)
+        peer.queue, peer.traffic, peer.id = queue.Queue(), [], 1
+        for _ in range(2):
+            peer.queue.put({'jsonrpc': '2.0', 'method': 'example/notification'})
+        with mock.patch.object(replay.time, 'monotonic', side_effect=[0, 0, 21]), self.assertRaises(TimeoutError):
+            peer.await_response()
+        self.assertEqual(len(peer.traffic), 1)
+
     def test_notification_wait_preserves_every_message_and_checks_uri(self):
         import queue
         peer = replay.Peer.__new__(replay.Peer)

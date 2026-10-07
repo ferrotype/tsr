@@ -402,6 +402,7 @@ class CommittedFiles(unittest.TestCase):
             "parse-bind": {"one_thread_wall_time": 1.25, "eight_threads_wall_time": 1.45,
                            "peak_rss": 0.85, "allocated_bytes": 0.85},
             "checker": {"type_footprint": 0.85},
+            "lsp": dict.fromkeys(perf.LSP_SCENARIOS, 1.0),
         })
         self.assertEqual(tomllib.loads(perf.THRESHOLDS.read_text()), tables)
         for workload in tables:

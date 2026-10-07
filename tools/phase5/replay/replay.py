@@ -155,8 +155,15 @@ class Peer(interop.Peer):
         super().write(message)
 
     def await_response(self):
+        deadline = time.monotonic() + 20
         while True:
-            message = self.queue.get(timeout=20)
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError('Response deadline expired')
+            try:
+                message = self.queue.get(timeout=remaining)
+            except queue.Empty as error:
+                raise TimeoutError('Response deadline expired') from error
             if isinstance(message, Exception):
                 raise message
             if 'method' not in message:

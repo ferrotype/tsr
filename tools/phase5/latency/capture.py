@@ -85,7 +85,7 @@ class Peer(replay.Peer):
     def await_response(self):
         deadline = time.monotonic() + 20
         while True:
-            timestamp, message = self.queue.get(timeout=max(0, deadline - time.monotonic()))
+            timestamp, message = self.next_message(deadline)
             if isinstance(message, Exception):
                 raise message
             if 'method' not in message:
@@ -94,6 +94,15 @@ class Peer(replay.Peer):
                 self.response_time = timestamp
                 return message
             self.respond(message)
+
+    def next_message(self, deadline):
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError('Response/diagnostics deadline expired')
+        try:
+            return self.queue.get(timeout=remaining)
+        except queue.Empty as error:
+            raise TimeoutError('Response/diagnostics deadline expired') from error
 
     def measured_request(self, method, params):
         response = self.exchange(method, params)
@@ -112,7 +121,7 @@ class Peer(replay.Peer):
     def first_diagnostics(self, uri, version, start):
         deadline = time.monotonic() + 20
         while True:
-            timestamp, message = self.queue.get(timeout=max(0, deadline - time.monotonic()))
+            timestamp, message = self.next_message(deadline)
             if isinstance(message, Exception):
                 raise message
             if 'method' not in message:
@@ -124,6 +133,17 @@ class Peer(replay.Peer):
                     if not isinstance(params.get('diagnostics'), list):
                         raise ValueError('Complete diagnostic publication requires diagnostics array')
                     return message, timestamp - start
+
+
+def diagnostic_mode(scenario):
+    specification = scenario.get('first_diagnostics', {'mode': 'push'})
+    if not isinstance(specification, dict) or specification.get('mode') not in ('push', 'pull'):
+        raise ValueError('First diagnostics requires an explicit push/pull mode')
+    if specification['mode'] == 'push' and set(specification) != {'mode'}:
+        raise ValueError('Push diagnostics takes only mode')
+    if specification['mode'] == 'pull' and (set(specification) != {'mode', 'params'} or not isinstance(specification['params'], dict)):
+        raise ValueError('Pull diagnostics requires fixed request params')
+    return specification['mode']
 
 
 def identity(fixture):
@@ -144,6 +164,7 @@ def identity(fixture):
 
 
 def validate_scenario(scenario, fixture):
+    mode = diagnostic_mode(scenario)
     if scenario.get('encoding') not in ('utf-8', 'utf-16'):
         raise ValueError('Scenario requires an explicit encoding')
     if set(scenario.get('requests', {})) != set(METRICS[1:]):
@@ -158,10 +179,23 @@ def validate_scenario(scenario, fixture):
         raise ValueError('Scenario requires warmup_hover and fixed edit params')
     if replay.exact_equal(scenario['warmup_hover'], scenario['requests']['hover']):
         raise ValueError('Warmup hover must be elsewhere than the measured hover')
+    substitutions = [('@PROJECT_ROOT_URI@', fixture.as_uri()), ('@PROJECT_ROOT@', str(fixture))]
+    expanded = replay.substitute(scenario, substitutions)
+    document_params = [expanded['edit'], expanded['warmup_hover'], *expanded['requests'].values()]
+    if mode == 'pull':
+        params = expanded['first_diagnostics']['params']
+        document_params.append(params)
+        if any(key in params for key in ('previousResultId', 'partialResultToken', 'workDoneToken')):
+            raise ValueError('First diagnostic pull requires a full response without result ids or progress tokens')
+    if any(params.get('textDocument', {}).get('uri') != (fixture / opened['path']).as_uri() for params in document_params):
+        raise ValueError('Scenario edit and requests must target the opened document')
+    if replay.exact_equal(scenario['warmup_hover'].get('position'), scenario['requests']['hover'].get('position')):
+        raise ValueError('Warmup hover position must differ from measured hover')
     changes = scenario['edit'].get('contentChanges', [])
     if len(changes) != 1 or not isinstance(changes[0].get('text'), str) or len(changes[0]['text']) != 1 or 'range' not in changes[0]:
         raise ValueError('Completion warmup requires one fixed one-character ranged edit')
-    if scenario['edit'].get('textDocument', {}).get('version') != opened['version'] + 1:
+    edit_version = scenario['edit'].get('textDocument', {}).get('version')
+    if type(edit_version) is not int or edit_version != opened['version'] + 1:
         raise ValueError('Edit version must advance the open version by one')
 
 
@@ -182,6 +216,7 @@ def run_runtime(command, cwd, scenario, output):
             if 'error' in response:
                 raise RuntimeError(f'Warmup request failed: {response}')
         raw['responses'].append({'position': len(raw['responses']), 'method': method, 'name': name, 'message': response})
+        return response
     try:
         initialize = expanded.get('initialize', {'processId': None, 'rootUri': cwd.as_uri(), 'initializationOptions': {'logVerbosity': 5, 'userPreferences': {'disableAutomaticTypeAcquisition': True}}, 'capabilities': {'general': {'positionEncodings': [scenario['encoding']]}}})
         preferences = initialize.get('initializationOptions', {}).get('userPreferences', {})
@@ -191,15 +226,28 @@ def run_runtime(command, cwd, scenario, output):
             raise ValueError('Workspace configuration callbacks can override ATA settings; omit this capability')
         if initialize.get('capabilities', {}).get('window', {}).get('workDoneProgress'):
             raise ValueError('Latency scenario must not advertise timer-dependent workDoneProgress')
-        request('initialize', 'initialize', initialize)
+        if initialize.get('capabilities', {}).get('general', {}).get('positionEncodings') != [scenario['encoding']]:
+            raise ValueError('Initialize must advertise exactly the scenario position encoding')
+        initialized = request('initialize', 'initialize', initialize)
+        selected_encoding = initialized.get('result', {}).get('capabilities', {}).get('positionEncoding', 'utf-16')
+        if selected_encoding != scenario['encoding']:
+            raise ValueError('Server selected a different position encoding')
         peer.write({'method': 'initialized', 'params': {}})
         opened = expanded['open']
         uri = (cwd / opened['path']).as_uri()
         text = opened.get('text', (cwd / opened['path']).read_text())
         peer.write({'method': 'textDocument/didOpen', 'params': {'textDocument': {'uri': uri, 'languageId': opened['languageId'], 'version': opened['version'], 'text': text}}})
-        diagnostic, elapsed = peer.first_diagnostics(uri, opened['version'], peer.write_times[-1])
+        open_start = peer.write_times[-1]
+        if diagnostic_mode(expanded) == 'pull':
+            request('first_diagnostics', 'textDocument/diagnostic', expanded['first_diagnostics']['params'])
+            diagnostic = raw['responses'][-1]['message'].get('result')
+            if not isinstance(diagnostic, dict) or diagnostic.get('kind') != 'full' or not isinstance(diagnostic.get('items'), list):
+                raise ValueError('First diagnostic pull requires a full report with items array')
+            elapsed = peer.response_time - open_start
+        else:
+            diagnostic, elapsed = peer.first_diagnostics(uri, opened['version'], open_start)
         measurements['first_diagnostics'] = elapsed
-        # First diagnostic already belongs to the complete per-document traffic stream.
+        # Push belongs to the complete traffic stream; pull is retained in responses.
         request('warmup_hover', 'textDocument/hover', expanded['warmup_hover'])
         peer.write({'method': 'textDocument/didChange', 'params': expanded['edit']})
         for name in METRICS[1:]:
@@ -229,7 +277,31 @@ def run_runtime(command, cwd, scenario, output):
             peer.close()
 
 
-def capture(fixture, scenario, commands, pairs, output, smoke=False):
+def validate_original_evidence(source, encoding):
+    for index in range(20):
+        transcripts = {}
+        for runtime in ('go', 'rust'):
+            directory = source / f'pair-{index:02d}' / runtime
+            if any(not (directory / artifact).is_file() for artifact in ('raw.json', 'transcript.json', 'stderr.log')):
+                raise ValueError('Extension requires all original pair artifacts')
+            raw = replay.strict_json((directory / 'raw.json').read_text())
+            if not isinstance(raw, dict) or raw.get('encoding') != encoding:
+                raise ValueError('Original raw evidence has the wrong encoding')
+            for message in [*raw['received'], *raw['executed']]:
+                replay.validate_message(message)
+            bodies = [bytes.fromhex(frame['body_hex']) for frame in raw['wire_frames']]
+            if any(frame['headers'].get('content-length') != str(len(body)) for frame, body in zip(raw['wire_frames'], bodies)):
+                raise ValueError('Original raw evidence has an invalid frame length')
+            if not replay.exact_equal([replay.strict_json(body) for body in bodies], raw['received']):
+                raise ValueError('Original raw frames disagree with received messages')
+            transcripts[runtime] = replay.strict_json((directory / 'transcript.json').read_text())
+            if not isinstance(transcripts[runtime], dict) or transcripts[runtime].get('encoding') != encoding:
+                raise ValueError('Original transcript has the wrong encoding')
+        if not replay.exact_equal(transcripts['go'], transcripts['rust']):
+            raise ValueError('Original pair transcripts no longer match')
+
+
+def capture(fixture, scenario, commands, pairs, output, smoke=False, extend=None):
     if pairs not in ((1, 3) if smoke else (20, 40)):
         raise ValueError('Smoke captures require 1/3 pairs; records require 20/40')
     if set(commands) != {'go', 'rust'} or any(not isinstance(command, list) or not command or any(not isinstance(arg, str) for arg in command) for command in commands.values()):
@@ -242,15 +314,38 @@ def capture(fixture, scenario, commands, pairs, output, smoke=False):
         binaries[runtime] = {'path': str(executable.resolve()), 'sha256': hashlib.sha256(executable.read_bytes()).hexdigest()}
     fixture = fixture.resolve()
     validate_scenario(scenario, fixture)
+    if output.resolve().is_relative_to(fixture):
+        raise ValueError('Capture output must be outside the fixture')
+    if output.exists() and any(output.iterdir()):
+        raise ValueError('Capture output must be empty; evidence is never overwritten')
     output.mkdir(parents=True, exist_ok=True)
     report = {'format': 1, 'smoke': smoke, 'correctness_matched': True, 'pairs': [],
               'samples': {runtime: {name: [] for name in METRICS} for runtime in ('go', 'rust')},
-              'host': {'os': platform.system().lower(), 'architecture': platform.machine(), 'cpu_capacity': os.cpu_count()},
+              'host': {'os': platform.system().lower(), 'architecture': platform.machine(), 'cpu_capacity': os.cpu_count(), 'hostname': platform.node()},
               'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'recorded_at': datetime.now(timezone.utc).isoformat(),
-              'metadata': {'fixture_sha256': identity(fixture), 'scenario': scenario, 'scenario_sha256': hashlib.sha256(json.dumps(scenario, sort_keys=True).encode()).hexdigest(), 'commands': commands, 'binaries': binaries}}
+              'metadata': {'fixture_sha256': identity(fixture), 'scenario': scenario, 'scenario_sha256': hashlib.sha256(json.dumps(scenario, sort_keys=True).encode()).hexdigest(), 'first_diagnostics_mode': diagnostic_mode(scenario), 'commands': commands, 'binaries': binaries}}
+    start_index = 0
     try:
-        for index in range(pairs):
+        if extend is not None:
+            if smoke or pairs != 40:
+                raise ValueError('Extension requires a nonsmoke 40-pair target')
+            source = extend / 'samples.json' if extend.is_dir() else extend
+            read_capture(source)
+            previous = replay.strict_json(source.read_text())
+            if len(previous['pairs']) != 20:
+                raise ValueError('Only one complete 20-pair capture can be extended')
+            if any(previous.get(key) != report[key] for key in ('host', 'revision', 'metadata')):
+                raise ValueError('Extension requires identical host, revision, fixture, scenario and commands/binaries')
+            # Validate all previous raw evidence before copying or launching a new process.
+            validate_original_evidence(source.parent, scenario['encoding'])
+            for index in range(20):
+                shutil.copytree(source.parent / f'pair-{index:02d}', output / f'pair-{index:02d}')
+            report['pairs'], report['samples'] = previous['pairs'], previous['samples']
+            report['metadata']['extension'] = {'source_samples_sha256': hashlib.sha256(source.read_bytes()).hexdigest(),
+                                               'source_recorded_at': previous['recorded_at'], 'added_pairs': 20}
+            start_index = 20
+        for index in range(start_index, pairs):
             order = ['go', 'rust'] if index % 2 == 0 else ['rust', 'go']
             pair = {'index': index, 'order': order, 'matched': False}
             report['pairs'].append(pair)
@@ -317,12 +412,13 @@ def main():
     parser.add_argument('--rust-command', required=True, help='JSON array of executable/arguments')
     parser.add_argument('--pairs', type=int, required=True)
     parser.add_argument('--smoke', action='store_true')
+    parser.add_argument('--extend', type=Path, help='Preserve a matched 20-pair capture and add 20 pairs; requires --pairs 40')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     commands = {runtime: replay.strict_json(getattr(args, runtime + '_command')) for runtime in ('go', 'rust')}
     if any(not isinstance(command, list) or not command or any(not isinstance(arg, str) for arg in command) for command in commands.values()):
         parser.error('Commands must be nonempty JSON string arrays')
-    result = capture(args.fixture, replay.strict_json(args.scenario.read_text()), commands, args.pairs, args.output, args.smoke)
+    result = capture(args.fixture, replay.strict_json(args.scenario.read_text()), commands, args.pairs, args.output, args.smoke, args.extend)
     if not result['correctness_matched']:
         raise SystemExit(1)
 

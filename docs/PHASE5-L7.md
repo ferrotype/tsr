@@ -367,14 +367,62 @@ auto-import completion lists) and eleven navigation/project-state cases
 export references, implementation search through a triple-slash reference,
 interactive template-literal inlay hints and a CSS import rename).
 
+## Correctness completion, 2026-10-07
+
+`target/phase5/harness/full-15` passes **all 4,117 native-executed parents**:
+5,922 passing result rows, zero failures and 417 visible native skips. The
+compiled roster remains 4,534 tests. All 19 residual parents from `full-12`
+now pass, including their individual baselines. Intermediate runs caught a
+UMD reference regression and four delayed-project state regressions; focused
+tests and the final full comparison verify their fixes. Both expectation
+files are empty failing sets: `parity.py check fourslash` and `check lsp`
+pass, with all 13 LSP client tests passing in `lsp-13`. No residual approval
+is needed. This measured N belongs to the native run, not the source audit;
+another platform or skip set requires its own native execution.
+
+The production fixes preserve independent project and package export indexes,
+local-name shadowing and JSX import usage; binding-pattern/JSDoc completion
+contexts; default-export and internal import-alias references; range-only
+implementation references; template-literal inlay parts; and the original file
+move through cross-project CSS rename. Project cleanup retains config ownership
+until file close, follows the nearest-config ancestor chain, and preserves
+delayed ancestors. Opening a project precedes cleanup of existing overlays,
+so a package already included in a configured program no longer survives in a
+second inferred program. Dirty unrelated programs remain deferred until a
+request needs them. Inferred-project resource identities are not parsed as
+config filenames.
+
+Focused verification passes 139 LS, 43 LSP, 150 project and 13 CLI unit tests
+(the existing real-npm integration test remains opt-in). Affected-crate clippy
+with warnings denied, formatting, `cargo xtask validate` and the focused
+inventory/replay/latency/perf Python tests pass. The flaky npm cancellation
+test now waits for child-process readiness before canceling, with bounded
+deadlines; its focused stress run passes 30/30. Queue cancellation has its
+missing unavailable-state/subsequent-item regression. The direct-test routing
+inventory still names 93 WORK rows for L8; these are not counted as executed
+native tests or silently certified by the fourslash results.
+
+Replay now retains the six normalized native response transcripts in
+`tools/phase5/replay/expected/`. Each new Go and Rust run must match its
+committed transcript as well as the other runtime. A changed expected response
+fails even when the live servers agree; missing or malformed expectations fail
+too. Fresh ordinary Go and Rust CLI builds pass all three fixtures in both
+UTF-8 and UTF-16 in `target/phase5/replay/l7-final`: all six live comparisons
+and all twelve runtime-to-expectation comparisons pass. No comparison field
+is dropped.
+
+The latency tooling supports an explicit pull-diagnostics metric, fixed response
+deadlines and a 20-to-40 extension that preserves and validates the original
+samples and artifacts. The dispatch workflow is wired, and the five thresholds
+are the plan's existing 1.0 values. The concrete TypeScript fixture and fixed
+queries are prepared for review; dependency archives were checked against the
+pinned lock. This is preparation, not a performance result.
+
 ## Still to complete
 
-The closure limit is met at 19 failing parents. The retained differences
-require owner approval, and the owner words their final entries. Remaining
-direct-test routes, CI validation and latency decisions/measurement also remain
-open. The macOS run of the L6 npm cancellation test is timing-sensitive: its
-50 ms deadline can expire before the shell prints its process id. No agents or
-measurement jobs were left running.
-The measured N above
-belongs to that compiled native run; a new platform, binary or skip set requires
-its own native execution rather than reusing the source count.
+L7's remaining acceptance work is latency: owner approval of the proposed
+fixture and pull-diagnostics metric (plan section 2, decision 4), three smoke
+pairs, then the owner's quiet-host twenty-pair run and any measured fixes.
+No performance run has been recorded and L7 is not declared closed. The
+correctness commit still needs its own CI result; CI passed on the preceding
+`2b2cf026` head.

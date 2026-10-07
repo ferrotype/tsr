@@ -251,21 +251,32 @@ impl<'a, 'p, 'o> SearchState<'a, 'p, 'o> {
             let mut named = symbol;
             let decls = h::declarations(self.c, symbol)?;
             // binder.GetLocalSymbolForExportDefault and merged non-module symbol.
-            if self.c.symbol(symbol)?.name_bytes() == b"default" {
-                if let Some(&decl) = decls.first() {
-                    if let Some(id) = self
-                        .l
-                        .program
-                        .file_of_node(decl)
-                        .ok_or(tsr_arena::Error::WrongOwner)?
-                        .bound()
-                        .view()
-                        .node_binding(decl)?
-                        .and_then(|b| b.local_symbol)
-                    {
-                        named = self.c.symbol_ref(id)?;
+            let mut local_default = None;
+            if let Some(&first) = decls.first() {
+                if ast::has_syntactic_modifier(
+                    self.l.view(first)?,
+                    first,
+                    tsr_ast::modifier_flags::DEFAULT,
+                )? {
+                    for &decl in &decls {
+                        if let Some(id) = self
+                            .l
+                            .program
+                            .file_of_node(decl)
+                            .ok_or(tsr_arena::Error::WrongOwner)?
+                            .bound()
+                            .view()
+                            .node_binding(decl)?
+                            .and_then(|b| b.local_symbol)
+                        {
+                            local_default = Some(self.c.symbol_ref(id)?);
+                            break;
+                        }
                     }
                 }
+            }
+            if let Some(local) = local_default {
+                named = local;
             } else if self.c.symbol(symbol)?.flags() & (sf::MODULE | sf::TRANSIENT) != 0 {
                 for decl in decls {
                     if !matches!(
@@ -871,11 +882,14 @@ impl LanguageService<'_> {
             for group in state.for_node(node, pos)? {
                 self.record_cross_project_group(c, &group)?;
                 for entry in group.entries {
-                    if let Some(node) = entry.node {
-                        if seen.insert(node) {
+                    // The pin also retains one range-only reference (nil
+                    // node), such as a triple-slash type directive. It is a
+                    // result, but cannot seed another symbol search.
+                    if seen.insert(entry.node) {
+                        if let Some(node) = entry.node {
                             queue.push_back((node, i64::from(c.node(node)?.pos())));
-                            entries.push(entry);
                         }
+                        entries.push(entry);
                     }
                 }
             }
@@ -920,10 +934,10 @@ impl LanguageService<'_> {
                 continue;
             }
             for entry in self.implementation_entries(c, node, i64::from(mapped.mapped.position))? {
+                if !seen.insert(entry.node) {
+                    continue;
+                }
                 if let Some(node) = entry.node {
-                    if !seen.insert(node) {
-                        continue;
-                    }
                     if drop_origin {
                         let location = c.node(node)?;
                         if location.pos() <= mapped.mapped.position
@@ -932,8 +946,8 @@ impl LanguageService<'_> {
                             continue;
                         }
                     }
-                    entries.push(entry);
                 }
+                entries.push(entry);
             }
         }
 

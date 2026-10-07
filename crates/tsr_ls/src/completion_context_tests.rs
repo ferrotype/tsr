@@ -172,3 +172,65 @@ fn declaration_name_slots_block_and_constructor_modifiers_remain_available() {
         .unwrap();
     assert_eq!(list.items.len(), 5);
 }
+
+#[test]
+fn index_signature_type_query_keeps_its_parameter_in_scope() {
+    let list = complete(b"/a.ts", "class C { [foo: typeof |\n}")
+        .list
+        .unwrap();
+    assert!(list.items.iter().flatten().any(|item| item.label == "foo"));
+    let list = complete(b"/a.ts", "class C { [foo: |\n}").list.unwrap();
+    assert!(!list.items.iter().flatten().any(|item| item.label == "foo"));
+}
+
+#[test]
+fn incomplete_array_binding_rest_names_block_completions() {
+    for name in [b"/a.ts".as_slice(), b"/d.ts".as_slice()] {
+        for text in ["var [x, ...z|", "var [x, ...z|\n"] {
+            assert!(complete(name, text).list.is_none(), "{text}");
+        }
+    }
+}
+
+#[test]
+fn jsdoc_type_literal_member_completion_uses_its_container() {
+    let text = "class MssqlClient {\n  /**\n   * @returns {Promise<{upStatement|, downStatement}>}\n   */\n  async relationCreate(args) {}\n}\nexport default MssqlClient;";
+    let list = complete(b"/index.ts", text).list.unwrap();
+    assert_eq!(
+        list.items
+            .iter()
+            .flatten()
+            .map(|item| item.label.as_str())
+            .collect::<Vec<_>>(),
+        ["readonly"]
+    );
+}
+
+#[test]
+fn object_binding_without_source_type_has_no_completion_list() {
+    for text in [
+        "var {x|",
+        "var {x, y|",
+        "function f({a|",
+        "function f({a, b|",
+    ] {
+        assert!(complete(b"/a.ts", text).list.is_none(), "{text}");
+    }
+    let list = complete(
+        b"/a.ts",
+        "declare const source: { x: number, y: number }; const {x, |} = source;",
+    )
+    .list
+    .unwrap();
+    assert!(list.items.iter().flatten().any(|item| item.label == "y"));
+}
+
+#[test]
+fn jsdoc_type_literal_declaration_name_has_no_completion_list() {
+    assert!(complete(
+        b"/index.ts",
+        "/**\n * @type { {|ageX: number} }\n */\nvar y;"
+    )
+    .list
+    .is_none());
+}

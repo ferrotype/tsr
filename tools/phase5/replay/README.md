@@ -38,6 +38,22 @@ it is separate from the functional parity expectation artifacts. The helper's
 `prepare --output DIR` builds the executables; `run --binaries DIR --output DIR`
 only executes the bounded matrix and restores downloaded executable permissions.
 
+Committed `expected/<session>/<encoding>.json` files retain the complete
+normalized native transcripts for all six cases, including executed client
+messages, responses, requests, notifications and per-document diagnostic streams.
+They were copied from the retained `target/phase5/replay/current` native captures
+of pin `1f70213d4922b434345f639b441681e470c7cfc1`, after exact typed comparison
+against the independently retained `target/phase5/replay/synchronized` native
+captures and the matching Rust captures. CI compares each fresh native and Rust
+transcript with its committed expectation, and independently compares the two
+fresh transcripts with each other. It never regenerates expectations. A reviewed
+session/fixture change requires an explicit native record and expected-file update.
+The summary exposes `live_matched` and each runtime's `expected_matched`; retained
+expectation mismatches go under `expected-mismatch/<runtime>` beside the existing
+live `mismatch` directory. The focused CI regression changes one committed
+initialize response and verifies that both expectation checks fail even when the
+fresh servers agree. Missing or malformed expected files also fail the matrix.
+
 The first session line names the fixture and project placeholders. Subsequent
 lines follow pinned `{kind, method, params}` format. One explicit scripted
 extension, `{"$response":2}`, resolves the first completion item from the third

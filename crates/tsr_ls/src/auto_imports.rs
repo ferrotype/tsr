@@ -66,13 +66,8 @@ impl LanguageService<'_> {
                 for (name, file) in package.ambient_modules(&program)? {
                     ambient.entry(name).or_default().push(file);
                 }
-                // Package exports are supplied by this independently scoped
-                // index, including files also loaded by the user's program.
-                let package_paths: std::collections::HashSet<_> =
-                    package.root_file_names().cloned().collect();
-                registry.index = registry
-                    .index
-                    .filtered(|e| !package_paths.contains(&e.path));
+                // Project-owned source files also remain in the project index;
+                // the pin searches both project and package buckets.
                 for export in package_registry.index.entries() {
                     registry.index.insert(export.clone());
                 }
@@ -182,6 +177,7 @@ impl LanguageService<'_> {
         options: &CompletionOptions,
         list: &mut lsp::CompletionList,
         statement: Option<&crate::completion_imports::ImportStatement>,
+        shadowed: &std::collections::HashSet<String>,
     ) -> Result<()> {
         if options.module_exports == Some(false) && statement.is_none()
             || tsr_tspath::is_dynamic_file_name(syntax.file.file_name())
@@ -212,13 +208,7 @@ impl LanguageService<'_> {
         if !fidelity.is_exact() {
             return Ok(());
         }
-        let shadowed: std::collections::HashSet<_> = list
-            .items
-            .iter()
-            .flatten()
-            .filter(|i| i.kind.as_deref() != Some(&lsp::CompletionItemKind::KEYWORD))
-            .map(|i| i.label.as_str())
-            .collect();
+        let jsx = crate::completion_jsx::open_tag(syntax, context)?;
         let mut groups: HashMap<_, Vec<(&Export, tsr_autoimport::fix::Fix)>> = HashMap::new();
         for export in registry.search(syntax.file.path(), &prefix) {
             self.check_canceled()?;
@@ -254,8 +244,8 @@ impl LanguageService<'_> {
                 export,
                 tsr_autoimport::fix::Usage {
                     type_only: context.type_only,
+                    jsx,
                     position: Some(usage_range.start.clone()),
-                    ..Default::default()
                 },
                 &options.auto_import,
             )? {

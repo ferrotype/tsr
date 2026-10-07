@@ -156,19 +156,51 @@ mod tests {
     }
     #[test]
     fn local_executor_cancellation_reaps_child_and_descendants() {
-        let context = Context::background().with_timeout(Duration::from_millis(50));
-        let start = std::time::Instant::now();
-        let error = execute(
-            &context,
-            b"/bin/sh",
-            b"",
-            &args("printf '%s\\n' $$; sleep 60 & wait"),
-        )
-        .unwrap_err();
-        assert_eq!(error.message, "context deadline exceeded");
-        assert!(start.elapsed() < Duration::from_secs(2));
-        let pid = String::from_utf8(error.output)
+        let id = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
+            .as_nanos();
+        let directory =
+            std::env::temp_dir().join(format!("tsr-npm-cancel-{}-{id}", std::process::id()));
+        std::fs::create_dir(&directory).unwrap();
+        struct Cleanup(std::path::PathBuf);
+        impl Drop for Cleanup {
+            fn drop(&mut self) {
+                let _ = std::fs::remove_dir_all(&self.0);
+            }
+        }
+        let _cleanup = Cleanup(directory.clone());
+        let context = Context::background().with_timeout(Duration::from_secs(10));
+        let worker_context = context.clone();
+        let cwd = directory.as_os_str().as_bytes().to_vec();
+        let worker = std::thread::spawn(move || {
+            execute(
+                &worker_context,
+                b"/bin/sh",
+                &cwd,
+                // Publish readiness only after a descendant inheriting the
+                // output pipes exists. The PID does not depend on output
+                // draining before cancellation.
+                &args("sleep 60 & printf '%s\\n' $$ > pending; mv pending ready; wait"),
+            )
+        });
+        let deadline = std::time::Instant::now() + Duration::from_secs(5);
+        let ready = loop {
+            if let Ok(ready) = std::fs::read_to_string(directory.join("ready")) {
+                break Some(ready);
+            }
+            if std::time::Instant::now() >= deadline {
+                break None;
+            }
+            std::thread::sleep(Duration::from_millis(5));
+        };
+        let start = std::time::Instant::now();
+        context.cancel();
+        let error = worker.join().unwrap().unwrap_err();
+        assert_eq!(error.message, "context canceled");
+        assert!(start.elapsed() < Duration::from_secs(2));
+        let pid = ready
+            .expect("shell did not publish process readiness")
             .trim()
             .parse()
             .unwrap();
