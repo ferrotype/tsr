@@ -128,9 +128,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ steps.node.outputs.version }}
-      - name: LSP generated code and pinned codec comparison
+      - name: LSP and API generated code and pinned codec comparison
         run: |
           cargo xtask gen lsproto --check
+          cargo xtask gen api --check
           python3 tools/phase5/lsproto/check.py
       # Several script tests read `cargo metadata --offline`; the registry has
       # to hold the locked crates before anything builds.
@@ -317,9 +318,50 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
+  # jsapi: the pinned client's own test suites against the ordinary binaries
+  #        the phase5-runner job built, native first for the denominator.
+  jsapi:
+    name: jsapi 1/1
+    needs: phase5-runner
+    runs-on: ${{ vars.PARITY_RUNNER || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Read the client's Node pin
+        id: node
+        run: echo "version=$(python3 -c "import json;print(json.load(open('upstream/package.json'))['volta']['node'])")" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.node.outputs.version }}
+          cache: npm
+          cache-dependency-path: upstream/package-lock.json
+      # The client's own test files import its bench module, which imports the
+      # workspace's tinybench and typescript; the lockfile pins both.
+      - name: Install the pinned client's locked dependencies
+        run: npm ci --ignore-scripts
+        working-directory: upstream
+      - uses: actions/download-artifact@v4
+        with:
+          name: phase5-replay-binaries
+          path: phase5-replay-binaries
+      - name: Prepare the suite against the downloaded binaries
+        run: |
+          chmod +x phase5-replay-binaries/native-lsp phase5-replay-binaries/rust-lsp
+          python3 tools/phase6/jsapi/runner.py prepare --prepared target/phase6/parity/jsapi --binaries phase5-replay-binaries
+      - name: Run the suite
+        run: python3 scripts/parity.py run jsapi --runner target/phase6/parity/jsapi/prepared.json --output results/jsapi/1-1
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: parity-jsapi-0
+          path: results
+          retention-days: 7
+          if-no-files-found: error
+
   parity-check:
     name: parity check
-    needs: [parity, phase5-parity]
+    needs: [parity, phase5-parity, jsapi]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
@@ -332,7 +374,7 @@ jobs:
       - name: Compare with the expectation files
         run: |
           status=0
-          for suite in compiler compiler-concurrent transpile fourslash lsp; do
+          for suite in compiler compiler-concurrent transpile fourslash lsp jsapi; do
             python3 scripts/parity.py check "$suite" --results results/"$suite"/* || status=1
           done
           exit "$status"

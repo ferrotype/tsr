@@ -55,6 +55,7 @@ class Suite:
 SUITES = {
     "fourslash": Suite("", "", (), 120, batch=True),
     "lsp": Suite("", "", (), 120, batch=True),
+    "jsapi": Suite("", "", (), 600, batch=True),
     "compiler": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "single"), 600),
     "compiler-concurrent": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "concurrent"), 600),
     "transpile": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "transpile"), 60),
@@ -64,6 +65,16 @@ SUITES = {
 
 def pin():
     return json.loads(UPSTREAM.read_text())["pin"]
+
+
+BATCH_SUITES = ("fourslash", "lsp", "jsapi")
+
+
+def bridge(suite):
+    """The batch suite's bridge module: it prepares, lists, runs native-first
+    groups and counts the gate for one family of pinned tests."""
+    import importlib
+    return importlib.import_module("phase6_parity" if suite == "jsapi" else "phase5_parity")
 
 
 def expectation_path(suite):
@@ -89,8 +100,7 @@ def runner_path(suite, explicit=None):
     Cargo reports for the release build, which honors CARGO_TARGET_DIR and
     .cargo/config (a fresh build is a no-op that still reports the path)."""
     if SUITES[suite].batch:
-        import phase5_parity
-        return phase5_parity.prepare(suite, explicit)
+        return bridge(suite).prepare(suite, explicit)
     if explicit:
         return Path(explicit).resolve()
     command = ["cargo", "build", "--release", "--locked", "-p", SUITES[suite].package,
@@ -113,8 +123,7 @@ def runner_command(suite, runner, *rest):
 
 def list_variants(suite, runner):
     if SUITES[suite].batch:
-        import phase5_parity
-        return phase5_parity.adapter().list_variants(suite, runner)
+        return bridge(suite).adapter().list_variants(suite, runner)
     completed = subprocess.run(runner_command(suite, runner, "list"), cwd=ROOT, check=True,
                                capture_output=True, text=True)
     variants = sorted(set(line for line in completed.stdout.splitlines() if line.strip()))
@@ -181,7 +190,8 @@ def run(args):
     shutil.rmtree(local, ignore_errors=True)
     local.mkdir(parents=True, exist_ok=True)
     timeout = args.timeout or SUITES[suite].timeout
-    jobs = args.jobs or (min(4, os.cpu_count() or 1) if SUITES[suite].batch else os.cpu_count() or 1)
+    # The client suites share one binary placement, so they run one file at a time.
+    jobs = args.jobs or (1 if suite == "jsapi" else min(4, os.cpu_count() or 1) if SUITES[suite].batch else os.cpu_count() or 1)
     if jobs < 1:
         sys.exit("--jobs must be positive")
     meta = {"suite": suite, "pin": pin(), "shard": [index, count], "total": len(variants),
@@ -195,7 +205,6 @@ def run(args):
     slowest = []
     with (output / "results.ndjson").open("w") as results, ThreadPoolExecutor(jobs) as pool:
         if SUITES[suite].batch:
-            import phase5_parity
             lock = threading.Lock()
             finished = 0
             def publish(rows):
@@ -208,7 +217,7 @@ def run(args):
                     finished += 1
                     if finished % 100 == 0 or finished == len(selected):
                         print(f"{finished}/{len(selected)} tests; {counts}", file=sys.stderr)
-            futures = [pool.submit(phase5_parity.run_group, suite, runner, selected[j::jobs],
+            futures = [pool.submit(bridge(suite).run_group, suite, runner, selected[j::jobs],
                                    local / str(j), timeout, publish) for j in range(min(jobs, len(selected)))]
             for future in as_completed(futures):
                 timings = future.result()
@@ -253,7 +262,7 @@ def complete(directory, meta, rows):
     answered = {}
     for row in rows:
         answered.setdefault(variant_of(row["id"], selected, row.get("parent")), []).append(row["id"])
-    if meta["suite"] in ("fourslash", "lsp"):
+    if meta["suite"] in BATCH_SUITES:
         roots = {row["id"] for row in rows if row["id"] == row.get("parent") and row.get("native_state") in STATES}
         if roots != selected or any("parent" not in row for row in rows):
             sys.exit(f"{directory}: missing explicit terminal parent/native state")
@@ -280,7 +289,7 @@ def merge(suite, directories):
         metas.append(meta)
         rows.extend(shard_rows)
         variants.extend(meta["variants"])
-    if suite in ("fourslash", "lsp"):
+    if suite in BATCH_SUITES:
         selections = {json.dumps(meta.get("native_selection"), sort_keys=True) for meta in metas}
         if len(selections) != 1 or "null" in selections:
             sys.exit("the result directories disagree on native host/source selection")
@@ -311,11 +320,15 @@ def summary(expectation, meta, rows, new_failures, now_passing):
     lines = [f"suite {expectation['suite']}: {meta['total']} variants; sub-tests pass {counts['pass']}, "
              f"skip {counts['skip']}, fail {counts['fail']} ({approved} approved)"]
     if expectation['suite'] == 'fourslash':
-        import phase5_parity
-        gate = phase5_parity.counts(rows)
+        gate = bridge('fourslash').counts(rows)
         ratio = 100 * (gate['executed'] - gate['failing']) / gate['executed'] if gate['executed'] else 0
         lines.append(f"native executed N={gate['executed']}; pinned skips={gate['native_skips']}; "
                      f"failing parents F={gate['failing']} (closure limit {gate['limit']}); {ratio:.3f}% pass; "
+                     f"native reference failures={gate['reference_failures']}")
+    elif expectation['suite'] == 'jsapi':
+        gate = bridge('jsapi').counts(rows)
+        lines.append(f"client test files={gate['files']}; cases={gate['cases']}; native executed={gate['executed']}; "
+                     f"native skips={gate['native_skips']}; failing cases={gate['failing']} (closure requires owner-approved only); "
                      f"native reference failures={gate['reference_failures']}")
     if new_failures:
         lines.append(f"{len(new_failures)} new failure(s) not named in status/parity/{expectation['suite']}.json:")
