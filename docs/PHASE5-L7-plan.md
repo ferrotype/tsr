@@ -1,10 +1,11 @@
 # Phase 5 L7: acceptance path, residuals, replay and latency
 
-Status: **correctness and replay pass; latency pending** (2026-10-07).
+Status: **correctness and replay pass; measured latency misses all five gates** (2026-10-07).
 All 4,117 native-executed fourslash tests, 13 LSP tests and six ordinary-CLI
 replays pass. The owner approved section 2 items 1–3 on 2026-10-06 and
 authorized the TypeScript/pull-diagnostics latency run on 2026-10-07.
-The real latency result remains outstanding.
+The twenty-pair run is recorded; all five 95% ratio intervals are above 1.0.
+L7 is not closed. See the results and host limitations in PHASE5-L7.md.
 Checkpoint L7 of the [Phase 5 plan](PHASE5-plan.md). Planning reference: `main`
 at `ef456f65` (L0 to L6 merged, 0.3.0 released). Work is on
 `codex/phase5-l7`. Upstream remains Corsa

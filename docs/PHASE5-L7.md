@@ -436,12 +436,50 @@ remain unchanged, and other arrays stay ordered. The rejected `smoke-01` and
 `smoke-02` artifacts remain available. Regression tests reject changed payloads,
 sort keys, item counts, tie order and changes to other response arrays.
 
+## Latency measurement, 2026-10-07
+
+The authorized capture at `7dfe0eaf` completed twenty alternating Go/Rust pairs
+in `target/phase5/latency/capture-01`, using the ordinary release CLIs from
+`target/phase5/replay/l7-final-binaries`. All twenty pairs passed the full
+response and traffic comparison. No pair was replaced or discarded. The
+three smoke pairs are separate and contribute no samples here.
+
+The immutable [performance record](../status/perf/lsp/2026-10-07T05-06-35.795361+00-00-7dfe0eaf.json)
+contains the binary/fixture/scenario identities, individual samples and
+bootstrap statistics. Times below are medians in milliseconds; ratios are
+Rust/Go, and intervals are 95% bootstrap intervals for that ratio.
+
+| Scenario | Go ms | Rust ms | Rust/Go | 95% interval | Gate |
+| --- | ---: | ---: | ---: | --- | --- |
+| First diagnostics (open through full pull) | 21.682 | 110.835 | 5.112 | 4.943–5.301 | Miss |
+| Completion after edit | 1.506 | 4.309 | 2.861 | 2.758–3.038 | Miss |
+| Hover | 0.278 | 0.576 | 2.074 | 1.899–2.389 | Miss |
+| References | 9.355 | 16.906 | 1.807 | 1.733–1.887 | Miss |
+| Local import-alias rename | 0.204 | 0.391 | 1.916 | 1.750–2.067 | Miss |
+
+Every interval is wholly above the unchanged 1.0 threshold, so the plan's
+twenty-to-forty extension is not triggered. This is a measured regression,
+not an inconclusive pass. No performance exception is approved.
+
+Host: macOS arm64, 18 schedulable CPUs, `GOGC=100`, `GOTOOLCHAIN=local`,
+`GOWORK=off`. No builds or other agent tests ran during the batch. Background
+applications remained active: the one-minute load average was 4.32 before and
+4.57 after; this was not an otherwise idle host. Host notes and raw frames
+remain in `target/phase5/latency/capture-01-host` and the capture directory.
+Sub-millisecond hover/rename ratios are especially sensitive to scheduling;
+the result should not be generalized to other projects or hardware.
+
+The measurement driver, focused latency/perf tests (43),
+`cargo xtask validate` and `git diff --check` pass. CI passed on the production
+correctness commit `8fed54f1`, including all fourslash, LSP, compiler,
+concurrent compiler, transpile and native CLI jobs. No production Rust changed
+for this capture.
+
 ## Still to complete
 
-L7's remaining acceptance work is latency. On 2026-10-07 the owner authorized
-the proposed fixture and pull-diagnostics metric (plan section 2, decision 4),
-three smoke pairs, then the twenty-pair run and any measured fixes. Smoke is
-complete; the run of record is next.
-No performance run has been recorded and L7 is not declared closed. CI passed
-on the correctness commit `8fed54f1`, including all fourslash, LSP, compiler,
-concurrent compiler, transpile and native CLI jobs.
+L7's correctness, replay and measurement work is complete, but its latency exit
+condition fails. Closing it requires performance fixes with a new paired run,
+or a separate owner decision accepting the measured differences. The first
+profiling target is the open/load/check path: it accounts for the largest
+absolute gap, 89.2 ms. These end-to-end timings do not yet attribute that gap
+to project loading, checker construction, checking or protocol work.
