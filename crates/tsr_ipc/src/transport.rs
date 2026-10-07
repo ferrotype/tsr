@@ -116,6 +116,24 @@ pub fn pipe() -> (Stream, Stream) {
     (end(0), end(1))
 }
 
+/// Standard input and output as one connection (the pin's `StdioTransport`):
+/// closing it closes neither handle, which the process owns; the peer sees
+/// the end when the process exits.
+struct StdioCloser;
+impl Closer for StdioCloser {
+    fn close(&self) -> io::Result<()> {
+        Ok(())
+    }
+}
+/// port: tsc/internal/ipc/transport.go:NewStdioTransport
+pub fn stdio() -> Stream {
+    Stream {
+        reader: Box::new(io::stdin()),
+        writer: Box::new(io::stdout()),
+        closer: Arc::new(StdioCloser),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
