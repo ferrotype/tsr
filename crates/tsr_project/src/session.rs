@@ -10,7 +10,7 @@ use crate::{
     ref_count_cache::RefCountCacheOptions,
     snapshot::SessionSnapshot,
     snapshot_fs::{SnapshotFs, SnapshotFsBuilder},
-    Snapshot,
+    Project, Snapshot,
 };
 use std::{
     collections::BTreeMap,
@@ -98,6 +98,8 @@ impl Default for SessionOptions {
 pub enum Error {
     Closed,
     NoProjectForUnknownScriptKind,
+    /// A temporary file whose name has no known script kind.
+    UnsupportedFileExtension(JsString),
     Compiler(tsr_compiler::Error),
     Host(tsr_vfs::Error),
 }
@@ -118,6 +120,11 @@ impl std::fmt::Display for Error {
             Self::NoProjectForUnknownScriptKind => {
                 f.write_str("no project for unknown script kind")
             }
+            Self::UnsupportedFileExtension(name) => write!(
+                f,
+                "unsupported file extension: {}",
+                String::from_utf8_lossy(name.as_bytes())
+            ),
             Self::Compiler(error) => error.fmt(f),
             Self::Host(error) => error.fmt(f),
         }
@@ -776,7 +783,70 @@ impl Session {
             self.options.position_encoding,
         )
         .with_overlays(old.fs.overlays().clone());
-        let mut changes = overlays.process_changes(&pending.changes)?;
+        let changes = overlays.process_changes(&pending.changes)?;
+        let next = self.derive_snapshot(
+            Derivation {
+                old,
+                overlays,
+                changes,
+                resources,
+                pending,
+                clean_disk,
+                host,
+            },
+            |builder| builder.build(resources),
+        )?;
+        let id = next.id().expect("session snapshot");
+        for (key, project) in &old.projects {
+            if next
+                .project_by_path(key.as_bytes())
+                .is_none_or(|next| !Arc::ptr_eq(project.pool(), next.pool()))
+            {
+                if let Some(scheduler) = project.scheduler() {
+                    scheduler.discard();
+                }
+            }
+        }
+        *self.snapshot.write().expect("session snapshot") = Some(next.clone());
+        transaction.pending = None;
+        self.options.logger.log(format_args!(
+            "Updated snapshot {} from {} ({} projects)",
+            id,
+            old.id,
+            next.projects().len()
+        ));
+        if let Some(watches) = self.watches.get() {
+            watches.enqueue(old.watches(), next.state().unwrap().watches());
+        }
+        self.sync_auto_import_watches();
+        self.trigger_ata(&next);
+        if self.events.get().is_some() {
+            self.send_event(SessionEvent::Published {
+                previous,
+                current: next.clone(),
+            });
+        }
+        Ok(next)
+    }
+    /// Builds the snapshot that follows `old` under `derivation` without
+    /// publishing it: the session's update adopts the result, and the API's
+    /// clones (a temporary file, a standalone program) keep theirs private,
+    /// as the pin's snapshot host derives without session side effects.
+    /// port: tsc/internal/project/snapshothost.go:SnapshotHost.update
+    fn derive_snapshot(
+        &self,
+        derivation: Derivation<'_>,
+        build: impl FnOnce(build::ProjectBuilder<'_>) -> Result<build::BuildOutput, Error>,
+    ) -> Result<Snapshot, Error> {
+        let Derivation {
+            old,
+            overlays,
+            mut changes,
+            resources,
+            pending,
+            clean_disk,
+            host,
+        } = derivation;
         if pending.mapper_locale_changed || pending.ata_changed || !pending.ata_changes.is_empty() {
             changes.invalidate_all = true;
         }
@@ -840,7 +910,7 @@ impl Session {
             defaults,
             api_state,
             api_error,
-        } = builder.build(resources)?;
+        } = build(builder)?;
         // The pin cleans unowned registry entries when recomputing the open
         // project set, not when merely loading resources for an LS request.
         // Such lookups may intentionally publish parsed solution configs that
@@ -898,36 +968,107 @@ impl Session {
             config_ownership: ownership,
             _programs: programs,
         });
-        for (key, project) in &old.projects {
-            if next
-                .project_by_path(key.as_bytes())
-                .is_none_or(|next| !Arc::ptr_eq(project.pool(), next.pool()))
-            {
-                if let Some(scheduler) = project.scheduler() {
-                    scheduler.discard();
-                }
-            }
-        }
-        *self.snapshot.write().expect("session snapshot") = Some(next.clone());
-        transaction.pending = None;
-        self.options.logger.log(format_args!(
-            "Updated snapshot {} from {} ({} projects)",
-            id,
-            old.id,
-            next.projects().len()
-        ));
-        if let Some(watches) = self.watches.get() {
-            watches.enqueue(old.watches(), next.state().unwrap().watches());
-        }
-        self.sync_auto_import_watches();
-        self.trigger_ata(&next);
-        if self.events.get().is_some() {
-            self.send_event(SessionEvent::Published {
-                previous,
-                current: next.clone(),
-            });
-        }
         Ok(next)
+    }
+
+    /// A snapshot derived from `base` with `uri` overridden by `new_text`,
+    /// not adopted by the session. A new file must have a known script kind.
+    /// port: tsc/internal/project/snapshot.go:Snapshot.cloneWithTemporaryFile
+    pub fn clone_with_temporary_file(
+        &self,
+        base: &Snapshot,
+        uri: &DocumentUri,
+        new_text: JsString,
+    ) -> Result<Snapshot, Error> {
+        let _update = self
+            .update
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        let old = base.state().ok_or(Error::Closed)?;
+        let path = uri.path(self.fs.use_case_sensitive_file_names());
+        let mut overlays = (**old.fs.overlays()).clone();
+        let mut changes = FileChangeSummary::default();
+        let (version, kind) = if let Some(existing) = overlays.get(&path) {
+            changes.changed.insert(uri.clone());
+            (existing.version() + 1, existing.kind())
+        } else {
+            let kind = tsr_core::ScriptKind::from_file_name(uri.file_name().as_bytes());
+            if kind == tsr_core::ScriptKind::UNKNOWN {
+                return Err(Error::UnsupportedFileExtension(uri.file_name()));
+            }
+            changes.opened = Some(uri.clone());
+            (0, kind)
+        };
+        overlays.insert(
+            path,
+            Arc::new(crate::overlay::FileHandle::overlay(
+                uri.file_name(),
+                new_text,
+                version,
+                kind,
+            )),
+        );
+        let overlays = OverlayFs::new(
+            self.fs.clone(),
+            self.options.current_directory.clone(),
+            self.options.position_encoding,
+        )
+        .with_overlays(Arc::new(overlays));
+        let resources = crate::api::ResourceRequest::document(uri.clone());
+        self.derive_snapshot(
+            Derivation {
+                old,
+                overlays,
+                changes,
+                resources: &resources,
+                pending: &Pending::default(),
+                clean_disk: false,
+                host: self.fs.clone(),
+            },
+            |builder| builder.build(&resources),
+        )
+    }
+
+    /// An isolated snapshot with one synthetic inferred project built from
+    /// explicit roots and options, seeded from `old_project` when given; the
+    /// base is not adopted as session state.
+    /// port: tsc/internal/project/snapshot.go:Snapshot.cloneForProgram
+    pub fn clone_for_program(
+        &self,
+        base: &Snapshot,
+        request: ProgramRequest,
+        old_project: Option<&Project>,
+        changes: FileChangeSummary,
+    ) -> Result<Snapshot, Error> {
+        let _update = self
+            .update
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        let old = base.state().ok_or(Error::Closed)?;
+        let overlays = OverlayFs::new(
+            self.fs.clone(),
+            self.options.current_directory.clone(),
+            self.options.position_encoding,
+        )
+        .with_overlays(old.fs.overlays().clone());
+        let resources = crate::api::ResourceRequest::default();
+        let mut command =
+            tsr_tsoptions::ParsedCommandLine::new(request.options, request.root_file_names);
+        command.project_references = request.project_references;
+        command.errors = request.config_file_parsing_diagnostics;
+        let command = Arc::new(command);
+        self.derive_snapshot(
+            Derivation {
+                old,
+                overlays,
+                changes,
+                resources: &resources,
+                pending: &Pending::default(),
+                clean_disk: false,
+                host: self.fs.clone(),
+            },
+            move |builder| builder.build_program(command, old_project),
+        )
     }
     // port: tsc/internal/project/session.go:Session.Close
     pub fn close(&self) {
@@ -973,6 +1114,27 @@ impl Drop for Session {
         }
     }
 }
+/// The input of one snapshot derivation: the base, the overlays and file
+/// changes already applied to them, the request, the pending session events
+/// to fold in, and the file system the new snapshot reads.
+struct Derivation<'a> {
+    old: &'a Arc<SessionSnapshot>,
+    overlays: OverlayFs,
+    changes: FileChangeSummary,
+    resources: &'a crate::api::ResourceRequest,
+    pending: &'a Pending,
+    clean_disk: bool,
+    host: Arc<dyn FileSystem>,
+}
+
+/// The pin's `createProgram` input to `cloneForProgram`.
+pub struct ProgramRequest {
+    pub root_file_names: Vec<JsString>,
+    pub options: CompilerOptions,
+    pub project_references: Option<Vec<tsr_tsoptions::ProjectReference>>,
+    pub config_file_parsing_diagnostics: Vec<tsr_ast::Diagnostic>,
+}
+
 struct PendingTransaction<'a> {
     session: &'a Session,
     pending: Option<Pending>,

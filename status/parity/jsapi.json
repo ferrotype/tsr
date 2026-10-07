@@ -30,23 +30,7 @@
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/async/api.test.ts/API > createProgram discovers imported non-root dependencies": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > createProgram ignores an on-disk tsconfig": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/async/api.test.ts/API > createProgram includes config file parsing diagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > createProgram includes project references": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > createProgram rejects an inactive or foreign old program": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
@@ -58,83 +42,7 @@
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/async/api.test.ts/API > createProgram updates roots when given an old program": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > disposes": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/async/api.test.ts/API > initializes once for concurrent first requests": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > parseCommandLine": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > parseCommandLine reports diagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > parseConfigFile": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > parseConfigFile includes compileOnSave": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > parseConfigFile includes projectReferences": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > parseConfigFile includes typeAcquisition": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > parseConfigFile preserves raw config": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > parseJsonConfigFileContent accepts non-object JSON": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > parseJsonConfigFileContent preserves an empty files list": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > parseJsonConfigFileContent preserves raw config": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > parseJsonConfigFileContent reports null array elements": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > parseJsonConfigFileContent with configDirectory": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > parseJsonConfigFileContent with configFileName": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > readConfigFile": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > readConfigFile reports read and parse errors": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > transpile": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Benchmarks": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
@@ -606,23 +514,11 @@
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/async/api.test.ts/Multiple snapshots > adding a new file is reflected in the next snapshot": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/async/api.test.ts/Multiple snapshots > each snapshot has its own server-side lifecycle": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/async/api.test.ts/Multiple snapshots > multiple sequential edits produce correct snapshots": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/async/api.test.ts/Multiple snapshots > two snapshots work independently": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/NodeArray > hasTrailingComma": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
@@ -647,10 +543,6 @@
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
     "jsapi/test/async/api.test.ts/Program - diagnostics > getBindDiagnostics with multiple files": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - diagnostics > getConfigFileNames and getConfigSourceFile": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
@@ -770,22 +662,6 @@
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/async/api.test.ts/Snapshot > project exposes parsedCommandLine": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Snapshot > updateSnapshot returns snapshot with projects": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Snapshot disposal > api.close disposes all active snapshots": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Snapshot disposal > dispose is idempotent": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/async/api.test.ts/Snapshot dispose": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
@@ -802,63 +678,7 @@
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/async/api.test.ts/Source file cache keying across projects > different parse modes produce separate cached objects; same parse modes share": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Source file caching > cache entries survive when one of two snapshots is disposed": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Source file caching > invalidateAll causes all files to be re-fetched": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Source file caching > modified file returns a different source file object": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/async/api.test.ts/Source file caching > node handles from a cached source file should be valid in a new snapshot": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Source file caching > same file from same snapshot returns cached object": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Source file caching > same file from two snapshots (same content) returns cached object": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Source file caching > unmodified file retains cached object across file change notification": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/SourceFile > extended data": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/SourceFile > file properties": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/SourceFile > forEachChild with visitList does not visit array children twice": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/SourceFile > getSourceFile rejects invalid document identifiers": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/SourceFile > getSourceFileNames returns all program files, not just root files": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/SourceFile > source file metadata identifies external library and default library files": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/SourceFile > source file metadata reports implied node format": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
@@ -899,18 +719,6 @@
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
     "jsapi/test/async/api.test.ts/Symbol - parent, members, exports > getParent returns containing symbol": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Timing > collects combined client, server, and transport timing info": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Timing > is disabled by default": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Timing > tracks source-file node materialization": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
@@ -1010,59 +818,11 @@
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/async/api.test.ts/VariableDeclarationList - BlockScoped flags > const declaration has Const flag": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/VariableDeclarationList - BlockScoped flags > let declaration has Let flag": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/async/api.test.ts/VariableDeclarationList const flag clone": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/async/api.test.ts/ast - getJSDocTags > a @type cast tag is owned by its parenthesized expression, not the declaration": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/ast - getJSDocTags > a function-expression parameter inherits @param tags from the variable statement": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/ast - getJSDocTags > returns a node's own tags, and inherited @param ∕ @template tags": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/getDefaultProjectForFile > closeFiles releases a file opened via openFiles": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/getDefaultProjectForFile > closeProjects releases a project opened via openProjects": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/async/api.test.ts/getDefaultProjectForFile > finds inferred project for d.ts in node_modules after openFiles": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/getDefaultProjectForFile > inferred project reflects file changes without a follow-up open∕close request": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/getDefaultProjectForFile > keeps previously opened files open across subsequent openFiles calls": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/getDefaultProjectForFile > opening a file resolves to a configured project via ancestor search": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/modifierFlags > export async function has Export | Async flags": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/modifierFlags > node without modifiers has ModifierFlags.None": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
@@ -1074,35 +834,7 @@
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/async/api.test.ts/template unicode escapes": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/unicode escapes": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/astnav.test.ts/astnav > findNextToken": {
-      "reason": "cancelled by parent",
-      "detail": "Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled"
-    },
-    "jsapi/test/async/astnav.test.ts/astnav > findPrecedingToken": {
-      "reason": "cancelled by parent",
-      "detail": "Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled"
-    },
-    "jsapi/test/async/astnav.test.ts/astnav > getTokenAtPosition": {
-      "reason": "cancelled by parent",
-      "detail": "Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled"
-    },
-    "jsapi/test/async/astnav.test.ts/astnav > getTouchingPropertyName": {
-      "reason": "cancelled by parent",
-      "detail": "Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled"
-    },
     "jsapi/test/diagnosticFormatter.test.ts/diagnosticFormatter > formats diagnostics with a configured program host": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/diagnosticFormatter.test.ts/diagnosticFormatter > uses the API directory and LF defaults for inferred projects": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
@@ -1142,10 +874,6 @@
       "reason": "server: not implemented: batchRequests",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: batchRequests"
     },
-    "jsapi/test/sync/api-generators.test.ts/API - generator batching > yields source file metadata requests on cache misses": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/sync/api.test.ts/API > createProgram": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
@@ -1154,23 +882,7 @@
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/sync/api.test.ts/API > createProgram discovers imported non-root dependencies": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > createProgram ignores an on-disk tsconfig": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/sync/api.test.ts/API > createProgram includes config file parsing diagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > createProgram includes project references": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > createProgram rejects an inactive or foreign old program": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
@@ -1182,85 +894,9 @@
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/sync/api.test.ts/API > createProgram updates roots when given an old program": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > disposes": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/sync/api.test.ts/API > initializes once for concurrent first requests": {
       "reason": "server: not implemented: batchRequests",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: batchRequests"
-    },
-    "jsapi/test/sync/api.test.ts/API > parseCommandLine": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > parseCommandLine reports diagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > parseConfigFile": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > parseConfigFile includes compileOnSave": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > parseConfigFile includes projectReferences": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > parseConfigFile includes typeAcquisition": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > parseConfigFile preserves raw config": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > parseJsonConfigFileContent accepts non-object JSON": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > parseJsonConfigFileContent preserves an empty files list": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > parseJsonConfigFileContent preserves raw config": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > parseJsonConfigFileContent reports null array elements": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > parseJsonConfigFileContent with configDirectory": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > parseJsonConfigFileContent with configFileName": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > readConfigFile": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > readConfigFile reports read and parse errors": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > transpile": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Benchmarks": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
     "jsapi/test/sync/api.test.ts/Checker - TypeParameter getters > getConstraint() and getDefault() return the constraint and default types": {
       "reason": "server: not implemented: initialize",
@@ -1730,23 +1366,11 @@
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/sync/api.test.ts/Multiple snapshots > adding a new file is reflected in the next snapshot": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/sync/api.test.ts/Multiple snapshots > each snapshot has its own server-side lifecycle": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/sync/api.test.ts/Multiple snapshots > multiple sequential edits produce correct snapshots": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/sync/api.test.ts/Multiple snapshots > two snapshots work independently": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/NodeArray > hasTrailingComma": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
@@ -1771,10 +1395,6 @@
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
     "jsapi/test/sync/api.test.ts/Program - diagnostics > getBindDiagnostics with multiple files": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - diagnostics > getConfigFileNames and getConfigSourceFile": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
@@ -1890,22 +1510,6 @@
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/sync/api.test.ts/Snapshot > project exposes parsedCommandLine": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Snapshot > updateSnapshot returns snapshot with projects": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Snapshot disposal > api.close disposes all active snapshots": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Snapshot disposal > dispose is idempotent": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/sync/api.test.ts/Snapshot dispose": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
@@ -1922,63 +1526,7 @@
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/sync/api.test.ts/Source file cache keying across projects > different parse modes produce separate cached objects; same parse modes share": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Source file caching > cache entries survive when one of two snapshots is disposed": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Source file caching > invalidateAll causes all files to be re-fetched": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Source file caching > modified file returns a different source file object": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/sync/api.test.ts/Source file caching > node handles from a cached source file should be valid in a new snapshot": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Source file caching > same file from same snapshot returns cached object": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Source file caching > same file from two snapshots (same content) returns cached object": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Source file caching > unmodified file retains cached object across file change notification": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/SourceFile > extended data": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/SourceFile > file properties": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/SourceFile > forEachChild with visitList does not visit array children twice": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/SourceFile > getSourceFile rejects invalid document identifiers": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/SourceFile > getSourceFileNames returns all program files, not just root files": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/SourceFile > source file metadata identifies external library and default library files": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/SourceFile > source file metadata reports implied node format": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
@@ -2019,18 +1567,6 @@
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
     "jsapi/test/sync/api.test.ts/Symbol - parent, members, exports > getParent returns containing symbol": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Timing > collects combined client, server, and transport timing info": {
-      "reason": "server: unknown method: getServerTiming",
-      "detail": "Error [ERR_TEST_FAILURE]: unknown method: getServerTiming"
-    },
-    "jsapi/test/sync/api.test.ts/Timing > is disabled by default": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Timing > tracks source-file node materialization": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
@@ -2130,59 +1666,11 @@
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/sync/api.test.ts/VariableDeclarationList - BlockScoped flags > const declaration has Const flag": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/VariableDeclarationList - BlockScoped flags > let declaration has Let flag": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/sync/api.test.ts/VariableDeclarationList const flag clone": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
-    "jsapi/test/sync/api.test.ts/ast - getJSDocTags > a @type cast tag is owned by its parenthesized expression, not the declaration": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/ast - getJSDocTags > a function-expression parameter inherits @param tags from the variable statement": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/ast - getJSDocTags > returns a node's own tags, and inherited @param ∕ @template tags": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/getDefaultProjectForFile > closeFiles releases a file opened via openFiles": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/getDefaultProjectForFile > closeProjects releases a project opened via openProjects": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/sync/api.test.ts/getDefaultProjectForFile > finds inferred project for d.ts in node_modules after openFiles": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/getDefaultProjectForFile > inferred project reflects file changes without a follow-up open∕close request": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/getDefaultProjectForFile > keeps previously opened files open across subsequent openFiles calls": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/getDefaultProjectForFile > opening a file resolves to a configured project via ancestor search": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/modifierFlags > export async function has Export | Async flags": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/modifierFlags > node without modifiers has ModifierFlags.None": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
     },
@@ -2193,286 +1681,6 @@
     "jsapi/test/sync/api.test.ts/runWithTemporaryFileUpdate > temporary file update is visible in the callback and reverted afterward": {
       "reason": "server: not implemented: initialize",
       "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/template unicode escapes": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/unicode escapes": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > NodeArrays are wrapped in a SyntaxList that holds the elements and separators": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > SourceFile children are the statements SyntaxList and the EndOfFile token": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > a JSDoc comment is exposed as the first child": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > a token node has no children and no first∕last token": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > getChildCount and getChildAt agree with getChildren": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > getChildren is cached: repeat calls return the same array": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > getChildren materializes the punctuation∕keyword tokens the AST omits": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > getChildren on an EndOfFile token carrying JSDoc is cached": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > getChildren tiles [pos, end) contiguously, absorbing interior trivia into tokens": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > getFirstToken and getLastToken descend to the edge tokens": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > getFirstToken skips leading JSDoc and returns the first real token": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JS class with @extends type arguments and member tags": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JS with @callback": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JS with @enum": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JS with @import declaration": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JS with @satisfies": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JS with @this inserted into the parameter list": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JS with @type, @template and reparsed type parameters": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JS with @typedef and @property hoisted into statements": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JS with a @type cast on a parenthesized expression": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JS with constrained and multiple @template tags": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JS with optional, default and rest @param variants": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JS with reparsed @param∕@returns types": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JS with reparsed types on exported and nested functions": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JS with trailing orphan @typedef attached to EndOfFile": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JSX component with reparsed @param props type": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JSX element with attributes and children": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: JSX with @type cast and @typedef around elements": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: class with decorators": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: class with members": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: comments and jsdoc with tags": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: empty constructs": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: enums": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: for variants": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: function with optional, default and rest params": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: generics with constraints and defaults": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: if∕else chains": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: import declarations": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: interface with signature members": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: object literal with all member kinds": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: switch with an empty case clause": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: tagged and nested template literals": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > invariants: variable declarations": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > structural invariants hold recursively across a rich tree": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + child∕token getters > the else keyword is materialized as a synthetic token": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + cloneNode > cloneNode clones a remote import declaration": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + cloneNode > cloneNode preserves text on remote identifier": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + cloneNode > cloneNode produces a NodeObject from a RemoteNode": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + cloneNode > does not read a sibling as an invalid JSDoc link name": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + cloneNode > uses distinct nodes for expression and type heritage": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + getSynthesizedDeepClone > deep clone of remote SourceFile preserves top-level metadata references": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + getSynthesizedDeepClone > deep clone of remote tree produces independent NodeObject tree": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + getSynthesizedDeepClone > deep clones a remote import declaration": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + position∕text getters > a node without leading trivia has zero leading trivia width": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + position∕text getters > getStart can include leading JSDoc comments": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + position∕text getters > getText∕getFullText on a nested node": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + position∕text getters > getter invariants hold even for malformed source with missing nodes": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + position∕text getters > getter invariants hold for every node in a representative tree": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + position∕text getters > position and text getters on a parsed statement": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + position∕text getters > the SourceFile node spans the whole file text": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + visitEachChild > identity visitor returns same remote node": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNode + visitEachChild > visitor can transform remote tree into NodeObject tree": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/RemoteNodeList inherited array methods > filter∕map∕slice return plain arrays without throwing": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/ast.test.ts/isValidTypeOnlyAliasUseSite > classifies syntactic type-only import use sites": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/astnav.test.ts/astnav > findNextToken": {
-      "reason": "cancelled by parent",
-      "detail": "Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled"
-    },
-    "jsapi/test/sync/astnav.test.ts/astnav > findPrecedingToken": {
-      "reason": "cancelled by parent",
-      "detail": "Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled"
-    },
-    "jsapi/test/sync/astnav.test.ts/astnav > getTokenAtPosition": {
-      "reason": "cancelled by parent",
-      "detail": "Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled"
-    },
-    "jsapi/test/sync/astnav.test.ts/astnav > getTouchingPropertyName": {
-      "reason": "cancelled by parent",
-      "detail": "Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled"
     }
   }
 }

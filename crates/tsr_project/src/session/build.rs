@@ -344,6 +344,39 @@ impl<'a> ProjectBuilder<'a> {
     }
 
     // port: tsc/internal/project/projectcollectionbuilder.go:ProjectCollectionBuilder.markFilesChanged
+    /// One synthetic inferred project from `command`'s explicit roots and
+    /// options, seeded from the old program's project when the client passes
+    /// one; every other project of the base leaves this snapshot.
+    /// port: tsc/internal/project/snapshot.go:Snapshot.cloneForProgram
+    pub(super) fn build_program(
+        mut self,
+        command: Arc<ParsedCommandLine>,
+        old_project: Option<&Project>,
+    ) -> Result<BuildOutput, Error> {
+        let key = JsString::from_bytes(INFERRED_PROJECT_NAME);
+        let roots = command.root_file_names.clone();
+        self.projects.clear();
+        self.delayed_projects.clear();
+        if let Some(old) = old_project {
+            self.projects.insert(key.clone(), old.clone());
+        }
+        self.update_project(&key, &key, ProjectKind::Inferred, command)?;
+        let defaults = roots
+            .iter()
+            .map(|name| (self.configs.path(name.as_bytes()), key.clone()))
+            .collect();
+        for other in self.old.projects.keys().filter(|other| **other != key) {
+            self.configs.release_project(other);
+        }
+        Ok(BuildOutput {
+            projects: self.projects,
+            delayed_projects: BTreeMap::new(),
+            defaults,
+            api_state: crate::api::ApiState::default(),
+            api_error: None,
+        })
+    }
+
     fn mark_projects_dirty(&mut self) {
         let changes = [
             (FileChangeKind::WatchChange, &self.changes.changed),

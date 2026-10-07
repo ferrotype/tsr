@@ -10,6 +10,7 @@ mod printing;
 pub mod proto;
 pub mod protocol_msgpack;
 pub mod server;
+pub mod session;
 pub use formatting::{format_decoded_for_insertion, format_node_for_insertion, FormatError};
 pub use printing::{print_node, PrintError, PrintNodeOptions};
 
