@@ -102,5 +102,16 @@ class Reporter(unittest.TestCase):
             self.assertIn(rows[0]['reason'], ('test file failed', 'worker exited 4 without results'))
 
 
+    def test_classify_labels_the_cause(self):
+        from tools.phase6.jsapi import runner
+        self.assertEqual(runner.classify('Error [ERR_TEST_FAILURE]: not implemented: initialize\ncode: -32603'),
+                         'server: not implemented: initialize')
+        self.assertEqual(runner.classify('Error: unknown method: getServerTiming'), 'server: unknown method: getServerTiming')
+        self.assertEqual(runner.classify("Error [ERR_TEST_FAILURE]: test did not finish before its parent and was cancelled"),
+                         'cancelled by parent')
+        self.assertEqual(runner.classify('AssertionError: expected 1 to equal 2'), 'assertion failed')
+        self.assertEqual(runner.classify(None), 'assertion failed')
+
+
 if __name__ == '__main__':
     unittest.main()

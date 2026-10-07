@@ -105,6 +105,24 @@ def _place_binary(binary, link=None):
     os.symlink(binary, link)
 
 
+SERVER_ERROR = re.compile(r'(?:not implemented|unknown method): [A-Za-z0-9_./]+')
+CANCELLED = 'test did not finish before its parent and was cancelled'
+
+
+def classify(error):
+    """The mechanical cause label of a failing case: a server method the
+    Rust session rejected by name, a cancellation by the parent, or an
+    assertion the client itself raised."""
+    if not error:
+        return 'assertion failed'
+    match = SERVER_ERROR.search(error)
+    if match:
+        return f'server: {match.group(0)}'
+    if CANCELLED in error:
+        return 'cancelled by parent'
+    return 'assertion failed'
+
+
 def _row(parent, suffix, state, reason='', detail=''):
     row = {'id': f'{SUITE}/{parent}' + suffix, 'parent': f'{SUITE}/{parent}', 'state': state}
     if reason:
@@ -186,7 +204,7 @@ def _run_file(prepared, name, local, timeout, binary):
             raise HarnessError(f'{name}: terminal event before start: {test_name!r}')
         suffix = '/' + full.replace('/', '∕')
         if kind == 'test:fail':
-            rows.append(_row(name, suffix, 'fail', 'assertion failed', event.get('error') or ''))
+            rows.append(_row(name, suffix, 'fail', classify(event.get('error')), event.get('error') or ''))
         elif event.get('skip') is not None or event.get('todo') is not None:
             rows.append(_row(name, suffix, 'skip', event.get('skip') or event.get('todo') or 'skipped'))
         else:
