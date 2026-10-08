@@ -84,6 +84,50 @@ impl<'scope> Binder<'_, 'scope, '_> {
             BindingNode::Checked(id) => crate::checked(crate::get_container_flags(self.view(), id)),
         }
     }
+
+    pub(crate) fn target_assignment_declaration_kind(
+        &self,
+        node: BindingNode<'scope>,
+    ) -> crate::ast::JSDeclarationKind {
+        use tsr_ast::{node_flags as nf, SyntaxKind as K};
+
+        if let BindingNode::Local(node) = node {
+            let Backend::Local(local) = &self.builder else {
+                unreachable!("local binder scope");
+            };
+            let read = local.node(node);
+            // These are the terminal None cases of GetAssignmentDeclarationKind.
+            // Keep access assignments and JavaScript calls on the shared helper;
+            // malformed binary payloads/links also retain its failure ordering.
+            match read.kind().known() {
+                Some(K::CallExpression) if read.flags() & nf::JAVA_SCRIPT_FILE == 0 => {
+                    return crate::ast::JSDeclarationKind::None;
+                }
+                Some(K::BinaryExpression) => {
+                    if let Some(data) = read.as_binary_expression() {
+                        if let Some(operator) = data.operator_token() {
+                            if local.node(operator).kind() != K::EqualsToken {
+                                return crate::ast::JSDeclarationKind::None;
+                            }
+                            if let Some(left) = data.left() {
+                                if !matches!(
+                                    local.node(left).kind().known(),
+                                    Some(K::PropertyAccessExpression | K::ElementAccessExpression)
+                                ) {
+                                    return crate::ast::JSDeclarationKind::None;
+                                }
+                            }
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+        crate::checked(crate::ast::get_assignment_declaration_kind(
+            self.view(),
+            self.node_id(node),
+        ))
+    }
 }
 
 /// A list identity stays local until an explicit compatibility boundary.
