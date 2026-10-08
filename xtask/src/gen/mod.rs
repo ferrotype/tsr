@@ -1,4 +1,5 @@
 //! Pinned frontends export facts; these Rust emitters own Rust syntax only.
+mod api;
 mod ast;
 mod ast_compact;
 mod ast_local_read;
@@ -316,6 +317,9 @@ fn ast_schema(summary: &Value) -> Result<bool, String> {
 pub(super) fn run(root: &Path, args: &[String], pin: &str) -> Result<bool, String> {
     if args.first().is_some_and(|arg| arg == "lsproto") {
         return lsproto::run(root, &args[1..], pin);
+    }
+    if args.first().is_some_and(|arg| arg == "api") {
+        return api::run(root, &args[1..], pin);
     }
     let mode = match args {
         [] => "write",

@@ -2,6 +2,7 @@
 mod allocation;
 #[global_allocator]
 static ALLOCATOR: allocation::CountingAllocator = allocation::CountingAllocator;
+mod api;
 mod lsp;
 mod process;
 mod signals;
@@ -37,8 +38,7 @@ fn run_main() -> i32 {
         return lsp::run(&args[1..]);
     }
     if args.first().is_some_and(|arg| arg.as_bytes() == b"--api") {
-        eprintln!("This command is not implemented in this build.");
-        return tsr_tsc::ExitStatus::NotImplemented.0;
+        return api::run(&args[1..]);
     }
     let context = tsr_ipc::Context::background().with_cancel();
     let _signals = match signals::Scope::new(context.clone()) {

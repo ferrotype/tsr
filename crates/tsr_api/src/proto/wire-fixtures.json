@@ -1,0 +1,306 @@
+{
+  "fixtures": [
+    {
+      "goType": "api.UpdateSnapshotParams",
+      "id": "ordinary-empty-options",
+      "input": "ordinary-empty-options",
+      "operation": "marshal",
+      "output": "{}"
+    },
+    {
+      "goType": "api.UpdateSnapshotParams",
+      "id": "ordinary-empty-slices",
+      "input": "ordinary-empty-slices",
+      "operation": "marshal",
+      "output": "{}"
+    },
+    {
+      "goType": "api.ReleaseParams",
+      "id": "ordinary-required-zero-id",
+      "input": "ordinary-required-zero-id",
+      "operation": "marshal",
+      "output": "{\"snapshot\":0}"
+    },
+    {
+      "goType": "api.ReleaseParams",
+      "id": "ordinary-max-uint64-id",
+      "input": "ordinary-max-uint64-id",
+      "operation": "marshal",
+      "output": "{\"snapshot\":18446744073709551615}"
+    },
+    {
+      "goType": "api.ReadConfigFileResponse",
+      "id": "ordinary-null-interface",
+      "input": "ordinary-null-interface",
+      "operation": "marshal",
+      "output": "{\"config\":null}"
+    },
+    {
+      "goType": "api.BatchRequestsResponse",
+      "id": "batch-empty-responses",
+      "input": "batch-empty-responses",
+      "operation": "marshal",
+      "output": "{\"responses\":[]}"
+    },
+    {
+      "goType": "api.BatchRequestsResponse",
+      "id": "batch-continuation",
+      "input": "batch-continuation",
+      "operation": "marshal",
+      "output": "{\"responses\":[],\"continuationToken\":\"next\"}"
+    },
+    {
+      "goType": "core.Tristate",
+      "id": "tristate-unknown",
+      "input": "tristate-unknown",
+      "operation": "marshal",
+      "output": "null"
+    },
+    {
+      "goType": "core.Tristate",
+      "id": "tristate-true",
+      "input": "tristate-true",
+      "operation": "marshal",
+      "output": "true"
+    },
+    {
+      "goType": "core.Tristate",
+      "id": "tristate-false",
+      "input": "tristate-false",
+      "operation": "marshal",
+      "output": "false"
+    },
+    {
+      "goType": "core.JsxEmit",
+      "id": "enum-jsx-emit",
+      "input": "enum-jsx-emit",
+      "operation": "marshal",
+      "output": "2"
+    },
+    {
+      "goType": "core.ModuleDetectionKind",
+      "id": "enum-module-detection",
+      "input": "enum-module-detection",
+      "operation": "marshal",
+      "output": "2"
+    },
+    {
+      "goType": "core.ModuleKind",
+      "id": "enum-module-kind",
+      "input": "enum-module-kind",
+      "operation": "marshal",
+      "output": "2"
+    },
+    {
+      "goType": "core.ModuleResolutionKind",
+      "id": "enum-module-resolution",
+      "input": "enum-module-resolution",
+      "operation": "marshal",
+      "output": "2"
+    },
+    {
+      "goType": "core.NewLineKind",
+      "id": "enum-newline",
+      "input": "enum-newline",
+      "operation": "marshal",
+      "output": "1"
+    },
+    {
+      "goType": "core.ScriptTarget",
+      "id": "enum-script-target",
+      "input": "enum-script-target",
+      "operation": "marshal",
+      "output": "2"
+    },
+    {
+      "goType": "api.Method",
+      "id": "literal-method",
+      "input": "literal-method",
+      "operation": "marshal",
+      "output": "\"release\""
+    },
+    {
+      "goType": "api.ImportAdderActionKind",
+      "id": "literal-import-adder",
+      "input": "literal-import-adder",
+      "operation": "marshal",
+      "output": "\"importSymbol\""
+    },
+    {
+      "goType": "json.Value",
+      "id": "raw-json-object",
+      "input": "raw-json-object",
+      "operation": "marshal",
+      "output": "{\"z\":1,\"a\":[true,null]}"
+    },
+    {
+      "error": {
+        "cause": {
+          "cause": {
+            "class": "cause",
+            "goErrorType": "*errors.errorString",
+            "reason": "unexpected EOF"
+          },
+          "class": "syntax",
+          "goErrorType": "*jsontext.SyntacticError",
+          "location": {
+            "byteOffset": 16,
+            "jsonPointer": "/unterminated"
+          }
+        },
+        "class": "semantic",
+        "goErrorType": "*json.SemanticError",
+        "goPackage": "encoding/json/jsontext",
+        "goType": "jsontext.Value",
+        "location": {
+          "byteOffset": 0,
+          "jsonPointer": ""
+        }
+      },
+      "goType": "json.Value",
+      "id": "raw-json-invalid",
+      "input": "raw-json-invalid",
+      "operation": "marshal"
+    },
+    {
+      "goType": "collections.OrderedMap[string, []string]",
+      "id": "ordered-map-insertion-order",
+      "input": "ordered-map-insertion-order",
+      "operation": "marshal",
+      "output": "{\"z\":[\"last\"],\"a\":[]}"
+    },
+    {
+      "goType": "api.DocumentIdentifier",
+      "id": "document-identifier-0",
+      "input": "\"foo.ts\"",
+      "operation": "unmarshal",
+      "output": {
+        "fileName": "foo.ts",
+        "uri": ""
+      }
+    },
+    {
+      "goType": "api.DocumentIdentifier",
+      "id": "document-identifier-1",
+      "input": "{\"uri\":\"file:///foo.ts\"}",
+      "operation": "unmarshal",
+      "output": {
+        "fileName": "",
+        "uri": "file:///foo.ts"
+      }
+    },
+    {
+      "goType": "api.DocumentIdentifier",
+      "id": "document-identifier-2",
+      "input": "{\"uri\":\"file:///foo.ts\",\"extra\":true}",
+      "operation": "unmarshal",
+      "output": {
+        "fileName": "",
+        "uri": "file:///foo.ts"
+      }
+    },
+    {
+      "goType": "api.DocumentIdentifier",
+      "id": "document-identifier-3",
+      "input": "{}",
+      "operation": "unmarshal",
+      "output": {
+        "fileName": "",
+        "uri": ""
+      }
+    },
+    {
+      "error": {
+        "cause": {
+          "class": "cause",
+          "goErrorType": "*errors.errorString",
+          "reason": "DocumentIdentifier: expected string or object, got number"
+        },
+        "class": "semantic",
+        "goErrorType": "*json.SemanticError",
+        "goPackage": "github.com/microsoft/TypeScript/tsc/internal/api",
+        "goType": "api.DocumentIdentifier",
+        "location": {
+          "byteOffset": 0,
+          "jsonPointer": ""
+        }
+      },
+      "goType": "api.DocumentIdentifier",
+      "id": "document-identifier-4",
+      "input": "42",
+      "operation": "unmarshal"
+    },
+    {
+      "goType": "core.Tristate",
+      "id": "tristate-decode-true",
+      "input": "true",
+      "operation": "unmarshal",
+      "output": 2
+    },
+    {
+      "goType": "core.Tristate",
+      "id": "tristate-decode-false",
+      "input": "false",
+      "operation": "unmarshal",
+      "output": 1
+    },
+    {
+      "goType": "core.Tristate",
+      "id": "tristate-decode-null",
+      "input": "null",
+      "operation": "unmarshal",
+      "output": 0
+    },
+    {
+      "goType": "core.Tristate",
+      "id": "tristate-decode-42",
+      "input": "42",
+      "operation": "unmarshal",
+      "output": 0
+    },
+    {
+      "goType": "packagejson.JSONValue",
+      "id": "package-json-kind-0",
+      "input": "null",
+      "operation": "unmarshal",
+      "output": "null"
+    },
+    {
+      "goType": "packagejson.JSONValue",
+      "id": "package-json-kind-1",
+      "input": "true",
+      "operation": "unmarshal",
+      "output": "boolean"
+    },
+    {
+      "goType": "packagejson.JSONValue",
+      "id": "package-json-kind-2",
+      "input": "42",
+      "operation": "unmarshal",
+      "output": "number"
+    },
+    {
+      "goType": "packagejson.JSONValue",
+      "id": "package-json-kind-3",
+      "input": "\"text\"",
+      "operation": "unmarshal",
+      "output": "string"
+    },
+    {
+      "goType": "packagejson.JSONValue",
+      "id": "package-json-kind-4",
+      "input": "[null,1]",
+      "operation": "unmarshal",
+      "output": "array"
+    },
+    {
+      "goType": "packagejson.JSONValue",
+      "id": "package-json-kind-5",
+      "input": "{\"z\":1,\"a\":2}",
+      "operation": "unmarshal",
+      "output": "object"
+    }
+  ],
+  "schemaVersion": 1,
+  "scope": "Representative pinned-Go wire observations; Rust runtime comparison belongs to the API sprint."
+}

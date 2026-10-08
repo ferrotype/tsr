@@ -25,6 +25,7 @@ tsr_json = { version = "0.3.0", path = "../tsr_json" }
 tsr_lsproto = { version = "0.3.0", path = "../tsr_lsproto" }
 tsr_project = { version = "0.3.0", path = "../tsr_project" }
 tsr_lsp = { version = "0.3.0", path = "../tsr_lsp" }
+tsr_api = { version = "0.3.0", path = "../tsr_api" }
 tsr_execute = { version = "0.3.0", path = "../tsr_execute" }
 tsr_tsc = { version = "0.3.0", path = "../tsr_tsc" }
 tsr_core = { version = "0.3.0", path = "../tsr_core" }

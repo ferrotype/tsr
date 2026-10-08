@@ -319,6 +319,37 @@ impl<K: Eq + Hash + Key, V: Encode, S: BuildHasher> Encode for HashMap<K, V, S> 
 }
 
 // JSON glue lives above core to keep core independent of the codec crate.
+macro_rules! core_enumeration {
+    ($($ty:ty => $name:literal),* $(,)?) => {$(
+        impl Encode for $ty {
+            fn type_name(&self) -> &'static str {
+                $name
+            }
+            fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+                out.int(i64::from(self.0))
+            }
+            fn encode_guarded(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
+                self.encode(out)
+            }
+        }
+        impl Decode for $ty {
+            fn type_name() -> &'static str {
+                $name
+            }
+            fn decode(&mut self, input: &mut Decoder<'_>) -> Result<(), Error> {
+                input.value(&mut self.0)
+            }
+        }
+    )*};
+}
+core_enumeration!(
+    tsr_core::compiler_options::JsxEmit => "core.JsxEmit",
+    tsr_core::compiler_options::ModuleDetectionKind => "core.ModuleDetectionKind",
+    tsr_core::compiler_options::ModuleKind => "core.ModuleKind",
+    tsr_core::compiler_options::ModuleResolutionKind => "core.ModuleResolutionKind",
+    tsr_core::compiler_options::NewLineKind => "core.NewLineKind",
+    tsr_core::ScriptTarget => "core.ScriptTarget",
+);
 impl Encode for tsr_core::Tristate {
     fn encode(&self, out: &mut Encoder<'_>) -> Result<(), Error> {
         if self.is_true() {
