@@ -113,7 +113,7 @@ pub(crate) fn try_member<T: Decode + Default>(data: &[u8], slot: &mut Option<Box
 
 /// port: tsc/internal/lsp/lsproto/lsp.go:jsonObjectRawField
 pub(crate) fn raw_field(data: &[u8], key: &str) -> Option<Vec<u8>> {
-    let mut input = Decoder::new(data);
+    let mut input = Decoder::from_slice(data);
     if input.peek_kind() != Kind::BeginObject {
         return None;
     }
@@ -130,7 +130,7 @@ pub(crate) fn raw_field(data: &[u8], key: &str) -> Option<Vec<u8>> {
 
 /// port: tsc/internal/lsp/lsproto/lsp.go:jsonObjectHasKey
 pub(crate) fn first_key(data: &[u8], keys: &[&str]) -> Option<usize> {
-    let mut input = Decoder::new(data);
+    let mut input = Decoder::from_slice(data);
     if input.peek_kind() != Kind::BeginObject {
         return None;
     }

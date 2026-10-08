@@ -90,7 +90,7 @@ pub(crate) fn unmarshal<T: Decode + Default>(data: &[u8]) -> Result<T, JsonError
 
 /// `json.Unmarshal(data, &pair)` into a `[2]int`.
 pub(crate) fn unmarshal_pair(data: &[u8]) -> Result<[i64; 2], JsonError> {
-    let mut decoder = Decoder::with_options(std::io::Cursor::new(data), Options::default());
+    let mut decoder = Decoder::from_slice(data);
     if decoder.peek_kind() != Kind::BeginArray {
         return decoder.type_error("[2]int").map(|()| [0, 0]);
     }
