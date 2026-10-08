@@ -23,6 +23,13 @@ pub trait Protocol: Send + Sync {
     fn write_response(&self, id: Option<&Id>, result: Option<&dyn Encode>) -> Result<(), Error>;
     /// Writes an error response.
     fn write_error(&self, id: Option<&Id>, error: &ResponseError) -> Result<(), Error>;
+    /// A response whose payload is raw bytes rather than JSON. Only the
+    /// synchronous msgpack protocol carries one; JSON-RPC never sees it.
+    fn write_binary_response(&self, _id: Option<&Id>, _payload: &[u8]) -> Result<(), Error> {
+        Err(Error::Message(
+            "ipc: this protocol cannot carry a binary response".into(),
+        ))
+    }
 }
 
 /// JSON-RPC 2.0 with the LSP base protocol framing (Content-Length headers).

@@ -1,5 +1,6 @@
 //! Production document/project dispatch. Transports own admission and pump
 //! callbacks independently; this worker boundary may perform synchronous I/O.
+pub mod api_session;
 mod capabilities;
 pub mod client;
 pub mod connection;

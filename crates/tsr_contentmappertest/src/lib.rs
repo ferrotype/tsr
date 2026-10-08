@@ -94,7 +94,7 @@ impl tsr_ipc::Handler for StaticProjectHandler {
                         code: 123,
                     });
                 }
-                Ok(Some(Box::new(OpenProjectResult {
+                Ok(Some(tsr_ipc::Response::json(OpenProjectResult {
                     option_diagnostics: diagnostics,
                     ..OpenProjectResult::default()
                 })))

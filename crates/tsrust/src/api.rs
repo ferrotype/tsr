@@ -44,6 +44,7 @@ pub fn run(args: &[JsString]) -> i32 {
     let server = StdioServer::new(StdioServerOptions {
         cwd,
         default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
+        fs: Arc::new(tsr_bundled::BundledFs::new(tsr_vfs::os::shared_fs())),
         pipe_path: (!flags.pipe.is_empty()).then(|| flags.pipe.clone()),
         callbacks,
         async_mode: flags.r#async,

@@ -3,20 +3,24 @@
 //! in-memory transport in-process peers connect through.
 mod conn;
 mod conn_async;
+mod conn_sync;
 mod context;
 mod protocol;
 mod timing;
 mod transport;
 
-pub use conn::{unmarshal_params, Conn, Error, Handler, HandlerError, HandlerResult};
-pub use conn_async::AsyncConn;
+pub use conn::{unmarshal_params, Conn, Error, Handler, HandlerError, HandlerResult, Response};
+pub use conn_async::{panic_text as panic_message, AsyncConn};
+pub use conn_sync::SyncConn;
 pub use context::{AfterFuncStop, Context, ContextError};
 pub use protocol::{JsonRpcProtocol, Protocol};
 pub use timing::{
     server_timing_snapshot, ServerTimingInfo, TimingCollector, METHOD_GET_SERVER_TIMING,
     METHOD_RESET_SERVER_TIMING,
 };
-pub use transport::{pipe, stdio, Closer, Stream};
+pub use transport::{
+    generate_pipe_path, pipe, stdio, Closer, PipeTransport, StdioTransport, Stream, Transport,
+};
 
 /// The pinned `ipc.Message`, a raw JSON-RPC message.
 pub type Message = tsr_jsonrpc::Message;
@@ -32,7 +36,7 @@ mod tests {
     impl Handler for Echo {
         fn handle_request(&self, _ctx: &Context, method: &str, params: &[u8]) -> HandlerResult {
             match method {
-                "echo" => Ok(Some(Box::new(RawValue(params.to_vec())))),
+                "echo" => Ok(Some(Response::json(RawValue(params.to_vec())))),
                 "nothing" => Ok(None),
                 "panic" => panic!("handler exploded"),
                 _ => Err(format!("unexpected method {method:?}").into()),

@@ -189,4 +189,64 @@ mod tests {
             br#"{"enabled":false,"totals":{"requestCount":0,"totalProcessingTimeMs":0},"recentRequests":[]}"#
         );
     }
+
+    /// Ports `TestTimingCollector` of tsc/internal/ipc/timing_test.go.
+    #[test]
+    fn accumulates_totals_and_records_recent_requests() {
+        let collector = TimingCollector::new();
+        collector.record("getSourceFile", Duration::from_millis(2));
+        collector.record("getSymbolAtPosition", Duration::from_micros(500));
+        let snapshot = collector.snapshot();
+        assert!(snapshot.enabled);
+        assert_eq!(snapshot.totals.request_count, 2);
+        assert_eq!(snapshot.totals.total_processing_time_ms, 2.5);
+        assert_eq!(snapshot.recent_requests.len(), 2);
+        assert_eq!(snapshot.recent_requests[0].method, "getSourceFile");
+        assert_eq!(snapshot.recent_requests[0].processing_time_ms, 2.0);
+        assert_eq!(snapshot.recent_requests[1].method, "getSymbolAtPosition");
+        assert_eq!(snapshot.recent_requests[1].processing_time_ms, 0.5);
+        // The pin clamps a negative duration to zero; `Duration` cannot be
+        // negative, so the zero duration is the boundary that remains.
+        let collector = TimingCollector::new();
+        collector.record("x", Duration::ZERO);
+        let snapshot = collector.snapshot();
+        assert_eq!(snapshot.totals.total_processing_time_ms, 0.0);
+        assert_eq!(snapshot.recent_requests[0].processing_time_ms, 0.0);
+    }
+
+    /// Ports `TestServerTimingSnapshotDisabled` of tsc/internal/ipc/timing_test.go.
+    #[test]
+    fn the_disabled_snapshot_is_empty() {
+        let snapshot = server_timing_snapshot(None);
+        assert!(!snapshot.enabled);
+        assert_eq!(snapshot.totals.request_count, 0);
+        assert!(snapshot.recent_requests.is_empty());
+    }
+
+    /// Ports `TestTimingCollectorReset` of tsc/internal/ipc/timing_test.go.
+    #[test]
+    fn reset_empties_the_collector_and_keeps_it_usable() {
+        let collector = TimingCollector::new();
+        collector.record("a", Duration::from_millis(1));
+        collector.record("b", Duration::from_millis(1));
+        collector.reset();
+        let snapshot = collector.snapshot();
+        assert!(snapshot.enabled);
+        assert_eq!(snapshot.totals.request_count, 0);
+        assert_eq!(snapshot.totals.total_processing_time_ms, 0.0);
+        assert!(snapshot.recent_requests.is_empty());
+        collector.record("c", Duration::from_millis(2));
+        let snapshot = collector.snapshot();
+        assert_eq!(snapshot.totals.request_count, 1);
+        assert_eq!(snapshot.recent_requests[0].method, "c");
+    }
+
+    /// Ports `TestDurationToMillis` of tsc/internal/ipc/timing_test.go.
+    #[test]
+    fn duration_to_millis_keeps_sub_microsecond_precision() {
+        assert_eq!(duration_to_millis(Duration::from_micros(1500)), 1.5);
+        assert_eq!(duration_to_millis(Duration::ZERO), 0.0);
+        assert_eq!(duration_to_millis(Duration::from_nanos(500)), 0.0005);
+        assert_eq!(duration_to_millis(Duration::from_nanos(1234)), 0.001_234);
+    }
 }

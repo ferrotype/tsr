@@ -21,18 +21,18 @@ impl Handler for Scripted {
     fn handle_request(&self, _: &Context, method: &str, params: &[u8]) -> HandlerResult {
         self.calls.lock().unwrap().push(method.to_owned());
         match method {
-            METHOD_INITIALIZE => Ok(Some(Box::new(self.initialize.clone()))),
+            METHOD_INITIALIZE => Ok(Some(tsr_ipc::Response::json(self.initialize.clone()))),
             METHOD_OPEN_PROJECT => {
                 let params = tsr_ipc::unmarshal_params::<OpenProjectParams>(params)?.unwrap();
                 self.calls.lock().unwrap().push(format!(
                     "compilerOptions={}",
                     String::from_utf8_lossy(&params.compiler_options.0)
                 ));
-                Ok(Some(Box::new(OpenProjectResult::default())))
+                Ok(Some(tsr_ipc::Response::json(OpenProjectResult::default())))
             }
             METHOD_CLOSE_PROJECT => Ok(None),
             METHOD_TRANSFORM => match &self.transform {
-                Ok(result) => Ok(Some(Box::new(result.clone()))),
+                Ok(result) => Ok(Some(tsr_ipc::Response::json(result.clone()))),
                 Err(message) => Err(message.clone().into()),
             },
             _ => Err(format!("unexpected method {method}").into()),
@@ -186,10 +186,10 @@ impl Handler for Gated {
             }
         }
         match method {
-            METHOD_INITIALIZE => Ok(Some(Box::new(source("box")))),
-            METHOD_OPEN_PROJECT => Ok(Some(Box::new(OpenProjectResult::default()))),
+            METHOD_INITIALIZE => Ok(Some(tsr_ipc::Response::json(source("box")))),
+            METHOD_OPEN_PROJECT => Ok(Some(tsr_ipc::Response::json(OpenProjectResult::default()))),
             METHOD_CLOSE_PROJECT => Ok(None),
-            METHOD_TRANSFORM => Ok(Some(Box::new(identity_output("x")))),
+            METHOD_TRANSFORM => Ok(Some(tsr_ipc::Response::json(identity_output("x")))),
             _ => Err(format!("unexpected method {method}").into()),
         }
     }

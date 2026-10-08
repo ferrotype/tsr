@@ -25,7 +25,7 @@ impl MapperHandler for LispHandler {
     /// port: tsc/internal/testutil/contentmappertest/lisp.go:lispHandler.HandleRequest
     fn handle_request(&self, _: &Context, method: &str, params: &[u8]) -> HandlerResult {
         match method {
-            METHOD_INITIALIZE => Ok(Some(Box::new(initialize_result("lisp")))),
+            METHOD_INITIALIZE => Ok(Some(tsr_ipc::Response::json(initialize_result("lisp")))),
             METHOD_TRANSFORM => {
                 let mut params_value = TransformParams::default();
                 tsr_json::unmarshal(params, &mut params_value, tsr_json::Options::default())?;
@@ -44,7 +44,7 @@ impl MapperHandler for LispHandler {
                     segment((10, 16), (7, 13), KIND_VERBATIM),
                 ])
                 .marshal()?;
-                Ok(Some(Box::new(TransformResultMessage {
+                Ok(Some(tsr_ipc::Response::json(TransformResultMessage {
                     output: MappedOutput {
                         text: r#"add(1, 2, "oops");"#.into(),
                         extension: ".ts".into(),

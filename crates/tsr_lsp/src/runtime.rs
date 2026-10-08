@@ -112,6 +112,9 @@ pub struct Runtime {
     shutdown: bool,
     observer: Option<JoinHandle<()>>,
     native_watcher: Option<Arc<crate::watcher::Watcher>>,
+    /// The pin's `apiSessions`: LSP-hosted API sessions by id, each removed
+    /// when its connection ends.
+    api_sessions: crate::api_session::ApiSessions,
 }
 impl Runtime {
     pub fn new(
@@ -137,6 +140,7 @@ impl Runtime {
             shutdown: false,
             observer: None,
             native_watcher: None,
+            api_sessions: Arc::default(),
         }
     }
     pub fn server(&self) -> Option<&Server> {
@@ -586,6 +590,17 @@ impl Runtime {
                     }
                     result
                 })));
+            }
+            "custom/initializeAPISession" => {
+                let value: lsp::InitializeAPISessionParams = crate::decode(params)?;
+                let result = crate::api_session::initialize(
+                    &self.api_sessions,
+                    self.ready()?.session(),
+                    &value,
+                    &self.logger,
+                    &self.context,
+                )?;
+                return client::raw(&result).map(Dispatch::Ready);
             }
             _ if unimplemented_method(method) => {
                 return Err(crate::error(
@@ -1363,7 +1378,6 @@ fn unimplemented_method(method: &str) -> bool {
             | "custom/saveAllocProfile"
             | "custom/startCPUProfile"
             | "custom/stopCPUProfile"
-            | "custom/initializeAPISession"
     )
 }
 

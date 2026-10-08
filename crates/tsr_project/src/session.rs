@@ -278,6 +278,16 @@ impl Session {
         })
     }
     // port: tsc/internal/project/session.go:Session.Snapshot
+    /// The directory relative paths resolve against.
+    /// port: tsc/internal/project/snapshothost.go:SnapshotHost.GetCurrentDirectory
+    pub fn current_directory(&self) -> &JsString {
+        &self.options.current_directory
+    }
+    /// The file system the session reads; the API session's `initialize`
+    /// reports its case sensitivity.
+    pub fn file_system(&self) -> &Arc<dyn FileSystem> {
+        &self.fs
+    }
     pub fn snapshot(&self) -> Result<Snapshot, Error> {
         self.snapshot
             .read()

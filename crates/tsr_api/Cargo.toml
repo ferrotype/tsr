@@ -29,6 +29,7 @@ tsr_jsstring = { version = "0.3.0", path = "../tsr_jsstring" }
 tsr_lsproto = { version = "0.3.0", path = "../tsr_lsproto" }
 tsr_tsoptions = { version = "0.3.0", path = "../tsr_tsoptions" }
 tsr_tspath = { version = "0.3.0", path = "../tsr_tspath" }
+tsr_vfs = { version = "0.3.0", path = "../tsr_vfs" }
 
 [dev-dependencies]
 tsr_arena = { version = "0.3.0", path = "../tsr_arena", features = ["harness"] }

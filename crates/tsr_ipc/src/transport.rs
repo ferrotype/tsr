@@ -134,6 +134,115 @@ pub fn stdio() -> Stream {
     }
 }
 
+/// Accepts connections from API clients: the pin's `Transport` of
+/// tsc/internal/ipc/transport.go.
+pub trait Transport: Send {
+    /// Waits for and returns the next connection.
+    fn accept(&mut self) -> io::Result<Stream>;
+    /// Stops accepting new connections.
+    fn close(&mut self) -> io::Result<()>;
+}
+
+/// A Unix-domain socket listener, the pin's `PipeTransport` of
+/// tsc/internal/ipc/transport.go (its Windows named pipe is not built).
+pub struct PipeTransport {
+    listener: Option<std::os::unix::net::UnixListener>,
+    path: std::path::PathBuf,
+}
+struct SocketCloser(std::os::unix::net::UnixStream);
+impl Closer for SocketCloser {
+    fn close(&self) -> io::Result<()> {
+        match self.0.shutdown(std::net::Shutdown::Both) {
+            Err(error) if error.kind() == io::ErrorKind::NotConnected => Ok(()),
+            result => result,
+        }
+    }
+}
+impl PipeTransport {
+    /// Listens at `path`, removing a stale socket file first.
+    /// port: tsc/internal/ipc/transport_unix.go:newPipeListener
+    pub fn new(path: impl Into<std::path::PathBuf>) -> io::Result<Self> {
+        let path = path.into();
+        let _ = std::fs::remove_file(&path);
+        let listener = std::os::unix::net::UnixListener::bind(&path)?;
+        Ok(Self {
+            listener: Some(listener),
+            path,
+        })
+    }
+    /// port: tsc/internal/ipc/transport.go:PipeTransport.Path
+    #[must_use]
+    pub fn path(&self) -> &std::path::Path {
+        &self.path
+    }
+}
+impl Stream {
+    /// Both directions of a connected Unix-domain socket; closing shuts it down.
+    pub fn from_unix(socket: std::os::unix::net::UnixStream) -> io::Result<Self> {
+        Ok(Self {
+            reader: Box::new(socket.try_clone()?),
+            writer: Box::new(socket.try_clone()?),
+            closer: Arc::new(SocketCloser(socket)),
+        })
+    }
+}
+
+impl Transport for PipeTransport {
+    /// port: tsc/internal/ipc/transport.go:PipeTransport.Accept
+    fn accept(&mut self) -> io::Result<Stream> {
+        let listener = self
+            .listener
+            .as_ref()
+            .ok_or_else(|| io::Error::new(io::ErrorKind::NotConnected, "transport closed"))?;
+        let (socket, _) = listener.accept()?;
+        Stream::from_unix(socket)
+    }
+    /// port: tsc/internal/ipc/transport.go:PipeTransport.Close
+    fn close(&mut self) -> io::Result<()> {
+        if self.listener.take().is_some() {
+            let _ = std::fs::remove_file(&self.path);
+        }
+        Ok(())
+    }
+}
+
+/// Standard input and output as the one connection a process serves: the
+/// pin's `StdioTransport` of tsc/internal/ipc/transport.go.
+pub struct StdioTransport {
+    used: bool,
+}
+impl StdioTransport {
+    #[must_use]
+    pub fn new() -> Self {
+        Self { used: false }
+    }
+}
+impl Default for StdioTransport {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl Transport for StdioTransport {
+    /// port: tsc/internal/ipc/transport.go:StdioTransport.Accept
+    fn accept(&mut self) -> io::Result<Stream> {
+        if self.used {
+            return Err(io::Error::new(io::ErrorKind::UnexpectedEof, "EOF"));
+        }
+        self.used = true;
+        Ok(stdio())
+    }
+    fn close(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}
+
+/// A socket path for `name` under the temporary directory.
+/// port: tsc/internal/ipc/transport_unix.go:GeneratePipePath
+#[must_use]
+pub fn generate_pipe_path(name: &str) -> std::path::PathBuf {
+    std::env::temp_dir().join(name)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

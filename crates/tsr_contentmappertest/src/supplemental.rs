@@ -23,8 +23,8 @@ fn params(bytes: &[u8]) -> Result<TransformParams, HandlerError> {
     Ok(params)
 }
 
-fn result(canonical: &str, supplemental: MappedOutput) -> Box<TransformResultMessage> {
-    Box::new(TransformResultMessage {
+fn result(canonical: &str, supplemental: MappedOutput) -> tsr_ipc::Response {
+    tsr_ipc::Response::json(TransformResultMessage {
         output: output(canonical),
         diagnostics: Vec::new(),
         supplemental: vec![supplemental],
@@ -38,7 +38,7 @@ impl MapperHandler for SupplementalHandler {
     /// port: tsc/internal/testutil/contentmappertest/supplemental.go:supplementalHandler.HandleRequest
     fn handle_request(&self, _: &Context, method: &str, bytes: &[u8]) -> HandlerResult {
         match method {
-            METHOD_INITIALIZE => Ok(Some(Box::new(initialize_result("mapper")))),
+            METHOD_INITIALIZE => Ok(Some(tsr_ipc::Response::json(initialize_result("mapper")))),
             METHOD_TRANSFORM => {
                 let params = params(bytes)?;
                 Ok(Some(result(
@@ -58,7 +58,7 @@ impl MapperHandler for SupplementalDiagnosticsHandler {
     /// port: tsc/internal/testutil/contentmappertest/supplemental_diagnostics.go:supplementalDiagnosticsHandler.HandleRequest
     fn handle_request(&self, _: &Context, method: &str, bytes: &[u8]) -> HandlerResult {
         match method {
-            METHOD_INITIALIZE => Ok(Some(Box::new(initialize_result("mapper")))),
+            METHOD_INITIALIZE => Ok(Some(tsr_ipc::Response::json(initialize_result("mapper")))),
             METHOD_TRANSFORM => {
                 let params = params(bytes)?;
                 const PREFIX: &str = "missingSupplementalGlobal;\n";
@@ -95,7 +95,7 @@ impl MapperHandler for SupplementalGlobalsHandler {
     /// port: tsc/internal/testutil/contentmappertest/supplemental_globals.go:supplementalGlobalsHandler.HandleRequest
     fn handle_request(&self, _: &Context, method: &str, bytes: &[u8]) -> HandlerResult {
         match method {
-            METHOD_INITIALIZE => Ok(Some(Box::new(initialize_result("mapper")))),
+            METHOD_INITIALIZE => Ok(Some(tsr_ipc::Response::json(initialize_result("mapper")))),
             METHOD_TRANSFORM => {
                 let params = params(bytes)?;
                 let supplemental = if params.file_name.ends_with("/a.vue") {
@@ -126,7 +126,7 @@ impl MapperHandler for SupplementalModuleHandler {
     /// port: tsc/internal/testutil/contentmappertest/supplemental_module.go:supplementalModuleHandler.HandleRequest
     fn handle_request(&self, _: &Context, method: &str, bytes: &[u8]) -> HandlerResult {
         match method {
-            METHOD_INITIALIZE => Ok(Some(Box::new(initialize_result("mapper")))),
+            METHOD_INITIALIZE => Ok(Some(tsr_ipc::Response::json(initialize_result("mapper")))),
             METHOD_TRANSFORM => {
                 params(bytes)?;
                 Ok(Some(result(
