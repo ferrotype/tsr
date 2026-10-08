@@ -14,6 +14,8 @@ include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/lice
 
 [dependencies]
 tsr_arena = { version = "0.3.0", path = "../tsr_arena" }
+tsr_astnav = { version = "0.3.0", path = "../tsr_astnav" }
+tsr_nodebuilder = { version = "0.3.0", path = "../tsr_nodebuilder" }
 tsr_ast = { version = "0.3.0", path = "../tsr_ast" }
 tsr_checker = { version = "0.3.0", path = "../tsr_checker" }
 tsr_core = { version = "0.3.0", path = "../tsr_core" }

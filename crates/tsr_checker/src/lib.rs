@@ -39,6 +39,7 @@
 
 mod access_expressions;
 mod access_symbols;
+mod api_accessors;
 mod apparent;
 mod arithmetic;
 mod array_literals;
@@ -273,6 +274,7 @@ pub mod storage_families;
 #[cfg(feature = "storage-pilot")]
 pub mod storage_pilot;
 
+pub use api_accessors::{InterfaceTypeParameters, TupleShape};
 pub use emit_resolver_js::TypeReferenceSerializationKind;
 pub use exports::{IndexInfoParts, IndexInfoRef, TypePredicateParts, TypePredicateRef};
 pub use flags::*;
@@ -315,11 +317,12 @@ pub use type_display::{
     to_node_builder_flags, DEFAULT_MAXIMUM_TRUNCATION_LENGTH, MAX_SERIALIZATION_LEVEL,
     NO_TRUNCATION_MAXIMUM_TRUNCATION_LENGTH,
 };
+pub use types::LiteralValue;
 pub use types::{element_flags, ElementFlags, TypeKind};
 pub(crate) use types::{
-    InterfaceData, IntrinsicData, LiteralData, LiteralValue, NumberKey, ObjectData, Payload,
-    ReferenceData, SymbolList, TemplateLiteralData, TupleData, TupleElementInfo, TypeAlias,
-    TypeList, TypeParameterData, TypeStore, UnionData, UnionOfUnionKey, UnionOrIntersectionMembers,
+    InterfaceData, IntrinsicData, LiteralData, NumberKey, ObjectData, Payload, ReferenceData,
+    SymbolList, TemplateLiteralData, TupleData, TupleElementInfo, TypeAlias, TypeList,
+    TypeParameterData, TypeStore, UnionData, UnionOfUnionKey, UnionOrIntersectionMembers,
 };
 #[cfg(any(test, feature = "storage-pilot"))]
 pub(crate) use types::{StructuredMembers, TypeRecord};

@@ -6,7 +6,12 @@
 //! current snapshot is the compatibility snapshot of the linear
 //! `updateSnapshot` chain, and `api_update` is `CloneSnapshot` over it.
 //! port: tsc/internal/api/session.go
+mod checker;
+mod checker_responses;
+#[cfg(test)]
+mod checker_tests;
 mod config;
+pub mod handles;
 pub mod responses;
 mod sources;
 #[cfg(test)]
@@ -53,7 +58,7 @@ impl std::error::Error for SessionError {}
 
 pub type SessionResult<T> = Result<T, SessionError>;
 
-fn client_error(message: impl Into<String>) -> SessionError {
+pub(super) fn client_error(message: impl Into<String>) -> SessionError {
     SessionError::Client(message.into())
 }
 
@@ -62,6 +67,8 @@ fn client_error(message: impl Into<String>) -> SessionError {
 /// tsc/internal/api/session.go.
 pub struct SnapshotData {
     pub snapshot: Snapshot,
+    /// Symbol, type and signature handles minted against this snapshot.
+    pub registries: handles::Registries,
 }
 impl SnapshotData {
     /// port: tsc/internal/api/session.go:snapshotData.getProject
@@ -196,7 +203,10 @@ impl ApiSession {
             entry.refs += 1;
             entry.data.clone()
         } else {
-            let data = Arc::new(SnapshotData { snapshot });
+            let data = Arc::new(SnapshotData {
+                snapshot,
+                registries: handles::Registries::default(),
+            });
             snapshots.by_handle.insert(
                 handle,
                 Entry {
@@ -612,7 +622,7 @@ impl ApiSession {
                     .map(Some)
                     .map_err(Into::into)
             }
-            _ => return Err(crate::server::unsupported(method)),
+            other => return self.dispatch_checker(other, method),
         };
         Ok(Some(response))
     }

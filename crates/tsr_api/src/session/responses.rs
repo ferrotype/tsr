@@ -367,3 +367,45 @@ pub fn base64_standard(bytes: &[u8]) -> String {
 pub fn diagnostic_file(diagnostic: &Diagnostic) -> Option<NodeId> {
     diagnostic.file
 }
+
+/// Standard base64 with padding to bytes; `None` for malformed input.
+pub fn base64_decode(text: &str) -> Option<Vec<u8>> {
+    fn value(byte: u8) -> Option<u32> {
+        Some(match byte {
+            b'A'..=b'Z' => u32::from(byte - b'A'),
+            b'a'..=b'z' => u32::from(byte - b'a') + 26,
+            b'0'..=b'9' => u32::from(byte - b'0') + 52,
+            b'+' => 62,
+            b'/' => 63,
+            _ => return None,
+        })
+    }
+    let bytes = text.as_bytes();
+    if !bytes.len().is_multiple_of(4) {
+        return None;
+    }
+    let mut out = Vec::with_capacity(bytes.len() / 4 * 3);
+    for chunk in bytes.chunks(4) {
+        let padding = chunk.iter().rev().take_while(|byte| **byte == b'=').count();
+        if padding > 2 {
+            return None;
+        }
+        let mut word = 0u32;
+        for (index, byte) in chunk.iter().enumerate() {
+            let digit = if *byte == b'=' && index >= 4 - padding {
+                0
+            } else {
+                value(*byte)?
+            };
+            word = (word << 6) | digit;
+        }
+        out.push((word >> 16) as u8);
+        if padding < 2 {
+            out.push((word >> 8) as u8);
+        }
+        if padding < 1 {
+            out.push(word as u8);
+        }
+    }
+    Some(out)
+}
