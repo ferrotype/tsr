@@ -132,8 +132,27 @@ finally {
     rmSync(root, { recursive: true, force: true });
 }
 
+// The verdict checks what the record claims, step by step.
+const checks: Record<string, boolean> = {};
 const faulted = report["faulted request"] as { isPanic?: boolean } | undefined;
 const after = report["old handles after the fault"] as { snapshot1?: string; snapshot2?: string } | undefined;
-const ok = native || (faulted?.isPanic === true && !!after?.snapshot1 && !!after?.snapshot2);
-console.log(JSON.stringify({ step: "verdict", ok }));
+const fresh = report["fresh snapshot"] as { idsDistinct?: boolean; symbol?: string } | undefined;
+const released = report["released snapshot"] as { error?: string } | undefined;
+const reconnect = report["reconnect"] as { symbol?: string } | undefined;
+const retired = (error: string | undefined) => !!error && error.includes("the checker generation has retired");
+if (!native) {
+    checks["the faulted request fails with the connection's panic error"] = faulted?.isPanic === true;
+    checks["snapshot 1's old handle is rejected as retired"] = retired(after?.snapshot1);
+    checks["snapshot 2's old handle is rejected as retired"] = retired(after?.snapshot2);
+}
+else {
+    checks["old handles keep answering without a fault"] = report["old handles"] !== undefined;
+}
+checks["the other project's pool keeps answering"] = report["other pool"] !== undefined;
+checks["a fresh snapshot answers on a new id"] = fresh?.idsDistinct === true && fresh?.symbol === "answer";
+checks["a released snapshot's handle reports the snapshot as gone"] = !!released?.error && released.error.includes("not found");
+checks["a reconnect answers"] = reconnect?.symbol === "answer";
+const failed = Object.entries(checks).filter(([, passed]) => !passed).map(([name]) => name);
+const ok = failed.length === 0;
+console.log(JSON.stringify({ step: "verdict", ok, failed }));
 process.exit(ok ? 0 : 1);

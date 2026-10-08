@@ -260,3 +260,25 @@ fn encoded_string(encoded: &[u8], index: u32) -> String {
     let end = read_u32(encoded, string_offsets + index as usize * 4 + 4) as usize;
     String::from_utf8_lossy(&encoded[string_data + start..string_data + end]).into_owned()
 }
+
+/// The copied baseline files are the pin's, byte for byte, so a pin bump
+/// that changes them is caught here when the submodule is checked out.
+#[test]
+fn the_copied_baselines_are_the_pinned_files() {
+    let manifest = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
+    let pinned = manifest.join("../../upstream/tsc/testdata/baselines/reference/api");
+    if !pinned.is_dir() {
+        return;
+    }
+    for name in [
+        "encodeSourceFile.txt",
+        "encodeSourceFileWithUnicodeEscapes.txt",
+    ] {
+        let expected = std::fs::read(pinned.join(name)).expect("the pinned baseline");
+        let copied = std::fs::read(manifest.join("testdata/api").join(name)).expect("the copy");
+        assert!(
+            expected == copied,
+            "{name} differs from the pinned baseline"
+        );
+    }
+}

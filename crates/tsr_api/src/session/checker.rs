@@ -382,18 +382,11 @@ impl ApiSession {
                 |op, symbol| Ok(op.symbol(symbol).map_err(checker_error)?.parent()),
             )?),
             // The pin answers the merged export symbol, or the symbol itself
-            // when it has none (`GetExportSymbolOfSymbol`), never null.
             Params::GetExportSymbolOfSymbol(p) => Response::json(self.symbol_property(
                 p.snapshot,
                 &p.project,
                 p.symbol,
-                |op, symbol| {
-                    Ok(Some(
-                        op.get_export_symbol_of_symbol(symbol)
-                            .map_err(checker_error)?
-                            .id(),
-                    ))
-                },
+                |op, symbol| Ok(op.symbol(symbol).map_err(checker_error)?.export_symbol()),
             )?),
             Params::GetMembersOfSymbol(p) => Response::json(self.symbol_table_property(
                 p.snapshot,

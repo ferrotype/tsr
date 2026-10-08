@@ -1,13 +1,14 @@
-//! `phase5_testserver --api`: the production `tsr_api` session behind the
-//! pin's `api` flags, plus one test-only control for the Phase 6 panic
-//! witness (`testhost/faultNextCheckerOperation`, which arms a panic in the
-//! next checker operation of a named snapshot). Nothing here ships in
-//! `tsrust`.
+//! `phase5_testserver --api`: the production `tsr_api` server behind the
+//! pin's `api` flags, with one test-only control in front of its session for
+//! the Phase 6 panic witness (`testhost/faultNextCheckerOperation`, which
+//! arms a panic in the next checker operation of a named snapshot). The
+//! server is `StdioServer` itself, through its session hook, so the witness
+//! serves on the path `tsrust --api` takes; only the command's mapper
+//! spawner is absent. Nothing here ships in `tsrust`.
 use std::sync::Arc;
-use tsr_api::callbackfs::CallbackFs;
-use tsr_api::server::{serve, Session};
+use tsr_api::server::{Session, StdioServer, StdioServerOptions};
 use tsr_api::session::ApiSession;
-use tsr_ipc::{Context, HandlerResult, PipeTransport, Response, StdioTransport, Stream, Transport};
+use tsr_ipc::{Context, HandlerResult, Response};
 use tsr_jsstring::JsString;
 
 /// The method the witness script sends; `{"snapshot": n}` arms the fault.
@@ -20,6 +21,7 @@ struct Flags {
     callbacks: Vec<String>,
     r#async: bool,
     timing: bool,
+    run_external_code: bool,
 }
 
 /// The pin's `api` flags the clients send (`getAPIProcessArgs`) plus `-pipe`
@@ -39,7 +41,8 @@ fn parse(args: &[String]) -> Result<Flags, String> {
                 .ok_or_else(|| format!("flag needs an argument: -{name}"))
         };
         match name {
-            "api" | "runExternalCode" => {}
+            "api" => {}
+            "runExternalCode" => flags.run_external_code = true,
             "async" => flags.r#async = true,
             "timing" => flags.timing = true,
             "cwd" => flags.cwd = Some(value()?),
@@ -102,63 +105,21 @@ pub fn run(args: &[String]) -> i32 {
             }
         },
     };
-    let base: Arc<dyn tsr_vfs::FileSystem> =
-        Arc::new(tsr_bundled::BundledFs::new(tsr_vfs::os::shared_fs()));
-    let (fs, callbacks): (Arc<dyn tsr_vfs::FileSystem>, Option<Arc<CallbackFs>>) =
-        if flags.callbacks.is_empty() {
-            (base, None)
-        } else {
-            match CallbackFs::new(base, &flags.callbacks) {
-                Ok(callbacks) => {
-                    let callbacks = Arc::new(callbacks);
-                    (callbacks.clone(), Some(callbacks))
-                }
-                Err(error) => {
-                    eprintln!("{error}");
-                    return 1;
-                }
-            }
-        };
-    let ctx = Context::background();
-    let session = ApiSession::standalone(
-        tsr_project::session::SessionOptions {
-            current_directory: cwd,
-            default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
-            position_encoding: tsr_jsstring::PositionEncoding::Utf8,
-            background_context: ctx.clone(),
-            ..Default::default()
-        },
-        fs,
-    );
-    let session: Arc<dyn Session> = Arc::new(FaultControlled(session));
-    let mut transport: Box<dyn Transport> = match &flags.pipe {
-        Some(path) => match PipeTransport::new(path) {
-            Ok(transport) => Box::new(transport),
-            Err(error) => {
-                eprintln!("failed to create pipe transport: {error}");
-                return 1;
-            }
-        },
-        None => Box::new(StdioTransport::new()),
-    };
-    let stream: Stream = match transport.accept() {
-        Ok(stream) => stream,
-        Err(error) => {
-            eprintln!("failed to accept connection: {error}");
-            return 1;
-        }
-    };
-    let result = serve(
-        stream,
-        session.clone(),
-        callbacks,
-        flags.r#async,
-        flags.timing,
-        &ctx,
-    );
-    session.close();
-    let _ = transport.close();
-    match result {
+    let server = StdioServer::new(StdioServerOptions {
+        cwd,
+        default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
+        fs: Arc::new(tsr_bundled::BundledFs::new(tsr_vfs::os::shared_fs())),
+        pipe_path: flags.pipe,
+        callbacks: flags.callbacks,
+        async_mode: flags.r#async,
+        collect_timing: flags.timing,
+        run_external_code: flags.run_external_code,
+        mapper_spawner: None,
+        session_hook: Some(Arc::new(|session| {
+            Arc::new(FaultControlled(session)) as Arc<dyn Session>
+        })),
+    });
+    match server.run(&Context::background()) {
         Ok(()) => 0,
         Err(error) => {
             eprintln!("{error}");
