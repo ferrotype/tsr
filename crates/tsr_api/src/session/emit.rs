@@ -222,9 +222,13 @@ impl ApiSession {
             source: file.source(),
             jsdoc: &mut provider,
         };
-        // The default settings for every session: the pin reads the
-        // snapshot's format settings, which only its LSP-hosted session has.
-        let settings = tsr_format::FormatCodeSettings::default();
+        // The snapshot's format settings: the hosting LSP session's user
+        // preferences, with its new-line preference; a standalone session's
+        // defaults.
+        let mut settings = data.preferences.format.clone();
+        if let Some(newline) = &data.preferences.newline {
+            settings.editor.new_line_character = newline.as_bytes().to_vec();
+        }
         crate::format_node_for_insertion(
             &encoded,
             &mut target,

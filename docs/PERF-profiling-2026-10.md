@@ -119,14 +119,17 @@ scheduling, not parsing.
    window are not collected at all (the search would never measure them;
    alias flags are still resolved for every candidate, as the pin's
    `getCandidateName` resolves them), and the rune buffers are reused.
-5. **`get_source_file_of_node`**: a node of the view's own single-source file
-   answers the arena's root (`AstView::single_source_root`); other nodes walk
-   as before.
+5. **`get_source_file_of_node`**: a valid node of a bound arena whose
+   binding is its only source answers that binding's source file
+   (`AstView::single_source_root`); every other node walks as before. An
+   unbound view carries no such guarantee: a builder may hold several
+   logical source files, or a fragment whose root is no source file.
 6. **`ProgramContext`'s arena directory cache** widened from one entry to
    sixty-four direct-mapped entries: a check alternates between the file
    being checked and the libraries its names resolve into.
-7. **API node handles**: the file root through the arena, the path copied
-   once without a lossy conversion.
+7. **API node handles**: the file through `get_source_file_of_node` (the
+   shortcut above for the checker's files), the path copied once without a
+   lossy conversion.
 8. **AST navigation** (`tsr_astnav`): the per-child JSDoc single-comment
    filter is evaluated only under a single-comment JSDoc parent, saving two
    node reads per child on every descent.

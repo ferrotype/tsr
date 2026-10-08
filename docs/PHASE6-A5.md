@@ -88,9 +88,9 @@ its own. `docs/PHASE6-tests.md` routes every `api` test.
   reuses or clones it (`TestCreateProgramReusesProgram`'s update kinds).
   The responses are the same; `build_program` must mark file changes when
   reuse lands (docs/PHASE6-A2.md).
-- Every session formats insertions and runs the import adder with the
-  default settings and preferences; the pin reads the snapshot's, which only
-  its LSP-hosted session has.
+- An LSP-hosted session's snapshots carry the hosting session's user
+  preferences as they stand when each snapshot is stored (the pin's are
+  those of the project snapshot); a standalone session has the defaults.
 - The language service builds the auto-import registry on demand from the
   project's cache; the pin clones the snapshot with auto-imports and
   retries (`clone_with_auto_imports`, no Rust counterpart).
@@ -124,3 +124,15 @@ its own. `docs/PHASE6-tests.md` routes every `api` test.
   submodule is present.
 - `getJsDocTags`, `getSignatureUsages` and `getImportAdderEdits`' failure
   case answer `[]`, the pin's nil slice.
+- The API's language service converts positions with the session's
+  encoding, as the pin's snapshot converters do: the standalone server's
+  is UTF-8, so the LSP character `toAPITextEdits` adds to a line's byte
+  start is a byte count, and an import extended past a non-ASCII
+  identifier is reported at the UTF-16 offset after it, not inside it.
+  Completions build their LSP position through the same converters. A
+  hosted session follows the LSP's negotiated encoding, where the pin's
+  addition mixes units on a non-ASCII line in the same way.
+- `getImportAdderEdits` takes the snapshot's user preferences and format
+  settings, and `formatNodeForInsertion` the snapshot's format settings
+  with its new-line preference, as the pin's handlers read them; a hosted
+  session answers them from the LSP session's configuration.

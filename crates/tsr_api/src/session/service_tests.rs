@@ -32,6 +32,8 @@ fn session(files: &[(&str, &str)]) -> Arc<ApiSession> {
         tsr_project::session::SessionOptions {
             current_directory: JsString::from_bytes(b"/home/projects".as_slice()),
             default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
+            // The standalone server's encoding (the pin's api/server.go).
+            position_encoding: tsr_jsstring::PositionEncoding::Utf8,
             ..Default::default()
         },
         Arc::new(tsr_bundled::BundledFs::new(Arc::new(iovfs::from(
@@ -1030,6 +1032,200 @@ fn apply_text_edits(source: &str, edits: &Value) -> String {
         text.replace_range(pos..end, &new_text);
     }
     text
+}
+
+/// Go's `base64.StdEncoding`, for the insertion-formatting data.
+fn base64(bytes: &[u8]) -> String {
+    const ALPHABET: &[u8; 64] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    let mut out = String::with_capacity(bytes.len().div_ceil(3) * 4);
+    for chunk in bytes.chunks(3) {
+        let mut word = [0u8; 3];
+        word[..chunk.len()].copy_from_slice(chunk);
+        let bits = u32::from_be_bytes([0, word[0], word[1], word[2]]);
+        for index in 0..4 {
+            if index <= chunk.len() {
+                out.push(ALPHABET[(bits >> (18 - 6 * index)) as usize & 63] as char);
+            } else {
+                out.push('=');
+            }
+        }
+    }
+    out
+}
+
+/// The export symbol the client passes to the import adder: the symbol at
+/// `position` of `file`, or its export symbol when the server reports one
+/// (the declaration's symbol of an exported variable is already the
+/// module's export, so the raw field is null for it).
+fn export_symbol_at(
+    session: &ApiSession,
+    snapshot: u64,
+    project: &str,
+    file: &str,
+    position: usize,
+) -> Value {
+    let symbol = request(
+        session,
+        "getSymbolAtPosition",
+        &json!({"snapshot": snapshot, "project": project, "file": file, "position": position}),
+    )
+    .unwrap();
+    let exported = request(
+        session,
+        "getExportSymbolOfSymbol",
+        &json!({"snapshot": snapshot, "project": project, "objectId": symbol["id"]}),
+    )
+    .unwrap();
+    let id = if exported.is_null() {
+        symbol["id"].clone()
+    } else {
+        exported["id"].clone()
+    };
+    assert!(id.is_number(), "{symbol} {exported}");
+    id
+}
+
+/// An import extended past a non-ASCII identifier: the language service
+/// converts positions with the standalone session's encoding, UTF-8, so
+/// the LSP character the pin's `toAPITextEdits` adds to the line's byte
+/// start is a byte count, and the UTF-16 offset it reports lands after
+/// `fóo` (12), not inside it (11).
+#[test]
+fn import_adder_edits_keep_their_coordinates_past_non_ascii_text() {
+    const FOO: &str = "/home/projects/p/src/foo.ts";
+    let session = session(&[
+        (CONFIG, r#"{ "compilerOptions": { "noLib": true } }"#),
+        (
+            INDEX,
+            "import { fóo } from \"./foo\";\nconst value = zoo;\n",
+        ),
+        (FOO, "export const fóo = 1;\nexport const zoo = 2;\n"),
+    ]);
+    let (snapshot, project) = open(&session, CONFIG);
+    let zoo = export_symbol_at(
+        &session,
+        snapshot,
+        &project,
+        FOO,
+        "export const fóo = 1;\nexport const "
+            .encode_utf16()
+            .count(),
+    );
+    let edits = request(
+        &session,
+        "getImportAdderEdits",
+        &json!({"snapshot": snapshot, "project": project, "file": INDEX, "actions": [{"kind": "importSymbol", "symbol": zoo}]}),
+    )
+    .unwrap();
+    assert_eq!(edits, json!([{"pos": 12, "end": 12, "newText": ", zoo"}]));
+}
+
+/// A session hosted by the LSP server formats insertions and import edits
+/// with the snapshot's user preferences, as the pin reads them from its
+/// snapshot: two-space indentation, CRLF and single quotes here, where a
+/// standalone session has the defaults.
+#[test]
+fn hosted_sessions_read_the_snapshot_preferences() {
+    const FOO: &str = "/home/projects/p/src/foo.ts";
+    const FILES: &[(&str, &str)] = &[
+        (CONFIG, r#"{ "compilerOptions": { "noLib": true } }"#),
+        (INDEX, "const value = 1;\n"),
+        (FOO, "function f() {\nreturn 1;\n}\nexport const zoo = 2;\n"),
+    ];
+    let hosted = {
+        let fs = Arc::new(vfstest::from_map(
+            &FILES
+                .iter()
+                .map(|(name, text)| {
+                    (
+                        name.as_bytes().to_vec(),
+                        InputFile::Text(text.as_bytes().to_vec()),
+                    )
+                })
+                .collect(),
+            false,
+        ));
+        let project = ProjectSession::new(
+            tsr_project::session::SessionOptions {
+                current_directory: JsString::from_bytes(b"/home/projects".as_slice()),
+                default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
+                ..Default::default()
+            },
+            Arc::new(tsr_bundled::BundledFs::new(Arc::new(iovfs::from(
+                fs, false,
+            )))),
+            &tsr_arena::Counters::new(),
+        );
+        ApiSession::for_lsp(
+            project,
+            Arc::new(|| {
+                let mut preferences = tsr_ls::CompletionOptions::default();
+                preferences.format.editor.indent_size = 2;
+                preferences.newline = Some("\r\n".into());
+                preferences.quote = tsr_ls::QuotePreference::Single;
+                preferences
+            }),
+        )
+    };
+    let standalone = session(FILES);
+    let format = |session: &ApiSession| -> (String, String) {
+        let (snapshot, project) = open(session, CONFIG);
+        let data = session.snapshot_data(SnapshotId(snapshot)).unwrap();
+        let setup = data.setup_checker(&ProjectId(project.clone())).unwrap();
+        let name = touching_property_name(setup.program, FOO.as_bytes(), "function ".len() as u32)
+            .unwrap()
+            .expect("the function name");
+        let file = setup
+            .program
+            .file_of_node(name)
+            .expect("the function's file");
+        let view = file.bound().view().ast();
+        let function = view.node(name).unwrap().parent().expect("the declaration");
+        let encoded = tsr_encoder::encode_node(
+            view,
+            function,
+            Some(file.source()),
+            &mut tsr_parser::ParserJsDocProvider::default(),
+        )
+        .unwrap();
+        let formatted = request(
+            session,
+            "formatNodeForInsertion",
+            &json!({"snapshot": snapshot, "project": project, "file": INDEX, "position": "const value = 1;\n".len(), "data": base64(&encoded.bytes)}),
+        )
+        .unwrap();
+        let zoo = export_symbol_at(
+            session,
+            snapshot,
+            &project,
+            FOO,
+            "function f() {\nreturn 1;\n}\nexport const ".len(),
+        );
+        let edits = request(
+            session,
+            "getImportAdderEdits",
+            &json!({"snapshot": snapshot, "project": project, "file": INDEX, "actions": [{"kind": "importSymbol", "symbol": zoo}]}),
+        )
+        .unwrap();
+        (
+            formatted.as_str().unwrap().to_string(),
+            apply_text_edits("const value = 1;\n", &edits),
+        )
+    };
+    assert_eq!(
+        format(&standalone),
+        (
+            "function f() {\n    return 1;\n}".to_string(),
+            "import { zoo } from \"./foo\";\n\nconst value = 1;\n".to_string()
+        )
+    );
+    assert_eq!(
+        format(&hosted),
+        (
+            "function f() {\r\n  return 1;\r\n}".to_string(),
+            "import { zoo } from './foo';\n\nconst value = 1;\n".to_string()
+        )
+    );
 }
 
 /// Ports the client's `LanguageService - imports` cases: a named import is

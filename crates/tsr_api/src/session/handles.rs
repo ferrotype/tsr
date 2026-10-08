@@ -363,16 +363,11 @@ pub fn node_handle(operation: &Operation<'_>, node: tsr_ast::NodeId) -> SessionR
     let view = operation.ast_view(node).map_err(checker_error)?;
     let read = view.node(node).map_err(checker_error)?;
     let kind = read.kind();
-    // The owning file's root; a node outside a file arena walks up instead.
-    let root = if let Some(root) = view.file_info().root {
-        root
-    } else {
-        let mut root = node;
-        while let Some(parent) = view.node(root).map_err(checker_error)?.parent() {
-            root = parent;
-        }
-        root
-    };
+    // The node's own source file (a bound single-source arena answers it
+    // without the walk); the pin dereferences a node without one.
+    let root = tsr_ast::utilities::get_source_file_of_node(view, Some(node))
+        .map_err(checker_error)?
+        .ok_or_else(|| SessionError::Other("node has no source file".into()))?;
     let file = view.source_file(root).map_err(checker_error)?;
     let table = tsr_encoder::get_node_index_table(
         view,

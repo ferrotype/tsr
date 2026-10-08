@@ -54,10 +54,13 @@ fn original_text_offset(
 
 impl ApiSession {
     /// The language service over the project's program; the API checker is
-    /// the one it queries, so symbol handles stay resolvable. Module-export
-    /// completions read the project's auto-import registry, which the
-    /// service builds on demand: the pin's retry through a snapshot cloned
-    /// with auto-imports has no Rust counterpart.
+    /// the one it queries, so symbol handles stay resolvable. It converts
+    /// positions with the session's encoding, as the pin's snapshot
+    /// converters do (the standalone server's is UTF-8, so the LSP
+    /// characters `to_api_text_edits` adds to byte line starts are bytes).
+    /// Module-export completions read the project's auto-import registry,
+    /// which the service builds on demand: the pin's retry through a
+    /// snapshot cloned with auto-imports has no Rust counterpart.
     /// port: tsc/internal/api/session.go:Session.setupLanguageService
     fn language_service<'a>(
         setup: &CheckerSetup<'a>,
@@ -65,7 +68,7 @@ impl ApiSession {
         let project = setup.data.project(&setup.project)?;
         let mut service = tsr_ls::LanguageService::new(
             setup.program,
-            tsr_jsstring::PositionEncoding::Utf16,
+            setup.data.position_encoding,
             tsr_core::CancellationToken::new(),
         );
         if let Some(host) = project.completion_file_system() {
@@ -98,9 +101,17 @@ impl ApiSession {
             .utf16_to_utf8(isize::try_from(params.position).unwrap_or(isize::MAX));
         let mut operation = setup.registry.operation()?;
         let mut service = Self::language_service(&setup)?;
+        // The snapshot's user preferences with the API's fixed client
+        // capabilities: label details only.
         let options = tsr_ls::CompletionOptions {
             label_details: true,
-            ..Default::default()
+            snippets: false,
+            commit_characters: false,
+            insert_replace: false,
+            default_commit_characters: false,
+            default_edit_range: false,
+            markdown: false,
+            ..data.preferences.clone()
         };
         let Some((list, symbols)) = service
             .api_completions(
@@ -304,13 +315,10 @@ impl ApiSession {
             actions.push((symbol, is_valid_type_only_use_site));
         }
         let mut service = Self::language_service(&setup)?;
+        // The snapshot's user preferences and format settings, as the pin's
+        // import adder takes them.
         let edits = service
-            .api_import_adder_edits(
-                &mut operation,
-                file.source(),
-                &actions,
-                &tsr_ls::CompletionOptions::default(),
-            )
+            .api_import_adder_edits(&mut operation, file.source(), &actions, &data.preferences)
             .map_err(service_error)?;
         if edits.is_empty() {
             return setup.commit(&Vec::<TextEdit>::new());

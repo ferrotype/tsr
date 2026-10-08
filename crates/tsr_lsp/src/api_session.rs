@@ -40,6 +40,7 @@ fn remove(sessions: &ApiSessions, id: &str) {
 pub fn initialize(
     sessions: &ApiSessions,
     project: &Arc<tsr_project::session::Session>,
+    preferences: tsr_api::session::PreferencesProvider,
     params: &lsp::InitializeAPISessionParams,
     logger: &Arc<Logger>,
     background: &Context,
@@ -48,7 +49,7 @@ pub fn initialize(
         .lock()
         .map_err(|_| crate::error(-32603, "API sessions poisoned"))?;
     let session: Arc<dyn tsr_api::server::Session> =
-        tsr_api::session::ApiSession::for_lsp(project.clone());
+        tsr_api::session::ApiSession::for_lsp(project.clone(), preferences);
     let pipe_path = match params.pipe.as_deref() {
         Some(pipe) if !pipe.is_empty() => pipe.clone(),
         _ => generate_pipe_path(),

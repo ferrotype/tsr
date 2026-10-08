@@ -593,9 +593,19 @@ impl Runtime {
             }
             "custom/initializeAPISession" => {
                 let value: lsp::InitializeAPISessionParams = crate::decode(params)?;
+                // The hosted session's snapshots read this session's user
+                // preferences as they stand when each snapshot is stored.
+                let settings = self.settings.clone();
                 let result = crate::api_session::initialize(
                     &self.api_sessions,
                     self.ready()?.session(),
+                    Arc::new(move || {
+                        settings
+                            .lock()
+                            .unwrap_or_else(std::sync::PoisonError::into_inner)
+                            .completion
+                            .clone()
+                    }),
                     &value,
                     &self.logger,
                     &self.context,

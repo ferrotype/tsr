@@ -118,9 +118,9 @@ cases and the generator batching cases pass in both clients.
   signature-usages search yet.
 - `getConstantValue`, `getJSDocTags` and `getDocumentationComment` still
   fail by name (the A3 follow-up).
-- The standalone session formats insertions with the default settings; the
-  pin reads the snapshot's format settings, which only an LSP-hosted
-  session has.
+- A standalone session formats insertions with the default settings, as
+  the pin's does; a hosted session reads the snapshot's (the review fix
+  below).
 - The differences recorded in A3 (`getRestTypeOfSignature`, tuple metadata,
   template-literal `getTypes`) stand.
 
@@ -161,5 +161,11 @@ The A4 review's findings, fixed in the review-fixes branch after A5:
   `jsapi` suite, whose labels are mechanical by design (the suite table's
   `refresh_reasons`); every other suite keeps its reasons as worded
   (docs/EVIDENCE-plan.md).
-- The insertion-formatting comment says what the code does: the default
-  settings for every session.
+- Insertion formatting reads the snapshot's format settings and new-line
+  preference, as the pin's handler reads `UserPreferences().FormatCodeSettings`
+  from its snapshot: an LSP-hosted session's snapshots carry the hosting
+  session's preferences as they stand when the snapshot is stored, a
+  standalone session's the defaults. Witness:
+  `hosted_sessions_read_the_snapshot_preferences` (two-space indentation,
+  CRLF and single quotes reach the formatted insertion and the import
+  adder's edit).
