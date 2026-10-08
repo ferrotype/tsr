@@ -120,7 +120,7 @@ impl ApiSession {
             &config_file_name,
             &[],
         )
-        .map_err(|error| SessionError::Other(format!("{error:?}")))?;
+        .map_err(|error| SessionError::Other(format!("{error}")))?;
         Ok(config_file_response(&command_line))
     }
 
@@ -152,7 +152,7 @@ impl ApiSession {
             &ConfigValue::Null,
             config_file_name.as_bytes(),
         )
-        .map_err(|error| SessionError::Other(format!("{error:?}")))?;
+        .map_err(|error| SessionError::Other(format!("{error}")))?;
         Ok(config_file_response(&command_line))
     }
 
@@ -204,7 +204,7 @@ fn transpile_output(
     } else {
         tsr_transpile::transpile_module(&request, input, &transpile_options)
     }
-    .map_err(|error| SessionError::Other(format!("{error:?}")))?;
+    .map_err(|error| SessionError::Other(format!("{error}")))?;
     let Some(output) = output else {
         return Err(SessionError::Other(
             "transpilation produced no output".into(),

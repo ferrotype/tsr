@@ -18,8 +18,8 @@ fn service_error(error: impl std::fmt::Display) -> SessionError {
 }
 
 /// Text edits in the client's coordinates: UTF-16 offsets into the original
-/// text of a mapped file. An edit outside the text makes the whole result
-/// null, as the pin's does.
+/// text of a mapped file. An edit outside the text drops the whole result,
+/// which goes out as `[]` like the pin's nil slice.
 /// port: tsc/internal/api/session.go:toAPITextEdits
 pub(super) fn to_api_text_edits(
     original_text: &[u8],
@@ -115,7 +115,10 @@ impl ApiSession {
             return setup.commit(&None::<CompletionInfoResponse>);
         };
         let mut entries = Vec::with_capacity(list.items.len());
-        for item in list.items.iter().flatten() {
+        for (index, item) in list.items.iter().enumerate() {
+            let Some(item) = item else {
+                continue;
+            };
             let mut entry = CompletionEntryResponse {
                 name: item.label.clone(),
                 kind: item.kind.as_deref().map_or(0, |kind| kind.0),
@@ -132,7 +135,7 @@ impl ApiSession {
                 symbol: None,
             };
             if params.include_symbol {
-                if let Some(symbol) = symbols.get(&item.label) {
+                if let Some(symbol) = symbols.get(&index) {
                     entry.symbol = Some(Box::new(setup.symbol_response(&mut operation, *symbol)?));
                 }
             }
@@ -157,9 +160,6 @@ impl ApiSession {
         let groups = service
             .api_referenced_symbols(&mut operation, node, params.position)
             .map_err(service_error)?;
-        if groups.is_empty() {
-            return setup.commit(&None::<Vec<ReferencedSymbolEntry>>);
-        }
         let mut result = Vec::with_capacity(groups.len());
         for group in groups {
             let Some(definition) = group.definition else {
@@ -178,7 +178,7 @@ impl ApiSession {
                 references,
             });
         }
-        setup.commit(&Some(result))
+        setup.commit(&result)
     }
 
     /// port: tsc/internal/api/session.go:Session.handleGetReferencesToSymbolInFile
@@ -219,14 +219,11 @@ impl ApiSession {
         let tags = service
             .api_symbol_jsdoc_tags(&mut operation, symbol)
             .map_err(service_error)?;
-        if tags.is_empty() {
-            return setup.commit(&None::<Vec<JsDocTagInfo>>);
-        }
         let tags: Vec<Option<Box<JsDocTagInfo>>> = tags
             .into_iter()
             .map(|(name, text)| Some(Box::new(JsDocTagInfo { name, text })))
             .collect();
-        setup.commit(&Some(tags))
+        setup.commit(&tags)
     }
 
     /// port: tsc/internal/api/session.go:Session.handleGetDocumentationComment
@@ -258,9 +255,6 @@ impl ApiSession {
         let usages = service
             .api_signature_usages(&mut operation, declaration)
             .map_err(service_error)?;
-        if usages.is_empty() {
-            return setup.commit(&None::<Vec<SignatureUsageResponse>>);
-        }
         let mut result = Vec::with_capacity(usages.len());
         for usage in usages {
             result.push(SignatureUsageResponse {
@@ -271,7 +265,7 @@ impl ApiSession {
                 },
             });
         }
-        setup.commit(&Some(result))
+        setup.commit(&result)
     }
 
     /// port: tsc/internal/api/session.go:Session.handleGetImportAdderEdits
@@ -323,6 +317,6 @@ impl ApiSession {
         }
         let view = file.bound().view().ast();
         let source = view.source_file(file.source()).map_err(service_error)?;
-        setup.commit(&to_api_text_edits(source.original_text(), &edits))
+        setup.commit(&to_api_text_edits(source.original_text(), &edits).unwrap_or_default())
     }
 }

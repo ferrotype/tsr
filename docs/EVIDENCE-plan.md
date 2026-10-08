@@ -176,7 +176,11 @@ parity.py accept <suite> --results DIR [DIR …]            # rewrite the expect
   `$GITHUB_STEP_SUMMARY` when set.
 - `accept` keeps every existing `reason` and `approved` text for ids that
   still fail, adds `reason: "unexplained; see local/<id>"` for new ones, and
-  drops ids that pass.
+  drops ids that pass. One exception, marked in the suite table: a suite
+  whose reasons are the runner's own labels (`jsapi`, where the client's
+  cause label is the whole explanation) refreshes an unapproved reason from
+  the run, so the file shows the current label; an approved reason is kept
+  there too.
 - Suites are a small table in the script: runner binary, enumeration
   command, default timeout. No per-suite scripts.
 

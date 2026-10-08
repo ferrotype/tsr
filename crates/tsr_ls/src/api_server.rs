@@ -30,7 +30,9 @@ pub struct ApiReferenceGroup {
 
 impl LanguageService<'_> {
     /// Completions at a UTF-8 position of `source`, with the symbol of each
-    /// symbol-backed entry by label (labels are unique in a list).
+    /// symbol-backed entry keyed by the entry's index in the list: an
+    /// auto-import entry may repeat a global's label without a symbol, as
+    /// the pin's `CompletionItem.Symbol` is set per item.
     /// port: tsc/internal/ls/completions.go:LanguageService.GetCompletionsAtPosition
     pub fn api_completions(
         &mut self,
@@ -39,7 +41,7 @@ impl LanguageService<'_> {
         position: i64,
         trigger_character: Option<&str>,
         options: &crate::CompletionOptions,
-    ) -> Result<Option<(lsp::CompletionList, HashMap<String, SymbolRef>)>> {
+    ) -> Result<Option<(lsp::CompletionList, HashMap<usize, SymbolRef>)>> {
         let file = self.source(source)?;
         let (line, character) =
             tsr_jsstring::scanner_positions::get_ecma_line_and_utf16_character_of_position(
