@@ -337,8 +337,8 @@ symbols through hashed tables (`NamePool::intern_hashed`, the rehashes,
 symbol graph (2%) and encodes flow references; the pin reads fields through
 pointers and its tables are Go maps (`mapaccess`, `mapassign`: 8% of its
 worker). A binder pass with the same method as the checker's (profile, then
-one change per concurrent pair) is the next parse-bind step; kind bits in
-`NodeId` (`docs/design/node-kind-bits.md`) would also take the binder's
+one change per concurrent pair) is the next parse-bind step; kind hints on
+node edges (`docs/design/node-kind-bits.md`) would also take the binder's
 kind reads.
 
 ## What remains
@@ -346,11 +346,12 @@ kind reads.
 - **The binder** is 1.8x the pin's on the parse-bind workload where the
   parser is 1.09x: node reads through the view, hashed name and symbol
   tables, the symbol-graph validation. The one lever left in parse and bind.
-- **Node access in the checker.** Kind bits in `NodeId` are the one
-  structural lever with a real return (about a tenth of the check phase,
-  and the binder's kind reads); the design note is
-  `docs/design/node-kind-bits.md`. Flat pages are done, the directory is
-  not the cost, parent reads are about one percent.
+- **Node access in the checker.** Kind hints on node edges are the one
+  structural lever with a real return (about a tenth of the check phase
+  before the flow-reference shape, to be counted again, and the binder's
+  kind reads); the design note is `docs/design/node-kind-bits.md`, amended
+  after the review of #115. Flat pages are done, the directory is not the
+  cost, parent reads are about one percent.
 - **The checker's remaining gap** after the flow work is spread across name
   resolution, the relater and the deep-expression walks; the function-level
   comparison against the pin's profile is the method.
