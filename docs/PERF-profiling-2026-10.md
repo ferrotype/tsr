@@ -191,6 +191,8 @@ of the page directory.
 | Change | Measured | Kept |
 | --- | ---: | --- |
 | sealed flat arena pages (one vector per completed file) | 0.986 | yes |
+| benchmark walker resolving views through the node directory (harness only) | 0.844 (top-60), 0.505 (small variants) | yes |
+| one file view per parent walk in the three hot walks | 0.894 (deep variants), neutral elsewhere | yes |
 | directory hit carrying the direct-read flag, symbol lookup without a view | 1.013 | no |
 | shared declared signature lists, no inherited-name copies, allocation-free lower-casing | 1.005 | no |
 | kind bits in `NodeId` | not built; the 92M kind-only reads at 4 ns put it at 8–10% of the check phase | |
@@ -210,6 +212,37 @@ The sealed flat arena is kept: `Arena::seal` moves the pages into one vector
 when a parse completes (`AstBuilder::complete`), so a completed file's slot
 read is one bounds check and one offset; an open arena keeps its pages. The
 counting feature and the phase-split counters stay as development tooling.
+
+### The benchmark's own view lookups
+
+Profiling the top-60 by variant group (the two deep-expression variants, the
+two flow-heavy ones, the eight small `nodeModules` ones repeated ten times)
+showed the routed view path (`for_node_owner`, `for_arena`,
+`owner_retention`, `CompletedFile::view`) at 7 to 38% of each group. Its
+callers were not the checker but the benchmark walker's `baseline::ast`,
+which scanned every file of the program for the owner of each node it
+visited and built a routed view each time. The pin's walker reads AST
+pointers, so this inflated every Rust checker number, most of all the small
+multi-file variants. `ProgramFile::shared_view` now caches the file's shared
+form, and the walker resolves a node through the program's node directory.
+In concurrent pairs the fix alone is 0.844 of the previous run on the top-60
+and 0.505 on the small group; the recorded S08 checker ratios include that
+overhead and should be re-recorded from this harness.
+
+### What the groups show after the fix
+
+| Group | Rust / Go before | Where the Rust time goes now |
+| --- | ---: | --- |
+| deep expressions | 4.7x and 3.5x | parent walks per identifier (`control_flow_container`, `in_ambient_or_type_node`) at 4 ns a step where the pin pays under 1 ns; node access 42% of the group |
+| flow-heavy | 2.3x and 2.2x | the flow walk itself: node reads inside `type_at_flow` and `matching_reference_worker`, name resolution for unresolved names |
+| small multi-file | 7x | harness digests and paths, checker creation (`merge_global_symbol`), file-cache compares, type display; no single item |
+
+Hoisting one file view out of the three hot parent walks
+(`in_ambient_or_type_node`, `control_flow_container_or_none`,
+`flow_this_type_query_worker`) is 0.894 on the deep group and neutral
+elsewhere; it is kept. Comparing accessed property names through a stack
+buffer instead of a `JsString` per comparison measured 1.008 on the flow
+group and was dropped.
 
 ## What remains
 

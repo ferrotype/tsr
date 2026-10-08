@@ -111,9 +111,10 @@ impl CheckerState {
         &self,
         node: NodeId,
     ) -> Result<Option<NodeId>, Error> {
-        let mut current = self.node(node)?.parent();
+        // Every ancestor is in the node's file: one view serves the walk.
+        let view = self.ast(node)?;
+        let mut current = view.node(node)?.parent();
         while let Some(id) = current {
-            let view = self.ast(id)?;
             let read = view.node(id)?;
             if matches!(
                 read.kind().known(),

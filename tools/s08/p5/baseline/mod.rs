@@ -53,6 +53,17 @@ pub fn hex(bytes: &[u8]) -> String {
 }
 
 fn ast(program: &Program, node: NodeId) -> Result<AstView<'_>> {
+    // The program's node directory names the file at once; its shared view
+    // is two borrows. The scan below remains for nodes outside a file's core.
+    if let Some(view) = program
+        .file_of_node(node)
+        .and_then(|file| file.shared_view())
+    {
+        let view = view.ast();
+        if view.node(node).is_ok() {
+            return Ok(view);
+        }
+    }
     for file in program.files() {
         match file.bound().view().ast().for_node_owner(node) {
             Ok(view) => {

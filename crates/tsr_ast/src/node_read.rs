@@ -101,7 +101,7 @@ impl<'a> NodeRead<'a> {
             },
             id,
             #[cfg(feature = "access-stats")]
-            used: Default::default(),
+            used: std::cell::Cell::default(),
         }
     }
     #[inline]
@@ -116,7 +116,7 @@ impl<'a> NodeRead<'a> {
             record: ReadRecord::Core { header, owner },
             id,
             #[cfg(feature = "access-stats")]
-            used: Default::default(),
+            used: std::cell::Cell::default(),
         }
     }
     pub(crate) fn transaction_core(
@@ -130,7 +130,7 @@ impl<'a> NodeRead<'a> {
             record: ReadRecord::TransactionCore { header, owner },
             id,
             #[cfg(feature = "access-stats")]
-            used: Default::default(),
+            used: std::cell::Cell::default(),
         }
     }
     pub(crate) fn owned(
@@ -149,19 +149,24 @@ impl<'a> NodeRead<'a> {
             },
             id,
             #[cfg(feature = "access-stats")]
-            used: Default::default(),
+            used: std::cell::Cell::default(),
         }
     }
-    #[inline(always)]
-    fn touch(&self, _bit: u8) {
+    /// Note an accessor class this read serves (`access-stats` only; a
+    /// no-op otherwise).
+    #[inline]
+    #[cfg_attr(not(feature = "access-stats"), allow(clippy::unused_self))]
+    fn touch(&self, bit: u8) {
         #[cfg(feature = "access-stats")]
         {
             let used = self.used.get();
-            if used & _bit == 0 {
-                crate::access_stats::first_use(_bit, used);
-                self.used.set(used | _bit);
+            if used & bit == 0 {
+                crate::access_stats::first_use(bit, used);
+                self.used.set(used | bit);
             }
         }
+        #[cfg(not(feature = "access-stats"))]
+        let _ = bit;
     }
     pub fn id(&self) -> NodeId {
         self.id
@@ -204,7 +209,7 @@ impl<'a> NodeRead<'a> {
             record,
             id: self.id,
             #[cfg(feature = "access-stats")]
-            used: Default::default(),
+            used: std::cell::Cell::default(),
         })
     }
     fn owned_record(&self) -> Option<&Node> {
