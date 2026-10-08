@@ -356,7 +356,8 @@ fn references_are_reported_as_node_handles() {
     .unwrap();
     assert_eq!(in_file.as_array().unwrap().len(), 3, "{in_file}");
     // The pin searches from a name token; a declaration node has no symbol
-    // at its location and yields null, as the Go handler does.
+    // at its location and yields no groups, which go out as `[]` (the Go
+    // handler's nil slice).
     let declaration = symbol["declarations"][0].as_str().unwrap();
     let none = request(
         &session,
@@ -364,7 +365,7 @@ fn references_are_reported_as_node_handles() {
         &json!({"snapshot": snapshot, "project": project, "node": declaration, "position": 14}),
     )
     .unwrap();
-    assert!(none.is_null(), "{none}");
+    assert_eq!(none, json!([]), "{none}");
     let name = handle_at(&session, snapshot, &project, INDEX, 14);
     let groups = request(
         &session,
@@ -681,6 +682,71 @@ fn a_request_that_unwinds_releases_its_snapshot_reference() {
     );
 }
 
+/// A client callback that panics during `updateSnapshot` (the pin's read
+/// callbacks panic on a client error) unwinds through the session's open-set
+/// lock; the next update continues, as the pin's deferred unlock lets it.
+#[test]
+fn an_update_that_unwinds_in_a_callback_leaves_the_session_usable() {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use tsr_vfs::wrapped::{Replacements, WrappedFs};
+    use tsr_vfs::FileSystem;
+    let files: std::collections::BTreeMap<Vec<u8>, InputFile> = [
+        (CONFIG, r#"{ "compilerOptions": { "noLib": true } }"#),
+        (INDEX, "export const n = 1;\n"),
+    ]
+    .into_iter()
+    .map(|(name, text)| {
+        (
+            name.as_bytes().to_vec(),
+            InputFile::Text(text.as_bytes().to_vec()),
+        )
+    })
+    .collect();
+    let base: Arc<dyn FileSystem> = Arc::new(iovfs::from(
+        Arc::new(vfstest::from_map(&files, false)),
+        false,
+    ));
+    let failing = Arc::new(AtomicBool::new(true));
+    let mut replacements = Replacements::forwarding(base.clone());
+    replacements.read_file_result = Some({
+        let failing = failing.clone();
+        let base = base.clone();
+        Arc::new(move |path: &[u8]| {
+            assert!(
+                !(path == INDEX.as_bytes() && failing.swap(false, Ordering::SeqCst)),
+                "the client's readFile callback failed"
+            );
+            base.read_file_result(path)
+        })
+    });
+    let session = ApiSession::standalone(
+        tsr_project::session::SessionOptions {
+            current_directory: JsString::from_bytes(b"/home/projects".as_slice()),
+            default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
+            ..Default::default()
+        },
+        Arc::new(tsr_bundled::BundledFs::new(Arc::new(WrappedFs::new(
+            base,
+            replacements,
+        )))),
+    );
+    let previous = std::panic::take_hook();
+    std::panic::set_hook(Box::new(|_| {}));
+    let unwound = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| open(&session, CONFIG)));
+    std::panic::set_hook(previous);
+    assert!(unwound.is_err(), "the first update unwinds in the callback");
+    assert!(!failing.load(Ordering::SeqCst));
+    let (snapshot, project) = open(&session, CONFIG);
+    let symbol = request(
+        &session,
+        "getSymbolAtPosition",
+        &json!({"snapshot": snapshot, "project": project, "file": INDEX, "position": 13}),
+    )
+    .unwrap();
+    assert_eq!(symbol["name"], "n");
+    session.close();
+}
+
 /// The ownership note's retirement-serialized commitment (section 2.7): a
 /// generation retired by a sibling after a query computed its response
 /// turns that response into the error form instead of publishing handles
@@ -986,8 +1052,10 @@ fn import_adder_edits_add_coalesce_and_extend_imports() {
         ),
     ]);
     let (snapshot, project) = open(&session, CONFIG);
-    // The client passes `symbol.getExportSymbol()`: the module's export of
-    // the local declaration.
+    // The client passes `symbol.getExportSymbol()`, which is the symbol
+    // itself when the server answers null: the declaration's symbol of an
+    // exported variable is already the module's export, with no export link
+    // of its own (the pin's handler reads the raw field).
     let export_symbol = |position: usize| -> Value {
         let symbol = request(
             &session,
@@ -1001,7 +1069,11 @@ fn import_adder_edits_add_coalesce_and_extend_imports() {
             &json!({"snapshot": snapshot, "project": project, "objectId": symbol["id"]}),
         )
         .unwrap();
-        exported["id"].clone()
+        if exported.is_null() {
+            symbol["id"].clone()
+        } else {
+            exported["id"].clone()
+        }
     };
     let foo = export_symbol("export const ".len());
     let bar = export_symbol("export const foo = 1;\nexport const ".len());

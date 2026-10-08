@@ -116,10 +116,18 @@ impl CallbackFs {
     /// port: tsc/internal/api/callbackfs.go:callbackFS.call
     fn connection(&self, name: &str) -> Result<(Arc<dyn Conn>, Context), Error> {
         let connected = self.connected.lock().expect("callback connection");
+        let Some(connected) = connected.as_ref() else {
+            return Err(detailed(format!(
+                "CallbackFS: {name} called before connection set"
+            )));
+        };
+        // A connection that has ended reports the pin's closed-connection
+        // error, which its call would have returned.
         connected
-            .as_ref()
-            .and_then(|connected| Some((connected.conn.upgrade()?, connected.ctx.clone())))
-            .ok_or_else(|| detailed(format!("CallbackFS: {name} called before connection set")))
+            .conn
+            .upgrade()
+            .map(|conn| (conn, connected.ctx.clone()))
+            .ok_or_else(|| detailed("ipc: connection closed"))
     }
 
     fn path_call(&self, name: &str, path: &[u8]) -> RawValue {

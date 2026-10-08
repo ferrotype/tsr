@@ -406,12 +406,21 @@ pub fn resolve_node_handle(
     };
     let first = text.find('.').ok_or_else(invalid)?;
     let second = text[first + 1..].find('.').ok_or_else(invalid)? + first + 1;
-    // port: strconv.ParseUint(s, 10, 32), with its error text.
+    // port: strconv.ParseUint(s, 10, 32), with its error text; unlike
+    // Rust's parser, ParseUint refuses a leading sign.
     let index_text = &text[..first];
     let index: usize = index_text
         .parse::<u32>()
-        .map_err(|error| {
-            let reason = match error.kind() {
+        .map_err(|error| *error.kind())
+        .and_then(|index| {
+            if index_text.starts_with('+') {
+                Err(std::num::IntErrorKind::InvalidDigit)
+            } else {
+                Ok(index)
+            }
+        })
+        .map_err(|kind| {
+            let reason = match kind {
                 std::num::IntErrorKind::PosOverflow => "value out of range",
                 _ => "invalid syntax",
             };
@@ -467,5 +476,5 @@ pub fn touching_property_name(
     navigator
         .get_touching_property_name(i64::try_from(offset).unwrap_or(i64::MAX))
         .map(Some)
-        .map_err(|error| SessionError::Other(format!("{error:?}")))
+        .map_err(|error| SessionError::Other(format!("{error}")))
 }

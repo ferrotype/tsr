@@ -370,7 +370,7 @@ impl ApiSession {
     ) -> Result<(Snapshot, Option<JsString>), String> {
         match self.project.api_update(changes, request) {
             Ok(update) => Ok((update.snapshot, update.error)),
-            Err(error) => Err(format!("{error:?}")),
+            Err(error) => Err(format!("{error}")),
         }
     }
 
@@ -388,7 +388,13 @@ impl ApiSession {
         &self,
         params: &UpdateSnapshotParams,
     ) -> SessionResult<UpdateSnapshotResponse> {
-        let mut open = self.open.lock().expect("open refs");
+        // A callback that panics during the update unwinds through this
+        // lock; the open sets change only after success, so the next update
+        // continues with them, as the pin's deferred unlock lets it.
+        let mut open = self
+            .open
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         let file_changes = self.to_file_change_summary(params.file_changes.as_deref());
         let cwd = self.current_directory().clone();
         let mut request = ApiSnapshotRequest::default();
@@ -623,7 +629,10 @@ impl ApiSession {
     /// closes; standalone sessions release their whole project session.
     /// port: tsc/internal/api/session.go:Session.releaseOpenRefs
     fn release_open_refs(&self) {
-        let mut open = self.open.lock().expect("open refs");
+        let mut open = self
+            .open
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         if open.projects.is_empty() && open.files.is_empty() {
             return;
         }
