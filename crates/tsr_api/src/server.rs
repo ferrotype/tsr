@@ -172,10 +172,21 @@ impl StdioServer {
     /// port: tsc/internal/api/server.go:StdioServer.Run
     pub fn run(&self, ctx: &Context) -> Result<(), Error> {
         let (fs, callbacks) = self.file_system()?;
-        let session: Arc<dyn Session> = Arc::new(Skeleton::new(
-            self.options.cwd.clone(),
-            fs.use_case_sensitive_file_names(),
-        ));
+        // The pin's project session options for a standalone session: UTF-8
+        // positions, logging off, the command's external-code and mapper
+        // settings.
+        let session: Arc<dyn Session> = crate::session::ApiSession::standalone(
+            tsr_project::session::SessionOptions {
+                current_directory: self.options.cwd.clone(),
+                default_library_path: self.options.default_library_path.clone(),
+                position_encoding: tsr_jsstring::PositionEncoding::Utf8,
+                run_external_code: self.options.run_external_code,
+                mapper_spawner: self.options.mapper_spawner.clone(),
+                background_context: ctx.clone(),
+                ..Default::default()
+            },
+            fs,
+        );
         let mut transport: Box<dyn Transport> = match &self.options.pipe_path {
             Some(path) => Box::new(PipeTransport::new(path).map_err(|error| {
                 Error::Message(format!("failed to create pipe transport: {error}"))

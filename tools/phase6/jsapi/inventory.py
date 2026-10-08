@@ -16,13 +16,25 @@ TEST = re.compile(r'^func (Test\w+)\(\w+ \*testing\.T\)', re.M)
 ROUTES = {
     ('api', 'TestDocumentIdentifierUnmarshalJSON'):
         'crates/tsr_api/src/proto/tests.rs pinned_wire_fixtures_hold: the five document-identifier fixtures of the S03 export are the same inputs',
-    ('api', 'TestJSONValueToAny'): 'WORK (A2): jsonValueToAny arrives with the configuration responses',
+    ('api', 'TestJSONValueToAny'): 'WORK (A2 follow-up): the JSON value conversion of parseJsonConfigFileContent',
+    ('api', 'TestStandaloneSessionUsesSnapshotHostWithoutProjectSession'):
+        'crates/tsr_api/src/session/tests.rs a_standalone_session_updates_snapshots_over_its_own_project_session and create_program_builds_one_synthetic_project_from_explicit_roots (snapshot ids are not compared: the Rust counter is process-wide)',
+    ('api', 'TestSessionTracksAndReleasesAPIRefs'):
+        'crates/tsr_api/src/session/tests.rs project_opens_are_idempotent_and_closes_release_only_held_refs (the standalone session; the shared project session case is A3)',
+    ('api', 'TestUpdateTemporarySnapshot'):
+        'crates/tsr_api/src/session/tests.rs a_temporary_snapshot_overrides_one_file_without_advancing_the_latest (file text instead of semantic diagnostics until A4)',
+    ('api', 'TestUpdateTemporarySnapshotRejectsUnsupportedExtension'):
+        'crates/tsr_api/src/session/tests.rs a_temporary_snapshot_overrides_one_file_without_advancing_the_latest (the tail)',
+    ('api', 'TestCreateProgram'):
+        'crates/tsr_api/src/session/tests.rs create_program_builds_one_synthetic_project_from_explicit_roots (without semantic diagnostics until A4)',
+    ('api', 'TestCreateProgramFileChangesRequireOldProgram'):
+        'crates/tsr_api/src/session/tests.rs create_program_builds_one_synthetic_project_from_explicit_roots (the error text)',
     ('api', 'TestNewDiagnosticResponseIncludesFormattingContext'): 'WORK (A4): diagnostic responses',
     ('api', 'TestNewDiagnosticResponseTruncatesLongFormattingContext'): 'WORK (A4): diagnostic responses',
 }
 CHECKPOINTS = {
     'session_batch_test.go': 'A4', 'session_completion_test.go': 'A4', 'session_textedit_test.go': 'A4',
-    'session_apistate_test.go': 'A2', 'session_createprogram_test.go': 'A2', 'session_temporary_test.go': 'A2',
+    'session_apistate_test.go': 'A3', 'session_createprogram_test.go': 'A3', 'session_temporary_test.go': 'A3',
     'decoder_test.go': 'A5: the Phase 0 corpus encoding parity covers decoding of every test input; the named cases need their equivalent-coverage note or a port',
     'encoder_test.go': 'A5: the two api baselines through a Rust encoder comparison',
 }

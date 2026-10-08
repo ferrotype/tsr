@@ -188,6 +188,14 @@ impl Snapshot {
     pub fn project_by_path(&self, path: &[u8]) -> Option<&Project> {
         self.state()?.projects.get(path)
     }
+    /// Every project of a session snapshot keyed by its path, inferred
+    /// project included, in path order.
+    // port: tsc/internal/project/projectcollection.go:ProjectCollection.ProjectsByPath
+    pub fn projects_by_path(&self) -> impl Iterator<Item = (&JsString, &Project)> {
+        self.state()
+            .into_iter()
+            .flat_map(|state| state.projects.iter())
+    }
     // port: tsc/internal/project/projectcollection.go:ProjectCollection.GetDefaultProject
     pub fn project_for_file(&self, path: &[u8]) -> Option<&Project> {
         let state = self.state()?;

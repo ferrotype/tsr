@@ -28,7 +28,7 @@ denominator and the native skip set.
 
 ## Direct Go tests of `internal/api`
 
-56 tests; **55** still routed to work. `WORK (A<n>)` names the checkpoint that
+56 tests; **49** still routed to work. `WORK (A<n>)` names the checkpoint that
 owes the port or its equivalent-coverage explanation.
 
 | Pinned test | Source | Route |
@@ -58,13 +58,13 @@ owes the port or its equivalent-coverage explanation.
 | `api/encoder/TestEncodeContentMapperSourceFileMetadata` | `upstream/tsc/internal/api/encoder/encoder_test.go:38` | WORK (A5: the two api baselines through a Rust encoder comparison) |
 | `api/encoder/TestEncodeSourceFileWithUnicodeEscapes` | `upstream/tsc/internal/api/encoder/encoder_test.go:94` | WORK (A5: the two api baselines through a Rust encoder comparison) |
 | `api/encoder/TestBuildNodeIndexTableMatchesEncode` | `upstream/tsc/internal/api/encoder/encoder_test.go:112` | WORK (A5: the two api baselines through a Rust encoder comparison) |
-| `api/TestJSONValueToAny` | `upstream/tsc/internal/api/jsonvalue_test.go:13` | WORK (A2): jsonValueToAny arrives with the configuration responses |
+| `api/TestJSONValueToAny` | `upstream/tsc/internal/api/jsonvalue_test.go:13` | WORK (A2 follow-up): the JSON value conversion of parseJsonConfigFileContent |
 | `api/TestDocumentIdentifierUnmarshalJSON` | `upstream/tsc/internal/api/proto_test.go:16` | crates/tsr_api/src/proto/tests.rs pinned_wire_fixtures_hold: the five document-identifier fixtures of the S03 export are the same inputs |
 | `api/TestNewDiagnosticResponseIncludesFormattingContext` | `upstream/tsc/internal/api/proto_test.go:67` | WORK (A4): diagnostic responses |
 | `api/TestNewDiagnosticResponseTruncatesLongFormattingContext` | `upstream/tsc/internal/api/proto_test.go:88` | WORK (A4): diagnostic responses |
-| `api/TestStandaloneSessionUsesSnapshotHostWithoutProjectSession` | `upstream/tsc/internal/api/session_apistate_test.go:15` | WORK (A2) |
-| `api/TestSessionTracksAndReleasesAPIRefs` | `upstream/tsc/internal/api/session_apistate_test.go:57` | WORK (A2) |
-| `api/TestUpdateSnapshotResponseSkipsUnloadedAncestorProject` | `upstream/tsc/internal/api/session_apistate_test.go:242` | WORK (A2) |
+| `api/TestStandaloneSessionUsesSnapshotHostWithoutProjectSession` | `upstream/tsc/internal/api/session_apistate_test.go:15` | crates/tsr_api/src/session/tests.rs a_standalone_session_updates_snapshots_over_its_own_project_session and create_program_builds_one_synthetic_project_from_explicit_roots (snapshot ids are not compared: the Rust counter is process-wide) |
+| `api/TestSessionTracksAndReleasesAPIRefs` | `upstream/tsc/internal/api/session_apistate_test.go:57` | crates/tsr_api/src/session/tests.rs project_opens_are_idempotent_and_closes_release_only_held_refs (the standalone session; the shared project session case is A3) |
+| `api/TestUpdateSnapshotResponseSkipsUnloadedAncestorProject` | `upstream/tsc/internal/api/session_apistate_test.go:242` | WORK (A3) |
 | `api/TestHandleBatchRequests` | `upstream/tsc/internal/api/session_batch_test.go:13` | WORK (A4) |
 | `api/TestHandleBatchRequestsRecoversPerRequestPanics` | `upstream/tsc/internal/api/session_batch_test.go:38` | WORK (A4) |
 | `api/TestBatchResponseEncodesEmptyResult` | `upstream/tsc/internal/api/session_batch_test.go:56` | WORK (A4) |
@@ -76,18 +76,18 @@ owes the port or its equivalent-coverage explanation.
 | `api/TestCompletionSymbolTypeIsResolvable` | `upstream/tsc/internal/api/session_completion_test.go:25` | WORK (A4) |
 | `api/TestCompletionOnInferredProject` | `upstream/tsc/internal/api/session_completion_test.go:98` | WORK (A4) |
 | `api/TestCompletionRetriesWithAutoImports` | `upstream/tsc/internal/api/session_completion_test.go:140` | WORK (A4) |
-| `api/TestCreateProgram` | `upstream/tsc/internal/api/session_createprogram_test.go:15` | WORK (A2) |
-| `api/TestCreateProgramWithNoRootFiles` | `upstream/tsc/internal/api/session_createprogram_test.go:116` | WORK (A2) |
-| `api/TestCreateProgramFileChangesRequireOldProgram` | `upstream/tsc/internal/api/session_createprogram_test.go:142` | WORK (A2) |
-| `api/TestCreateProgramRemovesAllRootFiles` | `upstream/tsc/internal/api/session_createprogram_test.go:160` | WORK (A2) |
-| `api/TestCreateProgramPreservesRootFileOrder` | `upstream/tsc/internal/api/session_createprogram_test.go:205` | WORK (A2) |
-| `api/TestCreateProgramReusesProgram` | `upstream/tsc/internal/api/session_createprogram_test.go:249` | WORK (A2) |
-| `api/TestCreateProgramProjectReferencesAndReuse` | `upstream/tsc/internal/api/session_createprogram_test.go:320` | WORK (A2) |
-| `api/TestCreateProgramFromConfiguredProgramDoesNotRetainOtherProjects` | `upstream/tsc/internal/api/session_createprogram_test.go:396` | WORK (A2) |
-| `api/TestUpdateTemporarySnapshot` | `upstream/tsc/internal/api/session_temporary_test.go:17` | WORK (A2) |
-| `api/TestUpdateTemporarySnapshotAddsUnopenedFile` | `upstream/tsc/internal/api/session_temporary_test.go:103` | WORK (A2) |
-| `api/TestUpdateTemporarySnapshotRejectsUnsupportedExtension` | `upstream/tsc/internal/api/session_temporary_test.go:142` | WORK (A2) |
-| `api/TestUpdateTemporarySnapshotUsesClientSnapshotAsBase` | `upstream/tsc/internal/api/session_temporary_test.go:165` | WORK (A2) |
+| `api/TestCreateProgram` | `upstream/tsc/internal/api/session_createprogram_test.go:15` | crates/tsr_api/src/session/tests.rs create_program_builds_one_synthetic_project_from_explicit_roots (without semantic diagnostics until A4) |
+| `api/TestCreateProgramWithNoRootFiles` | `upstream/tsc/internal/api/session_createprogram_test.go:116` | WORK (A3) |
+| `api/TestCreateProgramFileChangesRequireOldProgram` | `upstream/tsc/internal/api/session_createprogram_test.go:142` | crates/tsr_api/src/session/tests.rs create_program_builds_one_synthetic_project_from_explicit_roots (the error text) |
+| `api/TestCreateProgramRemovesAllRootFiles` | `upstream/tsc/internal/api/session_createprogram_test.go:160` | WORK (A3) |
+| `api/TestCreateProgramPreservesRootFileOrder` | `upstream/tsc/internal/api/session_createprogram_test.go:205` | WORK (A3) |
+| `api/TestCreateProgramReusesProgram` | `upstream/tsc/internal/api/session_createprogram_test.go:249` | WORK (A3) |
+| `api/TestCreateProgramProjectReferencesAndReuse` | `upstream/tsc/internal/api/session_createprogram_test.go:320` | WORK (A3) |
+| `api/TestCreateProgramFromConfiguredProgramDoesNotRetainOtherProjects` | `upstream/tsc/internal/api/session_createprogram_test.go:396` | WORK (A3) |
+| `api/TestUpdateTemporarySnapshot` | `upstream/tsc/internal/api/session_temporary_test.go:17` | crates/tsr_api/src/session/tests.rs a_temporary_snapshot_overrides_one_file_without_advancing_the_latest (file text instead of semantic diagnostics until A4) |
+| `api/TestUpdateTemporarySnapshotAddsUnopenedFile` | `upstream/tsc/internal/api/session_temporary_test.go:103` | WORK (A3) |
+| `api/TestUpdateTemporarySnapshotRejectsUnsupportedExtension` | `upstream/tsc/internal/api/session_temporary_test.go:142` | crates/tsr_api/src/session/tests.rs a_temporary_snapshot_overrides_one_file_without_advancing_the_latest (the tail) |
+| `api/TestUpdateTemporarySnapshotUsesClientSnapshotAsBase` | `upstream/tsc/internal/api/session_temporary_test.go:165` | WORK (A3) |
 | `api/TestToAPITextEditsUsesOriginalCoordinates` | `upstream/tsc/internal/api/session_textedit_test.go:14` | WORK (A4) |
 
 ## Baselines

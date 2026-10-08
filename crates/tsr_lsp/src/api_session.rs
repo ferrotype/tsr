@@ -47,12 +47,8 @@ pub fn initialize(
     let mut map = sessions
         .lock()
         .map_err(|_| crate::error(-32603, "API sessions poisoned"))?;
-    // A2 replaces the skeleton with the session over the project session's
-    // snapshot host; the connection code does not change.
-    let session: Arc<dyn tsr_api::server::Session> = Arc::new(tsr_api::server::Skeleton::new(
-        project.current_directory().clone(),
-        project.file_system().use_case_sensitive_file_names(),
-    ));
+    let session: Arc<dyn tsr_api::server::Session> =
+        tsr_api::session::ApiSession::for_lsp(project.clone());
     let pipe_path = match params.pipe.as_deref() {
         Some(pipe) if !pipe.is_empty() => pipe.clone(),
         _ => generate_pipe_path(),
