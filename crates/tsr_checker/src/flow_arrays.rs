@@ -85,12 +85,9 @@ impl CheckerState {
         let union = self.get_union_type(&[element, new_element])?;
         self.evolving_array_type(union)
     }
-    // port: tsc/internal/checker/flow.go:Checker.getTypeAtFlowArrayMutation
-    pub(crate) fn evolving_mutation_target(
-        &mut self,
-        reference: NodeId,
-        mutation: NodeId,
-    ) -> Result<bool, Error> {
+    /// The reference candidate a mutation's callee or assignment target
+    /// mutates.
+    pub(crate) fn evolving_mutation_object(&mut self, mutation: NodeId) -> Result<NodeId, Error> {
         let read = self.node(mutation)?;
         let access = if read.kind() == K::CallExpression {
             required(read.expression(), "array mutation callee")?
@@ -104,8 +101,7 @@ impl CheckerState {
             )?
         };
         let object = required(self.node(access)?.expression(), "array mutation object")?;
-        let object = self.reference_candidate(object)?;
-        self.matching_reference(reference, object)
+        self.reference_candidate(object)
     }
     pub(crate) fn evolve_array_mutation(
         &mut self,

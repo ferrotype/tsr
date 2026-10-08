@@ -1,4 +1,5 @@
 //! Reference equivalence is symbol based, with source-qualified property paths.
+use crate::symbols::NameBuf;
 use crate::{CheckerState, Error};
 use tsr_arena::{NodeId, SymbolId};
 use tsr_ast::{node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K};
@@ -434,5 +435,292 @@ impl CheckerState {
             }
         }
         Ok(None)
+    }
+}
+
+/// A flow walk's reference read once: what `matching_reference` reads from
+/// its source on every comparison, so each flow step reads only the target.
+/// Built at the walk's first comparison (`FlowQuery::shape`), where the
+/// first comparison would have read the reference.
+pub(crate) struct ReferenceShape {
+    /// The accesses from the reference inward, after the source-side peels
+    /// (parentheses, non-null and satisfies expressions, comma operands).
+    accesses: Vec<AccessStep>,
+    root: ReferenceRoot,
+    /// How many leading accesses `contains_flow_reference` would peel: the
+    /// raw chain of access expressions from the reference, stopped by any
+    /// other node, as its loop is.
+    contains_candidates: usize,
+}
+struct AccessStep {
+    /// The accessed property name (`getAccessedPropertyName`), when one.
+    name: Option<NameBuf>,
+    /// An element access's identifier argument, for the pin's second rule
+    /// (same resolved symbol, constant or unassigned); resolved at the
+    /// comparison, as the pin resolves it.
+    element_argument: Option<NodeId>,
+}
+enum ReferenceRoot {
+    /// `this` in a type query: only a `this` target matches.
+    ThisTypeQuery,
+    Identifier {
+        symbol: SymbolId,
+        exported: SymbolId,
+    },
+    This,
+    Super,
+    MetaProperty {
+        keyword: tsr_ast::NodeKind,
+        name: NameBuf,
+    },
+    /// A source kind the pin never matches.
+    Unmatched,
+}
+
+impl CheckerState {
+    /// The shape of `reference`: `matching_reference_worker`'s reading of its
+    /// source, done once.
+    // port: tsc/internal/checker/flow.go:Checker.isMatchingReference
+    pub(crate) fn reference_shape(&mut self, reference: NodeId) -> Result<ReferenceShape, Error> {
+        // The raw access chain `contains_flow_reference` peels.
+        let mut contains_candidates = 0;
+        let mut raw = reference;
+        loop {
+            let read = self.node(raw)?;
+            if !matches!(
+                read.kind().known(),
+                Some(K::PropertyAccessExpression | K::ElementAccessExpression)
+            ) {
+                break;
+            }
+            contains_candidates += 1;
+            raw = required(read.expression(), "access expression")?;
+        }
+        let mut accesses = Vec::new();
+        let mut source = reference;
+        let root = loop {
+            let read = self.node(source)?;
+            let kind = read.kind();
+            match kind.known() {
+                Some(
+                    K::ParenthesizedExpression | K::NonNullExpression | K::SatisfiesExpression,
+                ) => {
+                    source = required(read.expression(), "source reference operand")?;
+                }
+                Some(K::BinaryExpression) => {
+                    let binary = read
+                        .data_source()
+                        .as_binary_expression()
+                        .ok_or(tsr_arena::Error::InvalidGraph)?;
+                    let right = required(binary.right(), "source comma right")?;
+                    let operator = self
+                        .ast(source)?
+                        .node(required(binary.operator_token(), "source comma operator")?)?
+                        .kind();
+                    if operator != K::CommaToken {
+                        break ReferenceRoot::Unmatched;
+                    }
+                    source = right;
+                }
+                Some(K::PropertyAccessExpression | K::ElementAccessExpression) => {
+                    let base = required(read.expression(), "source property base")?;
+                    let element_argument = read
+                        .data_source()
+                        .as_element_access_expression()
+                        .and_then(|data| data.argument_expression());
+                    let element_argument = match element_argument {
+                        Some(argument) if self.node(argument)?.kind() == K::Identifier => {
+                            Some(argument)
+                        }
+                        _ => None,
+                    };
+                    let name = self
+                        .flow_property_name(source)?
+                        .map(|name| NameBuf::new(name.as_bytes()));
+                    accesses.push(AccessStep {
+                        name,
+                        element_argument,
+                    });
+                    source = base;
+                }
+                Some(K::QualifiedName) => {
+                    let data = read
+                        .data_source()
+                        .as_qualified_name()
+                        .ok_or(tsr_arena::Error::InvalidGraph)?;
+                    let left = required(data.left(), "qualified left")?;
+                    let right = required(data.right(), "qualified right")?;
+                    let name = NameBuf::new(self.node_text(right)?.as_bytes());
+                    accesses.push(AccessStep {
+                        name: Some(name),
+                        element_argument: None,
+                    });
+                    source = left;
+                }
+                Some(K::MetaProperty) => {
+                    let data = read
+                        .data_source()
+                        .as_meta_property()
+                        .ok_or(tsr_arena::Error::InvalidGraph)?;
+                    let keyword = data.keyword_token();
+                    let name = required(read.name(), "meta source name")?;
+                    let name = NameBuf::new(self.ast(source)?.node_text(name)?.as_bytes());
+                    break ReferenceRoot::MetaProperty { keyword, name };
+                }
+                Some(K::Identifier | K::PrivateIdentifier) => {
+                    if self.flow_this_type_query(source)? {
+                        break ReferenceRoot::ThisTypeQuery;
+                    }
+                    let symbol = self.resolved_value_symbol(source)?;
+                    let record = self.symbol(symbol)?;
+                    let exported = if record.flags() & sf::EXPORT_VALUE != 0 {
+                        record.export_symbol().unwrap_or(symbol)
+                    } else {
+                        symbol
+                    };
+                    break ReferenceRoot::Identifier { symbol, exported };
+                }
+                Some(K::ThisKeyword) => break ReferenceRoot::This,
+                Some(K::SuperKeyword) => break ReferenceRoot::Super,
+                _ => break ReferenceRoot::Unmatched,
+            }
+        };
+        Ok(ReferenceShape {
+            accesses,
+            root,
+            contains_candidates,
+        })
+    }
+
+    /// `matching_reference(reference, target)` with the reference's shape.
+    pub(crate) fn matching_shape(
+        &mut self,
+        shape: &ReferenceShape,
+        target: NodeId,
+    ) -> Result<bool, Error> {
+        self.matching_shape_at(shape, 0, target)
+    }
+
+    /// `contains_flow_reference(reference, target)` with the reference's shape.
+    pub(crate) fn shape_contains(
+        &mut self,
+        shape: &ReferenceShape,
+        target: NodeId,
+    ) -> Result<bool, Error> {
+        for peeled in 1..=shape.contains_candidates {
+            if self.matching_shape_at(shape, peeled, target)? {
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+
+    /// Match `target` against the reference with its first `index` accesses
+    /// peeled: the worker's target-side cases, with the source's reads
+    /// replaced by the shape.
+    fn matching_shape_at(
+        &mut self,
+        shape: &ReferenceShape,
+        index: usize,
+        target: NodeId,
+    ) -> Result<bool, Error> {
+        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+            self.matching_shape_worker(shape, index, target)
+        })
+    }
+    fn matching_shape_worker(
+        &mut self,
+        shape: &ReferenceShape,
+        index: usize,
+        target: NodeId,
+    ) -> Result<bool, Error> {
+        let read = self.node(target)?;
+        let target_kind = read.kind();
+        if matches!(
+            target_kind.known(),
+            Some(K::ParenthesizedExpression | K::NonNullExpression)
+        ) {
+            return self.matching_shape_at(
+                shape,
+                index,
+                required(read.expression(), "target reference operand")?,
+            );
+        }
+        if target_kind == K::BinaryExpression {
+            let binary = read
+                .data_source()
+                .as_binary_expression()
+                .ok_or(tsr_arena::Error::InvalidGraph)?;
+            let left = required(binary.left(), "target binary left")?;
+            let right = required(binary.right(), "target binary right")?;
+            let operator = self
+                .ast(target)?
+                .node(required(binary.operator_token(), "target binary operator")?)?
+                .kind();
+            return Ok(
+                tsr_ast::is_assignment_expression(self.ast(target)?, target, false)?
+                    && self.matching_shape_at(shape, index, left)?
+                    || operator == K::CommaToken && self.matching_shape_at(shape, index, right)?,
+            );
+        }
+        let Some(step) = shape.accesses.get(index) else {
+            return Ok(match &shape.root {
+                ReferenceRoot::ThisTypeQuery | ReferenceRoot::This => target_kind == K::ThisKeyword,
+                ReferenceRoot::Identifier { symbol, exported } => {
+                    if target_kind == K::Identifier {
+                        *symbol == self.resolved_value_symbol(target)?
+                    } else if matches!(
+                        target_kind.known(),
+                        Some(K::VariableDeclaration | K::BindingElement)
+                    ) {
+                        Some(*exported) == self.get_symbol_of_declaration(target)?
+                    } else {
+                        false
+                    }
+                }
+                ReferenceRoot::Super => target_kind == K::SuperKeyword,
+                ReferenceRoot::MetaProperty { keyword, name } => {
+                    match read.data_source().as_meta_property() {
+                        Some(data) if data.keyword_token() == *keyword => {
+                            let target_name = required(read.name(), "meta target name")?;
+                            self.ast(target)?.node_text(target_name)?.as_bytes() == name.as_bytes()
+                        }
+                        _ => false,
+                    }
+                }
+                ReferenceRoot::Unmatched => false,
+            });
+        };
+        if !matches!(
+            target_kind.known(),
+            Some(K::PropertyAccessExpression | K::ElementAccessExpression)
+        ) {
+            return Ok(false);
+        }
+        let target_base = required(read.expression(), "target property base")?;
+        if let Some(name) = &step.name {
+            if let Some(target_name) = self.flow_property_name(target)? {
+                return Ok(name.as_bytes() == target_name.as_bytes()
+                    && self.matching_shape_at(shape, index + 1, target_base)?);
+            }
+        }
+        if let Some(source_arg) = step.element_argument {
+            let target_read = self.node(target)?;
+            if let Some(target_data) = target_read.data_source().as_element_access_expression() {
+                let target_arg =
+                    required(target_data.argument_expression(), "target element argument")?;
+                if self.node(target_arg)?.kind() == K::Identifier {
+                    let symbol = self.resolved_value_symbol(source_arg)?;
+                    if symbol == self.resolved_value_symbol(target_arg)?
+                        && (self.is_constant_flow_variable(symbol)?
+                            || self.is_parameter_or_mutable_local_variable(symbol)?
+                                && !self.is_symbol_assigned(symbol)?)
+                    {
+                        return self.matching_shape_at(shape, index + 1, target_base);
+                    }
+                }
+            }
+        }
+        Ok(false)
     }
 }

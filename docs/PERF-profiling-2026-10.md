@@ -244,15 +244,121 @@ elsewhere; it is kept. Comparing accessed property names through a stack
 buffer instead of a `JsString` per comparison measured 1.008 on the flow
 group and was dropped.
 
+## Third pass: the flow reference, and parse-bind at eight threads
+
+### The flow reference's shape
+
+`type_at_flow` compared its reference against every assignment, container
+and mutation target it met through `matching_reference_worker`, which peeled
+the reference's parentheses, non-null assertions and comma chains and
+re-read its access names on every comparison. `ReferenceShape` now captures
+the reference once per walk (its access steps with their property names and
+element identifiers, and its root: a resolved identifier symbol with its
+export form, `this`, `super`, a meta property or a this-type query), and
+`matching_shape` walks only the target side; the containment test runs over
+the same steps. Concurrent pairs against the previous head, outputs hash
+unchanged:
+
+| Group | Ratio |
+| --- | ---: |
+| flow-heavy variants | 0.718 |
+| deep-expression variants | 0.777 |
+| top-60 | 0.900 |
+
+### Parse and bind at eight threads
+
+The recorded parse-bind ratios are 1.15 at one worker and 1.40 at eight
+(`status/perf/parse-bind`, 2026-09-19). The question was why the port
+scales worse than the pin. Measured on the quiet host, runs alternating and
+standalone:
+
+| Workers | Go | Rust | Ratio |
+| --- | ---: | ---: | ---: |
+| 1 | 3.08–3.30 s | 3.42 s | 1.07 |
+| 8 | 0.59–0.61 s | 0.75–0.76 s | 1.26 |
+
+Two things moved the one-worker number since the recording. The sealed
+arena of the second pass makes parse-bind faster, not slower: the binder
+reads the sealed file, and the copy is cheaper than the page directory it
+removes (the unsealed variant is 1.061 at one worker and 1.063 at eight).
+The scanner's buffered diagnostics were drained after every scanner
+operation, constructing and dropping a `Drain` per token (2.4% of the
+worker's self time); skipping the empty buffer is 0.990.
+
+To attribute the eight-worker ratio, a copy of each harness recorded the
+parse-and-bind time of every file (the pin's bridge in Go, ours in Rust;
+nothing else changed), and a simulation of the harness's schedule from
+those costs reproduces the measured Rust wall within half a percent (the
+harness has no other work). The pieces:
+
+- **The per-file cost ratio does not change with the thread count.** Rust
+  spends 3.40 s inside parse and bind at one worker against Go's 2.59–2.70 s
+  (1.27–1.31), and 3.79–3.91 s against 2.89–3.03 s at eight (1.28–1.35).
+  Both inflate by about 1.12 at eight threads, uniformly across workers;
+  the unsealed variant inflates the same (so not memory bandwidth) and
+  mimalloc's purge, commit and reserve settings measure 0.995–1.004 (so not
+  the allocator).
+- **The pin's one-worker wall hides its collector.** 0.48–0.60 s of Go's
+  one-worker wall (16–18%) is background marking between files on the
+  single P, outside its parse and bind time. At eight workers that share is
+  0.04–0.05 s (7–8%): the marking runs on the Ps the schedule leaves idle.
+  The port has no such background work, so its wall is its per-file cost
+  and nothing else.
+- **The harness schedule costs both sides the same.** Files go to workers
+  round-robin (`index % workers`) through channels of capacity `workers`,
+  in both harnesses by construction. The static assignment leaves worker 6
+  with the 8.4 MB file (0.58–0.60 s of its 3.9); the capacity-8 channel
+  blocks the sender on the slowest worker and the others run dry. Measured:
+  perfect division of the Rust eight-worker cost would be 0.49 s, the
+  static-assignment bound 0.598 s (the harness with an unbounded channel
+  lands exactly there), the gated harness 0.752 s. Workers are idle 36% of
+  the time in Rust and 33% in Go.
+
+So the eight-thread ratio is the per-file cost ratio with the pin's
+collector out of the way, and the one-thread ratio flatters the port by the
+pin's serialized collector. There is no scaling defect in the port; the
+lever is the per-file cost, and the profiles (one worker, samply, about one
+sample a millisecond) put it in one place:
+
+| Phase | Go | Rust | Ratio |
+| --- | ---: | ---: | ---: |
+| parse (with the scanner) | 1,920 | 2,086 | 1.09 |
+| bind | 735 | 1,335 | 1.82 |
+
+The pin's parse share includes its allocation (`mallocgc` 9%, `growslice`
+7% of its worker) and its marking runs between files (16%); the port's
+parse share includes the parent fix-up walk over stored children
+(`override_parent_in_immediate_children`, 8%) and the allocator's slow
+path (about 5%). The binder is the gap: the port's bind walk reads every
+node through the view (`node_kind`, `node_flags`, `AstView::node`, the
+`BindRead` decoders: about 15% of its bind time), interns names and inserts
+symbols through hashed tables (`NamePool::intern_hashed`, the rehashes,
+`SymbolTableMut::insert`, `SymbolTableRead::get`: about 10%), validates the
+symbol graph (2%) and encodes flow references; the pin reads fields through
+pointers and its tables are Go maps (`mapaccess`, `mapassign`: 8% of its
+worker). A binder pass with the same method as the checker's (profile, then
+one change per concurrent pair) is the next parse-bind step; kind hints on
+node edges (`docs/design/node-kind-bits.md`) would also take the binder's
+kind reads.
+
 ## What remains
 
-- **Node access in the checker.** Measured above: kind bits in `NodeId` are
-  the one lever left with a real return (about a tenth of the check phase);
-  flat pages are done, the directory is not the cost, parent reads are
-  about one percent.
-- **The checker's remaining gap** is spread across flow analysis, name
-  resolution and the relater; a function-level comparison with the pin's
-  profile is the method to size it.
+- **The binder** is 1.8x the pin's on the parse-bind workload where the
+  parser is 1.09x: node reads through the view, hashed name and symbol
+  tables, the symbol-graph validation. The one lever left in parse and bind.
+- **Node access in the checker.** Kind hints on node edges are the one
+  structural lever with a real return (about a tenth of the check phase
+  before the flow-reference shape, to be counted again, and the binder's
+  kind reads); the design note is `docs/design/node-kind-bits.md`, amended
+  after the review of #115. Flat pages are done, the directory is not the
+  cost, parent reads are about one percent.
+- **The checker's remaining gap** after the flow work is spread across name
+  resolution, the relater and the deep-expression walks; the function-level
+  comparison against the pin's profile is the method.
+- **The parse-bind harness** measures both sides under the same static
+  schedule; its idle time (a third of the workers' time at eight threads)
+  is the benchmark's, not the port's, and lets the pin's collector run for
+  free. Worth knowing when reading the eight-thread ratio.
 - **Navigation.** `getSymbolAtPosition`, completion, hover and references
   descend the tree through the general view routing (`for_node_owner`,
   `owner_retention`, `owning_source`) and allocate a vector of children per
@@ -261,7 +367,6 @@ group and was dropped.
 - **Symbol responses.** Registering symbols and building node handles is now
   a third of the batched request; a per-request cache of the file tables
   would remove most of the remaining `node_handle` cost.
-- **Parse and bind scaling** at eight threads (1.38) was not examined.
 - **Checker allocation**: `resolve_object_type_members` and the relater copy
   member vectors the pin shares.
 
@@ -273,3 +378,5 @@ group and was dropped.
 - LSP smoke: `python3 tools/phase5/latency/capture.py --fixture target/phase5/latency/typescript-proposal --scenario tools/phase5/latency/proposals/typescript-pull.json --go-command '[native,"--lsp","--stdio"]' --rust-command '[rust,"--lsp","--stdio"]' --pairs 1 --smoke --output DIR`, then `DIR/samples.json`.
 - Checker top-60: `cargo build --release --locked --example p7_checkerbench --manifest-path crates/tsr_compiler/Cargo.toml`, then `<exe> <requests.json> <rows.ndjson>`; stdout reports `interval_ns` and `outputs_sha256`, which must not change.
 - Sampling the Rust API server: `/usr/bin/sample <pid> 3 1 -mayDie -file out.txt` on the pid of `tsrust --api`; samply records the LSP server directly.
+- Concurrent pairs: start the baseline and the variant at the same moment, alternate the start order, score each pair by its ratio; six pairs resolve one percent on a busy host where sequential rounds drift by ten.
+- Parse-bind per-file costs: wrap the parse and bind call of each harness (`tools/s07/benchmark/main.go`, `crates/tsr_bench/src/main.rs`) in a timer writing `index,worker,ns`; simulate the schedule by sending `index % workers` into capacity-`workers` queues (the sender waits when the target queue holds `workers` items not yet started) and take the last finish. The Rust wall reproduces within half a percent.

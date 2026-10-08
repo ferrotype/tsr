@@ -437,10 +437,13 @@ impl<'src> Scanner<'src> {
     }
 
     /// Drain in emission order. Diagnostics are not restored by a checkpoint.
+    /// The parser drains after every scanner operation, so the empty buffer
+    /// (the common case) yields no `Drain` to construct and drop.
+    #[inline]
     pub fn drain_diagnostics(&mut self) -> impl Iterator<Item = ScannerDiagnostic> + '_ {
         let drained = match &mut self.error_sink {
-            ErrorSink::Buffered(errors) => Some(errors.drain(..)),
-            ErrorSink::Ignore | ErrorSink::Callback(_) => None,
+            ErrorSink::Buffered(errors) if !errors.is_empty() => Some(errors.drain(..)),
+            ErrorSink::Buffered(_) | ErrorSink::Ignore | ErrorSink::Callback(_) => None,
         };
         drained.into_iter().flatten()
     }
