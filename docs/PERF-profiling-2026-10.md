@@ -543,6 +543,71 @@ are `concurrent-screen`, `concurrent-dispatch` and
 `concurrent-dispatch-confirm`. The candidates are `local-classifier` and
 `local-assignment-dispatch`, both compared directly with `5d3098a2`.
 
+## Full performance refresh, 8 October
+
+Measured `fd3b3843` after #115 and #116 merged, on the owner's macOS arm64
+host with 18 CPUs and 64 GiB RAM. The three workloads ran serially, with no
+build or test from this task overlapping measurement. The official Go/Rust
+capture schedules were used: seven samples per runtime and mode for
+parse-bind and checker, and 20 matched LSP pairs. These are current-tree
+Go-relative observations, not additional effect-size estimates for the
+individual binder changes above; do not add or infer their savings from
+historical batches.
+
+The full parse-bind graphs matched for all 13,094 files at one and eight
+workers. The checker completed all 9,369 variants in every sample and mode,
+with identical output digests and action counts. Its sources stayed stable
+and no census family was unavailable. All five LSP response domains matched
+across all 20 pairs. Neither parity expectations nor thresholds changed.
+
+| Metric | Rust/Go ratio | Current threshold | Result |
+| --- | ---: | ---: | --- |
+| Parse-bind, one worker | 1.1012 | 1.25 | pass |
+| Parse-bind, eight workers | 1.2623 | 1.45 | pass |
+| Parse-bind peak RSS | 0.6720 | 0.85 | pass |
+| Parse-bind allocated bytes | 0.8738 | 0.85 | miss |
+| Checker interval | 1.6263 | — | measured |
+| Checker allocated bytes | 0.5663 | — | measured |
+| Checker retained bytes | 1.4217 | — | measured |
+| Checker bytes per reachable type | 0.8125 | 0.85 | pass |
+| LSP first diagnostics | 1.2566 | 1.0 | miss |
+| LSP completion | 2.3302 | 1.0 | miss |
+| LSP hover | 1.8228 | 1.0 | miss |
+| LSP references | 1.5525 | 1.0 | miss |
+| LSP rename | 1.2969 | 1.0 | miss |
+
+The checker timing samples have low variation (max/min below 1.016 on
+both runtimes), but its harness reports `host_busy: true`: normal-mode
+one-minute load was 5.16–7.17 against its fixed limit of 2.0. Preserve this
+qualification; this is not a quiet-host certification. The committed
+checker's host label records the flag. The 1.6263 interval ratio is 9.479 s
+Rust versus 5.828 s Go. The separate phase-timed mode attributes medians of
+4.636 s / 2.400 s to checking, 2.555 s / 1.311 s to initialization, and
+2.268 s / 2.219 s to display (Rust / Go). These phase medians are diagnostic;
+they are not sums used to replace the normal-mode measurement.
+
+The parse-bind allocation miss is about 69 MB above the current workload
+budget. All five LSP 95% ratio intervals lie above 1.0; none calls for
+extending this capture to 40 pairs under the current decision rule. The
+remaining performance gaps stay visible rather than changing thresholds.
+
+Raw captures, binaries, logs and the serial queue record are preserved at
+`target/perf-refresh-20261008-final/`; complete graph capture is at
+`target/s07-bindworkload/`. The three committed run files under
+`status/perf/{parse-bind,checker,lsp}/` carry revision `fd3b3843` and the raw
+per-sample values.
+
+This refresh also fixed two harness defects. The failing CI script test
+had treated a Rust ledger-progress digest as a change to historical pinned
+Go syntax inputs; the pin and actual producer inputs remain checked, and
+historical observation bytes are unchanged. The first local graph launch
+exposed a macOS executable-publication failure: overwriting the existing
+benchmark path caused it to be killed before main, while identical bytes
+on a fresh inode ran successfully. Benchmark publication now stages a fresh
+executable and atomically replaces the destination, with regressions for
+successful replacement and failure preserving the old executable. The
+failed launch and earlier captures are retained separately.
+
 ## What remains
 
 - **The binder** is 1.8x the pin's on the parse-bind workload where the

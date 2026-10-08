@@ -1,0 +1,236 @@
+{
+  "workload": "lsp",
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "revision": "fd3b38434869922e0fdeb58eb6a43b49b3d29f5f",
+  "host": {
+    "os": "macos",
+    "arch": "aarch64",
+    "cpus": 18,
+    "label": "Owner macOS arm64, 18 CPUs; serial capture queue, no concurrent builds/tests; host load retained"
+  },
+  "recorded_at": "2026-10-08T18:48:45.570350+00:00",
+  "ratios": {
+    "completion": 2.3301680058436816,
+    "first_diagnostics": 1.256561204490154,
+    "hover": 1.8228237662355853,
+    "references": 1.5524921186374332,
+    "rename": 1.296889547813195
+  },
+  "samples": {
+    "go": {
+      "first_diagnostics": [26962000, 19351375, 20402500, 19613500, 18699583, 19331208, 20149542, 19336083, 21485667, 20632125, 20102709, 19988542, 20528833, 19140084, 20057333, 20639333, 21113959, 20838375, 20423625, 19960791],
+      "completion": [2030125, 1405375, 1288083, 1262958, 1278083, 1280625, 1239750, 1595167, 1304042, 2660709, 1388042, 1313542, 1407459, 1359750, 1378250, 1259125, 1575458, 1391083, 1384208, 1343291],
+      "hover": [318708, 249459, 210917, 217041, 209625, 231416, 268250, 257583, 225916, 270959, 238417, 250292, 251667, 247625, 256500, 232291, 279084, 251333, 274666, 229125],
+      "references": [10967958, 8597833, 7426583, 7413458, 7242333, 9172334, 7402417, 9202459, 9058833, 7244083, 9303500, 7590500, 9267375, 9082458, 9594208, 7682417, 9895917, 9235708, 8900625, 7501167],
+      "rename": [204167, 161625, 165666, 232875, 163875, 154958, 151291, 199084, 155667, 146042, 168417, 171167, 168833, 162042, 221000, 194917, 239000, 167083, 181125, 169125]
+    },
+    "rust": {
+      "first_diagnostics": [40451000, 23915709, 23990542, 24077625, 24843417, 26069167, 25029125, 25335042, 24579417, 25591166, 25061375, 24332708, 25957500, 24660209, 26512208, 25930333, 25244375, 25645166, 25761000, 25361834],
+      "completion": [3970917, 2908542, 2961083, 2990750, 3025500, 3240167, 3097334, 3764875, 2984750, 3165667, 3011250, 3073167, 3183458, 3240333, 3403459, 3401708, 3281250, 3287875, 3196542, 3310958],
+      "hover": [452166, 412125, 412625, 437416, 403792, 590542, 431875, 452000, 428834, 408917, 460459, 428417, 462375, 459750, 461833, 518041, 496416, 459333, 472875, 458792],
+      "references": [15042875, 12779500, 13079291, 12993125, 13688959, 13454917, 13882875, 13857542, 13163708, 13999042, 14364583, 13549333, 15323084, 15297125, 14914875, 14685000, 14692042, 14398333, 14356542, 13734375],
+      "rename": [287458, 212834, 203292, 217416, 226500, 258417, 221167, 210375, 211291, 216208, 208667, 199209, 243125, 228917, 264750, 252834, 255375, 218292, 219084, 202417]
+    }
+  },
+  "summaries": {
+    "first_diagnostics": {
+      "samples_per_runtime": 20,
+      "go_median": 20126125.5,
+      "rust_median": 25289708.5,
+      "ratio": 1.256561204490154,
+      "go_relative_mad": 0.02548510889490379,
+      "rust_relative_mad": 0.0251114796360741,
+      "bootstrap": {
+        "algorithm": "independent-median-ratio/order-statistic-v1",
+        "seed": 21255,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "lower": 1.2169420352169646,
+        "upper": 1.2867840872336966,
+        "threshold": 1.0
+      },
+      "stable": false,
+      "needs_more": false,
+      "inconclusive": false
+    },
+    "completion": {
+      "samples_per_runtime": 20,
+      "go_median": 1369000.0,
+      "rust_median": 3190000.0,
+      "ratio": 2.3301680058436816,
+      "go_relative_mad": 0.05327794010226443,
+      "rust_relative_mad": 0.044742633228840124,
+      "bootstrap": {
+        "algorithm": "independent-median-ratio/order-statistic-v1",
+        "seed": 21255,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "lower": 2.2147249817384953,
+        "upper": 2.4847106151488987,
+        "threshold": 1.0
+      },
+      "stable": false,
+      "needs_more": false,
+      "inconclusive": false
+    },
+    "hover": {
+      "samples_per_runtime": 20,
+      "go_median": 249875.5,
+      "rust_median": 455479.0,
+      "ratio": 1.8228237662355853,
+      "go_relative_mad": 0.07370470494306164,
+      "rust_relative_mad": 0.045739759681566,
+      "bootstrap": {
+        "algorithm": "independent-median-ratio/order-statistic-v1",
+        "seed": 21255,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "lower": 1.7122880799576656,
+        "upper": 1.9632692854707832,
+        "threshold": 1.0
+      },
+      "stable": false,
+      "needs_more": false,
+      "inconclusive": false
+    },
+    "references": {
+      "samples_per_runtime": 20,
+      "go_median": 8979729.0,
+      "rust_median": 13940958.5,
+      "ratio": 1.5524921186374332,
+      "go_relative_mad": 0.0852290197176329,
+      "rust_relative_mad": 0.044117590623342,
+      "bootstrap": {
+        "algorithm": "independent-median-ratio/order-statistic-v1",
+        "seed": 21255,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "lower": 1.4968025175563708,
+        "upper": 1.8805264901262804,
+        "threshold": 1.0
+      },
+      "stable": false,
+      "needs_more": false,
+      "inconclusive": false
+    },
+    "rename": {
+      "samples_per_runtime": 20,
+      "go_median": 168625.0,
+      "rust_median": 218688.0,
+      "ratio": 1.296889547813195,
+      "go_relative_mad": 0.07548702742772424,
+      "rust_relative_mad": 0.04629883669885865,
+      "bootstrap": {
+        "algorithm": "independent-median-ratio/order-statistic-v1",
+        "seed": 21255,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "lower": 1.1652102690656894,
+        "upper": 1.4127016452524654,
+        "threshold": 1.0
+      },
+      "stable": false,
+      "needs_more": false,
+      "inconclusive": false
+    }
+  },
+  "metadata": {
+    "fixture_sha256": "9bec404c06c11369a2fce0f030219053e6bf0bc25e8549284b30fc6b893601b6",
+    "scenario": {
+      "encoding": "utf-16",
+      "open": {
+        "path": "src/ast/utils.ts",
+        "languageId": "typescript",
+        "version": 1
+      },
+      "first_diagnostics": {
+        "mode": "pull",
+        "params": {
+          "textDocument": {
+            "uri": "@PROJECT_ROOT_URI@/src/ast/utils.ts"
+          }
+        }
+      },
+      "warmup_hover": {
+        "textDocument": {
+          "uri": "@PROJECT_ROOT_URI@/src/ast/utils.ts"
+        },
+        "position": {
+          "line": 1,
+          "character": 10
+        }
+      },
+      "edit": {
+        "textDocument": {
+          "uri": "@PROJECT_ROOT_URI@/src/ast/utils.ts",
+          "version": 2
+        },
+        "contentChanges": [{"range": {"start": {"line": 0, "character": 0}, "end": {"line": 0, "character": 0}}, "text": " "}]
+      },
+      "requests": {
+        "completion": {
+          "textDocument": {
+            "uri": "@PROJECT_ROOT_URI@/src/ast/utils.ts"
+          },
+          "position": {
+            "line": 21,
+            "character": 39
+          },
+          "context": {
+            "triggerKind": 1
+          }
+        },
+        "hover": {
+          "textDocument": {
+            "uri": "@PROJECT_ROOT_URI@/src/ast/utils.ts"
+          },
+          "position": {
+            "line": 9,
+            "character": 15
+          }
+        },
+        "references": {
+          "textDocument": {
+            "uri": "@PROJECT_ROOT_URI@/src/ast/utils.ts"
+          },
+          "position": {
+            "line": 9,
+            "character": 15
+          },
+          "context": {
+            "includeDeclaration": true
+          }
+        },
+        "rename": {
+          "textDocument": {
+            "uri": "@PROJECT_ROOT_URI@/src/ast/utils.ts"
+          },
+          "position": {
+            "line": 9,
+            "character": 15
+          },
+          "newName": "LatencyNode"
+        }
+      }
+    },
+    "scenario_sha256": "be95d256f76851e02dd97ce7600532fe3a81192f6d2cfea566bbc14cf88f132b",
+    "first_diagnostics_mode": "pull",
+    "comparison_rules": ["completion-client-order-v1"],
+    "commands": {
+      "go": ["/Users/cristian/git/ts-rust/target/perf-refresh-20261008-final/lsp-binaries/native-lsp", "--lsp", "--stdio"],
+      "rust": ["/Users/cristian/git/ts-rust/target/perf-refresh-20261008-final/lsp-binaries/rust-lsp", "--lsp", "--stdio"]
+    },
+    "binaries": {
+      "go": {
+        "path": "/Users/cristian/git/ts-rust/target/perf-refresh-20261008-final/lsp-binaries/native-lsp",
+        "sha256": "429a5f8e3ee6a3674883329cd1dc8e99481be2071be8a4912fadab28cbfa8501"
+      },
+      "rust": {
+        "path": "/Users/cristian/git/ts-rust/target/perf-refresh-20261008-final/lsp-binaries/rust-lsp",
+        "sha256": "e5432184936b95731fd686a9b5517061489220f0e9eec32509dc07d180beb54b"
+      }
+    },
+    "pairs": [{"index": 0, "order": ["go", "rust"], "matched": true, "measurements_ns": {"go": {"first_diagnostics": 26962000, "completion": 2030125, "hover": 318708, "references": 10967958, "rename": 204167}, "rust": {"first_diagnostics": 40451000, "completion": 3970917, "hover": 452166, "references": 15042875, "rename": 287458}}}, {"index": 1, "order": ["rust", "go"], "matched": true, "measurements_ns": {"rust": {"first_diagnostics": 23915709, "completion": 2908542, "hover": 412125, "references": 12779500, "rename": 212834}, "go": {"first_diagnostics": 19351375, "completion": 1405375, "hover": 249459, "references": 8597833, "rename": 161625}}}, {"index": 2, "order": ["go", "rust"], "matched": true, "measurements_ns": {"go": {"first_diagnostics": 20402500, "completion": 1288083, "hover": 210917, "references": 7426583, "rename": 165666}, "rust": {"first_diagnostics": 23990542, "completion": 2961083, "hover": 412625, "references": 13079291, "rename": 203292}}}, {"index": 3, "order": ["rust", "go"], "matched": true, "measurements_ns": {"rust": {"first_diagnostics": 24077625, "completion": 2990750, "hover": 437416, "references": 12993125, "rename": 217416}, "go": {"first_diagnostics": 19613500, "completion": 1262958, "hover": 217041, "references": 7413458, "rename": 232875}}}, {"index": 4, "order": ["go", "rust"], "matched": true, "measurements_ns": {"go": {"first_diagnostics": 18699583, "completion": 1278083, "hover": 209625, "references": 7242333, "rename": 163875}, "rust": {"first_diagnostics": 24843417, "completion": 3025500, "hover": 403792, "references": 13688959, "rename": 226500}}}, {"index": 5, "order": ["rust", "go"], "matched": true, "measurements_ns": {"rust": {"first_diagnostics": 26069167, "completion": 3240167, "hover": 590542, "references": 13454917, "rename": 258417}, "go": {"first_diagnostics": 19331208, "completion": 1280625, "hover": 231416, "references": 9172334, "rename": 154958}}}, {"index": 6, "order": ["go", "rust"], "matched": true, "measurements_ns": {"go": {"first_diagnostics": 20149542, "completion": 1239750, "hover": 268250, "references": 7402417, "rename": 151291}, "rust": {"first_diagnostics": 25029125, "completion": 3097334, "hover": 431875, "references": 13882875, "rename": 221167}}}, {"index": 7, "order": ["rust", "go"], "matched": true, "measurements_ns": {"rust": {"first_diagnostics": 25335042, "completion": 3764875, "hover": 452000, "references": 13857542, "rename": 210375}, "go": {"first_diagnostics": 19336083, "completion": 1595167, "hover": 257583, "references": 9202459, "rename": 199084}}}, {"index": 8, "order": ["go", "rust"], "matched": true, "measurements_ns": {"go": {"first_diagnostics": 21485667, "completion": 1304042, "hover": 225916, "references": 9058833, "rename": 155667}, "rust": {"first_diagnostics": 24579417, "completion": 2984750, "hover": 428834, "references": 13163708, "rename": 211291}}}, {"index": 9, "order": ["rust", "go"], "matched": true, "measurements_ns": {"rust": {"first_diagnostics": 25591166, "completion": 3165667, "hover": 408917, "references": 13999042, "rename": 216208}, "go": {"first_diagnostics": 20632125, "completion": 2660709, "hover": 270959, "references": 7244083, "rename": 146042}}}, {"index": 10, "order": ["go", "rust"], "matched": true, "measurements_ns": {"go": {"first_diagnostics": 20102709, "completion": 1388042, "hover": 238417, "references": 9303500, "rename": 168417}, "rust": {"first_diagnostics": 25061375, "completion": 3011250, "hover": 460459, "references": 14364583, "rename": 208667}}}, {"index": 11, "order": ["rust", "go"], "matched": true, "measurements_ns": {"rust": {"first_diagnostics": 24332708, "completion": 3073167, "hover": 428417, "references": 13549333, "rename": 199209}, "go": {"first_diagnostics": 19988542, "completion": 1313542, "hover": 250292, "references": 7590500, "rename": 171167}}}, {"index": 12, "order": ["go", "rust"], "matched": true, "measurements_ns": {"go": {"first_diagnostics": 20528833, "completion": 1407459, "hover": 251667, "references": 9267375, "rename": 168833}, "rust": {"first_diagnostics": 25957500, "completion": 3183458, "hover": 462375, "references": 15323084, "rename": 243125}}}, {"index": 13, "order": ["rust", "go"], "matched": true, "measurements_ns": {"rust": {"first_diagnostics": 24660209, "completion": 3240333, "hover": 459750, "references": 15297125, "rename": 228917}, "go": {"first_diagnostics": 19140084, "completion": 1359750, "hover": 247625, "references": 9082458, "rename": 162042}}}, {"index": 14, "order": ["go", "rust"], "matched": true, "measurements_ns": {"go": {"first_diagnostics": 20057333, "completion": 1378250, "hover": 256500, "references": 9594208, "rename": 221000}, "rust": {"first_diagnostics": 26512208, "completion": 3403459, "hover": 461833, "references": 14914875, "rename": 264750}}}, {"index": 15, "order": ["rust", "go"], "matched": true, "measurements_ns": {"rust": {"first_diagnostics": 25930333, "completion": 3401708, "hover": 518041, "references": 14685000, "rename": 252834}, "go": {"first_diagnostics": 20639333, "completion": 1259125, "hover": 232291, "references": 7682417, "rename": 194917}}}, {"index": 16, "order": ["go", "rust"], "matched": true, "measurements_ns": {"go": {"first_diagnostics": 21113959, "completion": 1575458, "hover": 279084, "references": 9895917, "rename": 239000}, "rust": {"first_diagnostics": 25244375, "completion": 3281250, "hover": 496416, "references": 14692042, "rename": 255375}}}, {"index": 17, "order": ["rust", "go"], "matched": true, "measurements_ns": {"rust": {"first_diagnostics": 25645166, "completion": 3287875, "hover": 459333, "references": 14398333, "rename": 218292}, "go": {"first_diagnostics": 20838375, "completion": 1391083, "hover": 251333, "references": 9235708, "rename": 167083}}}, {"index": 18, "order": ["go", "rust"], "matched": true, "measurements_ns": {"go": {"first_diagnostics": 20423625, "completion": 1384208, "hover": 274666, "references": 8900625, "rename": 181125}, "rust": {"first_diagnostics": 25761000, "completion": 3196542, "hover": 472875, "references": 14356542, "rename": 219084}}}, {"index": 19, "order": ["rust", "go"], "matched": true, "measurements_ns": {"rust": {"first_diagnostics": 25361834, "completion": 3310958, "hover": 458792, "references": 13734375, "rename": 202417}, "go": {"first_diagnostics": 19960791, "completion": 1343291, "hover": 229125, "references": 7501167, "rename": 169125}}}],
+    "format": 1
+  }
+}
