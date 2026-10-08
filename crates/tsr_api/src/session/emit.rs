@@ -12,7 +12,10 @@ use crate::proto::{
 };
 use std::sync::{Arc, Mutex};
 use tsr_arena::Counters;
+use tsr_checker::{CheckerLifetime, CheckerRequest};
 use tsr_compiler::{CheckedProgram, EmitOnly, EmitOptions, EmitResult, Program, ProgramFile};
+use tsr_ipc::Context;
+use tsr_project::Project;
 use tsr_vfs::FileSystem;
 
 fn text(bytes: &[u8]) -> String {
@@ -29,11 +32,30 @@ fn emit_only(value: Option<u32>) -> SessionResult<EmitOnly> {
     })
 }
 
+/// The pin's `program.Emit` takes each file's checker from the program's
+/// pool, which is the project's, so an emit after a check reuses the checked
+/// files; a private pool would recheck everything on every call. The request
+/// is canceled with the connection's context, as the pin's `emitProgram`
+/// honours the request context.
 /// port: tsc/internal/api/session.go:emitProgram
-fn emit_program(program: &Arc<Program>, options: &EmitOptions<'_>) -> SessionResult<EmitResult> {
-    let checked = CheckedProgram::new(program.clone(), &Counters::new(), None);
+fn emit_program(
+    program: &Arc<Program>,
+    project: &Project,
+    ctx: &Context,
+    options: &EmitOptions<'_>,
+) -> SessionResult<EmitResult> {
+    let checked = CheckedProgram::with_pool(program.clone(), Arc::new(project.clone()));
+    let cancellation = tsr_core::CancellationToken::new();
+    let _stop = ctx.after_func({
+        let cancellation = cancellation.clone();
+        move || cancellation.cancel()
+    });
+    let request = CheckerRequest {
+        lifetime: CheckerLifetime::Temporary,
+        cancellation: Some(cancellation),
+    };
     checked
-        .emit(&tsr_checker::CheckerRequest::default(), options)
+        .emit(&request, options)
         .map_err(|error| SessionError::Other(format!("{error}")))?
         .ok_or_else(|| SessionError::Other("compiler emit returned nil result".into()))
 }
@@ -41,6 +63,8 @@ fn emit_program(program: &Arc<Program>, options: &EmitOptions<'_>) -> SessionRes
 /// port: tsc/internal/api/session.go:emitToOutput
 fn emit_to_output(
     program: &Arc<Program>,
+    project: &Project,
+    ctx: &Context,
     targets: Option<&[Arc<ProgramFile>]>,
     emit_only: EmitOnly,
     force_emit: bool,
@@ -69,7 +93,7 @@ fn emit_to_output(
             force_emit,
             write_file: Some(&write_file),
         };
-        emit_program(program, &options)?
+        emit_program(program, project, ctx, &options)?
     };
     let mut outputs = outputs.into_inner().expect("emit outputs");
     outputs.sort_by(|a, b| a.file_name.cmp(&b.file_name));
@@ -87,8 +111,13 @@ impl ApiSession {
     /// Writes through the session's file system, which is the client's
     /// callback file system when `writeFile` is enabled.
     /// port: tsc/internal/api/session.go:Session.handleEmit
-    pub(super) fn handle_emit(&self, params: &EmitParams) -> SessionResult<EmitResponse> {
+    pub(super) fn handle_emit(
+        &self,
+        ctx: &Context,
+        params: &EmitParams,
+    ) -> SessionResult<EmitResponse> {
         let data = self.snapshot_data(params.snapshot)?;
+        let project = data.project(&params.project)?;
         let program = data.program(&params.project)?;
         let emit_only = emit_only(params.emit_only.as_deref().copied())?;
         let fs: Arc<dyn FileSystem> = self.file_system().clone();
@@ -97,6 +126,8 @@ impl ApiSession {
         };
         let result = emit_program(
             program,
+            project,
+            ctx,
             &EmitOptions {
                 emit_only,
                 write_file: Some(&write_file),
@@ -117,22 +148,26 @@ impl ApiSession {
     /// port: tsc/internal/api/session.go:Session.handleEmitToString
     pub(super) fn handle_emit_to_string(
         &self,
+        ctx: &Context,
         params: &EmitParams,
     ) -> SessionResult<EmitOutputResponse> {
         let data = self.snapshot_data(params.snapshot)?;
+        let project = data.project(&params.project)?;
         let program = data.program(&params.project)?;
         let emit_only = emit_only(params.emit_only.as_deref().copied())?;
-        emit_to_output(program, None, emit_only, false)
+        emit_to_output(program, project, ctx, None, emit_only, false)
     }
 
     /// port: tsc/internal/api/session.go:Session.handleSelectedFilesEmit
     pub(super) fn handle_selected_files_emit(
         &self,
+        ctx: &Context,
         params: &SelectedFilesEmitParams,
         emit_only: EmitOnly,
         files_named: bool,
     ) -> SessionResult<EmitOutputResponse> {
         let data = self.snapshot_data(params.snapshot)?;
+        let project = data.project(&params.project)?;
         let program = data.program(&params.project)?;
         // The pin refuses a nil list and emits nothing for an empty one.
         if !files_named {
@@ -140,14 +175,13 @@ impl ApiSession {
         }
         let mut targets: Vec<Arc<ProgramFile>> = Vec::with_capacity(params.files.len());
         for file in &params.files {
-            let name = file.to_file_name();
-            let target = program
-                .files()
-                .iter()
-                .find(|candidate| {
+            let found = program.source_file(file.to_file_name().as_bytes());
+            let target = found
+                .and_then(|found| {
                     program
-                        .source_file(name.as_bytes())
-                        .is_some_and(|found| std::ptr::eq(found, candidate.as_ref()))
+                        .files()
+                        .iter()
+                        .find(|candidate| std::ptr::eq(found, candidate.as_ref()))
                 })
                 .cloned()
                 .ok_or_else(|| {
@@ -155,7 +189,7 @@ impl ApiSession {
                 })?;
             targets.push(target);
         }
-        emit_to_output(program, Some(&targets), emit_only, true)
+        emit_to_output(program, project, ctx, Some(&targets), emit_only, true)
     }
 
     /// port: tsc/internal/api/session.go:Session.handleFormatNodeForInsertion
@@ -178,7 +212,7 @@ impl ApiSession {
         let view = file.bound().view().ast();
         let source = view
             .source_file(file.source())
-            .map_err(|error| SessionError::Other(format!("{error:?}")))?;
+            .map_err(|error| SessionError::Other(format!("{error}")))?;
         let position = source
             .position_map()
             .utf16_to_utf8(isize::try_from(params.position).unwrap_or(isize::MAX));
@@ -188,9 +222,13 @@ impl ApiSession {
             source: file.source(),
             jsdoc: &mut provider,
         };
-        // The standalone session has the default preferences; an LSP-hosted
-        // session's format settings are the server's.
-        let settings = tsr_format::FormatCodeSettings::default();
+        // The snapshot's format settings: the hosting LSP session's user
+        // preferences, with its new-line preference; a standalone session's
+        // defaults.
+        let mut settings = data.preferences.format.clone();
+        if let Some(newline) = &data.preferences.newline {
+            settings.editor.new_line_character = newline.as_bytes().to_vec();
+        }
         crate::format_node_for_insertion(
             &encoded,
             &mut target,

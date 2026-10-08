@@ -45,6 +45,7 @@ mod verify_options;
 pub use verify_options::{verify_compiler_options, FileIncludeDiagnostic, OptionVerification};
 mod loader;
 mod metadata;
+mod preload;
 mod resolver_host;
 pub use cache::{
     CachedMappedProgramFiles, CachedProgramFile, FileCache, MappedFileResult, MappedProgramFiles,

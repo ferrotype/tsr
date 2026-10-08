@@ -122,3 +122,17 @@ takes 1.6 s), which bounds the cost at one such file per run.
   and `cargo xtask validate` pass.
 - `python3 scripts/parity.py check jsapi` passes against the accepted
   expectation file.
+
+## Review fixes after A5
+
+The A1 review's findings and their fixes: the stray-response error, the
+owned callback error texts and the host-specific wire expectations were
+fixed in the first round (docs/PHASE6-A2.md, "Review fixes after A4"); the
+second round adds:
+
+- A malformed reply to a read callback (`readFile`, `fileExists`,
+  `directoryExists`, `getAccessibleEntries`, `realpath`) panics, as the
+  pin's read callbacks panic on their unmarshal errors; the write side keeps
+  returning its errors.
+- The wire probe reads each reply under its deadline: a silent server is
+  recorded as a timed-out step and killed instead of blocking the capture.

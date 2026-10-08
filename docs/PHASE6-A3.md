@@ -128,10 +128,14 @@ A4 made `accept` refresh mechanical labels from the run.
 - Checker handlers publish under the retirement-serialized protocol of
   docs/design/ownership.md section 2.7: registry insertion and lookup take
   the project pool's generation gate, and a response is serialized outside
-  the gate, then committed to the connection only after the gate revalidates
-  the checker and generation. A generation retired by a sibling between a
-  query's computation and its commitment yields the error form, not handles
-  of a retired checker.
+  the gate, then validated under the gate before the connection writes it.
+  A generation retired by a sibling between a query's computation and that
+  validation yields the error form, not handles of a retired checker. The
+  write itself happens after the gate is released (the connection's writer
+  lock, not an ordered queue committed under the gate); section 2.7 records
+  this accepted form and its argument: a success written after a retirement
+  that followed its validation carries handles the next request rejects,
+  as one written just before the retirement does.
 - `register_type` and `register_signature` refuse an operation of another
   checker (`duplicate type`, `duplicate signature`, the pin's panics).
 - `base64_decode` follows Go's `StdEncoding`: CR and LF are skipped,

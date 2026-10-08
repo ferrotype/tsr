@@ -113,3 +113,32 @@ python3 tools/phase6/jsapi/inventory.py --results "$SCRATCH/jsapi/local/0/native
 ```
 
 `upstream/` needs `npm ci --ignore-scripts` once per lockfile change.
+
+## Review fixes after A5
+
+The A0 review's findings, fixed in the second round of review fixes:
+
+- The jsapi suite runs one file at a time: the pinned client's `getExePath`
+  reads one repository symlink that the runner points at the binary under
+  test before each file, so two workers would run each other's binary.
+  `parity.py run jsapi` refuses more than one job (its default was already
+  one).
+- Batch entries keep their method as text and are dispatched one by one
+  (A4): `ping`, `echo` and unknown names are answered inside their item, and
+  an absent method is the unknown method `""`, as the pin answers. The
+  generated `Method` decoder, which refuses unknown names, serves no
+  dispatch.
+- `omitempty` looks through a pointer at the encoded value, as json v2
+  does: a pointer to `""`, to `[]` or to a struct that encodes as `{}` is
+  left out like a nil one, while a pointer to a number or a boolean never
+  is. An empty completion `detail` is omitted, as the pin's is.
+- A raw value's emptiness is decided on its encoded value: whitespace
+  between tokens is not part of it and a string's content is, so `" "` is
+  sent and `{ }` is omitted.
+- The msgpack reader follows the pin's end-of-input rule: input that ends
+  before a field's first byte is the clean end of the connection (the pin's
+  `ReadByte` and `io.ReadFull` report `io.EOF`, which `Run` takes as the
+  end), input that ends inside a field is an unexpected end of file.
+- Known difference: a method name that is not UTF-8 reaches the session with
+  its invalid bytes replaced, where the pin keeps the bytes and quotes them
+  in its unknown-method error; the error differs only for such a client.

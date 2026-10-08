@@ -51,6 +51,7 @@ pub fn run(args: &[JsString]) -> i32 {
         collect_timing: flags.timing,
         run_external_code: flags.run_external_code,
         mapper_spawner: Some(system),
+        session_hook: None,
     });
     let context = Context::background().with_cancel();
     let _signals = match crate::signals::Scope::new(context.clone()) {

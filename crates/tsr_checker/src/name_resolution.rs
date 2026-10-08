@@ -83,12 +83,13 @@ impl Hooks<'_> {
             let Some(table) = table else { return Ok(None) };
             let table_id = table;
             let table = self.state.table(table_id)?;
-            let mut candidates = Vec::new();
+            let mut candidates: Vec<(Vec<u8>, SymbolId)> = Vec::new();
+            let name_rune_count = tsr_scanner::rune_count(name);
             for (_, candidate) in table {
                 let Some(candidate) = candidate else { continue };
                 let read = self.state.symbol(candidate)?;
-                let text = read.name_to_owned();
-                if text.is_empty() || matches!(text.as_bytes()[0], b'"' | 0xfe) {
+                let text = read.name_bytes();
+                if text.is_empty() || matches!(text[0], b'"' | 0xfe) {
                     continue;
                 }
                 let mut flags = read.flags();
@@ -107,8 +108,13 @@ impl Hooks<'_> {
                         return Err(Error::Unsupported("getSymbolFlags: alias resolution"));
                     }
                 }
-                if flags & meaning != 0 {
-                    candidates.push((text, candidate));
+                // The search measures no candidate outside its length window,
+                // so one is not collected; the alias resolution above still
+                // ran for it, as the pin's getCandidateName runs it.
+                if flags & meaning != 0
+                    && tsr_scanner::within_length_difference(name_rune_count, text)
+                {
+                    candidates.push((text.to_vec(), candidate));
                 }
             }
             if meaning & sf::GLOBAL_LOOKUP != 0 {
@@ -116,7 +122,7 @@ impl Hooks<'_> {
                 let table = self.state.table(table_id)?;
                 for &(builtin, suggestion) in &self.state.builtins.primitive_alias_suggestions {
                     if table.get(builtin).is_some() {
-                        let text = self.state.symbol(suggestion)?.name_to_owned();
+                        let text = self.state.symbol(suggestion)?.name_bytes().to_vec();
                         candidates.push((text, suggestion));
                     }
                 }
@@ -125,7 +131,7 @@ impl Hooks<'_> {
             let result = tsr_scanner::get_spelling_suggestion(
                 name,
                 candidates.iter(),
-                |entry| entry.0.as_bytes(),
+                |entry| entry.0.as_slice(),
                 |a, b| match self.state.compare_symbols(Some(a.1), Some(b.1)) {
                     Ok(order) => order,
                     Err(error) => {

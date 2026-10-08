@@ -97,7 +97,10 @@ def list_variants(suite, prepared):
 
 
 def _place_binary(binary, link=None):
-    """`getExePath()`'s repository path; a symlink the pin ignores."""
+    """`getExePath()`'s repository path; a symlink the pin ignores. One
+    placement per repository: the suite runs its files one at a time
+    (parity.py refuses more jobs), or two workers would point the link at
+    each other's binary."""
     link = Path(link) if link else ROOT / 'upstream/built/local/tsc'
     link.parent.mkdir(parents=True, exist_ok=True)
     if link.is_symlink() or link.exists():

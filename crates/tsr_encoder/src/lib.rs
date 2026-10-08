@@ -89,3 +89,5 @@ impl NodeLayout {
 
 #[cfg(test)]
 mod baseline_tests;
+#[cfg(test)]
+mod decoder_tests;

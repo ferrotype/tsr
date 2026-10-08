@@ -31,7 +31,15 @@ pub struct StdioServerOptions {
     pub collect_timing: bool,
     pub run_external_code: bool,
     pub mapper_spawner: Option<Arc<dyn tsr_contentmapper::Spawner>>,
+    /// A test host's wrapper around the production session, such as the
+    /// Phase 6 panic witness's fault control; `tsrust` sets none, so the
+    /// witness serves on the path `tsrust --api` takes.
+    pub session_hook: Option<SessionHook>,
 }
+
+/// Wraps the session a `StdioServer` built before it serves it.
+pub type SessionHook =
+    Arc<dyn Fn(Arc<crate::session::ApiSession>) -> Arc<dyn Session> + Send + Sync>;
 
 pub struct StdioServer {
     options: StdioServerOptions,
@@ -175,7 +183,7 @@ impl StdioServer {
         // The pin's project session options for a standalone session: UTF-8
         // positions, logging off, the command's external-code and mapper
         // settings.
-        let session: Arc<dyn Session> = crate::session::ApiSession::standalone(
+        let session = crate::session::ApiSession::standalone(
             tsr_project::session::SessionOptions {
                 current_directory: self.options.cwd.clone(),
                 default_library_path: self.options.default_library_path.clone(),
@@ -187,6 +195,10 @@ impl StdioServer {
             },
             fs,
         );
+        let session: Arc<dyn Session> = match &self.options.session_hook {
+            Some(hook) => hook(session),
+            None => session,
+        };
         let mut transport: Box<dyn Transport> = match &self.options.pipe_path {
             Some(path) => Box::new(PipeTransport::new(path).map_err(|error| {
                 Error::Message(format!("failed to create pipe transport: {error}"))

@@ -101,7 +101,7 @@ pub fn unmarshal<T: Decode + ?Sized>(
     value: &mut T,
     options: Options<'_>,
 ) -> Result<(), Error> {
-    unmarshal_read(std::io::Cursor::new(bytes), value, options)
+    unmarshal_with(Decoder::from_slice_with_options(bytes, options), value)
 }
 /// port: tsc/internal/json/json.go:UnmarshalRead
 pub fn unmarshal_read<T: Decode + ?Sized>(
@@ -109,7 +109,12 @@ pub fn unmarshal_read<T: Decode + ?Sized>(
     value: &mut T,
     options: Options<'_>,
 ) -> Result<(), Error> {
-    let mut decoder = Decoder::with_options(reader, options);
+    unmarshal_with(Decoder::with_options(reader, options), value)
+}
+fn unmarshal_with<T: Decode + ?Sized>(
+    mut decoder: Decoder<'_>,
+    value: &mut T,
+) -> Result<(), Error> {
     let result = decoder.value(value);
     if let Err(Error::Eof) = result {
         let (offset, pointer) = decoder.next_location()?;

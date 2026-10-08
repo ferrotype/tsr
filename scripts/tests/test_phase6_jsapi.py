@@ -53,6 +53,17 @@ class Rows(unittest.TestCase):
         self.assertTrue(parity.SUITES['jsapi'].batch)
         self.assertIn('jsapi', parity.BATCH_SUITES)
 
+    def test_the_suite_refuses_parallel_workers(self):
+        # The pinned client's getExePath reads one repository symlink that the
+        # runner points at the binary under test, so two workers would run
+        # each other's binary.
+        import types
+        args = types.SimpleNamespace(suite='jsapi', jobs=2, runner=None, id=None, shard=None,
+                                     output='unused', timeout=None)
+        with self.assertRaises(SystemExit) as refused:
+            parity.run(args)
+        self.assertIn('one file at a time', str(refused.exception))
+
 
 @unittest.skipUnless(shutil.which('node'), 'node is required')
 class Reporter(unittest.TestCase):

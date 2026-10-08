@@ -89,9 +89,68 @@ fn with_diagnostics_checker<R>(
     collect(&mut operation)
 }
 
+/// One file's diagnostics of `kind`, or the whole program's, filtered and
+/// sorted as the pin's program getters return them: the syntactic and bind
+/// collectors sort their own result, the checker-backed ones are collected
+/// per file through the file's diagnostics checker and sorted here.
+/// port: tsc/internal/compiler/program.go:Program.collectDiagnostics
+/// port: tsc/internal/compiler/program.go:Program.collectCheckerDiagnostics
+fn diagnostics_of(
+    project: &Project,
+    program: &Arc<Program>,
+    ctx: &Context,
+    kind: DiagnosticKind,
+    file: Option<&ProgramFile>,
+) -> SessionResult<Vec<Diagnostic>> {
+    match kind {
+        DiagnosticKind::Syntactic => program.syntactic_diagnostics(file).map_err(checker_error),
+        DiagnosticKind::Bind => program
+            .bind_diagnostics(file.map(ProgramFile::source))
+            .map_err(checker_error),
+        DiagnosticKind::Semantic | DiagnosticKind::Suggestion | DiagnosticKind::Declaration => {
+            let raw = if let Some(file) = file {
+                checker_diagnostics_of(project, program, ctx, kind, file)?
+            } else {
+                let mut raw = Vec::new();
+                for file in program.files() {
+                    raw.extend(checker_diagnostics_of(project, program, ctx, kind, file)?);
+                }
+                raw
+            };
+            program
+                .filter_and_sort_diagnostics(&raw)
+                .map_err(checker_error)
+        }
+    }
+}
+
+/// One file's raw checker-backed diagnostics through its diagnostics checker.
+fn checker_diagnostics_of(
+    project: &Project,
+    program: &Arc<Program>,
+    ctx: &Context,
+    kind: DiagnosticKind,
+    file: &ProgramFile,
+) -> SessionResult<Vec<Diagnostic>> {
+    with_diagnostics_checker(project, Some(file), ctx, |operation| match kind {
+        DiagnosticKind::Semantic => program
+            .semantic_diagnostics_in(operation, file, None)
+            .map_err(checker_error),
+        DiagnosticKind::Suggestion => program
+            .suggestion_diagnostics_in(operation, file, None)
+            .map_err(checker_error),
+        DiagnosticKind::Declaration => program
+            .declaration_diagnostics_with_checker(operation, file)
+            .map_err(checker_error),
+        DiagnosticKind::Syntactic | DiagnosticKind::Bind => {
+            unreachable!("not a checker-backed kind")
+        }
+    })
+}
+
 impl ApiSession {
-    /// The files a request names, or every file of the program when the
-    /// request has no file list (the pin's nil list; `[]` names none).
+    /// The files a request names (`[]` names none); the omitted list is the
+    /// pin's nil list, which the caller answers for the whole program.
     fn requested_files<'a>(
         program: &'a Arc<Program>,
         files: &[crate::proto::DocumentIdentifier],
@@ -112,6 +171,9 @@ impl ApiSession {
             .collect()
     }
 
+    /// The pin's getter runs once per named file, each result filtered and
+    /// sorted on its own and the lists concatenated, or once for the whole
+    /// program, sorted as one list.
     /// port: tsc/internal/api/session.go:Session.getDiagnostics
     pub(super) fn handle_get_diagnostics(
         &self,
@@ -123,40 +185,15 @@ impl ApiSession {
         let data = self.snapshot_data(params.snapshot)?;
         let project = data.project(&params.project)?;
         let program = data.program(&params.project)?;
-        let files = Self::requested_files(program, &params.files, files_named)?;
-        let mut diagnostics = Vec::new();
-        for file in files {
-            let collected: Vec<Diagnostic> = match kind {
-                DiagnosticKind::Syntactic => program
-                    .syntactic_diagnostics(Some(file))
-                    .map_err(checker_error)?,
-                DiagnosticKind::Bind => program
-                    .bind_diagnostics(Some(file.source()))
-                    .map_err(checker_error)?,
-                DiagnosticKind::Semantic => {
-                    with_diagnostics_checker(project, Some(file), ctx, |operation| {
-                        program
-                            .semantic_diagnostics_in(operation, file, None)
-                            .map_err(checker_error)
-                    })?
-                }
-                DiagnosticKind::Suggestion => {
-                    with_diagnostics_checker(project, Some(file), ctx, |operation| {
-                        program
-                            .suggestion_diagnostics_in(operation, file, None)
-                            .map_err(checker_error)
-                    })?
-                }
-                DiagnosticKind::Declaration => {
-                    with_diagnostics_checker(project, Some(file), ctx, |operation| {
-                        program
-                            .declaration_diagnostics_with_checker(operation, file)
-                            .map_err(checker_error)
-                    })?
-                }
-            };
-            diagnostics.extend(collected);
-        }
+        let diagnostics = if files_named {
+            let mut diagnostics = Vec::new();
+            for file in Self::requested_files(program, &params.files, true)? {
+                diagnostics.extend(diagnostics_of(project, program, ctx, kind, Some(file))?);
+            }
+            diagnostics
+        } else {
+            diagnostics_of(project, program, ctx, kind, None)?
+        };
         Ok(program_diagnostic_responses(program, &diagnostics))
     }
 
@@ -182,9 +219,13 @@ impl ApiSession {
         Ok(program_diagnostic_responses(program, diagnostics))
     }
 
-    /// The pin checks every file first so the global diagnostics are
-    /// complete, then keeps the project diagnostics without a file.
+    /// The pin checks every file first, so the pool's accumulated global
+    /// diagnostics are complete (an external pool reports them as its
+    /// checkers are used), then keeps the entries of the project diagnostics
+    /// without a file: the config-file parsing diagnostics, the program's
+    /// own and the pool's globals, sorted and deduplicated as one list.
     /// port: tsc/internal/api/session.go:Session.handleGetGlobalDiagnostics
+    /// port: tsc/internal/project/project.go:Project.GetProjectDiagnostics
     pub(super) fn handle_get_global_diagnostics(
         &self,
         ctx: &Context,
@@ -193,15 +234,18 @@ impl ApiSession {
         let data = self.snapshot_data(params.snapshot)?;
         let project = data.project(&params.project)?;
         let program = data.program(&params.project)?;
-        let diagnostics = with_diagnostics_checker(project, None, ctx, |operation| {
-            for file in program.files() {
-                program
-                    .semantic_diagnostics_in(operation, file, None)
-                    .map_err(checker_error)?;
-            }
-            operation.global_diagnostics().map_err(checker_error)
-        })?;
-        let globals: Vec<Diagnostic> = diagnostics
+        for file in program.files() {
+            checker_diagnostics_of(project, program, ctx, DiagnosticKind::Semantic, file)?;
+        }
+        let scheduler = project
+            .scheduler()
+            .ok_or_else(|| SessionError::Other("project has no checker scheduler".into()))?;
+        let mut diagnostics = program.config_file_parsing_diagnostics();
+        diagnostics.extend_from_slice(program.program_diagnostics().map_err(checker_error)?);
+        diagnostics.extend(scheduler.global_diagnostics().map_err(checker_error)?);
+        let globals: Vec<Diagnostic> = program
+            .sort_and_deduplicate_diagnostics(&diagnostics)
+            .map_err(checker_error)?
             .into_iter()
             .filter(|diagnostic| diagnostic.file.is_none())
             .collect();

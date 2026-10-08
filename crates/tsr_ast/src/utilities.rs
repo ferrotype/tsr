@@ -946,6 +946,11 @@ pub fn get_source_file_of_node(
     view: AstView<'_>,
     node: Option<NodeId>,
 ) -> Result<Option<NodeId>, Error> {
+    // A node of the view's own single-source file reaches its root without
+    // the walk: the file's root is that source file.
+    if let Some(root) = node.and_then(|node| view.single_source_root(node)) {
+        return Ok(Some(root));
+    }
     let found = find_ancestor_kind(view, node, K::SourceFile.into())?;
     if let Some(id) = found {
         view.node(id)?

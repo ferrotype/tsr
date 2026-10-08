@@ -23,8 +23,11 @@ impl<'a> Decoder<'a> {
         Self::with_options(reader, Options::default())
     }
     pub fn with_options(reader: impl Read + 'a, options: Options<'a>) -> Self {
+        Self::from_input(Input::new(reader), options)
+    }
+    fn from_input(input: Input<'a>, options: Options<'a>) -> Self {
         Self {
-            input: Input::new(reader),
+            input,
             pos: 0,
             base: 0,
             stack: Vec::new(),
@@ -34,8 +37,13 @@ impl<'a> Decoder<'a> {
             base_depth: 0,
         }
     }
-    pub fn from_slice(bytes: &'a [u8]) -> Self {
-        Self::new(std::io::Cursor::new(bytes))
+    pub fn from_slice(bytes: &[u8]) -> Self {
+        Self::from_slice_with_options(bytes, Options::default())
+    }
+    /// A decoder over a complete in-memory value: no reader, no refills and
+    /// no compaction, so every byte access is one bounds check.
+    pub fn from_slice_with_options(bytes: &[u8], options: Options<'a>) -> Self {
+        Self::from_input(Input::from_slice(bytes), options)
     }
     /// Per-call options are restored even when decoding fails. Namespace
     /// policy cannot change while the stream is positioned at an object name.
@@ -147,11 +155,18 @@ impl<'a> Decoder<'a> {
         &self.input.bytes[self.pos..]
     }
     fn compact(&mut self) {
-        if self.pos >= 4096 {
+        // A complete input never grows, so there is nothing to reclaim.
+        if self.pos >= 4096 && !self.input.eof {
             self.input.bytes.drain(..self.pos);
             self.base += self.pos;
             self.pos = 0;
         }
+    }
+    /// Whether everything scanned so far would be written back byte for byte
+    /// by an encoder without indentation: no whitespace between tokens and
+    /// no string spelled otherwise than the encoder spells it.
+    pub fn is_canonical(&self) -> bool {
+        !self.input.noncanonical
     }
     fn absolute_error(&self, mut e: Error) -> Error {
         if let Error::Syntax(s) = &mut e {
@@ -180,6 +195,7 @@ impl<'a> Decoder<'a> {
             &mut self.stack,
             &self.options,
             self.base_depth,
+            true,
         )
         .map_err(|e| self.absolute_error(e))?;
         self.previous_start = Some(self.base + start);
@@ -198,16 +214,19 @@ impl<'a> Decoder<'a> {
         self.compact();
         let start =
             prepare(&mut self.input, self.pos, &self.stack).map_err(|e| self.absolute_error(e))?;
-        let prefix = pointer(&self.stack, true);
         let mut cursor = start;
         let mut frames = Vec::new();
+        let depth = self.base_depth + self.stack.len();
         let result = (|| {
+            // The value's first token may be a member name, so it is decoded;
+            // the tokens inside the value are only validated.
             let (first, _) = next(
                 &mut self.input,
                 &mut cursor,
                 &mut frames,
                 &self.options,
-                self.base_depth + self.stack.len(),
+                depth,
+                true,
             )?;
             while !frames.is_empty() {
                 next(
@@ -215,7 +234,8 @@ impl<'a> Decoder<'a> {
                     &mut cursor,
                     &mut frames,
                     &self.options,
-                    self.base_depth + self.stack.len(),
+                    depth,
+                    false,
                 )?;
             }
             Ok(first)
@@ -225,28 +245,35 @@ impl<'a> Decoder<'a> {
                 error = Error::truncated(start, String::new());
             }
             if let Error::Syntax(e) = &mut error {
-                e.pointer = prefix.clone() + &e.pointer;
+                e.pointer = pointer(&self.stack, true) + &e.pointer;
             }
             self.absolute_error(error)
         })?;
-        if let Some(parent) = self.stack.last_mut() {
-            if parent.expects_name() {
-                let Token::String(name) = &first else {
-                    return Err(Error::syntax(
-                        self.base + start,
-                        prefix,
-                        "object member name must be a string",
-                    ));
-                };
-                if !self.options.allow_duplicate_names.unwrap_or(false)
-                    && !parent.names.insert(name)
-                {
-                    let mut p = prefix;
-                    append_pointer(&mut p, name);
-                    return Err(Error::duplicate(self.base + start, p));
-                }
-                parent.name = name.to_vec();
+        if self.stack.last().is_some_and(Frame::expects_name) {
+            let Token::String(name) = &first else {
+                return Err(Error::syntax(
+                    self.base + start,
+                    pointer(&self.stack, true),
+                    "object member name must be a string",
+                ));
+            };
+            let duplicate = !self.options.allow_duplicate_names.unwrap_or(false)
+                && !self
+                    .stack
+                    .last_mut()
+                    .expect("a frame expecting a name")
+                    .names
+                    .insert(name);
+            if duplicate {
+                let mut p = pointer(&self.stack, true);
+                append_pointer(&mut p, name);
+                return Err(Error::duplicate(self.base + start, p));
             }
+            let parent = self.stack.last_mut().expect("a frame expecting a name");
+            parent.name.clear();
+            parent.name.extend_from_slice(name);
+            parent.count += 1;
+        } else if let Some(parent) = self.stack.last_mut() {
             parent.count += 1;
         } else {
             self.root_count += 1;
@@ -322,14 +349,17 @@ fn prepare_inner(input: &mut Input<'_>, pos: usize, stack: &[Frame]) -> Result<u
     }
     Ok(i)
 }
+/// `keep` false scans a string value without decoding it (the token carries
+/// no text); member names are always decoded for the duplicate check.
 fn next(
     input: &mut Input<'_>,
     pos: &mut usize,
     stack: &mut Vec<Frame>,
     options: &Options<'_>,
     base_depth: usize,
+    keep: bool,
 ) -> Result<(Token<'static>, usize), Error> {
-    next_inner(input, pos, stack, options, base_depth).map_err(|mut e| {
+    next_inner(input, pos, stack, options, base_depth, keep).map_err(|mut e| {
         if let Error::Syntax(s) = &mut e {
             s.pointer = pointer(stack, true) + &s.pointer;
         }
@@ -342,6 +372,7 @@ fn next_inner(
     stack: &mut Vec<Frame>,
     options: &Options<'_>,
     base_depth: usize,
+    keep: bool,
 ) -> Result<(Token<'static>, usize), Error> {
     let start = prepare_inner(input, *pos, stack)?;
     let ptr = String::new();
@@ -389,9 +420,14 @@ fn next_inner(
     }
     let (token, end) = match kind {
         Kind::String => {
-            let (value, end) =
-                input.string(start, &ptr, options.allow_invalid_utf8.unwrap_or(false))?;
-            (Token::String(Cow::Owned(value)), end)
+            let allow_invalid = options.allow_invalid_utf8.unwrap_or(false);
+            if keep || expects_name {
+                let (value, end) = input.string(start, &ptr, allow_invalid)?;
+                (Token::String(Cow::Owned(value)), end)
+            } else {
+                let end = input.string_into(start, &ptr, allow_invalid, None)?;
+                (Token::String(Cow::Borrowed(&[])), end)
+            }
         }
         Kind::Number => {
             let end = input.number(start, &ptr)?;
@@ -417,7 +453,8 @@ fn next_inner(
                 append_pointer(&mut p, name);
                 return Err(Error::duplicate(start, p));
             }
-            parent.name = name.to_vec();
+            parent.name.clear();
+            parent.name.extend_from_slice(name);
         }
         parent.count += 1;
     }

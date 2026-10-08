@@ -331,7 +331,7 @@ impl<'a> Encoder<'a> {
     /// Raw values are validated before any emission, preserving transactional
     /// token state even when malformed input fails deep inside the value.
     pub fn write_value(&mut self, bytes: &[u8]) -> Result<(), Error> {
-        let mut decoder = Decoder::with_options(std::io::Cursor::new(bytes), self.options);
+        let mut decoder = Decoder::from_slice_with_options(bytes, self.options);
         decoder.base_depth = self.stack.len();
         decoder
             .skip_value()
@@ -349,13 +349,63 @@ impl<'a> Encoder<'a> {
                 }
                 error
             })?;
-        let mut decoder = Decoder::with_options(std::io::Cursor::new(bytes), self.options);
+        // A value the encoder would reproduce byte for byte is copied; one
+        // with whitespace or escapes to normalize is re-encoded token by
+        // token, as a member name is for its duplicate check.
+        if decoder.is_canonical()
+            && self.options.indent.is_none()
+            && !self.stack.last().is_some_and(Frame::expects_name)
+        {
+            return self.append_value(bytes);
+        }
+        let mut decoder = Decoder::from_slice_with_options(bytes, self.options);
         loop {
             match decoder.read_token() {
                 Ok(t) => self.write_token(t)?,
                 Err(Error::Eof) => break,
                 Err(e) => return Err(e),
             }
+        }
+        Ok(())
+    }
+    /// Write a value this encoder family produced (compact, canonical and
+    /// complete), without scanning it again. Everything else goes through
+    /// `write_value`, as does a value in member-name position.
+    pub fn write_encoded_value(&mut self, bytes: &[u8]) -> Result<(), Error> {
+        if bytes.is_empty()
+            || self.options.indent.is_some()
+            || self.stack.last().is_some_and(Frame::expects_name)
+        {
+            return self.write_value(bytes);
+        }
+        self.append_value(bytes)
+    }
+    /// Append one validated, canonical value verbatim, with the delimiter its
+    /// position needs, and advance the grammar as one value.
+    fn append_value(&mut self, bytes: &[u8]) -> Result<(), Error> {
+        let kind = Kind::from_byte(bytes.first().copied().unwrap_or_default());
+        let prefix = self.prefix(kind);
+        append_prefix(
+            &mut self.bytes,
+            prefix.delimiter,
+            prefix.space,
+            prefix.indent.map(str::as_bytes),
+            prefix.depth,
+            prefix.line_start.as_bytes(),
+        );
+        self.bytes.extend_from_slice(bytes);
+        if let Some(f) = self.stack.last_mut() {
+            f.count += 1;
+        } else {
+            self.root_count += 1;
+        }
+        if self.stack.is_empty() {
+            if !self.omit_top_level_newline {
+                self.bytes.push(b'\n');
+            }
+            self.flush()?;
+        } else if self.bytes.len() - self.flushed >= 4096 {
+            self.flush()?;
         }
         Ok(())
     }

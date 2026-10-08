@@ -20,6 +20,22 @@ pub fn spawn_parser_worker<'scope, 'env, T: Send + 'scope>(
         })
 }
 
+/// Start one reserved-stack worker that outlives its caller's frame: a pool
+/// a program load feeds and joins. Parser and binder entry points invoked by
+/// this worker run inline for its lifetime.
+#[cfg(not(all(target_arch = "wasm32", target_os = "unknown")))]
+pub fn spawn_parser_thread<T: Send + 'static>(
+    operation: impl FnOnce() -> T + Send + 'static,
+) -> std::io::Result<thread::JoinHandle<T>> {
+    thread::Builder::new()
+        .name("ts-parser".into())
+        .stack_size(256 * 1024 * 1024)
+        .spawn(|| {
+            ON_PARSER_WORKER.set(true);
+            operation()
+        })
+}
+
 /// Execute a complete parse or a batch on the reserved native parser stack.
 /// Recursive grammar uses stacker segments; the initial reservation also covers
 /// source-equivalent traversals that occur before a grammar guard. Lazy callers

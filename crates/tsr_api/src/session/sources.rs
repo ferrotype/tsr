@@ -38,7 +38,7 @@ impl ApiSession {
             &mut tsr_parser::ParserJsDocProvider::default(),
         )
         .map(|encoded| encoded.bytes)
-        .map_err(|error| SessionError::Other(format!("failed to encode source file: {error:?}")))
+        .map_err(|error| SessionError::Other(format!("failed to encode source file: {error}")))
     }
 
     /// port: tsc/internal/api/session.go:Session.handleGetSourceFile
@@ -108,7 +108,7 @@ impl ApiSession {
             .view()
             .source_file(config.root)
             .map(|source| JsString::from_bytes(source.file_name()))
-            .map_err(|error| SessionError::Other(format!("{error:?}")))?;
+            .map_err(|error| SessionError::Other(format!("{error}")))?;
         let mut names = vec![root];
         names.extend(config.extended_source_files.iter().cloned());
         Ok(Some(names))
@@ -118,11 +118,13 @@ impl ApiSession {
     pub(super) fn handle_get_config_file_names(
         &self,
         params: &GetProjectDiagnosticsParams,
-    ) -> SessionResult<Option<Vec<String>>> {
+    ) -> SessionResult<Vec<String>> {
         let data = self.snapshot_data(params.snapshot)?;
         data.program(&params.project)?;
+        // A project without a config file answers `[]`: the pin's nil slice.
         Ok(Self::config_file_names(&data, &params.project)?
-            .map(|names| names.iter().map(|name| text(name.as_bytes())).collect()))
+            .map(|names| names.iter().map(|name| text(name.as_bytes())).collect())
+            .unwrap_or_default())
     }
 
     /// port: tsc/internal/api/session.go:Session.handleGetConfigSourceFile
@@ -145,7 +147,7 @@ impl ApiSession {
         let root_view = config.file.view();
         let root = root_view
             .source_file(config.root)
-            .map_err(|error| SessionError::Other(format!("{error:?}")))?;
+            .map_err(|error| SessionError::Other(format!("{error}")))?;
         if root.path() == requested.as_bytes() {
             let encoded = tsr_encoder::encode_source_file(
                 root_view,
@@ -154,7 +156,7 @@ impl ApiSession {
             )
             .map(|encoded| encoded.bytes)
             .map_err(|error| {
-                SessionError::Other(format!("failed to encode source file: {error:?}"))
+                SessionError::Other(format!("failed to encode source file: {error}"))
             })?;
             return Ok(self.encode_source_file_response(Some(encoded)));
         }
@@ -186,7 +188,7 @@ impl ApiSession {
             )
             .map(|encoded| encoded.bytes)
             .map_err(|error| {
-                SessionError::Other(format!("failed to encode source file: {error:?}"))
+                SessionError::Other(format!("failed to encode source file: {error}"))
             })?;
             return Ok(self.encode_source_file_response(Some(encoded)));
         }

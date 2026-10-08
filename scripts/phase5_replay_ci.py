@@ -33,6 +33,19 @@ def prepare(output):
     if len(executables) != 1:
         raise RuntimeError(f'expected one ordinary tsrust artifact, got {executables}')
     shutil.copy2(executables[0], output / 'rust-lsp')
+    # The Phase 6 panic witness's server: the production API server with the
+    # fault control in front of its session (tsr_testhost::api_witness).
+    result = subprocess.run(
+        ['cargo', 'build', '--release', '--locked', '-p', 'tsr_testhost', '--bin', 'phase5_testserver',
+         '--message-format=json'],
+        cwd=ROOT, check=True, stdout=subprocess.PIPE, text=True)
+    artifacts = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
+    executables = [item['executable'] for item in artifacts
+                   if item.get('reason') == 'compiler-artifact'
+                   and item.get('target', {}).get('name') == 'phase5_testserver' and item.get('executable')]
+    if len(executables) != 1:
+        raise RuntimeError(f'expected one phase5_testserver artifact, got {executables}')
+    shutil.copy2(executables[0], output / 'test-server')
 
 
 def run_matrix(binaries, output, expected_root=EXPECTED):

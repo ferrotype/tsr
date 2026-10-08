@@ -338,8 +338,11 @@ impl LanguageService<'_> {
                     continue;
                 };
                 if names.insert(item.label.clone()) {
+                    // The API records the symbol of this item, not of its
+                    // label: an auto-import may repeat a global's name without
+                    // a symbol of its own.
                     if let Some(sink) = &mut self.completion_symbols {
-                        sink.insert(item.label.clone(), candidate.symbol);
+                        sink.insert(list.items.len(), candidate.symbol);
                     }
                     let symbol = checker.symbol(candidate.symbol)?;
                     let local = checker

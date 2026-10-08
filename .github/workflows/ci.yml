@@ -363,6 +363,15 @@ jobs:
           node --conditions @typescript/source tools/phase6/wire/handshake.mts phase5-replay-binaries/native-lsp | grep -v server-message > native.jsonl
           node --conditions @typescript/source tools/phase6/wire/handshake.mts phase5-replay-binaries/rust-lsp | grep -v server-message > rust.jsonl
           diff native.jsonl rust.jsonl
+      # The real-client panic witness (docs/PHASE6-A5.md): the fault against
+      # the test server, and the ordinary error forms against the pin.
+      - name: Run the panic witness against the test server and the pinned server
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x phase5-replay-binaries/test-server
+          node --conditions @typescript/source tools/phase6/wire/panic-witness.mts phase5-replay-binaries/test-server
+          node --conditions @typescript/source tools/phase6/wire/panic-witness.mts phase5-replay-binaries/native-lsp --native
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:

@@ -57,6 +57,7 @@ fn load(cache: &mut FileCache, fs: &Fs, name: &str, counters: &Counters) -> Arc<
             options(name),
             counters,
             None,
+            None,
         )
         .unwrap()
         .unwrap()
@@ -141,12 +142,12 @@ fn build_cache_key_includes_all_parse_options_and_script_kind() {
     for (options, kind) in variants {
         let mut cache = FileCache::for_build(shared.clone());
         let file = cache
-            .load(&fs, kind, options.clone(), &counters, None)
+            .load(&fs, kind, options.clone(), &counters, None, None)
             .unwrap()
             .unwrap();
         assert!(files.iter().all(|old| !Arc::ptr_eq(old, &file)));
         let repeated = cache
-            .load(&fs, kind, options, &counters, None)
+            .load(&fs, kind, options, &counters, None, None)
             .unwrap()
             .unwrap();
         assert!(Arc::ptr_eq(&file, &repeated));

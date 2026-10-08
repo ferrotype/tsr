@@ -203,9 +203,8 @@ pub struct LanguageService<'a> {
     cancellation: CancellationToken,
     cross_project_targets: Option<CrossProjectTargets>,
     /// While the API server collects completions: the symbol of each
-    /// symbol-backed entry by label.
-    pub(crate) completion_symbols:
-        Option<std::collections::HashMap<String, tsr_checker::SymbolRef>>,
+    /// symbol-backed entry by its index in the list.
+    pub(crate) completion_symbols: Option<std::collections::HashMap<usize, tsr_checker::SymbolRef>>,
     #[cfg(test)]
     reference_search_count: usize,
 }

@@ -8,6 +8,10 @@ pub(crate) struct Input<'a> {
     pub reader: Box<dyn Read + 'a>,
     pub bytes: Vec<u8>,
     pub eof: bool,
+    /// Set when the scanned text would not come back byte for byte from the
+    /// encoder: whitespace between tokens, an escape the encoder spells
+    /// differently, or an invalid sequence it replaces.
+    pub noncanonical: bool,
 }
 impl<'a> Input<'a> {
     pub fn new(reader: impl Read + 'a) -> Self {
@@ -15,9 +19,31 @@ impl<'a> Input<'a> {
             reader: Box::new(reader),
             bytes: Vec::new(),
             eof: false,
+            noncanonical: false,
         }
     }
+    /// A complete in-memory input: every byte is buffered up front, so no
+    /// access refills and the decoder never compacts.
+    pub fn from_slice(bytes: &[u8]) -> Self {
+        Self {
+            reader: Box::new(std::io::empty()),
+            bytes: bytes.to_vec(),
+            eof: true,
+            noncanonical: false,
+        }
+    }
+    #[inline]
     pub fn at(&mut self, index: usize) -> Result<Option<u8>, Error> {
+        if let Some(&byte) = self.bytes.get(index) {
+            return Ok(Some(byte));
+        }
+        self.fill(index)
+    }
+    /// Read until `index` is buffered or the input ends. Out of line: the
+    /// buffered case above is the hot path of every scanner.
+    #[cold]
+    #[inline(never)]
+    fn fill(&mut self, index: usize) -> Result<Option<u8>, Error> {
         while index >= self.bytes.len() && !self.eof {
             let mut chunk = [0; 512];
             let size = loop {
@@ -39,11 +65,15 @@ impl<'a> Input<'a> {
         Ok(self.bytes.get(index).copied())
     }
     pub fn space(&mut self, mut index: usize) -> Result<usize, Error> {
+        let start = index;
         while self
             .at(index)?
             .is_some_and(|b| matches!(b, b' ' | b'\t' | b'\r' | b'\n'))
         {
             index += 1;
+        }
+        if index != start {
+            self.noncanonical = true;
         }
         Ok(index)
     }
@@ -71,13 +101,39 @@ impl<'a> Input<'a> {
         allow_invalid: bool,
     ) -> Result<(Vec<u8>, usize), Error> {
         let mut out = Vec::new();
+        let end = self.string_into(start, pointer, allow_invalid, Some(&mut out))?;
+        Ok((out, end))
+    }
+    /// Scan the string token opening at `start`, appending its decoded text
+    /// to `out` when one is given; `None` validates a value being skipped
+    /// without decoding it. Returns the index after the closing quote.
+    pub fn string_into(
+        &mut self,
+        start: usize,
+        pointer: &str,
+        allow_invalid: bool,
+        mut out: Option<&mut Vec<u8>>,
+    ) -> Result<usize, Error> {
         let mut i = start + 1;
         loop {
+            // A run of plain buffered bytes is copied as one slice.
+            let run = i;
+            while let Some(&b) = self.bytes.get(i) {
+                if matches!(b, b'"' | b'\\' | 0..=31 | 0x80..=0xff) {
+                    break;
+                }
+                i += 1;
+            }
+            if i > run {
+                if let Some(out) = out.as_deref_mut() {
+                    out.extend_from_slice(&self.bytes[run..i]);
+                }
+            }
             let Some(b) = self.at(i)? else {
                 return Err(Error::truncated(i, pointer.into()));
             };
             match b {
-                b'"' => return Ok((out, i + 1)),
+                b'"' => return Ok(i + 1),
                 b'\\' => {
                     let slash = i;
                     let Some(escape) = self.at(i + 1)? else {
@@ -85,13 +141,18 @@ impl<'a> Input<'a> {
                     };
                     i += 2;
                     match escape {
-                        b'"' | b'/' | b'\\' => out.push(escape),
-                        b'b' => out.push(8),
-                        b'f' => out.push(12),
-                        b'n' => out.push(10),
-                        b'r' => out.push(13),
-                        b't' => out.push(9),
+                        b'"' | b'\\' => emit(&mut out, &[escape]),
+                        b'/' => {
+                            self.noncanonical = true;
+                            emit(&mut out, &[escape]);
+                        }
+                        b'b' => emit(&mut out, &[8]),
+                        b'f' => emit(&mut out, &[12]),
+                        b'n' => emit(&mut out, &[10]),
+                        b'r' => emit(&mut out, &[13]),
+                        b't' => emit(&mut out, &[9]),
                         b'u' => {
+                            self.noncanonical = true;
                             let first = self.hex4(i, slash, pointer)?;
                             i += 4;
                             let mut rune = i32::from(first);
@@ -126,7 +187,9 @@ impl<'a> Input<'a> {
                                     ));
                                 }
                             }
-                            append_rune(&mut out, rune);
+                            if let Some(out) = out.as_deref_mut() {
+                                append_rune(out, rune);
+                            }
                         }
                         _ => return Err(self.invalid(i - 1, pointer, "in string escape sequence")),
                     }
@@ -135,14 +198,21 @@ impl<'a> Input<'a> {
                 0x80..=0xff => {
                     self.at(i + 3)?;
                     let (rune, width) = decode_utf8(&self.bytes[i..]);
-                    if rune == RUNE_ERROR && width == 1 && !allow_invalid {
-                        return Err(Error::syntax(i, pointer.into(), "invalid UTF-8"));
+                    if rune == RUNE_ERROR && width == 1 {
+                        if !allow_invalid {
+                            return Err(Error::syntax(i, pointer.into(), "invalid UTF-8"));
+                        }
+                        self.noncanonical = true;
                     }
-                    append_rune(&mut out, rune);
+                    if let Some(out) = out.as_deref_mut() {
+                        append_rune(out, rune);
+                    }
                     i += width;
                 }
                 _ => {
-                    out.push(b);
+                    // The run stopped at the end of the buffer and the refill
+                    // made this plain byte available.
+                    emit(&mut out, &[b]);
                     i += 1;
                 }
             }
@@ -233,6 +303,21 @@ pub(crate) fn append_string<'a>(
     let mut offset = 0;
     out.push(b'"');
     while offset < bytes.len() {
+        // A run of plain ASCII is written as one slice.
+        let run = offset;
+        while let Some(&b) = bytes.get(offset) {
+            if matches!(b, 0..=0x1f | 0x80..=0xff | b'"' | b'\\') {
+                break;
+            }
+            offset += 1;
+        }
+        if offset > run {
+            out.extend_from_slice(&bytes[run..offset]);
+            if let Cow::Owned(decoded) = &mut decoded {
+                decoded.extend_from_slice(&bytes[run..offset]);
+            }
+            continue;
+        }
         let (rune, width) = decode_utf8(&bytes[offset..]);
         if rune == RUNE_ERROR && width == 1 && !allow_invalid {
             return Err(offset);
@@ -265,6 +350,12 @@ pub(crate) fn append_string<'a>(
     }
     out.push(b'"');
     Ok(decoded)
+}
+
+fn emit(out: &mut Option<&mut Vec<u8>>, bytes: &[u8]) {
+    if let Some(out) = out {
+        out.extend_from_slice(bytes);
+    }
 }
 
 fn append_rune(out: &mut Vec<u8>, rune: i32) {

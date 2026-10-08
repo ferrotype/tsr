@@ -46,6 +46,9 @@ class Suite:
     arguments: tuple[str, ...]
     timeout: int
     batch: bool = False
+    # `accept` refreshes an unapproved reason from the run only in a suite whose
+    # labels are mechanical by design; elsewhere every reason is kept as worded.
+    refresh_reasons: bool = False
 
 
 # `arguments` precede `list` / `run --id ID --local DIR` on the runner's command line.
@@ -55,7 +58,7 @@ class Suite:
 SUITES = {
     "fourslash": Suite("", "", (), 120, batch=True),
     "lsp": Suite("", "", (), 120, batch=True),
-    "jsapi": Suite("", "", (), 180, batch=True),
+    "jsapi": Suite("", "", (), 180, batch=True, refresh_reasons=True),
     "compiler": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "single"), 600),
     "compiler-concurrent": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "concurrent"), 600),
     "transpile": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "transpile"), 60),
@@ -174,6 +177,11 @@ def run_variant(suite, runner, variant, local, timeout):
 
 def run(args):
     suite = args.suite
+    # The pinned client's getExePath reads one repository symlink, which the
+    # runner points at the binary under test before each file; parallel
+    # workers would point it at each other's binary.
+    if suite == "jsapi" and (args.jobs or 1) > 1:
+        sys.exit("jsapi runs one file at a time: --jobs must be 1")
     runner = runner_path(suite, args.runner)
     roster = list_variants(suite, runner) if not args.id or SUITES[suite].batch else None
     variants = args.id or roster
@@ -368,9 +376,10 @@ def accept(args):
     failing = {}
     for key, row in sorted(failing_ids(rows).items()):
         entry = dict(expectation["failing"].get(key) or {})
-        # An approved entry keeps its worded reason; a mechanical label is
-        # refreshed from the run, so the file shows the current cause.
-        if "reason" not in entry or not entry.get("approved"):
+        # Every existing reason is kept as worded, approved or not; a suite
+        # whose labels are mechanical (jsapi) refreshes an unapproved one from
+        # the run, so its file shows the current cause.
+        if "reason" not in entry or (SUITES[suite].refresh_reasons and not entry.get("approved")):
             entry["reason"] = row.get("reason") or "unexplained"
             entry.pop("detail", None)
             if row.get("detail"):
