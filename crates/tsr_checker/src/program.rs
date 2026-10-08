@@ -11,21 +11,34 @@ use tsr_ast::{
     SymbolTableRead,
 };
 
-/// The last (arena, file index) a directory resolved, packed in one word so the
-/// context stays `Sync`: consecutive lookups almost always hit the same file,
-/// and a compare beats a hash probe on every node and symbol read.
-#[derive(Default)]
-struct LastHit(std::sync::atomic::AtomicU64);
+/// The (arena, file index) pairs a directory resolved last, one per cache
+/// line of arena ids and each packed in one word so the context stays
+/// `Sync`: a check alternates between a few files (the one being checked and
+/// the libraries its names resolve into), and a compare beats a hash probe on
+/// every node and symbol read.
+struct LastHit([std::sync::atomic::AtomicU64; LastHit::WAYS]);
+impl Default for LastHit {
+    fn default() -> Self {
+        Self(std::array::from_fn(|_| {
+            std::sync::atomic::AtomicU64::new(0)
+        }))
+    }
+}
 impl LastHit {
+    const WAYS: usize = 64;
+    #[inline]
+    fn slot(&self, arena: ArenaId) -> &std::sync::atomic::AtomicU64 {
+        &self.0[arena.get() as usize % Self::WAYS]
+    }
     #[inline]
     fn get(&self, arena: ArenaId) -> Option<usize> {
-        let word = self.0.load(std::sync::atomic::Ordering::Relaxed);
+        let word = self.slot(arena).load(std::sync::atomic::Ordering::Relaxed);
         (word != 0 && (word >> 32) as u32 == arena.get()).then_some((word & 0xffff_ffff) as usize)
     }
     #[inline]
     fn set(&self, arena: ArenaId, index: usize) {
         if let Ok(index) = u32::try_from(index) {
-            self.0.store(
+            self.slot(arena).store(
                 (u64::from(arena.get()) << 32) | u64::from(index),
                 std::sync::atomic::Ordering::Relaxed,
             );

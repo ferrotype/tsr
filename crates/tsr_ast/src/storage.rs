@@ -662,6 +662,19 @@ impl<'a> AstView<'a> {
     pub fn for_node_owner(self, node: NodeId) -> Result<Self, Error> {
         self.0.for_node_owner(node).map(|view| Self(view, self.1))
     }
+    /// The root of this view's file when `node` is a core node of it and the
+    /// file is the arena's only source; `None` asks for the parent walk.
+    #[inline]
+    pub fn single_source_root(self, node: NodeId) -> Option<NodeId> {
+        if node.arena() != self.0.id().arena()
+            || !self
+                .1
+                .is_none_or(|binding| binding.is_single_source_owner(node))
+        {
+            return None;
+        }
+        self.file_info().root
+    }
     /// Whether this view retains an arena's owner, independent of slot validity.
     /// This grants no node access; `node` still validates the arena and slot.
     pub fn retains_arena(self, arena: tsr_arena::ArenaId) -> bool {

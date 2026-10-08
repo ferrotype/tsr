@@ -4,14 +4,39 @@ use tsr_jsstring::{helpers::to_lower_go, wtf8::decode_utf8};
 
 pub use tsr_jsstring::equal_fold;
 
-fn runes(mut bytes: &[u8]) -> Vec<i32> {
-    let mut result = Vec::with_capacity(bytes.len());
+fn runes_into(out: &mut Vec<i32>, mut bytes: &[u8]) {
+    out.clear();
     while !bytes.is_empty() {
         let (rune, width) = decode_utf8(bytes);
-        result.push(rune);
+        out.push(rune);
         bytes = &bytes[width..];
     }
+}
+
+fn runes(bytes: &[u8]) -> Vec<i32> {
+    let mut result = Vec::with_capacity(bytes.len());
+    runes_into(&mut result, bytes);
     result
+}
+
+/// The rune count of a name, which the search compares candidate byte
+/// lengths against.
+pub fn rune_count(mut bytes: &[u8]) -> usize {
+    let mut count = 0;
+    while !bytes.is_empty() {
+        bytes = &bytes[decode_utf8(bytes).1..];
+        count += 1;
+    }
+    count
+}
+
+/// Whether the search would measure a candidate of this byte length against
+/// a name of `name_rune_count` runes: outside the window it is skipped
+/// before any distance, so a caller need not collect it at all.
+/// port: tsc/internal/core/core.go:getSpellingSuggestion
+pub fn within_length_difference(name_rune_count: usize, candidate: &[u8]) -> bool {
+    let maximum_length_difference = 2.max((name_rune_count as f64 * 0.34) as usize);
+    !candidate.is_empty() && candidate.len().abs_diff(name_rune_count) <= maximum_length_difference
 }
 
 /// port: tsc/internal/core/core.go:GetSpellingSuggestionForStrings
@@ -34,29 +59,31 @@ pub fn get_spelling_suggestion<'name, T: Copy>(
 ) -> Option<T> {
     let name_runes = runes(name);
     let name_lower = runes(&to_lower_go(name));
-    let maximum_length_difference = 2.max((name_runes.len() as f64 * 0.34) as usize);
     let mut best_distance = (name_runes.len() as f64 * 0.4).floor() + 0.9;
     let mut best_candidate: Option<T> = None;
     let mut buffers = DistanceBuffers::default();
+    let mut candidate_runes = Vec::new();
+    let mut candidate_lower = Vec::new();
     for (index, candidate_value) in candidates.into_iter().enumerate() {
         if maximum_candidates != 0 && index >= maximum_candidates {
             return None;
         }
         let candidate = get_name(candidate_value);
         // The source deliberately compares candidate BYTES with input RUNES.
-        if candidate.is_empty()
-            || candidate.len().abs_diff(name_runes.len()) > maximum_length_difference
+        if !within_length_difference(name_runes.len(), candidate)
             || candidate == name
             || (candidate.len() < 3 && !equal_fold(candidate, name))
         {
             continue;
         }
+        runes_into(&mut candidate_runes, candidate);
+        runes_into(&mut candidate_lower, &to_lower_go(candidate));
         let distance = levenshtein_with_max(
             &mut buffers,
             &name_runes,
-            &runes(candidate),
+            &candidate_runes,
             &name_lower,
-            &runes(&to_lower_go(candidate)),
+            &candidate_lower,
             best_distance,
         );
         if distance < 0.0 {
