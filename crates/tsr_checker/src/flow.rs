@@ -56,6 +56,8 @@ pub(crate) struct FlowLoopInfo {
 }
 struct FlowQuery {
     reference: NodeId,
+    /// The reference read once, at the first comparison of the walk.
+    shape: Option<crate::flow_reference::ReferenceShape>,
     flow_owner: NodeId,
     declared: TypeId,
     initial: TypeId,
@@ -370,6 +372,7 @@ impl CheckerState {
         self.flow.invocation_count += 1;
         let mut query = FlowQuery {
             reference,
+            shape: None,
             flow_owner,
             declared,
             initial,
@@ -423,6 +426,7 @@ impl CheckerState {
         self.flow.invocation_count += 1;
         let mut query = FlowQuery {
             reference,
+            shape: None,
             flow_owner: expression,
             declared,
             initial,
@@ -450,6 +454,41 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/flow.go:Checker.getTypeAtFlowNode
+    /// `matching_reference(query.reference, target)` through the query's
+    /// shape, built at the first comparison.
+    fn matching_query_reference(
+        &mut self,
+        query: &mut FlowQuery,
+        target: NodeId,
+    ) -> Result<bool, Error> {
+        if query.shape.is_none() {
+            query.shape = Some(self.reference_shape(query.reference)?);
+        }
+        let shape = query.shape.as_ref().expect("built above");
+        self.matching_shape(shape, target)
+    }
+    /// `contains_flow_reference(query.reference, target)` through the shape.
+    fn query_reference_contained(
+        &mut self,
+        query: &mut FlowQuery,
+        target: NodeId,
+    ) -> Result<bool, Error> {
+        if query.shape.is_none() {
+            query.shape = Some(self.reference_shape(query.reference)?);
+        }
+        let shape = query.shape.as_ref().expect("built above");
+        self.shape_contains(shape, target)
+    }
+    /// `evolving_mutation_target(query.reference, mutation)` through the shape.
+    fn evolving_mutation_target_of_query(
+        &mut self,
+        query: &mut FlowQuery,
+        mutation: NodeId,
+    ) -> Result<bool, Error> {
+        let object = self.evolving_mutation_object(mutation)?;
+        self.matching_query_reference(query, object)
+    }
+
     fn type_at_flow(&mut self, query: &mut FlowQuery, mut flow: FlowId) -> Result<FlowType, Error> {
         if query.depth == 2000 {
             let depth = query.depth;
@@ -481,7 +520,7 @@ impl CheckerState {
                     let Some(FlowData::Ast(target)) = node.node else {
                         return Err(tsr_arena::Error::InvalidGraph.into());
                     };
-                    if self.matching_reference(query.reference, target)? {
+                    if self.matching_query_reference(query, target)? {
                         if !self.reachable_flow(query.flow_owner, flow)? {
                             FlowType::complete(self.builtins.unreachable_never_type)
                         } else if self.assignment_target_kind(target)?
@@ -525,7 +564,7 @@ impl CheckerState {
                             };
                             FlowType::complete(ty)
                         }
-                    } else if self.contains_flow_reference(query.reference, target)? {
+                    } else if self.query_reference_contained(query, target)? {
                         if !self.reachable_flow(query.flow_owner, flow)? {
                             return Ok(FlowType::complete(self.builtins.unreachable_never_type));
                         }
@@ -558,7 +597,7 @@ impl CheckerState {
                                     if statement.kind() == K::ForInStatement {
                                         let expr =
                                             required(statement.expression(), "for-in expression")?;
-                                        if self.matching_reference(query.reference, expr)?
+                                        if self.matching_query_reference(query, expr)?
                                             || self.optional_chain_contains_reference(
                                                 expr,
                                                 query.reference,
@@ -701,7 +740,7 @@ impl CheckerState {
                         return Err(tsr_arena::Error::InvalidGraph.into());
                     };
                     if self.is_auto_flow_type(query.declared)
-                        && self.evolving_mutation_target(query.reference, mutation)?
+                        && self.evolving_mutation_target_of_query(query, mutation)?
                     {
                         let previous = self.type_at_flow(
                             query,
