@@ -662,18 +662,20 @@ impl<'a> AstView<'a> {
     pub fn for_node_owner(self, node: NodeId) -> Result<Self, Error> {
         self.0.for_node_owner(node).map(|view| Self(view, self.1))
     }
-    /// The root of this view's file when `node` is a core node of it and the
-    /// file is the arena's only source; `None` asks for the parent walk.
+    /// The source file of `node` without the parent walk: the view's
+    /// binding's source, when that binding is the only source of its arena
+    /// and `node` is a valid node of that arena. `None` asks for the walk:
+    /// an unbound view carries no such guarantee, since a builder may hold
+    /// several logical source files or a fragment whose root is no source
+    /// file at all.
     #[inline]
     pub fn single_source_root(self, node: NodeId) -> Option<NodeId> {
-        if node.arena() != self.0.id().arena()
-            || !self
-                .1
-                .is_none_or(|binding| binding.is_single_source_owner(node))
-        {
+        let binding = self.1?;
+        if !binding.is_single_source_owner(node) {
             return None;
         }
-        self.file_info().root
+        self.node(node).ok()?;
+        Some(binding.source())
     }
     /// Whether this view retains an arena's owner, independent of slot validity.
     /// This grants no node access; `node` still validates the arena and slot.

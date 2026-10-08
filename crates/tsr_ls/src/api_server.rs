@@ -2,6 +2,7 @@
 //! with the symbol behind each entry, and referenced symbols as nodes. The
 //! LSP handlers convert the same results to protocol positions; the API
 //! keeps nodes and symbols so its client can follow them by handle.
+use crate::converters::Script;
 use crate::{LanguageService, Result};
 use std::collections::{HashMap, HashSet};
 use tsr_arena::NodeId;
@@ -30,7 +31,9 @@ pub struct ApiReferenceGroup {
 
 impl LanguageService<'_> {
     /// Completions at a UTF-8 position of `source`, with the symbol of each
-    /// symbol-backed entry by label (labels are unique in a list).
+    /// symbol-backed entry keyed by the entry's index in the list: an
+    /// auto-import entry may repeat a global's label without a symbol, as
+    /// the pin's `CompletionItem.Symbol` is set per item.
     /// port: tsc/internal/ls/completions.go:LanguageService.GetCompletionsAtPosition
     pub fn api_completions(
         &mut self,
@@ -39,21 +42,26 @@ impl LanguageService<'_> {
         position: i64,
         trigger_character: Option<&str>,
         options: &crate::CompletionOptions,
-    ) -> Result<Option<(lsp::CompletionList, HashMap<String, SymbolRef>)>> {
+    ) -> Result<Option<(lsp::CompletionList, HashMap<usize, SymbolRef>)>> {
         let file = self.source(source)?;
-        let (line, character) =
-            tsr_jsstring::scanner_positions::get_ecma_line_and_utf16_character_of_position(
-                file.text().as_bytes(),
-                isize::try_from(position).unwrap_or(isize::MAX),
-            );
+        let original = file.original_file_name()?;
+        let script = Script {
+            file_name: file.file_name(),
+            text: file.text().as_bytes(),
+            original_file_name: original.as_bytes(),
+            original_text: file.original_text(),
+            span_map: file.span_map(),
+        };
+        // The service's own converters, so the worker reads the position
+        // back in the same encoding.
+        let (lsp_position, _) = self
+            .converters
+            .to_lsp_position(&script, i32::try_from(position).unwrap_or(i32::MAX));
         let params = lsp::CompletionParams {
             text_document: lsp::TextDocumentIdentifier {
                 uri: lsp::DocumentUri::from_file_name(file.file_name()),
             },
-            position: lsp::Position {
-                line: u32::try_from(line).unwrap_or(u32::MAX),
-                character: u32::try_from(character).unwrap_or(u32::MAX),
-            },
+            position: lsp_position,
             context: trigger_character.map(|trigger| {
                 Box::new(lsp::CompletionContext {
                     trigger_kind: lsp::CompletionTriggerKind::TRIGGER_CHARACTER,

@@ -57,7 +57,9 @@ file.
 - **Panics**: a failure the pin reaches by panicking, a type-kind mismatch
   such as `getTypeArguments` of an intrinsic type, is the Rust accessor's
   `UnexpectedType` refusal; the session reports it as `panic: …`, which is
-  what a batch item carries in the pin.
+  what a batch item carries in the pin. A batch item carries the panic's
+  first line only, where the pin's `panic: %v\n` is followed by the Go
+  stack.
 
 ## Witnesses
 
@@ -116,9 +118,9 @@ cases and the generator batching cases pass in both clients.
   signature-usages search yet.
 - `getConstantValue`, `getJSDocTags` and `getDocumentationComment` still
   fail by name (the A3 follow-up).
-- The standalone session formats insertions with the default settings; the
-  pin reads the snapshot's format settings, which only an LSP-hosted
-  session has.
+- A standalone session formats insertions with the default settings, as
+  the pin's does; a hosted session reads the snapshot's (the review fix
+  below).
 - The differences recorded in A3 (`getRestTypeOfSignature`, tuple metadata,
   template-literal `getTypes`) stand.
 
@@ -128,3 +130,42 @@ cases and the generator batching cases pass in both clients.
   clippy gate and `cargo xtask validate` pass.
 - `python3 scripts/parity.py check jsapi` passes against the accepted
   expectation file.
+
+## Review fixes after A5
+
+The A4 review's findings, fixed in the review-fixes branch after A5:
+
+- Diagnostics are filtered, sorted and deduplicated as the pin's program
+  getters return them (`filterAndSortDiagnostics`): one file's result on its
+  own, the whole program's as one list when `files` is omitted; the explicit
+  list concatenates per-file results without a global sort, as the pin does.
+- `getGlobalDiagnostics` is the pin's `GetProjectDiagnostics` filtered to
+  file-less entries: the config-file parsing diagnostics, the program's own
+  and the pool's accumulated globals after a semantic pass over every file,
+  sorted and deduplicated.
+- Emit runs through the project's checker pool
+  (`CheckedProgram::with_pool`) with the request's cancellation, so an emit
+  after a check reuses the checked files instead of rechecking on a private
+  pool; the selected-files emit looks each file up once.
+- `includeSymbol` attaches the symbol per completion item, as the pin's
+  `CompletionItem.Symbol` is set per item; an auto-import that repeats a
+  global's label carries no symbol.
+- A nil slice goes out as `[]` with the pinned JSON module (its
+  `FormatNilSliceAsNull` is off): the empty results of the list methods
+  (`getReferencedSymbolsForNode`, the type and symbol array properties,
+  `getMembersOfSymbol`, `getExportsOfSymbol`, `getPropertiesOfType`,
+  `getIndexInfosOfType`, `getExportsOfModule`, `getConfigFileNames`, and
+  A5's `getJsDocTags`, `getSignatureUsages` and `toAPITextEdits`' failure)
+  are `[]`, not `null`.
+- `parity.py accept` refreshes an unapproved reason from the run only in the
+  `jsapi` suite, whose labels are mechanical by design (the suite table's
+  `refresh_reasons`); every other suite keeps its reasons as worded
+  (docs/EVIDENCE-plan.md).
+- Insertion formatting reads the snapshot's format settings and new-line
+  preference, as the pin's handler reads `UserPreferences().FormatCodeSettings`
+  from its snapshot: an LSP-hosted session's snapshots carry the hosting
+  session's preferences as they stand when the snapshot is stored, a
+  standalone session's the defaults. Witness:
+  `hosted_sessions_read_the_snapshot_preferences` (two-space indentation,
+  CRLF and single quotes reach the formatted insertion and the import
+  adder's edit).

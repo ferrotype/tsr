@@ -361,6 +361,39 @@ fn encode_field(catalog: &Catalog, field: &Field) -> Result<String, String> {
     Ok(match (omit(&field.tag), shape) {
         // json v2 `omitempty` never leaves out a number or a boolean.
         (Omit::Always, _) | (Omit::Empty, Shape::Bool | Shape::Number) => always,
+        // `omitempty` looks through a pointer at the encoded value: a pointer
+        // to `""`, `{}` or `[]` is left out like a nil one; `omitzero` leaves
+        // out the nil pointer only.
+        (Omit::Empty, Shape::Pointer) => {
+            let pointee = field
+                .go
+                .element
+                .as_deref()
+                .ok_or_else(|| format!("pointer field {name} without an element type"))?;
+            let present = format!("{access}.as_deref()");
+            match catalog.shape(pointee)? {
+                Shape::Bool | Shape::Number | Shape::Tristate | Shape::Pointer => {
+                    format!("tsr_jsonrpc::optional(b{name:?}, {present})")
+                }
+                Shape::String => {
+                    let empty = if is_string_scalar(catalog, pointee) {
+                        "value.0.is_empty()"
+                    } else {
+                        "value.is_empty()"
+                    };
+                    format!("tsr_jsonrpc::omitted(b{name:?}, {present}.filter(|value| !{empty}).map(|value| value as &dyn Encode))")
+                }
+                Shape::Slice | Shape::Map => format!(
+                    "tsr_jsonrpc::omitted(b{name:?}, {present}.filter(|value| !value.is_empty()).map(|value| value as &dyn Encode))"
+                ),
+                Shape::Interface | Shape::Raw => format!(
+                    "tsr_jsonrpc::omitted(b{name:?}, {present}.filter(|value| !raw_is_empty(*value)).map(|value| value as &dyn Encode))"
+                ),
+                Shape::Struct | Shape::Handwritten => format!(
+                    "tsr_jsonrpc::omitted(b{name:?}, {present}.filter(|value| !value.is_json_empty()).map(|value| value as &dyn Encode))"
+                ),
+            }
+        }
         (_, Shape::Pointer) => format!("tsr_jsonrpc::optional(b{name:?}, {access}.as_deref())"),
         (_, Shape::Slice | Shape::Map) => format!(
             "tsr_jsonrpc::omitted(b{name:?}, (!{access}.is_empty()).then_some(&{access} as &dyn Encode))"

@@ -204,6 +204,55 @@ fn parameters_decode_as_the_pin_does() {
     assert!(Params::decode(Method::Release, br#"{"snapshot":1,"snapshot":2}"#).is_err());
 }
 
+/// json v2 `omitempty` looks through a pointer at the encoded value: a
+/// pointer to `""` or to a struct that encodes as `{}` is left out like a nil
+/// one, while a pointer to a number or a boolean never is.
+#[test]
+fn omitempty_looks_through_pointers() {
+    let mut entry = CompletionEntryResponse {
+        detail: Some(Box::new(String::new())),
+        label_details: Some(Box::new(CompletionEntryLabelDetailsResponse::default())),
+        ..Default::default()
+    };
+    let text = marshal(&entry).unwrap();
+    assert_eq!(text, r#"{"name":"","kind":0}"#);
+    entry.detail = Some(Box::new("d".into()));
+    entry.label_details = Some(Box::new(CompletionEntryLabelDetailsResponse {
+        description: Some(Box::new("x".into())),
+        ..Default::default()
+    }));
+    let text = marshal(&entry).unwrap();
+    assert_eq!(
+        text,
+        r#"{"name":"","kind":0,"detail":"d","labelDetails":{"description":"x"}}"#
+    );
+    // A pointer to a number keeps its zero.
+    let params = EmitParams {
+        emit_only: Some(Box::new(0)),
+        ..Default::default()
+    };
+    assert!(marshal(&params).unwrap().contains("\"emitOnly\":0"));
+}
+
+/// A raw value is empty by its encoded value, not its spelling: whitespace
+/// between tokens is not part of it, a string's content is.
+#[test]
+fn raw_emptiness_follows_the_encoded_value() {
+    use super::codecs::raw_is_empty;
+    for empty in ["", "null", "\"\"", "{}", "[]", " { } ", "[\n]", "  "] {
+        assert!(
+            raw_is_empty(&RawValue(empty.as_bytes().to_vec())),
+            "{empty:?}"
+        );
+    }
+    for value in ["\" \"", "\"a\"", "0", "false", "{\"a\":1}", "[0]"] {
+        assert!(
+            !raw_is_empty(&RawValue(value.as_bytes().to_vec())),
+            "{value:?}"
+        );
+    }
+}
+
 #[test]
 fn omission_rules_follow_json_v2() {
     // omitempty never leaves out a number or a boolean; omitzero does.

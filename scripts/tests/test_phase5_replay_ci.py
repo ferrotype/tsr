@@ -44,16 +44,22 @@ class ReplayCITests(unittest.TestCase):
             executable = root / 'custom-target/tsrust'
             executable.parent.mkdir()
             executable.write_text('ordinary Rust CLI')
-            artifact = {'reason': 'compiler-artifact', 'target': {'name': 'tsrust'}, 'executable': str(executable)}
+            test_server = root / 'custom-target/phase5_testserver'
+            test_server.write_text('the witness server')
+            # Both Cargo builds see the same mocked output; each picks its own artifact.
+            artifacts = '\n'.join(json.dumps({'reason': 'compiler-artifact', 'target': {'name': name}, 'executable': str(path)})
+                                  for name, path in (('tsrust', executable), ('phase5_testserver', test_server)))
             with patch.object(ci.runner, '_pinned_go', return_value='/pinned/go'):
-                with patch.object(ci.subprocess, 'run', return_value=SimpleNamespace(stdout=json.dumps(artifact))) as run:
+                with patch.object(ci.subprocess, 'run', return_value=SimpleNamespace(stdout=artifacts)) as run:
                     ci.prepare(root / 'binaries')
             self.assertEqual(run.call_args_list[0].args[0][-1], './cmd/tsc')
             self.assertEqual(run.call_args_list[0].args[0][0], '/pinned/go')
             self.assertNotIn('-overlay', run.call_args_list[0].args[0])
             self.assertIn('--release', run.call_args_list[1].args[0])
             self.assertIn('--locked', run.call_args_list[1].args[0])
+            self.assertIn('phase5_testserver', run.call_args_list[2].args[0])
             self.assertEqual((root / 'binaries/rust-lsp').read_text(), 'ordinary Rust CLI')
+            self.assertEqual((root / 'binaries/test-server').read_text(), 'the witness server')
 
     def test_mismatch_and_capture_failure_fail_without_omitting_later_cases(self):
         with tempfile.TemporaryDirectory() as directory:

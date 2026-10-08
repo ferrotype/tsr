@@ -181,3 +181,75 @@ fn node_index_cache_keeps_go_once_panic_and_rust_ownership_error_distinct() {
     assert!(result.is_err());
     assert!(reentrant.node_index_cache(|| unreachable!()).is_none());
 }
+
+/// `AstView::single_source_root` answers only for a bound single-source
+/// arena, and `get_source_file_of_node` walks everything else: an unbound
+/// builder may hold several logical source files, whose completed root is
+/// not every node's source file, or a fragment whose root is no source file
+/// at all.
+#[test]
+fn source_file_shortcut_requires_a_bound_single_source_arena() {
+    use tsr_ast::utilities::get_source_file_of_node;
+    let counters = Counters::new();
+    // Two logical source files in one arena, completed on the first.
+    let mut factory = AstBuilder::new(SourceText::default(), &counters);
+    let first = factory.new_source_file(
+        options(b"/one.ts"),
+        SourceText::from_loaded_bytes(&b"a"[..]),
+        None,
+        None,
+    );
+    let second = factory.new_source_file(
+        options(b"/two.ts"),
+        SourceText::from_loaded_bytes(&b"b"[..]),
+        None,
+        None,
+    );
+    let file = factory.complete(first).unwrap().publish_unbound();
+    let view = file.view();
+    assert_eq!(view.single_source_root(second), None);
+    assert_eq!(
+        get_source_file_of_node(view, Some(second)).unwrap(),
+        Some(second)
+    );
+    assert_eq!(
+        get_source_file_of_node(view, Some(first)).unwrap(),
+        Some(first)
+    );
+    // Bound, the arena still has two sources: the walk stays.
+    let bound = file.bind_with(first, |_| Ok(())).unwrap();
+    assert_eq!(bound.ast().single_source_root(first), None);
+    assert_eq!(
+        get_source_file_of_node(bound.ast(), Some(first)).unwrap(),
+        Some(first)
+    );
+    // A fragment: a token root is no source file.
+    let mut factory = AstBuilder::new(SourceText::default(), &counters);
+    let token = factory.new_token(SyntaxKind::EndOfFile.into());
+    let fragment = factory.complete(token).unwrap().publish_unbound();
+    assert_eq!(fragment.view().single_source_root(token), None);
+    assert_eq!(
+        get_source_file_of_node(fragment.view(), Some(token)).unwrap(),
+        None
+    );
+    // A bound single-source file answers its source file for its own
+    // nodes, and declines nodes of other arenas and its unbound view.
+    let mut factory = AstBuilder::new(SourceText::default(), &counters);
+    let eof = factory.new_token(SyntaxKind::EndOfFile.into());
+    let source = factory.new_source_file(
+        options(b"/three.ts"),
+        SourceText::from_loaded_bytes(&b"c"[..]),
+        None,
+        Some(eof),
+    );
+    let file = factory.complete(source).unwrap().publish_unbound();
+    assert_eq!(file.view().single_source_root(source), None);
+    let bound = file.bind_with(source, |_| Ok(())).unwrap();
+    assert_eq!(bound.ast().single_source_root(source), Some(source));
+    assert_eq!(bound.ast().single_source_root(eof), Some(source));
+    assert_eq!(bound.ast().single_source_root(token), None);
+    assert_eq!(
+        get_source_file_of_node(bound.ast(), Some(eof)).unwrap(),
+        Some(source)
+    );
+}

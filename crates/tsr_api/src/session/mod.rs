@@ -114,6 +114,12 @@ pub(super) fn checker_error<E: std::fmt::Display + std::any::Any>(error: E) -> S
     SessionError::Other(message)
 }
 
+/// The user preferences of the hosting LSP session, answered when a
+/// snapshot is stored: the pin's snapshot carries the session's
+/// `UserPreferences`, which insertion formatting, the import adder and
+/// completions read. A standalone session has the defaults.
+pub type PreferencesProvider = Arc<dyn Fn() -> tsr_ls::CompletionOptions + Send + Sync>;
+
 /// A snapshot the session holds for its clients, with the registries the
 /// checker handlers fill (A3): the pin's `snapshotData` of
 /// tsc/internal/api/session.go.
@@ -121,6 +127,12 @@ pub struct SnapshotData {
     pub snapshot: Snapshot,
     /// Symbol, type and signature handles minted against this snapshot.
     pub registries: handles::Registries,
+    /// The session's user preferences when the snapshot was stored: the
+    /// pin's `Snapshot.UserPreferences`.
+    pub preferences: tsr_ls::CompletionOptions,
+    /// The encoding the session's language services convert positions
+    /// with: the pin's snapshot converters.
+    pub position_encoding: tsr_jsstring::PositionEncoding,
 }
 impl SnapshotData {
     /// port: tsc/internal/api/session.go:snapshotData.getProject
@@ -195,6 +207,8 @@ pub struct ApiSession {
     project: Arc<ProjectSession>,
     /// A standalone session owns its project session and closes it.
     standalone: bool,
+    /// The hosting LSP session's preferences; a standalone session has none.
+    preferences: Option<PreferencesProvider>,
     use_binary_responses: AtomicBool,
     snapshots: Mutex<Snapshots>,
     /// The pin's `updateMu`: serializes updates and the ref tracking.
@@ -209,10 +223,11 @@ pub struct ApiSession {
 }
 
 impl ApiSession {
-    /// A session over the LSP server's project session.
+    /// A session over the LSP server's project session, whose user
+    /// preferences `preferences` answers for each stored snapshot.
     /// port: tsc/internal/api/session.go:NewLSPSession
-    pub fn for_lsp(project: Arc<ProjectSession>) -> Arc<Self> {
-        Arc::new(Self::new(project, false))
+    pub fn for_lsp(project: Arc<ProjectSession>, preferences: PreferencesProvider) -> Arc<Self> {
+        Arc::new(Self::new(project, false, Some(preferences)))
     }
 
     /// A session with its own project session over `fs`.
@@ -222,14 +237,19 @@ impl ApiSession {
         fs: Arc<dyn FileSystem>,
     ) -> Arc<Self> {
         let project = ProjectSession::new(options, fs, &tsr_arena::Counters::new());
-        Arc::new(Self::new(project, true))
+        Arc::new(Self::new(project, true, None))
     }
 
-    fn new(project: Arc<ProjectSession>, standalone: bool) -> Self {
+    fn new(
+        project: Arc<ProjectSession>,
+        standalone: bool,
+        preferences: Option<PreferencesProvider>,
+    ) -> Self {
         Self {
             id: next_session_id(),
             project,
             standalone,
+            preferences,
             use_binary_responses: AtomicBool::new(false),
             snapshots: Mutex::default(),
             open: Mutex::default(),
@@ -301,6 +321,11 @@ impl ApiSession {
             let data = Arc::new(SnapshotData {
                 snapshot,
                 registries: handles::Registries::default(),
+                preferences: self
+                    .preferences
+                    .as_ref()
+                    .map_or_else(Default::default, |preferences| preferences()),
+                position_encoding: self.project.position_encoding(),
             });
             snapshots.by_handle.insert(
                 handle,
@@ -370,7 +395,7 @@ impl ApiSession {
     ) -> Result<(Snapshot, Option<JsString>), String> {
         match self.project.api_update(changes, request) {
             Ok(update) => Ok((update.snapshot, update.error)),
-            Err(error) => Err(format!("{error:?}")),
+            Err(error) => Err(format!("{error}")),
         }
     }
 
@@ -388,7 +413,13 @@ impl ApiSession {
         &self,
         params: &UpdateSnapshotParams,
     ) -> SessionResult<UpdateSnapshotResponse> {
-        let mut open = self.open.lock().expect("open refs");
+        // A callback that panics during the update unwinds through this
+        // lock; the open sets change only after success, so the next update
+        // continues with them, as the pin's deferred unlock lets it.
+        let mut open = self
+            .open
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         let file_changes = self.to_file_change_summary(params.file_changes.as_deref());
         let cwd = self.current_directory().clone();
         let mut request = ApiSnapshotRequest::default();
@@ -623,7 +654,10 @@ impl ApiSession {
     /// closes; standalone sessions release their whole project session.
     /// port: tsc/internal/api/session.go:Session.releaseOpenRefs
     fn release_open_refs(&self) {
-        let mut open = self.open.lock().expect("open refs");
+        let mut open = self
+            .open
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
         if open.projects.is_empty() && open.files.is_empty() {
             return;
         }

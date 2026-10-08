@@ -141,7 +141,7 @@ impl ApiSession {
             None,
             &mut tsr_parser::ParserJsDocProvider::default(),
         )
-        .map_err(|error| SessionError::Other(format!("failed to encode {what}: {error:?}")))?;
+        .map_err(|error| SessionError::Other(format!("failed to encode {what}: {error}")))?;
         Ok(if self.binary() {
             Response::binary(encoded.bytes)
         } else {
@@ -382,18 +382,11 @@ impl ApiSession {
                 |op, symbol| Ok(op.symbol(symbol).map_err(checker_error)?.parent()),
             )?),
             // The pin answers the merged export symbol, or the symbol itself
-            // when it has none (`GetExportSymbolOfSymbol`), never null.
             Params::GetExportSymbolOfSymbol(p) => Response::json(self.symbol_property(
                 p.snapshot,
                 &p.project,
                 p.symbol,
-                |op, symbol| {
-                    Ok(Some(
-                        op.get_export_symbol_of_symbol(symbol)
-                            .map_err(checker_error)?
-                            .id(),
-                    ))
-                },
+                |op, symbol| Ok(op.symbol(symbol).map_err(checker_error)?.export_symbol()),
             )?),
             Params::GetMembersOfSymbol(p) => Response::json(self.symbol_table_property(
                 p.snapshot,
@@ -593,20 +586,14 @@ impl ApiSession {
                     let types = op
                         .signature_type_parameters(signature)
                         .map_err(checker_error)?;
-                    if types.is_empty() {
-                        return Ok(None);
-                    }
-                    Ok(Some(setup.type_responses(op, &types)?))
+                    setup.type_responses(op, &types)
                 })?)
             }
             Params::GetParametersOfSignature(p) => {
                 Response::json(self.with_checker(p.snapshot, &p.project, |setup, op| {
                     let signature = setup.registry.resolve_signature(op, p.signature)?;
                     let symbols = op.signature_parameters(signature).map_err(checker_error)?;
-                    if symbols.is_empty() {
-                        return Ok(None);
-                    }
-                    Ok(Some(setup.symbol_responses(op, &symbols)?))
+                    setup.symbol_responses(op, &symbols)
                 })?)
             }
             Params::GetThisParameterOfSignature(p) => {
@@ -855,10 +842,7 @@ impl ApiSession {
                 Response::json(self.with_checker(p.snapshot, &p.project, |setup, op| {
                     let ty = Self::resolve_type(setup, op, p.r#type)?;
                     let properties = op.get_properties_of_type(ty).map_err(checker_error)?;
-                    if properties.is_empty() {
-                        return Ok(None);
-                    }
-                    Ok(Some(setup.symbol_responses(op, &properties)?))
+                    setup.symbol_responses(op, &properties)
                 })?)
             }
             Params::GetApparentPropertiesOfType(p) => {
@@ -884,14 +868,11 @@ impl ApiSession {
                 Response::json(self.with_checker(p.snapshot, &p.project, |setup, op| {
                     let ty = Self::resolve_type(setup, op, p.r#type)?;
                     let infos = op.get_index_infos_of_type(ty).map_err(checker_error)?;
-                    if infos.is_empty() {
-                        return Ok(None);
-                    }
                     let mut results = Vec::with_capacity(infos.len());
                     for info in infos {
                         results.push(Some(Box::new(setup.index_info_response(op, info)?)));
                     }
-                    Ok(Some(results))
+                    Ok(results)
                 })?)
             }
             Params::GetConstraintOfTypeParameter(p) => {
@@ -995,14 +976,11 @@ impl ApiSession {
                 Response::json(self.with_checker(p.snapshot, &p.project, |setup, op| {
                     let symbol = Self::resolve_symbol(setup, op, p.symbol)?;
                     let mut exports = op.get_exports_of_module(symbol).map_err(checker_error)?;
-                    if exports.is_empty() {
-                        return Ok(None);
-                    }
                     exports.sort_by(|a, b| {
                         op.compare_symbols(Some(*a), Some(*b))
                             .unwrap_or(std::cmp::Ordering::Equal)
                     });
-                    Ok(Some(setup.symbol_responses(op, &exports)?))
+                    setup.symbol_responses(op, &exports)
                 })?)
             }
             Params::GetMemberInModuleExports(p) => {
@@ -1142,14 +1120,16 @@ impl ApiSession {
             Params::GetGlobalDiagnostics(p) => {
                 Response::json(self.handle_get_global_diagnostics(ctx, &p)?)
             }
-            Params::Emit(p) => Response::json(self.handle_emit(&p)?),
-            Params::EmitToString(p) => Response::json(self.handle_emit_to_string(&p)?),
+            Params::Emit(p) => Response::json(self.handle_emit(ctx, &p)?),
+            Params::EmitToString(p) => Response::json(self.handle_emit_to_string(ctx, &p)?),
             Params::GetJavaScriptEmit(p) => Response::json(self.handle_selected_files_emit(
+                ctx,
                 &p,
                 tsr_compiler::EmitOnly::Js,
                 files_named,
             )?),
             Params::GetDeclarationEmit(p) => Response::json(self.handle_selected_files_emit(
+                ctx,
                 &p,
                 tsr_compiler::EmitOnly::Dts,
                 files_named,
@@ -1218,6 +1198,7 @@ impl ApiSession {
         })
     }
 
+    /// An empty list goes out as `[]`: the pin's nil slice marshals so.
     /// port: tsc/internal/api/session.go:Session.resolveTypeArrayPropertyOfType
     fn type_array_property(
         &self,
@@ -1229,10 +1210,7 @@ impl ApiSession {
         self.with_checker(snapshot, project, |setup, op| {
             let ty = Self::resolve_type(setup, op, handle)?;
             let types = getter(op, ty)?;
-            if types.is_empty() {
-                return Ok(None);
-            }
-            Ok(Some(setup.type_responses(op, &types)?))
+            setup.type_responses(op, &types)
         })
     }
 
@@ -1271,7 +1249,7 @@ impl ApiSession {
         self.with_checker(snapshot, project, |setup, op| {
             let symbol = Self::resolve_symbol(setup, op, handle)?;
             let Some(table) = getter(op, symbol)? else {
-                return Ok(None);
+                return Ok(Vec::new());
             };
             let mut symbols: Vec<SymbolRef> = {
                 let table = op.symbol_table(table).map_err(checker_error)?;
@@ -1280,14 +1258,11 @@ impl ApiSession {
                     .map(|id| op.symbol_ref(id).map_err(checker_error))
                     .collect::<SessionResult<_>>()?
             };
-            if symbols.is_empty() {
-                return Ok(None);
-            }
             symbols.sort_by(|a, b| {
                 op.compare_symbols(Some(*a), Some(*b))
                     .unwrap_or(std::cmp::Ordering::Equal)
             });
-            Ok(Some(setup.symbol_responses(op, &symbols)?))
+            setup.symbol_responses(op, &symbols)
         })
     }
 

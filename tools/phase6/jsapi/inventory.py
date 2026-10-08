@@ -74,11 +74,31 @@ ROUTES = {
     ('api/encoder', 'TestEncodeSourceFileWithUnicodeEscapes'): 'crates/tsr_encoder/src/baseline_tests.rs encode_source_file_with_unicode_escapes_matches_the_baseline',
     ('api/encoder', 'TestEncodeContentMapperSourceFileMetadata'): 'crates/tsr_encoder/src/baseline_tests.rs content_mapper_metadata_is_encoded_in_the_extended_data',
     ('api/encoder', 'TestBuildNodeIndexTableMatchesEncode'): 'crates/tsr_encoder/src/baseline_tests.rs the_node_index_table_matches_the_encoding',
+    ('api/encoder', 'TestDecodeSourceFile_Basic'): 'crates/tsr_encoder/src/decoder_tests.rs a_decoded_source_file_keeps_its_name_text_statements_and_end_token',
+    ('api/encoder', 'TestDecodeSourceFile_Statements'): 'crates/tsr_encoder/src/decoder_tests.rs statements_decode_in_order',
+    ('api/encoder', 'TestDecodeSourceFile_VariableDeclaration'): 'crates/tsr_encoder/src/decoder_tests.rs a_variable_declaration_keeps_its_name_and_initializer',
+    ('api/encoder', 'TestDecodeSourceFile_VariableDeclarationListFlags'): 'crates/tsr_encoder/src/decoder_tests.rs declaration_list_flags_survive_decoding',
+    ('api/encoder', 'TestDecodeSourceFile_FunctionDeclaration'): 'crates/tsr_encoder/src/decoder_tests.rs a_function_declaration_keeps_its_parts',
+    ('api/encoder', 'TestDecodeSourceFile_ImportDeclaration'): 'crates/tsr_encoder/src/decoder_tests.rs an_import_declaration_keeps_its_clause_and_specifier',
+    ('api/encoder', 'TestDecodeSourceFile_IfStatement'): 'crates/tsr_encoder/src/decoder_tests.rs an_if_statement_keeps_both_branches',
+    ('api/encoder', 'TestDecodeSourceFile_TemplateExpression'): 'crates/tsr_encoder/src/decoder_tests.rs a_template_expression_keeps_its_head_and_spans',
+    ('api/encoder', 'TestDecodeSourceFile_ExportModifier'): 'crates/tsr_encoder/src/decoder_tests.rs an_export_modifier_decodes_as_a_keyword',
+    ('api/encoder', 'TestDecodeSourceFile_Positions'): 'crates/tsr_encoder/src/decoder_tests.rs the_root_spans_the_whole_text',
+    ('api/encoder', 'TestDecodeSourceFile_ClassDeclaration'): 'crates/tsr_encoder/src/decoder_tests.rs a_class_declaration_keeps_its_name_and_members',
+    ('api/encoder', 'TestDecodeNodes_SubtreeRoundTrip'): 'crates/tsr_encoder/src/decoder_tests.rs a_subtree_round_trips_through_decode_nodes',
+    ('api/encoder', 'TestDecodeSourceFile_BinaryExpression'): 'crates/tsr_encoder/src/decoder_tests.rs a_binary_expression_keeps_both_operands_and_its_operator',
+    ('api/encoder', 'TestDecodeSourceFile_KeywordExpressions'): 'crates/tsr_encoder/src/decoder_tests.rs this_decodes_as_a_keyword_expression',
+    ('api/encoder', 'TestDecodeSourceFile_EmptyModuleBlock'): 'crates/tsr_encoder/src/decoder_tests.rs an_empty_module_block_keeps_its_empty_statement_list',
+    ('api/encoder', 'TestDecodeSourceFile_EmptyBlockAndParams'): 'crates/tsr_encoder/src/decoder_tests.rs empty_parameter_and_statement_lists_decode_as_present_lists',
+    ('api/encoder', 'TestDecodeSourceFile_ArrowFunctionEmptyParams'): 'crates/tsr_encoder/src/decoder_tests.rs an_arrow_function_keeps_its_empty_parameter_list',
+    ('api/encoder', 'TestDecodeSourceFile_FunctionExpressionEmptyParams'): 'crates/tsr_encoder/src/decoder_tests.rs a_function_expression_keeps_its_empty_parameter_list',
+    ('api/encoder', 'TestDecodeSourceFile_PostfixUnaryOperator'): 'crates/tsr_encoder/src/decoder_tests.rs a_postfix_increment_keeps_its_operator_and_operand',
+    ('api/encoder', 'TestDecodeSourceFile_PrefixUnaryOperator'): 'crates/tsr_encoder/src/decoder_tests.rs a_prefix_negation_keeps_its_operator_and_operand',
+    ('api/encoder', 'TestDecodeSourceFile_PostfixDecrement'): 'crates/tsr_encoder/src/decoder_tests.rs a_postfix_decrement_keeps_its_operator',
 }
 CHECKPOINTS = {
     'session_batch_test.go': 'A4', 'session_completion_test.go': 'A4', 'session_textedit_test.go': 'A4',
     'session_apistate_test.go': 'A3', 'session_createprogram_test.go': 'A3', 'session_temporary_test.go': 'A3',
-    'decoder_test.go': 'equivalent coverage, owner review owed (docs/PHASE6-A5.md): the Rust decoder reads the format the Phase 0 corpus parity froze over 16,120 files; it is exercised by printNode and formatNodeForInsertion over client-encoded trees (tsr_api printing and formatting tests, the jsapi `SnapshotInternalAPI` and `printNode` cases) and every server encoding is decoded by the client suites (`test/encoder.test.ts`, `test/sync/ast.test.ts`)',
 }
 
 

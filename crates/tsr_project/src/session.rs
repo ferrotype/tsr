@@ -290,6 +290,12 @@ impl Session {
     pub fn current_directory(&self) -> &JsString {
         &self.options.current_directory
     }
+    /// The encoding of the session's LSP positions, which its snapshots'
+    /// converters and language services translate with: the pin's
+    /// `SessionOptions.PositionEncoding`.
+    pub fn position_encoding(&self) -> PositionEncoding {
+        self.options.position_encoding
+    }
     /// The file system the session reads; the API session's `initialize`
     /// reports its case sensitivity.
     pub fn file_system(&self) -> &Arc<dyn FileSystem> {

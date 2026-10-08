@@ -18,8 +18,8 @@ fn service_error(error: impl std::fmt::Display) -> SessionError {
 }
 
 /// Text edits in the client's coordinates: UTF-16 offsets into the original
-/// text of a mapped file. An edit outside the text makes the whole result
-/// null, as the pin's does.
+/// text of a mapped file. An edit outside the text drops the whole result,
+/// which goes out as `[]` like the pin's nil slice.
 /// port: tsc/internal/api/session.go:toAPITextEdits
 pub(super) fn to_api_text_edits(
     original_text: &[u8],
@@ -54,10 +54,13 @@ fn original_text_offset(
 
 impl ApiSession {
     /// The language service over the project's program; the API checker is
-    /// the one it queries, so symbol handles stay resolvable. Module-export
-    /// completions read the project's auto-import registry, which the
-    /// service builds on demand: the pin's retry through a snapshot cloned
-    /// with auto-imports has no Rust counterpart.
+    /// the one it queries, so symbol handles stay resolvable. It converts
+    /// positions with the session's encoding, as the pin's snapshot
+    /// converters do (the standalone server's is UTF-8, so the LSP
+    /// characters `to_api_text_edits` adds to byte line starts are bytes).
+    /// Module-export completions read the project's auto-import registry,
+    /// which the service builds on demand: the pin's retry through a
+    /// snapshot cloned with auto-imports has no Rust counterpart.
     /// port: tsc/internal/api/session.go:Session.setupLanguageService
     fn language_service<'a>(
         setup: &CheckerSetup<'a>,
@@ -65,7 +68,7 @@ impl ApiSession {
         let project = setup.data.project(&setup.project)?;
         let mut service = tsr_ls::LanguageService::new(
             setup.program,
-            tsr_jsstring::PositionEncoding::Utf16,
+            setup.data.position_encoding,
             tsr_core::CancellationToken::new(),
         );
         if let Some(host) = project.completion_file_system() {
@@ -98,9 +101,17 @@ impl ApiSession {
             .utf16_to_utf8(isize::try_from(params.position).unwrap_or(isize::MAX));
         let mut operation = setup.registry.operation()?;
         let mut service = Self::language_service(&setup)?;
+        // The snapshot's user preferences with the API's fixed client
+        // capabilities: label details only.
         let options = tsr_ls::CompletionOptions {
             label_details: true,
-            ..Default::default()
+            snippets: false,
+            commit_characters: false,
+            insert_replace: false,
+            default_commit_characters: false,
+            default_edit_range: false,
+            markdown: false,
+            ..data.preferences.clone()
         };
         let Some((list, symbols)) = service
             .api_completions(
@@ -115,7 +126,10 @@ impl ApiSession {
             return setup.commit(&None::<CompletionInfoResponse>);
         };
         let mut entries = Vec::with_capacity(list.items.len());
-        for item in list.items.iter().flatten() {
+        for (index, item) in list.items.iter().enumerate() {
+            let Some(item) = item else {
+                continue;
+            };
             let mut entry = CompletionEntryResponse {
                 name: item.label.clone(),
                 kind: item.kind.as_deref().map_or(0, |kind| kind.0),
@@ -132,7 +146,7 @@ impl ApiSession {
                 symbol: None,
             };
             if params.include_symbol {
-                if let Some(symbol) = symbols.get(&item.label) {
+                if let Some(symbol) = symbols.get(&index) {
                     entry.symbol = Some(Box::new(setup.symbol_response(&mut operation, *symbol)?));
                 }
             }
@@ -157,9 +171,6 @@ impl ApiSession {
         let groups = service
             .api_referenced_symbols(&mut operation, node, params.position)
             .map_err(service_error)?;
-        if groups.is_empty() {
-            return setup.commit(&None::<Vec<ReferencedSymbolEntry>>);
-        }
         let mut result = Vec::with_capacity(groups.len());
         for group in groups {
             let Some(definition) = group.definition else {
@@ -178,7 +189,7 @@ impl ApiSession {
                 references,
             });
         }
-        setup.commit(&Some(result))
+        setup.commit(&result)
     }
 
     /// port: tsc/internal/api/session.go:Session.handleGetReferencesToSymbolInFile
@@ -219,14 +230,11 @@ impl ApiSession {
         let tags = service
             .api_symbol_jsdoc_tags(&mut operation, symbol)
             .map_err(service_error)?;
-        if tags.is_empty() {
-            return setup.commit(&None::<Vec<JsDocTagInfo>>);
-        }
         let tags: Vec<Option<Box<JsDocTagInfo>>> = tags
             .into_iter()
             .map(|(name, text)| Some(Box::new(JsDocTagInfo { name, text })))
             .collect();
-        setup.commit(&Some(tags))
+        setup.commit(&tags)
     }
 
     /// port: tsc/internal/api/session.go:Session.handleGetDocumentationComment
@@ -258,9 +266,6 @@ impl ApiSession {
         let usages = service
             .api_signature_usages(&mut operation, declaration)
             .map_err(service_error)?;
-        if usages.is_empty() {
-            return setup.commit(&None::<Vec<SignatureUsageResponse>>);
-        }
         let mut result = Vec::with_capacity(usages.len());
         for usage in usages {
             result.push(SignatureUsageResponse {
@@ -271,7 +276,7 @@ impl ApiSession {
                 },
             });
         }
-        setup.commit(&Some(result))
+        setup.commit(&result)
     }
 
     /// port: tsc/internal/api/session.go:Session.handleGetImportAdderEdits
@@ -310,19 +315,16 @@ impl ApiSession {
             actions.push((symbol, is_valid_type_only_use_site));
         }
         let mut service = Self::language_service(&setup)?;
+        // The snapshot's user preferences and format settings, as the pin's
+        // import adder takes them.
         let edits = service
-            .api_import_adder_edits(
-                &mut operation,
-                file.source(),
-                &actions,
-                &tsr_ls::CompletionOptions::default(),
-            )
+            .api_import_adder_edits(&mut operation, file.source(), &actions, &data.preferences)
             .map_err(service_error)?;
         if edits.is_empty() {
             return setup.commit(&Vec::<TextEdit>::new());
         }
         let view = file.bound().view().ast();
         let source = view.source_file(file.source()).map_err(service_error)?;
-        setup.commit(&to_api_text_edits(source.original_text(), &edits))
+        setup.commit(&to_api_text_edits(source.original_text(), &edits).unwrap_or_default())
     }
 }

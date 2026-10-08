@@ -58,17 +58,14 @@ impl MessagePackProtocol {
         })
     }
 
-    /// One tuple; a clean end of input before the first byte is `Eof`.
+    /// One tuple. The input ending before a field's first byte is the clean
+    /// `Eof` (the pin's `ReadByte` and `io.ReadFull` report `io.EOF` there,
+    /// which the connection treats as the end); ending inside a field is an
+    /// unexpected end of file.
     /// port: tsc/internal/api/protocol_msgpack.go:MessagePackProtocol.readTuple
     pub fn read_tuple(&self) -> Result<(MessageType, String, Vec<u8>), Error> {
         let mut reader = self.reader.lock().expect("msgpack reader");
-        let first = match read_byte(&mut *reader) {
-            Ok(byte) => byte,
-            Err(error) if error.kind() == std::io::ErrorKind::UnexpectedEof => {
-                return Err(Error::Framing(Arc::new(FramingError::Eof)));
-            }
-            Err(error) => return Err(error.into()),
-        };
+        let first = read_byte(&mut *reader)?;
         if first != FIXED_ARRAY_3 {
             return Err(invalid(format!(
                 "expected fixed 3-element array (0x93), received: 0x{first:02x}"
@@ -115,9 +112,32 @@ fn id_method(id: Option<&Id>) -> String {
     id.map(ToString::to_string).unwrap_or_default()
 }
 
-fn read_byte(reader: &mut impl BufRead) -> std::io::Result<u8> {
+/// Fills `buffer` as the pin's `ReadByte` and `io.ReadFull` read a field:
+/// input that ends before the first byte is the clean `Eof`; input that ends
+/// inside the field is an unexpected end of file.
+fn read_full(reader: &mut impl BufRead, buffer: &mut [u8]) -> Result<(), Error> {
+    let mut filled = 0;
+    while filled < buffer.len() {
+        match reader.read(&mut buffer[filled..]) {
+            Ok(0) if filled == 0 => return Err(Error::Framing(Arc::new(FramingError::Eof))),
+            Ok(0) => {
+                return Err(std::io::Error::new(
+                    std::io::ErrorKind::UnexpectedEof,
+                    "unexpected EOF",
+                )
+                .into())
+            }
+            Ok(read) => filled += read,
+            Err(error) if error.kind() == std::io::ErrorKind::Interrupted => {}
+            Err(error) => return Err(error.into()),
+        }
+    }
+    Ok(())
+}
+
+fn read_byte(reader: &mut impl BufRead) -> Result<u8, Error> {
     let mut byte = [0u8; 1];
-    reader.read_exact(&mut byte)?;
+    read_full(reader, &mut byte)?;
     Ok(byte[0])
 }
 
@@ -128,12 +148,12 @@ fn read_bin(reader: &mut impl BufRead) -> Result<Vec<u8>, Error> {
         BIN8 => usize::from(read_byte(reader)?),
         BIN16 => {
             let mut size = [0u8; 2];
-            reader.read_exact(&mut size)?;
+            read_full(reader, &mut size)?;
             usize::from(u16::from_be_bytes(size))
         }
         BIN32 => {
             let mut size = [0u8; 4];
-            reader.read_exact(&mut size)?;
+            read_full(reader, &mut size)?;
             usize::try_from(u32::from_be_bytes(size)).expect("64-bit targets")
         }
         other => {
@@ -143,7 +163,7 @@ fn read_bin(reader: &mut impl BufRead) -> Result<Vec<u8>, Error> {
         }
     };
     let mut payload = vec![0u8; size];
-    reader.read_exact(&mut payload)?;
+    read_full(reader, &mut payload)?;
     Ok(payload)
 }
 
@@ -254,6 +274,41 @@ mod tests {
             Box::new(Sink(output.clone())),
         );
         (protocol, output)
+    }
+
+    /// The pin's reads report `io.EOF` when the input ends before a field,
+    /// which the connection takes as the end, and `io.ErrUnexpectedEOF` when
+    /// it ends inside one.
+    #[test]
+    fn input_ending_between_fields_is_the_clean_end_and_inside_one_is_an_error() {
+        for input in [
+            &[][..],
+            &[FIXED_ARRAY_3],
+            &[FIXED_ARRAY_3, 1],
+            &[FIXED_ARRAY_3, 1, BIN8],
+        ] {
+            let (protocol, _) = make(input);
+            assert!(
+                matches!(protocol.read_tuple(), Err(Error::Framing(error)) if matches!(*error, FramingError::Eof)),
+                "{input:?}"
+            );
+        }
+        // A size with no payload bytes at all is the clean end too; a partial
+        // payload or a partial size is not.
+        let (protocol, _) = make(&[FIXED_ARRAY_3, 1, BIN8, 4]);
+        assert!(
+            matches!(protocol.read_tuple(), Err(Error::Framing(error)) if matches!(*error, FramingError::Eof))
+        );
+        for input in [
+            &[FIXED_ARRAY_3, 1, BIN8, 4, b'p'][..],
+            &[FIXED_ARRAY_3, 1, BIN16, 0],
+        ] {
+            let (protocol, _) = make(input);
+            assert!(
+                matches!(protocol.read_tuple(), Err(Error::Io(error)) if error.kind() == std::io::ErrorKind::UnexpectedEof),
+                "{input:?}"
+            );
+        }
     }
 
     #[test]

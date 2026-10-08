@@ -488,7 +488,13 @@ impl Encode for UpdateSnapshotParams {
                     (!self.close_projects.is_empty())
                         .then_some(&self.close_projects as &dyn Encode),
                 ),
-                tsr_jsonrpc::optional(b"fileChanges", self.file_changes.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"fileChanges",
+                    self.file_changes
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
                 tsr_jsonrpc::omitted(
                     b"openFiles",
                     (!self.open_files.is_empty()).then_some(&self.open_files as &dyn Encode),
@@ -556,7 +562,13 @@ impl Encode for UpdateSnapshotResponse {
             &[
                 tsr_jsonrpc::field(b"snapshot", &self.snapshot),
                 tsr_jsonrpc::field(b"projects", &self.projects),
-                tsr_jsonrpc::optional(b"changes", self.changes.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"changes",
+                    self.changes
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
             ],
         )
     }
@@ -661,8 +673,20 @@ impl Encode for CreateProgramParams {
             &[
                 tsr_jsonrpc::field(b"rootFiles", &self.root_files),
                 tsr_jsonrpc::field(b"createProgramOptions", &self.create_program_options),
-                tsr_jsonrpc::optional(b"oldProgram", self.old_program.as_deref()),
-                tsr_jsonrpc::optional(b"fileChanges", self.file_changes.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"oldProgram",
+                    self.old_program
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
+                tsr_jsonrpc::omitted(
+                    b"fileChanges",
+                    self.file_changes
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
             ],
         )
     }
@@ -822,7 +846,13 @@ impl Encode for ConfigFileResponse {
                     (!self.project_references.is_empty())
                         .then_some(&self.project_references as &dyn Encode),
                 ),
-                tsr_jsonrpc::optional(b"typeAcquisition", self.type_acquisition.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"typeAcquisition",
+                    self.type_acquisition
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
                 tsr_jsonrpc::optional(b"compileOnSave", self.compile_on_save.as_deref()),
                 tsr_jsonrpc::omitted(
                     b"raw",
@@ -931,7 +961,13 @@ impl Encode for ReadConfigFileResponse {
             out,
             &[
                 tsr_jsonrpc::field(b"config", &self.config),
-                tsr_jsonrpc::optional(b"error", self.error.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"error",
+                    self.error
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
             ],
         )
     }
@@ -981,8 +1017,20 @@ impl Encode for ParseJsonConfigFileContentParams {
             out,
             &[
                 tsr_jsonrpc::field(b"json", &self.json),
-                tsr_jsonrpc::optional(b"configDirectory", self.config_directory.as_deref()),
-                tsr_jsonrpc::optional(b"configFileName", self.config_file_name.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"configDirectory",
+                    self.config_directory
+                        .as_deref()
+                        .filter(|value| !value.is_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
+                tsr_jsonrpc::omitted(
+                    b"configFileName",
+                    self.config_file_name
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
             ],
         )
     }
@@ -2354,7 +2402,13 @@ impl Encode for ResolveNameParams {
                     b"location",
                     (!self.location.0.is_empty()).then_some(&self.location as &dyn Encode),
                 ),
-                tsr_jsonrpc::optional(b"file", self.file.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"file",
+                    self.file
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
                 tsr_jsonrpc::optional(b"position", self.position.as_deref()),
                 tsr_jsonrpc::field(b"meaning", &self.meaning),
                 tsr_jsonrpc::field(b"excludeGlobals", &self.exclude_globals),
@@ -2430,7 +2484,13 @@ impl Encode for GetSymbolsInScopeParams {
                     b"location",
                     (!self.location.0.is_empty()).then_some(&self.location as &dyn Encode),
                 ),
-                tsr_jsonrpc::optional(b"file", self.file.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"file",
+                    self.file
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
                 tsr_jsonrpc::optional(b"position", self.position.as_deref()),
                 tsr_jsonrpc::field(b"meaning", &self.meaning),
             ],
@@ -3671,7 +3731,13 @@ impl Encode for TypePredicateResponse {
                     (!self.parameter_name.is_empty())
                         .then_some(&self.parameter_name as &dyn Encode),
                 ),
-                tsr_jsonrpc::optional(b"type", self.r#type.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"type",
+                    self.r#type
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
             ],
         )
     }
@@ -4316,7 +4382,13 @@ impl Encode for ReferencedSymbolEntry {
             out,
             &[
                 tsr_jsonrpc::field(b"definition", &self.definition),
-                tsr_jsonrpc::optional(b"symbol", self.symbol.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"symbol",
+                    self.symbol
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
                 tsr_jsonrpc::field(b"references", &self.references),
             ],
         )
@@ -4478,7 +4550,13 @@ impl Encode for GetCompletionsAtPositionParams {
                 tsr_jsonrpc::field(b"project", &self.project),
                 tsr_jsonrpc::field(b"file", &self.file),
                 tsr_jsonrpc::field(b"position", &self.position),
-                tsr_jsonrpc::optional(b"triggerCharacter", self.trigger_character.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"triggerCharacter",
+                    self.trigger_character
+                        .as_deref()
+                        .filter(|value| !value.is_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
                 tsr_jsonrpc::field(b"includeSymbol", &self.include_symbol),
             ],
         )
@@ -4660,8 +4738,20 @@ impl Encode for DiagnosticResponse {
                 ),
                 tsr_jsonrpc::field(b"pos", &self.pos),
                 tsr_jsonrpc::field(b"end", &self.end),
-                tsr_jsonrpc::optional(b"startPosition", self.start_position.as_deref()),
-                tsr_jsonrpc::optional(b"endPosition", self.end_position.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"startPosition",
+                    self.start_position
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
+                tsr_jsonrpc::omitted(
+                    b"endPosition",
+                    self.end_position
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
                 tsr_jsonrpc::omitted(
                     b"sourceLines",
                     (!self.source_lines.is_empty()).then_some(&self.source_lines as &dyn Encode),
@@ -5664,7 +5754,13 @@ impl Encode for TranspileOptions {
         tsr_jsonrpc::object(
             out,
             &[
-                tsr_jsonrpc::optional(b"compilerOptions", self.compiler_options.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"compilerOptions",
+                    self.compiler_options
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
                 tsr_jsonrpc::omitted(
                     b"fileName",
                     (!self.file_name.is_empty()).then_some(&self.file_name as &dyn Encode),
@@ -5781,12 +5877,48 @@ impl Encode for CompletionEntryResponse {
             &[
                 tsr_jsonrpc::field(b"name", &self.name),
                 tsr_jsonrpc::field(b"kind", &self.kind),
-                tsr_jsonrpc::optional(b"sortText", self.sort_text.as_deref()),
-                tsr_jsonrpc::optional(b"insertText", self.insert_text.as_deref()),
-                tsr_jsonrpc::optional(b"filterText", self.filter_text.as_deref()),
-                tsr_jsonrpc::optional(b"detail", self.detail.as_deref()),
-                tsr_jsonrpc::optional(b"labelDetails", self.label_details.as_deref()),
-                tsr_jsonrpc::optional(b"symbol", self.symbol.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"sortText",
+                    self.sort_text
+                        .as_deref()
+                        .filter(|value| !value.is_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
+                tsr_jsonrpc::omitted(
+                    b"insertText",
+                    self.insert_text
+                        .as_deref()
+                        .filter(|value| !value.is_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
+                tsr_jsonrpc::omitted(
+                    b"filterText",
+                    self.filter_text
+                        .as_deref()
+                        .filter(|value| !value.is_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
+                tsr_jsonrpc::omitted(
+                    b"detail",
+                    self.detail
+                        .as_deref()
+                        .filter(|value| !value.is_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
+                tsr_jsonrpc::omitted(
+                    b"labelDetails",
+                    self.label_details
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
+                tsr_jsonrpc::omitted(
+                    b"symbol",
+                    self.symbol
+                        .as_deref()
+                        .filter(|value| !value.is_json_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
             ],
         )
     }
@@ -5950,7 +6082,13 @@ impl Encode for EmitOutputFile {
             &[
                 tsr_jsonrpc::field(b"fileName", &self.file_name),
                 tsr_jsonrpc::field(b"text", &self.text),
-                tsr_jsonrpc::optional(b"sourceFileName", self.source_file_name.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"sourceFileName",
+                    self.source_file_name
+                        .as_deref()
+                        .filter(|value| !value.is_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
             ],
         )
     }
@@ -6054,8 +6192,20 @@ impl Encode for CompletionEntryLabelDetailsResponse {
         tsr_jsonrpc::object(
             out,
             &[
-                tsr_jsonrpc::optional(b"detail", self.detail.as_deref()),
-                tsr_jsonrpc::optional(b"description", self.description.as_deref()),
+                tsr_jsonrpc::omitted(
+                    b"detail",
+                    self.detail
+                        .as_deref()
+                        .filter(|value| !value.is_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
+                tsr_jsonrpc::omitted(
+                    b"description",
+                    self.description
+                        .as_deref()
+                        .filter(|value| !value.is_empty())
+                        .map(|value| value as &dyn Encode),
+                ),
             ],
         )
     }
