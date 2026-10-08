@@ -341,6 +341,86 @@ one change per concurrent pair) is the next parse-bind step; kind bits in
 `NodeId` (`docs/design/node-kind-bits.md`) would also take the binder's
 kind reads.
 
+## Binder name-path screens, 8 October
+
+Three bounded candidates were built against `81cd7724` (#115), each in
+isolation. None demonstrated a repeatable pipeline improvement, so all
+production changes were removed:
+
+1. **Reuse the declaration-name hash.** Carry the lookup hash into the
+   insertion of a new or replacement symbol, using the existing prehashed
+   table API. Symbol construction still interns the name separately.
+2. **Construct fresh symbols directly.** Avoid the generic populated-symbol
+   replacement path for `Symbol::new`: six reference fields are known empty,
+   so their escape maintenance and encoding are unnecessary. Retain name
+   encoding, including its wide-index escape, and creation tracing.
+3. **Insert using the symbol's interned name.** Resolve the already-stored
+   symbol name inside its owning store and insert that private name identity
+   into its table. This removes a second name-pool lookup and the temporary
+   `JsString` clone. It retains checked symbol/table identities and the same
+   hash-table insertion and promotion rules.
+
+Each screen used the normal release `ts-bench` binary (no allocation or
+profiling feature), the existing 13,094-file S07 workload, and six
+alternating **sequential** control/candidate pairs per worker mode after one
+warmup each. Builds and correctness checks ran outside the timed batches.
+These are Rust-versus-Rust development screens on the 18-CPU macOS host,
+not new Go-relative measurements or acceptance captures. Background host
+load remained present; one-minute load averages across the first three
+screens ranged from about 4.65 to 10.17.
+
+Ratios below are the median of the paired candidate/control ratios; times
+are the independently computed medians, in seconds. Lower is better.
+
+| Candidate | Workers | Control | Candidate | Paired ratio |
+| --- | ---: | ---: | ---: | ---: |
+| Hash reuse | 1 | 3.5227 | 3.5096 | 0.9975 |
+| Hash reuse | 8 | 0.8354 | 0.8354 | 1.0092 |
+| Fresh-symbol constructor | 1 | 3.4258 | 3.4518 | 1.0095 |
+| Fresh-symbol constructor | 8 | 0.7571 | 0.7487 | 0.9935 |
+| Interned-name insertion | 1 | 3.4159 | 3.4149 | 0.9976 |
+| Interned-name insertion | 8 | 0.8279 | 0.7917 | 0.9566 |
+| Interned-name insertion, confirmation | 1 | 3.3669 | 3.3531 | 0.9961 |
+| Interned-name insertion, confirmation | 8 | 0.7306 | 0.7304 | 0.9981 |
+
+The last candidate's initial eight-worker result warranted one confirmation
+batch using the **same binaries**. Its apparent 4.3% gain did not reproduce;
+the confirmation was effectively neutral. All median RSS differences were
+below 0.01%; allocation traffic was not instrumented. No memory improvement
+is claimed.
+
+Every timed child completed successfully with the same loaded-input digest,
+19,593,488 nodes, 2,459,867 symbols, 423 parse diagnostics and 5,250 bind
+diagnostics. Counts alone are not graph parity: the fresh-symbol and
+interned-name candidates also matched complete graph reports for 67 files
+(a strided workload sample plus its two largest files, 960,847 nodes) in
+both worker modes, including the raw graph digests and diagnostics.
+
+Targeted regressions exercised merge, present-null, replacement,
+early-return, duplicate and missing-name declaration paths through local
+and checked backends. The AST candidates additionally exercised empty and
+arbitrary-byte names, reference escapes or invalid-owner rejection, and
+creation-trace/runtime-identity behavior. The final candidate passed 191
+AST and 51 binder unit tests with creation tracing enabled, plus both
+crates' all-target clippy checks with warnings denied. These experimental
+tests remain with their patches; no new production API or test dependency
+was retained. No full compiler corpus or Go recapture was run.
+
+Local reproductions, exact patches, build/binary identities, individual
+samples, stderr and graph reports are preserved under
+`target/perf-binder-names-20261008/`; they are not committed artifacts.
+`build.py` builds and copies a candidate, and `screen.py CANDIDATE` runs the
+paired screen against the saved baseline. The rejected patches are
+`hash-reuse.patch`, `fresh-symbol.patch` and `interned-name-final.patch`.
+All start from the same baseline revision, rather than stacking the
+unretained changes. The confirmation executable is byte-identical to
+`interned-name`.
+
+These results limit these three mechanisms; they do not show that the
+whole sampled name/table group is free or that binder overhead is solved.
+They provide no basis for adding further name-storage machinery. The
+broader node-access cost remains a separate experiment.
+
 ## What remains
 
 - **The binder** is 1.8x the pin's on the parse-bind workload where the
