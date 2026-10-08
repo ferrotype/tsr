@@ -163,14 +163,63 @@ encode of 10,160 responses), a third checker query and a third symbol
 response construction (registry, node handles); the pin's whole request
 costs what our checker query alone costs.
 
+## Second pass: the node-access levers measured
+
+The structural estimate above ("another quarter off the check phase") was
+checked the same day, on the top-60 variants, two ways: a counting build
+(`tsr_ast`'s `access-stats` feature, read per phase by the benchmark's phase
+clocks) sized the reads, and one build per candidate change measured its
+effect. The machine was busy, so every timing is a concurrent pair: the
+baseline and the variant started at the same moment, six pairs per variant,
+scored by the per-pair ratio (spread about one percent).
+
+**What the check phase reads** (195 million node reads):
+
+| Reads | Count | Share |
+| --- | ---: | ---: |
+| serving only a kind check | 92M | 47% |
+| serving nothing (validation only) | 9M | 5% |
+| serving a parent walk | 43M | 22% |
+| decoding node data | 46M | 23% |
+
+With node access at about 21% of the diagnostics pass, one read costs about
+4 ns: the cost of a few predictable branches and a bounds-checked load, not
+of the page directory.
+
+**What each lever is worth** (ratio to the baseline run):
+
+| Change | Measured | Kept |
+| --- | ---: | --- |
+| sealed flat arena pages (one vector per completed file) | 0.986 | yes |
+| directory hit carrying the direct-read flag, symbol lookup without a view | 1.013 | no |
+| shared declared signature lists, no inherited-name copies, allocation-free lower-casing | 1.005 | no |
+| kind bits in `NodeId` | not built; the 92M kind-only reads at 4 ns put it at 8–10% of the check phase | |
+| same-owner parent reads | not built; the routing share of 43M reads puts it near 1% | |
+
+So the levers as a set are worth about a tenth of the check phase, not a
+quarter: the single-threaded `tsc` ratio would move from 2.3x to about 2.1x.
+Even node access made free (the pin's pointer read) would take the ratio to
+about 1.85x. The rest of the checker's gap is spread across the algorithmic
+areas themselves (flow analysis, name resolution, the relater), where the
+port runs the same algorithm with slower operations: `Result` on every
+accessor, arena-indexed types and symbols, hashed names. Sizing those needs
+a different method, a function-by-function comparison of inclusive time
+against the pin's profile on the same workload, which is the next step.
+
+The sealed flat arena is kept: `Arena::seal` moves the pages into one vector
+when a parse completes (`AstBuilder::complete`), so a completed file's slot
+read is one bounds check and one offset; an open arena keeps its pages. The
+counting feature and the phase-split counters stay as development tooling.
+
 ## What remains
 
-- **Node access in the checker.** `CheckerState::node` and `AstView::node`
-  are still the largest self-time entries of the check phase. The pin reads
-  fields through a pointer; the port resolves an arena and a slot and
-  decodes a compact header on every read. The levers recorded with the S08
-  work (flat arena pages, same-owner parent reads, kind bits in the id) are
-  the next structural step; this pass did not take it.
+- **Node access in the checker.** Measured above: kind bits in `NodeId` are
+  the one lever left with a real return (about a tenth of the check phase);
+  flat pages are done, the directory is not the cost, parent reads are
+  about one percent.
+- **The checker's remaining gap** is spread across flow analysis, name
+  resolution and the relater; a function-level comparison with the pin's
+  profile is the method to size it.
 - **Navigation.** `getSymbolAtPosition`, completion, hover and references
   descend the tree through the general view routing (`for_node_owner`,
   `owner_retention`, `owning_source`) and allocate a vector of children per

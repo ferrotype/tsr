@@ -3,6 +3,8 @@
 //! Child identities do not retain their owner. The generated visitors enumerate
 //! node and list edges; an owning tree supplies list resolution and recursion.
 
+#[cfg(feature = "access-stats")]
+pub mod access_stats;
 mod accessors_generated;
 mod bind_result;
 pub use bind_result::local_bind;
