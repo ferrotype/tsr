@@ -73,13 +73,48 @@ class OperationMatrixTests(unittest.TestCase):
                          'operation anchors changed: review and refreeze the dependent subset rule')
         self.assertEqual(rule.pop('review_sha256'), sha256(json_bytes(review)))
         self.assertEqual(rule['state'], 'frozen')
-        for name, expected in rule['provenance']['syntax']['producer_inputs'].items():
-            self.assertEqual(expected, sha256((ROOT / name).read_bytes()),
-                             'syntax observation input changed: ' + name)
+        self.assert_syntax_inputs(rule['provenance']['syntax'])
         rule['state'] = 'candidate_pending_dependency_closure_and_review'
         self.assertEqual(review['candidate_sha256']['subset-rule.json'], sha256(json_bytes(rule)))
         for name in ('subset.json', 'checker-obligations.json'):
             self.assertEqual(review['candidate_sha256'][name], sha256((directory / name).read_bytes()), name)
+
+    def assert_syntax_inputs(self, provenance):
+        for name, expected in provenance['producer_inputs'].items():
+            content = (ROOT / name).read_bytes()
+            if name == 'data/upstream.json':
+                # The Go-only observation depends on the pin, not the ledger's
+                # Rust-home/progress digest. Keep its historical input hash;
+                # updating port coverage must not require recapturing Go.
+                self.assertEqual(provenance['pin'], json.loads(content)['pin'],
+                                 'syntax observation upstream pin changed')
+            else:
+                self.assertEqual(expected, sha256(content),
+                                 'syntax observation input changed: ' + name)
+
+    def test_syntax_inputs_allow_ledger_progress_but_reject_pin_or_producer_changes(self):
+        pin = '1' * 40
+        manifest = {'pin': pin, 'ledger_generated_sha256': 'old ledger'}
+        original = json_bytes(manifest)
+        provenance = {'pin': pin, 'producer_inputs': {
+            'data/upstream.json': sha256(original), 'producer.py': sha256(b'original producer'),
+        }}
+
+        def read(path):
+            return json_bytes(manifest) if path.name == 'upstream.json' else producer
+
+        producer = b'original producer'
+        with patch.object(Path, 'read_bytes', read):
+            self.assert_syntax_inputs(provenance)
+            manifest['ledger_generated_sha256'] = 'new ledger'
+            self.assert_syntax_inputs(provenance)
+            manifest['pin'] = '2' * 40
+            with self.assertRaisesRegex(AssertionError, 'upstream pin changed'):
+                self.assert_syntax_inputs(provenance)
+            manifest['pin'] = pin
+            producer = b'changed producer'
+            with self.assertRaisesRegex(AssertionError, 'syntax observation input changed'):
+                self.assert_syntax_inputs(provenance)
 
     def test_embedded_inventory_progress_does_not_corrupt_producer_json(self):
         stdout, stderr = io.StringIO(), io.StringIO()

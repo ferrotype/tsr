@@ -59,6 +59,33 @@ class CargoArtifacts(unittest.TestCase):
                 self.decode(manifest, rows)
 
 
+class BinaryPublication(unittest.TestCase):
+    def test_replacement_preserves_old_inode_and_publishes_executable_bytes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source, destination = root / 'built', root / 'published'
+            source.write_bytes(b'new executable')
+            destination.write_bytes(b'old executable')
+            old_inode = root / 'old-inode'
+            os.link(destination, old_inode)
+            benchmark.publish_binary(source, destination)
+            self.assertEqual(old_inode.read_bytes(), b'old executable')
+            self.assertEqual(destination.read_bytes(), source.read_bytes())
+            self.assertNotEqual(destination.stat().st_ino, old_inode.stat().st_ino)
+            self.assertEqual(destination.stat().st_mode & 0o777, 0o755)
+            self.assertFalse(list(root.glob('.benchmark-binary-*')))
+
+    def test_failed_copy_preserves_existing_executable(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            destination = root / 'published'
+            destination.write_bytes(b'old executable')
+            with self.assertRaises(FileNotFoundError):
+                benchmark.publish_binary(root / 'missing', destination)
+            self.assertEqual(destination.read_bytes(), b'old executable')
+            self.assertFalse(list(root.glob('.benchmark-binary-*')))
+
+
 class CargoConfiguration(unittest.TestCase):
     def test_compiler_configuration_fails_closed_and_legacy_shadow_is_respected(self):
         with tempfile.TemporaryDirectory(prefix="s07-cargo-config-") as temporary:
