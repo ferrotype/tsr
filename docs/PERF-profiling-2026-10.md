@@ -344,8 +344,10 @@ kind reads.
 ## Binder name-path screens, 8 October
 
 Three bounded candidates were built against `81cd7724` (#115), each in
-isolation. None demonstrated a repeatable pipeline improvement, so all
-production changes were removed:
+isolation. The initial decision to remove all three used sequential pairs,
+contrary to this profiling series' concurrent method. That rejection was
+premature. The corrected concurrent measurements below support retaining
+the fresh-symbol constructor; the other two candidates remain removed.
 
 1. **Reuse the declaration-name hash.** Carry the lookup hash into the
    insertion of a new or replacement symbol, using the existing prehashed
@@ -360,7 +362,7 @@ production changes were removed:
    `JsString` clone. It retains checked symbol/table identities and the same
    hash-table insertion and promotion rules.
 
-Each screen used the normal release `ts-bench` binary (no allocation or
+The initial screens used the normal release `ts-bench` binary (no allocation or
 profiling feature), the existing 13,094-file S07 workload, and six
 alternating **sequential** control/candidate pairs per worker mode after one
 warmup each. Builds and correctness checks ran outside the timed batches.
@@ -383,11 +385,58 @@ are the independently computed medians, in seconds. Lower is better.
 | Interned-name insertion, confirmation | 1 | 3.3669 | 3.3531 | 0.9961 |
 | Interned-name insertion, confirmation | 8 | 0.7306 | 0.7304 | 0.9981 |
 
-The last candidate's initial eight-worker result warranted one confirmation
+Within this sequential method, the last candidate's initial eight-worker
+result warranted one confirmation
 batch using the **same binaries**. Its apparent 4.3% gain did not reproduce;
 the confirmation was effectively neutral. All median RSS differences were
 below 0.01%; allocation traffic was not instrumented. No memory improvement
-is claimed.
+is claimed. These sequential screens remain recorded, but do not decide
+retention against the concurrent methodology.
+
+### Corrected concurrent comparison
+
+The same saved baseline and candidate binaries were rerun using the direct
+process-launch method in Claude's `pairb.py`: start both executables before
+waiting for either, alternate launch order, then take the median of the
+within-pair `wall_time_ns` ratios. Each mode had six measured pairs after
+one warmup pair. The fresh-symbol candidate received a second batch with
+the same method and binaries. Binary hashes were checked before and after
+each batch. No build or correctness run from this task overlapped timing.
+
+Both processes used the same workload and worker count, so the eight-worker
+pair used sixteen workers on the eighteen-CPU host. The launch skew was
+below 1.8 ms in every measured pair. This matches the existing launch
+method; it does not add a barrier between the binaries' measurement
+intervals. Startup, preload and worker-setup fields are retained alongside
+the full reports, exit statuses and stderr. Every pair passed the same
+input/count checks as the initial screens.
+
+| Candidate | One-worker paired ratio | Eight-worker paired ratio |
+| --- | ---: | ---: |
+| Hash reuse | 1.0020 | 1.0032 |
+| Fresh-symbol constructor | 0.9926 | 0.9856 |
+| Interned-name insertion | 0.9976 | 0.9985 |
+| Fresh-symbol constructor, confirmation | 0.9895 | 0.9922 |
+
+The fresh-symbol constructor was faster in all twelve measured one-worker
+pairs and eleven of twelve eight-worker pairs. Its median improvement was
+0.7–1.4% across the four mode/batch combinations. Retain this small,
+repeatable improvement: the change skips work for fields known empty at
+allocation, without changing storage or the general populated-symbol path.
+Median RSS differences were below 0.01%; allocation traffic was not
+instrumented. This is a development result on this host, not a new
+Go-relative or acceptance measurement.
+
+Hash reuse showed no benefit. Interned-name insertion's approximately
+0.2% medians included pairs in both directions; those results do not
+justify its additional insertion API. Neither candidate is retained.
+
+For future candidates in this profiling series, preserve the concurrent
+method: save the baseline before editing, build with identical features,
+start both direct binaries before waiting, alternate launch order, verify
+outputs before scoring within-pair ratios, and confirm a proposed win with
+the same method. Do not silently replace concurrent pairs with sequential
+runs or compare medians from different batches.
 
 Every timed child completed successfully with the same loaded-input digest,
 19,593,488 nodes, 2,459,867 symbols, 423 parse diagnostics and 5,250 bind
@@ -400,26 +449,31 @@ Targeted regressions exercised merge, present-null, replacement,
 early-return, duplicate and missing-name declaration paths through local
 and checked backends. The AST candidates additionally exercised empty and
 arbitrary-byte names, reference escapes or invalid-owner rejection, and
-creation-trace/runtime-identity behavior. The final candidate passed 191
-AST and 51 binder unit tests with creation tracing enabled, plus both
-crates' all-target clippy checks with warnings denied. These experimental
-tests remain with their patches; no new production API or test dependency
-was retained. No full compiler corpus or Go recapture was run.
+creation-trace/runtime-identity behavior. The retained fresh-symbol
+constructor passed 190 AST and 51 binder unit tests with creation tracing
+enabled. Its declaration/default-state regressions are retained with it.
+After restoring the exact measured patch, both crates' all-target clippy
+checks passed with warnings denied, as did formatting and ledger
+validation. Eight focused compiler variants passed all 70 subtests against
+the pinned baselines; no parity expectation changed.
+No full compiler corpus or Go recapture was run.
 
 Local reproductions, exact patches, build/binary identities, individual
 samples, stderr and graph reports are preserved under
 `target/perf-binder-names-20261008/`; they are not committed artifacts.
-`build.py` builds and copies a candidate, and `screen.py CANDIDATE` runs the
-paired screen against the saved baseline. The rejected patches are
+`build.py` builds and copies a candidate. `screen.py` is the initial
+sequential runner; `concurrent_screen.py` is the corrected runner. The
+concurrent results live in `concurrent-screen/` and
+`concurrent-fresh-symbol-confirm/`. The original candidate patches are
 `hash-reuse.patch`, `fresh-symbol.patch` and `interned-name-final.patch`.
 All start from the same baseline revision, rather than stacking the
-unretained changes. The confirmation executable is byte-identical to
-`interned-name`.
+unretained changes. The sequential interned-name confirmation and
+concurrent fresh-symbol confirmation each reuse their candidate's exact
+binary.
 
-These results limit these three mechanisms; they do not show that the
-whole sampled name/table group is free or that binder overhead is solved.
-They provide no basis for adding further name-storage machinery. The
-broader node-access cost remains a separate experiment.
+These results do not show that the whole sampled name/table group is free
+or that binder overhead is solved. The broader node-access cost remains a
+separate experiment.
 
 ## What remains
 

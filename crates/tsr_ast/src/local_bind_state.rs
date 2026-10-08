@@ -58,8 +58,7 @@
 use super::{BindFlow, BindNode, Brand, LocalBind};
 use crate::{
     DeclarationSlice, FlowData, FlowList, FlowListId, FlowListRead, FlowNode, FlowNodeRead,
-    JsString, Symbol, SymbolId, SymbolRead, SymbolTable, SymbolTableId, SymbolTableMut,
-    SymbolTableRead,
+    JsString, SymbolId, SymbolRead, SymbolTable, SymbolTableId, SymbolTableMut, SymbolTableRead,
 };
 use std::{marker::PhantomData, num::NonZeroU32};
 use tsr_arena::Error;
@@ -160,7 +159,7 @@ impl<'scope> LocalBind<'scope, '_> {
     }
     #[cfg_attr(feature = "creation-trace", track_caller)]
     pub fn new_symbol(&mut self, flags: u32, name: JsString) -> BindSymbol<'scope> {
-        let id = self.symbols_mut().push(Symbol::new(flags, name));
+        let id = self.symbols_mut().push_new(flags, name);
         BindSymbol::from_slot(id.slot())
     }
     pub fn new_table(&mut self) -> BindTable<'scope> {

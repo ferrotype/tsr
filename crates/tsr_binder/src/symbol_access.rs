@@ -8,8 +8,7 @@ use crate::{
     Binder,
 };
 use tsr_ast::{
-    local_bind::BindSymbol, DeclarationSlice, JsString, NodeId, Symbol, SymbolId, SymbolRead,
-    SymbolTableId,
+    local_bind::BindSymbol, DeclarationSlice, JsString, NodeId, SymbolId, SymbolRead, SymbolTableId,
 };
 
 #[derive(Clone, Copy, Debug)]
@@ -71,7 +70,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
         match &mut self.builder {
             Backend::Local(local) => BindingSymbol::Local(local.new_symbol(flags, name)),
             Backend::Checked(builder) => {
-                BindingSymbol::Checked(builder.symbols_mut().push(Symbol::new(flags, name)))
+                BindingSymbol::Checked(builder.symbols_mut().push_new(flags, name))
             }
         }
     }
