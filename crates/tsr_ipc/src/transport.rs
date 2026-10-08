@@ -206,6 +206,14 @@ impl Transport for PipeTransport {
     }
 }
 
+/// A listener dropped without `close` (an early return after a failed
+/// accept) still removes its socket file, as the pin's deferred `Close`.
+impl Drop for PipeTransport {
+    fn drop(&mut self) {
+        let _ = Transport::close(self);
+    }
+}
+
 /// Standard input and output as the one connection a process serves: the
 /// pin's `StdioTransport` of tsc/internal/ipc/transport.go.
 pub struct StdioTransport {

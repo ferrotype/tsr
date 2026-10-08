@@ -4,7 +4,7 @@
 //! diagnostics. Checker-backed collections acquire the project's
 //! diagnostics checker through its scheduler, as the LSP server does.
 //! port: tsc/internal/api/session.go
-use super::responses::diagnostic_response;
+use super::responses::{config_resolver, diagnostic_responses};
 use super::{client_error, ApiSession, SessionError, SessionResult};
 use crate::proto::{DiagnosticResponse, GetDiagnosticsParams, GetProjectDiagnosticsParams};
 use std::sync::Arc;
@@ -50,29 +50,17 @@ pub(super) fn program_diagnostic_responses(
     program: &Program,
     diagnostics: &[Diagnostic],
 ) -> Vec<Option<Box<DiagnosticResponse>>> {
-    diagnostics
-        .iter()
-        .map(|diagnostic| {
-            let file = diagnostic.file.and_then(|file| {
-                program
-                    .files()
-                    .iter()
-                    .find(|candidate| candidate.source() == file)
-            });
-            let response = match file {
-                Some(file) => diagnostic_response(diagnostic, Some(file.bound().view().ast())),
-                // A config-file diagnostic names the config source file, which
-                // the program holds outside its file list.
-                None => match (diagnostic.file, program.config().config_file.as_ref()) {
-                    (Some(_), Some(config)) => {
-                        diagnostic_response(diagnostic, Some(config.file.view()))
-                    }
-                    _ => diagnostic_response(diagnostic, None),
-                },
-            };
-            Some(Box::new(response))
-        })
-        .collect()
+    // A program diagnostic names one of the program's files, or a config
+    // source file the program holds outside its file list; related
+    // information may name another file than the diagnostic.
+    let config = config_resolver(program.config());
+    let resolve = |node: tsr_ast::NodeId| {
+        program
+            .file_of_node(node)
+            .map(|file| file.bound().view().ast())
+            .or_else(|| config(node))
+    };
+    diagnostic_responses(diagnostics, &resolve)
 }
 
 /// Runs `collect` with the project's diagnostics checker for `file` (or any

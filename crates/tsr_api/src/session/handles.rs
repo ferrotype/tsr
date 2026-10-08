@@ -50,8 +50,18 @@ struct SymbolEntry {
 pub struct ProjectRegistry {
     _lease: PooledChecker,
     owner: Arc<CheckerOwner>,
+    pool: Arc<tsr_project::CheckerPool>,
     types: Mutex<HashMap<u32, RetainedType>>,
     signatures: Mutex<HashMap<u32, RetainedSignature>>,
+}
+
+/// A response whose handles were inserted and whose bytes were validated
+/// under the generation gate; the connection writes it as it is.
+pub struct Committed(tsr_json::RawValue);
+impl tsr_json::Encode for Committed {
+    fn encode(&self, out: &mut tsr_json::Encoder<'_>) -> Result<(), tsr_json::Error> {
+        self.0.encode(out)
+    }
 }
 
 impl ProjectRegistry {
@@ -64,9 +74,23 @@ impl ProjectRegistry {
         Ok(Self {
             _lease: lease,
             owner,
+            pool: project.pool().clone(),
             types: Mutex::default(),
             signatures: Mutex::default(),
         })
+    }
+
+    /// The generation gate of the project's pool, validated for this
+    /// registry's checker. Registry insertion, lookup and response
+    /// commitment run under it, so none can straddle a retirement
+    /// (docs/design/ownership.md section 2.7). The gate is held only
+    /// around the registry's own lock: never across a callback, a permit
+    /// wait or transport I/O.
+    pub fn gate(&self) -> SessionResult<tsr_arena::GenerationGuard<'_>> {
+        let gate = self.pool.generation().enter().map_err(checker_error)?;
+        gate.validate_checker(self.owner.identity())
+            .map_err(checker_error)?;
+        Ok(gate)
     }
 
     /// An operation on the project's API checker.
@@ -74,9 +98,22 @@ impl ProjectRegistry {
         self.owner.operation().map_err(checker_error)
     }
 
+    /// A handle registered through another checker would alias one of this
+    /// registry's by number; the pin panics on the duplicate, and so does
+    /// this, in the batch item's `panic:` form.
+    fn check_owner(&self, operation: &Operation<'_>, duplicate: &str) -> SessionResult<()> {
+        if Arc::ptr_eq(operation.owner(), &self.owner) {
+            Ok(())
+        } else {
+            Err(SessionError::Panic(duplicate.to_string()))
+        }
+    }
+
     /// port: tsc/internal/api/session.go:snapshotData.registerType
     pub fn register_type(&self, operation: &Operation<'_>, ty: TypeRef) -> SessionResult<TypeId> {
+        self.check_owner(operation, "duplicate type")?;
         let id = ty.id();
+        let _gate = self.gate()?;
         let mut types = self.types.lock().expect("type registry");
         if let std::collections::hash_map::Entry::Vacant(slot) = types.entry(id) {
             slot.insert(operation.retain_type(ty).map_err(checker_error)?);
@@ -93,18 +130,20 @@ impl ProjectRegistry {
         if handle.0 == 0 {
             return Err(client_error("empty type handle"));
         }
-        let retained = self
-            .types
-            .lock()
-            .expect("type registry")
-            .get(&handle.0)
-            .cloned()
-            .ok_or_else(|| {
-                client_error(format!(
-                    "type handle {} not found in project registry",
-                    handle.0
-                ))
-            })?;
+        let retained = {
+            let _gate = self.gate()?;
+            self.types
+                .lock()
+                .expect("type registry")
+                .get(&handle.0)
+                .cloned()
+                .ok_or_else(|| {
+                    client_error(format!(
+                        "type handle {} not found in project registry",
+                        handle.0
+                    ))
+                })?
+        };
         operation.import_type(&retained).map_err(checker_error)
     }
 
@@ -116,7 +155,9 @@ impl ProjectRegistry {
         operation: &Operation<'_>,
         signature: SignatureRef,
     ) -> SessionResult<SignatureId> {
+        self.check_owner(operation, "duplicate signature")?;
         let id = signature.id();
+        let _gate = self.gate()?;
         let mut signatures = self.signatures.lock().expect("signature registry");
         if let std::collections::hash_map::Entry::Vacant(slot) = signatures.entry(id) {
             slot.insert(
@@ -143,18 +184,20 @@ impl ProjectRegistry {
                 handle.0
             ))
         })?;
-        let retained = self
-            .signatures
-            .lock()
-            .expect("signature registry")
-            .get(&id)
-            .cloned()
-            .ok_or_else(|| {
-                client_error(format!(
-                    "signature handle {} not found in project registry",
-                    handle.0
-                ))
-            })?;
+        let retained = {
+            let _gate = self.gate()?;
+            self.signatures
+                .lock()
+                .expect("signature registry")
+                .get(&id)
+                .cloned()
+                .ok_or_else(|| {
+                    client_error(format!(
+                        "signature handle {} not found in project registry",
+                        handle.0
+                    ))
+                })?
+        };
         operation.import_signature(&retained).map_err(checker_error)
     }
 }
@@ -201,6 +244,7 @@ impl Registries {
     /// port: tsc/internal/api/session.go:snapshotData.registerSymbol
     pub fn register_symbol(
         &self,
+        registry: &ProjectRegistry,
         operation: &Operation<'_>,
         symbol: SymbolRef,
         canonical: &ProjectId,
@@ -211,6 +255,7 @@ impl Registries {
         );
         let raw = symbol.id();
         let key = (raw.arena(), raw.slot());
+        let _gate = registry.gate()?;
         let mut symbols = self.symbols.lock().expect("symbol registry");
         if let Some(id) = symbols.by_identity.get(&key).copied() {
             let entry = symbols.entries.get(&id).expect("registered symbol");
@@ -277,6 +322,24 @@ pub struct CheckerSetup<'a> {
     pub project: ProjectId,
 }
 
+impl CheckerSetup<'_> {
+    /// Publishes a query's response (docs/design/ownership.md section 2.7):
+    /// the value is serialized outside the gate, then the gate revalidates
+    /// this project's checker and generation before the bytes go to the
+    /// connection. A generation retired by a sibling request between the
+    /// computation and this point turns the response into the error form;
+    /// the handles the query inserted went in under the same gate and
+    /// reject use on the retired generation.
+    pub fn commit(&self, value: &dyn tsr_json::Encode) -> SessionResult<Committed> {
+        let bytes = tsr_json::marshal(value, tsr_json::Options::default())
+            .map_err(|error| SessionError::Other(format!("{error}")))?;
+        #[cfg(test)]
+        super::hooks::before_commit();
+        let _gate = self.registry.gate()?;
+        Ok(Committed(tsr_json::RawValue(bytes)))
+    }
+}
+
 impl SnapshotData {
     /// port: tsc/internal/api/session.go:Session.setupChecker
     pub fn setup_checker(&self, project: &ProjectId) -> SessionResult<CheckerSetup<'_>> {
@@ -329,12 +392,22 @@ pub fn resolve_node_handle(
     };
     let first = text.find('.').ok_or_else(invalid)?;
     let second = text[first + 1..].find('.').ok_or_else(invalid)? + first + 1;
-    let index: usize = text[..first].parse().map_err(|error| {
-        client_error(format!(
-            "invalid node handle {}: {error}",
-            tsr_jsstring::go_quote(text.as_bytes())
-        ))
-    })?;
+    // port: strconv.ParseUint(s, 10, 32), with its error text.
+    let index_text = &text[..first];
+    let index: usize = index_text
+        .parse::<u32>()
+        .map_err(|error| {
+            let reason = match error.kind() {
+                std::num::IntErrorKind::PosOverflow => "value out of range",
+                _ => "invalid syntax",
+            };
+            client_error(format!(
+                "invalid node handle {}: strconv.ParseUint: parsing {}: {reason}",
+                tsr_jsstring::go_quote(text.as_bytes()),
+                tsr_jsstring::go_quote(index_text.as_bytes())
+            ))
+        })
+        .map(|index| index as usize)?;
     let path = &text[second + 1..];
     let stale = || {
         client_error(format!(

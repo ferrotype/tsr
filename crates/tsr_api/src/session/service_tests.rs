@@ -564,3 +564,267 @@ fn create_program_returns_the_client_config_diagnostics() {
     .unwrap();
     assert_eq!(diagnostics, json!([diagnostic]));
 }
+
+/// A malformed node handle index reports `strconv.ParseUint`'s text, as
+/// the pin's `resolveNodeHandle` does, and is bounded to 32 bits.
+#[test]
+fn node_handle_indexes_report_the_pin_parse_errors() {
+    let session = session(&[
+        (CONFIG, r#"{ "compilerOptions": { "noLib": true } }"#),
+        (INDEX, "export const n = 1;\n"),
+    ]);
+    let (snapshot, project) = open(&session, CONFIG);
+    for (handle, reason) in [
+        (format!("abc.1.{INDEX}"), "invalid syntax"),
+        (format!("99999999999.1.{INDEX}"), "value out of range"),
+    ] {
+        let error = request(
+            &session,
+            "getSymbolAtLocation",
+            &json!({"snapshot": snapshot, "project": project, "location": handle}),
+        )
+        .unwrap_err();
+        let index = handle.split('.').next().unwrap();
+        assert_eq!(
+            error,
+            format!(
+                "api: client error: invalid node handle \"{handle}\": strconv.ParseUint: parsing \"{index}\": {reason}"
+            )
+        );
+    }
+}
+
+/// A diagnostic in a config the root extends keeps that file's name and its
+/// UTF-16 positions: the response resolves the file through the owner of
+/// the diagnostic's node, not the root config's view.
+#[test]
+fn extended_config_diagnostics_name_their_own_file() {
+    const BASE: &str = "/home/projects/p/base.json";
+    let base =
+        "// 💩 a comment before the error\n{ \"compilerOptions\": { \"target\": \"bogus\" } }";
+    let session = session(&[
+        (
+            CONFIG,
+            r#"{ "extends": "./base.json", "compilerOptions": { "noLib": true } }"#,
+        ),
+        (BASE, base),
+        (INDEX, "export const n = 1;\n"),
+    ]);
+    let (snapshot, project) = open(&session, CONFIG);
+    let config = request(
+        &session,
+        "getConfigFileParsingDiagnostics",
+        &json!({"snapshot": snapshot, "project": project}),
+    )
+    .unwrap();
+    let config = config.as_array().unwrap();
+    assert_eq!(config.len(), 1, "{config:?}");
+    assert_eq!(config[0]["code"], 6046);
+    assert_eq!(config[0]["fileName"], BASE, "{}", config[0]);
+    let prefix = &base[..base.find("\"bogus\"").unwrap()];
+    let pos = prefix.encode_utf16().count();
+    assert_eq!(config[0]["pos"], pos, "{}", config[0]);
+    assert_eq!(config[0]["end"], pos + "\"bogus\"".len());
+    assert_eq!(config[0]["startPosition"]["line"], 1);
+    assert_eq!(config[0]["sourceLines"].as_array().unwrap().len(), 1);
+}
+
+/// The snapshot reference a derivation takes is released when the request
+/// unwinds (the pin's deferred release): the client's own release is then
+/// the last one, and the snapshot's handles are rejected with the pin's
+/// text.
+#[test]
+fn a_request_that_unwinds_releases_its_snapshot_reference() {
+    let session = session(&[
+        (CONFIG, r#"{ "compilerOptions": { "noLib": true } }"#),
+        (INDEX, "export const n = 1;\n"),
+    ]);
+    let (snapshot, project) = open(&session, CONFIG);
+    let previous = std::panic::take_hook();
+    std::panic::set_hook(Box::new(|_| {}));
+    let unwound = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        let _retained = session.retain_snapshot(SnapshotId(snapshot)).unwrap();
+        panic!("a callback panicked during derivation");
+    }));
+    std::panic::set_hook(previous);
+    assert!(unwound.is_err());
+    assert_eq!(
+        request(&session, "release", &json!({"snapshot": snapshot})).unwrap(),
+        json!(true)
+    );
+    let error = request(
+        &session,
+        "getSymbolAtPosition",
+        &json!({"snapshot": snapshot, "project": project, "file": INDEX, "position": 13}),
+    )
+    .unwrap_err();
+    assert_eq!(
+        error,
+        format!("api: client error: snapshot {snapshot} not found")
+    );
+}
+
+/// The ownership note's retirement-serialized commitment (section 2.7): a
+/// generation retired by a sibling after a query computed its response
+/// turns that response into the error form instead of publishing handles
+/// of a retired checker, and the retired snapshot answers nothing further.
+#[test]
+fn a_response_is_not_published_after_its_generation_retires() {
+    let session = session(&[
+        (CONFIG, r#"{ "compilerOptions": { "noLib": true } }"#),
+        (INDEX, "export const answer = 1;\n"),
+    ]);
+    let (snapshot, project) = open(&session, CONFIG);
+    let symbol = request(
+        &session,
+        "getSymbolAtPosition",
+        &json!({"snapshot": snapshot, "project": project, "file": INDEX, "position": 14}),
+    )
+    .unwrap();
+    assert_eq!(symbol["name"], "answer");
+    let pool = session
+        .snapshot_data(SnapshotId(snapshot))
+        .unwrap()
+        .project(&ProjectId(project.clone()))
+        .unwrap()
+        .pool()
+        .clone();
+    hooks::set_before_commit(Some(Box::new(move || pool.generation().retire())));
+    let error = request(
+        &session,
+        "getTypeOfSymbol",
+        &json!({"snapshot": snapshot, "project": project, "symbol": symbol["id"]}),
+    )
+    .unwrap_err();
+    hooks::set_before_commit(None);
+    assert!(error.contains("retired"), "{error}");
+    let error = request(
+        &session,
+        "getTypeOfSymbol",
+        &json!({"snapshot": snapshot, "project": project, "symbol": symbol["id"]}),
+    )
+    .unwrap_err();
+    assert!(
+        error.contains("retired"),
+        "the retired generation's handles are rejected: {error}"
+    );
+}
+
+/// The registry's core: one binder symbol seen from two projects has one
+/// id, with the project that first observed it as its canonical project.
+#[test]
+fn a_symbol_shared_by_two_projects_has_one_id() {
+    const SHARED: &str = "/home/projects/p/src/shared.ts";
+    const OTHER_CONFIG: &str = "/home/projects/q/tsconfig.json";
+    let session = session(&[
+        (
+            CONFIG,
+            r#"{ "compilerOptions": { "noLib": true }, "files": ["src/index.ts", "src/shared.ts"] }"#,
+        ),
+        (
+            OTHER_CONFIG,
+            r#"{ "compilerOptions": { "noLib": true }, "files": ["../p/src/shared.ts"] }"#,
+        ),
+        (INDEX, "export const n = 1;\n"),
+        (SHARED, "export const shared = 1;\n"),
+    ]);
+    let (initial, first) = open(&session, CONFIG);
+    let update = session
+        .handle_update_snapshot(&UpdateSnapshotParams {
+            open_projects: vec![DocumentIdentifier {
+                file_name: OTHER_CONFIG.into(),
+                uri: String::new(),
+            }],
+            ..Default::default()
+        })
+        .unwrap();
+    let snapshot = update.snapshot.0;
+    assert!(snapshot >= initial);
+    let second = update
+        .projects
+        .iter()
+        .flatten()
+        .map(|project| project.id.0.clone())
+        .find(|id| *id != first)
+        .expect("the second project");
+    let from_first = request(
+        &session,
+        "getSymbolAtPosition",
+        &json!({"snapshot": snapshot, "project": first, "file": SHARED, "position": 14}),
+    )
+    .unwrap();
+    let from_second = request(
+        &session,
+        "getSymbolAtPosition",
+        &json!({"snapshot": snapshot, "project": second, "file": SHARED, "position": 14}),
+    )
+    .unwrap();
+    assert_eq!(from_first["name"], "shared");
+    assert_eq!(
+        from_first["id"], from_second["id"],
+        "{from_first} {from_second}"
+    );
+    assert_eq!(from_first["project"], first);
+    assert_eq!(
+        from_second["project"], first,
+        "the first project stays canonical"
+    );
+}
+
+/// `getRestTypeOfSignature` slices a tuple rest parameter first, as the
+/// pin's `tryGetRestTypeOfSignature` does: a tuple with no rest element
+/// has no rest type, an array rest parameter answers its element type.
+#[test]
+fn rest_types_of_signatures_slice_tuples_first() {
+    let content = "declare function f(...args: [string, number]): void;\ndeclare function g(...args: string[]): void;\ndeclare function h(...args: [string, ...number[]]): void;\n";
+    // Arrays and tuples need the es5 library's `Array`.
+    let session = session(&[
+        (CONFIG, r#"{ "compilerOptions": { "lib": ["es5"] } }"#),
+        (INDEX, content),
+    ]);
+    let (snapshot, project) = open(&session, CONFIG);
+    let rest_type = |name: &str| -> Value {
+        let position = content.find(&format!("function {name}")).unwrap() + "function ".len();
+        let symbol = request(
+            &session,
+            "getSymbolAtPosition",
+            &json!({"snapshot": snapshot, "project": project, "file": INDEX, "position": position}),
+        )
+        .unwrap();
+        let ty = request(
+            &session,
+            "getTypeOfSymbol",
+            &json!({"snapshot": snapshot, "project": project, "symbol": symbol["id"]}),
+        )
+        .unwrap();
+        let signatures = request(
+            &session,
+            "getSignaturesOfType",
+            &json!({"snapshot": snapshot, "project": project, "type": ty["id"], "kind": 0}),
+        )
+        .unwrap();
+        let rest = request(
+            &session,
+            "getRestTypeOfSignature",
+            &json!({"snapshot": snapshot, "project": project, "signature": signatures[0]["id"]}),
+        )
+        .unwrap();
+        request(
+            &session,
+            "typeToString",
+            &json!({"snapshot": snapshot, "project": project, "type": rest["id"]}),
+        )
+        .unwrap()
+    };
+    assert_eq!(
+        rest_type("f"),
+        json!("any"),
+        "a tuple without a rest element"
+    );
+    assert_eq!(rest_type("g"), json!("string"), "an array rest parameter");
+    assert_eq!(
+        rest_type("h"),
+        json!("any"),
+        "a sliced rest element without a numeric index"
+    );
+}

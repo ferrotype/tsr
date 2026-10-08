@@ -78,16 +78,28 @@ pub fn config_file_response(command_line: &ParsedCommandLine) -> ConfigFileRespo
             .map(|value| Box::new(TypeAcquisitionValue(value.clone()))),
         compile_on_save: compile_on_save.map(Box::new),
         raw: raw_config_json(&command_line.raw),
-        errors: diagnostic_responses(&command_line.errors, config_view(command_line)),
+        errors: diagnostic_responses(&command_line.errors, &config_resolver(command_line)),
     }
 }
 
-/// The view that owns a command line's diagnostics: its config source file.
-fn config_view(command_line: &ParsedCommandLine) -> Option<AstView<'_>> {
-    command_line
-        .config_file
-        .as_ref()
-        .map(|config| config.file.view())
+/// The view that owns a diagnostic's file node, when the caller can reach
+/// it: the pin's `d.File()` is the diagnostic's own file, which may be a
+/// config the root extends or, for related information, another file.
+pub type ViewResolver<'a> = dyn Fn(NodeId) -> Option<AstView<'a>> + 'a;
+
+/// Resolves a diagnostic's file among a command line's config sources: the
+/// root config and the configs it extends.
+pub fn config_resolver<'a>(
+    command_line: &'a ParsedCommandLine,
+) -> impl Fn(NodeId) -> Option<AstView<'a>> + 'a {
+    move |node| {
+        command_line
+            .config_file
+            .iter()
+            .chain(command_line.config_dependencies.iter())
+            .map(|config| config.file.view())
+            .find(|view| view.node(node).is_ok())
+    }
 }
 
 /// The raw configuration as protocol JSON: typed watch-option enums become
@@ -124,11 +136,11 @@ fn to_protocol_json_value(value: &ConfigValue) -> ConfigValue {
 /// port: tsc/internal/api/proto.go:NewDiagnosticResponses
 pub fn diagnostic_responses(
     diagnostics: &[Diagnostic],
-    view: Option<AstView<'_>>,
+    resolve: &ViewResolver<'_>,
 ) -> Vec<Option<Box<DiagnosticResponse>>> {
     diagnostics
         .iter()
-        .map(|diagnostic| Some(Box::new(diagnostic_response(diagnostic, view))))
+        .map(|diagnostic| Some(Box::new(diagnostic_response(diagnostic, resolve))))
         .collect()
 }
 
@@ -138,7 +150,7 @@ pub fn diagnostic_responses(
 /// port: tsc/internal/api/proto.go:newDiagnosticResponse
 pub fn diagnostic_response(
     diagnostic: &Diagnostic,
-    view: Option<AstView<'_>>,
+    resolve: &ViewResolver<'_>,
 ) -> DiagnosticResponse {
     let message = tsr_compiler::diagnostic_writer::localized(diagnostic)
         .unwrap_or_else(|_| diagnostic.message_text.as_bytes().to_vec());
@@ -160,7 +172,7 @@ pub fn diagnostic_response(
     };
     let file = diagnostic
         .file
-        .and_then(|file| view.and_then(|view| view.source_file(file).ok()));
+        .and_then(|file| resolve(file).and_then(|view| view.source_file(file).ok()));
     if let Some(file) = file {
         let source = file.text();
         let length = isize::try_from(source.len()).unwrap_or(isize::MAX);
@@ -199,18 +211,18 @@ pub fn diagnostic_response(
             end_line,
         );
     }
-    response.message_chain = nested_responses(&diagnostic.message_chain, view);
-    response.related_information = nested_responses(&diagnostic.related_information, view);
+    response.message_chain = nested_responses(&diagnostic.message_chain, resolve);
+    response.related_information = nested_responses(&diagnostic.related_information, resolve);
     response
 }
 
 fn nested_responses(
     diagnostics: &[Arc<Diagnostic>],
-    view: Option<AstView<'_>>,
+    resolve: &ViewResolver<'_>,
 ) -> Vec<Option<Box<DiagnosticResponse>>> {
     diagnostics
         .iter()
-        .map(|diagnostic| Some(Box::new(diagnostic_response(diagnostic, view))))
+        .map(|diagnostic| Some(Box::new(diagnostic_response(diagnostic, resolve))))
         .collect()
 }
 
@@ -284,20 +296,29 @@ pub fn compute_snapshot_changes(
             changes.removed_projects.push(project_handle(old));
             continue;
         };
-        let (Some(old_program), Some(new_program)) = (old.program(), new.program()) else {
-            continue;
-        };
-        if Arc::ptr_eq(old_program, new_program) {
-            continue;
+        // A project without a program diffs as an empty file set, as the
+        // pin's nil program does: its files are all deleted or all new.
+        match (old.program(), new.program()) {
+            (Some(old_program), Some(new_program)) if Arc::ptr_eq(old_program, new_program) => {
+                continue;
+            }
+            (None, None) => continue,
+            _ => {}
         }
-        let old_files: BTreeMap<Vec<u8>, &Arc<tsr_compiler::ProgramFile>> = old_program
-            .files()
+        let old_files: BTreeMap<Vec<u8>, &Arc<tsr_compiler::ProgramFile>> = old
+            .program()
+            .map(|program| program.files())
+            .unwrap_or_default()
             .iter()
             .map(|file| (file_path(file), file))
             .collect();
         let mut project_changes = ProjectFileChanges::default();
         let mut seen = std::collections::BTreeSet::new();
-        for file in new_program.files() {
+        let new_files = new
+            .program()
+            .map(|program| program.files())
+            .unwrap_or_default();
+        for file in new_files {
             let path = file_path(file);
             if let Some(old_file) = old_files.get(&path) {
                 if !Arc::ptr_eq(old_file, file) {
@@ -369,7 +390,11 @@ pub fn diagnostic_file(diagnostic: &Diagnostic) -> Option<NodeId> {
 }
 
 /// Standard base64 with padding to bytes; `None` for malformed input.
-pub fn base64_decode(text: &str) -> Option<Vec<u8>> {
+/// Go's `base64.StdEncoding.DecodeString`: CR and LF are skipped anywhere,
+/// padding may only end the input, and the error carries the offset of the
+/// offending byte (`illegal base64 data at input byte N`).
+/// Follows Go's `encoding/base64` `decodeQuantum` (Go 1.27), byte for byte.
+pub fn base64_decode(text: &str) -> Result<Vec<u8>, usize> {
     fn value(byte: u8) -> Option<u32> {
         Some(match byte {
             b'A'..=b'Z' => u32::from(byte - b'A'),
@@ -380,32 +405,77 @@ pub fn base64_decode(text: &str) -> Option<Vec<u8>> {
             _ => return None,
         })
     }
-    let bytes = text.as_bytes();
-    if !bytes.len().is_multiple_of(4) {
-        return None;
-    }
-    let mut out = Vec::with_capacity(bytes.len() / 4 * 3);
-    for chunk in bytes.chunks(4) {
-        let padding = chunk.iter().rev().take_while(|byte| **byte == b'=').count();
-        if padding > 2 {
-            return None;
+    let src = text.as_bytes();
+    let mut out = Vec::with_capacity(src.len() / 4 * 3);
+    let mut si = 0usize;
+    while si < src.len() {
+        let mut dbuf = [0u32; 4];
+        let mut dlen = 4;
+        let mut trailing_garbage = None;
+        let mut j = 0;
+        while j < 4 {
+            if si == src.len() {
+                match j {
+                    0 => return Ok(out),
+                    // Padding is required: the quantum ended early.
+                    _ => return Err(si - j),
+                }
+            }
+            let input = src[si];
+            si += 1;
+            if let Some(digit) = value(input) {
+                dbuf[j] = digit;
+                j += 1;
+                continue;
+            }
+            if input == b'\n' || input == b'\r' {
+                continue;
+            }
+            if input != b'=' {
+                return Err(si - 1);
+            }
+            // Padding: the quantum ends here.
+            match j {
+                0 | 1 => return Err(si - 1),
+                2 => {
+                    while si < src.len() && (src[si] == b'\n' || src[si] == b'\r') {
+                        si += 1;
+                    }
+                    if si == src.len() {
+                        return Err(src.len());
+                    }
+                    if src[si] != b'=' {
+                        return Err(si - 1);
+                    }
+                    si += 1;
+                }
+                _ => {}
+            }
+            while si < src.len() && (src[si] == b'\n' || src[si] == b'\r') {
+                si += 1;
+            }
+            if si < src.len() {
+                trailing_garbage = Some(si);
+            }
+            dlen = j;
+            break;
         }
-        let mut word = 0u32;
-        for (index, byte) in chunk.iter().enumerate() {
-            let digit = if *byte == b'=' && index >= 4 - padding {
-                0
-            } else {
-                value(*byte)?
-            };
-            word = (word << 6) | digit;
+        let word = dbuf[0] << 18 | dbuf[1] << 12 | dbuf[2] << 6 | dbuf[3];
+        if dlen >= 2 {
+            out.push((word >> 16) as u8);
         }
-        out.push((word >> 16) as u8);
-        if padding < 2 {
+        if dlen >= 3 {
             out.push((word >> 8) as u8);
         }
-        if padding < 1 {
+        if dlen == 4 {
             out.push(word as u8);
         }
+        if let Some(at) = trailing_garbage {
+            return Err(at);
+        }
+        if dlen < 4 {
+            return Ok(out);
+        }
     }
-    Some(out)
+    Ok(out)
 }

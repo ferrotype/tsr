@@ -3,7 +3,7 @@
 //! for the disk. The callbacks are chosen per connection by `--callbacks`;
 //! everything else goes to the base file system.
 //! port: tsc/internal/api/callbackfs.go
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, Weak};
 use tsr_ipc::{Conn, Context};
 use tsr_json::{Encode, Encoder, RawValue};
 use tsr_jsstring::JsString;
@@ -24,9 +24,16 @@ pub fn is_callback_name(name: &str) -> bool {
     CALLBACK_NAMES.contains(&name)
 }
 
+/// The connection is held weakly: it owns the session that owns this file
+/// system, and a strong reference here would keep a finished connection,
+/// its session and transport alive.
 struct Connected {
-    conn: Arc<dyn Conn>,
+    conn: Weak<dyn Conn>,
     ctx: Context,
+}
+
+fn detailed(text: impl Into<String>) -> Error {
+    Error::from(tsr_vfs::iofs::IoError::message(text))
 }
 
 pub struct CallbackFs {
@@ -58,7 +65,7 @@ fn is_null(reply: &RawValue) -> bool {
 fn decode<T: tsr_json::Decode + Default>(reply: &RawValue) -> Result<T, Error> {
     let mut value = T::default();
     tsr_json::unmarshal(&reply.0, &mut value, tsr_json::Options::default())
-        .map_err(|error| Error::Unsupported(Box::leak(error.to_string().into_boxed_str())))?;
+        .map_err(|error| detailed(error.to_string()))?;
     Ok(value)
 }
 
@@ -79,8 +86,11 @@ impl CallbackFs {
     }
 
     /// port: tsc/internal/api/callbackfs.go:callbackFS.SetConnection
-    pub fn set_connection(&self, ctx: Context, conn: Arc<dyn Conn>) {
-        *self.connected.lock().expect("callback connection") = Some(Connected { conn, ctx });
+    pub fn set_connection(&self, ctx: Context, conn: &Arc<dyn Conn>) {
+        *self.connected.lock().expect("callback connection") = Some(Connected {
+            conn: Arc::downgrade(conn),
+            ctx,
+        });
     }
 
     fn is_enabled(&self, name: &str) -> bool {
@@ -91,7 +101,9 @@ impl CallbackFs {
     /// call fails, and so does this.
     /// port: tsc/internal/api/callbackfs.go:callbackFS.call
     fn call(&self, name: &str, params: &dyn Encode) -> RawValue {
-        let (conn, ctx) = self.connection(name);
+        let (conn, ctx) = self
+            .connection(name)
+            .unwrap_or_else(|error| panic!("{error}"));
         match conn.call(&ctx, name, params) {
             Ok(reply) => reply,
             Err(error) => panic!("{error}"),
@@ -99,13 +111,15 @@ impl CallbackFs {
     }
 
     /// The connection and context of `set_connection`; the lock is not held
-    /// across the call, so callers serialize on the connection itself.
-    fn connection(&self, name: &str) -> (Arc<dyn Conn>, Context) {
+    /// across the call, so callers serialize on the connection itself. A
+    /// connection that has ended counts as unset.
+    /// port: tsc/internal/api/callbackfs.go:callbackFS.call
+    fn connection(&self, name: &str) -> Result<(Arc<dyn Conn>, Context), Error> {
         let connected = self.connected.lock().expect("callback connection");
-        let Some(connected) = connected.as_ref() else {
-            panic!("CallbackFS: {name} called before connection set");
-        };
-        (connected.conn.clone(), connected.ctx.clone())
+        connected
+            .as_ref()
+            .and_then(|connected| Some((connected.conn.upgrade()?, connected.ctx.clone())))
+            .ok_or_else(|| detailed(format!("CallbackFS: {name} called before connection set")))
     }
 
     fn path_call(&self, name: &str, path: &[u8]) -> RawValue {
@@ -216,13 +230,13 @@ impl FileSystem for CallbackFs {
     /// port: tsc/internal/api/callbackfs.go:callbackFS.WriteFile
     fn write_file(&self, path: &[u8], data: &[u8]) -> Result<(), Error> {
         if self.is_enabled("writeFile") {
-            let (conn, ctx) = self.connection("writeFile");
+            // The write side returns its errors where the read callbacks
+            // panic, as the pin's does.
+            let (conn, ctx) = self.connection("writeFile")?;
             return conn
                 .call(&ctx, "writeFile", &WriteFileParams { path, data })
                 .map(|_| ())
-                .map_err(|error| {
-                    Error::Unsupported(Box::leak(error.to_string().into_boxed_str()))
-                });
+                .map_err(|error| detailed(error.to_string()));
         }
         self.base.write_file(path, data)
     }
@@ -273,6 +287,9 @@ mod tests {
         }
     }
 
+    /// The returned table is the connection: the file system holds it
+    /// weakly, as the production connection outlives its callbacks, so a
+    /// test keeps it alive for as long as it calls back.
     fn connected(
         replies: HashMap<&'static str, &'static str>,
         enabled: &[&str],
@@ -291,13 +308,14 @@ mod tests {
                 .collect::<Vec<_>>(),
         )
         .unwrap();
-        fs.set_connection(Context::background(), table.clone());
+        let conn: Arc<dyn Conn> = table.clone();
+        fs.set_connection(Context::background(), &conn);
         (fs, table)
     }
 
     #[test]
     fn read_file_has_three_outcomes() {
-        let (fs, _) = connected(
+        let (fs, _conn) = connected(
             HashMap::from([("readFile", r#"{"content":"virtual"}"#)]),
             &["readFile"],
         );
@@ -305,7 +323,7 @@ mod tests {
             fs.read_file(b"/a.ts").unwrap().unwrap().raw.as_ref(),
             b"virtual"
         );
-        let (fs, _) = connected(
+        let (fs, _conn) = connected(
             HashMap::from([("readFile", r#"{"content":null}"#)]),
             &["readFile"],
         );

@@ -4,7 +4,7 @@
 //! API checker through `setup_checker`.
 //! port: tsc/internal/api/session.go
 use super::diagnostics::DiagnosticKind;
-use super::handles::{resolve_node_handle, touching_property_name, CheckerSetup};
+use super::handles::{resolve_node_handle, touching_property_name, CheckerSetup, Committed};
 use super::responses::base64_standard;
 use super::{client_error, ApiSession, SessionError, SessionResult};
 use crate::proto::{
@@ -24,16 +24,34 @@ type Setup<'a> = CheckerSetup<'a>;
 
 impl ApiSession {
     /// Runs `query` on the project's API checker.
-    fn with_checker<R>(
+    fn with_checker<R: tsr_json::Encode>(
         &self,
         snapshot: SnapshotId,
         project: &ProjectId,
         query: impl FnOnce(&Setup<'_>, &mut Operation<'_>) -> SessionResult<R>,
-    ) -> SessionResult<R> {
+    ) -> SessionResult<Committed> {
         let data = self.snapshot_data(snapshot)?;
         let setup = data.setup_checker(project)?;
         let mut operation = setup.registry.operation()?;
-        query(&setup, &mut operation)
+        let value = query(&setup, &mut operation)?;
+        setup.commit(&value)
+    }
+
+    /// `with_checker` for a query that encodes its own response (a binary
+    /// or base64 node encoding): the bytes are produced outside the gate
+    /// and the gate revalidates the generation before they are returned.
+    fn with_checker_response(
+        &self,
+        snapshot: SnapshotId,
+        project: &ProjectId,
+        query: impl FnOnce(&Setup<'_>, &mut Operation<'_>) -> SessionResult<Response>,
+    ) -> SessionResult<Response> {
+        let data = self.snapshot_data(snapshot)?;
+        let setup = data.setup_checker(project)?;
+        let mut operation = setup.registry.operation()?;
+        let response = query(&setup, &mut operation)?;
+        let _gate = setup.registry.gate()?;
+        Ok(response)
     }
 
     /// The source file of a request, or the pin's client error.
@@ -717,7 +735,7 @@ impl ApiSession {
             }
             Params::TypeToTypeNode(p) => {
                 return self
-                    .with_checker(p.snapshot, &p.project, |setup, op| {
+                    .with_checker_response(p.snapshot, &p.project, |setup, op| {
                         let ty = Self::resolve_type(setup, op, p.r#type)?;
                         let enclosing = if p.location.0.is_empty() {
                             None
@@ -735,7 +753,7 @@ impl ApiSession {
             }
             Params::SignatureToSignatureDeclaration(p) => {
                 return self
-                    .with_checker(p.snapshot, &p.project, |setup, op| {
+                    .with_checker_response(p.snapshot, &p.project, |setup, op| {
                         let signature = setup.registry.resolve_signature(op, p.signature)?;
                         let enclosing = if p.location.0.is_empty() {
                             None
@@ -1033,6 +1051,7 @@ impl ApiSession {
                     let registries = &setup.data.registries;
                     let unknown = registries
                         .register_symbol(
+                            &setup.registry,
                             op,
                             op.get_unknown_symbol().map_err(checker_error)?,
                             &setup.project,
@@ -1040,6 +1059,7 @@ impl ApiSession {
                         .0;
                     let undefined = registries
                         .register_symbol(
+                            &setup.registry,
                             op,
                             op.get_undefined_symbol().map_err(checker_error)?,
                             &setup.project,
@@ -1047,6 +1067,7 @@ impl ApiSession {
                         .0;
                     let arguments = registries
                         .register_symbol(
+                            &setup.registry,
                             op,
                             op.get_arguments_symbol().map_err(checker_error)?,
                             &setup.project,
@@ -1149,7 +1170,7 @@ impl ApiSession {
         project: &ProjectId,
         handle: crate::proto::TypeId,
         getter: impl FnOnce(&mut Operation<'_>, TypeRef) -> SessionResult<Option<TypeRef>>,
-    ) -> SessionResult<Option<TypeResponse>> {
+    ) -> SessionResult<Committed> {
         self.with_checker(snapshot, project, |setup, op| {
             let ty = Self::resolve_type(setup, op, handle)?;
             match getter(op, ty)? {
@@ -1166,7 +1187,7 @@ impl ApiSession {
         project: &ProjectId,
         handle: crate::proto::TypeId,
         getter: impl FnOnce(&mut Operation<'_>, TypeRef) -> SessionResult<Vec<TypeRef>>,
-    ) -> SessionResult<Option<Vec<Option<Box<TypeResponse>>>>> {
+    ) -> SessionResult<Committed> {
         self.with_checker(snapshot, project, |setup, op| {
             let ty = Self::resolve_type(setup, op, handle)?;
             let types = getter(op, ty)?;
@@ -1184,7 +1205,7 @@ impl ApiSession {
         project: &ProjectId,
         handle: crate::proto::SymbolId,
         getter: impl FnOnce(&mut Operation<'_>, SymbolRef) -> SessionResult<Option<tsr_arena::SymbolId>>,
-    ) -> SessionResult<Option<SymbolResponse>> {
+    ) -> SessionResult<Committed> {
         self.with_checker(snapshot, project, |setup, op| {
             let symbol = Self::resolve_symbol(setup, op, handle)?;
             match getter(op, symbol)? {
@@ -1208,7 +1229,7 @@ impl ApiSession {
             &mut Operation<'_>,
             SymbolRef,
         ) -> SessionResult<Option<tsr_ast::SymbolTableId>>,
-    ) -> SessionResult<Option<Vec<Option<Box<SymbolResponse>>>>> {
+    ) -> SessionResult<Committed> {
         self.with_checker(snapshot, project, |setup, op| {
             let symbol = Self::resolve_symbol(setup, op, handle)?;
             let Some(table) = getter(op, symbol)? else {
@@ -1237,7 +1258,7 @@ impl ApiSession {
         snapshot: SnapshotId,
         project: &ProjectId,
         getter: impl FnOnce(&Operation<'_>) -> TypeRef,
-    ) -> SessionResult<TypeResponse> {
+    ) -> SessionResult<Committed> {
         self.with_checker(snapshot, project, |setup, op| {
             let ty = getter(op);
             setup.type_response(op, ty)
@@ -1246,8 +1267,11 @@ impl ApiSession {
 
     /// port: tsc/internal/api/session.go:Session.handlePrintNode
     fn handle_print_node(params: &crate::proto::PrintNodeParams) -> SessionResult<String> {
-        let data = super::responses::base64_decode(&params.data)
-            .ok_or_else(|| client_error("invalid base64 data: illegal base64 data"))?;
+        let data = super::responses::base64_decode(&params.data).map_err(|at| {
+            client_error(format!(
+                "invalid base64 data: illegal base64 data at input byte {at}"
+            ))
+        })?;
         crate::print_node(
             &data,
             crate::PrintNodeOptions {

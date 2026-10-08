@@ -1,7 +1,7 @@
 //! Language-service queries: completions with the symbol behind each entry,
 //! referenced symbols for a node, and a symbol's references in a file.
 //! port: tsc/internal/api/session.go
-use super::handles::{node_handle, resolve_node_handle, CheckerSetup};
+use super::handles::{node_handle, resolve_node_handle, CheckerSetup, Committed};
 use super::{client_error, ApiSession, SessionError, SessionResult};
 use crate::proto::{
     CompletionEntryLabelDetailsResponse, CompletionEntryResponse, CompletionInfoResponse,
@@ -43,14 +43,14 @@ impl ApiSession {
     pub(super) fn handle_get_completions_at_position(
         &self,
         params: &GetCompletionsAtPositionParams,
-    ) -> SessionResult<Option<CompletionInfoResponse>> {
+    ) -> SessionResult<Committed> {
         let data = self.snapshot_data(params.snapshot)?;
         let setup = data.setup_checker(&params.project)?;
         let Some(file) = setup
             .program
             .source_file(params.file.to_file_name().as_bytes())
         else {
-            return Ok(None);
+            return setup.commit(&None::<CompletionInfoResponse>);
         };
         let view = file.bound().view().ast();
         let position = view
@@ -74,7 +74,7 @@ impl ApiSession {
             )
             .map_err(service_error)?
         else {
-            return Ok(None);
+            return setup.commit(&None::<CompletionInfoResponse>);
         };
         let mut entries = Vec::with_capacity(list.items.len());
         for item in list.items.iter().flatten() {
@@ -100,7 +100,7 @@ impl ApiSession {
             }
             entries.push(Some(Box::new(entry)));
         }
-        Ok(Some(CompletionInfoResponse {
+        setup.commit(&Some(CompletionInfoResponse {
             is_incomplete: list.is_incomplete,
             entries,
         }))
@@ -110,7 +110,7 @@ impl ApiSession {
     pub(super) fn handle_get_referenced_symbols_for_node(
         &self,
         params: &GetReferencedSymbolsForNodeParams,
-    ) -> SessionResult<Option<Vec<ReferencedSymbolEntry>>> {
+    ) -> SessionResult<Committed> {
         let data = self.snapshot_data(params.snapshot)?;
         let setup = data.setup_checker(&params.project)?;
         let node = resolve_node_handle(setup.program, &params.node)?;
@@ -120,7 +120,7 @@ impl ApiSession {
             .api_referenced_symbols(&mut operation, node, params.position)
             .map_err(service_error)?;
         if groups.is_empty() {
-            return Ok(None);
+            return setup.commit(&None::<Vec<ReferencedSymbolEntry>>);
         }
         let mut result = Vec::with_capacity(groups.len());
         for group in groups {
@@ -140,14 +140,14 @@ impl ApiSession {
                 references,
             });
         }
-        Ok(Some(result))
+        setup.commit(&Some(result))
     }
 
     /// port: tsc/internal/api/session.go:Session.handleGetReferencesToSymbolInFile
     pub(super) fn handle_get_references_to_symbol_in_file(
         &self,
         params: &GetReferencesToSymbolInFileParams,
-    ) -> SessionResult<Vec<NodeHandle>> {
+    ) -> SessionResult<Committed> {
         let data = self.snapshot_data(params.snapshot)?;
         let setup = data.setup_checker(&params.project)?;
         let mut operation: Operation<'_> = setup.registry.operation()?;
@@ -161,9 +161,10 @@ impl ApiSession {
         let nodes = operation
             .get_references_to_symbol_in_file(file.source(), symbol)
             .map_err(service_error)?;
-        nodes
+        let handles: Vec<NodeHandle> = nodes
             .into_iter()
             .map(|node| node_handle(&operation, node))
-            .collect()
+            .collect::<SessionResult<_>>()?;
+        setup.commit(&handles)
     }
 }

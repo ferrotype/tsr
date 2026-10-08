@@ -115,13 +115,45 @@ within the per-file deadline: the pending promise recorded in A1 and A2 was
 the client waiting on a session method that failed, and the checker queries
 answer it.
 
+## Exit families deferred to A4
+
+`API > createProgram…` (12 cases) and `runWithTemporaryFileUpdate` (2) are
+A2 exit families that still failed at A3: they need A4's diagnostics and
+pass with them. The 115 failing entries of `status/parity/jsapi.json` at
+the A3 head carried the first run's labels (`not implemented: initialize`);
+A4 made `accept` refresh mechanical labels from the run.
+
+## Review fixes after A4
+
+- Checker handlers publish under the retirement-serialized protocol of
+  docs/design/ownership.md section 2.7: registry insertion and lookup take
+  the project pool's generation gate, and a response is serialized outside
+  the gate, then committed to the connection only after the gate revalidates
+  the checker and generation. A generation retired by a sibling between a
+  query's computation and its commitment yields the error form, not handles
+  of a retired checker.
+- `register_type` and `register_signature` refuse an operation of another
+  checker (`duplicate type`, `duplicate signature`, the pin's panics).
+- `base64_decode` follows Go's `StdEncoding`: CR and LF are skipped,
+  padding may only end the input, and the error names the offending byte
+  (`illegal base64 data at input byte N`).
+- A malformed node handle index reports `strconv.ParseUint`'s text and
+  bounds the index to 32 bits.
+- `getRestTypeOfSignature` slices a tuple rest parameter first (see the
+  note below).
+- Identity witnesses: one symbol id across two projects with the first
+  project canonical; a released snapshot's handles rejected with the pin's
+  text; a retired generation's handles rejected and a fresh snapshot
+  answering.
+
 ## Known differences left for later checkpoints
 
-- `getRestTypeOfSignature` now answers the element type, as the pin does
-  (`tryGetRestTypeOfSignature`: the rest parameter's numeric index type).
-  The pin first slices a tuple rest parameter to its rest element
-  (`getRestTypeOfTupleType`); that slice helper is not ported, so a tuple
-  rest parameter answers its numeric index type directly.
+- `getRestTypeOfSignature` answers the element type, as the pin does
+  (`tryGetRestTypeOfSignature`): a tuple rest parameter is first sliced to
+  its rest element and the numeric index type of that element is read, so
+  `(...args: [string, number])` and `(...args: [string, ...number[]])`
+  both answer `any`. (The A3 head read the numeric index type of the whole
+  tuple; the review fixes corrected it.)
 - Tuple metadata (`elementFlags`, `fixedLength`, `readonly`, labeled
   declarations) is reported for tuple targets only, as the pin's
   `IsTupleTypeTarget` requires; instantiations report `isTupleType` alone.

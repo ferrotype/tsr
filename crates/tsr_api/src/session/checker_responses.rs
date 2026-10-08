@@ -26,10 +26,12 @@ impl CheckerSetup<'_> {
         operation: &mut Operation<'_>,
         symbol: SymbolRef,
     ) -> SessionResult<SymbolResponse> {
-        let (id, project) =
-            self.data
-                .registries
-                .register_symbol(operation, symbol, &self.project)?;
+        let (id, project) = self.data.registries.register_symbol(
+            &self.registry,
+            operation,
+            symbol,
+            &self.project,
+        )?;
         let (name, flags, check_flags, value_declaration, parent, export_symbol) = {
             let read = operation.symbol(symbol).map_err(checker_error)?;
             (
@@ -87,7 +89,7 @@ impl CheckerSetup<'_> {
         Ok(self
             .data
             .registries
-            .register_symbol(operation, symbol, &self.project)?
+            .register_symbol(&self.registry, operation, symbol, &self.project)?
             .0)
     }
 
@@ -103,7 +105,7 @@ impl CheckerSetup<'_> {
                 Ok(self
                     .data
                     .registries
-                    .register_symbol(operation, *symbol, &self.project)?
+                    .register_symbol(&self.registry, operation, *symbol, &self.project)?
                     .0)
             })
             .collect()
@@ -322,7 +324,7 @@ impl CheckerSetup<'_> {
             response.this_parameter = self
                 .data
                 .registries
-                .register_symbol(operation, this_parameter, &self.project)?
+                .register_symbol(&self.registry, operation, this_parameter, &self.project)?
                 .0;
         }
         if let Some(target) = operation
