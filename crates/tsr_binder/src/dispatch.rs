@@ -81,7 +81,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                 }
             }
             Some(K::BinaryExpression) => {
-                match checked(a::get_assignment_declaration_kind(self.view(), node)) {
+                match self.target_assignment_declaration_kind(target) {
                     a::JSDeclarationKind::ModuleExports => {
                         self.bind_module_exports_assignment(node);
                     }
@@ -179,7 +179,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                 self.bind_block_scoped_target(target, sf::INTERFACE, sf::INTERFACE_EXCLUDES);
             }
             Some(K::CallExpression) => {
-                match checked(a::get_assignment_declaration_kind(self.view(), node)) {
+                match self.target_assignment_declaration_kind(target) {
                     a::JSDeclarationKind::ObjectDefinePropertyValue => {
                         self.bind_expando_property_assignment(node);
                     }
@@ -188,7 +188,7 @@ impl<'scope> Binder<'_, 'scope, '_> {
                     }
                     _ => {}
                 }
-                if a::is_in_js_file(Some(&self.n(node))) {
+                if self.node_flags(target) & nf::JAVA_SCRIPT_FILE != 0 {
                     self.bind_call_expression(node);
                 }
             }

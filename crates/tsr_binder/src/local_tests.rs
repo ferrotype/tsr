@@ -491,6 +491,205 @@ fn declaration_helper_bridges_keep_lazy_names_checked() {
         .unwrap();
 }
 
+#[test]
+fn assignment_classifier_matches_parsed_typescript_and_javascript_expressions() {
+    use tsr_ast::JSDeclarationKind as D;
+
+    for (text, typescript, javascript) in [
+        ("1 + 2;", D::None, D::None),
+        ("value = 1;", D::None, D::None),
+        ("value.member = 1;", D::Property, D::Property),
+        ("value[key] = 1;", D::Property, D::Property),
+        ("this.member = 1;", D::None, D::ThisProperty),
+        ("module.exports = 1;", D::Property, D::ModuleExports),
+        ("exports.member = 1;", D::Property, D::ExportsProperty),
+        ("call();", D::None, D::None),
+        (
+            "Object.defineProperty(value, 'member', {});",
+            D::None,
+            D::ObjectDefinePropertyValue,
+        ),
+        (
+            "Object.defineProperty(exports, 'member', {});",
+            D::None,
+            D::ObjectDefinePropertyExports,
+        ),
+    ] {
+        for (kind, expected) in [(ScriptKind::TS, typescript), (ScriptKind::JS, javascript)] {
+            let parsed = tsr_parser::parse_source_file(
+                SourceText::from_loaded_bytes(text.as_bytes()),
+                kind,
+                SourceFileParseOptions {
+                    file_name: JsString::from_bytes(b"/assignment-classifier.ts".as_slice()),
+                    ..Default::default()
+                },
+            );
+            let view = parsed.view();
+            let statements = view.node(parsed.root()).unwrap().statement_list().unwrap();
+            let statement = view
+                .node_slice(view.list(statements).unwrap().nodes())
+                .unwrap()
+                .at(0)
+                .unwrap();
+            let expression = view.node(statement).unwrap().expression().unwrap();
+            // Explicit expectations supplement the authoritative checked helper.
+            assert_eq!(
+                tsr_ast::get_assignment_declaration_kind(view, expression).unwrap(),
+                expected,
+                "{text}"
+            );
+            parsed
+                .bind_and_publish(|builder| {
+                    let check = |binder: &Binder<'_, '_, '_>| {
+                        assert_eq!(
+                            binder.target_assignment_declaration_kind(
+                                binder.binding_node(expression)
+                            ),
+                            expected,
+                            "{kind:?}: {text}"
+                        );
+                    };
+                    check(&Binder::new(builder));
+                    builder
+                        .with_local_scope(|local| {
+                            let binder =
+                                Binder::from_backend(crate::backend::Backend::Local(local));
+                            assert!(matches!(
+                                binder.binding_node(expression),
+                                crate::target::BindingNode::Local(_)
+                            ));
+                            check(&binder);
+                        })
+                        .expect("ordinary parsed expression admits local access");
+                    Ok(())
+                })
+                .unwrap();
+        }
+    }
+}
+
+#[test]
+fn assignment_classifier_preserves_failure_order_and_observes_live_javascript_flags() {
+    use tsr_ast::{node_flags as nf, JSDeclarationKind as D};
+
+    fn outcome<'scope>(
+        binder: &Binder<'_, 'scope, '_>,
+        node: crate::target::BindingNode<'scope>,
+    ) -> Result<D, String> {
+        catch_unwind(AssertUnwindSafe(|| {
+            binder.target_assignment_declaration_kind(node)
+        }))
+        .map_err(|failure| panic_message(&*failure))
+    }
+
+    let mut build = AstBuilder::new(SourceText::default(), &Counters::new());
+    let wrong_binary = build.new_token(SyntaxKind::BinaryExpression.into());
+    let wrong_call = build.new_token(SyntaxKind::CallExpression.into());
+    let plus = build.new_token(SyntaxKind::PlusToken.into());
+    let equals = build.new_token(SyntaxKind::EqualsToken.into());
+    let ordinary = build.new_binary_expression(None, None, None, Some(plus), None);
+    let nil_operator = build.new_binary_expression(None, None, None, None, None);
+    let nil_left = build.new_binary_expression(None, None, None, Some(equals), None);
+    let identifier = build.new_identifier(JsString::from_bytes(b"value".as_slice()));
+    let nil_right_non_access =
+        build.new_binary_expression(None, Some(identifier), None, Some(equals), None);
+    let module = build.new_identifier(JsString::from_bytes(b"module".as_slice()));
+    let exports = build.new_identifier(JsString::from_bytes(b"exports".as_slice()));
+    let access = build.new_property_access_expression(Some(module), None, Some(exports), 0);
+    // The pin reads the access operand's JS flag, independent of the binary's.
+    build
+        .node_mut(access)
+        .unwrap()
+        .set_flags(nf::JAVA_SCRIPT_FILE);
+    let nil_right_access =
+        build.new_binary_expression(None, Some(access), None, Some(equals), None);
+    let object = build.new_identifier(JsString::from_bytes(b"Object".as_slice()));
+    let name = build.new_identifier(JsString::from_bytes(b"defineProperty".as_slice()));
+    let callee = build.new_property_access_expression(Some(object), None, Some(name), 0);
+    let key = build.new_string_literal(JsString::from_bytes(b"member".as_slice()), 0);
+    let descriptor = build.new_identifier(JsString::from_bytes(b"descriptor".as_slice()));
+    let arguments = build
+        .node_slice(vec![Some(exports), Some(key), Some(descriptor)])
+        .unwrap();
+    let arguments = build.new_list(TextRange::new(0, 0), arguments).unwrap();
+    let call = build.new_call_expression(Some(callee), None, None, Some(arguments), 0);
+    let source = build.new_source_file(
+        SourceFileParseOptions {
+            file_name: JsString::from_bytes(b"/assignment-classifier-fixture.ts".as_slice()),
+            ..Default::default()
+        },
+        SourceText::default(),
+        None,
+        None,
+    );
+    let cases = [
+        (ordinary, Ok(D::None)),
+        (nil_right_non_access, Ok(D::None)),
+        (wrong_call, Ok(D::None)),
+        (
+            wrong_binary,
+            Err(
+                "interface conversion: ast.nodeData is *ast.Token, not *ast.BinaryExpression"
+                    .to_owned(),
+            ),
+        ),
+        (
+            nil_operator,
+            Err("nil node in source AST utility".to_owned()),
+        ),
+        (nil_left, Err("nil assignment left operand".to_owned())),
+        (
+            nil_right_access,
+            Err("nil assignment right operand".to_owned()),
+        ),
+    ];
+    let check = |binder: &mut Binder<'_, '_, '_>| {
+        for (node, expected) in &cases {
+            assert_eq!(outcome(binder, binder.binding_node(*node)), *expected);
+        }
+        for flags in [0, nf::JAVA_SCRIPT_FILE, 0] {
+            let target = binder.binding_node(call);
+            binder.set_binding_flags(target, flags);
+            let expected = if flags == 0 {
+                D::None
+            } else {
+                D::ObjectDefinePropertyExports
+            };
+            assert_eq!(outcome(binder, target), Ok(expected));
+            assert_eq!(
+                outcome(binder, crate::target::BindingNode::Checked(call)),
+                Ok(expected)
+            );
+            let malformed = binder.binding_node(wrong_call);
+            binder.set_binding_flags(malformed, flags);
+            let expected = if flags == 0 {
+                Ok(D::None)
+            } else {
+                Err(
+                    "interface conversion: ast.nodeData is *ast.Token, not *ast.CallExpression"
+                        .to_owned(),
+                )
+            };
+            assert_eq!(outcome(binder, malformed), expected);
+        }
+    };
+    build
+        .complete(source)
+        .unwrap()
+        .bind_and_publish(|builder| {
+            check(&mut Binder::new(builder));
+            builder
+                .with_local_scope(|local| {
+                    check(&mut Binder::from_backend(crate::backend::Backend::Local(
+                        local,
+                    )));
+                })
+                .expect("constructed classifier cases admit local access");
+            Ok(())
+        })
+        .unwrap();
+}
+
 fn invoke_strict_predicate<'scope>(
     binder: &mut Binder<'_, 'scope, '_>,
     kind: SyntaxKind,

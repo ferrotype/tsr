@@ -341,6 +341,208 @@ one change per concurrent pair) is the next parse-bind step; kind hints on
 node edges (`docs/design/node-kind-bits.md`) would also take the binder's
 kind reads.
 
+## Binder name-path screens, 8 October
+
+Three bounded candidates were built against `81cd7724` (#115), each in
+isolation. The initial decision to remove all three used sequential pairs,
+contrary to this profiling series' concurrent method. That rejection was
+premature. The corrected concurrent measurements below support retaining
+the fresh-symbol constructor; the other two candidates remain removed.
+
+1. **Reuse the declaration-name hash.** Carry the lookup hash into the
+   insertion of a new or replacement symbol, using the existing prehashed
+   table API. Symbol construction still interns the name separately.
+2. **Construct fresh symbols directly.** Avoid the generic populated-symbol
+   replacement path for `Symbol::new`: six reference fields are known empty,
+   so their escape maintenance and encoding are unnecessary. Retain name
+   encoding, including its wide-index escape, and creation tracing.
+3. **Insert using the symbol's interned name.** Resolve the already-stored
+   symbol name inside its owning store and insert that private name identity
+   into its table. This removes a second name-pool lookup and the temporary
+   `JsString` clone. It retains checked symbol/table identities and the same
+   hash-table insertion and promotion rules.
+
+The initial screens used the normal release `ts-bench` binary (no allocation or
+profiling feature), the existing 13,094-file S07 workload, and six
+alternating **sequential** control/candidate pairs per worker mode after one
+warmup each. Builds and correctness checks ran outside the timed batches.
+These are Rust-versus-Rust development screens on the 18-CPU macOS host,
+not new Go-relative measurements or acceptance captures. Background host
+load remained present; one-minute load averages across the first three
+screens ranged from about 4.65 to 10.17.
+
+Ratios below are the median of the paired candidate/control ratios; times
+are the independently computed medians, in seconds. Lower is better.
+
+| Candidate | Workers | Control | Candidate | Paired ratio |
+| --- | ---: | ---: | ---: | ---: |
+| Hash reuse | 1 | 3.5227 | 3.5096 | 0.9975 |
+| Hash reuse | 8 | 0.8354 | 0.8354 | 1.0092 |
+| Fresh-symbol constructor | 1 | 3.4258 | 3.4518 | 1.0095 |
+| Fresh-symbol constructor | 8 | 0.7571 | 0.7487 | 0.9935 |
+| Interned-name insertion | 1 | 3.4159 | 3.4149 | 0.9976 |
+| Interned-name insertion | 8 | 0.8279 | 0.7917 | 0.9566 |
+| Interned-name insertion, confirmation | 1 | 3.3669 | 3.3531 | 0.9961 |
+| Interned-name insertion, confirmation | 8 | 0.7306 | 0.7304 | 0.9981 |
+
+Within this sequential method, the last candidate's initial eight-worker
+result warranted one confirmation
+batch using the **same binaries**. Its apparent 4.3% gain did not reproduce;
+the confirmation was effectively neutral. All median RSS differences were
+below 0.01%; allocation traffic was not instrumented. No memory improvement
+is claimed. These sequential screens remain recorded, but do not decide
+retention against the concurrent methodology.
+
+### Corrected concurrent comparison
+
+The same saved baseline and candidate binaries were rerun using the direct
+process-launch method in Claude's `pairb.py`: start both executables before
+waiting for either, alternate launch order, then take the median of the
+within-pair `wall_time_ns` ratios. Each mode had six measured pairs after
+one warmup pair. The fresh-symbol candidate received a second batch with
+the same method and binaries. Binary hashes were checked before and after
+each batch. No build or correctness run from this task overlapped timing.
+
+Both processes used the same workload and worker count, so the eight-worker
+pair used sixteen workers on the eighteen-CPU host. The launch skew was
+below 1.8 ms in every measured pair. This matches the existing launch
+method; it does not add a barrier between the binaries' measurement
+intervals. Startup, preload and worker-setup fields are retained alongside
+the full reports, exit statuses and stderr. Every pair passed the same
+input/count checks as the initial screens.
+
+| Candidate | One-worker paired ratio | Eight-worker paired ratio |
+| --- | ---: | ---: |
+| Hash reuse | 1.0020 | 1.0032 |
+| Fresh-symbol constructor | 0.9926 | 0.9856 |
+| Interned-name insertion | 0.9976 | 0.9985 |
+| Fresh-symbol constructor, confirmation | 0.9895 | 0.9922 |
+
+The fresh-symbol constructor was faster in all twelve measured one-worker
+pairs and eleven of twelve eight-worker pairs. Its median improvement was
+0.7–1.4% across the four mode/batch combinations. Retain this small,
+repeatable improvement: the change skips work for fields known empty at
+allocation, without changing storage or the general populated-symbol path.
+Median RSS differences were below 0.01%; allocation traffic was not
+instrumented. This is a development result on this host, not a new
+Go-relative or acceptance measurement.
+
+Hash reuse showed no benefit. Interned-name insertion's approximately
+0.2% medians included pairs in both directions; those results do not
+justify its additional insertion API. Neither candidate is retained.
+
+For future candidates in this profiling series, preserve the concurrent
+method: save the baseline before editing, build with identical features,
+start both direct binaries before waiting, alternate launch order, verify
+outputs before scoring within-pair ratios, and confirm a proposed win with
+the same method. Do not silently replace concurrent pairs with sequential
+runs or compare medians from different batches.
+
+Every timed child completed successfully with the same loaded-input digest,
+19,593,488 nodes, 2,459,867 symbols, 423 parse diagnostics and 5,250 bind
+diagnostics. Counts alone are not graph parity: the fresh-symbol and
+interned-name candidates also matched complete graph reports for 67 files
+(a strided workload sample plus its two largest files, 960,847 nodes) in
+both worker modes, including the raw graph digests and diagnostics.
+
+Targeted regressions exercised merge, present-null, replacement,
+early-return, duplicate and missing-name declaration paths through local
+and checked backends. The AST candidates additionally exercised empty and
+arbitrary-byte names, reference escapes or invalid-owner rejection, and
+creation-trace/runtime-identity behavior. The retained fresh-symbol
+constructor passed 190 AST and 51 binder unit tests with creation tracing
+enabled. Its declaration/default-state regressions are retained with it.
+After restoring the exact measured patch, both crates' all-target clippy
+checks passed with warnings denied, as did formatting and ledger
+validation. Eight focused compiler variants passed all 70 subtests against
+the pinned baselines; no parity expectation changed.
+No full compiler corpus or Go recapture was run.
+
+Local reproductions, exact patches, build/binary identities, individual
+samples, stderr and graph reports are preserved under
+`target/perf-binder-names-20261008/`; they are not committed artifacts.
+`build.py` builds and copies a candidate. `screen.py` is the initial
+sequential runner; `concurrent_screen.py` is the corrected runner. The
+concurrent results live in `concurrent-screen/` and
+`concurrent-fresh-symbol-confirm/`. The original candidate patches are
+`hash-reuse.patch`, `fresh-symbol.patch` and `interned-name-final.patch`.
+All start from the same baseline revision, rather than stacking the
+unretained changes. The sequential interned-name confirmation and
+concurrent fresh-symbol confirmation each reuse their candidate's exact
+binary.
+
+These results do not show that the whole sampled name/table group is free
+or that binder overhead is solved. The broader node-access cost remains a
+separate experiment.
+
+## Binder assignment-dispatch node reads, 8 October
+
+Starting from `5d3098a2` (including the retained fresh-symbol constructor),
+this screen removes general AST-view reads from two hot dispatch cases.
+`GetAssignmentDeclarationKind` immediately returns `None` for a non-`=`
+binary, an `=` binary with a non-access left operand, or a non-JavaScript
+call. The local binder can establish those results using its validated
+local header and typed payload. Access assignments and JavaScript calls
+still use the shared classifier. Malformed binary payloads and missing
+operator/left links also fall back, preserving the checked helper's panic
+messages and short-circuit order. Classification reads live flags; it
+does not cache them across mutation.
+
+The first candidate changed only that classifier entry. The second also
+uses the local flag reader for the immediately following JavaScript call
+check, instead of resolving the same node through the general view again.
+The checked backend keeps its normal owner and slot validation. No storage
+layout, public API, allocation policy, or generated code changes.
+
+Both candidates used the normal release `ts-bench` binary without profiling
+or allocation features. The control was built and saved before editing.
+Each batch used concurrent baseline/candidate processes over all 13,094
+workload files, alternating launch order, with six measured pairs after one
+warmup pair in each of the one- and eight-worker modes. The combined
+candidate's confirmation reused the exact same binaries. Binary hashes,
+exit codes, work counts and loaded-input digests were checked; no build or
+correctness run from this task overlapped timing. One-minute host load
+averages ranged from approximately 5.1 to 7.9 across the batches.
+
+| Candidate | One-worker paired ratio | Eight-worker paired ratio |
+| --- | ---: | ---: |
+| Local classifier prefix | 0.9959 | 0.9982 |
+| Prefix plus local JavaScript flag check | 0.9970 | 0.9945 |
+| Combined candidate, confirmation | 0.9967 | 0.9958 |
+
+Ratios are medians of within-pair candidate/control wall times. The first
+candidate's mixed signs did not justify a decision alone. The combined
+candidate was faster in twelve of twelve measured one-worker pairs and
+eleven of twelve eight-worker pairs across its two batches. Retain the
+combined change: its measured gain is small, about 0.3% at one worker and
+0.4–0.5% at eight. Median paired RSS changes were below 0.01%; allocation
+traffic was not instrumented. These are development screens on this host,
+not new Go-relative measurements. They neither quantify the remaining
+node-access overhead nor justify adding savings from separate batches.
+
+Each timed child returned the expected 19,593,488 nodes, 2,459,867 symbols,
+423 parse diagnostics and 5,250 bind diagnostics. Both candidates also
+matched the control's complete graph reports for the existing 67-file
+sample (960,847 nodes) in both worker modes, including raw digests and
+diagnostics. Adapter regressions compare local and checked results on TS
+and JS assignments/calls, malformed payloads and nil links, and JavaScript
+flags changing between calls. The independent review checked the terminal
+cases and fallback behavior against the shared helper and pinned Go.
+All 53 binder unit tests and all-target clippy with warnings denied passed,
+as did formatting, ledger validation and diff checks. Seven focused
+compiler variants passed all 63 subtests against the pinned baselines,
+with no failures, skips or expectation changes. The final production diff
+matches the measured candidate. No full compiler corpus or Go performance
+capture was run.
+
+Saved binaries, exact patches, build identities, raw concurrent samples,
+RSS, stderr and graph comparisons are under
+`target/perf-binder-node-access-20261008/`. `build.py` saves a release binary;
+`concurrent_screen.py` reproduces the concurrent comparison. The batches
+are `concurrent-screen`, `concurrent-dispatch` and
+`concurrent-dispatch-confirm`. The candidates are `local-classifier` and
+`local-assignment-dispatch`, both compared directly with `5d3098a2`.
+
 ## What remains
 
 - **The binder** is 1.8x the pin's on the parse-bind workload where the

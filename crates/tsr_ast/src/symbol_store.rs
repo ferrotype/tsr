@@ -444,6 +444,24 @@ impl<'a> SymbolsMut<'a> {
     pub fn id(&self) -> ArenaId {
         self.store.id()
     }
+    /// Allocate a fresh symbol with only flags and a name. Every other field
+    /// remains at its source default; unrestricted imports still use `push`.
+    #[cfg_attr(feature = "creation-trace", track_caller)]
+    pub fn push_new(self, flags: u32, name: JsString) -> SymbolId {
+        // Allocate before interning, as `push` does. A fresh slot has no old
+        // reference escapes to clear, but wide names still need their escape.
+        let id = self.store.rows.push(StoredSymbol::default());
+        let name = self.tables.intern_name(name);
+        let name = self.store.references.encode_name(id.slot(), name);
+        let row = self.store.rows.get_mut(id).expect("new symbol");
+        row.flags = flags;
+        row.name = name;
+        #[cfg(feature = "creation-trace")]
+        crate::creation_trace::symbol_birth(
+            &self.store.read(self.tables).get(id).expect("new symbol"),
+        );
+        id
+    }
     #[cfg_attr(feature = "creation-trace", track_caller)]
     pub fn push(self, value: Symbol) -> SymbolId {
         let id = self.store.rows.push(StoredSymbol::default());
@@ -659,6 +677,124 @@ mod tests {
     use crate::{existing_runtime_symbol_id, runtime_symbol_id, DeclarationLists, SymbolTable};
     use std::sync::Barrier;
     use tsr_arena::OwnedArena;
+
+    #[test]
+    fn fresh_symbols_match_generic_defaults_without_changing_populated_records() {
+        let counters = Counters::new();
+        let nodes = OwnedArena::<()>::new(&counters);
+        let foreign = OwnedArena::<()>::new(&counters);
+        let mut declarations = DeclarationLists::new(&counters);
+        let mut tables = SymbolTables::new(&counters);
+        let mut symbols = Symbols::new(&counters);
+        symbols.initialize_reference_arenas(nodes.id(), tables.id(), declarations.id());
+        let node = NodeId::from_parts(foreign.id(), u32::MAX).unwrap();
+        let table = SymbolTableId::from_parts(foreign.id(), u32::MAX).unwrap();
+        let parent = SymbolId::from_parts(foreign.id(), u32::MAX).unwrap();
+        let backing = declarations
+            .alloc_with_capacity(vec![Some(node), None], 5)
+            .unwrap();
+        let mut populated = Symbol::new(0x8123_4567, JsString::from_bytes(b"populated".as_slice()));
+        populated.check_flags = 0x9234_5678;
+        populated.declarations = backing;
+        populated.value_declaration = Some(node);
+        populated.members = Some(table);
+        populated.exports = Some(table);
+        populated.parent = Some(parent);
+        populated.export_symbol = Some(parent);
+        let runtime_id = runtime_symbol_id(&populated);
+        let populated = symbols.write(&mut tables).push(populated);
+        let reference_arenas = (
+            symbols.references.nodes,
+            symbols.references.tables,
+            symbols.references.declarations,
+        );
+        let escape_count = symbols.references.escapes.len();
+        assert_eq!(escape_count, 5);
+
+        for name in [b"".as_slice(), b"plain", b"\xfe\xffraw"] {
+            for flags in [0, u32::MAX] {
+                let generic = symbols
+                    .write(&mut tables)
+                    .push(Symbol::new(flags, JsString::from_bytes(name)));
+                let fresh = symbols
+                    .write(&mut tables)
+                    .push_new(flags, JsString::from_bytes(name));
+                assert_eq!(fresh.slot(), generic.slot() + 1);
+                let generic = symbols.read(&tables).get(generic).unwrap().to_owned();
+                let fresh = symbols.read(&tables).get(fresh).unwrap().to_owned();
+                assert_eq!(fresh.flags, generic.flags);
+                assert_eq!(fresh.check_flags, generic.check_flags);
+                assert_eq!(fresh.name, generic.name);
+                assert_eq!(fresh.declarations, generic.declarations);
+                assert!(fresh.declarations.is_nil());
+                assert_eq!(
+                    (
+                        fresh.value_declaration,
+                        fresh.members,
+                        fresh.exports,
+                        fresh.parent,
+                        fresh.export_symbol
+                    ),
+                    (
+                        generic.value_declaration,
+                        generic.members,
+                        generic.exports,
+                        generic.parent,
+                        generic.export_symbol
+                    )
+                );
+                assert_eq!(existing_runtime_symbol_id(&fresh), 0);
+                assert_eq!(existing_runtime_symbol_id(&generic), 0);
+            }
+        }
+        assert_eq!(
+            (
+                symbols.references.nodes,
+                symbols.references.tables,
+                symbols.references.declarations
+            ),
+            reference_arenas
+        );
+        assert_eq!(symbols.references.escapes.len(), escape_count);
+        let read = symbols.read(&tables).get(populated).unwrap();
+        assert_eq!(read.flags(), 0x8123_4567);
+        assert_eq!(read.check_flags(), 0x9234_5678);
+        assert_eq!(read.name_bytes(), b"populated");
+        assert_eq!(read.declarations(), backing);
+        assert_eq!(read.value_declaration(), Some(node));
+        assert_eq!((read.members(), read.exports()), (Some(table), Some(table)));
+        assert_eq!(
+            (read.parent(), read.export_symbol()),
+            (Some(parent), Some(parent))
+        );
+        assert_eq!(existing_runtime_symbol_id(&read), runtime_id);
+    }
+
+    #[cfg(feature = "creation-trace")]
+    #[test]
+    fn fresh_symbol_trace_observes_birth_before_lazy_identity_assignment() {
+        let counters = Counters::new();
+        let mut tables = SymbolTables::new(&counters);
+        let mut symbols = Symbols::new(&counters);
+        crate::creation_trace::begin();
+        let id = symbols
+            .write(&mut tables)
+            .push_new(7, JsString::from_bytes(b"fresh".as_slice()));
+        let read = symbols.read(&tables).get(id).unwrap();
+        assert_eq!(existing_runtime_symbol_id(&read), 0);
+        assert_eq!(crate::creation_trace::symbol_token(&read), Some(1));
+        let assigned = runtime_symbol_id(&read);
+        let events = crate::creation_trace::finish();
+        assert_eq!(events.len(), 2);
+        assert_eq!(events[0]["event"], "birth");
+        assert_eq!(events[0]["flags"], 7);
+        assert_eq!(events[0]["name"], serde_json::json!(b"fresh".as_slice()));
+        assert_eq!(events[0]["semantic_id"], 0);
+        assert_eq!(events[0]["origin"]["file"], file!());
+        assert_eq!(events[1]["event"], "id_assignment");
+        assert_eq!(events[1]["token"], 1);
+        assert_eq!(events[1]["semantic_id"], assigned);
+    }
 
     #[test]
     fn compact_links_roundtrip_full_slots_foreign_owners_and_nil_overwrites() {
