@@ -163,14 +163,96 @@ encode of 10,160 responses), a third checker query and a third symbol
 response construction (registry, node handles); the pin's whole request
 costs what our checker query alone costs.
 
+## Second pass: the node-access levers measured
+
+The structural estimate above ("another quarter off the check phase") was
+checked the same day, on the top-60 variants, two ways: a counting build
+(`tsr_ast`'s `access-stats` feature, read per phase by the benchmark's phase
+clocks) sized the reads, and one build per candidate change measured its
+effect. The machine was busy, so every timing is a concurrent pair: the
+baseline and the variant started at the same moment, six pairs per variant,
+scored by the per-pair ratio (spread about one percent).
+
+**What the check phase reads** (195 million node reads):
+
+| Reads | Count | Share |
+| --- | ---: | ---: |
+| serving only a kind check | 92M | 47% |
+| serving nothing (validation only) | 9M | 5% |
+| serving a parent walk | 43M | 22% |
+| decoding node data | 46M | 23% |
+
+With node access at about 21% of the diagnostics pass, one read costs about
+4 ns: the cost of a few predictable branches and a bounds-checked load, not
+of the page directory.
+
+**What each lever is worth** (ratio to the baseline run):
+
+| Change | Measured | Kept |
+| --- | ---: | --- |
+| sealed flat arena pages (one vector per completed file) | 0.986 | yes |
+| benchmark walker resolving views through the node directory (harness only) | 0.844 (top-60), 0.505 (small variants) | yes |
+| one file view per parent walk in the three hot walks | 0.894 (deep variants), neutral elsewhere | yes |
+| directory hit carrying the direct-read flag, symbol lookup without a view | 1.013 | no |
+| shared declared signature lists, no inherited-name copies, allocation-free lower-casing | 1.005 | no |
+| kind bits in `NodeId` | not built; the 92M kind-only reads at 4 ns put it at 8–10% of the check phase | |
+| same-owner parent reads | not built; the routing share of 43M reads puts it near 1% | |
+
+So the levers as a set are worth about a tenth of the check phase, not a
+quarter: the single-threaded `tsc` ratio would move from 2.3x to about 2.1x.
+Even node access made free (the pin's pointer read) would take the ratio to
+about 1.85x. The rest of the checker's gap is spread across the algorithmic
+areas themselves (flow analysis, name resolution, the relater), where the
+port runs the same algorithm with slower operations: `Result` on every
+accessor, arena-indexed types and symbols, hashed names. Sizing those needs
+a different method, a function-by-function comparison of inclusive time
+against the pin's profile on the same workload, which is the next step.
+
+The sealed flat arena is kept: `Arena::seal` moves the pages into one vector
+when a parse completes (`AstBuilder::complete`), so a completed file's slot
+read is one bounds check and one offset; an open arena keeps its pages. The
+counting feature and the phase-split counters stay as development tooling.
+
+### The benchmark's own view lookups
+
+Profiling the top-60 by variant group (the two deep-expression variants, the
+two flow-heavy ones, the eight small `nodeModules` ones repeated ten times)
+showed the routed view path (`for_node_owner`, `for_arena`,
+`owner_retention`, `CompletedFile::view`) at 7 to 38% of each group. Its
+callers were not the checker but the benchmark walker's `baseline::ast`,
+which scanned every file of the program for the owner of each node it
+visited and built a routed view each time. The pin's walker reads AST
+pointers, so this inflated every Rust checker number, most of all the small
+multi-file variants. `ProgramFile::shared_view` now caches the file's shared
+form, and the walker resolves a node through the program's node directory.
+In concurrent pairs the fix alone is 0.844 of the previous run on the top-60
+and 0.505 on the small group; the recorded S08 checker ratios include that
+overhead and should be re-recorded from this harness.
+
+### What the groups show after the fix
+
+| Group | Rust / Go before | Where the Rust time goes now |
+| --- | ---: | --- |
+| deep expressions | 4.7x and 3.5x | parent walks per identifier (`control_flow_container`, `in_ambient_or_type_node`) at 4 ns a step where the pin pays under 1 ns; node access 42% of the group |
+| flow-heavy | 2.3x and 2.2x | the flow walk itself: node reads inside `type_at_flow` and `matching_reference_worker`, name resolution for unresolved names |
+| small multi-file | 7x | harness digests and paths, checker creation (`merge_global_symbol`), file-cache compares, type display; no single item |
+
+Hoisting one file view out of the three hot parent walks
+(`in_ambient_or_type_node`, `control_flow_container_or_none`,
+`flow_this_type_query_worker`) is 0.894 on the deep group and neutral
+elsewhere; it is kept. Comparing accessed property names through a stack
+buffer instead of a `JsString` per comparison measured 1.008 on the flow
+group and was dropped.
+
 ## What remains
 
-- **Node access in the checker.** `CheckerState::node` and `AstView::node`
-  are still the largest self-time entries of the check phase. The pin reads
-  fields through a pointer; the port resolves an arena and a slot and
-  decodes a compact header on every read. The levers recorded with the S08
-  work (flat arena pages, same-owner parent reads, kind bits in the id) are
-  the next structural step; this pass did not take it.
+- **Node access in the checker.** Measured above: kind bits in `NodeId` are
+  the one lever left with a real return (about a tenth of the check phase);
+  flat pages are done, the directory is not the cost, parent reads are
+  about one percent.
+- **The checker's remaining gap** is spread across flow analysis, name
+  resolution and the relater; a function-level comparison with the pin's
+  profile is the method to size it.
 - **Navigation.** `getSymbolAtPosition`, completion, hover and references
   descend the tree through the general view routing (`for_node_owner`,
   `owner_retention`, `owning_source`) and allocate a vector of children per

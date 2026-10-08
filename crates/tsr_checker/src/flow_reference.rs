@@ -17,12 +17,14 @@ impl CheckerState {
         Ok(result)
     }
     fn flow_this_type_query_worker(&self, mut node: NodeId) -> Result<bool, Error> {
-        if self.node(node)?.kind() != K::Identifier || self.node_text(node)?.as_bytes() != b"this" {
+        // Every ancestor is in the node's file: one view serves the walk.
+        let view = self.ast(node)?;
+        if view.node(node)?.kind() != K::Identifier || view.node_text(node)?.as_bytes() != b"this" {
             return Ok(false);
         }
         loop {
-            let parent = required(self.node(node)?.parent(), "this type-query parent")?;
-            let read = self.node(parent)?;
+            let parent = required(view.node(node)?.parent(), "this type-query parent")?;
+            let read = view.node(parent)?;
             if let Some(qualified) = read.data_source().as_qualified_name() {
                 if qualified.left() == Some(node) {
                     node = parent;

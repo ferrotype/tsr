@@ -318,6 +318,12 @@ impl<N: NodeRecord, S> StorageBuilder<N, S> {
     }
     /// Whether all existing graph storage belongs to this exclusive core owner.
     /// Eager JSDoc cache entries may refer to core nodes without lazy allocations.
+    /// Flatten the core and auxiliary arenas once construction is over, so a
+    /// completed file's reads need no page directory.
+    pub fn seal(&mut self) {
+        self.owner.core.seal();
+        self.owner.auxiliary.seal();
+    }
     pub fn is_core_only(&self) -> bool {
         self.owner.imports.is_empty() && !self.owner.lazy.has_records()
     }

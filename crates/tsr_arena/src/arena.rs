@@ -8,6 +8,9 @@ use crate::{
 pub(crate) struct Arena<T> {
     pub(crate) id: ArenaId,
     pages: Vec<Page<T>>,
+    /// After `seal`, every value in one vector and no pages: a slot is then
+    /// one bounds check and one offset from the vector's base.
+    flat: Option<Page<T>>,
     len: usize,
     counters: Counters,
 }
@@ -39,13 +42,35 @@ impl<T> Arena<T> {
         Self {
             id,
             pages: Vec::new(),
+            flat: None,
             len: 0,
             counters: counters.clone(),
         }
     }
 
+    /// Move the pages into one vector once construction is over: reads of a
+    /// completed file need no page directory. A later push appends to it.
+    pub(crate) fn seal(&mut self) {
+        if self.flat.is_some() || self.pages.is_empty() {
+            return;
+        }
+        let mut values = Vec::with_capacity(self.len);
+        for page in self.pages.drain(..) {
+            values.extend(page.values);
+        }
+        self.flat = Some(Page {
+            values,
+            _allocation: self.counters.allocation(),
+        });
+    }
+
     pub(crate) fn push(&mut self, value: T) -> u32 {
         let slot = allocate_slot(self.len);
+        if let Some(flat) = &mut self.flat {
+            flat.values.push(value);
+            self.len += 1;
+            return slot;
+        }
         let (page, offset) = page_position(self.len);
         if page == self.pages.len() {
             let capacity = if page < 8 { 2 << page } else { 256 };
@@ -67,8 +92,12 @@ impl<T> Arena<T> {
         self.get_slot(slot)
     }
 
+    #[inline]
     pub(crate) fn get_slot(&self, slot: u32) -> Result<&T, Error> {
         let index = slot.checked_sub(1).ok_or(Error::InvalidSlot)? as usize;
+        if let Some(flat) = &self.flat {
+            return flat.values.get(index).ok_or(Error::InvalidSlot);
+        }
         if index >= self.len {
             return Err(Error::InvalidSlot);
         }
@@ -86,6 +115,7 @@ impl<T> Arena<T> {
             + self
                 .pages
                 .iter()
+                .chain(self.flat.iter())
                 .map(|page| page.values.capacity() * size_of::<T>())
                 .sum::<usize>()
     }
@@ -95,7 +125,11 @@ impl<T> Arena<T> {
     }
 
     pub(crate) fn values(&self) -> impl Iterator<Item = &T> {
-        self.pages.iter().flat_map(|page| page.values.iter())
+        // A sealed arena has no pages; an open one has no flat vector.
+        self.pages
+            .iter()
+            .chain(self.flat.iter())
+            .flat_map(|page| page.values.iter())
     }
 
     pub(crate) fn len(&self) -> usize {
@@ -111,6 +145,9 @@ impl<T> Arena<T> {
 
     pub(crate) fn get_slot_mut(&mut self, slot: u32) -> Result<&mut T, Error> {
         let index = slot.checked_sub(1).ok_or(Error::InvalidSlot)? as usize;
+        if let Some(flat) = &mut self.flat {
+            return flat.values.get_mut(index).ok_or(Error::InvalidSlot);
+        }
         if index >= self.len {
             return Err(Error::InvalidSlot);
         }

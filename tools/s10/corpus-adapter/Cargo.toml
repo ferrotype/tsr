@@ -10,6 +10,8 @@ publish.workspace = true
 # Existing shared walker source declares these cfgs. Normal S10 builds leave
 # measurement instrumentation off.
 s08-phase-timer = []
+# The phase clocks also split tsr_ast's node-read counters per phase.
+access-stats = ["tsr_ast/access-stats"]
 
 [dependencies]
 serde_json = { version = "1", features = ["preserve_order"] }

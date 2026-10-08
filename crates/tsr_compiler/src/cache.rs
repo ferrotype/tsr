@@ -13,16 +13,28 @@ use tsr_jsstring::{JsString, SourceText};
 pub struct ProgramFile {
     pub(crate) bound: CompletedFile,
     mapped_bundle: Option<Arc<[CompletedFile]>>,
+    /// The file's shared form, built on first use: a view from it is two
+    /// borrows, where `CompletedFile::view` routes through the handle.
+    shared: std::sync::OnceLock<Option<tsr_ast::SharedBoundFile>>,
 }
 impl ProgramFile {
     pub(crate) fn new(bound: CompletedFile) -> Self {
         Self {
             bound,
             mapped_bundle: None,
+            shared: std::sync::OnceLock::new(),
         }
     }
     pub fn bound(&self) -> &CompletedFile {
         &self.bound
+    }
+    /// The bound view through the file's shared form, `None` for a bundle
+    /// member; cheaper than `bound().view()` on every node of a walk.
+    pub fn shared_view(&self) -> Option<tsr_ast::BoundView<'_>> {
+        self.shared
+            .get_or_init(|| self.bound.shared())
+            .as_ref()
+            .map(tsr_ast::SharedBoundFile::view)
     }
     pub fn source(&self) -> tsr_ast::NodeId {
         self.bound.source()

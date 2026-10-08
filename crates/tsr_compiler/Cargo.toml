@@ -23,6 +23,8 @@ services-replay = ["tsr_checker/services-replay"]
 # allocation adds the counting allocator wrapper.
 s08-phase-timer = []
 s08-allocation = ["tsr_checker/storage-pilot"]
+# Development-only node-read counters printed by the checkerbench child.
+access-stats = ["tsr_ast/access-stats"]
 
 [[test]]
 name = "c1_contracts"

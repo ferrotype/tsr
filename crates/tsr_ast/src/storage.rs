@@ -342,6 +342,7 @@ impl AstBuilder {
     pub fn complete(mut self, root: NodeId) -> Result<ParsedFile, Error> {
         self.view().node(root)?;
         self.frame_mut().root = Some(root);
+        self.storage.seal();
         let checked = self.construction_edges_valid && self.storage.is_core_only();
         self.view().validate_core_with_construction_edges(checked)?;
         Ok(ParsedFile {

@@ -17,26 +17,85 @@ struct Clocks {
     /// Phase stack; the top phase owns the time since `since`.
     stack: Vec<usize>,
     since: Option<Instant>,
+    /// The node-read counters when the top phase last started charging, and
+    /// their exclusive growth per phase (`access-stats` feature only).
+    #[cfg(feature = "access-stats")]
+    counts_since: [u64; 13],
+    #[cfg(feature = "access-stats")]
+    count_totals: [[u64; 13]; 3],
 }
 
 thread_local! {
-    static CLOCKS: RefCell<Clocks> = const { RefCell::new(Clocks { totals: [0; 3], stack: Vec::new(), since: None }) };
+    static CLOCKS: RefCell<Clocks> = const { RefCell::new(Clocks {
+        totals: [0; 3],
+        stack: Vec::new(),
+        since: None,
+        #[cfg(feature = "access-stats")]
+        counts_since: [0; 13],
+        #[cfg(feature = "access-stats")]
+        count_totals: [[0; 13]; 3],
+    }) };
     static DEPTH: Cell<u32> = const { Cell::new(0) };
+}
+
+/// The per-phase counter growth of every variant so far (`reset` folds a
+/// finished variant in).
+#[cfg(feature = "access-stats")]
+static PHASE_COUNTS: std::sync::Mutex<[[u64; 13]; 3]> = std::sync::Mutex::new([[0; 13]; 3]);
+
+#[cfg(feature = "access-stats")]
+pub fn phase_counts() -> [[u64; 13]; 3] {
+    let mut counts = *PHASE_COUNTS.lock().expect("phase counts");
+    let pending = CLOCKS.with(|c| c.borrow().count_totals);
+    for (total, phase) in counts.iter_mut().zip(pending) {
+        for (total, value) in total.iter_mut().zip(phase) {
+            *total += value;
+        }
+    }
+    counts
 }
 
 fn settle(clocks: &mut Clocks, now: Instant) {
     if let (Some(since), Some(&phase)) = (clocks.since, clocks.stack.last()) {
         clocks.totals[phase] += u64::try_from((now - since).as_nanos()).unwrap_or(u64::MAX);
+        #[cfg(feature = "access-stats")]
+        {
+            let counts = tsr_ast::access_stats::snapshot();
+            for (total, (now, before)) in clocks.count_totals[phase]
+                .iter_mut()
+                .zip(counts.iter().zip(clocks.counts_since.iter()))
+            {
+                *total += now - before;
+            }
+        }
     }
     clocks.since = Some(now);
+    #[cfg(feature = "access-stats")]
+    {
+        clocks.counts_since = tsr_ast::access_stats::snapshot();
+    }
 }
 
 pub fn reset() {
     CLOCKS.with(|c| {
+        #[cfg(feature = "access-stats")]
+        {
+            let finished = c.borrow().count_totals;
+            let mut counts = PHASE_COUNTS.lock().expect("phase counts");
+            for (total, phase) in counts.iter_mut().zip(finished) {
+                for (total, value) in total.iter_mut().zip(phase) {
+                    *total += value;
+                }
+            }
+        }
         *c.borrow_mut() = Clocks {
             totals: [0; 3],
             stack: Vec::new(),
             since: None,
+            #[cfg(feature = "access-stats")]
+            counts_since: [0; 13],
+            #[cfg(feature = "access-stats")]
+            count_totals: [[0; 13]; 3],
         }
     });
 }
@@ -80,6 +139,10 @@ pub fn resume_at(now: Instant) {
         let mut clocks = c.borrow_mut();
         if !clocks.stack.is_empty() {
             clocks.since = Some(now);
+            #[cfg(feature = "access-stats")]
+            {
+                clocks.counts_since = tsr_ast::access_stats::snapshot();
+            }
         }
     });
 }

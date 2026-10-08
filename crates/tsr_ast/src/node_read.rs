@@ -25,6 +25,10 @@ use tsr_jsstring::SourceText;
 pub struct NodeRead<'a> {
     record: ReadRecord<'a>,
     id: NodeId,
+    /// Which accessors this read has served (bit 1 the kind, bit 2 anything
+    /// else); each first use of a bit is tallied.
+    #[cfg(feature = "access-stats")]
+    used: std::cell::Cell<u8>,
 }
 enum ReadRecord<'a> {
     Core {
@@ -81,6 +85,8 @@ impl<'a> NodeRead<'a> {
         record: &StorageRead<'a, StoredNode>,
         owner: StorageView<'a, StoredNode>,
     ) -> Self {
+        #[cfg(feature = "access-stats")]
+        crate::access_stats::bump(&crate::access_stats::READS_LAZY);
         let aux = AuxId::from_parts(owner.lazy_auxiliary_arena(), record.ordinal)
             .expect("lazy payload slot");
         Self {
@@ -94,6 +100,8 @@ impl<'a> NodeRead<'a> {
                 owner: owner.physical_owner(),
             },
             id,
+            #[cfg(feature = "access-stats")]
+            used: std::cell::Cell::default(),
         }
     }
     #[inline]
@@ -102,9 +110,13 @@ impl<'a> NodeRead<'a> {
         header: &'a StoredNode,
         owner: &'a StorageOwner<StoredNode>,
     ) -> Self {
+        #[cfg(feature = "access-stats")]
+        crate::access_stats::bump(&crate::access_stats::READS_CORE);
         Self {
             record: ReadRecord::Core { header, owner },
             id,
+            #[cfg(feature = "access-stats")]
+            used: std::cell::Cell::default(),
         }
     }
     pub(crate) fn transaction_core(
@@ -112,9 +124,13 @@ impl<'a> NodeRead<'a> {
         header: &'a StoredNode,
         owner: &'a StorageTransaction<'a, StoredNode>,
     ) -> Self {
+        #[cfg(feature = "access-stats")]
+        crate::access_stats::bump(&crate::access_stats::READS_TRANSACTION);
         Self {
             record: ReadRecord::TransactionCore { header, owner },
             id,
+            #[cfg(feature = "access-stats")]
+            used: std::cell::Cell::default(),
         }
     }
     pub(crate) fn owned(
@@ -123,6 +139,8 @@ impl<'a> NodeRead<'a> {
         owner_id: FileId,
         source: &'a SourceText,
     ) -> Self {
+        #[cfg(feature = "access-stats")]
+        crate::access_stats::bump(&crate::access_stats::READS_OWNED);
         Self {
             record: ReadRecord::Owned {
                 node,
@@ -130,7 +148,25 @@ impl<'a> NodeRead<'a> {
                 owner_id,
             },
             id,
+            #[cfg(feature = "access-stats")]
+            used: std::cell::Cell::default(),
         }
+    }
+    /// Note an accessor class this read serves (`access-stats` only; a
+    /// no-op otherwise).
+    #[inline]
+    #[cfg_attr(not(feature = "access-stats"), allow(clippy::unused_self))]
+    fn touch(&self, bit: u8) {
+        #[cfg(feature = "access-stats")]
+        {
+            let used = self.used.get();
+            if used & bit == 0 {
+                crate::access_stats::first_use(bit, used);
+                self.used.set(used | bit);
+            }
+        }
+        #[cfg(not(feature = "access-stats"))]
+        let _ = bit;
     }
     pub fn id(&self) -> NodeId {
         self.id
@@ -143,6 +179,7 @@ impl<'a> NodeRead<'a> {
         }
     }
     pub fn source(&self) -> &'a SourceText {
+        self.touch(2);
         match self.record {
             ReadRecord::Core { owner, .. } | ReadRecord::Lazy { owner, .. } => owner.source_text(),
             ReadRecord::TransactionCore { owner, .. } => owner.source(),
@@ -171,6 +208,8 @@ impl<'a> NodeRead<'a> {
         Some(Self {
             record,
             id: self.id,
+            #[cfg(feature = "access-stats")]
+            used: std::cell::Cell::default(),
         })
     }
     fn owned_record(&self) -> Option<&Node> {
@@ -214,6 +253,7 @@ impl<'a> NodeRead<'a> {
     /// Explicit construction copy used by unrestricted exclusive edits and cold
     /// published overlays; ordinary payload reads never reconstruct a node.
     pub(crate) fn to_owned_preserving_identity(&self) -> Node {
+        self.touch(2);
         let facts = match self.core_header() {
             Some(_) => self
                 .compact_context()
@@ -234,17 +274,24 @@ impl<'a> NodeRead<'a> {
         }
     }
     pub(crate) fn copy_for_binding(&self) -> Node {
+        self.touch(2);
         let mut node = self.to_owned_preserving_identity();
         node.runtime_id = std::sync::atomic::AtomicU64::new(crate::runtime_node_id(self));
         node
     }
     pub fn kind(&self) -> crate::NodeKind {
+        self.touch(1);
+        #[cfg(feature = "access-stats")]
+        crate::access_stats::bump(&crate::access_stats::KIND);
         match self.core_header() {
             Some(header) => header.kind,
             _ => self.owned_record().unwrap().kind(),
         }
     }
     pub fn parent(&self) -> Option<NodeId> {
+        self.touch(2);
+        #[cfg(feature = "access-stats")]
+        crate::access_stats::bump(&crate::access_stats::PARENT);
         match self.core_header() {
             Some(header) => self
                 .compact_context()
@@ -253,18 +300,27 @@ impl<'a> NodeRead<'a> {
         }
     }
     pub fn flags(&self) -> u32 {
+        self.touch(2);
+        #[cfg(feature = "access-stats")]
+        crate::access_stats::bump(&crate::access_stats::FLAGS);
         match self.core_header() {
             Some(header) => header.flags,
             _ => self.owned_record().unwrap().flags(),
         }
     }
     pub fn pos(&self) -> i32 {
+        self.touch(2);
+        #[cfg(feature = "access-stats")]
+        crate::access_stats::bump(&crate::access_stats::POS_END);
         match self.core_header() {
             Some(header) => header.pos,
             _ => self.owned_record().unwrap().pos(),
         }
     }
     pub fn end(&self) -> i32 {
+        self.touch(2);
+        #[cfg(feature = "access-stats")]
+        crate::access_stats::bump(&crate::access_stats::POS_END);
         match self.core_header() {
             Some(header) => header.end,
             _ => self.owned_record().unwrap().end(),
@@ -274,6 +330,9 @@ impl<'a> NodeRead<'a> {
         tsr_core::TextRange::new(i64::from(self.pos()), i64::from(self.end()))
     }
     pub fn data(&self) -> NodeDataRead<'_> {
+        self.touch(2);
+        #[cfg(feature = "access-stats")]
+        crate::access_stats::bump(&crate::access_stats::DATA);
         match self.core_header() {
             Some(header) => {
                 let context = self.compact_context();
@@ -288,12 +347,16 @@ impl<'a> NodeRead<'a> {
         }
     }
     pub fn data_source(&self) -> NodeDataSource<'_> {
+        self.touch(2);
+        #[cfg(feature = "access-stats")]
+        crate::access_stats::bump(&crate::access_stats::DATA_SOURCE);
         match self.core_header() {
             Some(header) => NodeDataSource::from_stored(header, self),
             _ => NodeDataSource::from_owned(self.owned_record().unwrap().data()),
         }
     }
     pub(crate) fn inline_binding(&self) -> Option<crate::NodeBinding> {
+        self.touch(2);
         match self.core_header() {
             Some(header) => {
                 let context = self.compact_context();
@@ -303,6 +366,7 @@ impl<'a> NodeRead<'a> {
         }
     }
     pub(crate) fn inline_symbol(&self) -> Option<crate::SymbolId> {
+        self.touch(2);
         match self.core_header() {
             Some(header) => {
                 let context = self.compact_context();
@@ -312,6 +376,7 @@ impl<'a> NodeRead<'a> {
         }
     }
     pub(crate) fn inline_locals(&self) -> Option<crate::SymbolTableId> {
+        self.touch(2);
         match self.core_header() {
             Some(header) => {
                 let context = self.compact_context();
@@ -321,6 +386,7 @@ impl<'a> NodeRead<'a> {
         }
     }
     pub(crate) fn inline_flow(&self) -> Option<crate::FlowId> {
+        self.touch(2);
         match self.core_header() {
             Some(header) => {
                 let context = self.compact_context();
@@ -336,6 +402,7 @@ impl<'a> NodeRead<'a> {
         self.for_each_child_generated(visitor)
     }
     pub(crate) fn cached_subtree_facts(&self) -> u32 {
+        self.touch(2);
         match self.core_header() {
             Some(header) => self
                 .compact_context()
@@ -346,6 +413,7 @@ impl<'a> NodeRead<'a> {
         }
     }
     pub(crate) fn store_subtree_facts(&self, facts: u32) {
+        self.touch(2);
         match self.core_header() {
             Some(header) => self.compact_context().store.payloads.store_subtree_facts(
                 header.actual_shape(),

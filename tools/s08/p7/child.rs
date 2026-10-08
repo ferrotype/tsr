@@ -415,5 +415,17 @@ pub fn main() -> Result<(), Box<dyn std::error::Error>> {
     totals["outputs_sha256"] = json!(hex(&digests.finalize()));
     totals["actions_sha256"] = json!(hex(&actions.finalize()));
     println!("{}", serde_json::to_string(&totals)?);
+    #[cfg(feature = "access-stats")]
+    eprintln!("access-stats {}", tsr_ast::access_stats::report());
+    #[cfg(all(feature = "access-stats", feature = "s08-phase-timer"))]
+    for (phase, counts) in crate::baseline::instrument::NAMES
+        .iter()
+        .zip(crate::baseline::instrument::phase_counts())
+    {
+        eprintln!(
+            "access-stats-phase {phase} {}",
+            tsr_ast::access_stats::report_values(&counts)
+        );
+    }
     Ok(())
 }
