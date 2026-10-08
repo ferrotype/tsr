@@ -171,6 +171,19 @@ def rust_executable(messages, manifest, instrumented):
     return cargo_executable(messages, manifest, "ts-bench", "bin", ["allocation"] if instrumented else [])
 
 
+def publish_binary(source, destination):
+    # Replacing an executable's bytes in place can leave macOS using its old
+    # cached code signature and kill the new process before main. Publish a
+    # complete executable on a fresh inode in the destination filesystem.
+    destination = Path(destination)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix=".benchmark-binary-", dir=destination.parent) as temporary:
+        staged = Path(temporary) / destination.name
+        shutil.copyfile(source, staged)
+        staged.chmod(0o755)
+        os.replace(staged, destination)
+
+
 def build_rust(instrumented=False):
     if type(instrumented) is not bool:
         raise ValueError("benchmark instrumentation mode must be boolean")
@@ -194,8 +207,7 @@ def build_rust(instrumented=False):
         executable = rust_executable(command(args, cwd=ROOT, env=env), ROOT / "crates/tsr_bench/Cargo.toml", instrumented)
         if not executable.resolve().is_relative_to(build_directory):
             raise ValueError("Cargo benchmark artifact escaped its isolated build directory")
-        shutil.copyfile(executable, destination)
-    destination.chmod(0o755)
+        publish_binary(executable, destination)
     return destination, env
 
 
