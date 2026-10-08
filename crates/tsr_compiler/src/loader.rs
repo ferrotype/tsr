@@ -795,6 +795,10 @@ struct Loader<'a> {
     /// collection publishes those of the paths it keeps.
     processing: BTreeMap<JsString, Vec<ProcessingDiagnostic>>,
     content_mappers: crate::content_mapped::ContentMapperState,
+    /// Workers parsing the queued tasks ahead of the loop, and the number of
+    /// queued tasks already handed to them.
+    preloader: Option<crate::preload::Preloader>,
+    preload_mark: usize,
 }
 type ReferenceFailure = (&'static tsr_diagnostics::Message, Vec<JsString>);
 /// port: tsc/internal/compiler/program.go:ProgramOptions.canUseProjectReferenceSource
@@ -957,9 +961,16 @@ impl<'a> Loader<'a> {
             redirect_outputs: BTreeSet::new(),
             processing: BTreeMap::new(),
             content_mappers,
+            preloader: None,
+            preload_mark: 0,
         })
     }
-    fn run(mut self) -> Result<Program, Error> {
+    /// The load runs on one reserved-stack parser worker, so the files the
+    /// loop parses itself parse inline instead of each on a thread of its own.
+    fn run(self) -> Result<Program, Error> {
+        tsr_parser::on_parser_worker(move || self.run_inner())
+    }
+    fn run_inner(mut self) -> Result<Program, Error> {
         let _trace = TraceScope::new(
             self.tracing.as_ref(),
             TracePhase::Program,
@@ -1033,13 +1044,21 @@ impl<'a> Loader<'a> {
         }
         self.config.root_file_names = roots;
         // port: tsc/internal/compiler/filesparser.go:filesParser.parse
+        if self.preloads_files() {
+            self.preloader = Some(crate::preload::Preloader::new(
+                self.cache.producer(&self.host, self.counters),
+            ));
+        }
         while let Some(task) = self.pending.pop() {
+            self.preload_mark = self.preload_mark.min(self.pending.len());
             if task.elide && task.depth > self.options.max_node_module_js_depth.unwrap_or_default()
             {
                 continue;
             }
+            self.preload_pending();
             self.load_worker(&task.name, task.is_lib, task.is_root, task.depth)?;
         }
+        self.preloader = None;
         let loaded_names: BTreeMap<_, _> = self
             .files
             .iter()
@@ -1923,7 +1942,19 @@ impl<'a> Loader<'a> {
             },
             true,
         );
-        let options = SourceFileParseOptions {
+        let options = self.source_file_parse_options(name, key, meta)?;
+        if tsr_tspath::file_extension_is_one_of(name, &self.content_mappers.extensions) {
+            return self.parse_content_mapped_file(options);
+        }
+        self.get_source_file(options, kind)
+    }
+    fn source_file_parse_options(
+        &mut self,
+        name: &[u8],
+        key: &JsString,
+        meta: &SourceFileMetaData,
+    ) -> Result<SourceFileParseOptions, Error> {
+        Ok(SourceFileParseOptions {
             file_name: JsString::from_bytes(name),
             path: key.clone(),
             external_module_indicator_options: metadata::indicator(
@@ -1932,11 +1963,82 @@ impl<'a> Loader<'a> {
                     .compiler_options_for_file(&self.options, key.as_bytes(), name)?,
                 meta,
             ),
-        };
-        if tsr_tspath::file_extension_is_one_of(name, &self.content_mappers.extensions) {
-            return self.parse_content_mapped_file(options);
+        })
+    }
+    /// Parallel programs that are not traced parse their queued files ahead
+    /// of the loop (`preload`); a traced load keeps the pin's event order.
+    fn preloads_files(&self) -> bool {
+        cfg!(not(all(target_arch = "wasm32", target_os = "unknown")))
+            && !self
+                .single_threaded
+                .default_if_unknown(self.options.single_threaded)
+                .is_true()
+            && self.tracing.is_none()
+            && !self.options.trace_resolution.is_true()
+    }
+    /// Hand the tasks queued since the last call to the workers, the next
+    /// to be popped first. A task's parse context is computed here exactly as
+    /// `load_worker` computes it; a task the worker cannot take (a redirect,
+    /// a mapped or unsupported file, a cache that must compare) is left to the
+    /// loop, as is one whose preparation fails, so the loop reports it.
+    fn preload_pending(&mut self) {
+        if self.preloader.is_none() {
+            return;
         }
-        self.get_source_file(options, kind)
+        let max_depth = self.options.max_node_module_js_depth.unwrap_or_default();
+        let tasks: Vec<LoadTask> = self.pending[self.preload_mark..]
+            .iter()
+            .rev()
+            .filter(|task| !(task.elide && task.depth > max_depth))
+            .cloned()
+            .collect();
+        self.preload_mark = self.pending.len();
+        for task in tasks {
+            if let Ok(Some(job)) = self.preload_job(&task) {
+                self.preloader
+                    .as_mut()
+                    .expect("the preloader is checked above")
+                    .submit(job);
+            }
+        }
+    }
+    fn preload_job(&mut self, task: &LoadTask) -> Result<Option<crate::preload::Job>, Error> {
+        let name = path::absolute(&task.name, self.cwd.as_bytes());
+        let key = self.to_path(&name);
+        if self.depths.contains_key(&key)
+            || self.child_tasks.contains_key(&key)
+            || self.content_mappers.supplementals.contains_key(&key)
+            || self
+                .references
+                .parse_file_redirect(key.as_bytes(), &name)?
+                .is_some()
+            || tsr_tspath::file_extension_is_one_of(&name, &self.content_mappers.extensions)
+        {
+            return Ok(None);
+        }
+        if path::has_extension(&name) && !self.options.allow_non_ts_extensions.is_true() {
+            let canonical = path::canonical(&name, self.host.use_case_sensitive_file_names());
+            if !self.is_supported_extension(&canonical) {
+                return Ok(None);
+            }
+        }
+        let kind = self.cache.script_kind(&name);
+        let meta = metadata::load(
+            &mut self.resolver,
+            &name,
+            &self.options,
+            task.is_lib,
+            self.skip_resolution,
+        )?;
+        let options = self.source_file_parse_options(&name, &key, &meta)?;
+        if !self.cache.preloadable(&options) {
+            return Ok(None);
+        }
+        Ok(Some(crate::preload::Job {
+            path: key,
+            kind,
+            options,
+        }))
     }
     /// A content-mapped file's virtual source through the host's mapper,
     /// keeping its original name and text. After a failed initialization or
@@ -2105,6 +2207,7 @@ impl<'a> Loader<'a> {
             options,
             self.counters,
             self.tracing.as_ref(),
+            self.preloader.as_ref(),
         )
     }
     /// A `/// <reference path>`: its absolute file name, or the diagnostic's

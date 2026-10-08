@@ -377,6 +377,54 @@ impl FileCache {
             !entries.is_empty()
         });
     }
+    /// What the loader's parse-ahead workers load with: this cache's project
+    /// cache, so their files carry the leases the loader's own loads would.
+    pub(crate) fn producer(
+        &self,
+        host: &Arc<dyn tsr_vfs::FileSystem>,
+        counters: &Counters,
+    ) -> crate::preload::Producer {
+        crate::preload::Producer {
+            host: host.clone(),
+            project: self.project.clone(),
+            counters: counters.clone(),
+        }
+    }
+    /// Whether a worker may load the file ahead of the loader: not through
+    /// the build-shared cache, and not when a local reuse candidate exists,
+    /// which only the loader's own read can compare.
+    pub(crate) fn preloadable(&self, options: &SourceFileParseOptions) -> bool {
+        let file_name = options.file_name.as_bytes();
+        if self.shared.is_some()
+            && (tsr_tspath::is_declaration_file_name(file_name)
+                || tsr_tspath::file_extension_is(file_name, b".json"))
+        {
+            return false;
+        }
+        self.project.is_some()
+            || !self
+                .files
+                .get(&options.path)
+                .is_some_and(|entries| entries.iter().any(|entry| entry.strong_count() != 0))
+    }
+    /// A file a worker loaded, taking the place of the loader's own load.
+    fn adopt(&mut self, preloaded: crate::preload::Preloaded) -> Arc<ProgramFile> {
+        match preloaded.retention {
+            Some(retention) => self
+                .project_retention
+                .upgrade()
+                .expect("project parse cache requires a program load")
+                .lock()
+                .expect("program retention poisoned")
+                .push(retention),
+            None => self
+                .files
+                .entry(preloaded.options.path.clone())
+                .or_default()
+                .push(Arc::downgrade(&preloaded.file)),
+        }
+        preloaded.file
+    }
     // port: tsc/internal/execute/build/host.go:host.GetSourceFile
     pub(crate) fn load(
         &mut self,
@@ -385,7 +433,13 @@ impl FileCache {
         options: SourceFileParseOptions,
         counters: &Counters,
         tracing: Option<&Arc<dyn tsr_checker::TraceSink>>,
+        preloader: Option<&crate::preload::Preloader>,
     ) -> Result<Option<Arc<ProgramFile>>, Error> {
+        if let Some(preloaded) = preloader.and_then(|preloader| preloader.take(&options.path)) {
+            if preloaded.kind == kind && preloaded.options == options {
+                return Ok(Some(self.adopt(preloaded)));
+            }
+        }
         let shared = self
             .shared
             .as_ref()
