@@ -9,6 +9,7 @@
 use super::{client_error, SessionError, SessionResult, SnapshotData};
 use crate::proto::{NodeHandle, ProjectId, SignatureId, SymbolId, TypeId};
 use std::collections::HashMap;
+use std::fmt::Write as _;
 use std::sync::{Arc, Mutex};
 use tsr_arena::ArenaId;
 use tsr_checker::{
@@ -60,7 +61,8 @@ pub struct ProjectRegistry {
 pub struct Committed(tsr_json::RawValue);
 impl tsr_json::Encode for Committed {
     fn encode(&self, out: &mut tsr_json::Encoder<'_>) -> Result<(), tsr_json::Error> {
-        self.0.encode(out)
+        // The bytes came from this encoder, so they are not scanned again.
+        out.write_encoded_value(&self.0 .0)
     }
 }
 
@@ -361,12 +363,17 @@ pub fn node_handle(operation: &Operation<'_>, node: tsr_ast::NodeId) -> SessionR
     let view = operation.ast_view(node).map_err(checker_error)?;
     let read = view.node(node).map_err(checker_error)?;
     let kind = read.kind();
-    let mut root = node;
-    while let Some(parent) = view.node(root).map_err(checker_error)?.parent() {
-        root = parent;
-    }
+    // The owning file's root; a node outside a file arena walks up instead.
+    let root = if let Some(root) = view.file_info().root {
+        root
+    } else {
+        let mut root = node;
+        while let Some(parent) = view.node(root).map_err(checker_error)?.parent() {
+            root = parent;
+        }
+        root
+    };
     let file = view.source_file(root).map_err(checker_error)?;
-    let path = String::from_utf8_lossy(file.path()).into_owned();
     let table = tsr_encoder::get_node_index_table(
         view,
         root,
@@ -375,7 +382,14 @@ pub fn node_handle(operation: &Operation<'_>, node: tsr_ast::NodeId) -> SessionR
     .map_err(checker_error)?
     .ok_or_else(|| SessionError::Other("node index table unavailable".into()))?;
     let index = table.get_index(view, Some(&read)).map_err(checker_error)?;
-    Ok(NodeHandle(format!("{index}.{}.{path}", kind.raw())))
+    let path = file.path();
+    let mut handle = String::with_capacity(path.len() + 16);
+    write!(handle, "{index}.{}.", kind.raw()).expect("a string accepts writes");
+    match std::str::from_utf8(path) {
+        Ok(path) => handle.push_str(path),
+        Err(_) => handle.push_str(&String::from_utf8_lossy(path)),
+    }
+    Ok(NodeHandle(handle))
 }
 
 /// port: tsc/internal/api/session.go:snapshotData.resolveNodeHandle
