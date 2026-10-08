@@ -15,8 +15,8 @@ as the whole variant, under the variant id alone.
 `run` writes DIR/results.ndjson and DIR/meta.json (and the runner's local
 baseline output under DIR/local). `check` merges the result directories,
 compares the failing set with status/parity/<suite>.json and exits non-zero
-on any difference; `accept` rewrites that file, keeping every reason and
-approval still in force.
+on any difference; `accept` rewrites that file, keeping every approved
+reason and refreshing the mechanical labels from the run.
 """
 from __future__ import annotations
 
@@ -368,8 +368,11 @@ def accept(args):
     failing = {}
     for key, row in sorted(failing_ids(rows).items()):
         entry = dict(expectation["failing"].get(key) or {})
-        if "reason" not in entry:
+        # An approved entry keeps its worded reason; a mechanical label is
+        # refreshed from the run, so the file shows the current cause.
+        if "reason" not in entry or not entry.get("approved"):
             entry["reason"] = row.get("reason") or "unexplained"
+            entry.pop("detail", None)
             if row.get("detail"):
                 entry["detail"] = row["detail"].splitlines()[0][:200]
         failing[key] = entry

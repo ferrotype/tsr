@@ -3,465 +3,89 @@
   "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
   "total": 12,
   "failing": {
-    "jsapi/test/async/api.test.ts/API - automatic batching > batches multiple concurrent requests into one automatically": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API - batchContext > holds requests until disposal": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API - batchContext > settles an item error without dropping a sibling result": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API - batchContext > transparently paginates batch responses": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > createProgram": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > createProgram accepts a regular project program as the old program": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > createProgram includes config file parsing diagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > createProgram updates an old program with file changes": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > createProgram updates an old program with invalidateAll": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/API > initializes once for concurrent first requests": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
     "jsapi/test/async/api.test.ts/Checker - getConstantValue > returns numeric value of an enum member": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getConstantValue",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getConstantValue"
     },
     "jsapi/test/async/api.test.ts/Checker - getConstantValue > returns string value of a string-initialized enum member": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/LanguageService - getCompletionsAtPosition > completion entries include sortText": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/LanguageService - getCompletionsAtPosition > includeSymbol: true populates symbol on property completions": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/LanguageService - getCompletionsAtPosition > returns member completions after a dot": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/LanguageService - getCompletionsAtPosition > returns undefined for a non-existent file": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/LanguageService - getReferencedSymbolsForNode > getReferencedSymbolsForNode": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getConstantValue",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getConstantValue"
     },
     "jsapi/test/async/api.test.ts/LanguageService - getSignatureUsage > getSignatureUsage": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getSignatureUsages",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getSignatureUsages"
     },
     "jsapi/test/async/api.test.ts/LanguageService - imports > getImportAdderEdits adds to an existing import": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getImportAdderEdits",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getImportAdderEdits"
     },
     "jsapi/test/async/api.test.ts/LanguageService - imports > getImportAdderEdits coalesces multiple importSymbol actions": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getImportAdderEdits",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getImportAdderEdits"
     },
     "jsapi/test/async/api.test.ts/LanguageService - imports > getImportAdderEdits rejects invalid actions": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getImportAdderEdits",
+      "detail": "Error [ERR_TEST_FAILURE]: The input did not match the regular expression /symbol handle \\d+ not found/. Input:"
     },
     "jsapi/test/async/api.test.ts/LanguageService - imports > getImportAdderEdits returns no edits for non-exported symbols": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getImportAdderEdits",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getImportAdderEdits"
     },
     "jsapi/test/async/api.test.ts/LanguageService - imports > getImportEditsForSymbols adds a named import": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - diagnostics > diagnostics with empty files array returns empty": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - diagnostics > diagnostics with no files argument returns all": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - diagnostics > getBindDiagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - diagnostics > getBindDiagnostics with multiple files": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - diagnostics > getConfigFileParsingDiagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - diagnostics > getDeclarationDiagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - diagnostics > getGlobalDiagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - diagnostics > getGlobalDiagnostics returns file-less diagnostics from the checker": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - diagnostics > getProgramDiagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - diagnostics > getSemanticDiagnostics with messageChain and relatedInformation": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - diagnostics > getSemanticDiagnostics with multiple files": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - diagnostics > getSuggestionDiagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - diagnostics > getSyntacticDiagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - diagnostics > getSyntacticDiagnostics with multiple files": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - emit > emit all files": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - emit > emit and emitToString respect noEmit": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - emit > emit only dts": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - emit > emit only js": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - emit > emit rejects unknown files and invalid emitOnly values": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - emit > emit reports async VFS write failures as diagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - emit > emitToString emits the whole program and respects emitOnly": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - emit > noEmitOnError reports diagnostics without writing output": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - emit > whole-program emit includes option-controlled maps": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - selected file emit > getDeclarationEmit forces declarations and declaration maps": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - selected file emit > getJavaScriptEmit forces JavaScript and source maps": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/Program - selected file emit > selected file emit accepts empty arrays": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/SnapshotInternalAPI - formatNodeForInsertion > formats a node at top-level with no indentation": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/SnapshotInternalAPI - formatNodeForInsertion > formats a synthesized statement with correct indentation for insertion inside a function body": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/SnapshotInternalAPI - formatNodeForInsertion > formats a synthesized statement with correct indentation when non-ASCII characters precede the insertion position": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getImportAdderEdits",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getImportAdderEdits"
     },
     "jsapi/test/async/api.test.ts/Symbol - getDocumentationComment and getJsDocTags > getDocumentationComment returns the leading comment text": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getDocumentationComment",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getDocumentationComment"
     },
     "jsapi/test/async/api.test.ts/Symbol - getDocumentationComment and getJsDocTags > getJsDocTags returns structured tag name∕text pairs": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/async/api.test.ts/runWithTemporaryFileUpdate > temporary file update is visible in the callback and reverted afterward": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/diagnosticFormatter.test.ts/diagnosticFormatter > formats diagnostics with a configured program host": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/diagnosticFormatter.test.ts/diagnosticFormatter > uses the API host for standalone diagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api-generators.test.ts/API - generator batching > advances generators through multiple request rounds": {
-      "reason": "server: not implemented: batchRequests",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: batchRequests"
-    },
-    "jsapi/test/sync/api-generators.test.ts/API - generator batching > all deduplicates only initialize requests within a batch round": {
-      "reason": "server: not implemented: batchRequests",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: batchRequests"
-    },
-    "jsapi/test/sync/api-generators.test.ts/API - generator batching > composes request generators with all": {
-      "reason": "server: not implemented: batchRequests",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: batchRequests"
+      "reason": "server: not implemented: getJsDocTags",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getJsDocTags"
     },
     "jsapi/test/sync/api-generators.test.ts/API - generator batching > keeps every publicly reachable generator-backed method in sync": {
-      "reason": "server: not implemented: batchRequests",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: batchRequests"
-    },
-    "jsapi/test/sync/api-generators.test.ts/API - generator batching > throws request errors into generators": {
-      "reason": "server: not implemented: batchRequests",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: batchRequests"
-    },
-    "jsapi/test/sync/api-generators.test.ts/API - generator batching > transparently paginates batch responses": {
-      "reason": "server: not implemented: batchRequests",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: batchRequests"
-    },
-    "jsapi/test/sync/api-generators.test.ts/API - generator batching > transparently paginates responses at the default batch size limit": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api-generators.test.ts/API - generator batching > uses generators attached to sync API methods": {
-      "reason": "server: not implemented: batchRequests",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: batchRequests"
-    },
-    "jsapi/test/sync/api.test.ts/API > createProgram": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > createProgram accepts a regular project program as the old program": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > createProgram includes config file parsing diagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > createProgram updates an old program with file changes": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > createProgram updates an old program with invalidateAll": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/API > initializes once for concurrent first requests": {
-      "reason": "server: not implemented: batchRequests",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: batchRequests"
+      "reason": "server: not implemented: getImportAdderEdits",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getImportAdderEdits"
     },
     "jsapi/test/sync/api.test.ts/Checker - getConstantValue > returns numeric value of an enum member": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getConstantValue",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getConstantValue"
     },
     "jsapi/test/sync/api.test.ts/Checker - getConstantValue > returns string value of a string-initialized enum member": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/LanguageService - getCompletionsAtPosition > completion entries include sortText": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/LanguageService - getCompletionsAtPosition > includeSymbol: true populates symbol on property completions": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/LanguageService - getCompletionsAtPosition > returns member completions after a dot": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/LanguageService - getCompletionsAtPosition > returns undefined for a non-existent file": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/LanguageService - getReferencedSymbolsForNode > getReferencedSymbolsForNode": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getConstantValue",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getConstantValue"
     },
     "jsapi/test/sync/api.test.ts/LanguageService - getSignatureUsage > getSignatureUsage": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getSignatureUsages",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getSignatureUsages"
     },
     "jsapi/test/sync/api.test.ts/LanguageService - imports > getImportAdderEdits adds to an existing import": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getImportAdderEdits",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getImportAdderEdits"
     },
     "jsapi/test/sync/api.test.ts/LanguageService - imports > getImportAdderEdits coalesces multiple importSymbol actions": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getImportAdderEdits",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getImportAdderEdits"
     },
     "jsapi/test/sync/api.test.ts/LanguageService - imports > getImportAdderEdits rejects invalid actions": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getImportAdderEdits",
+      "detail": "Error [ERR_TEST_FAILURE]: The input did not match the regular expression /symbol handle \\d+ not found/. Input:"
     },
     "jsapi/test/sync/api.test.ts/LanguageService - imports > getImportAdderEdits returns no edits for non-exported symbols": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getImportAdderEdits",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getImportAdderEdits"
     },
     "jsapi/test/sync/api.test.ts/LanguageService - imports > getImportEditsForSymbols adds a named import": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - diagnostics > diagnostics with empty files array returns empty": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - diagnostics > diagnostics with no files argument returns all": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - diagnostics > getBindDiagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - diagnostics > getBindDiagnostics with multiple files": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - diagnostics > getConfigFileParsingDiagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - diagnostics > getDeclarationDiagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - diagnostics > getGlobalDiagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - diagnostics > getGlobalDiagnostics returns file-less diagnostics from the checker": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - diagnostics > getProgramDiagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - diagnostics > getSemanticDiagnostics with messageChain and relatedInformation": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - diagnostics > getSemanticDiagnostics with multiple files": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - diagnostics > getSuggestionDiagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - diagnostics > getSyntacticDiagnostics": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - diagnostics > getSyntacticDiagnostics with multiple files": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - emit > emit all files": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - emit > emit and emitToString respect noEmit": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - emit > emit only dts": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - emit > emit only js": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - emit > emit rejects unknown files and invalid emitOnly values": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - emit > emitToString emits the whole program and respects emitOnly": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - emit > noEmitOnError reports diagnostics without writing output": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - emit > whole-program emit includes option-controlled maps": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - selected file emit > getDeclarationEmit forces declarations and declaration maps": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - selected file emit > getJavaScriptEmit forces JavaScript and source maps": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/Program - selected file emit > selected file emit accepts empty arrays": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/SnapshotInternalAPI - formatNodeForInsertion > formats a node at top-level with no indentation": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/SnapshotInternalAPI - formatNodeForInsertion > formats a synthesized statement with correct indentation for insertion inside a function body": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/SnapshotInternalAPI - formatNodeForInsertion > formats a synthesized statement with correct indentation when non-ASCII characters precede the insertion position": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getImportAdderEdits",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getImportAdderEdits"
     },
     "jsapi/test/sync/api.test.ts/Symbol - getDocumentationComment and getJsDocTags > getDocumentationComment returns the leading comment text": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getDocumentationComment",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getDocumentationComment"
     },
     "jsapi/test/sync/api.test.ts/Symbol - getDocumentationComment and getJsDocTags > getJsDocTags returns structured tag name∕text pairs": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
-    },
-    "jsapi/test/sync/api.test.ts/runWithTemporaryFileUpdate > temporary file update is visible in the callback and reverted afterward": {
-      "reason": "server: not implemented: initialize",
-      "detail": "Error [ERR_TEST_FAILURE]: not implemented: initialize"
+      "reason": "server: not implemented: getJsDocTags",
+      "detail": "Error [ERR_TEST_FAILURE]: not implemented: getJsDocTags"
     }
   }
 }

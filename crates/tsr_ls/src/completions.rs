@@ -109,7 +109,7 @@ impl LanguageService<'_> {
         Ok(response)
     }
 
-    fn completion_worker(
+    pub(crate) fn completion_worker(
         &mut self,
         checker: &mut Operation<'_>,
         params: &lsp::CompletionParams,
@@ -338,6 +338,9 @@ impl LanguageService<'_> {
                     continue;
                 };
                 if names.insert(item.label.clone()) {
+                    if let Some(sink) = &mut self.completion_symbols {
+                        sink.insert(item.label.clone(), candidate.symbol);
+                    }
                     let symbol = checker.symbol(candidate.symbol)?;
                     let local = checker
                         .symbol_declarations(candidate.symbol)?

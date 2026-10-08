@@ -292,6 +292,14 @@ fn localized_with_args(
     if d.message.is_none() && !d.message_text.is_empty() {
         return Ok(d.message_text.as_bytes().to_vec());
     }
+    // An ad hoc message (`NewDiagnosticFromText`) is the pin's `d.message`,
+    // which localizes to its own text.
+    if d.message.is_none() && d.message_key.is_empty() {
+        if let Some(ad_hoc) = &d.ad_hoc_message {
+            let args: Vec<_> = args.iter().map(JsString::as_bytes).collect();
+            return Ok(ad_hoc.localize(locale, &args));
+        }
+    }
     let message = d
         .message
         .or_else(|| {

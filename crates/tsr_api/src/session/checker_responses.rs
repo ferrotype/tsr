@@ -15,9 +15,7 @@ fn text(bytes: &[u8]) -> String {
     String::from_utf8_lossy(bytes).into_owned()
 }
 
-fn checker_error(error: impl std::fmt::Display) -> super::SessionError {
-    super::SessionError::Other(format!("{error}"))
-}
+use super::checker_error;
 
 impl CheckerSetup<'_> {
     /// Registers `symbol` and names its parent and export symbol, which get

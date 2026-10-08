@@ -1,5 +1,6 @@
 //! Language service operations over a retained compiler snapshot.
 mod api;
+pub mod api_server;
 mod crossproject;
 pub use crossproject::{CrossProjectDefinition, CrossProjectPosition, CrossProjectTargets};
 #[cfg(test)]
@@ -201,6 +202,10 @@ pub struct LanguageService<'a> {
     source_maps: source_map::Maps,
     cancellation: CancellationToken,
     cross_project_targets: Option<CrossProjectTargets>,
+    /// While the API server collects completions: the symbol of each
+    /// symbol-backed entry by label.
+    pub(crate) completion_symbols:
+        Option<std::collections::HashMap<String, tsr_checker::SymbolRef>>,
     #[cfg(test)]
     reference_search_count: usize,
 }
@@ -218,6 +223,7 @@ impl<'a> LanguageService<'a> {
             source_maps: source_map::Maps::new(),
             cancellation,
             cross_project_targets: None,
+            completion_symbols: None,
             #[cfg(test)]
             reference_search_count: 0,
         }

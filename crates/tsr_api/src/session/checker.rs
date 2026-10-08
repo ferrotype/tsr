@@ -3,6 +3,7 @@
 //! handles, and the type-to-syntax conversions. Each runs on the project's
 //! API checker through `setup_checker`.
 //! port: tsc/internal/api/session.go
+use super::diagnostics::DiagnosticKind;
 use super::handles::{resolve_node_handle, touching_property_name, CheckerSetup};
 use super::responses::base64_standard;
 use super::{client_error, ApiSession, SessionError, SessionResult};
@@ -11,11 +12,9 @@ use crate::proto::{
     SymbolResponse, TypeResponse, WellKnownSignaturesResponse, WellKnownSymbolsResponse,
 };
 use tsr_checker::{Operation, SignatureKind, SymbolRef, TypeRef};
-use tsr_ipc::{HandlerError, Response};
+use tsr_ipc::{Context, HandlerError, Response};
 
-fn checker_error(error: impl std::fmt::Display) -> SessionError {
-    SessionError::Other(format!("{error}"))
-}
+use super::checker_error;
 
 fn text(bytes: &[u8]) -> String {
     String::from_utf8_lossy(bytes).into_owned()
@@ -136,8 +135,10 @@ impl ApiSession {
     )]
     pub(super) fn dispatch_checker(
         &self,
+        ctx: &Context,
         params: Params,
         method: &str,
+        files_named: bool,
     ) -> Result<Option<Response>, HandlerError> {
         let response = match params {
             Params::GetSymbolAtPosition(p) => {
@@ -1068,6 +1069,74 @@ impl ApiSession {
                 })?)
             }
             Params::PrintNode(p) => Response::json(Self::handle_print_node(&p)?),
+            Params::GetSyntacticDiagnostics(p) => Response::json(self.handle_get_diagnostics(
+                ctx,
+                &p,
+                DiagnosticKind::Syntactic,
+                files_named,
+            )?),
+            Params::GetBindDiagnostics(p) => Response::json(self.handle_get_diagnostics(
+                ctx,
+                &p,
+                DiagnosticKind::Bind,
+                files_named,
+            )?),
+            Params::GetSemanticDiagnostics(p) => Response::json(self.handle_get_diagnostics(
+                ctx,
+                &p,
+                DiagnosticKind::Semantic,
+                files_named,
+            )?),
+            Params::GetSuggestionDiagnostics(p) => Response::json(self.handle_get_diagnostics(
+                ctx,
+                &p,
+                DiagnosticKind::Suggestion,
+                files_named,
+            )?),
+            Params::GetDeclarationDiagnostics(p) => Response::json(self.handle_get_diagnostics(
+                ctx,
+                &p,
+                DiagnosticKind::Declaration,
+                files_named,
+            )?),
+            Params::GetConfigFileParsingDiagnostics(p) => {
+                Response::json(self.handle_get_config_file_parsing_diagnostics(&p)?)
+            }
+            Params::GetProgramDiagnostics(p) => {
+                Response::json(self.handle_get_program_diagnostics(&p)?)
+            }
+            Params::GetGlobalDiagnostics(p) => {
+                Response::json(self.handle_get_global_diagnostics(ctx, &p)?)
+            }
+            Params::Emit(p) => Response::json(self.handle_emit(&p)?),
+            Params::EmitToString(p) => Response::json(self.handle_emit_to_string(&p)?),
+            Params::GetJavaScriptEmit(p) => Response::json(self.handle_selected_files_emit(
+                &p,
+                tsr_compiler::EmitOnly::Js,
+                files_named,
+            )?),
+            Params::GetDeclarationEmit(p) => Response::json(self.handle_selected_files_emit(
+                &p,
+                tsr_compiler::EmitOnly::Dts,
+                files_named,
+            )?),
+            Params::FormatNodeForInsertion(p) => {
+                Response::json(self.handle_format_node_for_insertion(&p)?)
+            }
+            Params::GetCompletionsAtPosition(p) => {
+                Response::json(self.handle_get_completions_at_position(&p)?)
+            }
+            Params::GetReferencedSymbolsForNode(p) => {
+                Response::json(self.handle_get_referenced_symbols_for_node(&p)?)
+            }
+            Params::GetReferencesToSymbolInFile(p) => {
+                Response::json(self.handle_get_references_to_symbol_in_file(&p)?)
+            }
+            // Decision 8: the profiling methods answer the explicit unsupported
+            // error the LSP server gives its profiling methods.
+            Params::StartCPUProfile(_) | Params::StopCPUProfile | Params::SaveHeapProfile(_) => {
+                return Err(SessionError::Other(format!("method not implemented: {method}")).into())
+            }
             _ => return Err(crate::server::unsupported(method)),
         };
         Ok(Some(response))

@@ -18,9 +18,7 @@ use tsr_checker::{
 use tsr_compiler::Program;
 use tsr_project::{CheckerSlot, PooledChecker, Project};
 
-fn checker_error(error: impl std::fmt::Display) -> SessionError {
-    SessionError::Other(format!("{error}"))
-}
+use super::checker_error;
 
 /// The registries of one snapshot: the pin's `snapshotData` of
 /// tsc/internal/api/session.go.
