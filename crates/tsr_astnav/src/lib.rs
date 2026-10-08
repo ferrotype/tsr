@@ -219,13 +219,18 @@ impl<'a, 'p> Navigator<'a, 'p> {
     // port: tsc/internal/astnav/tokens.go:getNodeVisitor
     pub fn visit_child_slots_and_jsdoc(&mut self, id: NodeId) -> Result<Vec<HookVisit>, Error> {
         let mut out = Vec::new();
+        // Every child's parent is `id`, so only a single-comment JSDoc node
+        // has the comment child the visitor leaves out; the children of any
+        // other node are listed without reading them.
+        let filter_comments =
+            utilities_middle::is_js_doc_single_comment_node(self.view, &self.node(id)?)?;
         for doc in self.jsdoc_of(id)? {
-            self.push_node_hook(&mut out, Some(doc))?;
+            self.push_node_hook(&mut out, Some(doc), filter_comments)?;
         }
         let slots = self.node(id)?.child_slots();
         for (role, slot) in slots {
             match slot {
-                ChildSlot::Node(node) => self.push_node_hook(&mut out, node)?,
+                ChildSlot::Node(node) => self.push_node_hook(&mut out, node, filter_comments)?,
                 ChildSlot::List(list) => {
                     if (role != ChildRole::Modifiers || list.is_some())
                         && !utilities_middle::is_js_doc_single_comment_node_list(self.view, list)?
@@ -235,7 +240,7 @@ impl<'a, 'p> Navigator<'a, 'p> {
                 }
                 ChildSlot::Nodes(nodes) => {
                     for node in self.view.node_slice(nodes)?.iter() {
-                        self.push_node_hook(&mut out, node)?;
+                        self.push_node_hook(&mut out, node, filter_comments)?;
                     }
                 }
             }
@@ -243,8 +248,15 @@ impl<'a, 'p> Navigator<'a, 'p> {
         Ok(out)
     }
 
-    fn push_node_hook(&self, out: &mut Vec<HookVisit>, node: Option<NodeId>) -> Result<(), Error> {
-        if !utilities_middle::is_js_doc_single_comment_node_comment(self.view, node)? {
+    fn push_node_hook(
+        &self,
+        out: &mut Vec<HookVisit>,
+        node: Option<NodeId>,
+        filter_comments: bool,
+    ) -> Result<(), Error> {
+        if !(filter_comments
+            && utilities_middle::is_js_doc_single_comment_node_comment(self.view, node)?)
+        {
             out.push(HookVisit::Node(node));
         }
         Ok(())
