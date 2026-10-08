@@ -5,8 +5,16 @@ use tsr_testhost::{
     project_host::{Connection, Input},
 };
 fn main() -> std::process::ExitCode {
-    if std::env::args().skip(1).collect::<Vec<_>>() != ["--stdio"] {
-        eprintln!("usage: phase5_testserver --stdio");
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    // The Phase 6 panic witness: the production API session with one
+    // test-only fault control (tsr_testhost::api_witness).
+    if args.first().map(String::as_str) == Some("--api") {
+        return std::process::ExitCode::from(
+            u8::try_from(tsr_testhost::api_witness::run(&args)).unwrap_or(1),
+        );
+    }
+    if args != ["--stdio"] {
+        eprintln!("usage: phase5_testserver --stdio | --api [api flags]");
         return std::process::ExitCode::FAILURE;
     }
     let (output, receive) = mpsc::channel();

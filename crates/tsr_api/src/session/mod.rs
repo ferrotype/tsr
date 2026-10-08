@@ -70,6 +70,32 @@ impl std::error::Error for SessionError {}
 
 pub type SessionResult<T> = Result<T, SessionError>;
 
+impl ApiSession {
+    /// Arms the panic witness: the next checker operation of `snapshot`
+    /// panics inside its operation, so the lease retires the pool
+    /// generation as a real checker fault would (ADR 0012). Only the private
+    /// test server exposes this.
+    #[cfg(feature = "fault-injection")]
+    pub fn arm_fault(&self, snapshot: SnapshotId) {
+        *self.fault.lock().expect("fault") = Some(snapshot.0);
+    }
+
+    /// Trips an armed fault for `snapshot`; called while an operation is held.
+    #[cfg(feature = "fault-injection")]
+    pub(super) fn trip_fault(&self, snapshot: SnapshotId) {
+        let armed = self
+            .fault
+            .lock()
+            .expect("fault")
+            .take_if(|armed| *armed == snapshot.0);
+        assert!(
+            armed.is_none(),
+            "injected fault in a checker operation of snapshot {}",
+            snapshot.0
+        );
+    }
+}
+
 pub(super) fn client_error(message: impl Into<String>) -> SessionError {
     SessionError::Client(message.into())
 }
@@ -175,6 +201,9 @@ pub struct ApiSession {
     open: Mutex<OpenRefs>,
     /// Remaining pages of paginated batch responses by continuation token.
     batch_pages: Mutex<HashMap<String, Vec<tsr_json::RawValue>>>,
+    /// The snapshot whose next checker operation panics (the A5 witness).
+    #[cfg(feature = "fault-injection")]
+    fault: Mutex<Option<u64>>,
     next_batch_page: std::sync::atomic::AtomicU64,
     closed: AtomicBool,
 }
@@ -205,6 +234,8 @@ impl ApiSession {
             snapshots: Mutex::default(),
             open: Mutex::default(),
             batch_pages: Mutex::default(),
+            #[cfg(feature = "fault-injection")]
+            fault: Mutex::default(),
             next_batch_page: std::sync::atomic::AtomicU64::new(0),
             closed: AtomicBool::new(false),
         }

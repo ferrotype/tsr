@@ -131,9 +131,18 @@ CONTENT_MAPPER_FILES = (
 # destination audit assigned every one of their operations to Phase 3, whose
 # gate cannot close without them; program.go stays Phase 4's file.
 EMITTER_FILES = ("tsc/internal/compiler/emitter.go", "tsc/internal/compiler/emitHost.go")
+# The API server's entry, the snapshot host and the project/ls API surfaces
+# are Phase 6's (docs/PHASE6-plan.md: the files the JS API server port owns).
+API_SERVER_FILES = (
+    "tsc/cmd/tsc/api.go",
+    "tsc/internal/ls/api.go",
+    "tsc/internal/project/api.go",
+    "tsc/internal/project/snapshothost.go",
+)
 FILE_PHASES = ({"tsc/internal/compiler/checkerpool.go": 2} | dict.fromkeys(CONTENT_MAPPER_FILES, 2)
                | dict.fromkeys(EMITTER_FILES, 3)
-               | {"tsc/internal/compiler/projectreferencedtsfakinghost.go": 5})
+               | {"tsc/internal/compiler/projectreferencedtsfakinghost.go": 5}
+               | dict.fromkeys(API_SERVER_FILES, 6))
 
 # Phase 4 decision 4 and ADR 0002: macOS uses FSEvents; kqueue is not a
 # supported fallback even though this file's build constraint includes Darwin.

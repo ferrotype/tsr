@@ -49,12 +49,29 @@ fn handle_at(
     file: &str,
     position: u32,
 ) -> String {
+    ancestor_handle_at(session, snapshot, project, file, position, 0)
+}
+
+/// The handle of the `levels`-th ancestor of the token at `position`.
+fn ancestor_handle_at(
+    session: &ApiSession,
+    snapshot: u64,
+    project: &str,
+    file: &str,
+    position: u32,
+    levels: usize,
+) -> String {
     let data = session.snapshot_data(SnapshotId(snapshot)).unwrap();
     let setup = data.setup_checker(&ProjectId(project.to_string())).unwrap();
     let operation = setup.registry.operation().unwrap();
-    let node = touching_property_name(setup.program, file.as_bytes(), position)
+    let mut node = touching_property_name(setup.program, file.as_bytes(), position)
         .unwrap()
         .expect("a token at the position");
+    let file = setup.program.file_of_node(node).expect("the token's file");
+    let view = file.bound().view().ast();
+    for _ in 0..levels {
+        node = view.node(node).unwrap().parent().expect("an ancestor");
+    }
     node_handle(&operation, node).unwrap().0
 }
 
@@ -827,4 +844,695 @@ fn rest_types_of_signatures_slice_tuples_first() {
         json!("any"),
         "a sliced rest element without a numeric index"
     );
+}
+
+/// Ports the client's `Checker - getConstantValue` cases: an enum member's
+/// numeric or string value, through the member node.
+#[test]
+fn enum_members_report_their_constant_values() {
+    let content = "export enum E { A = 1, B = 2 }\nexport enum Color { Red = \"red\" }\n";
+    let session = session(&[
+        (CONFIG, r#"{ "compilerOptions": { "noLib": true } }"#),
+        (INDEX, content),
+    ]);
+    let (snapshot, project) = open(&session, CONFIG);
+    let value_of = |name: &str, levels: usize| -> Value {
+        let position = u32::try_from(content.find(name).unwrap()).unwrap();
+        let node = ancestor_handle_at(&session, snapshot, &project, INDEX, position, levels);
+        request(
+            &session,
+            "getConstantValue",
+            &json!({"snapshot": snapshot, "project": project, "location": node}),
+        )
+        .unwrap()
+    };
+    assert_eq!(value_of("B = 2", 1), json!(2));
+    assert_eq!(value_of("Red", 1), json!("red"));
+    assert_eq!(
+        value_of("B = 2", 0),
+        Value::Null,
+        "a name token is not a constant"
+    );
+}
+
+/// Ports the client's `Symbol - getDocumentationComment and getJsDocTags`
+/// cases: the comment text without tags, and the tags as name/text pairs.
+#[test]
+fn documentation_and_tags_come_from_the_declaration_comment() {
+    let content = "\n/**\n * Adds two numbers together.\n * @param a the first number\n * @returns the sum\n */\nexport function add(a: number, b: number): number { return a + b; }\n";
+    let session = session(&[
+        (CONFIG, r#"{ "compilerOptions": { "noLib": true } }"#),
+        (INDEX, content),
+    ]);
+    let (snapshot, project) = open(&session, CONFIG);
+    let symbol = request(
+        &session,
+        "getSymbolAtPosition",
+        &json!({"snapshot": snapshot, "project": project, "file": INDEX, "position": content.find("add(a").unwrap()}),
+    )
+    .unwrap();
+    let doc = request(
+        &session,
+        "getDocumentationComment",
+        &json!({"snapshot": snapshot, "project": project, "symbol": symbol["id"]}),
+    )
+    .unwrap();
+    let doc = doc.as_str().unwrap();
+    assert!(doc.contains("Adds two numbers together"), "{doc}");
+    assert!(!doc.contains("@param"), "{doc}");
+    let tags = request(
+        &session,
+        "getJsDocTags",
+        &json!({"snapshot": snapshot, "project": project, "symbol": symbol["id"]}),
+    )
+    .unwrap();
+    assert_eq!(
+        tags,
+        json!([{"name": "param", "text": "a the first number"}, {"name": "returns", "text": "the sum"}])
+    );
+}
+
+/// Ports the client's `LanguageService - getSignatureUsage` case: a usage
+/// pairs the referencing name with the call it is the callee of.
+#[test]
+fn signature_usages_pair_names_with_their_calls() {
+    let content =
+        "function greet(name: string) { return name; }\ngreet(\"world\");\nconst alias = greet;\n";
+    let session = session(&[
+        (CONFIG, r#"{ "compilerOptions": { "noLib": true } }"#),
+        (INDEX, content),
+    ]);
+    let (snapshot, project) = open(&session, CONFIG);
+    let declaration = ancestor_handle_at(&session, snapshot, &project, INDEX, 9, 1);
+    let usages = request(
+        &session,
+        "getSignatureUsages",
+        &json!({"snapshot": snapshot, "project": project, "signatureDecl": declaration}),
+    )
+    .unwrap();
+    let usages = usages.as_array().expect("usages");
+    assert_eq!(usages.len(), 2, "{usages:?}");
+    assert!(
+        usages[0]["call"]
+            .as_str()
+            .is_some_and(|call| !call.is_empty()),
+        "{usages:?}"
+    );
+    assert!(
+        usages[1].get("call").is_none(),
+        "an uncalled reference has no call: {usages:?}"
+    );
+}
+
+/// Applies the client's UTF-16 offset edits to ASCII text.
+fn apply_text_edits(source: &str, edits: &Value) -> String {
+    let mut edits: Vec<(usize, usize, String)> = edits
+        .as_array()
+        .expect("edits")
+        .iter()
+        .map(|edit| {
+            (
+                edit["pos"].as_u64().unwrap() as usize,
+                edit["end"].as_u64().unwrap() as usize,
+                edit["newText"].as_str().unwrap().to_string(),
+            )
+        })
+        .collect();
+    edits.sort_by_key(|edit| std::cmp::Reverse(edit.0));
+    let mut text = source.to_string();
+    for (pos, end, new_text) in edits {
+        text.replace_range(pos..end, &new_text);
+    }
+    text
+}
+
+/// Ports the client's `LanguageService - imports` cases: a named import is
+/// added, two actions coalesce into one import, an existing import is
+/// extended, a non-exported symbol yields no edits, and invalid actions
+/// are refused with the pin's texts.
+#[test]
+fn import_adder_edits_add_coalesce_and_extend_imports() {
+    const FOO: &str = "/home/projects/p/src/foo.ts";
+    let session = session(&[
+        (CONFIG, r#"{ "compilerOptions": { "noLib": true } }"#),
+        (INDEX, "const value = foo + bar;\n"),
+        (
+            OTHER,
+            "import { foo } from \"./foo\";\nconst value = foo + bar;\n",
+        ),
+        (
+            FOO,
+            "export const foo = 1;\nexport const bar = 2;\nconst local = 3;\n",
+        ),
+    ]);
+    let (snapshot, project) = open(&session, CONFIG);
+    // The client passes `symbol.getExportSymbol()`: the module's export of
+    // the local declaration.
+    let export_symbol = |position: usize| -> Value {
+        let symbol = request(
+            &session,
+            "getSymbolAtPosition",
+            &json!({"snapshot": snapshot, "project": project, "file": FOO, "position": position}),
+        )
+        .unwrap();
+        let exported = request(
+            &session,
+            "getExportSymbolOfSymbol",
+            &json!({"snapshot": snapshot, "project": project, "objectId": symbol["id"]}),
+        )
+        .unwrap();
+        exported["id"].clone()
+    };
+    let foo = export_symbol("export const ".len());
+    let bar = export_symbol("export const foo = 1;\nexport const ".len());
+    assert!(foo.is_number() && bar.is_number(), "{foo} {bar}");
+    let edits = request(
+        &session,
+        "getImportAdderEdits",
+        &json!({"snapshot": snapshot, "project": project, "file": INDEX, "actions": [{"kind": "importSymbol", "symbol": foo}]}),
+    )
+    .unwrap();
+    assert_eq!(
+        apply_text_edits("const value = foo + bar;\n", &edits),
+        "import { foo } from \"./foo\";\n\nconst value = foo + bar;\n"
+    );
+    let edits = request(
+        &session,
+        "getImportAdderEdits",
+        &json!({"snapshot": snapshot, "project": project, "file": INDEX, "actions": [
+            {"kind": "importSymbol", "symbol": foo}, {"kind": "importSymbol", "symbol": bar}]}),
+    )
+    .unwrap();
+    assert_eq!(
+        apply_text_edits("const value = foo + bar;\n", &edits),
+        "import { bar, foo } from \"./foo\";\n\nconst value = foo + bar;\n"
+    );
+    let edits = request(
+        &session,
+        "getImportAdderEdits",
+        &json!({"snapshot": snapshot, "project": project, "file": OTHER, "actions": [{"kind": "importSymbol", "symbol": bar}]}),
+    )
+    .unwrap();
+    assert_eq!(
+        apply_text_edits(
+            "import { foo } from \"./foo\";\nconst value = foo + bar;\n",
+            &edits
+        ),
+        "import { bar, foo } from \"./foo\";\nconst value = foo + bar;\n"
+    );
+    let local = request(
+        &session,
+        "getSymbolAtPosition",
+        &json!({"snapshot": snapshot, "project": project, "file": FOO, "position": "export const foo = 1;\nexport const bar = 2;\nconst ".len()}),
+    )
+    .unwrap();
+    let edits = request(
+        &session,
+        "getImportAdderEdits",
+        &json!({"snapshot": snapshot, "project": project, "file": INDEX, "actions": [{"kind": "importSymbol", "symbol": local["id"]}]}),
+    )
+    .unwrap();
+    assert_eq!(edits, json!([]));
+    let error = request(
+        &session,
+        "getImportAdderEdits",
+        &json!({"snapshot": snapshot, "project": project, "file": INDEX, "actions": [{"kind": "unknown", "symbol": foo}]}),
+    )
+    .unwrap_err();
+    assert_eq!(
+        error,
+        "api: client error: unknown import adder action kind \"unknown\""
+    );
+    let error = request(
+        &session,
+        "getImportAdderEdits",
+        &json!({"snapshot": snapshot, "project": project, "file": INDEX, "actions": [{"kind": "importSymbol"}]}),
+    )
+    .unwrap_err();
+    assert_eq!(
+        error,
+        "api: client error: import adder action 0 missing symbol"
+    );
+    let error = request(
+        &session,
+        "getImportAdderEdits",
+        &json!({"snapshot": snapshot, "project": project, "file": INDEX, "actions": [{"kind": "importSymbol", "symbol": 999_999_999}]}),
+    )
+    .unwrap_err();
+    assert_eq!(
+        error,
+        "api: client error: symbol handle 999999999 not found in snapshot registry"
+    );
+}
+
+/// Ports `TestJSONValueToAny` of tsc/internal/api/jsonvalue_test.go: the
+/// JSON a client hands `parseJsonConfigFileContent` keeps its key order,
+/// its null array elements and its empty arrays on the way to `raw`.
+#[test]
+fn client_json_keeps_order_nulls_and_empty_arrays() {
+    let session = session(&[]);
+    let json = json!({"z": 1, "a": {"y": 2, "x": 3}, "m": [{"b": 4, "a": 5}, null], "e": []});
+    let response = request(
+        &session,
+        "parseJsonConfigFileContent",
+        &json!({"json": json, "configDirectory": "/home/projects/p"}),
+    )
+    .unwrap();
+    let raw = serde_json::to_string(&response["raw"]).unwrap();
+    assert_eq!(
+        raw,
+        r#"{"z":1,"a":{"y":2,"x":3},"m":[{"b":4,"a":5},null],"e":[]}"#
+    );
+}
+
+/// Ports `TestCreateProgramWithNoRootFiles` and
+/// `TestCreateProgramRemovesAllRootFiles`: a program with no roots has an
+/// empty inferred project, also when it replaces an old program's roots.
+#[test]
+fn create_program_accepts_an_empty_root_set() {
+    let session = session(&[(INDEX, "export {};")]);
+    let response = request(
+        &session,
+        "createProgram",
+        &json!({"rootFiles": [], "createProgramOptions": {"compilerOptions": {"noLib": true}}}),
+    )
+    .unwrap();
+    assert_eq!(response["project"]["rootFiles"], json!([]));
+    let data = session
+        .snapshot_data(SnapshotId(response["snapshot"].as_u64().unwrap()))
+        .unwrap();
+    let project = data
+        .project(&ProjectId(
+            response["project"]["id"].as_str().unwrap().to_string(),
+        ))
+        .unwrap();
+    assert_eq!(project.program().unwrap().files().len(), 0);
+
+    let old = request(
+        &session,
+        "createProgram",
+        &json!({"rootFiles": [INDEX], "createProgramOptions": {"compilerOptions": {"noLib": true}}}),
+    )
+    .unwrap();
+    assert_eq!(old["project"]["rootFiles"], json!([INDEX]));
+    let emptied = request(
+        &session,
+        "createProgram",
+        &json!({"rootFiles": [], "createProgramOptions": {"compilerOptions": {"noLib": true}},
+                "oldProgram": {"snapshot": old["snapshot"], "project": old["project"]["id"]},
+                "fileChanges": {"changed": [INDEX]}}),
+    )
+    .unwrap();
+    assert_eq!(emptied["project"]["rootFiles"], json!([]));
+    let data = session
+        .snapshot_data(SnapshotId(emptied["snapshot"].as_u64().unwrap()))
+        .unwrap();
+    let project = data
+        .project(&ProjectId(
+            emptied["project"]["id"].as_str().unwrap().to_string(),
+        ))
+        .unwrap();
+    assert_eq!(project.program().unwrap().files().len(), 0);
+}
+
+/// Ports `TestCreateProgramPreservesRootFileOrder`: the response lists the
+/// roots in the order the client gave them, before and after a reorder on
+/// an old program. (The pin's `ProgramUpdateKind` is internal to its
+/// program reuse, which the Rust session does not do.)
+#[test]
+fn create_program_preserves_root_file_order() {
+    const A: &str = "/home/projects/p/a.ts";
+    const B: &str = "/home/projects/p/b.ts";
+    let session = session(&[(A, "export const a = 1;"), (B, "export const b = 1;")]);
+    let old = request(
+        &session,
+        "createProgram",
+        &json!({"rootFiles": [B, A], "createProgramOptions": {"compilerOptions": {"noLib": true}}}),
+    )
+    .unwrap();
+    assert_eq!(old["project"]["rootFiles"], json!([B, A]));
+    let reordered = request(
+        &session,
+        "createProgram",
+        &json!({"rootFiles": [A, B], "createProgramOptions": {"compilerOptions": {"noLib": true}},
+                "oldProgram": {"snapshot": old["snapshot"], "project": old["project"]["id"]}}),
+    )
+    .unwrap();
+    assert_eq!(reordered["project"]["rootFiles"], json!([A, B]));
+}
+
+/// Ports the observable half of `TestCreateProgramReusesProgram`: a changed
+/// file is re-read for the new program and changed options take effect.
+/// The pin's reuse kinds (`Cloned`, `SameFileNames`) have no counterpart:
+/// the Rust session loads the program afresh (docs/PHASE6-A2.md).
+#[test]
+fn create_program_with_an_old_program_sees_changes_and_new_options() {
+    let session = session(&[(INDEX, "export const value: string = 1;")]);
+    let options = json!({"compilerOptions": {"noLib": true, "strict": true}});
+    let old = request(
+        &session,
+        "createProgram",
+        &json!({"rootFiles": [INDEX], "createProgramOptions": options}),
+    )
+    .unwrap();
+    let before = request(
+        &session,
+        "getSemanticDiagnostics",
+        &json!({"snapshot": old["snapshot"], "project": old["project"]["id"], "files": [INDEX]}),
+    )
+    .unwrap();
+    assert_eq!(before.as_array().unwrap().len(), 1, "{before}");
+    session
+        .file_system()
+        .write_file(INDEX.as_bytes(), b"export const value: string = \"valid\";")
+        .unwrap();
+    let updated = request(
+        &session,
+        "createProgram",
+        &json!({"rootFiles": [INDEX], "createProgramOptions": options,
+                "oldProgram": {"snapshot": old["snapshot"], "project": old["project"]["id"]},
+                "fileChanges": {"changed": [INDEX]}}),
+    )
+    .unwrap();
+    let after = request(
+        &session,
+        "getSemanticDiagnostics",
+        &json!({"snapshot": updated["snapshot"], "project": updated["project"]["id"], "files": [INDEX]}),
+    )
+    .unwrap();
+    assert_eq!(after, json!([]));
+    let relaxed = request(
+        &session,
+        "createProgram",
+        &json!({"rootFiles": [INDEX], "createProgramOptions": {"compilerOptions": {"noLib": true, "strict": false}},
+                "oldProgram": {"snapshot": old["snapshot"], "project": old["project"]["id"]}}),
+    )
+    .unwrap();
+    assert_eq!(
+        relaxed["project"]["compilerOptions"]["strict"],
+        json!(false),
+        "{relaxed}"
+    );
+}
+
+/// Ports `TestCreateProgramProjectReferencesAndReuse`'s observable half: the
+/// references a client gives are echoed by the project's command line and
+/// resolved by its program; a changed reference replaces the old one.
+#[test]
+fn create_program_resolves_project_references() {
+    const APP: &str = "/home/projects/app/index.ts";
+    const LIB_CONFIG: &str = "/home/projects/lib/tsconfig.json";
+    const OTHER_CONFIG: &str = "/home/projects/other/tsconfig.json";
+    let session = session(&[
+        (APP, "export const value: string = 1;"),
+        (
+            LIB_CONFIG,
+            r#"{ "compilerOptions": { "composite": true, "noLib": true }, "files": ["index.ts"] }"#,
+        ),
+        ("/home/projects/lib/index.ts", "export const lib = 1;"),
+        (
+            OTHER_CONFIG,
+            r#"{ "compilerOptions": { "composite": true, "noLib": true }, "files": ["index.ts"] }"#,
+        ),
+        ("/home/projects/other/index.ts", "export const other = 1;"),
+    ]);
+    // The pin's `core.ProjectReference` writes `circular` without omitempty.
+    let reference =
+        |config: &str| json!({"path": config, "originalPath": config, "circular": false});
+    let old = request(
+        &session,
+        "createProgram",
+        &json!({"rootFiles": [APP], "createProgramOptions": {"compilerOptions": {"noLib": true, "strict": true},
+                "projectReferences": [reference(LIB_CONFIG)]}}),
+    )
+    .unwrap();
+    assert_eq!(
+        old["project"]["parsedCommandLine"]["projectReferences"],
+        json!([reference(LIB_CONFIG)]),
+        "{old}"
+    );
+    let data = session
+        .snapshot_data(SnapshotId(old["snapshot"].as_u64().unwrap()))
+        .unwrap();
+    let project = data
+        .project(&ProjectId(
+            old["project"]["id"].as_str().unwrap().to_string(),
+        ))
+        .unwrap();
+    let resolved: Vec<String> = project
+        .program()
+        .unwrap()
+        .resolved_project_references()
+        .flatten()
+        .map(|command_line| {
+            String::from_utf8_lossy(
+                command_line
+                    .config_file
+                    .as_ref()
+                    .unwrap()
+                    .file
+                    .view()
+                    .source_file(command_line.config_file.as_ref().unwrap().root)
+                    .unwrap()
+                    .file_name(),
+            )
+            .into_owned()
+        })
+        .collect();
+    assert_eq!(resolved, vec![LIB_CONFIG.to_string()]);
+    let changed = request(
+        &session,
+        "createProgram",
+        &json!({"rootFiles": [APP], "createProgramOptions": {"compilerOptions": {"noLib": true, "strict": true},
+                "projectReferences": [reference(OTHER_CONFIG)]},
+                "oldProgram": {"snapshot": old["snapshot"], "project": old["project"]["id"]}}),
+    )
+    .unwrap();
+    assert_eq!(
+        changed["project"]["parsedCommandLine"]["projectReferences"],
+        json!([reference(OTHER_CONFIG)]),
+        "{changed}"
+    );
+}
+
+/// Ports `TestCreateProgramFromConfiguredProgramDoesNotRetainOtherProjects`:
+/// a program created from a configured project's roots lives in a snapshot
+/// with that inferred project alone, and sees the changed file.
+#[test]
+fn create_program_from_a_configured_project_drops_the_other_projects() {
+    const OTHER_CONFIG: &str = "/home/projects/other/tsconfig.json";
+    const OTHER_FILE: &str = "/home/projects/other/index.ts";
+    let session = session(&[
+        (
+            CONFIG,
+            r#"{ "compilerOptions": { "noLib": true, "strict": true }, "files": ["src/index.ts"] }"#,
+        ),
+        (INDEX, "export const value: string = 1;"),
+        (
+            OTHER_CONFIG,
+            r#"{ "compilerOptions": { "noLib": true }, "files": ["index.ts"] }"#,
+        ),
+        (OTHER_FILE, "export const other = 1;"),
+    ]);
+    let update = session
+        .handle_update_snapshot(&UpdateSnapshotParams {
+            open_projects: vec![
+                DocumentIdentifier {
+                    file_name: CONFIG.into(),
+                    uri: String::new(),
+                },
+                DocumentIdentifier {
+                    file_name: OTHER_CONFIG.into(),
+                    uri: String::new(),
+                },
+            ],
+            ..Default::default()
+        })
+        .unwrap();
+    let base = update
+        .projects
+        .iter()
+        .flatten()
+        .find(|project| project.config_file_name == CONFIG)
+        .expect("the configured project");
+    session
+        .file_system()
+        .write_file(INDEX.as_bytes(), b"export const value: string = \"valid\";")
+        .unwrap();
+    let updated = request(
+        &session,
+        "createProgram",
+        &json!({"rootFiles": base.root_files, "createProgramOptions": {"compilerOptions": {"noLib": true, "strict": true}},
+                "oldProgram": {"snapshot": update.snapshot.0, "project": base.id.0},
+                "fileChanges": {"changed": [INDEX]}}),
+    )
+    .unwrap();
+    let data = session
+        .snapshot_data(SnapshotId(updated["snapshot"].as_u64().unwrap()))
+        .unwrap();
+    let projects: Vec<String> = data
+        .snapshot
+        .projects_by_path()
+        .map(|(path, _)| String::from_utf8_lossy(path.as_bytes()).into_owned())
+        .collect();
+    assert_eq!(projects.len(), 1, "{projects:?}");
+    let diagnostics = request(
+        &session,
+        "getSemanticDiagnostics",
+        &json!({"snapshot": updated["snapshot"], "project": updated["project"]["id"], "files": [INDEX]}),
+    )
+    .unwrap();
+    assert_eq!(diagnostics, json!([]));
+    assert_eq!(
+        request(
+            &session,
+            "release",
+            &json!({"snapshot": updated["snapshot"]})
+        )
+        .unwrap(),
+        json!(true)
+    );
+}
+
+/// Ports `TestUpdateTemporarySnapshotAddsUnopenedFile` and
+/// `TestUpdateTemporarySnapshotUsesClientSnapshotAsBase`: a temporary file
+/// joins the configured project's roots in the temporary snapshot only, and
+/// the temporary snapshot derives from the client's base, not from a later
+/// snapshot's state.
+#[test]
+fn temporary_snapshots_add_unopened_files_and_derive_from_the_client_base() {
+    const TEMPORARY: &str = "/home/projects/p/src/temporary.ts";
+    const LATER: &str = "/home/projects/p/src/later.ts";
+    let session = session(&[
+        (
+            CONFIG,
+            r#"{ "compilerOptions": { "noLib": true }, "include": ["src/**/*.ts"] }"#,
+        ),
+        (INDEX, "export const existing = 1;"),
+    ]);
+    let base = session
+        .handle_update_snapshot(&UpdateSnapshotParams {
+            open_files: vec![DocumentIdentifier {
+                file_name: INDEX.into(),
+                uri: String::new(),
+            }],
+            ..Default::default()
+        })
+        .unwrap();
+    let base_roots: Vec<String> = base.projects[0].as_ref().unwrap().root_files.clone();
+    assert!(
+        !base_roots.iter().any(|root| root == TEMPORARY),
+        "{base_roots:?}"
+    );
+    let temporary = request(
+        &session,
+        "updateTemporarySnapshot",
+        &json!({"snapshot": base.snapshot.0, "file": TEMPORARY, "newText": "export const temporary = 1;"}),
+    )
+    .unwrap();
+    let roots = temporary["projects"][0]["rootFiles"].as_array().unwrap();
+    assert!(roots.iter().any(|root| root == TEMPORARY), "{temporary}");
+    assert!(
+        !base_roots.iter().any(|root| root == TEMPORARY),
+        "the base stays unchanged"
+    );
+    assert_eq!(
+        request(
+            &session,
+            "release",
+            &json!({"snapshot": temporary["snapshot"]})
+        )
+        .unwrap(),
+        json!(true)
+    );
+
+    // A file created and opened after the client's snapshot is not in a
+    // temporary snapshot derived from it. (The pin's test opens the file
+    // through the LSP session; the standalone session learns of the new
+    // file through the update's file changes.)
+    session
+        .file_system()
+        .write_file(LATER.as_bytes(), b"export const later = 1;")
+        .unwrap();
+    let later = session
+        .handle_update_snapshot(&UpdateSnapshotParams {
+            open_files: vec![DocumentIdentifier {
+                file_name: LATER.into(),
+                uri: String::new(),
+            }],
+            file_changes: Some(Box::new(crate::proto::ApiFileChanges {
+                created: vec![DocumentIdentifier {
+                    file_name: LATER.into(),
+                    uri: String::new(),
+                }],
+                ..Default::default()
+            })),
+            ..Default::default()
+        })
+        .unwrap();
+    assert!(
+        later.projects[0]
+            .as_ref()
+            .unwrap()
+            .root_files
+            .iter()
+            .any(|root| root == LATER),
+        "{:?}",
+        later.projects[0]
+    );
+    let temporary = request(
+        &session,
+        "updateTemporarySnapshot",
+        &json!({"snapshot": base.snapshot.0, "file": INDEX, "newText": "export const existing = 2;"}),
+    )
+    .unwrap();
+    let roots = temporary["projects"][0]["rootFiles"].as_array().unwrap();
+    assert!(!roots.iter().any(|root| root == LATER), "{temporary}");
+}
+
+/// Ports `TestUpdateSnapshotResponseSkipsUnloadedAncestorProject`: opening a
+/// nested project reports it with its roots and options, and not an
+/// ancestor config that is known but not loaded.
+#[test]
+fn update_snapshot_reports_loaded_projects_only() {
+    const NESTED: &str = "/repo/packages/app/tsconfig.json";
+    const ANCESTOR: &str = "/repo/packages/tsconfig.json";
+    const FILE: &str = "/repo/packages/app/src/index.ts";
+    let session = session(&[
+        (ANCESTOR, r#"{ "files": [] }"#),
+        (
+            NESTED,
+            r#"{ "compilerOptions": { "composite": true, "noLib": true }, "include": ["**/*"] }"#,
+        ),
+        (FILE, "let s: string = 1234;"),
+    ]);
+    let update = session
+        .handle_update_snapshot(&UpdateSnapshotParams {
+            open_files: vec![DocumentIdentifier {
+                file_name: FILE.into(),
+                uri: String::new(),
+            }],
+            open_projects: vec![DocumentIdentifier {
+                file_name: NESTED.into(),
+                uri: String::new(),
+            }],
+            ..Default::default()
+        })
+        .unwrap();
+    let names: Vec<&str> = update
+        .projects
+        .iter()
+        .flatten()
+        .map(|project| project.config_file_name.as_str())
+        .collect();
+    assert!(names.contains(&NESTED), "{names:?}");
+    assert!(!names.contains(&ANCESTOR), "{names:?}");
+    let nested = update
+        .projects
+        .iter()
+        .flatten()
+        .find(|project| project.config_file_name == NESTED)
+        .unwrap();
+    assert!(!nested.root_files.is_empty());
+    assert!(nested.compiler_options.is_some());
 }

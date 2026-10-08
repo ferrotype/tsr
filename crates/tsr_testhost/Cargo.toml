@@ -19,6 +19,8 @@ tsr_tspath = { version = "0.3.0", path = "../tsr_tspath" }
 
 tsr_lsp = { version = "0.3.0", path = "../tsr_lsp" }
 tsr_project = { version = "0.3.0", path = "../tsr_project" }
+tsr_api = { version = "0.3.0", path = "../tsr_api", features = ["fault-injection"] }
+tsr_bundled = { version = "0.3.0", path = "../tsr_bundled" }
 tsr_arena = { version = "0.3.0", path = "../tsr_arena" }
 tsr_compiler = { version = "0.3.0", path = "../tsr_compiler" }
 tsr_core = { version = "0.3.0", path = "../tsr_core" }
