@@ -32,11 +32,11 @@ The three contracts (0006, 0007, 0013) were accepted by the owner on 2026-09-05 
 
 ## Proposed, not yet written
 
-Pending technical decisions from the plan's section 13 become records when the owner decides them:
+Pending technical decisions from the plan's section 13 become records when the owner decides them; the [Phase 7 plan](../PHASE7-plan.md) schedules the four that remain (R1 and R5):
 
-- Storage layout for nodes and types (item 6): an experiment, chosen on E5, E6 and checker-slice measurements.
-- Interning (item 8): deferred; decided on measured string duplication.
-- Trampolines at the four left-operand recursion sites (item 11): decided by the stress tests.
-- Replacement for the `checkchildren` analyzer (item 14): a `rustc_driver`-based lint or dylint, chosen in the spike.
-- The spike subset rule and frozen manifest (item 16).
-- Whether the fourslash test-host transport is a patch on the pinned harness or a fork (open question 5).
+- Storage layout for nodes and types (item 6): decided on the benchmarking scenarios' census in Phase 7 R1.
+- Interning (item 8): decided on measured string duplication in R1.
+- Trampolines at the four left-operand recursion sites (item 11): decided by the stress tests in R5.
+- Replacement for the `checkchildren` analyzer (item 14): a `dylint` or `rustc_driver` lint, or the structural rule checked by review, decided in R5.
+
+Settled since this list was written: the spike subset (item 16, Phase 0) and the fourslash transport (open question 5: a carried patch on the pinned harness, ADR 0019).
