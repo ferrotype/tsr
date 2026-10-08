@@ -62,11 +62,13 @@ fn is_null(reply: &RawValue) -> bool {
     reply.0.is_empty() || reply.0.as_slice() == b"null"
 }
 
-fn decode<T: tsr_json::Decode + Default>(reply: &RawValue) -> Result<T, Error> {
+/// A read callback's reply; a malformed one panics, as the pin's read
+/// callbacks panic on their unmarshal errors.
+fn decoded<T: tsr_json::Decode + Default>(reply: &RawValue) -> T {
     let mut value = T::default();
     tsr_json::unmarshal(&reply.0, &mut value, tsr_json::Options::default())
-        .map_err(|error| detailed(error.to_string()))?;
-    Ok(value)
+        .unwrap_or_else(|error| panic!("{error}"));
+    value
 }
 
 impl CallbackFs {
@@ -179,7 +181,7 @@ impl FileSystem for CallbackFs {
         if self.is_enabled("readFile") {
             let reply = self.path_call("readFile", path);
             if !is_null(&reply) {
-                let wrapper: ContentReply = decode(&reply)?;
+                let wrapper: ContentReply = decoded(&reply);
                 return Ok(wrapper
                     .content
                     .map(|content| FileContent::physical(content.into_bytes())));
@@ -195,7 +197,7 @@ impl FileSystem for CallbackFs {
         if self.is_enabled("fileExists") {
             let reply = self.path_call("fileExists", path);
             if !is_null(&reply) {
-                return Ok(reply.0.as_slice() == b"true");
+                return Ok(decoded::<bool>(&reply));
             }
         }
         self.base.file_exists(path)
@@ -205,7 +207,7 @@ impl FileSystem for CallbackFs {
         if self.is_enabled("directoryExists") {
             let reply = self.path_call("directoryExists", path);
             if !is_null(&reply) {
-                return Ok(reply.0.as_slice() == b"true");
+                return Ok(decoded::<bool>(&reply));
             }
         }
         self.base.directory_exists(path)
@@ -215,7 +217,7 @@ impl FileSystem for CallbackFs {
         if self.is_enabled("getAccessibleEntries") {
             let reply = self.path_call("getAccessibleEntries", path);
             if !reply.0.is_empty() && reply.0.as_slice() != b"null" {
-                let entries: EntriesReply = decode(&reply)?;
+                let entries: EntriesReply = decoded(&reply);
                 return Ok(Entries {
                     files: Some(entries.files),
                     directories: Some(entries.directories),
@@ -230,7 +232,7 @@ impl FileSystem for CallbackFs {
         if self.is_enabled("realpath") {
             let reply = self.path_call("realpath", path);
             if !is_null(&reply) {
-                return decode(&reply);
+                return Ok(decoded(&reply));
             }
         }
         self.base.realpath(path)

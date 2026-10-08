@@ -32,14 +32,28 @@ pub trait RawEmpty {
     fn raw_is_empty(&self) -> bool;
 }
 impl RawEmpty for RawValue {
+    /// Decided on the encoded value: whitespace between tokens is not part
+    /// of it, a string's content is, so `" "` is a value and `{ }` is not.
     fn raw_is_empty(&self) -> bool {
-        let trimmed: Vec<u8> = self
-            .0
-            .iter()
-            .copied()
-            .filter(|b| !matches!(b, b' ' | b'\t' | b'\r' | b'\n'))
-            .collect();
-        matches!(trimmed.as_slice(), b"" | b"null" | b"\"\"" | b"{}" | b"[]")
+        let mut decoder = Decoder::from_slice(&self.0);
+        match decoder.peek_kind() {
+            Kind::Null => true,
+            Kind::String => {
+                matches!(decoder.read_token(), Ok(Token::String(text)) if text.is_empty())
+            }
+            Kind::BeginObject => {
+                decoder.read_token().is_ok() && decoder.peek_kind() == Kind::EndObject
+            }
+            Kind::BeginArray => {
+                decoder.read_token().is_ok() && decoder.peek_kind() == Kind::EndArray
+            }
+            // An absent value, or no token at all.
+            Kind::Invalid => self
+                .0
+                .iter()
+                .all(|byte| matches!(byte, b' ' | b'\t' | b'\r' | b'\n')),
+            _ => false,
+        }
     }
 }
 impl<T: RawEmpty> RawEmpty for Option<T> {

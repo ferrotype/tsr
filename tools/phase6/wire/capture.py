@@ -26,6 +26,7 @@ import os
 from pathlib import Path
 import struct
 import subprocess
+import threading
 import sys
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -179,6 +180,28 @@ def async_script():
     ]
 
 
+def read_with_timeout(reader, stream, timeout):
+    """`reader(stream)` on a helper thread: a server that never answers
+    raises `TimeoutError` instead of blocking the probe forever (the caller
+    kills the server, which ends the blocked read)."""
+    outcome = {}
+
+    def work():
+        try:
+            outcome['value'] = reader(stream)
+        except BaseException as error:  # noqa: BLE001 - re-raised on the caller's thread
+            outcome['error'] = error
+
+    thread = threading.Thread(target=work, daemon=True)
+    thread.start()
+    thread.join(timeout)
+    if thread.is_alive():
+        raise TimeoutError(f'no reply within {timeout} s')
+    if 'error' in outcome:
+        raise outcome['error']
+    return outcome['value']
+
+
 def run_script(binary, protocol, cwd, timeout=30):
     args = [str(binary), '--api', '--cwd', str(cwd), '--timing']
     if protocol == 'async':
@@ -198,11 +221,19 @@ def run_script(binary, protocol, cwd, timeout=30):
                 break
             if expect_reply:
                 try:
-                    received = reader(process.stdout)
+                    received = read_with_timeout(reader, process.stdout, timeout)
                     step['received'] = received[-1].hex()
                 except (EOFError, ValueError) as error:
                     step['received'] = ''
                     step['error'] = str(error)
+                except TimeoutError as error:
+                    # The deadline covers the reply, not only the exit: a
+                    # silent server is recorded and killed, not waited for.
+                    step['received'] = ''
+                    step['error'] = str(error)
+                    steps.append(step)
+                    process.kill()
+                    break
             steps.append(step)
         try:
             process.stdin.close()

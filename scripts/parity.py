@@ -177,6 +177,11 @@ def run_variant(suite, runner, variant, local, timeout):
 
 def run(args):
     suite = args.suite
+    # The pinned client's getExePath reads one repository symlink, which the
+    # runner points at the binary under test before each file; parallel
+    # workers would point it at each other's binary.
+    if suite == "jsapi" and (args.jobs or 1) > 1:
+        sys.exit("jsapi runs one file at a time: --jobs must be 1")
     runner = runner_path(suite, args.runner)
     roster = list_variants(suite, runner) if not args.id or SUITES[suite].batch else None
     variants = args.id or roster
