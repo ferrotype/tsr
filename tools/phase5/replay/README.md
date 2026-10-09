@@ -70,8 +70,11 @@ the fixture, including after symlink resolution.
 
 Named normalization is limited to scratch root paths/URIs (including the pin's
 lowercase root on a verified case-insensitive filesystem), response correlation
-by session position, server request ids by stream position, and pushed diagnostics
-in order per document. Other notifications preserve stream order. Responses keep
+by session position, server request ids by stream position, pushed diagnostics
+in order per document, and the pin's exit race: after a final `exit`, its
+`window/logMessage` "error handling method 'exit': EOF" and its "context canceled"
+exit status 1 are accepted, because whether either appears depends on how its
+read, dispatch and write loops are scheduled. Other notifications preserve stream order. Responses keep
 full JSON including errors, array order, absent versus null, and nested ids.
 Comparison distinguishes booleans from numbers; JSON numeric values `1` and
 `1.0` are equivalent. Parsing rejects duplicate keys and nonfinite numbers,

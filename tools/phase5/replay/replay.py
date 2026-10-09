@@ -24,7 +24,24 @@ NORMALIZATIONS = {
     'client-request-id': 'Responses are correlated with the session position, not allocated ids.',
     'server-request-id': 'Server request ids are replaced with their ordinal within that stream.',
     'diagnostic-document-stream': 'Push diagnostics preserve order per URI; cross-document scheduling is independent.',
+    'pinned-exit-race': 'After a final exit, the pin\'s exit log and its "context canceled" exit status 1 are dropped.',
 }
+
+# The pin's exit handler returns io.EOF to stop the dispatch loop, which logs it
+# as "error handling method 'exit': EOF", and its read, dispatch and write loops
+# then race to stop (tsc/internal/lsp/server.go, Run and handleExit): the log
+# reaches the client only when the writer wins, and Run returns "context
+# canceled", which tsc/cmd/tsc/lsp.go turns into exit status 1, when dispatch
+# wins. Neither outcome is session traffic, so after a final exit both are
+# accepted; any other late traffic, stderr or status still fails.
+EXIT_LOG = "error handling method 'exit'"
+EXIT_RACE_STDERR = 'context canceled'
+
+
+def pinned_exit_log(message):
+    params = message.get('params')
+    return (message.get('method') == 'window/logMessage' and isinstance(params, dict)
+            and isinstance(params.get('message'), str) and params['message'].startswith(EXIT_LOG))
 
 
 def substitute(value, replacements):
@@ -327,7 +344,9 @@ def run(session, command, output, encoding='utf-16', fixture_root=None):
                     if wait['after'] == position:
                         peer.await_notification(wait['method'], wait['params'], wait['count'], replacements=root_replacements(cwd))
             peer.process.stdin.close()
-            if peer.process.wait(timeout=20) != 0:
+            exited = bool(steps) and steps[-1]['kind'] == 'notification' and steps[-1]['method'] == 'exit'
+            status = peer.process.wait(timeout=20)
+            if status != 0 and not (exited and status == 1 and peer.stderr_text().strip() == EXIT_RACE_STDERR):
                 raise RuntimeError(peer.stderr_text())
             # EOF is a reader sentinel, not server traffic. Drain all frames emitted before exit.
             peer.thread.join(timeout=2)
@@ -343,6 +362,8 @@ def run(session, command, output, encoding='utf-16', fixture_root=None):
                     raise ValueError(f'Unsolicited response after exit: {message!r}')
                 if 'id' in message:
                     raise ValueError(f'Unanswered server request after exit: {message!r}')
+                if exited and pinned_exit_log(message):
+                    continue
                 peer.respond(message)
         finally:
             try:
