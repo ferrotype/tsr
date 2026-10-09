@@ -19,7 +19,7 @@ A port of TypeScript 7's Go compiler (Corsa) that passes the pin's own test suit
 
 ## What it is
 
-TypeScript 7 moved its compiler to Go (microsoft/TypeScript, module `tsc/`). `tsr` ports that compiler to Rust and holds it to one pinned upstream commit, a submodule under `upstream/`, which supplies the test cases, the baselines, the lib files, the schemas and the clients. Every suite the pin runs against its Go binary runs in CI against the Rust one; `status/parity/<suite>.json` names every sub-test that differs, with a reason, and CI fails when that set changes.
+TypeScript 7 moved its compiler to Go (microsoft/TypeScript, module `tsc/`). `tsr` ports that compiler to Rust and holds it to one pinned upstream commit, a submodule under `upstream/`, which supplies the test cases, the baselines, the lib files, the schemas and the clients. The seven acceptance suites listed below run in CI against Rust; `status/parity/<suite>.json` names every sub-test that differs, with a reason, and CI fails when that set changes. Direct internal-test ports and remaining coverage work are tracked separately.
 
 What you get:
 
@@ -39,7 +39,7 @@ Phases are sequenced by dependency, not by calendar (ADR 0005); each closes when
 | 2 | The checker | Done ([records](docs/PHASE2-C7.md)) |
 | 3 | Emit: transformers, printer, source maps, declaration emit, transpile | Done ([record](docs/PHASE3-T8.md)) |
 | 4 | Programs, command line, build orchestrator, watcher, watch mode, tracing: `tsrust` | Done ([record](docs/PHASE4-X6.md)) |
-| 5 | Language service, project system, LSP server | Done ([record](docs/PHASE5-L7.md)) |
+| 5 | Language service, project system, LSP server | L7 complete; L8 test/ledger closure remains ([plan](docs/PHASE5-plan.md)) |
 | 6 | JS API server | Done ([record](docs/PHASE6-A5.md)) |
 | 7 | Hardening, performance acceptance, WebAssembly and embedding acceptance, release and cut-over | Proposed ([plan](docs/PHASE7-plan.md)) |
 
@@ -55,7 +55,7 @@ Phases are sequenced by dependency, not by calendar (ADR 0005); each closes when
 | `lsp` (the pin's LSP and project suites) | 13 | 0 | 0 |
 | `jsapi` (the pin's synchronous and asynchronous client suites, 706 cases) | 12 | 0 | 0 |
 
-The two approved `tsc` entries are trace-event order in `generateTrace` output; everything else the pin checks, the Rust binary produces byte for byte.
+The two approved `tsc` entries are trace-event order in `generateTrace` output. The other required comparisons and assertions in these suites pass. Counts are enumerated variants/tests, not a claim that native-skipped tests executed; the fourslash denominator uses tests the pinned server actually runs. This is suite parity, not complete coverage of every upstream operation.
 
 **Performance** (`status/perf/`, Rust over Go on the owner's host, 2026-10-08):
 
@@ -63,10 +63,11 @@ The two approved `tsc` entries are trace-event order in `generateTrace` output; 
 |---|---:|
 | Parse and bind of the VS Code tree, one worker / eight workers | 1.10 / 1.26 |
 | Parse and bind, peak memory | 0.67 |
+| Parse and bind, allocated bytes | 0.874 (current limit 0.85) |
 | Checker query workload, elapsed / per-type memory | 1.63 / 0.81 |
 | LSP: first diagnostics, completion, hover, references, rename | 1.26, 2.33, 1.82, 1.55, 1.30 |
 
-The targets are 1.0 for every time ratio and 0.70 for memory, on the five TypeScript benchmarking scenarios at 2, 4 and 8 checkers; reaching them, or deciding otherwise with the attribution in hand, is Phase 7's.
+The checker capture reports a busy host; its timing is an observation, not a quiet-host acceptance result. Existing workload limits remain in [thresholds.toml](status/perf/thresholds.toml). The separate Phase 7 targets are 1.0 elapsed and 0.70 peak memory on each of the five TypeScript benchmarking scenarios at 2, 4 and 8 checkers. Those full-program scenarios have not been measured yet; the query and parse-bind slices do not establish their results.
 
 **Port coverage:** 8,464 of the pin's 11,485 functions carry a `// port:` marker to their Rust counterpart (73.7%), and 219 of 456 files are ported whole; the language service and project system pass their suites with the fewest markers. `cargo xtask validate` rejects a marker that names nothing in the pinned inventory; the [status page](https://ferrotype.github.io/tsr/) breaks coverage down by package.
 
@@ -94,9 +95,9 @@ cargo build --release -p tsrust --bin tsrust
 ./target/release/tsrust --lsp --stdio
 ```
 
-Targets: macOS arm64 and x64, Linux x64 and arm64 (glibc 2.28 or newer). CI runs the suites on macOS arm64 and Linux x64 today; the other two builds return in Phase 7.
+Release targets: macOS arm64 and x64, Linux x64 and arm64, with a glibc 2.28 floor for Linux. CI runs the suites on macOS arm64 and Linux x64 today; the other two targets and verification on the glibc floor remain Phase 7 acceptance work.
 
-Libraries: `tsr` on crates.io re-exports every library crate as a module (`tsr::parser`, `tsr::checker`); `tsr_embed` is the embedding API with an in-memory host; `tsr_wasm` the bare WebAssembly build. Their full-corpus acceptance is Phase 7's; until then they are what the S10 record describes.
+Libraries: the `tsr` facade re-exports core compiler libraries as modules (`tsr::parser`, `tsr::checker`); `tsr_embed` is the embedding API with an in-memory host, and `tsr_wasm` is the separate bare WebAssembly build. Their full-corpus acceptance remains Phase 7 work; until then their coverage is the scope recorded in S10.
 
 ## Repository map
 
