@@ -35,9 +35,9 @@ pub(crate) fn system() -> Arc<dyn Clock> {
     Arc::new(SystemClock)
 }
 
-#[cfg(test)]
+#[cfg(any(test, feature = "test-support"))]
 pub(crate) mod manual {
-    use super::*;
+    use super::{Arc, Clock, Duration, Instant, Timer};
     use std::{collections::BTreeMap, sync::Mutex};
     type Task = Box<dyn FnOnce() + Send>;
     struct State {
@@ -54,6 +54,7 @@ pub(crate) mod manual {
                 tasks: BTreeMap::new(),
             }))))
         }
+        #[cfg(test)]
         pub(crate) fn advance(&self, duration: Duration) {
             self.0.lock().unwrap().now += duration;
             loop {

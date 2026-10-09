@@ -28,6 +28,9 @@ tsr_json = { version = "0.3.0", path = "../tsr_json" }
 tsr_lsproto = { version = "0.3.0", path = "../tsr_lsproto" }
 tsr_tsoptions = { version = "0.3.0", path = "../tsr_tsoptions" }
 
+[dev-dependencies]
+tsr_project = { version = "0.3.0", path = "../tsr_project", features = ["test-support"] }
+
 [[bin]]
 name = "phase5_testserver"
 path = "src/bin/phase5_testserver.rs"
