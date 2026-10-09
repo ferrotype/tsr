@@ -225,6 +225,26 @@ impl Session {
             crate::clock::system(),
         )
     }
+    /// A harness session whose background timers never advance. Explicit
+    /// snapshot requests still consume pending changes through the normal path.
+    #[cfg(feature = "test-support")]
+    #[doc(hidden)]
+    pub fn with_frozen_clock(
+        options: SessionOptions,
+        fs: Arc<dyn FileSystem>,
+        counters: &Counters,
+        parse_cache: Arc<ParseCache>,
+        mapped_parse_cache: Arc<ContentMappedParseCache>,
+    ) -> Arc<Self> {
+        Self::with_clock(
+            options,
+            fs,
+            counters,
+            parse_cache,
+            mapped_parse_cache,
+            crate::clock::manual::ManualClock::new(),
+        )
+    }
     fn with_clock(
         options: SessionOptions,
         fs: Arc<dyn FileSystem>,

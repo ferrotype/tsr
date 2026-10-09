@@ -12,6 +12,10 @@ categories.workspace = true
 readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
+[features]
+# Downstream harness tests can inspect queued changes without racing wall time.
+test-support = []
+
 [dependencies]
 tsr_autoimport = { version = "0.4.0", path = "../tsr_autoimport" }
 tsr_ipc = { version = "0.4.0", path = "../tsr_ipc" }
