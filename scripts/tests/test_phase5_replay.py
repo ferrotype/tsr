@@ -119,6 +119,67 @@ while True:
             self.assertEqual(actual['server_notifications'][0]['params']['ordered'], [2, 1])
             self.assertTrue((base / 'output/raw.json').is_file())
 
+    def replay_with_stop(self, base, stop, steps=None):
+        """Replay shutdown then exit against a fake server whose behavior at
+        exit (or stdin EOF) is the given Python body."""
+        import sys
+        fixture = base / 'fixture'
+        fixture.mkdir(exist_ok=True)
+        server = base / 'server.py'
+        server.write_text('import json, sys\n'
+                          'def emit(value):\n'
+                          '    body = json.dumps({"jsonrpc": "2.0", **value}).encode()\n'
+                          '    sys.stdout.buffer.write(f"Content-Length: {len(body)}\\r\\n\\r\\n".encode() + body)\n'
+                          '    sys.stdout.buffer.flush()\n'
+                          'def stop():\n' + ''.join(f'    {line}\n' for line in stop) +
+                          'while True:\n'
+                          '    headers = {}\n'
+                          '    while True:\n'
+                          '        line = sys.stdin.buffer.readline()\n'
+                          '        if not line:\n'
+                          '            stop()\n'
+                          '        if line == b"\\r\\n":\n'
+                          '            break\n'
+                          '        key, value = line.decode().split(":", 1)\n'
+                          '        headers[key.lower()] = value.strip()\n'
+                          '    message = json.loads(sys.stdin.buffer.read(int(headers["content-length"])))\n'
+                          '    if message.get("method") == "exit":\n'
+                          '        stop()\n'
+                          '    if "id" in message:\n'
+                          '        emit({"id": message["id"], "result": None})\n')
+        steps = steps or [{'kind': 'request', 'method': 'shutdown', 'params': None}, {'kind': 'notification', 'method': 'exit'}]
+        session = base / 'session.jsonl'
+        session.write_text('\n'.join(json.dumps(row) for row in [{'fixture': 'unused'}, *steps]))
+        return replay.run(session, [sys.executable, str(server)], base / 'output', fixture_root=fixture)
+
+    def exit_log(self, message):
+        return 'emit({"method": "window/logMessage", "params": {"type": 1, "message": %s}})' % json.dumps(message)
+
+    def test_pinned_exit_race_is_not_session_traffic(self):
+        with tempfile.TemporaryDirectory() as clean, tempfile.TemporaryDirectory() as raced:
+            expected = self.replay_with_stop(Path(clean), ['sys.exit(0)'])
+            actual = self.replay_with_stop(Path(raced), [
+                self.exit_log("error handling method 'exit': EOF"),
+                'sys.stderr.write("context canceled\\n")', 'sys.exit(1)'])
+            self.assertEqual(actual['server_notifications'], [])
+            self.assertEqual(actual, expected)
+
+    def test_other_exit_traffic_and_failures_still_count(self):
+        with tempfile.TemporaryDirectory() as directory:
+            actual = self.replay_with_stop(Path(directory), [self.exit_log('unexpected'), 'sys.exit(0)'])
+            self.assertEqual(actual['server_notifications'][0]['params']['message'], 'unexpected')
+        failures = [
+            (['sys.stderr.write("panic\\n")', 'sys.exit(1)'], None),
+            (['sys.stderr.write("context canceled\\n")', 'sys.exit(2)'], None),
+            # Without a final exit, "context canceled" is a real failure.
+            (['sys.stderr.write("context canceled\\n")', 'sys.exit(1)'],
+             [{'kind': 'request', 'method': 'shutdown', 'params': None}]),
+        ]
+        for stop, steps in failures:
+            with self.subTest(stop=stop, steps=steps), tempfile.TemporaryDirectory() as directory:
+                with self.assertRaises(RuntimeError):
+                    self.replay_with_stop(Path(directory), stop, steps)
+
     def test_mutations_are_scheduled_and_confined(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory).resolve()
