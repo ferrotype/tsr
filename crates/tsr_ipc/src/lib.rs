@@ -18,9 +18,9 @@ pub use timing::{
     server_timing_snapshot, ServerTimingInfo, TimingCollector, METHOD_GET_SERVER_TIMING,
     METHOD_RESET_SERVER_TIMING,
 };
-pub use transport::{
-    generate_pipe_path, pipe, stdio, Closer, PipeTransport, StdioTransport, Stream, Transport,
-};
+#[cfg(unix)]
+pub use transport::PipeTransport;
+pub use transport::{generate_pipe_path, pipe, stdio, Closer, StdioTransport, Stream, Transport};
 
 /// The pinned `ipc.Message`, a raw JSON-RPC message.
 pub type Message = tsr_jsonrpc::Message;

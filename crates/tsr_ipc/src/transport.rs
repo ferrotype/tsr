@@ -144,12 +144,16 @@ pub trait Transport: Send {
 }
 
 /// A Unix-domain socket listener, the pin's `PipeTransport` of
-/// tsc/internal/ipc/transport.go (its Windows named pipe is not built).
+/// tsc/internal/ipc/transport.go (its Windows named pipe is not built). It
+/// exists on Unix only, so the libraries still build for wasm32.
+#[cfg(unix)]
 pub struct PipeTransport {
     listener: Option<std::os::unix::net::UnixListener>,
     path: std::path::PathBuf,
 }
+#[cfg(unix)]
 struct SocketCloser(std::os::unix::net::UnixStream);
+#[cfg(unix)]
 impl Closer for SocketCloser {
     fn close(&self) -> io::Result<()> {
         match self.0.shutdown(std::net::Shutdown::Both) {
@@ -158,6 +162,7 @@ impl Closer for SocketCloser {
         }
     }
 }
+#[cfg(unix)]
 impl PipeTransport {
     /// Listens at `path`, removing a stale socket file first.
     /// port: tsc/internal/ipc/transport_unix.go:newPipeListener
@@ -176,6 +181,7 @@ impl PipeTransport {
         &self.path
     }
 }
+#[cfg(unix)]
 impl Stream {
     /// Both directions of a connected Unix-domain socket; closing shuts it down.
     pub fn from_unix(socket: std::os::unix::net::UnixStream) -> io::Result<Self> {
@@ -187,6 +193,7 @@ impl Stream {
     }
 }
 
+#[cfg(unix)]
 impl Transport for PipeTransport {
     /// port: tsc/internal/ipc/transport.go:PipeTransport.Accept
     fn accept(&mut self) -> io::Result<Stream> {
@@ -208,6 +215,7 @@ impl Transport for PipeTransport {
 
 /// A listener dropped without `close` (an early return after a failed
 /// accept) still removes its socket file, as the pin's deferred `Close`.
+#[cfg(unix)]
 impl Drop for PipeTransport {
     fn drop(&mut self) {
         let _ = Transport::close(self);
