@@ -1,6 +1,10 @@
 # Phase 6: JS API server
 
-Status: **detailed plan, proposed** (2026-10-07). The owner accepted the
+Status: **complete** (2026-10-08): A0 to A5 merged into `main` (#105 to
+#111, review fixes #110 and #113), `jsapi` 706/706 with no approved entry,
+the panic witness in CI; what Phase 7 inherits is in section 9 and in
+[docs/PHASE7-plan.md](PHASE7-plan.md). The plan text below is as accepted.
+The owner accepted the
 decisions of section 8 on 2026-10-07; this revision adds the work items,
 witnesses and exit checks of each checkpoint and incorporates Astra's
 read-only review of the same day (handle identity aligned with the symbols

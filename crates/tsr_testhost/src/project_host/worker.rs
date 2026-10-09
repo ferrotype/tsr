@@ -509,7 +509,27 @@ mod tests {
     fn state_observation_does_not_flush_pending_edits_or_closes() {
         let mut worker = Worker::new();
         let fs = host("declare const shared: number;");
-        initialize(&mut worker, &fs, PositionEncoding::Utf16, false, false);
+        // Closing schedules a zero-delay background update. Freeze its clock
+        // so these assertions distinguish observation from an explicit flush,
+        // rather than racing the legitimate timer-driven publication.
+        let session = Session::with_frozen_clock(
+            SessionOptions::default(),
+            fs.clone(),
+            &worker.counters,
+            worker.cache.clone(),
+            worker.mapped_cache.clone(),
+        );
+        session
+            .apply_inferred_options(
+                CompilerOptions {
+                    no_lib: Tristate::TRUE,
+                    module_detection: ModuleDetectionKind::LEGACY,
+                    ..Default::default()
+                },
+                fs.clone(),
+            )
+            .unwrap();
+        worker.server = Some(Server::new(session));
         open(&mut worker, &fs, "/main.ts");
         let before = worker.run(Action::PublishedState, fs.clone()).unwrap();
         let published = worker
