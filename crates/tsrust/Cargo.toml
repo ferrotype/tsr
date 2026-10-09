@@ -1,6 +1,6 @@
 [package]
 name = "tsrust"
-version = "0.3.0"
+version = "0.4.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -21,20 +21,20 @@ path = "src/main.rs"
 system-allocator = []
 
 [dependencies]
-tsr_json = { version = "0.3.0", path = "../tsr_json" }
-tsr_lsproto = { version = "0.3.0", path = "../tsr_lsproto" }
-tsr_project = { version = "0.3.0", path = "../tsr_project" }
-tsr_lsp = { version = "0.3.0", path = "../tsr_lsp" }
-tsr_api = { version = "0.3.0", path = "../tsr_api" }
-tsr_execute = { version = "0.3.0", path = "../tsr_execute" }
-tsr_tsc = { version = "0.3.0", path = "../tsr_tsc" }
-tsr_core = { version = "0.3.0", path = "../tsr_core" }
-tsr_bundled = { version = "0.3.0", path = "../tsr_bundled" }
-tsr_contentmapper = { version = "0.3.0", path = "../tsr_contentmapper" }
-tsr_ipc = { version = "0.3.0", path = "../tsr_ipc" }
-tsr_jsstring = { version = "0.3.0", path = "../tsr_jsstring" }
-tsr_vfs = { version = "0.3.0", path = "../tsr_vfs" }
-tsr_tspath = { version = "0.3.0", path = "../tsr_tspath" }
+tsr_json = { version = "0.4.0", path = "../tsr_json" }
+tsr_lsproto = { version = "0.4.0", path = "../tsr_lsproto" }
+tsr_project = { version = "0.4.0", path = "../tsr_project" }
+tsr_lsp = { version = "0.4.0", path = "../tsr_lsp" }
+tsr_api = { version = "0.4.0", path = "../tsr_api" }
+tsr_execute = { version = "0.4.0", path = "../tsr_execute" }
+tsr_tsc = { version = "0.4.0", path = "../tsr_tsc" }
+tsr_core = { version = "0.4.0", path = "../tsr_core" }
+tsr_bundled = { version = "0.4.0", path = "../tsr_bundled" }
+tsr_contentmapper = { version = "0.4.0", path = "../tsr_contentmapper" }
+tsr_ipc = { version = "0.4.0", path = "../tsr_ipc" }
+tsr_jsstring = { version = "0.4.0", path = "../tsr_jsstring" }
+tsr_vfs = { version = "0.4.0", path = "../tsr_vfs" }
+tsr_tspath = { version = "0.4.0", path = "../tsr_tspath" }
 # ADR 0017: the allocator the benchmark binary uses; the counters above it feed --diagnostics.
 mimalloc = "=0.1.48"
 

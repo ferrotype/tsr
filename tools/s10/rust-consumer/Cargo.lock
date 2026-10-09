@@ -361,7 +361,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_arena"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "hashbrown",
  "tsr_jsstring",
@@ -369,7 +369,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_ast"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "hashbrown",
  "stacker",
@@ -384,7 +384,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_astnav"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "tsr_arena",
  "tsr_ast",
@@ -393,7 +393,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_binder"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "stacker",
  "tsr_arena",
@@ -407,7 +407,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_bundled"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "tsr_jsstring",
  "tsr_vfs",
@@ -415,7 +415,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_checker"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "hashbrown",
  "stacker",
@@ -440,7 +440,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_compiler"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "stacker",
  "tsr_arena",
@@ -466,7 +466,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_contentmapper"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "tsr_arena",
  "tsr_ast",
@@ -485,7 +485,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_contentmappertest"
-version = "0.1.0"
+version = "0.4.0"
 dependencies = [
  "tsr_ast",
  "tsr_contentmapper",
@@ -498,14 +498,14 @@ dependencies = [
 
 [[package]]
 name = "tsr_core"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "tsr_jsstring",
 ]
 
 [[package]]
 name = "tsr_diagnostics"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "tsr_core",
  "tsr_json",
@@ -514,7 +514,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_embed"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "tsr_arena",
  "tsr_ast",
@@ -529,7 +529,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_encoder"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "tsr_arena",
  "tsr_ast",
@@ -539,14 +539,14 @@ dependencies = [
 
 [[package]]
 name = "tsr_glob"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "tsr_jsstring",
 ]
 
 [[package]]
 name = "tsr_ipc"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "tsr_json",
  "tsr_jsonrpc",
@@ -554,7 +554,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_jsnum"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "num-bigint",
  "num-traits",
@@ -564,7 +564,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_json"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "stacker",
  "tsr_core",
@@ -574,7 +574,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_jsonrpc"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "tsr_json",
  "tsr_jsstring",
@@ -582,15 +582,15 @@ dependencies = [
 
 [[package]]
 name = "tsr_jsstring"
-version = "0.3.0"
+version = "0.4.0"
 
 [[package]]
 name = "tsr_locale"
-version = "0.3.0"
+version = "0.4.0"
 
 [[package]]
 name = "tsr_module"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "serde",
  "serde_json",
@@ -606,14 +606,14 @@ dependencies = [
 
 [[package]]
 name = "tsr_nodebuilder"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "tsr_ast",
 ]
 
 [[package]]
 name = "tsr_parser"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "stacker",
  "tsr_arena",
@@ -627,7 +627,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_printer"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "hashbrown",
  "stacker",
@@ -644,7 +644,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_pseudochecker"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "stacker",
  "tsr_arena",
@@ -653,7 +653,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_scanner"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "stacker",
  "tsr_arena",
@@ -666,14 +666,14 @@ dependencies = [
 
 [[package]]
 name = "tsr_semver"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "tsr_jsstring",
 ]
 
 [[package]]
 name = "tsr_sourcemap"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "hashbrown",
  "tsr_arena",
@@ -685,7 +685,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_transformers"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "stacker",
  "tsr_arena",
@@ -703,7 +703,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_tsoptions"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "serde_json",
  "stacker",
@@ -724,7 +724,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_tspath"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "tsr_core",
  "tsr_jsstring",
@@ -732,7 +732,7 @@ dependencies = [
 
 [[package]]
 name = "tsr_vfs"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "rustix",
  "tsr_core",

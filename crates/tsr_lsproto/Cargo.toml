@@ -1,6 +1,6 @@
 [package]
 name = "tsr_lsproto"
-version = "0.3.0"
+version = "0.4.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -13,10 +13,10 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
-tsr_json = { version = "0.3.0", path = "../tsr_json" }
-tsr_jsonrpc = { version = "0.3.0", path = "../tsr_jsonrpc" }
-tsr_jsstring = { version = "0.3.0", path = "../tsr_jsstring" }
-tsr_tspath = { version = "0.3.0", path = "../tsr_tspath" }
+tsr_json = { version = "0.4.0", path = "../tsr_json" }
+tsr_jsonrpc = { version = "0.4.0", path = "../tsr_jsonrpc" }
+tsr_jsstring = { version = "0.4.0", path = "../tsr_jsstring" }
+tsr_tspath = { version = "0.4.0", path = "../tsr_tspath" }
 
 [lints]
 workspace = true

@@ -1,6 +1,6 @@
 [package]
 name = "tsr_tracing"
-version = "0.3.0"
+version = "0.4.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -13,11 +13,11 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
-tsr_checker = { version = "0.3.0", path = "../tsr_checker" }
-tsr_json = { version = "0.3.0", path = "../tsr_json" }
-tsr_jsstring = { version = "0.3.0", path = "../tsr_jsstring" }
-tsr_tspath = { version = "0.3.0", path = "../tsr_tspath" }
-tsr_vfs = { version = "0.3.0", path = "../tsr_vfs" }
+tsr_checker = { version = "0.4.0", path = "../tsr_checker" }
+tsr_json = { version = "0.4.0", path = "../tsr_json" }
+tsr_jsstring = { version = "0.4.0", path = "../tsr_jsstring" }
+tsr_tspath = { version = "0.4.0", path = "../tsr_tspath" }
+tsr_vfs = { version = "0.4.0", path = "../tsr_vfs" }
 xxhash-rust = { version = "=0.8.18", features = ["xxh3"] }
 
 [lints]

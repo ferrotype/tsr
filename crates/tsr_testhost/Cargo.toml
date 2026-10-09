@@ -1,35 +1,35 @@
 [package]
 name = "tsr_testhost"
-version = "0.3.0"
+version = "0.4.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish.workspace = true
 
 [dependencies]
-tsr_contentmapper = { version = "0.3.0", path = "../tsr_contentmapper" }
-tsr_ipc = { version = "0.3.0", path = "../tsr_ipc" }
+tsr_contentmapper = { version = "0.4.0", path = "../tsr_contentmapper" }
+tsr_ipc = { version = "0.4.0", path = "../tsr_ipc" }
 base64 = "0.22.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["raw_value"] }
-tsr_vfs = { version = "0.3.0", path = "../tsr_vfs" }
-tsr_jsstring = { version = "0.3.0", path = "../tsr_jsstring" }
+tsr_vfs = { version = "0.4.0", path = "../tsr_vfs" }
+tsr_jsstring = { version = "0.4.0", path = "../tsr_jsstring" }
 
-tsr_tspath = { version = "0.3.0", path = "../tsr_tspath" }
+tsr_tspath = { version = "0.4.0", path = "../tsr_tspath" }
 
-tsr_lsp = { version = "0.3.0", path = "../tsr_lsp" }
-tsr_project = { version = "0.3.0", path = "../tsr_project" }
-tsr_api = { version = "0.3.0", path = "../tsr_api", features = ["fault-injection"] }
-tsr_bundled = { version = "0.3.0", path = "../tsr_bundled" }
-tsr_arena = { version = "0.3.0", path = "../tsr_arena" }
-tsr_compiler = { version = "0.3.0", path = "../tsr_compiler" }
-tsr_core = { version = "0.3.0", path = "../tsr_core" }
-tsr_json = { version = "0.3.0", path = "../tsr_json" }
-tsr_lsproto = { version = "0.3.0", path = "../tsr_lsproto" }
-tsr_tsoptions = { version = "0.3.0", path = "../tsr_tsoptions" }
+tsr_lsp = { version = "0.4.0", path = "../tsr_lsp" }
+tsr_project = { version = "0.4.0", path = "../tsr_project" }
+tsr_api = { version = "0.4.0", path = "../tsr_api", features = ["fault-injection"] }
+tsr_bundled = { version = "0.4.0", path = "../tsr_bundled" }
+tsr_arena = { version = "0.4.0", path = "../tsr_arena" }
+tsr_compiler = { version = "0.4.0", path = "../tsr_compiler" }
+tsr_core = { version = "0.4.0", path = "../tsr_core" }
+tsr_json = { version = "0.4.0", path = "../tsr_json" }
+tsr_lsproto = { version = "0.4.0", path = "../tsr_lsproto" }
+tsr_tsoptions = { version = "0.4.0", path = "../tsr_tsoptions" }
 
 [dev-dependencies]
-tsr_project = { version = "0.3.0", path = "../tsr_project", features = ["test-support"] }
+tsr_project = { version = "0.4.0", path = "../tsr_project", features = ["test-support"] }
 
 [[bin]]
 name = "phase5_testserver"
